@@ -26,7 +26,7 @@ namespace AlphaTab.Test.Importer
         internal Gp3To5Importer PrepareImporterWithBytes(byte[] buffer)
         {
             var readerBase = new Gp3To5Importer();
-            readerBase.Init(ByteBuffer.FromBuffer(buffer));
+            readerBase.Init(ByteBuffer.FromBuffer(buffer), new Settings());
             return readerBase;
         }
 
@@ -532,8 +532,8 @@ namespace AlphaTab.Test.Importer
                 throw new ArgumentNullException(nameof(caller), "svg rendering failed because caller info was missing");
             }
 #if !PHASE
-            var settings = Settings.Defaults;
-            settings.Engine = "svg";
+            var settings = new Settings();
+            settings.Core.Engine = "svg";
             var renderer = new ScoreRenderer(settings);
             for (var i = 0; i < score.Tracks.Count; i++)
             {

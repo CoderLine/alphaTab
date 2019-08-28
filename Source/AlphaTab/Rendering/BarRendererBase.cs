@@ -58,14 +58,14 @@ namespace AlphaTab.Rendering
         public Bar Bar { get; set; }
 
         /// <summary>
-        /// Gets or sets whether this renderer is linked to the next one 
+        /// Gets or sets whether this renderer is linked to the next one
         /// by some glyphs like a vibrato effect
         /// </summary>
         public bool IsLinkedToPrevious { get; set; }
 
         /// <summary>
         /// Gets or sets whether this renderer can wrap to the next line
-        /// or it needs to stay connected to the previous one. 
+        /// or it needs to stay connected to the previous one.
         /// (e.g. when having double bar repeats we must not separate the 2 bars)
         /// </summary>
         public bool CanWrap { get; set; }
@@ -110,7 +110,7 @@ namespace AlphaTab.Rendering
             Width = width;
         }
 
-        public RenderingResources Resources => Settings.RenderingResources;
+        public RenderingResources Resources => Settings.Display.RenderingResources;
 
         public ScoreRenderer ScoreRenderer
         {
@@ -120,7 +120,7 @@ namespace AlphaTab.Rendering
 
         public Settings Settings => ScoreRenderer.Settings;
 
-        public float Scale => Settings.Scale;
+        public float Scale => Settings.Display.Scale;
 
         private bool _wasFirstOfLine;
         public bool IsFirstOfLine => Index == 0;
@@ -196,7 +196,7 @@ namespace AlphaTab.Rendering
         }
 
         /// <summary>
-        /// Gets the top padding for the main content of the renderer. 
+        /// Gets the top padding for the main content of the renderer.
         /// Can be used to specify where i.E. the score lines of the notation start.
         /// </summary>
         /// <returns></returns>
@@ -207,7 +207,7 @@ namespace AlphaTab.Rendering
         }
 
         /// <summary>
-        /// Gets the bottom padding for the main content of the renderer. 
+        /// Gets the bottom padding for the main content of the renderer.
         /// Can be used to specify where i.E. the score lines of the notation end.
         /// </summary>
         public float BottomPadding
@@ -499,17 +499,17 @@ namespace AlphaTab.Rendering
         PreNotes,
 
         /// <summary>
-        /// Gets the on-notes position which is located after the accidentals but before the note heads. 
+        /// Gets the on-notes position which is located after the accidentals but before the note heads.
         /// </summary>
         OnNotes,
 
         /// <summary>
-        /// Gets the middel-notes position which is located after in the middle the note heads. 
+        /// Gets the middel-notes position which is located after in the middle the note heads.
         /// </summary>
         MiddleNotes,
 
         /// <summary>
-        /// Get the post-notes position which is located at after the note heads. 
+        /// Get the post-notes position which is located at after the note heads.
         /// </summary>
         PostNotes,
 

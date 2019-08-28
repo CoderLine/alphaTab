@@ -21,14 +21,14 @@ namespace AlphaTab.Platform.JavaScript
             _api = api;
             try
             {
-                _worker = new Worker(settings.ScriptFile);
+                _worker = new Worker(settings.Core.ScriptFile);
             }
             catch
             {
                 // fallback to blob worker
                 try
                 {
-                    HaxeString script = "importScripts('" + settings.ScriptFile + "')";
+                    HaxeString script = "importScripts('" + settings.Core.ScriptFile + "')";
                     var blob = new Blob(new[]
                     {
                         script

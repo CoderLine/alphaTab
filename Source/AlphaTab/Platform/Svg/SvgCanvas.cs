@@ -175,7 +175,7 @@ namespace AlphaTab.Platform.Svg
             }
 
             var s = "<text x=\"" + (int)x + "\" y=\"" + (int)y + "\" style=\"stroke: none; font:" +
-                    Font.ToCssString(Settings.Scale) + "\" "
+                    Font.ToCssString(Settings.Display.Scale) + "\" "
                     + " dominant-baseline=\"" + GetSvgBaseLine() + "\"";
             if (Color.Rgba != Color.BlackRgb)
             {

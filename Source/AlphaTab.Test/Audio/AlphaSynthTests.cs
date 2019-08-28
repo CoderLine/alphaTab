@@ -24,7 +24,7 @@ namespace AlphaTab.Test.Audio
                           " (0.4 0.3).8 r.8(3.4 3.3).8 r.8(5.4 5.3).4 r.8(3.4 3.3).8 | " +
                           "r.8(0.4 0.3).8(-.3 - .4).2 { d } | ";
                 var importer = new AlphaTexImporter();
-                importer.Init(TestPlatform.CreateStringReader(tex));
+                importer.Init(TestPlatform.CreateStringReader(tex), new Settings());
                 var score = importer.ReadScore();
 
                 var midi = new MidiFile();

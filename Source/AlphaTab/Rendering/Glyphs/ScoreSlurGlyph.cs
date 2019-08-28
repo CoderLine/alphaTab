@@ -12,7 +12,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override float GetTieHeight(float startX, float startY, float endX, float endY)
         {
-            return (float)Math.Log(endX - startX + 1) * Renderer.Settings.SlurHeight;
+            return (float)Math.Log(endX - startX + 1) * Renderer.Settings.Notation.SlurHeight;
         }
     }
 }

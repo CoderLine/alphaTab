@@ -13,7 +13,10 @@ namespace AlphaTab.Rendering.Effects
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
-            if (beat.Voice.Index != 0 || beat.IsRest || settings.FingeringMode != FingeringMode.SingleNoteEffectBand)
+            if (beat.Voice.Index != 0 ||
+                beat.IsRest ||
+                settings.Notation.FingeringMode != FingeringMode.SingleNoteEffectBand ||
+                settings.Notation.FingeringMode != FingeringMode.SingleNoteEffectBandForcePiano)
             {
                 return false;
             }

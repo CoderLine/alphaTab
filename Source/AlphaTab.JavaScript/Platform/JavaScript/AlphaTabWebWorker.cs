@@ -31,8 +31,9 @@ namespace AlphaTab.Platform.JavaScript
             switch (cmd)
             {
                 case "alphaTab.initialize":
-                    Settings settings = Settings.FromJson(data.settings, null);
-                    Logger.LogLevel = settings.LogLevel;
+                    var settings = new Settings();
+                    settings.LoadFromJson(data.settings);
+                    Logger.LogLevel = settings.Core.LogLevel;
                     _renderer = new ScoreRenderer(settings);
                     _renderer.PartialRenderFinished += result => _main.PostMessage(new
                     {
@@ -75,9 +76,11 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        private void UpdateSettings(object settings)
+        private void UpdateSettings(object json)
         {
-            _renderer.UpdateSettings(Settings.FromJson(settings, null));
+            var settings = new Settings();
+            settings.LoadFromJson(json);
+            _renderer.UpdateSettings(settings);
         }
 
         private void RenderMultiple(Score score, int[] trackIndexes)

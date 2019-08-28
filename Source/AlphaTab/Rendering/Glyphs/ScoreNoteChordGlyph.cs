@@ -133,7 +133,7 @@ namespace AlphaTab.Rendering.Glyphs
                 effectY += effectSpacing;
             }
 
-            if (Renderer.Settings.IncludeNoteBounds)
+            if (Renderer.Settings.Core.IncludeNoteBounds)
             {
                 foreach (var note in _notes)
                 {

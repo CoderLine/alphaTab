@@ -22,8 +22,8 @@ namespace AlphaTab.Samples.PngDump
             var score = ScoreLoader.LoadScoreFromBytes(File.ReadAllBytes(args[0]));
 
             // render score with svg engine and desired rendering width
-            var settings = Settings.Defaults;
-            settings.Engine = "skia";
+            var settings = new Settings();
+            settings.Core.Engine = "skia";
             var renderer = new ScoreRenderer(settings);
             renderer.Width = 970;
 

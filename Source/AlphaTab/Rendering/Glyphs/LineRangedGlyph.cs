@@ -20,7 +20,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            if (Renderer.Settings.ExtendLineEffectsToBeatEnd)
+            if (Renderer.Settings.Notation.ExtendLineEffectsToBeatEnd)
             {
                 EndPosition = BeatXPosition.EndBeat;
                 ForceGroupedRendering = true;

@@ -74,14 +74,14 @@ namespace AlphaTab.Platform.CSharp
         {
             get
             {
-                if (_typeFaceCache != Font.ToCssString(Settings.Scale))
+                if (_typeFaceCache != Font.ToCssString(Settings.Display.Scale))
                 {
                     if (_typeFace != null)
                     {
                         _typeFace.Dispose();
                     }
 
-                    _typeFaceCache = Font.ToCssString(Settings.Scale);
+                    _typeFaceCache = Font.ToCssString(Settings.Display.Scale);
                     _typeFace = SKTypeface.FromFamilyName(Font.Family,
                         Font.IsBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal,
                         SKFontStyleWidth.Normal,
@@ -242,7 +242,7 @@ namespace AlphaTab.Platform.CSharp
             using (var paint = CreatePaint())
             {
                 paint.Typeface = TypeFace;
-                paint.TextSize = Font.Size * Settings.Scale;
+                paint.TextSize = Font.Size * Settings.Display.Scale;
                 switch (TextAlign)
                 {
                     case TextAlign.Left:

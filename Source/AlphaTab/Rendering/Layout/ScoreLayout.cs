@@ -40,12 +40,12 @@ namespace AlphaTab.Rendering.Layout
         public void LayoutAndRender()
         {
             var score = Renderer.Score;
-            var startIndex = Renderer.Settings.Layout.Get("start", 1);
+            var startIndex = Renderer.Settings.Display.StartBar;
             startIndex--; // map to array index
             startIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, startIndex));
             FirstBarIndex = startIndex;
 
-            var endBarIndex = Renderer.Settings.Layout.Get("count", score.MasterBars.Count);
+            var endBarIndex = Renderer.Settings.Display.BarCount;
             if (endBarIndex < 0)
             {
                 endBarIndex = score.MasterBars.Count;
@@ -65,11 +65,11 @@ namespace AlphaTab.Rendering.Layout
         {
             Logger.Info("ScoreLayout", "Creating score info glyphs");
 
-            var flags = Renderer.Settings.Layout.Get("hideInfo", false)
+            var flags = Renderer.Settings.Notation.HideInfo
                 ? HeaderFooterElements.None
                 : HeaderFooterElements.All;
             var score = Renderer.Score;
-            var res = Renderer.Settings.RenderingResources;
+            var res = Renderer.Settings.Display.RenderingResources;
 
             ScoreInfoGlyphs = new FastDictionary<HeaderFooterElements, TextGlyph>();
             if (!string.IsNullOrEmpty(score.Title) && (flags & HeaderFooterElements.Title) != 0)
@@ -126,7 +126,7 @@ namespace AlphaTab.Rendering.Layout
                 }
             }
 
-            if (!Renderer.Settings.Layout.Get("hideTuning", false))
+            if (!Renderer.Settings.Notation.HideTuning)
             {
                 Model.Staff staffWithTuning = null;
                 foreach (var track in Renderer.Tracks)
@@ -158,7 +158,7 @@ namespace AlphaTab.Rendering.Layout
             }
 
             // chord diagram glyphs
-            if (!Renderer.Settings.Layout.Get("hideChordDiagram", false))
+            if (!Renderer.Settings.Notation.HideChordDiagram)
             {
                 ChordDiagrams = new ChordDiagramContainerGlyph(0, 0);
                 ChordDiagrams.Renderer = new BarRendererBase(Renderer, null);
@@ -184,7 +184,7 @@ namespace AlphaTab.Rendering.Layout
             }
         }
 
-        public float Scale => Renderer.Settings.Scale;
+        public float Scale => Renderer.Settings.Display.Scale;
 
         public int FirstBarIndex { get; private set; }
         public int LastBarIndex { get; private set; }
@@ -214,35 +214,33 @@ namespace AlphaTab.Rendering.Layout
                     var staff = track.Staves[staffIndex];
 
                     // use optimal profile for track
-                    string staveProfile;
+                    StaveProfile staveProfile;
                     if (staff.IsPercussion)
                     {
-                        staveProfile = Environment.StaveProfileScore;
+                        staveProfile = StaveProfile.Score;
                     }
-                    else if (Renderer.Settings.Staves.Id != "default")
+                    else if (Renderer.Settings.Display.StaveProfile != StaveProfile.Default)
                     {
-                        staveProfile = Renderer.Settings.Staves.Id;
+                        staveProfile = Renderer.Settings.Display.StaveProfile;
                     }
                     else if (staff.ShowTablature && staff.ShowStandardNotation)
                     {
-                        staveProfile = Environment.StaveProfileScoreTab;
+                        staveProfile = StaveProfile.ScoreTab;
                     }
                     else if (staff.ShowTablature)
                     {
-                        staveProfile = hasScore ? Environment.StaveProfileTabMixed : Environment.StaveProfileTab;
+                        staveProfile = hasScore ? StaveProfile.TabMixed : StaveProfile.Tab;
                     }
                     else if (staff.ShowStandardNotation)
                     {
-                        staveProfile = Environment.StaveProfileScore;
+                        staveProfile = StaveProfile.Score;
                     }
                     else
                     {
                         continue;
                     }
 
-                    var profile = Environment.StaveProfiles.ContainsKey(staveProfile)
-                        ? Environment.StaveProfiles[staveProfile]
-                        : Environment.StaveProfiles["default"];
+                    var profile = Environment.StaveProfiles[staveProfile];
 
                     foreach (var factory in profile)
                     {
@@ -294,9 +292,9 @@ namespace AlphaTab.Rendering.Layout
             var msg = "rendered by alphaTab (https://alphaTab.net)";
 
             var canvas = Renderer.Canvas;
-            var resources = Renderer.Settings.RenderingResources;
+            var resources = Renderer.Settings.Display.RenderingResources;
 
-            var size = 12 * Renderer.Settings.Scale;
+            var size = 12 * Renderer.Settings.Display.Scale;
             var height = size * 2;
             Height += height;
             var x = Width / 2;

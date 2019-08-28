@@ -14,7 +14,7 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class ScoreRenderer : IScoreRenderer
     {
-        private string _currentLayoutMode;
+        private LayoutMode? _currentLayoutMode;
         private string _currentRenderEngine;
         private Track[] _renderedTracks;
 
@@ -53,10 +53,10 @@ namespace AlphaTab.Rendering
 
         private bool RecreateCanvas()
         {
-            if (_currentRenderEngine != Settings.Engine)
+            if (_currentRenderEngine != Settings.Core.Engine)
             {
                 Canvas = Environment.GetRenderEngineFactory(Settings).CreateCanvas();
-                _currentRenderEngine = Settings.Engine;
+                _currentRenderEngine = Settings.Core.Engine;
                 return true;
             }
 
@@ -65,10 +65,10 @@ namespace AlphaTab.Rendering
 
         private bool RecreateLayout()
         {
-            if (_currentLayoutMode != Settings.Layout.Mode)
+            if (_currentLayoutMode != Settings.Display.LayoutMode)
             {
                 Layout = Environment.GetLayoutEngineFactory(Settings).CreateLayout(this);
-                _currentLayoutMode = Settings.Layout.Mode;
+                _currentLayoutMode = Settings.Display.LayoutMode;
                 return true;
             }
 
@@ -154,7 +154,7 @@ namespace AlphaTab.Rendering
             }
 
             RecreateCanvas();
-            Canvas.LineWidth = Settings.Scale;
+            Canvas.LineWidth = Settings.Display.Scale;
             Canvas.Settings = Settings;
 
             Logger.Info("Rendering", "Rendering " + Tracks.Length + " tracks");
@@ -208,7 +208,7 @@ namespace AlphaTab.Rendering
 
         private void LayoutAndRender()
         {
-            Logger.Info("Rendering", "Rendering at scale " + Settings.Scale + " with layout " + Layout.Name);
+            Logger.Info("Rendering", "Rendering at scale " + Settings.Display.Scale + " with layout " + Layout.Name);
             Layout.LayoutAndRender();
             Layout.RenderAnnotation();
             OnRenderFinished();

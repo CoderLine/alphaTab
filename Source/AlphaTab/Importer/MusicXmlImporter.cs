@@ -9,8 +9,6 @@ namespace AlphaTab.Importer
 {
     internal class MusicXmlImporter : ScoreImporter
     {
-        public const string MergePartGroupsSetting = "musicXMLMergePartGroups";
-
         private Score _score;
         private FastDictionary<string, Track> _trackById;
         private FastDictionary<string, FastList<Track>> _partGroups;
@@ -34,7 +32,7 @@ namespace AlphaTab.Importer
             _tieStarts = new FastList<Note>();
             _tieStartIds = new FastDictionary<int, bool>();
             _slurStarts = new FastDictionary<string, Note>();
-            var xml = Platform.Platform.ToString(Data.ReadAll(), GetSetting("encoding", "utf-8"));
+            var xml = Platform.Platform.ToString(Data.ReadAll(), Settings.Importer.Encoding);
             XmlDocument dom;
             try
             {
@@ -50,7 +48,7 @@ namespace AlphaTab.Importer
             ParseDom(dom);
 
             // merge partgroups into a single track with multiple staves
-            if (GetSetting(MergePartGroupsSetting, false))
+            if (Settings.Importer.MergePartGroupsInMusicXml)
             {
                 MergePartGroups();
             }

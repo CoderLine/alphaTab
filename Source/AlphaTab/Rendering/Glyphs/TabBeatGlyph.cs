@@ -14,7 +14,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 //
                 // Note numbers
-                var isGrace = Renderer.Settings.SmallGraceTabNotes && Container.Beat.GraceType != GraceType.None;
+                var isGrace = Renderer.Settings.Notation.SmallGraceTabNotes &&
+                              Container.Beat.GraceType != GraceType.None;
                 NoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 NoteNumbers.Beat = Container.Beat;
                 NoteNumbers.BeamingHelper = BeamingHelper;
@@ -66,13 +67,14 @@ namespace AlphaTab.Rendering.Glyphs
                 //
                 // Note dots
                 //
-                if (Container.Beat.Dots > 0 && tabRenderer.RenderRhythm)
+                if (Container.Beat.Dots > 0 && tabRenderer.Settings.Notation.RhythmMode != TabRhythmMode.Hidden)
                 {
                     AddGlyph(new SpacingGlyph(0, 0, 5 * Scale));
                     for (var i = 0; i < Container.Beat.Dots; i++)
                     {
                         AddGlyph(new CircleGlyph(0,
-                            tabRenderer.LineOffset * tabRenderer.Bar.Staff.Tuning.Length + tabRenderer.RhythmHeight,
+                            tabRenderer.LineOffset * tabRenderer.Bar.Staff.Tuning.Length +
+                            tabRenderer.Settings.Notation.RhythmHeight * tabRenderer.Scale,
                             1.5f * Scale));
                     }
                 }

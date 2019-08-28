@@ -3,7 +3,7 @@ namespace AlphaTab
     /// <summary>
     /// Lists all modes on how alphaTab can handle the display and playback of music notation. 
     /// </summary>
-    public enum DisplayMode
+    public enum NotationMode
     {
         /// <summary>
         /// Music elements will be displayed and played as in Guitar Pro. 

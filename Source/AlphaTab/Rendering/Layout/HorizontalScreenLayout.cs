@@ -50,7 +50,12 @@ namespace AlphaTab.Rendering.Layout
 
         protected override void DoLayoutAndRender()
         {
-            _pagePadding = Renderer.Settings.Layout.Get("padding", PagePadding);
+            _pagePadding = Renderer.Settings.Display.Padding;
+            if (_pagePadding == null)
+            {
+                _pagePadding = PagePadding;
+            }
+
             if (_pagePadding.Length == 1)
             {
                 _pagePadding = new[]
@@ -69,13 +74,13 @@ namespace AlphaTab.Rendering.Layout
             var score = Renderer.Score;
             var canvas = Renderer.Canvas;
 
-            var startIndex = Renderer.Settings.Layout.Get("start", 1);
+            var startIndex = Renderer.Settings.Display.StartBar;
             startIndex--; // map to array index
             startIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, startIndex));
             var currentBarIndex = startIndex;
 
-            var endBarIndex = Renderer.Settings.Layout.Get("count", score.MasterBars.Count);
-            if (endBarIndex < 0)
+            var endBarIndex = Renderer.Settings.Display.BarCount;
+            if (endBarIndex <= 0)
             {
                 endBarIndex = score.MasterBars.Count;
             }
@@ -88,7 +93,7 @@ namespace AlphaTab.Rendering.Layout
             _group.X = _pagePadding[0];
             _group.Y = _pagePadding[1];
 
-            var countPerPartial = Renderer.Settings.Layout.Get("countPerPartial", 10);
+            var countPerPartial = Renderer.Settings.Display.BarCountPerPartial;
             var partials = new FastList<HorizontalScreenLayoutPartialInfo>();
 
             var currentPartial = new HorizontalScreenLayoutPartialInfo();
@@ -97,7 +102,7 @@ namespace AlphaTab.Rendering.Layout
                 var result = _group.AddBars(Renderer.Tracks, currentBarIndex);
 
                 // if we detect that the new renderer is linked to the previous
-                // renderer, we need to put it into the previous partial 
+                // renderer, we need to put it into the previous partial
                 if (currentPartial.MasterBars.Count == 0 && result.IsLinkedToPrevious && partials.Count > 0)
                 {
                     var previousPartial = partials[partials.Count - 1];
@@ -151,7 +156,7 @@ namespace AlphaTab.Rendering.Layout
             {
                 var partial = partials[i];
                 canvas.BeginRender(partial.Width, Height);
-                canvas.Color = Renderer.Settings.RenderingResources.MainGlyphColor;
+                canvas.Color = Renderer.Settings.Display.RenderingResources.MainGlyphColor;
                 canvas.TextAlign = TextAlign.Left;
 
                 var renderX = _group.GetBarX(partial.MasterBars[0].Index) + _group.AccoladeSpacing;

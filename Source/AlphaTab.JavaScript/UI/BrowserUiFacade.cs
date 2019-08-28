@@ -133,10 +133,11 @@ namespace AlphaTab.UI
         {
             _api = api;
 
-            var dataAttributes = GetDataAttributes();
-            var settings = Settings.FromJson(raw, dataAttributes);
+            var dataAttributes = GetDataAttributes(raw);
+            var settings = new Settings();
+            settings.LoadFromPropertyBag(dataAttributes);
             api.Settings = settings;
-            if (settings.Engine == "default" || settings.Engine == "svg")
+            if (settings.Core.Engine == "default" || settings.Core.Engine == "svg")
             {
                 api.Container.Scroll += ShowSvgsInViewPort;
                 api.Container.Resize += ShowSvgsInViewPort;
@@ -197,17 +198,17 @@ namespace AlphaTab.UI
 
         private void SetupFontCheckers(Settings settings)
         {
-            RegisterFontChecker(settings.RenderingResources.CopyrightFont);
-            RegisterFontChecker(settings.RenderingResources.EffectFont);
-            RegisterFontChecker(settings.RenderingResources.FingeringFont);
-            RegisterFontChecker(settings.RenderingResources.GraceFont);
-            RegisterFontChecker(settings.RenderingResources.MarkerFont);
-            RegisterFontChecker(settings.RenderingResources.TablatureFont);
-            RegisterFontChecker(settings.RenderingResources.TitleFont);
-            RegisterFontChecker(settings.RenderingResources.WordsFont);
-            RegisterFontChecker(settings.RenderingResources.BarNumberFont);
-            RegisterFontChecker(settings.RenderingResources.FretboardNumberFont);
-            RegisterFontChecker(settings.RenderingResources.SubTitleFont);
+            RegisterFontChecker(settings.Display.RenderingResources.CopyrightFont);
+            RegisterFontChecker(settings.Display.RenderingResources.EffectFont);
+            RegisterFontChecker(settings.Display.RenderingResources.FingeringFont);
+            RegisterFontChecker(settings.Display.RenderingResources.GraceFont);
+            RegisterFontChecker(settings.Display.RenderingResources.MarkerFont);
+            RegisterFontChecker(settings.Display.RenderingResources.TablatureFont);
+            RegisterFontChecker(settings.Display.RenderingResources.TitleFont);
+            RegisterFontChecker(settings.Display.RenderingResources.WordsFont);
+            RegisterFontChecker(settings.Display.RenderingResources.BarNumberFont);
+            RegisterFontChecker(settings.Display.RenderingResources.FretboardNumberFont);
+            RegisterFontChecker(settings.Display.RenderingResources.SubTitleFont);
         }
 
         private void RegisterFontChecker(Font font)
@@ -365,7 +366,7 @@ namespace AlphaTab.UI
             var styleElement = (StyleElement)elementDocument.GetElementById("alphaTabStyle");
             if (styleElement == null)
             {
-                var fontDirectory = settings.FontDirectory;
+                var fontDirectory = settings.Core.FontDirectory;
                 styleElement = (StyleElement)elementDocument.CreateElement("style");
                 styleElement.Id = "alphaTabStyle";
                 styleElement.Type = "text/css";
@@ -472,7 +473,7 @@ namespace AlphaTab.UI
             return tracks.ToArray();
         }
 
-        private FastDictionary<string, object> GetDataAttributes()
+        private FastDictionary<string, object> GetDataAttributes(object json)
         {
             var dataAttributes = new FastDictionary<string, object>();
 
@@ -577,7 +578,7 @@ namespace AlphaTab.UI
                             placeholder.Style.Height = renderResult.Height + "px";
                             placeholder.Style.Display = "inline-block";
 
-                            if (IsElementInViewPort(placeholder) || !_api.Settings.EnableLazyLoading)
+                            if (IsElementInViewPort(placeholder) || !_api.Settings.Core.EnableLazyLoading)
                             {
                                 var bodyHtml = (string)body;
                                 placeholder.OuterHTML = bodyHtml;
@@ -634,14 +635,14 @@ namespace AlphaTab.UI
                 Logger.Info("Player", "Will use webworkers for synthesizing and web audio api for playback");
                 player = new AlphaSynthWebWorkerApi(new AlphaSynthWebAudioOutput(),
                     alphaSynthScriptFile,
-                    _api.Settings.LogLevel);
+                    _api.Settings.Core.LogLevel);
             }
             else if (supportsWebWorkers)
             {
                 Logger.Info("Player", "Will use webworkers for synthesizing and flash for playback");
                 player = new AlphaSynthWebWorkerApi(new AlphaSynthFlashOutput(alphaSynthScriptFile),
                     alphaSynthScriptFile,
-                    _api.Settings.LogLevel);
+                    _api.Settings.Core.LogLevel);
             }
 
             if (player == null)
@@ -652,9 +653,9 @@ namespace AlphaTab.UI
             {
                 player.Ready += () =>
                 {
-                    if (!string.IsNullOrEmpty(_api.Settings.SoundFontFile))
+                    if (!string.IsNullOrEmpty(_api.Settings.Player.SoundFontFile))
                     {
-                        ((AlphaTabApi)_api).LoadSoundFontFromUrl(_api.Settings.SoundFontFile);
+                        ((AlphaTabApi)_api).LoadSoundFontFromUrl(_api.Settings.Player.SoundFontFile);
                     }
                 };
             }
@@ -767,9 +768,9 @@ namespace AlphaTab.UI
 
         public IContainer GetScrollContainer()
         {
-            var scrollElement = Platform.Platform.TypeOf(_api.Settings.ScrollElement) == "string"
-                ? Browser.Document.QuerySelector(_api.Settings.ScrollElement)
-                : _api.Settings.ScrollElement.As<Element>();
+            var scrollElement = Platform.Platform.TypeOf(_api.Settings.Player.ScrollElement) == "string"
+                ? Browser.Document.QuerySelector(_api.Settings.Player.ScrollElement)
+                : _api.Settings.Player.ScrollElement.As<Element>();
 
             var nodeName = scrollElement.NodeName.ToLowerCase();
             if (nodeName == "html" || nodeName == "body")

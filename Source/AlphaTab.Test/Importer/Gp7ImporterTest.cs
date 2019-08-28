@@ -26,7 +26,7 @@ namespace AlphaTab.Test.Importer
         internal Gp7Importer PrepareGp7ImporterWithBytes(byte[] buffer)
         {
             var readerBase = new Gp7Importer();
-            readerBase.Init(ByteBuffer.FromBuffer(buffer));
+            readerBase.Init(ByteBuffer.FromBuffer(buffer), new Settings());
             return readerBase;
         }
 

@@ -12,30 +12,30 @@ namespace AlphaTab.Test.VisualTests.Features
         [TestMethod, AsyncTestMethod]
         public void TiedNotes()
         {
-            var settings = Settings.Defaults;
+            var settings = new Settings();
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/TiedNotes.gp5", "TestFiles/VisualTests/Features/SpecialNotes/TiedNotes.png");
         }
 
         [TestMethod, AsyncTestMethod]
         public void GraceNotes()
         {
-            var settings = Settings.Defaults;
+            var settings = new Settings();
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/GraceNotes.gp5", "TestFiles/VisualTests/Features/SpecialNotes/GraceNotes.png");
         }
 
         [TestMethod, AsyncTestMethod]
         public void DeadNotes()
         {
-            var settings = Settings.Defaults;
+            var settings = new Settings();
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/DeadNotes.gp5", "TestFiles/VisualTests/Features/SpecialNotes/DeadNotes.png");
         }
 
         [TestMethod, AsyncTestMethod]
         public void GhostNotes()
         {
-            var settings = Settings.Defaults;
+            var settings = new Settings();
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/GhostNotes.gp5", "TestFiles/VisualTests/Features/SpecialNotes/GhostNotes.png");
         }
-      
+
     }
 }

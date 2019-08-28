@@ -63,7 +63,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\SynthEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Util\SynthConstants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Util\SynthHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DisplayMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NotationMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Environment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exporter\AlphaTexExporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FingeringMode.cs" />
@@ -92,7 +92,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)IO\IWriteable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\ZipFile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LayoutEngineFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)LayoutSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\AccentuationType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\AccidentalType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Automation.cs" />
@@ -292,7 +291,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ScrollMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\IOHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)StaveSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Cursors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\IContainer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\IMouseEventArgs.cs" />

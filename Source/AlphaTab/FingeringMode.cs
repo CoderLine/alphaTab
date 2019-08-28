@@ -6,14 +6,27 @@ namespace AlphaTab
     public enum FingeringMode
     {
         /// <summary>
-        /// Fingerings will be shown in the standard notation staff. 
+        /// Fingerings will be shown in the standard notation staff.
         /// </summary>
-        Score,
+        ScoreDefault,
+
+        /// <summary>
+        /// Fingerings will be shown in the standard notation staff. Piano finger style is enforced, where
+        /// fingers are rendered as 1-5 instead of p,i,m,a,c and T,1,2,3,4.
+        /// </summary>
+        ScoreForcePiano,
 
         /// <summary>
         /// Fingerings will be shown in a effect band above the tabs in case
         /// they have only a single note on the beat.
         /// </summary>
-        SingleNoteEffectBand
+        SingleNoteEffectBand,
+
+        /// <summary>
+        /// Fingerings will be shown in a effect band above the tabs in case
+        /// they have only a single note on the beat. Piano finger style is enforced, where
+        /// fingers are rendered as 1-5 instead of p,i,m,a,c and T,1,2,3,4.
+        /// </summary>
+        SingleNoteEffectBandForcePiano
     }
 }

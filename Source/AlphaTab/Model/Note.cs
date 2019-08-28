@@ -726,7 +726,7 @@ namespace AlphaTab.Model
         {
             var nextNoteOnLine = new Util.Lazy<Note>(() => NextNoteOnSameLine(this));
 
-            var isSongBook = settings != null && settings.DisplayMode == DisplayMode.SongBook;
+            var isSongBook = settings != null && settings.Notation.NotationMode == NotationMode.SongBook;
 
             // connect ties
             if (IsTieDestination)

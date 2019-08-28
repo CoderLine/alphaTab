@@ -121,12 +121,6 @@ namespace AlphaTab.Platform.JavaScript
             context.Tex(tex, tracks);
         }
 
-        [Name("updateLayout")]
-        public void UpdateLayout(JQuery element, AlphaTabApi context, LayoutSettings layout)
-        {
-            context.UpdateLayout(layout);
-        }
-
         [Name("updateSettings")]
         public void UpdateLayout(JQuery element, AlphaTabApi context)
         {

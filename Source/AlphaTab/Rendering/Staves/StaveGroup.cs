@@ -9,7 +9,7 @@ namespace AlphaTab.Rendering.Staves
 {
     /// <summary>
     /// A Staff consists of a list of different staves and groups
-    /// them using an accolade. 
+    /// them using an accolade.
     /// </summary>
     internal class StaveGroup
     {
@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Staves
 
         /// <summary>
         /// Indicates whether this line is full or not. If the line is full the
-        /// bars can be aligned to the maximum width. If the line is not full 
+        /// bars can be aligned to the maximum width. If the line is not full
         /// the bars will not get stretched.
         /// </summary>
         public bool IsFull { get; set; }
@@ -181,14 +181,14 @@ namespace AlphaTab.Rendering.Staves
             if (!_accoladeSpacingCalculated && Index == 0)
             {
                 _accoladeSpacingCalculated = true;
-                if (Layout.Renderer.Settings.Layout.Get("hideTrackNames", false))
+                if (Layout.Renderer.Settings.Notation.HideTrackNames)
                 {
                     AccoladeSpacing = 0;
                 }
                 else
                 {
                     var canvas = Layout.Renderer.Canvas;
-                    var res = Layout.Renderer.Settings.RenderingResources.EffectFont;
+                    var res = Layout.Renderer.Settings.Display.RenderingResources.EffectFont;
                     canvas.Font = res;
                     foreach (var t in tracks)
                     {
@@ -284,13 +284,13 @@ namespace AlphaTab.Rendering.Staves
                 _allStaves[i].Paint(cx, cy, canvas, startIndex, count);
             }
 
-            var res = Layout.Renderer.Settings.RenderingResources;
+            var res = Layout.Renderer.Settings.Display.RenderingResources;
 
             if (Staves.Count > 0 && startIndex == 0)
             {
                 //
                 // Draw start grouping
-                // 
+                //
                 canvas.Color = res.BarSeparatorColor;
 
                 if (_firstStaffInAccolade != null && _lastStaffInAccolade != null)
@@ -316,7 +316,7 @@ namespace AlphaTab.Rendering.Staves
 
                 //
                 // Draw accolade for each track group
-                // 
+                //
                 canvas.Font = res.EffectFont;
                 for (int i = 0, j = Staves.Count; i < j; i++)
                 {
@@ -331,14 +331,14 @@ namespace AlphaTab.Rendering.Staves
 
                         var acooladeX = cx + g.FirstStaffInAccolade.X;
 
-                        var barSize = 3 * Layout.Renderer.Settings.Scale;
+                        var barSize = 3 * Layout.Renderer.Settings.Display.Scale;
                         var barOffset = barSize;
 
                         var accoladeStart = firstStart - barSize * 4;
                         var accoladeEnd = lastEnd + barSize * 4;
 
                         // text
-                        if (Index == 0 && !Layout.Renderer.Settings.Layout.Get("hideTrackNames", false))
+                        if (Index == 0 && !Layout.Renderer.Settings.Notation.HideTrackNames)
                         {
                             canvas.FillText(g.Track.ShortName, cx + AccoladeLabelSpacing * Layout.Scale, firstStart);
                         }
@@ -370,7 +370,7 @@ namespace AlphaTab.Rendering.Staves
                         canvas.ClosePath();
                         canvas.Fill();
 
-                        // bottom spike 
+                        // bottom spike
                         canvas.BeginPath();
                         canvas.MoveTo(spikeStartX, accoladeEnd);
                         canvas.BezierCurveTo(spikeStartX,

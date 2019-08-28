@@ -12,7 +12,7 @@ namespace AlphaTab.Importer
 
         public override Score ReadScore()
         {
-            // at first we need to load the binary file system 
+            // at first we need to load the binary file system
             // from the GPX container
             Logger.Info(Name, "Loading GPX filesystem");
             var fileSystem = new GpxFileSystem();
@@ -32,7 +32,7 @@ namespace AlphaTab.Importer
                 switch (entry.FileName)
                 {
                     case GpxFileSystem.ScoreGpif:
-                        xml = Platform.Platform.ToString(entry.Data, GetSetting("encoding", "utf-8"));
+                        xml = Platform.Platform.ToString(entry.Data, Settings.Importer.Encoding);
                         break;
                     case GpxFileSystem.BinaryStylesheet:
                         binaryStylesheet = entry.Data;

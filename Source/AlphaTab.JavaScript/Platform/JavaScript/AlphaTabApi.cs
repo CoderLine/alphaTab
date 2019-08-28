@@ -46,7 +46,7 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                if (Settings.Layout.Mode == "horizontal")
+                if (Settings.Display.LayoutMode == LayoutMode.Horizontal)
                 {
                     a4.Style.Width = "297mm";
                 }
@@ -86,13 +86,14 @@ namespace AlphaTab.Platform.JavaScript
             preview.Focus();
 
             // render alphaTab
-            var settings = Settings.Defaults;
-            settings.ScriptFile = Settings.ScriptFile;
-            settings.FontDirectory = Settings.FontDirectory;
-            settings.Scale = 0.8f;
-            settings.StretchForce = 0.8f;
-            settings.EnableLazyLoading = false;
-            settings.UseWorkers = false;
+            var settings = new Settings();
+            settings.Core.ScriptFile = Settings.Core.ScriptFile;
+            settings.Core.FontDirectory = Settings.Core.FontDirectory;
+            settings.Core.EnableLazyLoading = false;
+            settings.Core.UseWorkers = false;
+
+            settings.Display.Scale = 0.8f;
+            settings.Display.StretchForce = 0.8f;
 
             var alphaTab = new AlphaTabApi(a4, settings);
             alphaTab.Renderer.PostRenderFinished += () =>
@@ -101,16 +102,6 @@ namespace AlphaTab.Platform.JavaScript
                 preview.Print();
             };
             alphaTab.RenderTracks(Tracks);
-        }
-
-        public override void UpdateLayout(LayoutSettings layoutSettings)
-        {
-            if (!(layoutSettings is LayoutSettings))
-            {
-                layoutSettings = Settings.LayoutFromJson(layoutSettings);
-            }
-
-            base.UpdateLayout(layoutSettings);
         }
 
         public void DownloadMidi()

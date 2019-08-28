@@ -6,8 +6,8 @@ using AlphaTab.Platform;
 namespace AlphaTab.Rendering.Staves
 {
     /// <summary>
-    /// A Staff represents a single line within a StaveGroup. 
-    /// It stores BarRenderer instances created from a given factory. 
+    /// A Staff represents a single line within a StaveGroup.
+    /// It stores BarRenderer instances created from a given factory.
     /// </summary>
     internal class Staff
     {
@@ -27,9 +27,9 @@ namespace AlphaTab.Rendering.Staves
         public int StaffIndex { get; set; }
 
         /// <summary>
-        /// This is the index of the track being rendered. This is not the index of the track within the model, 
-        /// but the n-th track being rendered. It is the index of the <see cref="ScoreRenderer.Tracks"/> array defining 
-        /// which tracks should be rendered. 
+        /// This is the index of the track being rendered. This is not the index of the track within the model,
+        /// but the n-th track being rendered. It is the index of the <see cref="ScoreRenderer.Tracks"/> array defining
+        /// which tracks should be rendered.
         /// For single-track rendering this will always be zero.
         /// </summary>
         public int TrackIndex { get; set; }
@@ -39,7 +39,7 @@ namespace AlphaTab.Rendering.Staves
 
         /// <summary>
         /// This is the visual offset from top where the
-        /// Staff contents actually start. Used for grouping 
+        /// Staff contents actually start. Used for grouping
         /// using a accolade
         /// </summary>
         public float StaveTop { get; set; }
@@ -49,7 +49,7 @@ namespace AlphaTab.Rendering.Staves
 
         /// <summary>
         /// This is the visual offset from top where the
-        /// Staff contents actually ends. Used for grouping 
+        /// Staff contents actually ends. Used for grouping
         /// using a accolade
         /// </summary>
         public float StaveBottom { get; set; }
@@ -115,7 +115,7 @@ namespace AlphaTab.Rendering.Staves
             }
             else
             {
-                renderer = _factory.Create(StaveGroup.Layout.Renderer, bar, StaveGroup.Layout.Renderer.Settings.Staves);
+                renderer = _factory.Create(StaveGroup.Layout.Renderer, bar);
             }
 
             renderer.Staff = this;
@@ -141,7 +141,7 @@ namespace AlphaTab.Rendering.Staves
         public void ScaleToWidth(float width)
         {
             _sharedLayoutData = new FastDictionary<string, object>();
-            // Note: here we could do some "intelligent" distribution of 
+            // Note: here we could do some "intelligent" distribution of
             // the space over the bar renderers, for now we evenly apply the space to all bars
             var difference = width - StaveGroup.Width;
             var spacePerBar = difference / BarRenderers.Count;

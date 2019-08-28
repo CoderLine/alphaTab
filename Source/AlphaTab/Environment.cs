@@ -14,12 +14,8 @@ namespace AlphaTab
     internal partial class Environment
     {
         public static FastDictionary<string, RenderEngineFactory> RenderEngines;
-        public static FastDictionary<string, LayoutEngineFactory> LayoutEngines;
-        public static FastDictionary<string, BarRendererFactory[]> StaveProfiles;
-        public const string StaveProfileScoreTab = "score-tab";
-        public const string StaveProfileTab = "tab";
-        public const string StaveProfileTabMixed = "tab-mixed";
-        public const string StaveProfileScore = "score";
+        public static FastDictionary<LayoutMode, LayoutEngineFactory> LayoutEngines;
+        public static FastDictionary<StaveProfile, BarRendererFactory[]> StaveProfiles;
 
         static Environment()
         {
@@ -33,39 +29,33 @@ namespace AlphaTab
 
         public static RenderEngineFactory GetRenderEngineFactory(Settings settings)
         {
-            if (settings.Engine == null || !RenderEngines.ContainsKey(settings.Engine))
+            if (settings.Core.Engine == null || !RenderEngines.ContainsKey(settings.Core.Engine))
             {
                 return RenderEngines["default"];
             }
 
-            return RenderEngines[settings.Engine];
+            return RenderEngines[settings.Core.Engine];
         }
 
         public static LayoutEngineFactory GetLayoutEngineFactory(Settings settings)
         {
-            if (settings.Layout.Mode == null || !LayoutEngines.ContainsKey(settings.Layout.Mode))
-            {
-                return LayoutEngines["default"];
-            }
-
-            return LayoutEngines[settings.Layout.Mode];
+            return LayoutEngines[settings.Display.LayoutMode];
         }
 
         public static void Init()
         {
             RenderEngines = new FastDictionary<string, RenderEngineFactory>();
-            LayoutEngines = new FastDictionary<string, LayoutEngineFactory>();
-            StaveProfiles = new FastDictionary<string, BarRendererFactory[]>();
+            LayoutEngines = new FastDictionary<LayoutMode, LayoutEngineFactory>();
+            StaveProfiles = new FastDictionary<StaveProfile, BarRendererFactory[]>();
 
             PlatformInit();
 
             // default layout engines
-            LayoutEngines["page"] = new LayoutEngineFactory(true, r => new PageViewLayout(r));
-            LayoutEngines["horizontal"] = new LayoutEngineFactory(false, r => new HorizontalScreenLayout(r));
-            LayoutEngines["default"] = LayoutEngines["page"];
+            LayoutEngines[LayoutMode.Page] = new LayoutEngineFactory(true, r => new PageViewLayout(r));
+            LayoutEngines[LayoutMode.Horizontal] = new LayoutEngineFactory(false, r => new HorizontalScreenLayout(r));
 
             // default combinations of stave textprofiles
-            StaveProfiles["default"] = StaveProfiles[StaveProfileScoreTab] = new BarRendererFactory[]
+            StaveProfiles[StaveProfile.ScoreTab] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("score-effects",
                     new IEffectBarRendererInfo[]
@@ -93,7 +83,7 @@ namespace AlphaTab
                 new TabBarRendererFactory(false, false, false)
             };
 
-            StaveProfiles[StaveProfileScore] = new BarRendererFactory[]
+            StaveProfiles[StaveProfile.Score] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("score-effects",
                     new IEffectBarRendererInfo[]
@@ -143,7 +133,7 @@ namespace AlphaTab
                 new AlternateEndingsEffectInfo()
             };
 
-            StaveProfiles[StaveProfileTab] = new BarRendererFactory[]
+            StaveProfiles[StaveProfile.Tab] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("tab-effects", tabEffectInfos),
                 new TabBarRendererFactory(true, true, true), new EffectBarRendererFactory("tab-bottom-effects",
@@ -153,7 +143,7 @@ namespace AlphaTab
                     })
             };
 
-            StaveProfiles[StaveProfileTabMixed] = new BarRendererFactory[]
+            StaveProfiles[StaveProfile.TabMixed] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("tab-effects",tabEffectInfos),
                 new TabBarRendererFactory(false, false, false), new EffectBarRendererFactory("tab-bottom-effects",

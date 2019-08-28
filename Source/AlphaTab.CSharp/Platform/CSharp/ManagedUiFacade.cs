@@ -40,7 +40,7 @@ namespace AlphaTab.Platform.CSharp
 
         public IAlphaSynth CreateWorkerPlayer()
         {
-            var player = new ManagedThreadAlphaSynthWorkerApi(CreateSynthOutput(), Api.Settings.LogLevel, BeginInvoke);
+            var player = new ManagedThreadAlphaSynthWorkerApi(CreateSynthOutput(), Api.Settings.Core.LogLevel, BeginInvoke);
             player.Ready += () =>
             {
                 using (var sf =

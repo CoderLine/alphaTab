@@ -35,7 +35,12 @@ namespace AlphaTab.Rendering.Layout
 
         protected override void DoLayoutAndRender()
         {
-            _pagePadding = Renderer.Settings.Layout.Get("padding", PagePadding);
+            _pagePadding = Renderer.Settings.Display.Padding;
+            if (_pagePadding == null)
+            {
+                _pagePadding = PagePadding;
+            }
+
             if (_pagePadding.Length == 1)
             {
                 _pagePadding = new[]
@@ -102,7 +107,7 @@ namespace AlphaTab.Rendering.Layout
                 return y;
             }
 
-            var res = Renderer.Settings.RenderingResources;
+            var res = Renderer.Settings.Display.RenderingResources;
 
             ChordDiagrams.Width = Width;
             ChordDiagrams.DoLayout();
@@ -135,7 +140,7 @@ namespace AlphaTab.Rendering.Layout
             Logger.Debug(Name, "Layouting score info");
 
             var scale = Scale;
-            var res = Renderer.Settings.RenderingResources;
+            var res = Renderer.Settings.Display.RenderingResources;
 
             var centeredGlyphs = new[]
             {
@@ -226,7 +231,7 @@ namespace AlphaTab.Rendering.Layout
             var canvas = Renderer.Canvas;
 
             // if we have a fixed number of bars per row, we only need to refit them.
-            if (Renderer.Settings.Layout.Get("barsPerRow", -1) != -1)
+            if (Renderer.Settings.Display.BarsPerRow != -1)
             {
                 for (var i = 0; i < _groups.Count; i++)
                 {
@@ -335,7 +340,7 @@ namespace AlphaTab.Rendering.Layout
             // paint into canvas
             var height = group.Height + GroupSpacing * Scale;
             canvas.BeginRender(Width, height);
-            Renderer.Canvas.Color = Renderer.Settings.RenderingResources.MainGlyphColor;
+            Renderer.Canvas.Color = Renderer.Settings.Display.RenderingResources.MainGlyphColor;
             Renderer.Canvas.TextAlign = TextAlign.Left;
             // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates
             // since we use partial drawing
@@ -377,7 +382,7 @@ namespace AlphaTab.Rendering.Layout
             var group = CreateEmptyStaveGroup();
             group.Index = _groups.Count;
 
-            var barsPerRow = Renderer.Settings.Layout.Get("barsPerRow", -1);
+            var barsPerRow = Renderer.Settings.Display.BarsPerRow;
 
             var maxWidth = MaxWidth;
             var end = endIndex + 1;

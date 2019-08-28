@@ -38,19 +38,19 @@ namespace AlphaTab.Model
         {
             for (var i = 0; i < score.Tracks.Count; i++)
             {
-                if (i < settings.DisplayTranspositionPitches.Length)
+                if (i < settings.Notation.DisplayTranspositionPitches.Length)
                 {
                     foreach (var staff in score.Tracks[i].Staves)
                     {
-                        staff.DisplayTranspositionPitch = -settings.DisplayTranspositionPitches[i];
+                        staff.DisplayTranspositionPitch = -settings.Notation.DisplayTranspositionPitches[i];
                     }
                 }
 
-                if (i < settings.TranspositionPitches.Length)
+                if (i < settings.Notation.TranspositionPitches.Length)
                 {
                     foreach (var staff in score.Tracks[i].Staves)
                     {
-                        staff.TranspositionPitch = -settings.TranspositionPitches[i];
+                        staff.TranspositionPitch = -settings.Notation.TranspositionPitches[i];
                     }
                 }
             }
@@ -58,7 +58,9 @@ namespace AlphaTab.Model
 
         public static string FingerToString(Settings settings, Beat beat, Fingers finger, bool leftHand)
         {
-            if (settings.ForcePianoFingering || GeneralMidi.IsPiano(beat.Voice.Bar.Staff.Track.PlaybackInfo.Program))
+            if (settings.Notation.FingeringMode == FingeringMode.ScoreForcePiano ||
+                settings.Notation.FingeringMode == FingeringMode.SingleNoteEffectBandForcePiano ||
+                GeneralMidi.IsPiano(beat.Voice.Bar.Staff.Track.PlaybackInfo.Program))
             {
                 switch (finger)
                 {

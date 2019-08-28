@@ -9,7 +9,7 @@ namespace AlphaTab.Rendering
     {
         public override string StaffId => ScoreBarRenderer.StaffId;
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
         {
             return new ScoreBarRenderer(renderer, bar);
         }

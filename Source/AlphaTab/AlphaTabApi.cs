@@ -71,7 +71,7 @@ namespace AlphaTab
             Container = uiFacade.RootContainer;
 
             uiFacade.Initialize(this, settings);
-            Logger.LogLevel = Settings.LogLevel;
+            Logger.LogLevel = Settings.Core.LogLevel;
 
             CanvasElement = uiFacade.CreateCanvasElement();
             Container.AppendChild(CanvasElement);
@@ -86,7 +86,7 @@ namespace AlphaTab
                 },
                 uiFacade.ResizeThrottle);
 
-            if (Settings.UseWorkers && UiFacade.AreWorkersSupported &&
+            if (Settings.Core.UseWorkers && UiFacade.AreWorkersSupported &&
                 Environment.GetRenderEngineFactory(Settings).SupportsWorkers)
             {
                 Renderer = UiFacade.CreateWorkerRenderer();
@@ -122,7 +122,7 @@ namespace AlphaTab
             };
             Renderer.Error += OnError;
 
-            if (Settings.EnablePlayer)
+            if (Settings.Player.EnablePlayer)
             {
                 SetupPlayer();
             }
@@ -664,7 +664,7 @@ namespace AlphaTab
             Player.PositionChanged += OnPlayerPositionChanged;
             Player.Finished += OnPlayerFinished;
 
-            if (Settings.EnableCursor)
+            if (Settings.Player.EnableCursor)
             {
                 SetupCursors();
             }
@@ -964,7 +964,6 @@ namespace AlphaTab
             beatCursor.StopAnimation();
             beatCursor.Top = barBounds.Y;
             beatCursor.Left = beatBoundings.VisualBounds.X;
-            beatCursor.Width = Settings.BeatCursorWidth;
             beatCursor.Height = barBounds.H;
 
             // if playing, animate the cursor to the next beat
@@ -1007,12 +1006,12 @@ namespace AlphaTab
                     });
                 }
 
-                if (!_selecting && Settings.ScrollMode != ScrollMode.Off)
+                if (!_selecting && Settings.Player.ScrollMode != ScrollMode.Off)
                 {
                     //// calculate position of whole music wheet within the scroll parent
                     var scrollElement = UiFacade.GetScrollContainer();
                     var isVertical = Environment.GetLayoutEngineFactory(Settings).Vertical;
-                    var mode = Settings.ScrollMode;
+                    var mode = Settings.Player.ScrollMode;
 
                     var elementOffset = UiFacade.GetOffset(scrollElement, Container);
 
@@ -1021,11 +1020,11 @@ namespace AlphaTab
                         switch (mode)
                         {
                             case ScrollMode.Continuous:
-                                var y = (int)(elementOffset.Y + barBoundings.RealBounds.Y + Settings.ScrollOffsetY);
+                                var y = (int)(elementOffset.Y + barBoundings.RealBounds.Y + Settings.Player.ScrollOffsetY);
                                 if (y != _lastScroll)
                                 {
                                     _lastScroll = y;
-                                    UiFacade.ScrollToY(scrollElement, y, Settings.ScrollSpeed);
+                                    UiFacade.ScrollToY(scrollElement, y, Settings.Player.ScrollSpeed);
                                 }
 
                                 break;
@@ -1034,9 +1033,9 @@ namespace AlphaTab
                                 if (barBoundings.VisualBounds.Y + barBoundings.VisualBounds.H >= elementBottom ||
                                     barBoundings.VisualBounds.Y < scrollElement.ScrollTop)
                                 {
-                                    var scrollTop = barBoundings.RealBounds.Y + Settings.ScrollOffsetY;
+                                    var scrollTop = barBoundings.RealBounds.Y + Settings.Player.ScrollOffsetY;
                                     _lastScroll = (int)barBoundings.VisualBounds.X;
-                                    UiFacade.ScrollToY(scrollElement, (int)scrollTop, Settings.ScrollSpeed);
+                                    UiFacade.ScrollToY(scrollElement, (int)scrollTop, Settings.Player.ScrollSpeed);
                                 }
 
                                 break;
@@ -1050,9 +1049,9 @@ namespace AlphaTab
                                 var x = (int)barBoundings.VisualBounds.X;
                                 if (x != _lastScroll)
                                 {
-                                    var scrollLeft = (int)(barBoundings.RealBounds.X + Settings.ScrollOffsetX);
+                                    var scrollLeft = (int)(barBoundings.RealBounds.X + Settings.Player.ScrollOffsetX);
                                     _lastScroll = (int)barBoundings.VisualBounds.X;
-                                    UiFacade.ScrollToX(scrollElement, scrollLeft, Settings.ScrollSpeed);
+                                    UiFacade.ScrollToX(scrollElement, scrollLeft, Settings.Player.ScrollSpeed);
                                 }
 
                                 break;
@@ -1061,9 +1060,9 @@ namespace AlphaTab
                                 if (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W >= elementRight ||
                                     barBoundings.VisualBounds.X < scrollElement.ScrollLeft)
                                 {
-                                    var scrollLeft = barBoundings.RealBounds.X + Settings.ScrollOffsetX;
+                                    var scrollLeft = barBoundings.RealBounds.X + Settings.Player.ScrollOffsetX;
                                     _lastScroll = (int)barBoundings.VisualBounds.X;
-                                    UiFacade.ScrollToX(scrollElement, (int)scrollLeft, Settings.ScrollSpeed);
+                                    UiFacade.ScrollToX(scrollElement, (int)scrollLeft, Settings.Player.ScrollSpeed);
                                 }
 
                                 break;
@@ -1202,18 +1201,6 @@ namespace AlphaTab
                 CursorSelectRange(_selectionStart, _selectionEnd);
             };
         }
-
-        /// <summary>
-        /// Updates the layout settings and triggers a re-rendering.
-        /// </summary>
-        /// <param name="layoutSettings">The new layout settings to apply</param>
-        public virtual void UpdateLayout(LayoutSettings layoutSettings)
-        {
-            Settings.Layout = layoutSettings;
-            Renderer.UpdateSettings(Settings);
-            Renderer.Render();
-        }
-
 
         private void CursorSelectRange(SelectionInfo startBeat, SelectionInfo endBeat)
         {

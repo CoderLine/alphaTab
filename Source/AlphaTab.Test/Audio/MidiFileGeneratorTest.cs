@@ -20,7 +20,7 @@ namespace AlphaTab.Test.Audio
         private Score ParseTex(string tex)
         {
             var importer = new AlphaTexImporter();
-            importer.Init(TestPlatform.CreateStringReader(tex));
+            importer.Init(TestPlatform.CreateStringReader(tex), new Settings());
             return importer.ReadScore();
         }
 
@@ -30,7 +30,7 @@ namespace AlphaTab.Test.Audio
             TestPlatform.LoadFile("TestFiles/GuitarPro5/NightWish.gp5", buffer =>
             {
                 var readerBase = new Gp3To5Importer();
-                readerBase.Init(ByteBuffer.FromBuffer(buffer));
+                readerBase.Init(ByteBuffer.FromBuffer(buffer), new Settings());
                 var score = readerBase.ReadScore();
 
                 var generator = new MidiFileGenerator(score, null, new FlatMidiEventGenerator());
