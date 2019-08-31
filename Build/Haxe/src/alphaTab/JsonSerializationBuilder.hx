@@ -210,8 +210,12 @@ class JsonSerializationBuilder {
 									'system.UInt64',
 									'system.Single',
 									'system.Double',
-									'system.Char',
-									'system.BooleanArray',
+									'system.Char':
+									statements.push(macro {
+										json.$jsonName = obj.$fieldName;
+									});
+
+								case 'system.BooleanArray',
 									'system.ByteArray',
 									'system.SByteArray',
 									'system.Int16Array',
@@ -224,7 +228,7 @@ class JsonSerializationBuilder {
 									'system.DoubleArray',
 									'system.CharArray':
 									statements.push(macro {
-										json.$jsonName = obj.$fieldName;
+										json.$jsonName = obj.$fieldName == null ? null : obj.$fieldName.clone();
 									});
 
 								default:
@@ -254,6 +258,8 @@ class JsonSerializationBuilder {
 			pack: targetType.pack,
 			name: targetType.name
 		};
+
+		statements.push(macro if(json == null) return null);
 
 		statements.push(macro var obj = new $targetTypePath());
 
@@ -352,8 +358,14 @@ class JsonSerializationBuilder {
 									'system.UInt64',
 									'system.Single',
 									'system.Double',
-									'system.Char',
-									'system.BooleanArray',
+									'system.Char':
+									// TODO: better validation of input value vs output value
+									fieldCase.expr = macro {
+										obj.$fieldName = untyped json[key];
+									};
+
+
+									case 'system.BooleanArray',
 									'system.ByteArray',
 									'system.SByteArray',
 									'system.Int16Array',
@@ -367,7 +379,7 @@ class JsonSerializationBuilder {
 									'system.CharArray':
 									// TODO: better validation of input value vs output value
 									fieldCase.expr = macro {
-										obj.$fieldName = untyped json[key];
+										obj.$fieldName = untyped json[key] == null ? null : untyped json[key].slice();
 									};
 
 								default:

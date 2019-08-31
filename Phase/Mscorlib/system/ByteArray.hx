@@ -12,6 +12,8 @@ abstract ByteArray(js.html.Uint8Array)
 	
 	public var length(get, never):Int32;
 	public inline function get_length() : Int32 return this.length;
+    
+    public inline function clone() : ByteArray return untyped this.slice();
 	
 	@:op([]) public inline function get(index:Int32):Byte return this[index.toHaxeInt()];
 	@:op([]) public inline function set(index:Int32, val:Byte):Byte return this[index.toHaxeInt()] = val.toHaxeInt();

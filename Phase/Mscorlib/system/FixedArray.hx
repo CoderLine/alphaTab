@@ -14,6 +14,8 @@ abstract FixedArray<T>(Array<T>) to Array<T>
 	
 	public var length(get, never):Int32;
 	public inline function get_length() : Int32 return this.length;
+    
+    public inline function clone() : FixedArray<T> return this.slice(0);
 	
 	@:op([]) public inline function get(index:Int32):T return this[index.toHaxeInt()];
 	@:op([]) public inline function set(index:Int32, val:T):T return this[index.toHaxeInt()] = val;

@@ -9,6 +9,8 @@ abstract DoubleArray(js.html.Float64Array)
 	
 	public var length(get, never):Int32;
 	public inline function get_length() : Int32 return this.length;
+    
+    public inline function clone() : DoubleArray return untyped this.slice();
 	
 	@:op([]) public inline function get(index:Int32):Double return this[index.toHaxeInt()];
 	@:op([]) public inline function set(index:Int32, val:Double):Double return this[index.toHaxeInt()] = val.toHaxeFloat();
