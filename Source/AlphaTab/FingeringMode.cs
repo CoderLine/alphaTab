@@ -1,8 +1,11 @@
+using AlphaTab.Util;
+
 namespace AlphaTab
 {
     /// <summary>
     /// Lists all modes on how fingerings should be displayed.
     /// </summary>
+    [JsonSerializable]
     public enum FingeringMode
     {
         /// <summary>

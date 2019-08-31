@@ -1,8 +1,11 @@
+using AlphaTab.Util;
+
 namespace AlphaTab
 {
     /// <summary>
     /// Lists all modes on how alphaTab can handle the display and playback of music notation. 
     /// </summary>
+    [JsonSerializable]
     public enum NotationMode
     {
         /// <summary>

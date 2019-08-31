@@ -1,9 +1,11 @@
-﻿namespace AlphaTab.Platform.Model
+using AlphaTab.Util;
+
+namespace AlphaTab.Platform.Model
 {
     /// <summary>
     /// A color object which allows accessing each color component individually. 
     /// </summary>
-    public class Color
+    public partial class Color
     {
         /// <summary>
         /// Gets the hex string for black. 

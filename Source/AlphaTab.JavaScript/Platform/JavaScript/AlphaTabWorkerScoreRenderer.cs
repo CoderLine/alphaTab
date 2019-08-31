@@ -45,7 +45,7 @@ namespace AlphaTab.Platform.JavaScript
             _worker.PostMessage(new
             {
                 cmd = "alphaTab.initialize",
-                settings = settings.ToJson()
+                settings = Settings.ToJson(settings)
             });
             _worker.AddEventListener("message", (Action<Event>)(HandleWorkerMessage));
         }
@@ -60,7 +60,7 @@ namespace AlphaTab.Platform.JavaScript
             _worker.PostMessage(new
             {
                 cmd = "alphaTab.updateSettings",
-                settings = settings.ToJson()
+                settings = Settings.ToJson(settings)
             });
         }
 

@@ -271,7 +271,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Layout\HorizontalScreenLayout.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Layout\PageViewLayout.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Layout\ScoreLayout.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\RenderingResources.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreBarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreRenderer.cs" />
@@ -295,9 +294,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)UI\IContainer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\IMouseEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\IUiFacade.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\JsonProperty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Lazy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Logger.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)VibratoPlaybackSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNode.cs" />

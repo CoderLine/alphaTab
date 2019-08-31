@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Collections;
 using AlphaTab.Haxe;
@@ -135,7 +134,7 @@ namespace AlphaTab.UI
 
             var dataAttributes = GetDataAttributes(raw);
             var settings = new Settings();
-            settings.LoadFromPropertyBag(dataAttributes);
+            //settings.LoadFromPropertyBag(dataAttributes);
             api.Settings = settings;
             if (settings.Core.Engine == "default" || settings.Core.Engine == "svg")
             {

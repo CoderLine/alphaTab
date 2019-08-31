@@ -1,12 +1,13 @@
-﻿using System;
+using System;
 using AlphaTab.Collections;
+using AlphaTab.Util;
 
 namespace AlphaTab.Platform.Model
 {
     /// <summary>
     /// This container public class can store the definition for a font and it's style.
     /// </summary>
-    public class Font
+    public partial class Font
     {
         private string _css;
         private float _cssScale;

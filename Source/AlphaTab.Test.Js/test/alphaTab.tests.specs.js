@@ -108,11 +108,6 @@ describe("alphaTab.test.importer.AlphaTexImporterTest", function() {
         __instance.grace_Issue79();
         done();
     });
-    it("bendRendering_Issue79", function(done) {
-        alphaTab.test.TestPlatform.Done = done;
-        __instance.bendRendering_Issue79();
-        done();
-    });
     it("testLeftHandFingerSingleNote", function(done) {
         alphaTab.test.TestPlatform.Done = done;
         __instance.testLeftHandFingerSingleNote();

@@ -1,4 +1,4 @@
-﻿namespace AlphaTab.Util
+namespace AlphaTab.Util
 {
     internal class Logger
     {
@@ -43,6 +43,7 @@
     /// <summary>
     /// Defines all loglevels. 
     /// </summary>
+    [JsonSerializable]
     public enum LogLevel
     {
         /// <summary>
