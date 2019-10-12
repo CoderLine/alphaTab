@@ -110,9 +110,10 @@ namespace AlphaTab.Audio.Synth
                 //we have to restart the midi to make sure we get the right state: instruments, volume, pan, etc
                 _currentTime = 0;
                 _eventIndex = 0;
+                var metronomeVolume = _synthesizer.MetronomeVolume;
                 _synthesizer.NoteOffAll(true);
                 _synthesizer.Reset();
-                _synthesizer.SetupMetronomeChannel();
+                _synthesizer.SetupMetronomeChannel(metronomeVolume);
 
                 SilentProcess(timePosition);
             }
@@ -342,9 +343,10 @@ namespace AlphaTab.Audio.Synth
         {
             if (_currentTime >= InternalEndTime)
             {
+                var metronomeVolume = _synthesizer.MetronomeVolume;
                 _synthesizer.NoteOffAll(true);
                 _synthesizer.Reset();
-                _synthesizer.SetupMetronomeChannel();
+                _synthesizer.SetupMetronomeChannel(metronomeVolume);
                 OnFinished();
             }
         }

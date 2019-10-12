@@ -1,4 +1,5 @@
 // This file contains alphaTab specific extensions to the TinySoundFont audio synthesis
+
 using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Audio.Synth.Util;
@@ -176,9 +177,15 @@ namespace AlphaTab.Audio.Synth.Synthesis
             }
         }
 
-        public void SetupMetronomeChannel()
+        public float MetronomeVolume
         {
-            ChannelSetVolume(SynthConstants.MetronomeChannel, 1);
+            get => ChannelGetMixVolume(SynthConstants.MetronomeChannel);
+            set => ChannelSetMixVolume(SynthConstants.MetronomeChannel, value);
+        }
+
+        public void SetupMetronomeChannel(float volume)
+        {
+            ChannelSetVolume(SynthConstants.MetronomeChannel, volume);
             ChannelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
         }
     }
