@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using AlphaTab.Audio;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth;
@@ -195,6 +195,13 @@ namespace AlphaTab
         {
             var tracks = new FastList<Track>();
             if (trackIndexes == null)
+            {
+                if (score.Tracks.Count > 0)
+                {
+                    tracks.Add(score.Tracks[0]);
+                }
+            }
+            if(trackIndexes.Length == 0)
             {
                 if (score.Tracks.Count > 0)
                 {
