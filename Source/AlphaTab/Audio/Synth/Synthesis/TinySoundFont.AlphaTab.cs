@@ -185,7 +185,8 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         public void SetupMetronomeChannel(float volume)
         {
-            ChannelSetVolume(SynthConstants.MetronomeChannel, volume);
+            ChannelSetVolume(SynthConstants.MetronomeChannel, 1);
+            ChannelSetMixVolume(SynthConstants.MetronomeChannel, volume);
             ChannelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
         }
     }
