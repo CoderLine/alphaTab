@@ -101,7 +101,7 @@ namespace AlphaTab.Platform.JavaScript
             switch (cmd)
             {
                 case "alphaTab.preRender":
-                    OnPreRender();
+                    OnPreRender(data.resize);
                     break;
                 case "alphaTab.partialRenderFinished":
                     OnPartialRenderFinished(data.result);
@@ -130,14 +130,14 @@ namespace AlphaTab.Platform.JavaScript
             });
         }
 
-        public event Action PreRender;
+        public event Action<bool> PreRender;
 
-        protected virtual void OnPreRender()
+        protected virtual void OnPreRender(bool resize)
         {
             var handler = PreRender;
             if (handler != null)
             {
-                handler();
+                handler(resize);
             }
         }
 

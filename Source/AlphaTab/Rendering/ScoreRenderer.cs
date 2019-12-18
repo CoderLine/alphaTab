@@ -164,7 +164,7 @@ namespace AlphaTab.Rendering
                 Logger.Info("Rendering", "Track " + i + ": " + track.Name);
             }
 
-            OnPreRender();
+            OnPreRender(false);
             RecreateLayout();
             LayoutAndRender();
             _renderedTracks = Tracks;
@@ -191,7 +191,7 @@ namespace AlphaTab.Rendering
             {
                 Logger.Info("Rendering", "Starting optimized rerendering for resize");
                 BoundsLookup = new BoundsLookup();
-                OnPreRender();
+                OnPreRender(true);
                 Canvas.Settings = Settings;
                 Layout.Resize();
                 Layout.RenderAnnotation();
@@ -216,14 +216,14 @@ namespace AlphaTab.Rendering
         }
 
         /// <inheritdoc />
-        public event Action PreRender;
+        public event Action<bool> PreRender;
 
-        private void OnPreRender()
+        private void OnPreRender(bool isResize)
         {
             var handler = PreRender;
             if (handler != null)
             {
-                handler();
+                handler(isResize);
             }
         }
 

@@ -102,6 +102,7 @@ namespace AlphaTab
             initialResizeEventInfo.Settings = Settings;
             OnResize(initialResizeEventInfo);
 
+            Renderer.PreRender += OnRenderStarted;
             Renderer.RenderFinished += e => OnRenderFinished();
             Renderer.PostRenderFinished += () =>
             {
@@ -109,7 +110,7 @@ namespace AlphaTab
                 Logger.Info("rendering", "Rendering completed in " + duration + "ms");
                 OnPostRenderFinished();
             };
-            Renderer.PreRender += () =>
+            Renderer.PreRender += resize =>
             {
                 _startTime = Platform.Platform.GetCurrentMilliseconds();
             };
@@ -245,20 +246,33 @@ namespace AlphaTab
 
         private void InternalRenderTracks(Score score, Track[] tracks)
         {
-            ModelUtils.ApplyPitchOffsets(Settings, score);
-
-            Score = score;
-            Tracks = tracks;
-            _trackIndexes = new FastList<int>();
-            foreach (var track in tracks)
+            if (score != Score)
             {
-                _trackIndexes.Add(track.Index);
+                ModelUtils.ApplyPitchOffsets(Settings, score);
+
+                Score = score;
+                Tracks = tracks;
+                _trackIndexes = new FastList<int>();
+                foreach (var track in tracks)
+                {
+                    _trackIndexes.Add(track.Index);
+                }
+
+                OnLoaded(score);
+                LoadMidiForScore();
+
+                Render();
             }
-
-            OnLoaded(score);
-            LoadMidiForScore();
-
-            Render();
+            else
+            {
+                Tracks = tracks;
+                _trackIndexes = new FastList<int>();
+                foreach (var track in tracks)
+                {
+                    _trackIndexes.Add(track.Index);
+                }
+                Render();
+            }
         }
 
         private void TriggerResize()
@@ -1280,6 +1294,22 @@ namespace AlphaTab
             }
 
             UiFacade.TriggerEvent(Container, "resize", obj);
+        }
+
+        /// <summary>
+        /// This event is fired when the rendering of the whole music sheet is starting.
+        /// </summary>
+        public event Action<bool> RenderStarted;
+
+        private void OnRenderStarted(bool resize)
+        {
+            var handler = RenderStarted;
+            if (handler != null)
+            {
+                handler(resize);
+            }
+
+            UiFacade.TriggerEvent(Container, "render", resize);
         }
 
         /// <summary>

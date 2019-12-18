@@ -39,7 +39,7 @@ namespace AlphaTab.Rendering
         /// <summary>
         /// Occurs before the rendering of the tracks starts.
         /// </summary>
-        event Action PreRender;
+        event Action<bool> PreRender;
 
         /// <summary>
         /// Occurs after the rendering of the tracks finished.

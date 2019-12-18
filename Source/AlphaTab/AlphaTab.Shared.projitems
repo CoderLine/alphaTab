@@ -147,6 +147,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\FontSizes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\CssFontSvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\SvgCanvas.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProgressEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RenderEngineFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\BarRendererBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\BarRendererFactory.cs" />

@@ -49,9 +49,10 @@ namespace AlphaTab.Platform.JavaScript
                         cmd = "alphaTab.postRenderFinished",
                         boundsLookup = _renderer.BoundsLookup.ToJson()
                     });
-                    _renderer.PreRender += () => _main.PostMessage(new
+                    _renderer.PreRender += resize => _main.PostMessage(new
                     {
-                        cmd = "alphaTab.preRender"
+                        cmd = "alphaTab.preRender",
+                        resize = resize
                     });
                     _renderer.Error += Error;
                     break;

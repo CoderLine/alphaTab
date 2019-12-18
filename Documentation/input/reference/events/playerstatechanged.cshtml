@@ -38,7 +38,7 @@ Since: 0.9.4
     <tbody>    
         <tr>
             <td><code>args <span class="code-badge">All</span></code></td>
-            <td><code>AlphaTab.PlayerStateChangedEventArgs</code></td>
+            <td><code>AlphaTab.Audio.Synth.PlayerStateChangedEventArgs</code></td>
             <td>
                 The information about the player state change event. 
             </td>
@@ -46,7 +46,7 @@ Since: 0.9.4
     </tbody>
 </table>
 
-<h2>AlphaTab.ResizeEventArgs Properties</h2>
+<h2>AlphaTab.Audio.Synth.PlayerStateChangedEventArgs Properties</h2>
 
 <table class="table table-striped table-condensed type-table">
     <thead>
@@ -131,7 +131,7 @@ $('#alphaTab').on('alphaTab.playerStateChanged', function(e, args) {
 <pre>
 <code class="language-javaScript line-numbers">
 document.querySelector('#alphaTab').addEventListener('alphaTab.playerStateChanged', function(e) {
-    var args = e.details;
+    var args = e.detail;
     updatePlayerControls(args.State, args.Stopped);
 }, false);
 </code>

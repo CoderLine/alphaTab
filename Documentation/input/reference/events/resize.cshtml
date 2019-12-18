@@ -137,7 +137,7 @@ $('#alphaTab').on('alphaTab.resize', function(e, args) {
 <pre>
 <code class="language-javaScript line-numbers">
 document.querySelector('#alphaTab').addEventListener('alphaTab.resize', function(e) {
-    var args = e.details;
+    var args = e.detail;
     args.Settings.Scale = args.NewWidth > 1300 
         ? 1.5f 
         : (args.NewWidth > 800) ? 1.3f : 1;

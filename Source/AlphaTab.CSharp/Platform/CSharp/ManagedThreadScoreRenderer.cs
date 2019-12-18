@@ -59,7 +59,7 @@ namespace AlphaTab.Platform.CSharp
             _renderer.PartialRenderFinished += result => _uiInvoke(() => OnPartialRenderFinished(result));
             _renderer.RenderFinished += result => _uiInvoke(() => OnRenderFinished(result));
             _renderer.PostRenderFinished += () => _uiInvoke(() => OnPostFinished(_renderer.BoundsLookup));
-            _renderer.PreRender += () => _uiInvoke(OnPreRender);
+            _renderer.PreRender += resize => _uiInvoke(()=>OnPreRender(resize));
             _renderer.Error += (s, e) => _uiInvoke(() => OnError(s, e));
         }
 
@@ -145,14 +145,14 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
-        public event Action PreRender;
+        public event Action<bool> PreRender;
 
-        protected virtual void OnPreRender()
+        protected virtual void OnPreRender(bool isResize)
         {
             var handler = PreRender;
             if (handler != null)
             {
-                handler();
+                handler(isResize);
             }
         }
 

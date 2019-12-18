@@ -65,7 +65,7 @@ namespace AlphaTab.Platform.CSharp
 
         public virtual void InitialRender()
         {
-            Api.Renderer.PreRender += () =>
+            Api.Renderer.PreRender += resize =>
             {
                 TotalResultCount.Enqueue(new Counter());
             };

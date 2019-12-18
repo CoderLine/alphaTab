@@ -139,7 +139,7 @@ $('#alphaTab').on('alphaTab.positionChanged', function(e, args) {
 <pre>
 <code class="language-javaScript line-numbers">
 document.querySelector('#alphaTab').addEventListener('alphaTab.positionChanged', function(e) {
-    var args = e.details;
+    var args = e.detail;
     updatePlayerPosition(args);
 }, false);
 </code>

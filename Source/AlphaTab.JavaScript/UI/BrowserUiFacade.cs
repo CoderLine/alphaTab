@@ -308,7 +308,7 @@ namespace AlphaTab.UI
 
         public void InitialRender()
         {
-            _api.Renderer.PreRender += () => { _totalResultCount = 0; };
+            _api.Renderer.PreRender += resize => { _totalResultCount = 0; };
 
             RootContainerBecameVisible += () =>
             {
@@ -438,22 +438,23 @@ namespace AlphaTab.UI
             }
             else if (tracksData.HasMember("length"))
             {
-                var length = tracks.Member<int>("length");
+                var length = tracksData.Member<int>("length");
                 var array = (object[])tracksData;
                 for (var i = 0; i < length; i++)
                 {
+                    var item = array[i];
                     int value;
-                    if (Platform.Platform.TypeOf(array) == "number")
+                    if (Platform.Platform.TypeOf(item) == "number")
                     {
-                        value = (int)array[i];
+                        value = (int)item;
                     }
-                    else if (tracks.HasMember("Index"))
+                    else if (item.HasMember("index"))
                     {
-                        value = array[i].Member<int>("Index");
+                        value = item.Member<int>("index");
                     }
                     else
                     {
-                        value = Platform.Platform.ParseInt(array[i].ToString());
+                        value = Platform.Platform.ParseInt(item.ToString());
                     }
 
                     if (value >= 0)
@@ -462,9 +463,9 @@ namespace AlphaTab.UI
                     }
                 }
             }
-            else if (tracksData.HasMember("Index"))
+            else if (tracksData.HasMember("index"))
             {
-                tracks.Add(tracksData.Member<int>("Index"));
+                tracks.Add(tracksData.Member<int>("index"));
             }
 
             return tracks.ToArray();
@@ -659,17 +660,17 @@ namespace AlphaTab.UI
             var elementsToHighlight = element.GetElementsByClassName(groupId);
             for (var i = 0; i < elementsToHighlight.Length; i++)
             {
-                elementsToHighlight.Item(i).ClassList.Add("atHighlight");
+                elementsToHighlight.Item(i).ClassList.Add("at-highlight");
             }
         }
 
         public void RemoveHighlights()
         {
             var element = ((HtmlElementContainer)_api.Container).Element;
-            var elements = element.GetElementsByClassName("atHighlight");
+            var elements = element.GetElementsByClassName("at-highlight");
             while (elements.Length > 0)
             {
-                elements.Item(0).ClassList.Remove("atHighlight");
+                elements.Item(0).ClassList.Remove("at-highlight");
             }
         }
 
@@ -677,16 +678,16 @@ namespace AlphaTab.UI
         {
             var element = ((HtmlElementContainer)_api.Container).Element;
             var cursorWrapper = Browser.Document.CreateElement("div");
-            cursorWrapper.ClassList.Add("cursors");
+            cursorWrapper.ClassList.Add("at-cursors");
 
             var selectionWrapper = Browser.Document.CreateElement("div");
-            selectionWrapper.ClassList.Add("selectionWrapper");
+            selectionWrapper.ClassList.Add("at-selection");
 
             var barCursor = Browser.Document.CreateElement("div");
-            barCursor.ClassList.Add("barCursor");
+            barCursor.ClassList.Add("at-cursor-bar");
 
             var beatCursor = Browser.Document.CreateElement("div");
-            beatCursor.ClassList.Add("beatCursor");
+            beatCursor.ClassList.Add("at-cursor-beat");
 
             // required css styles
             element.Style.Position = "relative";
@@ -746,7 +747,10 @@ namespace AlphaTab.UI
 
         public IContainer GetScrollContainer()
         {
-            var scrollElement = Browser.Document.QuerySelector(_api.Settings.ScrollElement);
+            var scrollElement = Platform.Platform.TypeOf(_api.Settings.ScrollElement) == "string"
+                ? Browser.Document.QuerySelector(_api.Settings.ScrollElement)
+                : _api.Settings.ScrollElement.As<Element>();
+
             var nodeName = scrollElement.NodeName.ToLowerCase();
             if (nodeName == "html" || nodeName == "body")
             {
