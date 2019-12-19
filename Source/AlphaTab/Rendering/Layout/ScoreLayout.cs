@@ -158,7 +158,7 @@ namespace AlphaTab.Rendering.Layout
             }
 
             // chord diagram glyphs
-            if (!Renderer.Settings.Notation.HideChordDiagram)
+            if (!Renderer.Settings.Notation.HideChordDiagrams)
             {
                 ChordDiagrams = new ChordDiagramContainerGlyph(0, 0);
                 ChordDiagrams.Renderer = new BarRendererBase(Renderer, null);

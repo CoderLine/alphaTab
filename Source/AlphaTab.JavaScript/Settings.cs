@@ -24,7 +24,7 @@ namespace AlphaTab
         /// <summary>
         /// Gets or sets whether lazy loading for displayed elements is enabled.
         /// </summary>
-        [JsonName("lazy")]
+        [JsonName("enableLazyLoading")]
         public bool EnableLazyLoading { get; set; } = true;
 
         public CoreSettings()
@@ -130,7 +130,7 @@ namespace AlphaTab
         /// Gets or sets the URl of the sound font to be loaded.
         /// </summary>
         [JsonName("soundFont")]
-        public string SoundFontFile { get; set; }
+        public string SoundFont { get; set; }
 
         /// <summary>
         /// Gets or sets the element that should be used for scrolling.

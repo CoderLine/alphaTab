@@ -652,9 +652,9 @@ namespace AlphaTab.UI
             {
                 player.Ready += () =>
                 {
-                    if (!string.IsNullOrEmpty(_api.Settings.Player.SoundFontFile))
+                    if (!string.IsNullOrEmpty(_api.Settings.Player.SoundFont))
                     {
-                        ((AlphaTabApi)_api).LoadSoundFontFromUrl(_api.Settings.Player.SoundFontFile);
+                        ((AlphaTabApi)_api).LoadSoundFontFromUrl(_api.Settings.Player.SoundFont);
                     }
                 };
             }

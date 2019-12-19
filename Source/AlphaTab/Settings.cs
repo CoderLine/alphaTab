@@ -168,7 +168,7 @@ namespace AlphaTab
         /// <summary>
         /// The log level to use within alphaTab
         /// </summary>
-        [JsonName("logLevel", "logging")]
+        [JsonName("logLevel")]
         public LogLevel LogLevel { get; set; } = LogLevel.Info;
 
         /// <summary>
@@ -363,8 +363,8 @@ namespace AlphaTab
         /// <summary>
         /// Whether to display the chord diagrams or not.
         /// </summary>
-        [JsonName("hideChordDiagram")]
-        public bool HideChordDiagram { get; set; } = false;
+        [JsonName("hideChordDiagrams")]
+        public bool HideChordDiagrams { get; set; } = false;
 
         /// <summary>
         /// Whether to show rhythm notation in the guitar tablature.
@@ -433,34 +433,11 @@ namespace AlphaTab
         public bool ExtendLineEffectsToBeatEnd { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets whether the triplet feel should be applied/played during audio playback.
-        /// </summary>
-        public bool PlayTripletFeel { get; set; } = true;
-
-        /// <summary>
         /// Gets or sets the height for slurs. The factor is multiplied with the a logarithmic distance
         /// between slur start and end.
         /// </summary>
         [JsonName("slurHeight")]
         public float SlurHeight { get; set; } = 7.0f;
-
-        /// <summary>
-        /// Gets or sets the bend duration in milliseconds for songbook bends.
-        /// </summary>
-        [JsonName("songBookBendDuration")]
-        public int SongBookBendDuration { get; set; } = 75;
-
-        /// <summary>
-        /// Gets or sets the duration of whammy dips in milliseconds for songbook whammys.
-        /// </summary>
-        [JsonName("songBookDipDuration")]
-        public int SongBookDipDuration { get; set; } = 150;
-
-        /// <summary>
-        /// Gets or sets the settings on how the vibrato audio is generated.
-        /// </summary>
-        [JsonName("vibrato")]
-        public VibratoPlaybackSettings Vibrato { get; } = new VibratoPlaybackSettings();
     }
 
     /// <summary>
@@ -546,13 +523,13 @@ namespace AlphaTab
         /// <summary>
         /// Gets or sets whether the player should be enabled.
         /// </summary>
-        [JsonName("enable")]
+        [JsonName("enablePlayer")]
         public bool EnablePlayer { get; set; } = false;
 
         /// <summary>
         /// Gets or sets whether playback cursors should be displayed.
         /// </summary>
-        [JsonName("cursor")]
+        [JsonName("enableCursor")]
         public bool EnableCursor { get; set; } = true;
 
         /// <summary>
@@ -579,6 +556,29 @@ namespace AlphaTab
         /// </summary>
         [JsonName("scrollSpeed")]
         public int ScrollSpeed { get; set; } = 300;
+
+        /// <summary>
+        /// Gets or sets the bend duration in milliseconds for songbook bends.
+        /// </summary>
+        [JsonName("songBookBendDuration")]
+        public int SongBookBendDuration { get; set; } = 75;
+
+        /// <summary>
+        /// Gets or sets the duration of whammy dips in milliseconds for songbook whammys.
+        /// </summary>
+        [JsonName("songBookDipDuration")]
+        public int SongBookDipDuration { get; set; } = 150;
+
+        /// <summary>
+        /// Gets or sets the settings on how the vibrato audio is generated.
+        /// </summary>
+        [JsonName("vibrato")]
+        public VibratoPlaybackSettings Vibrato { get; } = new VibratoPlaybackSettings();
+
+        /// <summary>
+        /// Gets or sets whether the triplet feel should be applied/played during audio playback.
+        /// </summary>
+        public bool PlayTripletFeel { get; set; } = true;
     }
 
     /// <summary>

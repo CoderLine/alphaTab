@@ -241,7 +241,7 @@ namespace AlphaTab.Audio.Generator
             {
                 audioDuration = beat.Voice.Bar.MasterBar.CalculateDuration();
             }
-            else if (beat.Voice.Bar.MasterBar.TripletFeel != TripletFeel.NoTripletFeel && (_settings != null && !_settings.Notation.PlayTripletFeel))
+            else if (beat.Voice.Bar.MasterBar.TripletFeel != TripletFeel.NoTripletFeel && (_settings != null && !_settings.Player.PlayTripletFeel))
             {
                 if (_currentTripletFeel != null)
                 {
@@ -321,12 +321,12 @@ namespace AlphaTab.Audio.Generator
                 switch (beat.Vibrato)
                 {
                     case VibratoType.Slight:
-                        phaseLength = _settings.Notation.Vibrato.BeatSlightLength;
-                        bendAmplitude = _settings.Notation.Vibrato.BeatSlightAmplitude;
+                        phaseLength = _settings.Player.Vibrato.BeatSlightLength;
+                        bendAmplitude = _settings.Player.Vibrato.BeatSlightAmplitude;
                         break;
                     case VibratoType.Wide:
-                        phaseLength = _settings.Notation.Vibrato.BeatWideLength;
-                        bendAmplitude = _settings.Notation.Vibrato.BeatWideAmplitude;
+                        phaseLength = _settings.Player.Vibrato.BeatWideLength;
+                        bendAmplitude = _settings.Player.Vibrato.BeatWideAmplitude;
                         break;
                 }
 
@@ -707,12 +707,12 @@ namespace AlphaTab.Audio.Generator
             switch (note.Vibrato)
             {
                 case VibratoType.Slight:
-                    phaseLength = _settings.Notation.Vibrato.NoteSlightLength;
-                    bendAmplitude = _settings.Notation.Vibrato.NoteSlightAmplitude;
+                    phaseLength = _settings.Player.Vibrato.NoteSlightLength;
+                    bendAmplitude = _settings.Player.Vibrato.NoteSlightAmplitude;
                     break;
                 case VibratoType.Wide:
-                    phaseLength = _settings.Notation.Vibrato.NoteWideLength;
-                    bendAmplitude = _settings.Notation.Vibrato.NoteWideAmplitude;
+                    phaseLength = _settings.Player.Vibrato.NoteWideLength;
+                    bendAmplitude = _settings.Player.Vibrato.NoteWideAmplitude;
                     break;
                 default:
                     return;
@@ -798,7 +798,7 @@ namespace AlphaTab.Audio.Generator
                 }
 
                 duration = Math.Max(noteDuration.NoteOnly,
-                    MidiUtils.MillisToTicks(_settings.Notation.SongBookBendDuration, _currentTempo));
+                    MidiUtils.MillisToTicks(_settings.Player.SongBookBendDuration, _currentTempo));
             }
             else
             {
@@ -812,7 +812,7 @@ namespace AlphaTab.Audio.Generator
             }
 
             var bendDuration = Math.Min(duration,
-                MidiUtils.MillisToTicks(_settings.Notation.SongBookBendDuration, _currentTempo));
+                MidiUtils.MillisToTicks(_settings.Player.SongBookBendDuration, _currentTempo));
 
             var playedBendPoints = new FastList<BendPoint>();
             switch (note.BendType)
@@ -1025,7 +1025,7 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             var whammyDuration = Math.Min(duration,
-                                    MidiUtils.MillisToTicks(_settings.Notation.SongBookBendDuration, _currentTempo));
+                                    MidiUtils.MillisToTicks(_settings.Player.SongBookBendDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart,
                                 channel,
                                 duration,
@@ -1053,7 +1053,7 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             var whammyDuration = Math.Min(duration,
-                                MidiUtils.MillisToTicks(_settings.Notation.SongBookDipDuration, _currentTempo));
+                                MidiUtils.MillisToTicks(_settings.Player.SongBookDipDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart,
                                 channel,
                                 duration,
@@ -1090,7 +1090,7 @@ namespace AlphaTab.Audio.Generator
                             _handler.AddBend(track.Index, noteStart, (byte)channel, (int)preDiveValue);
 
                             var whammyDuration = Math.Min(duration,
-                                MidiUtils.MillisToTicks(_settings.Notation.SongBookBendDuration, _currentTempo));
+                                MidiUtils.MillisToTicks(_settings.Player.SongBookBendDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart,
                                 channel,
                                 duration,
