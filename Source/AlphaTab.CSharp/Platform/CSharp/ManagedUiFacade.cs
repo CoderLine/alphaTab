@@ -85,6 +85,7 @@ namespace AlphaTab.Platform.CSharp
         protected abstract void RenderTracks();
 
         public abstract void BeginAppendRenderResults(RenderFinishedEventArgs renderResults);
+        public abstract void DestroyCursors();
         public abstract Cursors CreateCursors();
         public abstract void BeginInvoke(Action action);
         public abstract void RemoveHighlights();

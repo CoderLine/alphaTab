@@ -99,6 +99,11 @@ namespace AlphaTab.UI
         Cursors CreateCursors();
 
         /// <summary>
+        /// Destroys the cursor objects that are used to highlight the currently played beats and bars.
+        /// </summary>
+        void DestroyCursors();
+
+        /// <summary>
         /// Tells the UI layer to invoke the given action.
         /// </summary>
         /// <param name="action"></param>
