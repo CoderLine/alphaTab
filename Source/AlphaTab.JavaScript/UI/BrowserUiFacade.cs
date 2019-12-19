@@ -134,7 +134,7 @@ namespace AlphaTab.UI
 
             var dataAttributes = GetDataAttributes();
             var settings = Settings.FromJson(raw);
-            //settings.LoadFromPropertyBag(dataAttributes);
+            settings.FillFromDataAttributes(dataAttributes);
             api.Settings = settings;
             if (settings.Core.Engine == "default" || settings.Core.Engine == "svg")
             {

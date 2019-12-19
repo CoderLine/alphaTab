@@ -62,7 +62,7 @@ namespace AlphaTab.Platform
             {
                 if (value.StartsWith(x))
                 {
-                    return value;
+                    return x;
                 }
             }
 

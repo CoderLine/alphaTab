@@ -1,6 +1,9 @@
+using System;
 using AlphaTab.Collections;
+using AlphaTab.Haxe;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Util;
+using Phase;
 
 namespace AlphaTab
 {
@@ -150,5 +153,30 @@ namespace AlphaTab
         {
             return null; // dynamically implemented via macro
         }
+
+        public void FillFromDataAttributes(dynamic dataAttributes)
+        {
+            var keys = Script.Write<string[]>("untyped __js__(\"Object.keys({0})\", dataAttributes)");
+            foreach (var key in keys)
+            {
+                object value;
+                try
+                {
+                    value = Json.Parse(dataAttributes[key]);
+                }
+                catch
+                {
+                    value = dataAttributes[key];
+                }
+                SetProperty(key.ToLower(), value);
+            }
+        }
+
+        public bool SetProperty(string property, dynamic value)
+        {
+            // dynamically implemented via macro
+            return false;
+        }
+
     }
 }

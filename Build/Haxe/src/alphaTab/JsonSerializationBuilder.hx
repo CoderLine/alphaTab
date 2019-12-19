@@ -148,11 +148,10 @@ class JsonSerializationBuilder {
 				kind: FFun({
 					args: [
 					    {name: 'property', type: macro:system.CsString},
-					    {name: 'value', type: macro:Dynamic },
-					    {name: 'partial', type: macro:Bool }
+					    {name: 'value', type: macro:Dynamic }
                     ],
 					expr: null,
-					ret: macro:Void
+					ret: macro:Bool
 				})
 			}
 			if(!isAbstract)
@@ -383,7 +382,7 @@ class JsonSerializationBuilder {
 		statements.push(macro if(json == null) return null);
 
 		statements.push(macro var obj = new $targetTypePath());
-		statements.push(macro obj.fillFromJson(obj));
+		statements.push(macro obj.fillFromJson(json));
 		statements.push(macro return obj);
 
 		return macro $b{statements};
@@ -425,13 +424,12 @@ class JsonSerializationBuilder {
 					if (metaEntry.name == "json" && metaEntry.params != null) {
 						for (v in metaEntry.params) {
 							var name = ExprTools.getValue(v).toString();
+                            var jsonName = {
+                                pos: Context.currentPos(),
+                                expr: EConst(CString(name.toLowerCase()))
+                            }
+                            jsonNames.push(jsonName);
 							if (name != "") {
-							    var jsonName = {
-									pos: Context.currentPos(),
-									expr: EConst(CString(name.toLowerCase()))
-								}
-								jsonNames.push(jsonName);
-
 								fieldCase.values.push(jsonName);
 							}
 						}
@@ -465,6 +463,7 @@ class JsonSerializationBuilder {
                                 switchCases.push(fieldCase);
                                 fieldCase.expr = macro {
                                     this.$fieldName = $p{fieldTypeName}.fromJson(${val});
+                                    return true;
                                 };
                             }
                             else {
@@ -477,16 +476,23 @@ class JsonSerializationBuilder {
                                 };
                                 var complexMapping = macro {
                                     if(alphaTab.platform.Platform.equalsAny(property, [$a{jsonNames}])) {
-                                        this.$fieldName = $p{fieldTypeName}.fromJson(${val});
-                                        return;
-                                    } else if(partial) {
+                                        if(this.$fieldName == null) {
+                                            this.$fieldName = $p{fieldTypeName}.fromJson(${val});
+                                        }
+                                        else {
+                                            this.$fieldName.fillFromJson(${val});
+                                        }
+                                        return true;
+                                    } else {
                                         var partialMatch = alphaTab.platform.Platform.findStartsWith(property, [$a{jsonNames}]);
                                         if(partialMatch != null) {
                                             if(this.$fieldName == null) {
                                                 this.$fieldName = ${newExpr};
                                             }
-                                            this.$fieldName.setProperty(property.substring_Int32(partialMatch.length) , ${val}, true);
-                                            return;
+                                            if(this.$fieldName.setProperty(property.substring_Int32(partialMatch.length) , ${val}))
+                                            {
+                                                return true;
+                                            }
                                         }
                                     }
                                 };
@@ -518,7 +524,7 @@ class JsonSerializationBuilder {
                                     // TODO: better validation of input value vs output value
                                     fieldCase.expr = macro {
                                         this.$fieldName = ${val};
-                                        return;
+                                        return true;
                                     };
 
 
@@ -537,13 +543,13 @@ class JsonSerializationBuilder {
                                     // TODO: better validation of input value vs output value
                                     fieldCase.expr = macro {
                                         this.$fieldName = ${val} == null ? null : ${val}.slice();
-                                        return;
+                                        return true;
                                     };
 
                                 default:
                                     fieldCase.expr = macro {
                                         this.$fieldName = $p{fullName.split('.')}.fromJson(${val});
-                                        return;
+                                        return true;
                                     };
                             }
 
@@ -552,6 +558,8 @@ class JsonSerializationBuilder {
                 }
 			}
 		}
+
+        statements.push(macro return false);
 
 		return macro $b{statements};
 	}
@@ -567,7 +575,7 @@ class JsonSerializationBuilder {
 		statements.push(macro if(json == null) return);
 
 		var forSwitch:Expr = macro system.ObjectExtensions.forIn(json, function(key) {
-			setProperty(key.toLower(), untyped json[key], false);
+			setProperty(key.toLower(), untyped json[key]);
 		});
 		statements.push(forSwitch);
 
