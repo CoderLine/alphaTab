@@ -8,7 +8,7 @@ namespace AlphaTab
         private static void PlatformInit()
         {
             RenderEngines["svg"] = new RenderEngineFactory(true, () => new CssFontSvgCanvas());
-#if NET472
+#if NET48
             RenderEngines["gdi"] = new RenderEngineFactory(true, () => new GdiCanvas());
 #endif
             RenderEngines["skia"] = new RenderEngineFactory(true, () => new SkiaCanvas());

@@ -1,7 +1,7 @@
 ﻿
 using AlphaTab.Importer;
 using AlphaTab.Model;
-#if NET472
+#if NET48
 using System;
 using System.Collections.Concurrent;
 using System.Drawing;

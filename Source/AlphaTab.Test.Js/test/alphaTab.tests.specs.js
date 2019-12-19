@@ -31,6 +31,11 @@ describe("alphaTab.test.audio.MidiFileGeneratorTest", function() {
         __instance.testBendMultiPoint();
         done();
     });
+    it("testTripletFeel", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.testTripletFeel();
+        done();
+    });
 });
 describe("alphaTab.test.audio.MidiPlaybackControllerTest", function() {
     var __instance = new alphaTab.test.audio.MidiPlaybackControllerTest();

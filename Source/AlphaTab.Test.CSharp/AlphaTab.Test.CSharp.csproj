@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>AlphaTab.Test.CSharp</RootNamespace>
     <AssemblyName>AlphaTab.Test.CSharp</AssemblyName>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <PackageId>AlphaTab.Test.CSharp</PackageId>
     <NoWarn>$(NoWarn);0626;0824</NoWarn>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

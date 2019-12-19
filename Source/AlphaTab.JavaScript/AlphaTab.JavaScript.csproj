@@ -3,7 +3,7 @@
     <PackageId>AlphaTab.JavaScript</PackageId>
     <RootNamespace>AlphaTab</RootNamespace>
     <AssemblyName>AlphaTab.JavaScript</AssemblyName>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <NoWarn>$(NoWarn);0626;0824</NoWarn>
     <DefineConstants>$(DefineConstants);JavaScript</DefineConstants>
   </PropertyGroup>

@@ -1,4 +1,4 @@
-﻿#if NET472
+﻿#if NET48
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Media;
@@ -6,7 +6,7 @@ using System.Windows.Media.Imaging;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
-    internal class GdiImageSource 
+    internal class GdiImageSource
     {
         public static BitmapSource Create(Bitmap image)
         {
