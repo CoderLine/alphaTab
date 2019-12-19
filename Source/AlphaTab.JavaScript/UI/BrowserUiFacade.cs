@@ -548,6 +548,12 @@ namespace AlphaTab.UI
                         {
                             canvasElement.RemoveChild(canvasElement.LastChild);
                         }
+
+                        // directly show the elements in the viewport once we're done.
+                        if (_api.Settings.EnableLazyLoading)
+                        {
+                            ShowSvgsInViewPort();
+                        }
                     }
                     // NOTE: here we try to replace existing children
                     else
