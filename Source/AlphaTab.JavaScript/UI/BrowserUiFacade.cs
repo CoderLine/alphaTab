@@ -132,8 +132,8 @@ namespace AlphaTab.UI
         {
             _api = api;
 
-            var dataAttributes = GetDataAttributes(raw);
-            var settings = new Settings();
+            var dataAttributes = GetDataAttributes();
+            var settings = Settings.FromJson(raw);
             //settings.LoadFromPropertyBag(dataAttributes);
             api.Settings = settings;
             if (settings.Core.Engine == "default" || settings.Core.Engine == "svg")
@@ -472,7 +472,7 @@ namespace AlphaTab.UI
             return tracks.ToArray();
         }
 
-        private FastDictionary<string, object> GetDataAttributes(object json)
+        private FastDictionary<string, object> GetDataAttributes()
         {
             var dataAttributes = new FastDictionary<string, object>();
 

@@ -43,6 +43,32 @@ namespace AlphaTab.Platform
             return Script.Write<string>("untyped __js__(\"arguments.callee.caller.caller.name\")");
         }
 
+        public static bool EqualsAny(string value, string[] values)
+        {
+            foreach (var x in values)
+            {
+                if (value == x)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static string FindStartsWith(string value, string[] values)
+        {
+            foreach (var x in values)
+            {
+                if (value.StartsWith(x))
+                {
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
         public static void Log(LogLevel logLevel, string category, string msg, object details = null)
         {
             // ReSharper disable once RedundantAssignment
