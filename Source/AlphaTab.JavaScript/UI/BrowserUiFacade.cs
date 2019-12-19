@@ -551,7 +551,7 @@ namespace AlphaTab.UI
                         }
 
                         // directly show the elements in the viewport once we're done.
-                        if (_api.Settings.EnableLazyLoading)
+                        if (_api.Settings.Core.EnableLazyLoading)
                         {
                             ShowSvgsInViewPort();
                         }

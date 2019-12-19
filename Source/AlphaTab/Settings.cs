@@ -6,37 +6,37 @@ using AlphaTab.Util;
 namespace AlphaTab
 {
     /// <summary>
-    /// This public class contains central definitions for controlling the visual appearance. 
+    /// This public class contains central definitions for controlling the visual appearance.
     /// </summary>
     [JsonSerializable]
     public class RenderingResources
     {
         /// <summary>
-        /// Gets or sets the font to use for displaying the songs copyright information in the header of the music sheet. 
+        /// Gets or sets the font to use for displaying the songs copyright information in the header of the music sheet.
         /// </summary>
         [JsonName("copyrightFont")]
         public Font CopyrightFont { get; set; }
 
         /// <summary>
-        /// Gets or sets the font to use for displaying the songs title in the header of the music sheet. 
+        /// Gets or sets the font to use for displaying the songs title in the header of the music sheet.
         /// </summary>
         [JsonName("titleFont")]
         public Font TitleFont { get; set; }
 
         /// <summary>
-        /// Gets or sets the font to use for displaying the songs subtitle in the header of the music sheet. 
+        /// Gets or sets the font to use for displaying the songs subtitle in the header of the music sheet.
         /// </summary>
         [JsonName("subTitleFont")]
         public Font SubTitleFont { get; set; }
 
         /// <summary>
-        /// Gets or sets the font to use for displaying the lyrics information in the header of the music sheet. 
+        /// Gets or sets the font to use for displaying the lyrics information in the header of the music sheet.
         /// </summary>
         [JsonName("wordsFont")]
         public Font WordsFont { get; set; }
 
         /// <summary>
-        /// Gets or sets the font to use for displaying certain effect related elements in the music sheet. 
+        /// Gets or sets the font to use for displaying certain effect related elements in the music sheet.
         /// </summary>
         [JsonName("effectFont")]
         public Font EffectFont { get; set; }
@@ -48,7 +48,7 @@ namespace AlphaTab
         public Font FretboardNumberFont { get; set; }
 
         /// <summary>
-        /// Gets or sets the font to use for displaying the guitar tablature numbers in the music sheet. 
+        /// Gets or sets the font to use for displaying the guitar tablature numbers in the music sheet.
         /// </summary>
         [JsonName("tablatureFont")]
         public Font TablatureFont { get; set; }
@@ -60,25 +60,25 @@ namespace AlphaTab
         public Font GraceFont { get; set; }
 
         /// <summary>
-        /// Gets or sets the color to use for rendering the lines of staves. 
+        /// Gets or sets the color to use for rendering the lines of staves.
         /// </summary>
         [JsonName("staffLineColor")]
         public Color StaffLineColor { get; set; }
 
         /// <summary>
-        /// Gets or sets the color to use for rendering bar separators, the accolade and repeat signs. 
+        /// Gets or sets the color to use for rendering bar separators, the accolade and repeat signs.
         /// </summary>
         [JsonName("barSeparatorColor")]
         public Color BarSeparatorColor { get; set; }
 
         /// <summary>
-        /// Gets or sets the font to use for displaying the bar numbers above the music sheet. 
+        /// Gets or sets the font to use for displaying the bar numbers above the music sheet.
         /// </summary>
         [JsonName("barNumberFont")]
         public Font BarNumberFont { get; set; }
 
         /// <summary>
-        /// Gets or sets the color to use for displaying the bar numbers above the music sheet. 
+        /// Gets or sets the color to use for displaying the bar numbers above the music sheet.
         /// </summary>
         [JsonName("barNumberColor")]
         public Color BarNumberColor { get; set; }
@@ -90,25 +90,25 @@ namespace AlphaTab
         public Font FingeringFont { get; set; }
 
         /// <summary>
-        /// Gets or sets the font to use for section marker labels shown above the music sheet. 
+        /// Gets or sets the font to use for section marker labels shown above the music sheet.
         /// </summary>
         [JsonName("markerFont")]
         public Font MarkerFont { get; set; }
 
         /// <summary>
-        /// Gets or sets the color to use for music notation elements of the primary voice. 
+        /// Gets or sets the color to use for music notation elements of the primary voice.
         /// </summary>
         [JsonName("mainGlyphColor")]
         public Color MainGlyphColor { get; set; }
 
         /// <summary>
-        /// Gets or sets the color to use for music notation elements of the secondary voices. 
+        /// Gets or sets the color to use for music notation elements of the secondary voices.
         /// </summary>
         [JsonName("secondaryGlyphColor")]
         public Color SecondaryGlyphColor { get; set; }
 
         /// <summary>
-        /// Gets or sets the color to use for displaying the song information above the music sheet. 
+        /// Gets or sets the color to use for displaying the song information above the music sheet.
         /// </summary>
         [JsonName("scoreInfoColor")]
         public Color ScoreInfoColor { get; set; }

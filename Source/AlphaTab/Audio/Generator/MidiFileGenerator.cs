@@ -241,7 +241,7 @@ namespace AlphaTab.Audio.Generator
             {
                 audioDuration = beat.Voice.Bar.MasterBar.CalculateDuration();
             }
-            else if (beat.Voice.Bar.MasterBar.TripletFeel != TripletFeel.NoTripletFeel && (_settings == null || _settings.PlayTripletFeel))
+            else if (beat.Voice.Bar.MasterBar.TripletFeel != TripletFeel.NoTripletFeel && (_settings != null && !_settings.Notation.PlayTripletFeel))
             {
                 if (_currentTripletFeel != null)
                 {

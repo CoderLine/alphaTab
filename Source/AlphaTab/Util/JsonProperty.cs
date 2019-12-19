@@ -1,5 +1,4 @@
 using System;
-using Phase.Attributes;
 
 namespace AlphaTab.Util
 {

@@ -156,7 +156,7 @@ namespace AlphaTab
             Renderer.UpdateSettings(Settings);
 
             // enable/disable player if needed
-            if (Settings.EnablePlayer)
+            if (Settings.Player.EnablePlayer)
             {
                 SetupPlayer();
             }
@@ -1103,7 +1103,7 @@ namespace AlphaTab
         {
             CanvasElement.MouseDown += e =>
             {
-                if (!e.IsLeftMouseButton || !Settings.EnablePlayer || !Settings.EnableCursor)
+                if (!e.IsLeftMouseButton || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
                 {
                     return;
                 }
@@ -1123,7 +1123,7 @@ namespace AlphaTab
 
             CanvasElement.MouseMove += e =>
             {
-                if (!_selecting || !Settings.EnablePlayer || !Settings.EnableCursor)
+                if (!_selecting || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
                 {
                     return;
                 }
@@ -1140,7 +1140,7 @@ namespace AlphaTab
 
             CanvasElement.MouseUp += e =>
             {
-                if (!_selecting || !Settings.EnablePlayer || !Settings.EnableCursor)
+                if (!_selecting || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
                 {
                     return;
                 }
@@ -1194,7 +1194,7 @@ namespace AlphaTab
 
             Renderer.PostRenderFinished += () =>
             {
-                if (_selectionStart == null || !Settings.EnablePlayer || !Settings.EnableCursor)
+                if (_selectionStart == null || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
                 {
                     return;
                 }
