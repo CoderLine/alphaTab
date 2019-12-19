@@ -127,6 +127,11 @@ namespace AlphaTab
         public VibratoPlaybackSettings Vibrato { get; set; }
 
         /// <summary>
+        /// Gets or sets whether the triplet feel should be applied/played during audio playback.
+        /// </summary>
+        public bool PlayTripletFeel { get; set; }
+
+        /// <summary>
         /// Gets or sets the height for slurs. The factor is multiplied with the a logarithmic distance
         /// between slur start and end.
         /// </summary>
@@ -274,6 +279,8 @@ namespace AlphaTab
                 settings.Vibrato.BeatWideAmplitude = 3;
                 settings.Vibrato.BeatSlightLength = 240;
                 settings.Vibrato.BeatWideLength = 240;
+
+                settings.PlayTripletFeel = true;
 
                 settings.SongBookBendDuration = 75;
                 settings.SongBookDipDuration = 150;

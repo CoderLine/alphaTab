@@ -151,6 +151,7 @@ namespace AlphaTab
 
             json.includeNoteBounds = IncludeNoteBounds;
 
+            json.playTripletFeel = PlayTripletFeel;
             json.vibrato = Platform.Platform.NewObject();
             json.noteSlightAmplitude = Vibrato.NoteSlightAmplitude;
             json.noteWideAmplitude = Vibrato.NoteWideAmplitude;
@@ -519,6 +520,15 @@ namespace AlphaTab
             else if (dataAttributes != null && dataAttributes.ContainsKey("includeNoteBounds"))
             {
                 settings.IncludeNoteBounds = (bool)dataAttributes["includeNoteBounds"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "playTripletFeel"))
+            {
+                settings.PlayTripletFeel = json.playTripletFeel;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("playTripletFeel"))
+            {
+                settings.PlayTripletFeel = (bool)dataAttributes["playTripletFeel"];
             }
 
             if (Platform.Platform.JsonExists(json, "vibrato"))

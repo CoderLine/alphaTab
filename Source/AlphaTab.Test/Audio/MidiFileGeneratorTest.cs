@@ -60,7 +60,6 @@ namespace AlphaTab.Test.Audio
         {
             var tex = ":4 15.6{b(0 4)} 15.6";
             var score = ParseTex(tex);
-
             Assert.AreEqual(1, score.Tracks.Count);
             Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars.Count);
             Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices.Count);
@@ -368,6 +367,91 @@ namespace AlphaTab.Test.Audio
             }
 
             Assert.AreEqual(expectedEvents.Length, handler.MidiEvents.Count);
+        }
+
+        [TestMethod]
+        public void TestTripletFeel()
+        {
+            var tex = "\\ts 2 4 \\tf t8 3.2.8*4 | \\tf t16 3.2.16*8 | \\tf d8 3.2.8*4 | \\tf d16 3.2.16*8 | \\tf s8 3.2.8*4 | \\tf s16 3.2.16*8";
+            var score = ParseTex(tex);
+
+            var expectedPlaybackStartTimes = new FastList<int>
+            {
+                // @formatter:off
+                0, 480, 960, 1440,
+                0, 240, 480, 720, 960, 1200, 1440, 1680,
+                0, 480, 960, 1440,
+                0, 240, 480, 720, 960, 1200, 1440, 1680,
+                0, 480, 960, 1440,
+                0, 240, 480, 720, 960, 1200, 1440, 1680
+                // @formatter:on
+            };
+            var expectedPlaybackDurations = new FastList<int>
+            {
+                // @formatter:off
+                480, 480, 480, 480,
+                240, 240, 240, 240, 240, 240, 240, 240,
+                480, 480, 480, 480,
+                240, 240, 240, 240, 240, 240, 240, 240,
+                480, 480, 480, 480,
+                240, 240, 240, 240, 240, 240, 240, 240
+                // @formatter:on
+            };
+            var actualPlaybackStartTimes = new FastList<int>();
+            var actualPlaybackDurations = new FastList<int>();
+
+            var beat = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
+            while (beat != null)
+            {
+                actualPlaybackStartTimes.Add(beat.PlaybackStart);
+                actualPlaybackDurations.Add(beat.PlaybackDuration);
+                beat = beat.NextBeat;
+            }
+
+            Assert.AreEqual(string.Join(",", expectedPlaybackStartTimes), string.Join(",", actualPlaybackStartTimes));
+            Assert.AreEqual(string.Join(",", expectedPlaybackDurations), string.Join(",", actualPlaybackDurations));
+
+            var expectedMidiStartTimes = new FastList<int>
+            {
+                // @formatter:off
+                0, 640, 960, 1600,
+                1920, 2240, 2400, 2720, 2880, 3200, 3360, 3680,
+                3840, 4560, 4800, 5520,
+                5760, 6120, 6240, 6600, 6720, 7080, 7200, 7560,
+                7680, 7920, 8640, 8880,
+                9600, 9720, 10080, 10200, 10560, 10680, 11040, 11160
+                // @formatter:on
+            };
+            var expectedMidiDurations = new FastList<int>
+            {
+                // @formatter:off
+                640, 320, 640, 320,
+                320, 160, 320, 160, 320, 160, 320 ,160,
+                720, 240, 720, 240,
+                360, 120, 360, 120, 360, 120, 360, 120,
+                240, 720, 240, 720,
+                120, 360, 120, 360, 120, 360, 120, 360
+                // @formatter:on
+            };
+            var actualMidiStartTimes = new FastList<int>();
+            var actualMidiDurations = new FastList<int>();
+
+            var handler = new FlatMidiEventGenerator();
+            var generator = new MidiFileGenerator(score, null, handler);
+            generator.Generate();
+
+            foreach (var midiEvent in handler.MidiEvents)
+            {
+                if (midiEvent is FlatMidiEventGenerator.NoteEvent)
+                {
+                    var noteEvent = (FlatMidiEventGenerator.NoteEvent)midiEvent;
+                    actualMidiStartTimes.Add(noteEvent.Tick);
+                    actualMidiDurations.Add(noteEvent.Length);
+                }
+            }
+
+            Assert.AreEqual(string.Join(",", expectedMidiStartTimes), string.Join(",", actualMidiStartTimes));
+            Assert.AreEqual(string.Join(",", expectedMidiDurations), string.Join(",", actualMidiDurations));
         }
     }
 }

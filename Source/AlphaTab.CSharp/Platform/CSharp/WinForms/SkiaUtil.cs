@@ -1,4 +1,4 @@
-﻿#if NET472
+﻿#if NET48
 using System.Drawing;
 using System.Drawing.Imaging;
 using SkiaSharp;

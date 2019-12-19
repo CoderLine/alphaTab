@@ -1,2 +1,2 @@
 taskkill /im:msbuild.exe /f
-xcopy D:\Dev\C#\Projects\Phase.netstandard\Phase.MsBuild\bin\Debug\net471\* . /Y
+xcopy D:\Dev\CSharp\Phase.netstandard\Phase.MsBuild\bin\Debug\net48\* . /Y

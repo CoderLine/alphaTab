@@ -229,13 +229,36 @@ namespace AlphaTab.Audio.Generator
             }
         }
 
+        private TripletFeelDurations _currentTripletFeel;
+
         private void GenerateBeat(Beat beat, int barStartTick, Bar realBar)
         {
             // TODO: take care of tripletfeel
             var beatStart = beat.PlaybackStart;
-            var audioDuration = beat.Voice.Bar.IsEmpty
-                ? beat.Voice.Bar.MasterBar.CalculateDuration()
-                : beat.PlaybackDuration;
+            var audioDuration = beat.PlaybackDuration;
+
+            if (beat.Voice.Bar.IsEmpty)
+            {
+                audioDuration = beat.Voice.Bar.MasterBar.CalculateDuration();
+            }
+            else if (beat.Voice.Bar.MasterBar.TripletFeel != TripletFeel.NoTripletFeel && (_settings == null || _settings.PlayTripletFeel))
+            {
+                if (_currentTripletFeel != null)
+                {
+                    beatStart -= _currentTripletFeel.SecondBeatStartOffset;
+                    audioDuration = _currentTripletFeel.SecondBeatDuration;
+                    _currentTripletFeel = null;
+                }
+                else
+                {
+                    _currentTripletFeel = CalculateTripletFeelInfo(beatStart, audioDuration, beat);
+                    if (_currentTripletFeel != null)
+                    {
+                        audioDuration = _currentTripletFeel.FirstBeatDuration;
+                    }
+                }
+            }
+
 
             var beatLookup = new BeatTickLookup();
             beatLookup.Start = barStartTick + beatStart;
@@ -314,6 +337,92 @@ namespace AlphaTab.Audio.Generator
                     bendAmplitude,
                     track.PlaybackInfo.SecondaryChannel);
             }
+        }
+
+        private class TripletFeelDurations
+        {
+            public int FirstBeatDuration { get; set; }
+            public int SecondBeatStartOffset { get; set; }
+            public int SecondBeatDuration { get; set; }
+        }
+
+        private TripletFeelDurations CalculateTripletFeelInfo(int beatStart, int audioDuration, Beat beat)
+        {
+            Duration initialDuration;
+            switch (beat.Voice.Bar.MasterBar.TripletFeel)
+            {
+                case TripletFeel.Triplet8th:
+                case TripletFeel.Dotted8th:
+                case TripletFeel.Scottish8th:
+                    initialDuration = Duration.Eighth;
+                    break;
+                case TripletFeel.Triplet16th:
+                case TripletFeel.Dotted16th:
+                case TripletFeel.Scottish16th:
+                    initialDuration = Duration.Sixteenth;
+                    break;
+                default:
+                    // not possible
+                    return null;
+            }
+
+            var interval = initialDuration.ToTicks();
+
+            // it must be a plain note with the expected duration
+            // without dots, triplets, grace notes etc.
+            if (audioDuration != interval)
+            {
+                return null;
+            }
+
+            // check if the beat is aligned in respect to the duration
+            // e.g. the eighth notes on a 4/4 time signature must start exactly on the following
+            // times to get a triplet feel applied
+            // 0 480 960 1440 1920 2400 2880 3360
+            if ((beatStart % interval) != 0)
+            {
+                return null;
+            }
+
+            // ensure next beat matches spec
+            if (beat.NextBeat == null || beat.NextBeat.Voice != beat.Voice || beat.PlaybackDuration != interval)
+            {
+                return null;
+            }
+
+            // looks like we have a triplet feel combination start here!
+            var durations = new TripletFeelDurations();
+            switch (beat.Voice.Bar.MasterBar.TripletFeel)
+            {
+                case TripletFeel.Triplet8th:
+                    durations.FirstBeatDuration = MidiUtils.ApplyTuplet(Duration.Quarter.ToTicks(), 3, 2);
+                    durations.SecondBeatDuration = MidiUtils.ApplyTuplet(Duration.Eighth.ToTicks(), 3, 2);
+                    break;
+                case TripletFeel.Dotted8th:
+                    durations.FirstBeatDuration = MidiUtils.ApplyDot(Duration.Eighth.ToTicks(), false);
+                    durations.SecondBeatDuration = Duration.Sixteenth.ToTicks();
+                    break;
+                case TripletFeel.Scottish8th:
+                    durations.FirstBeatDuration = Duration.Sixteenth.ToTicks();
+                    durations.SecondBeatDuration = MidiUtils.ApplyDot(Duration.Eighth.ToTicks(), false);
+                    break;
+                case TripletFeel.Triplet16th:
+                    durations.FirstBeatDuration = MidiUtils.ApplyTuplet(Duration.Eighth.ToTicks(), 3, 2);
+                    durations.SecondBeatDuration = MidiUtils.ApplyTuplet(Duration.Sixteenth.ToTicks(), 3, 2);
+                    break;
+                case TripletFeel.Dotted16th:
+                    durations.FirstBeatDuration = MidiUtils.ApplyDot(Duration.Sixteenth.ToTicks(), false);
+                    durations.SecondBeatDuration = Duration.ThirtySecond.ToTicks();
+                    break;
+                case TripletFeel.Scottish16th:
+                    durations.FirstBeatDuration = Duration.ThirtySecond.ToTicks();
+                    durations.SecondBeatDuration = MidiUtils.ApplyDot(Duration.Sixteenth.ToTicks(), false);
+                    break;
+            }
+
+            // calculate the number of ticks the second beat can start earlier
+            durations.SecondBeatStartOffset = audioDuration - durations.FirstBeatDuration;
+            return durations;
         }
 
         private void GenerateNote(Note note, int beatStart, int beatDuration, int[] brushInfo)
@@ -916,7 +1025,7 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             var whammyDuration = Math.Min(duration,
-                                    MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
+                                MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart,
                                 channel,
                                 duration,
@@ -944,7 +1053,7 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             var whammyDuration = Math.Min(duration,
-                                    MidiUtils.MillisToTicks(_settings.SongBookDipDuration, _currentTempo));
+                                MidiUtils.MillisToTicks(_settings.SongBookDipDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart,
                                 channel,
                                 duration,
@@ -981,7 +1090,7 @@ namespace AlphaTab.Audio.Generator
                             _handler.AddBend(track.Index, noteStart, (byte)channel, (int)preDiveValue);
 
                             var whammyDuration = Math.Min(duration,
-                                    MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
+                                MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart,
                                 channel,
                                 duration,
