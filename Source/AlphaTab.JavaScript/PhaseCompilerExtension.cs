@@ -16,6 +16,8 @@ namespace AlphaTab
         {
             context.Attributes.Type<JsonNameAttribute>()
                 .Add(new MetaAttribute("@json"), new ExternalAttribute());
+            context.Attributes.Type<JsonImmutableAttribute>()
+                .Add(new MetaAttribute("@immutable"), new ExternalAttribute());
             context.Attributes.Type<JsonSerializableAttribute>()
                 .Add(new MetaAttribute("@:build(alphaTab.JsonSerializationBuilder.build())"), new ExternalAttribute());
         }

@@ -4,6 +4,7 @@ using Phase;
 
 namespace AlphaTab.Platform.Model
 {
+    [JsonImmutable]
     public partial class Color
     {
         public static Color FromJson(object json)

@@ -7,6 +7,7 @@ namespace AlphaTab.Platform.Model
     /// <summary>
     /// This container public class can store the definition for a font and it's style.
     /// </summary>
+    [JsonImmutable]
     public partial class Font
     {
         private string _css;
