@@ -1,0 +1,1191 @@
+Title: Breaking changes on Settings between 0.9.5 and 0.9.6
+Description: Describes all the breaking changes from 0.9.5 and 0.9.6 due to the settings reorganization.
+ShowInSideBar: true
+Since: 0.9.6
+---
+
+<p>
+	In 0.9.6 there was a bigger settings rework introduced that very likely broke every setup beside the default one. 
+	Please find all changes that were introduced below. 
+</p>
+
+<h2>API changes</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Before</th>
+            <th>After</th>
+            <th>Description</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td>
+				<code>AlphaTab.Settings.Defaults <span class="code-badge">.net</span></code><br />
+				<code>alphaTab.Settings.get_defaults() <span class="code-badge">JavaScript</span></code><br />
+			</td>
+            <td>
+				<code>new AlphaTab.Settings() <span class="code-badge">.net</span></code><br />
+				<code>new alphaTab.Settings() <span class="code-badge">JavaScript</span></code><br />
+            </td>
+			<td>
+				The default values for all settings were moved to the constructor. Simply
+				create a new object and all default settings will be configured. 
+			</td>	
+		</tr>
+		<tr>
+            <td>
+				<code>settings.toJson() <span class="code-badge">JavaScript</span></code><br />
+			</td>
+            <td>
+				<code>alphaTab.Settings.toJson(settings) <span class="code-badge">JavaScript</span></code><br />
+            </td>
+			<td>
+				The serialization methods is now static on the class. 
+			</td>	
+		</tr>
+		<tr>
+            <td>
+				<code>alphaTab.Settings.fillFromJson(settings,json,dataAttributes) <span class="code-badge">JavaScript</span></code><br />
+			</td>
+            <td>
+				<code>alphaTab.Settings.fromJson(json) <span class="code-badge">JavaScript</span></code><br />
+            </td>
+			<td>
+				To create a settings object from Json Use the 
+			</td>	
+        </tr>
+		
+    </tbody>
+</table>
+
+<h2>Settings changes</h2>
+
+<p>
+	Many settings have now a new place within the settings object, hence many settings might need adjustment in your code. The new 
+	mechanism of specifying settings is way more tolerant than the old one: settings are now case insensitive (<code>useWorkers</code> is equal to <code>uSeWoRkerS</code>) and dashes on html attributes are also
+	ignored (<code>data-use-workers</code> is equal to <code>data-useworkers</code>). 
+</p>
+<ul>
+	<ul><code>.net</code> is how the property is named on .net object level</ul>
+	<ul><code>JavaScript</code> is how the property is named on the JavaScript object level (alphaTab.Settings instance)</ul>
+	<ul><code>JSON</code> is how the property is named when specifying the property as input to alphaTab (usually short hand names)</ul>
+	<ul><code>HTML</code> is how the property is named on HTML data attributes</ul>
+</ul>
+
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Before</th>
+            <th>After</th>
+            <th>Notes</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td>
+				<code>UseWorkers <span class="code-badge">.net</span></code><br />
+				<code>useWorker <span class="code-badge">JavaScript</span></code><br />
+				<code>useWorker <span class="code-badge">JSON</span></code><br />
+				<code>data-use-worker <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Core.UseWorkers <span class="code-badge">.net</span></code><br />
+				<code>core.useWorkers, useWorkers <span class="code-badge">JavaScript</span></code><br />
+				<code>core.useWorkers, useWorkers <span class="code-badge">JSON</span></code><br />
+				<code>data-core-use-workers, data-use-workers <span class="code-badge">HTML</span></code><br />
+            </td>
+			<td></td>
+        </tr>
+        <tr>
+            <td>
+				<code>LogLevel <span class="code-badge">.net</span></code><br />
+				<code>logLevel <span class="code-badge">JavaScript</span></code><br />
+				<code>logging <span class="code-badge">JSON</span></code><br />
+				<code>data-logging <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Core.LogLevel <span class="code-badge">.net</span></code><br />
+				<code>core.logLevel <span class="code-badge">JavaScript</span></code><br />
+				<code>core.logLevel, logLevel <span class="code-badge">JSON</span></code><br />
+				<code>data-core-loglevel, data-loglevel <span class="code-badge">HTML</span></code><br />
+            </td>
+			<td></td>
+        </tr>		
+        <tr>
+            <td>
+				<code>DisplayMode <span class="code-badge">.net</span></code><br />
+				<code>displayMode <span class="code-badge">JavaScript</span></code><br />
+				<code>displayMode <span class="code-badge">JSON</span></code><br />
+				<code>data-display-mode <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.NotationMode <span class="code-badge">.net</span></code><br />
+				<code>notation.notationMode <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.notationMode <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-notationmode <span class="code-badge">HTML</span></code><br />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+				<code>Scale <span class="code-badge">.net</span></code><br />
+				<code>scale <span class="code-badge">JavaScript</span></code><br />
+				<code>scale <span class="code-badge">JSON</span></code><br />
+				<code>data-scale <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.Scale <span class="code-badge">.net</span></code><br />
+				<code>display.scale <span class="code-badge">JavaScript</span></code><br />
+				<code>display.scale, scale <span class="code-badge">JSON</span></code><br />
+				<code>data-display-scale, data-scale <span class="code-badge">HTML</span></code><br />			
+            </td>
+			<td></td>
+        </tr>
+        <tr>
+            <td>
+				<code>SlurHeight <span class="code-badge">.net</span></code><br />
+				<code>slurHeight <span class="code-badge">JavaScript</span></code><br />
+				<code>slurHeight <span class="code-badge">JSON</span></code><br />
+				<code>data-slur-height <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.SlurHeight <span class="code-badge">.net</span></code><br />
+				<code>notation.slurHeight <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.slurHeight <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-slur-height <span class="code-badge">HTML</span></code><br />			
+            </td>
+			<td></td>
+        </tr>
+        <tr>
+            <td>
+				<code>Engine <span class="code-badge">.net</span></code><br />
+				<code>engine <span class="code-badge">JavaScript</span></code><br />
+				<code>engine <span class="code-badge">JSON</span></code><br />
+				<code>data-engine <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Core.Engine <span class="code-badge">.net</span></code><br />
+				<code>core.engine <span class="code-badge">JavaScript</span></code><br />
+				<code>core.engine, engine <span class="code-badge">JSON</span></code><br />
+				<code>data-core-engine, data-engine <span class="code-badge">HTML</span></code><br />			
+            </td>
+			<td></td>
+        </tr>
+        <tr>
+            <td>
+				<code>StretchForce <span class="code-badge">.net</span></code><br />
+				<code>stretchForce <span class="code-badge">JavaScript</span></code><br />
+				<code>stretchForce <span class="code-badge">JSON</span></code><br />
+				<code>data-stretch-force <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.StretchForce <span class="code-badge">.net</span></code><br />
+				<code>display.stretchForce <span class="code-badge">JavaScript</span></code><br />
+				<code>display.stretchForce, stretchForce <span class="code-badge">JSON</span></code><br />
+				<code>data-display-stretchforce, data-stretchforce <span class="code-badge">HTML</span></code><br />
+            </td>
+			<td></td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ForcePianoFingering <span class="code-badge">.net</span></code><br />
+				<code>forcePianoFingering <span class="code-badge">JavaScript</span></code><br />
+				<code>forcePianoFingering <span class="code-badge">JSON</span></code><br />
+				<code>data-force-piano-fingering <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.FingeringMode <span class="code-badge">.net</span></code><br />
+				<code>forcePianoFingering <span class="code-badge">JavaScript</span></code><br />
+				<code>forcePianoFingering <span class="code-badge">JSON</span></code><br />
+				<code>data-force-piano-fingering <span class="code-badge">HTML</span></code><br />			
+            </td>
+			<td>
+				Set it to <code>ScoreForcePiano</code> or <code>SingleNoteEffectBandForcePiano</code> to get the 
+				forced piano fingering depending on the preferred display of fingering. 
+			</td>
+        </tr>
+				
+        <tr>
+            <td>
+				<code>EnableLazyLoading <span class="code-badge">.net</span></code><br />
+				<code>enableLazyLoading <span class="code-badge">JavaScript</span></code><br />
+				<code>lazy <span class="code-badge">JSON</span></code><br />
+				<code>data-lazy <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Core.EnableLazyLoading <span class="code-badge">.net</span></code><br />
+				<code>Core.enableLazyLoading <span class="code-badge">JavaScript</span></code><br />
+				<code>core.enableLazyLoading, enableLazyLoading <span class="code-badge">JSON</span></code><br />
+				<code>data-core-enablelazyloading, data-enablelazyloading <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>TranspositionPitches <span class="code-badge">.net</span></code><br />
+				<code>transpositionPitches <span class="code-badge">JavaScript</span></code><br />
+				<code>transpositionPitches <span class="code-badge">JSON</span></code><br />
+				<code>data-transposition-pitches <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.TranspositionPitches <span class="code-badge">.net</span></code><br />
+				<code>Notation.transpositionPitches <span class="code-badge">JavaScript</span></code><br />
+				<code>Notation.transpositionPitches <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-transpositionpitches <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>DisplayTranspositionPitches  <span class="code-badge">.net</span></code><br />
+				<code>displayTranspositionPitches <span class="code-badge">JavaScript</span></code><br />
+				<code>displayTranspositionPitches <span class="code-badge">JSON</span></code><br />
+				<code>data-display-transposition-pitches  <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.DisplayTranspositionPitches  <span class="code-badge">.net</span></code><br />
+				<code>notation.displayTranspositionPitches <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.displayTranspositionPitches <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-displaytranspositionpitches  <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ScriptFile  <span class="code-badge">.net</span></code><br />
+				<code>scriptFile <span class="code-badge">JavaScript</span></code><br />
+				<code>scriptFile <span class="code-badge">JSON</span></code><br />
+				<code>data-script-file <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Core.ScriptFile <span class="code-badge">.net</span></code><br />
+				<code>core.scriptFile <span class="code-badge">JavaScript</span></code><br />
+				<code>core.scriptFile, scriptFile <span class="code-badge">JSON</span></code><br />
+				<code>data-core-script-file, data-script-file <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>FontDirectory  <span class="code-badge">.net</span></code><br />
+				<code>fontDirectory <span class="code-badge">JavaScript</span></code><br />
+				<code>fontDirectory <span class="code-badge">JSON</span></code><br />
+				<code>data-font-directory <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Core.FontDirectory  <span class="code-badge">.net</span></code><br />
+				<code>core.fontDirectory <span class="code-badge">JavaScript</span></code><br />
+				<code>core.fontDirectory, fontDirectory <span class="code-badge">JSON</span></code><br />
+				<code>data-core-font-directory, data-font-directory <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>SmallGraceTabNotes  <span class="code-badge">.net</span></code><br />
+				<code>smallGraceTabNotes <span class="code-badge">JavaScript</span></code><br />
+				<code>smallGraceTabNotes <span class="code-badge">JSON</span></code><br />
+				<code>data-small-grace-tab-notes <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.SmallGraceTabNotes  <span class="code-badge">.net</span></code><br />
+				<code>notation.smallGraceTabNotes <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.smallGraceTabNotes <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-smallgracetabnotes <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>FingeringMode <span class="code-badge">.net</span></code><br />
+				<code>fingeringMode <span class="code-badge">JavaScript</span></code><br />
+				<code>fingeringMdoe <span class="code-badge">JSON</span></code><br />
+				<code>data-fingering-mode <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.FingeringMode <span class="code-badge">.net</span></code><br />
+				<code>notation.fingeringMode <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.fingeringMdoe <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-fingering-mode <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ExtendBendArrowsOnTiedNotes <span class="code-badge">.net</span></code><br />
+				<code>extendBendArrowsOnTiedNotes <span class="code-badge">JavaScript</span></code><br />
+				<code>extendBendArrowsOnTiedNotes <span class="code-badge">JSON</span></code><br />
+				<code>data-extend-bend-arrows-on-tied-notes <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.ExtendBendArrowsOnTiedNotes <span class="code-badge">.net</span></code><br />
+				<code>notation.extendBendArrowsOnTiedNotes <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.extendBendArrowsOnTiedNotes <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-extendbendarrowsontiednotes <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ShowParenthesisForTiedBends <span class="code-badge">.net</span></code><br />
+				<code>showParenthesisForTiedBends <span class="code-badge">JavaScript</span></code><br />
+				<code>showParenthesisForTiedBends <span class="code-badge">JSON</span></code><br />
+				<code>data-show-parenthesis-for-tied-bends <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.ShowParenthesisForTiedBends <span class="code-badge">.net</span></code><br />
+				<code>notation.showParenthesisForTiedBends <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.showParenthesisForTiedBends <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-showparenthesisfortiedbends <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ShowTabNoteOnTiedBend <span class="code-badge">.net</span></code><br />
+				<code>showTabNoteOnTiedBend <span class="code-badge">JavaScript</span></code><br />
+				<code>showTabNoteOnTiedBend <span class="code-badge">JSON</span></code><br />
+				<code>data-show-tab-note-on-tied-bend <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.ShowTabNoteOnTiedBend <span class="code-badge">.net</span></code><br />
+				<code>notation.showTabNoteOnTiedBend <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.showTabNoteOnTiedBend <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-showtabnoteontiedbend <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ShowZeroOnDiveWhammy  <span class="code-badge">.net</span></code><br />
+				<code>showZeroOnDiveWhammy  <span class="code-badge">JavaScript</span></code><br />
+				<code>showZeroOnDiveWhammy  <span class="code-badge">JSON</span></code><br />
+				<code>data-show-zero-on-dive-whammy  <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.ShowZeroOnDiveWhammy  <span class="code-badge">.net</span></code><br />
+				<code>notation.showZeroOnDiveWhammy  <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.showZeroOnDiveWhammy  <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-showzeroondivewhammy  <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ExtendLineEffectsToBeatEnd   <span class="code-badge">.net</span></code><br />
+				<code>extendLineEffectsToBeatEnd   <span class="code-badge">JavaScript</span></code><br />
+				<code>extendLineEffectsToBeatEnd   <span class="code-badge">JSON</span></code><br />
+				<code>data-extend-line-effects-to-beat-end   <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.ExtendLineEffectsToBeatEnd   <span class="code-badge">.net</span></code><br />
+				<code>notation.extendLineEffectsToBeatEnd   <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.extendLineEffectsToBeatEnd   <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-extendlineeffectstobeatend   <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>SongBookBendDuration   <span class="code-badge">.net</span></code><br />
+				<code>songBookBendDuration   <span class="code-badge">JavaScript</span></code><br />
+				<code>songBookBendDuration   <span class="code-badge">JSON</span></code><br />
+				<code>data-song-book-bend-duration <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.SongBookBendDuration   <span class="code-badge">.net</span></code><br />
+				<code>player.songBookBendDuration   <span class="code-badge">JavaScript</span></code><br />
+				<code>player.songBookBendDuration   <span class="code-badge">JSON</span></code><br />
+				<code>data-player-songbookbendduration <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>SongBookDipDuration   <span class="code-badge">.net</span></code><br />
+				<code>songBookDipDuration   <span class="code-badge">JavaScript</span></code><br />
+				<code>songBookDipDuration   <span class="code-badge">JSON</span></code><br />
+				<code>data-song-book-dip-duration <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.SongBookDipDuration   <span class="code-badge">.net</span></code><br />
+				<code>player.songBookDipDuration   <span class="code-badge">JavaScript</span></code><br />
+				<code>player.songBookDipDuration   <span class="code-badge">JSON</span></code><br />
+				<code>data-player-songbookdipduration <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Layout.Mode <span class="code-badge">.net</span></code><br />
+				<code>layout.mode <span class="code-badge">JavaScript</span></code><br />
+				<code>layout.mode,layout <span class="code-badge">JSON</span></code><br />
+				<code>data-layout <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.LayoutMode <span class="code-badge">.net</span></code><br />
+				<code>display.layoutMode <span class="code-badge">JavaScript</span></code><br />
+				<code>display.layoutMode, layoutMode <span class="code-badge">JSON</span></code><br />
+				<code>data-display-layout-mode, data-layout-mode <span class="code-badge">HTML</span></code><br />			
+            </td>
+			<td>
+				The display mode is now a strong typed enumeration. 
+			</td>	
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Layout.AdditionalSettings["barsPerRow"] <span class="code-badge">.net</span></code><br />
+				<code>layout.additionalSettings.barsPerRow <span class="code-badge">JavaScript</span></code><br />
+				<code>layout.additionalSettings.barsPerRow <span class="code-badge">JSON</span></code><br />
+				<code>data-layout-bars-per-row <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.BarsPerRow <span class="code-badge">.net</span></code><br />
+				<code>Display.barsPerRow <span class="code-badge">JavaScript</span></code><br />
+				<code>Display.barsPerRow, barsPerRow <span class="code-badge">JSON</span></code><br />
+				<code>data-display-barsperrow, data-barsperrow <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Layout.AdditionalSettings["start"] <span class="code-badge">.net</span></code><br />
+				<code>layout.additionalSettings.start <span class="code-badge">JavaScript</span></code><br />
+				<code>layout.additionalSettings.start <span class="code-badge">JSON</span></code><br />
+				<code>data-layout-start <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.StartBar <span class="code-badge">.net</span></code><br />
+				<code>Display.startBar <span class="code-badge">JavaScript</span></code><br />
+				<code>Display.startBar, startBar <span class="code-badge">JSON</span></code><br />
+				<code>data-display-startbar, data-startbar <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Layout.AdditionalSettings["count"] <span class="code-badge">.net</span></code><br />
+				<code>layout.additionalSettings.count <span class="code-badge">JavaScript</span></code><br />
+				<code>layout.additionalSettings.count <span class="code-badge">JSON</span></code><br />
+				<code>data-layout-count <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.BarCount <span class="code-badge">.net</span></code><br />
+				<code>Display.barCount <span class="code-badge">JavaScript</span></code><br />
+				<code>Display.barCount, startBar <span class="code-badge">JSON</span></code><br />
+				<code>data-display-barcount, data-barcount <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Layout.AdditionalSettings["hideInfo"] <span class="code-badge">.net</span></code><br />
+				<code>layout.additionalSettings.hideInfo <span class="code-badge">JavaScript</span></code><br />
+				<code>layout.additionalSettings.hideInfo <span class="code-badge">JSON</span></code><br />
+				<code>data-layout-hide-info <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.HideInfo <span class="code-badge">.net</span></code><br />
+				<code>Display.hideInfo <span class="code-badge">JavaScript</span></code><br />
+				<code>Display.hideInfo, startBar <span class="code-badge">JSON</span></code><br />
+				<code>data-display-hideinfo, data-hideinfo <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Layout.AdditionalSettings["hideTuning"] <span class="code-badge">.net</span></code><br />
+				<code>layout.additionalSettings.hideTuning <span class="code-badge">JavaScript</span></code><br />
+				<code>layout.additionalSettings.hideTuning <span class="code-badge">JSON</span></code><br />
+				<code>data-layout-hide-tuning <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.HideTuning <span class="code-badge">.net</span></code><br />
+				<code>Display.hideTuning <span class="code-badge">JavaScript</span></code><br />
+				<code>Display.hideTuning, startBar <span class="code-badge">JSON</span></code><br />
+				<code>data-display-hidetuning, data-hidetuning <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Layout.AdditionalSettings["hideChordDiagram"] <span class="code-badge">.net</span></code><br />
+				<code>layout.additionalSettings.hideChordDiagram <span class="code-badge">JavaScript</span></code><br />
+				<code>layout.additionalSettings.hideChordDiagram <span class="code-badge">JSON</span></code><br />
+				<code>data-layout-hide-chord-diagram <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.HideChordDiagrams <span class="code-badge">.net</span></code><br />
+				<code>Display.hideChordDiagrams <span class="code-badge">JavaScript</span></code><br />
+				<code>Display.hideChordDiagrams, hideChordDiagrams <span class="code-badge">JSON</span></code><br />
+				<code>data-display-hidechorddiagrams, data-hidechorddiagrams <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Layout.AdditionalSettings["hideTrackNames"] <span class="code-badge">.net</span></code><br />
+				<code>layout.additionalSettings.hideTrackNames <span class="code-badge">JavaScript</span></code><br />
+				<code>layout.additionalSettings.hideTrackNames <span class="code-badge">JSON</span></code><br />
+				<code>data-layout-hide-track-names <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.HideTrackNames <span class="code-badge">.net</span></code><br />
+				<code>Display.hideTrackNames <span class="code-badge">JavaScript</span></code><br />
+				<code>Display.hideTrackNames, startBar <span class="code-badge">JSON</span></code><br />
+				<code>data-display-hidetracknames, data-hidetracknames <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>IncludeNoteBounds <span class="code-badge">.net</span></code><br />
+				<code>includeNoteBounds <span class="code-badge">JavaScript</span></code><br />
+				<code>includeNoteBounds <span class="code-badge">JSON</span></code><br />
+				<code>data-include-note-bounds <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Core.IncludeNoteBounds <span class="code-badge">.net</span></code><br />
+				<code>core.includeNoteBounds <span class="code-badge">JavaScript</span></code><br />
+				<code>core.includeNoteBounds, includeNoteBounds<span class="code-badge">JSON</span></code><br />
+				<code>data-core-include-note-bounds, data-include-note-bounds <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>PlayTripletFeel <span class="code-badge">.net</span></code><br />
+				<code>playTripletFeel <span class="code-badge">JavaScript</span></code><br />
+				<code>playTripletFeel <span class="code-badge">JSON</span></code><br />
+				<code>data-play-triplet-feel <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>player.PlayTripletFeel <span class="code-badge">.net</span></code><br />
+				<code>player.playTripletFeel <span class="code-badge">JavaScript</span></code><br />
+				<code>player.playTripletFeel <span class="code-badge">JSON</span></code><br />
+				<code>data-player-playtripletfeel <span class="code-badge">HTML</span></code><br />
+			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Vibrato.NoteSlightAmplitude <span class="code-badge">.net</span></code><br />
+				<code>vibrato.noteSlightAmplitude <span class="code-badge">JavaScript</span></code><br />
+				<code>vibrato.noteSlightAmplitude  <span class="code-badge">JSON</span></code><br />
+				<code>data-vibrato-note-slight-amplitude <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.Vibrato.NoteSlightAmplitude <span class="code-badge">.net</span></code><br />
+				<code>player.vibrato.noteSlightAmplitude <span class="code-badge">JavaScript</span></code><br />
+				<code>player.vibrato.noteSlightAmplitude  <span class="code-badge">JSON</span></code><br />
+				<code>data-player-vibrato-noteslightamplitude <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Vibrato.NoteWideAmplitude <span class="code-badge">.net</span></code><br />
+				<code>vibrato.noteWideAmplitude <span class="code-badge">JavaScript</span></code><br />
+				<code>vibrato.noteWideAmplitude  <span class="code-badge">JSON</span></code><br />
+				<code>data-vibrato-note-wide-amplitude <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.Vibrato.NoteWideAmplitude <span class="code-badge">.net</span></code><br />
+				<code>player.vibrato.noteWideAmplitude <span class="code-badge">JavaScript</span></code><br />
+				<code>player.vibrato.noteWideAmplitude  <span class="code-badge">JSON</span></code><br />
+				<code>data-player-vibrato-notewideamplitude <span class="code-badge">HTML</span></code><br />
+			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Vibrato.NoteSlightLength <span class="code-badge">.net</span></code><br />
+				<code>vibrato.noteSlightLength <span class="code-badge">JavaScript</span></code><br />
+				<code>vibrato.noteSlightLength  <span class="code-badge">JSON</span></code><br />
+				<code>data-vibrato-note-slight-length <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.Vibrato.NoteSlightLength <span class="code-badge">.net</span></code><br />
+				<code>player.vibrato.noteSlightLength <span class="code-badge">JavaScript</span></code><br />
+				<code>player.vibrato.noteSlightLength  <span class="code-badge">JSON</span></code><br />
+				<code>data-player-vibrato-noteslightlength <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Vibrato.NoteWideLength <span class="code-badge">.net</span></code><br />
+				<code>vibrato.noteWideLength <span class="code-badge">JavaScript</span></code><br />
+				<code>vibrato.noteWideLength  <span class="code-badge">JSON</span></code><br />
+				<code>data-vibrato-note-wide-length <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.Vibrato.NoteWideLength <span class="code-badge">.net</span></code><br />
+				<code>player.vibrato.noteWideLength <span class="code-badge">JavaScript</span></code><br />
+				<code>player.vibrato.noteWideLength  <span class="code-badge">JSON</span></code><br />
+				<code>data-player-vibrato-notewidelength <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Vibrato.BeatSlightAmplitude <span class="code-badge">.net</span></code><br />
+				<code>vibrato.beatSlightAmplitude <span class="code-badge">JavaScript</span></code><br />
+				<code>vibrato.beatSlightAmplitude  <span class="code-badge">JSON</span></code><br />
+				<code>data-vibrato-beat-slight-amplitude <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.Vibrato.BeatSlightAmplitude <span class="code-badge">.net</span></code><br />
+				<code>player.vibrato.beatSlightAmplitude <span class="code-badge">JavaScript</span></code><br />
+				<code>player.vibrato.beatSlightAmplitude  <span class="code-badge">JSON</span></code><br />
+				<code>data-player-vibrato-beatslightamplitude <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Vibrato.BeatWideAmplitude <span class="code-badge">.net</span></code><br />
+				<code>vibrato.beatWideAmplitude <span class="code-badge">JavaScript</span></code><br />
+				<code>vibrato.beatWideAmplitude  <span class="code-badge">JSON</span></code><br />
+				<code>data-vibrato-beat-wide-amplitude <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.Vibrato.BeatWideAmplitude <span class="code-badge">.net</span></code><br />
+				<code>player.vibrato.beatWideAmplitude <span class="code-badge">JavaScript</span></code><br />
+				<code>player.vibrato.beatWideAmplitude  <span class="code-badge">JSON</span></code><br />
+				<code>data-player-vibrato-beatwideamplitude <span class="code-badge">HTML</span></code><br />
+			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Vibrato.BeatSlightLength <span class="code-badge">.net</span></code><br />
+				<code>vibrato.beatSlightLength <span class="code-badge">JavaScript</span></code><br />
+				<code>vibrato.beatSlightLength  <span class="code-badge">JSON</span></code><br />
+				<code>data-vibrato-beat-slight-length <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.Vibrato.BeatSlightLength <span class="code-badge">.net</span></code><br />
+				<code>player.vibrato.beatSlightLength <span class="code-badge">JavaScript</span></code><br />
+				<code>player.vibrato.beatSlightLength  <span class="code-badge">JSON</span></code><br />
+				<code>data-player-vibrato-beatslightlength <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Vibrato.BeatWideLength <span class="code-badge">.net</span></code><br />
+				<code>vibrato.beatWideLength <span class="code-badge">JavaScript</span></code><br />
+				<code>vibrato.beatWideLength  <span class="code-badge">JSON</span></code><br />
+				<code>data-vibrato-beat-wide-length <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.Vibrato.BeatWideLength <span class="code-badge">.net</span></code><br />
+				<code>player.vibrato.beatWideLength <span class="code-badge">JavaScript</span></code><br />
+				<code>player.vibrato.beatWideLength  <span class="code-badge">JSON</span></code><br />
+				<code>data-player-vibrato-beatwidelength <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Staves.Id <span class="code-badge">.net</span></code><br />
+				<code>staves.id <span class="code-badge">JavaScript</span></code><br />
+				<code>staves.id, staves <span class="code-badge">JSON</span></code><br />
+				<code>data-staves <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.StaveProfile <span class="code-badge">.net</span></code><br />
+				<code>display.staveProfile <span class="code-badge">JavaScript</span></code><br />
+				<code>display.staveProfile, staveProfile <span class="code-badge">JSON</span></code><br />
+				<code>data-display-staveprofile, data-staveprofile <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Staves.AdditionalSettings["rhythm"] <span class="code-badge">.net</span></code><br />
+				<code>staves.additionalSettings.rhythm <span class="code-badge">JavaScript</span></code><br />
+				<code>staves.additionalSettings.rhythm <span class="code-badge">JSON</span></code><br />
+				<code>data-staves-rhythm <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.RhythmMode <span class="code-badge">.net</span></code><br />
+				<code>notation.rhythmMode <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.rhythmMode <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-rhythm-mode <span class="code-badge">HTML</span></code><br />
+			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Staves.AdditionalSettings["rhythmBeams"] <span class="code-badge">.net</span></code><br />
+				<code>staves.additionalSettings.rhythmBeams <span class="code-badge">JavaScript</span></code><br />
+				<code>staves.additionalSettings.rhythmBeams <span class="code-badge">JSON</span></code><br />
+				<code>data-staves-rhythm-beams <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.RhythmMode <span class="code-badge">.net</span></code><br />
+				<code>notation.rhythmMode <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.rhythmMode <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-rhythm-mode <span class="code-badge">HTML</span></code><br />
+			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Staves.AdditionalSettings["rhythmHeight"] <span class="code-badge">.net</span></code><br />
+				<code>staves.additionalSettings.rhythmHeight <span class="code-badge">JavaScript</span></code><br />
+				<code>staves.additionalSettings.rhythmHeight <span class="code-badge">JSON</span></code><br />
+				<code>data-staves-rhythm-height <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Notation.RhythmHeight <span class="code-badge">.net</span></code><br />
+				<code>notation.rhythmHeight <span class="code-badge">JavaScript</span></code><br />
+				<code>notation.rhythmHeight <span class="code-badge">JSON</span></code><br />
+				<code>data-notation-rhythm-height <span class="code-badge">HTML</span></code><br />
+			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>EnablePlayer <span class="code-badge">.net</span></code><br />
+				<code>enablePlayer <span class="code-badge">JavaScript</span></code><br />
+				<code>enablePlayer <span class="code-badge">JSON</span></code><br />
+				<code>data-player <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.EnablePlayer <span class="code-badge">.net</span></code><br />
+				<code>player.enablePlayer <span class="code-badge">JavaScript</span></code><br />
+				<code>player.enablePlayer <span class="code-badge">JSON</span></code><br />
+				<code>data-player-enableplayer <span class="code-badge">HTML</span></code><br />			
+            </td>
+			<td>
+				On JavaScript earlier the setting controlled both enabling the player and which soundfont should be loaded. 
+				Now it really only controls whether the player should be enabled. The soundfont is specified via <code>SoundFont</code> or loaded manually via API.
+			</td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>SoundFontFile <span class="code-badge">.net</span></code><br />
+				<code>soundFontFile <span class="code-badge">JavaScript</span></code><br />
+				<code>soundFontFile <span class="code-badge">JSON</span></code><br />
+				<code>data-player <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.SoundFont <span class="code-badge">.net</span></code><br />
+				<code>player.soundFont <span class="code-badge">JavaScript</span></code><br />
+				<code>player.soundFont <span class="code-badge">JSON</span></code><br />
+				<code>data-player-soundfont <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>EnableCursor <span class="code-badge">.net</span></code><br />
+				<code>enableCursor <span class="code-badge">JavaScript</span></code><br />
+				<code>cursor <span class="code-badge">JSON</span></code><br />
+				<code>data-cursor <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.EnableCursor <span class="code-badge">.net</span></code><br />
+				<code>player.enableCursor <span class="code-badge">JavaScript</span></code><br />
+				<code>player.enableCursor <span class="code-badge">JSON</span></code><br />
+				<code>data-player-enablecursor <span class="code-badge">HTML</span></code><br />
+			
+            </td>
+        </tr>		
+		
+		
+        <tr>
+            <td>
+				<code>ImporterSettings["encoding"] <span class="code-badge">.net</span></code><br />
+				<code>importer.encoding <span class="code-badge">JavaScript</span></code><br />
+				<code>importer.encoding <span class="code-badge">JSON</span></code><br />
+				<code>data-importer-encoding <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Importer.Encoding <span class="code-badge">.net</span></code><br />
+				<code>importer.encoding <span class="code-badge">JavaScript</span></code><br />
+				<code>importer.encoding <span class="code-badge">JSON</span></code><br />
+				<code>data-importer-encoding <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>Staves.ImporterSettings["musicXMLMergePartGroups"] <span class="code-badge">.net</span></code><br />
+				<code>staves.importer.musicXMLMergePartGroups <span class="code-badge">JavaScript</span></code><br />
+				<code>staves.importer.musicXMLMergePartGroups <span class="code-badge">JSON</span></code><br />
+				<code>data-importer-musicxml-merge-part-groups <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Importer.MergePartGroupsInMusicXml <span class="code-badge">.net</span></code><br />
+				<code>importer.mergePartGroupsInMusicXml <span class="code-badge">JavaScript</span></code><br />
+				<code>importer.mergePartGroupsInMusicXml <span class="code-badge">JSON</span></code><br />
+				<code>data-importer-mergepartgroupsinmusicxml <span class="code-badge">HTML</span></code><br />			
+			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.CopyrightFont <span class="code-badge">.net</span></code><br />
+				<code>resources.copyrightFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.copyrightFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-copyright-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>display.RenderingResources.CopyrightFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.copyrightFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.copyrightFont, resources.copyrightFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-copyrightfont, data-resources-copyrightfont <span class="code-badge">HTML</span></code><br />
+			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.TitleFont <span class="code-badge">.net</span></code><br />
+				<code>resources.titleFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.titleFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-title-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.TitleFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.titleFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.titleFont, resources.titleFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-titlefont, data-resources-titlefont <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.SubTitleFont <span class="code-badge">.net</span></code><br />
+				<code>resources.subTitleFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.subTitleFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-subtitle-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.SubTitleFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.subTitleFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.subTitleFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-subtitlefont, data-resources-subtitlefont <span class="code-badge">HTML</span></code><br />
+			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.WordsFont <span class="code-badge">.net</span></code><br />
+				<code>resources.wordsFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.wordsFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-words-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.WordsFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.wordsFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.wordsFont, resources.wordsFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-wordsfont, data-resources-wordsfont <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.EffectFont <span class="code-badge">.net</span></code><br />
+				<code>resources.effectFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.effectFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-effect-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.EffectFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.effectFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.effectFont, resources.effectFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-effectfont, data-resources-effectfont <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.FretboardNumberFont <span class="code-badge">.net</span></code><br />
+				<code>resources.fretboardNumberFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.fretboardNumberFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-fretboard-number-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.FretboardNumberFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.fretboardNumberFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.fretboardNumberFont, resources.fretboardNumberFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-fretboardnumberfont, data-resources-fretboardnumberfont <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>		
+		
+        <tr>
+            <td>
+				<code>RenderingResources.TablatureFont <span class="code-badge">.net</span></code><br />
+				<code>resources.tablatureFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.tablatureFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-tablature-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.TablatureFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.tablatureFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.tablatureFont, resources.tablatureFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-tablaturefont, data-resources-tablaturefont<span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.GraceFont <span class="code-badge">.net</span></code><br />
+				<code>resources.graceFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.graceFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-grace-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.GraceFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.graceFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.graceFont. resources.graceFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-gracefont, data-resources-gracefont <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>		
+		
+        <tr>
+            <td>
+				<code>RenderingResources.BarNumberFont <span class="code-badge">.net</span></code><br />
+				<code>resources.barNumberFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.barNumberFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-bar-number-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.BarNumberFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.barNumberFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.barNumberFont, resources.barNumberFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-barnumberfont, data-resources-barnumberfont <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.FingeringFont <span class="code-badge">.net</span></code><br />
+				<code>resources.fingeringFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.fingeringFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-fingering-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.FingeringFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.fingeringFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.fingeringFont, resources.fingeringFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-fingeringfont, data-resources-fingeringfont <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.MarkerFont <span class="code-badge">.net</span></code><br />
+				<code>resources.markerFont <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.markerFont <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-marker-font <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.MarkerFont <span class="code-badge">.net</span></code><br />
+				<code>display.resources.markerFont <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.markerFont, resources.markerFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-markerfont, data-resources-markerfont <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.StaffLineColor <span class="code-badge">.net</span></code><br />
+				<code>resources.staffLineColor <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.staffLineColor <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-staff-line-color <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.StaffLineColor <span class="code-badge">.net</span></code><br />
+				<code>display.resources.staffLineColor <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.staffLineColor, display.resources.staffLineColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-stafflinecolor, data-resources-stafflinecolor <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.BarNumberColor <span class="code-badge">.net</span></code><br />
+				<code>resources.barNumberColor <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.barNumberColor <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-bar-number-color <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.BarNumberColor <span class="code-badge">.net</span></code><br />
+				<code>display.resources.barNumberColor <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.barNumberColor, resources.barNumberColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-barnumbercolor, data-resources-barnumbercolor <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.BarSeparatorColor <span class="code-badge">.net</span></code><br />
+				<code>resources.barSeparatorColor <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.barSeparatorColor <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-bar-separator-color <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.BarSeparatorColor <span class="code-badge">.net</span></code><br />
+				<code>display.resources.barSeparatorColor <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.barSeparatorColor, resources.barSeparatorColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-barseparatorcolor, data-resources-barseparatorcolor <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.MainGlyphColor <span class="code-badge">.net</span></code><br />
+				<code>resources.mainGlyphColor <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.mainGlyphColor <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-main-glyph-color <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.MainGlyphColor <span class="code-badge">.net</span></code><br />
+				<code>display.resources.mainGlyphColor <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.mainGlyphColor, resources.mainGlyphColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-mainglyphcolor, data-resources-mainglyphcolor <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.SecondaryGlyphColor <span class="code-badge">.net</span></code><br />
+				<code>resources.secondaryGlyphColor <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.secondaryGlyphColor <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-secondary-glyph-color <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.SecondaryGlyphColor <span class="code-badge">.net</span></code><br />
+				<code>display.resources.secondaryGlyphColor <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.secondaryGlyphColor, resources.secondaryGlyphColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-secondaryglyphcolor, data-resources-secondaryglyphcolor <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>RenderingResources.ScoreInfoColor <span class="code-badge">.net</span></code><br />
+				<code>resources.scoreInfoColor <span class="code-badge">JavaScript</span></code><br />
+				<code>resources.scoreInfoColor <span class="code-badge">JSON</span></code><br />
+				<code>data-resources-score-info-color <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Display.RenderingResources.ScoreInfoColor <span class="code-badge">.net</span></code><br />
+				<code>display.resources.scoreInfoColor <span class="code-badge">JavaScript</span></code><br />
+				<code>display.resources.scoreInfoColor, resources.scoreInfoColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-scoreinfocolor, data-resources-scoreinfocolor <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ScrollOffsetX  <span class="code-badge">.net</span></code><br />
+				<code>scrollOffsetX  <span class="code-badge">JavaScript</span></code><br />
+				<code>playerOffset, playerOffset[0] <span class="code-badge">JSON</span></code><br />
+				<code>data-player-offset <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>player.ScrollOffsetX  <span class="code-badge">.net</span></code><br />
+				<code>player.scrollOffsetX  <span class="code-badge">JavaScript</span></code><br />
+				<code>player.scrollOffsetX <span class="code-badge">JSON</span></code><br />
+				<code>data-player-scrolloffsetx <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ScrollOffsetY  <span class="code-badge">.net</span></code><br />
+				<code>scrollOffsetY  <span class="code-badge">JavaScript</span></code><br />
+				<code>playerOffset, playerOffset[1] <span class="code-badge">JSON</span></code><br />
+				<code>data-player-offset <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>player.ScrollOffsetY  <span class="code-badge">.net</span></code><br />
+				<code>player.scrollOffsetY  <span class="code-badge">JavaScript</span></code><br />
+				<code>player.scrollOffsetY <span class="code-badge">JSON</span></code><br />
+				<code>data-player-scrolloffsety <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ScrollMode <span class="code-badge">.net</span></code><br />
+				<code>scrollMode <span class="code-badge">JavaScript</span></code><br />
+				<code>autoScroll <span class="code-badge">JSON</span></code><br />
+				<code>data-auto-scroll <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>player.ScrollMode <span class="code-badge">.net</span></code><br />
+				<code>player.scrollMode <span class="code-badge">JavaScript</span></code><br />
+				<code>player.scrollMode <span class="code-badge">JSON</span></code><br />
+				<code>data-player-scrollmode <span class="code-badge">HTML</span></code><br />			
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ScrollSpeed  <span class="code-badge">.net</span></code><br />
+				<code>scrollSpeed  <span class="code-badge">JavaScript</span></code><br />
+				<code>scrollSpeed <span class="code-badge">JSON</span></code><br />
+			</td>
+            <td>
+				<code>player.ScrollSpeed <span class="code-badge">.net</span></code><br />
+				<code>player.scrollSpeed <span class="code-badge">JavaScript</span></code><br />
+				<code>player.scrollSpeed <span class="code-badge">JSON</span></code><br />
+				<code>data-player-scrollspeed <span class="code-badge">HTML</span></code><br />						
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>ScrollElement  <span class="code-badge">.net</span></code><br />
+				<code>scrollElement <span class="code-badge">JavaScript</span></code><br />
+				<code>scrollElement <span class="code-badge">JSON</span></code><br />
+				<code>data-scroll-element <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+				<code>Player.ScrollElement  <span class="code-badge">.net</span></code><br />
+				<code>player.scrollElement <span class="code-badge">JavaScript</span></code><br />
+				<code>player.scrollElement <span class="code-badge">JSON</span></code><br />
+				<code>data-player-scroll-element <span class="code-badge">HTML</span></code><br />
+            </td>
+        </tr>
+		
+        <tr>
+            <td>
+				<code>BeatCursorWidth  <span class="code-badge">.net</span></code><br />
+				<code>beatCursorWidth <span class="code-badge">JavaScript</span></code><br />
+				<code>beatCursorWidth <span class="code-badge">JSON</span></code><br />
+				<code>data-beat-cursor-width <span class="code-badge">HTML</span></code><br />
+			</td>
+            <td>
+            </td>
+			<td>
+				Setting was removed, use CSS like for the other stylings to set the width of the beat cursor. 
+			</td>
+        </tr>
+		
+		
+    </tbody>
+</table>
+
