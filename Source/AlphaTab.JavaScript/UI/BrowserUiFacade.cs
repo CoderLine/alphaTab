@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Collections;
 using AlphaTab.Haxe;
@@ -649,7 +650,13 @@ namespace AlphaTab.UI
             }
             else
             {
-                player.Ready += () => { ((AlphaTabApi)_api).LoadSoundFontFromUrl(_api.Settings.SoundFontFile); };
+                player.Ready += () =>
+                {
+                    if (!string.IsNullOrEmpty(_api.Settings.SoundFontFile))
+                    {
+                        ((AlphaTabApi)_api).LoadSoundFontFromUrl(_api.Settings.SoundFontFile);
+                    }
+                };
             }
 
             return player;
@@ -678,6 +685,13 @@ namespace AlphaTab.UI
             {
                 elements.Item(0).ClassList.Remove("at-highlight");
             }
+        }
+
+        public void DestroyCursors()
+        {
+            var element = ((HtmlElementContainer)_api.Container).Element;
+            var cursorWrapper = element.QuerySelector(".at-cursors");
+            element.RemoveChild(cursorWrapper);
         }
 
         public Cursors CreateCursors()

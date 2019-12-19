@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -191,10 +192,20 @@ namespace AlphaTab.Platform.CSharp.Wpf
                 r);
         }
 
+        public override void DestroyCursors()
+        {
+            var element = (Panel)((FrameworkElementContainer)Api.CanvasElement).Control.Parent;
+            var cursors = element.Children.OfType<Canvas>().FirstOrDefault(c => "at-cursors".Equals(c.Tag));
+            if (cursors != null)
+            {
+                element.Children.Remove(cursors);
+            }
+        }
 
         public override Cursors CreateCursors()
         {
             var cursorWrapper = new Canvas();
+            cursorWrapper.Tag = "at-cursors";
             cursorWrapper.HorizontalAlignment = HorizontalAlignment.Left;
             cursorWrapper.VerticalAlignment = VerticalAlignment.Top;
 

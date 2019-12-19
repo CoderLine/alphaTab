@@ -194,6 +194,10 @@ namespace AlphaTab.Platform.CSharp.WinForms
         }
 
 
+        public override void DestroyCursors()
+        {
+        }
+
         public override Cursors CreateCursors()
         {
             // no cursors for winforms, why? - It lacks of proper transparency support

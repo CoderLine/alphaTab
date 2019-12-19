@@ -127,6 +127,8 @@ namespace AlphaTab
                 SetupPlayer();
             }
 
+            SetupClickHandling();
+
             UiFacade.InitialRender();
         }
 
@@ -152,6 +154,16 @@ namespace AlphaTab
         public void UpdateSettings()
         {
             Renderer.UpdateSettings(Settings);
+
+            // enable/disable player if needed
+            if (Settings.EnablePlayer)
+            {
+                SetupPlayer();
+            }
+            else
+            {
+                DestroyPlayer();
+            }
         }
 
         /// <summary>
@@ -202,7 +214,8 @@ namespace AlphaTab
                     tracks.Add(score.Tracks[0]);
                 }
             }
-            if(trackIndexes.Length == 0)
+
+            if (trackIndexes.Length == 0)
             {
                 if (score.Tracks.Count > 0)
                 {
@@ -219,6 +232,7 @@ namespace AlphaTab
                     }
                 }
             }
+
             InternalRenderTracks(score, tracks.ToArray());
         }
 
@@ -271,6 +285,7 @@ namespace AlphaTab
                 {
                     _trackIndexes.Add(track.Index);
                 }
+
                 Render();
             }
         }
@@ -589,8 +604,25 @@ namespace AlphaTab
             }
         }
 
+        private void DestroyPlayer()
+        {
+            if (Player == null)
+            {
+                return;
+            }
+
+            Player.Destroy();
+            Player = null;
+            DestroyCursors();
+        }
+
         private void SetupPlayer()
         {
+            if (Player != null)
+            {
+                return;
+            }
+
             Player = UiFacade.CreateWorkerPlayer();
             if (Player == null)
             {
@@ -634,7 +666,11 @@ namespace AlphaTab
 
             if (Settings.EnableCursor)
             {
-                SetupCursor();
+                SetupCursors();
+            }
+            else
+            {
+                DestroyCursors();
             }
         }
 
@@ -779,14 +815,30 @@ namespace AlphaTab
         private int _previousTick;
         private PlayerState _playerState;
 
-        private BoundsLookup _cursorCache;
         private Beat _currentBeat;
 
         private PlayerState _previousStateForCursor;
         private BoundsLookup _previousCursorCache;
         private int _lastScroll;
 
-        private void SetupCursor()
+        private void DestroyCursors()
+        {
+            if (_cursorWrapper == null)
+            {
+                return;
+            }
+
+            UiFacade.DestroyCursors();
+            _cursorWrapper = null;
+            _barCursor = null;
+            _beatCursor = null;
+            _selectionWrapper = null;
+
+            _previousTick = 0;
+            _playerState = PlayerState.Paused;
+        }
+
+        private void SetupCursors()
         {
             //
             // Create cursors
@@ -812,7 +864,6 @@ namespace AlphaTab
             // we need to update our position caches if we render a tablature
             Renderer.PostRenderFinished += () =>
             {
-                _cursorCache = Renderer.BoundsLookup;
                 CursorUpdateTick(_previousTick);
             };
 
@@ -837,8 +888,6 @@ namespace AlphaTab
                     }
                 }
             };
-
-            SetupClickHandling();
         }
 
         /// <summary>
@@ -876,7 +925,7 @@ namespace AlphaTab
                 return;
             }
 
-            var cache = _cursorCache;
+            var cache = Renderer.BoundsLookup;
             if (cache == null)
             {
                 return;
@@ -1055,7 +1104,7 @@ namespace AlphaTab
         {
             CanvasElement.MouseDown += e =>
             {
-                if (!e.IsLeftMouseButton)
+                if (!e.IsLeftMouseButton || !Settings.EnablePlayer || !Settings.EnableCursor)
                 {
                     return;
                 }
@@ -1064,7 +1113,7 @@ namespace AlphaTab
 
                 var relX = e.GetX(CanvasElement);
                 var relY = e.GetY(CanvasElement);
-                var beat = _cursorCache.GetBeatAtPos(relX, relY);
+                var beat = Renderer.BoundsLookup.GetBeatAtPos(relX, relY);
                 if (beat != null)
                 {
                     _selectionStart = new SelectionInfo(beat);
@@ -1075,14 +1124,14 @@ namespace AlphaTab
 
             CanvasElement.MouseMove += e =>
             {
-                if (!_selecting)
+                if (!_selecting || !Settings.EnablePlayer || !Settings.EnableCursor)
                 {
                     return;
                 }
 
                 var relX = e.GetX(CanvasElement);
                 var relY = e.GetY(CanvasElement);
-                var beat = _cursorCache.GetBeatAtPos(relX, relY);
+                var beat = Renderer.BoundsLookup.GetBeatAtPos(relX, relY);
                 if (beat != null && (_selectionEnd == null || _selectionEnd.Beat != beat))
                 {
                     _selectionEnd = new SelectionInfo(beat);
@@ -1092,7 +1141,7 @@ namespace AlphaTab
 
             CanvasElement.MouseUp += e =>
             {
-                if (!_selecting)
+                if (!_selecting || !Settings.EnablePlayer || !Settings.EnableCursor)
                 {
                     return;
                 }
@@ -1146,10 +1195,11 @@ namespace AlphaTab
 
             Renderer.PostRenderFinished += () =>
             {
-                if (_selectionStart != null)
+                if (_selectionStart == null || !Settings.EnablePlayer || !Settings.EnableCursor)
                 {
-                    CursorSelectRange(_selectionStart, _selectionEnd);
+                    return;
                 }
+                CursorSelectRange(_selectionStart, _selectionEnd);
             };
         }
 
@@ -1167,7 +1217,7 @@ namespace AlphaTab
 
         private void CursorSelectRange(SelectionInfo startBeat, SelectionInfo endBeat)
         {
-            var cache = _cursorCache;
+            var cache = Renderer.BoundsLookup;
             if (cache == null)
             {
                 return;
@@ -1376,6 +1426,7 @@ namespace AlphaTab
         /// This event is fired when all required data for playback is loaded and ready.
         /// </summary>
         public event Action ReadyForPlayback;
+
         private void OnReadyForPlayback()
         {
             var handler = ReadyForPlayback;
@@ -1391,6 +1442,7 @@ namespace AlphaTab
         /// This event is fired when the playback of the whole song finished.
         /// </summary>
         public event Action PlayerFinished;
+
         private void OnPlayerFinished()
         {
             var handler = PlayerFinished;
@@ -1406,6 +1458,7 @@ namespace AlphaTab
         /// This event is fired when the SoundFont needed for playback was loaded.
         /// </summary>
         public event Action SoundFontLoaded;
+
         private void OnSoundFontLoaded()
         {
             var handler = SoundFontLoaded;
@@ -1413,6 +1466,7 @@ namespace AlphaTab
             {
                 handler();
             }
+
             UiFacade.TriggerEvent(Container, "soundFontLoaded");
         }
 
@@ -1420,6 +1474,7 @@ namespace AlphaTab
         /// This event is fired when the Midi file needed for playback was loaded.
         /// </summary>
         public event Action MidiLoaded;
+
         private void OnMidiLoaded()
         {
             var handler = MidiLoaded;
@@ -1427,6 +1482,7 @@ namespace AlphaTab
             {
                 handler();
             }
+
             UiFacade.TriggerEvent(Container, "midiFileLoaded");
         }
 
@@ -1434,6 +1490,7 @@ namespace AlphaTab
         /// This event is fired when the playback state changed.
         /// </summary>
         public event Action<PlayerStateChangedEventArgs> PlayerStateChanged;
+
         private void OnPlayerStateChanged(PlayerStateChangedEventArgs e)
         {
             var handler = PlayerStateChanged;
@@ -1441,6 +1498,7 @@ namespace AlphaTab
             {
                 handler(e);
             }
+
             UiFacade.TriggerEvent(Container, "playerStateChanged", e);
         }
 
@@ -1448,6 +1506,7 @@ namespace AlphaTab
         /// This event is fired when the current playback position of the song changed.
         /// </summary>
         public event Action<PositionChangedEventArgs> PlayerPositionChanged;
+
         private void OnPlayerPositionChanged(PositionChangedEventArgs e)
         {
             var handler = PlayerPositionChanged;
@@ -1455,6 +1514,7 @@ namespace AlphaTab
             {
                 handler(e);
             }
+
             UiFacade.TriggerEvent(Container, "positionChanged", e);
         }
 
