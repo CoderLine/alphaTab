@@ -132,10 +132,16 @@ namespace AlphaTab.UI
         {
             _api = api;
 
-            var dataAttributes = GetDataAttributes();
             var settings = new Settings();
             settings.FillFromJson(raw);
+            var dataAttributes = GetDataAttributes();
             settings.FillFromDataAttributes(dataAttributes);
+
+            if (settings.Notation.NotationMode == NotationMode.SongBook)
+            {
+                settings.SetSongBookModeSettings();
+            }
+
             api.Settings = settings;
             if (settings.Core.Engine == "default" || settings.Core.Engine == "svg")
             {

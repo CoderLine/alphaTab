@@ -1,6 +1,4 @@
-using System;
 using AlphaTab.Collections;
-using AlphaTab.Haxe;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Util;
 using Phase;

@@ -618,6 +618,17 @@ namespace AlphaTab
         [JsonName("player")]
         public PlayerSettings Player { get; } = new PlayerSettings();
 
+        internal void SetSongBookModeSettings()
+        {
+            Notation.NotationMode = NotationMode.SongBook;
+            Notation.SmallGraceTabNotes = false;
+            Notation.FingeringMode = FingeringMode.SingleNoteEffectBand;
+            Notation.ExtendBendArrowsOnTiedNotes = false;
+            Notation.ShowParenthesisForTiedBends = false;
+            Notation.ShowTabNoteOnTiedBend = false;
+            Notation.ShowZeroOnDiveWhammy = true;
+        }
+
         /// <summary>
         /// Gets the default settings for the songbook display mode.
         /// </summary>
@@ -626,13 +637,7 @@ namespace AlphaTab
             get
             {
                 var settings = new Settings();
-                settings.Notation.NotationMode = NotationMode.SongBook;
-                settings.Notation.SmallGraceTabNotes = false;
-                settings.Notation.FingeringMode = FingeringMode.SingleNoteEffectBand;
-                settings.Notation.ExtendBendArrowsOnTiedNotes = false;
-                settings.Notation.ShowParenthesisForTiedBends = false;
-                settings.Notation.ShowTabNoteOnTiedBend = false;
-                settings.Notation.ShowZeroOnDiveWhammy = true;
+                settings.SetSongBookModeSettings();
                 return settings;
             }
         }
