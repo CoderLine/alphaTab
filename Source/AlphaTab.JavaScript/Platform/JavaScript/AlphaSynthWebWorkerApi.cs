@@ -198,16 +198,16 @@ namespace AlphaTab.Platform.JavaScript
 
             try
             {
-                _synth = new Worker(alphaSynthScriptFile);
+                HaxeString script = "importScripts('" + alphaSynthScriptFile + "')";
+                var blob = new Blob(Script.Write<object>("[ script ]"));
+                _synth = new Worker(URL.CreateObjectURL(blob));
             }
             catch
             {
-                // fallback to blob worker
+                // fallback to direct worker
                 try
                 {
-                    HaxeString script = "importScripts('" + alphaSynthScriptFile + "')";
-                    var blob = new Blob(Script.Write<object>("[ script ]"));
-                    _synth = new Worker(URL.CreateObjectURL(blob));
+                    _synth = new Worker(alphaSynthScriptFile);
                 }
                 catch (Exception e)
                 {
