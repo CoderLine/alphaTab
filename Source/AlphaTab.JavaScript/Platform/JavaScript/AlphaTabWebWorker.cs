@@ -1,8 +1,10 @@
 using System;
+using AlphaTab.Collections;
 using AlphaTab.Haxe;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
+using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Util;
 
@@ -67,12 +69,30 @@ namespace AlphaTab.Platform.JavaScript
                     _renderer.Width = data.width;
                     break;
                 case "alphaTab.renderScore":
+                    UpdateFontSizes(data.fontSizes);
                     var score = JsonConverter.JsObjectToScore(data.score, _renderer.Settings);
                     RenderMultiple(score, data.trackIndexes);
                     break;
                 case "alphaTab.updateSettings":
                     UpdateSettings(data.settings);
                     break;
+            }
+        }
+
+        private void UpdateFontSizes(object fontSizes)
+        {
+            if (fontSizes != null)
+            {
+                if (FontSizes.FontSizeLookupTables == null)
+                {
+                    FontSizes.FontSizeLookupTables = new FastDictionary<string, byte[]>();
+                }
+
+                var keys = Platform.JsonKeys(fontSizes);
+                foreach (var font in keys)
+                {
+                    FontSizes.FontSizeLookupTables[font] = fontSizes.Member<byte[]>(font);
+                }
             }
         }
 

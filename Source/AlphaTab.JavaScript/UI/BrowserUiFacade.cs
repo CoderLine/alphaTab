@@ -237,7 +237,7 @@ namespace AlphaTab.UI
         {
             var canvasElement = Browser.Document.CreateElement("div");
 
-            canvasElement.ClassName = "alphaTabSurface";
+            canvasElement.ClassName = "at-surface";
             canvasElement.Style.FontSize = "0";
             canvasElement.Style.Overflow = "hidden";
             canvasElement.Style.LineHeight = "0";
@@ -387,8 +387,9 @@ namespace AlphaTab.UI
                 css.AppendLine("     font-weight: normal;");
                 css.AppendLine("     font-style: normal;");
                 css.AppendLine("}");
-                css.AppendLine(".alphaTabSurface * {");
+                css.AppendLine(".at-surface * {");
                 css.AppendLine("    cursor: default;");
+                css.AppendLine("    vertical-align: top;");
                 css.AppendLine("}");
                 css.AppendLine(".at {");
                 css.AppendLine("     font-family: 'alphaTab';");

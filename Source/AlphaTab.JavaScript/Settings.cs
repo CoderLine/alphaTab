@@ -159,7 +159,8 @@ namespace AlphaTab
 
         public void FillFromDataAttributes(dynamic dataAttributes)
         {
-            var keys = Script.Write<string[]>("untyped __js__(\"Object.keys({0})\", dataAttributes)");
+            object dataAttributesObject = dataAttributes;
+            var keys = Platform.Platform.JsonKeys(dataAttributesObject);
             foreach (var key in keys)
             {
                 SetProperty(key.ToLower(), dataAttributes[key]);

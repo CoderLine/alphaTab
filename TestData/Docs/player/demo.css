@@ -53,6 +53,7 @@ body {
     grid-area: viewport;
     border-bottom: 1px solid rgba(0, 0, 0, .12);
     overflow-y: auto;
+    padding-right:20px; /* scrollbar */
 }
 
 .at-footer {
@@ -252,6 +253,10 @@ a.active i.fas {
     height: 4px;
     background: #4972a1;
     width: 0;
+}
+
+.at-speed-value {
+    font-size: 0.8rem;    
 }
 
 /** Circular Progress Bar https://jsfiddle.net/bootstrapious/3xnomecr  **/

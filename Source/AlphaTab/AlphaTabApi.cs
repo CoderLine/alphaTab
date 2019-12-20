@@ -867,7 +867,6 @@ namespace AlphaTab
             //
             // Hook into events
 
-            //var surface = Element.QuerySelector(".alphaTabSurface");
             _previousTick = 0;
             _playerState = PlayerState.Paused;
             // we need to update our position caches if we render a tablature

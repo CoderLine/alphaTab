@@ -41,7 +41,7 @@ namespace AlphaTab.Platform.Svg
             Buffer.Append(width);
             Buffer.Append("px\" height=\"");
             Buffer.Append((int)height);
-            Buffer.Append("px\" class=\"alphaTabSurfaceSvg\">\n");
+            Buffer.Append("px\" class=\"at-surface-svg\">\n");
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
         }
