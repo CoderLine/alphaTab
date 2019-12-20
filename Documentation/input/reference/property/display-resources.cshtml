@@ -1,0 +1,189 @@
+Title: Display.Resources
+JsName: display.resources;resources
+JsonName: display.resources;resources
+DataAttribute: data-display-resources-*, data-resources-*
+Category: Display
+Description: Allows adjusting of the used fonts and colors for rendering.
+Since: 0.9.6
+ShowInSideBar: false
+---
+
+@functions {
+    IEnumerable<IDocument> GetDocumentsAtPath(string relativePath)
+    {
+        return Documents.Where(d => 
+            string.Join("/", d.Get<object[]>(Keys.TreePath) ?? new object[0])
+            .StartsWith(relativePath)
+        );
+    }
+}
+
+<h2>Description</h2>
+<p>
+    AlphaTab allows configuring the colors and fonts used for rendering via the rendering resources settings. Please note that as of today
+    this is the primary way of changing the way how alphaTab styles elements. CSS styling in the browser cannot be guaranteed to work due to its flexibility. 
+</p>
+
+<p>
+Due to space reasons in the following table the common prefix of the settings are removed. Please refer to these examples to eliminate confusion on the usage: 
+</p>
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Platform</th>
+            <th>Prefix</th>
+            <th>Example Usage</th>
+        </tr>
+    </thead>    
+    <tbody>
+        <tr>
+            <td>.net</td>
+            <td>
+                <code>Display.Resources.</code>
+            </td>
+            <td><code>settings.Display.Resources.WordsFonts = ...</code></td>
+        </tr>
+        <tr>
+            <td>JavaScript</td>
+            <td>
+                <code>display.resources.</code>
+            </td>
+            <td>
+                <code>settings.display.resources.wordsFont = '...'</code>
+            </td>
+        </tr>
+        <tr>
+            <td>JSON</td>
+            <td>
+                <code>display.resources.</code><br />
+                <code>resources.</code>
+            </td>
+            <td>
+                <code>var settings = { display: { resources: { wordsFonts: '...'} };</code> or<br />
+                <code>var settings = { resources: { wordsFonts: '...'} };</code>
+            </td>
+        </tr>
+        <tr>
+            <td>HTML</td>
+            <td>
+                <code>data-display-resources-</code><br />
+                <code>data-resources-</code></td>
+            <td>
+                <code>&lt;div data-resources-wordsfont="..."&gt</code><br />
+                <code>&lt;div data-wordsfont="..."&gt</code>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Resources</h2>
+Following resources exist for adjusting the style. 
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Resource</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Summary</th>
+        </tr>
+    </thead>    
+    <tbody>   
+        @foreach(IDocument child in GetDocumentsAtPath("reference/property/display-resources-"))
+        {
+            var prefixes = new [] {
+                "display.resources.", "resources.",
+                "data-display-resources-", "data-resources-"
+            };
+            Func<string[], string[]> simplifyNames = array => 
+            {
+                for(var i = 0; i < array.Length; i++) 
+                {
+                    foreach(var prefix in prefixes) 
+                    {
+                        if(array[i].StartsWith(prefix)) 
+                        {
+                            array[i] = array[i].Substring(prefix.Length);
+                            break;
+                        }
+                    }
+                }
+                return array.Distinct().ToArray();
+            };
+    
+            object[] childTreePath = child.Get<object[]>(Keys.TreePath);        
+            string[] jsTypes = child.String("JsType").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+            string[] jsonTypes = child.String("JsonType").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+            string dotNetName = simplifyNames(new[]{child.String("Title")})[0];
+            string[] jsNames = simplifyNames(child.String("JsName").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries));
+            string[] jsonNames = simplifyNames(child.String("JsonName").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries));
+            string[] dataAttributeNames = simplifyNames(child.String("DataAttribute").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries));
+          
+            <tr>
+                <td>
+                    <code class="code-badge code-badge-net">
+                        @dotNetName
+                        <span>.net</span>
+                    </code>
+                    @foreach(var name in jsNames)
+                    {
+                        <br />
+                        <code class="code-badge code-badge-js">
+                            @name <span>JavaScript</span>
+                        </code>
+                    }
+                    @foreach(var name in jsonNames)
+                    {
+                        <br />
+                        <code class="code-badge code-badge-json">
+                            @name <span>JSON</span>
+                        </code>
+                    }
+                    @foreach(var name in dataAttributeNames)
+                    {
+                        <br />
+                        <code class="code-badge code-badge-html">
+                            @name <span>HTML</span>
+                        </code>
+                    }
+                </td>
+                <td>
+                    <code class="code-badge code-badge-net">
+                        @Html.Raw(child.String("Type"))
+                        <span>.net</span>
+                    </code>
+                    @foreach(var jsType in jsTypes)
+                    {
+                        <br />
+                        <code class="code-badge code-badge-js">@(jsType) <span>JavaScript</span></code>
+                    }                    
+                    @foreach(var jsonType in jsonTypes)
+                    {
+                        <br />
+                        <code class="code-badge code-badge-json">@(jsonType) <span>JSON &amp; HTML</span></code>
+                    }
+                </td>
+                <td>@Html.Raw(child.String("DefaultValue"))</td>
+                <td>
+                    @(child.String(DocsKeys.Description))
+                </td>
+            </tr>
+        }    
+    </tbody>
+</table>
+
+<h2>Types</h2>
+
+<h3>Fonts</h3>
+<p>
+For the .net platform any installed font on the system can be used. Simply construct the <code>Font</code> object to configure your desired fonts. 
+</p>
+<p>
+For the JavaScript platform any font that might be installed on the client machines can be used. Any additional fonts can be added via WebFonts. The rendering of the score will be delayed until it is detected that the font was loaded. Simply use any CSS font property compliant string as configuration. Relative font sizes with percentual values are not supported, remaining values will be considered if supported.
+</p>
+
+
+<h3>Colors</h3>
+<p>
+On .net simply construct the <code>Color</code> object to configure your desired color. For JavaScript you can use any CSS font property compliant string. (#RGB, #RGBA, #RRGGBB, #RRGGBBAA, rgb(r,g,b), rgba(r,g,b,a) )
+</p>

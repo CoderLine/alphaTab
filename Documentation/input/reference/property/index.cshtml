@@ -50,6 +50,7 @@ The following table contains all the properties as they can be set on the genera
         @{
             IEnumerable<IDocument> propertyPages = Model.DocumentList(Keys.Children);
             IList<IGrouping<string, IDocument>> propertyPagesGroups = propertyPages
+                        .Where(x => x.Bool("ShowInTable", true))
                         .GroupBy(x => x.String(DocsKeys.Category))
                         .OrderBy(x => x.Key)
                         .ToList();
@@ -77,24 +78,42 @@ The following table contains all the properties as they can be set on the genera
                     {
                         url = Context.GetLink(child);
                     }
-                    <tr>
                     
+                    string dotNetName = child.String("Title");
+                    string[] jsNames = child.String("JsName", "").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+                    string[] jsonNames = child.String("JsonName", "").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+                    string[] dataAttributeNames = child.String("DataAttribute", "").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+                   
+                    <tr>
                         <td>
                             <a href="@url">
-                                <code>
-                                    @Html.Raw(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString()))
-                                    <span class="code-badge">.net</span>
+                                <code class="code-badge code-badge-net">
+                                    @dotNetName
+                                    <span>.net</span>
                                 </code>
-                                <br />
-                                <code>
-                                    @Html.Raw(child.String("JsName"))
-                                    <span class="code-badge">JSON</span>
-                                </code>
-                                <br />
-                                <code>
-                                    @Html.Raw(child.String("DataAttribute"))
-                                    <span class="code-badge">HTML</span>
-                                </code>
+                                @if(jsNames.Length > 0) { <br /> }
+                                @foreach(var name in jsNames)
+                                {
+                                    <code class="code-badge code-badge-js">
+                                        @name <span>JavaScript</span>
+                                    </code>
+                                }
+
+                                @if(jsonNames.Length > 0) { <br /> }
+                                @foreach(var name in jsonNames)
+                                {
+                                    <code class="code-badge code-badge-json">
+                                        @name <span>JSON</span>
+                                    </code>
+                                }
+                                
+                                @if(dataAttributeNames.Length > 0) { <br /> }
+                                @foreach(var name in dataAttributeNames)
+                                {
+                                    <code class="code-badge code-badge-html">
+                                        @name <span>HTML</span>
+                                    </code>
+                                }
                             </a>
                         </td>
                         <td>@(child.String(DocsKeys.Description))</td>
