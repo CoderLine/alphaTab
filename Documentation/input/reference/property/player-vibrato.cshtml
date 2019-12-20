@@ -1,5 +1,6 @@
 Title: Player.Vibrato
 JsName: player.vibrato
+JsonName: player.vibrato
 DataAttribute: data-player-vibrato-*
 Category: Player
 Description: The Vibrato settings allow control how the different vibrato types are generated for audio. 
@@ -30,8 +31,6 @@ Since: 0.9.6
     <li>Note Slight - A fast vibrato on a single note. This vibrato is usually done with the finger on the fretboard.</li>
     <li>Note Wide - A slow vibrato on a single note. This vibrato is usually done with the finger on the fretboard.</li>
 </ol>
-
-@Html.Partial("_PropertyDescription", Model)
 
 <h2>Vibrato Settings</h2>
 
@@ -68,8 +67,6 @@ Since: 0.9.6
             };
     
             object[] childTreePath = child.Get<object[]>(Keys.TreePath);        
-            string[] jsTypes = child.String("JsType").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
-            string[] jsonTypes = child.String("JsonType").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
             string dotNetName = simplifyNames(new[]{child.String("Title")})[0];
             string[] jsNames = simplifyNames(child.String("JsName").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries));
             string[] jsonNames = simplifyNames(child.String("JsonName").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries));
