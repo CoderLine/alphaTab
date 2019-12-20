@@ -63,6 +63,7 @@ namespace AlphaTab.UI
         }
 
         public event Action CanRenderChanged;
+
         private void OnFontLoaded(string family)
         {
             FontSizes.GenerateFontLookup(family);
@@ -417,6 +418,7 @@ namespace AlphaTab.UI
             {
                 return new int[0];
             }
+
             var tracks = new FastList<int>();
 
             // decode string
@@ -548,74 +550,70 @@ namespace AlphaTab.UI
 
         public void BeginAppendRenderResults(RenderFinishedEventArgs renderResult)
         {
-            Browser.Window.SetTimeout((Action)(() =>
+            var canvasElement = ((HtmlElementContainer)_api.CanvasElement).Element;
+
+            // null result indicates that the rendering finished
+            if (renderResult == null)
+            {
+                // so we remove elements that might be from a previous render session
+                while (canvasElement.ChildElementCount > _totalResultCount)
                 {
-                    var canvasElement = ((HtmlElementContainer)_api.CanvasElement).Element;
+                    canvasElement.RemoveChild(canvasElement.LastChild);
+                }
 
-                    // null result indicates that the rendering finished
-                    if (renderResult == null)
+                // directly show the elements in the viewport once we're done.
+                if (_api.Settings.Core.EnableLazyLoading)
+                {
+                    ShowSvgsInViewPort();
+                }
+            }
+            // NOTE: here we try to replace existing children
+            else
+            {
+                var body = renderResult.RenderResult;
+                if (Platform.Platform.TypeOf(body) == "string")
+                {
+                    Element placeholder;
+                    if (_totalResultCount < canvasElement.ChildElementCount)
                     {
-                        // so we remove elements that might be from a previous render session
-                        while (canvasElement.ChildElementCount > _totalResultCount)
-                        {
-                            canvasElement.RemoveChild(canvasElement.LastChild);
-                        }
-
-                        // directly show the elements in the viewport once we're done.
-                        if (_api.Settings.Core.EnableLazyLoading)
-                        {
-                            ShowSvgsInViewPort();
-                        }
+                        placeholder = (Element)canvasElement.ChildNodes.Item(_totalResultCount);
                     }
-                    // NOTE: here we try to replace existing children
                     else
                     {
-                        var body = renderResult.RenderResult;
-                        if (Platform.Platform.TypeOf(body) == "string")
-                        {
-                            Element placeholder;
-                            if (_totalResultCount < canvasElement.ChildElementCount)
-                            {
-                                placeholder = (Element)canvasElement.ChildNodes.Item(_totalResultCount);
-                            }
-                            else
-                            {
-                                placeholder = Browser.Document.CreateElement("div");
-                                canvasElement.AppendChild(placeholder);
-                            }
-
-                            placeholder.Style.Width = renderResult.Width + "px";
-                            placeholder.Style.Height = renderResult.Height + "px";
-                            placeholder.Style.Display = "inline-block";
-
-                            if (IsElementInViewPort(placeholder) || !_api.Settings.Core.EnableLazyLoading)
-                            {
-                                var bodyHtml = (string)body;
-                                placeholder.OuterHTML = bodyHtml;
-                            }
-                            else
-                            {
-                                placeholder.Member("svg", body);
-                                placeholder.SetAttribute("data-lazy", "true");
-                            }
-                        }
-                        else
-                        {
-                            if (_totalResultCount < canvasElement.ChildElementCount)
-                            {
-                                canvasElement.ReplaceChild(renderResult.RenderResult.As<Node>(),
-                                    canvasElement.ChildNodes.Item(_totalResultCount));
-                            }
-                            else
-                            {
-                                canvasElement.AppendChild(renderResult.RenderResult.As<Node>());
-                            }
-                        }
-
-                        _totalResultCount++;
+                        placeholder = Browser.Document.CreateElement("div");
+                        canvasElement.AppendChild(placeholder);
                     }
-                }),
-                1);
+
+                    placeholder.Style.Width = renderResult.Width + "px";
+                    placeholder.Style.Height = renderResult.Height + "px";
+                    placeholder.Style.Display = "inline-block";
+
+                    if (IsElementInViewPort(placeholder) || !_api.Settings.Core.EnableLazyLoading)
+                    {
+                        var bodyHtml = (string)body;
+                        placeholder.OuterHTML = bodyHtml;
+                    }
+                    else
+                    {
+                        placeholder.Member("svg", body);
+                        placeholder.SetAttribute("data-lazy", "true");
+                    }
+                }
+                else
+                {
+                    if (_totalResultCount < canvasElement.ChildElementCount)
+                    {
+                        canvasElement.ReplaceChild(renderResult.RenderResult.As<Node>(),
+                            canvasElement.ChildNodes.Item(_totalResultCount));
+                    }
+                    else
+                    {
+                        canvasElement.AppendChild(renderResult.RenderResult.As<Node>());
+                    }
+                }
+
+                _totalResultCount++;
+            }
         }
 
         /// <summary>
