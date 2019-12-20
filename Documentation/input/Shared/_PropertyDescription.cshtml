@@ -1,0 +1,36 @@
+@{
+    string dotNetName = Model.String("Title");
+    string[] jsNames = Model.String("JsName").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+    string[] jsonNames = Model.String("JsonName").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+    string[] dataAttributeNames = Model.String("DataAttribute").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+}
+
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code>@dotNetName <span class="code-badge">.net</span></td>
+        </tr> 
+        @foreach(var name in jsNames)
+        {
+            <tr>
+                <td><code>@name <span class="code-badge">JavaScript</span></td>
+            </tr>        
+        }
+        
+        @foreach(var name in jsonNames)
+        {
+            <tr>
+                <td><code>@name <span class="code-badge">JSON</span></td>
+            </tr>        
+        }
+        
+        @foreach(var name in dataAttributeNames)
+        {
+            <tr>
+                <td><code>@name <span class="code-badge">HTML</span></td>
+            </tr>        
+        }
+        
+    </tbody>
+</table>

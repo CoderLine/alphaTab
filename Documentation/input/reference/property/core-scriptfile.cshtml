@@ -1,10 +1,11 @@
-Title: ScriptFile
-JsName: scriptFile
-DataAttribute: data-script-file
+Title: Core.ScriptFile
+JsName: core.scriptFile;scriptFile
+JsonName: core.scriptFile;scriptFile
+DataAttribute: data-core-scriptfile;data-scriptfile
 Category: JavaScript Specific
 Description: The full URL to the alphaTab JavaScript file.
 ShowInSideBar: false
-Since: 0.9.4
+Since: 0.9.6
 ---
 
 <h2>Description</h2>
@@ -15,6 +16,8 @@ Since: 0.9.4
     in case those scripts are not suitable for web workers. e.g. if there is a script bundled together with alphaTab that accesses the DOM,
     this will cause an error when alphaTab starts this script as worker. 
 </p>
+
+@Html.Partial("_PropertyDescription", Model) 
 
 <h2>Types</h2>
 
@@ -27,26 +30,4 @@ Since: 0.9.4
 </table>
 
 <h2>Default Value</h2>
-
-<code>${AlphaTabScriptFolder}/Font/<code>
-
-<h2>Example - JavaScript</h2>
-
-<pre>
-<code class="language-javascript line-numbers">
-window.ALPHATAB_ROOT = "https://cdn.myserver.com/scripts/alphaTab.min.js";
-var settings = {
-    scriptFile: "/scripts/bundle.js"
-};
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
-var japi = $('#alphaTab').alphaTab(settings);
-</code>
-</pre>
-
-<h2>Example - HTML</h2>
-
-<pre>
-<code class="language-html line-numbers">
-&lt;div id="alphaTab" data-script-file="/assets/fonts/"&gt;&lt;/div&gt;
-</code>
-</pre>
+Absolute url to JavaScript file containing alphaTab. (auto detected)

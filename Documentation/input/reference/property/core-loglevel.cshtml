@@ -1,9 +1,10 @@
-Title: LogLevel
-JsName: logging
-DataAttribute: data-logging
+Title: Core.LogLevel
+JsName: core.logLevel;logLevel
+JsonName: core.logLevel;logLevel
+DataAttribute: data-core-loglevel;data-loglevel
 Category: Core
 Description: The log level to use within alphaTab.
-Since: 0.9.4
+Since: 0.9.6
 ShowInSideBar: false
 ---
 
@@ -11,6 +12,8 @@ ShowInSideBar: false
 <p>
 AlphaTab internally does quite a bit of logging for debugging and informational purposes. The log level of alphaTab can be controlled via this setting.
 </p>
+
+@Html.Partial("_PropertyDescription", Model) 
 
 <h2>Types</h2>
 
@@ -56,36 +59,5 @@ AlphaTab internally does quite a bit of logging for debugging and informational 
 </table>
 
 <h2>Default Value</h2>
-
-<code>GuitarPro<code>
-
-<h2>Example - C#</h2>
-
-<pre>
-<code class="language-csharp line-numbers">
-var settings = Settings.Defaults; 
-settings.LogLevel = LogLevel.Warning;
-</code>
-</pre>
-
-
-<h2>Example - JavaScript</h2>
-
-<pre>
-<code class="language-javascript line-numbers">
-var settings = {
-    logging: 'warning'
-};
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
-var japi = $('#alphaTab').alphaTab(settings);
-</code>
-</pre>
-
-<h2>Example - HTML</h2>
-
-<pre>
-<code class="language-html line-numbers">
-&lt;div id="alphaTab" data-logging="warning"&gt;&lt;/div&gt;
-</code>
-</pre>
+<code>Info<code>
 

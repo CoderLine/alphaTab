@@ -1,9 +1,10 @@
-Title: IncludeNoteBounds
-JsName: includeNoteBounds
-DataAttribute: data-include-note-bounds
+Title: Core.IncludeNoteBounds
+JsName: core.includeNoteBounds;includeNoteBounds
+JsonName: core.includeNoteBounds;includeNoteBounds
+DataAttribute: data-core-includenotebounds;data-includenotebounds
 Category: Core
 Description: Gets or sets whether in the BoundsLookup also the position and area of each individual note is provided.
-Since: 0.9.4
+Since: 0.9.6
 ShowInSideBar: false
 ---
 
@@ -12,6 +13,8 @@ ShowInSideBar: false
     AlphaTab collects the position of the rendered music notation elements during the rendering process. This way some level of interactivity can be provided like the feature that seeks to the corresponding position when clicking on a beat. 
     By default the position of the individual notes is not collected due to performance reasons. If access to note position information is needed, this setting can enable it. 
 </p>
+
+@Html.Partial("_PropertyDescription", Model) 
 
 <h2>Types</h2>
 
@@ -27,40 +30,23 @@ ShowInSideBar: false
 
 <code>false<code>
 
-<h2>Example - C#</h2>
-
-<pre>
-<code class="language-csharp line-numbers">
-var settings = Settings.Defaults; 
-settings.IncludeNoteBounds = true;
-</code>
-</pre>
-
-
 <h2>Example - JavaScript</h2>
 
 <pre>
 <code class="language-javascript line-numbers">
-var settings = {
-    includeNoteBounds: 'true'
+const settings = {
+    core: {
+        includeNoteBounds: true
+    }
 };
-var api = null;
+let api = null;
 document.querySelector('#alphaTab').addEventListener('alphaTab.rendered', function() {
-    var lookup = api.Renderer.BoundsLookup;
+    var lookup = api.renderer.boundsLookup;
     var x = 100;
     var y = 100;
-    var beat = lookup.GetBeatAtPos(x, y);
-    var note = lookup.GetNoteAtPos(beat, x, y); 
+    var beat = lookup.getBeatAtPos(x, y);
+    var note = lookup.getNoteAtPos(beat, x, y); 
 });
 api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
-var japi = $('#alphaTab').alphaTab(settings);
-</code>
-</pre>
-
-<h2>Example - HTML</h2>
-
-<pre>
-<code class="language-html line-numbers">
-&lt;div id="alphaTab" data-include-note-bounds="true"&gt;&lt;/div&gt;
 </code>
 </pre>
