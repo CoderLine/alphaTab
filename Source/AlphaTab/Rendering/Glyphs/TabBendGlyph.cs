@@ -320,7 +320,7 @@ namespace AlphaTab.Rendering.Glyphs
                     endNote = nextNote;
                     isMultiBeatBend = true;
 
-                    if (endNote.HasBend || !Renderer.Settings.ExtendBendArrowsOnTiedNotes)
+                    if (endNote.HasBend || !Renderer.Settings.Notation.ExtendBendArrowsOnTiedNotes)
                     {
                         endNoteHasBend = true;
                         break;
@@ -332,7 +332,7 @@ namespace AlphaTab.Rendering.Glyphs
                     Renderer.ScoreRenderer.Layout.GetRendererForBar<TabBarRenderer>(Renderer.Staff.StaveId,
                         endBeat.Voice.Bar);
 
-                if (endBeat.IsLastOfVoice && !endNote.HasBend && Renderer.Settings.ExtendBendArrowsOnTiedNotes)
+                if (endBeat.IsLastOfVoice && !endNote.HasBend && Renderer.Settings.Notation.ExtendBendArrowsOnTiedNotes)
                 {
                     endBeat = null;
                 }

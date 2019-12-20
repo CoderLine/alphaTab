@@ -1,4 +1,5 @@
-﻿using AlphaTab.Collections;
+﻿using System;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -25,15 +26,9 @@ namespace AlphaTab.Rendering
         public TabBarRenderer(ScoreRenderer renderer, Bar bar)
             : base(renderer, bar)
         {
-            RhythmHeight = 15 * renderer.Layout.Scale;
-            RhythmBeams = false;
         }
 
         public float LineOffset => (LineSpacing + 1) * Scale;
-
-        public bool RenderRhythm { get; set; }
-        public float RhythmHeight { get; set; }
-        public bool RhythmBeams { get; set; }
 
         public override float GetNoteX(Note note, bool onEnd = true)
         {
@@ -66,10 +61,11 @@ namespace AlphaTab.Rendering
             BottomPadding = numberOverflow;
             Height = LineOffset * (Bar.Staff.Tuning.Length - 1) + numberOverflow * 2;
 
-            if (RenderRhythm)
+
+            if (Settings.Notation.RhythmMode != TabRhythmMode.Hidden)
             {
-                Height += RhythmHeight;
-                BottomPadding += RhythmHeight;
+                Height += Settings.Notation.RhythmHeight * Settings.Display.Scale;
+                BottomPadding += Settings.Notation.RhythmHeight * Settings.Display.Scale;
             }
 
             base.UpdateSizes();
@@ -78,7 +74,7 @@ namespace AlphaTab.Rendering
         public override void DoLayout()
         {
             base.DoLayout();
-            if (RenderRhythm)
+            if (Settings.Notation.RhythmMode != TabRhythmMode.Hidden)
             {
                 var hasTuplets = false;
                 foreach (var voice in Bar.Voices)
@@ -260,7 +256,7 @@ namespace AlphaTab.Rendering
                 }
             }
 
-            // if we have multiple voices we need to sort by X-position, otherwise have a wild mix in the list 
+            // if we have multiple voices we need to sort by X-position, otherwise have a wild mix in the list
             // but painting relies on ascending X-position
             foreach (var line in tabNotes)
             {
@@ -301,7 +297,7 @@ namespace AlphaTab.Rendering
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             base.Paint(cx, cy, canvas);
-            if (RenderRhythm)
+            if (Settings.Notation.RhythmMode != TabRhythmMode.Hidden)
             {
                 PaintBeams(cx, cy, canvas);
                 PaintTuplets(cx, cy, canvas);
@@ -344,7 +340,7 @@ namespace AlphaTab.Rendering
                 : Resources.SecondaryGlyphColor;
 
             // check if we need to paint simple footer
-            if (h.Beats.Count == 1 || RhythmBeams)
+            if (h.Beats.Count == 1 || Settings.Notation.RhythmMode == TabRhythmMode.ShowWithBeams)
             {
                 PaintFooter(cx, cy, canvas, h);
             }
@@ -364,7 +360,7 @@ namespace AlphaTab.Rendering
                 if (h.HasBeatLineX(beat))
                 {
                     //
-                    // draw line 
+                    // draw line
                     //
                     var beatLineX = h.GetBeatLineX(beat);
                     var y1 = cy + Y;
@@ -373,7 +369,7 @@ namespace AlphaTab.Rendering
                     var startGlyph = (TabBeatGlyph)GetOnNotesGlyphForBeat(beat);
                     if (startGlyph.NoteNumbers == null)
                     {
-                        y1 += Height - RhythmHeight - _tupletSize;
+                        y1 += Height - Settings.Notation.RhythmHeight * Settings.Display.Scale - _tupletSize;
                     }
                     else
                     {
@@ -410,7 +406,7 @@ namespace AlphaTab.Rendering
 
                         var barY = barStart + barIndex * barSpacing;
 
-                        // 
+                        //
                         // Broken Bar to Next
                         //
                         if (h.Beats.Count == 1)
@@ -421,7 +417,7 @@ namespace AlphaTab.Rendering
                             barEndY = barY;
                             PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
                         }
-                        // 
+                        //
                         // Bar to Next?
                         //
                         else if (i < h.Beats.Count - 1)
@@ -457,7 +453,7 @@ namespace AlphaTab.Rendering
                             barEndY = barY;
                             PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
                         }
-                        // 
+                        //
                         // Broken Bar to Previous?
                         //
                         else if (i > 0 && !BeamingHelper.IsFullBarJoin(beat, h.Beats[i - 1], barIndex))
@@ -575,7 +571,7 @@ namespace AlphaTab.Rendering
                 var lastBeamingHelper = Helpers.BeamHelperLookup[h.Voice.Index][lastBeat.Index];
                 if (firstBeamingHelper != null && lastBeamingHelper != null)
                 {
-                    // 
+                    //
                     // Calculate the overall area of the tuplet bracket
 
                     var startX = firstBeamingHelper.GetBeatLineX(firstBeat);
@@ -600,7 +596,7 @@ namespace AlphaTab.Rendering
                     var sw = canvas.MeasureText(s);
                     var sp = 3 * Scale;
 
-                    // 
+                    //
                     // Calculate the offsets where to break the bracket
                     var middleX = (startX + endX) / 2;
                     var offset1X = middleX - sw / 2 - sp;
@@ -659,7 +655,7 @@ namespace AlphaTab.Rendering
 
 
                 //
-                // draw line 
+                // draw line
                 //
 
                 var beatLineX = h.GetBeatLineX(beat);
@@ -669,7 +665,7 @@ namespace AlphaTab.Rendering
                 var startGlyph = (TabBeatGlyph)GetOnNotesGlyphForBeat(beat);
                 if (startGlyph.NoteNumbers == null)
                 {
-                    y1 += Height - RhythmHeight - _tupletSize;
+                    y1 += Height - Settings.Notation.RhythmHeight * Settings.Display.Scale - _tupletSize;
                 }
                 else
                 {
@@ -691,7 +687,7 @@ namespace AlphaTab.Rendering
                 canvas.Stroke();
 
                 //
-                // Draw beam 
+                // Draw beam
                 //
                 if (beat.Duration > Duration.Quarter)
                 {

@@ -148,7 +148,7 @@ namespace AlphaTab.Platform.CSharp
                     fs |= FontStyle.Italic;
                 }
 
-                return new Font(_font.FontFamily.Name, _font.Size * Settings.Scale, fs);
+                return new Font(_font.FontFamily.Name, _font.Size * Settings.Display.Scale, fs);
             }
             set
             {
@@ -163,7 +163,7 @@ namespace AlphaTab.Platform.CSharp
                     fontStyle = GdiFontStyle.Italic;
                 }
 
-                _font = new GdiFont(value.Family, value.Size * Settings.Scale, fontStyle, GraphicsUnit.Pixel);
+                _font = new GdiFont(value.Family, value.Size * Settings.Display.Scale, fontStyle, GraphicsUnit.Pixel);
             }
         }
 

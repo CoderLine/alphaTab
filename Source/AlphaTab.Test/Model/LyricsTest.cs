@@ -18,7 +18,7 @@ namespace AlphaTab.Test.Model
             {
                 var buffer = ByteBuffer.FromBuffer(data);
                 var importer = new GpxImporter();
-                importer.Init(buffer);
+                importer.Init(buffer, new Settings());
                 loaded(importer.ReadScore());
             });
         }

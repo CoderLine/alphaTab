@@ -3,7 +3,7 @@ Order: 2
 ---
 
 <div class="description">
-    To show the guitar tablature only, set either <code>staves: 'tab'</code> or <code>data-staves="tab"</code>
+    To show the guitar tablature only, set either <code>display.staveProfile = 'tab'</code> or <code>data-display-staveprofile="tab"</code>
 </div>
 
 <div>
@@ -20,14 +20,16 @@ Order: 2
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
                   file: '@Context.GetLink("/assets/files/player/Canon.gp5")',
-                  staves: 'tab'
+                  display: {
+					staveProfile: 'tab'
+				  }
                 })
             </script>
         </div>
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-staves="tab"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-display-staveprofile="tab"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

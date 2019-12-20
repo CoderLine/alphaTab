@@ -12,27 +12,26 @@ namespace AlphaTab.Test.VisualTests.Features
         [TestMethod, AsyncTestMethod]
         public void Rhythm()
         {
-            var settings = Settings.Defaults;
-            settings.Staves.Id = "tab";
-            settings.Staves.AdditionalSettings["rhythm"] = true;
+            var settings = new Settings();
+            settings.Display.StaveProfile = StaveProfile.Tab;
+            settings.Notation.RhythmMode = TabRhythmMode.ShowWithBars;
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/Rhythm.gp5", "TestFiles/VisualTests/Features/GuitarTabs/Rhythm.png");
         }
 
         [TestMethod, AsyncTestMethod]
         public void RhythmWithBeams()
         {
-            var settings = Settings.Defaults;
-            settings.Staves.Id = "tab";
-            settings.Staves.AdditionalSettings["rhythm"] = true;
-            settings.Staves.AdditionalSettings["rhythmBeams"] = true;
+            var settings = new Settings();
+            settings.Display.StaveProfile = StaveProfile.Tab;
+            settings.Notation.RhythmMode = TabRhythmMode.ShowWithBeams;
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/Rhythm.gp5", "TestFiles/VisualTests/Features/GuitarTabs/RhythmWithBeams.png");
         }
 
         [TestMethod, AsyncTestMethod]
         public void StringVariations()
         {
-            var settings = Settings.Defaults;
-            settings.Staves.Id = "tab";
+            var settings = new Settings();
+            settings.Display.StaveProfile = StaveProfile.Tab;
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/Tabs.gp5", "TestFiles/VisualTests/Features/GuitarTabs/StringVariations.png");
         }
 

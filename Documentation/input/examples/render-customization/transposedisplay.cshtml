@@ -3,7 +3,7 @@ Order: 8
 ---
 
 <div class="description">
-    By default standard music notation for guitar tabs is shifted by 1 octave for display. This does not have an impact on the audio. This feature can also be used manually. For all tracks the number of semitones can be specified. The option <code>displayTranspositionPitches</code> or the data attribute <code>data-display-transposition-pitches</code> define the pitches for transposition. 
+    By default standard music notation for guitar tabs is shifted by 1 octave for display. This does not have an impact on the audio. This feature can also be used manually. For all tracks the number of semitones can be specified. The option <code>notation.displayTranspositionPitches</code> or the data attribute <code>data-notation-displaytranspositionpitches</code> define the pitches for transposition. 
 </div>
 
 <div>
@@ -20,14 +20,16 @@ Order: 8
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
                   file: '@Context.GetLink("/assets/files/features/Skillet.gp5")',
-                  displayTranspositionPitches: [12]
+                  notation: {
+					displayTranspositionPitches: [12]
+				  }
                 })
             </script>
         </div>
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")" data-display-transposition-pitches="[12]"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")" data-notation-displaytranspositionpitches="[12]"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

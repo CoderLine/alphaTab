@@ -22,7 +22,7 @@ namespace AlphaTab.Test.Importer
         internal MusicXmlImporter PrepareImporterWithBytes(byte[] buffer)
         {
             var readerBase = new MusicXmlImporter();
-            readerBase.Init(ByteBuffer.FromBuffer(buffer));
+            readerBase.Init(ByteBuffer.FromBuffer(buffer), new Settings());
             return readerBase;
         }
 
@@ -75,7 +75,7 @@ namespace AlphaTab.Test.Importer
         //            }, false);
         //        }
 
-        protected void TestReferenceFile(string file, Action<Score> done = null, string renderLayout = "page", bool renderAllTracks = false)
+        protected void TestReferenceFile(string file, Action<Score> done = null, LayoutMode renderLayout = LayoutMode.Page, bool renderAllTracks = false)
         {
             TestPlatform.LoadFile(file, fileData =>
             {
@@ -385,14 +385,11 @@ namespace AlphaTab.Test.Importer
         }
 
 #if !PHASE
-        protected void Render(Track[] tracks, string path, string renderLayout)
+        protected void Render(Track[] tracks, string path, LayoutMode renderLayout)
         {
-            var settings = Settings.Defaults;
-            settings.Engine = "gdi";
-            settings.Layout = new LayoutSettings
-            {
-                Mode = renderLayout
-            };
+            var settings = new Settings();
+            settings.Core.Engine = "gdi";
+            settings.Display.LayoutMode = renderLayout;
             var renderer = new ScoreRenderer(settings);
             renderer.Width = 800;
             var images = new FastList<Image>();

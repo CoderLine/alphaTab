@@ -3,7 +3,7 @@ Order: 1
 ---
 
 <div class="description">
-    The horizontal layout be enabled via <code>layout: 'horizontal'</code> or <code>data-layout="horizontal"</code>. 
+    The horizontal layout be enabled via <code>display.layoutmode = 'horizontal'</code> or <code>data-display-layoutmode="horizontal"</code>. 
     The whole music notation is arranged as a single line. This layout is useful for small screen sizes. 
 </div>
 
@@ -22,14 +22,16 @@ Order: 1
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
                   file: '@Context.GetLink("/assets/files/player/Canon.gp5")',
-                  layout: 'horizontal'
+                  display: {
+					layoutMode: 'horizontal'
+				  }
                 })
             </script>
         </div>
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-layout="horizontal"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-display-layoutmode="horizontal"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

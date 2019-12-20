@@ -42,7 +42,8 @@
     }
 
     .at-cursor-beat { /* Defines the beat cursor */
-        background: rgba(64, 64, 255, 0.75)
+        background: rgba(64, 64, 255, 0.75);
+        width: 3px;
     }
     
     .at-highlight * { /* Defines the color of the music symbols when they are being played (svg) */
@@ -77,8 +78,9 @@
             <div class="at-canvas" id="alphaTab" 
                 data-file="Nightwish.gp5"
                 data-tracks="3"
-                data-player-offset="-10"
-                data-player="../../js/alphaTab/default.sf2">
+                data-player-scrolloffsety="-10"
+                data-player-enableplayer="true"
+                data-player-soundfont="../../js/alphaTab/default.sf2">
             </div>
         </div>
         
@@ -131,7 +133,7 @@
                     
                     <!-- The playback speed -->
                     <div>
-                        <span class="at-speed-label">Speed</span>
+                        <span class="at-speed-label">Speed <span class="at-speed-value">100%</span></span>
                         <input type="range" min="0" max="300" step="10" value="100" class="at-speed">
                     </div>
 
@@ -385,7 +387,7 @@
         }
         
         el.addEventListener('alphaTab.playedBeatChanged', function(e) {
-            updateMasterBarTimes(e.detail.beat.voice.bar.masterBar);
+            updateMasterBarTimes(e.detail.voice.bar.masterBar);
         });
         
         // we also have some time related information shown in the UI
@@ -456,11 +458,7 @@
             e.stopPropagation();
             at.playbackSpeed = e.target.value / 100.0;
             e.target.title = e.target.value + "%";
-            if(e.target.value == "100") {
-                control.querySelector('.at-speed-label').innerText = "Speed";
-            } else {
-                control.querySelector('.at-speed-label').innerText = "Speed (" + e.target.value + "%)";
-            }
+            control.querySelector('.at-speed-value').innerText = e.target.value + "%";
         };
         
         control.querySelector('.at-loop').onclick = function(e) {
@@ -495,15 +493,15 @@
                 switch(e.target.dataset.layout)
                 {
                     case 'page':
-                        settings.layout.mode = 'page';
+                        settings.display.layoutMode = 'page';
                         settings.scrollMode = 1;
                     break;
                     case 'horizontal-bar':
-                        settings.layout.mode = 'horizontal';
+                        settings.display.layoutMode = 'horizontal';
                         settings.scrollMode = 1;
                     break;
                     case 'horizontal-screen':
-                        settings.layout.mode = 'horizontal';
+                        settings.display.layoutMode = 'horizontal';
                         settings.scrollMode = 2;
                     break;
                 }
@@ -521,7 +519,9 @@
             // depending on your own layout, you might want to set this to another element
             // that should be scrolled to keep alphaTab in the view
             // usually the scroll element should point to the next scrollable parent above alphaTab
-            scrollElement: control.querySelector('.at-viewport')
+            player: {
+                scrollElement: control.querySelector('.at-viewport')
+            }
         };
         at = new alphaTab.platform.javaScript.AlphaTabApi(el, additionalSettings);
 

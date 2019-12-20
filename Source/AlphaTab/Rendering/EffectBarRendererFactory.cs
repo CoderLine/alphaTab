@@ -16,7 +16,7 @@ namespace AlphaTab.Rendering
             IsInAccolade = false;
         }
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
         {
             return new EffectBarRenderer(renderer, bar, _infos);
         }

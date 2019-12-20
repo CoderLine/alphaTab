@@ -67,7 +67,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
         #region Settings
 
         public static readonly DependencyProperty SettingsProperty = DependencyProperty.Register(
-            "Settings", typeof(Settings), typeof(AlphaTab), new PropertyMetadata(Settings.Defaults, OnSettingsChanged));
+            "Settings", typeof(Settings), typeof(AlphaTab), new PropertyMetadata(new Settings(), OnSettingsChanged));
 
         private static void OnSettingsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -127,9 +127,9 @@ namespace AlphaTab.Platform.CSharp.Wpf
         public AlphaTab()
         {
             SnapsToDevicePixels = true;
-            Settings = Settings.Defaults;
-            Settings.EnablePlayer = true;
-            Settings.EnableCursor = true;
+            Settings = new Settings();
+            Settings.Player.EnablePlayer = true;
+            Settings.Player.EnableCursor = true;
         }
 
         public override void OnApplyTemplate()

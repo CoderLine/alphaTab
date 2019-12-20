@@ -1,0 +1,116 @@
+Title: Player.Vibrato
+JsName: player.vibrato
+JsonName: player.vibrato
+DataAttribute: data-player-vibrato-*
+Category: Player
+Description: The Vibrato settings allow control how the different vibrato types are generated for audio. 
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+@functions {
+    IEnumerable<IDocument> GetDocumentsAtPath(string relativePath)
+    {
+        return Documents.Where(d => 
+            string.Join("/", d.Get<object[]>(Keys.TreePath) ?? new object[0])
+            .StartsWith(relativePath)
+        );
+    }
+}
+
+<h2>Description</h2>
+<p>
+    AlphaTab supports 4 types of vibratos, for each vibrato the amplitude and the wavelength can be configured. The amplitude controls how many semitones
+    the vibrato changes the pitch up and down while playback. The wavelength controls how many midi ticks it will take to complete one up and down vibrato.
+    The 4 vibrato types are: 
+</p>
+
+<ol>
+    <li>Beat Slight - A fast vibrato on the whole beat. This vibrato is usually done with the whammy bar.</li>
+    <li>Beat Wide - A slow vibrato on the whole beat. This vibrato is usually done with the whammy bar.</li>
+    <li>Note Slight - A fast vibrato on a single note. This vibrato is usually done with the finger on the fretboard.</li>
+    <li>Note Wide - A slow vibrato on a single note. This vibrato is usually done with the finger on the fretboard.</li>
+</ol>
+
+<h2>Vibrato Settings</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Setting</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Summary</th>
+        </tr>
+    </thead>    
+    <tbody>   
+        @foreach(IDocument child in GetDocumentsAtPath("reference/property/player-vibrato-"))
+        {
+            var prefixes = new [] {
+                "display.resources.", "resources.",
+                "data-display-resources-", "data-resources-"
+            };
+            Func<string[], string[]> simplifyNames = array => 
+            {
+                for(var i = 0; i < array.Length; i++) 
+                {
+                    foreach(var prefix in prefixes) 
+                    {
+                        if(array[i].StartsWith(prefix)) 
+                        {
+                            array[i] = array[i].Substring(prefix.Length);
+                            break;
+                        }
+                    }
+                }
+                return array.Distinct().ToArray();
+            };
+    
+            object[] childTreePath = child.Get<object[]>(Keys.TreePath);        
+            string dotNetName = simplifyNames(new[]{child.String("Title")})[0];
+            string[] jsNames = simplifyNames(child.String("JsName").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries));
+            string[] jsonNames = simplifyNames(child.String("JsonName").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries));
+            string[] dataAttributeNames = simplifyNames(child.String("DataAttribute").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries));
+          
+            <tr>
+                <td>
+                    <code class="code-badge code-badge-net">
+                        @dotNetName
+                        <span>.net</span>
+                    </code>
+                    @foreach(var name in jsNames)
+                    {
+                        <br />
+                        <code class="code-badge code-badge-js">
+                            @name <span>JavaScript</span>
+                        </code>
+                    }
+                    @foreach(var name in jsonNames)
+                    {
+                        <br />
+                        <code class="code-badge code-badge-json">
+                            @name <span>JSON</span>
+                        </code>
+                    }
+                    @foreach(var name in dataAttributeNames)
+                    {
+                        <br />
+                        <code class="code-badge code-badge-html">
+                            @name <span>HTML</span>
+                        </code>
+                    }
+                </td>
+                <td>
+                    <code class="code-badge code-badge-all">
+                        @Html.Raw(child.String("Type"))
+                        <span>all</span>
+                    </code>
+                </td>
+                <td>@Html.Raw(child.String("DefaultValue"))</td>
+                <td>
+                    @(child.String(DocsKeys.Description))
+                </td>
+            </tr>
+        }    
+    </tbody>
+</table>

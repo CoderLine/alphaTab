@@ -81,7 +81,7 @@ namespace AlphaTab.Rendering.Glyphs
                 b.ApplyLayoutingInfo(info);
             }
 
-            ScaleToForce(Math.Max(Renderer.Settings.StretchForce, info.MinStretchForce));
+            ScaleToForce(Math.Max(Renderer.Settings.Display.StretchForce, info.MinStretchForce));
         }
 
         public override void AddGlyph(Glyph g)

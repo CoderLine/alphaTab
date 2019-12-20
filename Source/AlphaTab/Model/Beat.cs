@@ -652,9 +652,9 @@ namespace AlphaTab.Model
 
         internal void Finish(Settings settings)
         {
-            var displayMode = settings == null ? DisplayMode.GuitarPro : settings.DisplayMode;
+            var displayMode = settings == null ? NotationMode.GuitarPro : settings.Notation.NotationMode;
             var isGradual = Text == "grad" || Text == "grad.";
-            if (isGradual && displayMode == DisplayMode.SongBook)
+            if (isGradual && displayMode == NotationMode.SongBook)
             {
                 Text = "";
             }
@@ -682,7 +682,7 @@ namespace AlphaTab.Model
                     IsPalmMute = true;
                 }
 
-                if (displayMode == DisplayMode.SongBook && note.HasBend && GraceType != GraceType.BendGrace)
+                if (displayMode == NotationMode.SongBook && note.HasBend && GraceType != GraceType.BendGrace)
                 {
                     if (!note.IsTieOrigin)
                     {
@@ -782,7 +782,7 @@ namespace AlphaTab.Model
             // if beat is a rest implicitely take over letring/palmmute
             // from the previous beat gets cleaned later in case we flagged it wrong.
             else if (IsRest && PreviousBeat != null && settings != null &&
-                     settings.DisplayMode == DisplayMode.GuitarPro)
+                     settings.Notation.NotationMode == NotationMode.GuitarPro)
             {
                 if (PreviousBeat.IsLetRing)
                 {
@@ -800,7 +800,7 @@ namespace AlphaTab.Model
             // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
             if (WhammyBarPoints.Count > 0 && WhammyBarType == WhammyType.Custom)
             {
-                if (displayMode == DisplayMode.SongBook)
+                if (displayMode == NotationMode.SongBook)
                 {
                     WhammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
                 }
@@ -837,7 +837,7 @@ namespace AlphaTab.Model
                                  origin.Value < middle1.Value && middle1.Value > destination.Value)
                         {
                             WhammyBarType = WhammyType.Dip;
-                            if (middle1.Offset == middle2.Offset || displayMode == DisplayMode.SongBook)
+                            if (middle1.Offset == middle2.Offset || displayMode == NotationMode.SongBook)
                             {
                                 WhammyBarPoints.RemoveAt(2);
                             }

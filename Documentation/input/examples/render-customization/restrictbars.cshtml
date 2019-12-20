@@ -4,7 +4,7 @@ Order: 2
 
 <div class="description">
     If you only want to render only a dedicated range of bars you can specify them as 
-    layout settings. The layout settings <code>start</code> and <code>count</code> define the range
+    layout settings. The layout settings <code>startBar</code> and <code>barCount</code> define the range
     and can be specified also as data attribute. 
 </div>
 
@@ -22,12 +22,9 @@ Order: 2
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
                   file: '@Context.GetLink("/assets/files/player/Canon.gp5")',
-                  layout: {
-                    mode: 'page',
-                    additionalSettings: {
-                        start: 10,
-                        count: 5
-                    }
+                  display: {
+					startBar: 10,
+					barCount: 5
                   }
                 })
             </script>
@@ -35,7 +32,7 @@ Order: 2
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-layout-start="10" data-layout-count="5"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-display-startbar="10" data-display-barcount="5"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

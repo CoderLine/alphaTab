@@ -25,16 +25,12 @@ namespace AlphaTab.Rendering
             return staff.Tuning.Length > 0 && base.CanCreate(track, staff);
         }
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
         {
             var tabBarRenderer = new TabBarRenderer(renderer, bar);
             tabBarRenderer.ShowRests = _showRests;
             tabBarRenderer.ShowTimeSignature = _showTimeSignature;
             tabBarRenderer.ShowTiedNotes = _showTiedNotes;
-            tabBarRenderer.RenderRhythm = staveSettings.Get("rhythm", tabBarRenderer.RenderRhythm);
-            tabBarRenderer.RhythmHeight = staveSettings.Get("rhythmHeight", tabBarRenderer.RhythmHeight);
-            tabBarRenderer.RhythmBeams = staveSettings.Get("rhythmBeams", tabBarRenderer.RhythmBeams);
-
             return tabBarRenderer;
         }
     }

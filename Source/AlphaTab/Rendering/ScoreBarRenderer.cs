@@ -9,7 +9,7 @@ using AlphaTab.Rendering.Utils;
 namespace AlphaTab.Rendering
 {
     /// <summary>
-    /// This BarRenderer renders a bar using standard music notation. 
+    /// This BarRenderer renders a bar using standard music notation.
     /// </summary>
     internal class ScoreBarRenderer : BarRendererBase, IBeamYCalculator
     {
@@ -193,7 +193,7 @@ namespace AlphaTab.Rendering
                 ? Resources.MainGlyphColor
                 : Resources.SecondaryGlyphColor;
 
-            // TODO: draw stem at least at the center of the score staff. 
+            // TODO: draw stem at least at the center of the score staff.
 
             // check if we need to paint simple footer
             if (h.Beats.Count == 1)
@@ -304,7 +304,7 @@ namespace AlphaTab.Rendering
                 {
                     var direction = firstBeamingHelper.Direction;
 
-                    // 
+                    //
                     // Calculate the overall area of the tuplet bracket
 
                     var startX = firstBeamingHelper.GetBeatLineX(firstBeat) + Scale;
@@ -316,7 +316,7 @@ namespace AlphaTab.Rendering
                     var sw = canvas.MeasureText(s);
                     var sp = 3 * Scale;
 
-                    // 
+                    //
                     // Calculate the offsets where to break the bracket
                     var middleX = (startX + endX) / 2;
                     var offset1X = middleX - sw / 2 - sp;
@@ -485,7 +485,7 @@ namespace AlphaTab.Rendering
                 var scaleMod = isGrace ? NoteHeadGlyph.GraceScale : 1;
 
                 //
-                // draw line 
+                // draw line
                 //
                 var beatLineX = h.GetBeatLineX(beat) + Scale;
 
@@ -541,7 +541,7 @@ namespace AlphaTab.Rendering
 
                     var barY = barStart + barIndex * barSpacing;
 
-                    // 
+                    //
                     // Bar to Next?
                     //
                     if (i < h.Beats.Count - 1)
@@ -567,7 +567,7 @@ namespace AlphaTab.Rendering
                         barEndY = barY + CalculateBeamY(h, barEndX);
                         PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
                     }
-                    // 
+                    //
                     // Broken Bar to Previous?
                     //
                     else if (i > 0 && !BeamingHelper.IsFullBarJoin(beat, h.Beats[i - 1], barIndex))
@@ -599,7 +599,7 @@ namespace AlphaTab.Rendering
         {
             var beat = h.Beats[0];
             if (beat.GraceType == GraceType.BendGrace ||
-                beat.GraceType != GraceType.None && Settings.DisplayMode == DisplayMode.SongBook)
+                beat.GraceType != GraceType.None && Settings.Notation.NotationMode == NotationMode.SongBook)
             {
                 return;
             }
@@ -608,7 +608,7 @@ namespace AlphaTab.Rendering
             var scaleMod = isGrace ? NoteHeadGlyph.GraceScale : 1;
 
             //
-            // draw line 
+            // draw line
             //
 
             var stemSize = GetFooterStemSize(h.ShortestDuration);
@@ -671,7 +671,7 @@ namespace AlphaTab.Rendering
             }
 
             //
-            // Draw beam 
+            // Draw beam
             //
             if (beat.Duration > Duration.Quarter || isGrace)
             {
@@ -685,7 +685,8 @@ namespace AlphaTab.Rendering
         private void PaintFingering(ICanvas canvas, Beat beat, float beatLineX, BeamDirection direction, float topY)
         {
             var settings = Settings;
-            if (settings.FingeringMode != FingeringMode.Score)
+            if (settings.Notation.FingeringMode != FingeringMode.ScoreDefault &&
+                settings.Notation.FingeringMode != FingeringMode.ScoreForcePiano)
             {
                 return;
             }
@@ -699,8 +700,8 @@ namespace AlphaTab.Rendering
                 beatLineX += 3 * Scale;
             }
 
-            // sort notes ascending in their value to ensure 
-            // we are drawing the numbers according to their order on the stave 
+            // sort notes ascending in their value to ensure
+            // we are drawing the numbers according to their order on the stave
             var noteList = beat.Notes.Clone();
             noteList.Sort((a, b) => a.RealValue - b.RealValue);
 
@@ -936,7 +937,7 @@ namespace AlphaTab.Rendering
         }
 
         /// <summary>
-        /// Gets the relative y position of the given steps relative to first line. 
+        /// Gets the relative y position of the given steps relative to first line.
         /// </summary>
         /// <param name="steps">the amount of steps while 2 steps are one line</param>
         /// <param name="correction"></param>

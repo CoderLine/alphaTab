@@ -41,7 +41,7 @@ namespace AlphaTab.Platform.Svg
             Buffer.Append(width);
             Buffer.Append("px\" height=\"");
             Buffer.Append((int)height);
-            Buffer.Append("px\" class=\"alphaTabSurfaceSvg\">\n");
+            Buffer.Append("px\" class=\"at-surface-svg\">\n");
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
         }
@@ -175,7 +175,7 @@ namespace AlphaTab.Platform.Svg
             }
 
             var s = "<text x=\"" + (int)x + "\" y=\"" + (int)y + "\" style=\"stroke: none; font:" +
-                    Font.ToCssString(Settings.Scale) + "\" "
+                    Font.ToCssString(Settings.Display.Scale) + "\" "
                     + " dominant-baseline=\"" + GetSvgBaseLine() + "\"";
             if (Color.Rgba != Color.BlackRgb)
             {

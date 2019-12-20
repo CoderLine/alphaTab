@@ -12,13 +12,13 @@ namespace AlphaTab.Test.VisualTests.Features
         [TestMethod, AsyncTestMethod]
         public void DrumTabs()
         {
-            var settings = Settings.Defaults;
+            var settings = new Settings();
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/Drums.gp5", "TestFiles/VisualTests/Features/SpecialTracks/DrumTabs.png");
         }
         [TestMethod, AsyncTestMethod]
         public void GrandStaff()
         {
-            var settings = Settings.Defaults;
+            var settings = new Settings();
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/Piano.gpx", "TestFiles/VisualTests/Features/SpecialTracks/GrandStaff.png");
         }
     }

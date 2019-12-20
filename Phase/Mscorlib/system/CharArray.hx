@@ -9,6 +9,8 @@ abstract CharArray(js.html.Uint16Array)
 	
 	public var length(get, never):Int32;
 	public inline function get_length() : Int32 return this.length;
+    
+    public inline function clone() : CharArray return untyped this.slice();
 	
 	@:op([]) public inline function get(index:Int32):Char return this[index.toHaxeInt()];
 	@:op([]) public inline function set(index:Int32, val:Char):Char return this[index.toHaxeInt()] = val.toHaxeInt();

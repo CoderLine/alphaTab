@@ -5,7 +5,7 @@ Order: 0
 <div class="description">
     The page layout is the default layout of alphaTab. The bars are aligned
     in a page like manner but without separation into individual pages. 
-    The layout can explicitely be set via <code>layout: 'page'</code> or <code>data-layout="page"</code>
+    The layout can explicitely be set via <code>display.layoutmode = 'page'</code> or <code>data-display-layoutmode="page"</code>
 </div>
 
 <div>
@@ -22,14 +22,16 @@ Order: 0
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
                   file: '@Context.GetLink("/assets/files/player/Canon.gp5")',
-                  layout: 'page'
+                  display: {
+					layoutMode: 'page'
+				  }
                 })
             </script>
         </div>
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-layout="page"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-display-layoutmode="page"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

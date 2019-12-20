@@ -30,7 +30,7 @@ namespace AlphaTab.Importer
 
         public override Score ReadScore()
         {
-            _encoding = GetSetting("encoding", "utf-8");
+            _encoding = Settings.Importer.Encoding;
             ReadVersion();
 
             _score = new Score();
@@ -283,7 +283,7 @@ namespace AlphaTab.Importer
                 if (_versionNumber < 500)
                 {
                     var currentMasterBar = previousMasterBar;
-                    // get the already existing alternatives to ignore them 
+                    // get the already existing alternatives to ignore them
                     var existentAlternatives = 0;
                     while (currentMasterBar != null)
                     {
@@ -444,7 +444,7 @@ namespace AlphaTab.Importer
 
             if (_versionNumber >= 500)
             {
-                // flags for 
+                // flags for
                 //  0x01 -> show tablature
                 //  0x02 -> show standard notation
                 Data.ReadByte();
@@ -911,7 +911,7 @@ namespace AlphaTab.Importer
             tableChange.Instrument = Data.ReadSignedByte();
             if (_versionNumber >= 500)
             {
-                Data.Skip(16); // Rse Info 
+                Data.Skip(16); // Rse Info
             }
 
             tableChange.Volume = Data.ReadSignedByte();
@@ -1055,7 +1055,7 @@ namespace AlphaTab.Importer
 
             if ((flags & 0x01) != 0 && _versionNumber < 500)
             {
-                Data.ReadByte(); // duration 
+                Data.ReadByte(); // duration
                 Data.ReadByte(); // tuplet
             }
 
@@ -1351,7 +1351,7 @@ namespace AlphaTab.Importer
                         note.HarmonicType = HarmonicType.Artificial;
                         // ReSharper restore UnusedVariable
                         break;
-                    // TODO: how to calculate the harmonic value? 
+                    // TODO: how to calculate the harmonic value?
                     case 3:
                         note.HarmonicType = HarmonicType.Tap;
                         note.HarmonicValue = DeltaFretToHarmonicValue(Data.ReadByte());

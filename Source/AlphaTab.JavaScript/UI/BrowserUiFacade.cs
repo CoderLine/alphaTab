@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Collections;
 using AlphaTab.Haxe;
@@ -133,10 +132,18 @@ namespace AlphaTab.UI
         {
             _api = api;
 
+            var settings = new Settings();
+            settings.FillFromJson(raw);
             var dataAttributes = GetDataAttributes();
-            var settings = Settings.FromJson(raw, dataAttributes);
+            settings.FillFromDataAttributes(dataAttributes);
+
+            if (settings.Notation.NotationMode == NotationMode.SongBook)
+            {
+                settings.SetSongBookModeSettings();
+            }
+
             api.Settings = settings;
-            if (settings.Engine == "default" || settings.Engine == "svg")
+            if (settings.Core.Engine == "default" || settings.Core.Engine == "svg")
             {
                 api.Container.Scroll += ShowSvgsInViewPort;
                 api.Container.Resize += ShowSvgsInViewPort;
@@ -197,17 +204,17 @@ namespace AlphaTab.UI
 
         private void SetupFontCheckers(Settings settings)
         {
-            RegisterFontChecker(settings.RenderingResources.CopyrightFont);
-            RegisterFontChecker(settings.RenderingResources.EffectFont);
-            RegisterFontChecker(settings.RenderingResources.FingeringFont);
-            RegisterFontChecker(settings.RenderingResources.GraceFont);
-            RegisterFontChecker(settings.RenderingResources.MarkerFont);
-            RegisterFontChecker(settings.RenderingResources.TablatureFont);
-            RegisterFontChecker(settings.RenderingResources.TitleFont);
-            RegisterFontChecker(settings.RenderingResources.WordsFont);
-            RegisterFontChecker(settings.RenderingResources.BarNumberFont);
-            RegisterFontChecker(settings.RenderingResources.FretboardNumberFont);
-            RegisterFontChecker(settings.RenderingResources.SubTitleFont);
+            RegisterFontChecker(settings.Display.Resources.CopyrightFont);
+            RegisterFontChecker(settings.Display.Resources.EffectFont);
+            RegisterFontChecker(settings.Display.Resources.FingeringFont);
+            RegisterFontChecker(settings.Display.Resources.GraceFont);
+            RegisterFontChecker(settings.Display.Resources.MarkerFont);
+            RegisterFontChecker(settings.Display.Resources.TablatureFont);
+            RegisterFontChecker(settings.Display.Resources.TitleFont);
+            RegisterFontChecker(settings.Display.Resources.WordsFont);
+            RegisterFontChecker(settings.Display.Resources.BarNumberFont);
+            RegisterFontChecker(settings.Display.Resources.FretboardNumberFont);
+            RegisterFontChecker(settings.Display.Resources.SubTitleFont);
         }
 
         private void RegisterFontChecker(Font font)
@@ -230,7 +237,7 @@ namespace AlphaTab.UI
         {
             var canvasElement = Browser.Document.CreateElement("div");
 
-            canvasElement.ClassName = "alphaTabSurface";
+            canvasElement.ClassName = "at-surface";
             canvasElement.Style.FontSize = "0";
             canvasElement.Style.Overflow = "hidden";
             canvasElement.Style.LineHeight = "0";
@@ -365,7 +372,7 @@ namespace AlphaTab.UI
             var styleElement = (StyleElement)elementDocument.GetElementById("alphaTabStyle");
             if (styleElement == null)
             {
-                var fontDirectory = settings.FontDirectory;
+                var fontDirectory = settings.Core.FontDirectory;
                 styleElement = (StyleElement)elementDocument.CreateElement("style");
                 styleElement.Id = "alphaTabStyle";
                 styleElement.Type = "text/css";
@@ -380,8 +387,9 @@ namespace AlphaTab.UI
                 css.AppendLine("     font-weight: normal;");
                 css.AppendLine("     font-style: normal;");
                 css.AppendLine("}");
-                css.AppendLine(".alphaTabSurface * {");
+                css.AppendLine(".at-surface * {");
                 css.AppendLine("    cursor: default;");
+                css.AppendLine("    vertical-align: top;");
                 css.AppendLine("}");
                 css.AppendLine(".at {");
                 css.AppendLine("     font-family: 'alphaTab';");
@@ -418,7 +426,10 @@ namespace AlphaTab.UI
                 {
                     if (tracksData == "all")
                     {
-                        return null;
+                        return new int[]
+                        {
+                            -1
+                        };
                     }
 
                     tracksData = Json.Parse((string)tracksData);
@@ -551,7 +562,7 @@ namespace AlphaTab.UI
                         }
 
                         // directly show the elements in the viewport once we're done.
-                        if (_api.Settings.EnableLazyLoading)
+                        if (_api.Settings.Core.EnableLazyLoading)
                         {
                             ShowSvgsInViewPort();
                         }
@@ -577,7 +588,7 @@ namespace AlphaTab.UI
                             placeholder.Style.Height = renderResult.Height + "px";
                             placeholder.Style.Display = "inline-block";
 
-                            if (IsElementInViewPort(placeholder) || !_api.Settings.EnableLazyLoading)
+                            if (IsElementInViewPort(placeholder) || !_api.Settings.Core.EnableLazyLoading)
                             {
                                 var bodyHtml = (string)body;
                                 placeholder.OuterHTML = bodyHtml;
@@ -634,14 +645,14 @@ namespace AlphaTab.UI
                 Logger.Info("Player", "Will use webworkers for synthesizing and web audio api for playback");
                 player = new AlphaSynthWebWorkerApi(new AlphaSynthWebAudioOutput(),
                     alphaSynthScriptFile,
-                    _api.Settings.LogLevel);
+                    _api.Settings.Core.LogLevel);
             }
             else if (supportsWebWorkers)
             {
                 Logger.Info("Player", "Will use webworkers for synthesizing and flash for playback");
                 player = new AlphaSynthWebWorkerApi(new AlphaSynthFlashOutput(alphaSynthScriptFile),
                     alphaSynthScriptFile,
-                    _api.Settings.LogLevel);
+                    _api.Settings.Core.LogLevel);
             }
 
             if (player == null)
@@ -652,9 +663,9 @@ namespace AlphaTab.UI
             {
                 player.Ready += () =>
                 {
-                    if (!string.IsNullOrEmpty(_api.Settings.SoundFontFile))
+                    if (!string.IsNullOrEmpty(_api.Settings.Player.SoundFont))
                     {
-                        ((AlphaTabApi)_api).LoadSoundFontFromUrl(_api.Settings.SoundFontFile);
+                        ((AlphaTabApi)_api).LoadSoundFontFromUrl(_api.Settings.Player.SoundFont);
                     }
                 };
             }
@@ -767,9 +778,9 @@ namespace AlphaTab.UI
 
         public IContainer GetScrollContainer()
         {
-            var scrollElement = Platform.Platform.TypeOf(_api.Settings.ScrollElement) == "string"
-                ? Browser.Document.QuerySelector(_api.Settings.ScrollElement)
-                : _api.Settings.ScrollElement.As<Element>();
+            var scrollElement = Platform.Platform.TypeOf(_api.Settings.Player.ScrollElement) == "string"
+                ? Browser.Document.QuerySelector(_api.Settings.Player.ScrollElement)
+                : _api.Settings.Player.ScrollElement.As<Element>();
 
             var nodeName = scrollElement.NodeName.ToLowerCase();
             if (nodeName == "html" || nodeName == "body")

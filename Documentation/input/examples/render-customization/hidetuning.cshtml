@@ -3,7 +3,7 @@ Order: 4
 ---
 
 <div class="description">
-    The guitar tuning is shown by default. To hide it the layout option <code>hideTuning</code> or data attribute <code>data-layout-hide-tuning</code> can be set.
+    The guitar tuning is shown by default. To hide it the layout option <code>notation.hideTuning</code> or data attribute <code>data-notation-hidetuning</code> can be set.
 </div>
 
 <div>
@@ -20,11 +20,8 @@ Order: 4
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
                   file: '@Context.GetLink("/assets/files/player/Canon.gp5")',
-                  layout: {
-                    mode: 'page',
-                    additionalSettings: {
-                        hideTuning: true
-                    }
+                  notation: {
+					hideTuning: true
                   }
                 })
             </script>
@@ -32,7 +29,7 @@ Order: 4
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-layout-hide-tuning="true"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-notation-hidetuning="true"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

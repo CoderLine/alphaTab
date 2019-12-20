@@ -1,6 +1,8 @@
 using System;
+using System.Configuration;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
+using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
@@ -21,14 +23,14 @@ namespace AlphaTab.Platform.JavaScript
             _api = api;
             try
             {
-                _worker = new Worker(settings.ScriptFile);
+                _worker = new Worker(settings.Core.ScriptFile);
             }
             catch
             {
                 // fallback to blob worker
                 try
                 {
-                    HaxeString script = "importScripts('" + settings.ScriptFile + "')";
+                    HaxeString script = "importScripts('" + settings.Core.ScriptFile + "')";
                     var blob = new Blob(new[]
                     {
                         script
@@ -45,7 +47,7 @@ namespace AlphaTab.Platform.JavaScript
             _worker.PostMessage(new
             {
                 cmd = "alphaTab.initialize",
-                settings = settings.ToJson()
+                settings = SerializeSettingsForWorker(settings)
             });
             _worker.AddEventListener("message", (Action<Event>)(HandleWorkerMessage));
         }
@@ -60,8 +62,18 @@ namespace AlphaTab.Platform.JavaScript
             _worker.PostMessage(new
             {
                 cmd = "alphaTab.updateSettings",
-                settings = settings.ToJson()
+                settings = SerializeSettingsForWorker(settings)
             });
+        }
+
+        private object SerializeSettingsForWorker(Settings settings)
+        {
+            dynamic json = Settings.ToJson(settings);
+
+            // cut out player settings, they are only needed on UI thread side
+            json.player = null;
+
+            return json;
         }
 
         public void Render()
@@ -126,7 +138,8 @@ namespace AlphaTab.Platform.JavaScript
             {
                 cmd = "alphaTab.renderScore",
                 score = jsObject,
-                trackIndexes = trackIndexes
+                trackIndexes = trackIndexes,
+                fontSizes = FontSizes.FontSizeLookupTables
             });
         }
 

@@ -24,6 +24,6 @@ namespace AlphaTab.Rendering
             return !HideOnPercussionTrack || !staff.IsPercussion;
         }
 
-        public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings);
+        public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar);
     }
 }

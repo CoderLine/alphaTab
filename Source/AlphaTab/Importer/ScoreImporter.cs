@@ -37,27 +37,10 @@ namespace AlphaTab.Importer
         /// </summary>
         /// <param name="data"></param>
         /// <param name="settings"></param>
-        public void Init(IReadable data, Settings settings = null)
+        public void Init(IReadable data, Settings settings)
         {
             Data = data;
             Settings = settings;
-        }
-
-        /// <summary>
-        /// Gets the importer specific setting using the specified key.
-        /// </summary>
-        /// <param name="key">The key of the setting to load the value for.</param>
-        /// <param name="defaultValue">The default value to load if no setting was specified. </param>
-        /// <returns>The importer setting specified by the user, or the given defaultValue if the key was not contained.</returns>
-        protected T GetSetting<T>(string key, T defaultValue = default(T))
-        {
-            key = key.ToLower();
-            if (Settings == null || Settings.ImporterSettings == null || !Settings.ImporterSettings.ContainsKey(key))
-            {
-                return defaultValue;
-            }
-
-            return (T)Settings.ImporterSettings[key];
         }
 
         /// <summary>

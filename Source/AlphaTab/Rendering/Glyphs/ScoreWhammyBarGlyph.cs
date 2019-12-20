@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            var whammyMode = Renderer.Settings.DisplayMode;
+            var whammyMode = Renderer.Settings.Notation.NotationMode;
             switch (_beat.WhammyBarType)
             {
                 case WhammyType.None:
@@ -45,7 +45,7 @@ namespace AlphaTab.Rendering.Glyphs
                     break;
                 case WhammyType.Dip:
                 {
-                    if (whammyMode == DisplayMode.SongBook)
+                    if (whammyMode == NotationMode.SongBook)
                     {
                         var res = Renderer.Resources;
                         ((ScoreBarRenderer)Renderer).SimpleWhammyOverflow =
@@ -55,7 +55,7 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         var middleGlyphs = new BendNoteHeadGroupGlyph(_beat);
                         middleGlyphs.Renderer = Renderer;
-                        if (Renderer.Settings.DisplayMode == DisplayMode.GuitarPro)
+                        if (Renderer.Settings.Notation.NotationMode == NotationMode.GuitarPro)
                         {
                             var middleBendPoint = _beat.WhammyBarPoints[1];
                             foreach (var note in _beat.Notes)
@@ -70,7 +70,7 @@ namespace AlphaTab.Rendering.Glyphs
 
                         var endGlyphs = new BendNoteHeadGroupGlyph(_beat);
                         endGlyphs.Renderer = Renderer;
-                        if (Renderer.Settings.DisplayMode == DisplayMode.GuitarPro)
+                        if (Renderer.Settings.Notation.NotationMode == NotationMode.GuitarPro)
                         {
                             var lastBendPoint = _beat.WhammyBarPoints[_beat.WhammyBarPoints.Count - 1];
                             foreach (var note in _beat.Notes)
@@ -102,7 +102,7 @@ namespace AlphaTab.Rendering.Glyphs
                     return;
             }
 
-            var whammyMode = Renderer.Settings.DisplayMode;
+            var whammyMode = Renderer.Settings.Notation.NotationMode;
             var startNoteRenderer =
                 Renderer.ScoreRenderer.Layout.GetRendererForBar<ScoreBarRenderer>(Renderer.Staff.StaveId,
                     beat.Voice.Bar);
@@ -248,7 +248,7 @@ namespace AlphaTab.Rendering.Glyphs
 
                         break;
                     case WhammyType.Dip:
-                        if (whammyMode == DisplayMode.SongBook)
+                        if (whammyMode == NotationMode.SongBook)
                         {
                             if (i == 0)
                             {
@@ -387,7 +387,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         private int GetBendNoteValue(Note note, BendPoint bendPoint)
         {
-            // NOTE: bendpoints are in 1/4 tones, but the note values are in 1/2 notes. 
+            // NOTE: bendpoints are in 1/4 tones, but the note values are in 1/2 notes.
             return note.DisplayValueWithoutBend + bendPoint.Value / 2;
         }
     }

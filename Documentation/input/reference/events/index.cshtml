@@ -41,13 +41,13 @@ For the other cases the events can be subscribed via registering a function on t
                     <tr>
                         <td>
                             <a href="@url">
-                                <code>@(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString())) <span class="code-badge">.net</span></code>
+                                <code class="code-badge code-badge-net">@(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString())) <span>.net</span></code>
                                 @for(int i = 0; i < jsNames.Length; i++) 
                                 {
                                     <br />
-                                    <code>@(jsNames[i]) <span class="code-badge">JavaScript</span></code>
+                                    <code class="code-badge code-badge-js">@(jsNames[i]) <span>JavaScript</span></code>
                                 }
-                                <br /><code>@(child.String("DomName")) <span class="code-badge">DOM</span></code>
+                                <br /><code class="code-badge code-badge-html">@(child.String("DomName")) <span>DOM</span></code>
                                 
                             </a>
                         </td>                   

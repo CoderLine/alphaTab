@@ -1,0 +1,40 @@
+Title: Display.LayoutMode
+JsName: display.layoutMode
+JsonName: display.layoutMode
+DataAttribute: data-display-layoutmode
+Category: Display
+Description: The layouting mode used to arrange the the notation.
+Since: 0.9.6
+ShowInSideBar: false
+---
+
+<h2>Description</h2>
+<p>
+    AlphaTab has various layout engines that arrange the rendered bars differently. This setting controls which layout mode is used. 
+</p>
+
+@Html.Partial("_PropertyDescription", Model) 
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-all">string <span>all</span></td>
+            <td>
+                <code>page</code> - The bars are aligned in a <a href="@Context.GetLink("/features/layouts")#page-layout">page-style fashion</a><br />
+                <code>horizontal</code> - The bars are aligned in a <a href="@Context.GetLink("features/layouts")#horizontal-layout">left-to-right fashion.</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>page</code>

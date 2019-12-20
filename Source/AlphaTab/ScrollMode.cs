@@ -1,8 +1,11 @@
+using AlphaTab.Util;
+
 namespace AlphaTab
 {
     /// <summary>
     /// Lists all modes how alphaTab can scroll the container during playback. 
     /// </summary>
+    [JsonSerializable]
     public enum ScrollMode
     {
         /// <summary>

@@ -1,0 +1,43 @@
+Title: Player.SongBookBendDuration
+JsName: player.songBookBendDuration
+JsonName: player.songBookBendDuration
+DataAttribute: data-player-songbookbendduration
+Category: Player
+Description: The bend duration in milliseconds for songbook bends.
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    If the display mode <code>songbook</code> is enabled, this has an effect on the way bends are played. For songbook bends the bend is done very quickly at the end or start of the beat. 
+    This setting defines the play duration for those bends in milliseconds. This duration is in milliseconds unlike some other settings which are in midi ticks. The reason is that on songbook bends, 
+    the bends should always be played in the same speed, regardless of the song tempo. Midi ticks are tempo dependent. 
+</p>
+
+@Html.Partial("_PropertyDescription", Model)
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-all">int <span>all</span></td>
+            <td>
+                <code>75</code><br />
+                <code>120</code><br />
+                <code>250</code>
+            </td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>75</code>

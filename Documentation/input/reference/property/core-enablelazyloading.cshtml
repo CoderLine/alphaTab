@@ -1,0 +1,29 @@
+Title: Core.EnableLazyLoading
+JsName: core.enableLazyLoading;enableLazyLoading
+JsonName: core.enableLazyLoading:enableLazyLoading
+DataAttribute: data-core-enablelazyloading;data-enablelazyloading
+Category: Core - JavaScript Specific
+Description: Enables lazy loading of the rendered music sheet chunks.
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    AlphaTab renders the music sheet in smaller sub-chunks to have fast UI feedback. Not all of those sub-chunks are immediately
+    appended to the DOM due to performance reasons. AlphaTab tries to detect which elements are visible on the screen, and only
+    appends those elements to the DOM. This reduces the load of the browser heavily but is not working for all layouts and use cases. 
+    This setting set to false, ensures that all rendered items are instantly appended to the DOM. 
+</p>
+
+@Html.Partial("_PropertyDescription", Model)
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code>bool</code></td>
+        </tr>   
+    </tbody>
+</table>

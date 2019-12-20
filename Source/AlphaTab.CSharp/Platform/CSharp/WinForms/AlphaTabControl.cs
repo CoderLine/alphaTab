@@ -72,9 +72,9 @@ namespace AlphaTab.Platform.CSharp.WinForms
             AutoScroll = true;
             Controls.Add(_layoutPanel);
 
-            Settings = Settings.Defaults;
-            Settings.EnablePlayer = true;
-            Settings.EnableCursor = true;
+            Settings = new Settings();
+            Settings.Player.EnablePlayer = true;
+            Settings.Player.EnableCursor = true;
 
             Api = new AlphaTabApi<AlphaTabControl>(new WinFormsUiFacade(this, _layoutPanel), this);
         }

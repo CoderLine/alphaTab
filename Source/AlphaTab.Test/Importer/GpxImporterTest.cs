@@ -25,7 +25,7 @@ namespace AlphaTab.Test.Importer
         internal GpxImporter PrepareGpxImporterWithBytes(byte[] buffer)
         {
             var readerBase = new GpxImporter();
-            readerBase.Init(ByteBuffer.FromBuffer(buffer));
+            readerBase.Init(ByteBuffer.FromBuffer(buffer), new Settings());
             return readerBase;
         }
 

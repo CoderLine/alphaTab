@@ -42,17 +42,17 @@ The following table contains all the properties as they can be set on the genera
                             <a href="@url">
                                 @if(!child.Get<bool>("JavaScriptOnly", false))
                                 {
-                                    <code>@(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString())) <span class="code-badge">.net</span></code>
+                                    <code class="code-badge code-badge-net">@(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString())) <span>.net</span></code>
                                     <br />
                                 }
                                 @for(int i = 0; i < jsNames.Length; i++) 
                                 {
-                                    <code>@(jsNames[i]) <span class="code-badge">JavaScript</span></code>
+                                    <code class="code-badge code-badge-js">@(jsNames[i]) <span>JavaScript</span></code>
                                     <br />
                                 }       
                                 @for(int i = 0; i < jqueryNames.Length; i++) 
                                 {
-                                    <code>@(jqueryNames[i]) <span class="code-badge">jQuery</span></code>
+                                    <code class="code-badge code-badge-jq">@(jqueryNames[i]) <span>jQuery</span></code>
                                     <br />
                                 }       
                             </a>

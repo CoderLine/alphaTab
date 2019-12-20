@@ -51,7 +51,7 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
             else if (n.Beat.Index == 0 ||
-                     ((n.BendType == BendType.Bend || n.BendType == BendType.BendRelease) && Renderer.Settings.ShowTabNoteOnTiedBend))
+                     ((n.BendType == BendType.Bend || n.BendType == BendType.BendRelease) && Renderer.Settings.Notation.ShowTabNoteOnTiedBend))
             {
                 _noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
             }
@@ -128,7 +128,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             canvas.FillText(_noteString, x, cy + Y);
 
-            if (Renderer.Settings.IncludeNoteBounds)
+            if (Renderer.Settings.Core.IncludeNoteBounds)
             {
                 var noteBounds = new NoteBounds();
                 noteBounds.Note = _note;

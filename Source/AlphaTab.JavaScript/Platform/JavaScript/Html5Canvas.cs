@@ -172,10 +172,10 @@ namespace AlphaTab.Platform.JavaScript
                 _font = value;
                 if (_context != null)
                 {
-                    _context.Font = value.ToCssString(Settings.Scale);
+                    _context.Font = value.ToCssString(Settings.Display.Scale);
                 }
 
-                _measureContext.Font = value.ToCssString(Settings.Scale);
+                _measureContext.Font = value.ToCssString(Settings.Display.Scale);
             }
         }
 

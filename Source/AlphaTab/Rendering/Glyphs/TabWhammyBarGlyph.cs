@@ -34,9 +34,9 @@ namespace AlphaTab.Rendering.Glyphs
 
             var renderingPoints = new FastList<BendPoint>();
 
-            // Guitar Pro Rendering Note: 
-            // Last point of bend is always at end of the beat even 
-            // though it might not be 100% correct from timing perspective. 
+            // Guitar Pro Rendering Note:
+            // Last point of bend is always at end of the beat even
+            // though it might not be 100% correct from timing perspective.
 
             switch (beat.WhammyBarType)
             {
@@ -63,10 +63,10 @@ namespace AlphaTab.Rendering.Glyphs
         {
             base.DoLayout();
 
-            _isSimpleDip = Renderer.Settings.DisplayMode == DisplayMode.SongBook &&
+            _isSimpleDip = Renderer.Settings.Notation.NotationMode == NotationMode.SongBook &&
                            _beat.WhammyBarType == WhammyType.Dip;
 
-            // 
+            //
             // Get the min and max values for all combined whammys
             BendPoint minValue = null;
             BendPoint maxValue = null;
@@ -89,7 +89,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             var topOffset = maxValue.Value > 0 ? Math.Abs(GetOffset(maxValue.Value)) : 0;
 
-            if (topOffset > 0 || _beat.WhammyBarPoints[0].Value != 0 || Renderer.Settings.ShowZeroOnDiveWhammy)
+            if (topOffset > 0 || _beat.WhammyBarPoints[0].Value != 0 || Renderer.Settings.Notation.ShowZeroOnDiveWhammy)
             {
                 topOffset += Renderer.Resources.TablatureFont.Size * 2f;
             }
@@ -146,7 +146,7 @@ namespace AlphaTab.Rendering.Glyphs
                 else
                 {
                     endXPositionType = endBeat.HasWhammyBar
-                                       && (startNoteRenderer.Settings.DisplayMode != DisplayMode.SongBook ||
+                                       && (startNoteRenderer.Settings.Notation.NotationMode != NotationMode.SongBook ||
                                            endBeat.WhammyBarType != WhammyType.Dip)
                         ? BeatXPosition.MiddleNotes
                         : BeatXPosition.PreNotes;
@@ -190,7 +190,7 @@ namespace AlphaTab.Rendering.Glyphs
                     var nextPt = i < j - 2 ? _renderPoints[i + 2] : null;
 
                     var isFirst = i == 0;
-                    // draw pre-bend if previous 
+                    // draw pre-bend if previous
                     if (i == 0 && firstPt.Value != 0 && !_beat.IsContinuedWhammy)
                     {
                         PaintWhammy(false, new BendPoint(), firstPt, secondPt, startX, zeroY, dx, canvas);
@@ -287,7 +287,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 var y = y1;
                 y -= res.TablatureFont.Size + 2 * Scale;
-                if (Renderer.Settings.ShowZeroOnDiveWhammy)
+                if (Renderer.Settings.Notation.ShowZeroOnDiveWhammy)
                 {
                     canvas.FillText("0", x1, y);
                 }
@@ -300,7 +300,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             var dV = Math.Abs(secondPt.Value);
-            if ((dV != 0 || Renderer.Settings.ShowZeroOnDiveWhammy && !_isSimpleDip) && firstPt.Value != secondPt.Value)
+            if ((dV != 0 || Renderer.Settings.Notation.ShowZeroOnDiveWhammy && !_isSimpleDip) && firstPt.Value != secondPt.Value)
             {
                 var s = "";
                 if (secondPt.Value < 0)
