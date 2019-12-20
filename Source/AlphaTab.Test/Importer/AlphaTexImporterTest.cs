@@ -918,5 +918,16 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(1920, score.MasterBars[2].CalculateDuration());
             Assert.AreEqual(3840, score.MasterBars[3].CalculateDuration());
         }
+        
+        [TestMethod]
+        public void TestRepeat()
+        {
+            var tex = @"\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \rc 2 1.3 2.3 3.3 4.3 | \ro \rc 3 1.3 2.3 3.3 4.3 |";
+            var score = ParseTex(tex);
+            Assert.AreEqual(0, score.MasterBars[0].RepeatCount);
+            Assert.AreEqual(0, score.MasterBars[1].RepeatCount);
+            Assert.AreEqual(2, score.MasterBars[2].RepeatCount);
+            Assert.AreEqual(3, score.MasterBars[3].RepeatCount);
+        }
     }
 }

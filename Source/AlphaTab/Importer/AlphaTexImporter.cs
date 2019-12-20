@@ -61,6 +61,8 @@ namespace AlphaTab.Importer
                 Consolidate();
 
                 _score.Finish(Settings);
+                _score.RebuildRepeatGroups();
+
                 foreach (var track in _lyrics)
                 {
                     _score.Tracks[track].ApplyLyrics(_lyrics[track]);
@@ -2023,7 +2025,7 @@ namespace AlphaTab.Importer
                         Error("repeatclose", AlphaTexSymbols.Number);
                     }
 
-                    master.RepeatCount = (int)_syData - 1;
+                    master.RepeatCount = (int)_syData;
                     NewSy();
                 }
                 else if (syData == "ks")
