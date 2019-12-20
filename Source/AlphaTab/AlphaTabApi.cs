@@ -214,21 +214,30 @@ namespace AlphaTab
                     tracks.Add(score.Tracks[0]);
                 }
             }
-
-            if (trackIndexes.Length == 0)
-            {
-                if (score.Tracks.Count > 0)
-                {
-                    tracks.Add(score.Tracks[0]);
-                }
-            }
             else
             {
-                foreach (var index in trackIndexes)
+                if (trackIndexes.Length == 0)
                 {
-                    if (index >= 0 && index <= score.Tracks.Count)
+                    if (score.Tracks.Count > 0)
                     {
-                        tracks.Add(score.Tracks[index]);
+                        tracks.Add(score.Tracks[0]);
+                    }
+                }
+                else if (trackIndexes.Length == 1 && trackIndexes[0] == -1)
+                {
+                    foreach (var track in score.Tracks)
+                    {
+                        tracks.Add(track);
+                    }
+                }
+                else
+                {
+                    foreach (var index in trackIndexes)
+                    {
+                        if (index >= 0 && index <= score.Tracks.Count)
+                        {
+                            tracks.Add(score.Tracks[index]);
+                        }
                     }
                 }
             }

@@ -121,15 +121,7 @@ namespace AlphaTab.Platform.JavaScript
             context.Tex(tex, tracks);
         }
 
-        [Name("updateSettings")]
-        public void UpdateLayout(JQuery element, AlphaTabApi context)
-        {
-            context.UpdateSettings();
-        }
-
         #endregion
-
-
 
         #region Player
 

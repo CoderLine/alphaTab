@@ -32,31 +32,19 @@ Since: 0.9.6
 			<td>
 				The default values for all settings were moved to the constructor. Simply
 				create a new object and all default settings will be configured. 
-			</td>	
+			</td>
 		</tr>
 		<tr>
             <td>
-				<code>settings.toJson() <span class="code-badge">JavaScript</span></code><br />
+				<code>AlphaTabApi.updateLayout(settings,json,dataAttributes) <span class="code-badge">JavaScript</span></code><br />
 			</td>
             <td>
-				<code>alphaTab.Settings.toJson(settings) <span class="code-badge">JavaScript</span></code><br />
+				
             </td>
 			<td>
-				The serialization methods is now static on the class. 
-			</td>	
-		</tr>
-		<tr>
-            <td>
-				<code>alphaTab.Settings.fillFromJson(settings,json,dataAttributes) <span class="code-badge">JavaScript</span></code><br />
+				This API was removed. Simply change the settings and call <code>updateSettings</code> and <code>render</code> to achive the same behavior. 
 			</td>
-            <td>
-				<code>alphaTab.Settings.fromJson(json) <span class="code-badge">JavaScript</span></code><br />
-            </td>
-			<td>
-				To create a settings object from Json Use the 
-			</td>	
-        </tr>
-		
+        </tr>		
     </tbody>
 </table>
 
@@ -68,10 +56,10 @@ Since: 0.9.6
 	ignored (<code>data-use-workers</code> is equal to <code>data-useworkers</code>). 
 </p>
 <ul>
-	<ul><code>.net</code> is how the property is named on .net object level</ul>
-	<ul><code>JavaScript</code> is how the property is named on the JavaScript object level (alphaTab.Settings instance)</ul>
-	<ul><code>JSON</code> is how the property is named when specifying the property as input to alphaTab (usually short hand names)</ul>
-	<ul><code>HTML</code> is how the property is named on HTML data attributes</ul>
+	<li><code>.net</code> is how the property is named on .net object level</li>
+	<li><code>JavaScript</code> is how the property is named on the JavaScript object level (alphaTab.Settings instance)</li>
+	<li><code>JSON</code> is how the property is named when specifying the property as input to alphaTab (usually short hand names)</li>
+	<li><code>HTML</code> is how the property is named on HTML data attributes</li>
 </ul>
 
 
@@ -93,9 +81,11 @@ Since: 0.9.6
 			</td>
             <td>
 				<code>Core.UseWorkers <span class="code-badge">.net</span></code><br />
-				<code>core.useWorkers, useWorkers <span class="code-badge">JavaScript</span></code><br />
-				<code>core.useWorkers, useWorkers <span class="code-badge">JSON</span></code><br />
-				<code>data-core-use-workers, data-use-workers <span class="code-badge">HTML</span></code><br />
+				<code>core.useWorkers <span class="code-badge">JavaScript</span></code><br />
+				<code>core.useWorkers <span class="code-badge">JSON</span></code><br />
+				<code>useWorkers <span class="code-badge">JSON</span></code><br />
+				<code>data-core-use-workers <span class="code-badge">HTML</span></code><br />
+				<code>data-use-workers <span class="code-badge">HTML</span></code><br />
             </td>
 			<td></td>
         </tr>
@@ -109,8 +99,10 @@ Since: 0.9.6
             <td>
 				<code>Core.LogLevel <span class="code-badge">.net</span></code><br />
 				<code>core.logLevel <span class="code-badge">JavaScript</span></code><br />
-				<code>core.logLevel, logLevel <span class="code-badge">JSON</span></code><br />
-				<code>data-core-loglevel, data-loglevel <span class="code-badge">HTML</span></code><br />
+				<code>core.logLevel <span class="code-badge">JSON</span></code><br />
+				<code>logLevel <span class="code-badge">JSON</span></code><br />
+				<code>data-core-loglevel <span class="code-badge">HTML</span></code><br />
+				<code>data-loglevel <span class="code-badge">HTML</span></code><br />
             </td>
 			<td></td>
         </tr>		
@@ -139,8 +131,10 @@ Since: 0.9.6
             <td>
 				<code>Display.Scale <span class="code-badge">.net</span></code><br />
 				<code>display.scale <span class="code-badge">JavaScript</span></code><br />
-				<code>display.scale, scale <span class="code-badge">JSON</span></code><br />
-				<code>data-display-scale, data-scale <span class="code-badge">HTML</span></code><br />			
+				<code>display.scale <span class="code-badge">JSON</span></code><br />
+				<code>scale <span class="code-badge">JSON</span></code><br />
+				<code>data-display-scale <span class="code-badge">HTML</span></code><br />			
+				<code>data-scale <span class="code-badge">HTML</span></code><br />			
             </td>
 			<td></td>
         </tr>
@@ -169,8 +163,10 @@ Since: 0.9.6
             <td>
 				<code>Core.Engine <span class="code-badge">.net</span></code><br />
 				<code>core.engine <span class="code-badge">JavaScript</span></code><br />
-				<code>core.engine, engine <span class="code-badge">JSON</span></code><br />
-				<code>data-core-engine, data-engine <span class="code-badge">HTML</span></code><br />			
+				<code>core.engine <span class="code-badge">JSON</span></code><br />
+				<code>engine <span class="code-badge">JSON</span></code><br />
+				<code>data-core-engine <span class="code-badge">HTML</span></code><br />			
+				<code>data-engine <span class="code-badge">HTML</span></code><br />			
             </td>
 			<td></td>
         </tr>
@@ -184,8 +180,10 @@ Since: 0.9.6
             <td>
 				<code>Display.StretchForce <span class="code-badge">.net</span></code><br />
 				<code>display.stretchForce <span class="code-badge">JavaScript</span></code><br />
-				<code>display.stretchForce, stretchForce <span class="code-badge">JSON</span></code><br />
-				<code>data-display-stretchforce, data-stretchforce <span class="code-badge">HTML</span></code><br />
+				<code>display.stretchForce <span class="code-badge">JSON</span></code><br />
+				<code>stretchForce <span class="code-badge">JSON</span></code><br />
+				<code>data-display-stretchforce <span class="code-badge">HTML</span></code><br />
+				<code>data-stretchforce <span class="code-badge">HTML</span></code><br />
             </td>
 			<td></td>
         </tr>
@@ -219,8 +217,10 @@ Since: 0.9.6
             <td>
 				<code>Core.EnableLazyLoading <span class="code-badge">.net</span></code><br />
 				<code>Core.enableLazyLoading <span class="code-badge">JavaScript</span></code><br />
-				<code>core.enableLazyLoading, enableLazyLoading <span class="code-badge">JSON</span></code><br />
-				<code>data-core-enablelazyloading, data-enablelazyloading <span class="code-badge">HTML</span></code><br />			
+				<code>core.enableLazyLoading <span class="code-badge">JSON</span></code><br />
+				<code>enableLazyLoading <span class="code-badge">JSON</span></code><br />
+				<code>data-core-enablelazyloading <span class="code-badge">HTML</span></code><br />			
+				<code>data-enablelazyloading <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -264,8 +264,10 @@ Since: 0.9.6
             <td>
 				<code>Core.ScriptFile <span class="code-badge">.net</span></code><br />
 				<code>core.scriptFile <span class="code-badge">JavaScript</span></code><br />
-				<code>core.scriptFile, scriptFile <span class="code-badge">JSON</span></code><br />
-				<code>data-core-script-file, data-script-file <span class="code-badge">HTML</span></code><br />			
+				<code>core.scriptFile <span class="code-badge">JSON</span></code><br />
+				<code>scriptFile <span class="code-badge">JSON</span></code><br />
+				<code>data-core-script-file<span class="code-badge">HTML</span></code><br />			
+				<code>data-script-file <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -279,8 +281,10 @@ Since: 0.9.6
             <td>
 				<code>Core.FontDirectory  <span class="code-badge">.net</span></code><br />
 				<code>core.fontDirectory <span class="code-badge">JavaScript</span></code><br />
-				<code>core.fontDirectory, fontDirectory <span class="code-badge">JSON</span></code><br />
-				<code>data-core-font-directory, data-font-directory <span class="code-badge">HTML</span></code><br />
+				<code>core.fontDirectory <span class="code-badge">JSON</span></code><br />
+				<code>fontDirectory <span class="code-badge">JSON</span></code><br />
+				<code>data-core-font-directory <span class="code-badge">HTML</span></code><br />
+				<code>data-font-directory <span class="code-badge">HTML</span></code><br />
             </td>
         </tr>
 		
@@ -303,13 +307,13 @@ Since: 0.9.6
             <td>
 				<code>FingeringMode <span class="code-badge">.net</span></code><br />
 				<code>fingeringMode <span class="code-badge">JavaScript</span></code><br />
-				<code>fingeringMdoe <span class="code-badge">JSON</span></code><br />
+				<code>fingeringMode <span class="code-badge">JSON</span></code><br />
 				<code>data-fingering-mode <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
 				<code>Notation.FingeringMode <span class="code-badge">.net</span></code><br />
 				<code>notation.fingeringMode <span class="code-badge">JavaScript</span></code><br />
-				<code>notation.fingeringMdoe <span class="code-badge">JSON</span></code><br />
+				<code>notation.fingeringMode <span class="code-badge">JSON</span></code><br />
 				<code>data-notation-fingering-mode <span class="code-badge">HTML</span></code><br />
             </td>
         </tr>
@@ -423,14 +427,17 @@ Since: 0.9.6
             <td>
 				<code>Layout.Mode <span class="code-badge">.net</span></code><br />
 				<code>layout.mode <span class="code-badge">JavaScript</span></code><br />
-				<code>layout.mode,layout <span class="code-badge">JSON</span></code><br />
+				<code>layout.mode <span class="code-badge">JSON</span></code><br />
+				<code>layout <span class="code-badge">JSON</span></code><br />
 				<code>data-layout <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
 				<code>Display.LayoutMode <span class="code-badge">.net</span></code><br />
 				<code>display.layoutMode <span class="code-badge">JavaScript</span></code><br />
-				<code>display.layoutMode, layoutMode <span class="code-badge">JSON</span></code><br />
-				<code>data-display-layout-mode, data-layout-mode <span class="code-badge">HTML</span></code><br />			
+				<code>display.layoutMode <span class="code-badge">JSON</span></code><br />
+				<code>layoutMode <span class="code-badge">JSON</span></code><br />
+				<code>data-display-layout-mode <span class="code-badge">HTML</span></code><br />			
+				<code>data-layout-mode <span class="code-badge">HTML</span></code><br />			
             </td>
 			<td>
 				The display mode is now a strong typed enumeration. 
@@ -446,9 +453,11 @@ Since: 0.9.6
 			</td>
             <td>
 				<code>Display.BarsPerRow <span class="code-badge">.net</span></code><br />
-				<code>Display.barsPerRow <span class="code-badge">JavaScript</span></code><br />
-				<code>Display.barsPerRow, barsPerRow <span class="code-badge">JSON</span></code><br />
-				<code>data-display-barsperrow, data-barsperrow <span class="code-badge">HTML</span></code><br />			
+				<code>display.barsPerRow <span class="code-badge">JavaScript</span></code><br />
+				<code>display.barsPerRow <span class="code-badge">JSON</span></code><br />
+				<code>barsPerRow <span class="code-badge">JSON</span></code><br />
+				<code>data-display-barsperrow <span class="code-badge">HTML</span></code><br />			
+				<code>data-barsperrow <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -461,9 +470,11 @@ Since: 0.9.6
 			</td>
             <td>
 				<code>Display.StartBar <span class="code-badge">.net</span></code><br />
-				<code>Display.startBar <span class="code-badge">JavaScript</span></code><br />
-				<code>Display.startBar, startBar <span class="code-badge">JSON</span></code><br />
-				<code>data-display-startbar, data-startbar <span class="code-badge">HTML</span></code><br />			
+				<code>display.startBar <span class="code-badge">JavaScript</span></code><br />
+				<code>display.startBar <span class="code-badge">JSON</span></code><br />
+				<code>startBar <span class="code-badge">JSON</span></code><br />
+				<code>data-display-startbar <span class="code-badge">HTML</span></code><br />			
+				<code>data-startbar <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -476,9 +487,11 @@ Since: 0.9.6
 			</td>
             <td>
 				<code>Display.BarCount <span class="code-badge">.net</span></code><br />
-				<code>Display.barCount <span class="code-badge">JavaScript</span></code><br />
-				<code>Display.barCount, startBar <span class="code-badge">JSON</span></code><br />
-				<code>data-display-barcount, data-barcount <span class="code-badge">HTML</span></code><br />			
+				<code>display.barCount <span class="code-badge">JavaScript</span></code><br />
+				<code>display.barCount <span class="code-badge">JSON</span></code><br />
+				<code>barCount <span class="code-badge">JSON</span></code><br />
+				<code>data-display-barcount <span class="code-badge">HTML</span></code><br />			
+				<code>data-barcount <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -491,9 +504,11 @@ Since: 0.9.6
 			</td>
             <td>
 				<code>Display.HideInfo <span class="code-badge">.net</span></code><br />
-				<code>Display.hideInfo <span class="code-badge">JavaScript</span></code><br />
-				<code>Display.hideInfo, startBar <span class="code-badge">JSON</span></code><br />
-				<code>data-display-hideinfo, data-hideinfo <span class="code-badge">HTML</span></code><br />			
+				<code>display.hideInfo <span class="code-badge">JavaScript</span></code><br />
+				<code>display.hideInfo <span class="code-badge">JSON</span></code><br />
+				<code>hideInfo <span class="code-badge">JSON</span></code><br />
+				<code>data-display-hideinfo <span class="code-badge">HTML</span></code><br />			
+				<code>data-hideinfo <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -506,9 +521,11 @@ Since: 0.9.6
 			</td>
             <td>
 				<code>Display.HideTuning <span class="code-badge">.net</span></code><br />
-				<code>Display.hideTuning <span class="code-badge">JavaScript</span></code><br />
-				<code>Display.hideTuning, startBar <span class="code-badge">JSON</span></code><br />
-				<code>data-display-hidetuning, data-hidetuning <span class="code-badge">HTML</span></code><br />			
+				<code>display.hideTuning <span class="code-badge">JavaScript</span></code><br />
+				<code>display.hideTuning <span class="code-badge">JSON</span></code><br />
+				<code>hideTuning <span class="code-badge">JSON</span></code><br />
+				<code>data-display-hidetuning <span class="code-badge">HTML</span></code><br />			
+				<code>data-hidetuning <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -521,9 +538,11 @@ Since: 0.9.6
 			</td>
             <td>
 				<code>Display.HideChordDiagrams <span class="code-badge">.net</span></code><br />
-				<code>Display.hideChordDiagrams <span class="code-badge">JavaScript</span></code><br />
-				<code>Display.hideChordDiagrams, hideChordDiagrams <span class="code-badge">JSON</span></code><br />
-				<code>data-display-hidechorddiagrams, data-hidechorddiagrams <span class="code-badge">HTML</span></code><br />			
+				<code>display.hideChordDiagrams <span class="code-badge">JavaScript</span></code><br />
+				<code>display.hideChordDiagrams <span class="code-badge">JSON</span></code><br />
+				<code>hideChordDiagrams <span class="code-badge">JSON</span></code><br />
+				<code>data-display-hidechorddiagrams <span class="code-badge">HTML</span></code><br />			
+				<code>data-hidechorddiagrams <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -536,9 +555,11 @@ Since: 0.9.6
 			</td>
             <td>
 				<code>Display.HideTrackNames <span class="code-badge">.net</span></code><br />
-				<code>Display.hideTrackNames <span class="code-badge">JavaScript</span></code><br />
-				<code>Display.hideTrackNames, startBar <span class="code-badge">JSON</span></code><br />
-				<code>data-display-hidetracknames, data-hidetracknames <span class="code-badge">HTML</span></code><br />			
+				<code>display.hideTrackNames <span class="code-badge">JavaScript</span></code><br />
+				<code>display.hideTrackNames <span class="code-badge">JSON</span></code><br />
+				<code>hideTrackNames <span class="code-badge">JSON</span></code><br />
+				<code>data-display-hidetracknames <span class="code-badge">HTML</span></code><br />			
+				<code>data-hidetracknames <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -552,8 +573,10 @@ Since: 0.9.6
             <td>
 				<code>Core.IncludeNoteBounds <span class="code-badge">.net</span></code><br />
 				<code>core.includeNoteBounds <span class="code-badge">JavaScript</span></code><br />
-				<code>core.includeNoteBounds, includeNoteBounds<span class="code-badge">JSON</span></code><br />
-				<code>data-core-include-note-bounds, data-include-note-bounds <span class="code-badge">HTML</span></code><br />			
+				<code>core.includeNoteBounds <span class="code-badge">JSON</span></code><br />
+				<code>includeNoteBounds<span class="code-badge">JSON</span></code><br />
+				<code>data-core-includenotebounds <span class="code-badge">HTML</span></code><br />			
+				<code>data-includenotebounds <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -699,14 +722,17 @@ Since: 0.9.6
             <td>
 				<code>Staves.Id <span class="code-badge">.net</span></code><br />
 				<code>staves.id <span class="code-badge">JavaScript</span></code><br />
-				<code>staves.id, staves <span class="code-badge">JSON</span></code><br />
+				<code>staves.id <span class="code-badge">JSON</span></code><br />
+				<code>staves <span class="code-badge">JSON</span></code><br />
 				<code>data-staves <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
 				<code>Display.StaveProfile <span class="code-badge">.net</span></code><br />
 				<code>display.staveProfile <span class="code-badge">JavaScript</span></code><br />
-				<code>display.staveProfile, staveProfile <span class="code-badge">JSON</span></code><br />
-				<code>data-display-staveprofile, data-staveprofile <span class="code-badge">HTML</span></code><br />			
+				<code>display.staveProfile <span class="code-badge">JSON</span></code><br />
+				<code>staveProfile <span class="code-badge">JSON</span></code><br />
+				<code>data-display-staveprofile <span class="code-badge">HTML</span></code><br />			
+				<code>data-staveprofile <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -721,7 +747,7 @@ Since: 0.9.6
 				<code>Notation.RhythmMode <span class="code-badge">.net</span></code><br />
 				<code>notation.rhythmMode <span class="code-badge">JavaScript</span></code><br />
 				<code>notation.rhythmMode <span class="code-badge">JSON</span></code><br />
-				<code>data-notation-rhythm-mode <span class="code-badge">HTML</span></code><br />
+				<code>data-notation-rhythmmode <span class="code-badge">HTML</span></code><br />
 			
             </td>
         </tr>
@@ -737,7 +763,7 @@ Since: 0.9.6
 				<code>Notation.RhythmMode <span class="code-badge">.net</span></code><br />
 				<code>notation.rhythmMode <span class="code-badge">JavaScript</span></code><br />
 				<code>notation.rhythmMode <span class="code-badge">JSON</span></code><br />
-				<code>data-notation-rhythm-mode <span class="code-badge">HTML</span></code><br />
+				<code>data-notation-rhythmmode <span class="code-badge">HTML</span></code><br />
 			
             </td>
         </tr>
@@ -753,7 +779,7 @@ Since: 0.9.6
 				<code>Notation.RhythmHeight <span class="code-badge">.net</span></code><br />
 				<code>notation.rhythmHeight <span class="code-badge">JavaScript</span></code><br />
 				<code>notation.rhythmHeight <span class="code-badge">JSON</span></code><br />
-				<code>data-notation-rhythm-height <span class="code-badge">HTML</span></code><br />
+				<code>data-notation-rhythmheight <span class="code-badge">HTML</span></code><br />
 			
             </td>
         </tr>
@@ -848,10 +874,12 @@ Since: 0.9.6
 				<code>data-resources-copyright-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>display.RenderingResources.CopyrightFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.CopyrightFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.copyrightFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.copyrightFont, resources.copyrightFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-copyrightfont, data-resources-copyrightfont <span class="code-badge">HTML</span></code><br />
+				<code>display.resources.copyrightFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.copyrightFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-copyrightfont <span class="code-badge">HTML</span></code><br />
+				<code>data-resources-copyrightfont <span class="code-badge">HTML</span></code><br />
 			
             </td>
         </tr>
@@ -864,10 +892,12 @@ Since: 0.9.6
 				<code>data-resources-title-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.TitleFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.TitleFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.titleFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.titleFont, resources.titleFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-titlefont, data-resources-titlefont <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.titleFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.titleFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-titlefont <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-titlefont <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -879,10 +909,12 @@ Since: 0.9.6
 				<code>data-resources-subtitle-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.SubTitleFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.SubTitleFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.subTitleFont <span class="code-badge">JavaScript</span></code><br />
 				<code>display.resources.subTitleFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-subtitlefont, data-resources-subtitlefont <span class="code-badge">HTML</span></code><br />
+				<code>resources.subTitleFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-subtitlefont <span class="code-badge">HTML</span></code><br />
+				<code>data-resources-subtitlefont <span class="code-badge">HTML</span></code><br />
 			
             </td>
         </tr>
@@ -895,10 +927,12 @@ Since: 0.9.6
 				<code>data-resources-words-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.WordsFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.WordsFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.wordsFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.wordsFont, resources.wordsFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-wordsfont, data-resources-wordsfont <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.wordsFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.wordsFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-wordsfont <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-wordsfont <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -910,10 +944,12 @@ Since: 0.9.6
 				<code>data-resources-effect-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.EffectFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.EffectFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.effectFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.effectFont, resources.effectFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-effectfont, data-resources-effectfont <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.effectFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.effectFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-effectfont <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-effectfont <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -925,10 +961,12 @@ Since: 0.9.6
 				<code>data-resources-fretboard-number-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.FretboardNumberFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.FretboardNumberFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.fretboardNumberFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.fretboardNumberFont, resources.fretboardNumberFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-fretboardnumberfont, data-resources-fretboardnumberfont <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.fretboardNumberFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.fretboardNumberFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-fretboardnumberfont <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-fretboardnumberfont <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>		
 		
@@ -940,10 +978,12 @@ Since: 0.9.6
 				<code>data-resources-tablature-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.TablatureFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.TablatureFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.tablatureFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.tablatureFont, resources.tablatureFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-tablaturefont, data-resources-tablaturefont<span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.tablatureFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.tablatureFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-tablaturefont<span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-tablaturefont<span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -955,10 +995,12 @@ Since: 0.9.6
 				<code>data-resources-grace-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.GraceFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.GraceFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.graceFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.graceFont. resources.graceFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-gracefont, data-resources-gracefont <span class="code-badge">HTML</span></code><br />
+				<code>display.resources.graceFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.graceFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-gracefont <span class="code-badge">HTML</span></code><br />
+				<code>data-resources-gracefont <span class="code-badge">HTML</span></code><br />
             </td>
         </tr>		
 		
@@ -970,10 +1012,12 @@ Since: 0.9.6
 				<code>data-resources-bar-number-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.BarNumberFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.BarNumberFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.barNumberFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.barNumberFont, resources.barNumberFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-barnumberfont, data-resources-barnumberfont <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.barNumberFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.barNumberFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-barnumberfont <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-barnumberfont <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -985,10 +1029,12 @@ Since: 0.9.6
 				<code>data-resources-fingering-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.FingeringFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.FingeringFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.fingeringFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.fingeringFont, resources.fingeringFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-fingeringfont, data-resources-fingeringfont <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.fingeringFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.fingeringFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-fingeringfont <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-fingeringfont <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -1000,10 +1046,12 @@ Since: 0.9.6
 				<code>data-resources-marker-font <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.MarkerFont <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.MarkerFont <span class="code-badge">.net</span></code><br />
 				<code>display.resources.markerFont <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.markerFont, resources.markerFont <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-markerfont, data-resources-markerfont <span class="code-badge">HTML</span></code><br />
+				<code>display.resources.markerFont <span class="code-badge">JSON</span></code><br />
+				<code>resources.markerFont <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-markerfont <span class="code-badge">HTML</span></code><br />
+				<code>data-resources-markerfont <span class="code-badge">HTML</span></code><br />
             </td>
         </tr>
 		
@@ -1015,10 +1063,12 @@ Since: 0.9.6
 				<code>data-resources-staff-line-color <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.StaffLineColor <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.StaffLineColor <span class="code-badge">.net</span></code><br />
 				<code>display.resources.staffLineColor <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.staffLineColor, display.resources.staffLineColor <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-stafflinecolor, data-resources-stafflinecolor <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.staffLineColor <span class="code-badge">JSON</span></code><br />
+				<code>resources.staffLineColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-stafflinecolor <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-stafflinecolor <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -1030,10 +1080,12 @@ Since: 0.9.6
 				<code>data-resources-bar-number-color <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.BarNumberColor <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.BarNumberColor <span class="code-badge">.net</span></code><br />
 				<code>display.resources.barNumberColor <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.barNumberColor, resources.barNumberColor <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-barnumbercolor, data-resources-barnumbercolor <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.barNumberColor <span class="code-badge">JSON</span></code><br />
+				<code>resources.barNumberColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-barnumbercolor <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-barnumbercolor <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -1045,10 +1097,12 @@ Since: 0.9.6
 				<code>data-resources-bar-separator-color <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.BarSeparatorColor <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.BarSeparatorColor <span class="code-badge">.net</span></code><br />
 				<code>display.resources.barSeparatorColor <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.barSeparatorColor, resources.barSeparatorColor <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-barseparatorcolor, data-resources-barseparatorcolor <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.barSeparatorColor <span class="code-badge">JSON</span></code><br />
+				<code>resources.barSeparatorColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-barseparatorcolor <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-barseparatorcolor <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -1060,10 +1114,12 @@ Since: 0.9.6
 				<code>data-resources-main-glyph-color <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.MainGlyphColor <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.MainGlyphColor <span class="code-badge">.net</span></code><br />
 				<code>display.resources.mainGlyphColor <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.mainGlyphColor, resources.mainGlyphColor <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-mainglyphcolor, data-resources-mainglyphcolor <span class="code-badge">HTML</span></code><br />
+				<code>display.resources.mainGlyphColor <span class="code-badge">JSON</span></code><br />
+				<code>resources.mainGlyphColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-mainglyphcolor <span class="code-badge">HTML</span></code><br />
+				<code>data-resources-mainglyphcolor <span class="code-badge">HTML</span></code><br />
             </td>
         </tr>
 		
@@ -1075,10 +1131,12 @@ Since: 0.9.6
 				<code>data-resources-secondary-glyph-color <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.SecondaryGlyphColor <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.SecondaryGlyphColor <span class="code-badge">.net</span></code><br />
 				<code>display.resources.secondaryGlyphColor <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.secondaryGlyphColor, resources.secondaryGlyphColor <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-secondaryglyphcolor, data-resources-secondaryglyphcolor <span class="code-badge">HTML</span></code><br />			
+				<code>display.resources.secondaryGlyphColor <span class="code-badge">JSON</span></code><br />
+				<code>resources.secondaryGlyphColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-secondaryglyphcolor <span class="code-badge">HTML</span></code><br />			
+				<code>data-resources-secondaryglyphcolor <span class="code-badge">HTML</span></code><br />			
             </td>
         </tr>
 		
@@ -1090,10 +1148,12 @@ Since: 0.9.6
 				<code>data-resources-score-info-color <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
-				<code>Display.RenderingResources.ScoreInfoColor <span class="code-badge">.net</span></code><br />
+				<code>Display.Resources.ScoreInfoColor <span class="code-badge">.net</span></code><br />
 				<code>display.resources.scoreInfoColor <span class="code-badge">JavaScript</span></code><br />
-				<code>display.resources.scoreInfoColor, resources.scoreInfoColor <span class="code-badge">JSON</span></code><br />
-				<code>data-display-resources-scoreinfocolor, data-resources-scoreinfocolor <span class="code-badge">HTML</span></code><br />
+				<code>display.resources.scoreInfoColor <span class="code-badge">JSON</span></code><br />
+				<code>resources.scoreInfoColor <span class="code-badge">JSON</span></code><br />
+				<code>data-display-resources-scoreinfocolor <span class="code-badge">HTML</span></code><br />
+				<code>data-resources-scoreinfocolor <span class="code-badge">HTML</span></code><br />
             </td>
         </tr>
 		
@@ -1101,7 +1161,8 @@ Since: 0.9.6
             <td>
 				<code>ScrollOffsetX  <span class="code-badge">.net</span></code><br />
 				<code>scrollOffsetX  <span class="code-badge">JavaScript</span></code><br />
-				<code>playerOffset, playerOffset[0] <span class="code-badge">JSON</span></code><br />
+				<code>playerOffset <span class="code-badge">JSON</span></code><br />
+				<code>playerOffset[0] <span class="code-badge">JSON</span></code><br />
 				<code>data-player-offset <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
@@ -1116,7 +1177,8 @@ Since: 0.9.6
             <td>
 				<code>ScrollOffsetY  <span class="code-badge">.net</span></code><br />
 				<code>scrollOffsetY  <span class="code-badge">JavaScript</span></code><br />
-				<code>playerOffset, playerOffset[1] <span class="code-badge">JSON</span></code><br />
+				<code>playerOffset <span class="code-badge">JSON</span></code><br />
+				<code>playerOffset[1] <span class="code-badge">JSON</span></code><br />
 				<code>data-player-offset <span class="code-badge">HTML</span></code><br />
 			</td>
             <td>
@@ -1158,7 +1220,7 @@ Since: 0.9.6
 		
         <tr>
             <td>
-				<code>ScrollElement  <span class="code-badge">.net</span></code><br />
+				<code>ScrollElement <span class="code-badge">.net</span></code><br />
 				<code>scrollElement <span class="code-badge">JavaScript</span></code><br />
 				<code>scrollElement <span class="code-badge">JSON</span></code><br />
 				<code>data-scroll-element <span class="code-badge">HTML</span></code><br />
@@ -1181,7 +1243,7 @@ Since: 0.9.6
             <td>
             </td>
 			<td>
-				Setting was removed, use CSS like for the other stylings to set the width of the beat cursor. 
+				Setting was removed4 use CSS like for the other stylings to set the width of the beat cursor. 
 			</td>
         </tr>
 		

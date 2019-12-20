@@ -188,7 +188,7 @@ namespace AlphaTab.Rendering.Staves
                 else
                 {
                     var canvas = Layout.Renderer.Canvas;
-                    var res = Layout.Renderer.Settings.Display.RenderingResources.EffectFont;
+                    var res = Layout.Renderer.Settings.Display.Resources.EffectFont;
                     canvas.Font = res;
                     foreach (var t in tracks)
                     {
@@ -284,7 +284,7 @@ namespace AlphaTab.Rendering.Staves
                 _allStaves[i].Paint(cx, cy, canvas, startIndex, count);
             }
 
-            var res = Layout.Renderer.Settings.Display.RenderingResources;
+            var res = Layout.Renderer.Settings.Display.Resources;
 
             if (Staves.Count > 0 && startIndex == 0)
             {

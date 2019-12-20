@@ -13,19 +13,19 @@ Order: 0
 	Loading...        
 </div>
 <script type="text/javascript">
-	var score = alphaTab.importer.ScoreLoader.LoadScoreAsync($('#alphaTabScore').data('file'), 
+	var score = alphaTab.importer.ScoreLoader.loadScoreAsync($('#alphaTabScore').data('file'), 
 	function(score) {
 		var info = jQuery('#alphaTabScore');
 		info.html('');
-		info.append('<p><b>Title:</b> '+score.Title+'</p>');
-		info.append('<p><b>Subtitle:</b> '+score.Subtitle+'</p>');
-		info.append('<p><b>Album:</b> '+score.Album+'</p>');
-		info.append('<p><b>Tempo:</b> '+score.Tempo+'</p>');
-		info.append('<p><b>Bars:</b> '+score.MasterBars.length+'</p>');
-		info.append('<p><b>Tracks:</b> ('+score.Tracks.length+')</p>');
+		info.append('<p><b>Title:</b> '+score.title+'</p>');
+		info.append('<p><b>Subtitle:</b> '+score.subtitle+'</p>');
+		info.append('<p><b>Album:</b> '+score.album+'</p>');
+		info.append('<p><b>Tempo:</b> '+score.tempo+'</p>');
+		info.append('<p><b>Bars:</b> '+score.masterBars.length+'</p>');
+		info.append('<p><b>Tracks:</b> ('+score.tracks.length+')</p>');
 		var tracks = $('<ul></ul>');
-		for(var i = 0; i < score.Tracks.length; i++) {
-			tracks.append('<li>'+score.Tracks[i].Name+'</li>');
+		for(var i = 0; i < score.tracks.length; i++) {
+			tracks.append('<li>'+score.tracks[i].name+'</li>');
 		}
 		info.append(tracks);
 	},

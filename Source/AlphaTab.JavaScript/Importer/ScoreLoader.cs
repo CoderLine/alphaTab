@@ -26,6 +26,10 @@ namespace AlphaTab.Importer
             Action<Exception> error,
             Settings settings = null)
         {
+            if (settings == null)
+            {
+                settings = new Settings();
+            }
             var xhr = new XMLHttpRequest();
             xhr.Open("GET", path, true);
             xhr.ResponseType = XMLHttpRequestResponseType.ARRAYBUFFER;

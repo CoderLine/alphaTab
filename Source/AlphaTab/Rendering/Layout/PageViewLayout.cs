@@ -107,7 +107,7 @@ namespace AlphaTab.Rendering.Layout
                 return y;
             }
 
-            var res = Renderer.Settings.Display.RenderingResources;
+            var res = Renderer.Settings.Display.Resources;
 
             ChordDiagrams.Width = Width;
             ChordDiagrams.DoLayout();
@@ -140,7 +140,7 @@ namespace AlphaTab.Rendering.Layout
             Logger.Debug(Name, "Layouting score info");
 
             var scale = Scale;
-            var res = Renderer.Settings.Display.RenderingResources;
+            var res = Renderer.Settings.Display.Resources;
 
             var centeredGlyphs = new[]
             {
@@ -340,7 +340,7 @@ namespace AlphaTab.Rendering.Layout
             // paint into canvas
             var height = group.Height + GroupSpacing * Scale;
             canvas.BeginRender(Width, height);
-            Renderer.Canvas.Color = Renderer.Settings.Display.RenderingResources.MainGlyphColor;
+            Renderer.Canvas.Color = Renderer.Settings.Display.Resources.MainGlyphColor;
             Renderer.Canvas.TextAlign = TextAlign.Left;
             // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates
             // since we use partial drawing

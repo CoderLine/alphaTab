@@ -156,7 +156,7 @@ namespace AlphaTab.Rendering.Layout
             {
                 var partial = partials[i];
                 canvas.BeginRender(partial.Width, Height);
-                canvas.Color = Renderer.Settings.Display.RenderingResources.MainGlyphColor;
+                canvas.Color = Renderer.Settings.Display.Resources.MainGlyphColor;
                 canvas.TextAlign = TextAlign.Left;
 
                 var renderX = _group.GetBarX(partial.MasterBars[0].Index) + _group.AccoladeSpacing;

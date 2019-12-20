@@ -69,7 +69,7 @@ namespace AlphaTab.Rendering.Layout
                 ? HeaderFooterElements.None
                 : HeaderFooterElements.All;
             var score = Renderer.Score;
-            var res = Renderer.Settings.Display.RenderingResources;
+            var res = Renderer.Settings.Display.Resources;
 
             ScoreInfoGlyphs = new FastDictionary<HeaderFooterElements, TextGlyph>();
             if (!string.IsNullOrEmpty(score.Title) && (flags & HeaderFooterElements.Title) != 0)
@@ -292,7 +292,7 @@ namespace AlphaTab.Rendering.Layout
             var msg = "rendered by alphaTab (https://alphaTab.net)";
 
             var canvas = Renderer.Canvas;
-            var resources = Renderer.Settings.Display.RenderingResources;
+            var resources = Renderer.Settings.Display.Resources;
 
             var size = 12 * Renderer.Settings.Display.Scale;
             var height = size * 2;

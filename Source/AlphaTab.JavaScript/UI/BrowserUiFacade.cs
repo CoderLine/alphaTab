@@ -133,7 +133,8 @@ namespace AlphaTab.UI
             _api = api;
 
             var dataAttributes = GetDataAttributes();
-            var settings = Settings.FromJson(raw);
+            var settings = new Settings();
+            settings.FillFromJson(raw);
             settings.FillFromDataAttributes(dataAttributes);
             api.Settings = settings;
             if (settings.Core.Engine == "default" || settings.Core.Engine == "svg")
@@ -197,17 +198,17 @@ namespace AlphaTab.UI
 
         private void SetupFontCheckers(Settings settings)
         {
-            RegisterFontChecker(settings.Display.RenderingResources.CopyrightFont);
-            RegisterFontChecker(settings.Display.RenderingResources.EffectFont);
-            RegisterFontChecker(settings.Display.RenderingResources.FingeringFont);
-            RegisterFontChecker(settings.Display.RenderingResources.GraceFont);
-            RegisterFontChecker(settings.Display.RenderingResources.MarkerFont);
-            RegisterFontChecker(settings.Display.RenderingResources.TablatureFont);
-            RegisterFontChecker(settings.Display.RenderingResources.TitleFont);
-            RegisterFontChecker(settings.Display.RenderingResources.WordsFont);
-            RegisterFontChecker(settings.Display.RenderingResources.BarNumberFont);
-            RegisterFontChecker(settings.Display.RenderingResources.FretboardNumberFont);
-            RegisterFontChecker(settings.Display.RenderingResources.SubTitleFont);
+            RegisterFontChecker(settings.Display.Resources.CopyrightFont);
+            RegisterFontChecker(settings.Display.Resources.EffectFont);
+            RegisterFontChecker(settings.Display.Resources.FingeringFont);
+            RegisterFontChecker(settings.Display.Resources.GraceFont);
+            RegisterFontChecker(settings.Display.Resources.MarkerFont);
+            RegisterFontChecker(settings.Display.Resources.TablatureFont);
+            RegisterFontChecker(settings.Display.Resources.TitleFont);
+            RegisterFontChecker(settings.Display.Resources.WordsFont);
+            RegisterFontChecker(settings.Display.Resources.BarNumberFont);
+            RegisterFontChecker(settings.Display.Resources.FretboardNumberFont);
+            RegisterFontChecker(settings.Display.Resources.SubTitleFont);
         }
 
         private void RegisterFontChecker(Font font)
@@ -418,7 +419,10 @@ namespace AlphaTab.UI
                 {
                     if (tracksData == "all")
                     {
-                        return null;
+                        return new int[]
+                        {
+                            -1
+                        };
                     }
 
                     tracksData = Json.Parse((string)tracksData);

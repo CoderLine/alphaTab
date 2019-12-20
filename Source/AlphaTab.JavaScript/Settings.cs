@@ -149,6 +149,11 @@ namespace AlphaTab
             return null; // dynamically implemented via macro
         }
 
+        public void FillFromJson(dynamic json)
+        {
+            // dynamically implemented via macro
+        }
+
         public static object ToJson(Settings settings)
         {
             return null; // dynamically implemented via macro
@@ -159,16 +164,7 @@ namespace AlphaTab
             var keys = Script.Write<string[]>("untyped __js__(\"Object.keys({0})\", dataAttributes)");
             foreach (var key in keys)
             {
-                object value;
-                try
-                {
-                    value = Json.Parse(dataAttributes[key]);
-                }
-                catch
-                {
-                    value = dataAttributes[key];
-                }
-                SetProperty(key.ToLower(), value);
+                SetProperty(key.ToLower(), dataAttributes[key]);
             }
         }
 

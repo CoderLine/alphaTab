@@ -230,7 +230,7 @@ namespace AlphaTab
 
         /// <summary>
         /// Only guitar tablature is rendered, but also rests and time signatures are not shown.
-        /// This profile is typically used in mulit-track scenarios.
+        /// This profile is typically used in multi-track scenarios.
         /// </summary>
         TabMixed,
     }
@@ -268,7 +268,7 @@ namespace AlphaTab
         /// <summary>
         /// Limit the displayed bars per row.
         /// </summary>
-        [JsonName("barPerRow")]
+        [JsonName("barsPerRow")]
         public int BarsPerRow { get; set; } = -1;
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace AlphaTab
         /// Gets or sets the resources used during rendering. This defines all fonts and colors used.
         /// </summary>
         [JsonName("resources")]
-        public RenderingResources RenderingResources { get; } = new RenderingResources();
+        public RenderingResources Resources { get; } = new RenderingResources();
 
         /// <summary>
         /// Gets or sets the padding between the music notation and the border.

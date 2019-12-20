@@ -160,11 +160,21 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             var tracks = new FastList<Track>();
-            foreach (var index in trackIndexes)
+            if (trackIndexes.Length == 1 && trackIndexes[0] == -1)
             {
-                if (index >= 0 && index < Score.Tracks.Count)
+                foreach (var track in Score.Tracks)
                 {
-                    tracks.Add(Score.Tracks[index]);
+                    tracks.Add(track);
+                }
+            }
+            else
+            {
+                foreach (var index in trackIndexes)
+                {
+                    if (index >= 0 && index < Score.Tracks.Count)
+                    {
+                        tracks.Add(Score.Tracks[index]);
+                    }
                 }
             }
 

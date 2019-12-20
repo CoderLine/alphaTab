@@ -241,7 +241,7 @@ namespace AlphaTab.Audio.Generator
             {
                 audioDuration = beat.Voice.Bar.MasterBar.CalculateDuration();
             }
-            else if (beat.Voice.Bar.MasterBar.TripletFeel != TripletFeel.NoTripletFeel && (_settings != null && !_settings.Player.PlayTripletFeel))
+            else if (beat.Voice.Bar.MasterBar.TripletFeel != TripletFeel.NoTripletFeel && _settings.Player.PlayTripletFeel)
             {
                 if (_currentTripletFeel != null)
                 {
@@ -569,7 +569,7 @@ namespace AlphaTab.Audio.Generator
                 }
             }
 
-            if (note.IsLetRing && (_settings == null || _settings.Notation.NotationMode == NotationMode.GuitarPro))
+            if (note.IsLetRing && _settings.Notation.NotationMode == NotationMode.GuitarPro)
             {
                 // LetRing ends when:
                 // - rest

@@ -110,7 +110,7 @@ namespace AlphaTab.Rendering
             Width = width;
         }
 
-        public RenderingResources Resources => Settings.Display.RenderingResources;
+        public RenderingResources Resources => Settings.Display.Resources;
 
         public ScoreRenderer ScoreRenderer
         {

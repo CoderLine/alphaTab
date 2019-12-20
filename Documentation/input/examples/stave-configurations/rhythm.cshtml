@@ -4,7 +4,7 @@ Order: 3
 
 <div class="description">
     When using the <code>tab</code> stave configuration, additionaly the rhythm 
-    can be displayed via the additional stave setting <code>rhythm: true</code> or the attribute <code>data-staves-rhythm="true"</code>
+    can be displayed via the setting <code>notation.rhythmMode</code> or the attribute <code>data-notation-rhythmmode</code>
 </div>
 
 <div>
@@ -21,19 +21,16 @@ Order: 3
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
                   file: '@Context.GetLink("/assets/files/features/Rhythm.gp5")',
-                  staves: {
-                    id: 'tab',
-                    additionalSettings: {
-                        rhythm: true    
-                    }    
-                  }                
+                  notation: {
+                    rhythmMode: 'ShowWithBars'
+                  }
                 })
             </script>
         </div>
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")" data-staves="tab" data-staves-rhythm="true"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")" data-display-staveprofile="tab" data-notation-rhythmmode="ShowWithBars"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">
@@ -62,12 +59,9 @@ Order: 3
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit2').alphaTab({
                   file: '@Context.GetLink("/assets/files/features/Rhythm.gp5")',
-                  staves: {
-                    id: 'tab',
-                    additionalSettings: {
-                        rhythm: true,
-                        rhythmHeight: 50
-                    }    
+                  notation: {
+					rhythmMode: 'ShowWithBars',
+					rhythmHeight: 50
                   }                
                 })
             </script>
@@ -75,7 +69,7 @@ Order: 3
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit2" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")" data-staves="tab" data-staves-rhythm="true" data-staves-rhythm-height="50"></div>
+            <div id="alphaTabDataInit2" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")" data-display-staveprofile="tab" data-notation-rhythmmode="ShowWithBars" data-notation-rhythm="50"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">
@@ -87,7 +81,7 @@ Order: 3
 </div>
 
 <div class="description">
-    You can prevent beaming by setting <code>rhythmBeams: false</code> or <code>data-staves-rhythm-beams="false"</code>
+    You can prevent beaming by setting <code>notation.rhythmMode = 'ShowWithBeams'</code> or <code>data-notation-rhythmmode="ShowWithBeams"</code>
 </div>
 
 <div>
@@ -104,12 +98,8 @@ Order: 3
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit3').alphaTab({
                   file: '@Context.GetLink("/assets/files/features/Rhythm.gp5")',
-                  staves: {
-                    id: 'tab',
-                    additionalSettings: {
-                        rhythm: true,
-                        rhythmBeams: false
-                    }
+                  notation: {
+					rhythmMode: 'ShowWithBeams'
                   }                
                 })
             </script>
@@ -117,7 +107,7 @@ Order: 3
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit3" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")" data-staves="tab" data-staves-rhythm="true" data-staves-rhythm-beam="false"></div>
+            <div id="alphaTabDataInit3" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")" data-display-staveprofile="tab" data-notation-rhythmmode="ShowWithBeams"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">
