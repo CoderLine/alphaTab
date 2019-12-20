@@ -21,28 +21,31 @@ namespace AlphaTab.Platform.JavaScript
         public AlphaTabWorkerScoreRenderer(AlphaTabApi<T> api, Settings settings)
         {
             _api = api;
+            // first try blob worker
             try
             {
-                _worker = new Worker(settings.Core.ScriptFile);
+                HaxeString script = "importScripts('" + settings.Core.ScriptFile + "')";
+                var blob = new Blob(new[]
+                {
+                    script
+                });
+                _worker = new Worker(URL.CreateObjectURL(blob));
             }
-            catch
+            catch (Exception e)
             {
-                // fallback to blob worker
+                // fallback to direct worker
                 try
                 {
-                    HaxeString script = "importScripts('" + settings.Core.ScriptFile + "')";
-                    var blob = new Blob(new[]
-                    {
-                        script
-                    });
-                    _worker = new Worker(URL.CreateObjectURL(blob));
+                    _worker = new Worker(settings.Core.ScriptFile);
                 }
-                catch (Exception e)
+                catch
                 {
                     Logger.Error("Rendering", "Failed to create WebWorker: " + e);
                     // TODO: fallback to synchronous mode
                 }
             }
+
+
 
             _worker.PostMessage(new
             {

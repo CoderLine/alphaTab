@@ -32,8 +32,9 @@ namespace AlphaTab
 
             RegisterJQueryPlugin();
 
-            Script.Write(
-                "untyped __js__(\"Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };\");");
+            // polyfills
+            Script.Write("untyped __js__(\"Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };\");");
+            Script.Write("untyped __js__(\"Int32Array.prototype.slice = Int32Array.prototype.slice || function(begin, end) { return new Int32Array(Array.prototype.slice.call(this, begin, end)) };\");");
 
             // try to build the find the alphaTab script url in case we are not in the webworker already
             if (Lib.Global.document)
