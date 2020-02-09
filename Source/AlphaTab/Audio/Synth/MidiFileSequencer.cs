@@ -112,7 +112,7 @@ namespace AlphaTab.Audio.Synth
                 _eventIndex = 0;
                 var metronomeVolume = _synthesizer.MetronomeVolume;
                 _synthesizer.NoteOffAll(true);
-                _synthesizer.Reset();
+                _synthesizer.ResetSoft();
                 _synthesizer.SetupMetronomeChannel(metronomeVolume);
 
                 SilentProcess(timePosition);
@@ -345,7 +345,7 @@ namespace AlphaTab.Audio.Synth
             {
                 var metronomeVolume = _synthesizer.MetronomeVolume;
                 _synthesizer.NoteOffAll(true);
-                _synthesizer.Reset();
+                _synthesizer.ResetSoft();
                 _synthesizer.SetupMetronomeChannel(metronomeVolume);
                 OnFinished();
             }
