@@ -8,6 +8,7 @@ namespace AlphaTab.Rendering.Staves
         public Track Track { get; set; }
         public StaveGroup StaveGroup { get; set; }
         public FastList<Staff> Staves { get; set; }
+        public FastList<Staff> StavesRelevantForBoundsLookup { get; set; }
 
         public Staff FirstStaffInAccolade { get; set; }
         public Staff LastStaffInAccolade { get; set; }
@@ -17,6 +18,16 @@ namespace AlphaTab.Rendering.Staves
             StaveGroup = staveGroup;
             Track = track;
             Staves = new FastList<Staff>();
+            StavesRelevantForBoundsLookup = new FastList<Staff>();
+        }
+
+        public void AddStaff(Staff staff)
+        {
+            Staves.Add(staff);
+            if (staff.IsRelevantForBoundsLookup)
+            {
+                StavesRelevantForBoundsLookup.Add(staff);
+            }
         }
     }
 }

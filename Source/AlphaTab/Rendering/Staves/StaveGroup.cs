@@ -229,7 +229,7 @@ namespace AlphaTab.Rendering.Staves
             staff.StaveGroup = this;
             staff.Index = _allStaves.Count;
             _allStaves.Add(staff);
-            group.Staves.Add(staff);
+            group.AddStaff(staff);
 
             if (staff.IsInAccolade)
             {
@@ -458,44 +458,51 @@ namespace AlphaTab.Rendering.Staves
             };
             Layout.Renderer.BoundsLookup.AddStaveGroup(staveGroupBounds);
 
-            var masterBarBoundsLookup = new FastList<MasterBarBounds>();
+            var masterBarBoundsLookup = new FastDictionary<int, MasterBarBounds>();
             for (var i = 0; i < Staves.Count; i++)
             {
-                for (int j = 0, k = Staves[i].FirstStaffInAccolade.BarRenderers.Count; j < k; j++)
+                foreach (var staff in Staves[i].StavesRelevantForBoundsLookup)
                 {
-                    var renderer = Staves[i].FirstStaffInAccolade.BarRenderers[j];
-
-                    if (i == 0)
+                    foreach (var renderer in staff.BarRenderers)
                     {
-                        var masterBarBounds = new MasterBarBounds();
-                        masterBarBounds.Index = renderer.Bar.MasterBar.Index;
-                        masterBarBounds.IsFirstOfLine = renderer.IsFirstOfLine;
-                        masterBarBounds.RealBounds = new Bounds
+                        MasterBarBounds masterBarBounds;
+                        if (!masterBarBoundsLookup.ContainsKey(renderer.Bar.MasterBar.Index))
                         {
-                            X = x + renderer.X,
-                            Y = realTop,
-                            W = renderer.Width,
-                            H = realHeight
-                        };
-                        masterBarBounds.VisualBounds = new Bounds
+                            masterBarBounds = new MasterBarBounds();
+                            masterBarBounds.Index = renderer.Bar.MasterBar.Index;
+                            masterBarBounds.IsFirstOfLine = renderer.IsFirstOfLine;
+                            masterBarBounds.RealBounds = new Bounds
+                            {
+                                X = x + renderer.X,
+                                Y = realTop,
+                                W = renderer.Width,
+                                H = realHeight
+                            };
+                            masterBarBounds.VisualBounds = new Bounds
+                            {
+                                X = x + renderer.X,
+                                Y = visualTop,
+                                W = renderer.Width,
+                                H = visualHeight
+                            };
+                            masterBarBounds.LineAlignedBounds = new Bounds
+                            {
+                                X = x + renderer.X,
+                                Y = lineTop,
+                                W = renderer.Width,
+                                H = lineHeight
+                            };
+                            Layout.Renderer.BoundsLookup.AddMasterBar(masterBarBounds);
+                            masterBarBoundsLookup[masterBarBounds.Index] = masterBarBounds;
+                        }
+                        else
                         {
-                            X = x + renderer.X,
-                            Y = visualTop,
-                            W = renderer.Width,
-                            H = visualHeight
-                        };
-                        masterBarBounds.LineAlignedBounds = new Bounds
-                        {
-                            X = x + renderer.X,
-                            Y = lineTop,
-                            W = renderer.Width,
-                            H = lineHeight
-                        };
-                        Layout.Renderer.BoundsLookup.AddMasterBar(masterBarBounds);
-                        masterBarBoundsLookup.Add(masterBarBounds);
-                    }
+                            masterBarBounds = masterBarBoundsLookup[renderer.Bar.MasterBar.Index];
+                        }
 
-                    renderer.BuildBoundingsLookup(masterBarBoundsLookup[j], x, cy + Y + _firstStaffInAccolade.Y);
+
+                        renderer.BuildBoundingsLookup(masterBarBounds, x, cy + Y + staff.Y);
+                    }
                 }
             }
         }

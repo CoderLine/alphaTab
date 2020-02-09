@@ -8,6 +8,7 @@ namespace AlphaTab.Rendering
     internal abstract class BarRendererFactory
     {
         public bool IsInAccolade { get; set; }
+        public bool IsRelevantForBoundsLookup { get; set; }
         public bool HideOnMultiTrack { get; set; }
         public bool HideOnPercussionTrack { get; set; }
         public abstract string StaffId { get; }
@@ -15,6 +16,7 @@ namespace AlphaTab.Rendering
         protected BarRendererFactory()
         {
             IsInAccolade = true;
+            IsRelevantForBoundsLookup = true;
             HideOnPercussionTrack = false;
             HideOnMultiTrack = false;
         }

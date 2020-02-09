@@ -248,7 +248,9 @@ namespace AlphaTab.Audio
             var result = new MidiTickLookupFindBeatResult();
             result.CurrentBeat = beat.Beat;
             result.NextBeat = nextBeat == null ? null : nextBeat.Beat;
-            result.Duration = MidiUtils.TicksToMillis(beat.End - beat.Start, masterBar.Tempo);
+            result.Duration = nextBeat == null
+                ? MidiUtils.TicksToMillis(beat.End - beat.Start, masterBar.Tempo)
+                : MidiUtils.TicksToMillis(nextBeat.Start - beat.Start, masterBar.Tempo);
             return result;
         }
 

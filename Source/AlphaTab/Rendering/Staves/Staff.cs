@@ -86,6 +86,7 @@ namespace AlphaTab.Rendering.Staves
         }
 
         public bool IsInAccolade => _factory.IsInAccolade;
+        public bool IsRelevantForBoundsLookup => _factory.IsRelevantForBoundsLookup;
 
         public void RegisterStaffTop(float offset)
         {
