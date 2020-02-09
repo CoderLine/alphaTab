@@ -189,5 +189,37 @@ namespace AlphaTab.Audio.Synth.Synthesis
             ChannelSetMixVolume(SynthConstants.MetronomeChannel, volume);
             ChannelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
         }
+
+        /// <summary>
+        /// Stop all playing notes immediatly and reset all channel parameters but keeps user
+        /// defined settings
+        /// </summary>
+        public void ResetSoft()
+        {
+            foreach (var v in _voices)
+            {
+                if (v.PlayingPreset != -1 &&
+                    (v.AmpEnv.Segment < VoiceEnvelopeSegment.Release || v.AmpEnv.Parameters.Release != 0))
+                {
+                    v.EndQuick(OutSampleRate);
+                }
+            }
+
+            if (_channels != null)
+            {
+                foreach (var c in _channels.ChannelList)
+                {
+                    c.PresetIndex = c.Bank = 0;
+                    c.PitchWheel = c.MidiPan = 8192;
+                    c.MidiVolume = c.MidiExpression = 16383;
+                    c.MidiRpn = 0xFFFF;
+                    c.MidiData = 0;
+                    c.PanOffset = 0.0f;
+                    c.GainDb = 0.0f;
+                    c.PitchRange = 2.0f;
+                    c.Tuning = 0.0f;
+                }
+            }
+        }
     }
 }
