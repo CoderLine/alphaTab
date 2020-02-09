@@ -14,6 +14,7 @@ namespace AlphaTab.Rendering
             _infos = infos;
             _staffId = staffId;
             IsInAccolade = false;
+            IsRelevantForBoundsLookup = false;
         }
 
         public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
