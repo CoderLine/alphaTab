@@ -918,7 +918,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(1920, score.MasterBars[2].CalculateDuration());
             Assert.AreEqual(3840, score.MasterBars[3].CalculateDuration());
         }
-        
+
         [TestMethod]
         public void TestRepeat()
         {
@@ -928,6 +928,27 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(0, score.MasterBars[1].RepeatCount);
             Assert.AreEqual(2, score.MasterBars[2].RepeatCount);
             Assert.AreEqual(3, score.MasterBars[3].RepeatCount);
+        }
+
+        [TestMethod]
+        public void TestDefaultTranspositionOnInstruments()
+        {
+            var tex = @"\track ""Piano with Grand Staff"" ""pno.""
+                \staff{score} \tuning piano \instrument acousticgrandpiano
+                c4 d4 e4 f4 |
+                \staff{score} \tuning piano \clef F4
+                c2 c2 c2 c2 |
+                \track ""Guitar""
+                \staff{tabs} \capo 5
+                1.2 3.2 0.1 1.1
+            ";
+            var score = ParseTex(tex);
+            Assert.AreEqual(0, score.Tracks[0].Staves[0].TranspositionPitch);
+            Assert.AreEqual(0, score.Tracks[0].Staves[0].DisplayTranspositionPitch);
+            Assert.AreEqual(0, score.Tracks[0].Staves[1].TranspositionPitch);
+            Assert.AreEqual(0, score.Tracks[0].Staves[1].DisplayTranspositionPitch);
+            Assert.AreEqual(0, score.Tracks[1].Staves[0].TranspositionPitch);
+            Assert.AreEqual(-12, score.Tracks[1].Staves[0].DisplayTranspositionPitch);
         }
     }
 }
