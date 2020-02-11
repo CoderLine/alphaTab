@@ -140,6 +140,7 @@ namespace AlphaTab.Importer
             _currentTrack.PlaybackInfo.SecondaryChannel = _trackChannel++;
 
             _currentStaff = _currentTrack.Staves[0];
+            _currentStaff.DisplayTranspositionPitch = -12;
             _currentStaff.Tuning = Tuning.GetDefaultTuningFor(6).Tunings;
 
             _score.AddTrack(_currentTrack);
@@ -699,11 +700,6 @@ namespace AlphaTab.Importer
             {
                 NewSy();
             }
-
-            if (GeneralMidi.IsGuitar(_currentTrack.PlaybackInfo.Program))
-            {
-                _currentStaff.DisplayTranspositionPitch = -12;
-            }
         }
 
         private bool HandleStaffMeta()
@@ -788,6 +784,9 @@ namespace AlphaTab.Importer
                     {
                         Error("instrument", AlphaTexSymbols.Number);
                     }
+
+                    _currentStaff.DisplayTranspositionPitch =
+                        GeneralMidi.IsGuitar(_currentTrack.PlaybackInfo.Program) ? -12 : 0;
 
                     NewSy();
                     return true;
@@ -1013,6 +1012,7 @@ namespace AlphaTab.Importer
                     if (_currentTrack.Staves[0].Bars.Count > 0)
                     {
                         _currentTrack.EnsureStaveCount(_currentTrack.Staves.Count + 1);
+
                         _currentStaff = _currentTrack.Staves[_currentTrack.Staves.Count - 1];
                     }
 
