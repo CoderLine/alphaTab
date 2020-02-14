@@ -55,6 +55,11 @@ describe("alphaTab.test.audio.MidiPlaybackControllerTest", function() {
         alphaTab.test.TestPlatform.Done = done;
         __instance.testRepeatCloseAlternateEndings();
     });
+    it("testRepeatWithAlphaTex", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.testRepeatWithAlphaTex();
+        done();
+    });
 });
 describe("alphaTab.test.importer.AlphaTexImporterTest", function() {
     var __instance = new alphaTab.test.importer.AlphaTexImporterTest();
@@ -226,6 +231,21 @@ describe("alphaTab.test.importer.AlphaTexImporterTest", function() {
     it("testRandomAnacrusis", function(done) {
         alphaTab.test.TestPlatform.Done = done;
         __instance.testRandomAnacrusis();
+        done();
+    });
+    it("testRepeat", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.testRepeat();
+        done();
+    });
+    it("testDefaultTranspositionOnInstruments", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.testDefaultTranspositionOnInstruments();
+        done();
+    });
+    it("testDynamics", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.testDynamics();
         done();
     });
 });
