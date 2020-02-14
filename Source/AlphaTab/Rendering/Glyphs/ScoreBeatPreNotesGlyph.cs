@@ -7,6 +7,8 @@ namespace AlphaTab.Rendering.Glyphs
         private BendNoteHeadGroupGlyph _prebends;
         public float PrebendNoteHeadOffset => _prebends.X + _prebends.NoteHeadOffset;
 
+        public AccidentalGroupGlyph Accidentals { get; private set; }
+
         public override void DoLayout()
         {
             if (!Container.Beat.IsRest)
@@ -71,6 +73,7 @@ namespace AlphaTab.Rendering.Glyphs
 
                 if (!accidentals.IsEmpty)
                 {
+                    Accidentals = accidentals;
                     AddGlyph(accidentals);
                     AddGlyph(new SpacingGlyph(0,
                         0,

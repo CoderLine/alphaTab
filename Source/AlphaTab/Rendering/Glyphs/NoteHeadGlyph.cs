@@ -7,7 +7,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public const float GraceScale = 0.75f;
         public const float NoteHeadHeight = 9;
-        public const int QuarterNoteHeadWidth = 8;
+        public const int QuarterNoteHeadWidth = 10;
 
         private readonly bool _isGrace;
         private readonly Duration _duration;

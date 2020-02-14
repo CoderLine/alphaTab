@@ -9,7 +9,7 @@ namespace AlphaTab.Rendering.Effects
 
         protected override bool ShouldCreateGlyphForNote(Note note)
         {
-            return note.SlideType == SlideType.PickSlideDown || note.SlideType == SlideType.PickSlideUp;
+            return note.SlideOutType == SlideOutType.PickSlideDown || note.SlideOutType == SlideOutType.PickSlideUp;
         }
 
         public override EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.GroupedOnBeat;

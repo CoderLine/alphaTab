@@ -65,7 +65,7 @@ namespace AlphaTab.Rendering
                 return;
             }
 
-            // NOTE: we create 2 tie glyphs if we have a line break inbetween 
+            // NOTE: we create 2 tie glyphs if we have a line break inbetween
             // the two notes
             if (n.IsTieOrigin && !n.HasBend && !n.Beat.HasWhammyBar && n.Beat.GraceType != GraceType.BendGrace &&
                 n.TieDestination != null && n.TieDestination.IsVisible)
@@ -82,9 +82,9 @@ namespace AlphaTab.Rendering
 
             // TODO: depending on the type we have other positioning
             // we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
-            if (n.SlideType != SlideType.None)
+            if (n.SlideInType != SlideInType.None || n.SlideOutType != SlideOutType.None)
             {
-                var l = new ScoreSlideLineGlyph(n.SlideType, n, this);
+                var l = new ScoreSlideLineGlyph(n.SlideInType, n.SlideOutType, n, this);
                 Ties.Add(l);
             }
 

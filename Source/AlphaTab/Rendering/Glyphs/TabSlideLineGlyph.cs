@@ -6,14 +6,16 @@ namespace AlphaTab.Rendering.Glyphs
 {
     internal class TabSlideLineGlyph : Glyph
     {
+        private readonly SlideInType _inType;
+        private readonly SlideOutType _outType;
         private readonly Note _startNote;
-        private readonly SlideType _type;
         private readonly BeatContainerGlyph _parent;
 
-        public TabSlideLineGlyph(SlideType type, Note startNote, BeatContainerGlyph parent)
+        public TabSlideLineGlyph(SlideInType inType, SlideOutType outType, Note startNote, BeatContainerGlyph parent)
             : base(0, 0)
         {
-            _type = type;
+            _inType = inType;
+            _outType = outType;
             _startNote = startNote;
             _parent = parent;
         }
@@ -25,6 +27,47 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            PaintSlideIn(cx, cy, canvas);
+            PaintSlideOut(cx, cy, canvas);
+        }
+
+        private void PaintSlideIn(float cx, float cy, ICanvas canvas)
+        {
+            var startNoteRenderer = (TabBarRenderer)Renderer;
+
+            var sizeX = 12 * Scale;
+            var sizeY = 3 * Scale;
+            float startX;
+            float startY;
+            float endX;
+            float endY;
+
+            switch (_inType)
+            {
+                case SlideInType.IntoFromBelow:
+                    endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote, false);
+                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote);
+
+                    startX = endX - sizeX;
+                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + sizeY;
+                    break;
+                case SlideInType.IntoFromAbove:
+                    endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote, false);
+                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote);
+
+                    startX = endX - sizeX;
+                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) - sizeY;
+                    break;
+                default:
+                    return;
+            }
+
+            PaintSlideLine(canvas, false, startX, endX, startY, endY);
+        }
+
+
+        private void PaintSlideOut(float cx, float cy, ICanvas canvas)
+        {
             var startNoteRenderer = (TabBarRenderer)Renderer;
 
             var sizeX = 12 * Scale;
@@ -35,10 +78,10 @@ namespace AlphaTab.Rendering.Glyphs
             float endY;
             var waves = false;
 
-            switch (_type)
+            switch (_outType)
             {
-                case SlideType.Shift:
-                case SlideType.Legato:
+                case SlideOutType.Shift:
+                case SlideOutType.Legato:
                     float startOffsetY;
                     float endOffsetY;
 
@@ -87,21 +130,7 @@ namespace AlphaTab.Rendering.Glyphs
 
                     break;
 
-                case SlideType.IntoFromBelow:
-                    endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote, false);
-                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote);
-
-                    startX = endX - sizeX;
-                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + sizeY;
-                    break;
-                case SlideType.IntoFromAbove:
-                    endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote, false);
-                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote);
-
-                    startX = endX - sizeX;
-                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) - sizeY;
-                    break;
-                case SlideType.OutUp:
+                case SlideOutType.OutUp:
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote);
                     startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote);
 
@@ -109,7 +138,7 @@ namespace AlphaTab.Rendering.Glyphs
                     endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) - sizeY;
                     break;
 
-                case SlideType.OutDown:
+                case SlideOutType.OutDown:
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote);
                     startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote);
 
@@ -117,7 +146,7 @@ namespace AlphaTab.Rendering.Glyphs
                     endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + sizeY;
                     break;
 
-                case SlideType.PickSlideDown:
+                case SlideOutType.PickSlideDown:
 
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote);
                     startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) - sizeY * 2;
@@ -129,7 +158,7 @@ namespace AlphaTab.Rendering.Glyphs
                     waves = true;
                     break;
 
-                case SlideType.PickSlideUp:
+                case SlideOutType.PickSlideUp:
 
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote);
                     startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + sizeY;
@@ -144,6 +173,11 @@ namespace AlphaTab.Rendering.Glyphs
                     return;
             }
 
+            PaintSlideLine(canvas, waves, startX, endX, startY, endY);
+        }
+
+        private void PaintSlideLine(ICanvas canvas, bool waves, float startX, float endX, float startY, float endY)
+        {
             if (waves)
             {
                 var b = endX - startX;
