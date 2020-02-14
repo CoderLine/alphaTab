@@ -81,12 +81,12 @@ namespace AlphaTab.Test.Importer
         }
 
         [TestMethod]
-        public void TestGuitarPro3Harmonics() 
+        public void TestGuitarPro3Harmonics()
         {
             // TODO: Find out about GP3 harmonics!
             //var reader = PrepareImporterWithFile("GuitarPro3/TestHarmonics.gp3");
             //var score = reader.ReadScore();
-            
+
             //Assert.AreEqual(HarmonicType.Natural, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].HarmonicType);
             //Assert.AreEqual(HarmonicType.Artificial, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].HarmonicType);
         }
@@ -120,14 +120,14 @@ namespace AlphaTab.Test.Importer
             {
                 var score = reader.ReadScore();
 
-                Assert.AreEqual(SlideType.Shift, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].GetNoteOnString(5).SlideType);
-                Assert.AreEqual(SlideType.Shift, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].GetNoteOnString(2).SlideType);
+                Assert.AreEqual(SlideOutType.Shift, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].GetNoteOnString(5).SlideOutType);
+                Assert.AreEqual(SlideOutType.Shift, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].GetNoteOnString(2).SlideOutType);
                 Render(score);
             });
         }
 
         [TestMethod, AsyncTestMethod]
-        public void TestGuitarPro3Vibrato() 
+        public void TestGuitarPro3Vibrato()
         {
             // TODO: Check why this vibrato is not recognized
             PrepareImporterWithFile("GuitarPro3/TestVibrato.gp3", reader =>

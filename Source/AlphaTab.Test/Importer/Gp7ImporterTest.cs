@@ -1110,51 +1110,51 @@ namespace AlphaTab.Test.Importer
             {
                 var score = reader.ReadScore();
 
-                Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideUp, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].SlideOutType);
                 Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].Fret);
                 Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].Fret);
 
-                Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideDown, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].SlideOutType);
                 Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].Fret);
                 Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Notes[0].Fret);
 
 
-                Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideUp, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].SlideOutType);
                 Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].Fret);
                 Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Notes[0].Fret);
 
-                Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideDown, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Notes[0].SlideOutType);
                 Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Notes[0].Fret);
                 Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Notes[0].Fret);
 
 
-                Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Notes[0].SlideOutType);
                 Assert.AreEqual(20, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Notes[0].Fret);
 
-                Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Notes[0].SlideOutType);
                 Assert.AreEqual(12, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Notes[0].Fret);
 
-                Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Notes[0].SlideOutType);
                 Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Notes[0].Fret);
 
-                Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Notes[0].SlideOutType);
                 Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Notes[0].Fret);
 
 
-                Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideDown, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Notes[0].SlideOutType);
                 Assert.AreEqual(20, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Notes[0].Fret);
 
-                Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideDown, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Notes[0].SlideOutType);
                 Assert.AreEqual(12, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Notes[0].Fret);
 
-                Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[2].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideUp, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[2].Notes[0].SlideOutType);
                 Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[2].Notes[0].Fret);
 
-                Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[3].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideUp, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[3].Notes[0].SlideOutType);
                 Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[3].Notes[0].Fret);
 
 
-                Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Notes[0].SlideType);
+                Assert.AreEqual(SlideOutType.PickSlideDown, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Notes[0].SlideOutType);
                 Assert.AreEqual(20, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Notes[0].Fret);
 
                 Render(score);

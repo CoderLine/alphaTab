@@ -1860,42 +1860,42 @@ namespace AlphaTab.Importer
                 else if (syData == "sl")
                 {
                     NewSy();
-                    note.SlideType = SlideType.Legato;
+                    note.SlideOutType = SlideOutType.Legato;
                 }
                 else if (syData == "ss")
                 {
                     NewSy();
-                    note.SlideType = SlideType.Shift;
+                    note.SlideOutType = SlideOutType.Shift;
                 }
                 else if (syData == "sib")
                 {
                     NewSy();
-                    note.SlideType = SlideType.IntoFromBelow;
+                    note.SlideInType = SlideInType.IntoFromBelow;
                 }
                 else if (syData == "sia")
                 {
                     NewSy();
-                    note.SlideType = SlideType.IntoFromAbove;
+                    note.SlideInType = SlideInType.IntoFromAbove;
                 }
                 else if (syData == "sou")
                 {
                     NewSy();
-                    note.SlideType = SlideType.OutUp;
+                    note.SlideOutType = SlideOutType.OutUp;
                 }
                 else if (syData == "sod")
                 {
                     NewSy();
-                    note.SlideType = SlideType.OutDown;
+                    note.SlideOutType = SlideOutType.OutDown;
                 }
                 else if (syData == "psd")
                 {
                     NewSy();
-                    note.SlideType = SlideType.PickSlideDown;
+                    note.SlideOutType = SlideOutType.PickSlideDown;
                 }
                 else if (syData == "psu")
                 {
                     NewSy();
-                    note.SlideType = SlideType.PickSlideUp;
+                    note.SlideOutType = SlideOutType.PickSlideUp;
                 }
                 else if (syData == "h")
                 {

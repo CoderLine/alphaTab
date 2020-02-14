@@ -1998,42 +1998,37 @@ namespace AlphaTab.Importer
                                     var slideFlags = Platform.Platform.ParseInt(c.FindChildElement("Flags").InnerText);
                                     if ((slideFlags & 1) != 0)
                                     {
-                                        note.SlideType = SlideType.Shift;
+                                        note.SlideOutType = SlideOutType.Shift;
                                     }
-
-                                    if ((slideFlags & 2) != 0)
+                                    else if ((slideFlags & 2) != 0)
                                     {
-                                        note.SlideType = SlideType.Legato;
+                                        note.SlideOutType = SlideOutType.Legato;
                                     }
-
-                                    if ((slideFlags & 4) != 0)
+                                    else if ((slideFlags & 4) != 0)
                                     {
-                                        note.SlideType = SlideType.OutDown;
+                                        note.SlideOutType = SlideOutType.OutDown;
                                     }
-
-                                    if ((slideFlags & 8) != 0)
+                                    else if ((slideFlags & 8) != 0)
                                     {
-                                        note.SlideType = SlideType.OutUp;
+                                        note.SlideOutType = SlideOutType.OutUp;
                                     }
 
                                     if ((slideFlags & 16) != 0)
                                     {
-                                        note.SlideType = SlideType.IntoFromBelow;
+                                        note.SlideInType = SlideInType.IntoFromBelow;
                                     }
-
-                                    if ((slideFlags & 32) != 0)
+                                    else if ((slideFlags & 32) != 0)
                                     {
-                                        note.SlideType = SlideType.IntoFromAbove;
+                                        note.SlideInType = SlideInType.IntoFromAbove;
                                     }
-
+                                    
                                     if ((slideFlags & 64) != 0)
                                     {
-                                        note.SlideType = SlideType.PickSlideDown;
+                                        note.SlideOutType = SlideOutType.PickSlideDown;
                                     }
-
-                                    if ((slideFlags & 128) != 0)
+                                    else if ((slideFlags & 128) != 0)
                                     {
-                                        note.SlideType = SlideType.PickSlideUp;
+                                        note.SlideOutType = SlideOutType.PickSlideUp;
                                     }
 
                                     break;

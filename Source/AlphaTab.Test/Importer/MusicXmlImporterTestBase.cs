@@ -313,7 +313,8 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected.IsPalmMute, actual.IsPalmMute, "Mismatch on IsPalmMute");
             Assert.AreEqual(expected.IsDead, actual.IsDead, "Mismatch on IsDead");
             Assert.AreEqual(expected.IsStaccato, actual.IsStaccato, "Mismatch on IsStaccato");
-            Assert.AreEqual(expected.SlideType, actual.SlideType, "Mismatch on SlideType");
+            Assert.AreEqual(expected.SlideInType, actual.SlideInType, "Mismatch on SlideInType");
+            Assert.AreEqual(expected.SlideOutType, actual.SlideOutType, "Mismatch on SlideOutType");
             Assert.AreEqual(expected.Vibrato, actual.Vibrato, "Mismatch on Vibrato");
             Assert.AreEqual(expected.IsTieDestination, actual.IsTieDestination, "Mismatch on IsTieDestination");
             Assert.AreEqual(expected.IsTieOrigin, actual.IsTieOrigin, "Mismatch on IsTieOrigin");
