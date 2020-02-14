@@ -223,9 +223,14 @@ namespace AlphaTab.Model
         public bool IsStaccato { get; set; }
 
         /// <summary>
-        /// Gets or sets the slide type this note is played with.
+        /// Gets or sets the slide-in type this note is played with.
         /// </summary>
-        public SlideType SlideType { get; set; }
+        public SlideInType SlideInType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the slide-out type this note is played with.
+        /// </summary>
+        public SlideOutType SlideOutType { get; set; }
 
         /// <summary>
         /// Gets or sets the target note for several slide types.
@@ -637,7 +642,8 @@ namespace AlphaTab.Model
             Accentuated = AccentuationType.None;
             Fret = int.MinValue;
             HarmonicType = HarmonicType.None;
-            SlideType = SlideType.None;
+            SlideInType = SlideInType.None;
+            SlideOutType = SlideOutType.None;
             Vibrato = VibratoType.None;
 
             LeftHandFinger = Fingers.Unknown;
@@ -671,7 +677,8 @@ namespace AlphaTab.Model
             dst.IsPalmMute = src.IsPalmMute;
             dst.IsDead = src.IsDead;
             dst.IsStaccato = src.IsStaccato;
-            dst.SlideType = src.SlideType;
+            dst.SlideInType = src.SlideInType;
+            dst.SlideOutType = src.SlideOutType;
             dst.Vibrato = src.Vibrato;
             dst.IsTieDestination = src.IsTieDestination;
             dst.IsSlurDestination = src.IsSlurDestination;
@@ -812,14 +819,14 @@ namespace AlphaTab.Model
             }
 
             // set slides
-            switch (SlideType)
+            switch (SlideOutType)
             {
-                case SlideType.Shift:
-                case SlideType.Legato:
+                case SlideOutType.Shift:
+                case SlideOutType.Legato:
                     SlideTarget = nextNoteOnLine.Value;
                     if (SlideTarget == null)
                     {
-                        SlideType = SlideType.None;
+                        SlideOutType = SlideOutType.None;
                     }
 
                     break;
@@ -830,7 +837,7 @@ namespace AlphaTab.Model
             {
                 effectSlurDestination = HammerPullDestination;
             }
-            else if (SlideType == SlideType.Legato && SlideTarget != null)
+            else if (SlideOutType == SlideOutType.Legato && SlideTarget != null)
             {
                 effectSlurDestination = SlideTarget;
             }
