@@ -1501,6 +1501,40 @@ namespace AlphaTab.Importer
                 return true;
             }
 
+            if (syData == "dy")
+            {
+                NewSy();
+                switch (_syData.ToString().ToLower())
+                {
+                    case "ppp":
+                        beat.Dynamics = DynamicValue.PPP;
+                        break;
+                    case "pp":
+                        beat.Dynamics = DynamicValue.PP;
+                        break;
+                    case "p":
+                        beat.Dynamics = DynamicValue.P;
+                        break;
+                    case "mp":
+                        beat.Dynamics = DynamicValue.MP;
+                        break;
+                    case "mf":
+                        beat.Dynamics = DynamicValue.MF;
+                        break;
+                    case "f":
+                        beat.Dynamics = DynamicValue.F;
+                        break;
+                    case "ff":
+                        beat.Dynamics = DynamicValue.FF;
+                        break;
+                    case "fff":
+                        beat.Dynamics = DynamicValue.FFF;
+                        break;
+                }
+                NewSy();
+                return true;
+            }
+
             if (syData == "tp")
             {
                 NewSy();

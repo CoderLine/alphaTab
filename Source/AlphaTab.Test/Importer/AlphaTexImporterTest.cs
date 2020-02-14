@@ -950,5 +950,22 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(0, score.Tracks[1].Staves[0].TranspositionPitch);
             Assert.AreEqual(-12, score.Tracks[1].Staves[0].DisplayTranspositionPitch);
         }
+
+        [TestMethod]
+        public void TestDynamics()
+        {
+            var tex = @"1.1.8{dy ppp} 1.1{dy pp} 1.1{dy p} 1.1{dy mp} 1.1{dy mf} 1.1{dy f} 1.1{dy ff} 1.1{dy fff}";
+            var score = ParseTex(tex);
+            Assert.AreEqual(DynamicValue.PPP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Dynamics);
+            Assert.AreEqual(DynamicValue.PP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Dynamics);
+            Assert.AreEqual(DynamicValue.P, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Dynamics);
+            Assert.AreEqual(DynamicValue.MP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Dynamics);
+            Assert.AreEqual(DynamicValue.MF, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[4].Dynamics);
+            Assert.AreEqual(DynamicValue.F, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[5].Dynamics);
+            Assert.AreEqual(DynamicValue.FF, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[6].Dynamics);
+            Assert.AreEqual(DynamicValue.FFF, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[7].Dynamics);
+        }
+
+
     }
 }
