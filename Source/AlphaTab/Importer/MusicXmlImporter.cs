@@ -1006,7 +1006,7 @@ namespace AlphaTab.Importer
                         case "glissando":
                             if (c.GetAttribute("type") == "start")
                             {
-                                note.SlideType = SlideType.Shift;
+                                note.SlideOutType = SlideOutType.Shift;
                             }
 
                             break;

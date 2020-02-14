@@ -1155,7 +1155,7 @@ namespace AlphaTab.Importer
             {
                 if ((flags & 0x04) != 0)
                 {
-                    note.SlideType = SlideType.Shift;
+                    note.SlideOutType = SlideOutType.Shift;
                 }
             }
 
@@ -1227,7 +1227,7 @@ namespace AlphaTab.Importer
                 case 0: // none
                     break;
                 case 1:
-                    graceNote.SlideType = SlideType.Legato;
+                    graceNote.SlideOutType = SlideOutType.Legato;
                     graceNote.SlideTarget = note;
                     break;
                 case 2: // bend
@@ -1277,29 +1277,30 @@ namespace AlphaTab.Importer
             if (_versionNumber >= 500)
             {
                 var type = Data.ReadSignedByte();
-                switch (type)
+                if ((type & 1) != 0)
                 {
-                    case 1:
-                        note.SlideType = SlideType.Shift;
-                        break;
-                    case 2:
-                        note.SlideType = SlideType.Legato;
-                        break;
-                    case 4:
-                        note.SlideType = SlideType.OutDown;
-                        break;
-                    case 8:
-                        note.SlideType = SlideType.OutUp;
-                        break;
-                    case 16:
-                        note.SlideType = SlideType.IntoFromBelow;
-                        break;
-                    case 32:
-                        note.SlideType = SlideType.IntoFromAbove;
-                        break;
-                    default:
-                        note.SlideType = SlideType.None;
-                        break;
+                    note.SlideOutType = SlideOutType.Shift;
+                }
+                else if ((type & 2) != 0)
+                {
+                    note.SlideOutType = SlideOutType.Legato;
+                }
+                else if ((type & 4) != 0)
+                {
+                    note.SlideOutType = SlideOutType.OutDown;
+                }
+                else if ((type & 8) != 0)
+                {
+                    note.SlideOutType = SlideOutType.OutUp;
+                }
+
+                if ((type & 16) != 0)
+                {
+                    note.SlideInType = SlideInType.IntoFromBelow;
+                }
+                else if ((type & 32) != 0)
+                {
+                    note.SlideInType = SlideInType.IntoFromAbove;
                 }
             }
             else
@@ -1308,25 +1309,22 @@ namespace AlphaTab.Importer
                 switch (type)
                 {
                     case 1:
-                        note.SlideType = SlideType.Shift;
+                        note.SlideOutType = SlideOutType.Shift;
                         break;
                     case 2:
-                        note.SlideType = SlideType.Legato;
+                        note.SlideOutType = SlideOutType.Legato;
                         break;
                     case 3:
-                        note.SlideType = SlideType.OutDown;
+                        note.SlideOutType = SlideOutType.OutDown;
                         break;
                     case 4:
-                        note.SlideType = SlideType.OutUp;
+                        note.SlideOutType = SlideOutType.OutUp;
                         break;
                     case -1:
-                        note.SlideType = SlideType.IntoFromBelow;
+                        note.SlideInType = SlideInType.IntoFromBelow;
                         break;
                     case -2:
-                        note.SlideType = SlideType.IntoFromAbove;
-                        break;
-                    default:
-                        note.SlideType = SlideType.None;
+                        note.SlideInType = SlideInType.IntoFromAbove;
                         break;
                 }
             }

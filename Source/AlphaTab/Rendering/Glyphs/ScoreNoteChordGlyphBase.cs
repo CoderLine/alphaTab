@@ -69,6 +69,7 @@ namespace AlphaTab.Rendering.Glyphs
             var anyDisplaced = false;
             var direction = Direction;
 
+            var lineOffset = Scale * 1.5f;
             var w = 0f;
             for (int i = 0, j = _infos.Count; i < j; i++)
             {
@@ -79,7 +80,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var displace = false;
                 if (i == 0)
                 {
-                    displacedX = g.Width;
+                    displacedX = g.Width - lineOffset;
                 }
                 else
                 {
@@ -90,7 +91,7 @@ namespace AlphaTab.Rendering.Glyphs
                         if (!lastDisplaced)
                         {
                             displace = true;
-                            g.X = displacedX - Scale;
+                            g.X = displacedX;
                             anyDisplaced = true;
                             lastDisplaced = true; // let next iteration know we are displace now
                         }
@@ -123,7 +124,7 @@ namespace AlphaTab.Rendering.Glyphs
                 g.X += NoteStartX;
 
                 lastLine = _infos[i].Line;
-                w = Math.Max(w, g.X + g.Width);
+                w = Math.Max(w, g.X + g.Width - lineOffset);
             }
 
             if (anyDisplaced)

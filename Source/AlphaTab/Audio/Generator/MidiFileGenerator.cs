@@ -498,7 +498,7 @@ namespace AlphaTab.Audio.Generator
             {
                 GenerateWhammy(note.Beat, noteStart, noteDuration, channel);
             }
-            else if (note.SlideType != SlideType.None)
+            else if (note.SlideInType != SlideInType.None || note.SlideOutType != SlideOutType.None)
             {
                 // TODO GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }

@@ -87,9 +87,9 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
-            if (n.SlideType != SlideType.None)
+            if (n.SlideInType != SlideInType.None || n.SlideOutType != SlideOutType.None)
             {
-                var l = new TabSlideLineGlyph(n.SlideType, n, this);
+                var l = new TabSlideLineGlyph(n.SlideInType, n.SlideOutType, n, this);
                 Ties.Add(l);
             }
 

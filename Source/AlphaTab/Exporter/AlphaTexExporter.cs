@@ -4,7 +4,7 @@ using AlphaTab.Model;
 namespace AlphaTab.Exporter
 {
     /// <summary>
-    /// This class allows converting scores into alphaTex. 
+    /// This class allows converting scores into alphaTex.
     /// </summary>
     // ReSharper disable once UnusedMember.Global
     public class AlphaTexExporter
@@ -20,7 +20,7 @@ namespace AlphaTab.Exporter
         }
 
         /// <summary>
-        /// Exports the given track. 
+        /// Exports the given track.
         /// </summary>
         /// <param name="track">The track to export</param>
         public void Export(Track track)
@@ -35,7 +35,7 @@ namespace AlphaTab.Exporter
         }
 
         /// <summary>
-        /// Returns the generated tex code. 
+        /// Returns the generated tex code.
         /// </summary>
         /// <returns></returns>
         public string ToTex()
@@ -97,7 +97,7 @@ namespace AlphaTab.Exporter
 
         private void Bars(Track track)
         {
-            // alphatab only supports single staves, 
+            // alphatab only supports single staves,
             for (var i = 0; i < 1; i++)
             {
                 for (var j = 0; j < track.Staves[i].Bars.Count; j++)
@@ -250,13 +250,13 @@ namespace AlphaTab.Exporter
                 _builder.Append("v ");
             }
 
-            if (note.SlideType == SlideType.Legato)
+            if (note.SlideOutType == SlideOutType.Legato)
             {
                 hasEffectOpen = EffectOpen(hasEffectOpen);
                 _builder.Append("sl ");
             }
 
-            if (note.SlideType == SlideType.Shift)
+            if (note.SlideOutType == SlideOutType.Shift)
             {
                 hasEffectOpen = EffectOpen(hasEffectOpen);
                 _builder.Append("ss ");

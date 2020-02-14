@@ -240,12 +240,12 @@ namespace AlphaTab.Test.Importer
 
         protected void CheckSlides(Score score)
         {
-            Assert.AreEqual(SlideType.Legato, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].GetNoteOnString(5).SlideType);
-            Assert.AreEqual(SlideType.Shift, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].GetNoteOnString(2).SlideType);
-            Assert.AreEqual(SlideType.IntoFromBelow, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].GetNoteOnString(5).SlideType);
-            Assert.AreEqual(SlideType.IntoFromAbove, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].GetNoteOnString(5).SlideType);
-            Assert.AreEqual(SlideType.OutDown, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].GetNoteOnString(5).SlideType);
-            Assert.AreEqual(SlideType.OutUp, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].GetNoteOnString(5).SlideType);
+            Assert.AreEqual(SlideOutType.Legato, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].GetNoteOnString(5).SlideOutType);
+            Assert.AreEqual(SlideOutType.Shift, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].GetNoteOnString(2).SlideOutType);
+            Assert.AreEqual(SlideInType.IntoFromBelow, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].GetNoteOnString(5).SlideInType);
+            Assert.AreEqual(SlideInType.IntoFromAbove, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].GetNoteOnString(5).SlideInType);
+            Assert.AreEqual(SlideOutType.OutDown, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].GetNoteOnString(5).SlideOutType);
+            Assert.AreEqual(SlideOutType.OutUp, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].GetNoteOnString(5).SlideOutType);
         }
 
         protected void CheckStrings(Score score)
