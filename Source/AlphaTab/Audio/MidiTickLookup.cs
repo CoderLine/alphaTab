@@ -8,13 +8,15 @@ namespace AlphaTab.Audio
     /// </summary>
     public class BeatTickLookup
     {
+        private FastDictionary<int, bool> _highlightedBeats;
+
         /// <summary>
-        /// Gets or sets the start time in midi ticks at which the given beat is played. 
+        /// Gets or sets the start time in midi ticks at which the given beat is played.
         /// </summary>
         public int Start { get; set; }
 
         /// <summary>
-        /// Gets or sets the end time in midi ticks at which the given beat is played. 
+        /// Gets or sets the end time in midi ticks at which the given beat is played.
         /// </summary>
         public int End { get; set; }
 
@@ -24,9 +26,30 @@ namespace AlphaTab.Audio
         public Beat Beat { get; set; }
 
         /// <summary>
-        /// Gets or sets whether the beat is the placeholder beat for an empty bar. 
+        /// Gets or sets whether the beat is the placeholder beat for an empty bar.
         /// </summary>
         public bool IsEmptyBar { get; set; }
+
+        /// <summary>
+        /// Gets or sets a list of all beats that should be highlighted when
+        /// the beat of this lookup starts playing.
+        /// </summary>
+        public FastList<Beat> BeatsToHighlight { get; set; }
+
+        public BeatTickLookup()
+        {
+            _highlightedBeats = new FastDictionary<int, bool>();
+            BeatsToHighlight = new FastList<Beat>();
+        }
+
+        public void HighlightBeat(Beat beat)
+        {
+            if (!_highlightedBeats.ContainsKey(beat.Id))
+            {
+                _highlightedBeats[beat.Id] = true;
+                BeatsToHighlight.Add(beat);
+            }
+        }
     }
 
     /// <summary>
@@ -35,12 +58,12 @@ namespace AlphaTab.Audio
     public class MasterBarTickLookup
     {
         /// <summary>
-        /// Gets or sets the start time in midi ticks at which the MasterBar is played. 
+        /// Gets or sets the start time in midi ticks at which the MasterBar is played.
         /// </summary>
         public int Start { get; set; }
 
         /// <summary>
-        /// Gets or sets the end time in midi ticks at which the MasterBar is played. 
+        /// Gets or sets the end time in midi ticks at which the MasterBar is played.
         /// </summary>
         public int End { get; set; }
 
@@ -50,13 +73,13 @@ namespace AlphaTab.Audio
         public int Tempo { get; set; }
 
         /// <summary>
-        /// Gets or sets the MasterBar which is played. 
+        /// Gets or sets the MasterBar which is played.
         /// </summary>
         public MasterBar MasterBar { get; set; }
 
         /// <summary>
         /// Gets or sets the list of <see cref="BeatTickLookup"/> object which define the durations
-        /// for all <see cref="Beats"/> played within the period of this MasterBar. 
+        /// for all <see cref="Beats"/> played within the period of this MasterBar.
         /// </summary>
         public FastList<BeatTickLookup> Beats { get; set; }
 
@@ -75,7 +98,7 @@ namespace AlphaTab.Audio
         }
 
         /// <summary>
-        /// Performs the neccessary finalization steps after all information was written. 
+        /// Performs the neccessary finalization steps after all information was written.
         /// </summary>
         public void Finish()
         {
@@ -83,7 +106,7 @@ namespace AlphaTab.Audio
         }
 
         /// <summary>
-        /// Adds a new <see cref="BeatTickLookup"/> to the list of played beats during this MasterBar period. 
+        /// Adds a new <see cref="BeatTickLookup"/> to the list of played beats during this MasterBar period.
         /// </summary>
         /// <param name="beat"></param>
         public void AddBeat(BeatTickLookup beat)
@@ -93,29 +116,34 @@ namespace AlphaTab.Audio
     }
 
     /// <summary>
-    /// Represents the results of searching the currently played beat. 
+    /// Represents the results of searching the currently played beat.
     /// </summary>
     /// <seealso cref="MidiTickLookup.FindBeat"/>
     public class MidiTickLookupFindBeatResult
     {
         /// <summary>
-        /// Gets or sets the beat that is currently played. 
+        /// Gets or sets the beat that is currently played.
         /// </summary>
         public Beat CurrentBeat { get; set; }
 
         /// <summary>
-        /// Gets or sets the beat that will be played next. 
+        /// Gets or sets the beat that will be played next.
         /// </summary>
         public Beat NextBeat { get; set; }
 
         /// <summary>
-        /// Gets or sets the duration in milliseconds how long this beat is playing. 
+        /// Gets or sets the duration in milliseconds how long this beat is playing.
         /// </summary>
         public int Duration { get; set; }
+
+        /// <summary>
+        /// Gets or sets the beats ot highlight along the current beat.
+        /// </summary>
+        public FastList<Beat> BeatsToHighlight { get; set; }
     }
 
     /// <summary>
-    /// This class holds all information about when <see cref="MasterBar"/>s and <see cref="Beat"/>s are played. 
+    /// This class holds all information about when <see cref="MasterBar"/>s and <see cref="Beat"/>s are played.
     /// </summary>
     public class MidiTickLookup
     {
@@ -130,7 +158,7 @@ namespace AlphaTab.Audio
         public FastDictionary<int, MasterBarTickLookup> MasterBarLookup { get; }
 
         /// <summary>
-        /// Gets a list of all <see cref="MasterBarTickLookup"/> sorted by time. 
+        /// Gets a list of all <see cref="MasterBarTickLookup"/> sorted by time.
         /// </summary>
         public FastList<MasterBarTickLookup> MasterBars { get; }
 
@@ -144,11 +172,12 @@ namespace AlphaTab.Audio
         }
 
         /// <summary>
-        /// Performs the neccessary finalization steps after all information was written. 
+        /// Performs the neccessary finalization steps after all information was written.
         /// </summary>
         public void Finish()
         {
             MasterBarTickLookup previous = null;
+            var activeBeats = new FastList<BeatTickLookup>();
             foreach (var bar in MasterBars)
             {
                 bar.Finish();
@@ -157,12 +186,36 @@ namespace AlphaTab.Audio
                     previous.NextMasterBar = bar;
                 }
 
+                foreach (var beat in bar.Beats)
+                {
+                    // 1. calculate newly which beats are still active
+                    var newActiveBeats = new FastList<BeatTickLookup>();
+                    // TODO: only create new list if current position changed
+                    foreach (var activeBeat in activeBeats)
+                    {
+                        if (activeBeat.End > beat.Start)
+                        {
+                            newActiveBeats.Add(activeBeat);
+                            // 2. remember for current beat which active beats to highlight
+                            beat.HighlightBeat(activeBeat.Beat);
+                            // 3. ensure that active beat highlights current beat if they match the range
+                            if (beat.Start <= activeBeat.Start)
+                            {
+                                activeBeat.HighlightBeat(beat.Beat);
+                            }
+                        }
+                    }
+
+                    newActiveBeats.Add(beat);
+                    activeBeats = newActiveBeats;
+                }
+
                 previous = bar;
             }
         }
 
         /// <summary>
-        /// Finds the currently played beat given a list of tracks and the current time. 
+        /// Finds the currently played beat given a list of tracks and the current time.
         /// </summary>
         /// <param name="tracks">The tracks in which to search the played beat for.</param>
         /// <param name="tick">The current time in midi ticks.</param>
@@ -253,6 +306,7 @@ namespace AlphaTab.Audio
             result.Duration = nextBeat == null
                 ? MidiUtils.TicksToMillis(beat.End - beat.Start, masterBar.Tempo)
                 : MidiUtils.TicksToMillis(nextBeat.Start - beat.Start, masterBar.Tempo);
+            result.BeatsToHighlight = beat.BeatsToHighlight;
             return result;
         }
 
@@ -273,7 +327,7 @@ namespace AlphaTab.Audio
                     return bar;
                 }
 
-                // search in lower half 
+                // search in lower half
                 if (tick < bar.Start)
                 {
                     top = middle - 1;
@@ -289,7 +343,7 @@ namespace AlphaTab.Audio
         }
 
         /// <summary>
-        /// Gets the <see cref="MasterBarTickLookup"/> for a given masterbar at which the masterbar is played the first time. 
+        /// Gets the <see cref="MasterBarTickLookup"/> for a given masterbar at which the masterbar is played the first time.
         /// </summary>
         /// <param name="bar">The masterbar to find the time period for. </param>
         /// <returns>A <see cref="MasterBarTickLookup"/> containing the details about the first time the <see cref="MasterBar"/> is played.</returns>
@@ -311,7 +365,7 @@ namespace AlphaTab.Audio
         }
 
         /// <summary>
-        /// Gets the start time in midi ticks for a given masterbar at which the masterbar is played the first time. 
+        /// Gets the start time in midi ticks for a given masterbar at which the masterbar is played the first time.
         /// </summary>
         /// <param name="bar">The masterbar to find the time period for. </param>
         /// <returns>The time in midi ticks at which the masterbar is played the first time or 0 if the masterbar is not contained</returns>
@@ -327,7 +381,7 @@ namespace AlphaTab.Audio
         }
 
         /// <summary>
-        /// Adds a new <see cref="MasterBarTickLookup"/> to the lookup table. 
+        /// Adds a new <see cref="MasterBarTickLookup"/> to the lookup table.
         /// </summary>
         /// <param name="masterBar">The item to add. </param>
         public void AddMasterBar(MasterBarTickLookup masterBar)
