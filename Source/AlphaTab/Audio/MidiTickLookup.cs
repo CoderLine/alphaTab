@@ -221,7 +221,8 @@ namespace AlphaTab.Audio
             for (var b = index + 1; b < beats.Count; b++)
             {
                 var currentBeat = beats[b];
-                if (currentBeat.Start > beat.Start &&
+                if (currentBeat.Beat.GraceType == GraceType.None &&
+                    currentBeat.Start > beat.Start &&
                     trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
                 {
                     nextBeat = currentBeat;
@@ -237,7 +238,8 @@ namespace AlphaTab.Audio
                 for (var b = 0; b < beats.Count; b++)
                 {
                     var currentBeat = beats[b];
-                    if (trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
+                    if (currentBeat.Beat.GraceType == GraceType.None &&
+                        trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
                     {
                         nextBeat = currentBeat;
                         break;
