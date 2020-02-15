@@ -27,6 +27,7 @@ namespace AlphaTab.Importer
         private bool _allowTuning;
 
         private Duration _currentDuration;
+        private DynamicValue _currentDynamics;
         private int _currentTuplet;
         private FastDictionary<int, FastList<Lyrics>> _lyrics;
 
@@ -47,6 +48,7 @@ namespace AlphaTab.Importer
                 CreateDefaultScore();
                 _curChPos = 0;
                 _currentDuration = Duration.Quarter;
+                _currentDynamics = DynamicValue.F;
                 _currentTuplet = 1;
                 NextChar();
                 NewSy();
@@ -470,9 +472,9 @@ namespace AlphaTab.Importer
         {
             // no control characters, whitespaces, numbers or dots
             return !IsTerminal(code) && (
-                       code >= 0x21 && code <= 0x2F ||
-                       code >= 0x3A && code <= 0x7E ||
-                       code > 0x80); /* Unicode Symbols */
+                code >= 0x21 && code <= 0x2F ||
+                code >= 0x3A && code <= 0x7E ||
+                code > 0x80); /* Unicode Symbols */
         }
 
         /// <summary>
@@ -1173,6 +1175,7 @@ namespace AlphaTab.Importer
             }
 
             beat.Duration = _currentDuration;
+            beat.Dynamics = _currentDynamics;
             if (_currentTuplet != 1 && !beat.HasTuplet)
             {
                 ApplyTuplet(beat, _currentTuplet);
@@ -1531,6 +1534,8 @@ namespace AlphaTab.Importer
                         beat.Dynamics = DynamicValue.FFF;
                         break;
                 }
+
+                _currentDynamics = beat.Dynamics;
                 NewSy();
                 return true;
             }
@@ -1541,7 +1546,7 @@ namespace AlphaTab.Importer
                 NewSy();
                 return true;
             }
-            
+
             if (syData == "dec")
             {
                 beat.Crescendo = CrescendoType.Decrescendo;

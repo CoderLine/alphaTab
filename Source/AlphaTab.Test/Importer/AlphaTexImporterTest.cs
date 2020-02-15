@@ -966,6 +966,17 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(DynamicValue.FFF, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[7].Dynamics);
         }
 
+        [TestMethod]
+        public void TestDynamicsAuto()
+        {
+            var tex = @"1.1.4{dy ppp} 1.1 1.1{dy mp} 1.1";
+            var score = ParseTex(tex);
+            Assert.AreEqual(DynamicValue.PPP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Dynamics);
+            Assert.AreEqual(DynamicValue.PPP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Dynamics);
+            Assert.AreEqual(DynamicValue.MP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Dynamics);
+            Assert.AreEqual(DynamicValue.MP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Dynamics);
+        }
+
 
         [TestMethod]
         public void TestCrescendo()
