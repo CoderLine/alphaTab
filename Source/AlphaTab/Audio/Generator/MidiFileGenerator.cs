@@ -266,6 +266,7 @@ namespace AlphaTab.Audio.Generator
                 ? audioDuration
                 : beat.NextBeat.AbsolutePlaybackStart - beat.AbsolutePlaybackStart;
             beatLookup.End = barStartTick + beatStart;
+            beatLookup.HighlightBeat(beat);
 
             beatLookup.End += realTickOffset > audioDuration ? realTickOffset : audioDuration;
 

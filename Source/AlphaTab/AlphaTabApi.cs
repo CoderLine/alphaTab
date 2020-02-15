@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AlphaTab.Audio;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth;
@@ -916,7 +917,7 @@ namespace AlphaTab
                         var beat = cache.FindBeat(tracks, tick);
                         if (beat != null)
                         {
-                            CursorUpdateBeat(beat.CurrentBeat, beat.NextBeat, beat.Duration, stop);
+                            CursorUpdateBeat(beat.CurrentBeat, beat.NextBeat, beat.Duration, stop, beat.BeatsToHighlight);
                         }
                     }
                 }
@@ -926,7 +927,12 @@ namespace AlphaTab
         /// <summary>
         /// updates the cursors to highlight the specified beat
         /// </summary>
-        private void CursorUpdateBeat(Beat beat, Beat nextBeat, double duration, bool stop)
+        private void CursorUpdateBeat(
+            Beat beat,
+            Beat nextBeat,
+            double duration,
+            bool stop,
+            FastList<Beat> beatsToHighlight = null)
         {
             if (beat == null)
             {
@@ -983,8 +989,14 @@ namespace AlphaTab
 
                 if (!stop)
                 {
-                    var className = BeatContainerGlyph.GetGroupId(beat);
-                    UiFacade.HighlightElements(className);
+                    if (beatsToHighlight != null)
+                    {
+                        foreach (var highlight in beatsToHighlight)
+                        {
+                            var className = BeatContainerGlyph.GetGroupId(highlight);
+                            UiFacade.HighlightElements(className);
+                        }
+                    }
 
                     var nextBeatX = barBoundings.VisualBounds.X + barBoundings.VisualBounds.W;
                     // get position of next beat on same stavegroup
