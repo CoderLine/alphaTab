@@ -24,6 +24,13 @@ namespace AlphaTab.Test.VisualTests.Features
         }
 
         [TestMethod, AsyncTestMethod]
+        public void GraceNotesAdvanced()
+        {
+            var settings = new Settings();
+            RunVisualTest(settings, new[] { 0, 1 }, "TestFiles/VisualTests/Features/SpecialNotes/GraceNotesAdvanced.gp", "TestFiles/VisualTests/Features/SpecialNotes/GraceNotesAdvanced.png");
+        }
+
+        [TestMethod, AsyncTestMethod]
         public void DeadNotes()
         {
             var settings = new Settings();

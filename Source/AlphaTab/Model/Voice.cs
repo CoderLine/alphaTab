@@ -191,12 +191,12 @@ namespace AlphaTab.Model
                             nonGrace.UpdateDurations();
                         }
 
-                        // grace beats have 1/4 size of the non grace beat following them
-                        var perGraceDuration = nonGrace == null
+                        // grace beats have 1/4 size of the non grace beat preceeding them
+                        var perGraceDisplayDuration = beat.PreviousBeat == null
                             ? Duration.ThirtySecond.ToTicks()
-                            : nonGrace.DisplayDuration / 4 / numberOfGraceBeats;
+                            : beat.PreviousBeat.DisplayDuration / 4 / numberOfGraceBeats;
 
-                        // move all grace beats 
+                        // move all grace beats
                         var graceBeat = Beats[i];
                         for (var j = 0; j < numberOfGraceBeats && graceBeat != null; j++)
                         {
@@ -204,8 +204,8 @@ namespace AlphaTab.Model
                             graceBeat.UpdateDurations();
 
                             graceBeat.DisplayStart =
-                                currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
-                            graceBeat.DisplayDuration = perGraceDuration;
+                                currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDisplayDuration;
+                            graceBeat.DisplayDuration = perGraceDisplayDuration;
 
                             stolenDuration += graceBeat.PlaybackDuration;
 
