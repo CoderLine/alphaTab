@@ -1535,6 +1535,20 @@ namespace AlphaTab.Importer
                 return true;
             }
 
+            if (syData == "cre")
+            {
+                beat.Crescendo = CrescendoType.Crescendo;
+                NewSy();
+                return true;
+            }
+            
+            if (syData == "dec")
+            {
+                beat.Crescendo = CrescendoType.Decrescendo;
+                NewSy();
+                return true;
+            }
+
             if (syData == "tp")
             {
                 NewSy();

@@ -967,5 +967,15 @@ namespace AlphaTab.Test.Importer
         }
 
 
+        [TestMethod]
+        public void TestCrescendo()
+        {
+            var tex = @"1.1.4{dec} 1.1{dec} 1.1{cre} 1.1{cre}";
+            var score = ParseTex(tex);
+            Assert.AreEqual(CrescendoType.Decrescendo, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Crescendo);
+            Assert.AreEqual(CrescendoType.Decrescendo, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Crescendo);
+            Assert.AreEqual(CrescendoType.Crescendo, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Crescendo);
+            Assert.AreEqual(CrescendoType.Crescendo, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Crescendo);
+        }
     }
 }
