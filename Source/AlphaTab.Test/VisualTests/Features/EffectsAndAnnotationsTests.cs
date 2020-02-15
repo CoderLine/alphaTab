@@ -114,6 +114,12 @@ namespace AlphaTab.Test.VisualTests.Features
             RunVisualTest(settings, new[] { 0 }, "TestFiles/Docs/Features/Tuplets.gp5", "TestFiles/VisualTests/Features/EffectsAndAnnotations/Tuplets.png");
         }
         [TestMethod, AsyncTestMethod]
+        public void TupletsAdvanced()
+        {
+            var settings = new Settings();
+            RunVisualTest(settings, new[] { 0, 1, 2}, "TestFiles/VisualTests/Features/EffectsAndAnnotations/TupletsAdvanced.gp", "TestFiles/VisualTests/Features/EffectsAndAnnotations/TupletsAdvanced.png");
+        }
+        [TestMethod, AsyncTestMethod]
         public void Fingering()
         {
             var settings = new Settings();
