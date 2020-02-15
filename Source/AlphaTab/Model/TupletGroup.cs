@@ -1,5 +1,4 @@
-﻿using AlphaTab.Audio;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -8,6 +7,9 @@ namespace AlphaTab.Model
     /// </summary>
     public class TupletGroup
     {
+        public int _totalDuration;
+        private bool _isEqualLengthTuplet = true;
+
         /// <summary>
         /// Gets or sets the list of beats contained in this group.
         /// </summary>
@@ -18,15 +20,6 @@ namespace AlphaTab.Model
         /// </summary>
         public Voice Voice { get; set; }
 
-        /// <summary>
-        /// Gets the absolute midi tick start when this tuplet group starts.
-        /// </summary>
-        public int TupletStart { get; set; }
-
-        /// <summary>
-        /// Gets the absolute midi tick start when this tuplet group ends.
-        /// </summary>
-        public int TupletEnd { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TupletGroup"/> class.
@@ -39,7 +32,7 @@ namespace AlphaTab.Model
         }
 
         /// <summary>
-        /// Gets a value indicating whether the tuplet group is fully filled. 
+        /// Gets a value indicating whether the tuplet group is fully filled.
         /// </summary>
         public bool IsFull
         {
@@ -47,50 +40,85 @@ namespace AlphaTab.Model
             private set;
         }
 
-        private static readonly int FullThreshold = Duration.OneHundredTwentyEighth.ToTicks();
+
+        private const int HalfTicks = 1920;
+        private const int QuarterTicks = 960;
+        private const int EighthTicks = 480;
+        private const int SixteenthTicks = 240;
+        private const int ThirtySecondTicks = 120;
+        private const int SixtyFourthTicks = 60;
+        private const int OneHundredTwentyEighthTicks = 30;
+        private const int TwoHundredFiftySixthTicks = 15;
+
+
+        private static readonly int[] AllTicks =
+        {
+            HalfTicks, QuarterTicks, EighthTicks, SixteenthTicks, ThirtySecondTicks, SixtyFourthTicks,
+            OneHundredTwentyEighthTicks, TwoHundredFiftySixthTicks
+        };
 
         internal bool Check(Beat beat)
         {
             if (Beats.Count == 0)
             {
-                // calculate the range for which the tuplet will be valid. ("N notes sound like M")
-                // via this time range check we can have also tuplets with different durations like: 
-                // /-----4:2-----\  
-                // 4 2 16 16 16 16 
-                // - the tuplet is filled fully according to the duration and displayed accordingly
-                //
-                // while with a pure counting we would have
-                // /--4:2--\  4:2 4:2 
-                // 4 2 16 16  16  16 
-                // - the first tuplet would be treated as full because there are 4 notes in it, but 
-                //   duration wise it does not fill 2 quarter notes. 
-                TupletStart = beat.AbsolutePlaybackStart;
-                var beatDuration = beat.PlaybackDuration;
-                if (beat.GraceType == GraceType.None)
-                {
-                    beatDuration = MidiUtils.RemoveTuplet(beatDuration, beat.TupletNumerator, beat.TupletDenominator);
-                }
-
-                TupletEnd = TupletStart + beatDuration * beat.TupletDenominator;
-            }
-            else if (beat.GraceType != GraceType.None)
-            {
-                // grace notes do not break tuplet group, but also do not contribute to them. 
+                // accept first beat
+                Beats.Add(beat);
+                _totalDuration += beat.PlaybackDuration;
                 return true;
             }
-            else if (beat.Voice != Voice || IsFull
-                                         || beat.TupletNumerator != Beats[0].TupletNumerator ||
-                                         beat.TupletDenominator != Beats[0].TupletDenominator
-                                         || beat.AbsolutePlaybackStart > TupletEnd)
+
+            if (beat.GraceType != GraceType.None)
             {
+                // grace notes do not break tuplet group, but also do not contribute to them.
+                return true;
+            }
+
+            if (beat.Voice != Voice
+                || IsFull
+                || beat.TupletNumerator != Beats[0].TupletNumerator
+                || beat.TupletDenominator != Beats[0].TupletDenominator)
+            {
+                // only same tuplets are potentially accepted
                 return false;
             }
 
-            Beats.Add(beat);
-            var beatEnd = beat.AbsolutePlaybackStart + beat.PlaybackDuration;
-            if (TupletEnd < beatEnd + FullThreshold)
+            // TBH: I do not really know how the 100% tuplet grouping of Guitar Pro might work
+            // it sometimes has really strange rules where notes filling 3 quarters, are considered a full 3:2 tuplet
+
+            // in alphaTab we have now 2 rules where we consider a tuplet full:
+            // 1. if all beats have the same length, the tuplet must contain N notes of an N:M tuplet
+            // 2. if we have mixed beats, we check if the current set of beats, matches a N:M tuplet
+            //    by checking all potential note durations.
+
+            // this logic is very likely not 100% correct but for most cases the tuplets
+            // appeared correct.
+
+            if (beat.PlaybackDuration != Beats[0].PlaybackDuration)
             {
-                IsFull = true;
+                _isEqualLengthTuplet = false;
+            }
+
+            Beats.Add(beat);
+            _totalDuration += beat.PlaybackDuration;
+
+            if (_isEqualLengthTuplet)
+            {
+                if (Beats.Count == Beats[0].TupletNumerator)
+                {
+                    IsFull = true;
+                }
+            }
+            else
+            {
+                var factor = Beats[0].TupletNumerator / Beats[0].TupletDenominator;
+                foreach (var potentialMatch in AllTicks)
+                {
+                    if (_totalDuration == potentialMatch * factor)
+                    {
+                        IsFull = true;
+                        break;
+                    }
+                }
             }
 
             return true;
