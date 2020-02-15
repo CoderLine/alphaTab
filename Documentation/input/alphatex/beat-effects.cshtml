@@ -6,7 +6,7 @@ TexSample: true
 <p>
 	There are various effects that can be applied to a beat. All beat
 	effects are specified in braces after the beat. 
-	<code>Beat{Effects}</code>
+	<code>Beat{Effects}</code> Multiple effects are simple separated by spaces like <code>3.3 {f v}</code>
 </p>    
 
 <h2 id="simple-effects">Simple Effects</h2>
@@ -48,6 +48,9 @@ TexSample: true
 |
 // tremolo picking (`tp duration` where duration can be 8,16 or 32)
 3.3{tp 8} 3.3{tp 16} 3.3{tp 32}
+|
+// Crescendo / Decrescendo
+3.3{cre} 3.3{cre} 3.3{dec} 3.3{dec}
 </div>
 <script type="text/x-alphatab">
 	$('#alphaTabBeatEffects').alphaTab();
