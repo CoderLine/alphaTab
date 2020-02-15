@@ -48,10 +48,12 @@ namespace AlphaTab.Rendering.Glyphs
 
             var shouldDraw = false;
 
-            var direction = GetBeamDirection(StartBeat, startNoteRenderer);
-            // if we are on the tie start, we check if we 
+            // if we are on the tie start, we check if we
             // either can draw till the end note, or we just can draw till the bar end
-            if (!ForEnd)
+            var direction = startNoteRenderer == null
+                ? GetBeamDirection(EndBeat, endNoteRenderer)
+                : GetBeamDirection(StartBeat, startNoteRenderer);
+            if (!ForEnd && startNoteRenderer != null)
             {
                 // line break or bar break
                 if (startNoteRenderer != endNoteRenderer)
@@ -65,7 +67,7 @@ namespace AlphaTab.Rendering.Glyphs
                         endX = cx + startNoteRenderer.X + startNoteRenderer.Width;
                         endY = startY;
                     }
-                    // bar break: to tie destination 
+                    // bar break: to tie destination
                     // differs only by addition of EndNote X coordinate
                     else
                     {
@@ -85,7 +87,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
             // if we draw for the tie end, we only draw a tie if we had a line break between start and end
             // in this case there will be a tie from bar start to the note
-            else if (startNoteRenderer.Staff != endNoteRenderer.Staff)
+            else if (startNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
             {
                 startX = cx + endNoteRenderer.X;
                 endX = cx + endNoteRenderer.X + GetEndX(endNoteRenderer);
@@ -95,6 +97,7 @@ namespace AlphaTab.Rendering.Glyphs
 
                 shouldDraw = true;
             }
+
 
             if (shouldDraw)
             {
@@ -169,7 +172,7 @@ namespace AlphaTab.Rendering.Glyphs
                 y2 = t;
             }
             //
-            // calculate control points 
+            // calculate control points
             //
 
             offset *= scale;
