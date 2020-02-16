@@ -266,6 +266,7 @@ namespace AlphaTab.Platform.JavaScript
         /// <inheritdoc />
         public void PlayPause()
         {
+            _output.Activate();
             _synth.PostMessage(new
             {
                 cmd = AlphaSynthWebWorker.CmdPlayPause
