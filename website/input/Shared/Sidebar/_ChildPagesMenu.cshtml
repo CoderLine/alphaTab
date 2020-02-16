@@ -1,0 +1,59 @@
+@model IReadOnlyList<IDocument>
+
+@functions 
+{
+    IDocument[] FilterChildren(IEnumerable<IDocument> children) 
+    {
+        return children
+            .Where(x => x.Bool(DocsKeys.ShowInSidebar, true))
+            .OrderBy(x => x.Get<int>(DocsKeys.Order, 1000))
+            .ThenBy(x => x.WithoutSettings.String(Keys.Title))
+            .ToArray();
+    }
+}
+
+@{
+    // Group by category
+    IList<IGrouping<string, IDocument>> categoryGroups = Model
+        .GroupBy(x => x.String(DocsKeys.Category))
+        .OrderBy(x => x.Key)
+        .ToList();
+    foreach(IGrouping<string, IDocument> categoryGroup in categoryGroups)
+    {        
+        IDocument[] children = FilterChildren(categoryGroup);
+            
+        if(children.Length > 0) 
+        {
+            if(!string.IsNullOrWhiteSpace(categoryGroup.Key))
+            {
+                <li class="header">@categoryGroup.Key</li>
+            }
+
+            // Iterate documents in this category
+            foreach(IDocument child in children)
+            {
+                object[] currentTreePath = Document.Get<object[]>(Keys.TreePath);
+                object[] childTreePath = child.Get<object[]>(Keys.TreePath);                
+                string childTitle = child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString());  
+                string parentActive = currentTreePath.Take(childTreePath.Length).SequenceEqual(childTreePath) ? "active" : null;   
+                string childSelected = parentActive != null && currentTreePath.Length == childTreePath.Length ? "selected" : null;              
+                IDocument[] subChildren = FilterChildren(child.DocumentList(Keys.Children) ?? (IEnumerable<IDocument>)new IDocument[0]);
+                if(subChildren.Length > 0)
+                {
+                    // Parent                
+                    <li class="treeview @parentActive @childSelected">
+                        <a href="@Context.GetLink(child)">@childTitle</a> <a href="#" class="expand"></a>
+                        <ul class="treeview-menu">
+                            @Html.Partial("Sidebar/_ChildPagesMenu", subChildren)
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    // Leaf       
+                    <li class="@childSelected"><a href="@Context.GetLink(child)">@childTitle</a></li>
+                }
+            }
+        }
+    }
+}

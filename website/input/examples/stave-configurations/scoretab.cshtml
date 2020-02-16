@@ -1,0 +1,45 @@
+Title: Score and guitar tablature
+Order: 0
+---
+
+<div class="description">
+    This stave configuration is the default setting. It will show the standard music notation
+    and the guitar tablature for the rendered tracks. If the instrument is not stringed, the tab 
+    staff is hidden automatically. 
+    The staves being displayed can be via <code>display.staveprofile = 'scoretab'</code> or <code>data-display-staveprofile="scoretab"</code>
+	
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script type="text/x-alphatab">
+                $('#alphaTabScriptInit').alphaTab({
+                  file: '@Context.GetLink("/assets/files/player/Canon.gp5")',
+                  display: {
+					staveProfile: 'scoretab'
+				  }
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-display-staveprofile="scoretab"></div>
+        </div>
+        <div class="js">
+            <script type="text/x-alphatab">
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

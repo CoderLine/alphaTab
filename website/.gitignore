@@ -1,0 +1,16 @@
+#OS junk files
+[Tt]humbs.db
+*.DS_Store
+
+# Project Dirs and Files
+/config.wyam.hash
+/config.wyam.dll
+/input/assets/js/alphaTab/*
+/input/assets/files/*
+/output/*
+
+# temps
+.DS_Store 
+*.bak
+~*
+*.lock

@@ -1,0 +1,40 @@
+Title: Player.ScrollSpeed
+JsName: player.scrollSpeed
+JsonName: player.scrollSpeed
+DataAttribute: data-player-scrollspeed
+Category: Player
+Description: Gets or sets how fast the scrolling to the new position should happen.
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    If possible from the platform, alphaTab will try to do a smooth scrolling to the played bar. This setting defines the speed of scrolling in milliseconds. 
+</p>
+
+@Html.Partial("_PropertyDescription", Model)
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-all">int <span>all</span></td>
+            <td>
+                <code>200</code><br />
+                <code>300</code><br />
+                <code>100</code>
+            </td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+<code>300</code>

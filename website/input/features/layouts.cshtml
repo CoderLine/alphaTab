@@ -1,0 +1,104 @@
+Title: Layouts
+Order: 1
+---
+<p>
+	alphaTab supports several different layouts which align bars in a various manner. 
+</p>
+
+<h2 id="page-layout">Page Layout</h2>
+
+<p>
+	All bars are aligned in rows side by side till the row is full. 
+</p>
+
+<div id="alphaTabPageLayout" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")"></div>
+<script type="text/javascript">
+	$('#alphaTabPageLayout').alphaTab({
+		display: { layoutMode: 'page' }
+	});
+</script>
+
+<h2 id="multi-track">Multi Track</h2>
+
+<p>
+	You want to render multiple tracks at once. No Problem
+</p>
+
+<div id="alphaTabPageMuliTrack" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")" data-tracks="[0,3]"></div>
+<script type="text/javascript">
+	$('#alphaTabPageMuliTrack').alphaTab({
+		display: { layoutMode: 'page' }
+	});
+</script>
+
+<h2 id="page-layout-custom-width">Page Layout (custom width)</h2>
+
+<p>
+	All bars are aligned in rows side by side till the row is full. 
+</p>
+
+<div id="alphaTabPageLayoutWidth" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")"
+	style="width: 1280px"></div>
+<script type="text/javascript">
+	$('#alphaTabPageLayoutWidth').alphaTab();
+</script>
+
+
+<h2 id="page-layout-5-bars">Page Layout (5 bars per row)</h2>
+
+<p>
+	You can configure how many bars should be placed per row
+</p>
+
+<div id="alphaTabPagePerRow" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")"></div>
+<script type="text/javascript">
+	$('#alphaTabPagePerRow').alphaTab({
+		display: { barsPerRow: 5 }
+	});
+</script>
+
+<h2 id="page-layout-range">Page Layout (bar 5 to 8)</h2>
+
+<p>
+	It's also possible to only render some of the bars available in a track.
+</p>
+
+<div id="alphaTabPageSubSet" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")"></div>
+<script type="text/javascript">
+	$('#alphaTabPageSubSet').alphaTab({
+		display: {
+			startBar: 5,
+			barCount: 4
+		}
+	});
+</script>
+
+<h2 id="horizontal-layout">Horizontal Layout</h2>
+
+<p>
+	This is another layout type available. All bars are aligned horizontally.
+</p>
+
+<div id="alphaTabHorizontal" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")" style="overflow: auto"></div>
+<script type="text/javascript">
+	$('#alphaTabHorizontal').alphaTab({
+		display: { layoutMode: 'horizontal' }
+	});
+</script>
+
+<h2 id="horizontal-layout-range">Horizontal Layout (bar 5 to 8)</h2>
+
+<p>
+	You can also filter the rendered bars using this layout.
+</p>
+
+<div id="alphaTabHorizontalSubSet" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")"></div>
+<script type="text/javascript">
+	$('#alphaTabHorizontalSubSet').alphaTab({
+		display: {
+			layoutMode: 'horizontal',
+			startBar: 5,
+			barCount: 4
+		}
+	});
+</script>

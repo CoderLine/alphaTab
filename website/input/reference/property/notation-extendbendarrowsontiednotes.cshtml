@@ -1,0 +1,46 @@
+Title: Notation.ExtendBendArrowsOnTiedNotes
+JsName: notation.extendBendArrowsOnTiedNotes
+JsonName: notation.extendBendArrowsOnTiedNotes
+DataAttribute: data-notation-extendbendarrowsontiednotes
+Category: Notation
+Description: If set to true bend arrows expand to the end of the last tied note of the string. Otherwise they end on the next beat.
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    By default the arrows and lines on bend effects are extended to the space of tied notes. This behavior is the Guitar Pro default but some applications and songbooks practice it different. 
+    There the bend only is drawn to the next beat.
+</p>
+
+@Html.Partial("_PropertyDescription", Model) 
+
+<table class="table table-striped table-condensed">
+    <thead>
+        <tr>
+            <th>Enabled</th>
+            <th>Disabled</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><img src="@Context.GetLink("/reference/property/extendbendarrowsontiednotes-enabled.png")" alt="Enabled" /></td>
+            <td><img src="@Context.GetLink("/reference/property/extendbendarrowsontiednotes-disabled.png")" alt="Disabled" /></td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code>bool</code></td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>true</code>

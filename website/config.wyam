@@ -1,0 +1,11 @@
+#recipe Docs
+
+Settings[Keys.Host] = "alphaTab.net";
+Settings[Keys.LinksUseHttps] = true;
+Settings[DocsKeys.Title] = "alphaTab";
+Settings[DocsKeys.Logo] = "/assets/img/alphaTab.png";
+Settings[DocsKeys.BaseEditUrl] = "https://github.com/CoderLine/alphaTab/tree/develop/Documentation/input/";
+Settings[DocsKeys.ImplicitInheritDoc] = true;
+Settings[DocsKeys.ProjectFiles] = null;
+Settings[DocsKeys.ProjectFiles] = null;
+Settings[DocsKeys.NoGutter] = true;

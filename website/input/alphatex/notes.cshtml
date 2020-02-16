@@ -1,0 +1,76 @@
+Title: Notes
+Order: 1
+TexSample: true
+---
+
+<p>
+	The following examples show how to general notes. Multiple bars are
+	separated by <code>|</code>.
+</p>       
+
+<h2 id="single-notes-and-rests">Single notes and rests</h2>
+
+<p>
+	Notes follow the format <code>fret.string.duration</code>. For rests
+	the fret is simply replaced with <code>r</code>. The duration is specified
+	as a number where 1 represents a full note, 2 a half note and so on. 
+</p>
+
+<div id="alphaTabNumbers" data-tex="true">
+0.6.2 1.5.4 3.4.4 | 
+5.3.8 5.3.8 5.3.8 5.3.8 r.2
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabNumbers').alphaTab();
+</script>
+
+<h2 id="chords">Chords</h2>
+
+<p>
+	To specify multiple notes on a beat, group them in parenthesis. The full format is
+	<code>(fret.string fret.string ...).duration</code>
+</p>
+
+<div id="alphaTabChords" data-tex="true">
+(0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (0.3 0.4).8 |
+r.8 (3.3 3.4).8 r.8 (6.3 6.4).8 (5.3 5.4).4 r.4 |
+(0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (3.3 3.4).8 |
+r.8 (0.3 0.4).8
+
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabChords').alphaTab();
+</script>
+
+<h2 id="duration-ranges">Duration Ranges</h2>
+
+<p>
+	To make it simpler to write notes, you can apply the same duration to 
+	multiple notes. Start a new duration range with <code>:duration</code>.
+	The following notes will all have this duration. AlphaTex also remembers
+	the last explictely set duration and will take use it in case of a missing duration.
+</p>
+
+<div id="alphaTabDurationRanges" data-tex="true">
+// explicit ranges via :duration
+:4 2.3 3.3 :8 3.3 4.3 3.3 4.3 | 
+// implicit ranges via beat duration
+2.3.4 3.3 3.3.8 4.3 3.3 4.3
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabDurationRanges').alphaTab();
+</script>
+
+
+<h2 id="repeat-beats">Repeat beats</h2>
+
+<p>
+	You can specify a multiplier after a beat to add the same beat multiple times to the score. 
+</p>
+
+<div id="alphaTabBeatMultiplier" data-tex="true">
+3.3*4 | 4.3*4
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabBeatMultiplier').alphaTab();
+</script>

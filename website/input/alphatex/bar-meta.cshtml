@@ -1,0 +1,159 @@
+Title: Bar Metadata
+Order: 2
+TexSample: true
+---
+
+<p>
+	For bars various tags can be specified which change information like
+	clefs, key signatures repeats etc. They follow the format 
+	<code>\tag value value</code> just like the score metadata. Be sure not to 
+	mix the score metadata and the bar metadata of the first bar.
+</p>       
+
+<h2 id="time-signatures">Time Signatures</h2>
+
+<p>
+	Time signatures have the format <code>\ts Numerator Denominator</code>
+</p>
+
+<div id="alphaTabTs" data-tex="true">
+\ts 3 4 | \ts 4 4 | \ts 6 8       
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabTs').alphaTab();
+</script>
+
+<h2 id="repeats">Repeats</h2>
+
+<p>
+	Repeats can be started with <code>\ro</code> and 
+	be closed with <code>\rc Count</code>. Count specifies how often
+	the bar range is repeated. 
+</p>
+
+<div id="alphaTabRepeat" data-tex="true">
+\ro 1.3 2.3 3.3 4.3 |   
+5.3 6.3 7.3 8.3 |   
+\rc 2 1.3 2.3 3.3 4.3 |  
+\ro \rc 3 1.3 2.3 3.3 4.3 |   
+
+
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabRepeat').alphaTab();
+</script>
+
+<h2 id="key-signatures">Key Signatures</h2>
+
+<p>
+	The key signature can be specified with <code>\ks Value</code> where the value is one 
+	of the following: <code>Cb, Gb, Db, Ab, Eb, Bb, F, C, G, D, A, E, B, F#, C#</code>
+</p>                       
+						   
+<div id="alphaTabKs" data-tex="true">
+\ks Cb | \ks C | \ks C# 
+
+
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabKs').alphaTab();
+</script>
+
+<h2 id="clef">Clef</h2>
+
+<p>
+	To change the clef simply specify <code>\clef Clef</code> where Clef is one of the following
+	values: <code>G2, Treble, F4, Bass, C3, Tenor, C4, Alto, N, Neutral</code>
+</p>                       
+						   
+<div id="alphaTabClef" data-tex="true">
+\clef G2 | \clef F4 | \clef C3 | \clef C4 | \clef N |
+\clef Treble | \clef Bass | \clef Tenor | \clef Alto | \clef Neutral |
+		
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabClef').alphaTab();
+</script>
+
+<h2 id="tempo">Tempo</h2>
+
+<p>
+	To change the tempo of the score you can specify <code>\tempo BPM</code>.
+	
+</p>                       
+						   
+<div id="alphaTabTempo" data-tex="true">
+// score meta also supports \tempo, therefore we skip the score meta with a dot
+.
+// bars
+\tempo 30 1.3 2.3 3.3 4.3 | 
+\tempo 80 1.3 2.3 3.3 4.3 |
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabTempo').alphaTab();
+</script>
+
+<h2 id="triplet-feel">Triplet Feel</h2>
+
+<p>
+	To change the triplet feel of a bar specify <code>\tf TripletFeel</code>. Where <code>TripletFeel</code> is one of the following values: 
+</p>                       
+<table class="table table-striped table-condensed">
+    <thead>
+        <tr>
+            <th>TripletFeel</th>
+            <th>Possible values</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>No Triplet Feel</td>  <td>none, no, 0</td></tr>
+        <tr><td>Triplet 16th</td>     <td>triplet-16th, t16, 1</td></tr>
+        <tr><td>Triplet 8th</td>      <td>triplet-8th, t8, 2</td></tr>
+        <tr><td>Dotted 16th</td>      <td>dotted-16th, d16, 3</td></tr>
+        <tr><td>Dotted 8th</td>       <td>dotted-8th, d8, 4</td></tr>
+        <tr><td>Scottish 16th</td>    <td>scottish-16th, s16, 5</td></tr>
+        <tr><td>Scottish 8th</td>     <td>scottish-8th, s8, 6</td></tr>
+    </tbody>
+</table>
+
+						   
+<div id="alphaTabTripletFeel" data-tex="true">
+\tf none 3.3*4 | \tf triplet-16th 3.3*4 | \tf triplet-8th 3.3*4 | \tf dotted-16th 3.3*4 | \tf dotted-8th 3.3*4 | \tf scottish-16th 3.3*4 | \tf scottish-8th 3.3*4 |
+\tf no 1.1*4 | \tf t16 1.1*4 | \tf t8 1.1*4 | \tf d16 1.1*4 | \tf d8 1.1*4 | \tf s16 1.1*4 | \tf s8 1.1*4
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabTripletFeel').alphaTab();
+</script>
+
+<h2 id="anacrusis">Anacrusis</h2>
+
+<p>
+	By default bars follow a strict timing defined by the time signature and tempo. Anacrusis (aka. pickup bars) do not follow this rule. 
+    The length of those bars is defined by the actual beats/notes in the bar. Bars can be flagged as anacrusis bars via the <code>\ac</code> bar meta.
+</p>      
+						   
+<div id="alphaTabAnacrusis" data-tex="true">
+\ks D \ts 24 16 \ac r.16 6.3 7.3 9.3 7.3 6.3 | r.16 5.4 7.4 9.4 7.4 5.4 6.3.4{d} 9.6.16 10.6 12.6 10.6 9.6 14.6.4{d} r.16
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabAnacrusis').alphaTab();
+</script>
+
+<h2 id="sections">Sections</h2>
+
+<p>
+    To split your song into individual sections (e.g. intro, chorus, solo etc.) you can mark a bar as a section start by using <code>\section</code> followed by the section name. If you want to also specify a marker beside the text, use the format <code>\section Marker Text</code>
+</p>
+
+<div id="alphaTabSections" data-tex="true">
+\section Intro // simple section 
+1.1 1.1 1.1 1.1 | 1.1 1.1 1.1 1.1 | 
+\section "Chorus 01" // with spaces in name
+1.1 1.1 1.1 1.1 | 
+\section S Solo // with marker and section name differently
+1.1 1.1 1.1 1.1
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabSections').alphaTab();
+</script>
+

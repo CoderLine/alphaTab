@@ -1,0 +1,25 @@
+Title: Examples
+ShowInNavbar: true
+Order: 2
+---
+
+<p>
+	We have prepared a huge list of examples to show different alphaTab features by code. 
+	Those examples are the easiest way to understand what alphaTab is capable of and how to use it. 
+	The samples shown here are focusing on the usage on websites but many of the settings shown in this samples are also valid for the .net version of alphaTab.
+</p>
+
+<div class="menu-container">
+@foreach(IDocument child in Model.DocumentList(Keys.Children).OrderBy(x => x.Get<int>(DocsKeys.Order, 1000)))
+{
+	<div class="menu-block">
+		<h1>@(child.String(Keys.Title))</h1>
+		@if(child.ContainsKey(DocsKeys.Description))
+		{
+			<p>@Html.Raw(child.String(DocsKeys.Description))</p>
+		}
+
+		@Html.Partial("_ChildPages", child)
+	</div>
+}
+</div>

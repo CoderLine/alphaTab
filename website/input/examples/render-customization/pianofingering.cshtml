@@ -1,0 +1,41 @@
+Title: Force piano fingering
+Order: 7
+---
+
+<div class="description">
+    For piano tracks the fingering is notated with the numbers 1-5 whereas for stringed instruments they are annotated with p,i,m,a,c and T,1,2,3,4. By setting the <code>notation.FingeringMode</code> to force <code>ScoreForcePiano</code> or <code>ingleNoteEffectBandForcePiano</code>, always the piano notation is used.     
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script type="text/x-alphatab">
+                $('#alphaTabScriptInit').alphaTab({
+                  file: '@Context.GetLink("/assets/files/features/Fingering.gpx")',
+                  notation: {
+					fingeringMode: 'scoreForcePiano'
+				  }
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/features/Fingering.gpx")" data-notation-fingeringmodel="scoreforcepiano"></div>
+        </div>
+        <div class="js">
+            <script type="text/x-alphatab">
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

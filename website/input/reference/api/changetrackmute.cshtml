@@ -1,0 +1,84 @@
+Title: ChangeTrackMute()
+JsName: changeTrackMute()
+jQueryName: alphaTab('muteTracks')
+Category: Methods - Player
+Description: Changes the given tracks to be muted or not.
+ShowInSideBar: false
+Since: 0.9.4
+---
+
+<h2>Description</h2>
+<p>
+    Changes the given tracks to be muted or not. This will result in a muting of the primary and secondary midi channel that the track uses
+    for playback. If the track shares the channels with another track, all tracks will be muted as during playback they cannot be distinguished. 
+</p>
+
+<h2>Signatures</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-net">void ChangeTrackMute(Track[] tracks, bool mute) <span>.net</span></code></td>
+        </tr>   
+        <tr>
+            <td><code class="code-badge code-badge-js">function changeTrackMute(tracks, mute) <span>JavaScript</span></code></td>
+        </tr>   
+        <tr>
+            <td><code class="code-badge code-badge-jq">alphaTab('muteTracks', tracks, mute) <span>jQuery</span></code></td>
+        </tr>   
+    </tbody>
+</table>
+
+<h3>Parameters</h3>
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Parameters</th>
+            <th>Type</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-all">tracks <span>all</span></td>
+            <td><code>AlphaTab.Model.Tracks[]</code></td>
+            <td>The array of tracks that should be muted.</td>
+        </tr>   
+        <tr>
+            <td><code class="code-badge code-badge-all">mute <span>all</span></td>
+            <td><code>bool</code></td>
+            <td>A value indicating whether the track should be muted or not</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<h3>Returns</h3>
+Nothing
+
+<h2>Example - C#</h2>
+
+<pre>
+<code class="language-csharp line-numbers">
+var api = new AlphaTabApi<MyControl>(...);
+api.ChangeTrackMute(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, true);
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
+</code>
+</pre>
+
+<pre>
+<code class="language-javascript line-numbers">
+var at = $('#alphaTab');
+var tracks = at.alphaTab('tracks');
+at.alphaTab('muteTracks', [tracks[0], tracks[1]], true);
+</code>
+</pre>

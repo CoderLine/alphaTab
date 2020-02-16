@@ -1,0 +1,28 @@
+Title: Special Tracks
+Order: 4
+---
+
+<h2 id="drum-tabs">Drum Tabs</h2>
+
+<p>
+	AlphaTab uses the same drum tab notation as Guitar Pro 5. Since the guitar tab staff is not meaningful on 
+	percussion track, it's hidden in case a drum tab is displayed.
+</p>
+
+<div id="alphaTabDrum" data-file="@Context.GetLink("/assets/files/features/Drums.gp5")"></div>
+<script type="text/javascript">
+	$('#alphaTabDrum').alphaTab({
+	});
+</script>    
+
+<h2 id="grand-staff">Grand Staff</h2>
+
+<p>
+	With Guitar Pro 6 files also grand staffs can be rendered.
+</p>
+
+<div id="alphaTabGs" data-file="@Context.GetLink("/assets/files/features/Piano.gpx")"></div>
+<script type="text/javascript">
+	$('#alphaTabGs').alphaTab({
+	});
+</script>

@@ -1,0 +1,63 @@
+Title: Display.StaveProfile
+JsName: display.staveProfile;staveProfile
+JsonName: display.staveProfile;staveProfile
+DataAttribute: data-display-staveprofile, data-staveprofile
+Category: Display
+Description: The stave profile defining which staves are shown for the music sheet. 
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    AlphaTab has various stave profiles that define which staves will be shown in for the rendered tracks.
+</p>
+
+@Html.Partial("_PropertyDescription", Model) 
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-net">AlphaTab.StaveProfile <span>.net</span></td>
+            <td>
+                <code>Default</code> -  The profile is auto detected by the track configurations.<br />
+                <code>ScoreTab</code> -  Standard music notation and guitar tablature are rendered.<br />
+                <code>Score</code> -  Only standard music notation is rendered.<br />
+                <code>Tab</code> -  Only guitar tablature is rendered.<br />
+                <code>TabMixed</code> -  Only guitar tablature is rendered, but also rests and time signatures are not shown. This profile is typically used in multi-track scenarios.<br />
+            </td>
+        </tr>   
+        <tr>
+            <td><code class="code-badge code-badge-js">string <span>JavaScript &amp; HTML</span></td>
+            <td>
+                <code>default</code><br />
+                <code>scoretab</code><br />
+                <code>score</code><br />
+                <code>tab</code><br />
+                <code>tabmixed</code>
+            </td>
+        </tr>           
+        <tr>
+            <td><code class="code-badge code-badge-js">int <span>JavaScript &amp; HTML</span></td>
+            <td>
+                <code>0</code> - Default<br />
+                <code>1</code> - ScoreTab<br />
+                <code>2</code> - Score<br />
+                <code>3</code> - Tab<br />
+                <code>4</code> - TabMixed
+            </td>
+        </tr>           
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>Default</code>

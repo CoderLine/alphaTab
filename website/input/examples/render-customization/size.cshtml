@@ -1,0 +1,39 @@
+Title: Change render size
+Order: 1
+---
+
+<div class="description">
+    Normally the page layout scales automatically to the available width. If you 
+    want to have a fixed width (e.g. for printing) the size of the parent container should be set accordingly. 
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit" style="width: 800px"></div>
+        </div>
+        <div class="js">
+            <script type="text/x-alphatab">
+                $('#alphaTabScriptInit').alphaTab({
+                  file: '@Context.GetLink("/assets/files/player/Canon.gp5")'
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" style="width: 800px"></div>
+        </div>
+        <div class="js">
+            <script type="text/x-alphatab">
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

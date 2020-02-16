@@ -1,0 +1,45 @@
+Title: Guitar Tabs
+Order: 3
+---
+
+<h2 id="rhythm">Rhythm</h2>
+
+<p>
+	If you only display guitar tablatures, it might be interesting to add
+	a rhythm stave to show the durations. You can do this either above or below
+	the tablature.
+</p>
+
+<div id="alphaTabRhythm" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")"></div>
+<script type="text/javascript">
+	$('#alphaTabRhythm').alphaTab({
+		staves: {id: 'tab', additionalSettings: {'rhythm': true } }
+	});
+</script>  
+
+<h2 id="rhythm-beams">Rhythm With Beams</h2>
+
+<p>
+	If you prefer beams instead of bars for single notes you can have that too. 
+</p>
+
+<div id="alphaTabRhythmBeam" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")"></div>
+<script type="text/javascript">
+	$('#alphaTabRhythmBeam').alphaTab({
+		staves: {id: 'tab', additionalSettings: {'rhythm': true, 'rhythmBeams': true } }
+	});
+</script>      
+
+<h2 id="string-variations">String Variations</h2>
+
+<p>
+	alphaTab will render tabs for stringed instruments. It takes care of 
+	the number of strings and displays the tabs as you would expect.
+</p>
+
+<div id="alphaTabTabs" data-file="@Context.GetLink("/assets/files/features/Tabs.gp5")"></div>
+<script type="text/javascript">
+	$('#alphaTabTabs').alphaTab({
+		staves: ['tab']
+	});
+</script>

@@ -1,0 +1,146 @@
+Title: Resize
+JsName: addResize();removeResize()
+DomName: alphaTab.resize
+Category: Events - Core
+Description: This event is fired when alphaTab was resized and is about to rerender the music notation.
+ShowInSideBar: false
+Since: 0.9.4
+---
+
+<h2>Description</h2>
+<p>
+    This event is fired when alphaTab was resized and is about to rerender the music notation. Before the re-rendering on resize
+    the settings will be updated in the related components. This means that any changes to the layout options or other display settings are
+    considered. This allows to implement scenarios where maybe the scale or the layout mode dynamically changes along the resizing.
+</p>
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-net">Action&lt;ResizeEventArgs&gt; <span>.net</span></code></td>
+        </tr>
+        <tr>
+            <td><code class="code-badge code-badge-js">function(a) <span>JavaScript</span></code></td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Parameters</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Parameters</th>
+            <th>Type</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-all">args <span>all</span></code></td>
+            <td><code>AlphaTab.ResizeEventArgs</code></td>
+            <td>
+                The information about the resize event. 
+            </td>
+        </tr>  
+    </tbody>
+</table>
+
+<h2>AlphaTab.ResizeEventArgs Properties</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    <tbody>    
+        <tr>
+            <td>
+                <code class="code-badge code-badge-net">OldWidth <span>.net</span></code><br />
+                <code class="code-badge code-badge-js">oldWidth <span>JavaScript</span></code>
+            </td>
+            <td><code>int</code></td>
+            <td>
+                The size before the resizing happened. 
+            </td>
+        </tr>  
+        <tr>
+            <td>
+                <code class="code-badge code-badge-net">NewWidth <span>.net</span></code><br />
+                <code class="code-badge code-badge-js">newWidth <span>JavaScript</span></code>
+            </td>
+            <td><code>int</code></td>
+            <td>
+                The size after the resize was complete. 
+            </td>
+        </tr>  
+        <tr>
+            <td>
+                <code class="code-badge code-badge-net">Settings <span>.net</span></code><br />
+                <code class="code-badge code-badge-js">settings <span>JavaScript</span></code>
+            </td>
+            <td><code>AlphaTab.Settings</code></td>
+            <td>
+                The settings currently used for rendering. 
+            </td>
+        </tr>  
+    </tbody>
+</table>
+
+<h2>Example - C#</h2>
+
+<pre>
+<code class="language-csharp line-numbers">
+var api = new AlphaTabApi<MyControl>(...);
+api.Resize += args => 
+{
+    args.Settings.Scale = args.NewWidth > 1300 
+        ? 1.5f 
+        : (args.NewWidth > 800) ? 1.3f : 1;
+};
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addResize(function(args) {
+    args.Settings.Scale = args.NewWidth > 1300 
+        ? 1.5f 
+        : (args.NewWidth > 800) ? 1.3f : 1;
+});
+</code>
+</pre>
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').on('alphaTab.resize', function(e, args) {
+    args.Settings.Scale = args.NewWidth > 1300 
+        ? 1.5f 
+        : (args.NewWidth > 800) ? 1.3f : 1;
+});
+</code>
+</pre>
+
+<h2>Example - HTML</h2>
+
+<pre>
+<code class="language-javaScript line-numbers">
+document.querySelector('#alphaTab').addEventListener('alphaTab.resize', function(e) {
+    var args = e.detail;
+    args.Settings.Scale = args.NewWidth > 1300 
+        ? 1.5f 
+        : (args.NewWidth > 800) ? 1.3f : 1;
+}, false);
+</code>
+</pre>

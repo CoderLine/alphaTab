@@ -1,0 +1,63 @@
+@{	
+	IReadOnlyList<IDocument> children = Model.DocumentList(Keys.Children);
+	if(children != null && children.Count > 0)
+	{
+		IList<IGrouping<string, IDocument>> categoryGroups = 
+			children
+				.GroupBy(x => x.String(DocsKeys.Category))
+				.OrderBy(x => x.Key)
+				.ToList();
+	
+		foreach(IGrouping<string, IDocument> categoryGroup in categoryGroups)
+		{
+			<div class="box">
+				<div class="box-body no-padding">
+					<table class="table table-striped table-hover two-cols-alt table-responsive">
+						@if(!string.IsNullOrWhiteSpace(categoryGroup.Key))
+						{
+							<thead>
+								<tr class="active"><th colspan="2">@categoryGroup.Key</th></tr>
+							</thead>
+						}
+						
+						<tbody>
+							@foreach(IDocument child in categoryGroup
+								.OrderBy(x => x.Get<int>(DocsKeys.Order, 1000))
+								.ThenBy(x => x.WithoutSettings.String(Keys.Title)))
+							{
+								object[] childTreePath = child.Get<object[]>(Keys.TreePath);
+								<tr>
+									<td>
+										<strong>
+											@if(child.ContainsKey("Todo"))
+											{
+												<a href="#">
+													@(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString()))
+													<span class="wip">(work in progress)</span>
+												</a>
+											}
+											else
+											{
+												<a href="@Context.GetLink(child)">
+													@(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString()))
+												</a>
+											}
+										</strong>
+									</td>
+									<td>
+										@{
+											if(child.ContainsKey(DocsKeys.Description))
+											{
+												<text>@(child.String(DocsKeys.Description))</text>
+											}					
+										}
+									</td>
+								</tr>
+							}
+						</tbody>				
+					</table>
+				</div>
+			</div> 
+		}
+	}
+}

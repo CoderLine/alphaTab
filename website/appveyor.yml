@@ -1,0 +1,27 @@
+version: 1.0.0.{build}
+# branches to build
+branches:
+  only:
+    - master
+    
+image: Visual Studio 2019
+environment:
+  deployment_token:
+    secure: F3tqGIN2guX5kU5B6q89HGPDAgI0g//DwtqRQL0oVeaJU6oBkgbQeJfiproA3yFi
+    
+install:
+  - dotnet tool install -g Wyam.Tool
+
+build_script:
+  - generate.bat
+  - 7z a -r Documentation.zip Documentation\output\*
+
+artifacts:
+  # Documentation 
+  - path: Documentation.zip
+    name: Documentation
+
+deploy:
+  # Documentation
+  - provider: Environment
+    name: AlphaTabDocumentation

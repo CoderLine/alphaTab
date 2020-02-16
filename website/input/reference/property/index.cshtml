@@ -1,0 +1,125 @@
+Title: Properties
+Description: This section contains a list of all properties that allow configuration of the alphaTab behavior.
+Order: 1
+---
+
+<p>@Html.Raw(Model.String(DocsKeys.Description))</p>
+
+<p>
+    There are multiple ways how settings in alphaTab can be specified. For .net simply the normal classes are used and
+    changes are signaled via `UpdateSettings` call. For JavaScript the interaction with the settings is a bit more sensitive 
+    due to the lack of type safety and the support of JSON based settings. 
+    
+    <br />
+    Not all settings contain reasonable examples as they often just activate something within alphaTab 
+    or change the display of some notation. If you have questions on certain settings feel free to open a 
+    <a href="https://github.com/CoderLine/alphaTab/issues/new/choose">issue on GitHub</a>. 
+    
+    <br />
+    The first and most important rule is: when interacting with the settings object directly, the correct structure and data types
+    must be followed not to break alphaTab or make the changes useless. In order to simplify things when configuring alphaTab via JavaScript
+    there are 2 additional features: 
+    
+</p>
+
+<p>
+    1. AlphaTab can be configured via a simple plain JSON object<br/>
+    This JSON format supports some aliases and also some value conversions like for enums, fonts and colors. 
+    This JSON schema can only be used at selected places. When attempting to set JSON values on the derives <code>alphaTab.Settings</code> object,
+    this can lead to unexpected side effects. The JSON schema can be used when initializing alphaTab or by calling <code>settings.fillFromJson({ .. }</code>.    
+</p>    
+
+<p>
+    2. AlphaTab can be configured via HTML data attributes<br />
+    All settings can also be added as data attributes on the element for which alphaTab is initialized. This is especially useful
+    when multiple different instances of alphaTab are running on the same site but the main code to setup alphaTab should be shared. 
+    Individual settings can be specified on HTML elements.
+</p>    
+
+The following table contains all the properties as they can be set on the general settings object.
+
+<table class="table table-striped table-condensed reference-table">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    
+    <tbody>    
+        @{
+            IEnumerable<IDocument> propertyPages = Model.DocumentList(Keys.Children);
+            IList<IGrouping<string, IDocument>> propertyPagesGroups = propertyPages
+                        .Where(x => x.Bool("ShowInTable", true))
+                        .GroupBy(x => x.String(DocsKeys.Category))
+                        .OrderBy(x => x.Key)
+                        .ToList();
+            foreach(IGrouping<string, IDocument> categoryGroup in propertyPagesGroups)
+            {
+                <tr>
+                    <th colspan="4">@categoryGroup.Key</th>
+                </tr>
+                
+                @foreach(IDocument child in categoryGroup
+                                            .OrderBy(x => x.Get<int>(DocsKeys.Order, 1000))
+                                            .ThenBy(x => x.WithoutSettings.String(Keys.Title)))
+                {
+                    object[] childTreePath = child.Get<object[]>(Keys.TreePath);
+                    string url;
+                    if(child.Get<bool>("Todo", false))
+                    {
+                        url = "#todo";
+                    }
+                    else if((url = child.Get<string>("Link", null)) != null)
+                    {
+                        url = Context.GetLink(url);
+                    }
+                    else
+                    {
+                        url = Context.GetLink(child);
+                    }
+                    
+                    string dotNetName = child.String("Title");
+                    string[] jsNames = child.String("JsName", "").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+                    string[] jsonNames = child.String("JsonName", "").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+                    string[] dataAttributeNames = child.String("DataAttribute", "").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+                   
+                    <tr>
+                        <td>
+                            <a href="@url">
+                                <code class="code-badge code-badge-net">
+                                    @dotNetName
+                                    <span>.net</span>
+                                </code>
+                                @if(jsNames.Length > 0) { <br /> }
+                                @foreach(var name in jsNames)
+                                {
+                                    <code class="code-badge code-badge-js">
+                                        @name <span>JavaScript</span>
+                                    </code>
+                                }
+
+                                @if(jsonNames.Length > 0) { <br /> }
+                                @foreach(var name in jsonNames)
+                                {
+                                    <code class="code-badge code-badge-json">
+                                        @name <span>JSON</span>
+                                    </code>
+                                }
+                                
+                                @if(dataAttributeNames.Length > 0) { <br /> }
+                                @foreach(var name in dataAttributeNames)
+                                {
+                                    <code class="code-badge code-badge-html">
+                                        @name <span>HTML</span>
+                                    </code>
+                                }
+                            </a>
+                        </td>
+                        <td>@(child.String(DocsKeys.Description))</td>
+                    </tr>
+                }
+            }
+        }
+    </tbody>
+</table>

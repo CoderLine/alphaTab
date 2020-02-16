@@ -1,0 +1,41 @@
+Title: Hide song info
+Order: 3
+---
+
+<div class="description">
+    If you want to hide the song information like title or artist, the layout option <code>notation.hideInfo</code> or data attribute <code>data-notation-hideinfo</code> can be set. 
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script type="text/x-alphatab">
+                $('#alphaTabScriptInit').alphaTab({
+                  file: '@Context.GetLink("/assets/files/player/Canon.gp5")',
+                  notation: {
+					hideInfo: true
+                  }
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-notation-hideinfo="true"></div>
+        </div>
+        <div class="js">
+            <script type="text/x-alphatab">
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

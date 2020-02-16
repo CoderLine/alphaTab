@@ -1,0 +1,33 @@
+Title: Core.FontDirectory
+JsName: core.fontDirectory;fontDirectory
+JsonName: core.fontDirectory;fontDirectory
+DataAttribute: data-core-fontdirectory;data-fontdirectory
+Category: Core - JavaScript Specific
+Description: The full URL to the alphaTab font directory.
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    AlphaTab will generate some dynamic CSS that is needed for displaying the music symbols correctly. For this it needs to know
+    where the Web Font files of <a href="https://github.com/steinbergmedia/bravura" target="_blank">Bravura</a> are. Normally alphaTab expects 
+    them to be in a <code>Font</code> subfolder beside the script file. If this is not the case, this setting must be used to configure the path. 
+    Alternatively also a global variable <code>ALPHATAB_FONT</code> can be set on the page before initializing alphaTab. 
+</p>
+
+@Html.Partial("_PropertyDescription", Model) 
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code>string</code></td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>${AlphaTabScriptFolder}/Font/</code>

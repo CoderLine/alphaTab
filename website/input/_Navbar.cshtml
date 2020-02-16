@@ -1,0 +1,16 @@
+@{
+    List<Tuple<string, string>> pages = Context
+        .Documents[Docs.Pages]
+        .Where(x => x.Bool(DocsKeys.ShowInNavbar, true))
+        .Where(x => x.FilePath(Keys.RelativeFilePath)?.FullPath?.StartsWith("index") == (bool?)false)
+		.OrderBy(x => x.Get<int>(DocsKeys.Order, 1000))
+        .Select(x => Tuple.Create(x.WithoutSettings.String(Keys.Title), Context.GetLink(x)))
+        .Where(x => !string.IsNullOrEmpty(x.Item1))
+        .ToList();
+    foreach(Tuple<string, string> page in pages)
+    {
+        string active = Context.GetLink(Document).StartsWith(page.Item2) ? "active" : null;
+        <li class="@active"><a href="@(page.Item2)">@(page.Item1)</a></li>
+    }
+	<li><a href="https://github.com/CoderLine/alphaTab"><i class="fab fa-github"></i> GitHub</a></li>
+}

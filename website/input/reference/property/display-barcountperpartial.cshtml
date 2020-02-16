@@ -1,0 +1,38 @@
+Title: Display.BarCountPerPartial
+JsName: display.barCountPerPartial;barCountPerPartial
+JsonName: display.barCountPerPartial;barCountPerPartial
+DataAttribute: data-display-barcountperpartial, data-barcountperpartial
+Category: Display
+Description: The number of bars that should be placed within one partial render.
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    AlphaTab renders the whole music sheet in smaller chunks named "partials". This is to reduce the risk of
+    encountering browser performance restrictions and it gives faster visual feedback to the user. This
+    setting controls how many bars are placed within such a partial. 
+</p>
+
+@Html.Partial("_PropertyDescription", Model) 
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-all">int <span>all</span></td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>10</code>
