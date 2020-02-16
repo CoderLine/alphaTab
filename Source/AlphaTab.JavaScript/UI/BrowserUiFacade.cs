@@ -328,7 +328,8 @@ namespace AlphaTab.UI
 
                 if (!string.IsNullOrEmpty(_contents))
                 {
-                    _api.Tex(_contents, null);
+                    _api.Tex(_contents, _initialTrackIndexes);
+                    _initialTrackIndexes = null;
                 }
                 else if (!string.IsNullOrEmpty(_file))
                 {
@@ -471,7 +472,7 @@ namespace AlphaTab.UI
                         value = Platform.Platform.ParseInt(item.ToString());
                     }
 
-                    if (value >= 0)
+                    if (value >= 0 || value == -1)
                     {
                         tracks.Add(value);
                     }

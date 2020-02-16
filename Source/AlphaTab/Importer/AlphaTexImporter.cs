@@ -966,14 +966,19 @@ namespace AlphaTab.Importer
             while (_sy != AlphaTexSymbols.Eof)
             {
                 // read pipe from last bar
-                if (_sy != AlphaTexSymbols.Pipe)
+                if (_sy == AlphaTexSymbols.Pipe)
                 {
-                    Error("bar", AlphaTexSymbols.Pipe);
+                    NewSy();
+                    Bar();
                 }
-
-                NewSy();
-
-                Bar();
+                else if (_sy == AlphaTexSymbols.MetaCommand)
+                {
+                    Bar();
+                }
+                else
+                {
+                    break;
+                }
             }
         }
 
@@ -1092,7 +1097,10 @@ namespace AlphaTab.Importer
 
             while (_sy != AlphaTexSymbols.Pipe && _sy != AlphaTexSymbols.Eof)
             {
-                Beat(voice);
+                if (!Beat(voice))
+                {
+                    break;
+                }
             }
 
             if (voice.Beats.Count == 0)
@@ -1117,7 +1125,7 @@ namespace AlphaTab.Importer
             return bar;
         }
 
-        private void Beat(Voice voice)
+        private bool Beat(Voice voice)
         {
             // duration specifier?
             BeatDuration();
@@ -1138,7 +1146,10 @@ namespace AlphaTab.Importer
                 Note(beat);
                 while (_sy != AlphaTexSymbols.RParensis && _sy != AlphaTexSymbols.Eof)
                 {
-                    Note(beat);
+                    if (!Note(beat))
+                    {
+                        break;
+                    }
                 }
 
                 if (_sy != AlphaTexSymbols.RParensis)
@@ -1156,7 +1167,11 @@ namespace AlphaTab.Importer
             }
             else
             {
-                Note(beat);
+                if (!Note(beat))
+                {
+                    voice.Beats.RemoveAt(voice.Beats.Count - 1);
+                    return false;
+                }
             }
 
             // new duration
@@ -1206,6 +1221,8 @@ namespace AlphaTab.Importer
             {
                 voice.AddBeat(beat.Clone());
             }
+
+            return true;
         }
 
         private void BeatDuration()
@@ -1630,7 +1647,7 @@ namespace AlphaTab.Importer
             }
         }
 
-        private void Note(Beat beat)
+        private bool Note(Beat beat)
         {
             // fret.string
 
@@ -1661,8 +1678,7 @@ namespace AlphaTab.Importer
                     tone = tuning.NoteValue;
                     break;
                 default:
-                    Error("note-fret", AlphaTexSymbols.Number);
-                    break;
+                    return false;
             }
 
             NewSy(); // Fret done
@@ -1717,6 +1733,7 @@ namespace AlphaTab.Importer
             beat.AddNote(note);
 
             NoteEffects(note);
+            return true;
         }
 
         private void NoteEffects(Note note)
