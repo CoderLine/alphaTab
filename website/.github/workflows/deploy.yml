@@ -14,7 +14,9 @@ jobs:
     - uses: montudor/action-zip@v0.1.0
       
     - name: Install Wyam  
-      run: dotnet tool install -g Wyam.Tool
+      run: |
+        dotnet tool install -g Wyam.Tool
+        echo "::set-env name=PATH::${PATH}:${HOME}/.dotnet/tools"
       
     - name: Generate Documentation package
       run: wyam build --setting LinkRoot=/output/
