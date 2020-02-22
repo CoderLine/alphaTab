@@ -1,0 +1,29 @@
+name: Deploy
+on: 
+  push:
+    branches:
+      - master
+          
+jobs:
+  build:
+    runs-on: ubuntu-latest
+      
+    steps:
+    - uses: actions/checkout@v1 
+    - uses: actions/setup-dotnet@v1.4.0
+    - uses: montudor/action-zip@v0.1.0
+      
+    - name: Install Wyam  
+      run: dotnet tool install -g Wyam.Tool
+      
+    - name: Generate Documentation package
+      run: wyam build --setting LinkRoot=/output/
+      
+    - name: Package Zip
+      run: zip -qq -r ./Documentation.zip ./output
+      
+    - name: Push to Webserver
+      uses: actions/upload-artifact@v1
+      with:
+        name: Documentation
+        path: Documentation.zip
