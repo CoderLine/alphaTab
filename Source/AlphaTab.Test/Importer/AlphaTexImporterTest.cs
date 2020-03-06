@@ -977,6 +977,28 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(DynamicValue.MP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Dynamics);
         }
 
+        [TestMethod]
+        public void TestDynamicsAutoResetOnTrack()
+        {
+            var tex = @"1.1.4{dy ppp} 1.1 \track ""Second"" 1.1.4";
+            var score = ParseTex(tex);
+            Assert.AreEqual(DynamicValue.PPP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Dynamics);
+            Assert.AreEqual(DynamicValue.PPP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Dynamics);
+
+            Assert.AreEqual(DynamicValue.F, score.Tracks[1].Staves[0].Bars[0].Voices[0].Beats[0].Dynamics);
+        }
+
+        [TestMethod]
+        public void TestDynamicsAutoResetOnStaff()
+        {
+            var tex = @"1.1.4{dy ppp} 1.1 \staff 1.1.4";
+            var score = ParseTex(tex);
+            Assert.AreEqual(DynamicValue.PPP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Dynamics);
+            Assert.AreEqual(DynamicValue.PPP, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Dynamics);
+
+            Assert.AreEqual(DynamicValue.F, score.Tracks[0].Staves[1].Bars[0].Voices[0].Beats[0].Dynamics);
+        }
+
 
         [TestMethod]
         public void TestCrescendo()
