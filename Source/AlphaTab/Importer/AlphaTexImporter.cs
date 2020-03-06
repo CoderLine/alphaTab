@@ -147,6 +147,7 @@ namespace AlphaTab.Importer
 
             _score.AddTrack(_currentTrack);
             _lyrics[_currentTrack.Index] = new FastList<Lyrics>();
+            _currentDynamics = DynamicValue.F;
         }
 
         /// <summary>
@@ -1021,6 +1022,7 @@ namespace AlphaTab.Importer
                         _currentTrack.EnsureStaveCount(_currentTrack.Staves.Count + 1);
 
                         _currentStaff = _currentTrack.Staves[_currentTrack.Staves.Count - 1];
+                        _currentDynamics = DynamicValue.F;
                     }
 
                     StaffProperties();
