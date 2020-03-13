@@ -37,7 +37,7 @@ export class Collection {
             for (let i = 0; i < selectors.length; i++) {
                 const sel = selectors[i];
                 const aval = sel(a);
-                const bval = sel(a);
+                const bval = sel(b);
                 switch (typeof aval) {
                     case "string":
                         result = aval.localeCompare(bval);

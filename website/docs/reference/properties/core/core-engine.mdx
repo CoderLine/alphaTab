@@ -5,7 +5,7 @@ jsonName: core.engine;engine
 dataAttribute: data-core-engine;data-engine
 category: Core
 description: The engine which should be used to render the the tablature.
-showInSideBar: false
+sidebarPath: /docs/reference/properties
 since: 0.9.6
 ---
 
@@ -21,12 +21,12 @@ AlphaTab can use various render engines to draw the music notation. The availabl
 
 <TypeTable>
     <TypeRow type="net" name="string">
-        `skia` - Available on all .net platforms. Uses [Skia](https://skia.org/) for rendering
-        `gdi` - Only available desktop .net. Uses [GDI+](https://docs.microsoft.com/en-us/dotnet/framework/winforms/advanced/graphics-and-drawing-in-windows-forms) for rendering
+        `skia` - Available on all .net platforms. Uses [Skia](https://skia.org/) for rendering<br />
+        `gdi` - Only available desktop .net. Uses [GDI+](https://docs.microsoft.com/en-us/dotnet/framework/winforms/advanced/graphics-and-drawing-in-windows-forms) for rendering <br /> 
         `svg` - Available on all .net platforms. Outputs SVG strings. 
     </TypeRow>
     <TypeRow type="js" name="string">
-        `svg` - Outputs SVG strings. 
+        `svg` - Outputs SVG strings. <br />
         `html5` - Uses HTML5 canvas elements to render the music notation. 
     </TypeRow>
 </TypeTable>
@@ -37,5 +37,5 @@ AlphaTab can use various render engines to draw the music notation. The availabl
 
 <TypeTable>
     <TypeRow type="net" name="skia" />
-    <TypeRow type="js" name="JavaScript and HTML" />
+    <TypeRow type="js-html" name="svg" />
 </TypeTable>

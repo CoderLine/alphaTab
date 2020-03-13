@@ -43,7 +43,7 @@ export function PropertyRow({ property }) {
 export function PropertyCategory({ name, pages }) {
 	const rows = pages
 		.orderBy(p => p.prop('order', 1000), p => p.prop('title', ''))
-		.map(p => (<PropertyRow property={p} />))
+		.map(p => (<PropertyRow key={p.prop('id')} property={p} />))
 		.toArray();
 	return (
 		<>
@@ -61,7 +61,7 @@ export function PropertyTable() {
 			.groupBy(p => p.prop('category', ''))
 			.orderBy(p => p.key);
 	const categories = pages
-			.map(p => (<PropertyCategory name={p.key} pages={p.items} />))
+			.map(p => (<PropertyCategory key={p.key} name={p.key} pages={p.items} />))
 			.toArray();
 	return (
 		<table className="table table-striped table-condensed reference-table">

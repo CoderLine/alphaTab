@@ -302,8 +302,8 @@
         "signature": "062fd391f70e8816148e3ba09f2aa5b26db4529f3007d6bfad7776526dd828e6"
       },
       "../src/types.ts": {
-        "version": "5ea2e71c3a99cf64c08e0c7c6565e14b769ce9c969760364c921b2e30c698967",
-        "signature": "65d5fecc587f2acd731dd65f62293bd33f6a11c8d7406ec2eef1d15f83e1411e"
+        "version": "eed0a90ea7a8dc78f74cb5a161e68aead2c61380c178588ab291bbf8a1dc4b68",
+        "signature": "83fefb608c5e411cb854138b316cf7e3fc20cd760a5515dd1508f450a814240b"
       },
       "../src/env.ts": {
         "version": "494ccbd76829dd035b59afefdee97d5393f5b5b90d22c5832b45d79011f183d5",
@@ -530,7 +530,7 @@
         "signature": "8bdc794c8138fabbfd1cf6d6fff11672e5e9dda1d74a1203f0fda1732ea0efce"
       },
       "../src/index.ts": {
-        "version": "08b96237c6f25fdaad3c332b9fbe52bdbf62114d9484bdd1b029079b1fb38612",
+        "version": "b5191df3d47fe8ce09f7f96631ef7ed9f7566e1a14705a814d6eae8a2abe61bd",
         "signature": "a3e2fbd43e37b915fa53b5590241bb02031b4169ec3a6bc67ad82325f826a28c"
       },
       "../../../node_modules/@types/loader-utils/index.d.ts": {
@@ -5763,8 +5763,6 @@
       "../../../node_modules/@types/node/ts3.2/globals.d.ts",
       "../../../node_modules/@types/node/ts3.2/index.d.ts",
       "../../../node_modules/@types/fs-extra/index.d.ts",
-      "../src/types.ts",
-      "../src/env.ts",
       "../../../node_modules/@types/lodash/ts3.1/common/common.d.ts",
       "../../../node_modules/@types/lodash/ts3.1/common/array.d.ts",
       "../../../node_modules/@types/lodash/ts3.1/common/collection.d.ts",
@@ -5811,18 +5809,12 @@
       "../../../node_modules/@types/webpack/index.d.ts",
       "../../docusaurus-types/node_modules/commander/typings/index.d.ts",
       "../../docusaurus-types/src/index.d.ts",
-      "../src/order.ts",
       "../../../node_modules/import-fresh/index.d.ts",
-      "../src/sidebars.ts",
       "../../../node_modules/@types/shelljs/index.d.ts",
       "../node_modules/execa/index.d.ts",
       "../src/lastupdate.ts",
-      "../src/metadata.ts",
       "../../../node_modules/@types/webpack-virtual-modules/index.d.ts",
-      "../src/version.ts",
       "../../../node_modules/@types/loader-utils/index.d.ts",
-      "../src/markdown/linkify.ts",
-      "../src/markdown/index.ts",
       "../../../node_modules/@babel/types/lib/index.d.ts",
       "../../../node_modules/@types/babel__generator/index.d.ts",
       "../../../node_modules/@types/babel__traverse/index.d.ts",
@@ -5957,7 +5949,15 @@
       "../../../node_modules/@types/webpack-merge/index.d.ts",
       "../../../node_modules/@types/yargs-parser/index.d.ts",
       "../../../node_modules/@types/yargs/index.d.ts",
-      "../src/index.ts"
+      "../src/types.ts",
+      "../src/markdown/linkify.ts",
+      "../src/index.ts",
+      "../src/version.ts",
+      "../src/metadata.ts",
+      "../src/sidebars.ts",
+      "../src/order.ts",
+      "../src/env.ts",
+      "../src/markdown/index.ts"
     ]
   },
   "version": "3.7.4"

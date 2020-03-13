@@ -2,7 +2,7 @@ import Collection from './collection'
 import allDocs from '@docusaurus-meta/docs';
 
 
-class Page {
+export class Page {
     constructor(pageMeta) {
         this.pageMeta = pageMeta;
     }

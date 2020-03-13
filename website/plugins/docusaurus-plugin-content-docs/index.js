@@ -119,6 +119,7 @@ function pluginContentDocs(context, opts) {
             // Construct inter-metadata relationship in docsMetadata
             const docsMetadata = {};
             const permalinkToSidebar = {};
+            const redirectSidebarToRoute = {};
             const versionToSidebars = {};
             Object.keys(docsMetadataRaw).forEach(currentID => {
                 var _a, _b, _c, _d, _e, _f;
@@ -139,7 +140,7 @@ function pluginContentDocs(context, opts) {
                     previous,
                     next });
                 // sourceToPermalink and permalinkToSidebar mapping
-                const { source, permalink, version } = docsMetadataRaw[currentID];
+                const { source, permalink, version, sidebarPath } = docsMetadataRaw[currentID];
                 sourceToPermalink[source] = permalink;
                 if (sidebar) {
                     permalinkToSidebar[permalink] = sidebar;
@@ -149,6 +150,9 @@ function pluginContentDocs(context, opts) {
                         }
                         versionToSidebars[version].add(sidebar);
                     }
+                }
+                if (sidebarPath) {
+                    redirectSidebarToRoute[permalink] = sidebarPath;
                 }
             });
             const convertDocLink = (item) => {
@@ -186,6 +190,7 @@ function pluginContentDocs(context, opts) {
                 docsDir,
                 docsSidebars,
                 permalinkToSidebar: utils_1.objectWithKeySorted(permalinkToSidebar),
+                redirectSidebarToRoute: utils_1.objectWithKeySorted(redirectSidebarToRoute),
                 versionToSidebars,
             };
         },
@@ -244,6 +249,7 @@ function pluginContentDocs(context, opts) {
                     const docsBaseMetadata = {
                         docsSidebars: lodash_1.default.pick(content.docsSidebars, Array.from(neededSidebars)),
                         permalinkToSidebar: lodash_1.default.pickBy(content.permalinkToSidebar, sidebar => neededSidebars.has(sidebar)),
+                        redirectSidebarToRoute: content.redirectSidebarToRoute,
                         version,
                     };
                     // We want latest version route config to be placed last in the generated routeconfig.
@@ -256,6 +262,7 @@ function pluginContentDocs(context, opts) {
                 const docsBaseMetadata = {
                     docsSidebars: content.docsSidebars,
                     permalinkToSidebar: content.permalinkToSidebar,
+                    redirectSidebarToRoute: content.redirectSidebarToRoute,
                 };
                 const docsBaseRoute = utils_1.normalizeUrl([baseUrl, routeBasePath, ':route']);
                 return addBaseRoute(docsBaseRoute, docsBaseMetadata, routes);
@@ -265,8 +272,8 @@ function pluginContentDocs(context, opts) {
             const { getBabelLoader, getCacheLoader } = utils;
             const { rehypePlugins, remarkPlugins } = options;
             // inject a dynamic module which holds the page metadata
-            // webpack does not serve the virtual module if we point it to an 
-            // existing folder but missing files. That's why we have the new @docusaurus-meta 
+            // webpack does not serve the virtual module if we point it to an
+            // existing folder but missing files. That's why we have the new @docusaurus-meta
             // namespace
             const docsMetadataPath = path_1.default.join(dataDir, docsMetadataFilename);
             const docsMetadata = fs_extra_1.default.readFileSync(docsMetadataPath, 'utf-8');

@@ -106,6 +106,9 @@ export interface SourceToPermalink {
 export interface PermalinkToSidebar {
     [permalink: string]: string;
 }
+export interface RedirectSidebarToRoute {
+    [permalink: string]: string;
+}
 export interface VersionToSidebars {
     [version: string]: Set<string>;
 }
@@ -115,8 +118,9 @@ export interface LoadedContent {
     docsSidebars: DocsSidebar;
     permalinkToSidebar: PermalinkToSidebar;
     versionToSidebars: VersionToSidebars;
+    redirectSidebarToRoute: RedirectSidebarToRoute;
 }
-export declare type DocsBaseMetadata = Pick<LoadedContent, 'docsSidebars' | 'permalinkToSidebar'> & {
+export declare type DocsBaseMetadata = Pick<LoadedContent, 'docsSidebars' | 'permalinkToSidebar' | 'redirectSidebarToRoute'> & {
     version?: string;
 };
 export declare type VersioningEnv = {
