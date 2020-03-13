@@ -19,7 +19,7 @@ function ReferenceRow({ property }) {
     const jsNames = property.props('jsName');
     const jsonNames = property.props('jsonName');
     const jQueryNames = property.props('jQueryName');
-    const dataAttributeNames = property.props('dataAttribute');
+    const domNames = property.props('domName');
     const javaScriptOnly = property.prop('javaScriptOnly', false);
     return (
         <tr>
@@ -32,8 +32,8 @@ function ReferenceRow({ property }) {
                     {jsonNames.map(n => (<CodeBadge type="json" name={n} />))}
                     {jQueryNames.length > 0 && <br />}
                     {jQueryNames.map(n => (<CodeBadge type="jquery" name={n} />))}
-                    {dataAttributeNames.length > 0 && <br />}
-                    {dataAttributeNames.map(n => (<CodeBadge type="html" name={n} />))}
+                    {domNames.length > 0 && <br />}
+                    {domNames.map(n => (<CodeBadge type="html" name={n} />))}
                 </a>
             </td>
             <td>{property.prop('description')}</td>

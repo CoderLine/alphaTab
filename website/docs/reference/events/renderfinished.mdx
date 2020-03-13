@@ -1,0 +1,64 @@
+---
+title: RenderFinished
+jsName: addRenderFinished();removeRenderFinished()
+domName: alphaTab.rendered
+category: Events - Core
+description: This event is fired when the rendering of the whole music sheet is finished.
+sidebarPath: /docs/reference/events
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when the rendering of the whole music sheet is finished from the render engine side. There might be still tasks open for
+the display component to visually display the rendered components when this event is notified. 
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action" />    
+    <TypeRow type="js" name="function()" />    
+</TypeTable>
+
+## Parameters
+None
+
+## Example - C#
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.RenderFinished += () => 
+{
+    UpdateProgressBar("Finishing");
+};
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addRenderFinished(function() {
+    updateProgressBar("Finishing");
+});  
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').on('alphaTab.rendered', function() {
+    updateProgressBar("Finishing");
+});
+```
+
+## Example - HTML
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.rendered', function(e) {
+    updateProgressBar("Finishing");
+}, false);
+```

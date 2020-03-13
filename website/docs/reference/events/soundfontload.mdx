@@ -1,0 +1,58 @@
+---
+title: SoundFontLoad
+jsName: addSoundFontLoad();removeSoundFontLoad()
+domName: alphaTab.soundFontLoad
+category: Events - Player
+description: This event is fired when the SoundFont is being loaded.
+sidebarPath: /docs/reference/events
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when the SoundFont is being loaded and reports the progress accordingly.     
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="js" name="function(e)" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="args" type="AlphaTab.ProgressEventArgs">
+        The information about the load progress of the file.  
+    </ParameterRow>
+</ParameterTable>
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addSoundFontLoad(function(e) {
+    updateProgress(e.loaded, e.total);
+});
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').on('alphaTab.soundFontLoad', function(e, score) {
+    updateProgress(e.loaded, e.total);
+});
+```
+
+
+## Example - HTML
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.soundFontLoad', function() {
+    updateProgress(e.detail.loaded, e.detail.total);
+}, false);
+```

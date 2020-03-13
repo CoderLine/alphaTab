@@ -7,7 +7,7 @@ export default function PropertyDescription({metadata}) {
     const dotNetName = page.prop("title");
     const jsNames = page.props("jsName");
     const jsonNames = page.props("jsonName");
-    const dataAttributeNames = page.props("dataAttribute");
+    const domNames = page.props("domName");
     return (
         <table className="table table-striped table-condensed type-table">
             <tbody>
@@ -24,7 +24,7 @@ export default function PropertyDescription({metadata}) {
                         <td><CodeBadge type="json" name={name} /></td>
                     </tr>
                 ))}
-                {dataAttributeNames.map((name, index) => (
+                {domNames.map((name, index) => (
                     <tr key={index}>
                         <td><CodeBadge type="html" name={name} /></td>
                     </tr>

@@ -1,0 +1,78 @@
+---
+title: Error
+jsName: addError();removeError()
+domName: alphaTab.error
+category: Events - Core
+description: This event is fired when an error within alphatab occurred.
+sidebarPath: /docs/reference/events
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when an error within alphatab occurred. Use this event as global error handler to show errors
+to end-users. Due to the asynchronous nature of alphaTab, no call to the API will directly throw an error if it fails.
+Instead a signal to this error handlers will be sent. 
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action<string,Exception>" />    
+    <TypeRow type="js" name="function(type,details)" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="type" type="string">
+        The kind of error that happened, or the module that reported the error. Possible values are: <br />
+        `import  - An unexpected error while loading or parsing the score happened.<br />
+        `render` - An unexpected error during rendering happened.<br />
+        `soundFont` - An unexpected error while loading the SoundFont.<br />
+        `midi` - An unexpected error while loading the generated midi for the song.
+    </ParameterRow>
+    <ParameterRow platform="all" name="details" type="System.Exception">
+        The object containing the error details. 
+    </ParameterRow>
+</ParameterTable>
+
+## Example - C#
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.Error += (type, details) => 
+{
+    DisplayError(type, details);
+};
+```
+
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addError(function(type, details) {
+    displayError(type, details);
+});
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').on('alphaTab.error', function(e, type, details) {
+    displayError(type, details);
+});
+```
+
+## Example - HTML
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.error', function(e) {
+    displayError(e.detail.type, e.detail.details);
+}, false);
+```

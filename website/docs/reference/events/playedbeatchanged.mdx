@@ -1,0 +1,69 @@
+---
+title: PlayedBeatChanged
+jsName: addPlayedBeatChanged();removePlayedBeatChanged()
+domName: alphaTab.playedBeatChanged
+category: Events - Player
+description: This event is fired when the played beat changed.
+sidebarPath: /docs/reference/events
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when the played beat changed.
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
+    <TypeRow type="js" name="function(e)" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="beat" type="AlphaTab.Model.Beat">
+        The new beat that is now being played.. 
+    </ParameterRow>
+</ParameterTable>
+
+## Example - C#
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.PlayedBeatChanged += beat => 
+{
+    UpdateFretboard(args);
+};
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addPlayedBeatChanged(function(args) {
+    updateFretboard(beat);
+});
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').on('alphaTab.playedBeatChanged', function(e, beat) {
+    updateFretboard(beat);
+});
+```
+
+## Example - HTML
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.playedBeatChanged', function(e) {
+    var beat = e.detail;
+    updateFretboard(beat);
+}, false);
+```
