@@ -1,0 +1,58 @@
+Title: Display.StretchForce
+JsName: display.stretchForce;stretchForce
+JsonName: display.stretchForce;stretchForce
+DataAttribute: data-display-stretchforce, data-stretchforce
+Category: Display
+Description: The default stretch force to use for layouting. 
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    The stretch force is a setting that controls the spacing of the music notation. AlphaTab uses a varaint of the Groulay algorithm for spacing which has springs and rods for 
+    aligning elements. This setting controls the "strength" of the springs. The stronger the springs, the wider the spacing. 
+</p>
+
+<PropertyDescription metadata={metadata} />
+
+<table class="table table-striped table-condensed">
+    <thead>
+        <tr>
+            <th>Force 1</th>
+            <th>Force 0.5</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><img src="@Context.GetLink("/reference/property/stretchforce-default.png")" alt="Default" /></td>
+            <td><img src="@Context.GetLink("/reference/property/stretchforce-half.png")" alt="0.5" /></td>
+        </tr>   
+    </tbody>
+</table>
+
+<PropertyDescription metadata={metadata} />
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-all">float <span>all</span></td>
+            <td>
+                <code>1.0</code><br />
+                <code>1.5</code><br />
+                <code>0.5</code>
+            </td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+<code>1.0</code>

@@ -1,23 +1,37 @@
 import Collection from './collection'
-import globby from 'globby';
-import fs from 'fs-extra';
-import path from 'path';
+import allDocs from '@docusaurus-meta/docs';
+
+
+class Page {
+    constructor(pageMeta) {
+        this.pageMeta = pageMeta;
+    }
+
+    prop(key, defaultValue) {
+        if (key in this.pageMeta) {
+            return this.pageMeta[key];
+        }
+        return defaultValue;
+    }
+
+    props(key) {
+        const v = this.prop(key, '');
+        return v.split(';');
+    }
+}
 
 let allPages = null;
 
-async function loadAllPages() {
-
-    const docsDir = path.resolve(__dirname, '..', 'docs');
-    console.log('Loading all pages from path', docsDir);
-    
-    return []; 
+function loadAllPages() {
+    return Object.values(allDocs).map(p => new Page(p));
 }
 
 export function getPageList(baseUrl) {
-    if(!allPages) {
+    if (!allPages) {
         allPages = loadAllPages();
+        console.log('All Pages of docs loaded', allPages);
     }
-    return new Collection([]);
+    return new Collection(allPages.filter(p => p.prop('id', '').indexOf(baseUrl) === 0));
 }
 
 export default getPageList;

@@ -1,0 +1,48 @@
+---
+title: Core.IncludeNoteBounds
+jsName: core.includeNoteBounds;includeNoteBounds
+jsonName: core.includeNoteBounds;includeNoteBounds
+dataAttribute: data-core-includenotebounds;data-includenotebounds
+category: Core
+description: Gets or sets whether in the BoundsLookup also the position and area of each individual note is provided.
+since: 0.9.6
+showInSideBar: false
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+AlphaTab collects the position of the rendered music notation elements during the rendering process. This way some level of interactivity can be provided like the feature that seeks to the corresponding position when clicking on a beat. 
+By default the position of the individual notes is not collected due to performance reasons. If access to note position information is needed, this setting can enable it. 
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="bool" />
+</TypeTable>
+
+## Default Value
+
+`false`
+
+## Example - JavaScript
+
+```js
+const settings = {
+    core: {
+        includeNoteBounds: true
+    }
+};
+let api = null;
+document.querySelector('#alphaTab').addEventListener('alphaTab.rendered', function() {
+    var lookup = api.renderer.boundsLookup;
+    var x = 100;
+    var y = 100;
+    var beat = lookup.getBeatAtPos(x, y);
+    var note = lookup.getNoteAtPos(beat, x, y); 
+});
+api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+```

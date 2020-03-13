@@ -1,0 +1,38 @@
+Title: Player.ScrollElement
+JsName: player.scrollElement
+JsonName: player.scrollElement
+DataAttribute: data-player-scrollelement
+Category: Player - JavaScript Specific
+Description: The element to apply the scrolling on.
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    When the player is active, it by default automatically scrolls the browser window to the currently played bar. This setting 
+    defines which elements should be scrolled to bring the played bar into the view port. By default scrolling happens on the <code>html,body</code>
+    selector. 
+</p>
+
+@Html.Partial("_PropertyDescription", Model)
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-net">bool <span>.net</span></code></td>
+        </tr>   
+        <tr>
+            <td><code class="code-badge code-badge-js">string <span>JSON, JavaScript &amp; HTML</span></code></td>
+        </tr>   
+        <tr>
+            <td><code class="code-badge code-badge-js">DOM Element <span >JavaScript</span></code></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>html,body</code>

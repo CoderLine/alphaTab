@@ -2,6 +2,9 @@ export class Collection {
     constructor(array) {
         this.array = array;
     }
+    push(item) {
+        this.array.push(item);
+    }
     filter(predicate) {
         return new Collection(this.array.filter(predicate));
     }
@@ -12,19 +15,19 @@ export class Collection {
         return this.array;
     }
     groupBy(keySelector) {
-        const obj = { lookup: {}, result: [] };
-        this.array.reduce((_, val) => {
+        const groupLookup = new Map();
+        const groups = [];
+        this.array.forEach(val => {
             const key = keySelector(val);
-            if (key in obj.lookup) {
-                obj.lookup[key].items.push(val);
+            if (groupLookup.has(key)) {
+                groupLookup.get(key).items.push(val);
             } else {
-                const group = { key: key, items: [val] };
-                obj.lookup[key] = group;
-                obj.result.push(group);
+                const group = { key: key, items: new Collection([val]) };
+                groupLookup.set(key, group);
+                groups.push(group);
             }
-            return obj;
-        }, obj);
-        return new Collection(obj.result);
+        });
+        return new Collection(groups);
     }
     orderBy() {
         const selectors = arguments;
@@ -33,7 +36,22 @@ export class Collection {
             let result = 0;
             for (let i = 0; i < selectors.length; i++) {
                 const sel = selectors[i];
-                result = sel(a).localeCompare(sel(b));
+                const aval = sel(a);
+                const bval = sel(a);
+                switch (typeof aval) {
+                    case "string":
+                        result = aval.localeCompare(bval);
+                        break;
+                    default:
+                        if (a < b) {
+                            result = -1;
+                        } else if (a > b) {
+                            result = 1;
+                        } else {
+                            result = 0;
+                        }
+                        break;
+                }
                 if (result != 0) {
                     break;
                 }

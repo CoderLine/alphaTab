@@ -1,3 +1,4 @@
+const path = require('path');
 module.exports = {
   title: 'alphaTab',
   tagline: 'Build modern music notation apps for web, desktop and mobile',
@@ -8,17 +9,17 @@ module.exports = {
   projectName: 'alphaTab',
   themeConfig: {
     navbar: {
-	  hideOnScroll: true,
+      hideOnScroll: true,
       logo: {
         alt: 'alphaTab',
         src: 'img/alphaTab.png',
       },
       links: [
-        {to: 'docs/introduction', label: 'Docs', position: 'left'},
-        {to: 'docs/tutorial', label: 'Tutorial', position: 'left'},
-        {to: 'docs/showcase', label: 'Showcase', position: 'left'},
-        {to: 'community', label: 'Community', position: 'left'},
-        {to: 'blog', label: 'Blog', position: 'left'},
+        { to: 'docs/introduction', label: 'Docs', position: 'left' },
+        { to: 'docs/tutorial', label: 'Tutorial', position: 'left' },
+        { to: 'docs/showcase', label: 'Showcase', position: 'left' },
+        { to: 'community', label: 'Community', position: 'left' },
+        { to: 'blog', label: 'Blog', position: 'left' },
         {
           href: 'https://github.com/CoderLine/alphaTab',
           label: 'GitHub',
@@ -53,11 +54,11 @@ module.exports = {
               label: 'Gitter',
               href: 'https://gitter.im/alphaTabMusic/community',
             },
-			{
+            {
               label: 'GitHub',
               href: 'https://github.com/CoderLine/alphaTab',
             },
-			{
+            {
               label: 'Stack Overflow',
               href: 'https://stackoverflow.com/questions/tagged/alphatab',
             },
@@ -84,19 +85,40 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Daniel Kuschny and Contributors`,
     },
   },
-  presets: [
+  plugins: [
     [
-      '@docusaurus/preset-classic',
+      '@docusaurus/plugin-content-blog',
       {
-        docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
-          editUrl:
-            'https://github.com/CoderLine/alphaTabWebsite/tree/master',
-        },
-        theme: {
-          customCss: require.resolve('./src/css/custom.css'),
-        },
-      },
+
+      }
     ],
+    [
+      '@docusaurus/plugin-content-pages',
+      {
+      }
+    ],
+    [
+      '@docusaurus/plugin-sitemap',
+      {
+
+      }
+    ],
+    [
+      path.resolve(__dirname, './plugins/docusaurus-plugin-content-docs'),
+      {
+        sidebarPath: require.resolve('./sidebars.js'),
+        editUrl:
+          'https://github.com/CoderLine/alphaTabWebsite/tree/master',
+      }
+    ]
   ],
+  themes: [
+    [
+      '@docusaurus/theme-classic', 
+      {
+        customCss: require.resolve('./src/css/custom.css'),
+      }
+    ],
+    // algolia && '@docusaurus/theme-search-algolia',
+  ]
 };

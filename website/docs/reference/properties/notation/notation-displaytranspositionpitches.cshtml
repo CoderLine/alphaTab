@@ -1,0 +1,45 @@
+Title: Notation.DisplayTranspositionPitches
+JsName: notation.displayTranspositionPitches
+JsonName: notation.displayTranspositionPitches
+DataAttribute: data-notation-displaytranspositionpitches
+Category: Notation
+Description: The transposition pitch offsets for the individual tracks used for rendering only.
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    For some instruments the pitch shown on the standard notation has an additional transposition. One example is the Guitar. 
+    Notes are shown 1 octave higher than they are on the piano. The following image shows a C4 for a piano and a guitar, and a C5 for the piano as comparison: <br />
+    <img src="@(Context.GetLink("/reference/property/displaytranspositionpitches.png"))" alt="Display Transposition Pitches example" />
+</p>
+<p>
+    The <code>DisplayTranspositionPitches</code> setting allows defining an additional pitch offset per track, that is then considered when displaying the music sheet. 
+    This setting does not affect the playback of the instrument in any way. Despite the 2 different standard notations in the above example, they both play the same note height. <br />
+    The transposition is defined as number of semitones and one value per track of the song can be defined.
+</p>
+
+<PropertyDescription metadata={metadata} />
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-net">int[] <span>.net</span></code></td>
+        </tr>   
+        <tr>
+            <td><code class="code-badge code-badge-js">Array <span>JavaScript</span></code></td>
+        </tr>           
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>(empty)</code>

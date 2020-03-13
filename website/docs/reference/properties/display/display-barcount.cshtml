@@ -1,0 +1,39 @@
+Title: Display.BarCount
+JsName: display.barCount;barCount
+JsonName: display.barCount;barCount
+DataAttribute: data-display-barcount, data-barcount
+Category: Display
+Description: The total number of bars that should be rendered from the song. 
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    This setting sets the number of bars that should be rendered from the overall song. This setting can be used to 
+    achieve a paging system or to only show partial bars of the same file. By this a tutorial alike display can be achieved
+    that explains various parts of the song. 
+    <a href="@Context.GetLink("/features/layouts")#page-layout-range">Demo</a>
+</p>
+
+<PropertyDescription metadata={metadata} />
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-all">int <span>all</span></td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>-1</code> - All bars from start

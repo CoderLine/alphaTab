@@ -1,4 +1,9 @@
+import React from 'react';
+
 export function CodeBadge({ type, name }) {
+    if(!name) {
+        return (<></>);
+    }
     let title = type;
     switch (type) {
         case 'net':
@@ -14,8 +19,9 @@ export function CodeBadge({ type, name }) {
             title = 'HTML';
             break;
     }
+    const css = "code-badge code-badge-" + type;
     return (
-        <code class="code-badge code-badge-{type}">
+        <code className={css}>
             {name}
             <span>{title}</span>
         </code>

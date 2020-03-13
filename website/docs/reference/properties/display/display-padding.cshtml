@@ -1,0 +1,43 @@
+Title: Display.Padding
+JsName: display.padding;padding
+JsonName: display.padding;padding
+DataAttribute: data-display-padding, data-padding
+Category: Display
+Description: Adjusts the padding between the music notation and the border
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+    AlphaTab by default has a padding between the border of the control and the start of the content. 
+    This setting controls this padding between border and content. 
+</p>
+
+<PropertyDescription metadata={metadata} />
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-all">float[] <span>all</span></code></td>
+            <td>
+                <code>[<left>, <top>, <right>, <bottom>]</code>
+            </td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+If set to <code>null</code>: <br />
+
+<code>[20, 20, 20, 20] </code> - for LayoutMode.Horizontal <br />
+<code>[40, 40, 40, 40] </code> - for LayoutMode.Page

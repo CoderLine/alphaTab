@@ -1,0 +1,104 @@
+Title: Notation.NotationMode
+JsName: notation.notationMode
+JsonName: notation.notationMode
+DataAttribute: data-notation-notationmode
+Category: Notation
+Description: Gets or sets the mode to use for display and play music notation elements.
+ShowInSideBar: false
+Since: 0.9.6
+---
+
+<h2>Description</h2>
+<p>
+AlphaTab provides 2 main music notation display modes <code>GuitarPro</code> and <code>SongBook</code>. 
+As the names indicate they adjust the overall music notation rendering either to be more in line how <a href="https://www.guitar-pro.com" target="_blank">Arobas Guitar Pro</a> displays it,
+or more like the common practice in paper song books practices the display. <br />
+<br />
+The main differences in the Songbook display mode are: 
+</p>
+
+<ol>
+    <li>
+        <strong>Bends</strong>
+        <p>
+            For bends additional grace beats are introduced. <br />
+            Bends are categorized into gradual and fast bends.
+        </p>
+        <ul> 
+            <li>Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration.</li>
+            <li>Fast bends are done right before the next note. If the next note is tied even on-beat of the next note.</li>
+        </ul>
+    </li>
+    <li>
+        <strong>Whammy Bars</strong>
+        <p>
+            Dips are shown as simple annotation over the beats <br />
+            Whammy Bars are categorized into gradual and fast. 
+        </p>
+        <ul>
+            <li>Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration.</li>
+            <li>Fast whammys are done right the beat.</li>
+        </ul>
+    </li>
+    <li>
+        <strong>Let Ring</strong>
+        <p>
+            Tied notes with let ring are not shown in standard notation.<br />
+            Let ring does not cause a longer playback, duration is defined via tied notes. 
+        </p>
+    </li>
+    <li>
+        <strong>Settings</strong>
+        <p>
+            Following default setting values are applied:
+        </p>    
+        <ul>
+            <li><code>SmallGraceTabNotes = false</code></li>
+            <li><code>FingeringMode = FingeringMode.SingleNoteEffectBand</code></li>
+            <li><code>ExtendBendArrowsOnTiedNotes = false</code></li>
+            <li><code>ShowParenthesisForTiedBends = false</code></li>
+            <li><code>ShowTabNoteOnTiedBend = false</code></li>
+            <li><code>ShowZeroOnDiveWhammy = true</code></li>
+        </ul>
+    </li>
+</ol>
+
+<PropertyDescription metadata={metadata} />
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code class="code-badge code-badge-net">AlphaTab.DisplayMode <span>.net</span></td>
+            <td>
+                <code>SongBook</code><br />
+                <code>GuitarPro</code>
+            </td>
+        </tr>   
+        <tr>
+            <td><code class="code-badge code-badge-js">string <span>JSON &amp; HTML</span></td>
+            <td>
+                <code>SongBook</code><br />
+                <code>GuitarPro</code>
+            </td>
+        </tr>           
+        <tr>
+            <td><code class="code-badge code-badge-js">int <span>JavaScript &amp; HTML</span></td>
+            <td>
+                <code>0</code> (SongBook)<br />
+                <code>1</code> (GuitarPro)
+            </td>
+        </tr>           
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>GuitarPro</code>

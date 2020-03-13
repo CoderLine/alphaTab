@@ -10,10 +10,10 @@ export function buildPropertyUrl(property) {
 	let url = '';
 	if (property.prop('todo', false)) {
 		url = "#todo";
-	} else if (url = child.prop('link')) {
-		url = useBaseUrl(url);
+	} else if (url = property.prop('link')) {
+		url = useBaseUrl('docs/' + url);
 	} else {
-		url = property.getUrl();
+		url = useBaseUrl('docs/' + property.prop('id'));
 	}
 	return url;
 }
@@ -42,13 +42,13 @@ export function PropertyRow({ property }) {
 
 export function PropertyCategory({ name, pages }) {
 	const rows = pages
-		.orderBy(p => p.prop('order', 1000), p => p.prop('title'))
+		.orderBy(p => p.prop('order', 1000), p => p.prop('title', ''))
 		.map(p => (<PropertyRow property={p} />))
 		.toArray();
 	return (
 		<>
 			<tr>
-				<th colspan="4">{name}</th>
+				<th colSpan="4">{name}</th>
 			</tr>
 			{rows}
 		</>
@@ -56,10 +56,9 @@ export function PropertyCategory({ name, pages }) {
 }
 
 export function PropertyTable() {
-	console.log(getPageList);
-	const pages = getPageList('docs/reference/properties/')
+	const pages = getPageList('reference/properties/')
 			.filter(p => p.prop('showInTable', true))
-			.groupBy(p => p.prop('category'))
+			.groupBy(p => p.prop('category', ''))
 			.orderBy(p => p.key);
 	const categories = pages
 			.map(p => (<PropertyCategory name={p.key} pages={p.items} />))
