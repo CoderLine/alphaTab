@@ -1,0 +1,33 @@
+---
+title: Player.EnablePlayer
+jsName: player.enablePlayer
+jsonName: player.enablePlayer
+dataAttribute: data-player-enableplayer
+category: Player
+description: Gets or sets whether the player should be enabled.
+sidebarPath: /docs/reference/properties
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting configures whether the player feature is enabled or not. Depending on the platform enabling the player needs some additional actions of the developer. 
+For the JavaScript version the [Player.SoundFont](/docs/reference/property/soundfont) property must be set to the URL of the sound font that should be used or it must be loaded manually via API. 
+For .net manually the soundfont must be loaded. 
+
+AlphaTab does not ship a default UI for the player. The API must be hooked up to some UI controls to allow the user to interact with the player.
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="bool" />
+</TypeTable>
+
+## Default Value
+
+`false`

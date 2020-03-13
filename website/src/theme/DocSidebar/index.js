@@ -121,7 +121,6 @@ function DocSidebar(props) {
     siteConfig: {themeConfig: {navbar: {title, logo = {}} = {}}} = {},
   } = useDocusaurusContext();
   const logoUrl = useBaseUrl(logo.src);
-
   const {
     docsSidebars,
     path,

@@ -1,0 +1,189 @@
+---
+title: Display.Resources
+jsName: display.resources;resources
+jsonName: display.resources;resources
+dataAttribute: data-display-resources-*;data-resources-*
+category: Display
+description: Allows adjusting of the used fonts and colors for rendering.
+sidebarPath: /docs/reference/properties
+since: 0.9.6
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import CodeBadge from '../../../../src/code-badge';
+import getPageList from '../../../../src/page';
+
+export var Resources = {
+	colors: [
+		{
+			name: 'BarNumberColor',
+			defaultValue: 'rgb(200, 0, 0)',
+			description: 'The color to use for displaying the bar numbers above the music sheet.',
+		},
+		{
+			name: 'BarSeparatorColor',
+			defaultValue: 'rgb(34, 34, 17)',
+			description: 'The color to use for rendering bar separators, the accolade and repeat signs.',
+		},
+		{
+			name: 'MainGlyphColor',
+			defaultValue: 'rgb(0, 0, 0)',
+			description: 'The color to use for music notation elements of the primary voice.',
+		},
+		{
+			name: 'ScoreInfoColor',
+			defaultValue: 'rgb(0, 0, 0)',
+			description: 'The color to use for displaying the song information above the music sheets.',
+		},
+		{
+			name: 'SecondaryGlyphColor',
+			defaultValue: 'rgb(0,0,0,0.4)',
+			description: 'The color to use for music notation elements of the secondary voices.',
+		},
+		{
+			name: 'StaffLineColor',
+			defaultValue: 'rgb(165, 165, 165)',
+			description: 'The color to use for rendering the lines of staves.',
+		},
+	],
+	fonts: [
+		{
+			name: 'BarNumberFont',
+			defaultValue: '11px Arial',
+			description: 'The font to use for displaying the bar numbers above the music sheet.',
+		}, 
+		{
+			name: 'CopyrightFont',
+			defaultValue: 'bold 12px Arial',
+			description: 'The font to use for displaying the songs copyright information in the header of the music sheet.,',
+		},
+		{
+			name: 'EffectFont',
+			defaultValue: 'italic 12px Georgia',
+			description: 'The font to use for displaying certain effect related elements in the music sheet.',
+		},
+		{
+			name: 'FingeringFont',
+			defaultValue: '14px Georgia',
+			description: 'The font to use for displaying finger information in the music sheet.',
+		},
+		{
+			name: 'FretboardNumberFont',
+			defaultValue: '11px Arial',
+			description: 'The font to use for displaying the fretboard numbers in chord diagrams.',
+		},
+		{
+			name: 'GraceFont',
+			defaultValue: '11px Arial',
+			description: 'The font to use for grace notation related texts in the music sheet.',
+		},
+		{
+			name: 'MarkerFont',
+			defaultValue: 'bold 14px Georgia',
+			description: 'The font to use for section marker labels shown above the music sheet.',
+		},
+		{
+			name: 'SubTitleFont',
+			defaultValue: '20px Georgia',
+			description: 'The font to use for displaying the songs subtitle in the header of the music sheet.',
+		},
+		{
+			name: 'TablatureFont',
+			defaultValue: '13px Arial',
+			description: 'The font to use for displaying the guitar tablature numbers in the music sheet.',
+		},
+		{
+			name: 'TitleFont',
+			defaultValue: '32px Georgia',
+			description: 'The font to use for displaying the songs title in the header of the music sheet.',
+		},
+		{
+			name: 'WordsFont',
+			defaultValue: '15px Arial',
+			description: 'The font to use for displaying the lyrics information in the header of the music sheet.',
+		}
+	]
+};
+
+export function toCamelCase(v) {
+    return v.substr(0, 1).toLowerCase() + v.substr(1);
+}
+
+export function ResourceRow({resource, type}) {  
+    return (
+        <tr>
+            <td>
+                <CodeBadge type="net" name={resource.name} /><br />
+                <CodeBadge type="js" name={toCamelCase(resource.name)} /><br />
+                <CodeBadge type="json" name={toCamelCase(resource.name)} /><br />
+                <CodeBadge type="html" name={resource.name.toLowerCase()} />
+            </td>
+            <td>
+                <CodeBadge type="all" name={type} />
+            </td>
+            <td>{resource.defaultValue}</td>
+            <td>
+                {resource.description}
+            </td>
+        </tr>
+    );
+}
+
+export function ResourceTable() {
+    const colors = Resources.colors.map(c => <ResourceRow type="color" resource={c} />);
+    const fonts = Resources.fonts.map(f => <ResourceRow type="font" resource={f} />);
+    return (
+        <table className="table table-striped table-condensed type-table">
+            <thead>
+                <tr>
+                    <th>Resource</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                    <th>Summary</th>
+                </tr>
+            </thead>    
+            <tbody> 
+                {colors}
+                {fonts}
+            </tbody>
+        </table>
+    );
+}
+
+## Description
+
+AlphaTab allows configuring the colors and fonts used for rendering via the rendering resources settings. Please note that as of today
+this is the primary way of changing the way how alphaTab styles elements. CSS styling in the browser cannot be guaranteed to work due to its flexibility. 
+
+
+Due to space reasons in the following table the common prefix of the settings are removed. Please refer to these examples to eliminate confusion on the usage: 
+
+| Platform   | Prefix                    | Example Usage                                                      |
+|------------|---------------------------|--------------------------------------------------------------------|
+| .net       | `Display.Resources.`      | `settings.Display.Resources.WordsFonts = ...`                      |
+| JavaScript | `display.resources.`      | `settings.display.resources.wordsFont = ...`                       |
+| JSON       | `display.resources.`      | `var settings = { display: { resources: { wordsFonts: '...'} } };` |
+| JSON       | `resources.`              | `var settings = { resources: { wordsFonts: '...'} };`              |
+| HTML       | `data-display-resources-` | `<div data-display-resources-wordsfont="...">`                     |
+| HTML       | `data-resources-`         | `<div data-resources-wordsfont="...">`                             |
+
+
+## Resources
+Following resources exist for adjusting the style. 
+
+<ResourceTable />
+
+## Types
+
+### Fonts
+
+For the .net platform any installed font on the system can be used. Simply construct the `Font` object to configure your desired fonts. 
+
+For the JavaScript platform any font that might be installed on the client machines can be used. 
+Any additional fonts can be added via WebFonts. The rendering of the score will be delayed until it is detected that the font was loaded. 
+Simply use any CSS font property compliant string as configuration. Relative font sizes with percentual values are not supported, remaining values will be considered if supported.
+
+### Colors
+
+On .net simply construct the `Color` object to configure your desired color. 
+For JavaScript you can use any CSS font property compliant string. (#RGB, #RGBA, #RRGGBB, #RRGGBBAA, rgb(r,g,b), rgba(r,g,b,a) )

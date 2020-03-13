@@ -1,0 +1,33 @@
+---
+title: Notation.ExtendLineEffectsToBeatEnd
+jsName: notation.extendLineEffectsToBeatEnd
+jsonName: notation.extendLineEffectsToBeatEnd
+dataAttribute: data-notation-extendlineeffectstobeatend
+category: Notation
+description: If set to true, line effects like w/bar and let-ring are drawn until the end of the beat instead of the start
+sidebarPath: /docs/reference/properties
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+By default effect annotations that render a line above the staff, stop on the beat. This is the typical display of Guitar Pro. In songbooks and some other tools 
+these effects are drawn to the end of this beat.     
+
+<PropertyDescription metadata={metadata} />
+
+| Enabled                                                                     | Disabled                                                                      |
+|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| ![Enabled](/img/reference/property/extendlineeffectstobeatend-enabled.png) | ![Disabled](/img/reference/property/extendlineeffectstobeatend-disabled.png) |
+
+## Types
+
+<TypeTable>
+    <TypeRow name="bool" />
+</TypeTable>
+
+## Default Value
+`false`

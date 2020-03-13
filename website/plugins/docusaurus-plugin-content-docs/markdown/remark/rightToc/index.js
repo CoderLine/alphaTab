@@ -15,7 +15,7 @@ const stringify_object_1 = __importDefault(require("stringify-object"));
 const search_1 = __importDefault(require("./search"));
 const parseOptions = {
     plugins: ['jsx'],
-    sourceType: 'module',
+    sourcetype: 'module',
 };
 const isImport = (child) => child.type === 'import';
 const hasImports = (index) => index > -1;

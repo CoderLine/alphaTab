@@ -20,13 +20,19 @@ import styles from './styles.module.css';
 
 function DocPage(props) {
   const {route: baseRoute, docsMetadata, location} = props;
-  // case-sensitive route such as it is defined in the sidebar
   const {permalinkToSidebar, docsSidebars, version, redirectSidebarToRoute} = docsMetadata;
-  const currentRouteName = redirectSidebarToRoute[location.pathname] || location.pathname;
-  const currentRoute =
+  // case-sensitive route such as it is defined in the sidebar
+  let currentRoute =
     baseRoute.routes.find(route => {
-      return matchPath(currentRouteName, route);
+      return matchPath(location.pathname, route);
     }) || {};
+
+  if(currentRoute.path in redirectSidebarToRoute) {
+    currentRoute = baseRoute.routes.find(route => {
+      return matchPath(redirectSidebarToRoute[currentRoute.path], route);
+    })
+  }
+
   const sidebar = permalinkToSidebar[currentRoute.path];
   const {
     siteConfig: {themeConfig = {}} = {},

@@ -1,0 +1,35 @@
+---
+title: Display.Scale
+jsName: display.scale;scale
+jsonName: display.scale;scale
+dataAttribute: data-display-scale;data-scale
+category: Display
+description: Sets the zoom level of the rendered notation.
+sidebarPath: /docs/reference/properties
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+AlphaTab can scale up or down the rendered music notation for more optimized display scenarios. By default music notation is rendered at 100% scale (value 1) and can be scaled up or down by 
+percental values.
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+
+<TypeTable>
+    <TypeRow name="float" type="all">
+        `1.0` - 100%<br />
+        `1.2` - 120%<br />
+        `0.8` - 80%
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+
+`1.0`

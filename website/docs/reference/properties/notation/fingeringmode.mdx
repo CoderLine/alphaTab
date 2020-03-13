@@ -1,0 +1,45 @@
+---
+title: Notation.FingeringMode
+jsName: notation.fingeringMode
+jsonName: notation.fingeringMode
+dataAttribute: data-notation-fingeringmode
+category: Notation
+description: Gets or sets the fingering mode to use.
+sidebarPath: /docs/reference/properties
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+AlphaTab supports multiple modes on how to display fingering information in the music sheet. This setting controls how they should be displayed. The default behavior is to show the finger information 
+directly in the score along the notes. For some use cases of training courses and for beginners this notation might be hard to read. The effect band mode allows to show a single finger information above the staff.
+
+<PropertyDescription metadata={metadata} />
+
+| Score                                                        Effect Band                                                        |
+|-------------------------------------------------------------|-------------------------------------------------------------------|
+| ![Enabled](/img/reference/property/fingeringmode-score.png) | ![Disabled](/img/reference/property/fingeringmode-effectband.png) |
+
+## Types
+
+<TypeTable>
+    <TypeRow name="AlphaTab.FingeringMode" type="net">
+        `Score`<br />
+        `SingleNoteEffectBand`
+    </TypeRow>
+    <TypeRow name="string" type="js-html">
+        `score`<br />
+        `effectband`
+    </TypeRow>
+    <TypeRow name="int" type="js-html">
+        `0` - Score <br />
+        `1` - SingleNoteEffectBand
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+
+`Score`

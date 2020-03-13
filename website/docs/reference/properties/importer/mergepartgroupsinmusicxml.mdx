@@ -1,0 +1,28 @@
+---
+title: Importer.MergePartGroupsInMusicXml
+jsName: importer.mergePartGroupsInMusicXml
+jsonName: importer.mergePartGroupsInMusicXml
+dataAttribute: data-importer-mergepartgroupsinmusicxml
+category: Importer
+description: If part-groups should be merged into a single track (MusicXML).
+sidebarPath: /docs/reference/properties
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting controls whether multiple `part-group` tags will result into a single track with multiple staves. 
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="bool" />
+</TypeTable>
+
+## Default Value
+`false`

@@ -1,0 +1,37 @@
+---
+title: Notation.DisplayTranspositionPitches
+jsName: notation.displayTranspositionPitches
+jsonName: notation.displayTranspositionPitches
+dataAttribute: data-notation-displaytranspositionpitches
+category: Notation
+description: The transposition pitch offsets for the individual tracks used for rendering only.
+sidebarPath: /docs/reference/properties
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+For some instruments the pitch shown on the standard notation has an additional transposition. One example is the Guitar. 
+Notes are shown 1 octave higher than they are on the piano. The following image shows a C4 for a piano and a guitar, and a C5 for the piano as comparison:
+
+![Display Transposition Pitches example](/img/reference/property/displaytranspositionpitches.png)
+
+The `DisplayTranspositionPitch` setting allows defining an additional pitch offset per track, that is then considered when displaying the music sheet. 
+This setting does not affect the playback of the instrument in any way. Despite the 2 different standard notations in the above example, they both play the same note height.
+The transposition is defined as number of semitones and one value per track of the song can be defined.
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="int[]" type="net" />
+    <TypeRow name="Array" type="js" />
+</TypeTable>
+
+## Default Value
+
+`(empty)`

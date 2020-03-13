@@ -1,0 +1,33 @@
+---
+title: Notation.ShowTabNoteOnTiedBend
+jsName: notation.showTabNoteOnTiedBend
+jsonName: notation.showTabNoteOnTiedBend
+dataAttribute: data-notation-showtabnoteontiedbend
+category: Notation
+description: If set to true a tab number will be shown in case a bend is increased on a tied note.
+sidebarPath: /docs/reference/properties
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+By default tab notes are hidden in case they are tied notes. In case they have a bend on it, they are shown again with parenthesis. To also hide tied tab notes in case they have bends, this setting can be set to false.
+
+<PropertyDescription metadata={metadata} />
+
+| Enabled                                                               | Disabled                                                                |
+|-----------------------------------------------------------------------|-------------------------------------------------------------------------|
+| ![Enabled](/img/reference/property/showtabnoteontiedbend-enabled.png) | ![Disabled](/img/reference/property/showtabnoteontiedbend-disabled.png) |
+
+## Types
+
+<TypeTable>
+    <TypeRow name="bool" />
+</TypeTable>
+
+## Default Value
+
+`true`

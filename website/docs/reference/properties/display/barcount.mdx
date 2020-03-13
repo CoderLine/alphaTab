@@ -1,0 +1,31 @@
+---
+title: Display.BarCount
+jsName: display.barCount;barCount
+jsonName: display.barCount;barCount
+dataAttribute: data-display-barcount;data-barcount
+category: Display
+description: The total number of bars that should be rendered from the song. 
+sidebarPath: /docs/reference/properties
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting sets the number of bars that should be rendered from the overall song. This setting can be used to 
+achieve a paging system or to only show partial bars of the same file. By this a tutorial alike display can be achieved
+that explains various parts of the song. [Demo](/docs/showcase/layouts)
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="int" />
+</TypeTable>
+
+## Default Value
+
+`-1` - All bars from start
