@@ -1,0 +1,62 @@
+---
+title: ChangeTrackSolo()
+jsName: changeTrackSolo()
+jQueryName: alphaTab('soloTracks')
+category: Methods - Player
+description: Changes the given tracks to be played solo or not.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Changes the given tracks to be played solo or not. If any track is set to solo, all other tracks are muted, unless they are also flagged as solo.
+This will result in a solo playback of the primary and secondary midi channel that the track uses for playback. 
+If the track shares the channels with another track, all related tracks will be played as they cannot be distinguished.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void ChangeTrackSolo(Track[] tracks, bool solo)" />
+    <TypeRow type="js" name="function changeTrackSolo(tracks, solo)" />
+    <TypeRow type="jquery" name="alphaTab('soloTracks', tracks, solo)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="tracks" type="AlphaTab.Model.Tracks[]">
+        The array of tracks that should be played solo.
+    </ParameterRow>
+    <ParameterRow platform="all" name="solo" type="bool">
+        A value indicating whether the track should be played solo or not.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.ChangeTrackSolo(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, true);
+```
+
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.changeTrackSolo([api.score.tracks[0], api.score.tracks[1]], true);
+```
+
+## Example - jQuery
+
+```js
+var at = $('#alphaTab');
+var tracks = at.alphaTab('tracks');
+at.alphaTab('soloTracks', [tracks[0], tracks[1]], true);
+```

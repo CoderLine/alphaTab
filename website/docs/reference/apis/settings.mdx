@@ -1,0 +1,40 @@
+---
+title: Settings
+jsName: settings
+jQueryName: alphaTab('settings')
+category: Properties - Core
+description: The settings that are used for rendering the music notation
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets access to the underling <code>AlphaTab.Settings</code> object that is currently used by AlphaTab. 
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="AlphaTab.Settings" />
+</TypeTable>
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+ShowSettingsDialog(api.Settings);
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+showSettingsModal(api.settings);
+```
+
+## Example - jQuery
+
+```js
+showSettingsModal($('#alphaTab').alphaTab('settings'));
+```

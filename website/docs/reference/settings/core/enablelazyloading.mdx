@@ -1,0 +1,31 @@
+---
+title: Core.EnableLazyLoading
+jsName: core.enableLazyLoading;enableLazyLoading
+jsonName: core.enableLazyLoading:enableLazyLoading
+dataAttribute: data-core-enablelazyloading;data-enablelazyloading
+category: Core - JavaScript Specific
+description: Enables lazy loading of the rendered music sheet chunks.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+AlphaTab renders the music sheet in smaller sub-chunks to have fast UI feedback. Not all of those sub-chunks are immediately
+appended to the DOM due to performance reasons. AlphaTab tries to detect which elements are visible on the screen, and only
+appends those elements to the DOM. This reduces the load of the browser heavily but is not working for all layouts and use cases. 
+This setting set to false, ensures that all rendered items are instantly appended to the DOM. 
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="bool" />
+</TypeTable>
+
+## Default Value
+
+`true`

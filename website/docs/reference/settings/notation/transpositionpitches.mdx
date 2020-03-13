@@ -1,0 +1,31 @@
+---
+title: Notation.TranspositionPitches
+jsName: notation.transpositionPitches
+jsonName: notation.transpositionPitches
+dataAttribute: data-notation-transpositionpitches
+category: Notation
+description: The transposition pitch offsets for the individual tracks used for rendering and playback.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting allows transposing of tracks for display and playback. 
+The `TranspositionPitches` setting allows defining an additional pitch offset per track, that is then considered when displaying the music sheet. 
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="int[]" type="net" />
+    <TypeRow name="Array" type="js" />
+</TypeTable>
+
+## Default Value
+
+`(empty)`

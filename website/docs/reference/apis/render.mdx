@@ -1,0 +1,48 @@
+---
+title: Render()
+jsName: render()
+jQueryName: alphaTab('render')
+category: Methods - Core
+description: Initiates a re-rendering of the current setup.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Initiates a re-rendering of the current setup. If rendering is not yet possible, it will be deferred until the UI changes to be ready for rendering.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void Render()" />
+    <TypeRow type="js" name="function render()" />
+    <TypeRow type="jquery" name="alphaTab('render')" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Render();
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.render();
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('render');
+```

@@ -1,0 +1,132 @@
+---
+title: Load()
+jsName: load()
+jQueryName: alphaTab('load')
+category: Methods - Core
+description: Initiates a load of the score using the given data.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This function initiates a load of the score using the given data. The supported types is depending on the platform. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="bool Load(Score score)">
+        Load the given score object
+    </TypeRow>
+    <TypeRow type="net" name="bool Load(Score score, int[] trackIndexes)">
+        Load the given score object
+    </TypeRow>
+    <TypeRow type="net" name="bool Load(byte[] raw)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="net" name="bool Load(byte[] raw, int[] trackIndexes)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="net" name="bool Load(Stream raw)">
+        Load the score from the given stream using the available score loaders
+    </TypeRow>
+    <TypeRow type="net" name="bool Load(Stream raw, int[] trackIndexes)">
+        Load the score from the given stream using the available score loaders
+    </TypeRow>
+    <TypeRow type="js" name="function load(score)">
+        Load the given score object
+    </TypeRow>
+    <TypeRow type="js" name="function load(score, trackIndexes)">
+        Load the given score object
+    </TypeRow>
+    <TypeRow type="js" name="function load(arrayBuffer)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="js" name="function load(arrayBuffer, trackIndexes)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="js" name="function load(uint8array)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="js" name="function load(uint8array, trackIndexes)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="js" name="function load(url)">
+        Load the score from the given URL via Ajax using the available score loaders
+    </TypeRow>
+    <TypeRow type="js" name="function load(url, trackIndexes)">
+        Load the score from the given URL via Ajax using the available score loaders
+    </TypeRow>
+    <TypeRow type="jquery" name="alphaTab('load', score)">
+        Load the given score object
+    </TypeRow>
+    <TypeRow type="jquery" name="alphaTab('load', score, trackIndexes)">
+        Load the given score object
+    </TypeRow>
+    <TypeRow type="jquery" name="alphaTab('load', arraybuffer)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="jquery" name="alphaTab('load', arraybuffer, trackIndexes)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="jquery" name="alphaTab('load', uint8array)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="jquery" name="alphaTab('load', uint8array, trackIndexes)">
+        Load the score from the given raw bytes using the available score loaders
+    </TypeRow>
+    <TypeRow type="jquery" name="alphaTab('load', url)">
+        Load the score from the given URL via Ajax using the available score loaders
+    </TypeRow>
+    <TypeRow type="jquery" name="alphaTab('load', url, trackIndexes)">
+        Load the score from the given URL via Ajax using the available score loaders
+    </TypeRow>
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="net" name="score" type="AlphaTab.Model.Score">
+        The score object to load.
+    </ParameterRow>
+    <ParameterRow platform="net" name="raw" type="byte[]">
+        The raw bytes containing a file supported by the score loaders.
+    </ParameterRow>
+    <ParameterRow platform="net" name="raw" type="System.IO.Stream">
+        The stream containing a file supported by the score loaders.
+    </ParameterRow>
+    <ParameterRow platform="js-jquery" name="arraybuffer" type="ArrayBuffer">
+        The arraybuffer containing the raw bytes of a file supported by the score loaders
+    </ParameterRow>
+    <ParameterRow platform="js-jquery" name="uint8array" type="Uint8Array">
+        The Uint8Array containing the raw bytes of a file supported by the score loaders
+    </ParameterRow>
+    <ParameterRow platform="all" name="trackIndexes" type="int[]">
+        A indexes of the tracks that should be rendered after the track is loaded. If not supplied, the first song will be rendered.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+`true` if the passed in object is a supported format and loading was initiated, otherwise `false`.
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Load(System.IO.File.OpenRead("MyFile.gp"));
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.load('/assets/MyFile.gp');
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('load', '/assets/MyFile.gp');
+```

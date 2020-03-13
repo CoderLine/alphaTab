@@ -22,8 +22,8 @@ const sidebars = {
 		"alphatex/exporter"
 	],
 	"API Reference": [
-		"reference/properties",
-		"reference/methods",
+		"reference/settings",
+		"reference/api",
 		"reference/events"
 	]
   },

@@ -26,13 +26,11 @@ function DocPage(props) {
     baseRoute.routes.find(route => {
       return matchPath(location.pathname, route);
     }) || {};
-
   if(currentRoute.path in redirectSidebarToRoute) {
     currentRoute = baseRoute.routes.find(route => {
       return matchPath(redirectSidebarToRoute[currentRoute.path], route);
     })
   }
-
   const sidebar = permalinkToSidebar[currentRoute.path];
   const {
     siteConfig: {themeConfig = {}} = {},

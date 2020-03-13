@@ -1,0 +1,42 @@
+---
+title: IsReadyForPlayback
+jsName: isReadyForPlayback
+jQueryName: alphaTab('isReadyForPlayback')
+category: Properties - Player
+description: Whether the player is ready for starting the playback.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets whether the synthesizer is ready for playback. The player is ready for playback when
+all background workers are started, the audio output is initialized, a soundfont is loaded, and a song was loaded into the player as midi file.    
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="bool" />
+</TypeTable>
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+if(api.IsReadyForPlayback) api.Play();
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+if(api.isReadyForPlayback)) api.play();
+```
+
+## Example - jQuery
+
+```js
+var at = $('#alphaTab');
+if(at.alphaTab('isReadyForPlayback')) at.alphaTab('play');
+```

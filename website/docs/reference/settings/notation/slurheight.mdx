@@ -1,0 +1,37 @@
+---
+title: Notation.SlurHeight
+jsName: notation.slurHeight
+jsonName: notation.slurHeight
+dataAttribute: data-notation.slurheight
+category: Notation
+description: The height scale factor for slurs
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+Slurs and ties currently calculate their height based on the distance they have from start to end note. Most music notation software do some complex collision detection to avoid a slur to overlap with other elements, alphaTab
+only has a simplified version of the slur positioning as of today. This setting allows adjusting the slur height to avoid collisions. The factor defined by this setting, is multiplied with the logarithmic sitance between start and end. 
+
+<PropertyDescription metadata={metadata} />
+
+| Slur Height Default                                                    | Slur Height 14                                               |
+|------------------------------------------------------------------------|--------------------------------------------------------------|
+| ![Slur Height Default](/img/reference/property/slurheight-default.png) | ![Slur Height 14](/img/reference/property/slurheight-14.png)  |
+
+## Types
+
+<TypeTable>
+    <TypeRow name="float" type="all">
+        `7`<br />
+        `14`<br />
+        `3.5`
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+`7`

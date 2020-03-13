@@ -1,0 +1,44 @@
+---
+title: PlaybackSpeed
+jsName: playbackSpeed
+jQueryName: alphaTab('playbackSpeed')
+category: Properties - Player
+description: The current playback speed as percentage
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Controls the current playback speed as percentual value. Normal speed is 1.0 (100%) and 0.5 would be 50%.
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="float" />
+</TypeTable>
+
+## Default Value
+
+`1.0`
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.PlaybackSpeed = 0.5f;
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.playbackSpeed(0.5);
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('playbackSpeed', 0.5)
+```

@@ -15,8 +15,8 @@ export class Page {
     }
 
     props(key) {
-        const v = this.prop(key, '');
-        return v.split(';');
+        const v = this.prop(key, '') || '';
+        return v.split(';').filter(x => x.length > 0);
     }
 }
 

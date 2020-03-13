@@ -1,0 +1,78 @@
+---
+title: PlayerFinished
+jsName: addPlayerFinished();removePlayerFinished()
+DomName: alphaTab.finished
+category: Events - Player
+description: This event is fired when the playback of the whole song finished.
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+This event is fired when the playback of the whole song finished. This event is finished regardless on whether looping is enabled or not.
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action" />    
+    <TypeRow type="js" name="function()" />    
+</TypeTable>
+
+## Parameters
+None
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Finished += () => 
+{
+    // speed trainer
+    api.PlaybackSpeed = Math.Min(1.0, api.PlaybackSpeed + 0.1);
+};
+api.IsLooping = true;
+api.PlaybackSpeed = 0.5;
+api.Play();
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addFinished(function(args) {
+    // speed trainer
+    api.playbackSpeed = Math.min(1.0, api.playbackSpeed + 0.1);
+});
+api.isLooping = true;
+api.playbackSpeed = 0.5;
+api.play()
+```
+
+## Example - jQuery
+
+```js
+var at = $('#alphaTab');
+at.on('alphaTab.finished', function(e, args) {
+    at.alphaTab('playbackSpeed', Math.min(1.0, at.alphaTab('playbackSpeed') + 0.1)
+});
+at.alphaTab('loop', true);
+at.alphaTab('playbackSpeed', 0.5);
+at.alphaTab('play');
+```
+
+## Example - HTML
+
+```js
+var at = document.querySelector('#alphaTab');
+var api = null;
+at.addEventListener('alphaTab.finished', function(e) {
+    api.playbackSpeed = Math.min(1.0, api.playbackSpeed + 0.1);
+}, false);
+
+
+api = new alphaTab.platform.javaScript.AlphaTabApi(at);
+api.isLooping = true;
+api.playbackSpeed = 0.5;
+api.play()
+```

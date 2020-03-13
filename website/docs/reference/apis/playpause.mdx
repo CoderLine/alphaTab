@@ -1,0 +1,48 @@
+---
+title: PlayPause()
+jsName: playPause()
+jQueryName: alphaTab('playPause')
+category: Methods - Player
+description: Toggles between play/pause depending on the current player state.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Toggles between play/pause depending on the current player state. if the player was playing, it will pause. If it is paused, it will initiate a play. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void PlayPause()" />
+    <TypeRow type="js" name="function playPause()" />
+    <TypeRow type="jquery" name="alphaTab('playPause')" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+`true` if the playback was started, otherwise `false`. Reasons for not starting can be that the player is not ready or already playing.
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.PlayPause();
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.playPause();
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('playPause');
+```

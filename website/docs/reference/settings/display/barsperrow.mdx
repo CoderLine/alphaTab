@@ -1,0 +1,30 @@
+---
+title: Display.BarsPerRow
+jsName: display.barsPerRow;barsPerRow
+jsonName: display.barsPerRow;barsPerRow
+dataAttribute: data-display-barsperrow;data-barsperrow
+category: Display
+description: Limit the displayed bars per row.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting sets the number of bars that should be put into one row during layouting. This setting is only respected
+when using the layoutMode `page` where bars are aligned in rows. [Demo](/docs/showcase/layouts#page-layout-5-bars)
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="int" />
+</TypeTable>
+
+## Default Value
+
+`-1` - automatic 

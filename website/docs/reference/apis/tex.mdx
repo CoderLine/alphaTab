@@ -1,0 +1,64 @@
+---
+title: Tex()
+jsName: tex()
+jQueryName: alphaTab('tex')
+category: Methods - Core
+description: Tells alphaTab to render the given alphaTex.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Tells alphaTab to render the given alphaTex.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void Tex(string tex)" />
+    <TypeRow type="net" name="void Tex(string tex, int[] tracks)" />
+    <TypeRow type="js" name="function tex(tex)" />
+    <TypeRow type="js" name="function tex(tex, tracks)" />
+    <TypeRow type="jquery" name="alphaTab('tex', tex)" />
+    <TypeRow type="jquery" name="alphaTab('tex', tex, tracks)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="tex" type="string">
+        The alphaTex encoded string to load.
+    </ParameterRow>
+    <ParameterRow platform="all" name="tracks" type="int[]">
+        Which tracks to display.
+    </ParameterRow>
+    <ParameterRow platform="all" name="tracks" type="int">
+        Which track to display.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Tex("\title 'Test' . 3.3.4");
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.tex("\title 'Test' . 3.3.4");
+```
+
+## Example - jQuery
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+$('#alphaTab').alphaTab('tex', "\title 'Test' . 3.3.4");
+```

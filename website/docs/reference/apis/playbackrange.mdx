@@ -1,0 +1,79 @@
+---
+title: PlaybackRange
+jsName: playbackRange
+jQueryName: alphaTab('playbackRange')
+category: Properties - Player
+description: The range of the song that should be played
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Gets or sets the range of the song that should be played. The range is defined in midi ticks or the whole song is played if the range is set to null
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="AlphaTab.Audio.Synth.Synthesis.PlaybackRange" />
+</TypeTable>
+
+## PlaybackRange Properties
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    <tbody>    
+        <tr>
+            <td>
+                <CodeBadge type="net" name="StartTick" /><br />
+                <CodeBadge type="js" name="startTick" />
+            </td>
+            <td><code>int</code></td>
+            <td>
+                The position in midi ticks from where the song should start
+            </td>
+        </tr>  
+        <tr>
+            <td>
+                <CodeBadge type="net" name="EndTick" /><br />
+                <CodeBadge type="js" name="endTick" />
+            </td>
+            <td><code>int</code></td>
+            <td>
+                The position in midi ticks to where the song should be played.
+            </td>
+        </tr> 
+    </tbody>
+</table>
+
+## Default Value
+
+`null`
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.PlaybackRange = new PlaybackRange { StartTick = 1000, EndTick = 50000 };
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.playbackRange = { startTick: 1000, endTick: 50000 };
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('playbackRange', { startTick: 1000, endTick: 50000 })
+```

@@ -1,0 +1,34 @@
+---
+title: Player.ScrollOffsetY
+jsName: player.scrollOffsetY
+jsonName: player.scrollOffsetY
+dataAttribute: data-player-scrolloffsety
+category: Player
+description: Gets or sets the Y-offset to add when scrolling.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+When alphaTab does an auto-scrolling to the displayed bar, it will try to align the view port to the displayed bar. If due to 
+some layout specifics or for aesthetics a small padding is needed, this setting allows an additional Y-offset that is added to the 
+scroll position. 
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="int">
+        `-10`<br />
+        `20`
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+
+`0`

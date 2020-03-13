@@ -1,0 +1,44 @@
+---
+title: MasterVolume
+jsName: masterVolume
+jQueryName: alphaTab('masterVolume')
+category: Properties - Player
+description: The current master volume as percentage
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets or sets the master volume of the overall audio being played. The volume is annotated in percentage where 1.0 would be the normal volume and 0.5 only 50%.
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="float" />
+</TypeTable>
+
+## Default Value
+
+`1.0`
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.MasterVolume = 0.5f;
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.masterVolume = 0.5;
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('masterVolume', 0.5)
+```

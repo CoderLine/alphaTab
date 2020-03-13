@@ -25,6 +25,10 @@
   font-size: 80%;
 }
 
+.code-badge {
+  white-space: nowrap;
+}
+
 .code-badge span {
   border-left: 1px solid #DEDEDE;
   padding-left: 5px;
@@ -45,8 +49,8 @@
 .code-badge.code-badge-html { border-color: #ba6b6c; }
 .code-badge.code-badge-html span { color: #ba6b6c; }
 
-.code-badge.code-badge-jquery { border-color: #c97b63; }
-.code-badge.code-badge-jquery span { color: #c97b63; }
+.code-badge.code-badge-jq { border-color: #c97b63; }
+.code-badge.code-badge-jq span { color: #c97b63; }
 
 .code-badge.code-badge-all { border-color: #808e95; }
 .code-badge.code-badge-all span { color: #808e95; }

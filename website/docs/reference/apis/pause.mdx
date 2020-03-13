@@ -1,0 +1,48 @@
+---
+title: Pause()
+jsName: pause()
+jQueryName: alphaTab('pause')
+category: Methods - Player
+description: Pauses the playback of the current song.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Pauses the playback of the current song.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void Pause()" />
+    <TypeRow type="js" name="function pause()" />
+    <TypeRow type="jquery" name="alphaTab('pause')" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Pause();
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.pause();
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('pause');
+```
