@@ -1,5 +1,0 @@
----
-title: Metadata
----
-
-TODO

@@ -113,6 +113,11 @@ module.exports = {
         editUrl:
           'https://github.com/CoderLine/alphaTabWebsite/tree/master',
       }
+    ],
+    [
+      path.resolve(__dirname, './plugins/alphatab'),
+      {
+      }
     ]
   ],
   themes: [

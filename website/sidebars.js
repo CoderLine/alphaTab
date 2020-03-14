@@ -13,13 +13,13 @@ const sidebars = {
 		"guides/breaking-changes-095-096"
 	],
 	"alphaTex": [
+		"alphatex/introduction",
 		"alphatex/metadata",
 		"alphatex/notes",
 		"alphatex/bar-metadata",
 		"alphatex/tracks-staves",
 		"alphatex/beat-effects",
-		"alphatex/note-effects",
-		"alphatex/exporter"
+		"alphatex/note-effects"
 	],
 	"API Reference": [
 		"reference/settings",

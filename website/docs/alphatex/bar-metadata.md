@@ -1,5 +1,0 @@
----
-title: Bar Metadata
----
-
-TODO

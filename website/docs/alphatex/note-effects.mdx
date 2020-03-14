@@ -1,0 +1,89 @@
+---
+title: Note Effects
+---
+
+import AlphaTexSample from '../../src/alphatex-sample';
+
+Just like beat effects, there are also effects for single notes like harmonics,
+bends, accentuations etc. The syntax is 
+`Fret.String{NoteEffects}`
+
+## Simple Effects
+
+Please find the list of support effects in the example below. 
+
+<AlphaTexSample>{`
+// Harmonics (natural, articifial, tapped, pinch and semi)
+:8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh} |
+// trill (tr fret duration)
+:4 3.3{tr 4 16} 3.3{tr 5 32} 3.3{tr 6 64} 
+// vibrato
+3.3{v} |
+// slides (legato and shift)
+3.3{sl} 4.3 3.3{ss} 4.3 |
+// slides (into-from-below, intro-from-above, out-up, out-down)
+3.3{sib} 3.3{sia} 3.3{sou} 3.3{sod} |
+// slides (combined)
+3.3{sib sou} 3.3{sib sod} 3.3{sia sod} 3.3{sia sou} |
+// pick-slides (down and up)
+x.3{psd} 3.3 |
+x.3{psu} 3.3 |
+// hammer on/pull offs
+3.3{h} 4.3{h} |
+// ghost notes
+3.3{g}
+// accentuations (normal and heavy)
+3.3{ac} 3.3{hac}
+// staccato
+3.3{st} |
+// palm mute 
+3.3{pm} 3.3{pm} 3.3{pm} 3.3{pm} |
+// let ring 
+3.3{lr} 3.3{lr} 3.3{lr} 3.3{lr} |
+// dead notes
+3.3{x} x.3 |
+// fingering (left and right; 1 => Thumb, 2 => Index, 3 => Middle, 4 => Annual, 5 => Little)
+:8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5} (2.2{lf 4} 2.3{lf 3} 2.4{lf 2}) |
+:8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{lf 5} |
+`}</AlphaTexSample>
+
+## Bends
+
+The bend effect works like the tremolo/whammy bar effect.  
+You can specify a number of values which are evenly distributed over the
+time when the note is played. The values indicate the number of quarter notes
+increased bend up upon playing. `b (value1 value2 ...)`
+
+<AlphaTexSample>{`
+3.3{b (0 4 )} |
+3.3{b (0 4 0 8)} |
+`}</AlphaTexSample>
+
+## Tied Notes
+
+There are multiple ways to indicate tied notes depending on whether the instrument is stringed or not stringed. 
+For stringed instruments the fret simply can be set to `-` and the note will be tied to the note of the same string.
+
+<AlphaTexSample>{`
+3.3 -.3 | (1.1 3.2 2.3 0.4) (-.1 -.4)
+`}</AlphaTexSample>
+
+For non stringed instrument it can be a bit more tricky as we cannot use the string to identify which note to tie. There are multiple ways to work around this problem. AlphaTab will try to find the start note for the tie via several rules, if this does not match the desired behavior, you can specify the note value as alternative and indicate the tie via a note effect.
+
+<AlphaTexSample>{`
+\\tuning piano
+.
+// If there is a single note on the previous beat, we tie to this one
+// Then a simple - is enough for a tie
+:2 a4 - |
+// Alternatively you can specify a '-' or 't' as note effect to indicate a tie 
+:2 a4 a4{-} |
+// This also works for chords using correct note ordering 
+:2 (a4 a3) (- a3) |
+:2 (a4 a3) (a4 -) |
+// If nothing helps, always the explicit note value and tie effect should allow
+// specifying the correct behavior
+:2 (a4 a3) (a4{t} a3) |
+:4 (a4 a3) (b2 b3) a4{t} a3{-} |
+`}</AlphaTexSample>
+

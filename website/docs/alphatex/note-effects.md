@@ -1,5 +1,0 @@
----
-title: Note Effects
----
-
-TODO
