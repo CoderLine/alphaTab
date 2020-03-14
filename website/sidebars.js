@@ -30,16 +30,18 @@ const sidebars = {
   "showcase": {
 	"Showcase": [
 		'showcase'
+	],
+	"Features": [
+		'showcase/features/introduction',
+		'showcase/features/general',
+		'showcase/features/layouts',
+		'showcase/features/music-notation',
+		'showcase/features/guitar-tabs',
+		'showcase/features/special-tracks',
+		'showcase/features/special-notes',
+		'showcase/features/effects'
 	]
   }
 };
-
-for(let i = 0; i < 10; i++) {
-	sidebars.showcase.Showcase.push({
-		type: 'link',
-		label: 'Test ' + i,
-		href: 'https://alphatab.com'
-	});
-}
 
 module.exports = sidebars;

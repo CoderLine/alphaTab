@@ -1,0 +1,46 @@
+---
+title: Music Notation
+---
+
+import AlphaTab from '../../../src/alphatab';
+
+Rendering standard music notation is one of the essential features of alphaTab. 
+	   
+## Clefs
+Clefs are important for music notation too.
+<AlphaTab tex="true" settings={ {
+	staveProfile: 'score',
+	display: {
+		hideInfo: true
+	}
+} }>
+{`
+\\title "Clefs"
+.
+\\clef G2 | \\clef F4 | \\clef C3 | \\clef C4
+`}
+</AlphaTab>
+
+## Key Signatures
+Want key signatures? No problem, alphaTab will render them for you. 
+<AlphaTab file="/files/features/KeySignatures.gp5" settings={ {
+	staveProfile : 'score'
+} } />
+
+## Time Signatures
+Time signatures are important too.  
+<AlphaTab file="/files/features/TimeSignatures.gp5" settings={ {
+	staveProfile : 'score'
+} } />
+
+## Notes, Rests and Beams
+We automatically create beams for notes and ensure they are aligned in the most readable way. 
+<AlphaTab file="/files/features/Beams.gp5" settings={ {
+	staveProfile : 'score'
+} } />
+
+## Accidentals
+Accidentals are an essential element of music notation.
+<AlphaTab file="/files/features/Accidentals.gp5" settings={ {
+	staveProfile : 'score'
+} } />

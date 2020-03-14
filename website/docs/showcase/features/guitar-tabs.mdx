@@ -1,0 +1,28 @@
+---
+title: Guitar Tabs
+---
+
+import AlphaTab from '../../../src/alphatab';
+
+## Rhythm
+If you only display guitar tablatures, it might be interesting to add
+rhythm stave to show the durations. You can do this either above or below
+tablature.
+<AlphaTab file="/files/features/Rhythm.gp5" settings={ {
+	staveProfile: 'tab', 
+	notation: { rhythmMode: 'showwithbars'}
+} } />
+
+## Rhythm With Beams
+If you prefer beams instead of bars for single notes you can have that too. 
+<AlphaTab file="/files/features/Rhythm.gp5" settings={ {
+	staveProfile: 'tab', 
+	notation: { rhythmMode: 'showwithbeams'}
+} } />
+
+## String Variations
+alphaTab will render tabs for stringed instruments. It takes care of 
+number of strings and displays the tabs as you would expect.
+<AlphaTab file="/files/features/Tabs.gp5" settings={ {
+	staveProfile: 'tab' 
+} } />
