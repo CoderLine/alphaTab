@@ -84,6 +84,9 @@ module.exports = {
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Daniel Kuschny and Contributors`,
     },
+    prism: {
+      additionalLanguages: ['csharp'],
+    }
   },
   plugins: [
     [

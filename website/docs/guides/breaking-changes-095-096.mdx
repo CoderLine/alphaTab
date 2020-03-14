@@ -1,0 +1,1432 @@
+---
+title: Breaking changes on settings between 0.9.5 and 0.9.6 
+---
+
+import CodeBadge from '../../src/code-badge';
+
+In 0.9.6 there was a bigger settings rework introduced that very likely broke every setup beside the default one. 
+Please find all changes that were introduced below. 
+
+## API changes
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Before</th>
+            <th>After</th>
+            <th>Description</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td>
+                <CodeBadge type="net" name="AlphaTab.Settings.Defaults" /><br />
+                <CodeBadge type="js" name="alphaTab.Settings.get_defaults()" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="new AlphaTab.Settings()" /><br />
+                <CodeBadge type="js" name="new alphaTab.Settings()" /><br />
+            </td>
+            <td>
+                The default values for all settings were moved to the constructor. Simply
+                create a new object and all default settings will be configured. 
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <CodeBadge type="js" name="AlphaTabApi.updateLayout(settings,json,dataAttributes)" /><br />
+            </td>
+            <td>
+            </td>
+            <td>
+                This API was removed. Simply change the settings and call `updateSettings` and `render` to achive the same behavior. 
+            </td>
+        </tr>        
+    </tbody>
+</table>
+
+## Settings changes
+
+Many settings have now a new place within the settings object, hence many settings might need adjustment in your code. The new 
+    mechanism of specifying settings is way more tolerant than the old one: settings are now case insensitive (`useWorkers` is equal to `uSeWoRkerS`) and dashes on html attributes are also
+ignored (`data-use-workers` is equal to `data-useworkers`). 
+
+* `.net` is how the property is named on .net object level
+* `JavaScript` is how the property is named on the JavaScript object level (alphaTab.Settings instance)
+* `JSON` is how the property is named when specifying the property as input to alphaTab (usually short hand names)
+* `HTML` is how the property is named on HTML data attributes
+
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Before</th>
+            <th>After</th>
+            <th>Notes</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td>
+                <CodeBadge type="net" name="UseWorkers" /><br />
+                <CodeBadge type="js" name="useWorker" /><br />
+                <CodeBadge type="json" name="useWorker" /><br />
+                <CodeBadge type="html" name="data-use-worker" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Core.UseWorkers" /><br />
+                <CodeBadge type="js" name="core.useWorkers" /><br />
+                <CodeBadge type="json" name="core.useWorkers" /><br />
+                <CodeBadge type="json" name="useWorkers" /><br />
+                <CodeBadge type="html" name="data-core-use-workers" /><br />
+                <CodeBadge type="html" name="data-use-workers" /><br />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <CodeBadge type="net" name="LogLevel" /><br />
+                <CodeBadge type="js" name="logLevel" /><br />
+                <CodeBadge type="json" name="logging" /><br />
+                <CodeBadge type="html" name="data-logging" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Core.LogLevel" /><br />
+                <CodeBadge type="js" name="core.logLevel" /><br />
+                <CodeBadge type="json" name="core.logLevel" /><br />
+                <CodeBadge type="json" name="logLevel" /><br />
+                <CodeBadge type="html" name="data-core-loglevel" /><br />
+                <CodeBadge type="html" name="data-loglevel" /><br />
+            </td>
+            <td></td>
+        </tr>        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="DisplayMode" /><br />
+                <CodeBadge type="js" name="displayMode" /><br />
+                <CodeBadge type="json" name="displayMode" /><br />
+                <CodeBadge type="html" name="data-display-mode" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.NotationMode" /><br />
+                <CodeBadge type="js" name="notation.notationMode" /><br />
+                <CodeBadge type="json" name="notation.notationMode" /><br />
+                <CodeBadge type="html" name="data-notation-notationmode" /><br />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Scale" /><br />
+                <CodeBadge type="js" name="scale" /><br />
+                <CodeBadge type="json" name="scale" /><br />
+                <CodeBadge type="html" name="data-scale" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Scale" /><br />
+                <CodeBadge type="js" name="display.scale" /><br />
+                <CodeBadge type="json" name="display.scale" /><br />
+                <CodeBadge type="json" name="scale" /><br />
+                <CodeBadge type="html" name="data-display-scale" /><br />            
+                <CodeBadge type="html" name="data-scale" /><br />            
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <CodeBadge type="net" name="SlurHeight" /><br />
+                <CodeBadge type="js" name="slurHeight" /><br />
+                <CodeBadge type="json" name="slurHeight" /><br />
+                <CodeBadge type="html" name="data-slur-height" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.SlurHeight" /><br />
+                <CodeBadge type="js" name="notation.slurHeight" /><br />
+                <CodeBadge type="json" name="notation.slurHeight" /><br />
+                <CodeBadge type="html" name="data-notation-slur-height" /><br />            
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Engine" /><br />
+                <CodeBadge type="js" name="engine" /><br />
+                <CodeBadge type="json" name="engine" /><br />
+                <CodeBadge type="html" name="data-engine" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Core.Engine" /><br />
+                <CodeBadge type="js" name="core.engine" /><br />
+                <CodeBadge type="json" name="core.engine" /><br />
+                <CodeBadge type="json" name="engine" /><br />
+                <CodeBadge type="html" name="data-core-engine" /><br />            
+                <CodeBadge type="html" name="data-engine" /><br />            
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <CodeBadge type="net" name="StretchForce" /><br />
+                <CodeBadge type="js" name="stretchForce" /><br />
+                <CodeBadge type="json" name="stretchForce" /><br />
+                <CodeBadge type="html" name="data-stretch-force" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.StretchForce" /><br />
+                <CodeBadge type="js" name="display.stretchForce" /><br />
+                <CodeBadge type="json" name="display.stretchForce" /><br />
+                <CodeBadge type="json" name="stretchForce" /><br />
+                <CodeBadge type="html" name="data-display-stretchforce" /><br />
+                <CodeBadge type="html" name="data-stretchforce" /><br />
+            </td>
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ForcePianoFingering" /><br />
+                <CodeBadge type="js" name="forcePianoFingering" /><br />
+                <CodeBadge type="json" name="forcePianoFingering" /><br />
+                <CodeBadge type="html" name="data-force-piano-fingering" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.FingeringMode" /><br />
+                <CodeBadge type="js" name="forcePianoFingering" /><br />
+                <CodeBadge type="json" name="forcePianoFingering" /><br />
+                <CodeBadge type="html" name="data-force-piano-fingering" /><br />            
+            </td>
+            <td>
+                Set it to `ScoreForcePiano` or `SingleNoteEffectBandForcePiano` to get the 
+                forced piano fingering depending on the preferred display of fingering. 
+            </td>
+        </tr>
+                
+        <tr>
+            <td>
+                <CodeBadge type="net" name="EnableLazyLoading" /><br />
+                <CodeBadge type="js" name="enableLazyLoading" /><br />
+                <CodeBadge type="json" name="lazy" /><br />
+                <CodeBadge type="html" name="data-lazy" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Core.EnableLazyLoading" /><br />
+                <CodeBadge type="js" name="Core.enableLazyLoading" /><br />
+                <CodeBadge type="json" name="core.enableLazyLoading" /><br />
+                <CodeBadge type="json" name="enableLazyLoading" /><br />
+                <CodeBadge type="html" name="data-core-enablelazyloading" /><br />            
+                <CodeBadge type="html" name="data-enablelazyloading" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="TranspositionPitches" /><br />
+                <CodeBadge type="js" name="transpositionPitches" /><br />
+                <CodeBadge type="json" name="transpositionPitches" /><br />
+                <CodeBadge type="html" name="data-transposition-pitches" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.TranspositionPitches" /><br />
+                <CodeBadge type="js" name="Notation.transpositionPitches" /><br />
+                <CodeBadge type="json" name="Notation.transpositionPitches" /><br />
+                <CodeBadge type="html" name="data-notation-transpositionpitches" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="DisplayTranspositionPitches" /><br />
+                <CodeBadge type="js" name="displayTranspositionPitches" /><br />
+                <CodeBadge type="json" name="displayTranspositionPitches" /><br />
+                <CodeBadge type="html" name="data-display-transposition-pitches" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.DisplayTranspositionPitches" /><br />
+                <CodeBadge type="js" name="notation.displayTranspositionPitches" /><br />
+                <CodeBadge type="json" name="notation.displayTranspositionPitches" /><br />
+                <CodeBadge type="html" name="data-notation-displaytranspositionpitches" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ScriptFile" /><br />
+                <CodeBadge type="js" name="scriptFile" /><br />
+                <CodeBadge type="json" name="scriptFile" /><br />
+                <CodeBadge type="html" name="data-script-file" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Core.ScriptFile" /><br />
+                <CodeBadge type="js" name="core.scriptFile" /><br />
+                <CodeBadge type="json" name="core.scriptFile" /><br />
+                <CodeBadge type="json" name="scriptFile" /><br />
+                <CodeBadge type="html" name="data-core-script-file" /><br />
+                <CodeBadge type="html" name="data-script-file" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="FontDirectory" /><br />
+                <CodeBadge type="js" name="fontDirectory" /><br />
+                <CodeBadge type="json" name="fontDirectory" /><br />
+                <CodeBadge type="html" name="data-font-directory" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Core.FontDirectory" /><br />
+                <CodeBadge type="js" name="core.fontDirectory" /><br />
+                <CodeBadge type="json" name="core.fontDirectory" /><br />
+                <CodeBadge type="json" name="fontDirectory" /><br />
+                <CodeBadge type="html" name="data-core-font-directory" /><br />
+                <CodeBadge type="html" name="data-font-directory" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="SmallGraceTabNotes" /><br />
+                <CodeBadge type="js" name="smallGraceTabNotes" /><br />
+                <CodeBadge type="json" name="smallGraceTabNotes" /><br />
+                <CodeBadge type="html" name="data-small-grace-tab-notes" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.SmallGraceTabNotes" /><br />
+                <CodeBadge type="js" name="notation.smallGraceTabNotes" /><br />
+                <CodeBadge type="json" name="notation.smallGraceTabNotes" /><br />
+                <CodeBadge type="html" name="data-notation-smallgracetabnotes" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="FingeringMode" /><br />
+                <CodeBadge type="js" name="fingeringMode" /><br />
+                <CodeBadge type="json" name="fingeringMode" /><br />
+                <CodeBadge type="html" name="data-fingering-mode" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.FingeringMode" /><br />
+                <CodeBadge type="js" name="notation.fingeringMode" /><br />
+                <CodeBadge type="json" name="notation.fingeringMode" /><br />
+                <CodeBadge type="html" name="data-notation-fingering-mode" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ExtendBendArrowsOnTiedNotes" /><br />
+                <CodeBadge type="js" name="extendBendArrowsOnTiedNotes" /><br />
+                <CodeBadge type="json" name="extendBendArrowsOnTiedNotes" /><br />
+                <CodeBadge type="html" name="data-extend-bend-arrows-on-tied-notes" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.ExtendBendArrowsOnTiedNotes" /><br />
+                <CodeBadge type="js" name="notation.extendBendArrowsOnTiedNotes" /><br />
+                <CodeBadge type="json" name="notation.extendBendArrowsOnTiedNotes" /><br />
+                <CodeBadge type="html" name="data-notation-extendbendarrowsontiednotes" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ShowParenthesisForTiedBends" /><br />
+                <CodeBadge type="js" name="showParenthesisForTiedBends" /><br />
+                <CodeBadge type="json" name="showParenthesisForTiedBends" /><br />
+                <CodeBadge type="html" name="data-show-parenthesis-for-tied-bends" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.ShowParenthesisForTiedBends" /><br />
+                <CodeBadge type="js" name="notation.showParenthesisForTiedBends" /><br />
+                <CodeBadge type="json" name="notation.showParenthesisForTiedBends" /><br />
+                <CodeBadge type="html" name="data-notation-showparenthesisfortiedbends" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ShowTabNoteOnTiedBend" /><br />
+                <CodeBadge type="js" name="showTabNoteOnTiedBend" /><br />
+                <CodeBadge type="json" name="showTabNoteOnTiedBend" /><br />
+                <CodeBadge type="html" name="data-show-tab-note-on-tied-bend" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.ShowTabNoteOnTiedBend" /><br />
+                <CodeBadge type="js" name="notation.showTabNoteOnTiedBend" /><br />
+                <CodeBadge type="json" name="notation.showTabNoteOnTiedBend" /><br />
+                <CodeBadge type="html" name="data-notation-showtabnoteontiedbend" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ShowZeroOnDiveWhammy" /><br />
+                <CodeBadge type="js" name="showZeroOnDiveWhammy" /><br />
+                <CodeBadge type="json" name="showZeroOnDiveWhammy" /><br />
+                <CodeBadge type="html" name="data-show-zero-on-dive-whammy" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.ShowZeroOnDiveWhammy" /><br />
+                <CodeBadge type="js" name="notation.showZeroOnDiveWhammy" /><br />
+                <CodeBadge type="json" name="notation.showZeroOnDiveWhammy" /><br />
+                <CodeBadge type="html" name="data-notation-showzeroondivewhammy" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ExtendLineEffectsToBeatEnd" /><br />
+                <CodeBadge type="js" name="extendLineEffectsToBeatEnd" /><br />
+                <CodeBadge type="json" name="extendLineEffectsToBeatEnd" /><br />
+                <CodeBadge type="html" name="data-extend-line-effects-to-beat-end" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.ExtendLineEffectsToBeatEnd" /><br />
+                <CodeBadge type="js" name="notation.extendLineEffectsToBeatEnd" /><br />
+                <CodeBadge type="json" name="notation.extendLineEffectsToBeatEnd" /><br />
+                <CodeBadge type="html" name="data-notation-extendlineeffectstobeatend" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="SongBookBendDuration" /><br />
+                <CodeBadge type="js" name="songBookBendDuration" /><br />
+                <CodeBadge type="json" name="songBookBendDuration" /><br />
+                <CodeBadge type="html" name="data-song-book-bend-duration" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.SongBookBendDuration" /><br />
+                <CodeBadge type="js" name="player.songBookBendDuration" /><br />
+                <CodeBadge type="json" name="player.songBookBendDuration" /><br />
+                <CodeBadge type="html" name="data-player-songbookbendduration" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="SongBookDipDuration" /><br />
+                <CodeBadge type="js" name="songBookDipDuration" /><br />
+                <CodeBadge type="json" name="songBookDipDuration" /><br />
+                <CodeBadge type="html" name="data-song-book-dip-duration" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.SongBookDipDuration" /><br />
+                <CodeBadge type="js" name="player.songBookDipDuration" /><br />
+                <CodeBadge type="json" name="player.songBookDipDuration" /><br />
+                <CodeBadge type="html" name="data-player-songbookdipduration" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Layout.Mode" /><br />
+                <CodeBadge type="js" name="layout.mode" /><br />
+                <CodeBadge type="json" name="layout.mode" /><br />
+                <CodeBadge type="json" name="layout" /><br />
+                <CodeBadge type="html" name="data-layout" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.LayoutMode" /><br />
+                <CodeBadge type="js" name="display.layoutMode" /><br />
+                <CodeBadge type="json" name="display.layoutMode" /><br />
+                <CodeBadge type="json" name="layoutMode" /><br />
+                <CodeBadge type="html" name="data-display-layout-mode" /><br />            
+                <CodeBadge type="html" name="data-layout-mode" /><br />            
+            </td>
+            <td>
+                The display mode is now a strong typed enumeration. 
+            </td>    
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Layout.AdditionalSettings["barsPerRow"]' /><br />
+                <CodeBadge type="js" name="layout.additionalSettings.barsPerRow" /><br />
+                <CodeBadge type="json" name="layout.additionalSettings.barsPerRow" /><br />
+                <CodeBadge type="html" name="data-layout-bars-per-row" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.BarsPerRow" /><br />
+                <CodeBadge type="js" name="display.barsPerRow" /><br />
+                <CodeBadge type="json" name="display.barsPerRow" /><br />
+                <CodeBadge type="json" name="barsPerRow" /><br />
+                <CodeBadge type="html" name="data-display-barsperrow" /><br />            
+                <CodeBadge type="html" name="data-barsperrow" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Layout.AdditionalSettings["start"]' /><br />
+                <CodeBadge type="js" name="layout.additionalSettings.start" /><br />
+                <CodeBadge type="json" name="layout.additionalSettings.start" /><br />
+                <CodeBadge type="html" name="data-layout-start" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.StartBar" /><br />
+                <CodeBadge type="js" name="display.startBar" /><br />
+                <CodeBadge type="json" name="display.startBar" /><br />
+                <CodeBadge type="json" name="startBar" /><br />
+                <CodeBadge type="html" name="data-display-startbar" /><br />            
+                <CodeBadge type="html" name="data-startbar" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Layout.AdditionalSettings["count"]' /><br />
+                <CodeBadge type="js" name="layout.additionalSettings.count" /><br />
+                <CodeBadge type="json" name="layout.additionalSettings.count" /><br />
+                <CodeBadge type="html" name="data-layout-count" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.BarCount" /><br />
+                <CodeBadge type="js" name="display.barCount" /><br />
+                <CodeBadge type="json" name="display.barCount" /><br />
+                <CodeBadge type="json" name="barCount" /><br />
+                <CodeBadge type="html" name="data-display-barcount" /><br />            
+                <CodeBadge type="html" name="data-barcount" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Layout.AdditionalSettings["hideInfo"]' /><br />
+                <CodeBadge type="js" name="layout.additionalSettings.hideInfo" /><br />
+                <CodeBadge type="json" name="layout.additionalSettings.hideInfo" /><br />
+                <CodeBadge type="html" name="data-layout-hide-info" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.HideInfo" /><br />
+                <CodeBadge type="js" name="display.hideInfo" /><br />
+                <CodeBadge type="json" name="display.hideInfo" /><br />
+                <CodeBadge type="json" name="hideInfo" /><br />
+                <CodeBadge type="html" name="data-display-hideinfo" /><br />            
+                <CodeBadge type="html" name="data-hideinfo" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Layout.AdditionalSettings["hideTuning"]' /><br />
+                <CodeBadge type="js" name="layout.additionalSettings.hideTuning" /><br />
+                <CodeBadge type="json" name="layout.additionalSettings.hideTuning" /><br />
+                <CodeBadge type="html" name="data-layout-hide-tuning" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.HideTuning" /><br />
+                <CodeBadge type="js" name="display.hideTuning" /><br />
+                <CodeBadge type="json" name="display.hideTuning" /><br />
+                <CodeBadge type="json" name="hideTuning" /><br />
+                <CodeBadge type="html" name="data-display-hidetuning" /><br />            
+                <CodeBadge type="html" name="data-hidetuning" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Layout.AdditionalSettings["hideChordDiagram"]' /><br />
+                <CodeBadge type="js" name="layout.additionalSettings.hideChordDiagram" /><br />
+                <CodeBadge type="json" name="layout.additionalSettings.hideChordDiagram" /><br />
+                <CodeBadge type="html" name="data-layout-hide-chord-diagram" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.HideChordDiagrams" /><br />
+                <CodeBadge type="js" name="display.hideChordDiagrams" /><br />
+                <CodeBadge type="json" name="display.hideChordDiagrams" /><br />
+                <CodeBadge type="json" name="hideChordDiagrams" /><br />
+                <CodeBadge type="html" name="data-display-hidechorddiagrams" /><br />            
+                <CodeBadge type="html" name="data-hidechorddiagrams" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Layout.AdditionalSettings["hideTrackNames"]' /><br />
+                <CodeBadge type="js" name="layout.additionalSettings.hideTrackNames" /><br />
+                <CodeBadge type="json" name="layout.additionalSettings.hideTrackNames" /><br />
+                <CodeBadge type="html" name="data-layout-hide-track-names" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.HideTrackNames" /><br />
+                <CodeBadge type="js" name="display.hideTrackNames" /><br />
+                <CodeBadge type="json" name="display.hideTrackNames" /><br />
+                <CodeBadge type="json" name="hideTrackNames" /><br />
+                <CodeBadge type="html" name="data-display-hidetracknames" /><br />            
+                <CodeBadge type="html" name="data-hidetracknames" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="IncludeNoteBounds" /><br />
+                <CodeBadge type="js" name="includeNoteBounds" /><br />
+                <CodeBadge type="json" name="includeNoteBounds" /><br />
+                <CodeBadge type="html" name="data-include-note-bounds" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Core.IncludeNoteBounds" /><br />
+                <CodeBadge type="js" name="core.includeNoteBounds" /><br />
+                <CodeBadge type="json" name="core.includeNoteBounds" /><br />
+                <CodeBadge type="json" name="includeNoteBounds" /><br />
+                <CodeBadge type="html" name="data-core-includenotebounds" /><br />            
+                <CodeBadge type="html" name="data-includenotebounds" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="PlayTripletFeel" /><br />
+                <CodeBadge type="js" name="playTripletFeel" /><br />
+                <CodeBadge type="json" name="playTripletFeel" /><br />
+                <CodeBadge type="html" name="data-play-triplet-feel" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="player.PlayTripletFeel" /><br />
+                <CodeBadge type="js" name="player.playTripletFeel" /><br />
+                <CodeBadge type="json" name="player.playTripletFeel" /><br />
+                <CodeBadge type="html" name="data-player-playtripletfeel" /><br />
+            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Vibrato.NoteSlightAmplitude" /><br />
+                <CodeBadge type="js" name="vibrato.noteSlightAmplitude" /><br />
+                <CodeBadge type="json" name="vibrato.noteSlightAmplitude" /><br />
+                <CodeBadge type="html" name="data-vibrato-note-slight-amplitude" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.Vibrato.NoteSlightAmplitude" /><br />
+                <CodeBadge type="js" name="player.vibrato.noteSlightAmplitude" /><br />
+                <CodeBadge type="json" name="player.vibrato.noteSlightAmplitude" /><br />
+                <CodeBadge type="html" name="data-player-vibrato-noteslightamplitude" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Vibrato.NoteWideAmplitude" /><br />
+                <CodeBadge type="js" name="vibrato.noteWideAmplitude" /><br />
+                <CodeBadge type="json" name="vibrato.noteWideAmplitude" /><br />
+                <CodeBadge type="html" name="data-vibrato-note-wide-amplitude" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.Vibrato.NoteWideAmplitude" /><br />
+                <CodeBadge type="js" name="player.vibrato.noteWideAmplitude" /><br />
+                <CodeBadge type="json" name="player.vibrato.noteWideAmplitude" /><br />
+                <CodeBadge type="html" name="data-player-vibrato-notewideamplitude" /><br />
+            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Vibrato.NoteSlightLength" /><br />
+                <CodeBadge type="js" name="vibrato.noteSlightLength" /><br />
+                <CodeBadge type="json" name="vibrato.noteSlightLength" /><br />
+                <CodeBadge type="html" name="data-vibrato-note-slight-length" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.Vibrato.NoteSlightLength" /><br />
+                <CodeBadge type="js" name="player.vibrato.noteSlightLength" /><br />
+                <CodeBadge type="json" name="player.vibrato.noteSlightLength" /><br />
+                <CodeBadge type="html" name="data-player-vibrato-noteslightlength" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Vibrato.NoteWideLength" /><br />
+                <CodeBadge type="js" name="vibrato.noteWideLength" /><br />
+                <CodeBadge type="json" name="vibrato.noteWideLength" /><br />
+                <CodeBadge type="html" name="data-vibrato-note-wide-length" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.Vibrato.NoteWideLength" /><br />
+                <CodeBadge type="js" name="player.vibrato.noteWideLength" /><br />
+                <CodeBadge type="json" name="player.vibrato.noteWideLength" /><br />
+                <CodeBadge type="html" name="data-player-vibrato-notewidelength" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Vibrato.BeatSlightAmplitude" /><br />
+                <CodeBadge type="js" name="vibrato.beatSlightAmplitude" /><br />
+                <CodeBadge type="json" name="vibrato.beatSlightAmplitude" /><br />
+                <CodeBadge type="html" name="data-vibrato-beat-slight-amplitude" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.Vibrato.BeatSlightAmplitude" /><br />
+                <CodeBadge type="js" name="player.vibrato.beatSlightAmplitude" /><br />
+                <CodeBadge type="json" name="player.vibrato.beatSlightAmplitude" /><br />
+                <CodeBadge type="html" name="data-player-vibrato-beatslightamplitude" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Vibrato.BeatWideAmplitude" /><br />
+                <CodeBadge type="js" name="vibrato.beatWideAmplitude" /><br />
+                <CodeBadge type="json" name="vibrato.beatWideAmplitude" /><br />
+                <CodeBadge type="html" name="data-vibrato-beat-wide-amplitude" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.Vibrato.BeatWideAmplitude" /><br />
+                <CodeBadge type="js" name="player.vibrato.beatWideAmplitude" /><br />
+                <CodeBadge type="json" name="player.vibrato.beatWideAmplitude" /><br />
+                <CodeBadge type="html" name="data-player-vibrato-beatwideamplitude" /><br />
+            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Vibrato.BeatSlightLength" /><br />
+                <CodeBadge type="js" name="vibrato.beatSlightLength" /><br />
+                <CodeBadge type="json" name="vibrato.beatSlightLength" /><br />
+                <CodeBadge type="html" name="data-vibrato-beat-slight-length" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.Vibrato.BeatSlightLength" /><br />
+                <CodeBadge type="js" name="player.vibrato.beatSlightLength" /><br />
+                <CodeBadge type="json" name="player.vibrato.beatSlightLength" /><br />
+                <CodeBadge type="html" name="data-player-vibrato-beatslightlength" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Vibrato.BeatWideLength" /><br />
+                <CodeBadge type="js" name="vibrato.beatWideLength" /><br />
+                <CodeBadge type="json" name="vibrato.beatWideLength" /><br />
+                <CodeBadge type="html" name="data-vibrato-beat-wide-length" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.Vibrato.BeatWideLength" /><br />
+                <CodeBadge type="js" name="player.vibrato.beatWideLength" /><br />
+                <CodeBadge type="json" name="player.vibrato.beatWideLength" /><br />
+                <CodeBadge type="html" name="data-player-vibrato-beatwidelength" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="Staves.Id" /><br />
+                <CodeBadge type="js" name="staves.id" /><br />
+                <CodeBadge type="json" name="staves.id" /><br />
+                <CodeBadge type="json" name="staves" /><br />
+                <CodeBadge type="html" name="data-staves" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.StaveProfile" /><br />
+                <CodeBadge type="js" name="display.staveProfile" /><br />
+                <CodeBadge type="json" name="display.staveProfile" /><br />
+                <CodeBadge type="json" name="staveProfile" /><br />
+                <CodeBadge type="html" name="data-display-staveprofile" /><br />            
+                <CodeBadge type="html" name="data-staveprofile" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Staves.AdditionalSettings["rhythm"]' /><br />
+                <CodeBadge type="js" name="staves.additionalSettings.rhythm" /><br />
+                <CodeBadge type="json" name="staves.additionalSettings.rhythm" /><br />
+                <CodeBadge type="html" name="data-staves-rhythm" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.RhythmMode" /><br />
+                <CodeBadge type="js" name="notation.rhythmMode" /><br />
+                <CodeBadge type="json" name="notation.rhythmMode" /><br />
+                <CodeBadge type="html" name="data-notation-rhythmmode" /><br />
+            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Staves.AdditionalSettings["rhythmBeams"]' /><br />
+                <CodeBadge type="js" name="staves.additionalSettings.rhythmBeams" /><br />
+                <CodeBadge type="json" name="staves.additionalSettings.rhythmBeams" /><br />
+                <CodeBadge type="html" name="data-staves-rhythm-beams" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.RhythmMode" /><br />
+                <CodeBadge type="js" name="notation.rhythmMode" /><br />
+                <CodeBadge type="json" name="notation.rhythmMode" /><br />
+                <CodeBadge type="html" name="data-notation-rhythmmode" /><br />
+            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Staves.AdditionalSettings["rhythmHeight"]' /><br />
+                <CodeBadge type="js" name="staves.additionalSettings.rhythmHeight" /><br />
+                <CodeBadge type="json" name="staves.additionalSettings.rhythmHeight" /><br />
+                <CodeBadge type="html" name="data-staves-rhythm-height" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Notation.RhythmHeight" /><br />
+                <CodeBadge type="js" name="notation.rhythmHeight" /><br />
+                <CodeBadge type="json" name="notation.rhythmHeight" /><br />
+                <CodeBadge type="html" name="data-notation-rhythmheight" /><br />
+            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="EnablePlayer" /><br />
+                <CodeBadge type="js" name="enablePlayer" /><br />
+                <CodeBadge type="json" name="enablePlayer" /><br />
+                <CodeBadge type="html" name="data-player" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.EnablePlayer" /><br />
+                <CodeBadge type="js" name="player.enablePlayer" /><br />
+                <CodeBadge type="json" name="player.enablePlayer" /><br />
+                <CodeBadge type="html" name="data-player-enableplayer" /><br />            
+            </td>
+            <td>
+                On JavaScript earlier the setting controlled both enabling the player and which soundfont should be loaded. 
+                Now it really only controls whether the player should be enabled. The soundfont is specified via `SoundFont` or loaded manually via API.
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="SoundFontFile" /><br />
+                <CodeBadge type="js" name="soundFontFile" /><br />
+                <CodeBadge type="json" name="soundFontFile" /><br />
+                <CodeBadge type="html" name="data-player" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.SoundFont" /><br />
+                <CodeBadge type="js" name="player.soundFont" /><br />
+                <CodeBadge type="json" name="player.soundFont" /><br />
+                <CodeBadge type="html" name="data-player-soundfont" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="EnableCursor" /><br />
+                <CodeBadge type="js" name="enableCursor" /><br />
+                <CodeBadge type="json" name="cursor" /><br />
+                <CodeBadge type="html" name="data-cursor" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.EnableCursor" /><br />
+                <CodeBadge type="js" name="player.enableCursor" /><br />
+                <CodeBadge type="json" name="player.enableCursor" /><br />
+                <CodeBadge type="html" name="data-player-enablecursor" /><br />
+            
+            </td>
+        </tr>        
+        
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='ImporterSettings["encoding"]' /><br />
+                <CodeBadge type="js" name="importer.encoding" /><br />
+                <CodeBadge type="json" name="importer.encoding" /><br />
+                <CodeBadge type="html" name="data-importer-encoding" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Importer.Encoding" /><br />
+                <CodeBadge type="js" name="importer.encoding" /><br />
+                <CodeBadge type="json" name="importer.encoding" /><br />
+                <CodeBadge type="html" name="data-importer-encoding" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name='Staves.ImporterSettings["musicXMLMergePartGroups"]' /><br />
+                <CodeBadge type="js" name="staves.importer.musicXMLMergePartGroups" /><br />
+                <CodeBadge type="json" name="staves.importer.musicXMLMergePartGroups" /><br />
+                <CodeBadge type="html" name="data-importer-musicxml-merge-part-groups" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Importer.MergePartGroupsInMusicXml" /><br />
+                <CodeBadge type="js" name="importer.mergePartGroupsInMusicXml" /><br />
+                <CodeBadge type="json" name="importer.mergePartGroupsInMusicXml" /><br />
+                <CodeBadge type="html" name="data-importer-mergepartgroupsinmusicxml" /><br />            
+            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.CopyrightFont" /><br />
+                <CodeBadge type="js" name="resources.copyrightFont" /><br />
+                <CodeBadge type="json" name="resources.copyrightFont" /><br />
+                <CodeBadge type="html" name="data-resources-copyright-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.CopyrightFont" /><br />
+                <CodeBadge type="js" name="display.resources.copyrightFont" /><br />
+                <CodeBadge type="json" name="display.resources.copyrightFont" /><br />
+                <CodeBadge type="json" name="resources.copyrightFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-copyrightfont" /><br />
+                <CodeBadge type="html" name="data-resources-copyrightfont" /><br />
+            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.TitleFont" /><br />
+                <CodeBadge type="js" name="resources.titleFont" /><br />
+                <CodeBadge type="json" name="resources.titleFont" /><br />
+                <CodeBadge type="html" name="data-resources-title-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.TitleFont" /><br />
+                <CodeBadge type="js" name="display.resources.titleFont" /><br />
+                <CodeBadge type="json" name="display.resources.titleFont" /><br />
+                <CodeBadge type="json" name="resources.titleFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-titlefont" /><br />            
+                <CodeBadge type="html" name="data-resources-titlefont" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.SubTitleFont" /><br />
+                <CodeBadge type="js" name="resources.subTitleFont" /><br />
+                <CodeBadge type="json" name="resources.subTitleFont" /><br />
+                <CodeBadge type="html" name="data-resources-subtitle-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.SubTitleFont" /><br />
+                <CodeBadge type="js" name="display.resources.subTitleFont" /><br />
+                <CodeBadge type="json" name="display.resources.subTitleFont" /><br />
+                <CodeBadge type="json" name="resources.subTitleFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-subtitlefont" /><br />
+                <CodeBadge type="html" name="data-resources-subtitlefont" /><br />
+            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.WordsFont" /><br />
+                <CodeBadge type="js" name="resources.wordsFont" /><br />
+                <CodeBadge type="json" name="resources.wordsFont" /><br />
+                <CodeBadge type="html" name="data-resources-words-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.WordsFont" /><br />
+                <CodeBadge type="js" name="display.resources.wordsFont" /><br />
+                <CodeBadge type="json" name="display.resources.wordsFont" /><br />
+                <CodeBadge type="json" name="resources.wordsFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-wordsfont" /><br />            
+                <CodeBadge type="html" name="data-resources-wordsfont" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.EffectFont" /><br />
+                <CodeBadge type="js" name="resources.effectFont" /><br />
+                <CodeBadge type="json" name="resources.effectFont" /><br />
+                <CodeBadge type="html" name="data-resources-effect-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.EffectFont" /><br />
+                <CodeBadge type="js" name="display.resources.effectFont" /><br />
+                <CodeBadge type="json" name="display.resources.effectFont" /><br />
+                <CodeBadge type="json" name="resources.effectFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-effectfont" /><br />            
+                <CodeBadge type="html" name="data-resources-effectfont" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.FretboardNumberFont" /><br />
+                <CodeBadge type="js" name="resources.fretboardNumberFont" /><br />
+                <CodeBadge type="json" name="resources.fretboardNumberFont" /><br />
+                <CodeBadge type="html" name="data-resources-fretboard-number-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.FretboardNumberFont" /><br />
+                <CodeBadge type="js" name="display.resources.fretboardNumberFont" /><br />
+                <CodeBadge type="json" name="display.resources.fretboardNumberFont" /><br />
+                <CodeBadge type="json" name="resources.fretboardNumberFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-fretboardnumberfont" /><br />            
+                <CodeBadge type="html" name="data-resources-fretboardnumberfont" /><br />            
+            </td>
+        </tr>        
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.TablatureFont" /><br />
+                <CodeBadge type="js" name="resources.tablatureFont" /><br />
+                <CodeBadge type="json" name="resources.tablatureFont" /><br />
+                <CodeBadge type="html" name="data-resources-tablature-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.TablatureFont" /><br />
+                <CodeBadge type="js" name="display.resources.tablatureFont" /><br />
+                <CodeBadge type="json" name="display.resources.tablatureFont" /><br />
+                <CodeBadge type="json" name="resources.tablatureFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-tablaturefont" /><br />            
+                <CodeBadge type="html" name="data-resources-tablaturefont" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.GraceFont" /><br />
+                <CodeBadge type="js" name="resources.graceFont" /><br />
+                <CodeBadge type="json" name="resources.graceFont" /><br />
+                <CodeBadge type="html" name="data-resources-grace-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.GraceFont" /><br />
+                <CodeBadge type="js" name="display.resources.graceFont" /><br />
+                <CodeBadge type="json" name="display.resources.graceFont" /><br />
+                <CodeBadge type="json" name="resources.graceFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-gracefont" /><br />
+                <CodeBadge type="html" name="data-resources-gracefont" /><br />
+            </td>
+        </tr>        
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.BarNumberFont" /><br />
+                <CodeBadge type="js" name="resources.barNumberFont" /><br />
+                <CodeBadge type="json" name="resources.barNumberFont" /><br />
+                <CodeBadge type="html" name="data-resources-bar-number-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.BarNumberFont" /><br />
+                <CodeBadge type="js" name="display.resources.barNumberFont" /><br />
+                <CodeBadge type="json" name="display.resources.barNumberFont" /><br />
+                <CodeBadge type="json" name="resources.barNumberFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-barnumberfont" /><br />            
+                <CodeBadge type="html" name="data-resources-barnumberfont" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.FingeringFont" /><br />
+                <CodeBadge type="js" name="resources.fingeringFont" /><br />
+                <CodeBadge type="json" name="resources.fingeringFont" /><br />
+                <CodeBadge type="html" name="data-resources-fingering-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.FingeringFont" /><br />
+                <CodeBadge type="js" name="display.resources.fingeringFont" /><br />
+                <CodeBadge type="json" name="display.resources.fingeringFont" /><br />
+                <CodeBadge type="json" name="resources.fingeringFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-fingeringfont" /><br />            
+                <CodeBadge type="html" name="data-resources-fingeringfont" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.MarkerFont" /><br />
+                <CodeBadge type="js" name="resources.markerFont" /><br />
+                <CodeBadge type="json" name="resources.markerFont" /><br />
+                <CodeBadge type="html" name="data-resources-marker-font" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.MarkerFont" /><br />
+                <CodeBadge type="js" name="display.resources.markerFont" /><br />
+                <CodeBadge type="json" name="display.resources.markerFont" /><br />
+                <CodeBadge type="json" name="resources.markerFont" /><br />
+                <CodeBadge type="html" name="data-display-resources-markerfont" /><br />
+                <CodeBadge type="html" name="data-resources-markerfont" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.StaffLineColor" /><br />
+                <CodeBadge type="js" name="resources.staffLineColor" /><br />
+                <CodeBadge type="json" name="resources.staffLineColor" /><br />
+                <CodeBadge type="html" name="data-resources-staff-line-color" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.StaffLineColor" /><br />
+                <CodeBadge type="js" name="display.resources.staffLineColor" /><br />
+                <CodeBadge type="json" name="display.resources.staffLineColor" /><br />
+                <CodeBadge type="json" name="resources.staffLineColor" /><br />
+                <CodeBadge type="html" name="data-display-resources-stafflinecolor" /><br />            
+                <CodeBadge type="html" name="data-resources-stafflinecolor" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.BarNumberColor" /><br />
+                <CodeBadge type="js" name="resources.barNumberColor" /><br />
+                <CodeBadge type="json" name="resources.barNumberColor" /><br />
+                <CodeBadge type="html" name="data-resources-bar-number-color" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.BarNumberColor" /><br />
+                <CodeBadge type="js" name="display.resources.barNumberColor" /><br />
+                <CodeBadge type="json" name="display.resources.barNumberColor" /><br />
+                <CodeBadge type="json" name="resources.barNumberColor" /><br />
+                <CodeBadge type="html" name="data-display-resources-barnumbercolor" /><br />            
+                <CodeBadge type="html" name="data-resources-barnumbercolor" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.BarSeparatorColor" /><br />
+                <CodeBadge type="js" name="resources.barSeparatorColor" /><br />
+                <CodeBadge type="json" name="resources.barSeparatorColor" /><br />
+                <CodeBadge type="html" name="data-resources-bar-separator-color" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.BarSeparatorColor" /><br />
+                <CodeBadge type="js" name="display.resources.barSeparatorColor" /><br />
+                <CodeBadge type="json" name="display.resources.barSeparatorColor" /><br />
+                <CodeBadge type="json" name="resources.barSeparatorColor" /><br />
+                <CodeBadge type="html" name="data-display-resources-barseparatorcolor" /><br />            
+                <CodeBadge type="html" name="data-resources-barseparatorcolor" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.MainGlyphColor" /><br />
+                <CodeBadge type="js" name="resources.mainGlyphColor" /><br />
+                <CodeBadge type="json" name="resources.mainGlyphColor" /><br />
+                <CodeBadge type="html" name="data-resources-main-glyph-color" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.MainGlyphColor" /><br />
+                <CodeBadge type="js" name="display.resources.mainGlyphColor" /><br />
+                <CodeBadge type="json" name="display.resources.mainGlyphColor" /><br />
+                <CodeBadge type="json" name="resources.mainGlyphColor" /><br />
+                <CodeBadge type="html" name="data-display-resources-mainglyphcolor" /><br />
+                <CodeBadge type="html" name="data-resources-mainglyphcolor" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.SecondaryGlyphColor" /><br />
+                <CodeBadge type="js" name="resources.secondaryGlyphColor" /><br />
+                <CodeBadge type="json" name="resources.secondaryGlyphColor" /><br />
+                <CodeBadge type="html" name="data-resources-secondary-glyph-color" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.SecondaryGlyphColor" /><br />
+                <CodeBadge type="js" name="display.resources.secondaryGlyphColor" /><br />
+                <CodeBadge type="json" name="display.resources.secondaryGlyphColor" /><br />
+                <CodeBadge type="json" name="resources.secondaryGlyphColor" /><br />
+                <CodeBadge type="html" name="data-display-resources-secondaryglyphcolor" /><br />            
+                <CodeBadge type="html" name="data-resources-secondaryglyphcolor" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="RenderingResources.ScoreInfoColor" /><br />
+                <CodeBadge type="js" name="resources.scoreInfoColor" /><br />
+                <CodeBadge type="json" name="resources.scoreInfoColor" /><br />
+                <CodeBadge type="html" name="data-resources-score-info-color" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Display.Resources.ScoreInfoColor" /><br />
+                <CodeBadge type="js" name="display.resources.scoreInfoColor" /><br />
+                <CodeBadge type="json" name="display.resources.scoreInfoColor" /><br />
+                <CodeBadge type="json" name="resources.scoreInfoColor" /><br />
+                <CodeBadge type="html" name="data-display-resources-scoreinfocolor" /><br />
+                <CodeBadge type="html" name="data-resources-scoreinfocolor" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ScrollOffsetX" /><br />
+                <CodeBadge type="js" name="scrollOffsetX" /><br />
+                <CodeBadge type="json" name="playerOffset" /><br />
+                <CodeBadge type="json" name="playerOffset[0]" /><br />
+                <CodeBadge type="html" name="data-player-offset" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="player.ScrollOffsetX" /><br />
+                <CodeBadge type="js" name="player.scrollOffsetX" /><br />
+                <CodeBadge type="json" name="player.scrollOffsetX" /><br />
+                <CodeBadge type="html" name="data-player-scrolloffsetx" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ScrollOffsetY" /><br />
+                <CodeBadge type="js" name="scrollOffsetY" /><br />
+                <CodeBadge type="json" name="playerOffset" /><br />
+                <CodeBadge type="json" name="playerOffset[1]" /><br />
+                <CodeBadge type="html" name="data-player-offset" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="player.ScrollOffsetY" /><br />
+                <CodeBadge type="js" name="player.scrollOffsetY" /><br />
+                <CodeBadge type="json" name="player.scrollOffsetY" /><br />
+                <CodeBadge type="html" name="data-player-scrolloffsety" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ScrollMode" /><br />
+                <CodeBadge type="js" name="scrollMode" /><br />
+                <CodeBadge type="json" name="autoScroll" /><br />
+                <CodeBadge type="html" name="data-auto-scroll" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="player.ScrollMode" /><br />
+                <CodeBadge type="js" name="player.scrollMode" /><br />
+                <CodeBadge type="json" name="player.scrollMode" /><br />
+                <CodeBadge type="html" name="data-player-scrollmode" /><br />            
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ScrollSpeed" /><br />
+                <CodeBadge type="js" name="scrollSpeed" /><br />
+                <CodeBadge type="json" name="scrollSpeed" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="player.ScrollSpeed" /><br />
+                <CodeBadge type="js" name="player.scrollSpeed" /><br />
+                <CodeBadge type="json" name="player.scrollSpeed" /><br />
+                <CodeBadge type="html" name="data-player-scrollspeed" /><br />                        
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="ScrollElement" /><br />
+                <CodeBadge type="js" name="scrollElement" /><br />
+                <CodeBadge type="json" name="scrollElement" /><br />
+                <CodeBadge type="html" name="data-scroll-element" /><br />
+            </td>
+            <td>
+                <CodeBadge type="net" name="Player.ScrollElement" /><br />
+                <CodeBadge type="js" name="player.scrollElement" /><br />
+                <CodeBadge type="json" name="player.scrollElement" /><br />
+                <CodeBadge type="html" name="data-player-scroll-element" /><br />
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <CodeBadge type="net" name="BeatCursorWidth" /><br />
+                <CodeBadge type="js" name="beatCursorWidth" /><br />
+                <CodeBadge type="json" name="beatCursorWidth" /><br />
+                <CodeBadge type="html" name="data-beat-cursor-width" /><br />
+            </td>
+            <td>
+            </td>
+            <td>
+                Setting was removed4 use CSS like for the other stylings to set the width of the beat cursor. 
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+## Side-by-side Comparison
+
+Right below you can find a side-by-side comparison between a settings object before and after the rework. 
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Before</th>
+            <th>After</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td>
+                <code>{`
+                {
+                    scriptFile: null,
+                    fontDirectory: null,
+                    enableLazyLoading: true,
+                    soundFontFile: null,
+                    scrollElement: "html,body",
+                    scale: 1,
+                    engine: "default",
+                    layout: {
+                        mode: "page",
+                        additionalSettings: {}
+                    },
+                    importerSettings: {},
+                    stretchForce: 1,
+                    forcePianoFingering: false,
+                    staves: {
+                        id: "default",
+                        additionalSettings: {}
+                    },
+                    transpositionPitches: [],
+                    displayTranspositionPitches: [],
+                    logLevel: "info"
+                    smallGraceTabNotes: true,
+                    extendBendArrowsOnTiedNotes: true,
+                    showParenthesisForTiedBends: true,
+                    showTabNoteOnTiedBend: true,
+                    displayMode: 0,
+                    fingeringMode: 0,
+                    showZeroOnDiveWhammy: false,
+                    extendLineEffectsToBeatEnd: false,
+                    vibrato: {
+                        noteWideLength: 480,
+                        noteWideAmplitude: 2,
+                        noteSlightLength: 480,
+                        noteSlightAmplitude: 2,
+                        beatWideLength: 240,
+                        beatWideAmplitude: 3,
+                        beatSlightLength: 240,
+                        beatSlightAmplitude: 3
+                    }
+                    playTripletFeel: true,
+                    slurHeight: 7,
+                    songBookBendDuration: 75,
+                    songBookDipDuration: 150,
+                    includeNoteBounds: false,
+                    useWorkers: true,
+                    enablePlayer: false,
+                    enableCursor: false,
+                    beatCursorWidth: 3,
+                    scrollOffsetX: 0,
+                    scrollOffsetY: 0,
+                    scrollMode: "continuous",
+                    scrollSpeed: 300,
+                    renderingResources: {
+                        copyrightFont: "bold 12px 'Arial'",
+                        titleFont: "32px 'Georgia'",
+                        subTitleFont: "20px 'Georgia'",
+                        wordsFont: "15px 'Georgia'",
+                        effectFont: "italic 12px 'Georgia'",
+                        fretboardNumberFont: "11px 'Arial'",
+                        tablatureFont: "13px 'Arial'",
+                        graceFont: "11px 'Arial'",
+                        staffLineColor: "#A5A5A5",
+                        barSeparatorColor:"#222211",
+                        barNumberFont: "11px 'Arial'",
+                        barNumberColor: "#C80000"},
+                        fingeringFont: "14px 'Georgia'",
+                        markerFont: "bold 14px 'Georgia'",
+                        mainGlyphColor: "#000000",
+                        secondaryGlyphColor: "rgba(0,0,0,0.40)",
+                        scoreInfoColor: "#000000"
+                    }
+                }`}
+                </code>
+            </td>
+            <td>
+                <code>
+                {`
+                {
+                    core: {
+                        includeNoteBounds: false,
+                        useWorkers: true,
+                        logLevel: "info",
+                        engine: "default",
+                        enableLazyLoading: true,
+                        scriptFile: "https://docs.alphatab.net/develop/js/alphaTab/alphaTab.min.js",
+                        fontDirectory: "https://docs.alphatab.net/develop/js/alphaTab/Font/"    
+                    },
+                    display: {
+                        barCountPerPartial: 10
+                        barCount: -1
+                        startBar: 1
+                        barsPerRow: -1
+                        staveProfile: 'default'
+                        layoutMode: 'page',
+                        stretchForce: 1
+                        scale: 1
+                        padding: null,
+                        resources: {
+                            copyrightFont: "bold 12px 'Arial'",
+                            titleFont: "32px 'Georgia'",
+                            subTitleFont: "20px 'Georgia'",
+                            wordsFont: "15px 'Georgia'",
+                            effectFont: "italic 12px 'Georgia'",
+                            fretboardNumberFont: "11px 'Arial'",
+                            tablatureFont: "13px 'Arial'",
+                            graceFont: "11px 'Arial'",
+                            staffLineColor: "#A5A5A5",
+                            barSeparatorColor:"#222211",
+                            barNumberFont: "11px 'Arial'",
+                            barNumberColor: "#C80000",
+                            fingeringFont: "14px 'Georgia'",
+                            markerFont: "bold 14px 'Georgia'",
+                            mainGlyphColor: "#000000",
+                            secondaryGlyphColor: "rgba(0,0,0,0.40)",
+                            scoreInfoColor: "#000000"
+                        }
+                    },
+                    importer: {
+                        mergePartGroupsInMusicXml: false,
+                        encoding: "utf-8"
+                    },
+                    notation: {
+                        slurHeight: 7,
+                        extendLineEffectsToBeatEnd: false,
+                        showZeroOnDiveWhammy: false,
+                        showTabNoteOnTiedBend: true,
+                        showParenthesisForTiedBends: true,
+                        extendBendArrowsOnTiedNotes: true,
+                        smallGraceTabNotes: true,
+                        displayTranspositionPitches: []
+                        transpositionPitches: [],
+                        rhythmHeight: 15,
+                        rhythmMode: "hidden",
+                        hideChordDiagrams: false,
+                        hideTrackNames: false,
+                        hideTuning: false,
+                        hideInfo: false,
+                        fingeringMode: "ScoreDefault",
+                        notationMode: "GuitarPro"
+                    }
+                    player: {
+                        playTripletFeel: true,
+                        vibrato: {
+                            beatSlightAmplitude: 3,
+                            beatSlightLength: 240,
+                            beatWideAmplitude: 3,
+                            beatWideLength: 240,
+                            noteSlightAmplitude: 2,
+                            noteSlightLength: 480,
+                            noteWideAmplitude: 2,
+                            noteWideLength: 480,
+                        }
+                        songBookDipDuration: 150,
+                        songBookBendDuration: 75,
+                        scrollSpeed: 300,
+                        scrollMode: "Continuous",
+                        scrollOffsetY: 0,
+                        scrollOffsetX: 0,
+                        enableCursor: true,
+                        enablePlayer: false,
+                        scrollElement: "html,body",
+                        soundFont: null
+                    }
+                }
+                `}
+                </code>
+            </td>
+        </tr>    
+    </tbody>
+</table>
