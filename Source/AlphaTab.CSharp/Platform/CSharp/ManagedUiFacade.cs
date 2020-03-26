@@ -61,7 +61,7 @@ namespace AlphaTab.Platform.CSharp
         public abstract event Action RootContainerBecameVisible;
         public abstract void Destroy();
         public abstract IContainer CreateCanvasElement();
-        public abstract void TriggerEvent(IContainer container, string eventName, object details = null);
+        public abstract void TriggerEvent(IContainer container, string eventName, object details = null, IMouseEventArgs originalEvent = null);
 
         public virtual void InitialRender()
         {

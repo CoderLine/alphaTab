@@ -67,7 +67,8 @@ namespace AlphaTab.UI
         /// <param name="container">The element on which the event should be triggered. </param>
         /// <param name="eventName">The event that should be triggered.</param>
         /// <param name="details">The object holding the details about the event.</param>
-        void TriggerEvent(IContainer container, string eventName, object details = null);
+        /// <param name="originalEvent">The original event related to this custom event.</param>
+        void TriggerEvent(IContainer container, string eventName, object details = null, IMouseEventArgs originalEvent = null);
 
         /// <summary>
         /// Tells the UI layer to do the initial rendering.

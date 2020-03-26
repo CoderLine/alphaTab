@@ -917,7 +917,11 @@ namespace AlphaTab
                         var beat = cache.FindBeat(tracks, tick);
                         if (beat != null)
                         {
-                            CursorUpdateBeat(beat.CurrentBeat, beat.NextBeat, beat.Duration, stop, beat.BeatsToHighlight);
+                            CursorUpdateBeat(beat.CurrentBeat,
+                                beat.NextBeat,
+                                beat.Duration,
+                                stop,
+                                beat.BeatsToHighlight);
                         }
                     }
                 }
@@ -1026,7 +1030,7 @@ namespace AlphaTab
                     });
                 }
 
-                if (!_selecting && Settings.Player.ScrollMode != ScrollMode.Off)
+                if (!_beatMouseDown && Settings.Player.ScrollMode != ScrollMode.Off)
                 {
                     //// calculate position of whole music wheet within the scroll parent
                     var scrollElement = UiFacade.GetScrollContainer();
@@ -1040,7 +1044,8 @@ namespace AlphaTab
                         switch (mode)
                         {
                             case ScrollMode.Continuous:
-                                var y = (int)(elementOffset.Y + barBoundings.RealBounds.Y + Settings.Player.ScrollOffsetY);
+                                var y = (int)(elementOffset.Y + barBoundings.RealBounds.Y +
+                                              Settings.Player.ScrollOffsetY);
                                 if (y != _lastScroll)
                                 {
                                     _lastScroll = y;
@@ -1115,58 +1120,75 @@ namespace AlphaTab
 
         #region Selection
 
-        private bool _selecting;
+        private bool _beatMouseDown;
         private SelectionInfo _selectionStart;
         private SelectionInfo _selectionEnd;
 
-        private void SetupClickHandling()
+
+        /// <summary>
+        /// This event is fired whenever a the user presses the mouse button on a beat.
+        /// </summary>
+        public event Action<Beat> BeatMouseDown;
+
+
+        /// <summary>
+        /// This event is fired whenever the user moves the mouse over a beat after
+        /// the user already pressed the button on a beat.
+        /// </summary>
+        public event Action<Beat> BeatMouseMove;
+
+
+        /// <summary>
+        /// This event is fired whenever the user releases the mouse after a mouse press
+        /// on a beat. This event is fired regardless of whether the mouse was released on a beat.
+        /// The parameter is null if the mouse was released somewhere beside the beat.
+        /// </summary>
+        public event Action<Beat> BeatMouseUp;
+
+        private void OnBeatMouseDown(IMouseEventArgs originalEvent, Beat beat)
         {
-            CanvasElement.MouseDown += e =>
+            if (Settings.Player.EnablePlayer
+                && Settings.Player.EnableCursor
+                && Settings.Player.EnableUserInteraction)
             {
-                if (!e.IsLeftMouseButton || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
-                {
-                    return;
-                }
+                _selectionStart = new SelectionInfo(beat);
+                _selectionEnd = null;
+            }
 
-                e.PreventDefault();
+            _beatMouseDown = true;
 
-                var relX = e.GetX(CanvasElement);
-                var relY = e.GetY(CanvasElement);
-                var beat = Renderer.BoundsLookup.GetBeatAtPos(relX, relY);
-                if (beat != null)
-                {
-                    _selectionStart = new SelectionInfo(beat);
-                    _selectionEnd = null;
-                    _selecting = true;
-                }
-            };
-
-            CanvasElement.MouseMove += e =>
+            var handler = BeatMouseDown;
+            if (handler != null)
             {
-                if (!_selecting || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
-                {
-                    return;
-                }
+                handler(beat);
+            }
+            UiFacade.TriggerEvent(Container, "beatMouseDown", beat, originalEvent);
+        }
 
-                var relX = e.GetX(CanvasElement);
-                var relY = e.GetY(CanvasElement);
-                var beat = Renderer.BoundsLookup.GetBeatAtPos(relX, relY);
-                if (beat != null && (_selectionEnd == null || _selectionEnd.Beat != beat))
+        private void OnBeatMouseMove(IMouseEventArgs originalEvent, Beat beat)
+        {
+            if (Settings.Player.EnableUserInteraction)
+            {
+                if (_selectionEnd == null || _selectionEnd.Beat != beat)
                 {
                     _selectionEnd = new SelectionInfo(beat);
                     CursorSelectRange(_selectionStart, _selectionEnd);
                 }
-            };
+            }
 
-            CanvasElement.MouseUp += e =>
+
+            var handler = BeatMouseMove;
+            if (handler != null)
             {
-                if (!_selecting || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
-                {
-                    return;
-                }
+                handler(beat);
+            }
+            UiFacade.TriggerEvent(Container, "beatMouseMove", beat, originalEvent);
+        }
 
-                e.PreventDefault();
-
+        private void OnBeatMouseUp(IMouseEventArgs originalEvent, Beat beat)
+        {
+            if (Settings.Player.EnableUserInteraction)
+            {
                 // for the selection ensure start < end
                 if (_selectionEnd != null)
                 {
@@ -1208,16 +1230,86 @@ namespace AlphaTab
                         CursorSelectRange(_selectionStart, _selectionEnd);
                     }
                 }
+            }
 
-                _selecting = false;
+            var handler = BeatMouseUp;
+            if (handler != null)
+            {
+                handler(beat);
+            }
+            UiFacade.TriggerEvent(Container, "beatMouseUp", beat, originalEvent);
+
+            _beatMouseDown = false;
+        }
+
+
+        private void SetupClickHandling()
+        {
+            CanvasElement.MouseDown += e =>
+            {
+                if (!e.IsLeftMouseButton)
+                {
+                    return;
+                }
+
+                if (Settings.Player.EnableUserInteraction)
+                {
+                    e.PreventDefault();
+                }
+
+                var relX = e.GetX(CanvasElement);
+                var relY = e.GetY(CanvasElement);
+                var beat = Renderer.BoundsLookup.GetBeatAtPos(relX, relY);
+                if (beat != null)
+                {
+                    OnBeatMouseDown(e, beat);
+                }
+            };
+
+            CanvasElement.MouseMove += e =>
+            {
+                if (!_beatMouseDown)
+                {
+                    return;
+                }
+
+                var relX = e.GetX(CanvasElement);
+                var relY = e.GetY(CanvasElement);
+                var beat = Renderer.BoundsLookup.GetBeatAtPos(relX, relY);
+                if (beat != null)
+                {
+                    OnBeatMouseMove(e, beat);
+                }
+            };
+
+            CanvasElement.MouseUp += e =>
+            {
+                if (!_beatMouseDown)
+                {
+                    return;
+                }
+
+                if (Settings.Player.EnableUserInteraction)
+                {
+                    e.PreventDefault();
+                }
+
+                var relX = e.GetX(CanvasElement);
+                var relY = e.GetY(CanvasElement);
+                var beat = Renderer.BoundsLookup.GetBeatAtPos(relX, relY);
+                OnBeatMouseUp(e, beat);
             };
 
             Renderer.PostRenderFinished += () =>
             {
-                if (_selectionStart == null || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
+                if (_selectionStart == null
+                    || !Settings.Player.EnablePlayer
+                    || !Settings.Player.EnableCursor
+                    || !Settings.Player.EnableUserInteraction)
                 {
                     return;
                 }
+
                 CursorSelectRange(_selectionStart, _selectionEnd);
             };
         }
