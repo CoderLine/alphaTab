@@ -1,4 +1,4 @@
-version: 0.9.6.{build}
+version: 0.9.7.{build}
 # branches to build
 branches:
   only:
