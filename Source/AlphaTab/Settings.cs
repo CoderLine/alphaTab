@@ -533,6 +533,13 @@ namespace AlphaTab
         public bool EnableCursor { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets alphaTab should provide user interaction features to
+        /// select playback ranges and jump to the playback position by click (aka. seeking).
+        /// </summary>
+        [JsonName("enableUserInteraction")]
+        public bool EnableUserInteraction { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the X-offset to add when scrolling.
         /// </summary>
         [JsonName("scrollOffsetX")]

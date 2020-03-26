@@ -1123,7 +1123,10 @@ namespace AlphaTab
         {
             CanvasElement.MouseDown += e =>
             {
-                if (!e.IsLeftMouseButton || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
+                if (!e.IsLeftMouseButton
+                    || !Settings.Player.EnablePlayer
+                    || !Settings.Player.EnableCursor
+                    || !Settings.Player.EnableUserInteraction)
                 {
                     return;
                 }
@@ -1143,7 +1146,7 @@ namespace AlphaTab
 
             CanvasElement.MouseMove += e =>
             {
-                if (!_selecting || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
+                if (!_selecting)
                 {
                     return;
                 }
@@ -1160,7 +1163,7 @@ namespace AlphaTab
 
             CanvasElement.MouseUp += e =>
             {
-                if (!_selecting || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
+                if (!_selecting)
                 {
                     return;
                 }
@@ -1214,7 +1217,10 @@ namespace AlphaTab
 
             Renderer.PostRenderFinished += () =>
             {
-                if (_selectionStart == null || !Settings.Player.EnablePlayer || !Settings.Player.EnableCursor)
+                if (_selectionStart == null
+                    || !Settings.Player.EnablePlayer
+                    || !Settings.Player.EnableCursor
+                    || !Settings.Player.EnableUserInteraction)
                 {
                     return;
                 }
