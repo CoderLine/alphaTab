@@ -8,6 +8,7 @@ module.exports = {
   organizationName: 'CoderLine',
   projectName: 'alphaTab',
   themeConfig: {
+    disableDarkMode: true,
     navbar: {
       hideOnScroll: true,
       logo: {
@@ -17,9 +18,8 @@ module.exports = {
       links: [
         { to: 'docs/introduction', label: 'Docs', position: 'left' },
         { to: 'docs/tutorial', label: 'Tutorial', position: 'left' },
+        { to: 'docs/alphaTex/introduction', label: 'alphaTex', position: 'left' },
         { to: 'docs/showcase/introduction', label: 'Showcase', position: 'left' },
-        { to: 'community', label: 'Community', position: 'left' },
-        { to: 'blog', label: 'Blog', position: 'left' },
         {
           href: 'https://github.com/CoderLine/alphaTab',
           label: 'GitHub',
@@ -39,11 +39,11 @@ module.exports = {
             },
             {
               label: 'Installation',
-              to: 'docs/installation',
+              to: 'docs/getting-started/installation',
             },
             {
               label: 'AlphaTex',
-              to: 'docs/alphaTex',
+              to: 'docs/alphaTex/introduction',
             },
           ],
         },
@@ -67,10 +67,6 @@ module.exports = {
         {
           title: 'Social',
           items: [
-            {
-              label: 'Blog',
-              to: 'blog',
-            },
             {
               label: 'Facebook',
               href: 'https://facebook.com/alphaTabMusic',
@@ -124,7 +120,7 @@ module.exports = {
     [
       '@docusaurus/theme-classic', 
       {
-        customCss: require.resolve('./src/css/custom.css'),
+        customCss: require.resolve('./src/css/custom.css')
       }
     ],
     // algolia && '@docusaurus/theme-search-algolia',

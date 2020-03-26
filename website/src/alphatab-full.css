@@ -21,7 +21,7 @@
 .at-wrap {
     position: relative;
     width: 80%;
-    height: 800px;
+    height: 80vh;
     margin: 0 auto;
     border: 1px solid rgba(0, 0, 0, .12);
     background: #FFF;
@@ -257,6 +257,7 @@ input[type=range]::-moz-range-thumb {
 
 .at-speed-value {
     font-size: 0.8rem;
+    margin: 0 0.5em;
 }
 
 /** Circular Progress Bar https://jsfiddle.net/bootstrapious/3xnomecr  **/

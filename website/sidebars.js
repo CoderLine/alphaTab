@@ -8,10 +8,17 @@ const sidebars = {
 		"getting-started/installation",
 		"getting-started/configuration"
 	],
+	"API Reference": [
+		"reference/settings",
+		"reference/api",
+		"reference/events"
+	], 
 	"Guides": [
 		"guides/styling-player",
 		"guides/breaking-changes-095-096"
-	],
+	]
+  },
+  alphaTex: {
 	"alphaTex": [
 		"alphatex/introduction",
 		"alphatex/metadata",
@@ -21,13 +28,8 @@ const sidebars = {
 		"alphatex/beat-effects",
 		"alphatex/note-effects"
 	],
-	"API Reference": [
-		"reference/settings",
-		"reference/api",
-		"reference/events"
-	]
   },
-  "showcase": {
+  showcase: {
 	"Showcase": [
 		'showcase/introduction',
 		'showcase/general',

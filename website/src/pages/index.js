@@ -59,14 +59,14 @@ const features = [
 function Feature({ imageUrl, title, description }) {
   const imgUrl = useBaseUrl(imageUrl);
   return (
-    <div className={classnames("col col--12", styles.feature)}>
+    <div className={styles.feature}>
       {imgUrl && (
-        <div className="text--center">
           <img className={styles.featureImage} src={imgUrl} alt={title} />
-        </div>
       )}
-      <h3>{title}</h3>
-      <p>{description}</p>
+      <div className={styles.featureDescription}>
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </div>
     </div>
   );
 }
@@ -93,7 +93,7 @@ function Home() {
           </div>
         </div>
       </header>
-      <main>
+      <main class="main-at">
         <AlphaTab settings={ { 
           file: "/files/Nightwish.gp5",
           tracks: 3          
@@ -101,11 +101,9 @@ function Home() {
         {features && features.length && (
           <section className={styles.features}>
             <div className="container">
-              <div className="row">
                 {features.map((props, idx) => (
                   <Feature key={idx} {...props} />
                 ))}
-              </div>
             </div>
           </section>
         )}

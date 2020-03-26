@@ -10,6 +10,10 @@
   --ifm-container-width: 100%;
 }
 
+body {
+  background: transparent;
+}
+
 .navbar.navbar--fixed-top {
   z-index: 2000;
 }
@@ -20,7 +24,7 @@
   padding: 2rem;
 }
 
-main {
+main.main-at {
   border-top: 2rem solid #282c34;
 }
 

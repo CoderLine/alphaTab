@@ -32,16 +32,18 @@ class TrackItem extends React.Component {
 
     toggleMute(e) {
         e.preventDefault();
-        this.props.track.mute = !this.props.track.mute;
-        this.setState(this.state);
-        this.props.api.changeTrackMute([this.props.track], this.props.track.mute);
+        e.stopPropagation();
+        this.props.track.playbackInfo.mute = !this.props.track.playbackInfo.mute;
+        this.forceUpdate();
+        this.props.api.changeTrackMute([this.props.track], this.props.track.playbackInfo.mute);
     }
 
     toggleSolo(e) {
         e.preventDefault();
-        this.props.track.solo = !this.state.track.solo;
-        this.setState(this.state);
-        this.props.api.changeTrackSolo([this.props.track], this.props.track.mute);
+        e.stopPropagation();
+        this.props.track.playbackInfo.solo = !this.props.track.playbackInfo.solo;
+        this.forceUpdate();
+        this.props.api.changeTrackSolo([this.props.track], this.props.track.playbackInfo.solo);
     }
 
     updateVolume(e) {
@@ -60,19 +62,19 @@ class TrackItem extends React.Component {
         const isMute = this.props.track.playbackInfo.mute;
         const isSolo = this.props.track.playbackInfo.solo;
         const volume = this.props.track.playbackInfo.volume;
-        return (<div className={`at-track ${isSelected ? "active" : ""}`} onClick={this.selectTrack}>
+        return (<div className={`at-track ${isSelected ? "active" : ""}`} onClick={this.selectTrack.bind(this)}>
             <div className="at-track-icon">
                 <i className="fas fa-guitar"></i>
             </div>
             <span className="at-track-name">{this.props.track.name}</span>
             <div className="at-track-controls">
                 <button type="button"
-                    onClick={this.toggleMute}
+                    onClick={this.toggleMute.bind(this)}
                     className={`btn btn-sm btn-outline-danger at-track-mute ${isMute ? "active" : ""}`}>
                     Mute
                 </button>
                 <button type="button"
-                    onClick={this.toggleSolo}
+                    onClick={this.toggleSolo.bind(this)}
                     className={`btn btn-sm btn-outline-success at-track-solo ${isSolo ? "active" : ""}`}>
                     Solo
                 </button>
@@ -82,7 +84,7 @@ class TrackItem extends React.Component {
                     max="16"
                     ref="volumeSlider"
                     defaultValue={volume}
-                    onInput={this.updateVolume}
+                    onInput={this.updateVolume.bind(this)}
                     onClick={e => e.preventDefault()}
                     className="at-track-volume" />
             </div>
@@ -94,59 +96,91 @@ class TrackItem extends React.Component {
 class Times extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            currentTime: 0,
+            endTime: 1,
+            currentBarIndex: 0,
+            totalBarCount: 1,
+            timeSignatureNumerator: 4,
+            timeSignatureDenominator: 4,
+            tempo: 120
+        };
     }
     render() {
         return (
             <div className="at-times">
-                <div style="at-time-slider">
-                    <div className="at-time-slider-value" style={{ width: ((this.props.currentTime / this.props.endTime) * 100).toFixed(2) + '%' }}></div>
+                <div className="at-time-slider">
+                    <div className="at-time-slider-value" style={{ width: ((this.state.currentTime / this.state.endTime) * 100).toFixed(2) + '%' }}></div>
                 </div>
                 <div className="at-times-values">
                     <div className="at-bar-position"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Bar Position">
-                        {this.props.currentBarIndex + 1} / {this.props.totalBarCount}
+                        {this.state.currentBarIndex + 1} / {this.state.totalBarCount}
                     </div>
                     <div className="at-time-signature"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Time Signature">
-                        {this.props.timeSignatureNumerator} / {this.props.timeSignatureDenominator}
+                        {this.state.timeSignatureNumerator} / {this.state.timeSignatureDenominator}
                     </div>
                     <div className="at-time-position"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Time Position">
-                        {this.formatDuration(this.props.currentTime)} / {formatDuration(this.props.endTime)}
+                        {this.formatDuration(this.state.currentTime)} / {this.formatDuration(this.state.endTime)}
                     </div>
                     <div className="at-tempo"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Tempo">
-                        {this.props.tempo}
+                        {this.state.tempo}
                     </div>
                 </div>
             </div>
         );
+    }
+
+    formatDuration(milliseconds) {
+        let seconds = milliseconds / 1000;
+        const minutes = (seconds / 60) | 0;
+        seconds = (seconds - (minutes * 60)) | 0;
+        return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
     }
 }
 
 class PlaybackSpeedSlider extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            speed: 100
+        }
     }
+
+    onSpeedChange(e) {
+        e.stopPropagation();
+        if(this.props.api) {
+            this.setState({
+                speed: e.target.value
+            });
+            this.props.api.playbackSpeed = e.target.value / 100.0;
+        }
+    }
+
     render() {
         return (
             <div>
                 <span className="at-speed-label">
-                    Speed <span className="at-speed-value">100%</span>
+                    Speed 
+                    {this.state.speed !== 100 && <span className="at-speed-value">({this.state.speed}%)</span>}
                 </span>
                 <input type="range"
                     min="0"
                     max="300"
                     step="10"
-                    defaultValue="100"
+                    defaultValue={this.state.speed}
+                    onInput={this.onSpeedChange.bind(this)}
                     className="at-speed" />
             </div>
         );
@@ -157,38 +191,43 @@ class LayoutSelector extends React.Component {
     constructor(props) {
         super(props);
     }
+
+    selectLayout(layoutMode, scrollMode, e) {
+        e.preventDefault();
+        
+        if(this.props.api) {
+            const settings = this.props.api.settings;
+            console.log(settings);
+            settings.display.layoutMode = layoutMode;
+            settings.player.scrollmode = scrollMode;
+            this.props.api.updateSettings();
+            this.props.api.render();
+        }
+    }
+
     render() {
         return (
             <div className="btn-group dropup">
-                <button type="button"
-                    className="btn dropdown-toggle at-layout-button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false">
-                    Layout
+                <button type="button" className="btn dropdown-toggle at-layout-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Layout
                 </button>
-                <ul className="dropdown-menu at-layout-options">
-                    <li>
-                        <a href="#"
-                            data-layout="horizontal-screen">
-                            <i className="far fa-caret-square-right"></i>
-                            Horizontal Layout(Off-Screen)
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            data-layout="horizontal-bar">
-                            <i className="fas fa-caret-square-right"></i>
-                            Horizontal Layout(Bar Wise)
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" data-layout="page">
-                            <i className="fas fa-caret-square-down"></i>
-                            Vertical Layout
-                        </a>
-                    </li>
-                </ul>
+                <div className="dropdown-menu at-layout-options">
+                <a className="dropdown-item" 
+                    href="#" 
+                    onClick={this.selectLayout.bind(this, 1, 2)}>
+                    <i className="far fa-caret-square-right"></i> Horizontal Layout (Off-Screen)
+                </a>
+                <a className="dropdown-item" 
+                    href="#"
+                    onClick={this.selectLayout.bind(this, 1, 1)}>
+                    <i className="fas fa-caret-square-right"></i> Horizontal Layout (Bar Wise)
+                </a>
+                <a className="dropdown-item" 
+                    href="#"
+                    onClick={this.selectLayout.bind(this, 0, 1)}>
+                    <i className="fas fa-caret-square-down"></i> Vertical Layout
+                </a>
+                </div>
             </div>
         );
     }
@@ -197,47 +236,44 @@ class LayoutSelector extends React.Component {
 class ZoomLevelSelector extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            zoom: 100
+        }
     }
+
+    setZoom(e) {
+        e.preventDefault();
+        const api = this.props.api;
+        if(api) {
+            const zoom = parseInt(e.target.innerText);
+            this.setState({
+                zoom: zoom
+            })
+
+            api.settings.display.scale = zoom / 100.0;
+            api.updateSettings();
+            api.render();
+        }
+    }
+
     render() {
         return (
             <div className="btn-group dropup">
-                <button type="button"
-                    className="btn dropdown-toggle"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false">
-                    <i className="fas fa-search"></i>
-                    <span className="at-zoom-label">100 %</span>
+                <button type="button" className="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i className="fas fa-search"></i>
+                <span className="at-zoom-label" ref="currentValue">{this.state.zoom}%</span>
                 </button>
-                <ul className="dropdown-menu at-zoom-options">
-                    <li>
-                        <a href="#">25%</a>
-                    </li>
-                    <li>
-                        <a href="#">50%</a>
-                    </li>
-                    <li>
-                        <a href="#">75%</a>
-                    </li>
-                    <li>
-                        <a href="#">90%</a>
-                    </li>
-                    <li>
-                        <a href="#">100 %</a>
-                    </li>
-                    <li>
-                        <a href="#">110 %</a>
-                    </li>
-                    <li>
-                        <a href="#">125 %</a>
-                    </li>
-                    <li>
-                        <a href="#">150 %</a>
-                    </li>
-                    <li>
-                        <a href="#">200 %</a>
-                    </li>
-                </ul>
+                <div className="dropdown-menu at-zoom-options">
+                <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>25%</a>
+                <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>50%</a>
+                <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>75%</a>
+                <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>90%</a>
+                <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>100%</a>
+                <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>110%</a>
+                <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>125%</a>
+                <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>150%</a>
+                <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>200%</a>
+                </div>
             </div>
         );
     }
@@ -250,8 +286,8 @@ class ScoreDetails extends React.Component {
     render() {
         return (
             <div className="at-song-details">
-                <div className="at-song-title">{this.context.api?.score?.title}</div>
-                <div className="at-song-artist">{this.context.api?.score?.artist}</div>
+                <div className="at-song-title">{this.props.score?.title}</div>
+                <div className="at-song-artist">{this.props.score?.artist}</div>
             </div>
         );
     }
@@ -261,17 +297,39 @@ class PlayerProgressIndicator extends React.Component {
     constructor(props) {
         super(props);
     }
+
+    getLeftRotateTransform() {
+        if(this.props.percentage < 0.5) {
+            return 'rotate(0deg)';
+        } else {
+            return 'rotate(' + this.percentageToDegrees(this.props.percentage - 0.5) + 'deg)';
+        }
+    }
+
+    getRightRotateTransform() {
+        if(this.props.percentage < 0.5) {
+            return 'rotate(' + this.percentageToDegrees(this.props.percentage) + 'deg)';
+        } else {
+            return 'rotate(180deg)';
+        }
+    }
+
+    percentageToDegrees(percentage) { 
+        return percentage * 360
+    }
+
     render() {
         return (
+            this.props.percentage < 0.99 && 
             <div className="at-player-loading progress">
                 <span className="progress-left">
-                    <span className="progress-bar"></span>
+                    <span className="progress-bar" style={ { transform: this.getLeftRotateTransform() } }></span>
                 </span>
                 <span className="progress-right">
-                    <span className="progress-bar"></span>
+                    <span className="progress-bar"  style={ { transform: this.getRightRotateTransform() } }></span>
                 </span>
                 <div className="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center font-weight-bold">
-                    <span className="progress-value-number">0</span>
+                    <span className="progress-value-number">{(this.props.percentage * 100) | 0}</span>
                     <sup className="small">%</sup>
                 </div>
             </div>
@@ -282,54 +340,103 @@ class PlayerProgressIndicator extends React.Component {
 class PlayerControlsGroup extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            soundFontLoadPercentage: 0,
+            isLooping: false,
+            isMetronomeActive: false,
+            isPlaying: false
+        };
     }
+
+    stop(e) {
+        e.preventDefault();
+        this.props.api?.stop();
+    }
+
+    playPause(e) {
+        e.preventDefault();
+        this.props.api?.playPause();
+    }
+
+    print(e) {
+        e.preventDefault();
+        this.props.api?.print();
+    }
+
+    toggleLoop(e) {
+        e.preventDefault();
+        if(this.props.api) {
+            let isLooping = !this.state.isLooping;
+            this.setState({
+                isLooping: isLooping
+            });
+            this.props.api.isLooping = isLooping;
+        }
+    }
+
+    toggleMetronome(e) {
+        e.preventDefault();
+        if(this.props.api) {
+            let isMetronomeActive = !this.state.isMetronomeActive;
+            this.setState({
+                isMetronomeActive: isMetronomeActive
+            });
+            this.props.api.metronomeVolume = isMetronomeActive ? 1 : 0;
+        }
+    }
+
     render() {
         return (
             <div className="at-player">
                 <div className="at-player-left">
                     <a href="#"
-                        className="at-stop disabled"
+                        onClick={this.stop.bind(this)}
+                        className={"at-stop" + (this.props.api?.isReadyForPlayback ? "" : " disabled")}
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Stop">
                         <i className="fas fa-step-backward"></i>
                     </a>
                     <a href="#"
-                        className="at-play-pause disabled"
+                        onClick={this.playPause.bind(this)}
+                        className={"at-play-pause" + (this.props.api?.isReadyForPlayback ? "" : " disabled")}
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Play/Pause">
-                        <i className="fas fa-play-circle"></i>
+                        <i className={"fas " + (this.state.isPlaying ? "fa-pause-circle" : "fa-play-circle")}></i>
                     </a>
-                    <PlayerProgressIndicator />
-                    <ScoreDetails />
-                    <PlaybackSpeedSlider />
+                    <PlayerProgressIndicator percentage={this.state.soundFontLoadPercentage} />
+                    <ScoreDetails score={this.props.api?.score} />
+                    <PlaybackSpeedSlider api={this.props.api} />
                 </div>
 
                 <div className="at-player-right">
                     <a href="#"
-                        className="at-metronome disabled"
+                        onClick={this.toggleMetronome.bind(this)}
+                        className={"at-metronome" + (this.props.api?.isReadyForPlayback ? "" : " disabled") + (this.state.isMetronomeActive ? " active" : "")}
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Metronome">
                         <i className="fas fa-edit"></i>
                     </a>
                     <a href="#"
-                        className="at-loop disabled"
+                        onClick={this.toggleLoop.bind(this)}
+                        className={"at-loop" + (this.props.api?.isReadyForPlayback ? "" : " disabled") + (this.state.isLooping ? " active" : "")}
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Loop">
                         <i className="fas fa-retweet"></i>
                     </a>
                     <a href="#"
-                        className="at-print"
+                        onClick={this.print.bind(this)}
+                        className={"at-print" + (this.props.api?.isReadyForPlayback ? "" : " disabled")}
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Print">
                         <i className="fas fa-print"></i>
                     </a>
-                    <ZoomLevelSelector />
-                    <LayoutSelector />
+                    <ZoomLevelSelector api={this.props.api} />
+                    <LayoutSelector api={this.props.api} />
                 </div>
             </div>
         );
@@ -342,13 +449,11 @@ export default class AlphaTab extends React.Component {
         this.state = {
             settings: merge({ ...props.settings },
                 {
-                    settings: {
-                        player: {
-                            scrollElement: this.refs.viewPort,
-                            scrollOffsetY: -1,
-                            enablePlayer: true,
-                            soundFont: 'https://docs.alphatab.net/develop/assets/js/alphaTab/default.sf2'
-                        }
+                    player: {
+                        scrollElement: this.refs.viewPort,
+                        scrollOffsetY: -10,
+                        enablePlayer: true,
+                        soundFont: 'https://docs.alphatab.net/develop/assets/js/alphaTab/default.sf2'
                     }
                 }
             ),
@@ -356,19 +461,62 @@ export default class AlphaTab extends React.Component {
             api: null,
             score: null
         };
+        this._currentTempo = 0;
     }
     componentDidMount() {
+        this.state.settings.player.scrollElement = this.refs.viewPort;
         this.setupEvents();
+        
+        console.log(this.state.settings);
+
         this.setState({
             api: new alphaTab.platform.javaScript.AlphaTabApi(this.refs.alphaTab, this.state.settings)
         })
     }
 
+    componentWillUnmount() {
+        this.state.api.destroy();
+    }
+
+    updateMasterBarTimes(currentMasterBar) {
+        const masterBarCount = currentMasterBar.score.masterBars.length;
+        if(currentMasterBar.tempoAutomation != null) {
+            this._currentTempo = currentMasterBar.tempoAutomation.value | 0;
+        }
+
+        this.refs.times.setState({
+            timeSignatureNumerator: currentMasterBar.timeSignatureNumerator,
+            timeSignatureDenominator: currentMasterBar.timeSignatureDenominator,
+            currentBarIndex: (currentMasterBar.index + 1),
+            totalBarCount: masterBarCount,
+            tempo: this._currentTempo
+        });
+    }
+    
+
+
     setupEvents() {
         const at = this.refs.alphaTab;
+        const times = this.refs.times;
+        const playerControls = this.refs.playerControls;
+
         at.addEventListener('alphaTab.loaded', (e) => {
             this.setState({
                 score: e.detail
+            });
+            this._currentTempo = e.detail.tempo;
+            this.updateMasterBarTimes(e.detail.masterBars[0]);
+        });
+
+        at.addEventListener('alphaTab.playedBeatChanged', (e) => {
+            this.updateMasterBarTimes(e.detail.voice.bar.masterBar);
+        });
+
+        
+        at.addEventListener('alphaTab.playerStateChanged', (e) => {
+            const args = e.detail;
+            playerControls.setState({
+                isPlaying: args.state == 1
             });
         });
 
@@ -388,11 +536,29 @@ export default class AlphaTab extends React.Component {
             });
         });
 
+        let previousTime = -1;
+        at.addEventListener('alphaTab.positionChanged', (e) => {
+            var args = e.detail;                
+            
+            // reduce number of UI updates to second changes. 
+            const currentSeconds = (args.currentTime / 1000) | 0;
+            if(currentSeconds == previousTime) {
+                return;
+            }
+            previousTime = currentSeconds;
+            
+            times.setState(args);
+        });
+
         at.addEventListener('alphaTab.soundFontLoad', function (e) {
-            //updateProgress(playerLoadingIndicator, e.detail.loaded / e.detail.total);
+            playerControls.setState({
+                soundFontLoadPercentage: e.detail.loaded / e.detail.total
+            });
         });
         at.addEventListener('alphaTab.soundFontLoaded', function (e) {
-            //playerLoadingIndicator.classList.add('d-none');
+            playerControls.setState({
+                soundFontLoadPercentage: 1
+            });
         });
     }
 
@@ -430,8 +596,8 @@ export default class AlphaTab extends React.Component {
                 </div>
 
                 <div className="at-footer">
-                    <Times />
-                    <PlayerControlsGroup />
+                    <Times ref="times" />
+                    <PlayerControlsGroup ref="playerControls" api={this.state.api} />
                 </div>
             </div>
         );
