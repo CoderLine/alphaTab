@@ -21,7 +21,7 @@ This event is fired when the played beat changed.
 
 <TypeTable>
     <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
-    <TypeRow type="js" name="function(e)" />    
+    <TypeRow type="js" name="function(beat)" />    
 </TypeTable>
 
 ## Parameters
@@ -38,7 +38,7 @@ This event is fired when the played beat changed.
 var api = new AlphaTabApi<MyControl>(...);
 api.PlayedBeatChanged += beat => 
 {
-    UpdateFretboard(args);
+    UpdateFretboard(beat);
 };
 ```
 
@@ -46,7 +46,7 @@ api.PlayedBeatChanged += beat =>
 
 ```js
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addPlayedBeatChanged(function(args) {
+api.addPlayedBeatChanged(function(beat) {
     updateFretboard(beat);
 });
 ```
