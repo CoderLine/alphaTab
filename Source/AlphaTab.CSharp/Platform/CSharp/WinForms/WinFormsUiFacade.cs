@@ -112,7 +112,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
             return new ControlContainer(_layoutPanel);
         }
 
-        public override void TriggerEvent(IContainer container, string eventName, object details = null)
+        public override void TriggerEvent(IContainer container, string eventName, object details = null, IMouseEventArgs originalEvent = null)
         {
         }
 

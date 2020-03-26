@@ -118,7 +118,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             return new FrameworkElementContainer(canvas);
         }
 
-        public override void TriggerEvent(IContainer container, string eventName, object details = null)
+        public override void TriggerEvent(IContainer container, string eventName, object details = null, IMouseEventArgs originalEvent)
         {
         }
 

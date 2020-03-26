@@ -246,19 +246,32 @@ namespace AlphaTab.UI
             return new HtmlElementContainer(canvasElement);
         }
 
-        public void TriggerEvent(IContainer container, string name, object details = null)
+        public void TriggerEvent(IContainer container, string name, object details = null, IMouseEventArgs originalEvent = null)
         {
             var element = ((HtmlElementContainer)container).Element;
 
             name = "alphaTab." + name;
             dynamic e = Browser.Document.CreateEvent("CustomEvent");
+            var originalMouseEvent = (originalEvent != null) ? ((BrowserMouseEventArgs)originalEvent).MouseEvent : null;
             e.initCustomEvent(name, false, false, details);
+            if (originalMouseEvent != null)
+            {
+                e.originalEvent = originalMouseEvent;
+            }
             element.DispatchEvent(e);
 
             if (Platform.Platform.JsonExists(Browser.Window, "jQuery"))
             {
                 var jquery = Browser.Window.Member<dynamic>("jQuery");
-                jquery(element).trigger(name, details);
+
+                var args = new FastList<object>();
+                args.Add(details);
+                if (originalMouseEvent != null)
+                {
+                    args.Add(originalMouseEvent);
+                }
+
+                jquery(element).trigger(name, args.ToArray());
             }
         }
 
