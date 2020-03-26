@@ -1,0 +1,331 @@
+/* Styles for player */
+.at-cursor-bar { /* Defines the color of the bar background when a bar is played */
+    background: rgba(255, 242, 0, 0.25);
+}
+
+.at-selection div { /* Defines the color of the selection background */
+    background: rgba(64, 64, 255, 0.1)
+}
+
+.at-cursor-beat { /* Defines the beat cursor */
+    background: rgba(64, 64, 255, 0.75);
+    width: 3px;
+}
+
+.at-highlight * { /* Defines the color of the music symbols when they are being played (svg) */
+    fill: #0078ff;
+    stroke: #0078ff;
+}
+
+/* Styles for control */
+.at-wrap {
+    position: relative;
+    width: 80%;
+    height: 800px;
+    margin: 0 auto;
+    border: 1px solid rgba(0, 0, 0, .12);
+    background: #FFF;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 1fr auto;
+    grid-template-areas: "sidebar viewport" "footer  footer";
+}
+
+.at-sidebar {
+    grid-area: sidebar;
+    border-bottom: 1px solid rgba(0, 0, 0, .12);
+    width: 69px;
+    overflow: hidden;
+    display: flex;
+    align-content: stretch;
+    z-index: 1001;
+}
+
+.at-sidebar-content {
+    width: 69px;
+    border-right: 1px solid rgba(0, 0, 0, .12);
+    background: #f7f7f7;
+    transition: width .2s;
+}
+
+.at-sidebar:hover {
+    overflow: visible;
+}
+
+.at-sidebar:hover .at-sidebar-content {
+    width: 340px;
+}
+
+.at-viewport {
+    grid-area: viewport;
+    border-bottom: 1px solid rgba(0, 0, 0, .12);
+    overflow-y: auto;
+    padding-right: 20px;
+    /* scrollbar */
+}
+
+.at-footer {
+    grid-area: footer;
+}
+
+.at-song-title {
+    font-weight: 500;
+}
+
+.at-track {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas: "icon title" "icon controls";
+    padding: 5px;
+    transition: background .2s;
+    grid-gap: 5px;
+    cursor: pointer;
+}
+
+.at-track:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.at-track>.at-track-icon {
+    grid-area: icon;
+    font-size: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.5;
+    transition: opacity .2s;
+    width: 64px;
+    height: 64px;
+}
+
+.at-track:hover>.at-track-icon {
+    opacity: 0.8;
+}
+
+.at-track.active {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.at-track.active>.at-track-icon {
+    color: #4972a1;
+    opacity: 1;
+}
+
+.at-track>.at-track-name {
+    grid-area: title;
+    font-weight: 500;
+}
+
+.at-track>.at-track-controls {
+    grid-area: controls;
+    display: flex;
+    align-items: center;
+}
+
+.at-track>.at-track-controls>* {
+    margin: 0 2px;
+}
+
+.at-track>.at-track-controls>button.active:hover {
+    background: transparent;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+    height: 5px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #4972a1;
+    cursor: pointer;
+}
+
+input[type=range]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #4972a1;
+    cursor: pointer;
+}
+
+.at-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1002;
+    backdrop-filter: blur(3px);
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.at-wrap.loading .at-overlay {
+    display: flex;
+}
+
+.at-overlay-content {
+    margin-top: 20px;
+    background: #FFF;
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+}
+
+.at-overlay-content>.spinner-border {
+    color: #4972a1;
+}
+
+.at-player {
+    display: flex;
+    justify-content: space-between;
+}
+
+.at-player>div {
+    padding: 3px;
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    align-items: center;
+}
+
+.at-player-left i.fas {
+    font-size: 24px;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.at-player-right i.fas {
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.at-player-left>* {
+    margin-right: 5px;
+}
+
+.at-player-right>* {
+    margin-left: 5px;
+}
+
+.at-player-left>a.disabled, .at-player-left>a.disabled:hover, .at-player-left>a.disabled:active {
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.at-play-pause i.fas, a.active i.fas {
+    color: #4972a1;
+}
+
+.at-play-pause i.fas {
+    font-size: 32px;
+    color: #4972a1;
+}
+
+.at-times-values {
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    align-items: center;
+}
+
+.at-times-values>div {
+    padding: 3px;
+    border-right: 1px solid rgba(0, 0, 0, .12);
+    border-bottom: 1px solid rgba(0, 0, 0, .12);
+}
+
+.at-time-slider {
+    height: 4px;
+    background: #d9d9d9;
+}
+
+.at-time-slider-value {
+    height: 4px;
+    background: #4972a1;
+    width: 0;
+}
+
+.at-speed-value {
+    font-size: 0.8rem;
+}
+
+/** Circular Progress Bar https://jsfiddle.net/bootstrapious/3xnomecr  **/
+
+.progress {
+    width: 28px;
+    height: 28px;
+    background: none;
+    position: relative;
+}
+
+.progress::after {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #eee;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.progress>span {
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+}
+
+.progress .progress-left {
+    left: 0;
+}
+
+.progress .progress-bar {
+    width: 100%;
+    height: 100%;
+    background: none;
+    position: absolute;
+    top: 0;
+    border: 3px solid #4972a1;
+}
+
+.progress .progress-left .progress-bar {
+    left: 100%;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-left: 0;
+    -webkit-transform-origin: center left;
+    transform-origin: center left;
+}
+
+.progress .progress-right {
+    right: 0;
+}
+
+.progress .progress-right .progress-bar {
+    left: -100%;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-right: 0;
+    -webkit-transform-origin: center right;
+    transform-origin: center right;
+}
+
+.progress .progress-value {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 8px;
+}

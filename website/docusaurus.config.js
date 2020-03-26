@@ -17,7 +17,7 @@ module.exports = {
       links: [
         { to: 'docs/introduction', label: 'Docs', position: 'left' },
         { to: 'docs/tutorial', label: 'Tutorial', position: 'left' },
-        { to: 'docs/showcase', label: 'Showcase', position: 'left' },
+        { to: 'docs/showcase/introduction', label: 'Showcase', position: 'left' },
         { to: 'community', label: 'Community', position: 'left' },
         { to: 'blog', label: 'Blog', position: 'left' },
         {

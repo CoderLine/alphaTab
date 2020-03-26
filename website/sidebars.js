@@ -29,17 +29,14 @@ const sidebars = {
   },
   "showcase": {
 	"Showcase": [
-		'showcase'
-	],
-	"Features": [
-		'showcase/features/introduction',
-		'showcase/features/general',
-		'showcase/features/layouts',
-		'showcase/features/music-notation',
-		'showcase/features/guitar-tabs',
-		'showcase/features/special-tracks',
-		'showcase/features/special-notes',
-		'showcase/features/effects'
+		'showcase/introduction',
+		'showcase/general',
+		'showcase/layouts',
+		'showcase/music-notation',
+		'showcase/guitar-tabs',
+		'showcase/special-tracks',
+		'showcase/special-notes',
+		'showcase/effects'
 	]
   }
 };
