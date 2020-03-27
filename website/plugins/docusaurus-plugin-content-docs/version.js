@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Copyright (c) 2017-present, Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -23,25 +23,26 @@ function docsVersion(version, siteDir, options) {
     if (version.length > 32) {
         throw new Error('Invalid version tag specified! Length must <= 32 characters. Try something like: 1.0.0');
     }
-    // Since we are going to create `version-${version}` folder, we need to make sure its a valid path name
+    // Since we are going to create `version-${version}` folder, we need to make
+    // sure it's a valid pathname.
     if (/[<>:"\/\\|?*\x00-\x1F]/g.test(version)) {
         throw new Error('Invalid version tag specified! Please ensure its a valid pathname too. Try something like: 1.0.0');
     }
     if (/^\.\.?$/.test(version)) {
         throw new Error('Invalid version tag specified! Do not name your version "." or "..". Try something like: 1.0.0');
     }
-    // Load existing versions
+    // Load existing versions.
     let versions = [];
     const versionsJSONFile = env_1.getVersionsJSONFile(siteDir);
     if (fs_extra_1.default.existsSync(versionsJSONFile)) {
         versions = JSON.parse(fs_extra_1.default.readFileSync(versionsJSONFile, 'utf8'));
     }
-    // Check if version already exist
+    // Check if version already exists.
     if (versions.includes(version)) {
         throw new Error('This version already exists!. Use a version tag that does not already exist.');
     }
     const { path: docsPath, sidebarPath } = options;
-    // Copy docs files
+    // Copy docs files.
     const docsDir = path_1.default.join(siteDir, docsPath);
     if (fs_extra_1.default.existsSync(docsDir) && fs_extra_1.default.readdirSync(docsDir).length > 0) {
         const versionedDir = env_1.getVersionedDocsDir(siteDir);
@@ -51,10 +52,10 @@ function docsVersion(version, siteDir, options) {
     else {
         throw new Error('There is no docs to version !');
     }
-    // Load current sidebar and create a new versioned sidebars file
+    // Load current sidebar and create a new versioned sidebars file.
     if (fs_extra_1.default.existsSync(sidebarPath)) {
         const loadedSidebars = sidebars_1.default([sidebarPath]);
-        // Transform id in original sidebar to versioned id
+        // Transform id in original sidebar to versioned id.
         const normalizeItem = (item) => {
             switch (item.type) {
                 case 'category':
@@ -79,7 +80,7 @@ function docsVersion(version, siteDir, options) {
         fs_extra_1.default.ensureDirSync(path_1.default.dirname(newSidebarFile));
         fs_extra_1.default.writeFileSync(newSidebarFile, `${JSON.stringify(versionedSidebar, null, 2)}\n`, 'utf8');
     }
-    // update versions.json file
+    // Update versions.json file.
     versions.unshift(version);
     fs_extra_1.default.ensureDirSync(path_1.default.dirname(versionsJSONFile));
     fs_extra_1.default.writeFileSync(versionsJSONFile, `${JSON.stringify(versions, null, 2)}\n`);

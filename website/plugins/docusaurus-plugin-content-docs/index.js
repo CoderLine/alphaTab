@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Copyright (c) 2017-present, Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -39,7 +39,7 @@ function pluginContentDocs(context, opts) {
     const sourceToPermalink = {};
     const dataDir = path_1.default.join(generatedFilesDir, 'docusaurus-plugin-content-docs');
     const docsMetadataFilename = 'docs-metadata.json';
-    // Versioning
+    // Versioning.
     const env = env_1.default(siteDir);
     const { versioning } = env;
     const { versions, docsDir: versionedDir, sidebarsDir: versionedSidebarsDir, } = versioning;
@@ -77,7 +77,7 @@ function pluginContentDocs(context, opts) {
             // Prepare metadata container.
             const docsMetadataRaw = {};
             const docsPromises = [];
-            // Metadata for default/ master docs files.
+            // Metadata for default/master docs files.
             const docsFiles = await globby_1.default(include, {
                 cwd: docsDir,
             });
@@ -91,7 +91,7 @@ function pluginContentDocs(context, opts) {
                 });
                 docsMetadataRaw[metadata.id] = metadata;
             })));
-            // Metadata for versioned docs
+            // Metadata for versioned docs.
             if (versioning.enabled) {
                 const versionedGlob = lodash_1.default.flatten(include.map(pattern => versionsNames.map(versionName => `${versionName}/${pattern}`)));
                 const versionedFiles = await globby_1.default(versionedGlob, {
@@ -108,7 +108,7 @@ function pluginContentDocs(context, opts) {
                     docsMetadataRaw[metadata.id] = metadata;
                 })));
             }
-            // Load the sidebars & create docs ordering
+            // Load the sidebars and create docs ordering.
             const sidebarPaths = [
                 sidebarPath,
                 ...versionsNames.map(versionName => `${versionedSidebarsDir}/${versionName}-sidebars.json`),
@@ -116,7 +116,7 @@ function pluginContentDocs(context, opts) {
             const loadedSidebars = sidebars_1.default(sidebarPaths);
             const order = order_1.default(loadedSidebars);
             await Promise.all(docsPromises);
-            // Construct inter-metadata relationship in docsMetadata
+            // Construct inter-metadata relationship in docsMetadata.
             const docsMetadata = {};
             const permalinkToSidebar = {};
             const redirectSidebarToRoute = {};
@@ -179,8 +179,9 @@ function pluginContentDocs(context, opts) {
                         return item;
                 }
             };
-            // Transform the sidebar so that all sidebar item will be in the form of 'link' or 'category' only
-            // This is what will be passed as props to the UI component
+            // Transform the sidebar so that all sidebar item will be in the
+            // form of 'link' or 'category' only.
+            // This is what will be passed as props to the UI component.
             const docsSidebars = Object.entries(loadedSidebars).reduce((acc, [sidebarId, sidebarItems]) => {
                 acc[sidebarId] = sidebarItems.map(normalizeItem);
                 return acc;
@@ -204,7 +205,8 @@ function pluginContentDocs(context, opts) {
             const genRoutes = async (metadataItems) => {
                 const routes = await Promise.all(metadataItems.map(async (metadataItem) => {
                     await createData(
-                    // Note that this created data path must be in sync with metadataPath provided to mdx-loader
+                    // Note that this created data path must be in sync with
+                    // metadataPath provided to mdx-loader.
                     `${utils_1.docuHash(metadataItem.source)}.json`, JSON.stringify(metadataItem, null, 2));
                     return {
                         path: metadataItem.permalink,
@@ -232,8 +234,8 @@ function pluginContentDocs(context, opts) {
             // Generate one file with metadata of all docs
             // for query access on webpack side
             await createData(docsMetadataFilename, JSON.stringify(content.docsMetadata, null, 2));
-            // If versioning is enabled, we cleverly chunk the generated routes to be by version
-            // and pick only needed base metadata
+            // If versioning is enabled, we cleverly chunk the generated routes
+            // to be by version and pick only needed base metadata.
             if (versioning.enabled) {
                 const docsMetadataByVersion = lodash_1.default.groupBy(Object.values(content.docsMetadata), 'version');
                 await Promise.all(Object.keys(docsMetadataByVersion).map(async (version) => {
@@ -252,8 +254,9 @@ function pluginContentDocs(context, opts) {
                         redirectSidebarToRoute: content.redirectSidebarToRoute,
                         version,
                     };
-                    // We want latest version route config to be placed last in the generated routeconfig.
-                    // Otherwise, `/docs/next/foo` will match `/docs/:route` instead of `/docs/next/:route`
+                    // We want latest version route config to be placed last in the
+                    // generated routeconfig. Otherwise, `/docs/next/foo` will match
+                    // `/docs/:route` instead of `/docs/next/:route`.
                     return addBaseRoute(docsBaseRoute, docsBaseMetadata, routes, isLatestVersion ? -1 : undefined);
                 }));
             }
@@ -301,7 +304,8 @@ function pluginContentDocs(context, opts) {
                                         remarkPlugins,
                                         rehypePlugins,
                                         metadataPath: (mdxPath) => {
-                                            // Note that metadataPath must be the same/ in-sync as the path from createData for each MDX
+                                            // Note that metadataPath must be the same/in-sync as
+                                            // the path from createData for each MDX.
                                             const aliasedSource = utils_1.aliasedSitePath(mdxPath, siteDir);
                                             return path_1.default.join(dataDir, `${utils_1.docuHash(aliasedSource)}.json`);
                                         },

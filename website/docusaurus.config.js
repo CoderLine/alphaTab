@@ -1,4 +1,6 @@
 const path = require('path');
+const admonitions = require('remark-admonitions');
+
 module.exports = {
   title: 'alphaTab',
   tagline: 'Build modern music notation apps for web, desktop and mobile',
@@ -106,8 +108,10 @@ module.exports = {
       path.resolve(__dirname, './plugins/docusaurus-plugin-content-docs'),
       {
         sidebarPath: require.resolve('./sidebars.js'),
-        editUrl:
-          'https://github.com/CoderLine/alphaTabWebsite/tree/master',
+        editUrl: 'https://github.com/CoderLine/alphaTabWebsite/tree/master',
+        remarkPlugins: [
+          admonitions
+        ]
       }
     ],
     [

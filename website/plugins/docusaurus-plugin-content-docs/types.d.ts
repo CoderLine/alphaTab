@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-present, Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -41,14 +41,15 @@ export interface SidebarItemCategoryRaw {
     items: SidebarItemRaw[];
 }
 export declare type SidebarItem = SidebarItemDoc | SidebarItemLink | SidebarItemCategory;
-export declare type SidebarItemRaw = string | SidebarItemDoc | SidebarItemLink | SidebarItemCategoryRaw | {
+export declare type SidebarItemRaw = string | SidebarCategoryShorthandRaw | SidebarItemDoc | SidebarItemLink | SidebarItemCategoryRaw | {
     type: string;
     [key: string]: any;
 };
+export interface SidebarCategoryShorthandRaw {
+    [sidebarCategory: string]: SidebarItemRaw[];
+}
 export interface SidebarRaw {
-    [sidebarId: string]: {
-        [sidebarCategory: string]: SidebarItemRaw[];
-    } | SidebarItemRaw[];
+    [sidebarId: string]: SidebarCategoryShorthandRaw | SidebarItemRaw[];
 }
 export interface Sidebar {
     [sidebarId: string]: SidebarItem[];

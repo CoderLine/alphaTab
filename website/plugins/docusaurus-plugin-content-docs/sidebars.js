@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Copyright (c) 2017-present, Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,8 +11,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const import_fresh_1 = __importDefault(require("import-fresh"));
+function isCategoryShorthand(item) {
+    return typeof item !== 'string' && !item.type;
+}
 /**
- * Check that item contains only allowed keys
+ * Convert {category1: [item1,item2]} shorthand syntax to long-form syntax
+ */
+function normalizeCategoryShorthand(sidebar) {
+    return Object.entries(sidebar).map(([label, items]) => ({
+        type: 'category',
+        label,
+        items,
+    }));
+}
+/**
+ * Check that item contains only allowed keys.
  */
 function assertItem(item, keys) {
     const unknownKeys = Object.keys(item).filter(key => !keys.includes(key) && key !== 'type');
@@ -45,57 +58,50 @@ function assertIsLink(item) {
     }
 }
 /**
- * Normalizes recursively item and all its children. Ensures, that at the end
- * each item will be an object with the corresponding type
+ * Normalizes recursively item and all its children. Ensures that at the end
+ * each item will be an object with the corresponding type.
  */
 function normalizeItem(item) {
     if (typeof item === 'string') {
-        return {
-            type: 'doc',
-            id: item,
-        };
+        return [
+            {
+                type: 'doc',
+                id: item,
+            },
+        ];
     }
-    if (!item.type) {
-        throw new Error(`Unknown sidebar item "${JSON.stringify(item)}".`);
+    if (isCategoryShorthand(item)) {
+        return normalizeCategoryShorthand(item).flatMap(normalizeItem);
     }
     switch (item.type) {
         case 'category':
             assertIsCategory(item);
-            return Object.assign(Object.assign({}, item), { items: item.items.map(normalizeItem) });
+            return [Object.assign(Object.assign({}, item), { items: item.items.flatMap(normalizeItem) })];
         case 'link':
             assertIsLink(item);
-            return item;
+            return [item];
         case 'ref':
         case 'doc':
             assertIsDoc(item);
-            return item;
+            return [item];
         default:
             throw new Error(`Unknown sidebar item type: ${item.type}`);
     }
 }
 /**
- * Converts sidebars object to mapping to arrays of sidebar item objects
+ * Converts sidebars object to mapping to arrays of sidebar item objects.
  */
 function normalizeSidebar(sidebars) {
     return Object.entries(sidebars).reduce((acc, [sidebarId, sidebar]) => {
-        let normalizedSidebar;
-        if (!Array.isArray(sidebar)) {
-            // convert sidebar to a more generic structure
-            normalizedSidebar = Object.entries(sidebar).map(([label, items]) => ({
-                type: 'category',
-                label,
-                items,
-            }));
-        }
-        else {
-            normalizedSidebar = sidebar;
-        }
-        acc[sidebarId] = normalizedSidebar.map(normalizeItem);
+        const normalizedSidebar = Array.isArray(sidebar)
+            ? sidebar
+            : normalizeCategoryShorthand(sidebar);
+        acc[sidebarId] = normalizedSidebar.flatMap(normalizeItem);
         return acc;
     }, {});
 }
 function loadSidebars(sidebarPaths) {
-    // We don't want sidebars to be cached because of hotreloading.
+    // We don't want sidebars to be cached because of hot reloading.
     let allSidebars = {};
     if (!sidebarPaths || !sidebarPaths.length) {
         return {};

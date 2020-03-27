@@ -4,4 +4,62 @@ title: Introduction
 
 # What is alphaTab?
 
-# Features
+**alphaTab** is a JavaScript and .net library for building music notation software and websites. It allows you to take any of 
+various supported input files, and embed good looking and feature rich music sheets into your website.
+
+As of today alphaTab is **not** a drop-in component that provides all functionality out of the box. You should rather consider it as 
+an SDK to build components in the way you need it in your website. The needs to music sheets vary from application to application 
+and website to website. 
+
+:::note
+The JavaScript and .net version of alphaTab are sharing the same source code. We take our C# code and compile it to JavaScript 
+using a special toolchain.
+:::
+
+On high level alphaTab can be structured into the following submodules: 
+
+1. The data model
+2. The file importers
+3. The render engine
+4. The audio engine
+
+All these 4 modules together make up alphaTab and allows you to provide modern and interactive music notation into your website or application. 
+
+## The data model 
+The data model which holds all information about a piece of music. This includes general information like
+song title and artist but goes down to individual note level. Everything alphaTab needs to render or play music sheets
+is stored in this data model. 
+
+## The file importers
+To fill the data model alphaTab uses so called `Importers`. There exist various file formats in the market which can hold
+the information about music sheets. alphaTab has importers for: 
+
+* Guitar Pro 3-5 files `.gp3`, `.gp4`, `.gp5` which are a proprietary binary format from [Arobas Music](https://www.guitar-pro.com/en/index.php?pg=about)
+* Guitar Pro 6 files `.gpx` which are a proprietary archive format storing the music information as XML 
+* Guitar Pro 7 files `.gp` which are a zip archive storing the music information as XML
+* MusicXML files `.xml` which is an open XML based [standard](https://www.musicxml.com/). 
+* [alphaTex](/docs/alphaTex) which is a text based format optimized writing music notation in a textual format
+
+:::note
+There exist many *dialects* of MusicXML and due to its very nature of describing music sheets in a very visual way, 
+only a limited subset of MusicXML is actually supported. If you encounter issues or missing features do not hesistate
+to contact us on Gitter or GitHub to add support for missing features. 
+:::
+
+## The render engine
+This engine is what makes the music sheet visible. alphaTab takes all the information stored in the data model 
+and does a visual layouting and rendering which is called music engraving.
+
+For this alphaTab builds up a visual tree represntation of all the symbols following the rules of music notation. 
+Using this model alphaTab can very efficiently provide dynamic resizing and relayouting. 
+
+The symbols alphaTab is using the [SMuFL](https://www.smufl.org/) music font [Bravura](https://github.com/steinbergmedia/bravura)
+
+## The player
+To bring the music to life, alphaTab comes with a MIDI synthesizer embedded. To play the music sheet, alphaTab will convert the data model
+into MIDI commands, which are then played by a MIDI synthesizer based on [TinySoundFont](https://github.com/schellingb/TinySoundFont).
+
+We take the data model, convert it to MIDI, put this midi together with a SoundFont2 into the audio engine and violà, we have the 
+song being played for human ears. 
+
+alphaTab can provides user interactivity and a visual cursor out of the box.

@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Copyright (c) 2017-present, Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -16,7 +16,7 @@ const lastUpdate_1 = __importDefault(require("./lastUpdate"));
 async function lastUpdated(filePath, options) {
     const { showLastUpdateAuthor, showLastUpdateTime } = options;
     if (showLastUpdateAuthor || showLastUpdateTime) {
-        // Use fake data in dev for faster development
+        // Use fake data in dev for faster development.
         const fileLastUpdateData = process.env.NODE_ENV === 'production'
             ? await lastUpdate_1.default(filePath)
             : {
@@ -56,7 +56,7 @@ async function processMetadata({ source, refDir, context, options, env, }) {
             version = 'next';
         }
     }
-    // The version portion of the url path. Eg: 'next', '1.0.0', and ''
+    // The version portion of the url path. Eg: 'next', '1.0.0', and ''.
     const versionPath = version && version !== versioning.latestVersion ? version : '';
     const relativePath = path_1.default.relative(siteDir, filePath);
     const docsEditUrl = editUrl
@@ -74,7 +74,7 @@ async function processMetadata({ source, refDir, context, options, env, }) {
     // Default title is the id.
     const title = frontMatter.title || baseID;
     const description = frontMatter.description || excerpt;
-    // The last portion of the url path. Eg: 'foo/bar', 'bar'
+    // The last portion of the url path. Eg: 'foo/bar', 'bar'.
     const routePath = version && version !== 'next'
         ? id.replace(new RegExp(`^version-${version}/`), '')
         : id;
@@ -85,8 +85,10 @@ async function processMetadata({ source, refDir, context, options, env, }) {
         routePath,
     ]);
     const { lastUpdatedAt, lastUpdatedBy } = await lastUpdatedPromise;
-    // Assign all of object properties during instantiation (if possible) for NodeJS optimization
-    // Adding properties to object after instantiation will cause hidden class transitions.
+    // Assign all of object properties during instantiation (if possible) for
+    // NodeJS optimization.
+    // Adding properties to object after instantiation will cause hidden
+    // class transitions.
     const metadata = {
         id,
         title,

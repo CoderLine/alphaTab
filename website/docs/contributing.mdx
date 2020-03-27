@@ -2,16 +2,117 @@
 title: Contributing
 ---
 
-# Get involved
+We're happy to hear that you want to contribute to alphaTab. There are many ways to contribute to alphaTab.
+You can report bugs, request features or actually start contributing to the alphaTab source code. 
 
-# Join our Gitter Chatroom
+## Get Involved
 
-# Development Process
+If you are using alphaTab in your project, you might encounter easter eggs (aka. bugs) or have the need for 
+new features that do not exist yet in alphaTab. 
 
-# Reporting bugs
+We accept all kind of requests via [GitHub](https://github.com/CoderLine/alphaTab/issues/new/choose) just open a new issue
+by choosing one of the templates and filling it out with your request. 
 
-# Requesting features
+:::important
+Please follow the templates and do not just delete all information and drop in a 1 liner question. It is very important
+to get all the information asked in the template to judge the importance and content of the request. 2 minutes effort
+on your side, reduces heavily the effor on our side. We will close any issue not following the templates. 
+:::
 
-# Development Setup
+## Join our Gitter Chatroom
 
-# License
+If you just have a general question or need assistance our Gitter chatroom might be also a good way to get in contact.
+We just lately openeg this room so do not hesitate to ask there even though it feels a bit empty there ;) 
+
+https://gitter.im/alphaTabMusic/community
+
+# Join the Code
+
+You're a developer? You want to contribute code to alphaTab? Awesome! alphaTab is developed on GitHub using a GitFlow alike branching strategy. 
+
+The main new development happens on `develop` and new features are usually developed on `feature/{feature or issue name}`. To get started 
+you can fork alphaTab into your account, and start preparing a fix/feature there in the style you prefer. Then just open a pull request. 
+If you're not new to Git and GitHub you know the drill ;) 
+
+## License
+
+alphaTab is developed under MPL-2.0 and any source code you contribute you agree that you transfer the ownership of your change to alphaTab. 
+By this we do not want to "take away" your change, but we want to keep the freedom to potentially change the license to something more open or different (e.g. MIT)
+without the need of checking with hundreds of people if this change is possible. Of course we also would not make such a change without discussing it publicly before. 
+
+A primary goal is to keep alphaTab a free an open source library for anyone to integrate. 
+
+## Toolchain
+
+You're still here? That sounds very promising. You have made your fork, you cloned the repo and now you would be ready to start developing. 
+But how is the big question. Before we actually touch the code it is helpful to understand the toolchain we have in alphaTab.
+
+As you might already know alphaTab is developed currently in C# and by this produces a .net library. There is nothing special at this point.
+But it becomes more special on how we build our JavaScript library. To build the JavaScript version of alphaTab we are first compiling our C# code
+to [Haxe](https://haxe.org/). 
+
+"Why all this overhead?" you might ask. Well, I'm a huge fan of C# and its tooling. Hence I wanted to develop alphaTab in C#, but still provide it
+as Web Library. Haxe is a really nice meta language for cross compiling one source base to many other target languages. alphaTab 
+was using Haxe already in the past before we switched to C# and the performance and output code quality was just way better than any other
+cross compilation technology we used. 
+
+Okay, but Haxe does not support C# as input, so we made our own C# to Haxe compiler named Phase. This brings us to the following toolchains:
+
+<img src="/img/toolchain.svg" alt="Toolchain" />
+
+What's still a lot of overhead of course and not many people are familiar with this. This is the main reason why we are planning to move 
+to a TypeScript based toolchain. This way the main source base will become **TypeScript** based for the web, but with a custom cross compiler
+for the other platforms we want to ship. 
+
+Which brings me to the next aspect of alphaTab development. It aims for zero dependency and cross platform / language usage. 
+The main modules of alphaTab are written as standalone source code without 3rd party dependencies and with a style that allows 
+execution on any potential platform with a garbage collector built in (.net, JavaScript, Kotlin/Java,...). It is an active strategy
+to provide a platform native solution to any major platform on the market. 
+
+## Development Environment
+
+The main development can happen within any .net IDE which can built C# projects (Rider, Visual Studio or VS Code). It is up to you to decide 
+which one you would like to use. 
+
+Beside a .net environment you will need to install: 
+
+* [Haxe 3.4.7](https://haxe.org/download/version/3.4.7/)
+* [Node.js](https://nodejs.org/)
+
+Following NPM packages should be installed globally on your system.
+
+`npm install -g uglify-js`
+
+Then you can simply open the AlphaTab.sln and compile the projects. 
+
+## Project Structure
+
+**AlphaTab.Shared**
+
+Contains the shared platform code. This is where the main code of alphaTab lives. 
+
+**AlphaTab.CSharp**
+
+Executes the .net pipeline and builds a NuGet package containing the .net libraries.
+Contains any .net platform specific code. 
+
+**AlphaTab.JavaScript**
+
+Executes the JavaScript pipieline building the final minimized JavaScript file. 
+Contains any JavaScript platform specific code. 
+
+**Test/AlphaTab.Test**
+
+Contains the shared platform code for the overall unit test suite. 
+
+**Test/AlphaTab.Test.CSharp**
+
+Contains the tests for the .net platform including the shared tests. (can be run from Visual Studio)
+
+**Test/AlphaTab.Test.Js**
+
+Contains the tests for the JavaScript platform including the shared tests. (Needs manual run via karma)
+
+**Samples/***
+
+Contains .net sample projects.
