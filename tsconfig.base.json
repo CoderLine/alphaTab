@@ -1,0 +1,56 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es6",
+    "module": "es6",
+    "lib": [
+      "es2015",
+      "es2016",
+      "es2017",
+      "dom"
+    ],
+    "strict": true,
+
+    "allowSyntheticDefaultImports": true,
+
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+
+   // "allowSyntheticDefaultImports": true,
+   // "allowUnreachableCode": false,
+   // "noImplicitAny": true,
+   // "noImplicitThis": true,
+   // "noImplicitReturns": true,
+   // "noUnusedLocals": true,
+   // "noUnusedParameters": true,
+   // "allowJs": false,
+   // "downlevelIteration": false,
+
+    "sourceMap": true,
+    "declaration": true,
+    "incremental": true,
+    "declarationDir": "dist/types",
+    "outDir": "dist/lib",
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": [
+        "src/*"
+      ]
+    },
+    "typeRoots": [
+      "types",
+      "node_modules/@types"
+    ],
+    "plugins": [
+      {
+        "transform": "./compiler/JsonSerializationBuilder.ts"
+      },
+    ]
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/node_modules",
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "name": "alphatab",
+  "version": "0.9.7",
+  "description": "alphaTab is a music notation and guitar tablature rendering library",
+  "keywords": [
+    "guitar",
+    "music-notation",
+    "music-sheet",
+    "html5",
+    "svg",
+    "guitar-tablature"
+  ],
+  "homepage": "https://alphatab.net",
+  "bugs": {
+    "url": "https://github.com/CoderLine/alphaTab/issues"
+  },
+  "author": "Daniel Kuschny",
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CoderLine/alphaTab"
+  },
+  "main": "dist/alphatab.js",
+  "typings": "dist/types/alphatab.d.ts",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {
+    "lint": "tslint  --project tsconfig.build.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "prebuild": "rimraf dist",
+    "build": "ttsc --project tsconfig.build.json && rollup -c rollup.config.js",
+    "start": "concurrently --kill-others \"ttsc --project tsconfig.build.json --watch\" \"rollup -c rollup.config.ts -w\" \"http-server\"",
+    "test": "ttsc --project tsconfig.json && karma start karma.conf.js"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@types/jasmine": "^3.5.10",
+    "@types/pixelmatch": "^5.1.0",
+    "concurrently": "^5.1.0",
+    "http-server": "^0.12.1",
+    "karma": "^4.4.1",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-jasmine": "^3.1.1",
+    "karma-jasmine-html-reporter": "^1.5.3",
+    "karma-rollup-preprocessor": "^7.0.5",
+    "karma-spec-reporter": "0.0.32",
+    "pixelmatch": "^5.1.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.3.3",
+    "ts-node": "^8.8.2",
+    "tslint": "^6.1.1",
+    "tslint-config-prettier": "^1.15.0",
+    "tslint-config-standard": "^9.0.0",
+    "ttypescript": "^1.5.10",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {}
+}
