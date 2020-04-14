@@ -92,7 +92,7 @@ export class HuffTools {
             table.push(new Found(-1));
         }
         HuffTools.treeWalk(table, 0, 0, d, t);
-        return new NeedBits(d, table.splice(0) as any);
+        return new NeedBits(d, table);
     }
 
     private static treeWalk(table: Huffman[], p: number, cd: number, d: number, t: Huffman): void {

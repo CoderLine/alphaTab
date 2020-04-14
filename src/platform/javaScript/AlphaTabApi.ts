@@ -131,7 +131,7 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
                 }
             }
         }
-        return tracks.splice(0) as any;
+        return tracks;
     }
 
     public soundFontLoad: EventEmitter<(e: ProgressEventArgs) => void> = new EventEmitter();

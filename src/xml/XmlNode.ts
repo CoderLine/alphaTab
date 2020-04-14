@@ -69,7 +69,7 @@ export class XmlNode {
     public getElementsByTagName(name: string, recursive: boolean = false): XmlNode[] {
         let tags: XmlNode[] = [];
         this.searchElementsByTagName(this.childNodes, tags, name, recursive);
-        return tags.splice(0) as any;
+        return tags;
     }
 
     private searchElementsByTagName(all: XmlNode[], result: XmlNode[], name: string, recursive: boolean = false): void {

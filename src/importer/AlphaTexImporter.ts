@@ -698,7 +698,7 @@ export class AlphaTexImporter extends ScoreImporter {
                             tuning.push(t.realValue);
                             this._sy = this.newSy();
                         } while (this._sy === AlphaTexSymbols.Tuning);
-                        this._currentStaff.tuning = tuning.splice(0) as any;
+                        this._currentStaff.tuning = new Int32Array(tuning);
                         break;
                     default:
                         this.error('tuning', AlphaTexSymbols.Tuning, true);

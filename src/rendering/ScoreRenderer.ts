@@ -81,7 +81,7 @@ export class ScoreRenderer implements IScoreRenderer {
             if (tracks.length === 0 && score.tracks.length > 0) {
                 tracks.push(score.tracks[0]);
             }
-            this.tracks = tracks.splice(0) as any;
+            this.tracks = tracks;
             this.render();
         } catch (e) {
             this.error.trigger('render', e);

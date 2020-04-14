@@ -15,7 +15,7 @@
 
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-
+    "emitDecoratorMetadata": false,
    // "allowSyntheticDefaultImports": true,
    // "allowUnreachableCode": false,
    // "noImplicitAny": true,

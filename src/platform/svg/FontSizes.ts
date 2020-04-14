@@ -19,7 +19,7 @@ export class FontSizes {
                 let s: string = String.fromCharCode(i);
                 sizes.push(measureContext.measureText(s).width);
             }
-            let data: Uint8Array = sizes.splice(0) as any;
+            let data: Uint8Array = new Uint8Array(sizes);
             FontSizes.FontSizeLookupTables.set(family, data);
         } else {
             FontSizes.FontSizeLookupTables.set(family, new Uint8Array([8]));

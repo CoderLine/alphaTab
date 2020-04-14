@@ -224,7 +224,7 @@ export class AlphaTabApiBase<TSettings> {
                 }
             }
         }
-        this.internalRenderTracks(score, tracks.splice(0) as any);
+        this.internalRenderTracks(score, tracks);
     }
 
     /**
@@ -349,7 +349,7 @@ export class AlphaTabApiBase<TSettings> {
             if (this.uiFacade.canRender) {
                 // when font is finally loaded, start rendering
                 this.renderer.width = this.container.width;
-                this.renderer.renderScore(this.score!, this._trackIndexes!.splice(0) as any);
+                this.renderer.renderScore(this.score!, this._trackIndexes as any);
             } else {
                 this.uiFacade.canRenderChanged.on(renderAction);
             }
