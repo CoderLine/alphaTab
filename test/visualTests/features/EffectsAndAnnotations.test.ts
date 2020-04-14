@@ -74,7 +74,7 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('tuplets-advanced', async () => {
-        await VisualTestHelper.runVisualTest('features/effects-and-annotations/tuplets-advanced.gp');
+        await VisualTestHelper.runVisualTest('features/effects-and-annotations/tuplets-advanced.gp', undefined, [0,1,2]);
     });
 
     it('fingering', async () => {

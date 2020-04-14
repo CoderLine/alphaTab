@@ -5,14 +5,14 @@ module.exports = function (config) {
   config.set({
     frameworks: ["jasmine"],
     files: [
-      { pattern: "dist/lib.test/**/*.test.js", watched: false },
+      { pattern: "dist/lib.test/test/index.js", watched: false },
       {
         pattern: "test-data/**/*",
         type: "html",
         watched: false,
         included: false,
         served: true,
-        nocache: false,
+        nocache: true,
       },
       {
         pattern: "font/**/*",
@@ -20,11 +20,11 @@ module.exports = function (config) {
         watched: false,
         included: false,
         served: true,
-        nocache: false,
+        nocache: true,
       },
     ],
     preprocessors: {
-      "dist/lib.test/**/*.test.js": ["rollup"],
+      "dist/lib.test/test/index.js": ["rollup"],
     },
     reporters: ["spec", "kjhtml"],
     browsers: ["ChromeWithUserDataDir"],

@@ -106,7 +106,7 @@ export class VisualTestHelper {
     ): Promise<HTMLCanvasElement> {
         return new Promise<HTMLCanvasElement>((resolve, reject) => {
             const img = new Image();
-            img.src = 'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, data as any));
+            img.src = 'data:image/png;base64,' + btoa(data.reduce((p, d) => p + String.fromCharCode(d), ''));
             img.onload = function () {
                 const canvas = document.createElement('canvas');
                 canvas.classList.add(className);
@@ -227,7 +227,7 @@ export class VisualTestHelper {
                         expected.width,
                         expected.height,
                         {
-                            threshold: 0.1,
+                            threshold: 0.2,
                             includeAA: false,
                             diffMask: true,
                             alpha: 1
