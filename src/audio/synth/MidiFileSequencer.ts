@@ -73,6 +73,7 @@ export class MidiFileSequencer {
     public seek(timePosition: number): void {
         // map to speed=1
         timePosition *= this.playbackSpeed;
+        
         // ensure playback range
         if (this.playbackRange) {
             if (timePosition < this._playbackRangeStartTime) {
@@ -81,11 +82,13 @@ export class MidiFileSequencer {
                 timePosition = this._playbackRangeEndTime;
             }
         }
+
         // move back some ticks to ensure the on-time events are played
         timePosition -= 25;
         if (timePosition < 0) {
             timePosition = 0;
         }
+
         if (timePosition > this._currentTime) {
             this.silentProcess(timePosition - this._currentTime);
         } else if (timePosition < this._currentTime) {
@@ -104,40 +107,50 @@ export class MidiFileSequencer {
         if (milliseconds <= 0) {
             return;
         }
+
         let start: number = Date.now();
         let finalTime: number = this._currentTime + milliseconds;
+
         while (this._currentTime < finalTime) {
             if (this.fillMidiEventQueueLimited(finalTime - this._currentTime)) {
                 this._synthesizer.synthesizeSilent();
             }
         }
+
         let duration: number = Date.now() - start;
         Logger.debug('Sequencer', 'Silent seek finished in ' + duration + 'ms');
     }
 
     public loadMidi(midiFile: MidiFile): void {
         this._tempoChanges = [];
+
         this._division = midiFile.division;
         this._eventIndex = 0;
         this._currentTime = 0;
+
         // build synth events.
         this._synthData = [];
+
         // Converts midi to milliseconds for easy sequencing
         let bpm: number = 120;
         let absTick: number = 0;
         let absTime: number = 0.0;
+
         let metronomeLength: number = 0;
         let metronomeTick: number = 0;
         let metronomeTime: number = 0.0;
+
         let previousTick: number = 0;
         for (let mEvent of midiFile.events) {
             let synthData: SynthEvent = new SynthEvent(this._synthData.length, mEvent);
             this._synthData.push(synthData);
+
             let deltaTick: number = mEvent.tick - previousTick;
             absTick += deltaTick;
             absTime += deltaTick * (60000.0 / (bpm * midiFile.division));
             synthData.time = absTime;
             previousTick = mEvent.tick;
+
             if (mEvent.command === MidiEventType.Meta && mEvent.data1 === MetaEventType.Tempo) {
                 let meta: MetaNumberEvent = mEvent as MetaNumberEvent;
                 bpm = 60000000 / meta.value;
@@ -152,6 +165,7 @@ export class MidiFileSequencer {
                     this._firstProgramEventPerChannel.set(channel, synthData);
                 }
             }
+
             if (metronomeLength > 0) {
                 while (metronomeTick < absTick) {
                     let metronome: SynthEvent = SynthEvent.newMetronomeEvent(this._synthData.length);
@@ -162,6 +176,7 @@ export class MidiFileSequencer {
                 }
             }
         }
+
         this._synthData.sort((a, b) => {
             if (a.time > b.time) {
                 return 1;
@@ -185,6 +200,7 @@ export class MidiFileSequencer {
         if (maxMilliseconds > 0 && maxMilliseconds < millisecondsPerBuffer) {
             millisecondsPerBuffer = maxMilliseconds;
         }
+
         let anyEventsDispatched: boolean = false;
         let endTime: number = this.internalEndTime;
         for (let i: number = 0; i < TinySoundFont.MicroBufferCount; i++) {
@@ -199,6 +215,7 @@ export class MidiFileSequencer {
                 anyEventsDispatched = true;
             }
         }
+
         return anyEventsDispatched;
     }
 
@@ -214,26 +231,32 @@ export class MidiFileSequencer {
         let timePosition: number = 0.0;
         let bpm: number = 120.0;
         let lastChange: number = 0;
+
         // find start and bpm of last tempo change before time
         for (const c of this._tempoChanges) {
             if (tickPosition < c.ticks) {
                 break;
             }
+
             timePosition = c.time;
             bpm = c.bpm;
             lastChange = c.ticks;
         }
+
         // add the missing millis
         tickPosition -= lastChange;
         timePosition += tickPosition * (60000.0 / (bpm * this._division));
+
         return timePosition / playbackSpeed;
     }
 
     private timePositionToTickPositionWithSpeed(timePosition: number, playbackSpeed: number): number {
         timePosition *= playbackSpeed;
+
         let ticks: number = 0;
         let bpm: number = 120.0;
         let lastChange: number = 0;
+
         // find start and bpm of last tempo change before time
         for (const c of this._tempoChanges) {
             if (timePosition < c.time) {
@@ -243,6 +266,7 @@ export class MidiFileSequencer {
             bpm = c.bpm;
             lastChange = c.time;
         }
+        
         // add the missing ticks
         timePosition -= lastChange;
         ticks += (timePosition / (60000.0 / (bpm * this._division))) | 0;

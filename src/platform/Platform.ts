@@ -109,12 +109,6 @@ export class Platform {
         return array[0];
     }
 
-    public static clearIntArray(array: number[]): void {
-        for (let i: number = 0; i < array.length; i++) {
-            array[i] = 0;
-        }
-    }
-
     public static throttle(action: () => void, delay: number): () => void {
         let timeoutId: number = 0;
         return () => {

@@ -366,7 +366,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 switch (c.localName) {
                     case 'staff-lines':
                         for (let staff of track.staves) {
-                            staff.tuning = new Array<number>(parseInt(c.innerText));
+                            staff.tuning = new Array<number>(parseInt(c.innerText)).fill(0);
                         }
                         break;
                     case 'staff-tuning':

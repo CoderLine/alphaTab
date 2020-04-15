@@ -21,10 +21,14 @@ export class VoiceEnvelope {
 
     public level: number = 0;
     public slope: number = 0;
+
     public samplesUntilNextSegment: number = 0;
+
     public segment: VoiceEnvelopeSegment = VoiceEnvelopeSegment.None;
     public midiVelocity: number = 0;
+
     public parameters: Envelope | null = null;
+
     public segmentIsExponential: boolean = false;
     public isAmpEnv: boolean = false;
 
@@ -37,6 +41,7 @@ export class VoiceEnvelope {
             switch (activeSegment) {
                 case VoiceEnvelopeSegment.None:
                     this.samplesUntilNextSegment = (this.parameters.delay * outSampleRate) | 0;
+
                     if (this.samplesUntilNextSegment > 0) {
                         this.segment = VoiceEnvelopeSegment.Delay;
                         this.segmentIsExponential = false;
@@ -44,16 +49,21 @@ export class VoiceEnvelope {
                         this.slope = 0.0;
                         return;
                     }
+
                     activeSegment = VoiceEnvelopeSegment.Delay;
                     break;
+
                 case VoiceEnvelopeSegment.Delay:
                     this.samplesUntilNextSegment = (this.parameters.attack * outSampleRate) | 0;
+
                     if (this.samplesUntilNextSegment > 0) {
+
                         if (!this.isAmpEnv) {
                             // mod env attack duration scales with velocity (velocity of 1 is full duration, max velocity is 0.125 times duration)
                             this.samplesUntilNextSegment =
                                 (this.parameters.attack * ((145 - this.midiVelocity) / 144.0) * outSampleRate) | 0;
                         }
+
                         this.segment = VoiceEnvelopeSegment.Attack;
                         this.segmentIsExponential = false;
                         this.level = 0.0;
@@ -62,8 +72,10 @@ export class VoiceEnvelope {
                     }
                     activeSegment = VoiceEnvelopeSegment.Attack;
                     break;
+
                 case VoiceEnvelopeSegment.Attack:
                     this.samplesUntilNextSegment = (this.parameters.hold * outSampleRate) | 0;
+
                     if (this.samplesUntilNextSegment > 0) {
                         this.segment = VoiceEnvelopeSegment.Hold;
                         this.segmentIsExponential = false;
@@ -71,13 +83,16 @@ export class VoiceEnvelope {
                         this.slope = 0.0;
                         return;
                     }
+
                     activeSegment = VoiceEnvelopeSegment.Hold;
                     break;
+
                 case VoiceEnvelopeSegment.Hold:
                     this.samplesUntilNextSegment = (this.parameters.decay * outSampleRate) | 0;
                     if (this.samplesUntilNextSegment > 0) {
                         this.segment = VoiceEnvelopeSegment.Decay;
                         this.level = 1.0;
+
                         if (this.isAmpEnv) {
                             // I don't truly understand this; just following what LinuxSampler does.
                             let mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
@@ -97,10 +112,12 @@ export class VoiceEnvelope {
                                 (this.parameters.decay * (1.0 - this.parameters.sustain) * outSampleRate) | 0;
                             this.segmentIsExponential = false;
                         }
+
                         return;
                     }
                     activeSegment = VoiceEnvelopeSegment.Decay;
                     break;
+
                 case VoiceEnvelopeSegment.Decay:
                     this.segment = VoiceEnvelopeSegment.Sustain;
                     this.level = this.parameters.sustain;
@@ -108,12 +125,13 @@ export class VoiceEnvelope {
                     this.samplesUntilNextSegment = 0x7fffffff;
                     this.segmentIsExponential = false;
                     return;
+
                 case VoiceEnvelopeSegment.Sustain:
                     this.segment = VoiceEnvelopeSegment.Release;
                     this.samplesUntilNextSegment =
                         ((this.parameters.release <= 0 ? VoiceEnvelope.FastReleaseTime : this.parameters.release) *
-                            outSampleRate) |
-                        0;
+                            outSampleRate) | 0;
+
                     if (this.isAmpEnv) {
                         // I don't truly understand this; just following what LinuxSampler does.
                         let mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
@@ -123,7 +141,9 @@ export class VoiceEnvelope {
                         this.slope = -this.level / this.samplesUntilNextSegment;
                         this.segmentIsExponential = false;
                     }
+
                     return;
+                case VoiceEnvelopeSegment.Release:
                 default:
                     this.segment = VoiceEnvelopeSegment.Done;
                     this.segmentIsExponential = false;
@@ -147,11 +167,13 @@ export class VoiceEnvelope {
             this.parameters.hold =
                 this.parameters.hold < -10000.0 ? 0.0 : SynthHelper.timecents2Secs(this.parameters.hold);
         }
+
         if (this.parameters.keynumToDecay > 0) {
             this.parameters.decay += this.parameters.keynumToDecay * (60.0 - midiNoteNumber);
             this.parameters.decay =
                 this.parameters.decay < -10000.0 ? 0.0 : SynthHelper.timecents2Secs(this.parameters.decay);
         }
+
         this.midiVelocity = midiVelocity | 0;
         this.isAmpEnv = isAmpEnv;
         this.nextSegment(VoiceEnvelopeSegment.None, outSampleRate);
@@ -165,6 +187,7 @@ export class VoiceEnvelope {
                 this.level += this.slope * numSamples;
             }
         }
+        
         // tslint:disable-next-line: no-conditional-assignment
         if ((this.samplesUntilNextSegment -= numSamples) <= 0) {
             this.nextSegment(this.segment, outSampleRate);

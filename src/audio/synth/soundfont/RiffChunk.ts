@@ -15,30 +15,37 @@ export class RiffChunk {
         if (parent && RiffChunk.HeaderSize > parent.size) {
             return false;
         }
+
         if (stream.position + RiffChunk.HeaderSize >= stream.length) {
             return false;
         }
+
         chunk.id = IOHelper.read8BitStringLength(stream, 4);
         if (chunk.id.charCodeAt(0) <= 32 || chunk.id.charCodeAt(0) >= 122) {
             return false;
         }
         chunk.size = IOHelper.readUInt32LE(stream);
+
         if (parent && RiffChunk.HeaderSize + chunk.size > parent.size) {
             return false;
         }
+
         if (parent) {
             parent.size -= RiffChunk.HeaderSize + chunk.size;
         }
+
         let isRiff: boolean = chunk.id === 'RIFF';
         let isList: boolean = chunk.id === 'LIST';
         if (isRiff && parent) {
             // not allowed
             return false;
         }
+
         if (!isRiff && !isList) {
             // custom type without sub type
             return true;
         }
+        
         // for lists unwrap the list type
         chunk.id = IOHelper.read8BitStringLength(stream, 4);
         if (chunk.id.charCodeAt(0) <= 32 || chunk.id.charCodeAt(0) >= 122) {

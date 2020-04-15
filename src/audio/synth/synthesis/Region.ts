@@ -5,6 +5,7 @@
 import { HydraGenAmount } from '@src/audio/synth/soundfont/Hydra';
 import { Envelope } from '@src/audio/synth/synthesis/Envelope';
 import { LoopMode } from '@src/audio/synth/synthesis/LoopMode';
+import { TypeConversions } from '@src/io/TypeConversions';
 
 export enum GenOperators {
     StartAddrsOffset,
@@ -171,18 +172,24 @@ export class Region {
         this.delayVibLFO = 0;
         this.freqVibLFO = 0;
         this.vibLfoToPitch = 0;
+
         this.hiKey = this.hiVel = 127;
         this.pitchKeyCenter = 60; // C4
 
         if (forRelative) {
             return;
         }
+
         this.pitchKeyTrack = 100;
+        
         this.pitchKeyCenter = -1;
+        
         // SF2 defaults in timecents.
         this.ampEnv.delay = this.ampEnv.attack = this.ampEnv.hold = this.ampEnv.decay = this.ampEnv.release = -12000.0;
         this.modEnv.delay = this.modEnv.attack = this.modEnv.hold = this.modEnv.decay = this.modEnv.release = -12000.0;
+        
         this.initialFilterFc = 13500;
+        
         this.delayModLFO = -12000.0;
         this.delayVibLFO = -12000.0;
     }
@@ -190,19 +197,19 @@ export class Region {
     public operator(genOper: number, amount: HydraGenAmount): void {
         switch (genOper as GenOperators) {
             case GenOperators.StartAddrsOffset:
-                this.offset += amount.shortAmount;
+                this.offset += TypeConversions.int16ToUint32(amount.shortAmount);
                 break;
             case GenOperators.EndAddrsOffset:
-                this.end += amount.shortAmount;
+                this.end += TypeConversions.int16ToUint32(amount.shortAmount);
                 break;
             case GenOperators.StartloopAddrsOffset:
-                this.loopStart += amount.shortAmount;
+                this.loopStart += TypeConversions.int16ToUint32(amount.shortAmount);
                 break;
             case GenOperators.EndloopAddrsOffset:
-                this.loopEnd += amount.shortAmount;
+                this.loopEnd += TypeConversions.int16ToUint32(amount.shortAmount);
                 break;
             case GenOperators.StartAddrsCoarseOffset:
-                this.offset += amount.shortAmount * 32768;
+                this.offset += TypeConversions.int16ToUint32(amount.shortAmount) * 32768;
                 break;
             case GenOperators.ModLfoToPitch:
                 this.modLfoToPitch = amount.shortAmount;
@@ -226,7 +233,7 @@ export class Region {
                 this.modEnvToFilterFc = amount.shortAmount;
                 break;
             case GenOperators.EndAddrsCoarseOffset:
-                this.end += amount.shortAmount * 32768;
+                this.end += TypeConversions.int16ToUint32(amount.shortAmount) * 32768;
                 break;
             case GenOperators.ModLfoToVolume:
                 this.modLfoToVolume = amount.shortAmount;
@@ -303,13 +310,13 @@ export class Region {
                 this.hiVel = amount.highByteAmount;
                 break;
             case GenOperators.StartloopAddrsCoarseOffset:
-                this.loopStart += amount.shortAmount * 32768;
+                this.loopStart += TypeConversions.int16ToUint32(amount.shortAmount) * 32768;
                 break;
             case GenOperators.InitialAttenuation:
                 this.attenuation += amount.shortAmount * 0.1;
                 break;
             case GenOperators.EndloopAddrsCoarseOffset:
-                this.loopEnd += amount.shortAmount * 32768;
+                this.loopEnd += TypeConversions.int16ToUint32(amount.shortAmount) * 32768;
                 break;
             case GenOperators.CoarseTune:
                 this.transpose += amount.shortAmount;

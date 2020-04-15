@@ -7,42 +7,42 @@ export enum MidiEventType {
     /**
      * A note is released.
      */
-    NoteOff = 128,
+    NoteOff = 0x80,
 
     /**
      * A note is started.
      */
-    NoteOn = 144,
+    NoteOn = 0x90,
 
     /**
      * The pressure that was used to play the note.
      */
-    NoteAftertouch = 160,
+    NoteAftertouch = 0xA0,
 
     /**
      * Change of a midi controller
      */
-    Controller = 176,
+    Controller = 0xB0,
 
     /**
      * Change of a midi program
      */
-    ProgramChange = 192,
+    ProgramChange = 0xC0,
 
     /**
      * The pressure that should be applied to the whole channel.
      */
-    ChannelAftertouch = 208,
+    ChannelAftertouch = 0xD0,
 
     /**
      * A change of the audio pitch.
      */
-    PitchBend = 224,
+    PitchBend = 0xE0,
 
     /**
-     * A meta event.
+     * A meta event. See <see cref="MetaEventTypeEnum"/> for details.
      */
-    Meta = 255
+    Meta = 0xFF
 }
 
 /**

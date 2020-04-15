@@ -7,6 +7,11 @@ export class TypeConversions {
         return TypeConversions._dataView.getInt16(0, true);
     }
 
+    public static int16ToUint32(v: number): number {
+        TypeConversions._dataView.setInt16(0, v, true);
+        return TypeConversions._dataView.getUint32(0, true);
+    }
+
     public static int32ToUint16(v: number): number {
         TypeConversions._dataView.setInt32(0, v, true);
         return TypeConversions._dataView.getUint16(0, true);

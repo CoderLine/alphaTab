@@ -8,5 +8,5 @@ export class Preset {
     public name: string = "";
     public presetNumber: number = 0;
     public bank: number = 0;
-    public regions: Region[] = [];
+    public regions: Region[] | null = null;
 }

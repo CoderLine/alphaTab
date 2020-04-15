@@ -45,14 +45,17 @@ export class Envelope {
         this.delay = this.delay < -11950.0 ? 0.0 : SynthHelper.timecents2Secs(this.delay);
         this.attack = this.attack < -11950.0 ? 0.0 : SynthHelper.timecents2Secs(this.attack);
         this.release = this.release < -11950.0 ? 0.0 : SynthHelper.timecents2Secs(this.release);
+
         // If we have dynamic hold or decay times depending on key number we need
         // to keep the values in timecents so we can calculate it during startNote
         if (this.keynumToHold === 0) {
             this.hold = this.hold < -11950.0 ? 0.0 : SynthHelper.timecents2Secs(this.hold);
         }
+
         if (this.keynumToDecay === 0) {
             this.decay = this.decay < -11950.0 ? 0.0 : SynthHelper.timecents2Secs(this.decay);
         }
+        
         if (this.sustain < 0.0) {
             this.sustain = 0.0;
         } else if (sustainIsGain) {

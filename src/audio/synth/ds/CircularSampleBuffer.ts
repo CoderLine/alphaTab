@@ -41,6 +41,7 @@ export class CircularSampleBuffer {
         if (count > this._buffer.length - this.count) {
             count = this._buffer.length - this.count;
         }
+
         const writeToEnd: number = Math.min(this._buffer.length - this._writePosition, count);
         this._buffer.set(data.subarray(offset, offset + writeToEnd), this._writePosition);
         this._writePosition += writeToEnd;
@@ -69,12 +70,14 @@ export class CircularSampleBuffer {
         if (count > this.count) {
             count = this.count;
         }
+
         let samplesRead: number = 0;
         const readToEnd: number = Math.min(this._buffer.length - this._readPosition, count);
         data.set(this._buffer.subarray(this._readPosition, this._readPosition + readToEnd), offset);
         samplesRead += readToEnd;
         this._readPosition += readToEnd;
         this._readPosition %= this._buffer.length;
+
         if (samplesRead < count) {
             data.set(
                 this._buffer.subarray(this._readPosition, this._readPosition + count - samplesRead),
@@ -83,6 +86,7 @@ export class CircularSampleBuffer {
             this._readPosition += count - samplesRead;
             samplesRead = count;
         }
+
         this.count -= samplesRead;
         return samplesRead;
     }

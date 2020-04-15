@@ -12,26 +12,38 @@ import { VoiceLowPass } from '@src/audio/synth/synthesis/VoiceLowPass';
 import { SynthHelper } from '@src/audio/util/SynthHelper';
 
 export class Voice {
+    /**
+     * The lower this block size is the more accurate the effects are.
+     * Increasing the value significantly lowers the CPU usage of the voice rendering.
+     * If LFO affects the low-pass filter it can be hearable even as low as 8.
+     */
     private static readonly RenderEffectSampleBLock: number = 64;
 
     public playingPreset: number = 0;
     public playingKey: number = 0;
     public playingChannel: number = 0;
+
     public region: Region | null = null;
+
     public pitchInputTimecents: number = 0;
     public pitchOutputFactor: number = 0;
     public sourceSamplePosition: number = 0;
+
     public noteGainDb: number = 0;
     public panFactorLeft: number = 0;
     public panFactorRight: number = 0;
+
     public playIndex: number = 0;
     public loopStart: number = 0;
     public loopEnd: number = 0;
+
     public ampEnv: VoiceEnvelope = new VoiceEnvelope();
     public modEnv: VoiceEnvelope = new VoiceEnvelope();
+
     public lowPass: VoiceLowPass = new VoiceLowPass();
     public modLfo: VoiceLfo = new VoiceLfo();
     public vibLfo: VoiceLfo = new VoiceLfo();
+
     public mixVolume: number = 0;
     public mute: boolean = false;
 
@@ -39,6 +51,7 @@ export class Voice {
         if (!this.region) {
             return;
         }
+
         const note: number = this.playingKey + this.region.transpose + this.region.tune / 100.0;
         let adjustedPitch: number =
             this.region.pitchKeyCenter + (note - this.region.pitchKeyCenter) * (this.region.pitchKeyTrack / 100.0);
@@ -83,6 +96,7 @@ export class Voice {
         let input: Float32Array = f.fontSamples;
         let outL: number = 0;
         let outR: number = f.outputMode === OutputMode.StereoUnweaved ? numSamples : -1;
+
         // Cache some values, to give them at least some chance of ending up in registers.
         let updateModEnv: boolean = region.modEnvToPitch !== 0 || region.modEnvToFilterFc !== 0;
         let updateModLFO: boolean =
@@ -95,21 +109,26 @@ export class Voice {
         let tmpSampleEndDbl: number = region.end;
         let tmpLoopEndDbl: number = tmpLoopEnd + 1.0;
         let tmpSourceSamplePosition: number = this.sourceSamplePosition;
+
         let tmpLowpass: VoiceLowPass = new VoiceLowPass(this.lowPass);
+        
         let dynamicLowpass: boolean = region.modLfoToFilterFc !== 0 || region.modEnvToFilterFc !== 0;
         let tmpSampleRate: number = 0;
         let tmpInitialFilterFc: number = 0;
         let tmpModLfoToFilterFc: number = 0;
         let tmpModEnvToFilterFc: number = 0;
+        
         let dynamicPitchRatio: boolean =
             region.modLfoToPitch !== 0 || region.modEnvToPitch !== 0 || region.vibLfoToPitch !== 0;
         let pitchRatio: number = 0;
         let tmpModLfoToPitch: number = 0;
         let tmpVibLfoToPitch: number = 0;
         let tmpModEnvToPitch: number = 0;
+        
         let dynamicGain: boolean = region.modLfoToVolume !== 0;
         let noteGain: number = 0;
         let tmpModLfoToVolume: number = 0;
+
         if (dynamicLowpass) {
             tmpSampleRate = f.outSampleRate;
             tmpInitialFilterFc = region.initialFilterFc;
@@ -121,6 +140,7 @@ export class Voice {
             tmpModLfoToFilterFc = 0;
             tmpModEnvToFilterFc = 0;
         }
+
         if (dynamicPitchRatio) {
             pitchRatio = 0;
             tmpModLfoToPitch = region.modLfoToPitch;
@@ -132,18 +152,21 @@ export class Voice {
             tmpVibLfoToPitch = 0;
             tmpModEnvToPitch = 0;
         }
+
         if (dynamicGain) {
             tmpModLfoToVolume = region.modLfoToVolume * 0.1;
         } else {
             noteGain = SynthHelper.decibelsToGain(this.noteGainDb);
             tmpModLfoToVolume = 0;
         }
+
         while (numSamples > 0) {
             let gainMono: number;
             let gainLeft: number;
             let gainRight: number = 0;
-            let blockSamples: number = numSamples > 64 ? 64 : numSamples;
+            let blockSamples: number = numSamples > Voice.RenderEffectSampleBLock ? Voice.RenderEffectSampleBLock : numSamples;
             numSamples -= blockSamples;
+         
             if (dynamicLowpass) {
                 let fres: number =
                     tmpInitialFilterFc +
@@ -154,6 +177,7 @@ export class Voice {
                     tmpLowpass.setup(SynthHelper.cents2Hertz(fres) / tmpSampleRate);
                 }
             }
+
             if (dynamicPitchRatio) {
                 pitchRatio =
                     SynthHelper.timecents2Secs(
@@ -163,27 +187,34 @@ export class Voice {
                                 this.modEnv.level * tmpModEnvToPitch)
                     ) * this.pitchOutputFactor;
             }
+
             if (dynamicGain) {
                 noteGain = SynthHelper.decibelsToGain(this.noteGainDb + this.modLfo.level * tmpModLfoToVolume);
             }
+
             gainMono = noteGain * this.ampEnv.level;
+            
             if (isMuted) {
                 gainMono = 0;
             } else {
                 gainMono *= this.mixVolume;
             }
+
             // Update EG.
             this.ampEnv.process(blockSamples, f.outSampleRate);
             if (updateModEnv) {
                 this.modEnv.process(blockSamples, f.outSampleRate);
             }
+
             // Update LFOs.
             if (updateModLFO) {
                 this.modLfo.process(blockSamples);
             }
+
             if (updateVibLFO) {
                 this.vibLfo.process(blockSamples);
             }
+
             switch (f.outputMode) {
                 case OutputMode.StereoInterleaved:
                     gainLeft = gainMono * this.panFactorLeft;
@@ -191,16 +222,21 @@ export class Voice {
                     while (blockSamples-- > 0 && tmpSourceSamplePosition < tmpSampleEndDbl) {
                         let pos: number = tmpSourceSamplePosition | 0;
                         let nextPos: number = pos >= tmpLoopEnd && isLooping ? tmpLoopStart : pos + 1;
+
                         // Simple linear interpolation.
+
                         // TODO: check for interpolation mode on voice
                         let alpha: number = tmpSourceSamplePosition - pos;
                         let val: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
+
                         // Low-pass filter.
                         if (tmpLowpass.active) val = tmpLowpass.process(val);
+
                         outputBuffer[offset + outL] += val * gainLeft;
                         outL++;
                         outputBuffer[offset + outL] += val * gainRight;
                         outL++;
+
                         // Next sample.
                         tmpSourceSamplePosition += pitchRatio;
                         if (tmpSourceSamplePosition >= tmpLoopEndDbl && isLooping) {
@@ -214,15 +250,19 @@ export class Voice {
                     while (blockSamples-- > 0 && tmpSourceSamplePosition < tmpSampleEndDbl) {
                         let pos: number = tmpSourceSamplePosition | 0;
                         let nextPos: number = pos >= tmpLoopEnd && isLooping ? tmpLoopStart : pos + 1;
+                        
                         // Simple linear interpolation.
                         let alpha: number = tmpSourceSamplePosition - pos;
                         let val: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
+
                         // Low-pass filter.
                         if (tmpLowpass.active) val = tmpLowpass.process(val);
+                        
                         outputBuffer[offset + outL] += val * gainLeft;
                         outL++;
                         outputBuffer[offset + outR] += val * gainRight;
                         outR++;
+                        
                         // Next sample.
                         tmpSourceSamplePosition += pitchRatio;
                         if (tmpSourceSamplePosition >= tmpLoopEndDbl && isLooping) {
@@ -234,13 +274,17 @@ export class Voice {
                     while (blockSamples-- > 0 && tmpSourceSamplePosition < tmpSampleEndDbl) {
                         let pos: number = tmpSourceSamplePosition | 0;
                         let nextPos: number = pos >= tmpLoopEnd && isLooping ? tmpLoopStart : pos + 1;
+
                         // Simple linear interpolation.
                         let alpha: number = tmpSourceSamplePosition - pos;
                         let val: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
+
                         // Low-pass filter.
                         if (tmpLowpass.active) val = tmpLowpass.process(val);
+                        
                         outputBuffer[offset + outL] = val * gainMono;
                         outL++;
+                        
                         // Next sample.
                         tmpSourceSamplePosition += pitchRatio;
                         if (tmpSourceSamplePosition >= tmpLoopEndDbl && isLooping) {
@@ -249,11 +293,13 @@ export class Voice {
                     }
                     break;
             }
+
             if (tmpSourceSamplePosition >= tmpSampleEndDbl || this.ampEnv.segment === VoiceEnvelopeSegment.Done) {
                 this.kill();
                 return;
             }
         }
+        
         this.sourceSamplePosition = tmpSourceSamplePosition;
         if (tmpLowpass.active || dynamicLowpass) {
             this.lowPass = tmpLowpass;

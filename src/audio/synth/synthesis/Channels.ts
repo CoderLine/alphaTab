@@ -21,6 +21,7 @@ export class Channels {
             c.pitchWheel === 8192 ? c.tuning : (c.pitchWheel / 16383.0) * c.pitchRange * 2.0 - c.pitchRange + c.tuning,
             tinySoundFont.outSampleRate
         );
+        
         if (newpan <= -0.5) {
             voice.panFactorLeft = 1.0;
             voice.panFactorRight = 0.0;

@@ -91,11 +91,14 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set timePosition(value: number) {
-        Logger.debug('AlphaSynth', 'Seeking to position ' + value + 'ms');
+        Logger.debug('AlphaSynth', `Seeking to position ${value}ms`);
+
         // tell the sequencer to jump to the given position
         this._sequencer.seek(value);
+
         // update the internal position
         this.updateTimePosition(value);
+
         // tell the output to reset the already synthesized buffers and request data again
         this.output.resetSamples();
     }
@@ -131,6 +134,7 @@ export class AlphaSynth implements IAlphaSynth {
     public constructor(output: ISynthOutput) {
         Logger.debug('AlphaSynth', 'Initializing player');
         this.state = PlayerState.Paused;
+
         Logger.debug('AlphaSynth', 'Creating output');
         this.output = output;
         this.output.ready.on(() => {
@@ -157,10 +161,12 @@ export class AlphaSynth implements IAlphaSynth {
             this._sequencer.checkForStop();
         });
         this.output.samplesPlayed.on(this.onSamplesPlayed.bind(this));
+
         Logger.debug('AlphaSynth', 'Creating synthesizer');
         this._synthesizer = new TinySoundFont(this.output.sampleRate);
         this._sequencer = new MidiFileSequencer(this._synthesizer);
         this._sequencer.finished.on(this.output.sequencerFinished.bind(this.output));
+
         Logger.debug('AlphaSynth', 'Opening output');
         this.output.open();
     }
@@ -212,6 +218,7 @@ export class AlphaSynth implements IAlphaSynth {
 
     public loadSoundFont(data: Uint8Array): void {
         this.pause();
+
         let input: ByteBuffer = ByteBuffer.fromBuffer(data);
         try {
             Logger.info('AlphaSynth', 'Loading soundfont from bytes');
@@ -220,6 +227,7 @@ export class AlphaSynth implements IAlphaSynth {
             this._synthesizer.loadPresets(soundFont);
             this._isSoundFontLoaded = true;
             this.soundFontLoaded.trigger();
+
             Logger.info('AlphaSynth', 'soundFont successfully loaded');
             this.checkReadyForPlayback();
         } catch (e) {
@@ -241,11 +249,13 @@ export class AlphaSynth implements IAlphaSynth {
      */
     public loadMidiFile(midiFile: MidiFile): void {
         this.stop();
+
         try {
             Logger.info('AlphaSynth', 'Loading midi from model');
             this._sequencer.loadMidi(midiFile);
             this._isMidiLoaded = true;
             this.midiLoaded.trigger();
+
             Logger.info('AlphaSynth', 'Midi successfully loaded');
             this.checkReadyForPlayback();
             this.tickPosition = 0;
@@ -291,17 +301,7 @@ export class AlphaSynth implements IAlphaSynth {
         const endTick: number = this._sequencer.endTick;
         Logger.debug(
             'AlphaSynth',
-            'Position changed: (time: ' +
-                currentTime +
-                '/' +
-                endTime +
-                ', tick: ' +
-                currentTick +
-                '/' +
-                endTime +
-                ', Active Voices: ' +
-                this._synthesizer.activeVoiceCount,
-            null
+            `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTime}, Active Voices: ${this._synthesizer.activeVoiceCount}`
         );
         this.positionChanged.trigger(new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick));
     }

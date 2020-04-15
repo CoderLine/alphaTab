@@ -32,6 +32,7 @@ export class Hydra {
         }
 
         while (RiffChunk.load(chunkHead, chunkFastList, readable)) {
+
             let chunk: RiffChunk = new RiffChunk();
             if (chunkFastList.id === 'pdta') {
                 while (RiffChunk.load(chunkFastList, chunk, readable)) {
@@ -143,6 +144,7 @@ export class Hydra {
         let samplesLeft: number = (chunk.size / 2) | 0;
         const samples: Float32Array = new Float32Array(samplesLeft);
         let samplesPos: number = 0;
+        
         const sampleBuffer: Uint8Array = new Uint8Array(2048);
         const testBuffer: Int16Array = new Int16Array((sampleBuffer.length / 2) | 0);
         while (samplesLeft > 0) {

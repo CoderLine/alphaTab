@@ -1,5 +1,5 @@
 export class LinkedListNode<T> {
-    public list: LinkedList<T>;
+    public list: LinkedList<T> | null;
     public nextInternal: LinkedListNode<T> | null = null;
     public prevInternal: LinkedListNode<T> | null = null;
     public value: T;
@@ -10,11 +10,17 @@ export class LinkedListNode<T> {
     }
 
     public get next(): LinkedListNode<T> | null {
-        return !this.nextInternal || this.list.first === this.nextInternal ? null : this.nextInternal;
+        return !this.nextInternal || !this.list || this.list.first === this.nextInternal ? null : this.nextInternal;
     }
 
     public get prev(): LinkedListNode<T> | null {
-        return !this.prevInternal || this === this.list.first ? null : this.prevInternal;
+        return !this.prevInternal || !this.list || this === this.list.first ? null : this.prevInternal;
+    }
+
+    public invalidate() {
+        this.list = null;
+        this.nextInternal = null;
+        this.prevInternal = null;
     }
 }
 
@@ -68,26 +74,22 @@ export class LinkedList<T> {
         if (n.nextInternal === n) {
             this.first = null;
         } else {
-            if (n.nextInternal) {
-                n.nextInternal.prevInternal = n.prevInternal;
-            }
-            if (n.prevInternal) {
-                n.nextInternal = n.nextInternal;
-            }
+            n.nextInternal!.prevInternal = n.prevInternal;
+            n.prevInternal!.nextInternal = n.nextInternal;
 
             if (this.first === n) {
                 this.first = n.nextInternal;
             }
         }
+
+        n.invalidate();
         this.length--;
     }
 
     private insertNodeBefore(node: LinkedListNode<T>, newNode: LinkedListNode<T>): void {
         newNode.nextInternal = node;
         newNode.prevInternal = node.prevInternal;
-        if (node.prevInternal) {
-            node.prevInternal.nextInternal = newNode;
-        }
+        node.prevInternal!.nextInternal = newNode;
         node.prevInternal = newNode;
         newNode.list = this;
         this.length++;

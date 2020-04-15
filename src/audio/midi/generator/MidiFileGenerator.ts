@@ -138,9 +138,11 @@ export class MidiFileGenerator {
         this._handler.addControlChange(track.index, 0, channel, ControllerType.VolumeCoarse, volume);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.PanCoarse, balance);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.ExpressionControllerCoarse, 127);
+       
         // set parameter that is being updated (0) -> PitchBendRangeCoarse
         this._handler.addControlChange(track.index, 0, channel, ControllerType.RegisteredParameterFine, 0);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.RegisteredParameterCourse, 0);
+       
         // Set PitchBendRangeCoarse to 12
         this._handler.addControlChange(track.index, 0, channel, ControllerType.DataEntryFine, 0);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.DataEntryCoarse, 12);
@@ -154,8 +156,7 @@ export class MidiFileGenerator {
 
     private generateMasterBar(masterBar: MasterBar, previousMasterBar: MasterBar | null, currentTick: number): void {
         // time signature
-        if (
-            !previousMasterBar ||
+        if (!previousMasterBar ||
             previousMasterBar.timeSignatureDenominator !== masterBar.timeSignatureDenominator ||
             previousMasterBar.timeSignatureNumerator !== masterBar.timeSignatureNumerator
         ) {
@@ -186,6 +187,7 @@ export class MidiFileGenerator {
     private generateBar(bar: Bar, barStartTick: number): void {
         let playbackBar: Bar = this.getPlaybackBar(bar);
         this._currentBarRepeatLookup = null;
+
         for (const v of playbackBar.voices) {
             this.generateVoice(v, barStartTick, bar);
         }
@@ -227,6 +229,7 @@ export class MidiFileGenerator {
     private generateBeat(beat: Beat, barStartTick: number, realBar: Bar): void {
         let beatStart: number = beat.playbackStart;
         let audioDuration: number = beat.playbackDuration;
+        
         if (beat.voice.bar.isEmpty) {
             audioDuration = beat.voice.bar.masterBar.calculateDuration();
         } else if (
@@ -383,7 +386,7 @@ export class MidiFileGenerator {
         return durations;
     }
 
-    private generateNote(note: Note, beatStart: number, beatDuration: number, brushInfo: number[]): void {
+    private generateNote(note: Note, beatStart: number, beatDuration: number, brushInfo: Int32Array): void {
         const track: Track = note.beat.voice.bar.staff.track;
         const staff: Staff = note.beat.voice.bar.staff;
         const noteKey: number = note.realValue;
@@ -1068,8 +1071,8 @@ export class MidiFileGenerator {
         }
     }
 
-    private getBrushInfo(beat: Beat): number[] {
-        const brushInfo = new Array<number>(beat.voice.bar.staff.tuning.length);
+    private getBrushInfo(beat: Beat): Int32Array {
+        const brushInfo = new Int32Array(beat.voice.bar.staff.tuning.length);
         if (beat.brushType !== BrushType.None) {
             //
             // calculate the number of

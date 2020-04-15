@@ -1,12 +1,12 @@
 import { MidiEvent, MidiEventType } from '@src/audio/midi/event/MidiEvent';
 
 export enum SystemCommonType {
-    SystemExclusive = 240,
-    MtcQuarterFrame = 241,
-    SongPosition = 242,
-    SongSelect = 243,
-    TuneRequest = 246,
-    SystemExclusive2 = 247
+    SystemExclusive = 0xF0,
+    MtcQuarterFrame = 0xF1,
+    SongPosition = 0xF2,
+    SongSelect = 0xF3,
+    TuneRequest = 0xF6,
+    SystemExclusive2 = 0xF7
 }
 
 export class SystemCommonEvent extends MidiEvent {
