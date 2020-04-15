@@ -17,7 +17,6 @@ import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/util/Logger';
 import { IMouseEventArgs } from '../IMouseEventArgs';
 import { IUiFacade } from '../IUiFacade';
-import { AlphaSynthFlashOutput } from './AlphaSynthFlashOutput';
 import { AlphaSynthWebAudioOutput } from './AlphaSynthWebAudioOutput';
 import { AlphaSynthWebWorkerApi } from './AlphaSynthWebWorkerApi';
 import { AlphaTabApi } from './AlphaTabApi';
@@ -445,20 +444,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     /**
      * This method creates the player. It detects browser compatibility and
      * initializes a alphaSynth version for the client.
-     *
-     * Compatibility:
-     * If a browser supports WebWorkers, we will use WebWorkers for Synthesizing the samples and a Flash player for playback
-     *
-     * - IE6-9   - Unsupported
-     * - IE10-11 - Flash is used for playback, Synthesizing is done in a WebWorker
-     * - Firefox - Web Audio API is used for playback, Synthesizing is done in a WebWorker
-     * - Chrome  - Web Audio API is used for playback, Synthesizing is done in a WebWorker
-     * - Safari  - Web Audio API is used for playback, Synthesizing is done in a WebWorker
-     * - Opera   - Web Audio API is used for playback, Synthesizing is done in a WebWorker
      */
     public createWorkerPlayer(): IAlphaSynth | null {
         let supportsWebAudio: boolean = 'ScriptProcessorNode' in window;
-        let supportsWebWorkers: boolean = 'Worker' in window;
         let alphaSynthScriptFile: string | null = Environment.scriptFile;
         if (!alphaSynthScriptFile) {
             Logger.error('Player', 'alphaTab script file could not be detected, player cannot initialize');
@@ -473,16 +461,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 alphaSynthScriptFile,
                 this._api.settings.core.logLevel
             );
-        } else if (supportsWebWorkers) {
-            Logger.info('Player', 'Will use webworkers for synthesizing and flash for playback');
-            player = new AlphaSynthWebWorkerApi(
-                new AlphaSynthFlashOutput(alphaSynthScriptFile),
-                alphaSynthScriptFile,
-                this._api.settings.core.logLevel
-            );
         }
+
         if (!player) {
-            Logger.error('Player', 'Player requires webworkers and web audio api or flash, browser unsupported', null);
+            Logger.error('Player', 'Player requires webworkers and web audio api, browser unsupported', null);
         } else {
             player.ready.on(() => {
                 if (this._api.settings.player.soundFont) {

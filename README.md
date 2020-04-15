@@ -41,13 +41,13 @@ Before reading further you might simply jump to our demos:
 >
 > [alphaTex Introduction](https://docs.alphatab.net/master/alphatex/) - *Learn about alphaTex, the built-in markup language for writing music notation*
 
-alphaTab can load music notation from various sources like Guitar Pro 3-5, Guitar Pro 6, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using [alphaSynth](http://github.com/CoderLine/alphaSynth) the music sheets can also be played in your browser without the need of any plugins (HTML5 Web Audio if available, fallback to flash) .
+alphaTab can load music notation from various sources like Guitar Pro 3-5, Guitar Pro 6, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using [alphaSynth](http://github.com/CoderLine/alphaSynth) the music sheets can also be played in your browser.
 
 * load GuitarPro 3-5, GuitarPro 6, AlphaTex or MusicXML (experimental)
 * render as SVG, HTML5 canvas, GDI+,...
 * display single or multiple instruments as standard music notation and guitar tablatures consisting of song information, repeats, alternate endings, guitar tunints, clefs, key signatures, time signatures, notes, rests, accidentals, drum tabs, piano grand staff, tied notes, grace notes, dead notes, ghost notes, markers, tempos, lyrics, chords, vibratos, dynamics, tap/slap/pop, fade-in, let-ring, palm-mute, string bends, whammy bar, tremolo picking, strokes, slides, trills, pick strokes, tuplets, fingering, triplet feels,...
 * adapt to your responsive design by dynamic resizing
-* play the music sheet via HTML5 Web Audio API and Flash
+* play the music sheet via HTML5 Web Audio API (only if browser supports it)
 
 # Thanks to...
 
