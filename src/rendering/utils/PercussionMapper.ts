@@ -1,24 +1,24 @@
 import { Note } from '@src/model/Note';
 
 export class PercussionMapper {
-    private static ElementVariationToMidi: Int32Array[] = [
-        new Int32Array([35, 35, 35]),
-        new Int32Array([38, 38, 37]),
-        new Int32Array([56, 56, 56]),
-        new Int32Array([56, 56, 56]),
-        new Int32Array([56, 56, 56]),
-        new Int32Array([41, 41, 41]),
-        new Int32Array([43, 43, 43]),
-        new Int32Array([45, 45, 45]),
-        new Int32Array([47, 47, 47]),
-        new Int32Array([48, 48, 48]),
-        new Int32Array([42, 46, 46]),
-        new Int32Array([44, 44, 44]),
-        new Int32Array([49, 49, 49]),
-        new Int32Array([57, 57, 57]),
-        new Int32Array([55, 55, 55]),
-        new Int32Array([51, 59, 53]),
-        new Int32Array([52, 52, 52])
+    private static ElementVariationToMidi: number[][] = [
+        [35, 35, 35],
+        [38, 38, 37],
+        [56, 56, 56],
+        [56, 56, 56],
+        [56, 56, 56],
+        [41, 41, 41],
+        [43, 43, 43],
+        [45, 45, 45],
+        [47, 47, 47],
+        [48, 48, 48],
+        [42, 46, 46],
+        [44, 44, 44],
+        [49, 49, 49],
+        [57, 57, 57],
+        [55, 55, 55],
+        [51, 59, 53],
+        [52, 52, 52]
     ];
 
     public static midiFromElementVariation(note: Note): number {

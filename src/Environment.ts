@@ -426,11 +426,6 @@ export class Environment {
             function (x) {
                 return Math.log(x) * Math.LOG2E;
             };
-        Int32Array.prototype.slice =
-            Int32Array.prototype.slice ||
-            function (this: Int32Array, begin, end) {
-                return new Int32Array(Array.prototype.slice.call(this as any, begin, end));
-            };
 
         if (!Platform.isRunningInWorker) {
             window.AudioContext = window.AudioContext || (window as any).webkitAudioContext;

@@ -95,11 +95,9 @@ export class ChordDiagramGlyph extends EffectGlyph {
             canvas.fillRect(cx, y, w, this.scale);
         }
 
-        let barreLookup: Map<number, Int32Array> = new Map<number, Int32Array>();
+        let barreLookup = new Map<number, number[]>();
         for (let barreFret of this._chord.barreFrets) {
-            let strings: Int32Array = new Int32Array(2);
-            strings[0] = -1;
-            strings[1] = -1;
+            let strings: number[] = [-1,-1];
             barreLookup.set(barreFret - this._chord.firstFret, strings);
         }
 
@@ -108,7 +106,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
             if (fret > 0) {
                 fret -= this._chord.firstFret;
                 if (barreLookup.has(fret)) {
-                    let info: Int32Array = barreLookup.get(fret)!;
+                    let info = barreLookup.get(fret)!;
                     if (info[0] === -1 || guitarString < info[0]) {
                         info[0] = guitarString;
                     }
@@ -123,7 +121,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
         }
 
         for (let kvp of barreLookup) {
-            let strings: Int32Array = kvp[1];
+            let strings = kvp[1];
             let y: number = cy + kvp[0] * fretSpacing + fretSpacing / 2 + this.scale;
             let xLeft: number = cx + (this._chord.strings.length - strings[1] - 1) * stringSpacing;
             let xRight: number = cx + (this._chord.strings.length - strings[0] - 1) * stringSpacing;

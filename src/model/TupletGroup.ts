@@ -15,7 +15,7 @@ export class TupletGroup {
     private static readonly OneHundredTwentyEighthTicks: number = 30;
     private static readonly TwoHundredFiftySixthTicks: number = 15;
     
-    private static AllTicks: Int32Array = new Int32Array([
+    private static AllTicks: number[] = [
         TupletGroup.HalfTicks,
         TupletGroup.QuarterTicks,
         TupletGroup.EighthTicks,
@@ -24,7 +24,7 @@ export class TupletGroup {
         TupletGroup.SixtyFourthTicks,
         TupletGroup.OneHundredTwentyEighthTicks,
         TupletGroup.TwoHundredFiftySixthTicks
-    ]);
+    ];
 
     private _isEqualLengthTuplet: boolean = true;
 

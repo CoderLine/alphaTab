@@ -178,7 +178,7 @@ export class AlphaTabApiBase<TSettings> {
      * song will be shown.
      * @returns true if the data object is supported and a load was initiated, otherwise false
      */
-    public load(scoreData: unknown, trackIndexes?: Int32Array): boolean {
+    public load(scoreData: unknown, trackIndexes?: number[]): boolean {
         try {
             return this.uiFacade.load(
                 scoreData,
@@ -201,7 +201,7 @@ export class AlphaTabApiBase<TSettings> {
      * @param trackIndexes The indexes of the tracks from the song that should be rendered. If not provided, the first track of the
      * song will be shown.
      */
-    public renderScore(score: Score, trackIndexes?: Int32Array): void {
+    public renderScore(score: Score, trackIndexes?: number[]): void {
         let tracks: Track[] = [];
         if (!trackIndexes) {
             if (score.tracks.length > 0) {
@@ -314,7 +314,7 @@ export class AlphaTabApiBase<TSettings> {
      * @param tex The alphaTex code to render.
      * @param tracks If set, the given tracks will be rendered, otherwise the first track only will be rendered.
      */
-    public tex(tex: string, tracks?: Int32Array): void {
+    public tex(tex: string, tracks?: number[]): void {
         try {
             let parser: AlphaTexImporter = new AlphaTexImporter();
             let data: ByteBuffer = ByteBuffer.fromBuffer(Platform.stringToByteArray(tex));

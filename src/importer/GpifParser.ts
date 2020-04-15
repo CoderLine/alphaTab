@@ -466,7 +466,7 @@ export class GpifParser {
         switch (propertyName) {
             case 'Tuning':
                 let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
-                let tuning: Int32Array = new Int32Array(tuningParts.length);
+                let tuning = new Array<number>(tuningParts.length);
                 for (let i: number = 0; i < tuning.length; i++) {
                     tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
                 }
@@ -649,7 +649,7 @@ export class GpifParser {
         switch (propertyName) {
             case 'Tuning':
                 let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
-                let tuning: Int32Array = new Int32Array(tuningParts.length);
+                let tuning = new Array<number>(tuningParts.length);
                 for (let i: number = 0; i < tuning.length; i++) {
                     tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
                 }

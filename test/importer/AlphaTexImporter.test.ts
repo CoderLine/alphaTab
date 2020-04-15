@@ -182,7 +182,7 @@ describe('AlphaTexImporterTest', () => {
         renderer.partialRenderFinished.on(r => {
             svg += r.renderResult;
         });
-        renderer.renderScore(score, new Int32Array([0]));
+        renderer.renderScore(score, [0]);
         let regexTemplate: string = '<text[^>]+>\\s*{0}\\s*</text>';
         expect(
             new RegExp(regexTemplate.replace('{0}', HarmonicsEffectInfo.harmonicToString(HarmonicType.Natural))).exec(
@@ -717,7 +717,7 @@ describe('AlphaTexImporterTest', () => {
         let tex: string = ':8 5.3{tu 3}*3';
         let score: Score = parseTex(tex);
         let durations: Duration[] = [Duration.Eighth, Duration.Eighth, Duration.Eighth];
-        let tuplets: Int32Array = new Int32Array([3, 3, 3]);
+        let tuplets = [3, 3, 3];
         let i: number = 0;
         let b: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
         while (b) {

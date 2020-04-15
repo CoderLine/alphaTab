@@ -120,13 +120,13 @@ export class NotationSettings {
      * The transposition pitch offsets for the individual tracks.
      * They apply to rendering and playback.
      */
-    public transpositionPitches: Int32Array = new Int32Array(0);
+    public transpositionPitches: number[] = [];
 
     /**
      * The transposition pitch offsets for the individual tracks.
      * They apply to rendering only.
      */
-    public displayTranspositionPitches: Int32Array = new Int32Array(0);
+    public displayTranspositionPitches: number[] = [];
 
     /**
      * If set to true the guitar tabs on grace beats are rendered smaller.

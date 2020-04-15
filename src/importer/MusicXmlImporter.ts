@@ -337,7 +337,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let beat: Beat = this.getOrCreateBeat(element, bars, false);
         let durationInDivisions: number = parseInt(element.findChildElement('duration')!.innerText);
         let duration: number = (durationInDivisions * Duration.Quarter) / this._divisionsPerQuarterNote;
-        let durations: Int32Array = new Int32Array([
+        let durations = [
             Duration.SixtyFourth,
             Duration.ThirtySecond,
             Duration.Sixteenth,
@@ -345,7 +345,7 @@ export class MusicXmlImporter extends ScoreImporter {
             Duration.Quarter,
             Duration.Half,
             Duration.Whole
-        ]);
+        ];
         for (let d of durations) {
             if (duration >= d) {
                 beat.duration = d;
@@ -366,7 +366,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 switch (c.localName) {
                     case 'staff-lines':
                         for (let staff of track.staves) {
-                            staff.tuning = new Int32Array(parseInt(c.innerText));
+                            staff.tuning = new Array<number>(parseInt(c.innerText));
                         }
                         break;
                     case 'staff-tuning':
@@ -377,7 +377,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         for (let staff of track.staves) {
             if (this.isEmptyTuning(staff.tuning)) {
-                staff.tuning = new Int32Array(0);
+                staff.tuning = [];
             }
         }
     }
@@ -1370,11 +1370,11 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
         if (this.isEmptyTuning(track.staves[0].tuning)) {
-            track.staves[0].tuning = new Int32Array(0);
+            track.staves[0].tuning = [];
         }
     }
 
-    private isEmptyTuning(tuning: Int32Array): boolean {
+    private isEmptyTuning(tuning: number[]): boolean {
         if (!tuning) {
             return true;
         }

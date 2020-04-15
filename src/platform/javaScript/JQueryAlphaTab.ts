@@ -70,7 +70,7 @@ export class JQueryAlphaTab {
         context.print(width);
     }
 
-    public load(element: jQuery, context: AlphaTabApi, data: unknown, tracks?: Int32Array): boolean {
+    public load(element: jQuery, context: AlphaTabApi, data: unknown, tracks?: number[]): boolean {
         return context.load(data, tracks);
     }
 
@@ -78,7 +78,7 @@ export class JQueryAlphaTab {
         context.render();
     }
 
-    public renderScore(element: jQuery, context: AlphaTabApi, score: Score, tracks?: Int32Array): void {
+    public renderScore(element: jQuery, context: AlphaTabApi, score: Score, tracks?: number[]): void {
         context.renderScore(score, tracks);
     }
 
@@ -90,7 +90,7 @@ export class JQueryAlphaTab {
         context.render();
     }
 
-    public tex(element: jQuery, context: AlphaTabApi, tex: string, tracks: Int32Array): void {
+    public tex(element: jQuery, context: AlphaTabApi, tex: string, tracks: number[]): void {
         context.tex(tex, tracks);
     }
 

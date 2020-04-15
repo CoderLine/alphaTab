@@ -60,17 +60,17 @@ export class AccidentalHelper {
      * Those are the amount of steps for the different clefs in case of a note value 0
      * [Neutral, C3, C4, F4, G2]
      */
-    private static OctaveSteps: Int32Array = new Int32Array([40, 34, 32, 28, 40]);
+    private static OctaveSteps: number[] = [40, 34, 32, 28, 40];
 
     /**
      * The step offsets of the notes within an octave in case of for sharp keysignatures
      */
-    private static SharpNoteSteps: Int32Array = new Int32Array([0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6]);
+    private static SharpNoteSteps: number[] = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
 
     /**
      * The step offsets of the notes within an octave in case of for flat keysignatures
      */
-    private static FlatNoteSteps: Int32Array = new Int32Array([0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6]);
+    private static FlatNoteSteps: number[] = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6];
 
     private _registeredAccidentals: Map<number, boolean> = new Map();
     private _appliedScoreLines: Map<number, number> = new Map();
@@ -197,7 +197,7 @@ export class AccidentalHelper {
         // Move to Octave
         steps -= octave * 7;
         // get the step list for the current keySignature
-        let stepList: Int32Array =
+        let stepList =
             ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
                 ? AccidentalHelper.SharpNoteSteps
                 : AccidentalHelper.FlatNoteSteps;

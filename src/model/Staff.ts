@@ -50,7 +50,7 @@ export class Staff {
      * guitar tablature. Unlike the {@link Note.string} property this array directly represents
      * the order of the tracks shown in the tablature. The first item is the most top tablature line.
      */
-    public tuning: Int32Array = new Int32Array(0);
+    public tuning: number[] = [];
 
     /**
      * Gets or sets the name of the tuning.
@@ -79,7 +79,7 @@ export class Staff {
     public static copyTo(src: Staff, dst: Staff): void {
         dst.capo = src.capo;
         dst.index = src.index;
-        dst.tuning = new Int32Array(src.tuning);
+        dst.tuning = src.tuning.slice();
         dst.transpositionPitch = src.transpositionPitch;
         dst.displayTranspositionPitch = src.displayTranspositionPitch;
         dst.showStandardNotation = src.showStandardNotation;

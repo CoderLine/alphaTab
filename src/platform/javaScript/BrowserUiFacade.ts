@@ -33,7 +33,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _visibilityCheckIntervalId: number = 0;
     private _visibilityCheckInterval: number = 0;
     private _totalResultCount: number = 0;
-    private _initialTrackIndexes: Int32Array | null = null;
+    private _initialTrackIndexes: number[] | null = null;
 
     private _rootContainerBecameVisible: EventEmitter<() => void> = new EventEmitter();
     public rootContainerBecameVisible: IEventEmitter<() => void>;
@@ -213,7 +213,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             if (originalMouseEvent) {
                 args.push(originalMouseEvent);
             }
-            jquery(element).trigger(name, args.splice(0) as any);
+            jquery(element).trigger(name, args);
         }
     }
 
@@ -312,20 +312,20 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         Environment.createStyleElement(elementDocument, settings.core.fontDirectory);
     }
 
-    public parseTracks(tracksData: unknown): Int32Array {
+    public parseTracks(tracksData: unknown): number[] {
         if (!tracksData) {
-            return new Int32Array(0);
+            return [];
         }
         let tracks: number[] = [];
         // decode string
         if (typeof tracksData === 'string') {
             try {
                 if (tracksData === 'all') {
-                    return new Int32Array([-1]);
+                    return [-1];
                 }
                 tracksData = JSON.parse(tracksData);
             } catch (e) {
-                tracksData = new Int32Array([0]);
+                tracksData = [0];
             }
         }
         // decode array
@@ -351,7 +351,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         } else if ('index' in (tracksData as any)) {
             tracks.push((tracksData as any).index);
         }
-        return tracks.splice(0) as any;
+        return tracks;
     }
 
     private getDataAttributes(): Map<string, unknown> {

@@ -15,7 +15,7 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         super(new BrowserUiFacade(element), options);
     }
 
-    public tex(tex: string, tracks?: Int32Array): void {
+    public tex(tex: string, tracks?: number[]): void {
         let browser: BrowserUiFacade = this.uiFacade as BrowserUiFacade;
         super.tex(tex, browser.parseTracks(tracks));
     }
@@ -115,7 +115,7 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         super.changeTrackVolume(trackList, volume);
     }
 
-    private trackIndexesToTracks(trackIndexes: Int32Array): Track[] {
+    private trackIndexesToTracks(trackIndexes: number[]): Track[] {
         if (!this.score) {
             return [];
         }

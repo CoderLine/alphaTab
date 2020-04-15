@@ -7,7 +7,7 @@ import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 
 describe('MidiPlaybackControllerTest', () => {
-    const testRepeat = function (score: Score, expectedIndexes: Int32Array): void {
+    const testRepeat = function (score: Score, expectedIndexes: number[]): void {
         let controller: MidiPlaybackController = new MidiPlaybackController(score);
         let i: number = 0;
         while (!controller.finished) {
@@ -27,14 +27,14 @@ describe('MidiPlaybackControllerTest', () => {
     it('repeat-close', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('audio/repeat-close.gp5');
         let score: Score = reader.readScore();
-        let expectedIndexes: Int32Array = new Int32Array([0, 1, 0, 1, 2]);
+        let expectedIndexes = [0, 1, 0, 1, 2];
         testRepeat(score, expectedIndexes);
     });
 
     it('repeat-close-multi', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('audio/repeat-close-multi.gp5');
         let score: Score = reader.readScore();
-        let expectedIndexes: Int32Array = new Int32Array([0, 1, 0, 1, 0, 1, 0, 1, 2]);
+        let expectedIndexes = [0, 1, 0, 1, 0, 1, 0, 1, 2];
         testRepeat(score, expectedIndexes);
     });
 
@@ -43,7 +43,7 @@ describe('MidiPlaybackControllerTest', () => {
             'audio/repeat-close-without-start-at-beginning.gp5'
         );
         let score: Score = reader.readScore();
-        let expectedIndexes: Int32Array = new Int32Array([0, 1, 0, 1]);
+        let expectedIndexes = [0, 1, 0, 1];
         testRepeat(score, expectedIndexes);
     });
 
@@ -52,7 +52,7 @@ describe('MidiPlaybackControllerTest', () => {
             'audio/repeat-close-alternate-endings.gp5'
         );
         let score: Score = reader.readScore();
-        let expectedIndexes: Int32Array = new Int32Array([0, 1, 0, 2, 3, 0, 1, 0, 4]);
+        let expectedIndexes = [0, 1, 0, 2, 3, 0, 1, 0, 4];
         testRepeat(score, expectedIndexes);
     });
 

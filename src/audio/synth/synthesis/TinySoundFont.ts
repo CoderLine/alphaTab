@@ -35,7 +35,7 @@ export class TinySoundFont {
     public static readonly MicroBufferSize: number = 64;
 
     private _midiEventQueue: LinkedList<SynthEvent> = new LinkedList<SynthEvent>();
-    private _midiEventCounts: Int32Array = new Int32Array(32);
+    private _midiEventCounts: number[] = new Array<number>(32);
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
     private _isAnySolo: boolean = false;

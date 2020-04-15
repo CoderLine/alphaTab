@@ -30,7 +30,7 @@ describe('GpxImporterTest', () => {
             'PartConfiguration',
             'LayoutConfiguration'
         ];
-        let sizes: Int32Array = new Int32Array([8488, 130, 12204, 20, 12]);
+        let sizes = [8488, 130, 12204, 20, 12];
         for (let i: number = 0; i < fileSystem.files.length; i++) {
             let file: GpxFile = fileSystem.files[i];
             Logger.info('Test', `${file.fileName} - ${file.fileSize}`);

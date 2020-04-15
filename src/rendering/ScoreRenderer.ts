@@ -64,7 +64,7 @@ export class ScoreRenderer implements IScoreRenderer {
         return false;
     }
 
-    public renderScore(score: Score, trackIndexes: Int32Array): void {
+    public renderScore(score: Score, trackIndexes: number[]): void {
         try {
             this.score = score;
             let tracks: Track[];

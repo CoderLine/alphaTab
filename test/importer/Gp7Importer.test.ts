@@ -757,13 +757,13 @@ describe('Gp7ImporterTest', () => {
         expect(score.masterBars[0].fermata.size).toEqual(5);
         expect(score.masterBars[1].fermata.size).toEqual(5);
         expect(score.masterBars[2].fermata.size).toEqual(5); // Short
-        let offsets: Int32Array = new Int32Array([
+        let offsets = [
             0,
             (MidiUtils.QuarterTime * (1 / 2)) | 0,
             (MidiUtils.QuarterTime * (1 / 1)) | 0,
             (MidiUtils.QuarterTime * (2 / 1)) | 0,
             (MidiUtils.QuarterTime * (3 / 1)) | 0
-        ]);
+        ];
         let types: FermataType[] = [FermataType.Short, FermataType.Medium, FermataType.Long];
         for (let i: number = 0; i < 3; i++) {
             let masterBar: MasterBar = score.masterBars[i];

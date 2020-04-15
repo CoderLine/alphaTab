@@ -89,7 +89,7 @@ export class AlphaTabWebWorker {
         this._renderer.settings.fillFromJson(json);
     }
 
-    private renderMultiple(score: Score, trackIndexes: Int32Array): void {
+    private renderMultiple(score: Score, trackIndexes: number[]): void {
         try {
             this._renderer.renderScore(score, trackIndexes);
         } catch (e) {

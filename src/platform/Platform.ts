@@ -109,7 +109,7 @@ export class Platform {
         return array[0];
     }
 
-    public static clearIntArray(array: Int32Array): void {
+    public static clearIntArray(array: number[]): void {
         for (let i: number = 0; i < array.length; i++) {
             array[i] = 0;
         }

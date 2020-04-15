@@ -277,7 +277,7 @@ export class MidiFileGenerator {
         if (beat.isRest) {
             this._handler.addRest(track.index, barStartTick + beatStart, track.playbackInfo.primaryChannel);
         } else {
-            let brushInfo: Int32Array = this.getBrushInfo(beat);
+            let brushInfo = this.getBrushInfo(beat);
             for (const n of beat.notes) {
                 this.generateNote(n, barStartTick + beatStart, audioDuration, brushInfo);
             }
@@ -383,7 +383,7 @@ export class MidiFileGenerator {
         return durations;
     }
 
-    private generateNote(note: Note, beatStart: number, beatDuration: number, brushInfo: Int32Array): void {
+    private generateNote(note: Note, beatStart: number, beatDuration: number, brushInfo: number[]): void {
         const track: Track = note.beat.voice.bar.staff.track;
         const staff: Staff = note.beat.voice.bar.staff;
         const noteKey: number = note.realValue;
@@ -732,7 +732,7 @@ export class MidiFileGenerator {
                                 duration,
                                 track,
                                 true,
-                                new Int32Array([note.bendPoints[0].value, finalBendValue]),
+                                [note.bendPoints[0].value, finalBendValue],
                                 bendDuration
                             );
                         } else {
@@ -742,7 +742,7 @@ export class MidiFileGenerator {
                                 duration,
                                 track,
                                 false,
-                                new Int32Array([note.bendPoints[0].value, finalBendValue]),
+                                [note.bendPoints[0].value, finalBendValue],
                                 bendDuration
                             );
                         }
@@ -766,11 +766,11 @@ export class MidiFileGenerator {
                             duration,
                             track,
                             false,
-                            new Int32Array([
+                            [
                                 note.bendPoints[0].value,
                                 note.bendPoints[1].value,
                                 note.bendPoints[2].value
-                            ]),
+                            ],
                             bendDuration
                         );
                         return;
@@ -805,7 +805,7 @@ export class MidiFileGenerator {
                             duration,
                             track,
                             false,
-                            new Int32Array([note.bendPoints[0].value, finalBendValue]),
+                            [note.bendPoints[0].value, finalBendValue],
                             bendDuration
                         );
                         return;
@@ -831,7 +831,7 @@ export class MidiFileGenerator {
                             duration,
                             track,
                             false,
-                            new Int32Array([note.bendPoints[0].value, note.bendPoints[1].value]),
+                            [note.bendPoints[0].value, note.bendPoints[1].value],
                             bendDuration
                         );
                         return;
@@ -847,7 +847,7 @@ export class MidiFileGenerator {
         duration: number,
         track: Track,
         bendAtBeginning: boolean,
-        bendValues: Int32Array,
+        bendValues: number[],
         bendDuration: number
     ): void {
         const startTick: number = bendAtBeginning ? noteStart : noteStart + duration - bendDuration;
@@ -896,7 +896,7 @@ export class MidiFileGenerator {
                             duration,
                             track,
                             false,
-                            new Int32Array([bendPoints[0].value, bendPoints[1].value]),
+                            [bendPoints[0].value, bendPoints[1].value],
                             whammyDuration
                         );
                         return;
@@ -923,7 +923,7 @@ export class MidiFileGenerator {
                             duration,
                             track,
                             true,
-                            new Int32Array([bendPoints[0].value, bendPoints[1].value, bendPoints[2].value]),
+                            [bendPoints[0].value, bendPoints[1].value, bendPoints[2].value],
                             whammyDuration
                         );
                         return;
@@ -959,7 +959,7 @@ export class MidiFileGenerator {
                             duration,
                             track,
                             false,
-                            new Int32Array([bendPoints[0].value, bendPoints[1].value]),
+                            [bendPoints[0].value, bendPoints[1].value],
                             whammyDuration
                         );
                         return;
@@ -1068,8 +1068,8 @@ export class MidiFileGenerator {
         }
     }
 
-    private getBrushInfo(beat: Beat): Int32Array {
-        const brushInfo: Int32Array = new Int32Array(beat.voice.bar.staff.tuning.length);
+    private getBrushInfo(beat: Beat): number[] {
+        const brushInfo = new Array<number>(beat.voice.bar.staff.tuning.length);
         if (beat.brushType !== BrushType.None) {
             //
             // calculate the number of

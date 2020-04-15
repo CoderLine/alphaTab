@@ -149,7 +149,8 @@ export class StaveGroup {
                 for (let t of tracks) {
                     this.accoladeSpacing = Math.ceil(Math.max(this.accoladeSpacing, canvas.measureText(t.shortName)));
                 }
-                this.accoladeSpacing += 2 * StaveGroup.AccoladeLabelSpacing;
+                this.accoladeSpacing *= this.layout.scale;
+                this.accoladeSpacing += 2 * StaveGroup.AccoladeLabelSpacing * this.layout.scale;
                 this.width += this.accoladeSpacing;
             }
         }

@@ -685,7 +685,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         let text: string = this._syData.toString().toLowerCase();
                         if (text === 'piano' || text === 'none' || text === 'voice') {
                             // clear tuning
-                            this._currentStaff.tuning = new Int32Array(0);
+                            this._currentStaff.tuning = [];
                         } else {
                             this.error('tuning', AlphaTexSymbols.Tuning, true);
                         }
@@ -698,7 +698,7 @@ export class AlphaTexImporter extends ScoreImporter {
                             tuning.push(t.realValue);
                             this._sy = this.newSy();
                         } while (this._sy === AlphaTexSymbols.Tuning);
-                        this._currentStaff.tuning = new Int32Array(tuning);
+                        this._currentStaff.tuning = tuning;
                         break;
                     default:
                         this.error('tuning', AlphaTexSymbols.Tuning, true);

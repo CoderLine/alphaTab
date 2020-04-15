@@ -75,7 +75,7 @@ export class VisualTestHelper {
                 api.error.on((s, e) => {
                     reject(`Failed to render image: ${s},${e}`);
                 });
-                api.renderScore(score, new Int32Array(tracks!));
+                api.renderScore(score, tracks);
             });
 
             await Promise.race([

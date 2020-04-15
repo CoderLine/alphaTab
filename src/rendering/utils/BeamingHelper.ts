@@ -18,7 +18,7 @@ import { MidiUtils } from '@src/audio/util/MidiUtils';
  * This public class helps drawing beams and bars for notes.
  */
 export class BeamingHelper {
-    private static ScoreMiddleKeys: Int32Array = new Int32Array([71, 60, 57, 50, 71]);
+    private static ScoreMiddleKeys: number[] = [71, 60, 57, 50, 71];
 
     private _staff: Staff;
     private _beatLineXPositions: Map<number, BeatLinePositions> = new Map();

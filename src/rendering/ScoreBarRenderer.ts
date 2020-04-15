@@ -42,8 +42,8 @@ import { NoteHeadGlyph } from './glyphs/NoteHeadGlyph';
  */
 export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculator {
     public static readonly StaffId: string = 'score';
-    private static SharpKsSteps: Int32Array = new Int32Array([1, 4, 0, 3, 6, 2, 5]);
-    private static FlatKsSteps: Int32Array = new Int32Array([5, 2, 6, 3, 7, 4, 8]);
+    private static SharpKsSteps: number[] = [1, 4, 0, 3, 6, 2, 5];
+    private static FlatKsSteps: number[] = [5, 2, 6, 3, 7, 4, 8];
     private static readonly LineSpacing: number = 8;
     private static readonly StemWidth: number = 1.3;
 
@@ -729,7 +729,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         }
         // naturalize previous key
         let naturalizeSymbols: number = Math.abs(previousKey);
-        let previousKeyPositions: Int32Array = ModelUtils.keySignatureIsSharp(previousKey)
+        let previousKeyPositions = ModelUtils.keySignatureIsSharp(previousKey)
             ? ScoreBarRenderer.SharpKsSteps
             : ScoreBarRenderer.FlatKsSteps;
         for (let i: number = 0; i < naturalizeSymbols; i++) {
