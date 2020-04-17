@@ -1,4 +1,5 @@
 import { Settings } from '@src/Settings';
+import { CoreSettings } from './alphatab';
 
 /**
  * Represents the information related to a resize event.
@@ -18,4 +19,16 @@ export class ResizeEventArgs {
      * Gets the settings currently used for rendering.
      */
     public settings: Settings | null = null;
+
+    public core() : CoreSettings  {
+        if(this.settings && this.causeIssue()) {
+            return this.settings.core;
+        }
+        return new CoreSettings();
+    }
+
+    private causeIssue() {
+        this.settings = null;
+        return true;
+    }
 }

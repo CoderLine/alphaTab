@@ -1,0 +1,6 @@
+- TypeScript to C# compiler for .net version
+- .net build toolchain
+- Developer friendly "npm start"
+- Activate all compiler checks 
+- Linting
+- npm packaging

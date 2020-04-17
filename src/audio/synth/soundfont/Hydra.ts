@@ -10,6 +10,7 @@ import { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
 
 import { Platform } from '@src/platform/Platform';
+import { FormatError } from '@src/FormatError';
 
 export class Hydra {
     public phdrs: HydraPhdr[] = [];
@@ -28,7 +29,7 @@ export class Hydra {
         const chunkHead: RiffChunk = new RiffChunk();
         const chunkFastList: RiffChunk = new RiffChunk();
         if (!RiffChunk.load(null, chunkHead, readable) || chunkHead.id !== 'sfbk') {
-            return;
+            throw new FormatError("Soundfont is not a valid Soundfont2 file")
         }
 
         while (RiffChunk.load(chunkHead, chunkFastList, readable)) {

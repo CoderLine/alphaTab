@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist/lib.csharp",
+    "module": "commonjs",
+    "declaration": false,
+    "declarationDir": null,
+    "sourceMap": false,
+    "incremental": false,
+    "paths": {
+      "@src*": [
+        "src*"
+      ],
+      "@test*": [
+        "test*"
+      ]
+    },
+    "plugins": [
+      {
+        "transform": "./src.compiler/csharp/CSharpTranspilerPlugin.ts",
+        "after": true
+      },
+    ]
+  },
+  "include": [
+    "src",
+    "test"
+  ]
+}

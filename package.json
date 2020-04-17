@@ -29,6 +29,7 @@
     "lint": "tslint  --project tsconfig.build.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
     "build": "ttsc --project tsconfig.build.json && rollup -c rollup.config.js",
+    "buildCSharp": "ts-node --project tsconfig.build-csharp.json src.compiler/csharp/CSharpTranspiler.ts --project tsconfig.build-csharp.json",
     "start": "concurrently --kill-others \"ttsc --project tsconfig.build.json --watch\" \"rollup -c rollup.config.ts -w\" \"http-server\"",
     "test": "ttsc --project tsconfig.json && karma start karma.conf.js"
   },

@@ -43,7 +43,7 @@
     ],
     "plugins": [
       {
-        "transform": "./compiler/JsonSerializationBuilder.ts"
+        "transform": "./src.compiler/JsonSerializationBuilder.ts"
       },
     ]
   },
