@@ -23,8 +23,7 @@ export default class CSharpAstPrinter {
         this._fileHandle = fs.openSync(this._sourceFile.fileName, 'w');
         try {
             this.writeSourceFile(this._sourceFile);
-        }
-        finally {
+        } finally {
             fs.closeSync(this._fileHandle);
         }
     }
@@ -64,7 +63,6 @@ export default class CSharpAstPrinter {
     private writeDelegateDeclaration(d: cs.DelegateDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
-        this.write(' ');
         this.writeType(d.returnType);
         this.write(` ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
@@ -74,9 +72,9 @@ export default class CSharpAstPrinter {
 
     private writeDocumentation(d: cs.DocumentedElement) {
         if (d.documentation) {
-            this.writeLine("/* TODO: Xml docs")
+            this.writeLine('/* TODO: Xml docs');
             d.documentation.split('\n').forEach(line => this.writeLine(` * ${line}`));
-            this.writeLine("*/")
+            this.writeLine('*/');
         }
     }
 
@@ -96,16 +94,16 @@ export default class CSharpAstPrinter {
 
     private writeParameter(p: cs.ParameterDeclaration) {
         this.writeType(p.type);
-        this.write(` ${p.name}`)
+        this.write(` ${p.name}`);
         if (p.initializer) {
-            this.write(' = ')
+            this.write(' = ');
             this.writeExpression(p.initializer);
         }
     }
 
     private writeInterfaceDeclaration(d: cs.InterfaceDeclaration) {
         this.writeVisibility(d.visibility);
-        this.write(` interface ${d.name}`);
+        this.write(`interface ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
 
         if (d.interfaces && d.interfaces.length > 0) {
@@ -121,10 +119,9 @@ export default class CSharpAstPrinter {
         this.endBlock();
     }
 
-
     private writeEnumDeclaration(d: cs.EnumDeclaration) {
         this.writeVisibility(d.visibility);
-        this.write(` enum ${d.name}`);
+        this.write(`enum ${d.name}`);
         this.writeLine();
         this.beginBlock();
 
@@ -139,13 +136,12 @@ export default class CSharpAstPrinter {
             this.write(' = ');
             this.writeExpression(m.initializer);
         }
-        this.writeLine(',')
+        this.writeLine(',');
     }
-
 
     private writeClassDeclaration(d: cs.ClassDeclaration) {
         this.writeVisibility(d.visibility);
-        this.write(` class ${d.name}`);
+        this.write(`class ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
 
         if (d.baseClass) {
@@ -170,7 +166,6 @@ export default class CSharpAstPrinter {
 
         this.endBlock();
     }
-
 
     private writeMember(member: cs.Node) {
         switch (member.nodeType) {
@@ -202,34 +197,34 @@ export default class CSharpAstPrinter {
                 this.writeDelegateDeclaration(member as cs.DelegateDeclaration);
                 break;
         }
+        this.writeLine();
     }
 
     private writeEventDeclaration(d: cs.EventDeclaration) {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
 
     private writeMethodDeclaration(d: cs.MethodDeclaration) {
         this.writeVisibility(d.visibility);
-        this.write(' ');
 
         if (d.isStatic) {
-            this.write('static ')
+            this.write('static ');
         }
 
         if (d.isAbstract) {
-            this.write('abstract ')
+            this.write('abstract ');
         }
 
         if (d.isVirtual) {
-            this.write('virtual ')
+            this.write('virtual ');
         }
 
         if (d.isOverride) {
-            this.write('override ')
+            this.write('override ');
         }
 
         this.writeType(d.returnType);
-        this.write(` ${d.name}`)
+        this.write(` ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
         this.writeParameters(d.parameters);
 
@@ -241,7 +236,7 @@ export default class CSharpAstPrinter {
                 this.writeLine();
                 this.writeBlock(body as cs.Block);
             } else {
-                this.write(" => ");
+                this.write(' => ');
                 this.writeExpression(body as cs.Expression);
             }
         } else {
@@ -251,13 +246,13 @@ export default class CSharpAstPrinter {
 
     private writeConstructorDeclaration(d: cs.ConstructorDeclaration) {
         this.writeVisibility(d.visibility);
-        this.write(` ${(d.parent as cs.ClassDeclaration).name}`);
+        this.write(`${(d.parent as cs.ClassDeclaration).name}`);
         this.writeParameters(d.parameters);
 
         if (d.baseConstructorArguments) {
-            this.write(" : base (");
+            this.write(' : base (');
             this.writeCommaSeparated(d.baseConstructorArguments, e => this.writeExpression(e));
-            this.write(")");
+            this.write(')');
         }
 
         this.writeBody(d.body);
@@ -265,26 +260,25 @@ export default class CSharpAstPrinter {
 
     private writePropertyDeclaration(d: cs.PropertyDeclaration) {
         this.writeVisibility(d.visibility);
-        this.write(' ');
 
         if (d.isStatic) {
-            this.write('static ')
+            this.write('static ');
         }
 
         if (d.isAbstract) {
-            this.write('abstract ')
+            this.write('abstract ');
         }
 
         if (d.isVirtual) {
-            this.write('virtual ')
+            this.write('virtual ');
         }
 
         if (d.isOverride) {
-            this.write('override ')
+            this.write('override ');
         }
 
         this.writeType(d.type);
-        this.writeLine(` ${d.name}`)
+        this.writeLine(` ${d.name}`);
         this.beginBlock();
 
         if (d.getAccessor) {
@@ -305,14 +299,13 @@ export default class CSharpAstPrinter {
 
     private writeFieldDeclarat1on(d: cs.FieldDeclaration) {
         this.writeVisibility(d.visibility);
-        this.write(' ');
 
         if (d.isStatic) {
-            this.write('static ')
+            this.write('static ');
         }
 
         if (d.isReadonly) {
-            this.write('abstract ')
+            this.write('abstract ');
         }
 
         this.writeType(d.type);
@@ -329,13 +322,13 @@ export default class CSharpAstPrinter {
             case cs.SyntaxKind.UnresolvedTypeNode:
                 const resolved = this._context.resolveType(type);
                 if (!resolved) {
-                    this._context.addCsNodeDiagnostics(type,
+                    this._context.addCsNodeDiagnostics(
+                        type,
                         `Could not resolve type '${type.tsNode!.getText(this._sourceFile.tsNode as ts.SourceFile)}'`,
                         ts.DiagnosticCategory.Error
                     );
                     this.write('/* resolve error */');
-                }
-                else {
+                } else {
                     this.writeType(resolved);
                 }
                 break;
@@ -356,19 +349,40 @@ export default class CSharpAstPrinter {
                     case cs.PrimitiveType.String:
                         this.write('string');
                         break;
+                    case cs.PrimitiveType.Void:
+                        this.write('void');
+                        break;
                 }
                 break;
+            case cs.SyntaxKind.ArrayTypeNode:
+                const arrayType = type as cs.ArrayTypeNode;
+                this.write('System.Collections.Generic.IList<');
+                this.writeType(arrayType.elementType);
+                this.write('>');
+                break;
             case cs.SyntaxKind.TypeReference:
-                switch ((type as cs.TypeReference).reference.nodeType) {
-                    case cs.SyntaxKind.ClassDeclaration:
-                    case cs.SyntaxKind.InterfaceDeclaration:
-                    case cs.SyntaxKind.DelegateDeclaration:
-                        this.write(this.getFullName((type as cs.TypeReference).reference as cs.NamedTypeDeclaration));
-                        break;
-                    case cs.SyntaxKind.TypeParameterDeclaration:
-                        this.write((type as cs.TypeParameterDeclaration).name);
-                        break;
+                const typeReference = (type as cs.TypeReference).reference;
+                if (typeof typeReference === 'string') {
+                    this.write(typeReference);
+                } else {
+                    switch (typeReference.nodeType) {
+                        case cs.SyntaxKind.ClassDeclaration:
+                        case cs.SyntaxKind.InterfaceDeclaration:
+                        case cs.SyntaxKind.EnumDeclaration:
+                        case cs.SyntaxKind.DelegateDeclaration:
+                            this.write(
+                                this.getFullName((type as cs.TypeReference).reference as cs.NamedTypeDeclaration)
+                            );
+                            break;
+                        case cs.SyntaxKind.TypeParameterDeclaration:
+                            this.write((type as cs.TypeParameterDeclaration).name);
+                            break;
+                    }
                 }
+
+                break;
+            default:
+                this.write('TODO');
                 break;
         }
     }
@@ -377,35 +391,34 @@ export default class CSharpAstPrinter {
         if (!type.parent) {
             return '';
         }
-
         switch (type.parent.nodeType) {
             case cs.SyntaxKind.ClassDeclaration:
             case cs.SyntaxKind.InterfaceDeclaration:
+            case cs.SyntaxKind.EnumDeclaration:
             case cs.SyntaxKind.DelegateDeclaration:
                 return this.getFullName(type.parent as cs.NamedTypeDeclaration) + '.' + type.name;
             case cs.SyntaxKind.NamespaceDeclaration:
-                return (type.parent as cs.NamespaceDeclaration).namespace;
-        };
+                return (type.parent as cs.NamespaceDeclaration).namespace + '.' + type.name;
+        }
         return '';
     }
 
     private writeTypeParameters(typeParameters: cs.TypeParameterDeclaration[] | undefined) {
         if (typeParameters && typeParameters.length > 0) {
-            this.write("<");
+            this.write('<');
             typeParameters.forEach((p, i) => {
                 if (i > 0) {
-                    this.write(", ");
+                    this.write(', ');
                 }
                 this.writeTypeParameter(p);
-            })
-            this.write(">");
+            });
+            this.write('>');
         }
     }
 
     private writeTypeParameter(p: cs.TypeParameterDeclaration) {
         this.write(p.name);
     }
-
 
     private writeExpression(expr: cs.Expression) {
         this.write('/* TODO */');
@@ -424,25 +437,25 @@ export default class CSharpAstPrinter {
     private writeVisibility(visibility: cs.Visibility) {
         switch (visibility) {
             case cs.Visibility.Public:
-                this.write("public");
+                this.write('public ');
                 break;
             case cs.Visibility.Private:
-                this.write("private");
+                this.write('private ');
                 break;
             case cs.Visibility.Protected:
-                this.write("protected");
+                this.write('protected ');
                 break;
             case cs.Visibility.Internal:
-                this.write("internal");
+                this.write('internal ');
                 break;
         }
     }
 
     private writeUsing(using: cs.UsingDeclaration) {
         if (using.typeAlias) {
-            this.writeLine(`using ${using.typeAlias} = ${using.namespaceOrTypeName};`)
+            this.writeLine(`using ${using.typeAlias} = ${using.namespaceOrTypeName};`);
         } else {
-            this.writeLine(`using ${using.namespaceOrTypeName};`)
+            this.writeLine(`using ${using.namespaceOrTypeName};`);
         }
     }
 
@@ -463,9 +476,7 @@ export default class CSharpAstPrinter {
 
     private writeIndent() {
         if (this._isStartOfLine && this._indent > 0) {
-            fs.writeSync(this._fileHandle,
-                this._indent === 1 ? '    ' : '    '.repeat(this._indent)
-            );
+            fs.writeSync(this._fileHandle, this._indent === 1 ? '    ' : '    '.repeat(this._indent));
             this._isStartOfLine = false;
         }
     }
@@ -477,6 +488,6 @@ export default class CSharpAstPrinter {
 
     private endBlock() {
         this._indent--;
-        this.writeLine('}')
+        this.writeLine('}');
     }
 }

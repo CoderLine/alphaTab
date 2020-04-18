@@ -16,12 +16,12 @@ export enum SyntaxKind {
     EventDeclaration,
     PropertyAccessorDeclaration,
     ParameterDeclaration,
-    UnresolvedType,
     UnresolvedTypeNode,
     TypeReference,
     PrimitiveTypeNode,
     Block,
-    EnumMember
+    EnumMember,
+    ArrayTypeNode
 }
 
 export interface Node {
@@ -152,16 +152,22 @@ export interface TypeNode extends Node {
 }
 
 export interface UnresolvedTypeNode extends TypeNode {
+    tsType?: ts.Type
 }
 
 export interface TypeReference extends TypeNode {
-    reference: NamedTypeDeclaration | TypeParameterDeclaration | PrimitiveTypeNode;
+    reference: NamedTypeDeclaration | TypeParameterDeclaration | PrimitiveTypeNode | string;
+}
+
+export interface ArrayTypeNode extends TypeNode {
+    elementType: TypeNode
 }
 
 export enum PrimitiveType {
     Boolean,
     String,
     Number,
+    Void,
     Object,
     Dynamic
 }
