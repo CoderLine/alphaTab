@@ -178,7 +178,7 @@ export abstract class SvgCanvas implements ICanvas {
         y: number,
         scale: number,
         symbols: MusicFontSymbol[],
-        centerAtPosition: boolean
+        centerAtPosition?: boolean
     ): void;
 
     public onRenderFinished(): unknown {

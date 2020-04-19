@@ -6,6 +6,7 @@ export default class CSharpEmitterContext {
     private _symbolLookup: Map<ts.Symbol, cs.Node> = new Map();
 
     private _diagnostics: ts.Diagnostic[] = [];
+    private _unresolvedTypeNodes: cs.UnresolvedTypeNode[] = [];
     private _program: ts.Program;
     public typeChecker: ts.TypeChecker;
 
@@ -20,6 +21,20 @@ export default class CSharpEmitterContext {
 
     public getType(n: ts.Node): ts.Type {
         return this.typeChecker.getTypeAtLocation(n);
+    }
+
+    public registerUnresolvedTypeNode(unresolved: cs.UnresolvedTypeNode) {
+        this._unresolvedTypeNodes.push(unresolved);
+    }
+
+    public resolveAllUnresolvedTypeNodes() {
+        for (let node of this._unresolvedTypeNodes) {
+            let resolved = this.resolveType(node);
+            if (!resolved) {
+                resolved = this.resolveType(node);
+                this.addCsNodeDiagnostics(node, 'Could not resolve type', ts.DiagnosticCategory.Error);
+            }
+        }
     }
 
     public addCsNodeDiagnostics(node: cs.Node, message: string, category: ts.DiagnosticCategory) {
@@ -76,20 +91,30 @@ export default class CSharpEmitterContext {
     }
 
     public resolveType(node: cs.UnresolvedTypeNode): cs.TypeNode | null {
-        // TODO: proper mapping of typescript types to c# types considering generics
-
         if (!node.tsNode) {
             throw new Error('Node must be set for all types');
         }
 
+        let resolved: cs.TypeNode | null = null;
         if (node.tsType) {
-            const resolvedType = this.getTypeFromTsType(node, node.tsType);
-            if (resolvedType) {
-                return resolvedType;
-            }
+            resolved = this.getTypeFromTsType(node, node.tsType);
         }
 
-        return this.getTypeFromTsNode(node.parent, node.tsNode);
+        if (!resolved) {
+            resolved = this.getTypeFromTsNode(node.parent!, node.tsNode);
+        }
+
+        if (resolved) {
+            for (const prop of Object.getOwnPropertyNames(node)) {
+                delete (node as any)[prop];
+            }
+            for (const prop of Object.getOwnPropertyNames(resolved)) {
+                (node as any)[prop] = (resolved as any)[prop];
+            }
+            return node;
+        }
+
+        return null;
     }
     private getTypeFromTsType(parent: cs.Node, tsType: ts.Type): cs.TypeNode | null {
         if (tsType.symbol && this._symbolLookup.has(tsType.symbol)) {
@@ -102,47 +127,105 @@ export default class CSharpEmitterContext {
         } else if ((tsType.flags & ts.TypeFlags.Any) !== 0) {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                isNullable: false,
                 type: cs.PrimitiveType.Dynamic
             } as cs.PrimitiveTypeNode;
         } else if ((tsType.flags & ts.TypeFlags.Unknown) !== 0) {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                isNullable: false,
                 type: cs.PrimitiveType.Object
             } as cs.PrimitiveTypeNode;
-        } else if ((tsType.flags & ts.TypeFlags.Number) !== 0) {
+        } else if ((tsType.flags & ts.TypeFlags.Number) !== 0 || (tsType.flags & ts.TypeFlags.NumberLiteral) !== 0) {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                isNullable: false,
                 type: cs.PrimitiveType.Number
             } as cs.PrimitiveTypeNode;
-        } else if ((tsType.flags & ts.TypeFlags.String) !== 0) {
+        } else if ((tsType.flags & ts.TypeFlags.String) !== 0 || (tsType.flags & ts.TypeFlags.StringLiteral) !== 0) {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                isNullable: false,
                 type: cs.PrimitiveType.String
             } as cs.PrimitiveTypeNode;
-        } else if ((tsType.flags & ts.TypeFlags.Boolean) !== 0) {
+        } else if ((tsType.flags & ts.TypeFlags.Boolean) !== 0 || (tsType.flags & ts.TypeFlags.BooleanLiteral) !== 0) {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                isNullable: false,
                 type: cs.PrimitiveType.Boolean
             } as cs.PrimitiveTypeNode;
         } else if ((tsType.flags & ts.TypeFlags.Void) !== 0) {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                isNullable: false,
                 type: cs.PrimitiveType.Void
             } as cs.PrimitiveTypeNode;
-        } else if ((tsType.flags & ts.TypeFlags.Union) !== 0) {
-            const unionType: ts.UnionType = tsType as ts.UnionType;
+        } else if (tsType.symbol) {
+            // some built in type handling
+            switch (tsType.symbol.name) {
+                case 'Error':
+                    return {
+                        nodeType: cs.SyntaxKind.TypeReference,
+                        parent: parent,
+                        reference: 'System.Exception'
+                    } as cs.TypeReference;
+                case 'Array':
+                    return null;
+                case ts.InternalSymbolName.Type:
+                    return null;
+                default:
+                    return {
+                        nodeType: cs.SyntaxKind.TypeReference,
+                        parent: parent,
+                        reference: 'AlphaTab.Core.' + tsType.symbol.name
+                    } as cs.TypeReference;
+            }
+        }
 
+        return null;
+    }
+
+    private getTypeFromTsNode(parent: cs.Node, tsNode: ts.Node): cs.TypeNode | null {
+        if (ts.isArrayTypeNode(tsNode)) {
+            return {
+                nodeType: cs.SyntaxKind.ArrayTypeNode,
+                parent: parent,
+                tsNode: tsNode,
+                elementType: this.getTypeFromTsNode(parent, tsNode.elementType)
+            } as cs.ArrayTypeNode;
+        }
+
+        if (ts.isTypeReferenceNode(tsNode)) {
+            if(ts.isIdentifier(tsNode.typeName) && tsNode.typeName.text === 'Array' && tsNode.typeArguments) {
+                return {
+                    nodeType: cs.SyntaxKind.ArrayTypeNode,
+                    parent: parent,
+                    tsNode: tsNode,
+                    elementType: this.getTypeFromTsNode(parent, tsNode.typeArguments[0])
+                } as cs.ArrayTypeNode;
+            }
+        }
+
+        if(ts.isExpressionWithTypeArguments(tsNode)) {
+            if(ts.isIdentifier(tsNode.expression) && tsNode.expression.text === 'Array' && tsNode.typeArguments) {
+                return {
+                    nodeType: cs.SyntaxKind.ArrayTypeNode,
+                    parent: parent,
+                    tsNode: tsNode,
+                    elementType: this.getTypeFromTsNode(parent, tsNode.typeArguments[0])
+                } as cs.ArrayTypeNode;
+            }
+        }
+
+        if (ts.isParenthesizedTypeNode(tsNode)) {
+            return this.getTypeFromTsNode(parent, tsNode.type);
+        }
+
+        if (ts.isUnionTypeNode(tsNode)) {
             let isNullable = false;
-            let actualType: ts.Type | null = null;
-            for (const t of unionType.types) {
-                if ((t.flags & ts.TypeFlags.Null) !== 0 || (t.flags & ts.TypeFlags.Undefined) !== 0) {
+            let isOptional = false;
+            let actualType: ts.TypeNode | null = null;
+            for (const t of tsNode.types) {
+                if (t.kind === ts.SyntaxKind.NullKeyword) {
                     isNullable = true;
+                } else if (t.kind === ts.SyntaxKind.UndefinedKeyword) {
+                    isOptional = true;
+                } else if (actualType == null) {
+                    actualType = t;
                 } else if (actualType != null) {
                     this.addCsNodeDiagnostics(
                         parent,
@@ -154,69 +237,72 @@ export default class CSharpEmitterContext {
                 }
             }
 
-            if (!actualType || !actualType.symbol) {
-                this.addCsNodeDiagnostics(parent, 'Error resolving type', ts.DiagnosticCategory.Error);
-                return {
-                    nodeType: cs.SyntaxKind.TypeReference,
-                    parent: parent,
-                    reference: 'RESOLVE_ERROR',
-                } as cs.TypeReference;
+            if (!actualType) {
+                return null;
             }
 
-            const type = this.getTypeFromTsType(parent, actualType);
-
+            const type = this.getTypeFromTsNode(parent, actualType);
             return {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: parent,
                 reference: type,
+                isNullable: isNullable,
+                isOptional: isOptional
             } as cs.TypeReference;
         }
 
-        return null;
-    }
-    private getTypeFromTsNode(parent: cs.Node | null, tsNode: ts.Node): cs.TypeNode | null {
-        if (ts.isArrayTypeNode(tsNode)) {
-            return {
-                nodeType: cs.SyntaxKind.ArrayTypeNode,
-                parent: parent,
-                tsNode: tsNode,
-                elementType: this.getTypeFromTsNode(parent, tsNode.elementType)
-            } as cs.ArrayTypeNode;
+        if (ts.isFunctionTypeNode(tsNode)) {
+            const returnType = this.getTypeFromTsNode(parent, tsNode.type);
+            if (!returnType) {
+                return null;
+            }
+
+            const parameterTypes = tsNode.parameters.map(p => {
+                const symbol = this.typeChecker.getSymbolAtLocation(p.name);
+                const tsType = symbol ? this.typeChecker.getTypeOfSymbolAtLocation(symbol!, p) : null;
+                let type:cs.TypeNode | null = null;
+                if(tsType) {
+                    type = this.getTypeFromTsType(parent, tsType);
+                }
+                type = this.getTypeFromTsNode(parent, p.type ?? p);
+                if(!type) {
+                    console.log('err');
+                }
+                return type;
+            });
+
+            if (
+                returnType.nodeType === cs.SyntaxKind.PrimitiveTypeNode &&
+                (returnType as cs.PrimitiveTypeNode).type === cs.PrimitiveType.Void
+            ) {
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: parent,
+                    tsNode: tsNode.type,
+                    reference: 'System.Action',
+                    typeArguments: parameterTypes
+                } as cs.TypeReference;
+            } else {
+                parameterTypes.push(returnType);
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: parent,
+                    tsNode: tsNode.type,
+                    reference: 'System.Func',
+                    typeArguments: parameterTypes
+                } as cs.TypeReference;
+            }
         }
 
         const tsType = this.typeChecker.getTypeAtLocation(tsNode);
-        if (tsType && tsType.symbol && this._symbolLookup.has(tsType.symbol)) {
-            return this.resolveType({
-                nodeType: cs.SyntaxKind.UnresolvedTypeNode,
-                parent: parent,
-                tsNode: tsNode,
-                tsType: tsType
-            });
+        if (tsType) {
+            const tsTypeResolved = this.getTypeFromTsType(parent, tsType);
+            if (tsTypeResolved) {
+                return tsTypeResolved;
+            }
         }
 
-        return {
-            nodeType: cs.SyntaxKind.TypeReference,
-            parent: parent,
-            reference: 'RESOLVE_ERROR',
-            tsNode: tsNode
-        } as cs.TypeReference;
-
-        // if (node.tsNode) {
-        //     const symbol = this._typeChecker.getSymbolAtLocation(node.tsNode);
-        //     if (symbol) {
-        //         const node = this._symbolLookup.get(symbol);
-        //         if (node) {
-        //             switch (node.nodeType) {
-        //                 case cs.SyntaxKind.ClassDeclaration:
-        //                 case cs.SyntaxKind.EnumDeclaration:
-        //                 case cs.SyntaxKind.InterfaceDeclaration:
-        //                 case cs.SyntaxKind.:
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // }
-        // return null;
+        return null;
     }
 
     public registerSymbol(node: cs.Node, declaration: ts.Declaration) {

@@ -95,9 +95,12 @@ export default class CSharpAstPrinter {
     private writeParameter(p: cs.ParameterDeclaration) {
         this.writeType(p.type);
         this.write(` ${p.name}`);
+
         if (p.initializer) {
             this.write(' = ');
             this.writeExpression(p.initializer);
+        } else if (p.type.isOptional) {
+            this.write(' = default');
         }
     }
 
@@ -289,6 +292,12 @@ export default class CSharpAstPrinter {
             this.writePropertyAccessor(d.setAccessor);
         }
 
+        if(d.initializer) {
+            this.write(' = ');
+            this.writeExpression(d.initializer);
+            this.writeLine(';');
+        }
+
         this.endBlock();
     }
 
@@ -309,7 +318,7 @@ export default class CSharpAstPrinter {
         }
 
         this.writeType(d.type);
-        this.writeLine(` ${d.name}`);
+        this.write(` ${d.name}`);
         if (d.initializer) {
             this.write(' = ');
             this.writeExpression(d.initializer);
@@ -318,20 +327,10 @@ export default class CSharpAstPrinter {
     }
 
     private writeType(type: cs.TypeNode) {
+        if (!type) {
+            console.log('ERR');
+        }
         switch (type.nodeType) {
-            case cs.SyntaxKind.UnresolvedTypeNode:
-                const resolved = this._context.resolveType(type);
-                if (!resolved) {
-                    this._context.addCsNodeDiagnostics(
-                        type,
-                        `Could not resolve type '${type.tsNode!.getText(this._sourceFile.tsNode as ts.SourceFile)}'`,
-                        ts.DiagnosticCategory.Error
-                    );
-                    this.write('/* resolve error */');
-                } else {
-                    this.writeType(resolved);
-                }
-                break;
             case cs.SyntaxKind.PrimitiveTypeNode:
                 switch ((type as cs.PrimitiveTypeNode).type) {
                     case cs.PrimitiveType.Boolean:
@@ -361,29 +360,35 @@ export default class CSharpAstPrinter {
                 this.write('>');
                 break;
             case cs.SyntaxKind.TypeReference:
-                const typeReference = (type as cs.TypeReference).reference;
-                if (typeof typeReference === 'string') {
-                    this.write(typeReference);
+                const typeReference = type as cs.TypeReference;
+                const targetType = (type as cs.TypeReference).reference;
+                if (typeof targetType === 'string') {
+                    this.write(targetType);
                 } else {
-                    switch (typeReference.nodeType) {
-                        case cs.SyntaxKind.ClassDeclaration:
-                        case cs.SyntaxKind.InterfaceDeclaration:
-                        case cs.SyntaxKind.EnumDeclaration:
-                        case cs.SyntaxKind.DelegateDeclaration:
-                            this.write(
-                                this.getFullName((type as cs.TypeReference).reference as cs.NamedTypeDeclaration)
-                            );
-                            break;
-                        case cs.SyntaxKind.TypeParameterDeclaration:
-                            this.write((type as cs.TypeParameterDeclaration).name);
-                            break;
-                    }
+                    this.writeType(targetType);
                 }
 
+                if (typeReference.typeArguments) {
+                    this.write('<');
+                    this.writeCommaSeparated(typeReference.typeArguments, p => this.writeType(p));
+                    this.write('>');
+                }
+                break;
+            case cs.SyntaxKind.ClassDeclaration:
+            case cs.SyntaxKind.InterfaceDeclaration:
+            case cs.SyntaxKind.EnumDeclaration:
+            case cs.SyntaxKind.DelegateDeclaration:
+                this.write(this.getFullName(type as cs.NamedTypeDeclaration));
+                break;
+            case cs.SyntaxKind.TypeParameterDeclaration:
+                this.write((type as cs.TypeParameterDeclaration).name);
                 break;
             default:
                 this.write('TODO');
                 break;
+        }
+        if (type.isNullable) {
+            this.write('?');
         }
     }
 

@@ -14,7 +14,7 @@ export declare class jQuery extends Array<HTMLElement> {
 
     public readonly length: number;
 
-    public data(key: string): object;
+    public data(key: string): unknown;
     public data(key: string, value: any): void;
 
     public removeData(key: string): void;

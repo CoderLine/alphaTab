@@ -96,7 +96,12 @@ export interface MemberDeclaration extends NamedElement, DocumentedElement, Node
     isStatic: boolean;
 }
 
-export interface MethodDeclaration extends MemberDeclaration {
+export interface MethodDeclarationBase extends MemberDeclaration {
+    parameters: ParameterDeclaration[];
+    body?: Block | Expression;
+}
+
+export interface MethodDeclaration extends MethodDeclarationBase {
     isVirtual: boolean;
     isOverride: boolean;
     isAbstract: boolean;
@@ -106,9 +111,7 @@ export interface MethodDeclaration extends MemberDeclaration {
     typeParameters?: TypeParameterDeclaration[];
 }
 
-export interface ConstructorDeclaration extends MemberDeclaration {
-    parameters: ParameterDeclaration[];
-    body?: Block | Expression;
+export interface ConstructorDeclaration extends MethodDeclarationBase {
     baseConstructorArguments?: Expression[];
 }
 
@@ -149,6 +152,8 @@ export interface ParameterDeclaration extends NamedElement, Node {
 }
 
 export interface TypeNode extends Node {
+    isNullable?: boolean;
+    isOptional?: boolean;
 }
 
 export interface UnresolvedTypeNode extends TypeNode {
@@ -157,6 +162,7 @@ export interface UnresolvedTypeNode extends TypeNode {
 
 export interface TypeReference extends TypeNode {
     reference: NamedTypeDeclaration | TypeParameterDeclaration | PrimitiveTypeNode | string;
+    typeArguments?: TypeNode[]
 }
 
 export interface ArrayTypeNode extends TypeNode {
@@ -174,7 +180,6 @@ export enum PrimitiveType {
 
 export interface PrimitiveTypeNode extends TypeNode {
     type: PrimitiveType;
-    isNullable: boolean;
 }
 
 export interface Statement extends Node {
