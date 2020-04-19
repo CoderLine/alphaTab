@@ -500,7 +500,6 @@ export default class CSharpAstTransformer {
         parent.members.push(csProperty);
     }
 
-
     private visitGetAccessor(parent: cs.ClassDeclaration, classElement: ts.GetAccessorDeclaration) {
         const propertyName = this._context.toPascalCase(classElement.name.getText());
         const member = parent.members.find(m => m.name === propertyName);
@@ -1263,6 +1262,93 @@ export default class CSharpAstTransformer {
     }
 
     private visitExpression(parent: cs.Node, expression: ts.Expression): cs.Expression {
+        switch (expression.kind) {
+            case ts.SyntaxKind.OmittedExpression:
+                break;
+            case ts.SyntaxKind.PartiallyEmittedExpression:
+                break;
+            case ts.SyntaxKind.PrefixUnaryExpression:
+                break;
+            case ts.SyntaxKind.PostfixUnaryExpression:
+                break;
+            case ts.SyntaxKind.NullKeyword:
+                break;
+            case ts.SyntaxKind.TrueKeyword:
+                break;
+            case ts.SyntaxKind.FalseKeyword:
+                break;
+            case ts.SyntaxKind.ThisKeyword:
+                break;
+            case ts.SyntaxKind.SuperKeyword:
+                break;
+            case ts.SyntaxKind.ImportKeyword:
+                break;
+            case ts.SyntaxKind.DeleteExpression:
+                break;
+            case ts.SyntaxKind.TypeOfExpression:
+                break;
+            case ts.SyntaxKind.VoidExpression:
+                break;
+            case ts.SyntaxKind.AwaitExpression:
+                break;
+            case ts.SyntaxKind.YieldExpression:
+                break;
+            case ts.SyntaxKind.SyntheticExpression:
+                break;
+            case ts.SyntaxKind.BinaryExpression:
+                break;
+            case ts.SyntaxKind.ConditionalExpression:
+                break;
+            case ts.SyntaxKind.FunctionExpression:
+                break;
+            case ts.SyntaxKind.ArrowFunction:
+                break;
+            case ts.SyntaxKind.RegularExpressionLiteral:
+                break;
+            case ts.SyntaxKind.NumericLiteral:
+                break;
+            case ts.SyntaxKind.BigIntLiteral:
+                break;
+            case ts.SyntaxKind.TemplateHead:
+                break;
+            case ts.SyntaxKind.TemplateMiddle:
+                break;
+            case ts.SyntaxKind.TemplateTail:
+                break;
+            case ts.SyntaxKind.TemplateExpression:
+                break;
+            case ts.SyntaxKind.TaggedTemplateExpression:
+                break;
+            case ts.SyntaxKind.TypeAssertionExpression:
+                break;
+            case ts.SyntaxKind.TemplateSpan:
+                break;
+            case ts.SyntaxKind.ParenthesizedExpression:
+                break;
+            case ts.SyntaxKind.ArrayLiteralExpression:
+                break;
+            case ts.SyntaxKind.SpreadElement:
+                break;
+            case ts.SyntaxKind.PropertyAccessExpression:
+                break;
+            case ts.SyntaxKind.JsxExpression:
+                break;
+            case ts.SyntaxKind.JSDocTypeExpression:
+                break;
+            case ts.SyntaxKind.ObjectLiteralExpression:
+                break;
+            case ts.SyntaxKind.ElementAccessExpression:
+                break;
+            case ts.SyntaxKind.CallExpression:
+                break;
+            case ts.SyntaxKind.NewExpression:
+                break;
+            case ts.SyntaxKind.ClassExpression:
+                break;
+            case ts.SyntaxKind.ExpressionWithTypeArguments:
+                break;
+        }
+
         return {
             nodeType: cs.SyntaxKind.ToDoExpression,
             parent: parent,

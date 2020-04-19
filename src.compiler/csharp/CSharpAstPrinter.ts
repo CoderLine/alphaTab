@@ -326,13 +326,13 @@ export default class CSharpAstPrinter {
             this.writePropertyAccessor(d.setAccessor);
         }
 
+        this.endBlock();
+
         if (d.initializer) {
             this.write(' = ');
             this.writeExpression(d.initializer);
             this.writeLine(';');
         }
-
-        this.endBlock();
     }
 
     private writePropertyAccessor(accessor: cs.PropertyAccessorDeclaration) {
@@ -517,24 +517,24 @@ export default class CSharpAstPrinter {
     private writeTryStatement(s: cs.TryStatement) {
         this.writeLine('try');
         this.writeBlock(s.tryBlock);
-        if(s.catchClauses) {
-            s.catchClauses.forEach(c=>this.writeCatchClause(c));
+        if (s.catchClauses) {
+            s.catchClauses.forEach(c => this.writeCatchClause(c));
         }
-        if(s.finallyBlock) {
+        if (s.finallyBlock) {
             this.writeLine('finally');
             this.writeBlock(s.finallyBlock);
         }
     }
 
     private writeCatchClause(c: cs.CatchClause): void {
-        this.write('catch (')
+        this.write('catch (');
         this.writeType(c.variableDeclaration.type);
         this.write(' ');
         this.write(c.variableDeclaration.name);
         this.writeLine(')');
         this.writeBlock(c.block);
     }
-    
+
     private writeThrowStatement(s: cs.ThrowStatement) {
         this.write('throw');
         if (s.expression) {
@@ -561,7 +561,7 @@ export default class CSharpAstPrinter {
     }
 
     private writeCaseClause(c: cs.CaseClause) {
-        this.writeLine('case ');
+        this.write('case ');
         this.writeExpression(c.expression);
         this.writeLine(':');
         this._indent++;
@@ -710,7 +710,7 @@ export default class CSharpAstPrinter {
             } else {
                 this.write(', ');
             }
-            
+
             this.write(d.name);
             if (d.initializer) {
                 this.write(' = ');
