@@ -475,7 +475,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
-            name: this.toPascalCase((classElement.name as ts.Identifier).text),
+            name: this._context.toPascalCase((classElement.name as ts.Identifier).text),
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: cs.Visibility.None,
             tsNode: classElement
@@ -500,12 +500,9 @@ export default class CSharpAstTransformer {
         parent.members.push(csProperty);
     }
 
-    private toPascalCase(text: string): string {
-        return text ? text.substr(0, 1).toUpperCase() + text.substr(1) : '';
-    }
 
     private visitGetAccessor(parent: cs.ClassDeclaration, classElement: ts.GetAccessorDeclaration) {
-        const propertyName = this.toPascalCase(classElement.name.getText());
+        const propertyName = this._context.toPascalCase(classElement.name.getText());
         const member = parent.members.find(m => m.name === propertyName);
         if (member && member.nodeType === cs.SyntaxKind.PropertyDeclaration) {
             let existingProperty = member as cs.PropertyDeclaration;
@@ -547,7 +544,7 @@ export default class CSharpAstTransformer {
     }
 
     private visitSetAccessor(parent: cs.ClassDeclaration, classElement: ts.SetAccessorDeclaration) {
-        const propertyName = this.toPascalCase(classElement.name.getText());
+        const propertyName = this._context.toPascalCase(classElement.name.getText());
         const member = parent.members.find(m => m.name === propertyName);
         if (member && member.nodeType === cs.SyntaxKind.PropertyDeclaration) {
             let existingProperty = member as cs.PropertyDeclaration;
@@ -604,7 +601,7 @@ export default class CSharpAstTransformer {
                 isOverride: false,
                 isStatic: false,
                 isVirtual: false,
-                name: this.toPascalCase(classElement.name.getText()),
+                name: this._context.toPascalCase(classElement.name.getText()),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
                 visibility: visibility,
                 tsNode: classElement
@@ -661,7 +658,7 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.FieldDeclaration,
             isStatic: false,
             isReadonly: false,
-            name: this.toPascalCase(classElement.name.getText()),
+            name: this._context.toPascalCase(classElement.name.getText()),
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: cs.Visibility.Private,
             tsNode: classElement
@@ -707,7 +704,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
-            name: this.toPascalCase((classElement.name as ts.Identifier).text),
+            name: this._context.toPascalCase((classElement.name as ts.Identifier).text),
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: this.mapVisibility(classElement.modifiers),
@@ -756,6 +753,74 @@ export default class CSharpAstTransformer {
         parent.members.push(csMethod);
     }
 
+    private visitStatement(parent: cs.Node, s: ts.Statement): cs.Statement {
+        switch (s.kind) {
+            case ts.SyntaxKind.EmptyStatement:
+                return this.visitEmptyStatement(parent, s as ts.EmptyStatement);
+            case ts.SyntaxKind.DebuggerStatement:
+                return this.visitDebuggerStatement(parent, s as ts.DebuggerStatement);
+            case ts.SyntaxKind.Block:
+                return this.visitBlock(parent, s as ts.Block);
+            case ts.SyntaxKind.VariableStatement:
+                return this.visitVariableStatement(parent, s as ts.VariableStatement);
+            case ts.SyntaxKind.ExpressionStatement:
+                return this.visitExpressionStatement(parent, s as ts.ExpressionStatement);
+            case ts.SyntaxKind.IfStatement:
+                return this.visitIfStatement(parent, s as ts.IfStatement);
+            case ts.SyntaxKind.DoStatement:
+                return this.visitDoStatement(parent, s as ts.DoStatement);
+            case ts.SyntaxKind.WhileStatement:
+                return this.visitWhileStatement(parent, s as ts.WhileStatement);
+            case ts.SyntaxKind.ForStatement:
+                return this.visitForStatement(parent, s as ts.ForStatement);
+            case ts.SyntaxKind.ForOfStatement:
+                return this.visitForOfStatement(parent, s as ts.ForOfStatement);
+            case ts.SyntaxKind.ForInStatement:
+                return this.visitForInStatement(parent, s as ts.ForInStatement);
+            case ts.SyntaxKind.BreakStatement:
+                return this.visitBreakStatement(parent, s as ts.BreakStatement);
+            case ts.SyntaxKind.ContinueStatement:
+                return this.visitContinueStatement(parent, s as ts.ContinueStatement);
+            case ts.SyntaxKind.ReturnStatement:
+                return this.visitReturnStatement(parent, s as ts.ReturnStatement);
+            case ts.SyntaxKind.WithStatement:
+                this._context.addTsNodeDiagnostics(s, 'With statement is not supported', ts.DiagnosticCategory.Error);
+                return {} as cs.ThrowStatement;
+            case ts.SyntaxKind.SwitchStatement:
+                return this.visitSwitchStatement(parent, s as ts.SwitchStatement);
+            case ts.SyntaxKind.LabeledStatement:
+                this._context.addTsNodeDiagnostics(
+                    s,
+                    'Labeled statement is not supported',
+                    ts.DiagnosticCategory.Error
+                );
+                return {} as cs.ThrowStatement;
+            case ts.SyntaxKind.ThrowStatement:
+                return this.visitThrowStatement(parent, s as ts.ThrowStatement);
+            case ts.SyntaxKind.TryStatement:
+                return this.visitTryStatement(parent, s as ts.TryStatement);
+        }
+        return {} as cs.ThrowStatement;
+    }
+
+    private visitEmptyStatement(parent: cs.Node, s: ts.EmptyStatement) {
+        return {
+            nodeType: cs.SyntaxKind.EmptyStatement,
+            parent: parent,
+            tsNode: s
+        } as cs.EmptyStatement;
+    }
+    private visitDebuggerStatement(parent: cs.Node, s: ts.DebuggerStatement) {
+        return {} as cs.ThrowStatement;
+
+        // {
+        //     nodeType: cs.SyntaxKind.ExpressionStatement,
+        //     parent: parent,
+        //     tsNode: s,
+        //     expression: {} as cs.Expression // TOOD: call System.Diagnostics.Debugger.Break();
+        // } as cs.ExpressionStatement;
+    }
+
     private visitBlock(parent: cs.Node, block: ts.Block): cs.Block {
         const csBlock: cs.Block = {
             nodeType: cs.SyntaxKind.Block,
@@ -774,8 +839,326 @@ export default class CSharpAstTransformer {
         return csBlock;
     }
 
-    private visitStatement(parent: cs.Block, s: ts.Statement): cs.Statement | null {
-        return null;
+    private visitVariableStatement(parent: cs.Node, s: ts.VariableStatement) {
+        const variableStatement = {
+            nodeType: cs.SyntaxKind.VariableStatement,
+            parent: parent,
+            tsNode: s,
+            declarationList: {} as cs.VariableDeclarationList
+        } as cs.VariableStatement;
+
+        variableStatement.declarationList = this.visitVariableDeclarationList(variableStatement, s.declarationList);
+
+        return variableStatement;
+    }
+
+    private visitVariableDeclarationList(parent: cs.Node, s: ts.VariableDeclarationList): cs.VariableDeclarationList {
+        const variableStatement = {
+            nodeType: cs.SyntaxKind.VariableDeclarationList,
+            parent: parent,
+            tsNode: s,
+            declarations: []
+        } as cs.VariableDeclarationList;
+
+        s.declarations.forEach(d =>
+            variableStatement.declarations.push(this.visitVariableDeclaration(variableStatement, d))
+        );
+
+        return variableStatement;
+    }
+    private visitVariableDeclaration(parent: cs.Node, s: ts.VariableDeclaration): cs.VariableDeclaration {
+        const symbol = this._context.typeChecker.getSymbolAtLocation(s.name);
+        const type = this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, s);
+
+        const variableStatement = {
+            nodeType: cs.SyntaxKind.VariableDeclaration,
+            parent: parent,
+            tsNode: s,
+            name: s.name.getText(),
+            type: this.createUnresolvedTypeNode(null, s.type ?? s, type)
+        } as cs.VariableDeclaration;
+
+        variableStatement.type.parent = variableStatement;
+
+        if (s.initializer) {
+            variableStatement.initializer = this.visitExpression(variableStatement, s.initializer);
+        }
+
+        return variableStatement;
+    }
+
+    private visitExpressionStatement(parent: cs.Node, s: ts.ExpressionStatement) {
+        const expressionStatement = {
+            nodeType: cs.SyntaxKind.ExpressionStatement,
+            parent: parent,
+            tsNode: s,
+            expression: {} as cs.Expression
+        } as cs.ExpressionStatement;
+
+        expressionStatement.expression = this.visitExpression(expressionStatement, s.expression);
+
+        return expressionStatement;
+    }
+
+    private visitIfStatement(parent: cs.Node, s: ts.IfStatement) {
+        const ifStatement = {
+            nodeType: cs.SyntaxKind.IfStatement,
+            parent: parent,
+            tsNode: s,
+            expression: {} as cs.Expression,
+            thenStatement: {} as cs.Statement
+        } as cs.IfStatement;
+
+        ifStatement.expression = this.visitExpression(ifStatement, s.expression);
+        ifStatement.thenStatement = this.visitStatement(ifStatement, s.thenStatement);
+
+        if (s.thenStatement) {
+            ifStatement.thenStatement = this.visitStatement(ifStatement, s.thenStatement);
+        }
+
+        return ifStatement;
+    }
+
+    private visitDoStatement(parent: cs.Node, s: ts.DoStatement) {
+        const doStatement = {
+            nodeType: cs.SyntaxKind.DoStatement,
+            parent: parent,
+            tsNode: s,
+            expression: {} as cs.Expression,
+            statement: {} as cs.Statement
+        } as cs.DoStatement;
+
+        doStatement.expression = this.visitExpression(doStatement, s.expression);
+        doStatement.statement = this.visitStatement(doStatement, s.statement);
+
+        return doStatement;
+    }
+
+    private visitWhileStatement(parent: cs.Node, s: ts.WhileStatement) {
+        const whileStatement = {
+            nodeType: cs.SyntaxKind.WhileStatement,
+            parent: parent,
+            tsNode: s,
+            expression: {} as cs.Expression,
+            statement: {} as cs.Statement
+        } as cs.WhileStatement;
+
+        whileStatement.expression = this.visitExpression(whileStatement, s.expression);
+        whileStatement.statement = this.visitStatement(whileStatement, s.statement);
+
+        return whileStatement;
+    }
+
+    private visitForStatement(parent: cs.Node, s: ts.ForStatement) {
+        const forStatement = {
+            nodeType: cs.SyntaxKind.ForStatement,
+            parent: parent,
+            tsNode: s,
+            statement: {} as cs.Statement
+        } as cs.ForStatement;
+
+        if (s.initializer) {
+            if (ts.isVariableDeclarationList(s.initializer)) {
+                forStatement.initializer = this.visitVariableDeclarationList(forStatement, s.initializer);
+            } else {
+                forStatement.initializer = this.visitExpression(forStatement, s.initializer);
+            }
+        }
+        if (s.condition) {
+            forStatement.condition = this.visitExpression(forStatement, s.condition);
+        }
+
+        if (s.incrementor) {
+            forStatement.incrementor = this.visitExpression(forStatement, s.incrementor);
+        }
+
+        forStatement.statement = this.visitStatement(forStatement, s.statement);
+
+        return forStatement;
+    }
+
+    private visitForOfStatement(parent: cs.Node, s: ts.ForOfStatement) {
+        const forEachStatement = {
+            nodeType: cs.SyntaxKind.ForEachStatement,
+            parent: parent,
+            tsNode: s,
+            statement: {} as cs.Statement,
+            expression: {} as cs.Expression,
+            initializer: {} as cs.VariableDeclaration
+        } as cs.ForEachStatement;
+
+        if (ts.isVariableDeclarationList(s.initializer)) {
+            forEachStatement.initializer = this.visitVariableDeclarationList(forEachStatement, s.initializer);
+        } else {
+            forEachStatement.initializer = this.visitExpression(forEachStatement, s.initializer);
+        }
+
+        forEachStatement.expression = this.visitExpression(forEachStatement, s.expression);
+        forEachStatement.statement = this.visitStatement(forEachStatement, s.statement);
+
+        return forEachStatement;
+    }
+    private visitForInStatement(parent: cs.Node, s: ts.ForInStatement) {
+        // TODO: Detect raw object iteration and map it
+        const forEachStatement = {
+            nodeType: cs.SyntaxKind.ForEachStatement,
+            parent: parent,
+            tsNode: s,
+            statement: {} as cs.Statement,
+            expression: {} as cs.Expression,
+            initializer: {} as cs.VariableDeclaration
+        } as cs.ForEachStatement;
+
+        if (ts.isVariableDeclarationList(s.initializer)) {
+            forEachStatement.initializer = this.visitVariableDeclarationList(forEachStatement, s.initializer);
+        } else {
+            forEachStatement.initializer = this.visitExpression(forEachStatement, s.initializer);
+        }
+
+        forEachStatement.expression = this.visitExpression(forEachStatement, s.expression);
+        forEachStatement.statement = this.visitStatement(forEachStatement, s.statement);
+
+        return forEachStatement;
+    }
+
+    private visitBreakStatement(parent: cs.Node, s: ts.BreakStatement) {
+        const breakStatement = {
+            nodeType: cs.SyntaxKind.BreakStatement,
+            parent: parent,
+            tsNode: s
+        } as cs.BreakStatement;
+
+        return breakStatement;
+    }
+
+    private visitContinueStatement(parent: cs.Node, s: ts.ContinueStatement) {
+        const continueStatement = {
+            nodeType: cs.SyntaxKind.ContinueStatement,
+            parent: parent,
+            tsNode: s
+        } as cs.ContinueStatement;
+
+        return continueStatement;
+    }
+
+    private visitReturnStatement(parent: cs.Node, s: ts.ReturnStatement) {
+        const returnStatement = {
+            nodeType: cs.SyntaxKind.ReturnStatement,
+            parent: parent,
+            tsNode: s
+        } as cs.ReturnStatement;
+
+        if (s.expression) {
+            returnStatement.expression = this.visitExpression(returnStatement, s.expression);
+        }
+
+        return returnStatement;
+    }
+
+    private visitSwitchStatement(parent: cs.Node, s: ts.SwitchStatement) {
+        const switchStatement = {
+            nodeType: cs.SyntaxKind.SwitchStatement,
+            parent: parent,
+            tsNode: s,
+            expression: {} as cs.Expression,
+            caseClauses: []
+        } as cs.SwitchStatement;
+
+        switchStatement.expression = this.visitExpression(switchStatement, s.expression);
+        s.caseBlock.clauses.forEach(c => {
+            if (ts.isDefaultClause(c)) {
+                switchStatement.caseClauses.push(this.visitDefaultClause(switchStatement, c));
+            } else {
+                switchStatement.caseClauses.push(this.visitCaseClause(switchStatement, c));
+            }
+        });
+
+        return switchStatement;
+    }
+
+    private visitDefaultClause(parent: cs.SwitchStatement, s: ts.DefaultClause): cs.DefaultClause {
+        const defaultClause = {
+            nodeType: cs.SyntaxKind.DefaultClause,
+            parent: parent,
+            tsNode: s,
+            statements: []
+        } as cs.DefaultClause;
+
+        s.statements.forEach(c => {
+            const statement = this.visitStatement(defaultClause, c);
+            if (statement) {
+                defaultClause.statements.push(statement);
+            }
+        });
+
+        return defaultClause;
+    }
+
+    private visitCaseClause(parent: cs.SwitchStatement, s: ts.CaseClause): cs.CaseClause {
+        const caseClause = {
+            nodeType: cs.SyntaxKind.CaseClause,
+            parent: parent,
+            tsNode: s,
+            expression: {} as cs.Expression,
+            statements: []
+        } as cs.CaseClause;
+
+        caseClause.expression = this.visitExpression(caseClause, s.expression);
+        s.statements.forEach(c => {
+            const statement = this.visitStatement(caseClause, c);
+            if (statement) {
+                caseClause.statements.push(statement);
+            }
+        });
+
+        return caseClause;
+    }
+
+    private visitThrowStatement(parent: cs.Node, s: ts.ThrowStatement) {
+        const throwStatement = {
+            nodeType: cs.SyntaxKind.ThrowStatement,
+            parent: parent,
+            tsNode: s
+        } as cs.ThrowStatement;
+
+        if (s.expression) {
+            throwStatement.expression = this.visitExpression(throwStatement, s.expression);
+        }
+
+        return throwStatement;
+    }
+    private visitTryStatement(parent: cs.Node, s: ts.TryStatement) {
+        const tryStatement = {
+            nodeType: cs.SyntaxKind.TryStatement,
+            parent: parent,
+            tsNode: s,
+            tryBlock: {} as cs.Block
+        } as cs.TryStatement;
+
+        tryStatement.tryBlock = this.visitBlock(tryStatement, s.tryBlock);
+        if (s.catchClause) {
+            tryStatement.catchClauses = [
+                // TODO: detect type checks and convert them to catch clauses
+                this.visitCatchClause(tryStatement, s.catchClause)
+            ];
+        }
+
+        return tryStatement;
+    }
+
+    private visitCatchClause(parent: cs.TryStatement, s: ts.CatchClause): cs.CatchClause {
+        const catchClause = {
+            nodeType: cs.SyntaxKind.CatchClause,
+            parent: parent,
+            tsNode: s,
+            variableDeclaration: {} as cs.VariableDeclaration,
+            block: {} as cs.Block
+        } as cs.CatchClause;
+
+        catchClause.variableDeclaration = this.visitVariableDeclaration(catchClause, s.variableDeclaration!);
+        catchClause.block = this.visitBlock(catchClause, s.block);
+
+        return catchClause;
     }
 
     private visitMethodSignature(
@@ -792,7 +1175,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
-            name: this.toPascalCase((classElement.name as ts.Identifier).text),
+            name: this._context.toPascalCase((classElement.name as ts.Identifier).text),
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: cs.Visibility.None,
@@ -879,8 +1262,12 @@ export default class CSharpAstTransformer {
         parent.members.push(csConstructor);
     }
 
-    private visitExpression(parent: cs.Node, expression: ts.Expression): cs.Expression | undefined {
-        return undefined;
+    private visitExpression(parent: cs.Node, expression: ts.Expression): cs.Expression {
+        return {
+            nodeType: cs.SyntaxKind.ToDoExpression,
+            parent: parent,
+            tsNode: expression
+        } as cs.Expression;
     }
 
     private removeExtension(fileName: string) {

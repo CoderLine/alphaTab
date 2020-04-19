@@ -233,8 +233,8 @@ export default class CSharpAstPrinter {
             if (p.documentation) {
                 this.write(`/// <param cref="${p.name}">`);
                 this.writeDocumentationLines(p.documentation, false);
-                if(this._isStartOfLine) {
-                    this.write('/// ')
+                if (this._isStartOfLine) {
+                    this.write('/// ');
                 }
                 this.writeLine('</param>');
             }
@@ -464,8 +464,263 @@ export default class CSharpAstPrinter {
         this.write('/* TODO */');
     }
 
-    private writeStatement(stmt: cs.Statement) {
-        this.write('/* TODO */');
+    private writeStatement(s: cs.Statement) {
+        switch (s.nodeType) {
+            case cs.SyntaxKind.EmptyStatement:
+                this.writeEmptyStatement(s as cs.EmptyStatement);
+                break;
+            case cs.SyntaxKind.Block:
+                this.writeBlock(s as cs.Block);
+                break;
+            case cs.SyntaxKind.VariableStatement:
+                this.writeVariableStatement(s as cs.VariableStatement);
+                break;
+            case cs.SyntaxKind.ExpressionStatement:
+                this.writeExpressionStatement(s as cs.ExpressionStatement);
+                break;
+            case cs.SyntaxKind.IfStatement:
+                this.writeIfStatement(s as cs.IfStatement);
+                break;
+            case cs.SyntaxKind.DoStatement:
+                this.writeDoStatement(s as cs.DoStatement);
+                break;
+            case cs.SyntaxKind.WhileStatement:
+                this.writeWhileStatement(s as cs.WhileStatement);
+                break;
+            case cs.SyntaxKind.ForStatement:
+                this.writeForStatement(s as cs.ForStatement);
+                break;
+            case cs.SyntaxKind.ForEachStatement:
+                this.writeForEachStatement(s as cs.ForEachStatement);
+                break;
+            case cs.SyntaxKind.BreakStatement:
+                this.writeBreakStatement(s as cs.BreakStatement);
+                break;
+            case cs.SyntaxKind.ContinueStatement:
+                this.writeContinueStatement(s as cs.ContinueStatement);
+                break;
+            case cs.SyntaxKind.ReturnStatement:
+                this.writeReturnStatement(s as cs.ReturnStatement);
+                break;
+            case cs.SyntaxKind.SwitchStatement:
+                this.writeSwitchStatement(s as cs.SwitchStatement);
+                break;
+            case cs.SyntaxKind.ThrowStatement:
+                this.writeThrowStatement(s as cs.ThrowStatement);
+                break;
+            case cs.SyntaxKind.TryStatement:
+                this.writeTryStatement(s as cs.TryStatement);
+                break;
+        }
+    }
+
+    private writeTryStatement(s: cs.TryStatement) {
+        this.writeLine('try');
+        this.writeBlock(s.tryBlock);
+        if(s.catchClauses) {
+            s.catchClauses.forEach(c=>this.writeCatchClause(c));
+        }
+        if(s.finallyBlock) {
+            this.writeLine('finally');
+            this.writeBlock(s.finallyBlock);
+        }
+    }
+
+    private writeCatchClause(c: cs.CatchClause): void {
+        this.write('catch (')
+        this.writeType(c.variableDeclaration.type);
+        this.write(' ');
+        this.write(c.variableDeclaration.name);
+        this.writeLine(')');
+        this.writeBlock(c.block);
+    }
+    
+    private writeThrowStatement(s: cs.ThrowStatement) {
+        this.write('throw');
+        if (s.expression) {
+            this.write(' ');
+            this.writeExpression(s.expression);
+        }
+    }
+
+    private writeSwitchStatement(s: cs.SwitchStatement) {
+        this.write('switch (');
+        this.writeExpression(s.expression);
+        this.writeLine(')');
+        this.beginBlock();
+
+        s.caseClauses.forEach(c => {
+            if (c.nodeType === cs.SyntaxKind.DefaultClause) {
+                this.writeDefaultClause(c as cs.DefaultClause);
+            } else {
+                this.writeCaseClause(c as cs.CaseClause);
+            }
+        });
+
+        this.endBlock();
+    }
+
+    private writeCaseClause(c: cs.CaseClause) {
+        this.writeLine('case ');
+        this.writeExpression(c.expression);
+        this.writeLine(':');
+        this._indent++;
+        c.statements.forEach(s => this.writeStatement(s));
+        this._indent--;
+    }
+
+    private writeDefaultClause(c: cs.DefaultClause) {
+        this.writeLine('default:');
+        this._indent++;
+        c.statements.forEach(s => this.writeStatement(s));
+        this._indent--;
+    }
+
+    private writeReturnStatement(r: cs.ReturnStatement) {
+        this.write('return');
+        if (r.expression) {
+            this.write(' ');
+            this.writeExpression(r.expression);
+        }
+        this.writeLine(';');
+    }
+
+    private writeContinueStatement(_: cs.ContinueStatement) {
+        this.writeLine('continue;');
+    }
+
+    private writeBreakStatement(_: cs.BreakStatement) {
+        this.writeLine('break;');
+    }
+
+    private writeForEachStatement(s: cs.ForEachStatement) {
+        this.write('foreach (');
+        if (s.nodeType === cs.SyntaxKind.VariableDeclarationList) {
+            this.writeVariableDeclarationList(s.initializer as cs.VariableDeclarationList);
+        } else {
+            this.writeExpression(s.initializer as cs.Expression);
+        }
+        this.write(' in ');
+        this.writeExpression(s.expression);
+        this.writeLine(')');
+
+        if (s.statement.nodeType === cs.SyntaxKind.Block) {
+            this.writeStatement(s.statement);
+        } else {
+            this._indent++;
+            this.writeStatement(s.statement);
+            this._indent--;
+        }
+    }
+
+    private writeForStatement(s: cs.ForStatement) {
+        this.write('for (');
+        if (s.initializer) {
+            if (s.nodeType === cs.SyntaxKind.VariableDeclarationList) {
+                this.writeVariableDeclarationList(s.initializer as cs.VariableDeclarationList);
+            } else {
+                this.writeExpression(s.initializer as cs.Expression);
+            }
+        }
+        this.write(';');
+
+        if (s.condition) {
+            this.writeExpression(s.condition);
+        }
+        this.write(';');
+
+        if (s.incrementor) {
+            this.writeExpression(s.incrementor);
+        }
+        this.writeLine(')');
+
+        if (s.statement.nodeType === cs.SyntaxKind.Block) {
+            this.writeStatement(s.statement);
+        } else {
+            this._indent++;
+            this.writeStatement(s.statement);
+            this._indent--;
+        }
+    }
+
+    private writeWhileStatement(s: cs.WhileStatement) {
+        this.write('while (');
+        this.writeExpression(s.expression);
+        this.writeLine(')');
+        if (s.statement.nodeType === cs.SyntaxKind.Block) {
+            this.writeStatement(s.statement);
+        } else {
+            this._indent++;
+            this.writeStatement(s.statement);
+            this._indent--;
+        }
+    }
+
+    private writeDoStatement(s: cs.DoStatement) {
+        this.writeLine('do');
+        this.writeStatement(s.statement);
+        this.write('while (');
+        this.writeExpression(s.expression);
+        this.writeLine(');');
+    }
+
+    private writeIfStatement(s: cs.IfStatement) {
+        this.write('if (');
+        this.writeExpression(s.expression);
+        this.writeLine(')');
+        if (s.thenStatement.nodeType === cs.SyntaxKind.Block) {
+            this.writeStatement(s.thenStatement);
+        } else {
+            this._indent++;
+            this.writeStatement(s.thenStatement);
+            this._indent--;
+        }
+
+        if (s.elseStatement) {
+            this.write('else ');
+            if (s.elseStatement.nodeType === cs.SyntaxKind.IfStatement) {
+                this.writeStatement(s.elseStatement);
+            } else if (s.thenStatement.nodeType === cs.SyntaxKind.Block) {
+                this.writeLine();
+                this.writeStatement(s.thenStatement);
+            } else {
+                this.writeLine();
+                this._indent++;
+                this.writeStatement(s.thenStatement);
+                this._indent--;
+            }
+        }
+    }
+    private writeExpressionStatement(s: cs.ExpressionStatement) {
+        this.writeExpression(s);
+        this.writeLine(';');
+    }
+
+    private writeVariableStatement(v: cs.VariableStatement) {
+        this.writeVariableDeclarationList(v.declarationList);
+        this.writeLine(';');
+    }
+
+    private writeVariableDeclarationList(declarationList: cs.VariableDeclarationList) {
+        this.writeType(declarationList.declarations[0].type);
+
+        declarationList.declarations.forEach((d, i) => {
+            if (i === 0) {
+                this.write(' ');
+            } else {
+                this.write(', ');
+            }
+            
+            this.write(d.name);
+            if (d.initializer) {
+                this.write(' = ');
+                this.writeExpression(d.initializer);
+            }
+        });
+    }
+
+    private writeEmptyStatement(_: cs.EmptyStatement) {
+        this.writeLine(';');
     }
 
     private writeBlock(b: cs.Block) {

@@ -1,5 +1,6 @@
 import * as ts from 'typescript';
 
+// Base
 export enum SyntaxKind {
     SourceFile,
     UsingDeclaration,
@@ -19,15 +20,45 @@ export enum SyntaxKind {
     UnresolvedTypeNode,
     TypeReference,
     PrimitiveTypeNode,
-    Block,
     EnumMember,
-    ArrayTypeNode
+    ArrayTypeNode,
+
+    Block,
+    EmptyStatement,
+    VariableStatement,
+    ExpressionStatement,
+    IfStatement,
+    DoStatement,
+    WhileStatement,
+    ForStatement,
+    ForEachStatement,
+    BreakStatement,
+    ContinueStatement,
+    ReturnStatement,
+    SwitchStatement,
+    LabeledStatement,
+    ThrowStatement,
+    TryStatement,
+
+    VariableDeclarationList,
+    VariableDeclaration,
+    CaseClause,
+    DefaultClause,
+    CatchClause,
+
+    ToDoExpression
 }
 
 export interface Node {
     tsNode?: ts.Node;
     nodeType: SyntaxKind;
     parent: Node | null;
+}
+
+export interface SourceFile extends Node {
+    fileName: string;
+    usings: UsingDeclaration[];
+    namespace: NamespaceDeclaration;
 }
 
 export interface UsingDeclaration extends Node {
@@ -51,15 +82,16 @@ export enum Visibility {
 }
 
 export interface DocumentedElement {
-    documentation?: string
+    documentation?: string;
 }
 
 export interface NamedElement {
-    name: string
+    name: string;
 }
 
-export interface TypeParameterDeclaration extends NamedElement, Node {
-}
+// Declarations
+
+export interface TypeParameterDeclaration extends NamedElement, Node {}
 
 export interface NamedTypeDeclaration extends NamedElement, DocumentedElement, Node {
     typeParameters?: TypeParameterDeclaration[];
@@ -73,7 +105,13 @@ export interface ClassDeclaration extends NamedTypeDeclaration {
     members: ClassMember[];
 }
 
-export type ClassMember = ConstructorDeclaration | MethodDeclaration | FieldDeclaration | PropertyDeclaration | EventDeclaration | NamedTypeDeclaration;
+export type ClassMember =
+    | ConstructorDeclaration
+    | MethodDeclaration
+    | FieldDeclaration
+    | PropertyDeclaration
+    | EventDeclaration
+    | NamedTypeDeclaration;
 
 export interface EnumDeclaration extends NamedTypeDeclaration {
     members: EnumMember[];
@@ -89,7 +127,6 @@ export interface InterfaceDeclaration extends NamedTypeDeclaration {
 }
 
 export type InterfaceMember = MethodDeclaration | PropertyDeclaration | EventDeclaration;
-
 
 export interface MemberDeclaration extends NamedElement, DocumentedElement, Node {
     visibility: Visibility;
@@ -151,22 +188,24 @@ export interface ParameterDeclaration extends NamedElement, Node, DocumentedElem
     initializer?: Expression;
 }
 
+// Type System
+
 export interface TypeNode extends Node {
     isNullable?: boolean;
     isOptional?: boolean;
 }
 
 export interface UnresolvedTypeNode extends TypeNode {
-    tsType?: ts.Type
+    tsType?: ts.Type;
 }
 
 export interface TypeReference extends TypeNode {
     reference: NamedTypeDeclaration | TypeParameterDeclaration | PrimitiveTypeNode | string;
-    typeArguments?: TypeNode[]
+    typeArguments?: TypeNode[];
 }
 
 export interface ArrayTypeNode extends TypeNode {
-    elementType: TypeNode
+    elementType: TypeNode;
 }
 
 export enum PrimitiveType {
@@ -182,18 +221,102 @@ export interface PrimitiveTypeNode extends TypeNode {
     type: PrimitiveType;
 }
 
-export interface Statement extends Node {
-}
+// Expressions
+
+export interface Expression extends Node {}
+
+export interface ToDoExpression extends Node {}
+
+// Statements
+
+export interface Statement extends Node {}
 
 export interface Block extends Statement {
     statements: Statement[];
 }
 
-export interface Expression extends Node {
+export interface EmptyStatement extends Statement {}
+
+export interface VariableStatement extends Statement {
+    declarationList: VariableDeclarationList;
 }
 
-export interface SourceFile extends Node {
-    fileName: string;
-    usings: UsingDeclaration[];
-    namespace: NamespaceDeclaration;
+export interface ExpressionStatement extends Statement {
+    expression: Expression;
+}
+
+export interface IfStatement extends Statement {
+    expression: Expression;
+    thenStatement: Statement;
+    elseStatement?: Statement;
+}
+
+export interface DoStatement extends Statement {
+    expression: Expression;
+    statement: Statement;
+}
+
+export interface WhileStatement extends Statement {
+    expression: Expression;
+    statement: Statement;
+}
+
+export interface VariableDeclarationList extends Node {
+    declarations: VariableDeclaration[];
+}
+
+export interface VariableDeclaration extends Node {
+    type: TypeNode;
+    name: string;
+    initializer?: Expression;
+}
+
+export interface ForStatement extends Statement {
+    initializer?: VariableDeclarationList | Expression;
+    condition?: Expression;
+    incrementor?: Expression;
+    statement: Statement;
+}
+
+export interface ForEachStatement extends Statement {
+    initializer: VariableDeclarationList | Expression;
+    expression: Expression;
+    statement: Statement;
+}
+
+export interface BreakStatement extends Statement {}
+
+export interface ContinueStatement extends Statement {}
+
+export interface ReturnStatement extends Statement {
+    expression?: Expression;
+}
+
+export interface SwitchStatement extends Statement {
+    expression: Expression;
+    caseClauses: (CaseClause | DefaultClause)[];
+}
+
+export interface CaseClause extends Node {
+    expression: Expression;
+    statements: Statement[];
+}
+
+export interface DefaultClause extends Node {
+    statements: Statement[];
+}
+
+export interface ThrowStatement extends Statement {
+    expression?: Expression;
+}
+
+export interface TryStatement extends Statement {
+    tryBlock: Block;
+    catchClauses?: CatchClause[];
+    finallyBlock?: Block;
+}
+
+export interface CatchClause extends Node {
+    variableDeclaration: VariableDeclaration;
+    block: Block;
 }
