@@ -146,7 +146,7 @@ export interface DelegateDeclaration extends NamedTypeDeclaration {
     parameters: ParameterDeclaration[];
 }
 
-export interface ParameterDeclaration extends NamedElement, Node {
+export interface ParameterDeclaration extends NamedElement, Node, DocumentedElement {
     type: TypeNode;
     initializer?: Expression;
 }

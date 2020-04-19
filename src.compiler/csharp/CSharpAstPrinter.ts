@@ -72,9 +72,26 @@ export default class CSharpAstPrinter {
 
     private writeDocumentation(d: cs.DocumentedElement) {
         if (d.documentation) {
-            this.writeLine('/* TODO: Xml docs');
-            d.documentation.split('\n').forEach(line => this.writeLine(` * ${line}`));
-            this.writeLine('*/');
+            this.writeLine('/// <summary>');
+            this.writeDocumentationLines(d.documentation, true);
+            this.writeLine('/// </summary>');
+        }
+    }
+    private writeDocumentationLines(documentation: string, multiLine: boolean) {
+        const lines = documentation.split('\n');
+        if (lines.length > 1 || multiLine) {
+            if (!this._isStartOfLine) {
+                this.writeLine();
+            }
+            lines.forEach(line => {
+                this.writeLine(`/// ${line}`);
+            });
+        } else if (lines.length === 1) {
+            if (this._isStartOfLine) {
+                this.writeLine(`/// ${lines[0]}`);
+            } else {
+                this.write(lines[0]);
+            }
         }
     }
 
@@ -105,6 +122,7 @@ export default class CSharpAstPrinter {
     }
 
     private writeInterfaceDeclaration(d: cs.InterfaceDeclaration) {
+        this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
         this.write(`interface ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
@@ -123,6 +141,7 @@ export default class CSharpAstPrinter {
     }
 
     private writeEnumDeclaration(d: cs.EnumDeclaration) {
+        this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
         this.write(`enum ${d.name}`);
         this.writeLine();
@@ -143,6 +162,7 @@ export default class CSharpAstPrinter {
     }
 
     private writeClassDeclaration(d: cs.ClassDeclaration) {
+        this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
         this.write(`class ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
@@ -208,6 +228,18 @@ export default class CSharpAstPrinter {
     }
 
     private writeMethodDeclaration(d: cs.MethodDeclaration) {
+        this.writeDocumentation(d);
+        for (const p of d.parameters) {
+            if (p.documentation) {
+                this.write(`/// <param cref="${p.name}">`);
+                this.writeDocumentationLines(p.documentation, false);
+                if(this._isStartOfLine) {
+                    this.write('/// ')
+                }
+                this.writeLine('</param>');
+            }
+        }
+
         this.writeVisibility(d.visibility);
 
         if (d.isStatic) {
@@ -248,6 +280,7 @@ export default class CSharpAstPrinter {
     }
 
     private writeConstructorDeclaration(d: cs.ConstructorDeclaration) {
+        this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
         this.write(`${(d.parent as cs.ClassDeclaration).name}`);
         this.writeParameters(d.parameters);
@@ -262,6 +295,7 @@ export default class CSharpAstPrinter {
     }
 
     private writePropertyDeclaration(d: cs.PropertyDeclaration) {
+        this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
 
         if (d.isStatic) {
@@ -292,7 +326,7 @@ export default class CSharpAstPrinter {
             this.writePropertyAccessor(d.setAccessor);
         }
 
-        if(d.initializer) {
+        if (d.initializer) {
             this.write(' = ');
             this.writeExpression(d.initializer);
             this.writeLine(';');
@@ -307,6 +341,7 @@ export default class CSharpAstPrinter {
     }
 
     private writeFieldDeclarat1on(d: cs.FieldDeclaration) {
+        this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
 
         if (d.isStatic) {

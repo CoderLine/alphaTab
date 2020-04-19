@@ -227,6 +227,10 @@ export default class CSharpAstTransformer {
             tsNode: node
         };
 
+        if (node.name) {
+            csEnum.documentation = this.visitDocumentation(node.name);
+        }
+
         node.members.forEach(m => this.visitEnumMember(csEnum, m));
 
         this._csharpFile.namespace.declarations.push(csEnum);
@@ -238,11 +242,15 @@ export default class CSharpAstTransformer {
             parent: parent,
             tsNode: enumMember,
             nodeType: cs.SyntaxKind.EnumMember,
-            name: (enumMember.name as ts.Identifier).text
+            name: enumMember.name.getText()
         };
 
         if (enumMember.initializer) {
             csEnumMember.initializer = this.visitExpression(csEnumMember, enumMember.initializer);
+        }
+
+        if (enumMember.name) {
+            csEnumMember.documentation = this.visitDocumentation(enumMember.name);
         }
 
         parent.members.push(csEnumMember);
@@ -270,6 +278,10 @@ export default class CSharpAstTransformer {
             members: [],
             tsNode: node
         };
+
+        if (node.name) {
+            csInterface.documentation = this.visitDocumentation(node.name);
+        }
 
         if (node.typeParameters) {
             csInterface.typeParameters = node.typeParameters.map(p =>
@@ -341,6 +353,10 @@ export default class CSharpAstTransformer {
             members: []
         };
 
+        if (node.name) {
+            csClass.documentation = this.visitDocumentation(node.name);
+        }
+
         if (node.typeParameters) {
             csClass.typeParameters = node.typeParameters.map(p => this.visitTypeParameterDeclaration(csClass, p));
         }
@@ -357,6 +373,56 @@ export default class CSharpAstTransformer {
 
         this._csharpFile.namespace.declarations.push(csClass);
         this._context.registerSymbol(csClass, node);
+    }
+    private visitDocumentation(node: ts.Node): string | undefined {
+        let symbol = this._context.typeChecker.getSymbolAtLocation(node);
+        if (!symbol) {
+            return undefined;
+        }
+
+        const docs = symbol.getDocumentationComment(this._context.typeChecker);
+        if (!docs || docs.length === 0) {
+            return undefined;
+        }
+
+        let s = '';
+
+        for (const d of docs) {
+            switch ((ts.SymbolDisplayPartKind as any)[d.kind]) {
+                case ts.SymbolDisplayPartKind.text:
+                    s += d.text.split('\r').join('');
+                    break;
+                case ts.SymbolDisplayPartKind.lineBreak:
+                    s += '\n';
+                    break;
+                case ts.SymbolDisplayPartKind.space:
+                    s += ' ';
+                    break;
+                case ts.SymbolDisplayPartKind.aliasName:
+                case ts.SymbolDisplayPartKind.className:
+                case ts.SymbolDisplayPartKind.enumName:
+                case ts.SymbolDisplayPartKind.fieldName:
+                case ts.SymbolDisplayPartKind.interfaceName:
+                case ts.SymbolDisplayPartKind.keyword:
+                case ts.SymbolDisplayPartKind.numericLiteral:
+                case ts.SymbolDisplayPartKind.stringLiteral:
+                case ts.SymbolDisplayPartKind.localName:
+                case ts.SymbolDisplayPartKind.methodName:
+                case ts.SymbolDisplayPartKind.moduleName:
+                case ts.SymbolDisplayPartKind.operator:
+                case ts.SymbolDisplayPartKind.parameterName:
+                case ts.SymbolDisplayPartKind.propertyName:
+                case ts.SymbolDisplayPartKind.punctuation:
+                case ts.SymbolDisplayPartKind.typeParameterName:
+                case ts.SymbolDisplayPartKind.enumMemberName:
+                case ts.SymbolDisplayPartKind.functionName:
+                case ts.SymbolDisplayPartKind.regularExpressionLiteral:
+                    s += d.text.split('\r').join('');
+                    break;
+            }
+        }
+
+        return s;
     }
 
     private visitClassElement(parent: cs.ClassDeclaration, classElement: ts.ClassElement) {
@@ -414,6 +480,10 @@ export default class CSharpAstTransformer {
             visibility: cs.Visibility.None,
             tsNode: classElement
         };
+
+        if (classElement.name) {
+            csProperty.documentation = this.visitDocumentation(classElement.name);
+        }
 
         csProperty.type.parent = csProperty;
         csProperty.getAccessor = {
@@ -534,11 +604,15 @@ export default class CSharpAstTransformer {
                 isOverride: false,
                 isStatic: false,
                 isVirtual: false,
-                name: this.toPascalCase((classElement.name as ts.Identifier).text),
+                name: this.toPascalCase(classElement.name.getText()),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
                 visibility: visibility,
                 tsNode: classElement
             };
+
+            if (classElement.name) {
+                csProperty.documentation = this.visitDocumentation(classElement.name);
+            }
 
             let isReadonly = false;
             if (classElement.modifiers) {
@@ -587,11 +661,15 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.FieldDeclaration,
             isStatic: false,
             isReadonly: false,
-            name: this.toPascalCase((classElement.name as ts.Identifier).text),
+            name: this.toPascalCase(classElement.name.getText()),
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: cs.Visibility.Private,
             tsNode: classElement
         };
+
+        if (classElement.name) {
+            csField.documentation = this.visitDocumentation(classElement.name);
+        }
 
         if (classElement.modifiers) {
             classElement.modifiers.forEach(m => {
@@ -635,6 +713,10 @@ export default class CSharpAstTransformer {
             visibility: this.mapVisibility(classElement.modifiers),
             tsNode: classElement
         };
+
+        if (classElement.name) {
+            csMethod.documentation = this.visitDocumentation(classElement.name);
+        }
 
         if (classElement.modifiers) {
             classElement.modifiers.forEach(m => {
@@ -717,6 +799,10 @@ export default class CSharpAstTransformer {
             tsNode: classElement
         };
 
+        if (classElement.name) {
+            csMethod.documentation = this.visitDocumentation(classElement.name);
+        }
+
         csMethod.returnType.parent = csMethod;
 
         if (classElement.typeParameters && classElement.typeParameters.length > 0) {
@@ -761,6 +847,14 @@ export default class CSharpAstTransformer {
             type: this.createUnresolvedTypeNode(null, p.type ?? p, type)
         };
         csMethodParameter.type.parent = csMethodParameter;
+
+        if (p.questionToken) {
+            csMethodParameter.type.isOptional = true;
+        }
+
+        if (p.name) {
+            csMethodParameter.documentation = this.visitDocumentation(p.name);
+        }
 
         csMethod.parameters.push(csMethodParameter);
     }

@@ -105,12 +105,14 @@ export default class CSharpEmitterContext {
         }
 
         if (resolved) {
+            const wasOptional = node.isOptional;
             for (const prop of Object.getOwnPropertyNames(node)) {
                 delete (node as any)[prop];
             }
             for (const prop of Object.getOwnPropertyNames(resolved)) {
                 (node as any)[prop] = (resolved as any)[prop];
             }
+            node.isOptional = wasOptional;
             return node;
         }
 
