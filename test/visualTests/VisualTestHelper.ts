@@ -118,7 +118,7 @@ export class VisualTestHelper {
 
                 resolve(canvas);
             };
-            img.onerror = function (e) {
+            img.onerror = function (e: any) {
                 reject(e);
             };
         });
@@ -131,7 +131,7 @@ export class VisualTestHelper {
             img.onload = function () {
                 resolve(img);
             };
-            img.onerror = function (e) {
+            img.onerror = function (e: any) {
                 reject(e);
             };
         });

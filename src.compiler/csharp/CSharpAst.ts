@@ -46,6 +46,33 @@ export enum SyntaxKind {
     DefaultClause,
     CatchClause,
 
+    PrefixUnaryExpression,
+    PostfixUnaryExpression,
+    NullLiteral,
+    TrueLiteral,
+    FalseLiteralExpression,
+    ThisLiteral,
+    BaseLiteralExpression,
+    StringLiteral,
+    AwaitExpression,
+    BinaryExpression,
+    ConditionalExpression,
+    LambdaExpression,
+    NumericLiteral,
+    StringTemplateExpression,
+    IsExpression,
+    ParenthesizedExpression,
+    ArrayCreationExpression,
+    MemberAccessExpression,
+    AnonymousObjectCreationExpression,
+    AnonymousObjectProperty,
+    ElementAccessExpression,
+    InvocationExpression,
+    NewExpression,
+    CastExpression,
+    NonNullExpression,
+    NullSafeExpression,
+    Identifier,
     ToDoExpression
 }
 
@@ -184,7 +211,7 @@ export interface DelegateDeclaration extends NamedTypeDeclaration {
 }
 
 export interface ParameterDeclaration extends NamedElement, Node, DocumentedElement {
-    type: TypeNode;
+    type?: TypeNode;
     initializer?: Expression;
 }
 
@@ -197,6 +224,8 @@ export interface TypeNode extends Node {
 
 export interface UnresolvedTypeNode extends TypeNode {
     tsType?: ts.Type;
+    tsSymbol?: ts.Symbol;
+    typeArguments?: UnresolvedTypeNode[];
 }
 
 export interface TypeReference extends TypeNode {
@@ -209,9 +238,9 @@ export interface ArrayTypeNode extends TypeNode {
 }
 
 export enum PrimitiveType {
-    Boolean,
+    Bool,
     String,
-    Number,
+    Double,
     Void,
     Object,
     Dynamic
@@ -224,6 +253,115 @@ export interface PrimitiveTypeNode extends TypeNode {
 // Expressions
 
 export interface Expression extends Node {}
+
+export interface PrefixUnaryExpression extends Node {
+    operand: Expression;
+    operator: string;
+}
+
+export interface PostfixUnaryExpression extends Node {
+    operand: Expression;
+    operator: string;
+}
+
+export interface NullLiteral extends Node {}
+
+export interface BooleanLiteral extends Node {}
+
+export interface ThisLiteral extends Node {}
+
+export interface BaseLiteralExpression extends Node {}
+
+export interface StringLiteral extends Node {
+    text: string;
+}
+
+export interface AwaitExpression extends Node {
+    expression: Expression;
+}
+
+export interface BinaryExpression extends Node {
+    left: Expression;
+    operator: string;
+    right: Expression;
+}
+
+export interface ConditionalExpression extends Node {
+    condition: Expression;
+    whenTrue: Expression;
+    whenFalse: Expression;
+}
+
+export interface LambdaExpression extends Node {
+    parameters: ParameterDeclaration[];
+    body: Block | Expression;
+}
+
+export interface NumericLiteral extends Node {
+    value: string;
+}
+export interface StringTemplateExpression extends Node {
+    chunks: (StringLiteral | Expression)[];
+}
+
+export interface IsExpression extends Node {
+    expression: Expression;
+    type: TypeNode;
+    newName?: string;
+}
+export interface ParenthesizedExpression extends Node {
+    expression: Expression;
+}
+export interface ArrayCreationExpression extends Node {
+    type?: TypeNode;
+    values: Expression[];
+}
+export interface MemberAccessExpression extends Node {
+    expression: Expression;
+    member: string;
+}
+
+export interface AnonymousObjectCreationExpression extends Node {
+    properties: AnonymousObjectProperty[];
+}
+
+export interface AnonymousObjectProperty extends Node {
+    name: string;
+    value: Expression;
+}
+
+export interface ElementAccessExpression extends Node {
+    expression: Expression;
+    argumentExpression: Expression;
+}
+
+export interface InvocationExpression extends Node {
+    expression: Expression;
+    arguments: Expression[];
+    typeArguments?: TypeNode[];
+}
+
+export interface NewExpression extends Node {
+    type: TypeNode;
+    arguments: Expression[];
+}
+
+export interface CastExpression extends Node {
+    type: TypeNode;
+    expression: Expression;
+}
+
+export interface NonNullExpression extends Node {
+    expression: Expression;
+}
+
+export interface NullSafeExpression extends Node {
+    expression: Expression;
+}
+
+export interface Identifier extends Node {
+    text: string;
+}
 
 export interface ToDoExpression extends Node {}
 

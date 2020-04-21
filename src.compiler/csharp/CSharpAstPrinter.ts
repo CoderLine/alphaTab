@@ -110,13 +110,15 @@ export default class CSharpAstPrinter {
     }
 
     private writeParameter(p: cs.ParameterDeclaration) {
-        this.writeType(p.type);
+        if (p.type) {
+            this.writeType(p.type);
+        }
         this.write(` ${p.name}`);
 
         if (p.initializer) {
             this.write(' = ');
             this.writeExpression(p.initializer);
-        } else if (p.type.isOptional) {
+        } else if (p.type && p.type.isOptional) {
             this.write(' = default');
         }
     }
@@ -267,7 +269,7 @@ export default class CSharpAstPrinter {
     }
     private writeBody(body: cs.Expression | cs.Block | undefined) {
         if (body) {
-            if (body.nodeType == cs.SyntaxKind.Block) {
+            if (body.nodeType === cs.SyntaxKind.Block) {
                 this.writeLine();
                 this.writeBlock(body as cs.Block);
             } else {
@@ -349,7 +351,7 @@ export default class CSharpAstPrinter {
         }
 
         if (d.isReadonly) {
-            this.write('abstract ');
+            this.write('readonly ');
         }
 
         this.writeType(d.type);
@@ -368,13 +370,13 @@ export default class CSharpAstPrinter {
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
                 switch ((type as cs.PrimitiveTypeNode).type) {
-                    case cs.PrimitiveType.Boolean:
+                    case cs.PrimitiveType.Bool:
                         this.write('bool');
                         break;
                     case cs.PrimitiveType.Dynamic:
                         this.write('dynamic');
                         break;
-                    case cs.PrimitiveType.Number:
+                    case cs.PrimitiveType.Double:
                         this.write('double');
                         break;
                     case cs.PrimitiveType.Object:
@@ -461,6 +463,263 @@ export default class CSharpAstPrinter {
     }
 
     private writeExpression(expr: cs.Expression) {
+        switch (expr.nodeType) {
+            case cs.SyntaxKind.PrefixUnaryExpression:
+                this.writePrefixUnaryExpression(expr as cs.PrefixUnaryExpression);
+                break;
+            case cs.SyntaxKind.PostfixUnaryExpression:
+                this.writePostfixUnaryExpression(expr as cs.PostfixUnaryExpression);
+                break;
+            case cs.SyntaxKind.NullLiteral:
+                this.writeNullLiteral(expr as cs.NullLiteral);
+                break;
+            case cs.SyntaxKind.TrueLiteral:
+                this.writeBooleanLiteral(expr as cs.BooleanLiteral);
+                break;
+            case cs.SyntaxKind.ThisLiteral:
+                this.writeThisLiteral(expr as cs.ThisLiteral);
+                break;
+            case cs.SyntaxKind.BaseLiteralExpression:
+                this.writeBaseLiteralExpression(expr as cs.BaseLiteralExpression);
+                break;
+            case cs.SyntaxKind.StringLiteral:
+                this.writeStringLiteral(expr as cs.StringLiteral);
+                break;
+            case cs.SyntaxKind.AwaitExpression:
+                this.writeAwaitExpression(expr as cs.AwaitExpression);
+                break;
+            case cs.SyntaxKind.BinaryExpression:
+                this.writeBinaryExpression(expr as cs.BinaryExpression);
+                break;
+            case cs.SyntaxKind.ConditionalExpression:
+                this.writeConditionalExpression(expr as cs.ConditionalExpression);
+                break;
+            case cs.SyntaxKind.LambdaExpression:
+                this.writeLambdaExpression(expr as cs.LambdaExpression);
+                break;
+            case cs.SyntaxKind.NumericLiteral:
+                this.writeNumericLiteral(expr as cs.NumericLiteral);
+                break;
+            case cs.SyntaxKind.StringTemplateExpression:
+                this.writeStringTemplateExpression(expr as cs.StringTemplateExpression);
+                break;
+            case cs.SyntaxKind.IsExpression:
+                this.writeIsExpression(expr as cs.IsExpression);
+                break;
+            case cs.SyntaxKind.ParenthesizedExpression:
+                this.writeParenthesizedExpression(expr as cs.ParenthesizedExpression);
+                break;
+            case cs.SyntaxKind.ArrayCreationExpression:
+                this.writeArrayCreationExpression(expr as cs.ArrayCreationExpression);
+                break;
+            case cs.SyntaxKind.MemberAccessExpression:
+                this.writeMemberAccessExpression(expr as cs.MemberAccessExpression);
+                break;
+            case cs.SyntaxKind.AnonymousObjectCreationExpression:
+                this.writeAnonymousObjectCreationExpression(expr as cs.AnonymousObjectCreationExpression);
+                break;
+            case cs.SyntaxKind.AnonymousObjectProperty:
+                this.writeAnonymousObjectProperty(expr as cs.AnonymousObjectProperty);
+                break;
+            case cs.SyntaxKind.ElementAccessExpression:
+                this.writeElementAccessExpression(expr as cs.ElementAccessExpression);
+                break;
+            case cs.SyntaxKind.InvocationExpression:
+                this.writeInvocationExpression(expr as cs.InvocationExpression);
+                break;
+            case cs.SyntaxKind.NewExpression:
+                this.writeNewExpression(expr as cs.NewExpression);
+                break;
+            case cs.SyntaxKind.CastExpression:
+                this.writeCastExpression(expr as cs.CastExpression);
+                break;
+            case cs.SyntaxKind.NonNullExpression:
+                this.writeNonNullExpression(expr as cs.NonNullExpression);
+                break;
+            case cs.SyntaxKind.NullSafeExpression:
+                this.writeNullSafeExpression(expr as cs.NullSafeExpression);
+                break;
+            case cs.SyntaxKind.Identifier:
+                this.writeIdentifier(expr as cs.Identifier);
+                break;
+            case cs.SyntaxKind.ToDoExpression:
+                this.writeToDoExpression(expr as cs.ToDoExpression);
+                break;
+        }
+    }
+
+    private writePrefixUnaryExpression(expr: cs.PrefixUnaryExpression) {
+        this.write(expr.operator);
+        this.writeExpression(expr.operand);
+    }
+
+    private writePostfixUnaryExpression(expr: cs.PostfixUnaryExpression) {
+        this.writeExpression(expr.operand);
+        this.write(expr.operator);
+    }
+
+    private writeNullLiteral(expr: cs.NullLiteral) {
+        this.write('null');
+    }
+
+    private writeBooleanLiteral(expr: cs.BooleanLiteral) {
+        this.write(expr.nodeType === cs.SyntaxKind.TrueLiteral ? 'true' : 'false');
+    }
+
+    private writeThisLiteral(expr: cs.ThisLiteral) {
+        this.write('this');
+    }
+
+    private writeBaseLiteralExpression(expr: cs.BaseLiteralExpression) {
+        this.write('base');
+    }
+
+    private writeStringLiteral(expr: cs.StringLiteral) {
+        this.write(JSON.stringify(expr.text));
+    }
+
+    private writeAwaitExpression(expr: cs.AwaitExpression) {
+        this.write('await ');
+        this.writeExpression(expr.expression);
+    }
+
+    private writeBinaryExpression(expr: cs.BinaryExpression) {
+        this.writeExpression(expr.left);
+        this.write(' ');
+        this.write(expr.operator);
+        this.write(' ');
+        this.writeExpression(expr.right);
+    }
+
+    private writeConditionalExpression(expr: cs.ConditionalExpression) {
+        this.writeExpression(expr.condition);
+        this.write(' ? ');
+        this.writeExpression(expr.whenTrue);
+        this.write(' : ');
+        this.writeExpression(expr.whenFalse);
+    }
+
+    private writeLambdaExpression(expr: cs.LambdaExpression) {
+        this.write('(');
+        this.writeCommaSeparated(expr.parameters, p => this.writeParameter(p));
+        this.write(') => ');
+        this.writeExpression(expr.body);
+    }
+
+    private writeNumericLiteral(expr: cs.NumericLiteral) {
+        this.write(expr.value);
+    }
+
+    private writeStringTemplateExpression(expr: cs.StringTemplateExpression) {
+        this.write('$"');
+        expr.chunks.forEach(c => {
+            if (c.nodeType === cs.SyntaxKind.StringLiteral) {
+                const escapedText = JSON.stringify((c as cs.StringLiteral).text);
+                this.write(escapedText.substr(1, escapedText.length - 2));
+            } else {
+                this.write('{');
+                this.writeExpression(c as cs.Expression);
+                this.write('}');
+            }
+        });
+        this.write('"');
+    }
+
+    private writeIsExpression(expr: cs.IsExpression) {
+        this.writeExpression(expr.expression);
+        this.write(' is ');
+        this.writeType(expr.type);
+    }
+
+    private writeParenthesizedExpression(expr: cs.ParenthesizedExpression) {
+        this.write('(');
+        this.writeExpression(expr.expression);
+        this.write(')');
+    }
+
+    private writeArrayCreationExpression(expr: cs.ArrayCreationExpression) {
+        this.write('new ');
+        if (expr.type) {
+            this.writeType(expr.type);
+        }
+        this.write('[]{');
+        this.writeCommaSeparated(expr.values, v => this.writeExpression(v));
+        this.write('}');
+    }
+
+    private writeMemberAccessExpression(expr: cs.MemberAccessExpression) {
+        this.writeExpression(expr.expression);
+        this.write('.');
+        // TODO: resolve declaration and use name if possible
+        this.write(expr.member);
+    }
+
+    private writeAnonymousObjectCreationExpression(expr: cs.AnonymousObjectCreationExpression) {
+        this.write('new');
+        this.beginBlock();
+
+        expr.properties.forEach(p => this.writeAnonymousObjectProperty(p));
+
+        this.endBlock();
+    }
+
+    private writeAnonymousObjectProperty(expr: cs.AnonymousObjectProperty) {
+        this.write(expr.name);
+        this.write(' = ');
+        this.writeExpression(expr.value);
+        this.writeLine(',');
+    }
+
+    private writeElementAccessExpression(expr: cs.ElementAccessExpression) {
+        this.writeExpression(expr.expression);
+        this.write('[');
+        this.writeExpression(expr.argumentExpression);
+        this.write(']');
+    }
+
+    private writeInvocationExpression(expr: cs.InvocationExpression) {
+        this.writeExpression(expr.expression);
+        if (expr.typeArguments) {
+            this.write('<');
+            this.writeCommaSeparated(expr.typeArguments, t => this.writeType(t));
+            this.write('>');
+        }
+        this.write('(');
+        this.writeCommaSeparated(expr.arguments, a => this.writeExpression(a));
+        this.write(')');
+    }
+
+    private writeNewExpression(expr: cs.NewExpression) {
+        this.write('new ');
+        this.writeType(expr.type);
+        this.write('(');
+        this.writeCommaSeparated(expr.arguments, a => this.writeExpression(a));
+        this.write(')');
+    }
+
+    private writeCastExpression(expr: cs.CastExpression) {
+        this.write('(');
+        this.writeType(expr.type);
+        this.write(')');
+        this.writeExpression(expr.expression);
+    }
+
+    private writeNonNullExpression(expr: cs.NonNullExpression) {
+        this.writeExpression(expr.expression);
+        this.write('!');
+    }
+
+    private writeNullSafeExpression(expr: cs.NullSafeExpression) {
+        this.writeExpression(expr.expression);
+        this.write('?');
+    }
+
+    private writeIdentifier(expr: cs.Identifier) {
+        // TODO: resolve symbol and use correct name
+        this.write(expr.text);
+    }
+
+    private writeToDoExpression(expr: cs.ToDoExpression) {
         this.write('/* TODO */');
     }
 
@@ -692,7 +951,7 @@ export default class CSharpAstPrinter {
         }
     }
     private writeExpressionStatement(s: cs.ExpressionStatement) {
-        this.writeExpression(s);
+        this.writeExpression(s.expression);
         this.writeLine(';');
     }
 
