@@ -175,7 +175,10 @@ export class Font {
 
         return null;
     }
-
+    
+    /**
+     * @target web
+     */
     public static toJson(font: Font): unknown {
         return {
             family: font.family,

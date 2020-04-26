@@ -18,13 +18,11 @@ namespace AlphaTab.Core
         void Add(T item);
         IList<T> Slice();
         IList<T> Slice(double start);
-        IList<T> Slice(double start, double end);
         void Sort(Func<T, T, double> func);
         void Reverse();
-        string Join();
         string Join(string separator);
         IList<T> Filter(Func<T, bool> func);
-        void Unshift(T synthEvent);
+        void Unshift(T item);
         T Pop();
     }
 }

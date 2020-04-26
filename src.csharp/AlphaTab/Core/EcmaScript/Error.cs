@@ -1,16 +1,10 @@
-﻿namespace AlphaTab.Core.Es5
+﻿namespace AlphaTab.Core.EcmaScript
+
 {
     public class Error : System.Exception
     {
-        public Error()
-        {
-        }
-
         public Error(string message) : base(message)
         {
-
         }
-
-        public string Stack { get; set; }
     }
 }

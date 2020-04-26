@@ -7,7 +7,7 @@ using AlphaTab.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Util;
 using SkiaSharp;
-using String = AlphaTab.Core.Es2017.String;
+using String = AlphaTab.Core.EcmaScript.String;
 
 namespace AlphaTab.Platform.CSharp
 {

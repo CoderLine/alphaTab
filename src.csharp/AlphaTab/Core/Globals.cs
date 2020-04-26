@@ -1,30 +1,46 @@
-﻿using System;
+﻿using System.Globalization;
 
 namespace AlphaTab.Core
 {
     public static class Globals
     {
-        public static Console Console { get; }
-        public static dynamic GlobalThis { get; }
+        public static Console Console { get; } = new Console();
 
         public static double ParseInt(string s)
         {
-            throw new NotImplementedException();
+            if (double.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d))
+            {
+                return (int) d;
+            }
+
+            return double.NaN;
         }
 
         public static double ParseInt(string s, int radix)
         {
-            throw new NotImplementedException();
+            if (radix == 16 && int.TryParse(s, NumberStyles.HexNumber,
+                CultureInfo.InvariantCulture,
+                out var d))
+            {
+                return d;
+            }
+
+            return double.NaN;
         }
 
-        public static double ParseFloat(string substr)
+        public static double ParseFloat(string s)
         {
-            throw new NotImplementedException();
+            if (double.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d))
+            {
+                return d;
+            }
+
+            return double.NaN;
         }
 
-        public static bool IsNaN(double num)
+        public static bool IsNaN(double d)
         {
-            throw new NotImplementedException();
+            return double.IsNaN(d);
         }
     }
 }

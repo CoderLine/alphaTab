@@ -250,7 +250,8 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.EnumDeclaration,
             parent: this._csharpFile.namespace,
             members: [],
-            tsNode: node
+            tsNode: node,
+            skipEmit: this.shouldSkip(node)
         };
 
         if (node.name) {
@@ -268,7 +269,8 @@ export default class CSharpAstTransformer {
             parent: parent,
             tsNode: enumMember,
             nodeType: cs.SyntaxKind.EnumMember,
-            name: enumMember.name.getText()
+            name: enumMember.name.getText(),
+            skipEmit: this.shouldSkip(enumMember)
         };
 
         if (enumMember.initializer) {
@@ -302,7 +304,8 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.InterfaceDeclaration,
             parent: this._csharpFile.namespace,
             members: [],
-            tsNode: node
+            tsNode: node,
+            skipEmit: this.shouldSkip(node)
         };
 
         if (node.name) {
@@ -453,8 +456,8 @@ export default class CSharpAstTransformer {
             tsNode: d
         };
 
-        if(csMethod.name.match(/^[^a-zA-Z].*/)) {
-            csMethod.name = "Test" + csMethod.name;
+        if (csMethod.name.match(/^[^a-zA-Z].*/)) {
+            csMethod.name = 'Test' + csMethod.name;
         }
 
         csMethod.attributes = [
@@ -586,7 +589,8 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             isAbstract: !!node.modifiers && !!node.modifiers.find(m => m.kind === ts.SyntaxKind.AbstractKeyword),
             partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
-            members: []
+            members: [],
+            skipEmit: this.shouldSkip(node)
         };
 
         if (node.name) {
@@ -622,6 +626,29 @@ export default class CSharpAstTransformer {
         }
 
         node.members.forEach(m => this.visitClassElement(csClass, m));
+
+        if (globalStatements && globalStatements.length > 0) {
+            const staticConstructor = {
+                parent: csClass,
+                isStatic: true,
+                name: 'cctor',
+                nodeType: cs.SyntaxKind.ConstructorDeclaration,
+                parameters: [],
+                visibility: cs.Visibility.None,
+                tsNode: node,
+                body: {
+                    parent: null,
+                    nodeType: cs.SyntaxKind.Block,
+                    statements: []
+                } as cs.Block
+            } as cs.ConstructorDeclaration;
+
+            globalStatements.forEach(s =>
+                (staticConstructor.body as cs.Block).statements.push(this.visitStatement(staticConstructor.body!, s))
+            );
+
+            csClass.members.push(staticConstructor);
+        }
 
         this._csharpFile.namespace.declarations.push(csClass);
         this._context.registerSymbol(csClass);
@@ -678,10 +705,6 @@ export default class CSharpAstTransformer {
     }
 
     private visitClassElement(parent: cs.ClassDeclaration, classElement: ts.ClassElement) {
-        if (this.shouldSkip(classElement)) {
-            return;
-        }
-
         if (ts.isConstructorDeclaration(classElement)) {
             this.visitConstructorDeclaration(parent, classElement);
         } else if (ts.isMethodSignature(classElement)) {
@@ -706,10 +729,6 @@ export default class CSharpAstTransformer {
     }
 
     private visitInterfaceElement(parent: cs.InterfaceDeclaration, classElement: ts.TypeElement) {
-        if (this.shouldSkip(classElement)) {
-            return;
-        }
-
         if (ts.isMethodSignature(classElement)) {
             this.visitMethodSignature(parent, classElement);
         } else if (ts.isPropertySignature(classElement)) {
@@ -738,7 +757,8 @@ export default class CSharpAstTransformer {
             name: this._context.toPascalCase((classElement.name as ts.Identifier).text),
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: cs.Visibility.None,
-            tsNode: classElement
+            tsNode: classElement,
+            skipEmit: this.shouldSkip(classElement)
         };
 
         if (classElement.name) {
@@ -799,7 +819,8 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.PropertyDeclaration,
                 parent: parent,
                 visibility: this.mapVisibility(classElement.modifiers),
-                type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType)
+                type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
+                skipEmit: this.shouldSkip(classElement)
             };
 
             if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
@@ -869,7 +890,8 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.PropertyDeclaration,
                 parent: parent,
                 visibility: this.mapVisibility(classElement.modifiers),
-                type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType)
+                type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
+                skipEmit: this.shouldSkip(classElement)
             };
 
             if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
@@ -930,7 +952,8 @@ export default class CSharpAstTransformer {
             name: this._context.toPascalCase(classElement.name.getText()),
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: visibility,
-            tsNode: classElement
+            tsNode: classElement,
+            skipEmit: this.shouldSkip(classElement)
         };
 
         if (csProperty.visibility === cs.Visibility.Public || csProperty.visibility === cs.Visibility.Protected) {
@@ -1077,7 +1100,8 @@ export default class CSharpAstTransformer {
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: this.mapVisibility(classElement.modifiers),
-            tsNode: classElement
+            tsNode: classElement,
+            skipEmit: this.shouldSkip(classElement)
         };
 
         if (classElement.name) {
@@ -1282,7 +1306,7 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: variableStatement,
                 tsNode: s,
-                reference: 'AlphaTab.Core.Es5.Error'
+                reference: 'AlphaTab.Core.EcmaScript.Error'
             } as cs.TypeReference;
         } else {
             variableStatement.type = this.createUnresolvedTypeNode(variableStatement, s.type ?? s, type);
@@ -1591,7 +1615,8 @@ export default class CSharpAstTransformer {
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: cs.Visibility.None,
-            tsNode: classElement
+            tsNode: classElement,
+            skipEmit: this.shouldSkip(classElement)
         };
 
         this._currentClassMember = csMethod;
@@ -1689,7 +1714,8 @@ export default class CSharpAstTransformer {
             parameters: [],
             isStatic: false,
             visibility: this.mapVisibility(classElement.modifiers),
-            tsNode: classElement
+            tsNode: classElement,
+            skipEmit: this.shouldSkip(classElement)
         };
 
         classElement.parameters.forEach(p => this.visitMethodParameter(csConstructor, p));
@@ -2647,6 +2673,13 @@ export default class CSharpAstTransformer {
     }
 
     private visitIdentifier(parent: cs.Node, expression: ts.Identifier) {
+        if (expression.text === 'undefined') {
+            return {
+                parent: parent,
+                tsNode: expression,
+                nodeType: cs.SyntaxKind.NullLiteral
+            } as cs.NullLiteral;
+        }
         const identifier = {
             parent: parent,
             tsNode: expression,

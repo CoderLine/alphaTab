@@ -1,14 +1,17 @@
-﻿using System.Runtime.InteropServices.WindowsRuntime;
+﻿using System.IO;
 using System.Threading.Tasks;
-using AlphaTab.Core.Es2016;
+using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab
 {
-    partial class TestPlatform
+    static partial class TestPlatform
     {
         public static async Task<Uint8Array> LoadFile(string path)
         {
-            return null;
+            await using var fs = new FileStream(path, FileMode.Open);
+            await using var ms = new MemoryStream();
+            await fs.CopyToAsync(ms);
+            return new Uint8Array(ms.ToArray());
         }
     }
 }

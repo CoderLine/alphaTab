@@ -1,11 +1,23 @@
 ﻿
+using AlphaTab.Core.EcmaScript;
+using AlphaTab.Platform.CSharp;
+
 namespace AlphaTab
 {
     public partial class Environment
     {
-        private static void CreatePlatformSpecificRenderEngines(AlphaTab.Core.Es2015.Map<string, RenderEngineFactory> renderEngines)
+        public static void PlatformInit()
         {
+        }
 
+        private static void CreatePlatformSpecificRenderEngines(Map<string, RenderEngineFactory> renderEngines)
+        {
+            renderEngines.Set(
+                "skia",
+                new RenderEngineFactory(true, () => {
+                    return new SkiaCanvas();
+                })
+            );
         }
     }
 }

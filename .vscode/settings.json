@@ -1,0 +1,5 @@
+{
+    "files.exclude": {
+        "dist/lib.csharp/**": true
+    }
+}

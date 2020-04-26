@@ -6,6 +6,7 @@
         <IsPackable>false</IsPackable>
         <Nullable>enable</Nullable>
         <LangVersion>8</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,10 +20,14 @@
         <Compile Include="../../dist/lib.csharp/test/**/*.cs">
             <Link>Generated\%(RecursiveDir)\%(Filename)%(Extension)</Link>
         </Compile>
+        <Content Include="../../test-data/**/*.*">
+            <Link>test-data\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\AlphaTab\AlphaTab.csproj" />
+        <ProjectReference Include="..\AlphaTab\AlphaTab.csproj" />
     </ItemGroup>
 
 

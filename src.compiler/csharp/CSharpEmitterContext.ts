@@ -713,7 +713,15 @@ export default class CSharpEmitterContext {
             if (fileName.startsWith('lib.') && fileName.endsWith('.d.ts')) {
                 fileName = fileName.substring(4, fileName.length - 5);
                 if (fileName.length) {
-                    suffix = fileName.split('.').map(s => '.' + this.toPascalCase(s))[0];
+                    suffix = fileName.split('.').map(s => {
+                        if(s.match(/es[0-9]{4}/)) {
+                            return '.EcmaScript';
+                        }
+                        if(s.match(/es[0-9]{1}/)) {
+                            return '.EcmaScript';
+                        }
+                        return '.' + this.toPascalCase(s);
+                    })[0];
                 }
             }
         }

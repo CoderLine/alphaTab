@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using AlphaTab.Core;
-using AlphaTab.Core.Es5;
+using AlphaTab.Core.EcmaScript;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;

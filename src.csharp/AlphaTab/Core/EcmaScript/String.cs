@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace AlphaTab.Core.Es2017
+﻿namespace AlphaTab.Core.EcmaScript
 {
     public static class String
     {

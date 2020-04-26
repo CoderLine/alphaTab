@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Globalization;
 using System.Runtime.CompilerServices;
-using AlphaTab.Core.Es2015;
+using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab.Core
 {
@@ -51,18 +50,7 @@ namespace AlphaTab.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<string> Split(this string s, string separator)
         {
-            throw new NotImplementedException();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Join(this string[] s, string separator = ",")
-        {
-            return string.Join(separator, s);
-        }
-
-        public static string TypeOf(object obj)
-        {
-            throw new NotImplementedException();
+            return new List<string>(s.Split(separator));
         }
 
         public static MapEntry<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
@@ -80,14 +68,14 @@ namespace AlphaTab.Core
             return new MapEntry<TKey, TValue>(key, value);
         }
 
-        public static bool In(string key, object obj)
-        {
-            throw new NotImplementedException();
-        }
-
         public static string ToString(this double num, int radix)
         {
-            throw new NotImplementedException();
+            if (radix == 16)
+            {
+                return ((int) num).ToString("X");
+            }
+
+            return num.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

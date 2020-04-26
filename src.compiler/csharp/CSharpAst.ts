@@ -80,6 +80,7 @@ export enum SyntaxKind {
 }
 
 export interface Node {
+    skipEmit?: boolean;
     tsNode?: ts.Node;
     tsSymbol?: ts.Symbol;
     nodeType: SyntaxKind;

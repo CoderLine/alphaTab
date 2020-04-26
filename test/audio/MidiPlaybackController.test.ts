@@ -14,7 +14,7 @@ describe('MidiPlaybackControllerTest', () => {
             let index: number = controller.index;
             controller.processCurrent();
             if (controller.shouldPlay) {
-                Logger.debug('Test', `Checking index ${i}, expected[${expectedIndexes[i]}]`, [i, expectedIndexes[i]]);
+                Logger.debug('Test', `Checking index ${i}, expected[${expectedIndexes[i]}]`, i, expectedIndexes[i]);
                 expect(index).toEqual(expectedIndexes[i]);
                 i++;
             }

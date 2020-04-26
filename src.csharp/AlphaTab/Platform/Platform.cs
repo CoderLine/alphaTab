@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AlphaTab.Core.Es2016;
+using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab.Platform
 {
     partial class Platform
     {
-        public static string ToString(Uint8Array data, string encoding)
+        public static string ToString(Uint8Array data, string name)
         {
-            throw new NotImplementedException();
+            var encoding = Encoding.GetEncoding(name);
+            return encoding.GetString(data.Buffer.Raw.Array, data.Buffer.Raw.Offset,
+                data.Buffer.Raw.Count);
         }
 
         public static Action Throttle(Action action, double delay)

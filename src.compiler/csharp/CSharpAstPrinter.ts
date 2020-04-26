@@ -50,19 +50,21 @@ export default class CSharpAstPrinter {
         this.beginBlock();
 
         for (const declaration of namespace.declarations) {
-            switch (declaration.nodeType) {
-                case cs.SyntaxKind.ClassDeclaration:
-                    this.writeClassDeclaration(declaration as cs.ClassDeclaration);
-                    break;
-                case cs.SyntaxKind.EnumDeclaration:
-                    this.writeEnumDeclaration(declaration as cs.EnumDeclaration);
-                    break;
-                case cs.SyntaxKind.InterfaceDeclaration:
-                    this.writeInterfaceDeclaration(declaration as cs.InterfaceDeclaration);
-                    break;
-                case cs.SyntaxKind.DelegateDeclaration:
-                    this.writeDelegateDeclaration(declaration as cs.DelegateDeclaration);
-                    break;
+            if (!declaration.skipEmit) {
+                switch (declaration.nodeType) {
+                    case cs.SyntaxKind.ClassDeclaration:
+                        this.writeClassDeclaration(declaration as cs.ClassDeclaration);
+                        break;
+                    case cs.SyntaxKind.EnumDeclaration:
+                        this.writeEnumDeclaration(declaration as cs.EnumDeclaration);
+                        break;
+                    case cs.SyntaxKind.InterfaceDeclaration:
+                        this.writeInterfaceDeclaration(declaration as cs.InterfaceDeclaration);
+                        break;
+                    case cs.SyntaxKind.DelegateDeclaration:
+                        this.writeDelegateDeclaration(declaration as cs.DelegateDeclaration);
+                        break;
+                }
             }
         }
 
@@ -218,7 +220,7 @@ export default class CSharpAstPrinter {
         let hasConstuctor = false;
         d.members.forEach(m => {
             this.writeMember(m);
-            if (m.nodeType === cs.SyntaxKind.ConstructorDeclaration) {
+            if (m.nodeType === cs.SyntaxKind.ConstructorDeclaration && !(m as cs.ConstructorDeclaration).isStatic) {
                 hasConstuctor = true;
             }
         });
@@ -303,6 +305,10 @@ export default class CSharpAstPrinter {
     }
 
     private writeMember(member: cs.Node) {
+        if(member.skipEmit) {
+            return;
+        }
+        
         switch (member.nodeType) {
             case cs.SyntaxKind.FieldDeclaration:
                 this.writeFieldDeclarat1on(member as cs.FieldDeclaration);
@@ -359,7 +365,7 @@ export default class CSharpAstPrinter {
             this.write('static ');
         }
 
-        if(d.isAsync) {
+        if (d.isAsync) {
             this.write('async ');
         }
 
@@ -375,20 +381,21 @@ export default class CSharpAstPrinter {
             this.write('override ');
         }
 
-        if(d.isAsync) {
-            if(d.returnType.nodeType === cs.SyntaxKind.PrimitiveTypeNode && (d.returnType as cs.PrimitiveTypeNode).type === cs.PrimitiveType.Void) {
+        if (d.isAsync) {
+            if (
+                d.returnType.nodeType === cs.SyntaxKind.PrimitiveTypeNode &&
+                (d.returnType as cs.PrimitiveTypeNode).type === cs.PrimitiveType.Void
+            ) {
                 this.write('System.Threading.Tasks.Task');
-            }
-            else {
+            } else {
                 this.write('System.Threading.Tasks.Task<');
                 this.writeType(d.returnType);
                 this.write('>');
             }
-        }
-        else {
+        } else {
             this.writeType(d.returnType);
         }
-        
+
         this.write(` ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
         this.writeParameters(d.parameters);
@@ -430,6 +437,9 @@ export default class CSharpAstPrinter {
     private writeConstructorDeclaration(d: cs.ConstructorDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
+        if(d.isStatic) {
+            this.write('static ')
+        }
         this.write(`${(d.parent as cs.ClassDeclaration).name}`);
         this.writeParameters(d.parameters);
 

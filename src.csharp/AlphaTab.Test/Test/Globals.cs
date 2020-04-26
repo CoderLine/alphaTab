@@ -11,7 +11,7 @@ namespace AlphaTab.Test
 
         public static void Fail(string message)
         {
-            throw new System.NotImplementedException();
+            Assert.Fail(message);
         }
     }
 
@@ -36,17 +36,24 @@ namespace AlphaTab.Test
 
         public void ToBeTruthy()
         {
-            throw new System.NotImplementedException();
+            Assert.AreNotEqual(default, _actual);
         }
 
         public void ToBeTrue()
         {
-            throw new System.NotImplementedException();
+            if (_actual is bool b)
+            {
+                Assert.IsTrue(b);
+            }
+            else
+            {
+                Assert.Fail("ToBeTrue can only be used on bools");
+            }
         }
 
         public void ToBeFalsy()
         {
-            throw new System.NotImplementedException();
+            Assert.AreNotEqual(default, _actual);
         }
     }
 }
