@@ -1,5 +1,5 @@
 import { ISynthOutput } from '@src/audio/synth/ISynthOutput';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 
 export class TestOutput implements ISynthOutput {
     private _finished: boolean = false;
@@ -11,7 +11,7 @@ export class TestOutput implements ISynthOutput {
 
     public open(): void {
         this.samples = [];
-        this.ready.trigger();
+        (this.ready as EventEmitter).trigger();
     }
 
     public sequencerFinished(): void {
@@ -24,9 +24,9 @@ export class TestOutput implements ISynthOutput {
 
     public next(): void {
         if (this._finished) {
-            this.finished.trigger();
+            (this.finished as EventEmitter).trigger();
         } else {
-            this.sampleRequest.trigger();
+            (this.sampleRequest as EventEmitter).trigger();
         }
     }
 
@@ -38,7 +38,7 @@ export class TestOutput implements ISynthOutput {
         for (let i: number = 0; i < f.length; i++) {
             this.samples.push(f[i]);
         }
-        this.samplesPlayed.trigger(f.length);
+        (this.samplesPlayed as EventEmitterOfT<number>).trigger(f.length);
     }
 
     public resetSamples(): void {
@@ -52,20 +52,20 @@ export class TestOutput implements ISynthOutput {
     /**
      * Fired when the output has been successfully opened and is ready to play samples.
      */
-    readonly ready: EventEmitter<() => void> = new EventEmitter();
+    readonly ready: IEventEmitter = new EventEmitter();
 
     /**
      * Fired when a certain number of samples have been played.
      */
-    readonly samplesPlayed: EventEmitter<(count: number) => void> = new EventEmitter();
+    readonly samplesPlayed: IEventEmitterOfT<number> = new EventEmitterOfT<number>();
 
     /**
      * Fired when the output needs more samples to be played.
      */
-    readonly sampleRequest: EventEmitter<() => void> = new EventEmitter();
+    readonly sampleRequest: IEventEmitter = new EventEmitter();
 
     /**
      * Fired when the last samples after calling SequencerFinished have been played.
      */
-    readonly finished: EventEmitter<() => void> = new EventEmitter();
+    readonly finished: IEventEmitter = new EventEmitter();
 }

@@ -2,11 +2,17 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IReadable } from '@src/io/IReadable';
 import { Platform } from '@src/platform/Platform';
   
+/**
+ * @partial
+ */
 export class TestPlatform {
     public static createStringReader(tex: string): IReadable {
         return ByteBuffer.fromBuffer(Platform.stringToByteArray(tex));
     }
 
+    /**
+     * @target web
+     */
     public static loadFile(path: string): Promise<Uint8Array> {
         return new Promise<Uint8Array>((resolve, reject) => {
             let x: XMLHttpRequest = new XMLHttpRequest();

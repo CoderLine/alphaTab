@@ -6,8 +6,8 @@ import { PlayerSettings } from '@src/PlayerSettings';
 
 /**
  * This public class contains instance specific settings for alphaTab
+ * @json
  */
-// @json
 export class Settings {
     public static fromJson(json: any): Settings {
         // dynamically implemented via AST transformer
@@ -37,14 +37,14 @@ export class Settings {
     /**
      * The core settings control the general behavior of alphatab like
      * what modules are active.
+     * @json_on_parent
      */
-        // @json-on-parent
     public readonly core: CoreSettings = new CoreSettings();
 
     /**
      * The display settings control how the general layout and display of alphaTab is done.
+     * @json_on_parent
      */
-        // @json-on-parent
     public readonly display: DisplaySettings = new DisplaySettings();
 
     /**

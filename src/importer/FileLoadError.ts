@@ -1,3 +1,6 @@
+/**
+ * @target web
+ */
 export class FileLoadError extends Error {
     public xhr: XMLHttpRequest;
 

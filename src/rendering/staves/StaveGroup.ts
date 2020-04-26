@@ -398,30 +398,23 @@ export class StaveGroup {
                         masterBarBounds = new MasterBarBounds();
                         masterBarBounds.index = renderer.bar.masterBar.index;
                         masterBarBounds.isFirstOfLine = renderer.isFirstOfLine;
-                        masterBarBounds.realBounds = (() => {
-                            let _tmp = new Bounds();
-                            _tmp.x = x + renderer.x;
-                            _tmp.y = realTop;
-                            _tmp.w = renderer.width;
-                            _tmp.h = realHeight;
-                            return _tmp;
-                        })();
-                        masterBarBounds.visualBounds = (() => {
-                            let _tmp = new Bounds();
-                            _tmp.x = x + renderer.x;
-                            _tmp.y = visualTop;
-                            _tmp.w = renderer.width;
-                            _tmp.h = visualHeight;
-                            return _tmp;
-                        })();
-                        masterBarBounds.lineAlignedBounds = (() => {
-                            let _tmp = new Bounds();
-                            _tmp.x = x + renderer.x;
-                            _tmp.y = lineTop;
-                            _tmp.w = renderer.width;
-                            _tmp.h = lineHeight;
-                            return _tmp;
-                        })();
+                        masterBarBounds.realBounds =  new Bounds();
+                        masterBarBounds.realBounds.x = x + renderer.x;
+                        masterBarBounds.realBounds.y = realTop;
+                        masterBarBounds.realBounds.w = renderer.width;
+                        masterBarBounds.realBounds.h = realHeight;
+
+                        masterBarBounds.visualBounds = new Bounds();
+                        masterBarBounds.visualBounds.x = x + renderer.x;
+                        masterBarBounds.visualBounds.y = visualTop;
+                        masterBarBounds.visualBounds.w = renderer.width;
+                        masterBarBounds.visualBounds.h = visualHeight;
+
+                        masterBarBounds.lineAlignedBounds = new Bounds();
+                        masterBarBounds.lineAlignedBounds.x = x + renderer.x;
+                        masterBarBounds.lineAlignedBounds.y = lineTop;
+                        masterBarBounds.lineAlignedBounds.w = renderer.width;
+                        masterBarBounds.lineAlignedBounds.h = lineHeight;
                         this.layout.renderer.boundsLookup!.addMasterBar(masterBarBounds);
                         masterBarBoundsLookup.set(masterBarBounds.index, masterBarBounds);
                     } else {
@@ -438,7 +431,7 @@ export class StaveGroup {
             return 0;
         }
         let bar: Bar = this.layout.renderer.tracks![0].staves[0].bars[index];
-        let renderer: BarRendererBase = this.layout.getRendererForBar<BarRendererBase>(this._firstStaffInAccolade.staveId, bar)!;
+        let renderer: BarRendererBase = this.layout.getRendererForBar(this._firstStaffInAccolade.staveId, bar)!;
         return renderer.x;
     }
 }

@@ -10,7 +10,7 @@ import { PlayerState } from '@src/audio/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@src/audio/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@src/audio/synth/PositionChangedEventArgs';
 import { Environment } from '@src/Environment';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 
@@ -22,7 +22,7 @@ import { Track } from '@src/model/Track';
 import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { IUiFacade } from '@src/platform/IUiFacade';
-import { Cursors } from '@src/platform/javaScript/Cursors';
+import { Cursors } from '@src/platform/Cursors';
 import { Platform } from '@src/platform/Platform';
 import { ScrollMode } from '@src/PlayerSettings';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
@@ -186,11 +186,11 @@ export class AlphaTabApiBase<TSettings> {
                     this.renderScore(score, trackIndexes);
                 },
                 error => {
-                    this.onError('import', error);
+                    this.onError(error);
                 }
             );
         } catch (e) {
-            this.onError('import', e);
+            this.onError(e);
             return false;
         }
     }
@@ -236,10 +236,7 @@ export class AlphaTabApiBase<TSettings> {
             let score: Score = tracks[0].score;
             for (let track of tracks) {
                 if (track.score !== score) {
-                    this.onError(
-                        'load',
-                        new ArgumentError('All rendered tracks must belong to the same score.', 'tracks')
-                    );
+                    this.onError(new ArgumentError('All rendered tracks must belong to the same score.', 'tracks'));
                     return;
                 }
             }
@@ -281,13 +278,10 @@ export class AlphaTabApiBase<TSettings> {
                 this.triggerResize();
             });
         } else {
-            let resizeEventInfo: ResizeEventArgs = (() => {
-                let _tmp = new ResizeEventArgs();
-                _tmp.oldWidth = this.renderer.width;
-                _tmp.newWidth = this.container.width;
-                _tmp.settings = this.settings;
-                return _tmp;
-            })();
+            let resizeEventInfo: ResizeEventArgs = new ResizeEventArgs();
+            resizeEventInfo.oldWidth = this.renderer.width;
+            resizeEventInfo.newWidth = this.container.width;
+            resizeEventInfo.settings = this.settings;
             this.onResize(resizeEventInfo);
             this.renderer.updateSettings(this.settings);
             this.renderer.width = this.container.width;
@@ -322,7 +316,7 @@ export class AlphaTabApiBase<TSettings> {
             let score: Score = parser.readScore();
             this.renderScore(score, tracks);
         } catch (e) {
-            this.onError('import', e);
+            this.onError(e);
         }
     }
 
@@ -345,16 +339,13 @@ export class AlphaTabApiBase<TSettings> {
         if (!this.renderer) {
             return;
         }
-        let renderAction = () => {
-            if (this.uiFacade.canRender) {
-                // when font is finally loaded, start rendering
-                this.renderer.width = this.container.width;
-                this.renderer.renderScore(this.score!, this._trackIndexes as any);
-            } else {
-                this.uiFacade.canRenderChanged.on(renderAction);
-            }
-        };
-        renderAction();
+        if (this.uiFacade.canRender) {
+            // when font is finally loaded, start rendering
+            this.renderer.width = this.container.width;
+            this.renderer.renderScore(this.score!, this._trackIndexes as any);
+        } else {
+            this.uiFacade.canRenderChanged.on(() => this.render());
+        }
     }
 
     private _tickCache: MidiTickLookup | null = null;
@@ -500,11 +491,11 @@ export class AlphaTabApiBase<TSettings> {
         });
         this.player.soundFontLoaded.on(this.onSoundFontLoaded.bind(this));
         this.player.soundFontLoadFailed.on(e => {
-            this.onError('soundFont', e);
+            this.onError(e);
         });
         this.player.midiLoaded.on(this.onMidiLoaded.bind(this));
         this.player.midiLoadFailed.on(e => {
-            this.onError('midi', e);
+            this.onError(e);
         });
         this.player.stateChanged.on(this.onPlayerStateChanged.bind(this));
         this.player.positionChanged.on(this.onPlayerPositionChanged.bind(this));
@@ -854,10 +845,10 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
-    public playedBeatChanged: EventEmitter<(beat: Beat) => void> = new EventEmitter();
+    public playedBeatChanged: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
 
     private onPlayedBeatChanged(beat: Beat): void {
-        this.playedBeatChanged.trigger(beat);
+        (this.playedBeatChanged as EventEmitterOfT<Beat>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'playedBeatChanged', beat);
     }
 
@@ -865,9 +856,9 @@ export class AlphaTabApiBase<TSettings> {
     private _selectionStart: SelectionInfo | null = null;
     private _selectionEnd: SelectionInfo | null = null;
 
-    public beatMouseDown: EventEmitter<(beat: Beat) => void> = new EventEmitter();
-    public beatMouseMove: EventEmitter<(beat: Beat) => void> = new EventEmitter();
-    public beatMouseUp: EventEmitter<(beat: Beat) => void> = new EventEmitter();
+    public beatMouseDown: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
+    public beatMouseMove: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
+    public beatMouseUp: IEventEmitterOfT<Beat | null> = new EventEmitterOfT<Beat | null>();
 
     private onBeatMouseDown(originalEvent: IMouseEventArgs, beat: Beat): void {
         if (
@@ -879,7 +870,7 @@ export class AlphaTabApiBase<TSettings> {
             this._selectionEnd = null;
         }
         this._beatMouseDown = true;
-        this.beatMouseDown.trigger(beat);
+        (this.beatMouseDown as EventEmitterOfT<Beat>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'beatMouseDown', beat, originalEvent);
     }
 
@@ -890,7 +881,7 @@ export class AlphaTabApiBase<TSettings> {
                 this.cursorSelectRange(this._selectionStart, this._selectionEnd);
             }
         }
-        this.beatMouseMove.trigger(beat);
+        (this.beatMouseMove as EventEmitterOfT<Beat>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'beatMouseMove', beat, originalEvent);
     }
 
@@ -937,7 +928,7 @@ export class AlphaTabApiBase<TSettings> {
             }
         }
 
-        this.beatMouseUp.trigger(beat);
+        (this.beatMouseUp as EventEmitterOfT<Beat | null>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'beatMouseUp', beat, originalEvent);
         this._beatMouseDown = false;
     }
@@ -1070,91 +1061,92 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
-    public loaded: EventEmitter<(score: Score) => void> = new EventEmitter();
+    public loaded: IEventEmitterOfT<Score> = new EventEmitterOfT<Score>();
 
     private onLoaded(score: Score): void {
-        this.loaded.trigger(score);
+        (this.loaded as EventEmitterOfT<Score>).trigger(score);
         this.uiFacade.triggerEvent(this.container, 'loaded', score);
     }
 
-    public resize: EventEmitter<(e: ResizeEventArgs) => void> = new EventEmitter();
+    public resize: IEventEmitterOfT<ResizeEventArgs> = new EventEmitterOfT<ResizeEventArgs>();
 
     private onResize(e: ResizeEventArgs): void {
-        this.resize.trigger(e);
+        (this.resize as EventEmitterOfT<ResizeEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'resize', e);
     }
 
-    public renderStarted: EventEmitter<(isResize: boolean) => void> = new EventEmitter();
+    public renderStarted: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
 
     private onRenderStarted(resize: boolean): void {
-        this.renderStarted.trigger(resize);
+        (this.renderStarted as EventEmitterOfT<boolean>).trigger(resize);
         this.uiFacade.triggerEvent(this.container, 'render', resize);
     }
 
-    public renderFinished: EventEmitter<() => void> = new EventEmitter();
+    public renderFinished: IEventEmitter = new EventEmitter();
 
     private onRenderFinished(): void {
-        this.renderFinished.trigger();
+        (this.renderFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'rendered', null);
     }
 
-    public postRenderFinished: EventEmitter<() => void> = new EventEmitter();
+    public postRenderFinished: IEventEmitter = new EventEmitter();
 
     private onPostRenderFinished(): void {
-        this.postRenderFinished.trigger();
+        (this.postRenderFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'postRendered', null);
     }
 
-    public error: EventEmitter<(type: string, details: any) => void> = new EventEmitter();
+    public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
 
-    public onError(type: string, details: any): void {
-        Logger.error(type, 'An unexpected error occurred', details);
-        this.error.trigger(type, details);
-        this.uiFacade.triggerEvent(this.container, 'error', {
-            type: type,
-            details: details
-        });
+    public onError(error: Error): void {
+        Logger.error('API', 'An unexpected error occurred', error);
+        (this.error as EventEmitterOfT<Error>).trigger(error);
+        this.uiFacade.triggerEvent(this.container, 'error', error);
     }
 
-    public readyForPlayback: EventEmitter<() => void> = new EventEmitter();
+    public readyForPlayback: IEventEmitter = new EventEmitter();
 
     private onReadyForPlayback(): void {
-        this.readyForPlayback.trigger();
+        (this.readyForPlayback as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'playerReady', null);
     }
 
-    public playerFinished: EventEmitter<() => void> = new EventEmitter();
+    public playerFinished: IEventEmitter = new EventEmitter();
 
     private onPlayerFinished(): void {
-        this.playerFinished.trigger();
+        (this.playerFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'finished', null);
     }
 
-    public soundFontLoaded: EventEmitter<() => void> = new EventEmitter();
+    public soundFontLoaded: IEventEmitter = new EventEmitter();
 
     private onSoundFontLoaded(): void {
-        this.soundFontLoaded.trigger();
+        (this.soundFontLoaded as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'soundFontLoaded', null);
     }
 
-    public midiLoaded: EventEmitter<() => void> = new EventEmitter();
+    public midiLoaded: IEventEmitter = new EventEmitter();
 
     private onMidiLoaded(): void {
-        this.midiLoaded.trigger();
+        (this.midiLoaded as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'midiFileLoaded', null);
     }
 
-    public playerStateChanged: EventEmitter<(e: PlayerStateChangedEventArgs) => void> = new EventEmitter();
+    public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
+        PlayerStateChangedEventArgs
+    >();
 
     private onPlayerStateChanged(e: PlayerStateChangedEventArgs): void {
-        this.playerStateChanged.trigger(e);
+        (this.playerStateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'playerStateChanged', e);
     }
 
-    public playerPositionChanged: EventEmitter<(e: PositionChangedEventArgs) => void> = new EventEmitter();
+    public playerPositionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
+        PositionChangedEventArgs
+    >();
 
     private onPlayerPositionChanged(e: PositionChangedEventArgs): void {
-        this.playerPositionChanged.trigger();
+        (this.playerPositionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'positionChanged', e);
     }
 }

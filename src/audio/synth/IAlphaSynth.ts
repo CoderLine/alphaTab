@@ -3,7 +3,7 @@ import { PlaybackRange } from '@src/audio/synth/PlaybackRange';
 import { PlayerState } from '@src/audio/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@src/audio/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@src/audio/synth/PositionChangedEventArgs';
-import { IEventEmitter } from '@src/EventEmitter';
+import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { LogLevel } from '@src/util/Logger';
 
 /**
@@ -140,45 +140,45 @@ export interface IAlphaSynth {
     /**
      * This event is fired when the player is ready to be interacted with.
      */
-    readonly ready: IEventEmitter<() => void>;
+    readonly ready: IEventEmitter;
 
     /**
      * This event is fired when all required data for playback is loaded and ready.
      */
-    readonly readyForPlayback: IEventEmitter<() => void>;
+    readonly readyForPlayback: IEventEmitter;
 
     /**
      * This event is fired when the playback of the whole song finished.
      */
-    readonly finished: IEventEmitter<() => void>;
+    readonly finished: IEventEmitter;
 
     /**
      * This event is fired when the SoundFont needed for playback was loaded.
      */
-    readonly soundFontLoaded: IEventEmitter<() => void>;
+    readonly soundFontLoaded: IEventEmitter;
 
     /**
      * This event is fired when the loading of the SoundFont failed.
      */
-    readonly soundFontLoadFailed: IEventEmitter<(error: any) => void>;
+    readonly soundFontLoadFailed: IEventEmitterOfT<Error>;
 
     /**
      * This event is fired when the Midi file needed for playback was loaded.
      */
-    readonly midiLoaded: IEventEmitter<() => void>;
+    readonly midiLoaded: IEventEmitter;
 
     /**
      * This event is fired when the loading of the Midi file failed.
      */
-    readonly midiLoadFailed: IEventEmitter<(error: any) => void>;
+    readonly midiLoadFailed: IEventEmitterOfT<Error>
 
     /**
      * This event is fired when the playback state changed.
      */
-    readonly stateChanged: IEventEmitter<(e: PlayerStateChangedEventArgs) => void>;
+    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs>;
 
     /**
      * This event is fired when the current playback position of/ the song changed.
      */
-    readonly positionChanged: IEventEmitter<(e: PositionChangedEventArgs) => void>;
+    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs>;
 }

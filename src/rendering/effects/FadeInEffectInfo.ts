@@ -28,7 +28,7 @@ export class FadeInEffectInfo implements IEffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new FadeInGlyph(0, 0);
+        return new FadeInGlyph();
     }
 
     public canExpand(from: Beat, to: Beat): boolean {

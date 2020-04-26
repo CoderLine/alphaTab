@@ -63,7 +63,7 @@ export class TabSlurGlyph extends TabTieGlyph {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar<BarRendererBase>(
+        let startNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.startBeat!.voice.bar
         )!;

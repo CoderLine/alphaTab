@@ -219,7 +219,7 @@ export class TabBendGlyph extends Glyph {
                 endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                     this.renderer.staff.staveId,
                     nextNote.beat.voice.bar
-                );
+                ) as TabBarRenderer;
                 if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
                     break;
                 }
@@ -231,10 +231,10 @@ export class TabBendGlyph extends Glyph {
                 }
             }
             endBeat = endNote.beat;
-            endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar<TabBarRenderer>(
+            endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff.staveId,
                 endBeat.voice.bar
-            );
+            ) as TabBarRenderer;
             if (
                 endBeat.isLastOfVoice &&
                 !endNote.hasBend &&
@@ -287,14 +287,13 @@ export class TabBendGlyph extends Glyph {
                 if (note.bendType !== BendType.Prebend) {
                     this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                 } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
+                    secondPt = new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.value);
+                    secondPt.lineValue = firstPt.lineValue;
+
                     this.paintBend(
                         note,
                         firstPt,
-                        (() => {
-                            let _tmp = new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.value);
-                            _tmp.lineValue = firstPt.lineValue;
-                            return _tmp;
-                        })(),
+                        secondPt,
                         startX,
                         topY,
                         dX,

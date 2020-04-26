@@ -20,6 +20,7 @@
             ],
             "cwd": "${workspaceRoot}",
             "protocol": "inspector",
+            "smartStep": false,
             "internalConsoleOptions": "openOnSessionStart",
             "env": {
                 "TS_NODE_PROJECT": "tsconfig.build-csharp.json"

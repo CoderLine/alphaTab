@@ -21,7 +21,7 @@ import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 
 describe('AlphaTexImporterTest', () => {
-    const parseTex = function (tex: string): Score {
+    const parseTex: (tex:string) => Score = (tex: string): Score => {
         let importer: AlphaTexImporter = new AlphaTexImporter();
         importer.init(TestPlatform.createStringReader(tex), new Settings());
         return importer.readScore();

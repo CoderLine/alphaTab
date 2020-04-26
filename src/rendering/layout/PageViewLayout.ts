@@ -8,6 +8,7 @@ import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/util/Logger';
+import { EventEmitterOfT } from '@src/EventEmitter';
 
 /**
  * This layout arranges the bars into a fixed width and dynamic height region.
@@ -108,7 +109,7 @@ export class PageViewLayout extends ScoreLayout {
         e.totalHeight = totalHeight < 0 ? y : totalHeight;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
-        this.renderer.partialRenderFinished.trigger(e);
+        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
         return y;
     }
 
@@ -181,7 +182,7 @@ export class PageViewLayout extends ScoreLayout {
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
 
-        this.renderer.partialRenderFinished.trigger(e);
+        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
         return y;
     }
 
@@ -287,7 +288,7 @@ export class PageViewLayout extends ScoreLayout {
         args.renderResult = result;
         args.firstMasterBarIndex = group.firstBarIndex;
         args.lastMasterBarIndex = group.lastBarIndex;
-        this.renderer.partialRenderFinished.trigger(args);
+        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
         return height;
     }
 

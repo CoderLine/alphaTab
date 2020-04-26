@@ -2,9 +2,12 @@ import * as cs from './CSharpAst';
 import * as ts from 'typescript';
 import * as path from 'path';
 
+type SymbolKey = string;
+
 export default class CSharpEmitterContext {
     private _fileLookup: Map<ts.SourceFile, cs.SourceFile> = new Map();
-    private _symbolLookup: Map<ts.Symbol, cs.Node> = new Map();
+    private _symbolLookup: Map<SymbolKey, cs.NamedElement & cs.Node> = new Map();
+    private _symbolConst: Map<SymbolKey, boolean> = new Map();
 
     private _diagnostics: ts.Diagnostic[] = [];
     private _unresolvedTypeNodes: cs.UnresolvedTypeNode[] = [];
@@ -24,8 +27,95 @@ export default class CSharpEmitterContext {
         return this.typeChecker.getTypeAtLocation(n);
     }
 
+    public isTypeAssignable(targetType: ts.Type, actualType: ts.Type) {
+        if (targetType.flags === ts.TypeFlags.Any || targetType.flags === ts.TypeFlags.Unknown) {
+            return true;
+        }
+        if (actualType.isClassOrInterface()) {
+            return (this.typeChecker as any).isTypeAssignableTo(actualType, targetType);
+        }
+        return false;
+    }
+
     public registerUnresolvedTypeNode(unresolved: cs.UnresolvedTypeNode) {
         this._unresolvedTypeNodes.push(unresolved);
+    }
+
+    public getSymbolName(expr: cs.Node): string | undefined {
+        const symbolKey = this.getSymbolKey(expr.tsSymbol);
+        if (expr.tsSymbol) {
+            if (this._symbolLookup.has(symbolKey)) {
+                const csSymbol = this._symbolLookup.get(symbolKey)!;
+                switch (csSymbol.nodeType) {
+                    case cs.SyntaxKind.ClassDeclaration:
+                    case cs.SyntaxKind.InterfaceDeclaration:
+                    case cs.SyntaxKind.EnumDeclaration:
+                    case cs.SyntaxKind.DelegateDeclaration:
+                        return this.getFullName(csSymbol as cs.NamedTypeDeclaration);
+                }
+                return csSymbol.name;
+            } else if (
+                expr.tsSymbol.flags & ts.SymbolFlags.Class ||
+                expr.tsSymbol.flags & ts.SymbolFlags.Interface ||
+                expr.tsSymbol.flags & ts.SymbolFlags.ConstEnum ||
+                expr.tsSymbol.flags & ts.SymbolFlags.RegularEnum
+            ) {
+                return this.buildCoreNamespace(expr.tsSymbol) + expr.tsSymbol.name;
+            } else if (expr.tsSymbol.flags & ts.SymbolFlags.Function) {
+                if (this.isTestFunction(expr.tsSymbol)) {
+                    return 'AlphaTab.Test.Globals.' + this.toPascalCase(expr.tsSymbol.name);
+                }
+                return 'AlphaTab.Core.Globals.' + this.toPascalCase(expr.tsSymbol.name);
+            } else if (
+                (expr.tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable && this.isGlobalVariable(expr.tsSymbol)) ||
+                (expr.tsSymbol.flags & ts.SymbolFlags.NamespaceModule && this.isKnownModule(expr.tsSymbol))
+            ) {
+                return 'AlphaTab.Core.Globals.' + this.toPascalCase(expr.tsSymbol.name);
+            }
+        }
+        return undefined;
+    }
+    private isTestFunction(tsSymbol: ts.Symbol): boolean {
+        return tsSymbol.valueDeclaration?.getSourceFile().fileName.indexOf('jasmine') !== -1 ?? false;
+    }
+    private isKnownModule(tsSymbol: ts.Symbol): boolean {
+        switch (tsSymbol.name) {
+            case 'globalThis':
+                return true;
+            default:
+                return false;
+        }
+    }
+    public isGlobalVariable(symbol: ts.Symbol) {
+        if ((symbol.flags & ts.SymbolFlags.FunctionScopedVariable) === 0 || !symbol.valueDeclaration) {
+            return false;
+        }
+
+        if (
+            symbol.valueDeclaration.parent.kind === ts.SyntaxKind.VariableDeclarationList &&
+            symbol.valueDeclaration.parent.parent.kind === ts.SyntaxKind.VariableStatement &&
+            symbol.valueDeclaration.parent.parent.parent.kind === ts.SyntaxKind.SourceFile
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public getFullName(type: cs.NamedTypeDeclaration): string {
+        if (!type.parent) {
+            return '';
+        }
+        switch (type.parent.nodeType) {
+            case cs.SyntaxKind.ClassDeclaration:
+            case cs.SyntaxKind.InterfaceDeclaration:
+            case cs.SyntaxKind.EnumDeclaration:
+            case cs.SyntaxKind.DelegateDeclaration:
+                return this.getFullName(type.parent as cs.NamedTypeDeclaration) + '.' + type.name;
+            case cs.SyntaxKind.NamespaceDeclaration:
+                return (type.parent as cs.NamespaceDeclaration).namespace + '.' + type.name;
+        }
+        return '';
     }
 
     public resolveAllUnresolvedTypeNodes() {
@@ -92,7 +182,7 @@ export default class CSharpEmitterContext {
     }
 
     public resolveType(node: cs.UnresolvedTypeNode): cs.TypeNode | null {
-        if(node.nodeType !== cs.SyntaxKind.UnresolvedTypeNode){
+        if (node.nodeType !== cs.SyntaxKind.UnresolvedTypeNode) {
             return node;
         }
 
@@ -111,21 +201,56 @@ export default class CSharpEmitterContext {
 
         if (resolved) {
             const wasOptional = node.isOptional;
+            const wasNullable = node.isNullable;
             for (const prop of Object.getOwnPropertyNames(node)) {
                 delete (node as any)[prop];
             }
             for (const prop of Object.getOwnPropertyNames(resolved)) {
                 (node as any)[prop] = (resolved as any)[prop];
             }
-            node.isOptional = wasOptional;
+            if (wasOptional) {
+                node.isOptional = true;
+            }
+            if (wasNullable) {
+                node.isNullable = true;
+            }
             return node;
         }
 
         return null;
     }
 
-    private getTypeFromTsType(node: cs.Node, tsType: ts.Type, tsSymbol?: ts.Symbol, typeArguments?: cs.UnresolvedTypeNode[]): cs.TypeNode | null {
-        let csType: cs.TypeNode | null = this.resolveKnownTypeSymbol(node, tsType);
+    public isBooleanType(type: ts.Type) {
+        if (!type) {
+            return false;
+        }
+        return type.symbol && type.symbol.name === 'Boolean';
+    }
+
+    public getArrayElementType(type: ts.Type | undefined): ts.Type | null {
+        if (!type) {
+            return null;
+        }
+
+        if (type.symbol && type.symbol.name === 'Array') {
+            return (type as ts.TypeReference).typeArguments![0];
+        }
+
+        if (type.isUnion()) {
+            const nonNullable = this.typeChecker.getNonNullableType(type);
+            return this.getArrayElementType(nonNullable);
+        }
+
+        return null;
+    }
+
+    private getTypeFromTsType(
+        node: cs.Node,
+        tsType: ts.Type,
+        tsSymbol?: ts.Symbol,
+        typeArguments?: cs.UnresolvedTypeNode[]
+    ): cs.TypeNode | null {
+        let csType: cs.TypeNode | null = this.resolveKnownTypeSymbol(node, tsType, typeArguments);
         if (csType) {
             return csType;
         }
@@ -145,7 +270,12 @@ export default class CSharpEmitterContext {
         return csType;
     }
 
-    private resolveUnknownTypeSymbol(node: cs.Node, tsType: ts.Type, tsSymbol?: ts.Symbol, typeArguments?: cs.UnresolvedTypeNode[]): cs.TypeNode | null {
+    private resolveUnknownTypeSymbol(
+        node: cs.Node,
+        tsType: ts.Type,
+        tsSymbol?: ts.Symbol,
+        typeArguments?: cs.UnresolvedTypeNode[]
+    ): cs.TypeNode | null {
         if (!tsSymbol) {
             tsSymbol = tsType.symbol;
         }
@@ -156,25 +286,71 @@ export default class CSharpEmitterContext {
 
         // some built in type handling
         switch (tsSymbol.name) {
-            case 'Error':
+            case 'Promise':
+                const promiseType = tsType as ts.TypeReference;
+                if (typeArguments) {
+                    return typeArguments[0];
+                } else if (promiseType.typeArguments) {
+                    return this.getTypeFromTsType(node, promiseType.typeArguments[0]);
+                }
+                return null;
+            case 'Map':
+                const mapType = tsType as ts.TypeReference;
+                let mapValueType: cs.TypeNode | null = null;
+                if (typeArguments) {
+                    mapValueType = this.resolveType(typeArguments[1]);
+                } else if (mapType.typeArguments) {
+                    mapValueType = this.getTypeFromTsType(node, mapType.typeArguments[1]);
+                }
+
+                let isValueType = false;
+                if (mapValueType) {
+                    switch (mapValueType.nodeType) {
+                        case cs.SyntaxKind.PrimitiveTypeNode:
+                            switch ((mapValueType as cs.PrimitiveTypeNode).type) {
+                                case cs.PrimitiveType.Bool:
+                                case cs.PrimitiveType.Int:
+                                case cs.PrimitiveType.Double:
+                                    isValueType = true;
+                                    break;
+                            }
+                            break;
+                        case cs.SyntaxKind.TypeReference:
+                            const ref = (mapValueType as cs.TypeReference).reference;
+                            if (typeof ref !== 'string') {
+                                switch (ref.nodeType) {
+                                    case cs.SyntaxKind.EnumDeclaration:
+                                        isValueType = true;
+                                        break;
+                                }
+                            }
+                            break;
+                    }
+                }
+
                 return {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: node.parent,
                     tsNode: node.tsNode,
-                    reference: 'System.Exception'
+                    reference: this.buildCoreNamespace(tsSymbol) + (isValueType ? 'ValueTypeMap' : 'Map'),
+                    typeArguments: typeArguments
                 } as cs.TypeReference;
-
             case 'Array':
                 const arrayType = tsType as ts.TypeReference;
                 let arrayElementType: cs.TypeNode | null = null;
-                if(typeArguments) {
+                if (typeArguments) {
                     arrayElementType = this.resolveType(typeArguments[0]);
-                } else if(arrayType.typeArguments) {
+                } else if (arrayType.typeArguments) {
                     arrayElementType = this.getTypeFromTsType(node, arrayType.typeArguments[0]);
                 }
 
-                if(!arrayElementType) {
-                    return null;
+                if (!arrayElementType) {
+                    arrayElementType = {
+                        nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                        parent: node.parent,
+                        tsNode: node.tsNode,
+                        type: cs.PrimitiveType.Object
+                    } as cs.PrimitiveTypeNode;
                 }
 
                 return {
@@ -196,7 +372,8 @@ export default class CSharpEmitterContext {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: node.parent,
                     tsNode: node.tsNode,
-                    reference: this.buildCoreNamespace(tsSymbol) + tsSymbol.name
+                    reference: this.buildCoreNamespace(tsSymbol) + tsSymbol.name,
+                    typeArguments: typeArguments
                 } as cs.TypeReference;
         }
     }
@@ -383,6 +560,17 @@ export default class CSharpEmitterContext {
         } as cs.TypeReference;
     }
 
+    public isDefaultValueNull(tsType: ts.Type): boolean {
+        tsType = this.typeChecker.getNonNullableType(tsType);
+        if ((tsType.flags & ts.TypeFlags.Number) !== 0 || (tsType.flags & ts.TypeFlags.NumberLiteral) !== 0) {
+            return false;
+        }
+        if ((tsType.flags & ts.TypeFlags.Boolean) !== 0 || (tsType.flags & ts.TypeFlags.BooleanLiteral) !== 0) {
+            return false;
+        }
+        return true;
+    }
+
     private resolvePrimitiveType(parent: cs.Node, tsType: ts.Type): cs.TypeNode | null {
         const handleNullablePrimitive = (type: cs.PrimitiveType) => {
             let isNullable = false;
@@ -417,7 +605,9 @@ export default class CSharpEmitterContext {
 
         // unknown -> object
         if ((tsType.flags & ts.TypeFlags.Unknown) !== 0) {
-            return handleNullablePrimitive(cs.PrimitiveType.Object);
+            const unknown = handleNullablePrimitive(cs.PrimitiveType.Object);
+            unknown.isNullable = true;
+            return unknown;
         }
 
         // number or number literal -> double
@@ -443,12 +633,26 @@ export default class CSharpEmitterContext {
             } as cs.PrimitiveTypeNode;
         }
 
+        // never -> dynamic
+        // (actually it would be void for usages on return values, but we rather have it as array element type on empty arrays)
+        if ((tsType.flags & ts.TypeFlags.Never) !== 0) {
+            return {
+                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                type: cs.PrimitiveType.Dynamic
+            } as cs.PrimitiveTypeNode;
+        }
+
         return null;
     }
 
-    private resolveKnownTypeSymbol(node: cs.Node, tsType: ts.Type): cs.TypeNode | null {
-        if (tsType.symbol && this._symbolLookup.has(tsType.symbol)) {
-            const declaration = this._symbolLookup.get(tsType.symbol)!;
+    private resolveKnownTypeSymbol(
+        node: cs.Node,
+        tsType: ts.Type,
+        typeArguments?: cs.UnresolvedTypeNode[]
+    ): cs.TypeNode | null {
+        const symbolKey = this.getSymbolKey(tsType.symbol);
+        if (tsType.symbol && this._symbolLookup.has(symbolKey)) {
+            const declaration = this._symbolLookup.get(symbolKey)!;
             const reference = {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: node.parent,
@@ -456,11 +660,10 @@ export default class CSharpEmitterContext {
                 reference: declaration
             } as cs.TypeReference;
 
-            const typeArguments = (tsType as ts.TypeReference).typeArguments;
             if (typeArguments) {
                 reference.typeArguments = [];
                 typeArguments.forEach(a => {
-                    const parameterType = this.getTypeFromTsType(node, a);
+                    const parameterType = this.resolveType(a);
                     if (!parameterType) {
                         this.addTsNodeDiagnostics(
                             node.tsNode!,
@@ -471,9 +674,33 @@ export default class CSharpEmitterContext {
                         reference.typeArguments!.push(parameterType);
                     }
                 });
+            } else {
+                const tsTypeArguments = (tsType as ts.TypeReference).typeArguments;
+                if (tsTypeArguments) {
+                    reference.typeArguments = [];
+                    tsTypeArguments.forEach(a => {
+                        const parameterType = this.getTypeFromTsType(node, a);
+                        if (!parameterType) {
+                            this.addTsNodeDiagnostics(
+                                node.tsNode!,
+                                'Could not resolve type parameter',
+                                ts.DiagnosticCategory.Error
+                            );
+                        } else {
+                            reference.typeArguments!.push(parameterType);
+                        }
+                    });
+                }
             }
 
             return reference;
+        } else if (tsType.isTypeParameter()) {
+            return {
+                nodeType: cs.SyntaxKind.TypeReference,
+                parent: node.parent,
+                tsNode: node.tsNode,
+                reference: tsType.symbol.name
+            } as cs.TypeReference;
         }
 
         return null;
@@ -486,10 +713,7 @@ export default class CSharpEmitterContext {
             if (fileName.startsWith('lib.') && fileName.endsWith('.d.ts')) {
                 fileName = fileName.substring(4, fileName.length - 5);
                 if (fileName.length) {
-                    suffix = fileName
-                        .split('.')
-                        .map(s => '.' + this.toPascalCase(s))
-                        .join('');
+                    suffix = fileName.split('.').map(s => '.' + this.toPascalCase(s))[0];
                 }
             }
         }
@@ -497,23 +721,365 @@ export default class CSharpEmitterContext {
     }
 
     public toPascalCase(text: string): string {
+        if (text.indexOf('-') >= 0) {
+            return this.kebabCaseToPascalCase(text);
+        }
+
         return text ? text.substr(0, 1).toUpperCase() + text.substr(1) : '';
     }
 
-    public registerSymbol(node: cs.Node, declaration: ts.Declaration) {
-        if (node.tsNode) {
-            const symbol = this.getSymbolForDeclaration(declaration);
-            if (symbol) {
-                this._symbolLookup.set(symbol, node);
-            }
+    private kebabCaseToPascalCase(text: string): string {
+        return text
+            .split('-')
+            .map(w => this.toPascalCase(w))
+            .join('');
+    }
+
+    public registerSymbol(node: cs.NamedElement & cs.Node) {
+        const symbol = this.getSymbolForDeclaration(node.tsNode!);
+        if (symbol) {
+            const symbolKey = this.getSymbolKey(symbol);
+            this._symbolLookup.set(symbolKey, node);
+        } else {
+            this.addCsNodeDiagnostics(node, 'Could not register symbol', ts.DiagnosticCategory.Error);
         }
     }
 
-    private getSymbolForDeclaration(declaration: ts.Declaration): ts.Symbol | undefined {
-        let symbol = this.typeChecker.getSymbolAtLocation(declaration);
+    public isConst(declaration: cs.FieldDeclaration) {
+        const symbolKey = this.getSymbolKey(declaration.tsSymbol!);
+        return this._symbolConst.has(symbolKey);
+    }
+
+    public registerSymbolAsConst(symbol: ts.Symbol) {
+        const symbolKey = this.getSymbolKey(symbol);
+        this._symbolConst.set(symbolKey, true);
+    }
+
+    private getSymbolKey(symbol: ts.Symbol | undefined): SymbolKey {
         if (!symbol) {
-            symbol = this.typeChecker.getSymbolAtLocation(ts.getNameOfDeclaration(declaration)!);
+            return '';
+        }
+
+        if (symbol.flags & ts.SymbolFlags.Alias) {
+            symbol = this.typeChecker.getAliasedSymbol(symbol);
+        }
+
+        const declaration = symbol.valueDeclaration
+            ? symbol.valueDeclaration
+            : symbol.declarations && symbol.declarations.length > 0
+            ? symbol.declarations[0]
+            : undefined;
+
+        if (declaration) {
+            return symbol.name + '_' + declaration.getSourceFile().fileName + '_' + declaration.pos;
+        } else {
+            return symbol.name;
+        }
+    }
+
+    public getSymbolForDeclaration(node: ts.Node): ts.Symbol | undefined {
+        let symbol = this.typeChecker.getSymbolAtLocation(node);
+        if (!symbol) {
+            const name = (node as any).name;
+            if (name) {
+                symbol = this.typeChecker.getSymbolAtLocation(name);
+            }
         }
         return symbol;
+    }
+
+    public isBooleanSmartCast(tsNode: ts.Node) {
+        let tsParent = tsNode.parent!;
+        while (tsParent.kind === ts.SyntaxKind.ParenthesizedExpression) {
+            tsNode = tsParent;
+            tsParent = tsParent.parent!;
+        }
+        switch (tsParent.kind) {
+            case ts.SyntaxKind.ConditionalExpression:
+                if ((tsParent as ts.ConditionalExpression).condition !== tsNode) {
+                    return false;
+                }
+                break;
+            case ts.SyntaxKind.PrefixUnaryExpression:
+                if ((tsParent as ts.PrefixUnaryExpression).operator !== ts.SyntaxKind.ExclamationToken) {
+                    return false;
+                }
+                break;
+            case ts.SyntaxKind.IfStatement:
+                if ((tsParent as ts.IfStatement).expression !== tsNode) {
+                    return false;
+                }
+                break;
+            case ts.SyntaxKind.WhileStatement:
+                if ((tsParent as ts.WhileStatement).expression !== tsNode) {
+                    return false;
+                }
+                break;
+            case ts.SyntaxKind.ForStatement:
+                if ((tsParent as ts.ForStatement).condition !== tsNode) {
+                    return false;
+                }
+                break;
+            case ts.SyntaxKind.BinaryExpression:
+                switch ((tsParent as ts.BinaryExpression).operatorToken.kind) {
+                    case ts.SyntaxKind.AmpersandAmpersandToken:
+                    case ts.SyntaxKind.BarBarToken:
+                        break;
+                    default:
+                        return false;
+                }
+                break;
+            default:
+                return false;
+        }
+
+        // check if expression results in bool
+        const type = this.typeChecker.getTypeAtLocation(tsNode);
+        if (!type || this.isBooleanType(type)) {
+            return true;
+        }
+
+        return true;
+    }
+
+    public isValueTypeNotNullSmartCast(expression: ts.Expression): boolean | undefined {
+        if (
+            expression.parent.kind === ts.SyntaxKind.AsExpression || // already a cast
+            expression.parent.kind === ts.SyntaxKind.NonNullExpression || // explicit non null expression
+            this.isBooleanSmartCast(expression) ||
+            (ts.isBinaryExpression(expression.parent) &&
+                expression.parent.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+                expression.parent.left === expression) // left hand side assignment
+        ) {
+            return undefined;
+        }
+
+        // unwrap symbol of expression to get declared type
+        let symbol = this.typeChecker.getSymbolAtLocation(expression);
+        if (!symbol || !symbol.declarations || symbol.declarations.length === 0) {
+            return undefined;
+        }
+        if (symbol.flags & ts.SymbolFlags.Alias) {
+            symbol = this.typeChecker.getAliasedSymbol(symbol);
+        }
+        if (symbol.flags & ts.SymbolFlags.Interface || symbol.flags & ts.SymbolFlags.Class) {
+            return undefined;
+        }
+
+        // declared type must be nullable
+        let declaredType = this.typeChecker.getTypeAtLocation(symbol.declarations[0]);
+        if (!this.isNullableType(declaredType)) {
+            return undefined;
+        }
+
+        // actual type at location must be non nullable
+        let declaredTypeNonNull = this.typeChecker.getNonNullableType(declaredType);
+        let contextualType = this.typeChecker.getTypeOfSymbolAtLocation(symbol, expression);
+        if (!contextualType || this.isNullableType(contextualType)) {
+            return undefined;
+        }
+
+        // actual type must match non nullable declaration
+        if (declaredTypeNonNull === contextualType) {
+            return this.isValueType(declaredTypeNonNull);
+        }
+
+        return undefined;
+    }
+
+    public isNullableType(declaredType: ts.Type): boolean {
+        return (
+            declaredType.isUnion() &&
+            !!declaredType.types.find(t => t.flags & ts.TypeFlags.Null || t.flags & ts.TypeFlags.Undefined)
+        );
+    }
+
+    public getSmartCastType(expression: ts.Expression): ts.Type | null {
+        // if the parent is already casting, we have no "smart" cast.
+        if (expression.parent.kind === ts.SyntaxKind.AsExpression) {
+            return null;
+        }
+
+        // we consider the expression as smart casted if the declared symbol has a different
+        // contextual type than the declared type.
+        let symbol = this.typeChecker.getSymbolAtLocation(expression);
+        if (!symbol || !symbol.declarations || symbol.declarations.length === 0) {
+            return null;
+        }
+
+        if (symbol.flags & ts.SymbolFlags.Alias) {
+            symbol = this.typeChecker.getAliasedSymbol(symbol);
+        }
+
+        if (symbol.flags & ts.SymbolFlags.Interface || symbol.flags & ts.SymbolFlags.Class) {
+            return null;
+        }
+
+        let contextualType = this.typeChecker.getContextualType(expression);
+        if (!contextualType) {
+            contextualType = this.typeChecker.getTypeOfSymbolAtLocation(symbol, expression);
+            if (!contextualType) {
+                return null;
+            }
+        }
+
+        let declaredType = this.typeChecker.getTypeAtLocation(symbol.declarations[0]);
+
+        contextualType = this.typeChecker.getNonNullableType(contextualType);
+        declaredType = this.typeChecker.getNonNullableType(declaredType);
+
+        if (this.shouldSkipSmartCast(contextualType)) {
+            return null;
+        }
+
+        // cast enums to numbers in arithmetic operations
+        if (
+            expression.parent &&
+            (contextualType.flags & ts.TypeFlags.Enum || contextualType.flags & ts.TypeFlags.EnumLiteral)
+        ) {
+            if (ts.isBinaryExpression(expression.parent)) {
+                switch (expression.parent.operatorToken.kind) {
+                    case ts.SyntaxKind.AsteriskToken:
+                    case ts.SyntaxKind.PlusToken:
+                    case ts.SyntaxKind.MinusEqualsToken:
+                    case ts.SyntaxKind.SlashToken:
+                        return (this.typeChecker as any).getNumberType();
+                    case ts.SyntaxKind.EqualsEqualsToken:
+                    case ts.SyntaxKind.EqualsEqualsEqualsToken:
+                    case ts.SyntaxKind.ExclamationEqualsToken:
+                    case ts.SyntaxKind.ExclamationEqualsEqualsToken:
+                    case ts.SyntaxKind.GreaterThanEqualsToken:
+                    case ts.SyntaxKind.GreaterThanToken:
+                    case ts.SyntaxKind.LessThanEqualsToken:
+                    case ts.SyntaxKind.LessThanToken:
+                        const otherExpr =
+                            expression.parent.left === expression ? expression.parent.right : expression.parent.left;
+                        const otherExprType = this.typeChecker.getTypeAtLocation(otherExpr);
+                        if (otherExprType && otherExprType.flags & ts.TypeFlags.Number) {
+                            return (this.typeChecker as any).getNumberType();
+                        }
+                        break;
+                }
+            } else if (
+                ts.isElementAccessExpression(expression.parent) &&
+                expression.parent.argumentExpression === expression
+            ) {
+                return (this.typeChecker as any).getNumberType();
+            }
+        }
+
+        return contextualType !== declaredType && !this.isTypeAssignable(contextualType, declaredType)
+            ? contextualType
+            : null;
+    }
+    shouldSkipSmartCast(contextualType: ts.Type) {
+        // unions that are no enums
+        if (contextualType.isUnion() && (contextualType.flags & (ts.TypeFlags.Enum | ts.TypeFlags.EnumLiteral)) === 0) {
+            return true;
+        }
+
+        // no function types
+        if (this.isFunctionType(contextualType)) {
+            return true;
+        }
+
+        // some core types
+        if (contextualType.symbol) {
+            switch (contextualType.symbol.name) {
+                case 'ArrayLike':
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public isFunctionType(contextualType: ts.Type): boolean {
+        if (!contextualType.symbol || !contextualType.symbol.declarations) {
+            return false;
+        }
+        for (const declaration of contextualType.symbol.declarations) {
+            if (ts.isFunctionTypeNode(declaration)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public isOverride(classElement: ts.ClassElement): boolean {
+        let parent: ts.Node = classElement;
+        while (parent.kind !== ts.SyntaxKind.ClassDeclaration) {
+            if (parent.parent) {
+                parent = parent.parent;
+            } else {
+                return false;
+            }
+        }
+
+        let classDecl = parent as ts.ClassDeclaration;
+        let classSymbol = this.typeChecker.getSymbolAtLocation(classDecl.name!);
+        if (!classSymbol) {
+            return false;
+        }
+
+        let classType = this.typeChecker.getDeclaredTypeOfSymbol(classSymbol);
+        if (!classType || !classType.isClass()) {
+            return false;
+        }
+
+        if (this.hasAnyBaseTypeClassMember(classType, classElement.name!.getText())) {
+            return true;
+        }
+
+        return false;
+    }
+    private hasAnyBaseTypeClassMember(classType: ts.InterfaceType, memberName: string) {
+        const baseTypes = classType.getBaseTypes();
+        if (!baseTypes) {
+            return false;
+        }
+
+        for (const baseType of baseTypes) {
+            if (baseType.isClass() && this.hasClassMember(baseType, memberName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private hasClassMember(baseType: ts.InterfaceType, name: string): boolean {
+        if (
+            baseType.symbol &&
+            baseType.symbol.members &&
+            baseType.symbol.members.has(ts.escapeLeadingUnderscores(name))
+        ) {
+            return true;
+        }
+
+        return this.hasAnyBaseTypeClassMember(baseType, name);
+    }
+
+    public isValueTypeExpression(expression: ts.NonNullExpression) {
+        const tsType = this.typeChecker.getTypeAtLocation(expression);
+        return this.isValueType(tsType);
+    }
+
+    public isValueType(tsType: ts.Type) {
+        // primitives
+        if ((tsType.flags & ts.TypeFlags.Number) !== 0 || (tsType.flags & ts.TypeFlags.NumberLiteral) !== 0) {
+            return true;
+        }
+        if ((tsType.flags & ts.TypeFlags.Boolean) !== 0 || (tsType.flags & ts.TypeFlags.BooleanLiteral) !== 0) {
+            return true;
+        }
+
+        // enums
+        if (tsType.symbol && tsType.symbol.flags & ts.SymbolFlags.Enum) {
+            return true;
+        }
+
+        return false;
     }
 }

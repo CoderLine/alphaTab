@@ -50,7 +50,7 @@ export enum SyntaxKind {
     PostfixUnaryExpression,
     NullLiteral,
     TrueLiteral,
-    FalseLiteralExpression,
+    FalseLiteral,
     ThisLiteral,
     BaseLiteralExpression,
     StringLiteral,
@@ -73,11 +73,15 @@ export enum SyntaxKind {
     NonNullExpression,
     NullSafeExpression,
     Identifier,
-    ToDoExpression
+    DefaultExpression,
+    ToDoExpression,
+    
+    Attribute
 }
 
 export interface Node {
     tsNode?: ts.Node;
+    tsSymbol?: ts.Symbol;
     nodeType: SyntaxKind;
     parent: Node | null;
 }
@@ -111,6 +115,14 @@ export enum Visibility {
 export interface DocumentedElement {
     documentation?: string;
 }
+export interface AttributedElement {
+    attributes?: Attribute[];
+}
+
+export interface Attribute extends Node {
+    type: TypeNode,
+    arguments?: Expression[]
+}
 
 export interface NamedElement {
     name: string;
@@ -118,9 +130,11 @@ export interface NamedElement {
 
 // Declarations
 
-export interface TypeParameterDeclaration extends NamedElement, Node {}
+export interface TypeParameterDeclaration extends NamedElement, Node {
+    constraint?: TypeNode;
+}
 
-export interface NamedTypeDeclaration extends NamedElement, DocumentedElement, Node {
+export interface NamedTypeDeclaration extends NamedElement, DocumentedElement, Node, AttributedElement {
     typeParameters?: TypeParameterDeclaration[];
     visibility: Visibility;
 }
@@ -129,6 +143,7 @@ export interface ClassDeclaration extends NamedTypeDeclaration {
     baseClass?: TypeNode;
     interfaces?: TypeNode[];
     isAbstract: boolean;
+    partial: boolean;
     members: ClassMember[];
 }
 
@@ -163,9 +178,10 @@ export interface MemberDeclaration extends NamedElement, DocumentedElement, Node
 export interface MethodDeclarationBase extends MemberDeclaration {
     parameters: ParameterDeclaration[];
     body?: Block | Expression;
+    isAsync?: boolean;
 }
 
-export interface MethodDeclaration extends MethodDeclarationBase {
+export interface MethodDeclaration extends MethodDeclarationBase, AttributedElement {
     isVirtual: boolean;
     isOverride: boolean;
     isAbstract: boolean;
@@ -213,6 +229,7 @@ export interface DelegateDeclaration extends NamedTypeDeclaration {
 export interface ParameterDeclaration extends NamedElement, Node, DocumentedElement {
     type?: TypeNode;
     initializer?: Expression;
+    params: boolean;
 }
 
 // Type System
@@ -228,8 +245,9 @@ export interface UnresolvedTypeNode extends TypeNode {
     typeArguments?: UnresolvedTypeNode[];
 }
 
+export type TypeReferenceType = NamedTypeDeclaration | TypeParameterDeclaration | PrimitiveTypeNode | string;
 export interface TypeReference extends TypeNode {
-    reference: NamedTypeDeclaration | TypeParameterDeclaration | PrimitiveTypeNode | string;
+    reference: TypeReferenceType;
     typeArguments?: TypeNode[];
 }
 
@@ -241,6 +259,7 @@ export enum PrimitiveType {
     Bool,
     String,
     Double,
+    Int,
     Void,
     Object,
     Dynamic
@@ -312,6 +331,9 @@ export interface IsExpression extends Node {
 export interface ParenthesizedExpression extends Node {
     expression: Expression;
 }
+export interface DefaultExpression extends Node {
+    type?: TypeNode;
+}
 export interface ArrayCreationExpression extends Node {
     type?: TypeNode;
     values: Expression[];
@@ -319,6 +341,7 @@ export interface ArrayCreationExpression extends Node {
 export interface MemberAccessExpression extends Node {
     expression: Expression;
     member: string;
+    nullSafe?: boolean;
 }
 
 export interface AnonymousObjectCreationExpression extends Node {
@@ -359,7 +382,7 @@ export interface NullSafeExpression extends Node {
     expression: Expression;
 }
 
-export interface Identifier extends Node {
+export interface Identifier extends Expression {
     text: string;
 }
 

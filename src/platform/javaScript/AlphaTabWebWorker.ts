@@ -6,6 +6,9 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/util/Logger';
 
+/**
+ * @target web
+ */
 export class AlphaTabWebWorker {
     private _renderer!: ScoreRenderer;
     private _main: IWorkerScope;
@@ -93,28 +96,15 @@ export class AlphaTabWebWorker {
         try {
             this._renderer.renderScore(score, trackIndexes);
         } catch (e) {
-            this.error('render', e);
+            this.error(e);
         }
     }
 
-    private error(type: string, e: any): void {
-        Logger.error(type, 'An unexpected error occurred in worker', e);
-        let error: any = JSON.parse(JSON.stringify(e));
-        if (e.message) {
-            error.message = e.message;
-        }
-        if (e.stack) {
-            error.stack = e.stack;
-        }
-        if (e.constructor && e.constructor.name) {
-            error.type = e.constructor.name;
-        }
+    private error(error:Error): void {
+        Logger.error('Worker', 'An unexpected error occurred in worker', error);
         this._main.postMessage({
             cmd: 'alphaTab.error',
-            error: {
-                type: type,
-                detail: error
-            }
+            error: error
         });
     }
 }

@@ -31,7 +31,7 @@ export class MusicXmlImporterTestHelper {
     ): Promise<Score> {
         const fileData = await TestPlatform.loadFile(file);
         try {
-            let importer: MusicXmlImporter = this.prepareImporterWithBytes(fileData);
+            let importer: MusicXmlImporter = MusicXmlImporterTestHelper.prepareImporterWithBytes(fileData);
             let score: Score = importer.readScore();
             return score;
         } catch (e) {
@@ -42,26 +42,26 @@ export class MusicXmlImporterTestHelper {
         }
     }
 
-    protected getHierarchy(node: any): string {
+    protected static getHierarchy(node: any): string {
         let note: Note | null = node instanceof Note ? node : null;
         if (note) {
-            return `${this.getHierarchy(note.beat)}Note[${note.index}]`;
+            return `${MusicXmlImporterTestHelper.getHierarchy(note.beat)}Note[${note.index}]`;
         }
         let beat: Beat | null = node instanceof Beat ? node : null;
         if (beat) {
-            return `${this.getHierarchy(beat.voice)}Beat[${beat.index}]`;
+            return `${MusicXmlImporterTestHelper.getHierarchy(beat.voice)}Beat[${beat.index}]`;
         }
         let voice: Voice | null = node instanceof Voice ? node : null;
         if (voice) {
-            return `${this.getHierarchy(voice.bar)}Voice[${voice.index}]`;
+            return `${MusicXmlImporterTestHelper.getHierarchy(voice.bar)}Voice[${voice.index}]`;
         }
         let bar: Bar | null = node instanceof Bar ? node : null;
         if (bar) {
-            return `${this.getHierarchy(bar.staff)}Bar[${bar.index}]`;
+            return `${MusicXmlImporterTestHelper.getHierarchy(bar.staff)}Bar[${bar.index}]`;
         }
         let staff: Staff | null = node instanceof Staff ? node : null;
         if (staff) {
-            return `${this.getHierarchy(staff.track)}Staff[${staff.index}]`;
+            return `${MusicXmlImporterTestHelper.getHierarchy(staff.track)}Staff[${staff.index}]`;
         }
         let track: Track | null = node instanceof Track ? node : null;
         if (track) {

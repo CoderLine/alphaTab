@@ -6,7 +6,7 @@ import { MidiFile } from '@src/audio/midi/MidiFile';
 import { PlaybackRange } from '@src/audio/synth/PlaybackRange';
 import { SynthEvent } from '@src/audio/synth/synthesis/SynthEvent';
 import { TinySoundFont } from '@src/audio/synth/synthesis/TinySoundFont';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
 import { Logger } from '@src/util/Logger';
 
 export class MidiFileSequencerTempoChange {
@@ -274,7 +274,7 @@ export class MidiFileSequencer {
         return ticks + 1;
     }
 
-    public finished: EventEmitter<() => void> = new EventEmitter();
+    public finished: IEventEmitter = new EventEmitter();
 
     private get internalEndTime(): number {
         return !this.playbackRange ? this._endTime : this._playbackRangeEndTime;
@@ -286,7 +286,7 @@ export class MidiFileSequencer {
             this._synthesizer.noteOffAll(true);
             this._synthesizer.resetSoft();
             this._synthesizer.setupMetronomeChannel(metronomeVolume);
-            this.finished.trigger();
+            (this.finished as EventEmitter).trigger();
         }
     }
 

@@ -28,7 +28,7 @@ export class BitReader {
     public readBytes(count: number): Uint8Array {
         const bytes: Uint8Array = new Uint8Array(count);
         for (let i: number = 0; i < count; i++) {
-            bytes[i] = this.readByte() & 0xFF;
+            bytes[i] = this.readByte() & 0xff;
         }
         return bytes;
     }
@@ -37,7 +37,7 @@ export class BitReader {
         let bits: number = 0;
         let i: number = count - 1;
         while (i >= 0) {
-            bits |= this.readBit() << i;
+            bits = bits | (this.readBit() << i);
             i--;
         }
         return bits;
@@ -46,7 +46,7 @@ export class BitReader {
     public readBitsReversed(count: number): number {
         let bits: number = 0;
         for (let i: number = 0; i < count; i++) {
-            bits |= this.readBit() << i;
+            bits = bits | (this.readBit() << i);
         }
         return bits;
     }
@@ -55,7 +55,7 @@ export class BitReader {
         // need a new byte?
         if (this._position >= 8) {
             this._currentByte = this._source.readByte();
-            if (this._currentByte===-1) {
+            if (this._currentByte === -1) {
                 throw new EndOfReaderError();
             }
             this._position = 0;
@@ -71,7 +71,7 @@ export class BitReader {
         let all: ByteBuffer = ByteBuffer.empty();
         try {
             while (true) {
-                all.writeByte(this.readByte() & 0xFF);
+                all.writeByte(this.readByte() & 0xff);
             }
         } catch (e) {
             if (!(e instanceof EndOfReaderError)) {

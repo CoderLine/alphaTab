@@ -817,7 +817,7 @@ export class GpifParser {
                         let alternateEndings: string[] = c.innerText.split(' ');
                         let i: number = 0;
                         for (let k: number = 0; k < alternateEndings.length; k++) {
-                            i |= 1 << (-1 + parseInt(alternateEndings[k]));
+                            i = i | (1 << (-1 + parseInt(alternateEndings[k])));
                         }
                         masterBar.alternateEndings = i;
                         break;

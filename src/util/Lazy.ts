@@ -1,3 +1,6 @@
+/**
+ * @target web
+ */
 export class Lazy<T> {
     private _factory: () => T;
     private _value: T | undefined = undefined;

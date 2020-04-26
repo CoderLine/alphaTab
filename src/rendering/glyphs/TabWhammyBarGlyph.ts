@@ -113,7 +113,7 @@ export class TabWhammyBarGlyph extends Glyph {
             endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff.staveId,
                 endBeat.voice.bar
-            );
+            ) as TabBarRenderer;
             if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                 endBeat = null;
                 endNoteRenderer = null;

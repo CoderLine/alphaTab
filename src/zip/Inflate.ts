@@ -303,7 +303,7 @@ export class Inflate {
         }
         let b: boolean = (this._bits & 1) === 1;
         this._nbits--;
-        this._bits >>= 1;
+        this._bits = this._bits >> 1;
         return b;
     }
 
@@ -314,7 +314,7 @@ export class Inflate {
         }
         let b: number = this._bits & ((1 << n) - 1);
         this._nbits -= n;
-        this._bits >>= n;
+        this._bits = this._bits >> n;
         return b;
     }
 

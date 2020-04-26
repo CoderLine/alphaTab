@@ -1,8 +1,11 @@
 import { ISynthOutput } from '@src/audio/synth/ISynthOutput';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { IWorkerScope } from '@src/platform/javaScript/IWorkerScope';
 import { Logger } from '@src/util/Logger';
 
+/**
+ * @target web
+ */
 export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public static readonly CmdOutputPrefix: string = 'alphaSynth.output.';
     public static readonly CmdOutputSequencerFinished: string =
@@ -31,7 +34,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
         Logger.debug('AlphaSynth', 'Initializing webworker worker');
         this._worker = (globalThis as unknown) as IWorkerScope;
         this._worker.addEventListener('message', this.handleMessage.bind(this));
-        this.ready.trigger();
+        (this.ready as EventEmitter).trigger();
     }
 
     private handleMessage(e: MessageEvent): void {
@@ -39,21 +42,21 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
         let cmd: any = data.cmd;
         switch (cmd) {
             case AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest:
-                this.sampleRequest.trigger();
+                (this.sampleRequest as EventEmitter).trigger();
                 break;
             case AlphaSynthWorkerSynthOutput.CmdOutputFinished:
-                this.finished.trigger();
+                (this.finished as EventEmitter).trigger();
                 break;
             case AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed:
-                this.samplesPlayed.trigger(data.samples);
+                (this.samplesPlayed as EventEmitterOfT<number>).trigger(data.samples);
                 break;
         }
     }
 
-    public readonly ready: EventEmitter<() => void> = new EventEmitter();
-    public readonly samplesPlayed: EventEmitter<(count: number) => void> = new EventEmitter();
-    public readonly sampleRequest: EventEmitter<() => void> = new EventEmitter();
-    public readonly finished: EventEmitter<() => void> = new EventEmitter();
+    public readonly ready: IEventEmitter = new EventEmitter();
+    public readonly samplesPlayed: IEventEmitterOfT<number> = new EventEmitterOfT<number>();
+    public readonly sampleRequest: IEventEmitter = new EventEmitter();
+    public readonly finished: IEventEmitter = new EventEmitter();
 
     public sequencerFinished(): void {
         this._worker.postMessage({

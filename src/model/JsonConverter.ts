@@ -32,6 +32,7 @@ interface SerializedNote {
 /**
  * This class can convert a full {@link Score} instance to a simple JavaScript object and back for further
  * JSON serialization.
+ * @target web
  */
 export class JsonConverter {
     /**

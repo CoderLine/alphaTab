@@ -18,12 +18,12 @@ import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 
 describe('Gp7ImporterTest', () => {
-    const prepareGp7ImporterWithFile = async function (name: string): Promise<Gp7Importer> {
+    const prepareGp7ImporterWithFile:(name:string) => Promise<Gp7Importer> = async (name: string): Promise<Gp7Importer> => {
         const data = await TestPlatform.loadFile('test-data/' + name);
         return prepareGp7ImporterWithBytes(data);
     };
 
-    const prepareGp7ImporterWithBytes = function (buffer: Uint8Array): Gp7Importer {
+    const prepareGp7ImporterWithBytes: (buffer: Uint8Array) => Gp7Importer = (buffer: Uint8Array): Gp7Importer => {
         let readerBase: Gp7Importer = new Gp7Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;

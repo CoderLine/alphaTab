@@ -7,6 +7,9 @@ import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/util/Logger';
 
+/**
+ * @target web
+ */
 export declare class jQuery extends Array<HTMLElement> {
     public constructor(v?: any);
 
@@ -24,8 +27,11 @@ export declare class jQuery extends Array<HTMLElement> {
     public empty(): jQuery;
 }
 
+/**
+ * @target web
+ */
 export class JQueryAlphaTab {
-    public exec(element: HTMLElement, method: string, args: string[]): unknown {
+    public exec(element: HTMLElement, method: string, args: any[]): unknown {
         if (typeof method !== 'string') {
             args = [method];
             method = 'init';

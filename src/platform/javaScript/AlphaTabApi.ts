@@ -3,13 +3,16 @@ import { AlphaSynthMidiFileHandler } from '@src/audio/midi/generator/AlphaSynthM
 import { MidiFileGenerator } from '@src/audio/midi/generator/MidiFileGenerator';
 import { MidiFile } from '@src/audio/midi/MidiFile';
 import { LayoutMode } from '@src/DisplaySettings';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Track } from '@src/model/Track';
 import { AlphaSynthWebWorkerApi } from '@src/platform/javaScript/AlphaSynthWebWorkerApi';
 import { BrowserUiFacade } from '@src/platform/javaScript/BrowserUiFacade';
 import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { Settings } from '@src/Settings';
 
+/**
+ * @target web
+ */
 export class AlphaTabApi extends AlphaTabApiBase<unknown> {
     public constructor(element: HTMLElement, options: unknown) {
         super(new BrowserUiFacade(element), options);
@@ -134,7 +137,7 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         return tracks;
     }
 
-    public soundFontLoad: EventEmitter<(e: ProgressEventArgs) => void> = new EventEmitter();
+    public soundFontLoad: IEventEmitterOfT<ProgressEventArgs> = new EventEmitterOfT<ProgressEventArgs>();
 
     public loadSoundFontFromUrl(url: string): void {
         if (!this.player) {
@@ -142,7 +145,7 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         }
         (this.player as AlphaSynthWebWorkerApi).loadSoundFontFromUrl(
             url,
-            this.soundFontLoad.trigger.bind(this.soundFontLoad)
+            (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger.bind(this.soundFontLoad)
         );
     }
 }

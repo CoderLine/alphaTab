@@ -1,5 +1,5 @@
 import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitterOfT, IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { Score } from '@src/model/Score';
 import { FontSizes } from '@src/platform/svg/FontSizes';
@@ -9,6 +9,9 @@ import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/util/Logger';
 
+/**
+ * @target web
+ */
 export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     private _api: AlphaTabApiBase<T>;
     private _worker!: Worker;
@@ -91,20 +94,20 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         let cmd: string = data.cmd;
         switch (cmd) {
             case 'alphaTab.preRender':
-                this.preRender.trigger(data.resize);
+                (this.preRender as EventEmitterOfT<boolean>).trigger(data.resize);
                 break;
             case 'alphaTab.partialRenderFinished':
-                this.partialRenderFinished.trigger(data.result);
+                (this.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
                 break;
             case 'alphaTab.renderFinished':
-                this.renderFinished.trigger(data.result);
+                (this.renderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
                 break;
             case 'alphaTab.postRenderFinished':
                 this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, this._api.score!);
-                this.postRenderFinished.trigger();
+                (this.postRenderFinished as EventEmitter).trigger();
                 break;
             case 'alphaTab.error':
-                this.error.trigger(data.type, data.detail);
+                (this.error as EventEmitterOfT<Error>).trigger(data.error);
                 break;
         }
     }
@@ -119,9 +122,9 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
-    public preRender: EventEmitter<(isResize: boolean) => void> = new EventEmitter();
-    public partialRenderFinished: EventEmitter<(e: RenderFinishedEventArgs) => void> = new EventEmitter();
-    public renderFinished: EventEmitter<(e: RenderFinishedEventArgs) => void> = new EventEmitter();
-    public postRenderFinished: EventEmitter<() => void> = new EventEmitter();
-    public error: EventEmitter<(type: string, detail: any) => void> = new EventEmitter();
+    public preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
+    public partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public postRenderFinished: IEventEmitter = new EventEmitter();
+    public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
 }

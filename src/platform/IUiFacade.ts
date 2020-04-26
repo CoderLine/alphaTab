@@ -4,7 +4,7 @@ import { IEventEmitter } from '@src/EventEmitter';
 import { Score } from '@src/model/Score';
 import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import { Cursors } from '@src/platform/javaScript/Cursors';
+import { Cursors } from '@src/platform/Cursors';
 import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { Bounds } from '@src/rendering/utils/Bounds';
@@ -156,7 +156,7 @@ export interface IUiFacade<TSettings> {
      * @param error The action to call if any error during loading ocurred.
      * @returns true if the data object is supported and a load was initiated, otherwise false
      */
-    load(data: unknown, success: (score: Score) => void, error: (error: any) => void): boolean;
+    load(data: unknown, success: (score: Score) => void, error: (error: Error) => void): boolean;
 
     /**
      * Attempts a load of the score represented by the given data object.
@@ -168,10 +168,10 @@ export interface IUiFacade<TSettings> {
     /**
      * This events is fired when the {@link canRender} property changes.
      */
-    canRenderChanged: IEventEmitter<() => void>;
+    readonly canRenderChanged: IEventEmitter;
 
     /**
      * This event is fired when {@link rootContainer} became visible when it was invisible at the time rendering was initiated.
      */
-    rootContainerBecameVisible: IEventEmitter<() => void>;
+    readonly rootContainerBecameVisible: IEventEmitter;
 }

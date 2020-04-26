@@ -6,7 +6,7 @@ import { PlayerState } from '@src/audio/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@src/audio/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@src/audio/synth/PositionChangedEventArgs';
 import { SynthHelper } from '@src/audio/util/SynthHelper';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { FileLoadError } from '@src/importer/FileLoadError';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { ProgressEventArgs } from '@src/ProgressEventArgs';
@@ -15,6 +15,7 @@ import { SynthConstants } from '@src/audio/util/SynthConstants';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
+ * @target web
  */
 export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private _synth!: Worker;
@@ -254,7 +255,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         };
         request.onerror = e => {
             Logger.error('AlphaSynth', 'Loading failed: ' + (e as any).message);
-            this.soundFontLoadFailed.trigger(new FileLoadError((e as any).message, request));
+            (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(new FileLoadError((e as any).message, request));
         };
         request.onprogress = e => {
             Logger.debug('AlphaSynth', `Soundfont downloading: ${e.loaded}/${e.total} bytes`);
@@ -325,30 +326,30 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
             case 'alphaSynth.positionChanged':
                 this._timePosition = data.currentTime;
                 this._tickPosition = data.currentTick;
-                this.positionChanged.trigger(
+                (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
                     new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick)
                 );
                 break;
             case 'alphaSynth.playerStateChanged':
                 this._state = data.state;
-                this.stateChanged.trigger(new PlayerStateChangedEventArgs(data.state, data.stopped));
+                (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(new PlayerStateChangedEventArgs(data.state, data.stopped));
                 break;
             case 'alphaSynth.finished':
-                this.finished.trigger();
+                (this.finished as EventEmitter).trigger();
                 break;
             case 'alphaSynth.soundFontLoaded':
-                this.soundFontLoaded.trigger();
+                (this.soundFontLoaded as EventEmitter).trigger();
                 break;
             case 'alphaSynth.soundFontLoadFailed':
-                this.soundFontLoadFailed.trigger(data.error);
+                (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(data.error);
                 break;
             case 'alphaSynth.midiLoaded':
                 this.checkReadyForPlayback();
-                this.midiLoaded.trigger();
+                (this.midiLoaded as EventEmitter).trigger();
                 break;
             case 'alphaSynth.midiLoadFailed':
                 this.checkReadyForPlayback();
-                this.midiLoadFailed.trigger(data.error);
+                (this.midiLoadFailed as EventEmitterOfT<Error>).trigger(data.error);
                 break;
             case 'alphaSynth.output.sequencerFinished':
                 this._output.sequencerFinished();
@@ -370,25 +371,25 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
 
     private checkReady(): void {
         if (this.isReady) {
-            this.ready.trigger();
+            (this.ready as EventEmitter).trigger();
         }
     }
 
     private checkReadyForPlayback(): void {
         if (this.isReadyForPlayback) {
-            this.readyForPlayback.trigger();
+            (this.readyForPlayback as EventEmitter).trigger();
         }
     }
 
-    readonly ready: EventEmitter<() => void> = new EventEmitter();
-    readonly readyForPlayback: EventEmitter<() => void> = new EventEmitter();
-    readonly finished: EventEmitter<() => void> = new EventEmitter();
-    readonly soundFontLoaded: EventEmitter<() => void> = new EventEmitter();
-    readonly soundFontLoadFailed: EventEmitter<(error: any) => void> = new EventEmitter();
-    readonly midiLoaded: EventEmitter<() => void> = new EventEmitter();
-    readonly midiLoadFailed: EventEmitter<(error: any) => void> = new EventEmitter();
-    readonly stateChanged: EventEmitter<(e: PlayerStateChangedEventArgs) => void> = new EventEmitter();
-    readonly positionChanged: EventEmitter<(e: PositionChangedEventArgs) => void> = new EventEmitter();
+    readonly ready: IEventEmitter = new EventEmitter();
+    readonly readyForPlayback: IEventEmitter = new EventEmitter();
+    readonly finished: IEventEmitter = new EventEmitter();
+    readonly soundFontLoaded: IEventEmitter = new EventEmitter();
+    readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    readonly midiLoaded: IEventEmitter = new EventEmitter();
+    readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<PlayerStateChangedEventArgs>();
+    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
 
     //
     // output communication ( output -> worker )

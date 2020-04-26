@@ -18,8 +18,8 @@ export enum ScrollMode {
 
 /**
  * This object defines the details on how to generate the vibrato effects.
+ * @json
  */
-// @json
 export class VibratoPlaybackSettings {
     /**
      * Gets or sets the wavelength of the note-wide vibrato in midi ticks.
@@ -64,8 +64,8 @@ export class VibratoPlaybackSettings {
 
 /**
  * The player settings control how the audio playback and UI is behaving.
+ * @json
  */
-// @json
 export class PlayerSettings {
     /**
      * Gets or sets the URl of the sound font to be loaded.

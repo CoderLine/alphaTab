@@ -77,16 +77,7 @@ function hasFlag(type: ts.Type, flag: ts.TypeFlags): boolean {
 function isImmutable(type: ts.Type): boolean {
     const declaration = type.symbol.valueDeclaration;
     if (declaration) {
-        const sourceFile = declaration.getSourceFile();
-        const leadingComments = ts.getLeadingCommentRanges(sourceFile.text, declaration.pos);
-        if (leadingComments) {
-            for (let comment of leadingComments) {
-                const commentText = sourceFile.text.substring(comment.pos, comment.end);
-                if (commentText.startsWith('// @json-immutable')) {
-                    return true;
-                }
-            }
-        }
+        return !!ts.getJSDocTags(declaration).find(t=>t.tagName.text === 'json_immutable');
     }
 
     return false;
@@ -611,16 +602,10 @@ function rewriteClassForJsonSerialization(
 
             const jsonNames = [member.name.getText(sourceFile)];
 
-            const leadingComments = ts.getLeadingCommentRanges(sourceFile.text, member.pos);
-            leadingComments?.forEach(c => {
-                if (c.kind === ts.SyntaxKind.SingleLineCommentTrivia) {
-                    const commentText = sourceFile.text.substring(c.pos, c.end);
-                    if (commentText.startsWith('// @json-on-parent')) {
-                        jsonNames.push('');
-                    }
-                }
-            });
-
+            if(ts.getJSDocTags(member).find(t=>t.tagName.text === 'json_on_parent')) {
+                jsonNames.push('');
+            }
+            
             propertiesToSerialize.push({
                 property: propertyDeclaration,
                 jsonNames: jsonNames
@@ -867,17 +852,8 @@ export default function (program: ts.Program) {
         return (sourceFile: ts.SourceFile) => {
             function visitor(node: ts.Node): ts.Node {
                 if (ts.isClassDeclaration(node)) {
-                    let classDeclaration = node as ts.ClassDeclaration;
-                    const leadingComments = ts.getLeadingCommentRanges(sourceFile.text, node.pos);
-                    if (leadingComments) {
-                        for (let c of leadingComments) {
-                            if (c.kind === ts.SyntaxKind.SingleLineCommentTrivia) {
-                                const commentText = sourceFile.text.substring(c.pos, c.end);
-                                if (commentText.startsWith('// @json')) {
-                                    return rewriteClassForJsonSerialization(program, classDeclaration, sourceFile);
-                                }
-                            }
-                        }
+                    if(ts.getJSDocTags(node).find(t=>t.tagName.text === 'json')) {
+                        return rewriteClassForJsonSerialization(program, node, sourceFile);
                     }
                 }
 

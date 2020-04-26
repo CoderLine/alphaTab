@@ -43,8 +43,8 @@ export enum LayoutMode {
 
 /**
  * The display settings control how the general layout and display of alphaTab is done.
+ * @json
  */
-// @json
 export class DisplaySettings {
     /**
      * Sets the zoom level of the rendered notation

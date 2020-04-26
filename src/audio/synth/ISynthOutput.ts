@@ -1,4 +1,4 @@
-import { IEventEmitter } from '@src/EventEmitter';
+import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 
 /**
  * This is the base interface for output devices which can
@@ -50,20 +50,20 @@ export interface ISynthOutput {
     /**
      * Fired when the output has been successfully opened and is ready to play samples.
      */
-    readonly ready: IEventEmitter<() => void>;
+    readonly ready: IEventEmitter;
 
     /**
      * Fired when a certain number of samples have been played.
      */
-    readonly samplesPlayed: IEventEmitter<(count: number) => void>;
+    readonly samplesPlayed: IEventEmitterOfT<number>;
 
     /**
      * Fired when the output needs more samples to be played.
      */
-    readonly sampleRequest: IEventEmitter<() => void>;
+    readonly sampleRequest: IEventEmitter;
 
     /**
      * Fired when the last samples after calling SequencerFinished have been played.
      */
-    readonly finished: IEventEmitter<() => void>;
+    readonly finished: IEventEmitter;
 }

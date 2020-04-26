@@ -306,7 +306,7 @@ export class HydraShdr {
         this.endLoop = IOHelper.readUInt32LE(reader);
         this.sampleRate = IOHelper.readUInt32LE(reader);
         this.originalPitch = reader.readByte();
-        this.pitchCorrection = Platform.readSignedByte(reader);
+        this.pitchCorrection = IOHelper.readSInt8(reader);
         this.sampleLink = IOHelper.readUInt16LE(reader);
         this.sampleType = IOHelper.readUInt16LE(reader);
     }

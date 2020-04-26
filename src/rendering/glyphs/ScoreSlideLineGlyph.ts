@@ -100,10 +100,10 @@ export class ScoreSlideLineGlyph extends Glyph {
                     startY -= lineOffset;
                 }
                 if (this._startNote.slideTarget) {
-                    let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar<BarRendererBase>(
+                    let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
                         this.renderer.staff.staveId,
                         this._startNote.slideTarget.beat.voice.bar
-                    );
+                    ) as BarRendererBase;
                     if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                         endX = cx + startNoteRenderer.x + this._parent.x;
                         endY = startY;

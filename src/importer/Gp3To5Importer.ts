@@ -265,7 +265,7 @@ export class Gp3To5Importer extends ScoreImporter {
                     if (currentMasterBar.isRepeatStart) {
                         break;
                     }
-                    existentAlternatives |= currentMasterBar.alternateEndings;
+                    existentAlternatives = existentAlternatives | currentMasterBar.alternateEndings;
                     currentMasterBar = currentMasterBar.previousMasterBar;
                 }
                 // now calculate the alternative for this bar
@@ -275,7 +275,7 @@ export class Gp3To5Importer extends ScoreImporter {
                     // only add the repeating if it is not existing
                     let repeating: number = 1 << i;
                     if (repeatMask > i && (existentAlternatives & repeating) === 0) {
-                        repeatAlternative |= repeating;
+                        repeatAlternative = repeatAlternative | repeating;
                     }
                 }
                 newMasterBar.alternateEndings = repeatAlternative;
@@ -293,7 +293,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         // keysignature
         if ((flags & 0x40) !== 0) {
-            newMasterBar.keySignature = Platform.readSignedByte(this.data) as KeySignature;
+            newMasterBar.keySignature = IOHelper.readSInt8(this.data) as KeySignature;
             newMasterBar.keySignatureType = this.data.readByte() as KeySignatureType;
         } else if (previousMasterBar) {
             newMasterBar.keySignature = previousMasterBar.keySignature;
@@ -436,7 +436,7 @@ export class Gp3To5Importer extends ScoreImporter {
             newBeat.isEmpty = (type & 0x02) === 0;
         }
         voice.addBeat(newBeat);
-        let duration: number = Platform.readSignedByte(this.data);
+        let duration: number = IOHelper.readSInt8(this.data);
         switch (duration) {
             case -2:
                 newBeat.duration = Duration.Whole;
@@ -627,7 +627,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         beat.hasRasgueado = (flags2 & 0x01) !== 0;
         if ((flags & 0x20) !== 0 && this._versionNumber >= 400) {
-            let slapPop: number = Platform.readSignedByte(this.data);
+            let slapPop: number = IOHelper.readSInt8(this.data);
             switch (slapPop) {
                 case 1:
                     beat.tap = true;
@@ -640,7 +640,7 @@ export class Gp3To5Importer extends ScoreImporter {
                     break;
             }
         } else if ((flags & 0x20) !== 0) {
-            let slapPop: number = Platform.readSignedByte(this.data);
+            let slapPop: number = IOHelper.readSInt8(this.data);
             switch (slapPop) {
                 case 1:
                     beat.tap = true;
@@ -676,7 +676,7 @@ export class Gp3To5Importer extends ScoreImporter {
             }
         }
         if ((flags2 & 0x02) !== 0) {
-            switch (Platform.readSignedByte(this.data)) {
+            switch (IOHelper.readSInt8(this.data)) {
                 case 0:
                     beat.pickStroke = PickStroke.None;
                     break;
@@ -731,16 +731,16 @@ export class Gp3To5Importer extends ScoreImporter {
 
     public readMixTableChange(beat: Beat): void {
         let tableChange: MixTableChange = new MixTableChange();
-        tableChange.instrument = Platform.readSignedByte(this.data);
+        tableChange.instrument = IOHelper.readSInt8(this.data);
         if (this._versionNumber >= 500) {
             this.data.skip(16); // Rse Info
         }
-        tableChange.volume = Platform.readSignedByte(this.data);
-        tableChange.balance = Platform.readSignedByte(this.data);
-        let chorus: number = Platform.readSignedByte(this.data);
-        let reverb: number = Platform.readSignedByte(this.data);
-        let phaser: number = Platform.readSignedByte(this.data);
-        let tremolo: number = Platform.readSignedByte(this.data);
+        tableChange.volume = IOHelper.readSInt8(this.data);
+        tableChange.balance = IOHelper.readSInt8(this.data);
+        let chorus: number = IOHelper.readSInt8(this.data);
+        let reverb: number = IOHelper.readSInt8(this.data);
+        let phaser: number = IOHelper.readSInt8(this.data);
+        let tremolo: number = IOHelper.readSInt8(this.data);
         if (this._versionNumber >= 500) {
             tableChange.tempoName = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         }
@@ -765,7 +765,7 @@ export class Gp3To5Importer extends ScoreImporter {
             this.data.readByte();
         }
         if (tableChange.tempo >= 0) {
-            tableChange.duration = Platform.readSignedByte(this.data);
+            tableChange.duration = IOHelper.readSInt8(this.data);
             if (this._versionNumber >= 510) {
                 this.data.readByte(); // hideTempo (bool)
             }
@@ -837,16 +837,16 @@ export class Gp3To5Importer extends ScoreImporter {
             this.data.readByte(); // tuplet
         }
         if ((flags & 0x10) !== 0) {
-            let dynamicNumber: number = Platform.readSignedByte(this.data);
+            let dynamicNumber: number = IOHelper.readSInt8(this.data);
             newNote.dynamics = this.toDynamicValue(dynamicNumber);
             beat.dynamics = newNote.dynamics;
         }
         if ((flags & 0x20) !== 0) {
-            newNote.fret = Platform.readSignedByte(this.data);
+            newNote.fret = IOHelper.readSInt8(this.data);
         }
         if ((flags & 0x80) !== 0) {
-            newNote.leftHandFinger = Platform.readSignedByte(this.data) as Fingers;
-            newNote.rightHandFinger = Platform.readSignedByte(this.data) as Fingers;
+            newNote.leftHandFinger = IOHelper.readSInt8(this.data) as Fingers;
+            newNote.rightHandFinger = IOHelper.readSInt8(this.data) as Fingers;
             newNote.isFingering = true;
         }
         if (this._versionNumber >= 500) {
@@ -957,10 +957,10 @@ export class Gp3To5Importer extends ScoreImporter {
         let graceBeat: Beat = new Beat();
         let graceNote: Note = new Note();
         graceNote.string = note.string;
-        graceNote.fret = Platform.readSignedByte(this.data);
+        graceNote.fret = IOHelper.readSInt8(this.data);
         graceBeat.duration = Duration.ThirtySecond;
-        graceBeat.dynamics = this.toDynamicValue(Platform.readSignedByte(this.data));
-        let transition: number = Platform.readSignedByte(this.data);
+        graceBeat.dynamics = this.toDynamicValue(IOHelper.readSInt8(this.data));
+        let transition: number = IOHelper.readSInt8(this.data);
         switch (transition) {
             case 0:
                 break;
@@ -1005,7 +1005,7 @@ export class Gp3To5Importer extends ScoreImporter {
 
     public readSlide(note: Note): void {
         if (this._versionNumber >= 500) {
-            let type: number = Platform.readSignedByte(this.data);
+            let type: number = IOHelper.readSInt8(this.data);
             if ((type & 1) !== 0) {
                 note.slideOutType = SlideOutType.Shift;
             } else if ((type & 2) !== 0) {
@@ -1021,7 +1021,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 note.slideInType = SlideInType.IntoFromAbove;
             }
         } else {
-            let type: number = Platform.readSignedByte(this.data);
+            let type: number = IOHelper.readSInt8(this.data);
             switch (type) {
                 case 1:
                     note.slideOutType = SlideOutType.Shift;

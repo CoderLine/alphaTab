@@ -1,23 +1,31 @@
-import { IReadable } from '@src/io/IReadable';
-import { TypeConversions } from '@src/io/TypeConversions';
-
+/**
+ * @partial
+ */
 export class Platform {
+    /**
+     * @target web
+     */
     public static get isRunningInWorker(): boolean {
         return 'WorkerGlobalScope' in globalThis;
     }
 
+    /**
+     * @target web
+     */
     public static get supportsFontsApi(): boolean {
         return 'fonts' in document && 'load' in (document as any).fonts;
     }
 
+    /**
+     * @target web
+     */
     public static get supportsTextDecoder(): boolean {
         return 'TextDecoder' in globalThis;
     }
 
-    public static readSignedByte(readable: IReadable): number {
-        return TypeConversions.uint8ToInt8(readable.readByte());
-    }
-
+    /**
+     * @target web
+     */
     public static toString(data: Uint8Array, encoding: string): string {
         if (Platform.supportsTextDecoder) {
             let detectedEncoding: string | null = Platform.detectEncoding(data);
@@ -109,6 +117,9 @@ export class Platform {
         return array[0];
     }
 
+    /**
+     * @target web
+     */
     public static throttle(action: () => void, delay: number): () => void {
         let timeoutId: number = 0;
         return () => {
@@ -134,7 +145,7 @@ export class Platform {
         let hexChars: string = '0123456789ABCDEF';
         do {
             s = String.fromCharCode(hexChars.charCodeAt(n & 15)) + s;
-            n >>= 4;
+            n = n >> 4;
         } while (n > 0);
         while (s.length < digits) {
             s = '0' + s;

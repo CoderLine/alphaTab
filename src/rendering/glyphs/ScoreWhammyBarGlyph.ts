@@ -105,10 +105,10 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                 return;
         }
         let whammyMode: NotationMode = this.renderer.settings.notation.notationMode;
-        let startNoteRenderer: ScoreBarRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar<ScoreBarRenderer>(
+        let startNoteRenderer: ScoreBarRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             beat.voice.bar
-        )!;
+        )! as ScoreBarRenderer;
         let startX: number = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(beat, BeatXPosition.MiddleNotes);
         let beatDirection: BeamDirection = this.getBeamDirection(beat, startNoteRenderer);
         let direction: BeamDirection = this._beat.notes.length === 1 ? beatDirection : BeamDirection.Up;
@@ -135,7 +135,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                 endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                     this.renderer.staff.staveId,
                     note.tieDestination!.beat.voice.bar
-                );
+                ) as ScoreBarRenderer;
                 if (endNoteRenderer && endNoteRenderer.staff === startNoteRenderer.staff) {
                     endX =
                         cx +

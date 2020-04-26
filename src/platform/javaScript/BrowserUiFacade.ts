@@ -22,8 +22,11 @@ import { AlphaSynthWebWorkerApi } from './AlphaSynthWebWorkerApi';
 import { AlphaTabApi } from './AlphaTabApi';
 import { AlphaTabWorkerScoreRenderer } from './AlphaTabWorkerScoreRenderer';
 import { BrowserMouseEventArgs } from './BrowserMouseEventArgs';
-import { Cursors } from './Cursors';
+import { Cursors } from '../Cursors';
 
+/**
+ * @target web
+ */
 export class BrowserUiFacade implements IUiFacade<unknown> {
     private _fontCheckers: Map<string, FontLoadingChecker> = new Map();
     private _api!: AlphaTabApiBase<unknown>;
@@ -34,9 +37,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _totalResultCount: number = 0;
     private _initialTrackIndexes: number[] | null = null;
 
-    private _rootContainerBecameVisible: EventEmitter<() => void> = new EventEmitter();
-    public rootContainerBecameVisible: IEventEmitter<() => void>;
-    public canRenderChanged: IEventEmitter<() => void> = new EventEmitter();
+    private _rootContainerBecameVisible: IEventEmitter = new EventEmitter();
+    public rootContainerBecameVisible: IEventEmitter;
+    public canRenderChanged: IEventEmitter = new EventEmitter();
 
     public get resizeThrottle(): number {
         return 10;
@@ -67,7 +70,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private onFontLoaded(family: string): void {
         FontSizes.generateFontLookup(family);
         if (this.areAllFontsLoaded()) {
-            (this.canRenderChanged as EventEmitter<() => void>).trigger();
+            (this.canRenderChanged as EventEmitter).trigger();
         }
     }
 
@@ -89,7 +92,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                             if (this._api.container.isVisible) {
                                 window.clearInterval(this._visibilityCheckIntervalId);
                                 this._visibilityCheckIntervalId = 0;
-                                this._rootContainerBecameVisible.trigger();
+                                (this._rootContainerBecameVisible as EventEmitter).trigger();
                             }
                         }, this._visibilityCheckInterval);
                     }
@@ -216,7 +219,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
     }
 
-    public load(data: unknown, success: (score: Score) => void, error: (error: any) => void): boolean {
+    public load(data: unknown, success: (score: Score) => void, error: (error: Error) => void): boolean {
         if (data instanceof Score) {
             success(data);
             return true;
@@ -276,7 +279,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                         this._initialTrackIndexes = null;
                     },
                     e => {
-                        this._api.onError('import', e);
+                        this._api.onError(e as Error);
                     },
                     this._api.settings
                 );

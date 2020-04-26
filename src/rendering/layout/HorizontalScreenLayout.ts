@@ -7,6 +7,7 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { Logger } from '@src/util/Logger';
+import { EventEmitterOfT } from '@src/EventEmitter';
 
 export class HorizontalScreenLayoutPartialInfo {
     public width: number = 0;
@@ -162,7 +163,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             e.renderResult = result;
             e.firstMasterBarIndex = partial.masterBars[0].index;
             e.lastMasterBarIndex = partial.masterBars[partial.masterBars.length - 1].index;
-            this.renderer.partialRenderFinished.trigger(e);
+            (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
             currentBarIndex += partial.masterBars.length;
         }
     }

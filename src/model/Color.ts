@@ -1,7 +1,9 @@
 import { FormatError } from '@src/FormatError';
 import { Platform } from '@src/platform/Platform';
 
-// @json-immutable
+/**
+ * @json_immutable
+ */
 export class Color {
     public static readonly BlackRgb: string = '#000000';
 

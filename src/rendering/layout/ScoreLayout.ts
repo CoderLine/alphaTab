@@ -20,6 +20,7 @@ import { RenderStaff } from '@src/rendering/staves/RenderStaff';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/util/Logger';
+import { EventEmitterOfT } from '@src/EventEmitter';
 
 /**
  * This is the base public class for creating new layouting engines for the score renderer.
@@ -212,21 +213,20 @@ export abstract class ScoreLayout {
         if (!this._barRendererLookup.has(key)) {
             this._barRendererLookup.set(key, new Map<number, BarRendererBase>());
         }
-        this._barRendererLookup.get(key)!.set(renderer.bar!.id, renderer);
+        this._barRendererLookup.get(key)!.set(renderer.bar.id, renderer);
     }
 
     public unregisterBarRenderer(key: string, renderer: BarRendererBase): void {
         if (this._barRendererLookup.has(key)) {
             let lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
-            lookup.delete(renderer.bar!.id);
+            lookup.delete(renderer.bar.id);
         }
     }
 
-    public getRendererForBar<T>(key: string, bar: Bar): T | null {
+    public getRendererForBar(key: string, bar: Bar): BarRendererBase | null {
         let barRendererId: number = bar.id;
         if (this._barRendererLookup.has(key) && this._barRendererLookup.get(key)!.has(barRendererId)) {
-            // ReSharper disable once RedundantCast
-            return (this._barRendererLookup.get(key)!.get(barRendererId) as unknown) as T;
+            return this._barRendererLookup.get(key)!.get(barRendererId)!;
         }
         return null;
     }
@@ -255,6 +255,6 @@ export abstract class ScoreLayout {
         e.totalHeight = this.height;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
-        this.renderer.partialRenderFinished.trigger(e);
+        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
     }
 }

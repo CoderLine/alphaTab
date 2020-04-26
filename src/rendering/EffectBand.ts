@@ -134,6 +134,8 @@ export class EffectBand extends Glyph {
                 }
                 // in case of the very first beat, we simply create the glyph.
                 return this.createOrResizeGlyph(singleSizing, b);
+            default:
+                return this.createOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
         }
     }
 

@@ -16,7 +16,9 @@ export enum FontStyle {
      */ Italic
 }
 
-// @json-immutable
+/**
+ * @json_immutable
+ */
 export class Font {
     private _css: string;
     private _cssScale: number = 0.0;
@@ -81,6 +83,9 @@ export class Font {
         return this._css;
     }
 
+    /**
+     * @target web
+     */
     public static fromJson(value: unknown): Font | null {
         if (!value) {
             return null;

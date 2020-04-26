@@ -9,6 +9,7 @@ import { Logger } from '@src/util/Logger';
 /**
  * This class implements a HTML5 WebWorker based version of alphaSynth
  * which can be controlled via WebWorker messages.
+ * @target web
  */
 export class AlphaSynthWebWorker {
     public static readonly CmdPrefix: string = 'alphaSynth.';

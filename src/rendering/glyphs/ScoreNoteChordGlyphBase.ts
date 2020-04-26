@@ -1,4 +1,4 @@
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
 import { Color } from '@src/model/Color';
 import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
@@ -12,7 +12,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
     public minNote: ScoreNoteGlyphInfo | null = null;
     public maxNote: ScoreNoteGlyphInfo | null = null;
-    public spacingChanged: EventEmitter<() => void> = new EventEmitter();
+    public spacingChanged: IEventEmitter = new EventEmitter();
     public upLineX: number = 0;
     public downLineX: number = 0;
     public displacedX: number = 0;

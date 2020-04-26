@@ -3,29 +3,9 @@ import { Platform } from '../Platform';
 
 /**
  * This public class stores text widths for several fonts and allows width calculation
+ * @partial
  */
 export class FontSizes {
-    public static generateFontLookup(family: string): void {
-        if (FontSizes.FontSizeLookupTables.has(family)) {
-            return;
-        }
-
-        if (!Platform.isRunningInWorker) {
-            let canvas: HTMLCanvasElement = document.createElement('canvas');
-            let measureContext: CanvasRenderingContext2D = canvas.getContext('2d')!;
-            measureContext.font = `11px ${family}`;
-            let sizes: number[] = [];
-            for (let i: number = 0x20; i < 255; i++) {
-                let s: string = String.fromCharCode(i);
-                sizes.push(measureContext.measureText(s).width);
-            }
-            let data: Uint8Array = new Uint8Array(sizes);
-            FontSizes.FontSizeLookupTables.set(family, data);
-        } else {
-            FontSizes.FontSizeLookupTables.set(family, new Uint8Array([8]));
-        }
-    }
-
     // prettier-ignore
     public static Georgia: Uint8Array = new Uint8Array([
         3, 4, 5, 7, 7, 9, 8, 2, 4, 4, 5, 7, 3, 4, 3, 5, 7, 5, 6, 6, 6, 6, 6, 6, 7, 6, 3, 3, 7,
@@ -60,6 +40,31 @@ export class FontSizes {
     ]);
 
     public static readonly ControlChars: number = 0x20;
+
+    /**
+     * @target web
+     */
+    public static generateFontLookup(family: string): void {
+        if (FontSizes.FontSizeLookupTables.has(family)) {
+            return;
+        }
+
+        if (!Platform.isRunningInWorker) {
+            let canvas: HTMLCanvasElement = document.createElement('canvas');
+            let measureContext: CanvasRenderingContext2D = canvas.getContext('2d')!;
+            measureContext.font = `11px ${family}`;
+            let sizes: number[] = [];
+            for (let i: number = 0x20; i < 255; i++) {
+                let s: string = String.fromCharCode(i);
+                sizes.push(measureContext.measureText(s).width);
+            }
+
+            let data: Uint8Array = new Uint8Array(sizes);
+            FontSizes.FontSizeLookupTables.set(family, data);
+        } else {
+            FontSizes.FontSizeLookupTables.set(family, new Uint8Array([8]));
+        }
+    }
 
     public static measureString(s: string, family: string, size: number, style: FontStyle): number {
         let data: Uint8Array;

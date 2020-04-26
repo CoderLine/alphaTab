@@ -87,10 +87,10 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         // Draw note heads
-        let startNoteRenderer: ScoreBarRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar<ScoreBarRenderer>(
+        let startNoteRenderer: ScoreBarRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this._beat.voice.bar
-        )!;
+        )! as ScoreBarRenderer;
         let startX: number =
             cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.MiddleNotes);
         let endBeatX: number = cx + startNoteRenderer.x;
@@ -136,7 +136,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     : this.renderer.scoreRenderer.layout!.getRendererForBar(
                           this.renderer.staff.staveId,
                           endNote.beat.voice.bar
-                      );
+                      ) as ScoreBarRenderer;
                 // if we have a line break we draw only a line until the end
                 if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                     let endX: number = cx + startNoteRenderer.x + startNoteRenderer.width;

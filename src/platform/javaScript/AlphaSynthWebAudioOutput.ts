@@ -1,10 +1,11 @@
 import { CircularSampleBuffer } from '@src/audio/synth/ds/CircularSampleBuffer';
 import { ISynthOutput } from '@src/audio/synth/ISynthOutput';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitterOfT, IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
 
 /**
  * This class implements a HTML5 Web Audio API based audio output device
  * for alphaSynth. It can be controlled via a JS API.
+ * @target web
  */
 export class AlphaSynthWebAudioOutput implements ISynthOutput {
     private static readonly BufferSize: number = 4096;
@@ -44,7 +45,7 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
             document.body.addEventListener('touchend', resume, false);
             document.body.addEventListener('click', resume, false);
         }
-        this.ready.trigger();
+        (this.ready as EventEmitter).trigger();
     }
 
     public activate(): void {
@@ -124,7 +125,7 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         let count: number = ((10 / 2) | 0) * 4096;
         if (this._circularBuffer.count < count && this.sampleRequest) {
             for (let i: number = 0; i < ((10 / 2) | 0); i++) {
-                this.sampleRequest.trigger();
+                (this.sampleRequest as EventEmitter).trigger();
             }
         }
     }
@@ -135,7 +136,7 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         let samples: number = left.length + right.length;
         if (this._circularBuffer.count < samples) {
             if (this._finished) {
-                this.finished.trigger();
+                (this.finished as EventEmitter).trigger();
             }
         } else {
             let buffer: Float32Array = new Float32Array(samples);
@@ -145,15 +146,15 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
                 left[i] = buffer[s++];
                 right[i] = buffer[s++];
             }
-            this.samplesPlayed.trigger(left.length);
+            (this.samplesPlayed as EventEmitterOfT<number>).trigger(left.length);
         }
         if (!this._finished) {
             this.requestBuffers();
         }
     }
 
-    readonly ready: EventEmitter<() => void> = new EventEmitter();
-    readonly samplesPlayed: EventEmitter<(count: number) => void> = new EventEmitter();
-    readonly sampleRequest: EventEmitter<() => void> = new EventEmitter();
-    readonly finished: EventEmitter<() => void> = new EventEmitter();
+    readonly ready: IEventEmitter = new EventEmitter();
+    readonly samplesPlayed: IEventEmitterOfT<number> = new EventEmitterOfT<number>();
+    readonly sampleRequest: IEventEmitter = new EventEmitter();
+    readonly finished: IEventEmitter = new EventEmitter();
 }

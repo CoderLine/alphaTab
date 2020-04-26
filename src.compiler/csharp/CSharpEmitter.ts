@@ -17,8 +17,6 @@ export default function emit(program: ts.Program): ts.Diagnostic[] {
     });
 
     context.resolveAllUnresolvedTypeNodes();
-    diagnostics.push(...context.diagnostics);
-
 
     if (!context.hasErrors) {
         context.csharpFiles.forEach(file => {
@@ -27,6 +25,8 @@ export default function emit(program: ts.Program): ts.Diagnostic[] {
             diagnostics.push(...printer.diagnostics);
         })
     }
+
+    diagnostics.push(...context.diagnostics);
 
     return diagnostics;
 }

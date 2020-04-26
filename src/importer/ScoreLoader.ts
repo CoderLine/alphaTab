@@ -24,6 +24,7 @@ export class ScoreLoader {
      * @param success this function is called if the Score was successfully loaded from the datasource
      * @param error this function is called if any error during the loading occured.
      * @param settings settings for the score import
+     * @target web
      */
     // TODO: use promises
     public static loadScoreAsync(

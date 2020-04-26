@@ -9,7 +9,7 @@ import { PositionChangedEventArgs } from '@src/audio/synth/PositionChangedEventA
 import { Hydra } from '@src/audio/synth/soundfont/Hydra';
 import { TinySoundFont } from '@src/audio/synth/synthesis/TinySoundFont';
 import { SynthHelper } from '@src/audio/util/SynthHelper';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger, LogLevel } from '@src/util/Logger';
 import { SynthConstants } from '../util/SynthConstants';
@@ -139,14 +139,14 @@ export class AlphaSynth implements IAlphaSynth {
         this.output = output;
         this.output.ready.on(() => {
             this.isReady = true;
-            this.ready.trigger();
+            (this.ready as EventEmitter).trigger();
             this.checkReadyForPlayback();
         });
         this.output.finished.on(() => {
             // stop everything
             this.stop();
             Logger.debug('AlphaSynth', 'Finished playback');
-            this.finished.trigger();
+            (this.finished as EventEmitter).trigger();
             if (this._sequencer.isLooping) {
                 this.play();
             }
@@ -179,7 +179,7 @@ export class AlphaSynth implements IAlphaSynth {
         this._synthesizer.setupMetronomeChannel(this.metronomeVolume);
         Logger.debug('AlphaSynth', 'Starting playback');
         this.state = PlayerState.Playing;
-        this.stateChanged.trigger(new PlayerStateChangedEventArgs(this.state, false));
+        (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(new PlayerStateChangedEventArgs(this.state, false));
         this.output.play();
         return true;
     }
@@ -190,7 +190,7 @@ export class AlphaSynth implements IAlphaSynth {
         }
         Logger.debug('AlphaSynth', 'Pausing playback');
         this.state = PlayerState.Paused;
-        this.stateChanged.trigger(new PlayerStateChangedEventArgs(this.state, false));
+        (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(new PlayerStateChangedEventArgs(this.state, false));
         this.output.pause();
         this._synthesizer.noteOffAll(false);
     }
@@ -213,7 +213,7 @@ export class AlphaSynth implements IAlphaSynth {
         this._sequencer.stop();
         this._synthesizer.noteOffAll(true);
         this.tickPosition = this._sequencer.playbackRange ? this._sequencer.playbackRange.startTick : 0;
-        this.stateChanged.trigger(new PlayerStateChangedEventArgs(this.state, true));
+        (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(new PlayerStateChangedEventArgs(this.state, true));
     }
 
     public loadSoundFont(data: Uint8Array): void {
@@ -226,20 +226,20 @@ export class AlphaSynth implements IAlphaSynth {
             soundFont.load(input);
             this._synthesizer.loadPresets(soundFont);
             this._isSoundFontLoaded = true;
-            this.soundFontLoaded.trigger();
+            (this.soundFontLoaded as EventEmitter).trigger();
 
             Logger.info('AlphaSynth', 'soundFont successfully loaded');
             this.checkReadyForPlayback();
         } catch (e) {
             Logger.error('AlphaSynth', 'Could not load soundfont from bytes ' + e);
-            this.soundFontLoadFailed.trigger(e);
+            (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(e);
         }
     }
 
     private checkReadyForPlayback(): void {
         if (this.isReadyForPlayback) {
             this._synthesizer.setupMetronomeChannel(this.metronomeVolume);
-            this.readyForPlayback.trigger();
+            (this.readyForPlayback as EventEmitter).trigger();
         }
     }
 
@@ -254,14 +254,14 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.info('AlphaSynth', 'Loading midi from model');
             this._sequencer.loadMidi(midiFile);
             this._isMidiLoaded = true;
-            this.midiLoaded.trigger();
+            (this.midiLoaded as EventEmitter).trigger();
 
             Logger.info('AlphaSynth', 'Midi successfully loaded');
             this.checkReadyForPlayback();
             this.tickPosition = 0;
         } catch (e) {
             Logger.error('AlphaSynth', 'Could not load midi from model ' + e);
-            this.midiLoadFailed.trigger(e);
+            (this.midiLoadFailed as EventEmitterOfT<Error>).trigger(e);
         }
     }
 
@@ -303,16 +303,16 @@ export class AlphaSynth implements IAlphaSynth {
             'AlphaSynth',
             `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTime}, Active Voices: ${this._synthesizer.activeVoiceCount}`
         );
-        this.positionChanged.trigger(new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick));
+        (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick));
     }
 
-    readonly ready: EventEmitter<() => void> = new EventEmitter();
-    readonly readyForPlayback: EventEmitter<() => void> = new EventEmitter();
-    readonly finished: EventEmitter<() => void> = new EventEmitter();
-    readonly soundFontLoaded: EventEmitter<() => void> = new EventEmitter();
-    readonly soundFontLoadFailed: EventEmitter<(error: any) => void> = new EventEmitter();
-    readonly midiLoaded: EventEmitter<() => void> = new EventEmitter();
-    readonly midiLoadFailed: EventEmitter<(error: any) => void> = new EventEmitter();
-    readonly stateChanged: EventEmitter<(e: PlayerStateChangedEventArgs) => void> = new EventEmitter();
-    readonly positionChanged: EventEmitter<(e: PositionChangedEventArgs) => void> = new EventEmitter();
+    readonly ready: IEventEmitter = new EventEmitter();
+    readonly readyForPlayback: IEventEmitter = new EventEmitter();
+    readonly finished: IEventEmitter = new EventEmitter();
+    readonly soundFontLoaded: IEventEmitter = new EventEmitter();
+    readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    readonly midiLoaded: IEventEmitter = new EventEmitter();
+    readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<PlayerStateChangedEventArgs>();
+    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
 }

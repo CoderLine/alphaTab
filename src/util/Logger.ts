@@ -1,7 +1,7 @@
 /**
  * Defines all loglevels.
+ * @json
  */
-// @json
 export enum LogLevel {
     /**
      * No logging

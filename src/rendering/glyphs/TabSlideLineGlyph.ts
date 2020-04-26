@@ -90,7 +90,7 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes);
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, false) + startOffsetY;
                 if (this._startNote.slideTarget) {
-                    let endNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar<BarRendererBase>(
+                    let endNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
                         this.renderer.staff.staveId,
                         this._startNote.slideTarget.beat.voice.bar
                     )!;

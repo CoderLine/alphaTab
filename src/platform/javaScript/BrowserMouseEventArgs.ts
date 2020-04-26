@@ -2,6 +2,9 @@ import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { HtmlElementContainer } from '@src/platform/javaScript/HtmlElementContainer';
 
+/**
+ * @target web
+ */
 export class BrowserMouseEventArgs implements IMouseEventArgs {
     public readonly mouseEvent: MouseEvent;
 

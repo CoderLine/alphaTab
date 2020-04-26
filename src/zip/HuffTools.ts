@@ -69,7 +69,7 @@ export class HuffTools {
         if (bits.has(idx)) {
             return new Found(bits.get(idx)!);
         }
-        v <<= 1;
+        v = v << 1;
         len += 1;
         return new NeedBit(HuffTools.treeMake(bits, maxbits, v, len), HuffTools.treeMake(bits, maxbits, v | 1, len));
     }

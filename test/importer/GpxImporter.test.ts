@@ -8,12 +8,14 @@ import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 
 describe('GpxImporterTest', () => {
-    const prepareGpxImporterWithFile = async function (name: string): Promise<GpxImporter> {
+    const prepareGpxImporterWithFile: (name: string) => Promise<GpxImporter> = async (
+        name: string
+    ): Promise<GpxImporter> => {
         const data = await TestPlatform.loadFile('test-data/' + name);
         return prepareGpxImporterWithBytes(data);
     };
 
-    const prepareGpxImporterWithBytes = function (buffer: Uint8Array): GpxImporter {
+    const prepareGpxImporterWithBytes: (buffer: Uint8Array) => GpxImporter = (buffer: Uint8Array): GpxImporter => {
         let readerBase: GpxImporter = new GpxImporter();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;

@@ -126,14 +126,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                     let glyph: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
                     let noteBounds: NoteBounds = new NoteBounds();
                     noteBounds.note = note;
-                    noteBounds.noteHeadBounds = (() => {
-                        let _tmp = new Bounds();
-                        _tmp.x = cx + this.x + glyph.x;
-                        _tmp.y = cy + this.y + glyph.y;
-                        _tmp.w = glyph.width;
-                        _tmp.h = glyph.height;
-                        return _tmp;
-                    })();
+                    noteBounds.noteHeadBounds = new Bounds();
+                    noteBounds.noteHeadBounds.x = cx + this.x + glyph.x;
+                    noteBounds.noteHeadBounds.y = cy + this.y + glyph.y;
+                    noteBounds.noteHeadBounds.w = glyph.width;
+                    noteBounds.noteHeadBounds.h = glyph.height;
                     this.renderer.scoreRenderer.boundsLookup!.addNote(noteBounds);
                 }
             }

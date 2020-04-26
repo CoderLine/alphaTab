@@ -1,4 +1,4 @@
-import { IEventEmitter } from '@src/EventEmitter';
+import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { Score } from '@src/model/Score';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
@@ -49,25 +49,25 @@ export interface IScoreRenderer {
     /**
      * Occurs before the rendering of the tracks starts.
      */
-    readonly preRender: IEventEmitter<(isResize: boolean) => void>;
+    readonly preRender: IEventEmitterOfT<boolean>;
 
     /**
      * Occurs after the rendering of the tracks finished.
      */
-    readonly renderFinished: IEventEmitter<(e: RenderFinishedEventArgs) => void>;
+    readonly renderFinished: IEventEmitterOfT<RenderFinishedEventArgs>;
 
     /**
      * Occurs whenever a part of the whole music sheet is rendered and can be displayed.
      */
-    readonly partialRenderFinished: IEventEmitter<(e: RenderFinishedEventArgs) => void>;
+    readonly partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs>;
 
     /**
      * Occurs when the whole rendering and layout process finished.
      */
-    readonly postRenderFinished: IEventEmitter<() => void>;
+    readonly postRenderFinished: IEventEmitter;
 
     /**
      * Occurs whenever an error happens.
      */
-    readonly error: IEventEmitter<(type: string, details: any) => void>;
+    readonly error: IEventEmitterOfT<Error>;
 }

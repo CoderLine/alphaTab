@@ -73,8 +73,8 @@ export enum NotationMode {
 
 /**
  * The notation settings control how various music notation elements are shown and behaving
+ * @json
  */
-// @json
 export class NotationSettings {
     /**
      * Gets or sets the mode to use for display and play music notation elements.

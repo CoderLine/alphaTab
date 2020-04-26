@@ -1,6 +1,6 @@
 import { LayoutMode } from '@src/DisplaySettings';
 import { Environment } from '@src/Environment';
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Score } from '@src/model/Score';
 import { Track } from '@src/model/Track';
 import { ICanvas } from '@src/platform/ICanvas';
@@ -84,7 +84,7 @@ export class ScoreRenderer implements IScoreRenderer {
             this.tracks = tracks;
             this.render();
         } catch (e) {
-            this.error.trigger('render', e);
+            (this.error as EventEmitterOfT<Error>).trigger(e as Error);
         }
     }
 
@@ -123,7 +123,7 @@ export class ScoreRenderer implements IScoreRenderer {
             let track: Track = this.tracks[i];
             Logger.info('Rendering', 'Track ' + i + ': ' + track.name);
         }
-        this.preRender.trigger(false);
+        (this.preRender as EventEmitterOfT<boolean>).trigger(false);
         this.recreateLayout();
         this.layoutAndRender();
         this._renderedTracks = this.tracks;
@@ -137,12 +137,12 @@ export class ScoreRenderer implements IScoreRenderer {
         } else if (this.layout!.supportsResize) {
             Logger.info('Rendering', 'Starting optimized rerendering for resize');
             this.boundsLookup = new BoundsLookup();
-            this.preRender.trigger(true);
+            (this.preRender as EventEmitterOfT<boolean>).trigger(true);
             this.canvas!.settings = this.settings;
             this.layout!.resize();
             this.layout!.renderAnnotation();
             this.onRenderFinished();
-            this.postRenderFinished.trigger();
+            (this.postRenderFinished as EventEmitter).trigger();
         } else {
             Logger.warning('Rendering', 'Current layout does not support dynamic resizing, nothing was done', null);
         }
@@ -158,20 +158,20 @@ export class ScoreRenderer implements IScoreRenderer {
         this.layout!.layoutAndRender();
         this.layout!.renderAnnotation();
         this.onRenderFinished();
-        this.postRenderFinished.trigger();
+        (this.postRenderFinished as EventEmitter).trigger();
     }
 
-    public readonly preRender: EventEmitter<(isResize: boolean) => void> = new EventEmitter();
-    public readonly renderFinished: EventEmitter<(e: RenderFinishedEventArgs) => void> = new EventEmitter();
-    public readonly partialRenderFinished: EventEmitter<(e: RenderFinishedEventArgs) => void> = new EventEmitter();
-    public readonly postRenderFinished: EventEmitter<() => void> = new EventEmitter();
-    public readonly error: EventEmitter<(type: string, details: any) => void> = new EventEmitter();
+    public readonly preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
+    public readonly renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public readonly partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public readonly postRenderFinished: IEventEmitter = new EventEmitter();
+    public readonly error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
 
     private onRenderFinished() {
         const e = new RenderFinishedEventArgs();
         e.totalHeight = this.layout!.height;
         e.totalWidth = this.layout!.width;
         e.renderResult = this.canvas!.onRenderFinished();
-        this.renderFinished.trigger(e);
+        (this.renderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
     }
 }

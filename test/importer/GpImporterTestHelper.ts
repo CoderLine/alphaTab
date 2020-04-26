@@ -24,7 +24,7 @@ export class GpImporterTestHelper {
     public static async prepareImporterWithFile(name: string): Promise<Gp3To5Importer> {
         let path: string = 'test-data/';
         const buffer = await TestPlatform.loadFile(path + name);
-        return this.prepareImporterWithBytes(buffer);
+        return GpImporterTestHelper.prepareImporterWithBytes(buffer);
     }
 
     public static prepareImporterWithBytes(buffer: Uint8Array): Gp3To5Importer {
@@ -479,36 +479,36 @@ export class GpImporterTestHelper {
         let staff: Staff = track.staves[0];
         expect(staff.chords.size).toEqual(8);
 
-        this.checkChord(
+        GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('C', 1, [0, 1, 0, 2, 3, -1]),
             track.staves[0].bars[0].voices[0].beats[0].chord
         );
-        this.checkChord(
+        GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('Cm', 1, [-1, -1, 0, 1, 3, -1]),
             track.staves[0].bars[0].voices[0].beats[1].chord
         );
-        this.checkChord(
+        GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('C', 1, [3, 5, 5, 5, 3, -1], [3]),
             track.staves[0].bars[0].voices[0].beats[2].chord
         );
-        this.checkChord(
+        GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('Cm', 1, [3, 4, 5, 5, 3, -1], [3]),
             track.staves[0].bars[0].voices[0].beats[3].chord
         );
 
-        this.checkChord(
+        GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('D', 1, [2, 3, 2, 0, -1, -1], [2]),
             track.staves[0].bars[1].voices[0].beats[0].chord
         );
-        this.checkChord(
+        GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('Dm', 1, [1, 3, 2, 0, -1, -1]),
             track.staves[0].bars[1].voices[0].beats[1].chord
         );
-        this.checkChord(
+        GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('D', 5, [5, 7, 7, 7, 5, -1], [5]),
             track.staves[0].bars[1].voices[0].beats[2].chord
         );
-        this.checkChord(
+        GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('Dm', 5, [5, 6, 7, 7, 5, -1], [5]),
             track.staves[0].bars[1].voices[0].beats[3].chord
         );

@@ -29,7 +29,7 @@ import {
 import { TestPlatform } from '@test/TestPlatform';
 
 describe('MidiFileGeneratorTest', () => {
-    const parseTex = function (tex: string): Score {
+    const parseTex: (tex:string) => Score = (tex: string): Score => {
         let importer: AlphaTexImporter = new AlphaTexImporter();
         importer.init(TestPlatform.createStringReader(tex), new Settings());
         return importer.readScore();

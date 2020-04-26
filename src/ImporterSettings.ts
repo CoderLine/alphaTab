@@ -1,7 +1,7 @@
 /**
  * All settings related to importers that decode file formats.
+ * @json
  */
-// @json
 export class ImporterSettings {
     /**
      * The text encoding to use when decoding strings. By default UTF-8 is used.

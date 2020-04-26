@@ -282,22 +282,18 @@ export class BarRendererBase {
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
         let barBounds: BarBounds = new BarBounds();
         barBounds.bar = this.bar!;
-        barBounds.visualBounds = (() => {
-            let _tmp = new Bounds();
-            _tmp.x = cx + this.x;
-            _tmp.y = cy + this.y + this.topPadding;
-            _tmp.w = this.width;
-            _tmp.h = this.height - this.topPadding - this.bottomPadding;
-            return _tmp;
-        })();
-        barBounds.realBounds = (() => {
-            let _tmp = new Bounds();
-            _tmp.x = cx + this.x;
-            _tmp.y = cy + this.y;
-            _tmp.w = this.width;
-            _tmp.h = this.height;
-            return _tmp;
-        })();
+        barBounds.visualBounds =new Bounds();
+        barBounds.visualBounds.x = cx + this.x;
+        barBounds.visualBounds.y = cy + this.y + this.topPadding;
+        barBounds.visualBounds.w = this.width;
+        barBounds.visualBounds.h = this.height - this.topPadding - this.bottomPadding;
+
+        barBounds.realBounds = new Bounds();
+        barBounds.realBounds.x = cx + this.x;
+        barBounds.realBounds.y = cy + this.y;
+        barBounds.realBounds.w = this.width;
+        barBounds.realBounds.h = this.height;
+        
         masterBarBounds.addBar(barBounds);
         for (let kvp of this._voiceContainers) {
             let c: VoiceContainerGlyph = kvp[1];
@@ -307,22 +303,18 @@ export class BarRendererBase {
                     let bc: BeatContainerGlyph = c.beatGlyphs[i];
                     let beatBoundings: BeatBounds = new BeatBounds();
                     beatBoundings.beat = bc.beat;
-                    beatBoundings.visualBounds = (() => {
-                        let _tmp = new Bounds();
-                        _tmp.x = cx + this.x + c.x + bc.x + bc.onNotes.x;
-                        _tmp.y = barBounds.visualBounds.y;
-                        _tmp.w = bc.onNotes.width;
-                        _tmp.h = barBounds.visualBounds.h;
-                        return _tmp;
-                    })();
-                    beatBoundings.realBounds = (() => {
-                        let _tmp = new Bounds();
-                        _tmp.x = cx + this.x + c.x + bc.x;
-                        _tmp.y = barBounds.realBounds.y;
-                        _tmp.w = bc.width;
-                        _tmp.h = barBounds.realBounds.h;
-                        return _tmp;
-                    })();
+                    beatBoundings.visualBounds = new Bounds();
+                    beatBoundings.visualBounds.x = cx + this.x + c.x + bc.x + bc.onNotes.x;
+                    beatBoundings.visualBounds.y = barBounds.visualBounds.y;
+                    beatBoundings.visualBounds.w = bc.onNotes.width;
+                    beatBoundings.visualBounds.h = barBounds.visualBounds.h;
+                    
+                    beatBoundings.realBounds =new Bounds();
+                    beatBoundings.realBounds.x = cx + this.x + c.x + bc.x;
+                    beatBoundings.realBounds.y = barBounds.realBounds.y;
+                    beatBoundings.realBounds.w = bc.width;
+                    beatBoundings.realBounds.h = barBounds.realBounds.h;
+                    
                     if (isEmptyBar) {
                         beatBoundings.visualBounds.x = cx + this.x;
                         beatBoundings.realBounds.x = beatBoundings.visualBounds.x;

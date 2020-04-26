@@ -1,9 +1,10 @@
-import { EventEmitter } from '@src/EventEmitter';
+import { EventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Platform } from '@src/platform/Platform';
 import { Logger } from '@src/util/Logger';
 
 /**
  * This small utility helps to detect whether a particular font is already loaded.
+ * @target web
  */
 export class FontLoadingChecker {
     private _family: string;
@@ -11,7 +12,7 @@ export class FontLoadingChecker {
     private _isStarted: boolean = false;
     public isFontLoaded: boolean = false;
 
-    public fontLoaded: EventEmitter<(family: string) => void> = new EventEmitter();
+    public fontLoaded: IEventEmitterOfT<string> = new EventEmitterOfT<string>();
 
     public constructor(family: string, fallbackText: string = 'BESbwy') {
         this._family = family;
@@ -53,7 +54,7 @@ export class FontLoadingChecker {
                         Logger.info('Rendering', `[${this._family}] Font API signaled available`);
                         this.isFontLoaded = true;
                         window.clearInterval(failCounterId);
-                        this.fontLoaded.trigger(this._family);
+                        (this.fontLoaded as EventEmitterOfT<string>).trigger(this._family);
                     } else {
                         Logger.debug(
                             'Font',
@@ -108,7 +109,7 @@ export class FontLoadingChecker {
                         document.body.removeChild(monospace);
                         this.isFontLoaded = true;
                         window.clearInterval(failCounterId);
-                        this.fontLoaded.trigger(this._family);
+                        (this.fontLoaded as EventEmitterOfT<string>).trigger(this._family);
                     } else {
                         window.setTimeout(checkFont, 250);
                     }

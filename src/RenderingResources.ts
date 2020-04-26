@@ -3,8 +3,8 @@ import { Font, FontStyle } from './model/Font';
 
 /**
  * This public class contains central definitions for controlling the visual appearance.
+ * @json
  */
-// @json
 export class RenderingResources {
     private static sansFont: string = 'Arial';
     private static serifFont: string = 'Georgia';

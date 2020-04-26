@@ -81,9 +81,12 @@ export class RenderEngineFactory {
  * This public class represents the global alphaTab environment where
  * alphaTab looks for information like available layout engines
  * staves etc.
+ * @partial
  */
 export class Environment {
-
+    /**
+     * @target web
+     */
     public static createStyleElement(elementDocument: HTMLDocument, fontDirectory: string | null) {
         let styleElement: HTMLStyleElement = elementDocument.getElementById('alphaTabStyle') as HTMLStyleElement;
         if (!styleElement) {
@@ -130,14 +133,24 @@ export class Environment {
         }
     }
 
+    /**
+     * @target web
+     */
     public static scriptFile: string | null = Environment.detectScriptFile();
+    
+    /**
+     * @target web
+     */
     public static bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(
         'alphaTab',
         `&#${MusicFontSymbol.ClefG};`
     );
 
+    /**
+     * @target web
+     */
     private static detectScriptFile(): string | null {
-        if(Platform.isRunningInWorker) {
+        if (Platform.isRunningInWorker) {
             return null;
         }
         // try to build the find the alphaTab script url in case we are not in the webworker already
@@ -183,6 +196,9 @@ export class Environment {
         return scriptFile;
     }
 
+    /**
+     * @target web
+     */
     private static registerJQueryPlugin(): void {
         if (!Platform.isRunningInWorker && globalThis && 'jQuery' in globalThis) {
             let jquery: any = (globalThis as any)['jQuery'];
@@ -205,7 +221,10 @@ export class Environment {
         }
     }
 
-    // based on https://github.com/JamesMGreene/currentExecutingScript
+    /**
+     * based on https://github.com/JamesMGreene/currentExecutingScript
+     * @target web
+     */
     private static scriptFileFromStack(stack: string): string | null {
         let matches = stack.match(
             '(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?'
@@ -270,14 +289,21 @@ export class Environment {
                 return new CssFontSvgCanvas();
             })
         );
+        Environment.createPlatformSpecificRenderEngines(renderEngines);
+        renderEngines.set('default', renderEngines.get('svg')!);
+        return renderEngines;
+    }
+
+    /**
+     * @target web
+     */
+    private static createPlatformSpecificRenderEngines(renderEngines: Map<string, RenderEngineFactory>) {
         renderEngines.set(
             'html5',
             new RenderEngineFactory(false, () => {
                 return new Html5Canvas();
             })
         );
-        renderEngines.set('default', renderEngines.get('svg')!);
-        return renderEngines;
     }
 
     private static createDefaultStaveProfiles(): Map<StaveProfile, BarRendererFactory[]> {
@@ -418,18 +444,19 @@ export class Environment {
         return engines;
     }
 
-    public static init(): void {
+    /**
+     * @target web
+     */
+    public static platformInit(): void {
         Environment.registerJQueryPlugin();
         // polyfills
-        Math.log2 =
-            Math.log2 ||
-            function (x) {
-                return Math.log(x) * Math.LOG2E;
-            };
+        Math.log2 = Math.log2
+            ? Math.log2
+            : function (x) {
+                  return Math.log(x) * Math.LOG2E;
+              };
 
         if (!Platform.isRunningInWorker) {
-            window.AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-
             let vbAjaxLoader: string = '';
             vbAjaxLoader += 'Function VbAjaxLoader(method, fileName)' + '\r\n';
             vbAjaxLoader += '    Dim xhr' + '\r\n';
@@ -449,7 +476,7 @@ export class Environment {
             vbAjaxLoader += '    End If' + '\r\n';
             vbAjaxLoader += '    VbAjaxLoader=byteArray' + '\r\n';
             vbAjaxLoader += 'End Function' + '\r\n';
-            let vbAjaxLoaderScript: HTMLScriptElement = document.createElement('script');
+            let vbAjaxLoaderScript: HTMLScriptElement = document.createElement('script') as HTMLScriptElement;
             vbAjaxLoaderScript.setAttribute('type', 'text/vbscript');
             let inlineScript: Node = document.createTextNode(vbAjaxLoader);
             vbAjaxLoaderScript.appendChild(inlineScript);
@@ -467,4 +494,4 @@ export class Environment {
     }
 }
 
-Environment.init();
+Environment.platformInit();

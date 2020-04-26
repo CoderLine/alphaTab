@@ -3,7 +3,6 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 import { MidiEvent, MidiEventType } from '@src/audio/midi/event/MidiEvent';
-import { LinkedList } from '@src/audio/synth/ds/LinkedList';
 import {
     Hydra,
     HydraIbag,
@@ -40,7 +39,7 @@ export class TinySoundFont {
     public static readonly MicroBufferCount: number = 32; // 4069 samples in total
     public static readonly MicroBufferSize: number = 64; // 64 stereo samples
 
-    private _midiEventQueue: LinkedList<SynthEvent> = new LinkedList<SynthEvent>();
+    private _midiEventQueue: SynthEvent[] = [];
     private _midiEventCounts: Int32Array = new Int32Array(TinySoundFont.MicroBufferCount);
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
@@ -98,7 +97,7 @@ export class TinySoundFont {
     }
 
     public dispatchEvent(i: number, synthEvent: SynthEvent): void {
-        this._midiEventQueue.addFirst(synthEvent);
+        this._midiEventQueue.unshift(synthEvent);
         this._midiEventCounts[i]++;
     }
 
@@ -115,7 +114,7 @@ export class TinySoundFont {
             // process events for first microbuffer
             if (this._midiEventQueue.length > 0) {
                 for (let i: number = 0; i < this._midiEventCounts[x]; i++) {
-                    let m: SynthEvent | null = this._midiEventQueue.removeLast();
+                    let m: SynthEvent | undefined = this._midiEventQueue.pop();
                     if (m) {
                         if (m.isMetronome) {
                             this.channelNoteOff(SynthConstants.MetronomeChannel, 33);

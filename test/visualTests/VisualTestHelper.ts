@@ -9,6 +9,10 @@ import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
 import { CoreSettings, Environment } from '@src/alphatab';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 
+/**
+ * @partial
+ * @target web
+ */
 export class VisualTestHelper {
     public static async runVisualTest(inputFile: string, settings?: Settings, tracks?: number[]): Promise<void> {
         try {
@@ -72,8 +76,8 @@ export class VisualTestHelper {
                     result.push(e);
                     resolve();
                 });
-                api.error.on((s, e) => {
-                    reject(`Failed to render image: ${s},${e}`);
+                api.error.on((e) => {
+                    reject(`Failed to render image: ${e}`);
                 });
                 api.renderScore(score, tracks);
             });

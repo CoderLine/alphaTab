@@ -1,4 +1,4 @@
-import { IEventEmitter } from '@src/EventEmitter';
+import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 
 /**
@@ -66,25 +66,25 @@ export interface IContainer {
     /**
      * This event occurs when a scroll on the control happened.
      */
-    scroll: IEventEmitter<() => void>;
+    scroll: IEventEmitter;
 
     /**
      * This event occurs when the control was resized.
      */
-    resize: IEventEmitter<() => void>;
+    resize: IEventEmitter;
 
     /**
      * This event occurs when a mouse/finger press happened on the control.
      */
-    mouseDown: IEventEmitter<(e: IMouseEventArgs) => void>;
+    mouseDown: IEventEmitterOfT<IMouseEventArgs>;
 
     /**
      * This event occurs when a mouse/finger moves on top of the control.
      */
-    mouseMove: IEventEmitter<(e: IMouseEventArgs) => void>;
+    mouseMove: IEventEmitterOfT<IMouseEventArgs>
 
     /**
      * This event occurs when a mouse/finger is released from the control.
      */
-    mouseUp: IEventEmitter<(e: IMouseEventArgs) => void>;
+    mouseUp: IEventEmitterOfT<IMouseEventArgs>
 }

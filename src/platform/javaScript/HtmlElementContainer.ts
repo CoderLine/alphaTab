@@ -1,8 +1,11 @@
-import { IEventEmitter } from '@src/EventEmitter';
+import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { BrowserMouseEventArgs } from '@src/platform/javaScript/BrowserMouseEventArgs';
 
+/**
+ * @target web
+ */
 export class HtmlElementContainer implements IContainer {
     public get top(): number {
         return parseFloat(this.element.style.top);
@@ -142,27 +145,27 @@ export class HtmlElementContainer implements IContainer {
     /**
      * This event occurs when a scroll on the control happened.
      */
-    public scroll: IEventEmitter<() => void>;
+    public scroll: IEventEmitter;
 
     /**
      * This event occurs when the control was resized.
      */
-    public resize: IEventEmitter<() => void>;
+    public resize: IEventEmitter;
 
     /**
      * This event occurs when a mouse/finger press happened on the control.
      */
-    public mouseDown: IEventEmitter<(e: IMouseEventArgs) => void>;
+    public mouseDown: IEventEmitterOfT<IMouseEventArgs>;
 
     /**
      * This event occurs when a mouse/finger moves on top of the control.
      */
-    public mouseMove: IEventEmitter<(e: IMouseEventArgs) => void>;
+    public mouseMove: IEventEmitterOfT<IMouseEventArgs>;
 
     /**
      * This event occurs when a mouse/finger is released from the control.
      */
-    public mouseUp: IEventEmitter<(e: IMouseEventArgs) => void>;
+    public mouseUp: IEventEmitterOfT<IMouseEventArgs>;
 
     public appendChild(child: IContainer): void {
         this.element.appendChild((child as HtmlElementContainer).element);

@@ -2,15 +2,19 @@ import { Environment } from '@src/Environment';
 import { Platform } from '@src/platform/Platform';
 import { LogLevel } from '@src/util/Logger';
 
-// @json
+/**
+ * @json
+ */
 export class CoreSettings {
     /**
      * Gets or sets the script file url that will be used to spawn the workers.
+     * @target web
      */
     public scriptFile: string | null = null;
 
     /**
      * Gets or sets the url to the fonts that will be used to generate the alphaTab font style.
+     * @target web
      */
     public fontDirectory: string | null = null;
 
@@ -44,6 +48,9 @@ export class CoreSettings {
      */
     public includeNoteBounds: boolean = false;
 
+    /**
+     * @target web
+     */
     public constructor() {
         if (!Platform.isRunningInWorker && (globalThis as any).ALPHATAB_ROOT) {
             this.scriptFile = (globalThis as any).ALPHATAB_ROOT;
@@ -67,6 +74,9 @@ export class CoreSettings {
         }
     }
 
+    /**
+     * @target web
+     */
     public static ensureFullUrl(relativeUrl: string | null): string {
         if(!relativeUrl) {
             return '';

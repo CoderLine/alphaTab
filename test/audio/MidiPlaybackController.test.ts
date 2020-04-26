@@ -7,7 +7,7 @@ import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 
 describe('MidiPlaybackControllerTest', () => {
-    const testRepeat = function (score: Score, expectedIndexes: number[]): void {
+    const testRepeat: ((score: Score, expectedIndexes: number[]) => void) = (score: Score, expectedIndexes: number[]): void => {
         let controller: MidiPlaybackController = new MidiPlaybackController(score);
         let i: number = 0;
         while (!controller.finished) {

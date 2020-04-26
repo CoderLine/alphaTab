@@ -6,6 +6,7 @@ import { Settings } from '@src/Settings';
 
 /**
  * A canvas implementation for HTML5 canvas
+ * @target web
  */
 export class Html5Canvas implements ICanvas {
     private static readonly BlurCorrection = 0.5;

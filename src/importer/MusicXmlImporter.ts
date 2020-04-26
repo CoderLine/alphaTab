@@ -202,10 +202,12 @@ export class MusicXmlImporter extends ScoreImporter {
             return false;
         }
         let barIndex: number = 0;
-        let barWidth: number = parseInt(element.getAttribute('width')) || 0;
         if (isFirstMeasure) {
             this._divisionsPerQuarterNote = 0;
-            this._trackFirstMeasureNumber = parseInt(element.getAttribute('number')) || 0;
+            this._trackFirstMeasureNumber = parseInt(element.getAttribute('number'));
+            if(!this._trackFirstMeasureNumber) {
+                this._trackFirstMeasureNumber = 0;
+            }
             barIndex = 0;
         } else {
             barIndex = parseInt(element.getAttribute('number'));
