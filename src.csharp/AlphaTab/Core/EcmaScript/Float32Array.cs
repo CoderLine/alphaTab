@@ -27,12 +27,12 @@ namespace AlphaTab.Core.EcmaScript
 
         public Float32Array(IEnumerable<double> values)
         {
-            _data = new ArraySegment<float>(values.Cast<float>().ToArray());
+            _data = new ArraySegment<float>(values.Select(d=>(float)d).ToArray());
         }
 
         public Float32Array(IEnumerable<int> values)
         {
-            _data = new ArraySegment<float>(values.Cast<float>().ToArray());
+            _data = new ArraySegment<float>(values.Select(d=>(float)d).ToArray());
         }
 
         public double this[double index]

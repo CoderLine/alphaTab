@@ -34,11 +34,11 @@ namespace AlphaTab.Platform.CSharp
                     var libSkiaSharpPath = Path.GetDirectoryName(typeof(SkiaCanvas).Assembly.Location);
                     if (IntPtr.Size == 4)
                     {
-                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "x86", "libSkiaSharp.dll");
+                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", "win-x86", "native", "libSkiaSharp.dll");
                     }
                     else
                     {
-                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "x64", "libSkiaSharp.dll");
+                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", "win-x64", "native", "libSkiaSharp.dll");
                     }
 
                     Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "'");
@@ -116,6 +116,7 @@ namespace AlphaTab.Platform.CSharp
                 SKImageInfo.PlatformColorType,
                 SKAlphaType.Premul));
             _surface = newImage;
+
             if (_path != null)
             {
                 _path.Dispose();
@@ -268,7 +269,10 @@ namespace AlphaTab.Platform.CSharp
             switch (baseline)
             {
                 case TextBaseline.Top: // TopTextBaseline
-                    return -paint.FontMetrics.Ascent;
+                    // https://chromium.googlesource.com/chromium/blink/+/master/Source/modules/canvas2d/CanvasRenderingContext2D.cpp#2056
+                    // According to http://wiki.apache.org/xmlgraphics-fop/LineLayout/AlignmentHandling
+                    // "FOP (Formatting Objects Processor) puts the hanging baseline at 80% of the ascender height"
+                    return (-paint.FontMetrics.Ascent * 4) / 5;
                 case TextBaseline.Middle: // MiddleTextBaseline
                     return -paint.FontMetrics.Descent + paint.TextSize / 2;
                 case TextBaseline.Bottom: // BottomTextBaseline
@@ -357,6 +361,7 @@ namespace AlphaTab.Platform.CSharp
                 {
                     paint.TextAlign = SKTextAlign.Center;
                 }
+
 
                 _surface.Canvas.DrawText(s, (float)x, (float)y, paint);
             }

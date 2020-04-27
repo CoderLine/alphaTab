@@ -27,11 +27,14 @@ namespace AlphaTab.VisualTests
 
             settings.Core.Engine = "skia";
             settings.Core.EnableLazyLoading = false;
+            settings.Core.UseWorkers = false;
 
-            var inputFileData = await TestPlatform.LoadFile($"test-data/visual-tests/{inputFile}");
+            inputFile = $"test-data/visual-tests/{inputFile}";
+
+            var inputFileData = await TestPlatform.LoadFile(inputFile);
             var referenceFileName = TestPlatform.ChangeExtension(inputFile, ".png");
             var referenceFileData =
-                await TestPlatform.LoadFile($"test-data/visual-tests/{referenceFileName}");
+                await TestPlatform.LoadFile(referenceFileName);
             var score = ScoreLoader.LoadScoreFromBytes(inputFileData, settings);
 
             var result = new List<RenderFinishedEventArgs>();
@@ -87,21 +90,25 @@ namespace AlphaTab.VisualTests
             {
                 var point = new SKPoint();
                 var rowHeight = 0;
-                foreach (var img in result.OfType<SKImage>())
+                foreach (var partialResult in result)
                 {
-                    finalImageSurface.Canvas.DrawImage(img, point);
-                    if (img.Height > rowHeight)
+                    var partialCanvas = partialResult.RenderResult;
+                    if (partialCanvas is SKImage img)
                     {
-                        rowHeight = img.Height;
-                    }
+                        finalImageSurface.Canvas.DrawImage(img, point);
+                        if (partialResult.Height > rowHeight)
+                        {
+                            rowHeight = img.Height;
+                        }
 
-                    point.X += img.Width;
+                        point.X += img.Width;
 
-                    if (point.X >= totalWidth)
-                    {
-                        point.X = 0;
-                        point.Y += rowHeight;
-                        rowHeight = 0;
+                        if (point.X >= totalWidth)
+                        {
+                            point.X = 0;
+                            point.Y += rowHeight;
+                            rowHeight = 0;
+                        }
                     }
                 }
 
@@ -131,7 +138,8 @@ namespace AlphaTab.VisualTests
                     var compareResult = PixelMatch.Run(finalBitmap, referenceBitmap,
                         new PixelMatchOptions
                         {
-                            IncludeAntiAlias = true,
+                            Threshold = 0.2,
+                            IncludeAntiAlias = false,
                             IgnoreTransparent = true,
                             CreateOutputImage = true
                         });
@@ -139,9 +147,9 @@ namespace AlphaTab.VisualTests
 
                     using (compareResult.Output)
                     {
-                        Assert.IsTrue(compareResult.SizesMatch, "Dimensions differ");
 
-                        if (compareResult.DifferentPixels > 100)
+                        Assert.IsTrue(compareResult.SizesMatch, "Dimensions differ");
+                        if (compareResult.Mismatch > 0.01)
                         {
                             var diffImageName =
                                 Path.ChangeExtension(referenceFileName, ".diff.png");

@@ -1,6 +1,8 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using AlphaTab.Core.EcmaScript;
+using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Core
 {
@@ -12,15 +14,9 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Substring(this string s, double start, double length)
+        public static string Substr(this string s, double start, double length)
         {
-            return s.Substring((int) start, (int) length);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Substr(this string s, double start, double end)
-        {
-            return s.Substring((int) start, (int) (end - start));
+            return s.Substring((int) start, (int)length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -50,7 +46,7 @@ namespace AlphaTab.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<string> Split(this string s, string separator)
         {
-            return new List<string>(s.Split(separator));
+            return new List<string>(s.Split(new[] {separator}, StringSplitOptions.None));
         }
 
         public static MapEntry<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
@@ -76,6 +72,24 @@ namespace AlphaTab.Core
             }
 
             return num.ToString(CultureInfo.InvariantCulture);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsTruthy(string? s)
+        {
+            return !string.IsNullOrEmpty(s);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsTruthy(object? s)
+        {
+            return s != null;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsTruthy(double s)
+        {
+            return !double.IsNaN(s) && s != 0;
         }
     }
 }

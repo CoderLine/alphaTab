@@ -10,6 +10,9 @@ import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
 
 export class BoundsLookup {
+    /**
+     * @target web
+     */
     public toJson(): unknown {
         let json: any = {} as any;
         let staveGroups: StaveGroupBounds[] = [];
@@ -62,6 +65,9 @@ export class BoundsLookup {
         return json;
     }
 
+    /**
+     * @target web
+     */
     public static fromJson(json: unknown, score: Score): BoundsLookup {
         let lookup: BoundsLookup = new BoundsLookup();
         let staveGroups: StaveGroupBounds[] = (json as any)['staveGroups'];

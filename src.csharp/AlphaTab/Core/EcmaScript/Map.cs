@@ -16,10 +16,7 @@ namespace AlphaTab.Core.EcmaScript
 
         public Map(IEnumerable<MapEntry<TKey, TValue>> entries)
         {
-            foreach (var entry in entries)
-            {
-                Set(entry.Key, entry.Value);
-            }
+            _data = entries.ToDictionary(e => e.Key, e => e.Value);
         }
 
         public double Size => _data.Count;
@@ -62,24 +59,6 @@ namespace AlphaTab.Core.EcmaScript
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-    }
-
-
-    public class MapEntry<TKey, TValue>
-    {
-        public TKey Key { get; set; }
-        public TValue Value { get; set; }
-
-        public MapEntry(TKey key, TValue value)
-        {
-            Key = key;
-            Value = value;
-        }
-
-        public dynamic this[int index]
-        {
-            get { return index == 0 ? (object) Key : Value; }
         }
     }
 }

@@ -28,13 +28,8 @@ namespace AlphaTab.Core.EcmaScript
         {
         }
 
-        public Uint8Array(IEnumerable<double> values)
-            : this(values.Cast<byte>().ToArray())
-        {
-        }
-
         public Uint8Array(IEnumerable<int> values)
-            : this(values.Cast<byte>().ToArray())
+            : this(values.Select(d => (byte) d).ToArray())
         {
         }
 
@@ -49,7 +44,7 @@ namespace AlphaTab.Core.EcmaScript
         public Uint8Array Subarray(double begin, double end)
         {
             return new Uint8Array(new ArraySegment<byte>(_data.Array, _data.Offset + (int) begin,
-                (int)(end - begin)));
+                (int) (end - begin)));
         }
 
         public void Set(Uint8Array subarray, double pos)

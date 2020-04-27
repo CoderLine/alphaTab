@@ -66,7 +66,7 @@ function isEnumType(type: ts.Type) {
     return valueDeclaration && valueDeclaration.kind === ts.SyntaxKind.EnumDeclaration;
 }
 
-function isTypedArray(type: ts.Type, caller: any) {
+function isTypedArray(type: ts.Type) {
     return type.symbol.members.has(ts.escapeLeadingUnderscores('slice'));
 }
 

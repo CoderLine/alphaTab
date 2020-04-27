@@ -518,7 +518,8 @@ export default class CSharpAstPrinter {
     }
 
     private writePropertyAsField(d: cs.PropertyDeclaration) {
-        if (d.parent!.nodeType === cs.SyntaxKind.ClassDeclaration && d.visibility === cs.Visibility.Private) {
+        if (d.parent!.nodeType === cs.SyntaxKind.ClassDeclaration && d.visibility === cs.Visibility.Private &&
+            (!d.getAccessor || !d.getAccessor.body)) {
             return true;
         }
         return this.canBeConstant(d);

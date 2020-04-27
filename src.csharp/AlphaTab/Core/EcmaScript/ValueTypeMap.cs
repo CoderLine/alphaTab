@@ -16,10 +16,7 @@ namespace AlphaTab.Core.EcmaScript
 
         public ValueTypeMap(IEnumerable<MapEntry<TKey, TValue>> entries)
         {
-            foreach (var entry in entries)
-            {
-                Set(entry.Key, entry.Value);
-            }
+            _data = entries.ToDictionary(e => e.Key, e => e.Value);
         }
 
         public double Size => _data.Count;

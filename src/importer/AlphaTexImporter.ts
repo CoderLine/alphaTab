@@ -109,7 +109,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _ch: number = 0;
     private _curChPos: number = 0;
     private _sy: AlphaTexSymbols = AlphaTexSymbols.No;
-    private _syData: any;
+    private _syData: unknown;
     private _allowNegatives: boolean = false;
     private _allowTuning: boolean = false;
     private _currentDuration: Duration = Duration.QuadrupleWhole;
@@ -560,12 +560,12 @@ export class AlphaTexImporter extends ScoreImporter {
         let anyMeta: boolean = false;
         let continueReading: boolean = true;
         while (this._sy === AlphaTexSymbols.MetaCommand && continueReading) {
-            let syData: string = this._syData.toString().toLowerCase();
+            let syData: string = (this._syData as string).toLowerCase();
             switch (syData) {
                 case 'title':
                     this._sy = this.newSy();
                     if (this._sy === AlphaTexSymbols.String) {
-                        this._score.title = this._syData.toString();
+                        this._score.title = (this._syData as string);
                     } else {
                         this.error('title', AlphaTexSymbols.String, true);
                     }
@@ -575,7 +575,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 case 'subtitle':
                     this._sy = this.newSy();
                     if (this._sy === AlphaTexSymbols.String) {
-                        this._score.subTitle = this._syData.toString();
+                        this._score.subTitle = (this._syData as string);
                     } else {
                         this.error('subtitle', AlphaTexSymbols.String, true);
                     }
@@ -585,7 +585,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 case 'artist':
                     this._sy = this.newSy();
                     if (this._sy === AlphaTexSymbols.String) {
-                        this._score.artist = this._syData.toString();
+                        this._score.artist = (this._syData as string);
                     } else {
                         this.error('artist', AlphaTexSymbols.String, true);
                     }
@@ -595,7 +595,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 case 'album':
                     this._sy = this.newSy();
                     if (this._sy === AlphaTexSymbols.String) {
-                        this._score.album = this._syData.toString();
+                        this._score.album = (this._syData as string);
                     } else {
                         this.error('album', AlphaTexSymbols.String, true);
                     }
@@ -605,7 +605,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 case 'words':
                     this._sy = this.newSy();
                     if (this._sy === AlphaTexSymbols.String) {
-                        this._score.words = this._syData.toString();
+                        this._score.words = (this._syData as string);
                     } else {
                         this.error('words', AlphaTexSymbols.String, true);
                     }
@@ -615,7 +615,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 case 'music':
                     this._sy = this.newSy();
                     if (this._sy === AlphaTexSymbols.String) {
-                        this._score.music = this._syData.toString();
+                        this._score.music = (this._syData as string);
                     } else {
                         this.error('music', AlphaTexSymbols.String, true);
                     }
@@ -625,7 +625,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 case 'copyright':
                     this._sy = this.newSy();
                     if (this._sy === AlphaTexSymbols.String) {
-                        this._score.copyright = this._syData.toString();
+                        this._score.copyright = (this._syData as string);
                     } else {
                         this.error('copyright', AlphaTexSymbols.String, true);
                     }
@@ -666,7 +666,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private handleStaffMeta(): boolean {
-        let syData: string = this._syData.toString().toLowerCase();
+        let syData: string = (this._syData as string).toLowerCase();
         switch (syData) {
             case 'capo':
                 this._sy = this.newSy();
@@ -682,7 +682,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 let strings: number = this._currentStaff.tuning.length;
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
-                        let text: string = this._syData.toString().toLowerCase();
+                        let text: string = (this._syData as string).toLowerCase();
                         if (text === 'piano' || text === 'none' || text === 'voice') {
                             // clear tuning
                             this._currentStaff.tuning = [];
@@ -718,7 +718,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('instrument', AlphaTexSymbols.Number, false);
                     }
                 } else if (this._sy === AlphaTexSymbols.String) {
-                    let instrumentName: string = this._syData.toString().toLowerCase();
+                    let instrumentName: string = (this._syData as string).toLowerCase();
                     this._currentTrack.playbackInfo.program = GeneralMidi.getValue(instrumentName);
                 } else {
                     this.error('instrument', AlphaTexSymbols.Number, true);
@@ -760,7 +760,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 for (let i: number = 0; i < this._currentStaff.tuning.length; i++) {
                     if (this._sy === AlphaTexSymbols.Number) {
                         chord.strings.push(this._syData as number);
-                    } else if (this._sy === AlphaTexSymbols.String && this._syData.toString().toLowerCase() === 'x') {
+                    } else if (this._sy === AlphaTexSymbols.String && (this._syData as string).toLowerCase() === 'x') {
                         chord.strings.push(-1);
                     }
                     this._sy = this.newSy();
@@ -778,7 +778,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
         while (this._sy === AlphaTexSymbols.String) {
-            switch (this._syData.toString().toLowerCase()) {
+            switch ((this._syData as string).toLowerCase()) {
                 case 'firstfret':
                     this._sy = this.newSy();
                     switch (this._sy) {
@@ -795,7 +795,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                     switch (this._sy) {
                         case AlphaTexSymbols.String:
-                            chord.showDiagram = this._syData.toString().toLowerCase() !== 'false';
+                            chord.showDiagram = (this._syData as string).toLowerCase() !== 'false';
                             break;
                         case AlphaTexSymbols.Number:
                             chord.showDiagram = (this._syData as number) !== 0;
@@ -810,7 +810,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                     switch (this._sy) {
                         case AlphaTexSymbols.String:
-                            chord.showDiagram = this._syData.toString().toLowerCase() !== 'false';
+                            chord.showDiagram = (this._syData as string).toLowerCase() !== 'false';
                             break;
                         case AlphaTexSymbols.Number:
                             chord.showFingering = (this._syData as number) !== 0;
@@ -825,7 +825,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                     switch (this._sy) {
                         case AlphaTexSymbols.String:
-                            chord.showName = this._syData.toString().toLowerCase() !== 'false';
+                            chord.showName = (this._syData as string).toLowerCase() !== 'false';
                             break;
                         case AlphaTexSymbols.Number:
                             chord.showName = (this._syData as number) !== 0;
@@ -871,7 +871,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private trackStaffMeta(): void {
         if (this._sy === AlphaTexSymbols.MetaCommand) {
-            let syData: string = this._syData.toString().toLowerCase();
+            let syData: string = (this._syData as string).toLowerCase();
             if (syData === 'track') {
                 this._sy = this.newSy();
                 // new track starting? - if no masterbars it's the \track of the initial track.
@@ -880,24 +880,26 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 // name
                 if (this._sy === AlphaTexSymbols.String) {
-                    this._currentTrack.name = this._syData.toString();
+                    this._currentTrack.name = (this._syData as string);
                     this._sy = this.newSy();
                 }
                 // short name
                 if (this._sy === AlphaTexSymbols.String) {
-                    this._currentTrack.shortName = this._syData.toString();
+                    this._currentTrack.shortName = (this._syData as string);
                     this._sy = this.newSy();
                 }
             }
-            syData = this._syData.toString().toLowerCase();
-            if (syData === 'staff') {
-                this._sy = this.newSy();
-                if (this._currentTrack.staves[0].bars.length > 0) {
-                    this._currentTrack.ensureStaveCount(this._currentTrack.staves.length + 1);
-                    this._currentStaff = this._currentTrack.staves[this._currentTrack.staves.length - 1];
-                    this._currentDynamics = DynamicValue.F;
+            if(this._sy === AlphaTexSymbols.MetaCommand) {
+                syData = (this._syData as string).toLowerCase();
+                if (syData === 'staff') {
+                    this._sy = this.newSy();
+                    if (this._currentTrack.staves[0].bars.length > 0) {
+                        this._currentTrack.ensureStaveCount(this._currentTrack.staves.length + 1);
+                        this._currentStaff = this._currentTrack.staves[this._currentTrack.staves.length - 1];
+                        this._currentDynamics = DynamicValue.F;
+                    }
+                    this.staffProperties();
                 }
-                this.staffProperties();
             }
         }
     }
@@ -910,7 +912,7 @@ export class AlphaTexImporter extends ScoreImporter {
         let showStandardNotation: boolean = false;
         let showTabs: boolean = false;
         while (this._sy === AlphaTexSymbols.String) {
-            switch (this._syData.toString().toLowerCase()) {
+            switch ((this._syData as string).toLowerCase()) {
                 case 'score':
                     showStandardNotation = true;
                     this._sy = this.newSy();
@@ -994,7 +996,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this.error('note-list', AlphaTexSymbols.RParensis, true);
             }
             this._sy = this.newSy();
-        } else if (this._sy === AlphaTexSymbols.String && this._syData.toString().toLowerCase() === 'r') {
+        } else if (this._sy === AlphaTexSymbols.String && (this._syData as string).toLowerCase() === 'r') {
             // rest voice -> no notes
             this._sy = this.newSy();
         } else {
@@ -1056,7 +1058,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
         while (this._sy === AlphaTexSymbols.String) {
-            let effect: string = this._syData.toString().toLowerCase();
+            let effect: string = (this._syData as string).toLowerCase();
             switch (effect) {
                 case 'tu':
                     this._sy = this.newSy();
@@ -1083,7 +1085,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
         while (this._sy === AlphaTexSymbols.String) {
-            this._syData = this._syData.toString().toLowerCase();
+            this._syData = (this._syData as string).toLowerCase();
             if (!this.applyBeatEffect(beat)) {
                 this.error('beat-effects', AlphaTexSymbols.String, false);
             }
@@ -1099,7 +1101,7 @@ export class AlphaTexImporter extends ScoreImporter {
      * @returns true if a effect could be applied, otherwise false
      */
     private applyBeatEffect(beat: Beat): boolean {
-        let syData: string = this._syData.toString().toLowerCase();
+        let syData: string = (this._syData as string).toLowerCase();
         if (syData === 'f') {
             beat.fadeIn = true;
             this._sy = this.newSy();
@@ -1218,7 +1220,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         if (syData === 'ch') {
             this._sy = this.newSy();
-            let chordName: string = this._syData.toString();
+            let chordName: string = (this._syData as string);
             let chordId: string = chordName.toLowerCase();
             if (!this._currentStaff.chords.has(chordId)) {
                 let chord: Chord = new Chord();
@@ -1232,10 +1234,10 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         if (syData === 'gr') {
             this._sy = this.newSy();
-            if (this._syData.toString().toLowerCase() === 'ob') {
+            if ((this._syData as string).toLowerCase() === 'ob') {
                 beat.graceType = GraceType.OnBeat;
                 this._sy = this.newSy();
-            } else if (this._syData.toString().toLowerCase() === 'b') {
+            } else if ((this._syData as string).toLowerCase() === 'b') {
                 beat.graceType = GraceType.BendGrace;
                 this._sy = this.newSy();
             } else {
@@ -1245,7 +1247,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         if (syData === 'dy') {
             this.newSy();
-            switch (this._syData.toString().toLowerCase()) {
+            switch ((this._syData as string).toLowerCase()) {
                 case 'ppp':
                     beat.dynamics = DynamicValue.PPP;
                     break;
@@ -1354,8 +1356,8 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private note(beat: Beat): boolean {
         // fret.string
-        let isDead: boolean = this._syData.toString() === 'x';
-        let isTie: boolean = this._syData.toString() === '-';
+        let isDead: boolean = false;
+        let isTie: boolean = false;
         let fret: number = -1;
         let octave: number = -1;
         let tone: number = -1;
@@ -1364,6 +1366,9 @@ export class AlphaTexImporter extends ScoreImporter {
                 fret = this._syData as number;
                 break;
             case AlphaTexSymbols.String:
+                isDead = (this._syData as string) === 'x';
+                isTie = (this._syData as string) === '-';
+        
                 if (isTie || isDead) {
                     fret = 0;
                 } else {
@@ -1423,7 +1428,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
         while (this._sy === AlphaTexSymbols.String) {
-            let syData: string = this._syData.toString().toLowerCase();
+            let syData: string = (this._syData as string).toLowerCase();
             this._syData = syData;
             if (syData === 'b' || syData === 'be') {
                 let exact: boolean = (this._syData as string) === 'be';
@@ -1649,7 +1654,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private barMeta(bar: Bar): void {
         let master: MasterBar = bar.masterBar;
         while (this._sy === AlphaTexSymbols.MetaCommand) {
-            let syData: string = this._syData.toString().toLowerCase();
+            let syData: string = (this._syData as string).toLowerCase();
             if (syData === 'ts') {
                 this._sy = this.newSy();
                 if (this._sy !== AlphaTexSymbols.Number) {
@@ -1677,13 +1682,13 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.String) {
                     this.error('keysignature', AlphaTexSymbols.String, true);
                 }
-                master.keySignature = this.parseKeySignature(this._syData.toString().toLowerCase()) as KeySignature;
+                master.keySignature = this.parseKeySignature((this._syData as string).toLowerCase()) as KeySignature;
                 this._sy = this.newSy();
             } else if (syData === 'clef') {
                 this._sy = this.newSy();
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
-                        bar.clef = this.parseClefFromString(this._syData.toString().toLowerCase());
+                        bar.clef = this.parseClefFromString((this._syData as string).toLowerCase());
                         break;
                     case AlphaTexSymbols.Number:
                         bar.clef = this.parseClefFromInt(this._syData as number);
@@ -1731,7 +1736,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._allowTuning = true;
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
-                        master.tripletFeel = this.parseTripletFeelFromString(this._syData.toString().toLowerCase());
+                        master.tripletFeel = this.parseTripletFeelFromString((this._syData as string).toLowerCase());
                         break;
                     case AlphaTexSymbols.Number:
                         master.tripletFeel = this.parseTripletFeelFromInt(this._syData as number);

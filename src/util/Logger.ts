@@ -36,25 +36,25 @@ export class Logger {
         return Logger.logLevel !== LogLevel.None && level >= Logger.logLevel;
     }
 
-    public static debug(category: string, msg: string, ...details: any[]): void {
+    public static debug(category: string, msg: string, ...details: unknown[]): void {
         if (Logger.shouldLog(LogLevel.Debug)) {
             console.debug(Logger.format(category, msg), ...details);
         }
     }
 
-    public static warning(category: string, msg: string, ...details: any[]): void {
+    public static warning(category: string, msg: string, ...details: unknown[]): void {
         if (Logger.shouldLog(LogLevel.Warning)) {
             console.warn(Logger.format(category, msg), ...details);
         }
     }
 
-    public static info(category: string, msg: string, ...details: any[]): void {
+    public static info(category: string, msg: string, ...details: unknown[]): void {
         if (Logger.shouldLog(LogLevel.Info)) {
             console.info(Logger.format(category, msg), ...details);
         }
     }
 
-    public static error(category: string, msg: string, ...details: any[]): void {
+    public static error(category: string, msg: string, ...details: unknown[]): void {
         if (Logger.shouldLog(LogLevel.Error)) {
             console.error(Logger.format(category, msg), ...details);
         }

@@ -337,7 +337,7 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csInterface);
     }
 
-    private visitTypeParameterDeclaration(parent: cs.Node, p: ts.TypeParameterDeclaration): any {
+    private visitTypeParameterDeclaration(parent: cs.Node, p: ts.TypeParameterDeclaration): cs.TypeParameterDeclaration {
         const csTypeParameter: cs.TypeParameterDeclaration = {
             nodeType: cs.SyntaxKind.TypeParameterDeclaration,
             name: p.name.text,
@@ -1727,7 +1727,7 @@ export default class CSharpAstTransformer {
                 block.statements.length > 0 &&
                 block.statements[0].nodeType === cs.SyntaxKind.ExpressionStatement &&
                 (block.statements[0] as cs.ExpressionStatement).expression.nodeType ===
-                    cs.SyntaxKind.InvocationExpression &&
+                cs.SyntaxKind.InvocationExpression &&
                 ((block.statements[0] as cs.ExpressionStatement).expression as cs.InvocationExpression).expression
                     .nodeType === cs.SyntaxKind.BaseLiteralExpression
             ) {
@@ -2073,10 +2073,42 @@ export default class CSharpAstTransformer {
                     binaryExpression.left = this.makeInt(binaryExpression.left);
                     binaryExpression.right = this.makeInt(binaryExpression.right);
                     break;
+                case ts.SyntaxKind.SlashToken:
+                    if (expression.left.kind === ts.SyntaxKind.NumericLiteral && expression.right.kind === ts.SyntaxKind.NumericLiteral) {
+                        binaryExpression.right = this.makeDouble(binaryExpression.right);
+                    }
+                    break;
             }
 
             return binaryExpression;
         }
+    }
+
+    private makeDouble(expression: cs.Expression): cs.Expression {
+        // (double)(expr)
+
+        const cast = {
+            parent: expression.parent,
+            tsNode: expression.tsNode,
+            nodeType: cs.SyntaxKind.CastExpression,
+            expression: {
+                parent: null,
+                tsNode: expression.tsNode,
+                nodeType: cs.SyntaxKind.ParenthesizedExpression,
+                expression: expression
+            } as cs.ParenthesizedExpression,
+            type: {
+                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                parent: null,
+                tsNode: expression.tsNode,
+                type: cs.PrimitiveType.Double
+            } as cs.PrimitiveTypeNode
+        } as cs.CastExpression;
+
+        cast.expression.parent = cast;
+        cast.type.parent = cast;
+
+        return cast;
     }
 
     private makeInt(expression: cs.Expression): cs.Expression {
@@ -2137,51 +2169,39 @@ export default class CSharpAstTransformer {
             }
         }
 
-        // ( (expr) != default )
-
-        const paren = {
-            parent: expression.parent,
-            tsNode: expression.tsNode,
-            nodeType: cs.SyntaxKind.ParenthesizedExpression,
-            expression: {} as cs.Expression
-        } as cs.ParenthesizedExpression;
-
-        // (expr) != default
-        const comp = (paren.expression = {
-            parent: paren,
-            tsNode: expression.tsNode,
-            left: {} as cs.Expression,
-            operator: '!=',
-            right: {} as cs.Expression,
-            nodeType: cs.SyntaxKind.BinaryExpression
-        } as cs.BinaryExpression);
-
-        // (expr)
-        const parenExpr = (comp.left = {
-            parent: comp,
-            tsNode: expression.tsNode,
-            nodeType: cs.SyntaxKind.ParenthesizedExpression,
-            expression: expression
-        } as cs.ParenthesizedExpression);
-        expression.parent = parenExpr;
-
-        // default(type)
-        comp.right = {
-            parent: comp,
-            nodeType: cs.SyntaxKind.DefaultExpression,
-            tsNode: expression.tsNode
-        } as cs.DefaultExpression;
-
         const type = this._context.typeChecker.getTypeAtLocation(expression.tsNode!);
-        if (type.flags === ts.TypeFlags.Any) {
-            (comp.right as cs.DefaultExpression).type = this.createUnresolvedTypeNode(
-                comp.right,
-                expression.tsNode!,
-                type
-            );
+        if(type.flags & ts.TypeFlags.Boolean || type.flags & ts.TypeFlags.BooleanLiteral) {
+            return expression;
         }
 
-        return paren;
+        // AlphaTab.Core.TypeHelper.IsTruthy(expression);
+        const call = {
+            parent: expression.parent,
+            tsNode: expression.tsNode,
+            nodeType: cs.SyntaxKind.InvocationExpression,
+            expression: {} as cs.Expression,
+            arguments: []
+        } as cs.InvocationExpression;
+
+        const access = call.expression = {
+            parent: call,
+            tsNode: expression.tsNode,
+            nodeType: cs.SyntaxKind.MemberAccessExpression,
+            expression: {} as cs.Expression,
+            member: 'IsTruthy'
+        } as cs.MemberAccessExpression;
+
+        access.expression = {
+            parent: access,
+            tsNode: expression.tsNode,
+            nodeType: cs.SyntaxKind.Identifier,
+            text: 'AlphaTab.Core.TypeHelper'
+        } as cs.Identifier;
+
+        expression.parent = call;
+        call.arguments.push(expression);
+        
+        return call;
     }
 
     private visitFunctionExpression(parent: cs.Node, expression: ts.FunctionExpression) {
@@ -2698,7 +2718,7 @@ export default class CSharpAstTransformer {
                 (node.tsSymbol.flags & ts.SymbolFlags.Variable) === ts.SymbolFlags.Variable ||
                 (node.tsSymbol.flags & ts.SymbolFlags.EnumMember) === ts.SymbolFlags.EnumMember ||
                 (node.tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable) ===
-                    ts.SymbolFlags.FunctionScopedVariable ||
+                ts.SymbolFlags.FunctionScopedVariable ||
                 (node.tsSymbol.flags & ts.SymbolFlags.BlockScopedVariable) === ts.SymbolFlags.BlockScopedVariable
             ) {
                 let smartCastType = this._context.getSmartCastType(expression);

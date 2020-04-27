@@ -5,6 +5,12 @@ import * as path from 'path';
 type SymbolKey = string;
 
 export default class CSharpEmitterContext {
+    public isNullableString(type: ts.Type) {
+        if(type.isUnion()) {
+            type = this.typeChecker.getNonNullableType(type);
+        }
+        return ((type.flags & ts.TypeFlags.String) || (type.flags & ts.TypeFlags.StringLiteral));
+    }
     private _fileLookup: Map<ts.SourceFile, cs.SourceFile> = new Map();
     private _symbolLookup: Map<SymbolKey, cs.NamedElement & cs.Node> = new Map();
     private _symbolConst: Map<SymbolKey, boolean> = new Map();

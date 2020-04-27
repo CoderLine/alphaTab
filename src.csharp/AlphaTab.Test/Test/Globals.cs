@@ -24,13 +24,21 @@ namespace AlphaTab.Test
             _actual = actual;
         }
 
-        public void ToEqual<TOther>(TOther expected, string message = null)
+        public void ToEqual(object expected, string message = null)
         {
-            Assert.AreEqual(expected, _actual);
+            if (expected is int i && _actual is double)
+            {
+                expected = (double)i;
+            }
+            Assert.AreEqual(expected, _actual, message);
         }
 
-        public void ToBe<TOther>(TOther expected)
+        public void ToBe(object expected)
         {
+            if (expected is int i && _actual is double)
+            {
+                expected = (double)i;
+            }
             Assert.AreEqual(expected, _actual);
         }
 
@@ -53,7 +61,7 @@ namespace AlphaTab.Test
 
         public void ToBeFalsy()
         {
-            Assert.AreNotEqual(default, _actual);
+            Assert.AreEqual(default, _actual);
         }
     }
 }

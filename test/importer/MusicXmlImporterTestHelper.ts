@@ -42,7 +42,7 @@ export class MusicXmlImporterTestHelper {
         }
     }
 
-    protected static getHierarchy(node: any): string {
+    protected static getHierarchy(node: unknown): string {
         let note: Note | null = node instanceof Note ? node : null;
         if (note) {
             return `${MusicXmlImporterTestHelper.getHierarchy(note.beat)}Note[${note.index}]`;
@@ -71,7 +71,7 @@ export class MusicXmlImporterTestHelper {
         if (mb) {
             return `MasterBar[${mb.index}]`;
         }
-        return node.constructor.name;
+        return 'unknown';
     }
 
     protected expectScoreEqual(expected: Score, actual: Score): void {

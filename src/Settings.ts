@@ -9,25 +9,40 @@ import { PlayerSettings } from '@src/PlayerSettings';
  * @json
  */
 export class Settings {
+    /**
+     * @target web
+     */
     public static fromJson(json: any): Settings {
         // dynamically implemented via AST transformer
         return new Settings();
     }
 
+    /**
+     * @target web
+     */
     public fillFromJson(json: any): void {
         // dynamically implemented via AST transformer
     }
 
+    /**
+     * @target web
+     */
     public static toJson(settings: Settings): unknown {
         // dynamically implemented via AST transformer
         return null;
     }
 
+    /**
+     * @target web
+     */
     public setProperty(property: string, value: any): boolean {
         // dynamically implemented via macro
         return false;
     }
 
+    /**
+     * @target web
+     */
     public fillFromDataAttributes(dataAttributes: Map<string, unknown>): void {
         for (let kvp of dataAttributes) {
             this.setProperty(kvp[0].toLowerCase(), kvp[1]);
