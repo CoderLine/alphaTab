@@ -80,7 +80,7 @@ if (pretty) {
     });
 }
 
-if (diagnostics.length > 0) {
+if (errorCount > 0) {
     ts.sys.exit(ts.ExitStatus.DiagnosticsPresent_OutputsGenerated);
 } else {
     ts.sys.exit(ts.ExitStatus.Success);
