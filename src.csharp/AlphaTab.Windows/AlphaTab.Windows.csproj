@@ -5,14 +5,18 @@
         <AssemblyName>AlphaTab.Windows</AssemblyName>
         <PackageId>AlphaTab.Windows</PackageId>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <DocumentationFile>$(OutDir)$(AssemblyName).xml</DocumentationFile>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <UseWPF>true</UseWPF>
-        <UseWinForms>true</UseWinForms>
+        <UseWindowsForms>true</UseWindowsForms>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\AlphaTab\AlphaTab.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NAudio" Version="1.10.0" />
     </ItemGroup>
 
 </Project>

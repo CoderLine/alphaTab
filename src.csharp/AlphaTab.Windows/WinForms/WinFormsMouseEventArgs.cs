@@ -1,8 +1,7 @@
-﻿#if NET48
-using System.Windows.Forms;
-using AlphaTab.UI;
+﻿using System.Windows.Forms;
+using AlphaTab.Platform;
 
-namespace AlphaTab.Platform.CSharp.WinForms
+namespace AlphaTab.WinForms
 {
     internal class WinFormsMouseEventArgs : IMouseEventArgs
     {
@@ -17,15 +16,15 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
         public bool IsLeftMouseButton => _args.Button == MouseButtons.Left;
 
-        public float GetX(IContainer relativeTo)
+        public double GetX(IContainer relativeTo)
         {
-            var relativeControl = ((ControlContainer)relativeTo).Control;
+            var relativeControl = ((ControlContainer) relativeTo).Control;
             return relativeControl.PointToClient(_sender.PointToScreen(_args.Location)).X;
         }
 
-        public float GetY(IContainer relativeTo)
+        public double GetY(IContainer relativeTo)
         {
-            var relativeControl = ((ControlContainer)relativeTo).Control;
+            var relativeControl = ((ControlContainer) relativeTo).Control;
             return relativeControl.PointToClient(_sender.PointToScreen(_args.Location)).Y;
         }
 
@@ -34,4 +33,3 @@ namespace AlphaTab.Platform.CSharp.WinForms
         }
     }
 }
-#endif

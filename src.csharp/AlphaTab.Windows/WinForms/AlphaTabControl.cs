@@ -1,14 +1,12 @@
-﻿#if NET48
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using AlphaTab.Collections;
 using AlphaTab.Model;
 
-namespace AlphaTab.Platform.CSharp.WinForms
+namespace AlphaTab.WinForms
 {
     public sealed class AlphaTabControl : Panel
     {
@@ -42,6 +40,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
                 {
                     observable.CollectionChanged += OnTracksChanged;
                 }
+
                 RenderTracks();
             }
         }
@@ -64,7 +63,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public AlphaTabApi<AlphaTabControl> Api { get; private set; }
+        public AlphaTabApiBase<AlphaTabControl> Api { get; private set; }
 
         public AlphaTabControl()
         {
@@ -76,7 +75,8 @@ namespace AlphaTab.Platform.CSharp.WinForms
             Settings.Player.EnablePlayer = true;
             Settings.Player.EnableCursor = true;
 
-            Api = new AlphaTabApi<AlphaTabControl>(new WinFormsUiFacade(this, _layoutPanel), this);
+            Api = new AlphaTabApiBase<AlphaTabControl>(new WinFormsUiFacade(this, _layoutPanel),
+                this);
         }
 
         protected override void OnPaddingChanged(EventArgs e)
@@ -119,7 +119,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
             }
 
             Score score = null;
-            var trackIndexes = new FastList<int>();
+            var trackIndexes = new AlphaTab.Core.List<double>();
             foreach (var track in Tracks)
             {
                 if (score == null)
@@ -135,15 +135,15 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
             if (score != null)
             {
-                Api.RenderScore(score, trackIndexes.ToArray());
+                Api.RenderScore(score, trackIndexes);
             }
         }
 
         public event Action<Settings> SettingsChanged;
+
         private void OnSettingsChanged(Settings obj)
         {
             SettingsChanged?.Invoke(obj);
         }
     }
 }
-#endif

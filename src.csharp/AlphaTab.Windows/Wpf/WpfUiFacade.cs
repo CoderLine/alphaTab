@@ -1,83 +1,74 @@
-﻿#if NET48
-using System;
-using System.Collections.Concurrent;
-using System.IO;
+﻿using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using AlphaTab.Audio.Synth;
+using AlphaTab.Platform;
+using AlphaTab.Platform.CSharp;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
-using AlphaTab.UI;
 using SkiaSharp;
 using Point = System.Windows.Point;
 using Image = System.Windows.Controls.Image;
 
-namespace AlphaTab.Platform.CSharp.Wpf
+namespace AlphaTab.Wpf
 {
     internal class WpfUiFacade : ManagedUiFacade<AlphaTab>
     {
         private readonly ScrollViewer _scrollViewer;
-        private event Action _rootContainerBecameVisible;
+        private event Action InternalRootContainerBecameVisible;
 
         public override IContainer RootContainer { get; }
 
-        public override event Action RootContainerBecameVisible
-        {
-            add
-            {
-                if (RootContainer.IsVisible)
-                {
-                    value();
-                }
-                else
-                {
-                    void OnSizeChanged(object sender, SizeChangedEventArgs e)
-                    {
-                        _scrollViewer.IsVisibleChanged -= OnVisibilityChanged;
-                        _scrollViewer.SizeChanged -= OnSizeChanged;
-                        if (_scrollViewer.IsVisible && _scrollViewer.ActualWidth > 0)
-                        {
-                            if (_rootContainerBecameVisible != null)
-                            {
-                                _rootContainerBecameVisible();
-                            }
-
-                            _rootContainerBecameVisible = null;
-                        }
-                    }
-
-                    void OnVisibilityChanged(object sender, DependencyPropertyChangedEventArgs e)
-                    {
-                        _scrollViewer.IsVisibleChanged -= OnVisibilityChanged;
-                        _scrollViewer.SizeChanged -= OnSizeChanged;
-                        if (_scrollViewer.IsVisible && _scrollViewer.ActualWidth > 0)
-                        {
-                            if (_rootContainerBecameVisible != null)
-                            {
-                                _rootContainerBecameVisible();
-                            }
-
-                            _rootContainerBecameVisible = null;
-                        }
-                    }
-
-                    _rootContainerBecameVisible += value;
-                    _scrollViewer.IsVisibleChanged += OnVisibilityChanged;
-                    _scrollViewer.SizeChanged += OnSizeChanged;
-                }
-            }
-            remove => _rootContainerBecameVisible -= value;
-        }
+        public override IEventEmitter RootContainerBecameVisible { get; }
 
         public WpfUiFacade(ScrollViewer scrollViewer)
         {
             _scrollViewer = scrollViewer;
             RootContainer = new FrameworkElementContainer(scrollViewer);
+            RootContainerBecameVisible = new DelegatedEventEmitter(
+                value =>
+                {
+                    if (RootContainer.IsVisible)
+                    {
+                        value();
+                    }
+                    else
+                    {
+                        void OnSizeChanged(object sender, SizeChangedEventArgs e)
+                        {
+                            _scrollViewer.IsVisibleChanged -= OnVisibilityChanged;
+                            _scrollViewer.SizeChanged -= OnSizeChanged;
+                            if (_scrollViewer.IsVisible && _scrollViewer.ActualWidth > 0)
+                            {
+                                InternalRootContainerBecameVisible?.Invoke();
+                                InternalRootContainerBecameVisible = null;
+                            }
+                        }
+
+                        void OnVisibilityChanged(object sender,
+                            DependencyPropertyChangedEventArgs e)
+                        {
+                            _scrollViewer.IsVisibleChanged -= OnVisibilityChanged;
+                            _scrollViewer.SizeChanged -= OnSizeChanged;
+                            if (_scrollViewer.IsVisible && _scrollViewer.ActualWidth > 0)
+                            {
+                                InternalRootContainerBecameVisible?.Invoke();
+                                InternalRootContainerBecameVisible = null;
+                            }
+                        }
+
+                        InternalRootContainerBecameVisible += value;
+                        _scrollViewer.IsVisibleChanged += OnVisibilityChanged;
+                        _scrollViewer.SizeChanged += OnSizeChanged;
+                    }
+                },
+                value => { InternalRootContainerBecameVisible -= value; }
+            );
         }
 
-        public override void Initialize(AlphaTabApi<AlphaTab> api, AlphaTab control)
+        public override void Initialize(AlphaTabApiBase<AlphaTab> api, AlphaTab control)
         {
             base.Initialize(api, control);
             api.Settings = control.Settings;
@@ -118,15 +109,17 @@ namespace AlphaTab.Platform.CSharp.Wpf
             return new FrameworkElementContainer(canvas);
         }
 
-        public override void TriggerEvent(IContainer container, string eventName, object details = null, IMouseEventArgs originalEvent = null)
+        public override void TriggerEvent(IContainer container, string eventName,
+            object details = null, IMouseEventArgs originalEvent = null)
         {
         }
 
         public override void BeginAppendRenderResults(RenderFinishedEventArgs r)
         {
-            SettingsContainer.Dispatcher.BeginInvoke((Action<RenderFinishedEventArgs>)(renderResult =>
+            SettingsContainer.Dispatcher?.BeginInvoke(
+                (Action<RenderFinishedEventArgs>) (renderResult =>
                 {
-                    var panel = (WrapPanel)((FrameworkElementContainer)Api.CanvasElement).Control;
+                    var panel = (WrapPanel) ((FrameworkElementContainer) Api.CanvasElement).Control;
 
                     // null result indicates that the rendering finished
                     if (renderResult == null)
@@ -144,12 +137,12 @@ namespace AlphaTab.Platform.CSharp.Wpf
                         var body = renderResult.RenderResult;
 
                         ImageSource source = null;
-                        if (body is string svg)
+                        if (body is string)
                         {
                             // TODO: svg support
                             return;
                         }
-                        else if (body is SKImage skiaImage)
+                        if (body is SKImage skiaImage)
                         {
                             using (skiaImage)
                             {
@@ -169,7 +162,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
                             TotalResultCount.TryPeek(out var counter);
                             if (counter.Count < panel.Children.Count)
                             {
-                                var img = (Image)panel.Children[counter.Count];
+                                var img = (Image) panel.Children[counter.Count];
                                 img.Width = renderResult.Width;
                                 img.Height = renderResult.Height;
                                 img.Stretch = Stretch.None;
@@ -178,10 +171,12 @@ namespace AlphaTab.Platform.CSharp.Wpf
                             }
                             else
                             {
-                                var img = new Image();
-                                img.Width = renderResult.Width;
-                                img.Height = renderResult.Height;
-                                img.Source = source;
+                                var img = new Image
+                                {
+                                    Width = renderResult.Width,
+                                    Height = renderResult.Height,
+                                    Source = source
+                                };
                                 panel.Children.Add(img);
                             }
 
@@ -194,8 +189,9 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public override void DestroyCursors()
         {
-            var element = (Panel)((FrameworkElementContainer)Api.CanvasElement).Control.Parent;
-            var cursors = element.Children.OfType<Canvas>().FirstOrDefault(c => "at-cursors".Equals(c.Tag));
+            var element = (Panel) ((FrameworkElementContainer) Api.CanvasElement).Control.Parent;
+            var cursors = element.Children.OfType<Canvas>()
+                .FirstOrDefault(c => "at-cursors".Equals(c.Tag));
             if (cursors != null)
             {
                 element.Children.Remove(cursors);
@@ -204,27 +200,33 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public override Cursors CreateCursors()
         {
-            var cursorWrapper = new Canvas();
-            cursorWrapper.Tag = "at-cursors";
-            cursorWrapper.HorizontalAlignment = HorizontalAlignment.Left;
-            cursorWrapper.VerticalAlignment = VerticalAlignment.Top;
+            var cursorWrapper = new Canvas
+            {
+                Tag = "at-cursors",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
+            };
 
             var selectionWrapper = new Canvas();
 
-            var barCursor = new System.Windows.Shapes.Rectangle();
-            barCursor.Fill = SettingsContainer.BarCursorFill;
-            barCursor.IsHitTestVisible = false;
+            var barCursor = new System.Windows.Shapes.Rectangle
+            {
+                Fill = SettingsContainer.BarCursorFill,
+                IsHitTestVisible = false
+            };
 
-            var beatCursor = new System.Windows.Shapes.Rectangle();
-            beatCursor.Fill = SettingsContainer.BeatCursorFill;
-            beatCursor.IsHitTestVisible = false;
+            var beatCursor = new System.Windows.Shapes.Rectangle
+            {
+                Fill = SettingsContainer.BeatCursorFill,
+                IsHitTestVisible = false
+            };
 
             cursorWrapper.Children.Add(selectionWrapper);
             cursorWrapper.Children.Add(barCursor);
             cursorWrapper.Children.Add(beatCursor);
 
             // add cursors to UI
-            var element = (Panel)((FrameworkElementContainer)Api.CanvasElement).Control.Parent;
+            var element = (Panel) ((FrameworkElementContainer) Api.CanvasElement).Control.Parent;
             element.Children.Insert(0, cursorWrapper);
 
             return new Cursors(
@@ -237,7 +239,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public override void BeginInvoke(Action action)
         {
-            SettingsContainer.Dispatcher.BeginInvoke(action);
+            SettingsContainer.Dispatcher?.BeginInvoke(action);
         }
 
         public override void RemoveHighlights()
@@ -250,9 +252,11 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public override IContainer CreateSelectionElement()
         {
-            var selection = new System.Windows.Shapes.Rectangle();
-            selection.Fill = SettingsContainer.SelectionFill;
-            selection.IsHitTestVisible = false;
+            var selection = new System.Windows.Shapes.Rectangle
+            {
+                Fill = SettingsContainer.SelectionFill,
+                IsHitTestVisible = false
+            };
             return new FrameworkElementContainer(selection);
         }
 
@@ -263,12 +267,13 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public override Bounds GetOffset(IContainer relativeTo, IContainer container)
         {
-            var containerWpf = ((FrameworkElementContainer)container).Control;
+            var containerWpf = ((FrameworkElementContainer) container).Control;
 
-            var canvas = ((FrameworkElementContainer)Api.CanvasElement).Control;
+            var canvas = ((FrameworkElementContainer) Api.CanvasElement).Control;
             var position = containerWpf.TranslatePoint(new Point(0, 0), canvas);
 
-            if (relativeTo != null && ((FrameworkElementContainer)relativeTo).Control is ScrollViewer sv)
+            if (relativeTo != null &&
+                ((FrameworkElementContainer) relativeTo).Control is ScrollViewer sv)
             {
                 position.Y -= sv.VerticalOffset;
                 position.X -= sv.HorizontalOffset;
@@ -276,16 +281,16 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
             return new Bounds
             {
-                X = (float)position.X,
-                Y = (float)position.Y,
-                W = (float)containerWpf.ActualWidth,
-                H = (float)containerWpf.ActualHeight
+                X = (float) position.X,
+                Y = (float) position.Y,
+                W = (float) containerWpf.ActualWidth,
+                H = (float) containerWpf.ActualHeight
             };
         }
 
-        public override void ScrollToY(IContainer scrollElement, int offset, int speed)
+        public override void ScrollToY(IContainer scrollElement, double offset, double speed)
         {
-            if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
+            if (((FrameworkElementContainer) scrollElement).Control is ScrollViewer s)
             {
                 s.ScrollToVerticalOffset(offset);
             }
@@ -294,9 +299,9 @@ namespace AlphaTab.Platform.CSharp.Wpf
             //    new DoubleAnimation(offset, new System.Windows.Duration(TimeSpan.FromMilliseconds(speed))));
         }
 
-        public override void ScrollToX(IContainer scrollElement, int offset, int speed)
+        public override void ScrollToX(IContainer scrollElement, double offset, double speed)
         {
-            if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
+            if (((FrameworkElementContainer) scrollElement).Control is ScrollViewer s)
             {
                 s.ScrollToHorizontalOffset(offset);
             }
@@ -307,4 +312,3 @@ namespace AlphaTab.Platform.CSharp.Wpf
         }
     }
 }
-#endif

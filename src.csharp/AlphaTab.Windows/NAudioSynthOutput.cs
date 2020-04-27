@@ -1,10 +1,10 @@
-﻿#if NET48
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Ds;
+using AlphaTab.Core.EcmaScript;
 using NAudio.Wave;
 
-namespace AlphaTab.Platform.CSharp.Wpf
+namespace AlphaTab
 {
     /// <summary>
     /// A <see cref="ISynthOutput"/> implementation that uses NAudio to play the
@@ -21,7 +21,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
         private bool _finished;
 
         /// <inheritdoc />
-        public int SampleRate => PreferredSampleRate;
+        public double SampleRate => PreferredSampleRate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NAudioSynthOutput"/> class.
@@ -36,6 +36,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
         {
         }
 
+
         /// <inheritdoc />
         public void Open()
         {
@@ -45,7 +46,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             _context = new DirectSoundOut(100);
             _context.Init(this);
 
-            Ready();
+            ((EventEmitter) Ready).Trigger();
         }
 
         /// <inheritdoc />
@@ -86,7 +87,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
         }
 
         /// <inheritdoc />
-        public void AddSamples(float[] f)
+        public void AddSamples(Float32Array f)
         {
             _circularBuffer.Write(f, 0, f.Length);
         }
@@ -106,7 +107,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             {
                 for (var i = 0; i < BufferCount / 2; i++)
                 {
-                    SampleRequest();
+                    ((EventEmitter) SampleRequest).Trigger();
                 }
             }
         }
@@ -118,21 +119,21 @@ namespace AlphaTab.Platform.CSharp.Wpf
             {
                 if (_finished)
                 {
-                    Finished();
+                    ((EventEmitter) Finished).Trigger();
                 }
             }
             else
             {
-                var read = new float[count];
+                var read = new Float32Array(count);
                 _circularBuffer.Read(read, 0, read.Length);
 
                 for (var i = 0; i < count; i++)
                 {
-                    buffer[offset + i] = read[i];
+                    buffer[offset + i] = (float) read[i];
                 }
 
                 var samples = count / 2;
-                SamplesPlayed(samples);
+                ((EventEmitterOfT<double>) SamplesPlayed).Trigger(samples);
             }
 
             if (!_finished)
@@ -144,13 +145,15 @@ namespace AlphaTab.Platform.CSharp.Wpf
         }
 
         /// <inheritdoc />
-        public event Action Ready;
+        public IEventEmitter Ready { get; } = new EventEmitter();
+
         /// <inheritdoc />
-        public event Action<int> SamplesPlayed;
+        public IEventEmitterOfT<double> SamplesPlayed { get; } = new EventEmitterOfT<double>();
+
         /// <inheritdoc />
-        public event Action SampleRequest;
+        public IEventEmitter SampleRequest { get; } = new EventEmitter();
+
         /// <inheritdoc />
-        public event Action Finished;
+        public IEventEmitter Finished { get; } = new EventEmitter();
     }
 }
-#endif

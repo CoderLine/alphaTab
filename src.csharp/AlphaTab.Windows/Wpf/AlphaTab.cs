@@ -1,44 +1,47 @@
-﻿#if NET48
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using AlphaTab.Audio.Synth;
-using AlphaTab.Collections;
 using AlphaTab.Model;
+using Color = System.Windows.Media.Color;
 
-namespace AlphaTab.Platform.CSharp.Wpf
+namespace AlphaTab.Wpf
 {
     public class AlphaTab : Control
     {
         static AlphaTab()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(AlphaTab), new FrameworkPropertyMetadata(typeof(AlphaTab)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(AlphaTab),
+                new FrameworkPropertyMetadata(typeof(AlphaTab)));
         }
 
         private ScrollViewer _scrollView;
 
         #region Tracks
 
-        public static readonly DependencyProperty TracksProperty = DependencyProperty.Register("Tracks", typeof(IEnumerable<Track>), typeof(AlphaTab), new PropertyMetadata(default(IEnumerable<Track>), OnTracksChanged));
+        public static readonly DependencyProperty TracksProperty =
+            DependencyProperty.Register("Tracks", typeof(IEnumerable<Track>), typeof(AlphaTab),
+                new PropertyMetadata(default(IEnumerable<Track>), OnTracksChanged));
 
-        private static void OnTracksChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnTracksChanged(DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
         {
             var observable = e.OldValue as INotifyCollectionChanged;
             if (observable != null)
             {
-                ((AlphaTab)d).UnregisterObservableCollection(observable);
+                ((AlphaTab) d).UnregisterObservableCollection(observable);
             }
 
             observable = e.NewValue as INotifyCollectionChanged;
             if (observable != null)
             {
-                ((AlphaTab)d).RegisterObservableCollection(observable);
+                ((AlphaTab) d).RegisterObservableCollection(observable);
             }
 
-            ((AlphaTab)d).InvalidateTracks();
+            ((AlphaTab) d).InvalidateTracks();
         }
 
         private void RegisterObservableCollection(INotifyCollectionChanged collection)
@@ -58,7 +61,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public IEnumerable<Track> Tracks
         {
-            get => (IEnumerable<Track>)GetValue(TracksProperty);
+            get => (IEnumerable<Track>) GetValue(TracksProperty);
             set => SetValue(TracksProperty, value);
         }
 
@@ -67,16 +70,18 @@ namespace AlphaTab.Platform.CSharp.Wpf
         #region Settings
 
         public static readonly DependencyProperty SettingsProperty = DependencyProperty.Register(
-            "Settings", typeof(Settings), typeof(AlphaTab), new PropertyMetadata(new Settings(), OnSettingsChanged));
+            "Settings", typeof(Settings), typeof(AlphaTab),
+            new PropertyMetadata(new Settings(), OnSettingsChanged));
 
-        private static void OnSettingsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnSettingsChanged(DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
         {
-            ((AlphaTab)d).SettingsChanged?.Invoke((Settings)e.NewValue);
+            ((AlphaTab) d).SettingsChanged?.Invoke((Settings) e.NewValue);
         }
 
         public Settings Settings
         {
-            get => (Settings)GetValue(SettingsProperty);
+            get => (Settings) GetValue(SettingsProperty);
             set => SetValue(SettingsProperty, value);
         }
 
@@ -84,45 +89,50 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         #region BarCursorFill
 
-        public static readonly DependencyProperty BarCursorFillProperty = DependencyProperty.Register(
-            "BarCursorFill", typeof(Brush), typeof(AlphaTab), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(64, 255, 242, 0))));
+        public static readonly DependencyProperty BarCursorFillProperty =
+            DependencyProperty.Register(
+                "BarCursorFill", typeof(Brush), typeof(AlphaTab),
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(64, 255, 242, 0))));
 
         public Brush BarCursorFill
         {
-            get => (Brush)GetValue(BarCursorFillProperty);
+            get => (Brush) GetValue(BarCursorFillProperty);
             set => SetValue(BarCursorFillProperty, value);
         }
 
-
         #endregion
+
         #region BeatCursorFill
 
-        public static readonly DependencyProperty BeatCursorFillProperty = DependencyProperty.Register(
-            "BeatCursorFill", typeof(Brush), typeof(AlphaTab), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(191, 64, 64, 255))));
+        public static readonly DependencyProperty BeatCursorFillProperty =
+            DependencyProperty.Register(
+                "BeatCursorFill", typeof(Brush), typeof(AlphaTab),
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(191, 64, 64, 255))));
 
         public Brush BeatCursorFill
         {
-            get => (Brush)GetValue(BeatCursorFillProperty);
+            get => (Brush) GetValue(BeatCursorFillProperty);
             set => SetValue(BeatCursorFillProperty, value);
         }
 
-
         #endregion
+
         #region SelectionFill
 
-        public static readonly DependencyProperty SelectionCursorFillProperty = DependencyProperty.Register(
-            "SelectionFill", typeof(Brush), typeof(AlphaTab), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(25, 64, 64, 255))));
+        public static readonly DependencyProperty SelectionCursorFillProperty =
+            DependencyProperty.Register(
+                "SelectionFill", typeof(Brush), typeof(AlphaTab),
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(25, 64, 64, 255))));
 
         public Brush SelectionFill
         {
-            get => (Brush)GetValue(SelectionCursorFillProperty);
+            get => (Brush) GetValue(SelectionCursorFillProperty);
             set => SetValue(SelectionCursorFillProperty, value);
         }
 
-
         #endregion
 
-        public AlphaTabApi<AlphaTab> Api { get; private set; }
+        public AlphaTabApiBase<AlphaTab> Api { get; private set; }
 
         public AlphaTab()
         {
@@ -135,8 +145,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _scrollView = (ScrollViewer)Template.FindName("PART_ScrollView", this);
-            Api = new AlphaTabApi<AlphaTab>(new WpfUiFacade(_scrollView), this);
+            _scrollView = (ScrollViewer) Template.FindName("PART_ScrollView", this);
+            Api = new AlphaTabApiBase<AlphaTab>(new WpfUiFacade(_scrollView), this);
         }
 
         public void InvalidateTracks()
@@ -155,7 +165,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             }
 
             Score score = null;
-            var trackIndexes = new FastList<int>();
+            var trackIndexes = new Core.List<double>();
             foreach (var track in Tracks)
             {
                 if (score == null)
@@ -171,11 +181,10 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
             if (score != null)
             {
-                Api.RenderScore(score, trackIndexes.ToArray());
+                Api.RenderScore(score, trackIndexes);
             }
         }
 
         public event Action<Settings> SettingsChanged;
     }
 }
-#endif

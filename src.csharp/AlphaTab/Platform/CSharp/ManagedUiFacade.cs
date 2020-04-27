@@ -10,7 +10,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Platform.CSharp
 {
-    internal abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
+    public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
     {
         protected ConcurrentQueue<Counter> TotalResultCount { get; private set; }
 

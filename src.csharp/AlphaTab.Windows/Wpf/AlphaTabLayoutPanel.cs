@@ -1,8 +1,7 @@
-﻿#if NET48
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace AlphaTab.Platform.CSharp.Wpf
+namespace AlphaTab.Wpf
 {
     internal class AlphaTabLayoutPanel : Panel
     {
@@ -48,4 +47,3 @@ namespace AlphaTab.Platform.CSharp.Wpf
         }
     }
 }
-#endif

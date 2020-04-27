@@ -1,11 +1,10 @@
-﻿#if NET48
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
-using AlphaTab.UI;
+using AlphaTab.Platform;
 
-namespace AlphaTab.Platform.CSharp.Wpf
+namespace AlphaTab.Wpf
 {
     internal class FrameworkElementContainer : IContainer
     {
@@ -14,38 +13,79 @@ namespace AlphaTab.Platform.CSharp.Wpf
         public FrameworkElementContainer(FrameworkElement control)
         {
             Control = control;
+
+            Scroll = new DelegatedEventEmitter(
+                value =>
+                {
+                    if (Control is ScrollViewer scroll)
+                    {
+                        scroll.ScrollChanged += (sender, args) => value();
+                    }
+                },
+                value => { }
+            );
+
+            Resize = new DelegatedEventEmitter(
+                value => { Control.SizeChanged += (sender, args) => value(); },
+                value => { }
+            );
+
+            MouseDown = new DelegatedEventEmitter<IMouseEventArgs>(
+                value =>
+                {
+                    Control.MouseDown += (sender, args) => value(new WpfMouseEventArgs(args));
+                },
+                value => { }
+            );
+
+            MouseMove = new DelegatedEventEmitter<IMouseEventArgs>(
+                value =>
+                {
+                    Control.MouseMove += (sender, args) => value(new WpfMouseEventArgs(args));
+                },
+                value => { }
+            );
+
+            MouseUp = new DelegatedEventEmitter<IMouseEventArgs>(
+                value =>
+                {
+                    Control.MouseUp += (sender, args) => value(new WpfMouseEventArgs(args));
+                },
+                value => { }
+            );
         }
 
-        public float Top
+        public double Top
         {
-            get => (float)Canvas.GetTop(Control);
+            get => (float) Canvas.GetTop(Control);
             set => Canvas.SetTop(Control, value);
         }
 
-        public float Left
+        public double Left
         {
-            get => (float)Canvas.GetLeft(Control);
+            get => (float) Canvas.GetLeft(Control);
             set => Canvas.SetLeft(Control, value);
         }
 
-        public float Width
+        public double Width
         {
-            get => (float)Control.ActualWidth;
+            get => (float) Control.ActualWidth;
             set => Control.Width = value;
         }
 
 
-        public float Height
+        public double Height
         {
-            get => (float)Control.ActualHeight;
+            get => (float) Control.ActualHeight;
             set => Control.Height = value;
         }
 
         public bool IsVisible => Control.IsVisible && Control.ActualWidth > 0;
 
-        public float ScrollLeft
+        public double ScrollLeft
         {
-            get => Control is ScrollViewer scroll ? (float)scroll.HorizontalOffset : 0;
+            get => Control is ScrollViewer scroll ? (float) scroll.HorizontalOffset : 0;
+
             set
             {
                 if (Control is ScrollViewer scroll)
@@ -55,9 +95,10 @@ namespace AlphaTab.Platform.CSharp.Wpf
             }
         }
 
-        public float ScrollTop
+        public double ScrollTop
         {
-            get => Control is ScrollViewer scroll ? (float)scroll.VerticalOffset : 0;
+            get => Control is ScrollViewer scroll ? (float) scroll.VerticalOffset : 0;
+
             set
             {
                 if (Control is ScrollViewer scroll)
@@ -71,95 +112,38 @@ namespace AlphaTab.Platform.CSharp.Wpf
         {
             if (Control is Panel p)
             {
-                p.Children.Add(((FrameworkElementContainer)child).Control);
+                p.Children.Add(((FrameworkElementContainer) child).Control);
             }
             else if (Control is ScrollViewer s && s.Content is ContentControl sc)
             {
-                sc.Content = ((FrameworkElementContainer)child).Control;
+                sc.Content = ((FrameworkElementContainer) child).Control;
             }
             else if (Control is ScrollViewer ss && ss.Content is Decorator d)
             {
-                d.Child = ((FrameworkElementContainer)child).Control;
+                d.Child = ((FrameworkElementContainer) child).Control;
             }
             else if (Control is ScrollViewer sss && sss.Content is Panel pp)
             {
-                pp.Children.Add(((FrameworkElementContainer)child).Control);
+                pp.Children.Add(((FrameworkElementContainer) child).Control);
             }
             else if (Control is ContentControl c)
             {
-                c.Content = ((FrameworkElementContainer)child).Control;
+                c.Content = ((FrameworkElementContainer) child).Control;
             }
         }
 
-        public event Action Scroll
-        {
-            add
-            {
-                if (Control is ScrollViewer scroll)
-                {
-                    scroll.ScrollChanged += (sender, args) => value();
-                }
-            }
-            remove
-            {
-            }
-        }
-
-        public event Action Resize
-        {
-            add
-            {
-                Control.SizeChanged += (sender, args) => value();
-            }
-            remove
-            {
-            }
-        }
 
         public void StopAnimation()
         {
             Control.BeginAnimation(Canvas.LeftProperty, null);
         }
 
-        public void TransitionToX(double duration, float x)
+        public void TransitionToX(double duration, double x)
         {
             Control.BeginAnimation(Canvas.LeftProperty,
                 new DoubleAnimation(x, new Duration(TimeSpan.FromMilliseconds(duration))));
         }
 
-
-        public event Action<IMouseEventArgs> MouseDown
-        {
-            add
-            {
-                Control.MouseDown += (sender, args) => value(new WpfMouseEventArgs(args));
-            }
-            remove
-            {
-            }
-        }
-
-        public event Action<IMouseEventArgs> MouseMove
-        {
-            add
-            {
-                Control.MouseMove += (sender, args) => value(new WpfMouseEventArgs(args));
-            }
-            remove
-            {
-            }
-        }
-
-        public event Action<IMouseEventArgs> MouseUp
-        {
-            add
-            {
-                Control.MouseUp += (sender, args) => value(new WpfMouseEventArgs(args));
-            }
-            remove
-            {
-            }
-        }
 
         public void Clear()
         {
@@ -168,6 +152,11 @@ namespace AlphaTab.Platform.CSharp.Wpf
                 p.Children.Clear();
             }
         }
+
+        public IEventEmitter Scroll { get; set; }
+        public IEventEmitter Resize { get; set; }
+        public IEventEmitterOfT<IMouseEventArgs> MouseDown { get; set; }
+        public IEventEmitterOfT<IMouseEventArgs> MouseMove { get; set; }
+        public IEventEmitterOfT<IMouseEventArgs> MouseUp { get; set; }
     }
 }
-#endif

@@ -1,12 +1,11 @@
-﻿#if NET48
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SkiaSharp;
 
-namespace AlphaTab.Platform.CSharp.Wpf
+namespace AlphaTab.Wpf
 {
-    internal class SkImageSource
+    internal static class SkImageSource
     {
         public static BitmapSource Create(object data)
         {
@@ -25,4 +24,3 @@ namespace AlphaTab.Platform.CSharp.Wpf
         }
     }
 }
-#endif

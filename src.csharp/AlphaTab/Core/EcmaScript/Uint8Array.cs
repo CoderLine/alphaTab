@@ -53,5 +53,10 @@ namespace AlphaTab.Core.EcmaScript
             System.Buffer.BlockCopy(buffer.Array, (int) buffer.Offset, _data.Array,
                 _data.Offset + (int) pos, buffer.Count);
         }
+
+        public static implicit operator Uint8Array(byte[] v)
+        {
+            return new Uint8Array(v);
+        }
     }
 }

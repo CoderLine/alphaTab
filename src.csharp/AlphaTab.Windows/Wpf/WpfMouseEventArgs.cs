@@ -1,8 +1,7 @@
-﻿#if NET48
-using System.Windows.Input;
-using AlphaTab.UI;
+﻿using System.Windows.Input;
+using AlphaTab.Platform;
 
-namespace AlphaTab.Platform.CSharp.Wpf
+namespace AlphaTab.Wpf
 {
     internal class WpfMouseEventArgs : IMouseEventArgs
     {
@@ -21,14 +20,14 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public bool IsLeftMouseButton { get; }
 
-        public float GetX(IContainer relativeTo)
+        public double GetX(IContainer relativeTo)
         {
             var relativeControl = ((FrameworkElementContainer)relativeTo).Control;
             var position = _args.GetPosition(relativeControl);
             return (float)position.X;
         }
 
-        public float GetY(IContainer relativeTo)
+        public double GetY(IContainer relativeTo)
         {
             var relativeControl = ((FrameworkElementContainer)relativeTo).Control;
             var position = _args.GetPosition(relativeControl);
@@ -41,4 +40,3 @@ namespace AlphaTab.Platform.CSharp.Wpf
         }
     }
 }
-#endif

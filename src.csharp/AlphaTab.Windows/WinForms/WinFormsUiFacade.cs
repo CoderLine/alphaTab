@@ -1,83 +1,70 @@
-﻿
-using AlphaTab.Importer;
-using AlphaTab.Model;
-#if NET48
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Drawing;
-using System.IO;
 using System.Windows.Forms;
 using AlphaTab.Audio.Synth;
-using AlphaTab.Platform.CSharp.Wpf;
+using AlphaTab.Platform;
+using AlphaTab.Platform.CSharp;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
-using AlphaTab.UI;
 using SkiaSharp;
-using Cursors = AlphaTab.UI.Cursors;
 
-namespace AlphaTab.Platform.CSharp.WinForms
+namespace AlphaTab.WinForms
 {
     internal class WinFormsUiFacade : ManagedUiFacade<AlphaTabControl>
     {
         private readonly AlphaTabLayoutPanel _layoutPanel;
-        private event Action _rootContainerBecameVisible;
+        private event Action InternalRootContainerBecameVisible;
 
         public override IContainer RootContainer { get; }
-
-        public override event Action RootContainerBecameVisible
-        {
-            add
-            {
-                if (RootContainer.IsVisible)
-                {
-                    value();
-                }
-                else
-                {
-                    void OnSizeChanged(object sender, EventArgs e)
-                    {
-                        SettingsContainer.VisibleChanged -= OnVisibilityChanged;
-                        SettingsContainer.SizeChanged -= OnSizeChanged;
-                        if (SettingsContainer.Visible && SettingsContainer.Width > 0)
-                        {
-                            if (_rootContainerBecameVisible != null)
-                            {
-                                _rootContainerBecameVisible();
-                            }
-
-                            _rootContainerBecameVisible = null;
-                        }
-                    }
-                    void OnVisibilityChanged(object sender, EventArgs e)
-                    {
-                        SettingsContainer.VisibleChanged -= OnVisibilityChanged;
-                        SettingsContainer.SizeChanged -= OnSizeChanged;
-                        if (SettingsContainer.Visible && SettingsContainer.Width > 0)
-                        {
-                            if (_rootContainerBecameVisible != null)
-                            {
-                                _rootContainerBecameVisible();
-                            }
-
-                            _rootContainerBecameVisible = null;
-                        }
-                    }
-                    _rootContainerBecameVisible += value;
-                    SettingsContainer.VisibleChanged += OnVisibilityChanged;
-                    SettingsContainer.SizeChanged += OnSizeChanged;
-                }
-            }
-            remove => _rootContainerBecameVisible -= value;
-        }
-
+        public override IEventEmitter RootContainerBecameVisible { get; }
 
         public WinFormsUiFacade(AlphaTabControl scrollViewer, AlphaTabLayoutPanel layoutPanel)
         {
             _layoutPanel = layoutPanel;
             RootContainer = new ControlContainer(scrollViewer);
+            RootContainerBecameVisible = new DelegatedEventEmitter(
+                value =>
+                {
+                    if (RootContainer.IsVisible)
+                    {
+                        value();
+                    }
+                    else
+                    {
+                        void OnSizeChanged(object sender, EventArgs e)
+                        {
+                            SettingsContainer.VisibleChanged -= OnVisibilityChanged;
+                            SettingsContainer.SizeChanged -= OnSizeChanged;
+                            if (SettingsContainer.Visible && SettingsContainer.Width > 0)
+                            {
+                                InternalRootContainerBecameVisible?.Invoke();
+                                InternalRootContainerBecameVisible = null;
+                            }
+                        }
+                        void OnVisibilityChanged(object sender, EventArgs e)
+                        {
+                            SettingsContainer.VisibleChanged -= OnVisibilityChanged;
+                            SettingsContainer.SizeChanged -= OnSizeChanged;
+                            if (SettingsContainer.Visible && SettingsContainer.Width > 0)
+                            {
+                                InternalRootContainerBecameVisible?.Invoke();
+
+                                InternalRootContainerBecameVisible = null;
+                            }
+                        }
+                        InternalRootContainerBecameVisible += value;
+                        SettingsContainer.VisibleChanged += OnVisibilityChanged;
+                        SettingsContainer.SizeChanged += OnSizeChanged;
+                    }
+                },
+                value =>
+                {
+                    InternalRootContainerBecameVisible -= value;
+                }
+                );
         }
 
-        public void Initialize(AlphaTabApi<AlphaTabControl> api, AlphaTabControl control)
+        public override void Initialize(AlphaTabApiBase<AlphaTabControl> api, AlphaTabControl control)
         {
             base.Initialize(api, control);
             api.Settings = control.Settings;
@@ -129,7 +116,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
                     // so we remove elements that might be from a previous render session
                     while (panel.Controls.Count > counter.Count)
                     {
-                        var control = panel.Controls[panel.Controls.Count - 1];
+                        var control = panel.Controls[^1];
                         panel.Controls.RemoveAt(panel.Controls.Count - 1);
                         control.Dispose();
                     }
@@ -140,19 +127,19 @@ namespace AlphaTab.Platform.CSharp.WinForms
                     var body = renderResult.RenderResult;
 
                     Bitmap source = null;
-                    if (body is string svg)
+                    if (body is string)
                     {
                         // TODO: svg support
                         return;
                     }
-                    else if (body is SKImage skiaImage)
+                    if (body is SKImage skiaImage)
                     {
                         using (skiaImage)
                         {
                             source = SkiaUtil.ToBitmap(skiaImage);
                         }
                     }
-                    else if (body is System.Drawing.Bitmap image)
+                    else if (body is Bitmap image)
                     {
                         source = image;
                     }
@@ -167,10 +154,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
                             img.Height = (int)renderResult.Height;
                             var oldImg = img.Image;
                             img.Image = source;
-                            if (oldImg != null)
-                            {
-                                oldImg.Dispose();
-                            }
+                            oldImg?.Dispose();
                         }
                         else
                         {
@@ -198,7 +182,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
         {
         }
 
-        public override Cursors CreateCursors()
+        public override Platform.Cursors CreateCursors()
         {
             // no cursors for winforms, why? - It lacks of proper transparency support
             // maybe if somebody asks for it.  it's worth an investigation.
@@ -252,17 +236,16 @@ namespace AlphaTab.Platform.CSharp.WinForms
             };
         }
 
-        public override void ScrollToY(IContainer scrollElement, int offset, int speed)
+        public override void ScrollToY(IContainer scrollElement, double offset, double speed)
         {
             var c = ((ControlContainer) scrollElement).Control;
-            c.AutoScrollOffset = new Point(c.AutoScrollOffset.X, offset);
+            c.AutoScrollOffset = new Point(c.AutoScrollOffset.X, (int)offset);
         }
 
-        public override void ScrollToX(IContainer scrollElement, int offset, int speed)
+        public override void ScrollToX(IContainer scrollElement, double offset, double speed)
         {
             var c = ((ControlContainer)scrollElement).Control;
-            c.AutoScrollOffset = new Point(offset, c.AutoScrollOffset.Y);
+            c.AutoScrollOffset = new Point((int)offset, c.AutoScrollOffset.Y);
         }
     }
 }
-#endif

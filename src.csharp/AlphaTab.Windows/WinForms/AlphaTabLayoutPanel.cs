@@ -1,21 +1,19 @@
-﻿#if NET48
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.Layout;
 
-namespace AlphaTab.Platform.CSharp.WinForms
+namespace AlphaTab.WinForms
 {
     internal class AlphaTabLayoutPanel : Panel
     {
         private AlphaTabLayoutEngine _laoyutEngine;
 
-        public override LayoutEngine LayoutEngine => _laoyutEngine ?? (_laoyutEngine = new AlphaTabLayoutEngine());
+        public override LayoutEngine LayoutEngine =>
+            _laoyutEngine ??= new AlphaTabLayoutEngine();
 
         public AlphaTabLayoutPanel()
         {
-            DoubleBuffered = true;
+            base.DoubleBuffered = true;
             ResizeRedraw = true;
         }
 
@@ -23,7 +21,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
         {
             public override bool Layout(object container, LayoutEventArgs layoutEventArgs)
             {
-                var parent = (Control)container;
+                var parent = (Control) container;
 
                 var xChild = 0;
                 var yChild = 0;
@@ -53,4 +51,3 @@ namespace AlphaTab.Platform.CSharp.WinForms
         }
     }
 }
-#endif

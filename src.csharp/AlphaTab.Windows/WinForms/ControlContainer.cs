@@ -1,10 +1,8 @@
-﻿#if NET48
-using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
-using AlphaTab.UI;
+using AlphaTab.Platform;
 
-namespace AlphaTab.Platform.CSharp.WinForms
+namespace AlphaTab.WinForms
 {
     internal class ControlContainer : IContainer
     {
@@ -13,28 +11,68 @@ namespace AlphaTab.Platform.CSharp.WinForms
         public ControlContainer(Control control)
         {
             Control = control;
+
+            Scroll = new DelegatedEventEmitter(
+                value =>
+                {
+                    if (Control is ScrollableControl scroll)
+                    {
+                        scroll.Scroll += (sender, args) => value();
+                    }
+                },
+                value => { }
+            );
+
+            Resize = new DelegatedEventEmitter(
+                value => { Control.Resize += (sender, args) => value(); },
+                value => { }
+            );
+
+            MouseDown = new DelegatedEventEmitter<IMouseEventArgs>(
+                value =>
+                {
+                    Control.MouseDown += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
+                },
+                value => { }
+            );
+
+            MouseMove = new DelegatedEventEmitter<IMouseEventArgs>(
+                value =>
+                {
+                    Control.MouseMove += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
+                },
+                value => { }
+            );
+
+            MouseUp = new DelegatedEventEmitter<IMouseEventArgs>(
+                value =>
+                {
+                    Control.MouseUp += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
+                },
+                value => { }
+            );
         }
 
-        public float Top
+        public double Top
         {
             get => Control.Top;
             set => Control.Top = (int)value;
         }
 
-        public float Left
+        public double Left
         {
             get => Control.Left;
             set => Control.Left = (int)value;
         }
 
-        public float Width
+        public double Width
         {
             get => Control.ClientSize.Width - Control.Padding.Horizontal;
             set => Control.Width = (int)value + Control.Padding.Horizontal;
         }
 
 
-        public float Height
+        public double Height
         {
             get => Control.ClientSize.Height - Control.Padding.Vertical;
             set => Control.Height = (int)value + Control.Padding.Vertical;
@@ -42,7 +80,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
         public bool IsVisible => Control.Visible && Control.Width > 0;
 
-        public float ScrollLeft
+        public double ScrollLeft
         {
             get => Control is ScrollableControl scroll ? scroll.AutoScrollPosition.X : 0;
             set
@@ -54,7 +92,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
             }
         }
 
-        public float ScrollTop
+        public double ScrollTop
         {
             get => Control is ScrollableControl scroll ? scroll.VerticalScroll.Value : 0;
             set
@@ -70,37 +108,12 @@ namespace AlphaTab.Platform.CSharp.WinForms
             Control.Controls.Add(((ControlContainer)child).Control);
         }
 
-        public event Action Scroll
-        {
-            add
-            {
-                if (Control is ScrollableControl scroll)
-                {
-                    scroll.Scroll += (sender, args) => value();
-                }
-            }
-            remove
-            {
-            }
-        }
-
-        public event Action Resize
-        {
-            add
-            {
-                Control.Resize += (sender, args) => value();
-            }
-            remove
-            {
-            }
-        }
-
         public void StopAnimation()
         {
             //Control.BeginAnimation(Canvas.LeftProperty, null);
         }
 
-        public void TransitionToX(double duration, float x)
+        public void TransitionToX(double duration, double x)
         {
             // TODO: Animation
             Control.Left = (int)x;
@@ -109,44 +122,15 @@ namespace AlphaTab.Platform.CSharp.WinForms
             //    new DoubleAnimation(x, new Duration(TimeSpan.FromMilliseconds(duration))));
         }
 
-
-        public event Action<IMouseEventArgs> MouseDown
-        {
-            add
-            {
-                Control.MouseDown += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
-            }
-            remove
-            {
-            }
-        }
-
-        public event Action<IMouseEventArgs> MouseMove
-        {
-            add
-            {
-                Control.MouseMove += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
-            }
-            remove
-            {
-            }
-        }
-
-        public event Action<IMouseEventArgs> MouseUp
-        {
-            add
-            {
-                Control.MouseUp += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
-            }
-            remove
-            {
-            }
-        }
-
         public void Clear()
         {
             Control.Controls.Clear();
         }
+
+        public IEventEmitter Scroll { get; set; }
+        public IEventEmitter Resize { get; set; }
+        public IEventEmitterOfT<IMouseEventArgs> MouseDown { get; set; }
+        public IEventEmitterOfT<IMouseEventArgs> MouseMove { get; set; }
+        public IEventEmitterOfT<IMouseEventArgs> MouseUp { get; set; }
     }
 }
-#endif

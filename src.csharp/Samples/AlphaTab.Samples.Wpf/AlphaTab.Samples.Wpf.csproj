@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <OutputType>WinExe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2020.1.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Images\32\control_pause.png"/>
+        <None Remove="Images\32\control_play.png"/>
+        <None Remove="Images\32\folder_page_white.png"/>
+        <None Remove="Images\32\information.png"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Resource Include="Images\32\control_pause.png"/>
+        <Resource Include="Images\32\control_play.png"/>
+        <Resource Include="Images\32\folder_page_white.png"/>
+        <Resource Include="Images\32\information.png"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\AlphaTab.Windows\AlphaTab.Windows.csproj"/>
+    </ItemGroup>
+</Project>
