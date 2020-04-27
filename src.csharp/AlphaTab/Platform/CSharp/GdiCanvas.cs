@@ -1,30 +1,21 @@
-﻿#if NET48
-using AlphaTab.Rendering;
-using AlphaTab.Rendering.Glyphs;
-using AlphaTab.Rendering.Utils;
+﻿using AlphaTab.Rendering.Glyphs;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using AlphaTab.Platform.Model;
-using Color = AlphaTab.Platform.Model.Color;
-using Font = AlphaTab.Platform.Model.Font;
-using FontStyle = AlphaTab.Platform.Model.FontStyle;
 using GdiFont = System.Drawing.Font;
 using GdiFontStyle = System.Drawing.FontStyle;
 using GdiColor = System.Drawing.Color;
+using String = AlphaTab.Core.EcmaScript.String;
 
 namespace AlphaTab.Platform.CSharp
 {
-    internal class GdiCanvas : ICanvas
+    internal sealed class GdiCanvas : ICanvas
     {
-        protected const float BlurCorrection = 0.5f;
-
-        private static readonly Bitmap MeasurementImage;
         private static readonly Graphics MeasurementGraphics;
         private static readonly PrivateFontCollection MusicFontCollection;
         private static readonly StringFormat MusicFontFormat;
@@ -32,8 +23,8 @@ namespace AlphaTab.Platform.CSharp
 
         static GdiCanvas()
         {
-            MeasurementImage = new Bitmap(1, 1);
-            var newGraphics = MeasurementGraphics = Graphics.FromImage(MeasurementImage);
+            var measurementImage = new Bitmap(1, 1);
+            var newGraphics = MeasurementGraphics = Graphics.FromImage(measurementImage);
             newGraphics.SmoothingMode = SmoothingMode.HighQuality;
             newGraphics.TextRenderingHint = TextRenderingHint.AntiAlias;
             newGraphics.Clear(GdiColor.Transparent);
@@ -52,50 +43,54 @@ namespace AlphaTab.Platform.CSharp
 
             MusicFontCollection = new PrivateFontCollection();
 
-            using (var bravura = typeof(GdiCanvas).Assembly.GetManifestResourceStream(typeof(GdiCanvas), "Bravura.ttf"))
+            var type = typeof(GdiCanvas).GetTypeInfo();
+            using var bravura =
+                type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf");
+            var dataPtr = Marshal.AllocCoTaskMem((int) bravura.Length);
+            try
             {
-                var dataPtr = Marshal.AllocCoTaskMem((int)bravura.Length);
-                try
-                {
-                    var fontData = new byte[bravura.Length];
-                    bravura.Read(fontData, 0, fontData.Length);
-                    Marshal.Copy(fontData, 0, dataPtr, fontData.Length);
+                var fontData = new byte[bravura.Length];
+                bravura.Read(fontData, 0, fontData.Length);
+                Marshal.Copy(fontData, 0, dataPtr, fontData.Length);
 
-                    MusicFontCollection.AddMemoryFont(dataPtr, fontData.Length);
-                }
-                finally
-                {
-                    Marshal.FreeCoTaskMem(dataPtr);
-                }
+                MusicFontCollection.AddMemoryFont(dataPtr, fontData.Length);
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem(dataPtr);
             }
         }
 
-        private static readonly Dictionary<float, GdiFont> FontLookup = new Dictionary<float, GdiFont>();
-        private static GdiFont GetMusicFont(float scale)
+        private static readonly Dictionary<double, GdiFont> FontLookup =
+            new Dictionary<double, GdiFont>();
+
+        private static GdiFont GetMusicFont(double scale)
         {
-            GdiFont font;
-            if (!FontLookup.TryGetValue(scale, out font))
+            if (!FontLookup.TryGetValue(scale, out var font))
             {
                 FontLookup[scale] = font =
- new GdiFont(MusicFontCollection.Families[0], 34 * scale, GdiFontStyle.Regular, GraphicsUnit.Pixel);
+                    new GdiFont(MusicFontCollection.Families[0], (float) (34 * scale),
+                        GdiFontStyle.Regular,
+                        GraphicsUnit.Pixel);
             }
+
             return font;
         }
 
 
         private Bitmap _image;
-        private float _width;
-        private float _height;
+        private double _width;
+        private double _height;
         private Graphics _graphics;
 
         private GraphicsPath _currentPath;
 
-        private float _currentX;
-        private float _currentY;
+        private double _currentX;
+        private double _currentY;
 
         private readonly StringFormat _stringFormat;
 
-        private float _lineWidth;
+        private double _lineWidth;
         private GdiFont _font;
         private TextAlign _textAlign;
         private TextBaseline _textBaseline;
@@ -106,23 +101,24 @@ namespace AlphaTab.Platform.CSharp
 
         public Settings Settings { get; set; }
 
-        public Color Color
+        public Model.Color Color
         {
-            get => new Color(_color.R, _color.G, _color.B, _color.A);
+            get => new Model.Color(_color.R, _color.G, _color.B, _color.A);
             set
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
 
-                _color = GdiColor.FromArgb(value.A, value.R, value.G, value.B);
+                _color = GdiColor.FromArgb((byte) value.A, (byte) value.R, (byte) value.G,
+                    (byte) value.B);
                 RecreateBrush();
                 RecreatePen();
             }
         }
 
-        public float LineWidth
+        public double LineWidth
         {
             get => _lineWidth;
             set
@@ -133,22 +129,23 @@ namespace AlphaTab.Platform.CSharp
         }
 
 
-        public Font Font
+        public Model.Font Font
         {
             get
             {
-                var fs = FontStyle.Plain;
+                var fs = Model.FontStyle.Plain;
                 if (_font.Bold)
                 {
-                    fs |= FontStyle.Bold;
+                    fs = Model.FontStyle.Bold;
                 }
 
                 if (_font.Italic)
                 {
-                    fs |= FontStyle.Italic;
+                    fs = Model.FontStyle.Italic;
                 }
 
-                return new Font(_font.FontFamily.Name, _font.Size * Settings.Display.Scale, fs);
+                return new Model.Font(_font.FontFamily.Name, _font.Size * Settings.Display.Scale,
+                    fs);
             }
             set
             {
@@ -163,7 +160,9 @@ namespace AlphaTab.Platform.CSharp
                     fontStyle = GdiFontStyle.Italic;
                 }
 
-                _font = new GdiFont(value.Family, value.Size * Settings.Display.Scale, fontStyle, GraphicsUnit.Pixel);
+                _font = new GdiFont(value.Family, (float) (value.Size * Settings.Display.Scale),
+                    fontStyle,
+                    GraphicsUnit.Pixel);
             }
         }
 
@@ -215,8 +214,11 @@ namespace AlphaTab.Platform.CSharp
             _height = 1;
 
             _currentPath = new GraphicsPath(FillMode.Winding);
-            _stringFormat = new StringFormat(StringFormat.GenericTypographic);
-            _stringFormat.LineAlignment = StringAlignment.Near;
+            _stringFormat = new StringFormat(StringFormat.GenericTypographic)
+            {
+                LineAlignment = StringAlignment.Near,
+                Alignment = StringAlignment.Near
+            };
 
             _lineWidth = 1;
             _currentX = 0;
@@ -225,12 +227,12 @@ namespace AlphaTab.Platform.CSharp
             _textAlign = TextAlign.Left;
             _textBaseline = TextBaseline.Top;
 
-            Color = new Color(255, 255, 255);
+            Color = new Model.Color(255, 255, 255);
 
             RecreateImage();
         }
 
-        public void BeginRender(float width, float height)
+        public void BeginRender(double width, double height)
         {
             _width = width;
             _height = height;
@@ -243,7 +245,7 @@ namespace AlphaTab.Platform.CSharp
             return _image;
         }
 
-        public virtual object OnRenderFinished()
+        public object OnRenderFinished()
         {
             // nothing to do
             return null;
@@ -259,16 +261,13 @@ namespace AlphaTab.Platform.CSharp
 
         private void RecreateImage()
         {
-            var newImage = new Bitmap((int)_width, (int)_height, PixelFormat.Format32bppPArgb);
+            var newImage = new Bitmap((int) _width, (int) _height, PixelFormat.Format32bppPArgb);
             var newGraphics = Graphics.FromImage(newImage);
             newGraphics.CompositingMode = CompositingMode.SourceOver;
             newGraphics.SmoothingMode = SmoothingMode.HighQuality;
             newGraphics.TextRenderingHint = TextRenderingHint.AntiAlias;
 
-            if (_graphics != null)
-            {
-                _graphics.Dispose();
-            }
+            _graphics?.Dispose();
 
             _image = newImage;
             _graphics = newGraphics;
@@ -276,41 +275,28 @@ namespace AlphaTab.Platform.CSharp
 
         private void RecreatePen()
         {
-            var newPen = new Pen(_color, _lineWidth);
-            if (_pen != null)
-            {
-                _pen.Dispose();
-            }
+            var newPen = new Pen(_color, (float) _lineWidth);
+            _pen?.Dispose();
+
             _pen = newPen;
         }
 
         private void RecreateBrush()
         {
             var newBrush = new SolidBrush(_color);
-            if (_brush != null)
-            {
-                _brush.Dispose();
-            }
+            _brush?.Dispose();
+
             _brush = newBrush;
         }
 
-        public void Clear()
+        public void FillRect(double x, double y, double w, double h)
         {
-            _graphics.Clear(GdiColor.Transparent);
+            _graphics.FillRectangle(_brush, (float) x, (float) y, (float) w, (float) h);
         }
 
-        public void FillRect(float x, float y, float w, float h)
+        public void StrokeRect(double x, double y, double w, double h)
         {
-            x = (int)x - BlurCorrection;
-            y = (int)y - BlurCorrection;
-            _graphics.FillRectangle(_brush, x, y, w, h);
-        }
-
-        public void StrokeRect(float x, float y, float w, float h)
-        {
-            x = (int)x - BlurCorrection;
-            y = (int)y - BlurCorrection;
-            _graphics.DrawRectangle(_pen, x, y, w, h);
+            _graphics.DrawRectangle(_pen, (float) x, (float) y, (float) w, (float) h);
         }
 
         public void BeginPath()
@@ -323,41 +309,41 @@ namespace AlphaTab.Platform.CSharp
             _currentPath.CloseFigure();
         }
 
-        public void MoveTo(float x, float y)
+        public void MoveTo(double x, double y)
         {
-            x = (int)x - BlurCorrection;
-            y = (int)y - BlurCorrection;
             _currentX = x;
             _currentY = y;
         }
 
-        public void LineTo(float x, float y)
+        public void LineTo(double x, double y)
         {
-            x = (int)x - BlurCorrection;
-            y = (int)y - BlurCorrection;
-            _currentPath.AddLine(_currentX, _currentY, x, y);
+            _currentPath.AddLine((float) _currentX, (float) _currentY, (float) x, (float) y);
             _currentX = x;
             _currentY = y;
         }
 
-        public void QuadraticCurveTo(float cpx, float cpy, float x, float y)
+        public void QuadraticCurveTo(double cpx, double cpy, double x, double y)
         {
-            _currentPath.AddBezier(_currentX, _currentY, cpx, cpy, cpx, cpy, x, y);
+            _currentPath.AddBezier((float) _currentX, (float) _currentY, (float) cpx, (float) cpy,
+                (float) cpx, (float) cpy, (float) x, (float) y);
             _currentX = x;
             _currentY = y;
         }
 
-        public void BezierCurveTo(float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
+        public void BezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y, double x,
+            double y)
         {
-            _currentPath.AddBezier(_currentX, _currentY, cp1x, cp1y, cp2x, cp2y, x, y);
+            _currentPath.AddBezier((float) _currentX, (float) _currentY, (float) cp1x, (float) cp1y,
+                (float) cp2x, (float) cp2y, (float) x, (float) y);
             _currentX = x;
             _currentY = y;
         }
 
-        public void FillCircle(float x, float y, float radius)
+        public void FillCircle(double x, double y, double radius)
         {
             _currentPath.StartFigure();
-            _currentPath.AddEllipse(x - radius, y - radius, radius * 2, radius * 2);
+            _currentPath.AddEllipse((float) (x - radius), (float) (y - radius), (float) radius * 2,
+                (float) radius * 2);
             _currentPath.CloseFigure();
             _currentX = x;
             _currentY = y;
@@ -378,21 +364,22 @@ namespace AlphaTab.Platform.CSharp
             _currentPath = new GraphicsPath(FillMode.Winding);
         }
 
-        public void FillText(string text, float x, float y)
+        public void FillText(string text, double x, double y)
         {
-            _graphics.DrawString(text, _font, _brush, new Point((int)x, (int)y), _stringFormat);
+            _graphics.DrawString(text, _font, _brush, new PointF((float) x, (float) y), _stringFormat);
         }
 
-        public float MeasureText(string text)
+        public double MeasureText(string text)
         {
             lock (MeasurementGraphics)
             {
-                return MeasurementGraphics.MeasureString(text, _font).Width;
+                return MeasurementGraphics.MeasureString(text, _font, new PointF(0,0), _stringFormat).Width;
             }
         }
 
-        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition =
- false)
+        public void FillMusicFontSymbol(double x, double y, double scale, MusicFontSymbol symbol,
+            bool centerAtPosition =
+                false)
         {
             if (symbol == MusicFontSymbol.None)
             {
@@ -402,31 +389,36 @@ namespace AlphaTab.Platform.CSharp
             // for whatever reason the padding on GDI font rendering is a bit messed up, there is 1px padding on the left
             x += scale;
 
-            _graphics.DrawString(Platform.StringFromCharCode((int)symbol), GetMusicFont(scale), _brush, x, y, centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
+            _graphics.DrawString(String.FromCharCode((int) symbol), GetMusicFont(scale),
+                _brush, (float) x, (float) y,
+                centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
         }
 
-        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition
- = false)
+        public void FillMusicFontSymbols(double x, double y, double scale,
+            Core.IList<MusicFontSymbol> symbols,
+            bool centerAtPosition
+                = false)
         {
             var s = "";
             foreach (var symbol in symbols)
             {
                 if (symbol != MusicFontSymbol.None)
                 {
-                    s += Platform.StringFromCharCode((int)symbol);
+                    s += String.FromCharCode((int) symbol);
                 }
             }
 
             // for whatever reason the padding on GDI font rendering is a bit messed up, there is 1px padding on the left
             x += scale;
 
-            _graphics.DrawString(s, GetMusicFont(scale), _brush, x, y, centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
+            _graphics.DrawString(s, GetMusicFont(scale), _brush, (float) x, (float) y,
+                centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
         }
 
-        public void BeginRotate(float centerX, float centerY, float angle)
+        public void BeginRotate(double centerX, double centerY, double angle)
         {
-            _graphics.TranslateTransform(centerX, centerY);
-            _graphics.RotateTransform(angle);
+            _graphics.TranslateTransform((float) centerX, (float) centerY);
+            _graphics.RotateTransform((float) angle);
         }
 
         public void EndRotate()
@@ -435,4 +427,3 @@ namespace AlphaTab.Platform.CSharp
         }
     }
 }
-#endif

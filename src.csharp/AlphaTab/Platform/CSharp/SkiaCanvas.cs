@@ -57,10 +57,8 @@ namespace AlphaTab.Platform.CSharp
 
             // attempt to load correct skia native lib
             var type = typeof(SkiaCanvas).GetTypeInfo();
-            var bravura = type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf");
-            {
-                MusicFont = SKTypeface.FromStream(bravura);
-            }
+            using var bravura = type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf");
+            MusicFont = SKTypeface.FromStream(bravura);
         }
 
         private SKSurface _surface;
@@ -139,11 +137,6 @@ namespace AlphaTab.Platform.CSharp
             return null;
         }
 
-        public void Clear()
-        {
-            _surface.Canvas.Clear(SKColors.Transparent);
-        }
-
         public void FillRect(double x, double y, double w, double h)
         {
             using (var paint = CreatePaint())
@@ -157,6 +150,11 @@ namespace AlphaTab.Platform.CSharp
         {
             var paint = new SKPaint();
             paint.IsAntialias = true;
+            paint.SubpixelText = true;
+            // paint.IsAutohinted = true;
+            // paint.DeviceKerningEnabled = true;
+            // paint.IsLinearText = true;
+            // paint.HintingLevel = SKPaintHinting.Full;
             paint.Color = new SKColor((byte) Color.R, (byte) Color.G, (byte) Color.B,
                 (byte) Color.A);
             return paint;

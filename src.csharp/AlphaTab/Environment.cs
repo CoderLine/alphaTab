@@ -18,6 +18,12 @@ namespace AlphaTab
                     return new SkiaCanvas();
                 })
             );
+            renderEngines.Set(
+                "gdi",
+                new RenderEngineFactory(true, () => {
+                    return new GdiCanvas();
+                })
+            );
         }
     }
 }
