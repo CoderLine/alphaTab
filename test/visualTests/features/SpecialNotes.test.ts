@@ -1,4 +1,3 @@
-import { Settings } from '@src/Settings';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 
 describe('SpecialNotesTests', () => {

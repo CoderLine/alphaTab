@@ -4,11 +4,6 @@ interface JsonProperty {
     jsonNames: string[];
 }
 
-interface TypeWithNullableInfo {
-    type: ts.Type;
-    isNullable: boolean;
-}
-
 function wrapToNonNull(isNullableType: boolean, expr: ts.Expression) {
     return isNullableType ? expr : ts.createNonNullExpression(expr);
 }
@@ -140,7 +135,7 @@ function generateFillToJsonBodyForClass(
             if (isPrimitiveType(type.type)) {
                 // json.jsonName = this.fieldName
                 statements.push(assignToJsonName(accessField()));
-            } else if (isTypedArray(type.type, jsonName)) {
+            } else if (isTypedArray(type.type)) {
                 // json.jsonName = this.fieldName ? this.fieldName.slice() : null
                 if (type.isNullable) {
                     statements.push(
@@ -405,7 +400,7 @@ function generateSetPropertyMethodBodyForClass(
             // return true;
             caseStatements.push(assignField(ts.createIdentifier('value')));
             caseStatements.push(ts.createReturn(ts.createTrue()));
-        } else if (isTypedArray(type.type, prop.property.name)) {
+        } else if (isTypedArray(type.type)) {
             // nullable:
             // this.fieldName = value ? value.slice() : null
             // return true;
@@ -648,7 +643,7 @@ function rewriteClassForJsonSerialization(
             undefined,
             'toJson',
             undefined,
-            [],
+            undefined,
             [
                 ts.createParameter(
                     [],
@@ -671,11 +666,11 @@ function rewriteClassForJsonSerialization(
             undefined,
             'fillToJson',
             undefined,
-            [],
+            undefined,
             [
                 ts.createParameter(
-                    [],
-                    [],
+                    undefined,
+                    undefined,
                     undefined,
                     'json',
                     undefined,
@@ -694,11 +689,11 @@ function rewriteClassForJsonSerialization(
             undefined,
             'fromJson',
             undefined,
-            [],
+            undefined,
             [
                 ts.createParameter(
-                    [],
-                    [],
+                    undefined,
+                    undefined,
                     undefined,
                     'json',
                     undefined,
@@ -717,11 +712,11 @@ function rewriteClassForJsonSerialization(
             undefined,
             'fillFromJson',
             undefined,
-            [],
+            undefined,
             [
                 ts.createParameter(
-                    [],
-                    [],
+                    undefined,
+                    undefined,
                     undefined,
                     'json',
                     undefined,
@@ -740,19 +735,19 @@ function rewriteClassForJsonSerialization(
             undefined,
             'setProperty',
             undefined,
-            [],
+            undefined,
             [
                 ts.createParameter(
-                    [],
-                    [],
+                    undefined,
+                    undefined,
                     undefined,
                     'property',
                     undefined,
                     ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
                 ),
                 ts.createParameter(
-                    [],
-                    [],
+                    undefined,
+                    undefined,
                     undefined,
                     'value',
                     undefined,

@@ -1,4 +1,4 @@
-import { EventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import { IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Platform } from '@src/platform/Platform';
 import { Logger } from '@src/util/Logger';
 

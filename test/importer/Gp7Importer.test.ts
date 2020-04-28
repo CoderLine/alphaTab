@@ -3,7 +3,7 @@ import { Gp7Importer } from '@src/importer/Gp7Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Beat } from '@src/model/Beat';
 import { BendType } from '@src/model/BendType';
-import { Fermata, FermataType } from '@src/model/Fermata';
+import { FermataType } from '@src/model/Fermata';
 import { GraceType } from '@src/model/GraceType';
 import { MasterBar } from '@src/model/MasterBar';
 import { Note } from '@src/model/Note';

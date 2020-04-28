@@ -15,7 +15,6 @@ import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
 import { BeamGlyph } from '@src/rendering/glyphs/BeamGlyph';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { ClefGlyph } from '@src/rendering/glyphs/ClefGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { RepeatCloseGlyph } from '@src/rendering/glyphs/RepeatCloseGlyph';

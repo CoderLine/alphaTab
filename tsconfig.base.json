@@ -10,22 +10,14 @@
       "dom"
     ],
     "strict": true,
-
     "allowSyntheticDefaultImports": true,
-
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "emitDecoratorMetadata": false,
-   // "allowSyntheticDefaultImports": true,
-   // "allowUnreachableCode": false,
-   // "noImplicitAny": true,
-   // "noImplicitThis": true,
-   // "noImplicitReturns": true,
-   // "noUnusedLocals": true,
-   // "noUnusedParameters": true,
-   // "allowJs": false,
-   // "downlevelIteration": false,
-
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
     "sourceMap": true,
     "declaration": true,
     "incremental": true,

@@ -416,8 +416,8 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseHarmony(element: XmlNode, track: Track): void {
         let rootStep: string | null = null;
         let rootAlter: string = '';
-        let kind: string | null = null;
-        let kindText: string | null = null;
+        // let kind: string | null = null;
+        // let kindText: string | null = null;
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -452,8 +452,8 @@ export class MusicXmlImporter extends ScoreImporter {
                         }
                         break;
                     case 'kind':
-                        kindText = c.getAttribute('text');
-                        kind = c.innerText;
+                        // kindText = c.getAttribute('text');
+                        // kind = c.innerText;
                         break;
                 }
             }
@@ -1244,8 +1244,8 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseKey(element: XmlNode, masterBar: MasterBar): void {
         let fifths: number = -2147483648;
-        let keyStep: number = -2147483648;
-        let keyAlter: number = -2147483648;
+        //let keyStep: number = -2147483648;
+        //let keyAlter: number = -2147483648;
         let mode: string = '';
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
@@ -1254,10 +1254,10 @@ export class MusicXmlImporter extends ScoreImporter {
                         fifths = parseInt(c.innerText);
                         break;
                     case 'key-step':
-                        keyStep = parseInt(c.innerText);
+                        //keyStep = parseInt(c.innerText);
                         break;
                     case 'key-alter':
-                        keyAlter = parseInt(c.innerText);
+                        //keyAlter = parseInt(c.innerText);
                         break;
                     case 'mode':
                         mode = c.innerText;

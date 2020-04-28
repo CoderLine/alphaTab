@@ -195,7 +195,7 @@ export class AccidentalHelper {
         // Initial Position
         let steps: number = AccidentalHelper.OctaveSteps[clef];
         // Move to Octave
-        steps -= octave * 7;
+        steps -= octave * AccidentalHelper.StepsPerOctave;
         // get the step list for the current keySignature
         let stepList =
             ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)

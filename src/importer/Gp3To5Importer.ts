@@ -50,7 +50,7 @@ export class Gp3To5Importer extends ScoreImporter {
     private _lyrics: Lyrics[] = [];
     private _barCount: number = 0;
     private _trackCount: number = 0;
-    private _playbackInfos: PlaybackInformation[] =[];
+    private _playbackInfos: PlaybackInformation[] = [];
 
     public get name(): string {
         return 'Guitar Pro 3-5';
@@ -701,7 +701,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 let point: BendPoint = new BendPoint(0, 0);
                 point.offset = IOHelper.readInt32LE(this.data); // 0...60
 
-                point.value = (IOHelper.readInt32LE(this.data) / 25) | 0; // 0..12 (amount of quarters)
+                point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0; // 0..12 (amount of quarters)
 
                 GpBinaryHelpers.gpReadBool(this.data); // vibrato
 
@@ -944,7 +944,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 let point: BendPoint = new BendPoint(0, 0);
                 point.offset = IOHelper.readInt32LE(this.data); // 0...60
 
-                point.value = (IOHelper.readInt32LE(this.data) / 25) | 0; // 0..12 (amount of quarters)
+                point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0; // 0..12 (amount of quarters)
 
                 GpBinaryHelpers.gpReadBool(this.data); // vibrato
 
@@ -1054,12 +1054,10 @@ export class Gp3To5Importer extends ScoreImporter {
                     note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
                     break;
                 case 2:
-                    // ReSharper disable UnusedVariable
-                    let harmonicTone: number = this.data.readByte();
-                    let harmonicKey: number = this.data.readByte();
-                    let harmonicOctaveOffset: number = this.data.readByte();
+                    /*let _harmonicTone: number = */ this.data.readByte();
+                    /*let _harmonicKey: number =  */ this.data.readByte();
+                    /*let _harmonicOctaveOffset: number = */ this.data.readByte();
                     note.harmonicType = HarmonicType.Artificial;
-                    // ReSharper restore UnusedVariable
                     break;
                 case 3:
                     note.harmonicType = HarmonicType.Tap;

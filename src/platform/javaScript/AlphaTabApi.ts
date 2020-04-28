@@ -3,7 +3,7 @@ import { AlphaSynthMidiFileHandler } from '@src/audio/midi/generator/AlphaSynthM
 import { MidiFileGenerator } from '@src/audio/midi/generator/MidiFileGenerator';
 import { MidiFile } from '@src/audio/midi/MidiFile';
 import { LayoutMode } from '@src/DisplaySettings';
-import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import { IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Track } from '@src/model/Track';
 import { AlphaSynthWebWorkerApi } from '@src/platform/javaScript/AlphaSynthWebWorkerApi';
 import { BrowserUiFacade } from '@src/platform/javaScript/BrowserUiFacade';

@@ -241,7 +241,7 @@ describe('GpxImporterTest', () => {
 
     it('serenade', async () => {
         const reader = await prepareGpxImporterWithFile('guitarpro6/serenade.gpx');
-        let score: Score = reader.readScore();
+        reader.readScore();
         // only Check reading
     });
 

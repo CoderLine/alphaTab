@@ -15,7 +15,7 @@ export class GhostParenthesisGlyph extends Glyph {
 
     public doLayout(): void {
         super.doLayout();
-        this.width = 6 * this.scale;
+        this.width = GhostParenthesisGlyph.Size * this.scale;
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {

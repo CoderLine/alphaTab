@@ -9,7 +9,6 @@ import { IOHelper } from '@src/io/IOHelper';
 import { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
 
-import { Platform } from '@src/platform/Platform';
 import { FormatError } from '@src/FormatError';
 
 export class Hydra {

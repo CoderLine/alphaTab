@@ -4,7 +4,6 @@ import { ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { Logger } from '@src/util/Logger';
 import { EventEmitterOfT } from '@src/EventEmitter';

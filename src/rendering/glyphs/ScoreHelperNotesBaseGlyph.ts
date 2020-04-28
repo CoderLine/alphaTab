@@ -35,7 +35,7 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
         // TODO: should be 1/3
         let centerX: number = (x2 + x1) / 2;
         let centerY: number = (y2 + y1) / 2;
-        let offset: number = 11 * scale;
+        let offset: number = ScoreHelperNotesBaseGlyph.SlurHeight * scale;
         if (x2 - x1 < 20) {
             offset /= 2;
         }

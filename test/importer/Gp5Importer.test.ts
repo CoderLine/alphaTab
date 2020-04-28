@@ -131,7 +131,7 @@ describe('Gp5ImporterTest', () => {
 
     it('serenade', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/serenade.gp5');
-        let score: Score = reader.readScore();
+        reader.readScore();
         // only Check reading
     });
 

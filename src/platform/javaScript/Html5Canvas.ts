@@ -9,8 +9,6 @@ import { Settings } from '@src/Settings';
  * @target web
  */
 export class Html5Canvas implements ICanvas {
-    private static readonly BlurCorrection = 0.5;
-
     private _measureCanvas: HTMLCanvasElement;
     private _measureContext: CanvasRenderingContext2D;
     private _canvas: HTMLCanvasElement | null = null;

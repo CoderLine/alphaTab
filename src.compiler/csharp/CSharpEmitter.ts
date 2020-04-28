@@ -1,6 +1,4 @@
-import path from 'path';
 import * as ts from 'typescript';
-import * as cs from './CSharpAst';
 import CSharpAstTransformer from './CSharpAstTransformer';
 import CSharpEmitterContext from './CSharpEmitterContext';
 import CSharpAstPrinter from './CSharpAstPrinter';

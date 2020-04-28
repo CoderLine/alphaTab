@@ -1,7 +1,5 @@
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { Score } from '@src/model/Score';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import pixelmatch from 'pixelmatch';

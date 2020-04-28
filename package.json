@@ -1,6 +1,6 @@
 {
   "name": "alphatab",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "description": "alphaTab is a music notation and guitar tablature rendering library",
   "keywords": [
     "guitar",
@@ -28,13 +28,13 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "tslint --project tsconfig.build.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
-    "build": "npm run clean && ttsc --project tsconfig.build.json && rollup -c rollup.config.js",
+    "build": "ttsc --project tsconfig.build.json && rollup -c rollup.config.js",
     "watch-ts": "ttsc --project tsconfig.build.json --watch",
     "watch-rollup": "rollup -c rollup.config.js -w",
     "start-server": "http-server -o playground",
     "start": "concurrently --kill-others \"npm:watch-ts\" \"npm:watch-rollup\" \"npm:start-server\"",
     "test": "ttsc --project tsconfig.json && karma start karma.conf.js",
-    "generate-csharp": "npm run clean && ts-node --project tsconfig.build-csharp.json src.compiler/csharp/CSharpTranspiler.ts --project tsconfig.build-csharp.json",
+    "generate-csharp": "ts-node --project tsconfig.build-csharp.json src.compiler/csharp/CSharpTranspiler.ts --project tsconfig.build-csharp.json",
     "build-csharp": "npm run generate-csharp && cd src.csharp && dotnet build",
     "test-csharp": "cd src.csharp && dotnet test"
   },

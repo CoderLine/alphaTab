@@ -8,7 +8,6 @@ export default class CSharpAstTransformer {
     private _csharpFile: cs.SourceFile;
     private _context: CSharpEmitterContext;
     private _declarationOrAssignmentTypeStack: ts.Type[] = [];
-    private _currentClassMember: cs.ClassMember | null = null;
 
     public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
         this._typeScriptFile = typeScript;
@@ -518,7 +517,6 @@ export default class CSharpAstTransformer {
                 }
 
                 csMethod.returnType.parent = csMethod;
-                this._currentClassMember = csMethod;
 
                 d.initializer.parameters.forEach(p => csMethod.parameters.push(this.makeParameter(csMethod, p)));
                 this._declarationOrAssignmentTypeStack.push(type);
@@ -526,7 +524,6 @@ export default class CSharpAstTransformer {
                 this._declarationOrAssignmentTypeStack.pop();
 
                 parent.members.push(csMethod);
-                this._currentClassMember = null;
                 this._context.registerSymbol(csMethod);
             } else {
                 const csProperty: cs.PropertyDeclaration = {
@@ -542,7 +539,6 @@ export default class CSharpAstTransformer {
                     tsNode: d
                 };
 
-                this._currentClassMember = csProperty;
                 csProperty.type.parent = csProperty;
                 csProperty.getAccessor = {
                     parent: csProperty,
@@ -557,7 +553,6 @@ export default class CSharpAstTransformer {
                 }
 
                 parent.members.push(csProperty);
-                this._currentClassMember = null;
                 this._context.registerSymbol(csProperty);
             }
         });
@@ -970,8 +965,6 @@ export default class CSharpAstTransformer {
             csProperty.documentation = this.visitDocumentation(classElement.name);
         }
 
-        this._currentClassMember = csProperty;
-
         let isReadonly = false;
         if (classElement.modifiers) {
             classElement.modifiers.forEach(m => {
@@ -1030,56 +1023,8 @@ export default class CSharpAstTransformer {
         }
 
         parent.members.push(csProperty);
-        this._currentClassMember = null;
 
         this._context.registerSymbol(csProperty);
-    }
-
-    private visitPropertyDeclarationAsField(parent: cs.ClassDeclaration, classElement: ts.PropertyDeclaration) {
-        const type = this._context.typeChecker.getTypeAtLocation(classElement);
-        const csField: cs.FieldDeclaration = {
-            parent: parent,
-            nodeType: cs.SyntaxKind.FieldDeclaration,
-            isStatic: false,
-            isReadonly: false,
-            name: this._context.toPascalCase(classElement.name.getText()),
-            type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
-            tsSymbol: this._context.typeChecker.getSymbolAtLocation(classElement.name),
-            visibility: cs.Visibility.Private,
-            tsNode: classElement
-        };
-
-        if (classElement.name) {
-            csField.documentation = this.visitDocumentation(classElement.name);
-        }
-
-        this._currentClassMember = csField;
-
-        if (classElement.modifiers) {
-            classElement.modifiers.forEach(m => {
-                switch (m.kind) {
-                    case ts.SyntaxKind.StaticKeyword:
-                        csField.isStatic = true;
-                        break;
-                    case ts.SyntaxKind.ReadonlyKeyword:
-                        csField.isReadonly = true;
-                        break;
-                }
-            });
-        }
-
-        csField.type.parent = csField;
-
-        if (classElement.initializer) {
-            this._declarationOrAssignmentTypeStack.push(type);
-            csField.initializer = this.visitExpression(csField, classElement.initializer);
-            this._declarationOrAssignmentTypeStack.pop();
-        }
-
-        parent.members.push(csField);
-        this._currentClassMember = null;
-
-        this._context.registerSymbol(csField);
     }
 
     private visitMethodDeclaration(
@@ -1117,8 +1062,6 @@ export default class CSharpAstTransformer {
                 csMethod.isOverride = false;
             }
         }
-
-        this._currentClassMember = csMethod;
 
         if (classElement.modifiers) {
             classElement.modifiers.forEach(m => {
@@ -1171,7 +1114,6 @@ export default class CSharpAstTransformer {
         }
 
         parent.members.push(csMethod);
-        this._currentClassMember = null;
 
         this._context.registerSymbol(csMethod);
     }
@@ -1619,8 +1561,6 @@ export default class CSharpAstTransformer {
             skipEmit: this.shouldSkip(classElement)
         };
 
-        this._currentClassMember = csMethod;
-
         if (classElement.name) {
             csMethod.documentation = this.visitDocumentation(classElement.name);
         }
@@ -1647,8 +1587,6 @@ export default class CSharpAstTransformer {
         classElement.parameters.forEach(p => this.visitMethodParameter(csMethod, p));
 
         parent.members.push(csMethod);
-
-        this._currentClassMember = null;
 
         this._context.registerSymbol(csMethod);
     }
@@ -2477,11 +2415,6 @@ export default class CSharpAstTransformer {
                 objectLiteral.properties.push(assignment);
             } else if (ts.isSpreadAssignment(p)) {
                 this._context.addTsNodeDiagnostics(p, 'Spread operator not supported', ts.DiagnosticCategory.Error);
-                return {
-                    nodeType: cs.SyntaxKind.ToDoExpression,
-                    parent: objectLiteral,
-                    tsNode: p
-                } as cs.ToDoExpression;
             } else if (ts.isMethodDeclaration(p)) {
                 const assignment = {
                     parent: objectLiteral,

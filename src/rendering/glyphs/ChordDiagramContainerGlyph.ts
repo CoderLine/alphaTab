@@ -27,7 +27,7 @@ export class ChordDiagramContainerGlyph extends GlyphGroup {
     public doLayout(): void {
         let x: number = 0;
         let y: number = 0;
-        let padding: number = 2 * 3 * this.scale;
+        let padding: number = 2 * ChordDiagramContainerGlyph.Padding * this.scale;
         this._rows = [];
         let row: ChordDiagramRowGlyph = new ChordDiagramRowGlyph(x, y);
         row.width = this.width;
@@ -58,7 +58,7 @@ export class ChordDiagramContainerGlyph extends GlyphGroup {
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         for (let row of this._rows) {
-            row.paint(cx + this.x, cy + this.y + 3 * this.scale, canvas);
+            row.paint(cx + this.x, cy + this.y + ChordDiagramContainerGlyph.Padding * this.scale, canvas);
         }
     }
 }
