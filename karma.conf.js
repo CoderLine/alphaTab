@@ -26,21 +26,10 @@ module.exports = function (config) {
     preprocessors: {
       "dist/lib.test/test/index.js": ["rollup"],
     },
-    reporters: ["spec", "kjhtml"],
-    browsers: ["ChromeWithUserDataDir"],
-    //concurrency: 1,
-    singleRun: false,
 
     client: {
       clearContext: false
     },
-    customLaunchers: {
-      ChromeWithUserDataDir: {
-        base: 'Chrome',
-        flags: ['--user-data-dir=./tests/config/.chrome_dev_user']
-      }
-    },
-
 
     rollupPreprocessor: {
       plugins: [

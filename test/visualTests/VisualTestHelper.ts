@@ -238,12 +238,13 @@ export class VisualTestHelper {
 
                     diffContext.putImageData(diffImageData, 0, 0);
 
-                    result.pass = differentPixels <= 100;
+                    let totalPixels = expected.width * expected.height;
+                    let percentDifference = (differentPixels / totalPixels) * 100;
+                    result.pass = percentDifference < 0.5;
 
                     if (!result.pass) {
-                        let totalPixels = expected.width * expected.height;
-                        let percentDifference = ((differentPixels / totalPixels) * 100).toFixed(2);
-                        result.message = `Difference between original and new image is too big: ${differentPixels}/${totalPixels} (${percentDifference}%)`;
+                        let percentDifferenceText = percentDifference.toFixed(2);
+                        result.message = `Difference between original and new image is too big: ${differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
                     }
                 } catch (e) {
                     result.pass = false;

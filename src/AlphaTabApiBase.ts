@@ -1171,11 +1171,11 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    public addError(value: () => void) {
+    public addError(value: (error: Error) => void) {
         Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
         this.error.on(value);
     }
-    public removeError(value: () => void) {
+    public removeError(value: (error: Error) => void) {
         Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
         this.error.off(value);
     }
