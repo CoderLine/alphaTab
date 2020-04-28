@@ -771,7 +771,7 @@ export class AlphaTabApiBase<TSettings> {
                         if (
                             nextBeatBoundings &&
                             nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                                barBoundings.staveGroupBounds
+                            barBoundings.staveGroupBounds
                         ) {
                             nextBeatX = nextBeatBoundings.visualBounds.x;
                         }
@@ -846,6 +846,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public playedBeatChanged: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
+    public addPlayedBeatChanged(value: (beat: Beat | null) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.playedBeatChanged.on(value);
+    }
+    public removePlayedBeatChanged(value: (beat: Beat | null) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.playedBeatChanged.off(value);
+    }
 
     private onPlayedBeatChanged(beat: Beat): void {
         (this.playedBeatChanged as EventEmitterOfT<Beat>).trigger(beat);
@@ -857,8 +865,34 @@ export class AlphaTabApiBase<TSettings> {
     private _selectionEnd: SelectionInfo | null = null;
 
     public beatMouseDown: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
+    public addBeatMouseDown(value: (beat: Beat) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.beatMouseDown.on(value);
+    }
+    public removeBeatMouseDown(value: (beat: Beat) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.beatMouseDown.off(value);
+    }
+
     public beatMouseMove: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
+    public addBeatMouseMove(value: (beat: Beat) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.beatMouseMove.on(value);
+    }
+    public removeBeatMouseMove(value: (beat: Beat) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.beatMouseMove.off(value);
+    }
+
     public beatMouseUp: IEventEmitterOfT<Beat | null> = new EventEmitterOfT<Beat | null>();
+    public addBeatMouseUp(value: (beat: Beat | null) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.beatMouseUp.on(value);
+    }
+    public removeBeatMouseUp(value: (beat: Beat | null) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.beatMouseUp.off(value);
+    }
 
     private onBeatMouseDown(originalEvent: IMouseEventArgs, beat: Beat): void {
         if (
@@ -1062,6 +1096,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public loaded: IEventEmitterOfT<Score> = new EventEmitterOfT<Score>();
+    public addLoaded(value: (score: Score) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.loaded.on(value);
+    }
+    public removeLoaded(value: (score: Score) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.loaded.off(value);
+    }
 
     private onLoaded(score: Score): void {
         (this.loaded as EventEmitterOfT<Score>).trigger(score);
@@ -1069,6 +1111,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public resize: IEventEmitterOfT<ResizeEventArgs> = new EventEmitterOfT<ResizeEventArgs>();
+    public addResize(value: (args: ResizeEventArgs) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.resize.on(value);
+    }
+    public removeResize(value: (args: ResizeEventArgs) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.resize.off(value);
+    }
 
     private onResize(e: ResizeEventArgs): void {
         (this.resize as EventEmitterOfT<ResizeEventArgs>).trigger(e);
@@ -1076,6 +1126,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public renderStarted: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
+    public addRenderStarted(value: (isResize: boolean) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.renderStarted.on(value);
+    }
+    public removeRenderStarted(value: (isResize: boolean) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.renderStarted.off(value);
+    }
 
     private onRenderStarted(resize: boolean): void {
         (this.renderStarted as EventEmitterOfT<boolean>).trigger(resize);
@@ -1083,6 +1141,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public renderFinished: IEventEmitter = new EventEmitter();
+    public addRenderFinished(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.renderFinished.on(value);
+    }
+    public removeRenderFinished(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.renderFinished.off(value);
+    }
 
     private onRenderFinished(): void {
         (this.renderFinished as EventEmitter).trigger();
@@ -1090,6 +1156,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public postRenderFinished: IEventEmitter = new EventEmitter();
+    public addPostRenderFinished(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.postRenderFinished.on(value);
+    }
+    public removePostRenderFinished(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.postRenderFinished.off(value);
+    }
 
     private onPostRenderFinished(): void {
         (this.postRenderFinished as EventEmitter).trigger();
@@ -1097,6 +1171,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    public addError(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.error.on(value);
+    }
+    public removeError(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.error.off(value);
+    }
 
     public onError(error: Error): void {
         Logger.error('API', 'An unexpected error occurred', error);
@@ -1105,6 +1187,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public readyForPlayback: IEventEmitter = new EventEmitter();
+    public addReadyForPlayback(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.readyForPlayback.on(value);
+    }
+    public removeReadyForPlayback(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.readyForPlayback.off(value);
+    }
 
     private onReadyForPlayback(): void {
         (this.readyForPlayback as EventEmitter).trigger();
@@ -1112,6 +1202,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public playerFinished: IEventEmitter = new EventEmitter();
+    public addPlayerFinished(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.playerFinished.on(value);
+    }
+    public removePlayerFinished(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.playerFinished.off(value);
+    }
 
     private onPlayerFinished(): void {
         (this.playerFinished as EventEmitter).trigger();
@@ -1119,6 +1217,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public soundFontLoaded: IEventEmitter = new EventEmitter();
+    public addSoundFontLoaded(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.soundFontLoaded.on(value);
+    }
+    public removeSoundFontLoaded(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.soundFontLoaded.off(value);
+    }
 
     private onSoundFontLoaded(): void {
         (this.soundFontLoaded as EventEmitter).trigger();
@@ -1126,6 +1232,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     public midiLoaded: IEventEmitter = new EventEmitter();
+    public addMidiLoaded(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.midiLoaded.on(value);
+    }
+    public removeMidiLoaded(value: () => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.midiLoaded.off(value);
+    }
 
     private onMidiLoaded(): void {
         (this.midiLoaded as EventEmitter).trigger();
@@ -1135,6 +1249,14 @@ export class AlphaTabApiBase<TSettings> {
     public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
         PlayerStateChangedEventArgs
     >();
+    public addPlayerStateChanged(value: (args: PlayerStateChangedEventArgs) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.playerStateChanged.on(value);
+    }
+    public removePlayerStateChanged(value: (args: PlayerStateChangedEventArgs) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.playerStateChanged.off(value);
+    }
 
     private onPlayerStateChanged(e: PlayerStateChangedEventArgs): void {
         (this.playerStateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(e);
@@ -1144,6 +1266,14 @@ export class AlphaTabApiBase<TSettings> {
     public playerPositionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
         PositionChangedEventArgs
     >();
+    public addPlayerPositionChanged(value: (args: PositionChangedEventArgs) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.playerPositionChanged.on(value);
+    }
+    public removePlayerPositionChanged(value: (args: PositionChangedEventArgs) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.playerPositionChanged.off(value);
+    }
 
     private onPlayerPositionChanged(e: PositionChangedEventArgs): void {
         (this.playerPositionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);

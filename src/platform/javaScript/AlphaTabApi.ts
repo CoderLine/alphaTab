@@ -9,6 +9,7 @@ import { AlphaSynthWebWorkerApi } from '@src/platform/javaScript/AlphaSynthWebWo
 import { BrowserUiFacade } from '@src/platform/javaScript/BrowserUiFacade';
 import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { Settings } from '@src/Settings';
+import { Logger } from '@src/util/Logger';
 
 /**
  * @target web
@@ -138,6 +139,14 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
     }
 
     public soundFontLoad: IEventEmitterOfT<ProgressEventArgs> = new EventEmitterOfT<ProgressEventArgs>();
+    public addSoundFontLoad(value: (args: ProgressEventArgs) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
+        this.soundFontLoad.on(value);
+    }
+    public removeSoundFontLoad(value: (args: ProgressEventArgs) => void) {
+        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
+        this.soundFontLoad.off(value);
+    }
 
     public loadSoundFontFromUrl(url: string): void {
         if (!this.player) {
