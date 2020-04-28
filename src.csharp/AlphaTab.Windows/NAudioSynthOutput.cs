@@ -127,10 +127,8 @@ namespace AlphaTab
                 var read = new Float32Array(count);
                 _circularBuffer.Read(read, 0, read.Length);
 
-                for (var i = 0; i < count; i++)
-                {
-                    buffer[offset + i] = (float) read[i];
-                }
+                Buffer.BlockCopy(read.Data, 0, buffer, offset * sizeof(float),
+                    count * sizeof(float));
 
                 var samples = count / 2;
                 ((EventEmitterOfT<double>) SamplesPlayed).Trigger(samples);
