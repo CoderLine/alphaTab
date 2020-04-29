@@ -17,7 +17,7 @@ jobs:
           node-version: '12.x'
           registry-url: https://npm.pkg.github.com/CoderLine
       - run: npm install
-      - run: node ./scripts/update-version.js alpha $GITHUB_RUN_NUMBER
+      - run: node ./scripts/update-version.js alpha ${{ github.run_number  }}
       - run: npm run build-ci
       - run: npm publish --tag alpha
         env:
