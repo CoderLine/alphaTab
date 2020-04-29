@@ -1,11 +1,27 @@
-name: Nightly C#
+name: Nightly
 on: 
   push:
     branches: 
       - develop
 
 jobs:
-  build:
+  nighty_web:
+    name: Nightly Web
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: https://registry.npmjs.org/
+      - run: npm install
+      - run: node ./scripts/update-version.js alpha $GITHUB_RUN_NUMBER
+      - run: npm run build-ci
+      - run: npm publish --tag alpha
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  nightly_csharp:
     name: Build
     runs-on: windows-latest
     steps:
