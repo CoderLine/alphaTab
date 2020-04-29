@@ -8,14 +8,14 @@ on:
 
 jobs:
   nighty_web:
-    name: Nightly Web
+    name: Web
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://npm.pkg.github.com/CoderLine
       - run: npm install
       - run: node ./scripts/update-version.js alpha $GITHUB_RUN_NUMBER
       - run: npm run build-ci
@@ -24,7 +24,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   nightly_csharp:
-    name: Build
+    name: C#
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -39,5 +39,5 @@ jobs:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - run: npm install
       - run: npm run build-csharp-ci
-      - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg
-      - run: dotnet nuget push ./src.csharp/AlphaTab.Windows/bin/Release/*.nupkg
+      - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg -k  $NUGET_AUTH_TOKEN
+      - run: dotnet nuget push ./src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k $NUGET_AUTH_TOKEN
