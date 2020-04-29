@@ -1,10 +1,8 @@
-name: Nightly
+name: Publish
 on: 
   push:
     branches: 
       - develop
-  schedule:
-    - cron:  '0 0 * * *'
 
 jobs:
   nighty_web:
@@ -15,14 +13,14 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: https://npm.pkg.github.com
+          registry-url: https://npm.pkg.github.com/
           scope: '@CoderLine/alphaTab'          
       - run: npm install
       - run: node ./scripts/update-version.js alpha ${{ github.run_number }}
       - run: npm run build-ci
       - run: npm publish --tag alpha
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ github.token }}
 
   nightly_csharp:
     name: C#
@@ -37,8 +35,8 @@ jobs:
           dotnet-version: '3.1.100'
           source-url: https://nuget.pkg.github.com/CoderLine/index.json  
         env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NUGET_AUTH_TOKEN: ${{ github.token }}
       - run: npm install
       - run: npm run build-csharp-ci
-      - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{ secrets.GITHUB_TOKEN }}
-      - run: dotnet nuget push ./src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{ secrets.GITHUB_TOKEN }}
+      - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{ github.token }}
+      - run: dotnet nuget push ./src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{ github.token }}
