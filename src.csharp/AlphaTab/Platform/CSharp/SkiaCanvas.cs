@@ -151,10 +151,7 @@ namespace AlphaTab.Platform.CSharp
             var paint = new SKPaint();
             paint.IsAntialias = true;
             paint.SubpixelText = true;
-            // paint.IsAutohinted = true;
-            // paint.DeviceKerningEnabled = true;
-            // paint.IsLinearText = true;
-            // paint.HintingLevel = SKPaintHinting.Full;
+            paint.DeviceKerningEnabled = true;
             paint.Color = new SKColor((byte) Color.R, (byte) Color.G, (byte) Color.B,
                 (byte) Color.A);
             return paint;
@@ -258,11 +255,11 @@ namespace AlphaTab.Platform.CSharp
                         break;
                 }
 
-                _surface.Canvas.DrawText(text, (float)x, (float)(y + GetFontBaseline(TextBaseline, paint)), paint);
+                _surface.Canvas.DrawText(text, (int)x, (int)y + GetFontBaseline(TextBaseline, paint), paint);
             }
         }
 
-        private double GetFontBaseline(TextBaseline baseline, SKPaint paint)
+        private float GetFontBaseline(TextBaseline baseline, SKPaint paint)
         {
             switch (baseline)
             {

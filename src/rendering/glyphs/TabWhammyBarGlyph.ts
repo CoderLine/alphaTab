@@ -82,7 +82,7 @@ export class TabWhammyBarGlyph extends Glyph {
         }
         let bottomOffset: number = minValue!.value < 0 ? Math.abs(this.getOffset(minValue!.value)) : 0;
         this.renderer.registerOverflowTop(topOffset + bottomOffset);
-        let currentOffset: number = this.renderer.staff.getSharedLayoutData(
+        let currentOffset: number = this.renderer.staff.getSharedLayoutData<number>(
             TabWhammyBarGlyph.TopOffsetSharedDataKey,
             -1
         );
@@ -154,7 +154,7 @@ export class TabWhammyBarGlyph extends Glyph {
             let dx: number = (endX - startX) / BendPoint.MaxPosition;
             canvas.beginPath();
             let zeroY: number =
-                cy + this.renderer.staff.getSharedLayoutData(TabWhammyBarGlyph.TopOffsetSharedDataKey, 0);
+                cy + this.renderer.staff.getSharedLayoutData<number>(TabWhammyBarGlyph.TopOffsetSharedDataKey, 0);
             let slurText: string = this._beat.whammyStyle === BendStyle.Gradual ? 'grad.' : '';
             for (let i: number = 0, j: number = this._renderPoints.length - 1; i < j; i++) {
                 let firstPt: BendPoint = this._renderPoints[i];
