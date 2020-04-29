@@ -36,7 +36,7 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.100'
-          source-url: https://nuget.pkg.github.com/CoderLine/index.json  
+          source-url: https://nuget.pkg.github.com/Danielku15/index.json  
         env:
           NUGET_AUTH_TOKEN: ${{ github.token }}
       - run: npm install
