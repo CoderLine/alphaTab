@@ -4,9 +4,13 @@ const sidebars = {
 		'introduction', 
 		'contributing'
 	],
-	"Getting Started": [
-		"getting-started/installation",
-		"getting-started/configuration"
+	"Getting Started (Web)": [
+		"getting-started/installation-web",
+		"getting-started/configuration-web"
+	],
+	"Getting Started (.net)": [
+		"getting-started/installation-net",
+		"getting-started/configuration-net"
 	],
 	"API Reference": [
 		"reference/settings",

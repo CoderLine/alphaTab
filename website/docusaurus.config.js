@@ -41,7 +41,7 @@ module.exports = {
             },
             {
               label: 'Installation',
-              to: 'docs/getting-started/installation',
+              to: 'docs/getting-started/installation-web',
             },
             {
               label: 'AlphaTex',

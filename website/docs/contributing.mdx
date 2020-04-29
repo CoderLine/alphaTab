@@ -47,22 +47,13 @@ A primary goal is to keep alphaTab a free an open source library for anyone to i
 You're still here? That sounds very promising. You have made your fork, you cloned the repo and now you would be ready to start developing. 
 But how is the big question. Before we actually touch the code it is helpful to understand the toolchain we have in alphaTab.
 
-As you might already know alphaTab is developed currently in C# and by this produces a .net library. There is nothing special at this point.
-But it becomes more special on how we build our JavaScript library. To build the JavaScript version of alphaTab we are first compiling our C# code
-to [Haxe](https://haxe.org/). 
+AlphaTab has a long history on the language it uses for developing. After all this years alphaTab ended up using TypeScript as the main language 
+it is developed in. This change happend in April 2020. Before that AlphaTab was developed in C# with a special toolchain that ended up with JavaScript code via Haxe. 
 
-"Why all this overhead?" you might ask. Well, I'm a huge fan of C# and its tooling. Hence I wanted to develop alphaTab in C#, but still provide it
-as Web Library. Haxe is a really nice meta language for cross compiling one source base to many other target languages. alphaTab 
-was using Haxe already in the past before we switched to C# and the performance and output code quality was just way better than any other
-cross compilation technology we used. 
+The .net version of alphaTab is still provided via a special Compiler based on the TypeScript compiler. It translates the TypeScript source code to C# 
+from where it is compiled further. 
 
-Okay, but Haxe does not support C# as input, so we made our own C# to Haxe compiler named Phase. This brings us to the following toolchains:
-
-<img src="/img/toolchain.svg" alt="Toolchain" />
-
-What's still a lot of overhead of course and not many people are familiar with this. This is the main reason why we are planning to move 
-to a TypeScript based toolchain. This way the main source base will become **TypeScript** based for the web, but with a custom cross compiler
-for the other platforms we want to ship. 
+<img src="/img/toolchain.svg" />
 
 Which brings me to the next aspect of alphaTab development. It aims for zero dependency and cross platform / language usage. 
 The main modules of alphaTab are written as standalone source code without 3rd party dependencies and with a style that allows 
@@ -71,48 +62,112 @@ to provide a platform native solution to any major platform on the market.
 
 ## Development Environment
 
-The main development can happen within any .net IDE which can built C# projects (Rider, Visual Studio or VS Code). It is up to you to decide 
-which one you would like to use. 
+The main development can happen with any Web focused IDE or Editor. It is up to you to decide which one you would like to use. 
+We recommend Visual Studio Code. 
 
-Beside a .net environment you will need to install: 
+Beside the IDE you will need following tools: 
 
-* [Haxe 3.4.7](https://haxe.org/download/version/3.4.7/)
 * [Node.js](https://nodejs.org/)
+* [.net Core SDK](https://dotnet.microsoft.com/download)
 
-Following NPM packages should be installed globally on your system.
+After that you can run the following commands and should have already a compiled version of alphaTab in the output folder: 
 
-`npm install -g uglify-js`
+```
+> npm install
+> npm start
+```
 
-Then you can simply open the AlphaTab.sln and compile the projects. 
+## NPM Scripts
+ 
+* `clean` - cleans all output
+* `lint` - checks the source code for style violations
+* `build` - compiles a web version of alphaTab using the current code state 
+* `build-ci` - usedcompiles a web version of alphaTab using the current code state (used by GitHub Actions)
+* `start` - used during development time to build alphaTab quickly via watchers and incremental compilation
+* `test` - Runs the unit test suite in Chrome 
+* `test-ci` - Runs the unit test suite in Chrome Headless (used by GitHub Actions)
+* `generate-csharp` - Translates the TypeScript codebase to C#
+* `build-csharp` - compiles a C#/.net version of alphaTab using the current code state
+* `build-csharp-ci` - compiles a C#/.net version of alphaTab using the current code state (used by GitHub Actions)
+* `test-csharp` - runs the unit test suite for C#
+* `test-csharp-ci` - runs the unit test suite for C# (used by GitHub Actions)
 
 ## Project Structure
 
-**AlphaTab.Shared**
+- **dist/**
 
-Contains the shared platform code. This is where the main code of alphaTab lives. 
+  Contains the compile output. 
 
-**AlphaTab.CSharp**
+- **font/**
 
-Executes the .net pipeline and builds a NuGet package containing the .net libraries.
-Contains any .net platform specific code. 
+  Contains the text and soundfounts that alphaTab needs for operation. 
 
-**AlphaTab.JavaScript**
+- **img/**
 
-Executes the JavaScript pipieline building the final minimized JavaScript file. 
-Contains any JavaScript platform specific code. 
+  Contains some images for the repository.
 
-**Test/AlphaTab.Test**
+- **node_modules/**
 
-Contains the shared platform code for the overall unit test suite. 
+  Contains the downloaded NPM dependencies needed during development time. 
 
-**Test/AlphaTab.Test.CSharp**
+- **playground/**
 
-Contains the tests for the .net platform including the shared tests. (can be run from Visual Studio)
+  Contains atemplate for the local playground to use during development time. It contains some sample files which 
+  can be opened in the browser for testing. 
 
-**Test/AlphaTab.Test.Js**
+- **scripts/**
 
-Contains the tests for the JavaScript platform including the shared tests. (Needs manual run via karma)
+  Contains scripts for the continuous integration. 
 
-**Samples/***
+- **src/**
 
-Contains .net sample projects.
+  Contains the main source code of alphaTab.
+
+- **src.compiler/**
+
+  Contains the special source code which extends the TypeScript compiler. The whole TypeScript to C# compiler lives here but also 
+  some [transformers](https://github.com/cevek/ttypescript) which generate things like the JSON serializer. 
+
+- **src.csharp/**
+ 
+  Contains the C# specific source code which is needed on top of the generated code from TypeScript. 
+
+- **test/**
+
+  Contains the source code related to automated tests (unit tests, integration tests, visual regression tests,...).
+
+- **test-data/**
+
+  Contains all files needed during the tests. 
+
+- **karma.conf.js**
+
+  This is the input file for Karma, the test runner we use. 
+
+- **rollup.config.js**
+
+  This is the main configuration for Rollup.js, the bundler we use. 
+
+- **rollup.resolve.js**
+
+  A custom rollup plugin to handle module resolving. 
+
+- **tsconfig.base.json**
+
+ The main tsconfig valid for all compilations. 
+
+- **tsconfig.build.json**
+
+  The tsconfig which produces the production output (no tests).
+
+- **tsconfig.build-csharp.json**
+
+  The tsconfig used when compiling TypeScript to C#.
+
+- **tsconfig.json**
+
+  The tsconfig used during development containing the main sources and tests.
+
+- **tslint.json**
+
+  The code style rules.

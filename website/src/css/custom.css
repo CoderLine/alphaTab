@@ -10,6 +10,21 @@
   --ifm-container-width: 100%;
 }
 
+.markdown {
+  --ifm-h1-line-height: 2;
+  --ifm-h2-line-height: 1.5;
+  --ifm-heading-line-height: 1;
+
+  --ifm-h1-vertical-rhythm-top: 2;
+  --ifm-h2-vertical-rhythm-top: 1.5;
+  --ifm-h3-vertical-rhythm-top: 1;
+  --ifm-heading-vertical-rhythm-top: 1.5;
+
+  --ifm-h1-vertical-rhythm-bottom: 1;
+  --ifm-heading-vertical-rhythm-bottom: 0.5
+}
+
+
 body {
   background: transparent;
 }

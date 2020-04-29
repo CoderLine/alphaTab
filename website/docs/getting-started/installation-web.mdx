@@ -1,0 +1,105 @@
+---
+title: Installation (Web)
+---
+
+The web version of alphaTab is suitable for building websites displaying and playing musicsheets in different fashions. 
+You can create websites that offer Guitar Tabs for download, provide lessons to students or just if you want to share your 
+composed music with others. It's up to you what you make out of alphaTab. 
+
+You can either install alphaTab wia NPM or just download the package manually and place it in your project. So far we do not offer a CDN. 
+
+# Grab your Copy
+
+## Local Copy
+
+You can head over to GitHub and grab the latest version of the NPM package and download it manually. 
+
+https://github.com/Danielku15/alphaTab/packages/205124
+
+Unpack the assets to your project and you're all set to start developing. 
+
+## NPM
+
+We provide NPM packages via GitHub and soon also via npmjs.com. 
+For installing via GitHub Package Registry you might need to configure your NPM first. Follow [this Guide](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#installing-a-package) for that. 
+After that just install the package via 
+
+```
+npm install @coderline/alphatab
+```
+
+And alphaTab is downloaded to your node_modules for usage in your application. 
+
+
+# Initializing alphaTab
+
+Once you have alphaTab in your project simply include it and start using it. The next pages will explain you how to configure 
+alphaTab and use it. You can also check out our [tutorials](/docs/tutorial) to learn in a more stepwise approach how to continue.
+
+```html
+<!-- Include alphaTab -->
+<script src="alphaTab.js"></script>
+<!-- Create Element which should contain alphaTab -->
+<div id="alphaTab" data-tex="true">
+\title "Hello alphaTab"
+.
+:4 0.6 1.6 3.6 0.5 2.5 3.5 0.4 2.4 |
+   3.4 0.3 2.3 0.2 1.2 3.2 0.1 1.1 |
+   3.1.1
+</div>
+<!-- Initialize alphaTab -->
+<script type="text/javascript">
+const element = document.getElementById('alphaTab');
+const api = new alphaTab.platform.javaScript.AlphaTabApi(element);
+</script>
+```
+
+The output of this is: 
+
+export class InitDemo extends React.Component {
+	constructor(props) {
+        super(props);
+        this.state = {};
+	}
+	componentDidMount() {
+        const element = document.getElementById('alphaTab');
+        this.state.api = new alphaTab.platform.javaScript.AlphaTabApi(element);
+    }
+    render() {
+        return (
+            <div id="alphaTab" data-tex="true" style={ { border: '1px solid #E5E6E7' } }>
+            \title "Hello alphaTab"
+            .
+            :4 0.6 1.6 3.6 0.5 2.5 3.5 0.4 2.4 |
+            3.4 0.3 2.3 0.2 1.2 3.2 0.1 1.1 |
+            3.1.1
+            </div>
+        );
+    }
+}
+
+<InitDemo />
+
+# Additional Notes
+
+## Dependencies
+
+AlphaTab does not need any other libraries as dependency. It ships with everything it needs out of the box. 
+But to operate alphaTab in the web with all features there are still 2 dependencies involved: 
+
+- [Bravura](https://github.com/steinbergmedia/bravura) is the Music Font of our choice. It is a free font containing [music notation symbols](https://www.smufl.org/). 
+AlphaTab bundles this font and it is placed right beside the script files.  
+- To play audio a [SoundFont2](https://en.wikipedia.org/wiki/SoundFont) file is needed. It contains the audio samples for the instruments to be played via the midi synthesizer of alphaTab. 
+AlphaTab comes with a copy of a SONiVOX based SoundFont which is part of the Android Open Source Project and available for free under [Apache License](https://www.apache.org/licenses/LICENSE-2.0)
+
+## Bundling 
+
+It is very important to understand that **alphaTab cannot be bundled with other scripts unless they can run within a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)**.
+AlphaTab uses Web Workers to do all rendering and audio synthesis operations in the background without blocking the browser window. 
+
+To do this, alphaTab is launching a Web Worker with the JavaScript file it is contained in. If AlphaTab is bundled together with a script
+that accesses the DOM, this will fail as soon as AlphaTab spawns a worker with the file it is contained in. 
+
+AlphaTab cannot provide an out-of-the-box solution to this problem as it strongly depends on what bundling and compilation infrastructure your project is using. 
+To avoid issues we recommend to simply include alphaTab normally in your project or ensure that your bundling system keeps alphaTab in a standalone file
+which is reachable via AJAX. 

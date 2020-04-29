@@ -453,7 +453,7 @@ export default class AlphaTab extends React.Component {
                         scrollElement: this.refs.viewPort,
                         scrollOffsetY: -10,
                         enablePlayer: true,
-                        soundFont: 'https://docs.alphatab.net/develop/assets/js/alphaTab/default.sf2'
+                        soundFont: '/js/alphaTab/default.sf2'
                     }
                 }
             ),
