@@ -20,7 +20,6 @@ jobs:
       - run: npm install
       - run: node ./scripts/update-version.js alpha ${{ github.run_number }}
       - run: npm run build-ci
-      - run: npm login
       - run: npm publish --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
