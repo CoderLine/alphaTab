@@ -35,7 +35,9 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.100'
-          source-url: https://nuget.pkg.github.com/CoderLine/index.json
+          source-url: https://nuget.pkg.github.com/CoderLine/index.json  
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - run: npm install
       - run: npm run build-csharp-ci
       - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{ secrets.GITHUB_TOKEN }}
