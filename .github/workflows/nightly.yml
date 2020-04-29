@@ -1,7 +1,10 @@
 name: Nightly
 on: 
+  push:
+    branches: 
+      - develop
   schedule:
-    - cron:  '* 0 * * *'
+    - cron:  '0 0 * * *'
 
 jobs:
   nighty_web:
