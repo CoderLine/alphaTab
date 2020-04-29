@@ -24,10 +24,12 @@ jobs:
       - uses: actions/setup-node@master
         with:
           node-version: '12.x'
-          registry-url: https://npm.pkg.github.com/
-          scope: '<@Danielku15/alphaTab>'
+          registry-url: https://npm.pkg.github.com/Danielku15/
+          scope: '@Danielku15'
       - name: Publish to GitHub Package Registry
-        run: npm publish --tag alpha
+        run: |
+          npm config set scope "@Danielku15"
+          npm publish --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{github.token}}
 
