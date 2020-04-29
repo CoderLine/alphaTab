@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: https://npm.pkg.github.com
-          scope: @CoderLine/alphaTab
+          scope: '@CoderLine/alphaTab'          
       - run: npm install
       - run: node ./scripts/update-version.js alpha ${{ github.run_number }}
       - run: npm run build-ci
