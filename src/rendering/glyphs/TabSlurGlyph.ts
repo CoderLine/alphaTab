@@ -1,0 +1,79 @@
+import { Note } from '@src/model/Note';
+import { ICanvas } from '@src/platform/ICanvas';
+import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
+import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+
+export class TabSlurGlyph extends TabTieGlyph {
+    private _direction: BeamDirection;
+
+    public constructor(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean = false) {
+        super(startNote, endNote, forSlide, forEnd);
+        this._direction = TabTieGlyph.getBeamDirection_Note(startNote);
+    }
+
+    protected getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
+        return Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight;
+    }
+
+    public tryExpand(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean): boolean {
+        // same type required
+        if (this.ForSlide !== forSlide) {
+            return false;
+        }
+        if (this.forEnd !== forEnd) {
+            return false;
+        }
+        // same start and endbeat
+        if (this.StartNote.beat.id !== startNote.beat.id) {
+            return false;
+        }
+        if (this.EndNote.beat.id !== endNote.beat.id) {
+            return false;
+        }
+        // same draw direction
+        if (this._direction !== TabTieGlyph.getBeamDirection_Note(startNote)) {
+            return false;
+        }
+        // if we can expand, expand in correct direction
+        switch (this._direction) {
+            case BeamDirection.Up:
+                if (startNote.realValue > this.StartNote.realValue) {
+                    this.StartNote = startNote;
+                    this.startBeat = startNote.beat;
+                }
+                if (endNote.realValue > this.EndNote.realValue) {
+                    this.EndNote = endNote;
+                    this.endBeat = endNote.beat;
+                }
+                break;
+            case BeamDirection.Down:
+                if (startNote.realValue < this.StartNote.realValue) {
+                    this.StartNote = startNote;
+                    this.startBeat = startNote.beat;
+                }
+                if (endNote.realValue < this.EndNote.realValue) {
+                    this.EndNote = endNote;
+                    this.endBeat = endNote.beat;
+                }
+                break;
+        }
+        return true;
+    }
+
+    public paint(cx: number, cy: number, canvas: ICanvas): void {
+        let startNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
+            this.renderer.staff.staveId,
+            this.startBeat!.voice.bar
+        )!;
+        let direction: BeamDirection = this.getBeamDirection(this.startBeat!, startNoteRenderer);
+        let slurId: string = 'tab.slur.' + this.StartNote.beat.id + '.' + this.EndNote.beat.id + '.' + direction;
+        let renderer: TabBarRenderer = this.renderer as TabBarRenderer;
+        let isSlurRendered: boolean = renderer.staff.getSharedLayoutData(slurId, false);
+        if (!isSlurRendered) {
+            renderer.staff.setSharedLayoutData(slurId, true);
+            super.paint(cx, cy, canvas);
+        }
+    }
+}

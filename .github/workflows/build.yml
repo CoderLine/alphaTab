@@ -1,0 +1,35 @@
+name: Build
+on: 
+  push:
+    branches: 
+      - develop
+      - master
+  pull_request:
+
+jobs:
+  build_web:
+    name: Build and Test Web
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: npm install
+      - run: npm run build-ci
+      - run: npm run test-ci
+
+  build_csharp:
+    name: Build and Test C#
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.100'
+      - run: npm install
+      - run: npm run build-csharp-ci
+      - run: npm run test-csharp-ci      

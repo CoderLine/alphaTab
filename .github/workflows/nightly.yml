@@ -1,0 +1,40 @@
+name: Nightly
+on: 
+  schedule:
+    - cron:  '* 0 * * *'
+
+jobs:
+  nighty_web:
+    name: Nightly Web
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: https://registry.npmjs.org/
+      - run: npm install
+      - run: node ./scripts/update-version.js alpha $GITHUB_RUN_NUMBER
+      - run: npm run build-ci
+      - run: npm publish --tag alpha
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  nightly_csharp:
+    name: Build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.100'
+          source-url: https://nuget.pkg.github.com/CoderLine/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - run: npm install
+      - run: npm run build-csharp-ci
+      - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg
+      - run: dotnet nuget push ./src.csharp/AlphaTab.Windows/bin/Release/*.nupkg
