@@ -12,13 +12,13 @@
   ],
   "homepage": "https://alphatab.net",
   "bugs": {
-    "url": "https://github.com/CoderLine/alphaTab/issues"
+    "url": "https://github.com/danielku15/alphaTab/issues"
   },
   "author": "Daniel Kuschny",
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CoderLine/alphaTab"
+    "url": "https://github.com/danielku15/alphaTab"
   },
   "main": "dist/alphaTab.js",
   "typings": "dist/alphaTab.d.ts",
