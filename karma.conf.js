@@ -34,9 +34,11 @@ module.exports = function (config) {
     rollupPreprocessor: {
       plugins: [
         resolve({
-          "pixelmatch": "node_modules/pixelmatch/index.js",
-          "@src": "dist/lib.test/src",
-          "@test": "dist/lib.test/test",
+          mappings: {
+            "pixelmatch": "node_modules/pixelmatch/index.js",
+            "@src": "dist/lib.test/src",
+            "@test": "dist/lib.test/test"
+          }          
         }),
         commonjs(),
       ],
