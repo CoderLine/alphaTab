@@ -49,7 +49,5 @@ jobs:
           NUGET_AUTH_TOKEN: ${{github.token}}
       - run: npm install
       - run: npm run build-csharp-ci
-      - run: dir src.csharp\AlphaTab\bin\Release
       - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{github.token}}
-      - run: dir src.csharp\AlphaTab.Windows\bin\Release
       - run: dotnet nuget push src.csharp\AlphaTab.Windows\bin\Release\*.nupkg -k ${{github.token}}
