@@ -13,11 +13,14 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: https://npm.pkg.github.com/
-          scope: '@CoderLine/alphaTab'          
       - run: npm install
       - run: node ./scripts/update-version.js alpha ${{ github.run_number }}
       - run: npm run build-ci
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: https://npm.pkg.github.com/
+          scope: '@Danielku15/alphaTab'
       - run: npm publish --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
