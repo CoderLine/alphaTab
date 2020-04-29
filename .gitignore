@@ -7,3 +7,4 @@ bin/
 .idea/
 .vs/
 *.user
+*.tgz

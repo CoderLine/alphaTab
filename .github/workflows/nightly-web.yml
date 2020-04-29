@@ -1,0 +1,19 @@
+name: Nightly Web
+on: 
+  push:
+    branches: 
+      - develop
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: npm install
+      - run: npm --no-git-tag-version version prerelease --preid=alpha
+      - run: npm run build-ci
+      - run: npm publish --tag alpha

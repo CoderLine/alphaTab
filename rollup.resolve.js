@@ -1,13 +1,17 @@
 const join = require('path').join;
 const glob = require('glob').sync;
 
-module.exports = function (mappings) {
+module.exports = function (options) {
+    const mappings = options.mappings;
+    const types = options.types;
     return {
         name: 'resolve-typescript-paths',
         resolveId: function (importee, importer) {
             if (typeof importer === 'undefined' || importee.startsWith('\0')) {
                 return null;
             }
+
+            const extension = types ? '.d.ts' : '.js';
 
             if (importee.startsWith('**')) {
                 return importee;
@@ -17,11 +21,11 @@ module.exports = function (mappings) {
                     return null;
                 }
 
-                if (match[0][1].endsWith('.js')) {
+                if (match[0][1].endsWith(extension)) {
                     return join(process.cwd(), match[0][1]);
                 }
 
-                const resolved = join(process.cwd(), match[0][1], importee.substring(match[0][0].length) + '.js');
+                const resolved = join(process.cwd(), match[0][1], importee.substring(match[0][0].length) + extension);
                 return resolved;
             }
         },

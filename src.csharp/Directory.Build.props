@@ -3,9 +3,13 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
 
-    <Version>0.9.8</Version>
-    <AssemblyVersion>0.9.8.0</AssemblyVersion>
-    <FileVersion>0.9.8.0</FileVersion>
+    <MainVersion>0.9.8</MainVersion>
+    <BuildNumber Condition=" '$(BuildNumber)' == ''">$(GITHUB_RUN_NUMBER)</BuildNumber>
+    <BuildNumber Condition=" '$(BuildNumber)' == ''">0</BuildNumber>
+
+    <Version>$(MainVersion)-alpha.$(BuildNumber)</Version>
+    <AssemblyVersion>$(MainVersion).$(BuildNumber)</AssemblyVersion>
+    <FileVersion>$(MainVersion).$(BuildNumber)</FileVersion>
     <Authors>Danielku15</Authors>
     <Company>CoderLine</Company>
     <Product>AlphaTab</Product>
