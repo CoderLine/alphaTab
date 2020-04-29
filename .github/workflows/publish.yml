@@ -9,21 +9,27 @@ jobs:
     name: Web
     runs-on: windows-latest
     steps:
+      # Checkout the repo
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
-      - run: npm install
-      - run: node ./scripts/update-version.js alpha ${{ github.run_number }}
-      - run: npm run build-ci
-      - uses: actions/setup-node@v1
+        
+      # Build Project
+      - uses: actions/setup-node@master
+      - name: Build Project
+        run: |
+            npm install
+            node ./scripts/update-version.js alpha ${{github.run_number}}
+            npm run build-ci
+
+      # Publish to GitHub Package Registry
+      - uses: actions/setup-node@master
         with:
           node-version: '12.x'
           registry-url: https://npm.pkg.github.com/
-          scope: '@Danielku15/alphaTab'
-      - run: npm publish --tag alpha
+          scope: '<@Danielku15/alphaTab>'
+      - name: Publish to GitHub Package Registry
+        run: npm publish --tag alpha
         env:
-          NODE_AUTH_TOKEN: ${{ github.token }}
+          NODE_AUTH_TOKEN: ${{github.token}}
 
   nightly_csharp:
     name: C#
@@ -38,8 +44,8 @@ jobs:
           dotnet-version: '3.1.100'
           source-url: https://nuget.pkg.github.com/Danielku15/index.json  
         env:
-          NUGET_AUTH_TOKEN: ${{ github.token }}
+          NUGET_AUTH_TOKEN: ${{github.token}}
       - run: npm install
       - run: npm run build-csharp-ci
-      - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{ github.token }}
-      - run: dotnet nuget push ./src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{ github.token }}
+      - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{github.token}}
+      - run: dotnet nuget push ./src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{github.token}}
