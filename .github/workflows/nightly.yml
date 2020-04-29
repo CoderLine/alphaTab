@@ -15,10 +15,12 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-          registry-url: https://npm.pkg.github.com/CoderLine
+          registry-url: https://npm.pkg.github.com
+          scope: @CoderLine/alphaTab
       - run: npm install
-      - run: node ./scripts/update-version.js alpha ${{ github.run_number  }}
+      - run: node ./scripts/update-version.js alpha ${{ github.run_number }}
       - run: npm run build-ci
+      - run: npm login
       - run: npm publish --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,9 +37,7 @@ jobs:
         with:
           dotnet-version: '3.1.100'
           source-url: https://nuget.pkg.github.com/CoderLine/index.json
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - run: npm install
       - run: npm run build-csharp-ci
-      - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg -k  $NUGET_AUTH_TOKEN
-      - run: dotnet nuget push ./src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k $NUGET_AUTH_TOKEN
+      - run: dotnet nuget push ./src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{ secrets.GITHUB_TOKEN }}
+      - run: dotnet nuget push ./src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{ secrets.GITHUB_TOKEN }}
