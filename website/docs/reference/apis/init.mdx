@@ -1,0 +1,41 @@
+---
+title: Initialize
+javaScriptOnly: true
+jsName:
+jQueryName: alphaTab()
+category: Methods - Core
+description: Initializes AlphaTab.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This jQuery specific function initializes alphaTab. For other systems this is not needed as the API is directly created. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="jquery" name="alphaTab(settings)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="jquery" name="settings" type="AlphaTab.Settings">
+        The settings to use for alphaTab. Either as JSON structure or as Settings instance.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Nothing
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab({
+    scale: 1.5
+});
+```

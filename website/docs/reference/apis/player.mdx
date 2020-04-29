@@ -1,0 +1,40 @@
+---
+title: Player
+jsName: player
+jQueryName: alphaTab('player')
+category: Properties - Player
+description: The alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets access to the underling `AlphaTab.Audio.Synth.IAlphaSynth` that is used for the audio playback. 
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="AlphaTab.Audio.Synth.IAlphaSynth" />
+</TypeTable>
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+SetupPlayerEvents(api.Player);
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+setupPlayerEvents(api.settings);
+```
+
+## Example - jQuery
+
+```js
+setupPlayerEvents($('#alphaTab').alphaTab('player'));
+```

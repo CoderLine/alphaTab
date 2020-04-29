@@ -1,0 +1,62 @@
+---
+title: RenderScore()
+jsName: renderScore()
+jQueryName: alphaTab('renderScore')
+category: Methods - Core
+description: Initiates a rendering of the given score.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Initiates a rendering of the score. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="bool RenderScore(Score score)" />
+    <TypeRow type="net" name="bool RenderScore(Score score, int[] tracks)" />
+    <TypeRow type="js" name="function renderScore(score)" />
+    <TypeRow type="js" name="function renderScore(score, tracks)" />
+    <TypeRow type="jquery" name="alphaTab('renderScore', score, tracks)" />
+    <TypeRow type="jquery" name="alphaTab('renderScore', tracks)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="score" type="AlphaTab.Model.Score">
+        The score that contains the tracks to be rendered.
+    </ParameterRow>
+    <ParameterRow platform="all" name="tracks" type="AlphaTab.Model.Track[]">
+        The indexes of the tracks that should be rendered. If not provided, the first track of the song will be rendered.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.RenderScore(GenerateScore(), new [] { 2, 3 });
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.RenderScore(generateScore(),[ 2, 3 ]);
+```
+
+## Example - jQuery
+
+```js
+var at = $('#alphaTab');
+var score = at.alphaTab('score');
+at.alphaTab('renderScore', generateScore(), [ 2, 3 ]);
+```

@@ -1,0 +1,78 @@
+---
+title: General
+---
+
+import AlphaTab from '../../src/alphatab';
+
+## Score Details
+
+export class ScoreDetails extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			score: null,
+			error: null
+		};
+	}
+	componentDidMount() {
+		alphaTab.importer.ScoreLoader.loadScoreAsync(this.props.file, score =>
+		{
+			this.setState({score});
+		},
+		error => {
+			this.setState({error});
+		});
+	}
+	render() {
+    if (this.state.error) {
+		return this.state.error;
+    } else if(this.state.score) {
+		return (
+		<>
+			<p><strong>Title:</strong> {this.state.score.title}</p>
+			<p><strong>Subtitle:</strong> {this.state.score.subtitle}</p>
+			<p><strong>Album:</strong> {this.state.score.album}</p>
+			<p><strong>Tempo:</strong> {this.state.score.tempo}</p>
+			<p><strong>Bars:</strong> {this.state.score.masterBars.length}</p>
+			<p><strong>Tracks:</strong> {this.state.score.tracks.length}</p>
+			<ul>
+				{this.state.score.tracks.map(t => <li>{t.name}</li>)}
+			</ul>
+		</>);	
+	}
+	else {
+		return "Loading...";
+	}
+  }
+}
+
+The full score details are available as object dom. This way you can read and process any like you need. 
+
+<ScoreDetails file="/files/features/Skillet.gp5"  />
+
+## Song Details
+Some of the layout engines can render the song details on top of the music sheet.
+<AlphaTab file="/files/features/SongDetails.gp5" />
+
+## HTML5 Canvas
+
+Do you prefer an HTML5 canvas output instead of SVG? No problem.
+<AlphaTab file="/files/features/SongDetails.gp5" settings={ {
+	engine: 'html5' 
+} } />
+
+## Repeats
+Need display repeat marks? No problem, single repeats and multiple repeats come out of the box.
+<AlphaTab file="/files/features/Repeats.gp5" settings={ {
+	staveProfile: 'score' 
+} } />
+
+## Alternate Endings
+Even alternate repeat endings are no problem. 
+<AlphaTab file="/files/features/AlternateEndings.gp5" settings={ {
+	staveProfile: 'score' 
+} } />
+
+## Tunings
+The guitar tuning of the current track is rendered on the top of the music notation.
+<AlphaTab file="/files/features/Tuning.gp5" />

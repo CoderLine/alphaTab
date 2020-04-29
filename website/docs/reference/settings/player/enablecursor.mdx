@@ -1,0 +1,29 @@
+---
+title: Player.EnableCursor
+jsName: player.enableCursor
+jsonName: player.enableCursor
+domName: data-player-enablecursor
+category: Player
+description: Gets or sets whether playback cursors should be displayed.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting configures whether the playback cursors are shown or not. In case a developer decides to built an own cursor system the default one can be disabled with this setting. Enabling the cursor also requires the player to be active. 
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="bool" />
+</TypeTable>
+
+## Default Value
+
+`true`

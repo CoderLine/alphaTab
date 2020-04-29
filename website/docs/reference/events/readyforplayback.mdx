@@ -1,0 +1,64 @@
+---
+title: ReadyForPlayback
+jsName: addReadyForPlayback();removeReadyForPlayback()
+domName: alphaTab.playerReady
+category: Events - Player
+description: This event is fired when all required data for playback is loaded and ready.
+sidebarPath: /docs/reference/events
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when all required data for playback is loaded and ready. The player is ready for playback when
+all background workers are started, the audio output is initialized, a soundfont is loaded, and a song was loaded into the player as midi file.    
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action" />    
+    <TypeRow type="js" name="function()" />    
+</TypeTable>
+
+## Parameters
+none
+
+## Example - C#
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.ReadyForPlayback += () => 
+{
+    EnablePlayerControls()
+};
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addReadyForPlayback(function(score) {
+    enablePlayerControls();
+});
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').on('alphaTab.playerReady', function(e, score) {
+    enablePlayerControls();
+});
+```
+
+## Example - HTML
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.playerReady', function() {
+    enablePlayerControls();
+}, false);
+```

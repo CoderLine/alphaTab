@@ -1,0 +1,50 @@
+---
+title: Destroy()
+jsName: destroy()
+jQueryName: alphaTab('destroy')
+category: Methods - Core
+description: Destroys the alphaTab control and restores the initial state of the UI.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+This function destroys the alphaTab control and tries to restore the initial state of the UI. This might be useful if 
+your website is quite dynamic and you need to uninitialize alphaTab from an element again. After destroying alphaTab 
+it cannot be used anymore. Any further usage leads to unexpected behavior. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void Destroy()" />
+    <TypeRow type="js" name="function destroy()" />
+    <TypeRow type="jquery" name="alphaTab('destroy')" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Destroy();
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.destroy();
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('destroy');
+```

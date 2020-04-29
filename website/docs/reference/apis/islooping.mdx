@@ -1,0 +1,44 @@
+---
+title: IsLooping
+jsName: isLooping
+jQueryName: alphaTab('looping')
+category: Properties - Player
+description: Whether the playback should automatically restart after it finished
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+This setting controls whether the playback should automatically restart after it finished to create a playback loop.
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="bool" />
+</TypeTable>
+
+## Default Value
+
+`false`
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.IsLooping = true;
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.isLooping = true;
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('looping', true)
+```

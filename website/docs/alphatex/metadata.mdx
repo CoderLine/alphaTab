@@ -1,0 +1,37 @@
+---
+title: Metadata
+---
+
+import AlphaTexSample from '../../src/alphatex-sample';
+
+Metadata is specified using `\tagname value value` at the beginning of the score. 
+It can be used to specify global information like title, tempo or track tuning.
+Metadata is optional, but if specified, it must be followed by a dot do indicate the end
+of the metadata. 
+
+Some of the metadata tags can also be specified when starting a new staff or track. Please refer to the [Tracks and Staves](/docs/alphatex/tracks-staves) or details on how to start new tracks and staves. 
+
+<AlphaTexSample>{`
+// Song information (only at the beginning)
+    \\title "Song Title"
+    \\subtitle Subtitle
+    \\artist Artist
+    \\album 'My Album' 
+    \\words Daniel
+    \\music alphaTab
+    \\copyright Daniel
+    // Tempo in BPM
+    \\tempo 200
+\
+// Track and Staff Settings (can be used after \\track and \staff) 
+\
+    // Instrument as General Midi number or name
+    \\instrument 30 
+    // Capo fret
+    \\capo 2
+    // String tuning starting at the most bottom string
+    \\tuning e5 b4 g4 d4 a3 e3 
+\
+// end of metadata
+.        
+`}</AlphaTexSample>

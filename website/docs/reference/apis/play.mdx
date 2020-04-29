@@ -1,0 +1,48 @@
+---
+title: Play()
+jsName: play()
+jQueryName: alphaTab('play')
+category: Methods - Player
+description: Starts the playback of the current song.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Starts the playback of the current song if possible.Reasons for not starting can be that the player is not ready yet or it is already playing.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void Play()" />
+    <TypeRow type="js" name="function play()" />
+    <TypeRow type="jquery" name="alphaTab('play')" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing.
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Play();
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.play();
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('play');
+```

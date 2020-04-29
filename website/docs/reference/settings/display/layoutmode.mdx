@@ -1,0 +1,32 @@
+---
+title: Display.LayoutMode
+jsName: display.layoutMode
+jsonName: display.layoutMode
+domName: data-display-layoutmode
+category: Display
+description: The layouting mode used to arrange the the notation.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+AlphaTab has various layout engines that arrange the rendered bars differently. This setting controls which layout mode is used. 
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="string" type="all">
+        `page` - The bars are aligned in a [page-style fashion](/docs/showcase/layouts#page-layout")<br /> 
+        `horizontal` - The bars are aligned in a [left-to-right](/docs/showcase/layouts#horizontal-layout)
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+
+`page`

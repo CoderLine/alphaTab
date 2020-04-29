@@ -1,0 +1,62 @@
+{
+  "name": "alphatab-website",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "deploy": "docusaurus deploy"
+  },
+  "dependencies": {
+    "@docusaurus/core": "^2.0.0-alpha.48",
+    "@docusaurus/plugin-content-blog": "^2.0.0-alpha.48",
+    "@docusaurus/plugin-content-docs": "^2.0.0-alpha.48",
+    "@docusaurus/plugin-content-pages": "^2.0.0-alpha.48",
+    "@docusaurus/plugin-google-analytics": "^2.0.0-alpha.48",
+    "@docusaurus/plugin-google-gtag": "^2.0.0-alpha.48",
+    "@docusaurus/plugin-sitemap": "^2.0.0-alpha.48",
+    "@docusaurus/theme-classic": "^2.0.0-alpha.48",
+    "@docusaurus/theme-search-algolia": "^2.0.0-alpha.48",
+    "classnames": "^2.2.6",
+    "markdown-it": "^10.0.0",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "remark-admonitions": "^1.1.0"
+  },
+  "devDependencies": {
+    "@docusaurus/mdx-loader": "^2.0.0-alpha.48",
+    "@docusaurus/types": "^2.0.0-alpha.48",
+    "@docusaurus/utils": "^2.0.0-alpha.48",
+    "@types/fs-extra": "^8.1.0",
+    "@types/loader-utils": "^1.1.3",
+    "@types/lodash": "^4.14.149",
+    "@types/shelljs": "^0.8.6",
+    "commander": "^4.0.1",
+    "execa": "^3.4.0",
+    "fs-extra": "^8.1.0",
+    "globby": "^10.0.1",
+    "import-fresh": "^3.2.1",
+    "loader-utils": "^1.2.3",
+    "lodash": "^4.17.15",
+    "picomatch": "^2.1.1",
+    "shelljs": "^0.8.3",
+    "unist-util-visit": "^2.0.2",
+    "webpack-virtual-modules": "^0.2.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=10.9.0"
+  }
+}

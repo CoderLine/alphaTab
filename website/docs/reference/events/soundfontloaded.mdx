@@ -1,0 +1,64 @@
+---
+title: SoundFontLoaded
+jsName: addSoundFontLoaded();removeSoundFontLoaded()
+domName: alphaTab.soundFontLoaded
+category: Events - Player
+description: This event is fired when the SoundFont needed for playback was loaded.
+sidebarPath: /docs/reference/events
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when the SoundFont needed for playback was loaded.    
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action" />    
+    <TypeRow type="js" name="function()" />    
+</TypeTable>
+
+## Parameters
+none
+
+## Example - C#
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.SoundFontLoaded += () => 
+{
+    HideSoundFontLoadingIndicator();
+};
+```
+
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addSoundFontLoaded(function(score) {
+    hideSoundFontLoadingIndicator();
+});
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').on('alphaTab.soundFontLoaded', function(e, score) {
+    hideSoundFontLoadingIndicator();
+});
+```
+
+## Example - HTML
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.soundFontLoaded', function() {
+    hideSoundFontLoadingIndicator();
+}, false);
+```

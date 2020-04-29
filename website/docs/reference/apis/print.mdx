@@ -1,0 +1,56 @@
+---
+title: Print()
+jsName: print()
+jQueryName: alphaTab('print')
+javaScriptOnly: true
+category: Methods - Core
+description: Opens a popup window with the rendered music notation for printing.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Opens a popup window with the rendered music notation for printing. The default display of alphaTab in the browser is not very 
+suitable for printing. The items are lazy loaded, the width can be dynamic, and the scale might be better suitable for screens.
+This function opens a popup window which is filled with a by-default A4 optimized view of the rendered score: 
+
+* Lazy loading is disabled
+* The scale is reduced to 0.8
+* The stretch force is reduced to 0.8
+* The width is optimized to A4. Portrait if the page-layout is used, landscape if the horizontal-layout is used.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="js" name="function print()" />
+    <TypeRow type="js" name="function print(width)" />
+    <TypeRow type="jquery" name="alphaTab('print')" />
+    <TypeRow type="jquery" name="alphaTab('print', width)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="js-jquery" name="width" type="string">
+        An optional custom width as CSS width that should be used. Best is to use a CSS width that is suitable for your preferred page size.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Nothing
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.print();
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('print');
+```

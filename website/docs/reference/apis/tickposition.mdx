@@ -1,0 +1,40 @@
+---
+title: TickPosition
+jsName: tickPosition
+jQueryName: alphaTab('tickPosition')
+category: Properties - Player
+description: The position within the song in midi ticks
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets or sets the player position in midi ticks. 
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="int" />
+</TypeTable>
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.TickPosition = 4000;
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.tickPosition = 4000;
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('tickPosition', 4000)
+```

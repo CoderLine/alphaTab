@@ -1,0 +1,86 @@
+---
+title: LoadSoundFont()
+jsName: loadSoundFont()
+jQueryName: alphaTab('loadSoundFont')
+category: Methods - Player
+description: Triggers a load of the soundfont from the given data.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+This function initiates a load of the soundfont using the given data. The supported data types is depending on the platform. AlphaTab only supports SoundFont2 encoded soundfonts for loading. To load a soundfont the player must be enabled in advance. 	
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="bool LoadSoundFont(byte[] raw)">
+        Load the soundfont from the given raw bytes.
+    </TypeRow>
+    <TypeRow type="net" name="bool LoadSoundFont(Stream raw)">
+        Load the soundfont from the given stream.
+    </TypeRow>
+    <TypeRow type="js" name="function loadSoundFont(arraybuffer)">
+        Load the soundfont from the given raw bytes.
+    </TypeRow>
+    <TypeRow type="js" name="function loadSoundFont(uint8array)">
+        Load the soundfont from the given raw bytes.
+    </TypeRow>
+    <TypeRow type="js" name="function loadSoundFont(url)">
+        Load the soundfont from the given URL via AJAX.
+    </TypeRow>
+    <TypeRow type="js" name="alphaTab('loadSoundFont', arraybuffer)">
+        Load the soundfont from the given raw bytes.
+    </TypeRow>
+    <TypeRow type="js" name="alphaTab('loadSoundFont', uint8array)">
+        Load the soundfont from the given raw bytes.
+    </TypeRow>
+    <TypeRow type="js" name="alphaTab('loadSoundFont', url)">
+        Load the soundfont from the given URL via AJAX.
+    </TypeRow>
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="net" name="raw" type="byte[]">
+        The raw bytes containing a SoundFont2 file.
+    </ParameterRow>
+    <ParameterRow platform="net" name="raw" type="System.IO.Stream">
+        The stream containing a SoundFont2 file.
+    </ParameterRow>
+    <ParameterRow platform="js-jquery" name="arraybuffer" type="ArrayBuffer">
+        The arraybuffer containing the raw bytes of a SoundFont2 file
+    </ParameterRow>
+    <ParameterRow platform="js-jquery" name="uint8array" type="Uint8Array">
+        The Uint8Array containing the raw bytes of a SoundFont2 file
+    </ParameterRow>
+    <ParameterRow platform="js-jquery" name="url" type="string">
+        A URL pointing to a SoundFont2 file that should be loaded via AJAX.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+`true` if the passed in object is a supported format and loading was initiated, otherwise `false`.
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.LoadSoundFont(System.IO.File.OpenRead("MyFile.sf2"));
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.loadSoundFont('/assets/MyFile.sf2');
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('loadSoundFont', '/assets/MyFile.sf2');
+```

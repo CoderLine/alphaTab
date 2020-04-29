@@ -1,0 +1,65 @@
+---
+title: Notation.NotationMode
+jsName: notation.notationMode
+jsonName: notation.notationMode
+domName: data-notation-notationmode
+category: Notation
+description: Gets or sets the mode to use for display and play music notation elements.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+AlphaTab provides 2 main music notation display modes `GuitarPro` and `SongBook`. 
+As the names indicate they adjust the overall music notation rendering either to be more in line how [Arobas Guitar Pro](https://www.guitar-pro.com) displays it,
+or more like the common practice in paper song books practices the display.
+
+The main differences in the Songbook display mode are: 
+
+1. **Bends**
+For bends additional grace beats are introduced. Bends are categorized into gradual and fast bends.
+    * Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration.
+    * Fast bends are done right before the next note. If the next note is tied even on-beat of the next note.
+2.  **Whammy Bars**
+Dips are shown as simple annotation over the beats. Whammy Bars are categorized into gradual and fast. 
+    * Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration.
+    * Fast whammys are done right the beat. 
+
+3. **Let Ring**
+Tied notes with let ring are not shown in standard notation. Let ring does not cause a longer playback, duration is defined via tied notes. 
+            
+4. **Settings**
+Following default setting values are applied:
+* `SmallGraceTabNotes = false`
+* `FingeringMode = FingeringMode.SingleNoteEffectBand`
+* `ExtendBendArrowsOnTiedNotes = false`
+* `ShowParenthesisForTiedBends = false`
+* `ShowTabNoteOnTiedBend = false`
+* `ShowZeroOnDiveWhammy = true`
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="AlphaTab.DisplayMode" type="net">
+        `SongBook`<br />
+        `GuitarPro`
+    </TypeRow>
+    <TypeRow name="string" type="json-html">
+        `SongBook`<br />
+        `GuitarPro`
+    </TypeRow>
+    <TypeRow name="int" type="js-html">
+        `0` (SongBook)<br />
+        `1` (GuitarPro)
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+
+`GuitarPro`

@@ -1,0 +1,48 @@
+---
+title: Core.LogLevel
+jsName: core.logLevel;logLevel
+jsonName: core.logLevel;logLevel
+domName: data-core-loglevel;data-loglevel
+category: Core
+description: The log level to use within alphaTab.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+AlphaTab internally does quite a bit of logging for debugging and informational purposes. The log level of alphaTab can be controlled via this setting.
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="AlphaTab.Util.LogLevel">
+        `None` -  No logging<br />
+        `Debug` - Debug level (internal details are displayed)<br />
+        `Info` - Info level (only important details are shown)<br />
+        `Warning`<br />
+        `Error`
+    </TypeRow>
+    <TypeRow type="json-html" name="string">
+        `none`<br />
+        `debug`<br />
+        `info`<br />
+        `warning`<br />
+        `error`
+    </TypeRow>
+    <TypeRow type="js-html" name="int">
+        `0` - None<br />
+        `1` - Debug<br />
+        `2` - Info<br />
+        `3` - Warning<br />
+        `4` - Error
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+
+`Info`

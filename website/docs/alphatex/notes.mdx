@@ -1,0 +1,54 @@
+---
+title: Notes
+---
+
+import AlphaTexSample from '../../src/alphatex-sample';
+
+The following examples show how to general notes. Multiple bars are
+separated by `|`.
+
+## Single notes and rests
+
+Notes follow the format `fret.string.duration`. For rests
+the fret is simply replaced with `r`. The duration is specified
+as a number where 1 represents a full note, 2 a half note and so on. 
+
+<AlphaTexSample>{`
+0.6.2 1.5.4 3.4.4 | 
+5.3.8 5.3.8 5.3.8 5.3.8 r.2
+`}</AlphaTexSample>
+
+## Chords
+
+To specify multiple notes on a beat, group them in parenthesis. The full format is
+`(fret.string fret.string ...).duration`
+
+<AlphaTexSample>{`
+(0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (0.3 0.4).8 |
+r.8 (3.3 3.4).8 r.8 (6.3 6.4).8 (5.3 5.4).4 r.4 |
+(0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (3.3 3.4).8 |
+r.8 (0.3 0.4).8
+`}</AlphaTexSample>
+
+## Duration Ranges
+
+To make it simpler to write notes, you can apply the same duration to 
+multiple notes. Start a new duration range with `:duration`.
+The following notes will all have this duration. AlphaTex also remembers
+the last explictely set duration and will take use it in case of a missing duration.
+
+<AlphaTexSample>{`
+// explicit ranges via :duration
+:4 2.3 3.3 :8 3.3 4.3 3.3 4.3 | 
+// implicit ranges via beat duration
+2.3.4 3.3 3.3.8 4.3 3.3 4.3
+`}</AlphaTexSample>
+
+
+## Repeat beats
+
+You can specify a multiplier after a beat to add the same beat multiple times to the score. 
+
+<AlphaTexSample>{`
+3.3*4 | 4.3*4
+`}</AlphaTexSample>

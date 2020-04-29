@@ -1,0 +1,58 @@
+---
+title: UpdateSettings()
+jsName: updateSettings()
+jQueryName: alphaTab('updateSettings')
+category: Methods - Core
+description: Applies any changes that were done to the settings object and informs the Renderer about any new values to consider.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Applies any changes that were done to the settings object and informs the Renderer about any new values to consider.
+By default alphaTab will not trigger any re-rendering or settings update just if the settings object itself was changed. This method must be called
+to trigger an update of the settings in all components. Then a re-rendering can be initiated using the `Render()` method.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void UpdateSettings()" />
+    <TypeRow type="js" name="function updateSettings()" />
+    <TypeRow type="jquery" name="alphaTab('updateSettings')" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+
+api.Settings.Scale = 2.0;
+api.UpdateSettings();
+api.Render()
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.settings.scale = 2.0;
+api.updateSettings();
+api.render();
+```
+
+## Example - jQuery
+
+```js
+var at = $('#alphaTab');
+at.alphaTab('settings').scale = 2.0;
+at.alphaTab('updateSettings');
+at.alphaTab('render');
+```

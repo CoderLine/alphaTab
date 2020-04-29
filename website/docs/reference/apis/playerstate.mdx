@@ -1,0 +1,45 @@
+---
+title: PlayerState
+jsName: playerState
+jQueryName: alphaTab('playerState')
+category: Properties - Player
+description: The current player state
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets the current player state, meaning whether it is paused or playing. 
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="AlphaTab.Audio.Synth.PlayerState" />
+    <TypeRow type="js" name="int">
+        `0` for paused<br />
+        `1` for playing
+    </TypeRow>
+</TypeTable>
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+if(api.PlayerState != PlayerState.Playing) api.Play();
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+if(api.playerState != 1) api.play();
+```
+
+## Example - jQuery
+
+```js
+var at = $('#alphaTab');
+if(at.alphaTab('playerState') != 1) at.alphaTab('play');
+```

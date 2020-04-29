@@ -1,0 +1,71 @@
+---
+title: Layouts
+---
+
+import AlphaTab from '../../src/alphatab';
+
+alphaTab supports several different layouts which align bars in a various manner. 
+
+## Page Layout
+All bars are aligned in rows side by side till the row is full. 
+<AlphaTab file="/files/features/Skillet.gp5" settings={ {
+	display: { 
+		layoutMode: 'page' 
+	}
+} } />
+
+## Multi Track
+You want to render multiple tracks at once. No Problem
+<AlphaTab file="/files/features/Skillet.gp5" tracks={[0,3]} settings={ {
+	display: { 
+		layoutMode: 'page' 
+	}
+} } />
+
+## Page Layout (custom width)
+All bars are aligned in rows side by side till the row is full. 
+
+<div style={ {width: '600px'} }>
+<AlphaTab file="/files/features/Skillet.gp5" settings={ { 
+	display: { 
+		layoutMode: 'page' 
+	}
+} } />
+</div>
+
+## Page Layout (5 bars per row)
+You can configure how many bars should be placed per row
+<AlphaTab file="/files/features/Skillet.gp5" settings={ {
+	display: { 
+		barsPerRow: 5 
+	}
+} } />
+
+## Page Layout (bar 5 to 8)
+It's also possible to only render some of the bars available in a track.
+<AlphaTab file="/files/features/Skillet.gp5" settings={ {
+	display: { 
+		startBar: 5, 
+		barCount: 4 
+	}
+} } />
+
+## Horizontal Layout
+This is another layout type available. All bars are aligned horizontally.
+<div style={ { width: '600px', overflow: 'auto' } }>
+<AlphaTab file="/files/features/Skillet.gp5" settings={ {
+	display: { 
+		layoutMode: 'horizontal' 
+	}
+} } />
+</div>
+
+## Horizontal Layout (bar 5 to 8)
+You can also filter the rendered bars using this layout.
+<AlphaTab file="/files/features/Skillet.gp5" settings={ {
+	display: { 
+		layoutMode: 'horizontal',
+		startBar: 5,
+		barCount: 4
+	}
+} } />

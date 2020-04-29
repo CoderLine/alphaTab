@@ -1,0 +1,43 @@
+---
+title: Container
+jsName: container
+jQueryName: alphaTab('container')
+category: Properties - Core
+description: The UI container that holds the whole alphaTab control. 
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets the UI container that represents the element on which alphaTab was initialized. Note that this is not the raw instance, but a UI framework specific wrapper for alphaTab.
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="AlphaTab.UI.IContainer" />
+    <TypeRow type="net-wf" name="AlphaTab.Platform.CSharp.WinForms.ControlContainer" />
+    <TypeRow type="net-wpf" name="AlphaTab.Platform.CSharp.Wpf.FrameworkElementContainer" />
+    <TypeRow type="js" name="AlphaTab.UI.HtmlElementContainer" />
+</TypeTable>
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+var container = api.Container;
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+var container = api.container;
+```
+
+## Example - jQuery
+
+```js
+var container = $('#alphaTab').alphaTab('container');
+```

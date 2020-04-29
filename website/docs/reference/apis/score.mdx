@@ -1,0 +1,40 @@
+---
+title: Score
+jsName: score
+jQueryName: alphaTab('score')
+category: Properties - Core
+description: The score holding all information about the song being rendered
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets access to the underling `AlphaTab.Model.Score` that is currently being displayed. 
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="AlphaTab.Model.Score" />
+</TypeTable>
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+UpdateScoreInfo(api.Score);
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+updateScoreInfo(api.score);
+```
+
+## Example - jQuery
+
+```js
+updateScoreInfo($('#alphaTab').alphaTab('score'));
+```

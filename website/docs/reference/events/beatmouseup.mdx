@@ -1,0 +1,76 @@
+---
+title: BeatMouseUp
+jsName: addBeatMouseUp();removeBeatMouseUp()
+domName: alphaTab.beatMouseUp
+category: Events - Player
+description: This event is fired whenever the user releases the mouse after a mouse press on a beat.
+since: 0.9.7
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired whenever the user releases the mouse after a mouse press on a beat.
+This event is fired regardless of whether the mouse was released on a beat.
+The parameter is null if the mouse was released somewhere beside the beat.
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
+    <TypeRow type="js" name="function(beat, originalEvent)" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="beat" type="AlphaTab.Model.Beat">
+        Beat on which the mouse was released over after mouse down.
+        Might be null if no beat could be found in near location.
+    </ParameterRow>
+    <ParameterRow platform="jquery" name="originalEvent" type="MouseEvent">
+        The original mouse event that lead to trigger of the beat event. For the DOM event it is stored in the event.originalEvent.
+    </ParameterRow>
+</ParameterTable>
+
+## Example - C#
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.BeatMouseUp += beat => 
+{
+    HideSelection(beat);
+};
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addBeatMouseUp(function(beat) {
+    hideSelection(beat);
+});
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').on('alphaTab.beatMouseUp', function(e, beat) {
+    originalEvent.preventDefault();
+    hideSelection(beat);
+});
+```
+
+## Example - HTML
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseUp', function(e) {
+    var beat = e.detail;
+    e.originalEvent.preventDefault();
+    hideSelection(beat);
+}, false);
+```

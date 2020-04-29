@@ -1,0 +1,66 @@
+---
+title: ChangeTrackVolume()
+jsName: changeTrackVolume()
+jQueryName: alphaTab('trackVolume')
+category: Methods - Player
+description: Changes the volume of the given tracks.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Changes the volume of the given tracks. This will result in a volume change of the primary and secondary midi channel that the track uses for playback. 
+If the track shares the channels with another track, all related tracks will be changed as they cannot be distinguished.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void ChangeTrackVolume(Track[] tracks, float volume)" />
+    <TypeRow type="js" name="function changeTrackVolume(tracks, volume)" />
+    <TypeRow type="jquery" name="alphaTab('trackVolume', tracks, volume)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="tracks" type="AlphaTab.Model.Tracks[]">
+        The array of tracks that should be changed.
+    </ParameterRow>
+    <ParameterRow platform="all" name="volume" type="float">
+        The volume multiplicator that should be added to the volume that the track normally has. e.g. 1.0 for no change on the volume,
+        2.0 for doubling the volume. Allowed range: 0.0 - 3.0.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.ChangeTrackVolume(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, 1.5);
+api.ChangeTrackVolume(new Track[] { api.Score.Tracks[2] }, 0.5);
+```
+
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.changeTrackVolume([api.score.tracks[0], api.score.tracks[1]], 1.5);
+api.changeTrackVolume([api.score.tracks[2]], 0.5);
+```
+
+
+## Example - jQuery
+
+```js
+var at = $('#alphaTab');
+var tracks = at.alphaTab('tracks');
+at.alphaTab('trackVolume', [tracks[0], tracks[1]], 1.5);
+at.alphaTab('trackVolume', [tracks[0], tracks[1]], 0.5);
+```

@@ -1,0 +1,73 @@
+---
+title: BeatMouseMove
+jsName: addBeatMouseMove();removeBeatMouseMove()
+domName: alphaTab.beatMouseMove
+category: Events - Player
+description: This event is fired whenever the user moves the mouse over a beat after the user already pressed the button on a beat.
+since: 0.9.7
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired whenever the user moves the mouse over a beat after the user already pressed the button on a beat.
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
+    <TypeRow type="js" name="function(beat, originalEvent)" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="beat" type="AlphaTab.Model.Beat">
+        Beat on which the mouse was hovered over during mouse down. 
+    </ParameterRow>
+    <ParameterRow platform="jquery" name="originalEvent" type="MouseEvent">
+        The original mouse event that lead to trigger of the beat event. For the DOM event it is stored in the event.originalEvent.
+    </ParameterRow>
+</ParameterTable>
+
+## Example - C#
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.BeatMouseMove += beat => 
+{
+    ExpandSelectionToBeat(beat);
+};
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.addBeatMouseMove(function(beat) {
+    expandSelectionToBeat(beat);
+});
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').on('alphaTab.beatMouseMove', function(e, beat) {
+    originalEvent.preventDefault();
+    expandSelectionToBeat(beat);
+});
+```
+
+## Example - HTML
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseMove', function(e) {
+    var beat = e.detail;
+    e.originalEvent.preventDefault();
+    expandSelectionToBeat(beat);
+}, false);
+```

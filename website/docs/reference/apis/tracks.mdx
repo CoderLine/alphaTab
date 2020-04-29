@@ -1,0 +1,40 @@
+---
+title: Tracks
+jsName: tracks
+jQueryName: alphaTab('tracks')
+category: Properties - Core
+description: A list of the tracks that should be rendered based on the Score and TrackIndexes properties
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets a list of the tracks that are currently being rendered. 
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="AlphaTab.Model.Track[]" />
+</TypeTable>
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+FillTrackSelector(api.Tracks);
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+fillTrackSelector(api.tracks);
+```
+
+## Example - jQuery
+
+```js
+fillTrackSelector($('#alphaTab').alphaTab('tracks'));
+```

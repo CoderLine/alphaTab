@@ -1,0 +1,532 @@
+<!--
+    This sample shows how you could develop an own User Interface using alphaTab
+    utilizing most of the features. While this sample looks like some ready-to-use control
+    this is not the case, it is meant to act as a reference how you could implement a custom 
+    user interface around alphaTab. 
+    
+    The main script implementation to hook up the user interface and alphaTab can be found at the very
+    bottom of this file.     
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>AlphaTab Full Demo</title>
+    
+    <!-- Some demo dependencies, not actually needed for alphatab -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500,700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/b43f0e512e.js" crossorigin="anonymous"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@4.5.3/dist/handlebars.min.js" integrity="sha256-GwjGuGudzIwyNtTEBZuBYYPDvNlSMSKEDwECr6x6H9c=" crossorigin="anonymous"></script>
+       
+    <!-- Including alphaTab -->
+	<script src="../../js/alphaTab/swfobject.js"></script>
+	<script src="../../js/alphaTab/alphaTab.js"></script>
+
+    <!-- Demo Styles and Scripts -->
+    <link rel="stylesheet" href="demo.css" />
+    
+    <style type="text/css">
+    /* Styles for player */
+    .at-cursor-bar { /* Defines the color of the bar background when a bar is played */
+        background: rgba(255, 242, 0, 0.25);
+    }
+
+    .at-selection div { /* Defines the color of the selection background */
+        background: rgba(64, 64, 255, 0.1)
+    }
+
+    .at-cursor-beat { /* Defines the beat cursor */
+        background: rgba(64, 64, 255, 0.75);
+        width: 3px;
+    }
+    
+    .at-highlight * { /* Defines the color of the music symbols when they are being played (svg) */
+        fill: #0078ff;
+        stroke: #0078ff;
+    }
+    </style>
+</head>
+<body>
+    <!-- Structure for all the end user UI elements -->
+    <div class="at-wrap loading">
+    
+        <!-- a loading indicator -->
+        <div class="at-overlay">
+            <div class="at-overlay-content">
+                <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                </div>
+            </div>
+        </div>
+        
+        <div class="at-sidebar">
+            <div class="at-sidebar-content">
+                <div class="at-track-list">
+                    <!-- here will be the track list to allow users switching -->
+                    <!-- and changing playback settings of them -->
+                </div>
+            </div>
+        </div>        
+        
+        <div class="at-viewport">
+            <!-- Here is the actual alphaTab control, notice that we setup some settings here -->
+            <div class="at-canvas" id="alphaTab" 
+                data-file="Nightwish.gp5"
+                data-tracks="3"
+                data-player-scrolloffsety="-10"
+                data-player-enableplayer="true"
+                data-player-soundfont="../../js/alphaTab/default.sf2">
+            </div>
+        </div>
+        
+        <div class="at-footer">
+            <!-- this footer row contains some timing information -->
+            <div class="at-times">
+                <div class="at-time-slider">
+                    <div class="at-time-slider-value"></div>
+                </div>
+                <div class="at-times-values">
+                    <div class="at-bar-position" data-toggle="tooltip" data-placement="top" title="Bar Position"></div>
+                    <div class="at-time-signature" data-toggle="tooltip" data-placement="top" title="Time Signature"></div>
+                    <div class="at-time-position" data-toggle="tooltip" data-placement="top" title="Time Position"></div>
+                    <div class="at-tempo"  data-toggle="tooltip" data-placement="top" title="Tempo"></div>
+                </div>
+            </div>
+            
+            <!-- this footer line contains some additional player and user controls -->
+            <div class="at-player">
+                <div class="at-player-left">
+                    
+                    <!-- The stop button -->
+                    <a href="#" class="at-stop disabled" data-toggle="tooltip" data-placement="top" title="Stop">
+                        <i class="fas fa-step-backward"></i>
+                    </a>
+                    
+                    <!-- The play/pause button -->
+                    <a href="#" class="at-play-pause disabled" data-toggle="tooltip" data-placement="top" title="Play/Pause">
+                        <i class="fas fa-play-circle"></i>
+                    </a>
+                    
+                    <!-- The loading indicator while the soundfont is downloading -->
+                    <div class="at-player-loading progress">
+                        <span class="progress-left">
+                        <span class="progress-bar"></span>
+                            </span>
+                        <span class="progress-right">
+                            <span class="progress-bar"></span>
+                        </span>
+                        <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center font-weight-bold">
+                          <span class="progress-value-number">0</span><sup class="small">%</sup>
+                        </div>
+                    </div>
+                    
+                    <!-- Some song info -->
+                    <div class="at-song-details">
+                        <div class="at-song-title"></div>
+                        <div class="at-song-artist"></div>
+                    </div>
+                    
+                    <!-- The playback speed -->
+                    <div>
+                        <span class="at-speed-label">Speed <span class="at-speed-value">100%</span></span>
+                        <input type="range" min="0" max="300" step="10" value="100" class="at-speed">
+                    </div>
+
+                </div>      
+                
+                <div class="at-player-right">
+                    <!-- Some action controls like metronome, loop, print, zoom and layout -->
+                    <a href="#" class="at-metronome disabled" data-toggle="tooltip" data-placement="top" title="Metronome">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="#" class="at-loop disabled" data-toggle="tooltip" data-placement="top" title="Loop">
+                        <i class="fas fa-retweet"></i>
+                    </a>
+                    <a href="#" class="at-print" data-toggle="tooltip" data-placement="top" title="Print">
+                        <i class="fas fa-print"></i>
+                    </a>
+                    
+                    <div class="btn-group dropup">
+                      <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-search"></i>
+                        <span class="at-zoom-label">100%</span>
+                      </button>
+                      <div class="dropdown-menu at-zoom-options">
+                        <a class="dropdown-item" href="#">25%</a>
+                        <a class="dropdown-item" href="#">50%</a>
+                        <a class="dropdown-item" href="#">75%</a>
+                        <a class="dropdown-item" href="#">90%</a>
+                        <a class="dropdown-item" href="#">100%</a>
+                        <a class="dropdown-item" href="#">110%</a>
+                        <a class="dropdown-item" href="#">125%</a>
+                        <a class="dropdown-item" href="#">150%</a>
+                        <a class="dropdown-item" href="#">200%</a>
+                      </div>
+                    </div>
+                    
+                    <div class="btn-group dropup">
+                      <button type="button" class="btn dropdown-toggle at-layout-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Layout
+                      </button>
+                      <div class="dropdown-menu at-layout-options">
+                        <a class="dropdown-item" href="#" data-layout="horizontal-screen">
+                            <i class="far fa-caret-square-right"></i> Horizontal Layout (Off-Screen)
+                        </a>
+                        <a class="dropdown-item" href="#" data-layout="horizontal-bar">
+                            <i class="fas fa-caret-square-right"></i> Horizontal Layout (Bar Wise)
+                        </a>
+                        <a class="dropdown-item" href="#" data-layout="page">
+                            <i class="fas fa-caret-square-down"></i> Vertical Layout
+                        </a>
+                      </div>
+                    </div>
+                    
+                </div>                
+            </div>
+        </div>
+    </div>    
+    
+    <!-- Template for a single track selector item -->
+    <template id="at-track-template">
+        <div class="at-track">
+            <div class="at-track-icon">
+                <i class="fas fa-guitar"></i>
+            </div>
+            <span class="at-track-name">{{name}}</span>
+            <div class="at-track-controls">
+                <button type="button" class="btn btn-sm btn-outline-danger at-track-mute">Mute</button>
+                <button type="button" class="btn btn-sm btn-outline-success at-track-solo">Solo</button>
+                <i class="fas fa-volume-up"></i>
+                <input type="range" min="0" max="16" value="8" class="at-track-volume">
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // some helper functions for later
+        function updateProgress(el, value) {
+            value = value * 100;
+            const left = el.querySelector('.progress-left .progress-bar');
+            const right = el.querySelector('.progress-right .progress-bar');
+            function percentageToDegrees(percentage) { return percentage / 100 * 360 }
+
+            if (value > 0) {
+                if (value <= 50) {
+                    right.style.transform = 'rotate(' + percentageToDegrees(value) + 'deg)';
+                } else {
+                    right.style.transform = 'rotate(180deg)';
+                    left.style.transform = 'rotate(' + percentageToDegrees(value - 50) + 'deg)';
+                }
+            }
+            el.querySelector('.progress-value-number').innerText = value | 0;
+        }
+        
+        function formatDuration(milliseconds) {
+            let seconds = milliseconds / 1000;
+            const minutes = (seconds / 60) | 0;
+            seconds = (seconds - (minutes * 60)) | 0;
+            return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }
+        
+        const toDomElement = (function() {
+            const parser = document.createElement('div');
+            return function(html) {
+                parser.innerHTML = html;
+                return parser.firstElementChild;
+            };
+        })();
+
+    </script>
+    
+    <script>
+        // we're using handlebars as template engine to generate the track selector items later
+        const trackTemplate = Handlebars.compile(document.querySelector('#at-track-template').innerHTML);
+
+        const el = document.querySelector('#alphaTab');
+        const control = el.closest('.at-wrap');
+        let at = null; // will hold the alphaTab API later, declared here for visibility below
+        const trackItems = []; // a list of all track items for better handling later
+
+        // creates a new track selector item with all events hooked up
+        function createTrackItem(track) {        
+            const trackItem = toDomElement(trackTemplate(track));
+            
+            // init track controls
+            const muteButton = trackItem.querySelector('.at-track-mute');
+            const soloButton = trackItem.querySelector('.at-track-solo');
+            const volumeSlider = trackItem.querySelector('.at-track-volume');
+
+            muteButton.onclick = function(e) {
+                e.stopPropagation();
+                // toggle active state of button
+                muteButton.classList.toggle('active');
+                
+                // set mute flag of track based on active class
+                at.changeTrackMute([track], muteButton.classList.contains('active'));                        
+            };
+            
+            soloButton.onclick = function(e) {
+                e.stopPropagation();
+                
+                // toggle active state of button
+                soloButton.classList.toggle('active');
+                
+                // set solo flag of track based on active class
+                at.changeTrackSolo([track], soloButton.classList.contains('active'));                        
+            };                    
+            
+            volumeSlider.oninput = function(e) {
+                e.preventDefault();
+                // Here we need to do some math to map the 1-16 slider to the 
+                // volume in alphaTab. In alphaTab it is 1.0 for 100% which is
+                // equal to the volume in the track information
+                at.changeTrackVolume([track], volumeSlider.value / track.playbackInfo.volume)
+            };
+            
+            volumeSlider.onclick = function(e) {
+                // here we avoid that the trackItem.click below is triggered
+                e.stopPropagation();
+            };
+            
+            trackItem.onclick = function(e) {
+                e.stopPropagation();
+                // on click render the track, 
+                // via some shift click you could add a multi-track rendering feature
+                at.renderTracks([track]);
+            };
+            
+            // setup initial values from score
+            muteButton.value = track.playbackInfo.isMute;
+            soloButton.value = track.playbackInfo.isSolo;
+            volumeSlider.value = track.playbackInfo.volume;
+            
+            // remember track for later usage
+            trackItem.track = track;
+            return trackItem;
+        }
+        
+        // once the file is loaded, we can fill the UI 
+        // with all the info about the song
+        el.addEventListener('alphaTab.loaded', function(e) {
+            const score = e.detail;
+            
+            control.querySelector('.at-song-title').innerText = score.title;
+            control.querySelector('.at-song-artist').innerText = score.artist;
+
+            // fill track selector
+            const trackList = control.querySelector('.at-track-list');
+            trackList.innerHTML = '';
+            
+            for(track of score.tracks) {
+                const trackItem = createTrackItem(track);                    
+                trackItems.push(trackItem);
+                trackList.appendChild(trackItem);
+            }
+            
+            // initialize some player related indicators after load
+            currentTempo = score.tempo;
+            updateMasterBarTimes(score.masterBars[0]);
+        });
+        
+        // player loading indicator
+        const playerLoadingIndicator = control.querySelector('.at-player-loading');
+        const playerLoadingIndicatorPercent = control.querySelector('.at-player-loading-percent');
+        el.addEventListener('alphaTab.soundFontLoad', function(e) {
+            updateProgress(playerLoadingIndicator, e.detail.loaded / e.detail.total);
+        });
+        el.addEventListener('alphaTab.soundFontLoaded', function(e) {
+           playerLoadingIndicator.classList.add('d-none'); 
+        });
+        
+        
+        // once a score is about to be rendered, we can already
+        // initialize some UI info
+        el.addEventListener('alphaTab.render', function(e) {
+            // show/hide indicator (do not show it on resize)
+            const isResize = e.detail;
+            if(!isResize) {
+                control.classList.add('loading');
+            }
+            
+            // mark tracks active/inactive in selector
+            const tracks = new Map();
+            at.tracks.forEach(function(t) { tracks.set(t.index, t); });            
+            for(trackItem of trackItems) {
+                if(tracks.has(trackItem.track.index)) {
+                    trackItem.classList.add('active');
+                } else {
+                    trackItem.classList.remove('active');
+                }
+            }
+        });
+        el.addEventListener('alphaTab.rendered', function(e) {
+            control.classList.remove('loading');
+        });
+        
+        // during playback we want to update the displayed information
+        // depending on the currently played bar/beat
+        const barPositionLabel = control.querySelector('.at-bar-position');
+        const timeSignatureLabel = control.querySelector('.at-time-signature');
+        const tempoLabel = control.querySelector('.at-tempo');
+        
+        let currentTempo = 0;
+        function updateMasterBarTimes(currentMasterBar) {
+            var masterBarCount = currentMasterBar.score.masterBars.length;
+            if(currentMasterBar.tempoAutomation != null) {
+                currentTempo = currentMasterBar.tempoAutomation.value | 0;
+            }
+            
+            barPositionLabel.innerText = (currentMasterBar.index + 1) + ' / ' + masterBarCount;
+            timeSignatureLabel.innerText = currentMasterBar.timeSignatureNumerator + ' / ' + currentMasterBar.timeSignatureDenominator;
+            tempoLabel.innerText = currentTempo;
+        }
+        
+        el.addEventListener('alphaTab.playedBeatChanged', function(e) {
+            updateMasterBarTimes(e.detail.voice.bar.masterBar);
+        });
+        
+        // we also have some time related information shown in the UI
+        const timePositionLabel = control.querySelector('.at-time-position');
+        const timeSliderValue = control.querySelector('.at-time-slider-value');
+        
+        let previousTime = -1;
+        el.addEventListener('alphaTab.positionChanged', function(e) {
+            var args = e.detail;                
+            
+            // reduce number of UI updates to second changes. 
+            const currentSeconds = (args.currentTime / 1000) | 0;
+            if(currentSeconds == previousTime) {
+                return;
+            }
+            previousTime = currentSeconds;
+            
+            
+            timePositionLabel.innerText = formatDuration(args.currentTime) + ' / ' + formatDuration(args.endTime);
+            timeSliderValue.style.width = ((args.currentTime / args.endTime) * 100).toFixed(2) + '%';
+        });
+
+        // below we initialize and update the player controls based on events
+        const playPauseButton = control.querySelector('.at-play-pause');
+        el.addEventListener('alphaTab.playerReady', function(e) {
+            control.querySelectorAll('.at-player .disabled').forEach(function(c) {
+                c.classList.remove('disabled');
+            });
+        });
+        el.addEventListener('alphaTab.playerStateChanged', function(e) {
+            const args = e.detail;
+            const icon = playPauseButton.querySelector('i');
+            if(args.state == 0) {
+                icon.classList.remove('fa-pause-circle');
+                icon.classList.add('fa-play-circle');
+            }   
+            else {
+                icon.classList.remove('fa-play-circle');
+                icon.classList.add('fa-pause-circle');
+            }
+        });
+        playPauseButton.onclick = function(e) {
+            e.stopPropagation();
+            if(!e.target.classList.contains('disabled')) {
+                at.playPause();
+            }
+        };
+        control.querySelector('.at-stop').onclick = function(e) {
+            e.stopPropagation();
+            if(!e.target.classList.contains('disabled')) {
+                at.stop();
+            }
+        };
+
+        // here we setup the remaining UI controls and hook them up with the API
+        control.querySelector('.at-metronome').onclick = function(e) {
+            e.stopPropagation();
+            const link = e.target.closest('a');
+            link.classList.toggle('active');
+            if(link.classList.contains('active')) {
+                at.metronomeVolume = 1;                        
+            } else {
+                at.metronomeVolume = 0;                        
+            }
+        };
+        
+        control.querySelector('.at-speed').oninput = function(e) {
+            e.stopPropagation();
+            at.playbackSpeed = e.target.value / 100.0;
+            e.target.title = e.target.value + "%";
+            control.querySelector('.at-speed-value').innerText = e.target.value + "%";
+        };
+        
+        control.querySelector('.at-loop').onclick = function(e) {
+            e.stopPropagation();
+            const link = e.target.closest('a');
+            link.classList.toggle('active');
+            if(link.classList.contains('active')) {
+                at.isLooping = true;                        
+            } else {
+                at.isLooping = false;                        
+            }
+        };
+        
+        control.querySelector('.at-print').onclick = function(e) {
+            at.print();
+        };
+        
+        control.querySelectorAll('.at-zoom-options a').forEach(function(a) {
+            a.onclick = function(e) {
+                e.preventDefault();
+                at.settings.scale = parseInt(e.target.innerText) / 100.0;
+                control.querySelector('.at-zoom-label').innerText = e.target.innerText;
+                at.updateSettings();
+                at.render();
+            };
+        });
+        
+        control.querySelectorAll('.at-layout-options a').forEach(function(a) {
+            a.onclick = function(e) {
+                e.preventDefault();
+                const settings = at.settings;
+                switch(e.target.dataset.layout)
+                {
+                    case 'page':
+                        settings.display.layoutMode = 'page';
+                        settings.scrollMode = 1;
+                    break;
+                    case 'horizontal-bar':
+                        settings.display.layoutMode = 'horizontal';
+                        settings.scrollMode = 1;
+                    break;
+                    case 'horizontal-screen':
+                        settings.display.layoutMode = 'horizontal';
+                        settings.scrollMode = 2;
+                    break;
+                }
+                
+                at.updateSettings();
+                at.render();
+            };
+        });
+        
+        
+        // now with all events hooked up, we can kick-off alphatab
+        
+        const additionalSettings = {
+            // in this sample we want alphaTab to scroll the viewport element
+            // depending on your own layout, you might want to set this to another element
+            // that should be scrolled to keep alphaTab in the view
+            // usually the scroll element should point to the next scrollable parent above alphaTab
+            player: {
+                scrollElement: control.querySelector('.at-viewport')
+            }
+        };
+        at = new alphaTab.platform.javaScript.AlphaTabApi(el, additionalSettings);
+
+        // setup all bootstrap tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+    </script>
+</body>
+</html>     

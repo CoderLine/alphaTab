@@ -1,0 +1,65 @@
+---
+title: RenderTracks()
+jsName: renderTracks()
+jQueryName: alphaTab('renderTracks')
+category: Methods - Core
+description: Initiates a rendering of the given tracks.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Initiates a rendering of the tracks. All tracks must be from the same score, otherwise an error is raised. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="bool RenderTracks(Tracks[] track)" />
+    <TypeRow type="js" name="function renderTracks(tracks)" />
+    <TypeRow type="jquery" name="alphaTab('renderTracks', tracks)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="tracks" type="AlphaTab.Model.Track[]">
+        The tracks that should be rendered.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.RenderTracks(new []{
+    api.Score.Tracks[2], 
+    api.Score.Tracks[3]
+});
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.renderTracks([
+    api.score.tracks[2],
+    api.score.tracks[3]
+]);
+```
+
+## Example - jQuery
+
+```js
+var at = $('#alphaTab');
+var score = at.alphaTab('score');
+at.alphaTab('renderTracks', [
+    api.score.tracks[2],
+    api.score.tracks[3]
+]);
+```

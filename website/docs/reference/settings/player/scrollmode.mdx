@@ -1,0 +1,43 @@
+---
+title: Player.ScrollMode
+jsName: player.scrollMode
+jsonName: player.scrollMode
+domName: data-player-scrollmode
+category: Player
+description: Gets or sets the mode how to scroll.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting controls how alphaTab behaves for scrolling. It supports 3 modes: 
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="AlphaTab.ScrollMode">
+        `Off` - No automatic scrolling is done<br />
+        `Continuous` - Scrolling happens as soon the offsets of the cursors change<br />
+        `OffScreen` - Scrolling happens as soon the cursors exceed the displayed range
+    </TypeRow>
+    <TypeRow type="json-html" name="string">
+        `off`<br />
+        `continuous`<br />
+        `offscreen`
+    </TypeRow>
+    <TypeRow type="js" name="int">
+        `0` - Off<br />
+        `1` - Continuous<br />
+        `2` - OffScreen
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+
+`Continuous`

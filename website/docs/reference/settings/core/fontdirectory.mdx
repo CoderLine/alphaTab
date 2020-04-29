@@ -1,0 +1,32 @@
+---
+title: Core.FontDirectory
+jsName: core.fontDirectory;fontDirectory
+jsonName: core.fontDirectory;fontDirectory
+domName: data-core-fontdirectory;data-fontdirectory
+category: Core - JavaScript Specific
+description: The full URL to the alphaTab font directory.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+AlphaTab will generate some dynamic CSS that is needed for displaying the music symbols correctly. For this it needs to know
+where the Web Font files of [Bravura](https://github.com/steinbergmedia/bravura) are. Normally alphaTab expects 
+them to be in a `Font` subfolder beside the script file. If this is not the case, this setting must be used to configure the path. 
+Alternatively also a global variable `ALPHATAB_FONT` can be set on the page before initializing alphaTab. 
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="string" />
+</TypeTable>
+
+## Default Value
+
+`${AlphaTabScriptFolder}/Font/`

@@ -1,0 +1,49 @@
+---
+title: Stop()
+jsName: stop()
+jQueryName: alphaTab('stop')
+category: Methods - Player
+description: Stops the playback of the current song, and moves the playback position back to the start.
+sidebarPath: /docs/reference/api
+since:  0.9.4
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Stops the playback of the current song, and moves the playback position back to the start. If a dedicated playback range is selected, 
+it will move the playback position to the start of this range, not the whole song.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void Stop()" />
+    <TypeRow type="js" name="function stop()" />
+    <TypeRow type="jquery" name="alphaTab('stop')" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+Nothing
+
+## Example - C#
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Stop();
+```
+
+## Example - JavaScript
+
+```js
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.stop();
+```
+
+## Example - jQuery
+
+```js
+$('#alphaTab').alphaTab('stop');
+```

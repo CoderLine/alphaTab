@@ -1,0 +1,33 @@
+---
+title: Settings
+---
+
+import ReferenceTable from '../../src/reference-table';
+
+This section contains a list of all properties that allow configuration of the alphaTab behavior.
+
+There are multiple ways how settings in alphaTab can be specified.For.net simply the normal classes are used and
+changes are signaled via `UpdateSettings` call.For JavaScript the interaction with the settings is a bit more sensitive
+due to the lack of type safety and the support of JSON based settings.
+
+Not all settings contain reasonable examples as they often just activate something within alphaTab
+or change the display of some notation.If you have questions on certain settings feel free to open a
+[issue on GitHub](https://github.com/CoderLine/alphaTab/issues/new/choose)
+
+The first and most important rule is: when interacting with the settings object directly, the correct structure and data types
+must be followed not to break alphaTab or make the changes useless. In order to simplify things when configuring alphaTab via JavaScript
+there are 2 additional features:
+
+1. AlphaTab can be configured via a simple plain JSON object.
+This JSON format supports some aliases and also some value conversions like for enums, fonts and colors.
+	This JSON schema can only be used at selected places.When attempting to set JSON values on the derives`alphaTab.Settings` object,
+	this can lead to unexpected side effects.The JSON schema can be used when initializing alphaTab or by calling `settings.fillFromJson( ... )`.
+
+2. AlphaTab can be configured via HTML data attributes
+All settings can also be added as data attributes on the element for which alphaTab is initialized.This is especially useful
+when multiple different instances of alphaTab are running on the same site but the main code to setup alphaTab should be shared.
+Individual settings can be specified on HTML elements.
+
+The following table contains all the properties as they can be set on the general settings object.
+
+<ReferenceTable type="Property" filter="reference/settings/" />
