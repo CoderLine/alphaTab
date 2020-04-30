@@ -22,6 +22,29 @@ const sidebars = {
 		"guides/breaking-changes-095-096"
 	]
   },
+  tutorial: {
+	  "Tutorials": [
+		  "tutorials"
+	  ],
+	  "Tutorial (Web)": [
+		"tutorial-web/introduction",
+		"tutorial-web/setup",
+		"tutorial-web/viewport",
+		"tutorial-web/track-selector",
+		"tutorial-web/controls",
+		"tutorial-web/player",
+		"tutorial-web/conclusion"
+	  ],
+	  "Tutorial (.net)": [
+		"tutorial-net/introduction",
+		"tutorial-net/setup",
+		"tutorial-net/viewport",
+		"tutorial-net/track-selector",
+		"tutorial-net/controls",
+		"tutorial-net/player",
+		"tutorial-net/conclusion"
+	  ]
+  },
   alphaTex: {
 	"alphaTex": [
 		"alphatex/introduction",

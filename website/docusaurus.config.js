@@ -19,7 +19,7 @@ module.exports = {
       },
       links: [
         { to: 'docs/introduction', label: 'Docs', position: 'left' },
-        { to: 'docs/tutorial', label: 'Tutorial', position: 'left' },
+        { to: 'docs/tutorials', label: 'Tutorial', position: 'left' },
         { to: 'docs/alphaTex/introduction', label: 'alphaTex', position: 'left' },
         { to: 'docs/showcase/introduction', label: 'Showcase', position: 'left' },
         {
@@ -87,6 +87,7 @@ module.exports = {
     }
   },
   plugins: [
+    'docusaurus-lunr-search',
     [
       '@docusaurus/plugin-content-blog',
       {

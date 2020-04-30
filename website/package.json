@@ -33,6 +33,7 @@
     "@types/lodash": "^4.14.149",
     "@types/shelljs": "^0.8.6",
     "commander": "^4.0.1",
+    "docusaurus-lunr-search": "^1.0.2",
     "execa": "^3.4.0",
     "fs-extra": "^8.1.0",
     "globby": "^10.0.1",
