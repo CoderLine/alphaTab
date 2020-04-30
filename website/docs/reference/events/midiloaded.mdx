@@ -1,6 +1,6 @@
 ---
 title: MidiLoaded
-jsName: addMidiLoaded();removeMidiLoaded()
+jsName: midiFileLoaded
 domName: alphaTab.midiFileLoaded
 category: Events - Player
 description: This event is fired when the Midi file needed for playback was loaded.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when the Midi file needed for playback was loaded.    
@@ -27,7 +29,46 @@ This event is fired when the Midi file needed for playback was loaded.
 ## Parameters
 none
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.midiLoaded.on(() => {
+    hideGeneratingAudioIndicator();
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.midiFileLoaded', (e) => {
+    hideGeneratingAudioIndicator();
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.midiFileLoaded', () => {
+    hideGeneratingAudioIndicator();
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -37,27 +78,5 @@ api.MidiLoaded += () =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addMidiLoaded(function(score) {
-    hideGeneratingAudioIndicator();
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.midiFileLoaded', function(e, score) {
-    hideGeneratingAudioIndicator();
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.midiFileLoaded', function() {
-    hideGeneratingAudioIndicator();
-}, false);
-```
+</TabItem>
+</Tabs>

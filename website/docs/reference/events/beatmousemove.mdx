@@ -1,15 +1,18 @@
 ---
 title: BeatMouseMove
-jsName: addBeatMouseMove();removeBeatMouseMove()
+jsName: beatMouseMove
 domName: alphaTab.beatMouseMove
 category: Events - Player
 description: This event is fired whenever the user moves the mouse over a beat after the user already pressed the button on a beat.
+sidebarPath: /docs/reference/events
 since: 0.9.7
 ---
 
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired whenever the user moves the mouse over a beat after the user already pressed the button on a beat.
@@ -34,7 +37,49 @@ This event is fired whenever the user moves the mouse over a beat after the user
     </ParameterRow>
 </ParameterTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.beatMouseMove.on((beat) => {
+    expandSelectionToBeat(beat);
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.beatMouseMove', (e, beat) => {
+    originalEvent.preventDefault();
+    expandSelectionToBeat(beat);
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseMove', (e) => {
+    var beat = e.detail;
+    e.originalEvent.preventDefault();
+    expandSelectionToBeat(beat);
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -44,30 +89,5 @@ api.BeatMouseMove += beat =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addBeatMouseMove(function(beat) {
-    expandSelectionToBeat(beat);
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.beatMouseMove', function(e, beat) {
-    originalEvent.preventDefault();
-    expandSelectionToBeat(beat);
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseMove', function(e) {
-    var beat = e.detail;
-    e.originalEvent.preventDefault();
-    expandSelectionToBeat(beat);
-}, false);
-```
+</TabItem>
+</Tabs>

@@ -1,6 +1,6 @@
 ---
 title: PlayerPositionChanged
-jsName: addPlayerPositionChanged();removePlayerPositionChanged()
+jsName: positionChanged
 domName: alphaTab.positionChanged
 category: Events - Player
 description: This event is fired when the playback state changed.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when the current playback position of the song changed. 
@@ -61,7 +63,47 @@ This event is fired when the current playback position of the song changed.
     </ParameterRow>
 </ParameterTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.playerPositionChanged.on((args) => {
+    updatePlayerPosition(args);
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.positionChanged', (e, args) => {
+    updatePlayerPosition(args);
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.positionChanged', (e) => {
+    var args = e.detail;
+    updatePlayerPosition(args);
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -71,28 +113,5 @@ api.PlayerPositionChanged += args =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addPlayerPositionChanged(function(args) {
-    updatePlayerPosition(args);
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.positionChanged', function(e, args) {
-    updatePlayerPosition(args);
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.positionChanged', function(e) {
-    var args = e.detail;
-    updatePlayerPosition(args);
-}, false);
-```
+</TabItem>
+</Tabs>

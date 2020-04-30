@@ -1,6 +1,6 @@
 ---
 title: PostRenderFinished
-jsName: addPostRenderFinished();removePostRenderFinished()
+jsName: postRenderFinished
 domName: alphaTab.postRenderFinished
 category: Events - Core
 description: This event is fired when the rendering of the whole music sheet is finished, and all handlers of RenderFinished ran.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when the rendering of the whole music sheet is finished, and all handlers of RenderFinished ran. When this 
@@ -28,7 +30,46 @@ handlers are called, the whole rendering and display pipeline is completed.
 ## Parameters
 None
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.postRenderFinished.on(() => {
+    hideLoadingIndicator();
+});  
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.postRendered', () => {
+    hideLoadingIndicator();
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.postRendered', (e) => {
+    hideLoadingIndicator();
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -38,27 +79,5 @@ api.PostRenderFinished += () =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addPostRenderFinished(function() {
-    hideLoadingIndicator();
-});  
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.postRendered', function() {
-    hideLoadingIndicator();
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.postRendered', function(e) {
-    hideLoadingIndicator();
-}, false);
-```
+</TabItem>
+</Tabs>

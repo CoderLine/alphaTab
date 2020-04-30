@@ -1,6 +1,6 @@
 ---
 title: SoundFontLoad
-jsName: addSoundFontLoad();removeSoundFontLoad()
+jsName: soundFontLoad
 domName: alphaTab.soundFontLoad
 category: Events - Player
 description: This event is fired when the SoundFont is being loaded.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when the SoundFont is being loaded and reports the progress accordingly.     
@@ -31,28 +33,42 @@ This event is fired when the SoundFont is being loaded and reports the progress 
     </ParameterRow>
 </ParameterTable>
 
-## Example - JavaScript
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addSoundFontLoad(function(e) {
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.soundFontLoad.on((e) => {
     updateProgress(e.loaded, e.total);
 });
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
-$('#alphaTab').on('alphaTab.soundFontLoad', function(e, score) {
-    updateProgress(e.loaded, e.total);
+$('#alphaTab').on('alphaTab.soundFontLoad', (e, args) {
+    updateProgress(args.loaded, args.total);
 });
 ```
 
-
-## Example - HTML
+</TabItem>
+<TabItem value="html">
 
 ```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.soundFontLoad', function() {
+document.querySelector('#alphaTab').addEventListener('alphaTab.soundFontLoad', () => {
     updateProgress(e.detail.loaded, e.detail.total);
 }, false);
 ```
+
+</TabItem>
+</Tabs>

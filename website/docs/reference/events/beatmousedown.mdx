@@ -1,6 +1,6 @@
 ---
 title: BeatMouseDown
-jsName: addBeatMouseDown();removeBeatMouseDown()
+jsName: beatMouseDown
 domName: alphaTab.beatMouseDown
 category: Events - Player
 description: This event is fired whenever a the user presses the mouse button on a beat.
@@ -11,6 +11,8 @@ since: 0.9.7
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired whenever a the user presses the mouse button on a beat.
@@ -35,7 +37,49 @@ This event is fired whenever a the user presses the mouse button on a beat.
     </ParameterRow>
 </ParameterTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.beatMouseDown.on((beat) => {
+    startSelectionOnBeat(beat);
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.beatMouseDown', (e, beat) => {
+    originalEvent.preventDefault();
+    startSelectionOnBeat(beat);
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseDown', (e) => {
+    const beat = e.detail;
+    e.originalEvent.preventDefault();
+    startSelectionOnBeat(beat);
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -45,30 +89,5 @@ api.BeatMouseDown += beat =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addBeatMouseDown(function(beat) {
-    startSelectionOnBeat(beat);
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.beatMouseDown', function(e, beat) {
-    originalEvent.preventDefault();
-    startSelectionOnBeat(beat);
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseDown', function(e) {
-    var beat = e.detail;
-    e.originalEvent.preventDefault();
-    startSelectionOnBeat(beat);
-}, false);
-```
+</TabItem>
+</Tabs>

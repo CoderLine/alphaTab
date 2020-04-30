@@ -1,6 +1,6 @@
 ---
 title: Error
-jsName: addError();removeError()
+jsName: error
 domName: alphaTab.error
 category: Events - Core
 description: This event is fired when an error within alphatab occurred.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when an error within alphatab occurred. Use this event as global error handler to show errors
@@ -22,57 +24,66 @@ Instead a signal to this error handlers will be sent.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action<string,Exception>" />    
-    <TypeRow type="js" name="function(type,details)" />    
+    <TypeRow type="net" name="Action<Error>" />    
+    <TypeRow type="js" name="function(error)" />    
 </TypeTable>
 
 ## Parameters
 
 <ParameterTable>
-    <ParameterRow platform="all" name="type" type="string">
-        The kind of error that happened, or the module that reported the error. Possible values are: <br />
-        `import  - An unexpected error while loading or parsing the score happened.<br />
-        `render` - An unexpected error during rendering happened.<br />
-        `soundFont` - An unexpected error while loading the SoundFont.<br />
-        `midi` - An unexpected error while loading the generated midi for the song.
-    </ParameterRow>
-    <ParameterRow platform="all" name="details" type="System.Exception">
+    <ParameterRow platform="all" name="details" type="Error">
         The object containing the error details. 
     </ParameterRow>
 </ParameterTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.error.on((error) {
+    displayError(error);
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.error', (e, error) => {
+    displayError(error);
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.error', (e) => {
+    displayError(e.detail);
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.Error += (type, details) => 
+api.Error += (error) => 
 {
-    DisplayError(type, details);
+    DisplayError(error);
 };
 ```
 
-
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addError(function(type, details) {
-    displayError(type, details);
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.error', function(e, type, details) {
-    displayError(type, details);
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.error', function(e) {
-    displayError(e.detail.type, e.detail.details);
-}, false);
-```
+</TabItem>
+</Tabs>

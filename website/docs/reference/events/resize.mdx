@@ -1,6 +1,6 @@
 ---
 title: Resize
-jsName: addResize();removeResize()
+jsName: resize
 domName: alphaTab.resize
 category: Events - Core
 description: This event is fired when alphaTab was resized and is about to rerender the music notation.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when alphaTab was resized and is about to rerender the music notation. Before the re-rendering on resize
@@ -57,7 +59,52 @@ considered. This allows to implement scenarios where maybe the scale or the layo
     </ParameterRow>
 </ParameterTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.resize.on((args) => {
+    args.settings.scale = args.newWidth > 1300 
+        ? 1.5 
+        : (args.newWidth > 800) ? 1.3 : 1;
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.resize', (e, args) => {
+    args.settings.scale = args.newWidth > 1300 
+        ? 1.5 
+        : (args.newWidth > 800) ? 1.3 : 1;
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.resize', function(e) {
+    args.settings.scale = args.newWidth > 1300 
+        ? 1.5 
+        : (args.newWidth > 800) ? 1.3 : 1;
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -69,34 +116,5 @@ api.Resize += args =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addResize(function(args) {
-    args.Settings.Scale = args.NewWidth > 1300 
-        ? 1.5f 
-        : (args.NewWidth > 800) ? 1.3f : 1;
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.resize', function(e, args) {
-    args.Settings.Scale = args.NewWidth > 1300 
-        ? 1.5f 
-        : (args.NewWidth > 800) ? 1.3f : 1;
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.resize', function(e) {
-    var args = e.detail;
-    args.Settings.Scale = args.NewWidth > 1300 
-        ? 1.5f 
-        : (args.NewWidth > 800) ? 1.3f : 1;
-}, false);
-```
+</TabItem>
+</Tabs>

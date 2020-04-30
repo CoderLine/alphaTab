@@ -1,6 +1,6 @@
 ---
 title: RenderStarted
-jsName: addRenderStarted();removeRenderStarted()
+jsName: renderStarted
 domName: alphaTab.render
 category: Events - Core
 description: This event is fired when the rendering of the whole music sheet is starting.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when the rendering of the whole music sheet is starting. All
@@ -33,7 +35,46 @@ preparations are completed and the layout and render sequence is about to start.
     </ParameterRow>
 </ParameterTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.renderStarted.on(() => {
+    updateProgressBar("Rendering");
+});  
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.render', () => {
+    updateProgressBar("Rendering");
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.render', (e) => {
+    updateProgressBar("Rendering");
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -43,27 +84,5 @@ api.RenderStarted += () =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addRenderStarted(function() {
-    updateProgressBar("Rendering");
-});  
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.render', function() {
-    updateProgressBar("Rendering");
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.render', function(e) {
-    updateProgressBar("Rendering");
-}, false);
-```
+</TabItem>
+</Tabs>

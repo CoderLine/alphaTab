@@ -1,6 +1,6 @@
 ---
 title: Loaded
-jsName: addLoaded();removeLoaded()
+jsName: loaded
 domName: alphaTab.loaded
 category: Events - Core
 description: This event is fired whenever a new song is loaded
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 
 ## Description
@@ -34,7 +36,46 @@ This allows any modification of the score before further processing.
     </ParameterRow>
 </ParameterTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.loaded.on((score) => {
+    updateSongInformationInUi(score);
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.loaded', (e, score) => {
+    updateSongInformationInUi(score);
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.loaded', (e) => {
+    updateSongInformationInUi(e.detail);
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -44,27 +85,5 @@ api.Loaded += score =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addLoaded(function(score) {
-    updateSongInformationInUi(score);
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.loaded', function(e, score) {
-    updateSongInformationInUi(score);
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.loaded', function(e) {
-    updateSongInformationInUi(e.detail);
-}, false);
-```
+</TabItem>
+</Tabs>

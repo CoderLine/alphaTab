@@ -1,6 +1,6 @@
 ---
 title: PlayerStateChanged
-jsName: addPlayerStateChanged();removePlayerStateChanged()
+jsName: playerStateChanged
 domName: alphaTab.playerStateChanged
 category: Events - Player
 description: This event is fired when the playback state changed.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when the playback state changed. 
@@ -48,38 +50,55 @@ This event is fired when the playback state changed.
     </ParameterRow>
 </ParameterTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.playerStateChanged.on((args) => {
+    updatePlayerControls(args.state, args.stopped);
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.playerStateChanged', (e, args) => {
+    updatePlayerControls(args.state, args.stopped);
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.playerStateChanged', (e) => {
+    const args = e.detail;
+    updatePlayerControls(args.state, args.stopped);
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
 api.PlayerStateChanged += args => 
 {
-    UpdatePlayerControls(args.State, args.Stopped);
+    UpdatePlayerControls(args);
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addPlayerStateChanged(function(args) {
-    updatePlayerControls(args.State, args.Stopped);
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.playerStateChanged', function(e, args) {
-    updatePlayerControls(args.State, args.Stopped);
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.playerStateChanged', function(e) {
-    var args = e.detail;
-    updatePlayerControls(args.State, args.Stopped);
-}, false);
-```
+</TabItem>
+</Tabs>

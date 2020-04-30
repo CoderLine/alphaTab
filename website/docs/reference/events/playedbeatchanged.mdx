@@ -1,6 +1,6 @@
 ---
 title: PlayedBeatChanged
-jsName: addPlayedBeatChanged();removePlayedBeatChanged()
+jsName: playedBeatChanged
 domName: alphaTab.playedBeatChanged
 category: Events - Player
 description: This event is fired when the played beat changed.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when the played beat changed.
@@ -32,7 +34,47 @@ This event is fired when the played beat changed.
     </ParameterRow>
 </ParameterTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.playedBeatChanged.on((beat) => {
+    updateFretboard(beat);
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.playedBeatChanged', (e, beat) => {
+    updateFretboard(beat);
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.playedBeatChanged', (e) => {
+    const beat = e.detail;
+    updateFretboard(beat);
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -42,28 +84,5 @@ api.PlayedBeatChanged += beat =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addPlayedBeatChanged(function(beat) {
-    updateFretboard(beat);
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.playedBeatChanged', function(e, beat) {
-    updateFretboard(beat);
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.playedBeatChanged', function(e) {
-    var beat = e.detail;
-    updateFretboard(beat);
-}, false);
-```
+</TabItem>
+</Tabs>

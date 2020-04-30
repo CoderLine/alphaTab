@@ -1,6 +1,6 @@
 ---
 title: ReadyForPlayback
-jsName: addReadyForPlayback();removeReadyForPlayback()
+jsName: playerReady
 domName: alphaTab.playerReady
 category: Events - Player
 description: This event is fired when all required data for playback is loaded and ready.
@@ -11,6 +11,8 @@ since: 0.9.4
 import EventDescription from '../../../src/event-description';
 import {TypeTable, TypeRow} from '../../../src/type-table';
 import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Description
 This event is fired when all required data for playback is loaded and ready. The player is ready for playback when
@@ -28,7 +30,46 @@ all background workers are started, the audio output is initialized, a soundfont
 ## Parameters
 none
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+api.readyForPlayback.on(() => {
+    enablePlayerControls();
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.playerReady', (e) => {
+    enablePlayerControls();
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.playerReady', () => {
+    enablePlayerControls();
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
@@ -38,27 +79,5 @@ api.ReadyForPlayback += () =>
 };
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.addReadyForPlayback(function(score) {
-    enablePlayerControls();
-});
-```
-
-## Example - jQuery
-
-```js
-$('#alphaTab').on('alphaTab.playerReady', function(e, score) {
-    enablePlayerControls();
-});
-```
-
-## Example - HTML
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.playerReady', function() {
-    enablePlayerControls();
-}, false);
-```
+</TabItem>
+</Tabs>
