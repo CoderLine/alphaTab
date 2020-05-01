@@ -24,4 +24,4 @@ jobs:
         --url https://docs.alphaTab.net/deploy-zip.php \
         --header 'authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}' \
         --header 'branch: website' \
-        --data "website=@website.zip"
+        -F "website=@./website.zip"
