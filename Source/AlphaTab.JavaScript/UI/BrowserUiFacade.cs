@@ -797,13 +797,25 @@ namespace AlphaTab.UI
             var nodeName = scrollElement.NodeName.ToLowerCase();
             if (nodeName == "html" || nodeName == "body")
             {
-                // Some mobile browsers cannot scroll on html, we must scroll on body instead
-                // http://blog.jonathanargentiero.com/jquery-scrolltop-not-working-on-mobile-devices-iphone-ipad-android-phones/
                 // https://github.com/CoderLine/alphaTab/issues/205
-                string userAgent = Browser.Navigator.UserAgent;
-                scrollElement = userAgent.Match("((iPod|iPhone|iPad|Android))").IsTruthy()
-                    ? Browser.Document.Body
-                    : Browser.Document.DocumentElement;
+                // https://github.com/CoderLine/alphaTab/issues/354
+                // https://dev.opera.com/articles/fixing-the-scrolltop-bug/
+                if (Platform.Platform.JsonExists(Browser.Document, "scrollingElement"))
+                {
+                    scrollElement = Script.Write<Element>("untyped __js__(\"document.scrollingElement\")");
+                }
+                else
+                {
+                    string userAgent = Browser.Navigator.UserAgent;
+                    if (userAgent.IndexOf("WebKit") != -1)
+                    {
+                        scrollElement = Browser.Document.Body;
+                    }
+                    else
+                    {
+                        scrollElement = Browser.Document.DocumentElement;
+                    }
+                }
             }
 
             return new HtmlElementContainer(scrollElement);
