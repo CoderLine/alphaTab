@@ -15,13 +15,13 @@ jobs:
       with:
         node-version: '12.x'
     - run: npm install
-    - run: npm build
+    - run: npm run build
     - name: Package Zip
       run: zip -qq -r ./website.zip ./build
     - name: Push Zip To Server
       run: |
         curl --request POST \
-        --url https://docs.alphaTab.net/deploy.php \
+        --url https://docs.alphaTab.net/deploy-zip.php \
         --header 'authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}' \
         --header 'branch: website' \
         --data "website=@website.zip"
