@@ -16,6 +16,7 @@ jobs:
         node-version: '12.x'
     - run: npm install
     - run: npm run build
+    - run: cp web.config ./build
     - name: Package Zip
       run: zip -qq -r ./website.zip ./build
     - name: Push Zip To Server
