@@ -121,6 +121,9 @@ module.exports = {
       }
     ]
   ],
+  stylesheets: [
+    "https://fonts.googleapis.com/css?family=Ubuntu|Roboto|Source+Code+Pro"
+  ],
   themes: [
     [
       '@docusaurus/theme-classic', 

@@ -8,20 +8,55 @@
   --ifm-color-primary-lightest: #739fd1;
   --ifm-code-font-size: 95%;
   --ifm-container-width: 100%;
+  --ifm-font-size-base: 16px;
+  --ifm-font-family-base: system-ui, -apple-system, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont,
+  'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+  'Segoe UI Emoji', 'Segoe UI Symbol';
+  --ifm-heading-font-family: Ubuntu, var(--ifm-font-family-base);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--ifm-heading-font-family);
 }
 
 .markdown {
-  --ifm-h1-line-height: 2;
-  --ifm-h2-line-height: 1.5;
-  --ifm-heading-line-height: 1;
+  --ifm-h1-h2-vertical-rhythm-top: 1;
+  --ifm-h1-h2-vertical-rhythm-bottom: var(--ifm-h1-h2-vertical-rhythm-top);
+  --ifm-h3-vertical-rhythm-top: 1.25;
+  --ifm-h3-vertical-rhythm-bottom: calc(var(--ifm-h3-vertical-rhythm-top) / 2);
+  --ifm-h4-vertical-rhythm-top: 1.25;
+  --ifm-h4-vertical-rhythm-bottom: calc(var(--ifm-h4-vertical-rhythm-top) / 2);
+  --ifm-h5-vertical-rhythm-top: 1.25;
+  --ifm-h5-vertical-rhythm-bottom: calc(var(--ifm-h5-vertical-rhythm-top) / 2);
+  --ifm-h6-vertical-rhythm-top: 1.25;
+  --ifm-h6-vertical-rhythm-bottom: calc(var(--ifm-h6-vertical-rhythm-top) / 2);
+}
 
-  --ifm-h1-vertical-rhythm-top: 2;
-  --ifm-h2-vertical-rhythm-top: 1.5;
-  --ifm-h3-vertical-rhythm-top: 1;
-  --ifm-heading-vertical-rhythm-top: 1.5;
+article header h1 {
+  font-size: 2.5em !important;
+  margin-bottom: 1rem !important;
+}
 
-  --ifm-h1-vertical-rhythm-bottom: 1;
-  --ifm-heading-vertical-rhythm-bottom: 0.5
+
+.markdown > h1,
+.markdown > h2 {
+  margin-top: calc(var(--ifm-h1-h2-vertical-rhythm-top) * var(--ifm-leading));
+  margin-bottom: calc(
+    var(--ifm-h1-h2-vertical-rhythm-bottom) * var(--ifm-leading)
+  );
+  padding-top: calc(var(--ifm-h1-h2-vertical-rhythm-top) * var(--ifm-leading));
+}
+
+.markdown > h3 {
+  margin-top: calc(var(--ifm-h3-vertical-rhythm-top) * var(--ifm-leading));
+  margin-bottom: calc(
+    var(--ifm-h3-vertical-rhythm-bottom) * var(--ifm-leading)
+  );
 }
 
 
