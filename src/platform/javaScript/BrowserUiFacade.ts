@@ -241,7 +241,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public loadSoundFont(data: unknown): boolean {
-        if(!this._api.player) {
+        if (!this._api.player) {
             return false;
         }
 
@@ -571,11 +571,19 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 : (this._api.settings.player.scrollElement as HTMLElement);
         let nodeName: string = scrollElement.nodeName.toLowerCase();
         if (nodeName === 'html' || nodeName === 'body') {
-            // Some mobile browsers cannot scroll on html, we must scroll on body instead
-            // http://blog.jonathanargentiero.com/jquery-scrolltop-not-working-on-mobile-devices-iphone-ipad-android-phones/
             // https://github.com/CoderLine/alphaTab/issues/205
-            let userAgent: string = navigator.userAgent;
-            scrollElement = userAgent.match('((iPod|iPhone|iPad|Android))') ? document.body : document.documentElement;
+            // https://github.com/CoderLine/alphaTab/issues/354
+            // https://dev.opera.com/articles/fixing-the-scrolltop-bug/
+            if ('scrollingElement' in document) {
+                scrollElement = document.scrollingElement as HTMLElement;
+            } else {
+                const userAgent = navigator.userAgent;
+                if (userAgent.indexOf('WebKit') !== -1) {
+                    scrollElement = (document as HTMLDocument).body;
+                } else {
+                    scrollElement = (document as HTMLDocument).documentElement;
+                }
+            }
         }
         return new HtmlElementContainer(scrollElement);
     }
