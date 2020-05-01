@@ -1,5 +1,5 @@
 {
-  "name": "@danielku15/alphatab",
+  "name": "@coderline/alphatab",
   "version": "0.9.8",
   "description": "alphaTab is a music notation and guitar tablature rendering library",
   "keywords": [
@@ -12,13 +12,13 @@
   ],
   "homepage": "https://alphatab.net",
   "bugs": {
-    "url": "https://github.com/danielku15/alphaTab/issues"
+    "url": "https://github.com/coderline/alphaTab/issues"
   },
   "author": "Daniel Kuschny",
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/danielku15/alphaTab"
+    "url": "https://github.com/coderline/alphaTab"
   },
   "main": "dist/alphaTab.js",
   "typings": "dist/alphaTab.d.ts",
