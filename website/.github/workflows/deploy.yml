@@ -16,8 +16,8 @@ jobs:
     - name: npm install
     - name: npm build
     - uses: montudor/action-zip@v0.1.0
-        with:
-          args: zip -qq -r ./website.zip ./build
+      with:
+        args: zip -qq -r ./website.zip ./build
     - name: Push Zip To Server
       run: |
         curl --request POST \
