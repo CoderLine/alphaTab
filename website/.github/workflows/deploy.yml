@@ -10,14 +10,14 @@ jobs:
       
     steps:
     - uses: actions/checkout@v2
+    - uses: montudor/action-zip@v0.1.0
     - uses: actions/setup-node@master
       with:
         node-version: '12.x'
     - name: npm install
     - name: npm build
-    - uses: montudor/action-zip@v0.1.0
-      with:
-        args: zip -qq -r ./website.zip ./build
+    - name: Package Zip
+      run: zip -qq -r ./website.zip ./build
     - name: Push Zip To Server
       run: |
         curl --request POST \
