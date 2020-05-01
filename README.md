@@ -10,38 +10,29 @@ alphaTab is a cross platform music notation and guitar tablature rendering libra
 
 ## Build Status
 
-> Until the official 1.0 release we recommend to use `develop` branch.
+> Until the official 1.0 release we recommend to use pre release versions based on the `develop` branch.
 
-&nbsp; | `master` | `develop`
---- | --- | ---
-**Build** | ![Build](https://github.com/Danielku15/alphaTab/workflows/Build/badge.svg?branch=master)  | ![Build](https://github.com/Danielku15/alphaTab/workflows/Build/badge.svg?branch=develop)
-**Documentation** | [![Documentation](https://img.shields.io/badge/docs-master-brightgreen.svg)](https://docs.alphatab.net/master)  | [![Documentation](https://img.shields.io/badge/docs-develop-brightgreen.svg)](https://docs.alphatab.net/develop)
+&nbsp; | &nbsp;
+--- | ---
+**Build** | ![Build](https://github.com/CoderLine/alphaTab/workflows/Build/badge.svg?branch=develop)
+**Documentation** | [![Documentation](https://img.shields.io/badge/docs-master-brightgreen.svg)](https://alphatab.net/)
 
 # Downloads
 
-The latest binaries are available for download at [Appveyor](https://ci.appveyor.com/project/Danielku15/alphatab/build/artifacts). Use the links below to grab the binaries from the latest builds. Please do not use the GitHub releases yet, they are not maintained.
+The latest binaries based  are available for download at either npmjs.org or MyGet.
+Use the links below to grab the binaries from the latest builds. Please do not use the GitHub releases yet, they are not maintained. We recommend using package managers to pull the files to your projects. 
 
 > Until the official 1.0 release we recommend to use `develop` branch.
 
-&nbsp; | `master` | `develop`
---- | --- | ---
-**JavaScript** | [JavaScript.zip](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/JavaScript.zip?branch=master) | [JavaScript.zip](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/JavaScript.zip?branch=develop)
-**.net (nupkg for download/unzip)** | [AlphaTab.nupkg](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/AlphaTab.nupkg?branch=master) | [AlphaTab.nupkg](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/AlphaTab.nupkg?branch=develop)
-**.net (NuGet feeds)** | (not available until 1.0) | [AlphaTab at MyGet](https://www.myget.org/feed/coderline/package/nuget/AlphaTab)
-
+&nbsp; | &nbsp;
+--- | --- |
+**JavaScript** | [NPM](https://www.npmjs.com/package/@coderline/alphatab)
+**.net** | [MyGet](https://www.myget.org/feed/coderline/package/nuget/AlphaTab)
 
 # Features
 alphaTab mostly focuses on web based platforms allowing music notation to be embedded into websites and browser based apps but is designed to be used also from .net based platforms like Windows, UWP and Xamarin.
 
-Before reading further you might simply jump to our demos:
-
-> [Feature Demo](https://docs.alphatab.net/master/features/) - *Take a look at all visual elements that alphaTab can render*
->
-> [Player Demo](https://docs.alphatab.net/master/assets/files/player.html) - *By integrating alphaSynth the you get a web based music sheet player*
->
-> [alphaTex Introduction](https://docs.alphatab.net/master/alphatex/) - *Learn about alphaTex, the built-in markup language for writing music notation*
-
-alphaTab can load music notation from various sources like Guitar Pro 3-5, Guitar Pro 6, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using [alphaSynth](http://github.com/CoderLine/alphaSynth) the music sheets can also be played in your browser.
+alphaTab can load music notation from various sources like Guitar Pro 3-5, Guitar Pro 6, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using a built in midi synthesizer named alphaSynth the music sheets can also be played in your browser.
 
 * load GuitarPro 3-5, GuitarPro 6, AlphaTex or MusicXML (experimental)
 * render as SVG, HTML5 canvas, GDI+,...

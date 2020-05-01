@@ -18,7 +18,7 @@
     <Copyright>Copyright © 2020, Daniel Kuschny and Contributors</Copyright>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://www.alphatab.net</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Danielku15/alphaTab</RepositoryUrl>
+    <RepositoryUrl>https://github.com/CoderLine/alphaTab</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>music,notation,engraver,renderer</PackageTags>
   </PropertyGroup>
