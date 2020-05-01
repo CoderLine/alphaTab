@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@master
         with:
           node-version: '12.x'
-          registry-url: hhttps://registry.npmjs.org/
+          registry-url: https://registry.npmjs.org/
       - name: Publish to GitHub Package Registry
         run: npm publish --tag alpha --access public
         env:
@@ -41,10 +41,10 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.100'
-          source-url: https://nuget.pkg.github.com/Danielku15/index.json  
+          source-url: https://www.myget.org/F/coderline/api/v2/package
         env:
-          NUGET_AUTH_TOKEN: ${{github.token}}
+          NUGET_AUTH_TOKEN: ${{secret.MYGET_API_KEY}}
       - run: npm install
       - run: npm run build-csharp-ci
-      - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{github.token}}
-      - run: dotnet nuget push src.csharp\AlphaTab.Windows\bin\Release\*.nupkg -k ${{github.token}}
+      - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{secret.MYGET_API_KEY}}
+      - run: dotnet nuget push src.csharp\AlphaTab.Windows\bin\Release\*.nupkg -k ${{secret.MYGET_API_KEY}}
