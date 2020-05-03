@@ -7,11 +7,12 @@ import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { RenderingResources } from '@src/RenderingResources';
 import { ResizeEventArgs } from '@src/ResizeEventArgs';
 import { Settings } from '@src/Settings';
-import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
 import { AlphaTabError } from '@src/AlphaTabError';
 import { FormatError } from '@src/FormatError';
 import { LogLevel } from '@src/LogLevel';
 import { FileLoadError } from '@src/FileLoadError';
+
+import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
 
 export {
     AlphaTabApi,

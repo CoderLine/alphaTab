@@ -59,7 +59,7 @@ function setupControl(selector) {
 
     const viewPort =
         'playerScrollelement' in el.dataset ? el.dataset.playerScrollelement : control.querySelector('.at-viewport');
-    const at = new alphaTab.platform.javaScript.AlphaTabApi(el, {
+    const at = new alphaTab.AlphaTabApi(el, {
         player: {
             scrollElement: viewPort
         }
@@ -115,7 +115,7 @@ function setupControl(selector) {
         control.classList.remove('loading');
     });
 
-    at.loaded.on(score => {
+    at.scoreLoaded.on(score => {
         control.querySelector('.at-song-title').innerText = score.title;
         control.querySelector('.at-song-artist').innerText = score.artist;
 
@@ -179,7 +179,7 @@ function setupControl(selector) {
     });
 
     const playPauseButton = control.querySelector('.at-play-pause');
-    at.readyForPlayback.on(_ => {
+    at.playerReady.on(_ => {
         control.querySelectorAll('.at-player .disabled').forEach(function (c) {
             c.classList.remove('disabled');
         });
