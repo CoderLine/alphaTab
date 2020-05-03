@@ -62,23 +62,22 @@ module.exports = [
             })
         ]
     },
-    // https://github.com/Swatinem/rollup-plugin-dts/issues/86
-    // {
-    //     input: 'dist/types/alphatab.d.ts',
-    //     output: [
-    //         {
-    //             file: 'dist/alphaTab.d.ts',
-    //             format: 'es'
-    //         }
-    //     ],
-    //     plugins: [
-    //         resolve({
-    //             mappings: {
-    //                 '@src': 'dist/types'
-    //             },
-    //             types: true
-    //         }),
-    //         dts()
-    //     ]
-    // }
+    {
+        input: 'dist/types/alphatab.d.ts',
+        output: [
+            {
+                file: 'dist/alphaTab.d.ts',
+                format: 'es'
+            }
+        ],
+        plugins: [
+            resolve({
+                mappings: {
+                    '@src': 'dist/types'
+                },
+                types: true
+            }),
+            dts()
+        ]
+    }
 ];
