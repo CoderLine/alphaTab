@@ -1,6 +1,6 @@
 import { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
-import { Platform } from '@src/platform/Platform';
+import { Environment } from '@src/Environment';
 
 export class IOHelper {
     public static readInt32BE(input: IReadable): number {
@@ -68,7 +68,7 @@ export class IOHelper {
     public static read8BitChars(input: IReadable, length: number): string {
         let b: Uint8Array = new Uint8Array(length);
         input.read(b, 0, b.length);
-        return Platform.toString(b, 'utf-8');
+        return IOHelper.toString(b, 'utf-8');
     }
 
     public static read8BitString(input: IReadable): string {
@@ -114,4 +114,60 @@ export class IOHelper {
     public static readInt16(input: Uint8Array, index: number): number {
         return TypeConversions.int32ToInt16(input[index] | (input[index + 1] << 8));
     }
+
+    public static toString(data: Uint8Array, encoding: string): string {
+        if (Environment.supportsTextDecoder) {
+            let detectedEncoding: string | null = IOHelper.detectEncoding(data);
+            if (detectedEncoding) {
+                encoding = detectedEncoding;
+            }
+            if (!encoding) {
+                encoding = 'utf-8';
+            }
+            let decoder: TextDecoder = new TextDecoder(encoding);
+            return decoder.decode(data.buffer);
+        } else {
+            // manual UTF8 decoding for older browsers
+            let s: string = '';
+            let i: number = 0;
+            while (i < data.length) {
+                let c: number = data[i++];
+                if (c < 0x80) {
+                    if (c === 0) {
+                        break;
+                    }
+                    s += String.fromCharCode(c);
+                } else if (c < 0xe0) {
+                    s += String.fromCharCode(((c & 0x3f) << 6) | (data[i++] & 0x7f));
+                } else if (c < 0xf0) {
+                    s += String.fromCharCode(((c & 0x1f) << 12) | ((data[i++] & 0x7f) << 6) | (data[i++] & 0x7f));
+                } else {
+                    let u: number =
+                        ((c & 0x0f) << 18) |
+                        ((data[i++] & 0x7f) << 12) |
+                        ((data[i++] & 0x7f) << 6) |
+                        (data[i++] & 0x7f);
+                    s += String.fromCharCode((u >> 18) + 0xd7c0);
+                    s += String.fromCharCode((u & 0x3ff) | 0xdc00);
+                }
+            }
+            return s;
+        }
+    }
+    
+    private static detectEncoding(data: Uint8Array): string | null {
+        if (data.length > 2 && data[0] === 0xfe && data[1] === 0xff) {
+            return 'utf-16be';
+        }
+        if (data.length > 2 && data[0] === 0xff && data[1] === 0xfe) {
+            return 'utf-16le';
+        }
+        if (data.length > 4 && data[0] === 0x00 && data[1] === 0x00 && data[2] === 0xfe && data[3] === 0xff) {
+            return 'utf-32be';
+        }
+        if (data.length > 4 && data[0] === 0xff && data[1] === 0xfe && data[2] === 0x00 && data[3] === 0x00) {
+            return 'utf-32le';
+        }
+        return null;
+    }    
 }

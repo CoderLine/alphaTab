@@ -11,7 +11,6 @@ import { AlphaSynthWebWorker } from '@src/platform/javascript/AlphaSynthWebWorke
 import { AlphaTabWebWorker } from '@src/platform/javascript/AlphaTabWebWorker';
 import { Html5Canvas } from '@src/platform/javascript/Html5Canvas';
 import { JQueryAlphaTab } from '@src/platform/javascript/JQueryAlphaTab';
-import { Platform } from '@src/platform/Platform';
 import { CssFontSvgCanvas } from '@src/platform/svg/CssFontSvgCanvas';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { EffectBarRendererFactory } from '@src/rendering/EffectBarRendererFactory';
@@ -149,8 +148,40 @@ export class Environment {
     /**
      * @target web
      */
+    public static get isRunningInWorker(): boolean {
+        return 'WorkerGlobalScope' in globalThis;
+    }
+
+    /**
+     * @target web
+     */
+    public static get supportsFontsApi(): boolean {
+        return 'fonts' in document && 'load' in (document as any).fonts;
+    }
+
+    /**
+     * @target web
+     */
+    public static get supportsTextDecoder(): boolean {
+        return 'TextDecoder' in globalThis;
+    }
+
+    /**
+     * @target web
+     */
+    public static throttle(action: () => void, delay: number): () => void {
+        let timeoutId: number = 0;
+        return () => {
+            window.clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(action, delay);
+        };
+    }
+
+    /**
+     * @target web
+     */
     private static detectScriptFile(): string | null {
-        if (Platform.isRunningInWorker) {
+        if (Environment.isRunningInWorker) {
             return null;
         }
         // try to build the find the alphaTab script url in case we are not in the webworker already
@@ -200,7 +231,7 @@ export class Environment {
      * @target web
      */
     private static registerJQueryPlugin(): void {
-        if (!Platform.isRunningInWorker && globalThis && 'jQuery' in globalThis) {
+        if (!Environment.isRunningInWorker && globalThis && 'jQuery' in globalThis) {
             let jquery: any = (globalThis as any)['jQuery'];
             let api: JQueryAlphaTab = new JQueryAlphaTab();
             jquery.fn.alphaTab = function (this: any, method: string) {
@@ -456,7 +487,7 @@ export class Environment {
                   return Math.log(x) * Math.LOG2E;
               };
 
-        if (!Platform.isRunningInWorker) {
+        if (!Environment.isRunningInWorker) {
             let vbAjaxLoader: string = '';
             vbAjaxLoader += 'Function VbAjaxLoader(method, fileName)' + '\r\n';
             vbAjaxLoader += '    Dim xhr' + '\r\n';

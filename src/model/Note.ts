@@ -14,11 +14,11 @@ import { SlideOutType } from '@src/model/SlideOutType';
 import { Staff } from '@src/model/Staff';
 import { VibratoType } from '@src/model/VibratoType';
 import { NotationMode } from '@src/NotationSettings';
-import { Platform } from '@src/platform/Platform';
 import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
 import { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 import { Logger } from '@src/util/Logger';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
  * A note is a single played sound on a fretted instrument.
@@ -349,10 +349,10 @@ export class Note {
         }
         let value: number = this.harmonicValue;
         // add semitones to reach corresponding harmonic frets
-        if (Platform.isAlmostEqualTo(value, 2.4)) {
+        if (ModelUtils.isAlmostEqualTo(value, 2.4)) {
             return 36;
         }
-        if (Platform.isAlmostEqualTo(value, 2.7)) {
+        if (ModelUtils.isAlmostEqualTo(value, 2.7)) {
             // Fret 3 2nd octave + minor seventh
             return 34;
         }

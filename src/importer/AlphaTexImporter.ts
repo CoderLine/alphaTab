@@ -29,7 +29,6 @@ import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
-import { Platform } from '@src/platform/Platform';
 import { Logger } from '@src/util/Logger';
 import { ModelUtils, TuningParseResult } from '@src/model/ModelUtils';
 import { AlphaTabError } from '@src/AlphaTabError';
@@ -376,7 +375,7 @@ export class AlphaTexImporter extends ScoreImporter {
         do {
             if (this._ch === AlphaTexImporter.Eof) {
                 this._sy = AlphaTexSymbols.Eof;
-            } else if (Platform.isWhiteSpace(this._ch)) {
+            } else if (this._ch === 0x20 || this._ch === 0x0b || this._ch === 0x0d || this._ch === 0x0a || this._ch === 0x09) {
                 // skip whitespaces
                 this._ch = this.nextChar();
             } else if (this._ch === 0x2f /* / */) {

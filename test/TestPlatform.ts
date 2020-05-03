@@ -1,13 +1,13 @@
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IReadable } from '@src/io/IReadable';
-import { Platform } from '@src/platform/Platform';
+import { IOHelper } from '@src/io/IOHelper';
   
 /**
  * @partial
  */
 export class TestPlatform {
     public static createStringReader(tex: string): IReadable {
-        return ByteBuffer.fromBuffer(Platform.stringToByteArray(tex));
+        return ByteBuffer.fromString(tex);
     }
 
     /**
@@ -36,7 +36,7 @@ export class TestPlatform {
 
     public static async loadFileAsString(path: string): Promise<string> {
         const data = await TestPlatform.loadFile(path);
-        return Platform.toString(data, 'UTF-8');
+        return IOHelper.toString(data, 'UTF-8');
     }
 
     public static changeExtension(file: string, extension: string): string {

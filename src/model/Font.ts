@@ -1,4 +1,4 @@
-import { Platform } from '@src/platform/Platform';
+import { Environment } from '@src/Environment';
 
 /**
  * Lists all flags for font styles.
@@ -99,7 +99,7 @@ export class Font {
             return new Font((value as any).family, (value as any).size, (value as any).style);
         }
 
-        if (typeof value === 'string' && !Platform.isRunningInWorker) {
+        if (typeof value === 'string' && !Environment.isRunningInWorker) {
             let el: HTMLElement = document.createElement('span');
             el.setAttribute('style', 'font: ' + value);
             let style: CSSStyleDeclaration = el.style;

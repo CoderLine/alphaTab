@@ -1,5 +1,5 @@
 import { FontStyle } from '@src/model/Font';
-import { Platform } from '../Platform';
+import { Environment } from '@src/Environment';
 
 /**
  * This public class stores text widths for several fonts and allows width calculation
@@ -49,7 +49,7 @@ export class FontSizes {
             return;
         }
 
-        if (!Platform.isRunningInWorker) {
+        if (!Environment.isRunningInWorker) {
             let canvas: HTMLCanvasElement = document.createElement('canvas');
             let measureContext: CanvasRenderingContext2D = canvas.getContext('2d')!;
             measureContext.font = `11px ${family}`;

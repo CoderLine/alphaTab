@@ -3,10 +3,10 @@ import { Font } from '@src/model/Font';
 import { HarmonicType } from '@src/model/HarmonicType';
 import { Note } from '@src/model/Note';
 import { ICanvas } from '@src/platform/ICanvas';
-import { Platform } from '@src/platform/Platform';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 export class NoteNumberGlyph extends Glyph {
     private _note: Note;
@@ -52,7 +52,7 @@ export class NoteNumberGlyph extends Glyph {
         }
         if (n.isTrill) {
             this._trillNoteString = '(' + (n.trillFret - n.beat.voice.bar.staff.transpositionPitch) + ')';
-        } else if (!Platform.isAlmostEqualTo(n.harmonicValue, 0)) {
+        } else if (!ModelUtils.isAlmostEqualTo(n.harmonicValue, 0)) {
             switch (n.harmonicType) {
                 case HarmonicType.Artificial:
                 case HarmonicType.Pinch:

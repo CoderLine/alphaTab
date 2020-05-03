@@ -1,7 +1,6 @@
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
 import { IReadable } from '@src/io/IReadable';
-import { Platform } from '@src/platform/Platform';
 import { Inflate } from '@src/zip/Inflate';
 
 export class ZipEntry {
@@ -64,7 +63,7 @@ export class ZipReader {
         let uncompressedSize: number = IOHelper.readInt32LE(readable);
         let fileNameLength: number = IOHelper.readInt16LE(readable);
         let extraFieldLength: number = IOHelper.readInt16LE(readable);
-        let fname: string = Platform.toString(IOHelper.readByteArray(readable, fileNameLength), 'utf-8');
+        let fname: string = IOHelper.toString(IOHelper.readByteArray(readable, fileNameLength), 'utf-8');
         readable.skip(extraFieldLength);
 
         // 4.3.8 File Data

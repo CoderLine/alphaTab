@@ -30,6 +30,14 @@ export class ByteBuffer implements IWriteable, IReadable {
         return buffer;
     }
 
+    public static fromString(contents: string): ByteBuffer {
+        let byteArray: Uint8Array = new Uint8Array(contents.length);
+        for (let i: number = 0; i < contents.length; i++) {
+            byteArray[i] = contents.charCodeAt(i);
+        }
+        return ByteBuffer.fromBuffer(byteArray);
+    }
+
     public reset(): void {
         this.position = 0;
     }

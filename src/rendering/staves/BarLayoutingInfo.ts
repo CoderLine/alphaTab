@@ -1,8 +1,8 @@
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
-import { Platform } from '@src/platform/Platform';
 import { Spring } from '@src/rendering/staves/Spring';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
  * This public class stores size information about a stave.
@@ -208,7 +208,7 @@ export class BarLayoutingInfo {
     }
 
     public buildOnTimePositions(force: number): Map<number, number> {
-        if (Platform.isAlmostEqualTo(this._onTimePositionsForce, force) && this._onTimePositions) {
+        if (ModelUtils.isAlmostEqualTo(this._onTimePositionsForce, force) && this._onTimePositions) {
             return this._onTimePositions;
         }
         this._onTimePositionsForce = force;

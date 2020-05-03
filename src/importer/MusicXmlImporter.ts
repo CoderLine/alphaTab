@@ -22,11 +22,11 @@ import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 
-import { Platform } from '@src/platform/Platform';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
+import { IOHelper } from '@src/io/IOHelper';
 
 export class MusicXmlImporter extends ScoreImporter {
     private _score!: Score;
@@ -54,7 +54,7 @@ export class MusicXmlImporter extends ScoreImporter {
         this._tieStarts = [];
         this._tieStartIds = new Map<number, boolean>();
         this._slurStarts = new Map<string, Note>();
-        let xml: string = Platform.toString(this.data.readAll(), this.settings.importer.encoding);
+        let xml: string = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
         let dom: XmlDocument;
         try {
             dom = new XmlDocument(xml);
@@ -553,7 +553,7 @@ export class MusicXmlImporter extends ScoreImporter {
         //        chord.Name += "#" + degreeValue;
         //    }
         // }
-        this._currentChord = Platform.newGuid();
+        this._currentChord = ModelUtils.newGuid();
         for (let staff of track.staves) {
             staff.addChord(this._currentChord, chord);
         }

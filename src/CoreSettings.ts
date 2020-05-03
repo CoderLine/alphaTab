@@ -1,5 +1,4 @@
 import { Environment } from '@src/Environment';
-import { Platform } from '@src/platform/Platform';
 import { LogLevel } from '@src/LogLevel';
 
 /**
@@ -52,7 +51,7 @@ export class CoreSettings {
      * @target web
      */
     public constructor() {
-        if (!Platform.isRunningInWorker && (globalThis as any).ALPHATAB_ROOT) {
+        if (!Environment.isRunningInWorker && (globalThis as any).ALPHATAB_ROOT) {
             this.scriptFile = (globalThis as any).ALPHATAB_ROOT;
             this.scriptFile = CoreSettings.ensureFullUrl(this.scriptFile);
             this.scriptFile = CoreSettings.appendScriptName(this.scriptFile);
@@ -60,7 +59,7 @@ export class CoreSettings {
             this.scriptFile = Environment.scriptFile;
         }
 
-        if (!Platform.isRunningInWorker && (globalThis as any).ALPHATAB_FONT) {
+        if (!Environment.isRunningInWorker && (globalThis as any).ALPHATAB_FONT) {
             this.fontDirectory = (globalThis as any)['ALPHATAB_FONT'];
             this.fontDirectory = CoreSettings.ensureFullUrl(this.fontDirectory);
         } else {

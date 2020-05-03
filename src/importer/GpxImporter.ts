@@ -4,9 +4,9 @@ import { GpxFileSystem } from '@src/importer/GpxFileSystem';
 import { PartConfiguration } from '@src/importer/PartConfiguration';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { Score } from '@src/model/Score';
-import { Platform } from '@src/platform/Platform';
 import { Logger } from '@src/util/Logger';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
+import { IOHelper } from '@src/io/IOHelper';
 
 /**
  * This ScoreImporter can read Guitar Pro 6 (gpx) files.
@@ -37,7 +37,7 @@ export class GpxImporter extends ScoreImporter {
         for (let entry of fileSystem.files) {
             switch (entry.fileName) {
                 case 'score.gpif':
-                    xml = Platform.toString(entry.data!, this.settings.importer.encoding);
+                    xml = IOHelper.toString(entry.data!, this.settings.importer.encoding);
                     break;
                 case 'BinaryStylesheet':
                     binaryStylesheetData = entry.data;

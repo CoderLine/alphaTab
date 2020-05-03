@@ -1,6 +1,6 @@
 import { IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { Platform } from '@src/platform/Platform';
 import { Logger } from '@src/util/Logger';
+import { Environment } from '@src/Environment';
 
 /**
  * This small utility helps to detect whether a particular font is already loaded.
@@ -20,7 +20,7 @@ export class FontLoadingChecker {
     }
 
     public checkForFontAvailability(): void {
-        if (Platform.isRunningInWorker) {
+        if (Environment.isRunningInWorker) {
             // no web fonts in web worker
             this.isFontLoaded = false;
             return;
@@ -43,7 +43,7 @@ export class FontLoadingChecker {
 
         Logger.debug('Font', `Start checking for font availablility: ${this._family}`);
 
-        if (Platform.supportsFontsApi) {
+        if (Environment.supportsFontsApi) {
             Logger.debug('Font', `[${this._family}] Font API available`);
 
             let checkFont = () => {

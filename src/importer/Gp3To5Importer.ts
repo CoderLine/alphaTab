@@ -37,9 +37,8 @@ import { TripletFeel } from '@src/model/TripletFeel';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 
-import { Platform } from '@src/platform/Platform';
-
 import { Logger } from '@src/util/Logger';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
@@ -523,7 +522,7 @@ export class Gp3To5Importer extends ScoreImporter {
 
     public readChord(beat: Beat): void {
         let chord: Chord = new Chord();
-        let chordId: string = Platform.newGuid();
+        let chordId: string = ModelUtils.newGuid();
         if (this._versionNumber >= 500) {
             this.data.skip(17);
             chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this.settings.importer.encoding);
@@ -1150,7 +1149,9 @@ export class GpBinaryHelpers {
     public static gpReadDouble(data: IReadable): number {
         let bytes: Uint8Array = new Uint8Array(8);
         data.read(bytes, 0, bytes.length);
-        return Platform.toDouble(bytes);
+
+        let array: Float64Array = new Float64Array(bytes.buffer);
+        return array[0];
     }
 
     public static gpReadFloat(data: IReadable): number {
@@ -1159,7 +1160,9 @@ export class GpBinaryHelpers {
         bytes[2] = data.readByte();
         bytes[2] = data.readByte();
         bytes[1] = data.readByte();
-        return Platform.toFloat(bytes);
+        
+        let array: Float32Array = new Float32Array(bytes.buffer);
+        return array[0];
     }
 
     public static gpReadColor(data: IReadable, readAlpha: boolean = false): Color {
@@ -1207,7 +1210,7 @@ export class GpBinaryHelpers {
     public static gpReadString(data: IReadable, length: number, encoding: string): string {
         let b: Uint8Array = new Uint8Array(length);
         data.read(b, 0, b.length);
-        return Platform.toString(b, encoding);
+        return IOHelper.toString(b, encoding);
     }
 
     /**

@@ -4,7 +4,6 @@ import { Duration } from '@src/model/Duration';
 import { Fingers } from '@src/model/Fingers';
 import { Score } from '@src/model/Score';
 import { FingeringMode } from '@src/NotationSettings';
-import { Platform } from '@src/platform/Platform';
 import { Settings } from '@src/Settings';
 
 export class TuningParseResult {
@@ -133,7 +132,7 @@ export class ModelUtils {
         let octave: string = '';
         for (let i: number = 0; i < name.length; i++) {
             let c: number = name.charCodeAt(i);
-            if (Platform.isCharNumber(c, false)) {
+            if (c >= 0x30 && c <= 0x39) {
                 // number without note?
                 if (!note) {
                     return null;
@@ -211,5 +210,55 @@ export class ModelUtils {
                 return 0;
         }
         return b;
+    }
+
+    public static newGuid(): string {
+        return (
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            '-' +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            '-' +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            '-' +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            '-' +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1) +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1)
+        );
+    }
+
+    public static isAlmostEqualTo(a: number, b: number): boolean {
+        return Math.abs(a - b) < 0.00001;
+    }
+
+    public static toHexString(n: number, digits: number = 0): string {
+        let s: string = '';
+        let hexChars: string = '0123456789ABCDEF';
+        do {
+            s = String.fromCharCode(hexChars.charCodeAt(n & 15)) + s;
+            n = n >> 4;
+        } while (n > 0);
+        while (s.length < digits) {
+            s = '0' + s;
+        }
+        return s;
     }
 }

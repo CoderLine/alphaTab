@@ -22,7 +22,6 @@ import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { IUiFacade } from '@src/platform/IUiFacade';
 import { Cursors } from '@src/platform/Cursors';
-import { Platform } from '@src/platform/Platform';
 import { ScrollMode } from '@src/PlayerSettings';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 
@@ -110,7 +109,7 @@ export class AlphaTabApiBase<TSettings> {
         this.canvasElement = uiFacade.createCanvasElement();
         this.container.appendChild(this.canvasElement);
         this.container.resize.on(
-            Platform.throttle(() => {
+            Environment.throttle(() => {
                 if (this.container.width !== this.renderer.width) {
                     this.triggerResize();
                 }
@@ -322,7 +321,7 @@ export class AlphaTabApiBase<TSettings> {
     public tex(tex: string, tracks?: number[]): void {
         try {
             let parser: AlphaTexImporter = new AlphaTexImporter();
-            let data: ByteBuffer = ByteBuffer.fromBuffer(Platform.stringToByteArray(tex));
+            let data: ByteBuffer = ByteBuffer.fromString(tex);
             parser.init(data, this.settings);
             let score: Score = parser.readScore();
             this.renderScore(score, tracks);

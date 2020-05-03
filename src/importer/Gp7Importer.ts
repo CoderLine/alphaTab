@@ -6,10 +6,10 @@ import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 
 import { Score } from '@src/model/Score';
 
-import { Platform } from '@src/platform/Platform';
 import { Logger } from '@src/util/Logger';
 
 import { ZipEntry, ZipReader } from '@src/zip/ZipReader';
+import { IOHelper } from '@src/io/IOHelper';
 
 /**
  * This ScoreImporter can read Guitar Pro 7 (gp) files.
@@ -42,7 +42,7 @@ export class Gp7Importer extends ScoreImporter {
         for (let entry of entries) {
             switch (entry.fileName) {
                 case 'score.gpif':
-                    xml = Platform.toString(entry.data, this.settings.importer.encoding);
+                    xml = IOHelper.toString(entry.data, this.settings.importer.encoding);
                     break;
                 case 'BinaryStylesheet':
                     binaryStylesheetData = entry.data;

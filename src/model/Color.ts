@@ -1,5 +1,5 @@
 import { FormatError } from '@src/FormatError';
-import { Platform } from '@src/platform/Platform';
+import { ModelUtils } from './ModelUtils';
 
 /**
  * @json_immutable
@@ -24,9 +24,9 @@ export class Color {
         if (this.a === 0xff) {
             this.rgba =
                 '#' +
-                Platform.toHexString(this.r, 2) +
-                Platform.toHexString(this.g, 2) +
-                Platform.toHexString(this.b, 2);
+                ModelUtils.toHexString(this.r, 2) +
+                ModelUtils.toHexString(this.g, 2) +
+                ModelUtils.toHexString(this.b, 2);
         } else {
             this.rgba = `rgba(${this.r},${this.g},${this.b},${this.a / 255.0})`;
         }
