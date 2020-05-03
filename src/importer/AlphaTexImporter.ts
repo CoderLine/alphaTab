@@ -75,7 +75,6 @@ export class AlphaTexError extends Error {
     ): AlphaTexError {
         let message: string;
         if (!symbolData) {
-            debugger;
             message = `MalFormed AlphaTex: @${position}: Error on block ${nonTerm}, expected a ${AlphaTexSymbols[expected]} found a ${AlphaTexSymbols[symbol]}: '${symbolData}'`;
         } else {
             message = `MalFormed AlphaTex: @${position}: Error on block ${nonTerm}, invalid value: ${symbolData}`;

@@ -144,7 +144,10 @@ export class AlphaTabApiBase<TSettings> {
             this.setupPlayer();
         }
         this.setupClickHandling();
-        this.uiFacade.initialRender();
+        // delay rendering to allow ui to hook up with events first. 
+        this.uiFacade.beginInvoke(()=> {
+            this.uiFacade.initialRender();
+        });
     }
 
     /**
@@ -1024,11 +1027,15 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
         let selectionWrapper: IContainer | null = this._selectionWrapper;
-        if (!selectionWrapper || !startBeat || !endBeat || startBeat.beat === endBeat.beat) {
+        if (!selectionWrapper) {
             return;
         }
 
         selectionWrapper.clear();
+        if (!startBeat || !endBeat || startBeat.beat === endBeat.beat) {
+            return;
+        }
+
         if (!startBeat.bounds) {
             startBeat.bounds = cache.findBeat(startBeat.beat);
         }
