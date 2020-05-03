@@ -1,6 +1,6 @@
 import { ISynthOutput } from '@src/synth/ISynthOutput';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { IWorkerScope } from '@src/platform/javaScript/IWorkerScope';
+import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/util/Logger';
 
 /**

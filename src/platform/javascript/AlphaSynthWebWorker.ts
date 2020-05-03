@@ -2,8 +2,8 @@ import { AlphaSynth } from '@src/synth/AlphaSynth';
 import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { JsonConverter } from '@src/model/JsonConverter';
-import { AlphaSynthWorkerSynthOutput } from '@src/platform/javaScript/AlphaSynthWorkerSynthOutput';
-import { IWorkerScope } from '@src/platform/javaScript/IWorkerScope';
+import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
+import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/util/Logger';
 
 /**

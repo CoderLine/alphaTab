@@ -1,7 +1,7 @@
 import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import { BrowserMouseEventArgs } from '@src/platform/javaScript/BrowserMouseEventArgs';
+import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 
 /**
  * @target web

@@ -3,7 +3,7 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import pixelmatch from 'pixelmatch';
-import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
+import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { CoreSettings } from '@src/CoreSettings';
 import { Environment } from '@src/Environment';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';

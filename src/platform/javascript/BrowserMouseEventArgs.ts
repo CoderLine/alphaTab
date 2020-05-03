@@ -1,6 +1,6 @@
 import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import { HtmlElementContainer } from '@src/platform/javaScript/HtmlElementContainer';
+import { HtmlElementContainer } from '@src/platform/javascript/HtmlElementContainer';
 
 /**
  * @target web

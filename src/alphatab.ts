@@ -12,7 +12,7 @@ import { FormatError } from '@src/FormatError';
 import { LogLevel } from '@src/LogLevel';
 import { FileLoadError } from '@src/FileLoadError';
 
-import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
+import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 
 export {
     AlphaTabApi,

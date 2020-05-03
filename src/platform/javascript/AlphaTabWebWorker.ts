@@ -1,6 +1,6 @@
 import { JsonConverter } from '@src/model/JsonConverter';
 import { Score } from '@src/model/Score';
-import { IWorkerScope } from '@src/platform/javaScript/IWorkerScope';
+import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { FontSizes } from '@src/platform/svg/FontSizes';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';

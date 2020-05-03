@@ -7,7 +7,7 @@ import { Font } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { NotationMode } from '@src/NotationSettings';
 import { IContainer } from '@src/platform/IContainer';
-import { HtmlElementContainer } from '@src/platform/javaScript/HtmlElementContainer';
+import { HtmlElementContainer } from '@src/platform/javascript/HtmlElementContainer';
 import { FontSizes } from '@src/platform/svg/FontSizes';
 import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
@@ -17,11 +17,11 @@ import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/util/Logger';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { IUiFacade } from '@src/platform/IUiFacade';
-import { AlphaSynthWebAudioOutput } from '@src/platform/javaScript/AlphaSynthWebAudioOutput';
-import { AlphaSynthWebWorkerApi } from '@src/platform/javaScript/AlphaSynthWebWorkerApi';
-import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
-import { AlphaTabWorkerScoreRenderer } from '@src/platform/javaScript/AlphaTabWorkerScoreRenderer';
-import { BrowserMouseEventArgs } from '@src/platform/javaScript/BrowserMouseEventArgs';
+import { AlphaSynthWebAudioOutput } from '@src/platform/javascript/AlphaSynthWebAudioOutput';
+import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';
+import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
+import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWorkerScoreRenderer';
+import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 import { Cursors } from '@src/platform/Cursors';
 
 /**
