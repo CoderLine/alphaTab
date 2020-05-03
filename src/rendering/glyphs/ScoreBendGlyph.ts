@@ -12,7 +12,7 @@ import { ScoreHelperNotesBaseGlyph } from '@src/rendering/glyphs/ScoreHelperNote
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     private _beat: Beat;

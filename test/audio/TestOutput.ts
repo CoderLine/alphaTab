@@ -1,4 +1,4 @@
-import { ISynthOutput } from '@src/audio/synth/ISynthOutput';
+import { ISynthOutput } from '@src/synth/ISynthOutput';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 
 export class TestOutput implements ISynthOutput {

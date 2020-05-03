@@ -6,7 +6,7 @@ import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { Staff } from '@src/model/Staff';
 import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
-import { ModelUtils } from '@src/util/ModelUtils';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
  * This small utilty public class allows the assignment of accidentals within a

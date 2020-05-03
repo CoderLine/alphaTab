@@ -33,8 +33,8 @@ import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { IBeamYCalculator } from '@src/rendering/utils/IBeamYCalculator';
 import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
-import { ModelUtils } from '@src/util/ModelUtils';
-import { NoteHeadGlyph } from './glyphs/NoteHeadGlyph';
+import { ModelUtils } from '@src/model/ModelUtils';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 /**
  * This BarRenderer renders a bar using standard music notation.

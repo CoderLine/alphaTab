@@ -1,51 +1,44 @@
 import { CoreSettings } from '@src/CoreSettings';
-
 import { DisplaySettings, LayoutMode, StaveProfile } from '@src/DisplaySettings';
-
-import { Environment } from '@src/Environment';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-
 import { ImporterSettings } from '@src/ImporterSettings';
-
 import { FingeringMode, NotationMode, NotationSettings, TabRhythmMode } from '@src/NotationSettings';
-
-import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
-
 import { PlayerSettings, ScrollMode, VibratoPlaybackSettings } from '@src/PlayerSettings';
-
 import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { RenderingResources } from '@src/RenderingResources';
 import { ResizeEventArgs } from '@src/ResizeEventArgs';
-import { SelectionInfo } from '@src/SelectionInfo';
 import { Settings } from '@src/Settings';
+import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
+import { AlphaTabError } from '@src/AlphaTabError';
+import { FormatError } from '@src/FormatError';
+import { LogLevel } from '@src/LogLevel';
+import { FileLoadError } from '@src/FileLoadError';
 
 export {
+    AlphaTabApi,
+    AlphaTabError,
+    FileLoadError,
     CoreSettings,
-    DisplaySettings,
-    Environment,
-    FingeringMode,
-    ImporterSettings,
+    StaveProfile,
     LayoutMode,
+    DisplaySettings,
+    FormatError,
+    ImporterSettings,
+    TabRhythmMode,
+    FingeringMode,
     NotationMode,
     NotationSettings,
+    ScrollMode,
+    VibratoPlaybackSettings,
     PlayerSettings,
     ProgressEventArgs,
     RenderingResources,
     ResizeEventArgs,
-    ScrollMode,
-    SelectionInfo,
     Settings,
-    StaveProfile,
-    TabRhythmMode,
-    VibratoPlaybackSettings
+    LogLevel
 };
 
-export const importer = {
-    ScoreLoader
-};
-
-export const platform = {
-    javaScript: {
-        AlphaTabApi
-    }
-};
+export * as importer from '@src/importer'
+export * as midi from '@src/midi'
+export * as model from '@src/model'
+export * as rendering from '@src/rendering'
+export * as synth from '@src/synth'

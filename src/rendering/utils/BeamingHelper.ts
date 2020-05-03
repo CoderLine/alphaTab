@@ -11,8 +11,8 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatLinePositions } from '@src/rendering/utils/BeatLinePositions';
 import { IBeamYCalculator } from '@src/rendering/utils/IBeamYCalculator';
 import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
-import { ModelUtils } from '@src/util/ModelUtils';
-import { MidiUtils } from '@src/audio/util/MidiUtils';
+import { ModelUtils } from '@src/model/ModelUtils';
+import { MidiUtils } from '@src/midi/MidiUtils';
 
 /**
  * This public class helps drawing beams and bars for notes.

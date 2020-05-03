@@ -1,5 +1,6 @@
 {
     "files.exclude": {
-        "dist/lib.csharp/**": true
+        "dist/lib.csharp/**": true,
+        "src.csharp/**": true
     }
 }

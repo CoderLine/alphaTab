@@ -1,4 +1,4 @@
-import { MidiUtils } from '@src/audio/util/MidiUtils';
+import { MidiUtils } from '@src/midi/MidiUtils';
 import { Gp7Importer } from '@src/importer/Gp7Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Beat } from '@src/model/Beat';

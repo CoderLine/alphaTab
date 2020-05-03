@@ -1,17 +1,18 @@
-import { MidiFile } from '@src/audio/midi/MidiFile';
-import { IAlphaSynth } from '@src/audio/synth/IAlphaSynth';
-import { ISynthOutput } from '@src/audio/synth/ISynthOutput';
-import { PlaybackRange } from '@src/audio/synth/PlaybackRange';
-import { PlayerState } from '@src/audio/synth/PlayerState';
-import { PlayerStateChangedEventArgs } from '@src/audio/synth/PlayerStateChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/audio/synth/PositionChangedEventArgs';
-import { SynthHelper } from '@src/audio/util/SynthHelper';
+import { MidiFile } from '@src/midi/MidiFile';
+import { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import { ISynthOutput } from '@src/synth/ISynthOutput';
+import { PlaybackRange } from '@src/synth/PlaybackRange';
+import { PlayerState } from '@src/synth/PlayerState';
+import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import { SynthHelper } from '@src/synth/SynthHelper';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { FileLoadError } from '@src/importer/FileLoadError';
+import { FileLoadError } from '@src/FileLoadError';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { ProgressEventArgs } from '@src/ProgressEventArgs';
-import { Logger, LogLevel } from '@src/util/Logger';
-import { SynthConstants } from '@src/audio/util/SynthConstants';
+import { Logger } from '@src/util/Logger';
+import { LogLevel } from '@src/LogLevel';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -255,7 +256,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         };
         request.onerror = e => {
             Logger.error('AlphaSynth', 'Loading failed: ' + (e as any).message);
-            (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(new FileLoadError((e as any).message, request));
+            (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(
+                new FileLoadError((e as any).message, request)
+            );
         };
         request.onprogress = e => {
             Logger.debug('AlphaSynth', `Soundfont downloading: ${e.loaded}/${e.total} bytes`);
@@ -332,7 +335,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 break;
             case 'alphaSynth.playerStateChanged':
                 this._state = data.state;
-                (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(new PlayerStateChangedEventArgs(data.state, data.stopped));
+                (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
+                    new PlayerStateChangedEventArgs(data.state, data.stopped)
+                );
                 break;
             case 'alphaSynth.finished':
                 (this.finished as EventEmitter).trigger();
@@ -388,8 +393,12 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
     readonly midiLoaded: IEventEmitter = new EventEmitter();
     readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<PlayerStateChangedEventArgs>();
-    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
+    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
+        PlayerStateChangedEventArgs
+    >();
+    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
+        PositionChangedEventArgs
+    >();
 
     //
     // output communication ( output -> worker )

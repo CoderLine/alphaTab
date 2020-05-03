@@ -1,6 +1,6 @@
 ﻿using System;
-using AlphaTab.Audio.Synth;
-using AlphaTab.Audio.Synth.Ds;
+using AlphaTab.Synth;
+using AlphaTab.Synth.Ds;
 using AlphaTab.Core.EcmaScript;
 using NAudio.Wave;
 

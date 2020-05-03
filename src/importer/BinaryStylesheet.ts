@@ -1,7 +1,7 @@
 import { Score } from '@src/model/Score';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
-import { GpBinaryHelpers } from './Gp3To5Importer';
+import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
 import { BendPoint } from '@src/model/BendPoint';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Color } from '@src/model/Color';

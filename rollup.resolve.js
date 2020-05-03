@@ -1,5 +1,6 @@
 const join = require('path').join;
 const glob = require('glob').sync;
+const fs = require('fs');
 
 module.exports = function (options) {
     const mappings = options.mappings;
@@ -25,8 +26,11 @@ module.exports = function (options) {
                     return join(process.cwd(), match[0][1]);
                 }
 
-                const resolved = join(process.cwd(), match[0][1], importee.substring(match[0][0].length) + extension);
-                return resolved;
+                let resolved = join(process.cwd(), match[0][1], importee.substring(match[0][0].length));
+                if (fs.existsSync(join(resolved, 'index' + extension))) {
+                    return join(resolved, 'index' + extension);
+                }
+                return resolved + extension;
             }
         },
         load(id) {

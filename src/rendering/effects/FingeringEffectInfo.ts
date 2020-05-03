@@ -9,7 +9,7 @@ import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
 import { Settings } from '@src/Settings';
-import { ModelUtils } from '@src/util/ModelUtils';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 export class FingeringEffectInfo implements IEffectBarRendererInfo {
     public get effectId(): string {

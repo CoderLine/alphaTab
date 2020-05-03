@@ -2,7 +2,7 @@ import { PickStroke } from '@src/model/PickStroke';
 import { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class PickStrokeGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, pickStroke: PickStroke) {

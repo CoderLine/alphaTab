@@ -11,7 +11,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { ScoreBeatPreNotesGlyph } from '@src/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class ScoreSlideLineGlyph extends Glyph {
     private _outType: SlideOutType;

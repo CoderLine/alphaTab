@@ -3,7 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using AlphaTab.Audio.Synth;
+using AlphaTab.Synth;
 using AlphaTab.Platform;
 using AlphaTab.Platform.CSharp;
 using AlphaTab.Rendering;

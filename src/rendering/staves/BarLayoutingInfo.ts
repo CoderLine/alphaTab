@@ -1,4 +1,4 @@
-import { MidiUtils } from '@src/audio/util/MidiUtils';
+import { MidiUtils } from '@src/midi/MidiUtils';
 import { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { Platform } from '@src/platform/Platform';

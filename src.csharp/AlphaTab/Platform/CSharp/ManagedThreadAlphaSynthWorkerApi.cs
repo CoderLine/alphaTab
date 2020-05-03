@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using AlphaTab.Audio.Synth;
-using AlphaTab.Util;
+using AlphaTab.Synth;
 
 namespace AlphaTab.Platform.CSharp
 {

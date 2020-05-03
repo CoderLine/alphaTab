@@ -28,7 +28,7 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { RenderingResources } from '@src/RenderingResources';
-import { ModelUtils } from '@src/util/ModelUtils';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation

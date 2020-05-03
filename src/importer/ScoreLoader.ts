@@ -1,6 +1,5 @@
 import { Environment } from '@src/Environment';
-import { FileLoadError } from '@src/importer/FileLoadError';
-import { NoCompatibleReaderFoundError } from '@src/importer/NoCompatibleReaderFoundEror';
+import { FileLoadError } from '@src/FileLoadError';
 
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
@@ -130,6 +129,6 @@ export class ScoreLoader {
             return score;
         }
         Logger.error('ScoreLoader', 'No compatible importer found for file');
-        throw new NoCompatibleReaderFoundError();
+        throw new UnsupportedFormatError('No compatible importer found for file');
     }
 }

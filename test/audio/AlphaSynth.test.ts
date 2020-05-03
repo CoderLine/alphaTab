@@ -1,7 +1,7 @@
-import { AlphaSynthMidiFileHandler } from '@src/audio/midi/generator/AlphaSynthMidiFileHandler';
-import { MidiFileGenerator } from '@src/audio/midi/generator/MidiFileGenerator';
-import { MidiFile } from '@src/audio/midi/MidiFile';
-import { AlphaSynth } from '@src/audio/synth/AlphaSynth';
+import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
+import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
+import { MidiFile } from '@src/midi/MidiFile';
+import { AlphaSynth } from '@src/synth/AlphaSynth';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';

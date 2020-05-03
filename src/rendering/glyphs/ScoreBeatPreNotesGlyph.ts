@@ -13,7 +13,7 @@ import { GhostNoteContainerGlyph } from '@src/rendering/glyphs/GhostNoteContaine
 import { ScoreBrushGlyph } from '@src/rendering/glyphs/ScoreBrushGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     private _prebends: BendNoteHeadGroupGlyph | null = null;

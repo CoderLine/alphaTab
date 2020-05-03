@@ -4,7 +4,8 @@ import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import pixelmatch from 'pixelmatch';
 import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
-import { CoreSettings, Environment } from '@src/alphatab';
+import { CoreSettings } from '@src/CoreSettings';
+import { Environment } from '@src/Environment';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 
 /**

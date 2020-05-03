@@ -12,7 +12,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();

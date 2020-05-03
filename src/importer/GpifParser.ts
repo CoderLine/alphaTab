@@ -36,7 +36,7 @@ import { Settings } from '@src/Settings';
 import { XmlDocument } from '@src/xml/XmlDocument';
 
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
-import { MidiUtils } from '@src/audio/util/MidiUtils';
+import { MidiUtils } from '@src/midi/MidiUtils';
 
 /**
  * This structure represents a duration within a gpif

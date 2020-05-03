@@ -1,8 +1,8 @@
-import { ControllerType } from '@src/audio/midi/event/ControllerType';
-import { MidiEvent } from '@src/audio/midi/event/MidiEvent';
-import { MidiFileGenerator } from '@src/audio/midi/generator/MidiFileGenerator';
-import { MidiFile } from '@src/audio/midi/MidiFile';
-import { MidiUtils } from '@src/audio/util/MidiUtils';
+import { ControllerType } from '@src/midi/ControllerType';
+import { MidiEvent } from '@src/midi/MidiEvent';
+import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
+import { MidiFile } from '@src/midi/MidiFile';
+import { MidiUtils } from '@src/midi/MidiUtils';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7Importer } from '@src/importer/Gp7Importer';

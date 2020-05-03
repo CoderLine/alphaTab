@@ -1,5 +1,5 @@
-import { ControllerType } from '@src/audio/midi/event/ControllerType';
-import { IMidiFileHandler } from '@src/audio/midi/generator/IMidiFileHandler';
+import { ControllerType } from '@src/midi/ControllerType';
+import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 import { DynamicValue } from '@src/model/DynamicValue';
 
 export class FlatMidiEventGenerator implements IMidiFileHandler {

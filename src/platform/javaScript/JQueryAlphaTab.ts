@@ -1,5 +1,5 @@
-import { IAlphaSynth } from '@src/audio/synth/IAlphaSynth';
-import { PlayerState } from '@src/audio/synth/PlayerState';
+import { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import { PlayerState } from '@src/synth/PlayerState';
 import { Score } from '@src/model/Score';
 import { Track } from '@src/model/Track';
 import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';

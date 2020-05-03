@@ -1,5 +1,5 @@
 import { Settings } from '@src/Settings';
-import { CoreSettings } from './alphatab';
+import { CoreSettings } from '@src/CoreSettings';
 
 /**
  * Represents the information related to a resize event.

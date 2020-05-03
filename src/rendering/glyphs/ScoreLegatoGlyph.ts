@@ -4,7 +4,7 @@ import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class ScoreLegatoGlyph extends TieGlyph {
     public constructor(startBeat: Beat, endBeat: Beat, forEnd: boolean = false) {

@@ -1,5 +1,5 @@
 import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { IAlphaSynth } from '@src/audio/synth/IAlphaSynth';
+import { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import { Environment } from '@src/Environment';
 import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
@@ -15,14 +15,14 @@ import { Bounds } from '@src/rendering/utils/Bounds';
 import { Settings } from '@src/Settings';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/util/Logger';
-import { IMouseEventArgs } from '../IMouseEventArgs';
-import { IUiFacade } from '../IUiFacade';
-import { AlphaSynthWebAudioOutput } from './AlphaSynthWebAudioOutput';
-import { AlphaSynthWebWorkerApi } from './AlphaSynthWebWorkerApi';
-import { AlphaTabApi } from './AlphaTabApi';
-import { AlphaTabWorkerScoreRenderer } from './AlphaTabWorkerScoreRenderer';
-import { BrowserMouseEventArgs } from './BrowserMouseEventArgs';
-import { Cursors } from '../Cursors';
+import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import { IUiFacade } from '@src/platform/IUiFacade';
+import { AlphaSynthWebAudioOutput } from '@src/platform/javaScript/AlphaSynthWebAudioOutput';
+import { AlphaSynthWebWorkerApi } from '@src/platform/javaScript/AlphaSynthWebWorkerApi';
+import { AlphaTabApi } from '@src/platform/javaScript/AlphaTabApi';
+import { AlphaTabWorkerScoreRenderer } from '@src/platform/javaScript/AlphaTabWorkerScoreRenderer';
+import { BrowserMouseEventArgs } from '@src/platform/javaScript/BrowserMouseEventArgs';
+import { Cursors } from '@src/platform/Cursors';
 
 /**
  * @target web

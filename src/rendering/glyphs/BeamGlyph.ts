@@ -2,7 +2,7 @@ import { Duration } from '@src/model/Duration';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class BeamGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, duration: Duration, direction: BeamDirection, isGrace: boolean) {

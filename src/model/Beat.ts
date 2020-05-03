@@ -1,4 +1,4 @@
-import { MidiUtils } from '@src/audio/util/MidiUtils';
+import { MidiUtils } from '@src/midi/MidiUtils';
 import { Automation, AutomationType } from '@src/model/Automation';
 import { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';

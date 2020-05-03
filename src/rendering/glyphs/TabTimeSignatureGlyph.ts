@@ -1,6 +1,6 @@
 import { TimeSignatureGlyph } from '@src/rendering/glyphs/TimeSignatureGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class TabTimeSignatureGlyph extends TimeSignatureGlyph {
     protected get commonY(): number {

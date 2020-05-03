@@ -1,4 +1,4 @@
-import { MidiUtils } from '@src/audio/util/MidiUtils';
+import { MidiUtils } from '@src/midi/MidiUtils';
 import { Automation } from '@src/model/Automation';
 import { Beat } from '@src/model/Beat';
 import { Fermata } from '@src/model/Fermata';

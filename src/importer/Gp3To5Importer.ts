@@ -1,4 +1,4 @@
-import { GeneralMidi } from '@src/audio/util/GeneralMidi';
+import { GeneralMidi } from '@src/midi/GeneralMidi';
 
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';

@@ -1,4 +1,4 @@
-import { MidiPlaybackController } from '@src/audio/midi/generator/MidiPlaybackController';
+import { MidiPlaybackController } from '@src/midi/MidiPlaybackController';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';

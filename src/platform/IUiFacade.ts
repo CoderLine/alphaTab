@@ -1,5 +1,5 @@
 import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { IAlphaSynth } from '@src/audio/synth/IAlphaSynth';
+import { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import { IEventEmitter } from '@src/EventEmitter';
 import { Score } from '@src/model/Score';
 import { IContainer } from '@src/platform/IContainer';

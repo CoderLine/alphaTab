@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
-using AlphaTab.Audio.Synth;
+using AlphaTab.Synth;
 
 namespace AlphaTab.Samples.Wpf.Converter
 {

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using AlphaTab.Audio.Midi;
-using AlphaTab.Audio.Midi.Generator;
-using AlphaTab.Audio.Synth;
+using AlphaTab.Midi;
+using AlphaTab.Synth;
 using AlphaTab.Importer;
 
 namespace AlphaTab.Samples.Player

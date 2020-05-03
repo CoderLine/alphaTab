@@ -1,4 +1,4 @@
-import { GeneralMidi } from '@src/audio/util/GeneralMidi';
+import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
@@ -31,7 +31,8 @@ import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 import { Platform } from '@src/platform/Platform';
 import { Logger } from '@src/util/Logger';
-import { ModelUtils, TuningParseResult } from '@src/util/ModelUtils';
+import { ModelUtils, TuningParseResult } from '@src/model/ModelUtils';
+import { AlphaTabError } from '@src/AlphaTabError';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -55,7 +56,7 @@ export enum AlphaTexSymbols {
     Property
 }
 
-export class AlphaTexError extends Error {
+export class AlphaTexError extends AlphaTabError {
     public position: number = 0;
     public nonTerm: string = '';
     public expected: AlphaTexSymbols = AlphaTexSymbols.No;

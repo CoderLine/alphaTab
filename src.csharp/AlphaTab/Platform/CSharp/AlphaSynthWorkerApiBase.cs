@@ -1,8 +1,7 @@
 ﻿using System;
-using AlphaTab.Audio.Midi;
-using AlphaTab.Audio.Synth;
 using AlphaTab.Core.EcmaScript;
-using AlphaTab.Util;
+using AlphaTab.Midi;
+using AlphaTab.Synth;
 
 namespace AlphaTab.Platform.CSharp
 {

@@ -1,6 +1,6 @@
-import { AlphaSynth } from '@src/audio/synth/AlphaSynth';
-import { PlayerStateChangedEventArgs } from '@src/audio/synth/PlayerStateChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/audio/synth/PositionChangedEventArgs';
+import { AlphaSynth } from '@src/synth/AlphaSynth';
+import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { AlphaSynthWorkerSynthOutput } from '@src/platform/javaScript/AlphaSynthWorkerSynthOutput';
 import { IWorkerScope } from '@src/platform/javaScript/IWorkerScope';

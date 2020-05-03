@@ -79,7 +79,9 @@ export default class CSharpAstTransformer {
         const globalExports: ts.ExportDeclaration[] = [];
 
         this._typeScriptFile.statements.forEach(s => {
-            if (ts.isClassDeclaration(s) || ts.isInterfaceDeclaration(s) || ts.isEnumDeclaration(s)) {
+            if (ts.isExportDeclaration(s)) {
+                globalExports.push(s);
+            } else if (ts.isClassDeclaration(s) || ts.isInterfaceDeclaration(s) || ts.isEnumDeclaration(s)) {
                 const isExport = s.modifiers && !!s.modifiers.find(m => m.kind === ts.SyntaxKind.ExportKeyword);
                 const isDefaultExport = this.isDefaultExport(s);
                 if (isExport && isDefaultExport) {
@@ -123,8 +125,6 @@ export default class CSharpAstTransformer {
                 testClasses.push(s.expression);
             } else if (!ts.isImportDeclaration(s)) {
                 globalStatements.push(s);
-            } else if (ts.isExportDeclaration(s)) {
-                globalExports.push(s);
             }
         });
 

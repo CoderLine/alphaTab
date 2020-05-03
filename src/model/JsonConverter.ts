@@ -1,8 +1,8 @@
-import { MetaDataEvent } from '@src/audio/midi/event/MetaDataEvent';
-import { MetaNumberEvent } from '@src/audio/midi/event/MetaNumberEvent';
-import { MidiEvent } from '@src/audio/midi/event/MidiEvent';
-import { SystemExclusiveEvent } from '@src/audio/midi/event/SystemExclusiveEvent';
-import { MidiFile } from '@src/audio/midi/MidiFile';
+import { MetaDataEvent } from '@src/midi/MetaDataEvent';
+import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
+import { MidiEvent } from '@src/midi/MidiEvent';
+import { SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
+import { MidiFile } from '@src/midi/MidiFile';
 import { Automation } from '@src/model/Automation';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';

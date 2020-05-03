@@ -2,7 +2,7 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
 import { RenderingResources } from '@src/RenderingResources';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class TempoGlyph extends EffectGlyph {
     private _tempo: number = 0;

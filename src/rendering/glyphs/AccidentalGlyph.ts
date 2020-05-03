@@ -1,7 +1,7 @@
 import { AccidentalType } from '@src/model/AccidentalType';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class AccidentalGlyph extends MusicFontGlyph {
     private _isGrace: boolean;

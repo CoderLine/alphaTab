@@ -1,5 +1,5 @@
 import { Tuning } from '@src/model/Tuning';
-import { ModelUtils } from '@src/util/ModelUtils';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 describe('TuningParserTest', () => {
     it('standard', () => {

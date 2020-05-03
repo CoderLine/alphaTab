@@ -13,8 +13,8 @@ import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { RenderingResources } from '@src/RenderingResources';
-import { TabWhammyBarGlyph } from './TabWhammyBarGlyph';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     public static readonly SimpleDipHeight: number = TabWhammyBarGlyph.PerHalfSize * 2;

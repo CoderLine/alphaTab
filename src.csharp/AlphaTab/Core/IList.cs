@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using AlphaTab.Audio.Synth.Synthesis;
-using AlphaTab.Model;
-using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Core
 {

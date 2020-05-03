@@ -2,7 +2,7 @@ import { CrescendoType } from '@src/model/CrescendoType';
 import { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class CrescendoGlyph extends GroupedEffectGlyph {
     private static readonly Padding: number = (NoteHeadGlyph.QuarterNoteHeadWidth / 2) | 0;

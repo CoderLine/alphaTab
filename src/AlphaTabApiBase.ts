@@ -1,14 +1,13 @@
-import { ArgumentError } from '@src/ArgumentError';
-import { AlphaSynthMidiFileHandler } from '@src/audio/midi/generator/AlphaSynthMidiFileHandler';
-import { MidiFileGenerator } from '@src/audio/midi/generator/MidiFileGenerator';
+import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
+import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 
-import { MidiFile } from '@src/audio/midi/MidiFile';
-import { MidiTickLookup, MidiTickLookupFindBeatResult } from '@src/audio/midi/MidiTickLookup';
-import { IAlphaSynth } from '@src/audio/synth/IAlphaSynth';
-import { PlaybackRange } from '@src/audio/synth/PlaybackRange';
-import { PlayerState } from '@src/audio/synth/PlayerState';
-import { PlayerStateChangedEventArgs } from '@src/audio/synth/PlayerStateChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/audio/synth/PositionChangedEventArgs';
+import { MidiFile } from '@src/midi/MidiFile';
+import { MidiTickLookup, MidiTickLookupFindBeatResult } from '@src/midi/MidiTickLookup';
+import { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import { PlaybackRange } from '@src/synth/PlaybackRange';
+import { PlayerState } from '@src/synth/PlayerState';
+import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { Environment } from '@src/Environment';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 
@@ -38,11 +37,20 @@ import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
 import { ResizeEventArgs } from '@src/ResizeEventArgs';
-import { SelectionInfo } from '@src/SelectionInfo';
 import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/util/Logger';
-import { ModelUtils } from '@src/util/ModelUtils';
+import { ModelUtils } from '@src/model/ModelUtils';
+import { AlphaTabError } from '@src/AlphaTabError';
+
+class SelectionInfo {
+    public beat: Beat;
+    public bounds: BeatBounds | null = null;
+
+    public constructor(beat: Beat) {
+        this.beat = beat;
+    }
+}
 
 /**
  * This class represents the public API of alphaTab and provides all logic to display
@@ -239,7 +247,7 @@ export class AlphaTabApiBase<TSettings> {
             let score: Score = tracks[0].score;
             for (let track of tracks) {
                 if (track.score !== score) {
-                    this.onError(new ArgumentError('All rendered tracks must belong to the same score.', 'tracks'));
+                    this.onError(new AlphaTabError('All rendered tracks must belong to the same score.'));
                     return;
                 }
             }

@@ -1,5 +1,5 @@
-import { CircularSampleBuffer } from '@src/audio/synth/ds/CircularSampleBuffer';
-import { ISynthOutput } from '@src/audio/synth/ISynthOutput';
+import { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
+import { ISynthOutput } from '@src/synth/ISynthOutput';
 import { EventEmitter, IEventEmitterOfT, IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
 
 /**

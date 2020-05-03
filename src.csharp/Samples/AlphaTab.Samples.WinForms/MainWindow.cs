@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using AlphaTab.Audio.Synth;
+using AlphaTab.Synth;
 using AlphaTab.Importer;
 using AlphaTab.Model;
 using AlphaTab.Samples.WinForms.Properties;

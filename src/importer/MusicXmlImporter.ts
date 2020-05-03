@@ -23,7 +23,7 @@ import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 
 import { Platform } from '@src/platform/Platform';
-import { ModelUtils } from '@src/util/ModelUtils';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';

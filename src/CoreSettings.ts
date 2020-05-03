@@ -1,6 +1,6 @@
 import { Environment } from '@src/Environment';
 import { Platform } from '@src/platform/Platform';
-import { LogLevel } from '@src/util/Logger';
+import { LogLevel } from '@src/LogLevel';
 
 /**
  * @json

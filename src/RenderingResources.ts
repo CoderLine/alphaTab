@@ -1,5 +1,5 @@
-import { Color } from './model/Color';
-import { Font, FontStyle } from './model/Font';
+import { Color } from '@src/model/Color';
+import { Font, FontStyle } from '@src/model/Font';
 
 /**
  * This public class contains central definitions for controlling the visual appearance.

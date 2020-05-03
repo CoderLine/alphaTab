@@ -1,7 +1,7 @@
 import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { AlphaSynthMidiFileHandler } from '@src/audio/midi/generator/AlphaSynthMidiFileHandler';
-import { MidiFileGenerator } from '@src/audio/midi/generator/MidiFileGenerator';
-import { MidiFile } from '@src/audio/midi/MidiFile';
+import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
+import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
+import { MidiFile } from '@src/midi/MidiFile';
 import { LayoutMode } from '@src/DisplaySettings';
 import { IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Track } from '@src/model/Track';
