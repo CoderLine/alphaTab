@@ -74,7 +74,7 @@ namespace AlphaTab.Samples.WinForms
             get
             {
                 if (Score == null || CurrentTrackIndex < 0 ||
-                    CurrentTrackIndex >= _score.Tracks.Length)
+                    CurrentTrackIndex >= _score.Tracks.Count)
                 {
                     return null;
                 }
@@ -117,7 +117,7 @@ namespace AlphaTab.Samples.WinForms
 
                 trackDetails.Controls.Clear();
                 trackBars.Controls.Clear();
-                for (var i = Score.Tracks.Length - 1; i >= 0; i--)
+                for (var i = Score.Tracks.Count - 1; i >= 0; i--)
                 {
                     var details = new TrackDetailsControl(Score.Tracks[i]);
                     details.Dock = DockStyle.Top;

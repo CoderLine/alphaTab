@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AlphaTab.Core;
@@ -49,14 +50,14 @@ namespace AlphaTab.VisualTests
             {
                 if (e != null)
                 {
-                    result.Push(e);
+                    result.Add(e);
                 }
             });
             renderer.RenderFinished.On(e =>
             {
                 totalWidth = e.TotalWidth;
                 totalHeight = e.TotalHeight;
-                result.Push(e);
+                result.Add(e);
                 task.SetResult(null);
             });
             renderer.Error.On((e) => { task.SetException(e); });

@@ -640,7 +640,7 @@ export default class CSharpAstTransformer {
 
             globalStatements.forEach(s => {
                 const st = this.visitStatement(staticConstructor.body!, s)!;
-                if(st) {
+                if (st) {
                     (staticConstructor.body as cs.Block).statements.push(st);
                 }
             });
@@ -1277,7 +1277,7 @@ export default class CSharpAstTransformer {
         } as cs.ExpressionStatement;
 
         expressionStatement.expression = this.visitExpression(expressionStatement, s.expression)!;
-        if(!expressionStatement.expression){
+        if (!expressionStatement.expression) {
             return null;
         }
 
@@ -1294,17 +1294,17 @@ export default class CSharpAstTransformer {
         } as cs.IfStatement;
 
         ifStatement.expression = this.visitExpression(ifStatement, s.expression)!;
-        if(!ifStatement.expression) {
+        if (!ifStatement.expression) {
             return null;
         }
         ifStatement.thenStatement = this.visitStatement(ifStatement, s.thenStatement)!;
-        if(!ifStatement.thenStatement){
+        if (!ifStatement.thenStatement) {
             return null
         }
 
         if (s.elseStatement) {
             ifStatement.elseStatement = this.visitStatement(ifStatement, s.elseStatement)!;
-            if(!ifStatement.elseStatement){
+            if (!ifStatement.elseStatement) {
                 return null;
             }
         }
@@ -1322,12 +1322,12 @@ export default class CSharpAstTransformer {
         } as cs.DoStatement;
 
         doStatement.expression = this.visitExpression(doStatement, s.expression)!;
-        if(!doStatement.expression) {
+        if (!doStatement.expression) {
             return null;
         }
 
         doStatement.statement = this.visitStatement(doStatement, s.statement)!;
-        if(!doStatement.statement) {
+        if (!doStatement.statement) {
             return null;
         }
 
@@ -1344,12 +1344,12 @@ export default class CSharpAstTransformer {
         } as cs.WhileStatement;
 
         whileStatement.expression = this.visitExpression(whileStatement, s.expression)!;
-        if(!whileStatement.expression){
+        if (!whileStatement.expression) {
             return null;
         }
 
         whileStatement.statement = this.visitStatement(whileStatement, s.statement)!;
-        if(!whileStatement.statement){
+        if (!whileStatement.statement) {
             return null;
         }
 
@@ -1389,7 +1389,7 @@ export default class CSharpAstTransformer {
         }
 
         forStatement.statement = this.visitStatement(forStatement, s.statement)!;
-        if(!forStatement.statement) {
+        if (!forStatement.statement) {
             return null;
         }
 
@@ -1420,7 +1420,7 @@ export default class CSharpAstTransformer {
             return null;
         }
         forEachStatement.statement = this.visitStatement(forEachStatement, s.statement)!;
-        if(!forEachStatement.statement){
+        if (!forEachStatement.statement) {
             return null;
         }
 
@@ -1451,7 +1451,7 @@ export default class CSharpAstTransformer {
             return null;
         }
         forEachStatement.statement = this.visitStatement(forEachStatement, s.statement)!;
-        if(!forEachStatement.statement) {
+        if (!forEachStatement.statement) {
             return null;
         }
 
@@ -2480,7 +2480,7 @@ export default class CSharpAstTransformer {
             expression.elements.forEach(e => {
                 const ex = this.visitExpression(csExpr, e);
                 if (ex) {
-                    csExpr.values.push(ex);
+                    csExpr.values!.push(ex);
                 }
             });
 
@@ -2520,6 +2520,24 @@ export default class CSharpAstTransformer {
             (expression.parent as ts.CaseClause).expression === expression
         ) {
             this._context.registerSymbolAsConst(memberAccess.tsSymbol);
+        }
+
+        if (memberAccess.tsSymbol) {
+            const parentSymbol = (memberAccess.tsSymbol as any).parent as ts.Symbol;
+            if (parentSymbol) {
+                switch (parentSymbol.name) {
+                    case 'Array':
+                        switch (memberAccess.tsSymbol!.name) {
+                            case 'length':
+                                memberAccess.member = 'Count';
+                                break;
+                            case 'push':
+                                memberAccess.member = 'Add';
+                                break;
+                        }
+                        break;
+                }
+            }
         }
 
         if (expression.questionDotToken) {
@@ -2652,10 +2670,30 @@ export default class CSharpAstTransformer {
             return null;
         }
 
-        elementAccess.argumentExpression = this.visitExpression(elementAccess, expression.argumentExpression)!;
-        if (!elementAccess.argumentExpression) {
+        const argumentExpression = this.visitExpression(elementAccess, expression.argumentExpression)!;
+        if (!argumentExpression) {
             return null;
         }
+
+        const csArg = {
+            expression: {} as cs.Expression,
+            nodeType: cs.SyntaxKind.CastExpression,
+            parent: parent,
+            tsNode: expression.argumentExpression,
+            type: {
+                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                type: cs.PrimitiveType.Int
+            } as cs.PrimitiveTypeNode
+        } as cs.CastExpression;
+        elementAccess.argumentExpression = csArg;
+
+        const par = {
+            nodeType: cs.SyntaxKind.ParenthesizedExpression,
+            parent: csArg,
+            expression: argumentExpression
+        } as cs.ParenthesizedExpression;
+        argumentExpression.parent = par;
+        csArg.expression = par;
 
         return this.wrapToSmartCast(parent, elementAccess, expression);
     }
@@ -2757,6 +2795,33 @@ export default class CSharpAstTransformer {
                     );
                 }
             }
+        }
+
+        if (type && type.symbol && type.symbol.name == 'ArrayConstructor' && newExpression.arguments.length === 1) {
+            const toInt = {
+                parent: newExpression,
+                nodeType: cs.SyntaxKind.CastExpression,
+                expression: {} as cs.Expression,
+                type: {
+                    parent: null,
+                    nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                    type: cs.PrimitiveType.Int,
+                    tsNode: expression
+                } as cs.PrimitiveTypeNode,
+                tsNode: expression
+            } as cs.CastExpression;
+            toInt.expression = newExpression.arguments[0];
+            toInt.expression.parent = toInt;
+
+            const newArray = {
+                parent: newExpression,
+                nodeType: cs.SyntaxKind.ArrayCreationExpression,
+                sizeExpression: toInt,
+                type: csType.typeArguments![0],
+            } as cs.ArrayCreationExpression;
+            toInt.parent = newExpression;
+
+            newExpression.arguments = [newArray];
         }
 
         return newExpression;

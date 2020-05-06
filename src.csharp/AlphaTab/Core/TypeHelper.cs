@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Rendering.Glyphs;
@@ -13,10 +15,160 @@ namespace AlphaTab.Core
             return new List<T>(values);
         }
 
+        public static IList<T> Splice<T>(this IList<T> data, double start)
+        {
+            var count = data.Count - (int) start;
+            var items = data.GetRange((int) start, count);
+            data.RemoveRange((int) start, count);
+            return new List<T>(items);
+        }
+
+        public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
+        {
+            var items = data.GetRange((int) start, (int) deleteCount);
+            data.RemoveRange((int) start, (int) deleteCount);
+            return new List<T>(items);
+        }
+
+        public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount,
+            params T[] newItems)
+        {
+            var items = data.GetRange((int) start, (int) deleteCount);
+            data.RemoveRange((int) start, (int) deleteCount);
+            data.InsertRange((int) start, newItems);
+
+            return new List<T>(items);
+        }
+
+        public static IList<T> Slice<T>(this IList<T> data)
+        {
+            return new List<T>(new System.Collections.Generic.List<T>(data));
+        }
+
+        public static void Reverse<T>(this IList<T> data)
+        {
+            if (data is List<T> l)
+            {
+                l.Reverse();
+            }
+            else if (data is T[] array)
+            {
+                Array.Reverse(array);
+            }
+            else
+            {
+                throw new NotSupportedException("Cannot reverse list of type " + data.GetType().FullName);
+            }
+        }
+
+        public static IList<T> Slice<T>(this IList<T> data, double start)
+        {
+            return new List<T>(data.GetRange((int) start, data.Count - (int) start));
+        }
+
+        public static IList<T> GetRange<T>(this IList<T> data, int index, int count)
+        {
+            if (data is List<T> l)
+            {
+                return l.GetRange(index, count);
+            }
+
+            var newList = new List<T>();
+            newList.InsertRange(0, data.Skip(index).Take(count));
+            return newList;
+        }
+
+        public static void RemoveRange<T>(this IList<T> data, int index, int count)
+        {
+            if (data is List<T> l)
+            {
+                l.RemoveRange(index, count);
+            }
+            else
+            {
+                while (count > 0 && index >= data.Count)
+                {
+                    data.RemoveAt(index);
+                    count--;
+                }
+            }
+        }
+
+        public static string Join<T>(this IList<T> data, string separator)
+        {
+            return string.Join(separator, data);
+        }
+
+        public static IList<T> Filter<T>(this IList<T> data, Func<T, bool> func)
+        {
+            return data.Where(func).ToList();
+        }
+
+        public static void Unshift<T>(this IList<T> data, T item)
+        {
+            data.Insert(0, item);
+        }
+
+        public static T Pop<T>(this IList<T> data)
+        {
+            if (data.Count > 0)
+            {
+                var last = data.Last();
+                data.RemoveAt(data.Count - 1);
+                return last;
+            }
+
+            return default;
+        }
+
+
+        public static IList<T> Fill<T>(this IList<T> data, T i)
+        {
+            for (var j = 0; j < data.Count; j++)
+            {
+                data[j] = i;
+            }
+
+            return data;
+        }
+
+        public static void InsertRange<T>(this IList<T> data, int index, IEnumerable<T> newItems)
+        {
+            if (data is System.Collections.Generic.List<T> l)
+            {
+                l.InsertRange(index, newItems);
+            }
+            else
+            {
+                foreach (var item in newItems)
+                {
+                    data.Insert(index, item);
+                    index++;
+                }
+            }
+        }
+
+        public static void Sort<T>(this IList<T> data, Func<T, T, double> func)
+        {
+            if (data is System.Collections.Generic.List<T> l)
+            {
+                l.Sort((a, b) => (int) func(a, b));
+            }
+            else if(data is T[] array)
+            {
+                Array.Sort(array, (a, b) => (int) func(a, b));
+            }
+            else
+            {
+                throw new NotSupportedException("Cannot sort list of type " + data.GetType().FullName);
+            }
+        }
+
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Substr(this string s, double start, double length)
         {
-            return s.Substring((int) start, (int)length);
+            return s.Substring((int) start, (int) length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

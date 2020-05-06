@@ -243,7 +243,7 @@ export default class CSharpAstPrinter {
 
                     baseClass =
                         baseClassDeclaration.baseClass &&
-                        baseClassDeclaration.baseClass.nodeType === cs.SyntaxKind.TypeReference
+                            baseClassDeclaration.baseClass.nodeType === cs.SyntaxKind.TypeReference
                             ? (baseClassDeclaration.baseClass as cs.TypeReference).reference
                             : undefined;
                 } else {
@@ -305,10 +305,10 @@ export default class CSharpAstPrinter {
     }
 
     private writeMember(member: cs.Node) {
-        if(member.skipEmit) {
+        if (member.skipEmit) {
             return;
         }
-        
+
         switch (member.nodeType) {
             case cs.SyntaxKind.FieldDeclaration:
                 this.writeFieldDeclarat1on(member as cs.FieldDeclaration);
@@ -437,7 +437,7 @@ export default class CSharpAstPrinter {
     private writeConstructorDeclaration(d: cs.ConstructorDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
-        if(d.isStatic) {
+        if (d.isStatic) {
             this.write('static ')
         }
         this.write(`${(d.parent as cs.ClassDeclaration).name}`);
@@ -592,9 +592,9 @@ export default class CSharpAstPrinter {
                     this.write('[]');
                 } else {
                     if (forNew) {
-                        this.write('AlphaTab.Core.List<');
+                        this.write('System.Collections.Generic.List<');
                     } else {
-                        this.write('AlphaTab.Core.IList<');
+                        this.write('System.Collections.Generic.IList<');
                     }
                     this.writeType(arrayType.elementType);
                     this.write('>');
@@ -857,24 +857,31 @@ export default class CSharpAstPrinter {
         if (expr.type) {
             this.write('new ');
             this.writeType(expr.type, true);
-            if (expr.values.length > 0) {
-                this.writeLine('{');
-                this._indent++;
-                this.writeCommaSeparated(expr.values, v => {
-                    if (expr.values.length > 10) {
-                        this.writeLine();
-                    }
-                    this.writeExpression(v);
-                });
-                this._indent--;
-                this.writeLine('}');
+            if (expr.values) {
+                if (expr.values.length > 0) {
+                    this.writeLine('{');
+                    this._indent++;
+                    this.writeCommaSeparated(expr.values, v => {
+                        if (expr.values!.length > 10) {
+                            this.writeLine();
+                        }
+                        this.writeExpression(v);
+                    });
+                    this._indent--;
+                    this.writeLine('}');
+                } else {
+                    this.writeLine('()');
+                }
             } else {
-                this.writeLine('()');
+                this.write('[');
+                this.writeExpression(expr.sizeExpression!);
+                this.write(']');
             }
-        } else if (expr.values.length > 0) {
+        }
+        else if (expr.values && expr.values.length > 0) {
             this.write('AlphaTab.Core.TypeHelper.CreateList(');
             this.writeCommaSeparated(expr.values, v => {
-                if (expr.values.length > 10) {
+                if (expr.values!.length > 10) {
                     this.writeLine();
                 }
                 this.writeExpression(v);

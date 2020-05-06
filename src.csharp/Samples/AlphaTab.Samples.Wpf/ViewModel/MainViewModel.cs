@@ -85,7 +85,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         {
             get
             {
-                if (Score == null || CurrentTrackIndex < 0 || CurrentTrackIndex >= _score.Tracks.Length)
+                if (Score == null || CurrentTrackIndex < 0 || CurrentTrackIndex >= _score.Tracks.Count)
                 {
                     return null;
                 }
@@ -180,7 +180,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
                     Score = ScoreLoader.LoadScoreFromBytes(File.ReadAllBytes(file));
 
                     // build the track info objects for the ui
-                    var trackInfos = new TrackViewModel[(int)Score.Tracks.Length];
+                    var trackInfos = new TrackViewModel[(int)Score.Tracks.Count];
                     for (var i = 0; i < trackInfos.Length; i++)
                     {
                         trackInfos[i] = new TrackViewModel(Score.Tracks[i]);

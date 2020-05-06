@@ -29,7 +29,7 @@ namespace AlphaTab.Samples.PngDump
             };
 
             // iterate tracks
-            for (var i = 0; i < score.Tracks.Length; i++)
+            for (var i = 0; i < score.Tracks.Count; i++)
             {
                 var track = score.Tracks[i];
 
@@ -44,7 +44,7 @@ namespace AlphaTab.Samples.PngDump
                     totalWidth = (int) r.TotalWidth;
                     totalHeight = (int) r.TotalHeight;
                 });
-                renderer.RenderScore(score, new Core.List<double> {track.Index});
+                renderer.RenderScore(score, new List<double> {track.Index});
 
                 // write png
                 var info = new FileInfo(args[0]);

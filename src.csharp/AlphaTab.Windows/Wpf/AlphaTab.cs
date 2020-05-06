@@ -165,7 +165,7 @@ namespace AlphaTab.Wpf
             }
 
             Score score = null;
-            var trackIndexes = new Core.List<double>();
+            var trackIndexes = new List<double>();
             foreach (var track in Tracks)
             {
                 if (score == null)

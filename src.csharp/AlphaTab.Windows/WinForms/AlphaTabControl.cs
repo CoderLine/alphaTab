@@ -119,7 +119,7 @@ namespace AlphaTab.WinForms
             }
 
             Score score = null;
-            var trackIndexes = new AlphaTab.Core.List<double>();
+            var trackIndexes = new List<double>();
             foreach (var track in Tracks)
             {
                 if (score == null)

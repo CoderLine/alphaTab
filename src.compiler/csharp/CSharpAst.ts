@@ -337,7 +337,8 @@ export interface DefaultExpression extends Node {
 }
 export interface ArrayCreationExpression extends Node {
     type?: TypeNode;
-    values: Expression[];
+    values?: Expression[];
+    sizeExpression?: Expression;
 }
 export interface MemberAccessExpression extends Node {
     expression: Expression;

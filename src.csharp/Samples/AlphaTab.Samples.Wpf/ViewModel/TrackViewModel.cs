@@ -120,19 +120,19 @@ namespace AlphaTab.Samples.Wpf.ViewModel
             }
 
             // scan all bars if they have any note
-            _usedBars = new bool[(int)track.Score.MasterBars.Length];
-            for (var s = 0; s < track.Staves.Length; s++)
+            _usedBars = new bool[(int)track.Score.MasterBars.Count];
+            for (var s = 0; s < track.Staves.Count; s++)
             {
                 var staff = track.Staves[s];
-                for (var barI = 0; barI < staff.Bars.Length; barI++)
+                for (var barI = 0; barI < staff.Bars.Count; barI++)
                 {
                     var bar = staff.Bars[barI];
                     _usedBars[barI] = false;
 
-                    for (var voiceI = 0; voiceI < bar.Voices.Length && (!_usedBars[barI]); voiceI++)
+                    for (var voiceI = 0; voiceI < bar.Voices.Count && (!_usedBars[barI]); voiceI++)
                     {
                         var voice = bar.Voices[voiceI];
-                        for (var i = 0; i < voice.Beats.Length; i++)
+                        for (var i = 0; i < voice.Beats.Count; i++)
                         {
                             var b = voice.Beats[i];
                             if (!b.IsRest)

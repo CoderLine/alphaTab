@@ -23,12 +23,12 @@ namespace AlphaTab.Samples.ScoreDump
             Console.WriteLine("Subtitle: {0}", score.SubTitle);
             Console.WriteLine("Artist: {0}", score.Artist);
             Console.WriteLine("Tempo: {0}", score.Tempo);
-            Console.WriteLine("Bars: {0}", score.MasterBars.Length);
+            Console.WriteLine("Bars: {0}", score.MasterBars.Count);
             Console.WriteLine("Time Signature: {0}/{1}", score.MasterBars[0].TimeSignatureNumerator,
                 score.MasterBars[0].TimeSignatureDenominator);
             // tracks
             Console.WriteLine("Tracks: ");
-            for (var i = 0; i < score.Tracks.Length; i++)
+            for (var i = 0; i < score.Tracks.Count; i++)
             {
                 var track = score.Tracks[i];
                 Console.WriteLine("   {0} - {1} - {2}", i + 1, track.Name,

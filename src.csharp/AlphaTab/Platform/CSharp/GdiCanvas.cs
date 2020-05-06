@@ -395,7 +395,7 @@ namespace AlphaTab.Platform.CSharp
         }
 
         public void FillMusicFontSymbols(double x, double y, double scale,
-            Core.IList<MusicFontSymbol> symbols,
+            IList<MusicFontSymbol> symbols,
             bool centerAtPosition
                 = false)
         {
