@@ -21,7 +21,6 @@ import { Track } from '@src/model/Track';
 import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { IUiFacade } from '@src/platform/IUiFacade';
-import { Cursors } from '@src/platform/Cursors';
 import { ScrollMode } from '@src/PlayerSettings';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 
