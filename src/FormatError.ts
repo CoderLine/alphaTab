@@ -6,5 +6,6 @@ import { AlphaTabError } from "@src/AlphaTabError";
 export class FormatError extends AlphaTabError {
     public constructor(message: string) {
         super(message);
+        Object.setPrototypeOf(this, FormatError.prototype);
     }
 }

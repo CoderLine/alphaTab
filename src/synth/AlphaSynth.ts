@@ -228,14 +228,14 @@ export class AlphaSynth implements IAlphaSynth {
 
         let input: ByteBuffer = ByteBuffer.fromBuffer(data);
         try {
-            Logger.info('AlphaSynth', 'Loading soundfont from bytes');
+            Logger.debug('AlphaSynth', 'Loading soundfont from bytes');
             let soundFont: Hydra = new Hydra();
             soundFont.load(input);
             this._synthesizer.loadPresets(soundFont);
             this._isSoundFontLoaded = true;
             (this.soundFontLoaded as EventEmitter).trigger();
 
-            Logger.info('AlphaSynth', 'soundFont successfully loaded');
+            Logger.debug('AlphaSynth', 'soundFont successfully loaded');
             this.checkReadyForPlayback();
         } catch (e) {
             Logger.error('AlphaSynth', 'Could not load soundfont from bytes ' + e);
@@ -258,12 +258,12 @@ export class AlphaSynth implements IAlphaSynth {
         this.stop();
 
         try {
-            Logger.info('AlphaSynth', 'Loading midi from model');
+            Logger.debug('AlphaSynth', 'Loading midi from model');
             this._sequencer.loadMidi(midiFile);
             this._isMidiLoaded = true;
             (this.midiLoaded as EventEmitter).trigger();
 
-            Logger.info('AlphaSynth', 'Midi successfully loaded');
+            Logger.debug('AlphaSynth', 'Midi successfully loaded');
             this.checkReadyForPlayback();
             this.tickPosition = 0;
         } catch (e) {

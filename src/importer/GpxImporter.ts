@@ -23,13 +23,13 @@ export class GpxImporter extends ScoreImporter {
     public readScore(): Score {
         // at first we need to load the binary file system
         // from the GPX container
-        Logger.info(this.name, 'Loading GPX filesystem');
+        Logger.debug(this.name, 'Loading GPX filesystem');
         let fileSystem: GpxFileSystem = new GpxFileSystem();
         fileSystem.fileFilter = s => {
             return s.endsWith('score.gpif') || s.endsWith('BinaryStylesheet') || s.endsWith('PartConfiguration');
         };
         fileSystem.load(this.data);
-        Logger.info(this.name, 'GPX filesystem loaded');
+        Logger.debug(this.name, 'GPX filesystem loaded');
 
         let xml: string | null = null;
         let binaryStylesheetData: Uint8Array | null = null;
@@ -54,24 +54,24 @@ export class GpxImporter extends ScoreImporter {
 
         // the score.gpif file within this filesystem stores
         // the score information as XML we need to parse.
-        Logger.info(this.name, 'Start Parsing score.gpif');
+        Logger.debug(this.name, 'Start Parsing score.gpif');
         let gpifParser: GpifParser = new GpifParser();
         gpifParser.parseXml(xml, this.settings);
-        Logger.info(this.name, 'score.gpif parsed');
+        Logger.debug(this.name, 'score.gpif parsed');
         let score: Score = gpifParser.score;
 
         if (binaryStylesheetData) {
-            Logger.info(this.name, 'Start Parsing BinaryStylesheet');
+            Logger.debug(this.name, 'Start Parsing BinaryStylesheet');
             let binaryStylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData);
             binaryStylesheet.apply(score);
-            Logger.info(this.name, 'BinaryStylesheet parsed');
+            Logger.debug(this.name, 'BinaryStylesheet parsed');
         }
 
         if (partConfigurationData) {
-            Logger.info(this.name, 'Start Parsing Part Configuration');
+            Logger.debug(this.name, 'Start Parsing Part Configuration');
             let partConfiguration: PartConfiguration = new PartConfiguration(partConfigurationData);
             partConfiguration.apply(score);
-            Logger.info(this.name, 'Part Configuration parsed');
+            Logger.debug(this.name, 'Part Configuration parsed');
         }
 
         return score;

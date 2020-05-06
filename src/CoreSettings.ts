@@ -34,7 +34,7 @@ export class CoreSettings {
     /**
      * The log level to use within alphaTab
      */
-    public logLevel: LogLevel = LogLevel.Debug;
+    public logLevel: LogLevel = LogLevel.Info;
 
     /**
      * Gets or sets whether the rendering should be done in a worker if possible.

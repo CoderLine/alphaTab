@@ -124,6 +124,7 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             this.renderer = new ScoreRenderer(this.settings);
         }
+
         let initialResizeEventInfo: ResizeEventArgs = new ResizeEventArgs();
         initialResizeEventInfo.oldWidth = this.renderer.width;
         initialResizeEventInfo.newWidth = this.container.width | 0;
@@ -135,7 +136,7 @@ export class AlphaTabApiBase<TSettings> {
         });
         this.renderer.postRenderFinished.on(() => {
             let duration: number = Date.now() - this._startTime;
-            Logger.info('rendering', 'Rendering completed in ' + duration + 'ms');
+            Logger.debug('rendering', 'Rendering completed in ' + duration + 'ms');
             this.onPostRenderFinished();
         });
         this.renderer.preRender.on(_ => {
@@ -284,7 +285,7 @@ export class AlphaTabApiBase<TSettings> {
                 null
             );
             this.uiFacade.rootContainerBecameVisible.on(() => {
-                Logger.info('Rendering', 'AlphaTab container became visible, doing autosizing', null);
+                Logger.debug('Rendering', 'AlphaTab container became visible, doing autosizing', null);
                 this.triggerResize();
             });
         } else {
@@ -521,7 +522,7 @@ export class AlphaTabApiBase<TSettings> {
         if (!this.player || !this.score || !this.player.isReady) {
             return;
         }
-        Logger.info('AlphaTab', 'Generating Midi');
+        Logger.debug('AlphaTab', 'Generating Midi');
         let midiFile: MidiFile = new MidiFile();
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
         let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);

@@ -68,7 +68,7 @@ export abstract class ScoreLayout {
     protected abstract doLayoutAndRender(): void;
 
     private createScoreInfoGlyphs(): void {
-        Logger.info('ScoreLayout', 'Creating score info glyphs');
+        Logger.debug('ScoreLayout', 'Creating score info glyphs');
         let flags: HeaderFooterElements = this.renderer.settings.notation.hideInfo
             ? HeaderFooterElements.None
             : HeaderFooterElements.All;

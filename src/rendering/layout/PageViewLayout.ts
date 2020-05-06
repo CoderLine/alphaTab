@@ -258,7 +258,7 @@ export class PageViewLayout extends ScoreLayout {
             // finalize group (sizing etc).
             this.fitGroup(group);
             group.finalizeGroup();
-            Logger.info(
+            Logger.debug(
                 this.name,
                 'Rendering partial from bar ' + group.firstBarIndex + ' to ' + group.lastBarIndex,
                 null

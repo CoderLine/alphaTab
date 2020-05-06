@@ -118,24 +118,24 @@ export class ScoreRenderer implements IScoreRenderer {
         this.recreateCanvas();
         this.canvas!.lineWidth = this.settings.display.scale;
         this.canvas!.settings = this.settings;
-        Logger.info('Rendering', 'Rendering ' + this.tracks.length + ' tracks');
+        Logger.debug('Rendering', 'Rendering ' + this.tracks.length + ' tracks');
         for (let i: number = 0; i < this.tracks.length; i++) {
             let track: Track = this.tracks[i];
-            Logger.info('Rendering', 'Track ' + i + ': ' + track.name);
+            Logger.debug('Rendering', 'Track ' + i + ': ' + track.name);
         }
         (this.preRender as EventEmitterOfT<boolean>).trigger(false);
         this.recreateLayout();
         this.layoutAndRender();
         this._renderedTracks = this.tracks;
-        Logger.info('Rendering', 'Rendering finished');
+        Logger.debug('Rendering', 'Rendering finished');
     }
 
     public resizeRender(): void {
         if (this.recreateLayout() || this.recreateCanvas() || this._renderedTracks !== this.tracks || !this.tracks) {
-            Logger.info('Rendering', 'Starting full rerendering due to layout or canvas change', null);
+            Logger.debug('Rendering', 'Starting full rerendering due to layout or canvas change', null);
             this.render();
         } else if (this.layout!.supportsResize) {
-            Logger.info('Rendering', 'Starting optimized rerendering for resize');
+            Logger.debug('Rendering', 'Starting optimized rerendering for resize');
             this.boundsLookup = new BoundsLookup();
             (this.preRender as EventEmitterOfT<boolean>).trigger(true);
             this.canvas!.settings = this.settings;
@@ -150,7 +150,7 @@ export class ScoreRenderer implements IScoreRenderer {
     }
 
     private layoutAndRender(): void {
-        Logger.info(
+        Logger.debug(
             'Rendering',
             'Rendering at scale ' + this.settings.display.scale + ' with layout ' + this.layout!.name,
             null

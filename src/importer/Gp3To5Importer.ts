@@ -138,14 +138,13 @@ export class Gp3To5Importer extends ScoreImporter {
 
     public readVersion(): void {
         let version: string = GpBinaryHelpers.gpReadStringByteLength(this.data, 30, this.settings.importer.encoding);
-        console.log('version loaded', version);
         if (!version.startsWith(Gp3To5Importer.VersionString)) {
             throw new UnsupportedFormatError('Unsupported format');
         }
         version = version.substr(Gp3To5Importer.VersionString.length + 1);
         let dot: number = version.indexOf(String.fromCharCode(46));
         this._versionNumber = 100 * parseInt(version.substr(0, dot)) + parseInt(version.substr(dot + 1));
-        Logger.info(this.name, 'Guitar Pro version ' + version + ' detected');
+        Logger.debug(this.name, 'Guitar Pro version ' + version + ' detected');
     }
 
     public readScoreInformation(): void {

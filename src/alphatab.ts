@@ -27,16 +27,6 @@ if (!String.prototype.startsWith) {
     };
 }
 
-if (!(Object.prototype as any).forEach) {
-    (Object.prototype as any).forEach = function (callback: any) {
-        for (let key in this) {
-            if (this.hasOwnProperty(key)) {
-                callback(this[key], key);
-            }
-        }
-    };
-}
-
 // https://tc39.github.io/ecma262/#sec-array.prototype.find
 if (!Array.prototype.find) {
     Object.defineProperty(Array.prototype, 'find', {

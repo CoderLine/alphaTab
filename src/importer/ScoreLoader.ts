@@ -101,7 +101,7 @@ export class ScoreLoader {
         }
 
         let importers: ScoreImporter[] = Environment.buildImporters();
-        Logger.info(
+        Logger.debug(
             'ScoreLoader',
             'Loading score from ' + data.length + ' bytes using ' + importers.length + ' importers',
             null
@@ -111,16 +111,16 @@ export class ScoreLoader {
         for (let importer of importers) {
             bb.reset();
             try {
-                Logger.info('ScoreLoader', 'Importing using importer ' + importer.name);
+                Logger.debug('ScoreLoader', 'Importing using importer ' + importer.name);
                 importer.init(bb, settings);
                 score = importer.readScore();
-                Logger.info('ScoreLoader', 'Score imported using ' + importer.name);
+                Logger.debug('ScoreLoader', 'Score imported using ' + importer.name);
                 break;
             } catch (e) {
                 if (e instanceof UnsupportedFormatError) {
-                    Logger.info('ScoreLoader', importer.name + ' does not support the file');
+                    Logger.debug('ScoreLoader', importer.name + ' does not support the file');
                 } else {
-                    Logger.info('ScoreLoader', 'Score import failed due to unexpected error: ', e);
+                    Logger.error('ScoreLoader', 'Score import failed due to unexpected error: ', e);
                     throw e;
                 }
             }

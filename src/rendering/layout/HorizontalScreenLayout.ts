@@ -95,7 +95,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                             currentPartial.width += this._group.x + this._group.accoladeSpacing;
                         }
                         partials.push(currentPartial);
-                        Logger.info(
+                        Logger.debug(
                             this.name,
                             'Finished partial from bar ' +
                                 currentPartial.masterBars[0].index +
@@ -115,7 +115,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 currentPartial.width += this._group.x + this._group.accoladeSpacing;
             }
             partials.push(currentPartial);
-            Logger.info(
+            Logger.debug(
                 this.name,
                 'Finished partial from bar ' +
                     currentPartial.masterBars[0].index +
@@ -137,7 +137,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             if (i === 0) {
                 renderX -= this._group.x + this._group.accoladeSpacing;
             }
-            Logger.info(
+            Logger.debug(
                 this.name,
                 'Rendering partial from bar ' +
                     partial.masterBars[0].index +

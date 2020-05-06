@@ -4,6 +4,7 @@ import { IReadable } from '@src/io/IReadable';
 export class EndOfReaderError extends Error {
     public constructor() {
         super('Unexpected end of data within reader');
+        Object.setPrototypeOf(this, EndOfReaderError.prototype);
     }
 }
 

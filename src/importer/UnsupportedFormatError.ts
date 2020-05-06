@@ -8,5 +8,6 @@ export class UnsupportedFormatError extends Error {
     public constructor(message: string = 'Unsupported format', inner: Error | null = null) {
         super(message);
         this.inner = inner;
+        Object.setPrototypeOf(this, UnsupportedFormatError.prototype);
     }
 }

@@ -300,11 +300,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         for (let i: number = 0; i < placeholders.length; i++) {
             let placeholder: HTMLElement = placeholders.item(i) as HTMLElement;
             if (this.isElementInViewPort(placeholder)) {
-                placeholder.outerHTML = (placeholder as any)['svg'];
+                this.replacePlaceholder(placeholder, (placeholder as any)['svg']);
             }
         }
     }
-
+    
     public isElementInViewPort(element: HTMLElement): boolean {
         let rect: DOMRect = element.getBoundingClientRect();
         return (
@@ -404,50 +404,58 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public beginAppendRenderResults(renderResult: RenderFinishedEventArgs): void {
-        window.setTimeout(() => {
-            let canvasElement: HTMLElement = (this._api.canvasElement as HtmlElementContainer).element;
-            // null result indicates that the rendering finished
-            if (!renderResult) {
-                // so we remove elements that might be from a previous render session
-                while (canvasElement.childElementCount > this._totalResultCount) {
-                    canvasElement.removeChild(canvasElement.lastChild!);
+        let canvasElement: HTMLElement = (this._api.canvasElement as HtmlElementContainer).element;
+        // null result indicates that the rendering finished
+        if (!renderResult) {
+            // so we remove elements that might be from a previous render session
+            while (canvasElement.childElementCount > this._totalResultCount) {
+                canvasElement.removeChild(canvasElement.lastChild!);
+            }
+            // directly show the elements in the viewport once we're done.
+            if (this._api.settings.core.enableLazyLoading) {
+                this.showSvgsInViewPort();
+            }
+        } else {
+            let body: unknown = renderResult.renderResult;
+            if (typeof body === 'string') {
+                let placeholder: HTMLElement;
+                if (this._totalResultCount < canvasElement.childElementCount) {
+                    placeholder = canvasElement.childNodes.item(this._totalResultCount) as HTMLElement;
+                } else {
+                    placeholder = document.createElement('div');
+                    canvasElement.appendChild(placeholder);
                 }
-                // directly show the elements in the viewport once we're done.
-                if (this._api.settings.core.enableLazyLoading) {
-                    this.showSvgsInViewPort();
+                placeholder.style.width = renderResult.width + 'px';
+                placeholder.style.height = renderResult.height + 'px';
+                placeholder.style.display = 'inline-block';
+                if (this.isElementInViewPort(placeholder) || !this._api.settings.core.enableLazyLoading) {
+                    this.replacePlaceholder(placeholder, body);
+                } else {
+                    (placeholder as any)['svg'] = body;
+                    placeholder.setAttribute('data-lazy', 'true');
                 }
             } else {
-                let body: unknown = renderResult.renderResult;
-                if (typeof body === 'string') {
-                    let placeholder: HTMLElement;
-                    if (this._totalResultCount < canvasElement.childElementCount) {
-                        placeholder = canvasElement.childNodes.item(this._totalResultCount) as HTMLElement;
-                    } else {
-                        placeholder = document.createElement('div');
-                        canvasElement.appendChild(placeholder);
-                    }
-                    placeholder.style.width = renderResult.width + 'px';
-                    placeholder.style.height = renderResult.height + 'px';
-                    placeholder.style.display = 'inline-block';
-                    if (this.isElementInViewPort(placeholder) || !this._api.settings.core.enableLazyLoading) {
-                        placeholder.outerHTML = body;
-                    } else {
-                        (placeholder as any)['svg'] = body;
-                        placeholder.setAttribute('data-lazy', 'true');
-                    }
+                if (this._totalResultCount < canvasElement.childElementCount) {
+                    canvasElement.replaceChild(
+                        renderResult.renderResult as Node,
+                        canvasElement.childNodes.item(this._totalResultCount)
+                    );
                 } else {
-                    if (this._totalResultCount < canvasElement.childElementCount) {
-                        canvasElement.replaceChild(
-                            renderResult.renderResult as Node,
-                            canvasElement.childNodes.item(this._totalResultCount)
-                        );
-                    } else {
-                        canvasElement.appendChild(renderResult.renderResult as Node);
-                    }
+                    canvasElement.appendChild(renderResult.renderResult as Node);
                 }
-                this._totalResultCount++;
             }
-        }, 1);
+            this._totalResultCount++;
+        }
+    }
+
+    private replacePlaceholder(placeholder: HTMLElement, body: any) {
+        if(typeof placeholder.outerHTML === 'string') {
+            placeholder.outerHTML = body;
+        } else {
+            const display = document.createElement('div');
+            display.innerHTML = body;
+            placeholder.parentNode?.replaceChild(display.firstChild!, placeholder);
+        }
     }
 
     /**
@@ -464,7 +472,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         let player: AlphaSynthWebWorkerApi | null = null;
         if (supportsWebAudio) {
-            Logger.info('Player', 'Will use webworkers for synthesizing and web audio api for playback');
+            Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api for playback');
             player = new AlphaSynthWebWorkerApi(
                 new AlphaSynthWebAudioOutput(),
                 alphaSynthScriptFile,

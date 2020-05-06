@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>AlphaTab Control Demo</title>
+        <title>AlphaTab Simple Demo</title>
 
         <link
             rel="stylesheet"
@@ -11,7 +11,7 @@
             crossorigin="anonymous"
         />
         <script
-            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
             crossorigin="anonymous"
         ></script>
@@ -38,19 +38,20 @@
         ></script>
 
         <script src="/dist/alphaTab.js"></script>
-        <link rel="stylesheet" href="control.css" />
     </head>
     <body>
-        <div id="placeholder"></div>
-        <script type="text/javascript" src="control.js"></script>
+        <div
+            id="alphaTab"
+            data-file="/test-data/audio/full-song.gp5"
+            data-tracks="3"
+            data-player-scrolloffsetx="-10"
+            data-player-enableplayer="true"
+            data-player-soundfont="/font/sonivox/sonivox.sf2"
+        ></div>
         <script type="text/javascript">
-            const req = new XMLHttpRequest();
-            req.onload = function(data) {
-                document.getElementById('placeholder').outerHTML = req.responseText;
-                window.at = setupControl('#alphaTab');
-            };
-            req.open('GET', 'control-template.html');
-            req.send();
+            const el = document.querySelector('#alphaTab');
+            const at = new alphaTab.AlphaTabApi(el);
+
         </script>
     </body>
 </html>

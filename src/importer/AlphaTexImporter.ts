@@ -64,6 +64,7 @@ export class AlphaTexError extends AlphaTabError {
 
     public constructor(message: string) {
         super(message);
+        Object.setPrototypeOf(this, AlphaTexError.prototype);
     }
 
     public static symbolError(

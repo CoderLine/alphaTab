@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "target": "es6",
     "outDir": "dist/lib.csharp",
     "module": "commonjs",
     "declaration": false,

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -60,5 +61,22 @@ namespace AlphaTab.Core.EcmaScript
         {
             return GetEnumerator();
         }
+
+        public void ForEach(Action<TValue> callback)
+        {
+            foreach (var kvp in _data)
+            {
+                callback(kvp.Value);
+            }
+        }
+
+        public void ForEach(Action<TValue, TKey> callback)
+        {
+            foreach (var kvp in _data)
+            {
+                callback(kvp.Value, kvp.Key);
+            }
+        }
+
     }
 }

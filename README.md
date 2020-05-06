@@ -32,7 +32,7 @@ Use the links below to grab the binaries from the latest builds. Please do not u
 # Features
 alphaTab mostly focuses on web based platforms allowing music notation to be embedded into websites and browser based apps but is designed to be used also from .net based platforms like Windows, UWP and Xamarin.
 
-alphaTab can load music notation from various sources like Guitar Pro 3-5, Guitar Pro 6, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using a built in midi synthesizer named alphaSynth the music sheets can also be played in your browser.
+alphaTab can load music notation from various sources like Guitar Pro 3-7, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using a built in midi synthesizer named alphaSynth the music sheets can also be played in your browser.
 
 * load GuitarPro 3-5, GuitarPro 6, AlphaTex or MusicXML (experimental)
 * render as SVG, HTML5 canvas, GDI+,...

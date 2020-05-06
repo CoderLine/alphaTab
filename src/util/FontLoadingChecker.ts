@@ -51,7 +51,7 @@ export class FontLoadingChecker {
                     Logger.debug('Font', `[${this._family}] Font API signaled loaded`);
 
                     if ((document as any).fonts.check('1em ' + this._family)) {
-                        Logger.info('Rendering', `[${this._family}] Font API signaled available`);
+                        Logger.debug('Rendering', `[${this._family}] Font API signaled available`);
                         this.isFontLoaded = true;
                         window.clearInterval(failCounterId);
                         (this.fontLoaded as EventEmitterOfT<string>).trigger(this._family);

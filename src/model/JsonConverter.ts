@@ -93,7 +93,7 @@ export class JsonConverter {
             let staff2: Staff = {} as any;
             Staff.copyTo(staff, staff2);
             staff2.chords = new Map<string, Chord>();
-            staff.chords.forEach((chord, chordId)=>{
+            staff.chords.forEach((chord, chordId) => {
                 let chord2: Chord = {} as any;
                 Chord.copyTo(chord, chord2);
                 staff2.chords.set(chordId, chord2);
@@ -216,7 +216,7 @@ export class JsonConverter {
             }
 
             masterBar2.fermata = {} as any;
-            masterBar.fermata.forEach((fermata, fermataId)=>{
+            masterBar.fermata.forEach((fermata, fermataId) => {
                 let fermata2: any = {} as any;
                 masterBar2.fermata.set(fermataId, fermata2);
                 Fermata.copyTo(fermata, fermata2);
@@ -300,13 +300,25 @@ export class JsonConverter {
             let staff: Staff = track.staves[s];
             let staff2: Staff = track2.staves[s];
             Staff.copyTo(staff, staff2);
-            staff.chords.forEach((chord, chordId)=>{
+            JsonConverter.jsObjectMapForEach(staff.chords, (chord, chordId) => {
                 let chord2: Chord = new Chord();
                 Chord.copyTo(chord, chord2);
                 staff2.addChord(chordId, chord2);
             });
 
             JsonConverter.jsObjectToBars(staff, staff2, allNotes, notesToLink);
+        }
+    }
+
+    private static jsObjectMapForEach(obj: any, callback: (value: any, key: any) => void) {
+        if ('forEach' in obj) {
+            obj.forEach(callback);
+        } else {
+            for (let x in obj) {
+                if (obj.hasOwnProperty(x)) {
+                    callback(obj[x], x);
+                }
+            }
         }
     }
 

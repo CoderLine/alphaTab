@@ -7,5 +7,6 @@ export class FileLoadError extends Error {
     public constructor(message: string, xhr: XMLHttpRequest) {
         super(message);
         this.xhr = xhr;
+        Object.setPrototypeOf(this, FileLoadError.prototype);
     }
 }

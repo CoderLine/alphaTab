@@ -29,5 +29,6 @@ export class XmlError extends Error {
         super(message);
         this.xml = xml;
         this.pos = pos;
+        Object.setPrototypeOf(this, XmlError.prototype);
     }
 }

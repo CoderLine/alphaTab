@@ -59,12 +59,12 @@ function setupControl(selector) {
     const viewPort =
         'playerScrollelement' in el.dataset ? el.dataset.playerScrollelement : control.querySelector('.at-viewport');
     const at = new alphaTab.AlphaTabApi(el, {
-        core: {
-            logLevel: 'debug'
-        },
         player: {
             scrollElement: viewPort
         }
+    });
+    at.error.on(function(e) {
+        console.error('alphaTab error', e);
     });
 
     el.ondragover = function (e) {

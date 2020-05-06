@@ -4,5 +4,6 @@ export class AlphaTabError extends Error {
     public constructor(message: string, inner?: Error) {
         super(message);
         this.inner = inner;
+        Object.setPrototypeOf(this, AlphaTabError.prototype);
     }
 }

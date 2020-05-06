@@ -90,7 +90,7 @@ export class MidiFileGenerator {
             this.generateTrack(track);
         }
 
-        Logger.info('Midi', 'Begin midi generation');
+        Logger.debug('Midi', 'Begin midi generation');
         const controller: MidiPlaybackController = new MidiPlaybackController(this._score);
 
         let previousMasterBar: MasterBar | null = null;
@@ -121,7 +121,7 @@ export class MidiFileGenerator {
         }
 
         this.tickLookup.finish();
-        Logger.info('Midi', 'Midi generation done');
+        Logger.debug('Midi', 'Midi generation done');
     }
 
     private generateTrack(track: Track): void {

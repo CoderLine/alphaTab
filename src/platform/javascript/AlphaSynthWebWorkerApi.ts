@@ -244,7 +244,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public loadSoundFontFromUrl(url: string, progress: (e: ProgressEventArgs) => void): void {
-        Logger.info('AlphaSynth', `Start loading Soundfont from url ${url}`);
+        Logger.debug('AlphaSynth', `Start loading Soundfont from url ${url}`);
         let request: XMLHttpRequest = new XMLHttpRequest();
         request.open('GET', url, true, null, null);
         request.responseType = 'arraybuffer';

@@ -273,7 +273,7 @@ export default class CSharpAstTransformer {
         };
 
         if (enumMember.initializer) {
-            csEnumMember.initializer = this.visitExpression(csEnumMember, enumMember.initializer);
+            csEnumMember.initializer = this.visitExpression(csEnumMember, enumMember.initializer) ?? undefined;
         }
 
         if (enumMember.name) {
@@ -548,7 +548,7 @@ export default class CSharpAstTransformer {
 
                 if (d.initializer) {
                     this._declarationOrAssignmentTypeStack.push(type);
-                    csProperty.initializer = this.visitExpression(csProperty, d.initializer);
+                    csProperty.initializer = this.visitExpression(csProperty, d.initializer) ?? undefined;
                     this._declarationOrAssignmentTypeStack.pop();
                 }
 
@@ -638,9 +638,12 @@ export default class CSharpAstTransformer {
                 } as cs.Block
             } as cs.ConstructorDeclaration;
 
-            globalStatements.forEach(s =>
-                (staticConstructor.body as cs.Block).statements.push(this.visitStatement(staticConstructor.body!, s))
-            );
+            globalStatements.forEach(s => {
+                const st = this.visitStatement(staticConstructor.body!, s)!;
+                if(st) {
+                    (staticConstructor.body as cs.Block).statements.push(st);
+                }
+            });
 
             csClass.members.push(staticConstructor);
         }
@@ -1006,7 +1009,7 @@ export default class CSharpAstTransformer {
 
         if (classElement.initializer) {
             this._declarationOrAssignmentTypeStack.push(type);
-            csProperty.initializer = this.visitExpression(csProperty, classElement.initializer);
+            csProperty.initializer = this.visitExpression(csProperty, classElement.initializer) ?? undefined;
             this._declarationOrAssignmentTypeStack.pop();
         } else if (classElement.exclamationToken) {
             csProperty.initializer = {
@@ -1118,7 +1121,7 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csMethod);
     }
 
-    private visitStatement(parent: cs.Node, s: ts.Statement): cs.Statement {
+    private visitStatement(parent: cs.Node, s: ts.Statement): cs.Statement | null {
         switch (s.kind) {
             case ts.SyntaxKind.EmptyStatement:
                 return this.visitEmptyStatement(parent, s as ts.EmptyStatement);
@@ -1258,7 +1261,7 @@ export default class CSharpAstTransformer {
 
         if (s.initializer) {
             this._declarationOrAssignmentTypeStack.push(type);
-            variableStatement.initializer = this.visitExpression(variableStatement, s.initializer);
+            variableStatement.initializer = this.visitExpression(variableStatement, s.initializer) ?? undefined;
             this._declarationOrAssignmentTypeStack.pop();
         }
 
@@ -1273,7 +1276,10 @@ export default class CSharpAstTransformer {
             expression: {} as cs.Expression
         } as cs.ExpressionStatement;
 
-        expressionStatement.expression = this.visitExpression(expressionStatement, s.expression);
+        expressionStatement.expression = this.visitExpression(expressionStatement, s.expression)!;
+        if(!expressionStatement.expression){
+            return null;
+        }
 
         return expressionStatement;
     }
@@ -1287,11 +1293,20 @@ export default class CSharpAstTransformer {
             thenStatement: {} as cs.Statement
         } as cs.IfStatement;
 
-        ifStatement.expression = this.visitExpression(ifStatement, s.expression);
-        ifStatement.thenStatement = this.visitStatement(ifStatement, s.thenStatement);
+        ifStatement.expression = this.visitExpression(ifStatement, s.expression)!;
+        if(!ifStatement.expression) {
+            return null;
+        }
+        ifStatement.thenStatement = this.visitStatement(ifStatement, s.thenStatement)!;
+        if(!ifStatement.thenStatement){
+            return null
+        }
 
         if (s.elseStatement) {
-            ifStatement.elseStatement = this.visitStatement(ifStatement, s.elseStatement);
+            ifStatement.elseStatement = this.visitStatement(ifStatement, s.elseStatement)!;
+            if(!ifStatement.elseStatement){
+                return null;
+            }
         }
 
         return ifStatement;
@@ -1306,8 +1321,15 @@ export default class CSharpAstTransformer {
             statement: {} as cs.Statement
         } as cs.DoStatement;
 
-        doStatement.expression = this.visitExpression(doStatement, s.expression);
-        doStatement.statement = this.visitStatement(doStatement, s.statement);
+        doStatement.expression = this.visitExpression(doStatement, s.expression)!;
+        if(!doStatement.expression) {
+            return null;
+        }
+
+        doStatement.statement = this.visitStatement(doStatement, s.statement)!;
+        if(!doStatement.statement) {
+            return null;
+        }
 
         return doStatement;
     }
@@ -1321,8 +1343,15 @@ export default class CSharpAstTransformer {
             statement: {} as cs.Statement
         } as cs.WhileStatement;
 
-        whileStatement.expression = this.visitExpression(whileStatement, s.expression);
-        whileStatement.statement = this.visitStatement(whileStatement, s.statement);
+        whileStatement.expression = this.visitExpression(whileStatement, s.expression)!;
+        if(!whileStatement.expression){
+            return null;
+        }
+
+        whileStatement.statement = this.visitStatement(whileStatement, s.statement)!;
+        if(!whileStatement.statement){
+            return null;
+        }
 
         return whileStatement;
     }
@@ -1339,18 +1368,30 @@ export default class CSharpAstTransformer {
             if (ts.isVariableDeclarationList(s.initializer)) {
                 forStatement.initializer = this.visitVariableDeclarationList(forStatement, s.initializer);
             } else {
-                forStatement.initializer = this.visitExpression(forStatement, s.initializer);
+                forStatement.initializer = this.visitExpression(forStatement, s.initializer)!;
+                if (!forStatement.initializer) {
+                    return null;
+                }
             }
         }
         if (s.condition) {
-            forStatement.condition = this.visitExpression(forStatement, s.condition);
+            forStatement.condition = this.visitExpression(forStatement, s.condition)!;
+            if (!forStatement.condition) {
+                return null;
+            }
         }
 
         if (s.incrementor) {
-            forStatement.incrementor = this.visitExpression(forStatement, s.incrementor);
+            forStatement.incrementor = this.visitExpression(forStatement, s.incrementor)!;
+            if (!forStatement.incrementor) {
+                return null;
+            }
         }
 
-        forStatement.statement = this.visitStatement(forStatement, s.statement);
+        forStatement.statement = this.visitStatement(forStatement, s.statement)!;
+        if(!forStatement.statement) {
+            return null;
+        }
 
         return forStatement;
     }
@@ -1368,11 +1409,20 @@ export default class CSharpAstTransformer {
         if (ts.isVariableDeclarationList(s.initializer)) {
             forEachStatement.initializer = this.visitVariableDeclarationList(forEachStatement, s.initializer);
         } else {
-            forEachStatement.initializer = this.visitExpression(forEachStatement, s.initializer);
+            forEachStatement.initializer = this.visitExpression(forEachStatement, s.initializer)!;
+            if (!forEachStatement.initializer) {
+                return null;
+            }
         }
 
-        forEachStatement.expression = this.visitExpression(forEachStatement, s.expression);
-        forEachStatement.statement = this.visitStatement(forEachStatement, s.statement);
+        forEachStatement.expression = this.visitExpression(forEachStatement, s.expression)!;
+        if (!forEachStatement.expression) {
+            return null;
+        }
+        forEachStatement.statement = this.visitStatement(forEachStatement, s.statement)!;
+        if(!forEachStatement.statement){
+            return null;
+        }
 
         return forEachStatement;
     }
@@ -1390,11 +1440,20 @@ export default class CSharpAstTransformer {
         if (ts.isVariableDeclarationList(s.initializer)) {
             forEachStatement.initializer = this.visitVariableDeclarationList(forEachStatement, s.initializer);
         } else {
-            forEachStatement.initializer = this.visitExpression(forEachStatement, s.initializer);
+            forEachStatement.initializer = this.visitExpression(forEachStatement, s.initializer)!;
+            if (!forEachStatement.initializer) {
+                return null;
+            }
         }
 
-        forEachStatement.expression = this.visitExpression(forEachStatement, s.expression);
-        forEachStatement.statement = this.visitStatement(forEachStatement, s.statement);
+        forEachStatement.expression = this.visitExpression(forEachStatement, s.expression)!;
+        if (!forEachStatement.expression) {
+            return null;
+        }
+        forEachStatement.statement = this.visitStatement(forEachStatement, s.statement)!;
+        if(!forEachStatement.statement) {
+            return null;
+        }
 
         return forEachStatement;
     }
@@ -1427,7 +1486,10 @@ export default class CSharpAstTransformer {
         } as cs.ReturnStatement;
 
         if (s.expression) {
-            returnStatement.expression = this.visitExpression(returnStatement, s.expression);
+            returnStatement.expression = this.visitExpression(returnStatement, s.expression)!;
+            if (!returnStatement.expression) {
+                return null;
+            }
         }
 
         return returnStatement;
@@ -1442,12 +1504,19 @@ export default class CSharpAstTransformer {
             caseClauses: []
         } as cs.SwitchStatement;
 
-        switchStatement.expression = this.visitExpression(switchStatement, s.expression);
+        switchStatement.expression = this.visitExpression(switchStatement, s.expression)!;
+        if (!switchStatement.expression) {
+            return null;
+        }
+
         s.caseBlock.clauses.forEach(c => {
             if (ts.isDefaultClause(c)) {
                 switchStatement.caseClauses.push(this.visitDefaultClause(switchStatement, c));
             } else {
-                switchStatement.caseClauses.push(this.visitCaseClause(switchStatement, c));
+                const cl = this.visitCaseClause(switchStatement, c);
+                if (cl) {
+                    switchStatement.caseClauses.push(cl);
+                }
             }
         });
 
@@ -1472,7 +1541,7 @@ export default class CSharpAstTransformer {
         return defaultClause;
     }
 
-    private visitCaseClause(parent: cs.SwitchStatement, s: ts.CaseClause): cs.CaseClause {
+    private visitCaseClause(parent: cs.SwitchStatement, s: ts.CaseClause) {
         const caseClause = {
             nodeType: cs.SyntaxKind.CaseClause,
             parent: parent,
@@ -1481,7 +1550,10 @@ export default class CSharpAstTransformer {
             statements: []
         } as cs.CaseClause;
 
-        caseClause.expression = this.visitExpression(caseClause, s.expression);
+        caseClause.expression = this.visitExpression(caseClause, s.expression)!;
+        if (!caseClause.expression) {
+            return null;
+        }
         s.statements.forEach(c => {
             const statement = this.visitStatement(caseClause, c);
             if (statement) {
@@ -1500,7 +1572,10 @@ export default class CSharpAstTransformer {
         } as cs.ThrowStatement;
 
         if (s.expression) {
-            throwStatement.expression = this.visitExpression(throwStatement, s.expression);
+            throwStatement.expression = this.visitExpression(throwStatement, s.expression)!;
+            if (!throwStatement.expression) {
+                return null;
+            }
         }
 
         return throwStatement;
@@ -1628,8 +1703,8 @@ export default class CSharpAstTransformer {
         }
 
         if (p.initializer) {
-            csParameter.initializer = this.visitExpression(csParameter, p.initializer);
-            if (csParameter.initializer!.nodeType === cs.SyntaxKind.NullLiteral) {
+            csParameter.initializer = this.visitExpression(csParameter, p.initializer) ?? undefined;
+            if (csParameter.initializer && csParameter.initializer.nodeType === cs.SyntaxKind.NullLiteral) {
                 csParameter.type!.isNullable = true;
             }
         } else if (csParameter.type!.isOptional) {
@@ -1678,7 +1753,7 @@ export default class CSharpAstTransformer {
         parent.members.push(csConstructor);
     }
 
-    private visitExpression(parent: cs.Node, expression: ts.Expression): cs.Expression {
+    private visitExpression(parent: cs.Node, expression: ts.Expression): cs.Expression | null {
         switch (expression.kind) {
             case ts.SyntaxKind.PrefixUnaryExpression:
                 return this.visitPrefixUnaryExpression(parent, expression as ts.PrefixUnaryExpression);
@@ -1769,7 +1844,7 @@ export default class CSharpAstTransformer {
             tsNode: expression
         } as cs.Expression;
     }
-    private visitSpreadElement(parent: cs.Node, expression: ts.SpreadElement): cs.Expression {
+    private visitSpreadElement(parent: cs.Node, expression: ts.SpreadElement) {
         return this.visitExpression(parent, expression.expression);
     }
 
@@ -1782,7 +1857,10 @@ export default class CSharpAstTransformer {
             operator: this.mapOperator(expression.operator)
         } as cs.PrefixUnaryExpression;
 
-        csExpr.operand = this.visitExpression(csExpr, expression.operand);
+        csExpr.operand = this.visitExpression(csExpr, expression.operand)!;
+        if (!csExpr.operand) {
+            return null;
+        }
 
         return csExpr;
     }
@@ -1796,7 +1874,10 @@ export default class CSharpAstTransformer {
             operator: this.mapOperator(expression.operator)
         } as cs.PostfixUnaryExpression;
 
-        csExpr.operand = this.visitExpression(csExpr, expression.operand);
+        csExpr.operand = this.visitExpression(csExpr, expression.operand)!;
+        if (!csExpr.operand) {
+            return null;
+        }
 
         return csExpr;
     }
@@ -1853,7 +1934,10 @@ export default class CSharpAstTransformer {
         } as cs.InvocationExpression;
 
         csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'TypeOf');
-        csExpr.arguments.push(this.visitExpression(csExpr, expression.expression));
+        const e = this.visitExpression(csExpr, expression.expression);
+        if (e) {
+            csExpr.arguments.push(e);
+        }
 
         return csExpr;
     }
@@ -1883,7 +1967,10 @@ export default class CSharpAstTransformer {
             expression: {} as cs.Expression
         } as cs.AwaitExpression;
 
-        awaitExpression.expression = this.visitExpression(awaitExpression, expression.expression);
+        awaitExpression.expression = this.visitExpression(awaitExpression, expression.expression)!;
+        if (!awaitExpression.expression) {
+            return null;
+        }
 
         return awaitExpression;
     }
@@ -1900,8 +1987,15 @@ export default class CSharpAstTransformer {
             } as cs.InvocationExpression;
 
             csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'In');
-            csExpr.arguments.push(this.visitExpression(csExpr, expression.left));
-            csExpr.arguments.push(this.visitExpression(csExpr, expression.right));
+
+            let e = this.visitExpression(csExpr, expression.left)!;
+            if (e) {
+                csExpr.arguments.push(e);
+            }
+            e = this.visitExpression(csExpr, expression.right)!;
+            if (e) {
+                csExpr.arguments.push(e);
+            }
 
             return csExpr;
         } else if (expression.operatorToken.kind === ts.SyntaxKind.AsteriskAsteriskToken) {
@@ -1931,7 +2025,10 @@ export default class CSharpAstTransformer {
                 right: {} as cs.Expression,
                 operator: '='
             } as cs.BinaryExpression;
-            assignment.left = this.visitExpression(assignment, expression.left);
+            assignment.left = this.visitExpression(assignment, expression.left)!;
+            if (!assignment.left) {
+                return null;
+            }
 
             const bitOp = (assignment.right = {
                 parent: assignment,
@@ -1983,12 +2080,19 @@ export default class CSharpAstTransformer {
                 } as cs.PrimitiveTypeNode,
                 tsNode: expression
             } as cs.CastExpression);
-            toInt.expression = this.visitExpression(assignment, expression.left);
+            toInt.expression = this.visitExpression(assignment, expression.left)!;
+            if (!toInt.expression) {
+                return null;
+            }
 
             (bitOp.right as cs.ParenthesizedExpression).expression = this.visitExpression(
                 bitOp.right,
                 expression.right
-            );
+            )!;
+
+            if (!(bitOp.right as cs.ParenthesizedExpression).expression) {
+                return null;
+            }
 
             return assignment;
         } else {
@@ -2001,8 +2105,16 @@ export default class CSharpAstTransformer {
                 operator: this.mapOperator(expression.operatorToken.kind)
             } as cs.BinaryExpression;
 
-            binaryExpression.left = this.visitExpression(binaryExpression, expression.left);
-            binaryExpression.right = this.visitExpression(binaryExpression, expression.right);
+            binaryExpression.left = this.visitExpression(binaryExpression, expression.left)!;
+            if (!binaryExpression.left) {
+                return null;
+            }
+
+            binaryExpression.right = this.visitExpression(binaryExpression, expression.right)!;
+            if (!binaryExpression.right) {
+                return null;
+            }
+
             switch (expression.operatorToken.kind) {
                 case ts.SyntaxKind.AmpersandToken:
                 case ts.SyntaxKind.GreaterThanGreaterThanToken:
@@ -2093,9 +2205,20 @@ export default class CSharpAstTransformer {
             whenFalse: {} as cs.Expression
         } as cs.ConditionalExpression;
 
-        conditionalExpression.condition = this.visitExpression(conditionalExpression, expression.condition);
-        conditionalExpression.whenTrue = this.visitExpression(conditionalExpression, expression.whenTrue);
-        conditionalExpression.whenFalse = this.visitExpression(conditionalExpression, expression.whenFalse);
+        conditionalExpression.condition = this.visitExpression(conditionalExpression, expression.condition)!;
+        if (!conditionalExpression.condition) {
+            return null;
+        }
+
+        conditionalExpression.whenTrue = this.visitExpression(conditionalExpression, expression.whenTrue)!;
+        if (!conditionalExpression.whenTrue) {
+            return null;
+        }
+
+        conditionalExpression.whenFalse = this.visitExpression(conditionalExpression, expression.whenFalse)!;
+        if (!conditionalExpression.whenFalse) {
+            return null;
+        }
 
         return conditionalExpression;
     }
@@ -2108,7 +2231,7 @@ export default class CSharpAstTransformer {
         }
 
         const type = this._context.typeChecker.getTypeAtLocation(expression.tsNode!);
-        if(type.flags & ts.TypeFlags.Boolean || type.flags & ts.TypeFlags.BooleanLiteral) {
+        if (type.flags & ts.TypeFlags.Boolean || type.flags & ts.TypeFlags.BooleanLiteral) {
             return expression;
         }
 
@@ -2138,7 +2261,7 @@ export default class CSharpAstTransformer {
 
         expression.parent = call;
         call.arguments.push(expression);
-        
+
         return call;
     }
 
@@ -2197,7 +2320,14 @@ export default class CSharpAstTransformer {
         if (ts.isBlock(expression.body)) {
             lambdaExpression.body = this.visitBlock(lambdaExpression, expression.body);
         } else {
-            lambdaExpression.body = this.visitExpression(lambdaExpression, expression.body);
+            lambdaExpression.body = this.visitExpression(lambdaExpression, expression.body)!;
+            if (!lambdaExpression.body) {
+                lambdaExpression.body = {
+                    parent: lambdaExpression,
+                    nodeType: cs.SyntaxKind.Block,
+                    statements: []
+                } as cs.Block;
+            }
         }
 
         return lambdaExpression;
@@ -2265,7 +2395,10 @@ export default class CSharpAstTransformer {
         }
 
         expression.templateSpans.forEach(s => {
-            templateString.chunks.push(this.visitExpression(templateString, s.expression));
+            const e = this.visitExpression(templateString, s.expression);
+            if (e) {
+                templateString.chunks.push(e);
+            }
             templateString.chunks.push({
                 parent: templateString,
                 nodeType: cs.SyntaxKind.StringLiteral,
@@ -2287,7 +2420,10 @@ export default class CSharpAstTransformer {
         } as cs.IsExpression;
 
         // TODO: introduce new name for typechecked expression and use it within the current block
-        csExpr.expression = this.visitExpression(csExpr, expression.expression);
+        csExpr.expression = this.visitExpression(csExpr, expression.expression)!;
+        if (!csExpr.expression) {
+            return csExpr.expression;
+        }
 
         return csExpr;
     }
@@ -2300,7 +2436,10 @@ export default class CSharpAstTransformer {
             expression: {} as cs.Expression
         } as cs.ParenthesizedExpression;
 
-        csExpr.expression = this.visitExpression(csExpr, expression.expression);
+        csExpr.expression = this.visitExpression(csExpr, expression.expression)!;
+        if (!csExpr.expression) {
+            return null;
+        }
 
         return csExpr;
     }
@@ -2317,7 +2456,12 @@ export default class CSharpAstTransformer {
 
             csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'CreateMapEntry');
 
-            expression.elements.forEach(e => csExpr.arguments.push(this.visitExpression(csExpr, e)));
+            expression.elements.forEach(e => {
+                const ex = this.visitExpression(csExpr, e);
+                if (ex) {
+                    csExpr.arguments.push(ex);
+                }
+            });
 
             return csExpr;
         } else {
@@ -2333,7 +2477,12 @@ export default class CSharpAstTransformer {
                 csExpr.type = this.createUnresolvedTypeNode(csExpr, expression, contextual);
             }
 
-            expression.elements.forEach(e => csExpr.values.push(this.visitExpression(csExpr, e)));
+            expression.elements.forEach(e => {
+                const ex = this.visitExpression(csExpr, e);
+                if (ex) {
+                    csExpr.values.push(ex);
+                }
+            });
 
             return csExpr;
         }
@@ -2377,7 +2526,10 @@ export default class CSharpAstTransformer {
             memberAccess.nullSafe = true;
         }
 
-        memberAccess.expression = this.visitExpression(memberAccess, expression.expression);
+        memberAccess.expression = this.visitExpression(memberAccess, expression.expression)!;
+        if (!memberAccess.expression) {
+            return null;
+        }
 
         return this.wrapToSmartCast(parent, memberAccess, expression);
     }
@@ -2399,9 +2551,11 @@ export default class CSharpAstTransformer {
                     value: {} as cs.Expression
                 } as cs.AnonymousObjectProperty;
 
-                assignment.value = this.visitExpression(objectLiteral, p.initializer);
+                assignment.value = this.visitExpression(objectLiteral, p.initializer)!;
+                if (assignment.value) {
+                    objectLiteral.properties.push(assignment);
+                }
 
-                objectLiteral.properties.push(assignment);
             } else if (ts.isShorthandPropertyAssignment(p)) {
                 const assignment = {
                     parent: objectLiteral,
@@ -2410,9 +2564,11 @@ export default class CSharpAstTransformer {
                     value: {} as cs.Expression
                 } as cs.AnonymousObjectProperty;
 
-                assignment.value = this.visitExpression(objectLiteral, p.objectAssignmentInitializer!);
+                assignment.value = this.visitExpression(objectLiteral, p.objectAssignmentInitializer!)!;
+                if (assignment.value) {
+                    objectLiteral.properties.push(assignment);
+                }
 
-                objectLiteral.properties.push(assignment);
             } else if (ts.isSpreadAssignment(p)) {
                 this._context.addTsNodeDiagnostics(p, 'Spread operator not supported', ts.DiagnosticCategory.Error);
             } else if (ts.isMethodDeclaration(p)) {
@@ -2475,7 +2631,10 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.MemberAccessExpression
             } as cs.MemberAccessExpression);
 
-            memberAccess.expression = this.visitExpression(memberAccess, expression.argumentExpression);
+            memberAccess.expression = this.visitExpression(memberAccess, expression.argumentExpression)!;
+            if (!memberAccess.expression) {
+                return null;
+            }
 
             return callExpr;
         }
@@ -2488,8 +2647,15 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.ElementAccessExpression
         } as cs.ElementAccessExpression;
 
-        elementAccess.expression = this.visitExpression(elementAccess, expression.expression);
-        elementAccess.argumentExpression = this.visitExpression(elementAccess, expression.argumentExpression);
+        elementAccess.expression = this.visitExpression(elementAccess, expression.expression)!;
+        if (!elementAccess.expression) {
+            return null;
+        }
+
+        elementAccess.argumentExpression = this.visitExpression(elementAccess, expression.argumentExpression)!;
+        if (!elementAccess.argumentExpression) {
+            return null;
+        }
 
         return this.wrapToSmartCast(parent, elementAccess, expression);
     }
@@ -2507,8 +2673,21 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.InvocationExpression
         } as cs.InvocationExpression;
 
-        callExpression.expression = this.visitExpression(callExpression, expression.expression);
-        expression.arguments.forEach(a => callExpression.arguments.push(this.visitExpression(callExpression, a)));
+        callExpression.expression = this.visitExpression(callExpression, expression.expression)!;
+        if (!callExpression.expression) {
+            return null;
+        }
+
+        if (ts.isPropertyAccessExpression(expression.expression) && expression.expression.name.text === 'setPrototypeOf') {
+            return null;
+        }
+
+        expression.arguments.forEach(a => {
+            const e = this.visitExpression(callExpression, a);
+            if (e) {
+                callExpression.arguments.push(e);
+            }
+        });
 
         if (expression.typeArguments) {
             callExpression.typeArguments = [];
@@ -2544,7 +2723,12 @@ export default class CSharpAstTransformer {
 
         newExpression.type.parent = newExpression;
         if (expression.arguments) {
-            expression.arguments.forEach(a => newExpression.arguments.push(this.visitExpression(newExpression, a)));
+            expression.arguments.forEach(a => {
+                const e = this.visitExpression(newExpression, a);
+                if (e) {
+                    newExpression.arguments.push(e)
+                }
+            });
         }
 
         if (expression.typeArguments) {
@@ -2593,7 +2777,10 @@ export default class CSharpAstTransformer {
         } as cs.CastExpression;
 
         castExpression.type.parent = castExpression;
-        castExpression.expression = this.visitExpression(castExpression, expression.expression);
+        castExpression.expression = this.visitExpression(castExpression, expression.expression)!;
+        if (!castExpression.expression) {
+            return null;
+        }
 
         return castExpression;
     }
@@ -2608,7 +2795,10 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.MemberAccessExpression
             } as cs.MemberAccessExpression;
 
-            valueAccessExpression.expression = this.visitExpression(valueAccessExpression, expression.expression);
+            valueAccessExpression.expression = this.visitExpression(valueAccessExpression, expression.expression)!;
+            if (!valueAccessExpression.expression) {
+                return null;
+            }
 
             return valueAccessExpression;
         } else {
@@ -2619,7 +2809,10 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.NonNullExpression
             } as cs.NonNullExpression;
 
-            nonNullExpression.expression = this.visitExpression(nonNullExpression, expression.expression);
+            nonNullExpression.expression = this.visitExpression(nonNullExpression, expression.expression)!;
+            if (!nonNullExpression.expression) {
+                return null;
+            }
 
             return nonNullExpression;
         }
