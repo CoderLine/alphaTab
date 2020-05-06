@@ -94,9 +94,9 @@ export class BarRendererBase {
     public scaleToWidth(width: number): void {
         // preBeat and postBeat glyphs do not get resized
         let containerWidth: number = width - this._preBeatGlyphs.width - this._postBeatGlyphs.width;
-        for (let kvp of this._voiceContainers) {
-            kvp[1].scaleToWidth(containerWidth);
-        }
+        this._voiceContainers.forEach(container => {
+            container.scaleToWidth(containerWidth);
+        });
         this._postBeatGlyphs.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width + containerWidth;
         this.width = width;
     }
@@ -129,9 +129,9 @@ export class BarRendererBase {
         if (info.preBeatSize < preSize) {
             info.preBeatSize = preSize;
         }
-        for (let kvp of this._voiceContainers) {
-            kvp[1].registerLayoutingInfo(info);
-        }
+        this._voiceContainers.forEach(container => {
+            container.registerLayoutingInfo(info);
+        });
         let postSize: number = this._postBeatGlyphs.width;
         if (info.postBeatSize < postSize) {
             info.postBeatSize = postSize;
@@ -150,15 +150,14 @@ export class BarRendererBase {
         this._preBeatGlyphs.width = this.layoutingInfo.preBeatSize;
         // on beat glyphs we apply the glyph spacing
         let voiceEnd: number = this._preBeatGlyphs.x + this._preBeatGlyphs.width;
-        for (let kvp of this._voiceContainers) {
-            let c: VoiceContainerGlyph = kvp[1];
+        this._voiceContainers.forEach(c => {
             c.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width;
             c.applyLayoutingInfo(this.layoutingInfo);
             let newEnd: number = c.x + c.width;
             if (voiceEnd < newEnd) {
                 voiceEnd = newEnd;
             }
-        }
+        });
         // on the post glyphs we add the spacing before all other glyphs
         this._postBeatGlyphs.x = Math.floor(voiceEnd);
         this._postBeatGlyphs.width = this.layoutingInfo.postBeatSize;
@@ -186,7 +185,7 @@ export class BarRendererBase {
     public bottomPadding: number = 0;
 
     public doLayout(): void {
-        if(!this.bar) {
+        if (!this.bar) {
             return;
         }
         this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
@@ -221,15 +220,14 @@ export class BarRendererBase {
         let voiceContainers: Map<number, VoiceContainerGlyph> = this._voiceContainers;
         let beatGlyphsStart: number = this.beatGlyphsStart;
         let postBeatStart: number = beatGlyphsStart;
-        for (let kvp of voiceContainers) {
-            let c: VoiceContainerGlyph = kvp[1];
+        voiceContainers.forEach(c => {
             c.x = beatGlyphsStart;
             c.doLayout();
             let x: number = c.x + c.width;
             if (postBeatStart < x) {
                 postBeatStart = x;
             }
-        }
+        });
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
     }
@@ -266,11 +264,10 @@ export class BarRendererBase {
         this.paintBackground(cx, cy, canvas);
         canvas.color = this.resources.mainGlyphColor;
         this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
-        for (let kvp of this._voiceContainers) {
-            let c: VoiceContainerGlyph = kvp[1];
+        this._voiceContainers.forEach(c => {
             canvas.color = c.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
             c.paint(cx + this.x, cy + this.y, canvas);
-        }
+        });
         canvas.color = this.resources.mainGlyphColor;
         this._postBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
     }
@@ -282,7 +279,7 @@ export class BarRendererBase {
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
         let barBounds: BarBounds = new BarBounds();
         barBounds.bar = this.bar!;
-        barBounds.visualBounds =new Bounds();
+        barBounds.visualBounds = new Bounds();
         barBounds.visualBounds.x = cx + this.x;
         barBounds.visualBounds.y = cy + this.y + this.topPadding;
         barBounds.visualBounds.w = this.width;
@@ -293,11 +290,10 @@ export class BarRendererBase {
         barBounds.realBounds.y = cy + this.y;
         barBounds.realBounds.w = this.width;
         barBounds.realBounds.h = this.height;
-        
+
         masterBarBounds.addBar(barBounds);
-        for (let kvp of this._voiceContainers) {
-            let c: VoiceContainerGlyph = kvp[1];
-            let isEmptyBar: boolean = this.bar!.isEmpty && kvp[0] === 0;
+        this._voiceContainers.forEach((c, index) => {
+            let isEmptyBar: boolean = this.bar!.isEmpty && index === 0;
             if (!c.voice.isEmpty || isEmptyBar) {
                 for (let i: number = 0, j: number = c.beatGlyphs.length; i < j; i++) {
                     let bc: BeatContainerGlyph = c.beatGlyphs[i];
@@ -308,13 +304,13 @@ export class BarRendererBase {
                     beatBoundings.visualBounds.y = barBounds.visualBounds.y;
                     beatBoundings.visualBounds.w = bc.onNotes.width;
                     beatBoundings.visualBounds.h = barBounds.visualBounds.h;
-                    
-                    beatBoundings.realBounds =new Bounds();
+
+                    beatBoundings.realBounds = new Bounds();
                     beatBoundings.realBounds.x = cx + this.x + c.x + bc.x;
                     beatBoundings.realBounds.y = barBounds.realBounds.y;
                     beatBoundings.realBounds.w = bc.width;
                     beatBoundings.realBounds.h = barBounds.realBounds.h;
-                    
+
                     if (isEmptyBar) {
                         beatBoundings.visualBounds.x = cx + this.x;
                         beatBoundings.realBounds.x = beatBoundings.visualBounds.x;
@@ -322,7 +318,7 @@ export class BarRendererBase {
                     barBounds.addBeat(beatBoundings);
                 }
             }
-        }
+        });
     }
 
     protected addPostBeatGlyph(g: Glyph): void {

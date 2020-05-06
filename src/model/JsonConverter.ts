@@ -93,12 +93,11 @@ export class JsonConverter {
             let staff2: Staff = {} as any;
             Staff.copyTo(staff, staff2);
             staff2.chords = new Map<string, Chord>();
-            for (let kvp of staff.chords) {
-                let chord: Chord = kvp[1];
+            staff.chords.forEach((chord, chordId)=>{
                 let chord2: Chord = {} as any;
                 Chord.copyTo(chord, chord2);
-                staff2.chords.set(kvp[0], chord2);
-            }
+                staff2.chords.set(chordId, chord2);
+            });
 
             JsonConverter.barsToJsObject(staff, staff2);
             track2.staves.push(staff2);
@@ -217,12 +216,11 @@ export class JsonConverter {
             }
 
             masterBar2.fermata = {} as any;
-            for (let kvp of masterBar.fermata) {
-                let fermata: Fermata = kvp[1];
+            masterBar.fermata.forEach((fermata, fermataId)=>{
                 let fermata2: any = {} as any;
-                masterBar2.fermata.set(kvp[0], fermata2);
+                masterBar2.fermata.set(fermataId, fermata2);
                 Fermata.copyTo(fermata, fermata2);
-            }
+            });
 
             score2.masterBars.push(masterBar2);
         }
@@ -302,12 +300,11 @@ export class JsonConverter {
             let staff: Staff = track.staves[s];
             let staff2: Staff = track2.staves[s];
             Staff.copyTo(staff, staff2);
-            for (let kvp of staff.chords) {
-                let chord: Chord = kvp[1];
+            staff.chords.forEach((chord, chordId)=>{
                 let chord2: Chord = new Chord();
                 Chord.copyTo(chord, chord2);
-                staff2.addChord(kvp[0], chord2);
-            }
+                staff2.addChord(chordId, chord2);
+            });
 
             JsonConverter.jsObjectToBars(staff, staff2, allNotes, notesToLink);
         }

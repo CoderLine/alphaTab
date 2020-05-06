@@ -97,7 +97,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
 
         let barreLookup = new Map<number, number[]>();
         for (let barreFret of this._chord.barreFrets) {
-            let strings: number[] = [-1,-1];
+            let strings: number[] = [-1, -1];
             barreLookup.set(barreFret - this._chord.firstFret, strings);
         }
 
@@ -120,13 +120,12 @@ export class ChordDiagramGlyph extends EffectGlyph {
             }
         }
 
-        for (let kvp of barreLookup) {
-            let strings = kvp[1];
-            let y: number = cy + kvp[0] * fretSpacing + fretSpacing / 2 + this.scale;
+        barreLookup.forEach((strings, fret) => {
+            let y: number = cy + fret * fretSpacing + fretSpacing / 2 + this.scale;
             let xLeft: number = cx + (this._chord.strings.length - strings[1] - 1) * stringSpacing;
             let xRight: number = cx + (this._chord.strings.length - strings[0] - 1) * stringSpacing;
             canvas.fillRect(xLeft, y - circleRadius, xRight - xLeft, circleRadius * 2);
-        }
+        });
 
         canvas.textAlign = align;
         canvas.textBaseline = baseline;

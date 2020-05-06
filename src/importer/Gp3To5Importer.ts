@@ -138,6 +138,7 @@ export class Gp3To5Importer extends ScoreImporter {
 
     public readVersion(): void {
         let version: string = GpBinaryHelpers.gpReadStringByteLength(this.data, 30, this.settings.importer.encoding);
+        console.log('version loaded', version);
         if (!version.startsWith(Gp3To5Importer.VersionString)) {
             throw new UnsupportedFormatError('Unsupported format');
         }

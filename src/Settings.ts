@@ -44,9 +44,9 @@ export class Settings {
      * @target web
      */
     public fillFromDataAttributes(dataAttributes: Map<string, unknown>): void {
-        for (let kvp of dataAttributes) {
-            this.setProperty(kvp[0].toLowerCase(), kvp[1]);
-        }
+        dataAttributes.forEach((v, k) => {
+            this.setProperty(k.toLowerCase(), v);
+        });
     }
 
     /**

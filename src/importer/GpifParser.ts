@@ -115,10 +115,10 @@ export class GpifParser {
         this.buildModel();
         this.score.finish(settings);
         if (this._lyricsByTrack.size > 0) {
-            for (let kvp of this._lyricsByTrack) {
-                let track: Track = this._tracksById.get(kvp[0])!;
-                track.applyLyrics(kvp[1]);
-            }
+            this._lyricsByTrack.forEach((lyrics, t) => {
+                let track: Track = this._tracksById.get(t)!;
+                track.applyLyrics(lyrics);
+            });
         }
     }
 
@@ -1792,9 +1792,7 @@ export class GpifParser {
             }
         }
         // build masterbar automations
-        for (let kvp of this._masterTrackAutomations) {
-            let barIndex: string = kvp[0];
-            let automations: Automation[] = kvp[1];
+        this._masterTrackAutomations.forEach((automations, barIndex) => {
             let masterBar: MasterBar = this.score.masterBars[parseInt(barIndex)];
             for (let i: number = 0, j: number = automations.length; i < j; i++) {
                 let automation: Automation = automations[i];
@@ -1808,6 +1806,6 @@ export class GpifParser {
                     masterBar.tempoAutomation = automation;
                 }
             }
-        }
+        });
     }
 }

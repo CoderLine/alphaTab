@@ -1,6 +1,10 @@
 import { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 import { ISynthOutput } from '@src/synth/ISynthOutput';
 import { EventEmitter, IEventEmitterOfT, IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
+import { Environment } from '@src/Environment';
+import { AlphaTabError } from '@src/AlphaTabError';
+
+declare var webkitAudioContext: any;
 
 /**
  * This class implements a HTML5 Web Audio API based audio output device
@@ -29,7 +33,7 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         this._circularBuffer = new CircularSampleBuffer(
             AlphaSynthWebAudioOutput.BufferSize * AlphaSynthWebAudioOutput.BufferCount
         );
-        this._context = new AudioContext();
+        this._context = this.createAudioContext();
         // possible fix for Web Audio in iOS 9 (issue #4)
         let ctx: any = this._context;
         if (ctx.state === 'suspended') {
@@ -49,16 +53,18 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
     }
 
     public activate(): void {
-        if (this._context) {
-            let ctx: any = this._context;
-            ctx.resume();
+        if (!this._context) {
+            this._context = this.createAudioContext();
         }
+
+        // tslint:disable-next-line: no-floating-promises
+        this._context.resume();
     }
 
     private patchIosSampleRate(): void {
         let ua: string = navigator.userAgent;
         if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== 0) {
-            let context: AudioContext = new AudioContext();
+            let context: AudioContext = this.createAudioContext();
             let buffer: AudioBuffer = context.createBuffer(1, 1, AlphaSynthWebAudioOutput.PreferredSampleRate);
             let dummy: AudioBufferSourceNode = context.createBufferSource();
             dummy.buffer = buffer;
@@ -68,6 +74,15 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
             // tslint:disable-next-line: no-floating-promises
             context.close();
         }
+    }
+    
+    private createAudioContext(): AudioContext {
+        if('AudioContext' in Environment.globalThis) {
+            return new AudioContext();
+        } else if('webkitAudioContext' in Environment.globalThis) {
+            return new webkitAudioContext();
+        }
+        throw new AlphaTabError("AudioContext not found");
     }
 
     public play(): void {

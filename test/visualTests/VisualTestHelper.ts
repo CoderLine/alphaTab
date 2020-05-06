@@ -252,7 +252,7 @@ export class VisualTestHelper {
                     result.message = `Error comparing images: ${e}`;
                 }
 
-                const jasmineRequire = (globalThis as any).jasmineRequire;
+                const jasmineRequire = Environment.globalThis.jasmineRequire;
                 if (!result.pass && jasmineRequire.html) {
                     const dom = document.createElement('div');
                     dom.innerHTML = `

@@ -12,7 +12,6 @@ import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
 import { BeamGlyph } from '@src/rendering/glyphs/BeamGlyph';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
 import { RepeatCloseGlyph } from '@src/rendering/glyphs/RepeatCloseGlyph';
 import { RepeatCountGlyph } from '@src/rendering/glyphs/RepeatCountGlyph';
 import { RepeatOpenGlyph } from '@src/rendering/glyphs/RepeatOpenGlyph';
@@ -54,7 +53,9 @@ export class TabBarRenderer extends BarRendererBase {
     public getNoteX(note: Note, onEnd: boolean = true): number {
         let beat: TabBeatGlyph = this.getOnNotesGlyphForBeat(note.beat) as TabBeatGlyph;
         if (beat) {
-            return beat.container.x + beat.container.voiceContainer.x + beat.x + beat.noteNumbers!.getNoteX(note, onEnd);
+            return (
+                beat.container.x + beat.container.voiceContainer.x + beat.x + beat.noteNumbers!.getNoteX(note, onEnd)
+            );
         }
         return 0;
     }
@@ -215,17 +216,16 @@ export class TabBarRenderer extends BarRendererBase {
                     let notes: TabBeatGlyph = bg.onNotes as TabBeatGlyph;
                     let noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                     if (noteNumbers) {
-                        for (let kvp of noteNumbers.notesPerString) {
-                            let noteNumber: NoteNumberGlyph = kvp[1];
+                        noteNumbers.notesPerString.forEach((noteNumber, str) => {
                             if (!noteNumber.isEmpty) {
-                                tabNotes[this.bar.staff.tuning.length - kvp[0]].push(
+                                tabNotes[this.bar.staff.tuning.length - str].push(
                                     new Float32Array([
-                                        vc.x + bg.x + notes.x + noteNumbers.x,
-                                        noteNumbers.width + padding
+                                        vc.x + bg.x + notes.x + noteNumbers!.x,
+                                        noteNumbers!.width + padding
                                     ])
                                 );
                             }
-                        }
+                        });
                     }
                 }
             }

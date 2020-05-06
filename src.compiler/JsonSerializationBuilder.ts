@@ -646,8 +646,8 @@ function rewriteClassForJsonSerialization(
             undefined,
             [
                 ts.createParameter(
-                    [],
-                    [],
+                    undefined,
+                    undefined,
                     undefined,
                     'obj',
                     undefined,

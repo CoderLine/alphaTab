@@ -155,12 +155,11 @@ export class BarLayoutingInfo {
     private calculateSpringConstants(): void {
         this._xMin = 0;
         let springs: Map<number, Spring> = this.springs;
-        for (let kvp of springs) {
-            let spring: Spring = kvp[1];
+        springs.forEach(spring => {
             if (spring.springWidth < this._xMin) {
                 this._xMin = spring.springWidth;
             }
-        }
+        });
         let totalSpringConstant: number = 0;
         let sortedSprings: Spring[] = this._timeSortedSprings;
         for (let i: number = 0; i < sortedSprings.length; i++) {

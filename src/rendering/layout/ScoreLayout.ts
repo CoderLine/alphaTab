@@ -146,16 +146,14 @@ export abstract class ScoreLayout {
             let chords: Map<string, Chord> = new Map<string, Chord>();
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
-                    for (let kvp of staff.chords) {
-                        let chordId: string = kvp[0];
+                    staff.chords.forEach((chord, chordId) => {
                         if (!chords.has(chordId)) {
-                            let chord: Chord = kvp[1];
                             if (chord.showDiagram) {
                                 chords.set(chordId, chord);
-                                this.chordDiagrams.addChord(chord);
+                                this.chordDiagrams!.addChord(chord);
                             }
                         }
-                    }
+                    });
                 }
             }
         }

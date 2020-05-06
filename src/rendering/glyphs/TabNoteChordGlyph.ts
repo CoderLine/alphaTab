@@ -64,14 +64,13 @@ export class TabNoteChordGlyph extends Glyph {
         let effectY: number = this.getNoteY(this.minStringNote!, false) + tabHeight / 2;
         // TODO: take care of actual glyph height
         let effectSpacing: number = 7 * this.scale;
-        for (let kvp of this.beatEffects) {
-            let g: Glyph = kvp[1];
+        this.beatEffects.forEach(g => {
             g.y += effectY;
             g.x += this.width / 2;
             g.renderer = this.renderer;
             effectY += effectSpacing;
             g.doLayout();
-        }
+        });
         this.width = w;
     }
 
@@ -98,10 +97,9 @@ export class TabNoteChordGlyph extends Glyph {
             g.paint(cx, cy, canvas);
         }
         canvas.textBaseline = oldBaseLine;
-        for (let kvp of this.beatEffects) {
-            let g: Glyph = kvp[1];
+        this.beatEffects.forEach(g => {
             g.paint(cx, cy, canvas);
-        }
+        });
     }
 
     public updateBeamingHelper(cx: number): void {

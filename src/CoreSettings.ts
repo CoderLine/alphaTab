@@ -34,7 +34,7 @@ export class CoreSettings {
     /**
      * The log level to use within alphaTab
      */
-    public logLevel: LogLevel = LogLevel.Info;
+    public logLevel: LogLevel = LogLevel.Debug;
 
     /**
      * Gets or sets whether the rendering should be done in a worker if possible.
@@ -51,16 +51,16 @@ export class CoreSettings {
      * @target web
      */
     public constructor() {
-        if (!Environment.isRunningInWorker && (globalThis as any).ALPHATAB_ROOT) {
-            this.scriptFile = (globalThis as any).ALPHATAB_ROOT;
+        if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_ROOT) {
+            this.scriptFile = Environment.globalThis.ALPHATAB_ROOT;
             this.scriptFile = CoreSettings.ensureFullUrl(this.scriptFile);
             this.scriptFile = CoreSettings.appendScriptName(this.scriptFile);
         } else {
             this.scriptFile = Environment.scriptFile;
         }
 
-        if (!Environment.isRunningInWorker && (globalThis as any).ALPHATAB_FONT) {
-            this.fontDirectory = (globalThis as any)['ALPHATAB_FONT'];
+        if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_FONT) {
+            this.fontDirectory = Environment.globalThis['ALPHATAB_FONT'];
             this.fontDirectory = CoreSettings.ensureFullUrl(this.fontDirectory);
         } else {
             this.fontDirectory = this.scriptFile;
@@ -81,10 +81,9 @@ export class CoreSettings {
             return '';
         }
 
-        let global: unknown = globalThis;
         if (!relativeUrl.startsWith('http') && !relativeUrl.startsWith('https') && !relativeUrl.startsWith('file')) {
             let root: string = '';
-            let location: Location = (global as any)['location'];
+            let location: Location = Environment.globalThis['location'];
             root += location.protocol?.toString();
             root += '//'?.toString();
             if (location.hostname) {

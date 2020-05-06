@@ -2,6 +2,7 @@ import { ISynthOutput } from '@src/synth/ISynthOutput';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/util/Logger';
+import { Environment } from '@src/Environment';
 
 /**
  * @target web
@@ -32,7 +33,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
 
     public open(): void {
         Logger.debug('AlphaSynth', 'Initializing webworker worker');
-        this._worker = (globalThis as unknown) as IWorkerScope;
+        this._worker = Environment.globalThis as IWorkerScope;
         this._worker.addEventListener('message', this.handleMessage.bind(this));
         (this.ready as EventEmitter).trigger();
     }

@@ -122,7 +122,7 @@ export abstract class SvgCanvas implements ICanvas {
         }
         let s: string = `<text x="${x | 0}" y="${y | 0}" style="stroke: none; font:${this.font.toCssString(
             this.settings.display.scale
-        )}"  dominant-baseline="${this.getSvgBaseLine()}"`;
+        )}" ${this.getSvgBaseLine()}`;
         if (this.color.rgba !== '#000000') {
             s += ` fill="${this.color.rgba}"`;
         }
@@ -145,14 +145,13 @@ export abstract class SvgCanvas implements ICanvas {
         return '';
     }
 
-    private getSvgBaseLine(): string {
+    protected getSvgBaseLine(): string {
         switch (this.textBaseline) {
             case TextBaseline.Top:
-                return 'hanging';
+                return `dy="1.25ex"`;
             case TextBaseline.Middle:
-                return 'middle';
+                return `dy="0.5ex"`;
             case TextBaseline.Bottom:
-                return 'bottom';
             default:
                 return '';
         }

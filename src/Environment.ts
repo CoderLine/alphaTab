@@ -135,8 +135,38 @@ export class Environment {
     /**
      * @target web
      */
+    private static _globalThis: any | undefined = undefined;
+
+    /**
+     * @target web
+     */
+    public static get globalThis(): any {
+        if (Environment._globalThis === undefined) {
+            try {
+                Environment._globalThis = globalThis;
+            } catch (e) {
+                // global this not available
+            }
+
+            if (typeof Environment._globalThis === 'undefined') {
+                Environment._globalThis = self;
+            }
+            if (typeof Environment._globalThis === 'undefined') {
+                Environment._globalThis = window;
+            }
+            if (typeof Environment._globalThis === 'undefined') {
+                Environment._globalThis = Function('return this')();
+            }
+        }
+
+        return this._globalThis;
+    }
+
+    /**
+     * @target web
+     */
     public static scriptFile: string | null = Environment.detectScriptFile();
-    
+
     /**
      * @target web
      */
@@ -149,7 +179,7 @@ export class Environment {
      * @target web
      */
     public static get isRunningInWorker(): boolean {
-        return 'WorkerGlobalScope' in globalThis;
+        return 'WorkerGlobalScope' in Environment.globalThis;
     }
 
     /**
@@ -163,7 +193,7 @@ export class Environment {
      * @target web
      */
     public static get supportsTextDecoder(): boolean {
-        return 'TextDecoder' in globalThis;
+        return 'TextDecoder' in Environment.globalThis;
     }
 
     /**
@@ -231,8 +261,8 @@ export class Environment {
      * @target web
      */
     private static registerJQueryPlugin(): void {
-        if (!Environment.isRunningInWorker && globalThis && 'jQuery' in globalThis) {
-            let jquery: any = (globalThis as any)['jQuery'];
+        if (!Environment.isRunningInWorker && Environment.globalThis && 'jQuery' in Environment.globalThis) {
+            let jquery: any = Environment.globalThis['jQuery'];
             let api: JQueryAlphaTab = new JQueryAlphaTab();
             jquery.fn.alphaTab = function (this: any, method: string) {
                 const args = Array.prototype.slice.call(arguments, 1);

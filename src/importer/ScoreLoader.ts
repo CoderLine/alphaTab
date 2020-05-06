@@ -120,7 +120,7 @@ export class ScoreLoader {
                 if (e instanceof UnsupportedFormatError) {
                     Logger.info('ScoreLoader', importer.name + ' does not support the file');
                 } else {
-                    Logger.info('ScoreLoader', 'Score import failed due to unexpected error: ' + e, null);
+                    Logger.info('ScoreLoader', 'Score import failed due to unexpected error: ', e);
                     throw e;
                 }
             }

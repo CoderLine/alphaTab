@@ -165,9 +165,9 @@ export class PageViewLayout extends ScoreLayout {
         canvas.beginRender(this.width, y);
         canvas.color = res.scoreInfoColor;
         canvas.textAlign = TextAlign.Center;
-        for (let kvp of this.scoreInfoGlyphs) {
-            kvp[1].paint(0, 0, canvas);
-        }
+        this.scoreInfoGlyphs.forEach(g => {
+            g.paint(0, 0, canvas);
+        });
         if (this.tuningGlyph) {
             this.tuningGlyph.paint(0, 0, canvas);
         }
@@ -334,7 +334,7 @@ export class PageViewLayout extends ScoreLayout {
                     this._barsFromPreviousGroup.push(reverted);
                     while (reverted && !reverted.canWrap && group.masterBarsRenderers.length > 1) {
                         reverted = group.revertLastBar();
-                        if(reverted) {
+                        if (reverted) {
                             this._barsFromPreviousGroup.push(reverted);
                         }
                     }

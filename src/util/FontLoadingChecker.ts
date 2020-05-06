@@ -118,9 +118,16 @@ export class FontLoadingChecker {
                 }
             };
 
-            window.addEventListener('DOMContentLoaded', () => {
+            let readyState:string = document.readyState;
+            if (readyState === "complete" 
+                || readyState === "loaded" 
+                || readyState === "interactive") {
                 checkFont();
-            });
+            } else {
+                document.addEventListener('DOMContentLoaded', () => {
+                    checkFont();
+                });
+            }
         }
     }
 

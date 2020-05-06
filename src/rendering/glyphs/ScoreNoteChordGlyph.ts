@@ -45,7 +45,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public getNoteY(note: Note, aboveNote: boolean = false): number {
         if (this._noteGlyphLookup.has(note.id)) {
-            return this.y + this._noteGlyphLookup.get(note.id)!.y + (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * this.scale) / 2 : 0);
+            return (
+                this.y +
+                this._noteGlyphLookup.get(note.id)!.y +
+                (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * this.scale) / 2 : 0)
+            );
         }
         return 0;
     }
@@ -70,11 +74,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public doLayout(): void {
         super.doLayout();
         let direction: BeamDirection = this.direction;
-        for (let kvp of this.beatEffects) {
-            let effect: Glyph = kvp[1];
+        this.beatEffects.forEach(effect => {
             effect.renderer = this.renderer;
             effect.doLayout();
-        }
+        });
         if (this.beat.isTremolo) {
             let offset: number = 0;
             let baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
@@ -113,13 +116,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         // TODO: take care of actual glyph height
         let effectSpacing: number =
             this.beamingHelper.direction === BeamDirection.Up ? 7 * this.scale : -7 * this.scale;
-        for (let kvp of this.beatEffects) {
-            let g: Glyph = kvp[1];
+
+        this.beatEffects.forEach(g => {
             g.y = effectY;
             g.x = this.width / 2;
             g.paint(cx + this.x, cy + this.y, canvas);
             effectY += effectSpacing;
-        }
+        });
         if (this.renderer.settings.core.includeNoteBounds) {
             for (let note of this._notes) {
                 if (this._noteGlyphLookup.has(note.id)) {

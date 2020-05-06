@@ -37,6 +37,7 @@
             crossorigin="anonymous"
         ></script>
 
+        <script src="polyfills.js"></script>
         <script src="/dist/alphaTab.js"></script>
         <link rel="stylesheet" href="control.css" />
         <link rel="stylesheet" href="full-page.css" />
@@ -46,7 +47,7 @@
         <script type="text/javascript" src="control.js"></script>
         <script type="text/javascript">
             const req = new XMLHttpRequest();
-            req.onload = data => {
+            req.onload = function(data) {
                 document.getElementById('placeholder').outerHTML = req.responseText;
                 window.at = setupControl('#alphaTab');
             };

@@ -57,12 +57,18 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         if (!Environment.bravuraFontChecker.isFontLoaded) {
             return false;
         }
-        for (let kvp of this._fontCheckers) {
-            let checker: FontLoadingChecker = kvp[1];
+
+        let isAnyNotLoaded = false;
+        this._fontCheckers.forEach(checker => {
             if (!checker.isFontLoaded) {
-                return false;
+                isAnyNotLoaded = true;
             }
+        });
+
+        if(isAnyNotLoaded) {
+            return false;
         }
+        
         Logger.debug('Font', 'All fonts loaded: ' + this._fontCheckers.size);
         return true;
     }

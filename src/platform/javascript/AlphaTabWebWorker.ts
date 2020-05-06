@@ -5,6 +5,7 @@ import { FontSizes } from '@src/platform/svg/FontSizes';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/util/Logger';
+import { Environment } from '@src/Environment';
 
 /**
  * @target web
@@ -19,7 +20,7 @@ export class AlphaTabWebWorker {
     }
 
     public static init(): void {
-        (globalThis as any).alphaTabWebWorker = new AlphaTabWebWorker((globalThis as unknown) as IWorkerScope);
+        Environment.globalThis.alphaTabWebWorker = new AlphaTabWebWorker(Environment.globalThis as IWorkerScope);
     }
 
     private handleMessage(e: MessageEvent): void {
@@ -100,7 +101,7 @@ export class AlphaTabWebWorker {
         }
     }
 
-    private error(error:Error): void {
+    private error(error: Error): void {
         Logger.error('Worker', 'An unexpected error occurred in worker', error);
         this._main.postMessage({
             cmd: 'alphaTab.error',

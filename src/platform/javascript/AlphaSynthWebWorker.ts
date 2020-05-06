@@ -5,6 +5,7 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
 import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/util/Logger';
+import { Environment } from '@src/Environment';
 
 /**
  * This class implements a HTML5 WebWorker based version of alphaSynth
@@ -67,7 +68,7 @@ export class AlphaSynthWebWorker {
     }
 
     public static init(): void {
-        let main: IWorkerScope = (globalThis as unknown) as IWorkerScope;
+        let main: IWorkerScope = Environment.globalThis as IWorkerScope;
         main.addEventListener('message', e => {
             let data: any = e.data;
             let cmd: string = data.cmd;
@@ -75,7 +76,7 @@ export class AlphaSynthWebWorker {
                 case 'alphaSynth.initialize':
                     AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
                     Logger.logLevel = data.logLevel;
-                    (globalThis as any).alphaSynthWebWorker = new AlphaSynthWebWorker(main);
+                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(main);
                     break;
             }
         });
