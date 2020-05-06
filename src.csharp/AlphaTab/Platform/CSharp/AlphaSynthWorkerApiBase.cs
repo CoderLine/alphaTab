@@ -16,6 +16,7 @@ namespace AlphaTab.Platform.CSharp
         {
             _output = output;
             _logLevel = logLevel;
+            Player = null!;
         }
 
         public abstract void Destroy();
@@ -82,7 +83,7 @@ namespace AlphaTab.Platform.CSharp
             set => DispatchOnWorkerThread(() => { Player.TimePosition = value; });
         }
 
-        public PlaybackRange PlaybackRange
+        public PlaybackRange? PlaybackRange
         {
             get => Player.PlaybackRange;
             set => DispatchOnWorkerThread(() => { Player.PlaybackRange = value; });

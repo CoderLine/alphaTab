@@ -34,7 +34,7 @@ export default class CSharpAstPrinter {
         this.writeLine('// Changes to this file may cause incorrect behavior and will be lost if');
         this.writeLine('// the code is regenerated.');
         this.writeLine('// </auto-generated>');
-        this.writeLine('#nullable enable');
+        this.writeLine('#nullable enable annotations');
         this.writeLine();
         for (const using of sourceFile.usings) {
             this.writeUsing(using);

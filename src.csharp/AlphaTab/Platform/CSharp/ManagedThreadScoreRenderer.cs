@@ -16,16 +16,17 @@ namespace AlphaTab.Platform.CSharp
 
         private readonly Thread _workerThread;
         private BlockingCollection<Action> _workerQueue;
-        private ManualResetEventSlim _threadStartedEvent;
+        private ManualResetEventSlim? _threadStartedEvent;
         private CancellationTokenSource _workerCancellationToken;
         private ScoreRenderer _renderer;
         private double _width;
 
-        public BoundsLookup BoundsLookup { get; private set; }
+        public BoundsLookup? BoundsLookup { get; private set; }
 
         public ManagedThreadScoreRenderer(Settings settings, Action<Action> uiInvoke)
         {
             _uiInvoke = uiInvoke;
+            _renderer = null!;
             _threadStartedEvent = new ManualResetEventSlim(false);
             _workerQueue = new BlockingCollection<Action>();
             _workerCancellationToken = new CancellationTokenSource();

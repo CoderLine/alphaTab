@@ -62,10 +62,10 @@ namespace AlphaTab.Platform.CSharp
             MusicFont = SKTypeface.FromStream(bravura);
         }
 
-        private SKSurface _surface;
-        private SKPath _path;
-        private string _typeFaceCache;
-        private SKTypeface _typeFace;
+        private SKSurface _surface = null!;
+        private SKPath _path = null!;
+        private string _typeFaceCache = "";
+        private SKTypeface _typeFace = null!;
 
         public Color Color { get; set; }
         public double LineWidth { get; set; }
@@ -106,6 +106,7 @@ namespace AlphaTab.Platform.CSharp
             Font = new Font("Arial", 10);
             TextAlign = TextAlign.Left;
             TextBaseline = TextBaseline.Top;
+            Settings = null!;
         }
 
         public void BeginRender(double width, double height)

@@ -116,6 +116,9 @@ export class BoundsLookup {
         return lookup;
     }
 
+    /**
+     * @target web
+     */
     private boundsToJson(bounds: Bounds): Bounds {
         let json: Bounds = {} as any;
         json.x = bounds.x;

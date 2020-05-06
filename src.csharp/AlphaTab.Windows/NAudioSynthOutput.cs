@@ -29,6 +29,8 @@ namespace AlphaTab
         public NAudioSynthOutput()
             : base(PreferredSampleRate, 2)
         {
+            _context = null!;
+            _circularBuffer = null!;
         }
 
         /// <inheritdoc />

@@ -6,7 +6,7 @@ namespace AlphaTab.WinForms
 {
     internal class AlphaTabLayoutPanel : Panel
     {
-        private AlphaTabLayoutEngine _laoyutEngine;
+        private AlphaTabLayoutEngine? _laoyutEngine;
 
         public override LayoutEngine LayoutEngine =>
             _laoyutEngine ??= new AlphaTabLayoutEngine();
@@ -28,21 +28,24 @@ namespace AlphaTab.WinForms
 
                 var rowHeight = 0;
 
-                foreach (Control child in parent.Controls)
+                foreach (Control? child in parent.Controls)
                 {
-                    child.Location = new Point(xChild, yChild);
-
-                    xChild += child.Width;
-                    if (child.Height > rowHeight)
+                    if (child != null)
                     {
-                        rowHeight = child.Height;
-                    }
+                        child.Location = new Point(xChild, yChild);
 
-                    if (xChild >= parent.Width)
-                    {
-                        xChild = 0;
-                        yChild += rowHeight;
-                        rowHeight = 0;
+                        xChild += child.Width;
+                        if (child.Height > rowHeight)
+                        {
+                            rowHeight = child.Height;
+                        }
+
+                        if (xChild >= parent.Width)
+                        {
+                            xChild = 0;
+                            yChild += rowHeight;
+                            rowHeight = 0;
+                        }
                     }
                 }
 

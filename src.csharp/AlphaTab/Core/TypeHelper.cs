@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -118,7 +119,9 @@ namespace AlphaTab.Core
                 return last;
             }
 
+#pragma warning disable 8653
             return default;
+#pragma warning restore 8653
         }
 
 

@@ -2,7 +2,7 @@
 
 namespace AlphaTab
 {
-    public class DelegatedEventEmitter : IEventEmitter
+    internal class DelegatedEventEmitter : IEventEmitter
     {
         private readonly Action<Action> _on;
         private readonly Action<Action> _off;
@@ -24,7 +24,7 @@ namespace AlphaTab
         }
     }
 
-    public class DelegatedEventEmitter<T> : IEventEmitterOfT<T>
+    internal class DelegatedEventEmitter<T> : IEventEmitterOfT<T>
     {
         private readonly Action<Action<T>> _on;
         private readonly Action<Action<T>> _off;

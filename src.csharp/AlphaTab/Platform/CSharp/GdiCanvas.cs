@@ -210,6 +210,12 @@ namespace AlphaTab.Platform.CSharp
 
         public GdiCanvas()
         {
+            _image = null!;
+            _graphics = null!;
+            _brush = null!;
+            _pen = null!;
+            Settings = null!;
+
             _width = 1;
             _height = 1;
 

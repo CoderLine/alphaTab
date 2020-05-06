@@ -17,7 +17,7 @@ namespace AlphaTab
 
         public static Action Throttle(Action action, double delay)
         {
-            CancellationTokenSource cancellationTokenSource = null;
+            CancellationTokenSource? cancellationTokenSource = null;
             return () =>
             {
                 cancellationTokenSource?.Cancel();

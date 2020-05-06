@@ -13,7 +13,7 @@ namespace AlphaTab.WinForms
     internal class WinFormsUiFacade : ManagedUiFacade<AlphaTabControl>
     {
         private readonly AlphaTabLayoutPanel _layoutPanel;
-        private event Action InternalRootContainerBecameVisible;
+        private event Action? InternalRootContainerBecameVisible;
 
         public override IContainer RootContainer { get; }
         public override IEventEmitter RootContainerBecameVisible { get; }
@@ -31,7 +31,7 @@ namespace AlphaTab.WinForms
                     }
                     else
                     {
-                        void OnSizeChanged(object sender, EventArgs e)
+                        void OnSizeChanged(object? sender, EventArgs e)
                         {
                             SettingsContainer.VisibleChanged -= OnVisibilityChanged;
                             SettingsContainer.SizeChanged -= OnSizeChanged;
@@ -41,7 +41,8 @@ namespace AlphaTab.WinForms
                                 InternalRootContainerBecameVisible = null;
                             }
                         }
-                        void OnVisibilityChanged(object sender, EventArgs e)
+
+                        void OnVisibilityChanged(object? sender, EventArgs e)
                         {
                             SettingsContainer.VisibleChanged -= OnVisibilityChanged;
                             SettingsContainer.SizeChanged -= OnSizeChanged;
@@ -52,19 +53,18 @@ namespace AlphaTab.WinForms
                                 InternalRootContainerBecameVisible = null;
                             }
                         }
+
                         InternalRootContainerBecameVisible += value;
                         SettingsContainer.VisibleChanged += OnVisibilityChanged;
                         SettingsContainer.SizeChanged += OnSizeChanged;
                     }
                 },
-                value =>
-                {
-                    InternalRootContainerBecameVisible -= value;
-                }
-                );
+                value => { InternalRootContainerBecameVisible -= value; }
+            );
         }
 
-        public override void Initialize(AlphaTabApiBase<AlphaTabControl> api, AlphaTabControl control)
+        public override void Initialize(AlphaTabApiBase<AlphaTabControl> api,
+            AlphaTabControl control)
         {
             base.Initialize(api, control);
             api.Settings = control.Settings;
@@ -99,26 +99,29 @@ namespace AlphaTab.WinForms
             return new ControlContainer(_layoutPanel);
         }
 
-        public override void TriggerEvent(IContainer container, string eventName, object details = null, IMouseEventArgs originalEvent = null)
+        public override void TriggerEvent(IContainer container, string eventName,
+            object? details = null, IMouseEventArgs? originalEvent = null)
         {
         }
 
-        public override void BeginAppendRenderResults(RenderFinishedEventArgs r)
+        public override void BeginAppendRenderResults(RenderFinishedEventArgs? r)
         {
-            SettingsContainer.BeginInvoke((Action<RenderFinishedEventArgs>)(renderResult =>
+            SettingsContainer.BeginInvoke((Action<RenderFinishedEventArgs>) (renderResult =>
             {
                 var panel = _layoutPanel;
 
                 // null result indicates that the rendering finished
                 if (renderResult == null)
                 {
-                    TotalResultCount.TryDequeue(out var counter);
-                    // so we remove elements that might be from a previous render session
-                    while (panel.Controls.Count > counter.Count)
+                    if (TotalResultCount.TryDequeue(out var counter))
                     {
-                        var control = panel.Controls[^1];
-                        panel.Controls.RemoveAt(panel.Controls.Count - 1);
-                        control.Dispose();
+                        // so we remove elements that might be from a previous render session
+                        while (panel.Controls.Count > counter.Count)
+                        {
+                            var control = panel.Controls[^1];
+                            panel.Controls.RemoveAt(panel.Controls.Count - 1);
+                            control.Dispose();
+                        }
                     }
                 }
                 // NOTE: here we try to replace existing children
@@ -126,12 +129,13 @@ namespace AlphaTab.WinForms
                 {
                     var body = renderResult.RenderResult;
 
-                    Bitmap source = null;
+                    Bitmap? source = null;
                     if (body is string)
                     {
                         // TODO: svg support
                         return;
                     }
+
                     if (body is SKImage skiaImage)
                     {
                         using (skiaImage)
@@ -146,32 +150,35 @@ namespace AlphaTab.WinForms
 
                     if (source != null)
                     {
-                        TotalResultCount.TryPeek(out var counter);
-                        if (counter.Count < panel.Controls.Count)
+                        if (TotalResultCount.TryPeek(out var counter))
                         {
-                            var img = (PictureBox)panel.Controls[counter.Count];
-                            img.Width = (int)renderResult.Width;
-                            img.Height = (int)renderResult.Height;
-                            var oldImg = img.Image;
-                            img.Image = source;
-                            oldImg?.Dispose();
-                        }
-                        else
-                        {
-                            var img = new PictureBox
+                            if (counter.Count < panel.Controls.Count)
                             {
-                                AutoSize = false,
-                                BackColor = _layoutPanel.ForeColor,
-                                Width = (int)renderResult.Width,
-                                Height = (int)renderResult.Height,
-                                Image = source,
-                                Padding = Padding.Empty,
-                                Margin = Padding.Empty,
-                                BorderStyle = BorderStyle.None
-                            };
-                            panel.Controls.Add(img);
+                                var img = (PictureBox) panel.Controls[counter.Count];
+                                img.Width = (int) renderResult.Width;
+                                img.Height = (int) renderResult.Height;
+                                var oldImg = img.Image;
+                                img.Image = source;
+                                oldImg?.Dispose();
+                            }
+                            else
+                            {
+                                var img = new PictureBox
+                                {
+                                    AutoSize = false,
+                                    BackColor = _layoutPanel.ForeColor,
+                                    Width = (int) renderResult.Width,
+                                    Height = (int) renderResult.Height,
+                                    Image = source,
+                                    Padding = Padding.Empty,
+                                    Margin = Padding.Empty,
+                                    BorderStyle = BorderStyle.None
+                                };
+                                panel.Controls.Add(img);
+                            }
+
+                            counter.Count++;
                         }
-                        counter.Count++;
                     }
                 }
             }), r);
@@ -182,10 +189,10 @@ namespace AlphaTab.WinForms
         {
         }
 
-        public override Platform.Cursors CreateCursors()
+        public override Platform.Cursors? CreateCursors()
         {
             // no cursors for winforms, why? - It lacks of proper transparency support
-            // maybe if somebody asks for it.  it's worth an investigation.
+            // maybe if somebody asks for it, it's worth an investigation.
             return null;
         }
 
@@ -202,7 +209,7 @@ namespace AlphaTab.WinForms
         {
         }
 
-        public override IContainer CreateSelectionElement()
+        public override IContainer? CreateSelectionElement()
         {
             return null;
         }
@@ -212,15 +219,15 @@ namespace AlphaTab.WinForms
             return new ControlContainer(SettingsContainer);
         }
 
-        public override Bounds GetOffset(IContainer relativeTo, IContainer container)
+        public override Bounds GetOffset(IContainer? relativeTo, IContainer container)
         {
-            var containerWinForms = ((ControlContainer)container).Control;
+            var containerWinForms = ((ControlContainer) container).Control;
 
             var left = 0;
             var top = 0;
 
             var c = containerWinForms;
-            while(c != null && c != _layoutPanel)
+            while (c != null && c != _layoutPanel)
             {
                 left += c.Left;
                 top += c.Top;
@@ -239,13 +246,13 @@ namespace AlphaTab.WinForms
         public override void ScrollToY(IContainer scrollElement, double offset, double speed)
         {
             var c = ((ControlContainer) scrollElement).Control;
-            c.AutoScrollOffset = new Point(c.AutoScrollOffset.X, (int)offset);
+            c.AutoScrollOffset = new Point(c.AutoScrollOffset.X, (int) offset);
         }
 
         public override void ScrollToX(IContainer scrollElement, double offset, double speed)
         {
-            var c = ((ControlContainer)scrollElement).Control;
-            c.AutoScrollOffset = new Point((int)offset, c.AutoScrollOffset.Y);
+            var c = ((ControlContainer) scrollElement).Control;
+            c.AutoScrollOffset = new Point((int) offset, c.AutoScrollOffset.Y);
         }
     }
 }

@@ -89,7 +89,7 @@ export interface IUiFacade<TSettings> {
      * Creates the cursor objects that are used to highlight the currently played beats and bars.
      * @returns
      */
-    createCursors(): Cursors;
+    createCursors(): Cursors | null;
 
     /**
      * Destroys the cursor objects that are used to highlight the currently played beats and bars.
@@ -117,7 +117,7 @@ export interface IUiFacade<TSettings> {
      * Creates a new UI element that is used to display the selection rectangle.
      * @returns
      */
-    createSelectionElement(): IContainer;
+    createSelectionElement(): IContainer | null;
 
     /**
      * Gets the UI element that is used for scrolling during playback.

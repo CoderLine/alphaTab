@@ -10,6 +10,7 @@
         public Lazy(System.Func<T> factory)
         {
             _factory = factory;
+            _value = null!;
         }
 
         public T Value

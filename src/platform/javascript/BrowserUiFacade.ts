@@ -65,10 +65,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             }
         });
 
-        if(isAnyNotLoaded) {
+        if (isAnyNotLoaded) {
             return false;
         }
-        
+
         Logger.debug('Font', 'All fonts loaded: ' + this._fontCheckers.size);
         return true;
     }
@@ -304,7 +304,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             }
         }
     }
-    
+
     public isElementInViewPort(element: HTMLElement): boolean {
         let rect: DOMRect = element.getBoundingClientRect();
         return (
@@ -449,7 +449,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private replacePlaceholder(placeholder: HTMLElement, body: any) {
-        if(typeof placeholder.outerHTML === 'string') {
+        if (typeof placeholder.outerHTML === 'string') {
             placeholder.outerHTML = body;
         } else {
             const display = document.createElement('div');
@@ -520,7 +520,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         element.removeChild(cursorWrapper);
     }
 
-    public createCursors(): Cursors {
+    public createCursors(): Cursors | null {
         let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
         let cursorWrapper: HTMLElement = document.createElement('div');
         cursorWrapper.classList.add('at-cursors');
@@ -602,7 +602,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return new HtmlElementContainer(scrollElement);
     }
 
-    public createSelectionElement(): IContainer {
+    public createSelectionElement(): IContainer | null {
         let element: HTMLElement = document.createElement('div');
         element.style.position = 'absolute';
         return new HtmlElementContainer(element);

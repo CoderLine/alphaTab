@@ -7,9 +7,9 @@ namespace AlphaTab.Wpf
     {
         protected override Size MeasureOverride(Size availableSize)
         {
-            foreach (UIElement child in InternalChildren)
+            foreach (UIElement? child in InternalChildren)
             {
-                child.Measure(availableSize);
+                child?.Measure(availableSize);
             }
             return new Size
             {
@@ -25,21 +25,25 @@ namespace AlphaTab.Wpf
 
             var rowHeight = 0.0;
 
-            foreach (UIElement child in InternalChildren)
+            foreach (UIElement? child in InternalChildren)
             {
-                child.Arrange(new Rect(xChild, yChild, child.DesiredSize.Width, child.DesiredSize.Height));
-
-                xChild += child.DesiredSize.Width;
-                if (child.DesiredSize.Height > rowHeight)
+                if (child != null)
                 {
-                    rowHeight = child.DesiredSize.Height;
-                }
+                    child.Arrange(new Rect(xChild, yChild, child.DesiredSize.Width,
+                        child.DesiredSize.Height));
 
-                if (xChild >= finalSize.Width)
-                {
-                    xChild = 0;
-                    yChild += rowHeight;
-                    rowHeight = 0;
+                    xChild += child.DesiredSize.Width;
+                    if (child.DesiredSize.Height > rowHeight)
+                    {
+                        rowHeight = child.DesiredSize.Height;
+                    }
+
+                    if (xChild >= finalSize.Width)
+                    {
+                        xChild = 0;
+                        yChild += rowHeight;
+                        rowHeight = 0;
+                    }
                 }
             }
 

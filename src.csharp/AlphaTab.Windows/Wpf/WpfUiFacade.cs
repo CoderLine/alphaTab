@@ -17,7 +17,7 @@ namespace AlphaTab.Wpf
     internal class WpfUiFacade : ManagedUiFacade<AlphaTab>
     {
         private readonly ScrollViewer _scrollViewer;
-        private event Action InternalRootContainerBecameVisible;
+        private event Action? InternalRootContainerBecameVisible;
 
         public override IContainer RootContainer { get; }
 
@@ -110,11 +110,11 @@ namespace AlphaTab.Wpf
         }
 
         public override void TriggerEvent(IContainer container, string eventName,
-            object details = null, IMouseEventArgs originalEvent = null)
+            object? details = null, IMouseEventArgs? originalEvent = null)
         {
         }
 
-        public override void BeginAppendRenderResults(RenderFinishedEventArgs r)
+        public override void BeginAppendRenderResults(RenderFinishedEventArgs? r)
         {
             SettingsContainer.Dispatcher?.BeginInvoke(
                 (Action<RenderFinishedEventArgs>) (renderResult =>
@@ -124,11 +124,13 @@ namespace AlphaTab.Wpf
                     // null result indicates that the rendering finished
                     if (renderResult == null)
                     {
-                        TotalResultCount.TryDequeue(out var counter);
-                        // so we remove elements that might be from a previous render session
-                        while (panel.Children.Count > counter.Count)
+                        if (TotalResultCount.TryDequeue(out var counter))
                         {
-                            panel.Children.RemoveAt(panel.Children.Count - 1);
+                            // so we remove elements that might be from a previous render session
+                            while (panel.Children.Count > counter.Count)
+                            {
+                                panel.Children.RemoveAt(panel.Children.Count - 1);
+                            }
                         }
                     }
                     // NOTE: here we try to replace existing children
@@ -136,12 +138,13 @@ namespace AlphaTab.Wpf
                     {
                         var body = renderResult.RenderResult;
 
-                        ImageSource source = null;
+                        ImageSource? source = null;
                         if (body is string)
                         {
                             // TODO: svg support
                             return;
                         }
+
                         if (body is SKImage skiaImage)
                         {
                             using (skiaImage)
@@ -159,28 +162,30 @@ namespace AlphaTab.Wpf
 
                         if (source != null)
                         {
-                            TotalResultCount.TryPeek(out var counter);
-                            if (counter.Count < panel.Children.Count)
+                            if (TotalResultCount.TryPeek(out var counter))
                             {
-                                var img = (Image) panel.Children[counter.Count];
-                                img.Width = renderResult.Width;
-                                img.Height = renderResult.Height;
-                                img.Stretch = Stretch.None;
-                                img.SnapsToDevicePixels = true;
-                                img.Source = source;
-                            }
-                            else
-                            {
-                                var img = new Image
+                                if (counter.Count < panel.Children.Count)
                                 {
-                                    Width = renderResult.Width,
-                                    Height = renderResult.Height,
-                                    Source = source
-                                };
-                                panel.Children.Add(img);
-                            }
+                                    var img = (Image) panel.Children[counter.Count];
+                                    img.Width = renderResult.Width;
+                                    img.Height = renderResult.Height;
+                                    img.Stretch = Stretch.None;
+                                    img.SnapsToDevicePixels = true;
+                                    img.Source = source;
+                                }
+                                else
+                                {
+                                    var img = new Image
+                                    {
+                                        Width = renderResult.Width,
+                                        Height = renderResult.Height,
+                                        Source = source
+                                    };
+                                    panel.Children.Add(img);
+                                }
 
-                            counter.Count++;
+                                counter.Count++;
+                            }
                         }
                     }
                 }),
@@ -265,7 +270,7 @@ namespace AlphaTab.Wpf
             return new FrameworkElementContainer(_scrollViewer);
         }
 
-        public override Bounds GetOffset(IContainer relativeTo, IContainer container)
+        public override Bounds GetOffset(IContainer? relativeTo, IContainer container)
         {
             var containerWpf = ((FrameworkElementContainer) container).Control;
 

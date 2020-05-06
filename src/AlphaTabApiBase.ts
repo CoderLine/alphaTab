@@ -645,7 +645,7 @@ export class AlphaTabApiBase<TSettings> {
     private setupCursors(): void {
         //
         // Create cursors
-        let cursors: Cursors = this.uiFacade.createCursors();
+        let cursors = this.uiFacade.createCursors();
         if (!cursors) {
             return;
         }
@@ -1041,7 +1041,7 @@ export class AlphaTabApiBase<TSettings> {
             let staffEndX: number =
                 startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds.visualBounds.x +
                 startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds.visualBounds.w;
-            let startSelection: IContainer = this.uiFacade.createSelectionElement();
+            let startSelection: IContainer = this.uiFacade.createSelectionElement()!;
             startSelection.top = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
             startSelection.left = startX;
             startSelection.width = staffEndX - startX;
@@ -1051,14 +1051,14 @@ export class AlphaTabApiBase<TSettings> {
             let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds.index;
             for (let staffIndex: number = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
                 let staffBounds: StaveGroupBounds = cache.staveGroups[staffIndex];
-                let middleSelection: IContainer = this.uiFacade.createSelectionElement();
+                let middleSelection: IContainer = this.uiFacade.createSelectionElement()!;
                 middleSelection.top = staffBounds.visualBounds.y;
                 middleSelection.left = staffStartX;
                 middleSelection.width = staffEndX - staffStartX;
                 middleSelection.height = staffBounds.visualBounds.h;
                 selectionWrapper.appendChild(middleSelection);
             }
-            let endSelection: IContainer = this.uiFacade.createSelectionElement();
+            let endSelection: IContainer = this.uiFacade.createSelectionElement()!;
             endSelection.top = endBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
             endSelection.left = staffStartX;
             endSelection.width = endX - staffStartX;
@@ -1066,7 +1066,7 @@ export class AlphaTabApiBase<TSettings> {
             selectionWrapper.appendChild(endSelection);
         } else {
             // if the beats are on the same staff, we simply highlight from the startbeat to endbeat
-            let selection: IContainer = this.uiFacade.createSelectionElement();
+            let selection: IContainer = this.uiFacade.createSelectionElement()!;
             selection.top = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
             selection.left = startX;
             selection.width = endX - startX;

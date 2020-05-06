@@ -6,7 +6,7 @@ using System.Linq;
 namespace AlphaTab.Core.EcmaScript
 {
     public class Map<TKey, TValue> : IEnumerable<MapEntry<TKey, TValue>>
-        where TValue : class
+        where TValue : class?
     {
         private readonly Dictionary<TKey, TValue> _data;
 
@@ -22,14 +22,16 @@ namespace AlphaTab.Core.EcmaScript
 
         public double Size => _data.Count;
 
-        public TValue? Get(TKey key)
+        public TValue Get(TKey key)
         {
             if (_data.TryGetValue(key, out var value))
             {
                 return value;
             }
 
-            return null;
+#pragma warning disable 8653
+            return default;
+#pragma warning restore 8653
         }
 
         public void Set(TKey key, TValue value)

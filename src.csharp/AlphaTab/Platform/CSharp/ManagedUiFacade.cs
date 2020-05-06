@@ -11,8 +11,9 @@ using AlphaTab.Rendering.Utils;
 namespace AlphaTab.Platform.CSharp
 {
     public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
+        where TSettings : class
     {
-        protected ConcurrentQueue<Counter> TotalResultCount { get; private set; }
+        protected ConcurrentQueue<Counter> TotalResultCount { get; private set; } = null!;
 
         protected class Counter
         {
@@ -23,8 +24,8 @@ namespace AlphaTab.Platform.CSharp
         public bool AreWorkersSupported => true;
         public bool CanRender => true;
 
-        protected AlphaTabApiBase<TSettings> Api { get; private set; }
-        protected TSettings SettingsContainer { get; private set; }
+        protected AlphaTabApiBase<TSettings> Api { get; private set; } = null!;
+        protected TSettings SettingsContainer { get; private set; } = null!;
 
         public virtual void Initialize(AlphaTabApiBase<TSettings> api, TSettings settings)
         {
@@ -65,7 +66,7 @@ namespace AlphaTab.Platform.CSharp
         public abstract IContainer CreateCanvasElement();
 
         public abstract void TriggerEvent(IContainer container, string eventName,
-            object details = null, IMouseEventArgs? originalEvent = null);
+            object? details = null, IMouseEventArgs? originalEvent = null);
 
         public virtual void InitialRender()
         {
@@ -85,19 +86,19 @@ namespace AlphaTab.Platform.CSharp
 
         protected abstract void RenderTracks();
 
-        public abstract void BeginAppendRenderResults(RenderFinishedEventArgs renderResults);
+        public abstract void BeginAppendRenderResults(RenderFinishedEventArgs? renderResults);
         public abstract void DestroyCursors();
-        public abstract Cursors CreateCursors();
+        public abstract Cursors? CreateCursors();
         public abstract void BeginInvoke(Action action);
         public abstract void RemoveHighlights();
         public abstract void HighlightElements(string groupId);
-        public abstract IContainer CreateSelectionElement();
+        public abstract IContainer? CreateSelectionElement();
         public abstract IContainer GetScrollContainer();
-        public abstract Bounds GetOffset(IContainer scrollElement, IContainer container);
+        public abstract Bounds GetOffset(IContainer? scrollElement, IContainer container);
         public abstract void ScrollToY(IContainer scrollElement, double offset, double speed);
         public abstract void ScrollToX(IContainer scrollElement, double offset, double speed);
 
-        public bool Load(object data, Action<Score> success, Action<Error> error)
+        public bool Load(object? data, Action<Score> success, Action<Error> error)
         {
             switch (data)
             {
@@ -123,7 +124,7 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
-        public bool LoadSoundFont(object data)
+        public bool LoadSoundFont(object? data)
         {
             switch (data)
             {

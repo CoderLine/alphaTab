@@ -10,10 +10,5 @@
             Key = key;
             Value = value;
         }
-
-        public dynamic this[int index]
-        {
-            get { return index == 0 ? (object) Key : Value; }
-        }
     }
 }
