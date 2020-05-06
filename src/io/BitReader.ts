@@ -1,9 +1,10 @@
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IReadable } from '@src/io/IReadable';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
-export class EndOfReaderError extends Error {
+export class EndOfReaderError extends AlphaTabError {
     public constructor() {
-        super('Unexpected end of data within reader');
+        super(AlphaTabErrorType.Format, 'Unexpected end of data within reader');
         Object.setPrototypeOf(this, EndOfReaderError.prototype);
     }
 }

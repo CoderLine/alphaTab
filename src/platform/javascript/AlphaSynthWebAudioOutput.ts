@@ -2,7 +2,7 @@ import { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 import { ISynthOutput } from '@src/synth/ISynthOutput';
 import { EventEmitter, IEventEmitterOfT, IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
 import { Environment } from '@src/Environment';
-import { AlphaTabError } from '@src/AlphaTabError';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 declare var webkitAudioContext: any;
 
@@ -82,7 +82,7 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         } else if('webkitAudioContext' in Environment.globalThis) {
             return new webkitAudioContext();
         }
-        throw new AlphaTabError("AudioContext not found");
+        throw new AlphaTabError(AlphaTabErrorType.General, "AudioContext not found");
     }
 
     public play(): void {

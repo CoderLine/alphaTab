@@ -21,12 +21,14 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-export class XmlError extends Error {
+import { AlphaTabError, AlphaTabErrorType } from "@src/AlphaTabError";
+
+export class XmlError extends AlphaTabError {
     public xml: string;
     public pos: number = 0;
 
     public constructor(message: string, xml: string, pos: number) {
-        super(message);
+        super(AlphaTabErrorType.Format, message);
         this.xml = xml;
         this.pos = pos;
         Object.setPrototypeOf(this, XmlError.prototype);

@@ -39,7 +39,7 @@ import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/util/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { AlphaTabError } from '@src/AlphaTabError';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 class SelectionInfo {
     public beat: Beat;
@@ -247,7 +247,7 @@ export class AlphaTabApiBase<TSettings> {
             let score: Score = tracks[0].score;
             for (let track of tracks) {
                 if (track.score !== score) {
-                    this.onError(new AlphaTabError('All rendered tracks must belong to the same score.'));
+                    this.onError(new AlphaTabError(AlphaTabErrorType.General, 'All rendered tracks must belong to the same score.'));
                     return;
                 }
             }

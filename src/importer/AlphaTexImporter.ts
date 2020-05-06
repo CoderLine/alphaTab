@@ -31,7 +31,7 @@ import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 import { Logger } from '@src/util/Logger';
 import { ModelUtils, TuningParseResult } from '@src/model/ModelUtils';
-import { AlphaTabError } from '@src/AlphaTabError';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -63,7 +63,7 @@ export class AlphaTexError extends AlphaTabError {
     public symbolData: unknown;
 
     public constructor(message: string) {
-        super(message);
+        super(AlphaTabErrorType.AlphaTex, message);
         Object.setPrototypeOf(this, AlphaTexError.prototype);
     }
 
