@@ -1,5 +1,6 @@
 /**
  * Represents a fixed size circular sample buffer that can be written to and read from.
+ * @csharp_public
  */
 export class CircularSampleBuffer {
     private _buffer: Float32Array;

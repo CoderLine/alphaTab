@@ -130,6 +130,75 @@ export default class CSharpAstTransformer {
 
         // TODO: Introduce setting for main library name.
         if (path.basename(this._typeScriptFile.fileName).toLowerCase() === 'alphatab.ts') {
+            globalExports.forEach(x => {
+                if (!x.name && x.exportClause) {
+                    if (ts.isNamespaceExport(x.exportClause)) {
+                        this._context.addTsNodeDiagnostics(
+                            x.exportClause,
+                            'Namespace exports are not yet supported',
+                            ts.DiagnosticCategory.Error
+                        );
+                    } else {
+                        x.exportClause.elements.forEach(e => {
+                            const symbol = this._context.typeChecker.getTypeAtLocation(e.name)?.symbol;
+                            if (symbol) {
+                                this._context.registerSymbolAsExported(symbol);
+                            } else {
+                                this._context.addTsNodeDiagnostics(
+                                    x.exportClause!,
+                                    'Exported symbol could not be resolved',
+                                    ts.DiagnosticCategory.Error
+                                );
+                            }
+                        });
+                    }
+                } else {
+                    this._context.addTsNodeDiagnostics(
+                        x,
+                        'Unsupported export',
+                        ts.DiagnosticCategory.Error
+                    );
+                }
+            });
+
+            globalStatements.forEach(s => {
+                if (ts.isVariableStatement(s)
+                    && s.modifiers?.find(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
+                    s.declarationList.declarations.forEach(d => {
+                        if (d.initializer && ts.isObjectLiteralExpression(d.initializer)) {
+                            d.initializer.properties.forEach(p => {
+                                if (ts.isShorthandPropertyAssignment(p)) {
+                                    const symbol = this._context.typeChecker.getTypeAtLocation(p.name)?.symbol;
+                                    if (symbol) {
+                                        this._context.registerSymbolAsExported(symbol);
+                                    } else {
+                                        this._context.addTsNodeDiagnostics(
+                                            p,
+                                            'Exported symbol could not be resolved',
+                                            ts.DiagnosticCategory.Error
+                                        );
+                                    }
+                                } else {
+                                    this._context.addTsNodeDiagnostics(
+                                        p,
+                                        'Unsupported export',
+                                        ts.DiagnosticCategory.Error
+                                    );
+                                }
+                            });
+                        }
+                        else {
+                            this._context.addTsNodeDiagnostics(
+                                d,
+                                'Unsupported export',
+                                ts.DiagnosticCategory.Error
+                            );
+                        }
+                    })
+
+                }
+            })
+
             // TODO: register global exports
         } else {
             // validate global statements
@@ -141,21 +210,22 @@ export default class CSharpAstTransformer {
                         ts.DiagnosticCategory.Error
                     );
                 });
-                additionalNestedExportDeclarations.forEach(s => {
-                    this._context.addTsNodeDiagnostics(
-                        s,
-                        'Global statements in modules are only allowed if there is a default class export',
-                        ts.DiagnosticCategory.Error
-                    );
-                });
-                additionalNestedNonExportsDeclarations.forEach(s => {
-                    this._context.addTsNodeDiagnostics(
-                        s,
-                        'Global statements in modules are only allowed if there is a default class export',
-                        ts.DiagnosticCategory.Error
-                    );
-                });
             }
+
+            additionalNestedExportDeclarations.forEach(s => {
+                this._context.addTsNodeDiagnostics(
+                    s,
+                    'Global statements in modules are not yet supported',
+                    ts.DiagnosticCategory.Error
+                );
+            });
+            additionalNestedNonExportsDeclarations.forEach(s => {
+                this._context.addTsNodeDiagnostics(
+                    s,
+                    'Global statements in modules are not yet supported',
+                    ts.DiagnosticCategory.Error
+                );
+            });
 
             // TODO: make root namespace configurable from outside.
             let folders = path
@@ -250,7 +320,8 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             members: [],
             tsNode: node,
-            skipEmit: this.shouldSkip(node)
+            skipEmit: this.shouldSkip(node),
+            tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 
         if (node.name) {
@@ -304,7 +375,8 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             members: [],
             tsNode: node,
-            skipEmit: this.shouldSkip(node)
+            skipEmit: this.shouldSkip(node),
+            tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 
         if (node.name) {
@@ -585,7 +657,8 @@ export default class CSharpAstTransformer {
             isAbstract: !!node.modifiers && !!node.modifiers.find(m => m.kind === ts.SyntaxKind.AbstractKeyword),
             partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
             members: [],
-            skipEmit: this.shouldSkip(node)
+            skipEmit: this.shouldSkip(node),
+            tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 
         if (node.name) {
@@ -651,6 +724,7 @@ export default class CSharpAstTransformer {
         this._csharpFile.namespace.declarations.push(csClass);
         this._context.registerSymbol(csClass);
     }
+
     private visitDocumentation(node: ts.Node): string | undefined {
         let symbol = this._context.typeChecker.getSymbolAtLocation(node);
         if (!symbol) {
@@ -1088,8 +1162,6 @@ export default class CSharpAstTransformer {
                 }
             });
         }
-
-        // TODO: virtual/override
 
         csMethod.returnType.parent = csMethod;
 

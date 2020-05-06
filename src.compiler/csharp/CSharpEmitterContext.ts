@@ -6,13 +6,14 @@ type SymbolKey = string;
 
 export default class CSharpEmitterContext {
     public isNullableString(type: ts.Type) {
-        if(type.isUnion()) {
+        if (type.isUnion()) {
             type = this.typeChecker.getNonNullableType(type);
         }
         return ((type.flags & ts.TypeFlags.String) || (type.flags & ts.TypeFlags.StringLiteral));
     }
     private _fileLookup: Map<ts.SourceFile, cs.SourceFile> = new Map();
     private _symbolLookup: Map<SymbolKey, cs.NamedElement & cs.Node> = new Map();
+    private _exportedSymbols: Map<SymbolKey, boolean> = new Map();
     private _symbolConst: Map<SymbolKey, boolean> = new Map();
 
     private _diagnostics: ts.Diagnostic[] = [];
@@ -720,10 +721,10 @@ export default class CSharpEmitterContext {
                 fileName = fileName.substring(4, fileName.length - 5);
                 if (fileName.length) {
                     suffix = fileName.split('.').map(s => {
-                        if(s.match(/es[0-9]{4}/)) {
+                        if (s.match(/es[0-9]{4}/)) {
                             return '.EcmaScript';
                         }
-                        if(s.match(/es[0-9]{1}/)) {
+                        if (s.match(/es[0-9]{1}/)) {
                             return '.EcmaScript';
                         }
                         return '.' + this.toPascalCase(s);
@@ -747,6 +748,11 @@ export default class CSharpEmitterContext {
             .split('-')
             .map(w => this.toPascalCase(w))
             .join('');
+    }
+
+    public registerSymbolAsExported(symbol: ts.Symbol) {
+        const symbolKey = this.getSymbolKey(symbol);
+        this._exportedSymbols.set(symbolKey, true);
     }
 
     public registerSymbol(node: cs.NamedElement & cs.Node) {
@@ -781,8 +787,8 @@ export default class CSharpEmitterContext {
         const declaration = symbol.valueDeclaration
             ? symbol.valueDeclaration
             : symbol.declarations && symbol.declarations.length > 0
-            ? symbol.declarations[0]
-            : undefined;
+                ? symbol.declarations[0]
+                : undefined;
 
         if (declaration) {
             return symbol.name + '_' + declaration.getSourceFile().fileName + '_' + declaration.pos;
@@ -1095,5 +1101,114 @@ export default class CSharpEmitterContext {
         }
 
         return false;
+    }
+
+    public rewriteVisibilities() {
+        const visited: Set<SymbolKey> = new Set();
+        for (const kvp of this._symbolLookup) {
+            const symbolKey = this.getSymbolKey(kvp[1].tsSymbol!);
+            switch (kvp[1].nodeType) {
+                case cs.SyntaxKind.ClassDeclaration:
+                case cs.SyntaxKind.DelegateDeclaration:
+                case cs.SyntaxKind.EnumDeclaration:
+                case cs.SyntaxKind.InterfaceDeclaration:
+                    if (!visited.has(symbolKey)) {
+                        const csType = kvp[1] as cs.NamedTypeDeclaration;
+                        const shouldBePublic = !!ts.getJSDocTags(csType.tsNode!).find(t => t.tagName.text === 'csharp_public');
+                        if (csType.visibility === cs.Visibility.Public || shouldBePublic) {
+                            if (this._exportedSymbols.has(symbolKey) || shouldBePublic) {
+                                this.makePublic(csType, visited);
+                            } else {
+                                csType.visibility = cs.Visibility.Internal;
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
+    private makePublic(node: cs.Node, visited: Set<SymbolKey>) {
+        if (node.tsSymbol) {
+            const x = this.getSymbolKey(node.tsSymbol);
+            if (visited.has(x)) {
+                return;
+            }
+            visited.add(x);
+        }
+
+        switch (node.nodeType) {
+            case cs.SyntaxKind.ClassDeclaration:
+                const csClass = node as cs.ClassDeclaration;
+                csClass.visibility = cs.Visibility.Public;
+
+                if (csClass.baseClass) {
+                    this.makePublic(csClass.baseClass, visited);
+                }
+
+                if (csClass.interfaces) {
+                    csClass.interfaces.forEach(i => this.makePublic(i, visited));
+                }
+
+                csClass.members.forEach(m => {
+                    if (m.visibility == cs.Visibility.Public || m.visibility == cs.Visibility.Protected) {
+                        this.makePublic(m, visited)
+                    }
+                });
+                break;
+            case cs.SyntaxKind.EnumDeclaration:
+                const csEnum = node as cs.EnumDeclaration;
+                csEnum.visibility = cs.Visibility.Public;
+                break;
+            case cs.SyntaxKind.InterfaceDeclaration:
+                const csInterface = node as cs.InterfaceDeclaration;
+                csInterface.visibility = cs.Visibility.Public;
+
+                if (csInterface.interfaces) {
+                    csInterface.interfaces.forEach(i => this.makePublic(i, visited));
+                }
+
+                csInterface.members.forEach(m => {
+                    this.makePublic(m, visited)
+                });
+
+                break;
+
+            case cs.SyntaxKind.ConstructorDeclaration:
+                const csConstructor = node as cs.ConstructorDeclaration;
+                csConstructor.parameters.forEach(p => this.makePublic(p, visited));
+                break;
+            case cs.SyntaxKind.MethodDeclaration:
+                const csMethod = node as cs.MethodDeclaration;
+                csMethod.parameters.forEach(p => this.makePublic(p, visited));
+                this.makePublic(csMethod.returnType, visited);
+                break;
+            case cs.SyntaxKind.PropertyDeclaration:
+                const csProperty = node as cs.PropertyDeclaration;
+                this.makePublic(csProperty.type, visited);
+                break;
+            case cs.SyntaxKind.ParameterDeclaration:
+                const csParameter = node as cs.ParameterDeclaration;
+                if (csParameter.type) {
+                    this.makePublic(csParameter.type, visited);
+                }
+                break;
+            case cs.SyntaxKind.TypeReference:
+                const csTypeRef = node as cs.TypeReference;
+                if (csTypeRef.typeArguments) {
+                    csTypeRef.typeArguments.forEach(r => this.makePublic(r, visited));
+                }
+                if (typeof csTypeRef.reference !== 'string') {
+                    this.makePublic(csTypeRef.reference, visited);
+                }
+
+                break;
+            case cs.SyntaxKind.ArrayTypeNode:
+                const csArrayType = node as cs.ArrayTypeNode;
+                if (csArrayType.elementType) {
+                    this.makePublic(csArrayType.elementType, visited);
+                }
+                break;
+        }
     }
 }

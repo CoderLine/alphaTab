@@ -7,7 +7,7 @@ using AlphaTab.Platform.CSharp;
 
 namespace AlphaTab
 {
-    public partial class Environment
+    partial class Environment
     {
         public const bool SupportsTextDecoder = true;
         public static void PlatformInit()

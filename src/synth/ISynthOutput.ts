@@ -3,6 +3,7 @@ import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 /**
  * This is the base interface for output devices which can
  * request and playback audio samples.
+ * @csharp_public
  */
 export interface ISynthOutput {
     /**

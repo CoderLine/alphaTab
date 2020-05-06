@@ -55,6 +55,7 @@ class SelectionInfo {
  * This class represents the public API of alphaTab and provides all logic to display
  * a music sheet in any UI using the given {@link IUiFacade}
  * @param <TSettings> The UI object holding the settings.
+ * @csharp_public
  */
 export class AlphaTabApiBase<TSettings> {
     private _startTime: number = 0;

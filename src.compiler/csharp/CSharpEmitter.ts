@@ -15,6 +15,7 @@ export default function emit(program: ts.Program): ts.Diagnostic[] {
     });
 
     context.resolveAllUnresolvedTypeNodes();
+    context.rewriteVisibilities();
 
     if (!context.hasErrors) {
         context.csharpFiles.forEach(file => {
