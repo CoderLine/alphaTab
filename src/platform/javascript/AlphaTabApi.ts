@@ -139,22 +139,16 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
     }
 
     public soundFontLoad: IEventEmitterOfT<ProgressEventArgs> = new EventEmitterOfT<ProgressEventArgs>();
-    public addSoundFontLoad(value: (args: ProgressEventArgs) => void) {
-        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)');
-        this.soundFontLoad.on(value);
-    }
-    public removeSoundFontLoad(value: (args: ProgressEventArgs) => void) {
-        Logger.warning('API', 'Registering events via add<Name>/remove<Name> is deprecated, use <name>.on(..)/<name>.off(..)');
-        this.soundFontLoad.off(value);
-    }
-
     public loadSoundFontFromUrl(url: string): void {
         if (!this.player) {
             return;
         }
         (this.player as AlphaSynthWebWorkerApi).loadSoundFontFromUrl(
             url,
-            (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger.bind(this.soundFontLoad)
+            e => {
+                (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger(e);
+                this.uiFacade.triggerEvent(this.container, 'soundFontLoad', e);
+            }
         );
     }
 }
