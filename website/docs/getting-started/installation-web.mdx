@@ -8,9 +8,9 @@ composed music with others. It's up to you what you make out of alphaTab.
 
 You can either install alphaTab wia NPM or just download the package manually and place it in your project. So far we do not offer a CDN. 
 
-# Grab your Copy
+## Grab your Copy
 
-## Local Copy
+### Local Copy
 
 You can head over to GitHub and grab the latest version of the NPM package and download it manually. 
 
@@ -18,7 +18,7 @@ https://github.com/Danielku15/alphaTab/packages/205124
 
 Unpack the assets to your project and you're all set to start developing. 
 
-## NPM
+### NPM
 
 We provide NPM packages via GitHub and soon also via npmjs.com. 
 For installing via GitHub Package Registry you might need to configure your NPM first. Follow [this Guide](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#installing-a-package) for that. 
@@ -31,7 +31,7 @@ npm install @coderline/alphatab
 And alphaTab is downloaded to your node_modules for usage in your application. 
 
 
-# Initializing alphaTab
+## Initializing alphaTab
 
 Once you have alphaTab in your project simply include it and start using it. The next pages will explain you how to configure 
 alphaTab and use it. You can also check out our [tutorials](/docs/tutorial) to learn in a more stepwise approach how to continue.
@@ -80,9 +80,9 @@ export class InitDemo extends React.Component {
 
 <InitDemo />
 
-# Additional Notes
+## Additional Notes
 
-## Dependencies
+### Dependencies
 
 AlphaTab does not need any other libraries as dependency. It ships with everything it needs out of the box. 
 But to operate alphaTab in the web with all features there are still 2 dependencies involved: 
@@ -92,7 +92,7 @@ AlphaTab bundles this font and it is placed right beside the script files.
 - To play audio a [SoundFont2](https://en.wikipedia.org/wiki/SoundFont) file is needed. It contains the audio samples for the instruments to be played via the midi synthesizer of alphaTab. 
 AlphaTab comes with a copy of a SONiVOX based SoundFont which is part of the Android Open Source Project and available for free under [Apache License](https://www.apache.org/licenses/LICENSE-2.0)
 
-## Bundling 
+### Bundling 
 
 It is very important to understand that **alphaTab cannot be bundled with other scripts unless they can run within a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)**.
 AlphaTab uses Web Workers to do all rendering and audio synthesis operations in the background without blocking the browser window. 

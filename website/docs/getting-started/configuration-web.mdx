@@ -5,7 +5,7 @@ title: Configuration (Web)
 Now with alphaTab [being part](/docs/getting-started/installation-web) of your project it is time for customization.
 alphaTab has quite a list of settings, events and API methods to interact with.
 
-# Setup
+## Setup
 
 On the installation guide you already saw that alphaTab initializes itself to a given div element. 
 
@@ -25,7 +25,7 @@ const element = document.getElementById('alphaTab');
 const api = new alphaTab.platform.javaScript.AlphaTabApi(element);
 ```
 
-# Settings
+## Settings
 
 There are 2 main ways to initialize alphaTab: either via a settings object or via data attributes. 
 Depending on the technologies used in your project either the direct code initialization or the data attributes might be easier to use. 
@@ -85,7 +85,7 @@ const api = new alphaTab.platform.javaScript.AlphaTabApi(element);
 </TabItem>
 </Tabs>
 
-# Events
+## Events
 
 Events of alphaTab can be either subscribed on the API object directly, or via the DOM element to which alphaTab is attached. 
 Please refer to the [API Reference](http://localhost:3000/docs/reference/events) to find a full list of events available.
@@ -133,7 +133,7 @@ $(element).on('alphaTab.loaded', (e, score) => {
 </TabItem>
 </Tabs>
 
-# API
+## API
 
 The main interaction with alphaTab happens through the API object or via jQuery plugin. 
 Simply use any [available API](docs/reference/api) to get/set details or trigger actions. 

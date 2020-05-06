@@ -19,7 +19,9 @@ const sidebars = {
 	], 
 	"Guides": [
 		"guides/styling-player",
-		"guides/breaking-changes-095-096"
+		"guides/breaking-changes-095-096",
+		"guides/breaking-changes-097-098"
+
 	]
   },
   tutorial: {

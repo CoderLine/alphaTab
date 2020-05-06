@@ -1,0 +1,310 @@
+---
+title: Breaking changes on settings between 0.9.7 and 0.9.8 
+---
+
+import CodeBadge from '../../src/code-badge';
+
+With the version 0.9.8 alphaTab moved from the C# codebase to a TypeScript codebase. In preparation of the 1.0.0 release a lot of cleanups 
+happened and many things on the API were reviewed and changed. Goal of this (again) breaking changes is to have a future proof API surface
+that can survive a few releases without the need of again some reworks. 
+
+While this version comes with a lot of new benefits this guide only focuses on the breaking changes and how to upgrade your application. 
+
+## Web
+
+For the web version we tried to maintain compatiblity as good as possible while not sacrificing the changes we want to
+introduce. 
+
+### Quick Migration
+
+In most cases developers weren't in the need to use all the exposed classes of alphaTab and rather could stick to the main API surface
+and just access the properties. Property names did not change on this version. The main changes can be summarized as: 
+
+* The main API class was moved from `alphaTab.platform.javaScript.AlphaTabApi` to `alphaTab.alphaTabApi`
+* Enums have now clean names like `alphaTab.LayoutMode`
+* Interfaces have been removed
+* The `AlphaTexExporter` was fully removed. 
+* Check for changed event names that were used.
+* Use the new `on/off` event subscription if you used API object events. 
+
+In case you used various classes from the `alphaTab` module directly, you can find fhe full changes can be found below for migration. 
+
+### New Event System
+
+One of the bigger changes on this version is the event system. There are 3 ways to subscribe to events in alphaTab and each event might 
+be affected in a way: 
+
+1. **DOM Events:** 
+2. **jQuery Events:** 
+
+Some events have been renamed and need update.
+
+| Before                        |   After           |
+|-------------------------------|-------------------|
+| `alphaTab.playedBeatChanged`  |  `alphaTab.playedBeatChanged`
+| `alphaTab.beatMouseDown`      |  `alphaTab.beatMouseDown`    
+| `alphaTab.beatMouseMove`      |  `alphaTab.beatMouseMove`    
+| `alphaTab.beatMouseUp`        |  `alphaTab.beatMouseUp`      
+| `alphaTab.loaded`             |  `alphaTab.scoreLoaded`           
+| `alphaTab.resize`             |  `alphaTab.resize`           
+| `alphaTab.render`             |  `alphaTab.renderStarted`           
+| `alphaTab.rendered`           |  `alphaTab.renderFinished`         
+| `alphaTab.postRendered`       |  `alphaTab.postRenderFinished`     
+| `alphaTab.error`              |  `alphaTab.error`            
+| `alphaTab.playerReady`        |  `alphaTab.playerReady`      
+| `alphaTab.finished`           |  `alphaTab.playerFinished`         
+| `alphaTab.soundFontLoaded`    |  `alphaTab.soundFontLoaded`  
+| `alphaTab.midiFileLoaded`     |  `alphaTab.midiFileLoaded`   
+| `alphaTab.playerStateChanged` |  `alphaTab.playerStateChanged`
+| `alphaTab.positionChanged`    |  `alphaTab.playerPositionChanged`  
+| `alphaTab.soundFontLoad`      |  `alphaTab.soundFontLoad`    
+
+3. **Direct API events:** 
+
+The registration system for the events was completely changed and some events have been renamed. 
+Before events were registered via `addEventName(handler)` and unregistered via `removeEventName(handler)`. 
+Now events are registered via `eventName.on(handler)` and unregistered via `eventName.off(handler)`.
+
+| Before                              |   After                               |
+|-------------------------------------|---------------------------------------|
+| `<add/remove>PlayedBeatChanged`     |  `playedBeatChanged.<on/off>`         |
+| `<add/remove>BeatMouseDown`         |  `beatMouseDown.<on/off>`             |
+| `<add/remove>BeatMouseMove`         |  `beatMouseMove.<on/off>`             |
+| `<add/remove>BeatMouseUp`           |  `beatMouseUp.<on/off>`               |
+| `<add/remove>Loaded`                |  `scoreLoaded.<on/off>`               |
+| `<add/remove>Resize`                |  `resize.<on/off>`                    |
+| `<add/remove>RenderStarted`         |  `renderStarted.<on/off>`             |
+| `<add/remove>RenderFinished`        |  `renderFinished.<on/off>`            |
+| `<add/remove>PostRenderFinished`    |  `postRenderFinished.<on/off>`        |
+| `<add/remove>Error`                 |  `error.<on/off>`                     |
+| `<add/remove>ReadyForPlayback`      |  `playerReady.<on/off>`               |
+| `<add/remove>PlayerFinished`        |  `playerFinished.<on/off>`            |
+| `<add/remove>SoundFontLoaded`       |  `soundFontLoaded.<on/off>`           |
+| `<add/remove>MidiLoaded`            |  `midiFileLoade.<on/off>`             |
+| `<add/remove>PlayerStateChanged`    |  `playerStateChanged.<on/off>`        |
+| `<add/remove>PlayerPositionChanged` |  `playerPositionChanged.<on/off>`     |
+| `<add/remove>SoundFontLoad`         |  `soundFontLoad.<on/off>`             |
+
+### Error Handling
+
+The `error` event previously included 2 parameters. One for the error type another for the error details. 
+The error type was now moved into the error details itself. Internally the errors are extending the default 
+`Error` type but due to serialization this information might get lost. The `error.type` property contains
+one of the values of `alphaTab.AlphaTabErrorType` specifying some details about which kind of error was raised. 
+
+**Before**
+
+```js
+api.addError(function(type, error) {
+    if(type === 'import') {
+        alert('The input file has an invalid format: ' + error.message);
+    }
+})
+```
+
+**After**
+
+```js
+api.error.on(function(error) {
+    if(error.type === alphaTab.AlphaTabErrorType.Format) {
+        alert('The input file has an invalid format: ' + error.message);
+    }
+})
+```
+
+### New Structure
+
+One big change is the structure within the main `alphaTab` module. While the old hierarchy was quite nested, the 
+new structure aims for a rather flat hierarchy. 
+
+**Legend**
+
+All members are prefixed with `alphaTab.` as module name. In the table this prefix was omitted. 
+
+| Before                                                        | After                      | Comment                                                         |
+|---------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|
+| `AlphaTabApi`                                                 | `AlphaTabApi`              | Same name but was replaced by `platform.javaScript.AlphaTabApi` |
+| `AlphaTabException`                                           | `AlphaTabError`            
+| `CoreSettings`                                                | `CoreSettings`             
+| `DisplaySettings`                                             | `DisplaySettings`          
+| `ImporterSettings`                                            | `ImporterSettings`         
+| `NotationSettings`                                            | `NotationSettings`         
+| `PlayerSettings`                                              | `PlayerSettings`           
+| `ProgressEventArgs`                                           | `ProgressEventArgs`        
+| `RenderingResources`                                          | `RenderingResources`       
+| `ResizeEventArgs`                                             | `ResizeEventArgs`          
+| `Settings`                                                    | `Settings`                 
+| `VibratoPlaybackSettings`                                     | `VibratoPlaybackSettings`  
+| `_FingeringMode.FingeringMode_Impl_`                          | `FingeringMode`
+| `_LayoutMode.LayoutMode_Impl_`                                | `LayoutMode`
+| `_NotationMode.NotationMode_Impl_`                            | `NotationMode`
+| `_ScrollMode.ScrollMode_Impl_`                                | `ScrollMode`
+| `_StaveProfile.StaveProfile_Impl_`                            | `StaveProfile`
+| `_TabRhythmMode.TabRhythmMode_Impl`_                          | `TabRhythmMode`
+|                                                               |
+| `audio.BeatTickLookup`                                        | `midi.BeatTickLookup`
+| `audio.MasterBarTickLookup`                                   | `midi.MasterBarTickLookup`
+| `audio.MidiTickLookup`                                        | `midi.MidiTickLookup`
+| `audio.MidiTickLookupFindBeatResult`                          | `midi.MidiTickLookupFindBeatResult`
+|                                                               |
+| `audio.generator.AlphaSynthMidiFileHandler`                   | `midi.AlphaSynthMidiFileHandler`
+| `audio.generator.IMidiFileHandler`                            | _removed_
+| `audio.generator.MidiFileGenerator`                           | `midi.MidiFileGenerator`
+|                                                               |
+| `audio.synth.AlphaSynth`                                      | `synth.AlphaSynth`
+| `audio.synth.IAlphaSynth`                                     | _removed_
+| `audio.synth.ISynthOutput`                                    | _removed_
+| `audio.synth.PlaybackRange`                                   | `synth.PlaybackRange`
+| `audio.synth.PlayerStateChangedEventArgs`                     | `synth.PlayerStateChangedEventArgs`
+| `audio.synth.PositionChangedEventArgs`                        | `synth.PositionChangedEventArgs`
+| `audio.synth._PlayerState.PlayerState_Impl_`                  | `synth.PlayerState`
+| `audio.synth.ds.CircularSampleBuffer`                         | _removed_
+| `audio.synth.midi.MidiFile`                                   | `midi.MidiFile`
+| `audio.synth.midi.event.MidiEvent`                            | `midi.MidiEvent`
+| `audio.synth.midi.event._ControllerType.ControllerType_Impl_` | `midi.ControllerType`
+| `audio.synth.midi.event._MidiEventType.MidiEventType_Impl_`   | `midi.MidiEventType`
+| `audio.synth.synthesis._OutputMode.OutputMode_Impl_`          | _removed_
+|                                                               |
+| `collections._FastDictionary.FastDictionary_Impl_`            | _removed_
+| `collections._FastList.FastList_Impl_`                        | _removed_
+|                                                               |
+| `exporter.AlphaTexExporter`                                   | _removed_                                 | The alphaTab exporter feature was fully removed. 
+|                                                               |
+| `importer.FileLoadException`                                  | `FileLoadException`
+| `importer.NoCompatibleReaderFoundException`                   | `importer.UnsupportedFormatError`
+| `importer.PartConfiguration_Part`                             | _removed_
+| `importer.PartConfiguration_TrackConfiguration`               | _removed_
+| `importer.ScoreImporter`                                      | `importer.ScoreImporter`
+| `importer.ScoreLoader`                                        | `importer.SCoreLoader`
+| `importer.UnsupportedFormatException`                         | `importer.UnsupportedFormatError`
+|                                                               |
+| `io.IReadable`                                                | _removed_
+| `io.IWriteable`                                               | _removed_
+|                                                               |
+| `model.Automation`                                            | `model.Automation`         
+| `model.Bar`                                                   | `model.Bar`                
+| `model.Beat`                                                  | `model.Beat`               
+| `model.BendPoint`                                             | `model.BendPoint`          
+| `model.Chord`                                                 | `model.Chord`              
+| `model.Fermata`                                               | `model.Fermata`            
+| `model.Lyrics`                                                | `model.Lyrics`             
+| `model.MasterBar`                                             | `model.MasterBar`          
+| `model.Node`                                                  | `model.Node`               
+| `model.PlaybackInformation`                                   | `model.PlaybackInformation`
+| `model.RenderStylesheet`                                      | `model.RenderStylesheet`   
+| `model.Score`                                                 | `model.Score`              
+| `model.Section`                                               | `model.Section`            
+| `model.Staff`                                                 | `model.Staff`              
+| `model.Track`                                                 | `model.Track`              
+| `model.Tuning`                                                | `model.Tuning`             
+| `model.TupletGroup`                                           | `model.TupletGroup`        
+| `model.Voice`                                                 | `model.Voice`              
+| `model._AccentuationType.AccentuationType_Impl_`              | `model.AccentuationType`        
+| `model._AccidentalType.AccidentalType_Impl_`                  | `model.AccidentalType`            
+| `model._AutomationType.AutomationType_Impl_`                  | `model.AutomationType`            
+| `model._BendStyle.BendStyle_Impl_`                            | `model.BendStyle`                      
+| `model._BendType.BendType_Impl_`                              | `model.BendType`                        
+| `model._BrushType.BrushType_Impl_`                            | `model.BrushType`                      
+| `model._Clef.Clef_Impl_`                                      | `model.Clef`                                
+| `model._CrescendoType.CrescendoType_Impl_`                    | `model.CrescendoType`              
+| `model._Duration.Duration_Impl_`                              | `model.Duration`                        
+| `model._DynamicValue.DynamicValue_Impl_`                      | `model.DynamicValue`                
+| `model._FermataType.FermataType_Impl_`                        | `model.FermataType`                  
+| `model._Fingers.Fingers_Impl_`                                | `model.Fingers`                          
+| `model._GraceType.GraceType_Impl_`                            | `model.GraceType`                      
+| `model._HarmonicType.HarmonicType_Impl_`                      | `model.HarmonicType`                
+| `model._KeySignature.KeySignature_Impl_`                      | `model.KeySignature`                
+| `model._KeySignatureType.KeySignatureType_Impl_`              | `model.KeySignatureType`        
+| `model._NoteAccidentalMode.NoteAccidentalMode_Impl_`          | `model.NoteAccidentalMode`    
+| `model._Ottavia.Ottavia_Impl_`                                | `model.Ottavia`                          
+| `model._PickStroke.PickStroke_Impl_`                          | `model.PickStroke`                    
+| `model._SimileMark.SimileMark_Impl_`                          | `model.SimileMark`                    
+| `model._SlideInType.SlideInType_Impl_`                        | `model.SlideInType`                  
+| `model._SlideOutType.SlideOutType_Impl_`                      | `model.SlideOutType`                
+| `model._TripletFeel.TripletFeel_Impl_`                        | `model.TripletFeel`                  
+| `model._VibratoType.VibratoType_Impl_`                        | `model.VibratoType`                  
+| `model._WhammyType.WhammyType_Impl_`                          | `model.WhammyType`                    
+|                                                               | 
+| `platform.javaScript.AlphaTabApi`                             | _moved to_ `alphaTab.AlphaTabApi`
+| `platform.model.Color`                                        | `model.Color`
+| `platform.model.Font`                                         | `model.Font`
+| `platform.model._FontStyle.FontStyle`                         | `model.FontStyle`
+| `platform.model._TextAlign.TextAlign`                         | _removed_
+| `platform.model._TextBaseline.TextBaseline`                   | _removed_
+|                                                               |
+| `rendering.IScoreRenderer`                                    | _removed_
+| `rendering.RenderFinishedEventArgs`                           | `rendering.RenderFinishedEventArgs`
+| `rendering.ScoreRenderer`                                     | `rendering.ScoreRenderer`
+| `rendering.utils.BarBounds`                                   | `rendering.BarBounds`        
+| `rendering.utils.BeatBounds`                                  | `rendering.BeatBounds`       
+| `rendering.utils.Bounds`                                      | `rendering.Bounds`          
+| `rendering.utils.BoundsLookup`                                | `rendering.BoundsLookup`    
+| `rendering.utils.MasterBarBounds`                             | `rendering.MasterBarBounds` 
+| `rendering.utils.NoteBounds`                                  | `rendering.NoteBounds`      
+| `rendering.utils.StaveGroupBounds`                            | `rendering.StaveGroupBounds`
+|                                                               |
+| `ui.Cursors`                                                  | _removed_
+| `ui.IContainer`                                               | _removed_
+| `ui.IMouseEventArgs`                                          | _removed_
+| `ui.IUiFacade`                                                | _removed_
+|                                                               |
+| `util._LogLevel.LogLevel_Impl_`                               | `LogLevel`
+| `utils.SerializationException`                                | `FormatError`
+
+
+## .net 
+
+For .net the change on the code is way bigger than it is for the Web version. The .net version is now auto generated
+via the Web Version via a TypeScript to C# compiler. Due to the nature of TypeScript being a superset of JavaScript the 
+available data types are reduced. Due to this alphaTab is now heavily based on double values where earlier float and int values
+might have been used. This can result in a higher memory consumption and major breaking changes. 
+
+### New Packages and Namespaces
+
+The first change is about the new packages and namespaces. The .net version of alphaTab was restructured to come in 2 individual 
+NuGet packages: 
+
+1. **AlphaTab** is a package targeting .net standard 2.0 containing only the main alphaTab modules without UI specific components
+2. **AlphaTab.Windows** is a package targeting .net core 3.1 containing the WinForms and WPF specific UI components. 
+
+As the .net Framework 4.x is deprecated and .net core 3.x and later .net 5 is the future. If you really need a .net 4.x package 
+feel free to contact us. 
+
+### New Event System
+
+Just like the Web version the .net version is affected from the event system rework. The .net version does not use the C# built-in event system anymore.
+Subscribe to events via the `.On(handler)` and unsubscribe via the `.Off(handler)` method on the event object. 
+
+| Before                        |   After                               |
+|-------------------------------|---------------------------------------|
+| `PlayedBeatChanged += -=`     |  `PlayedBeatChanged.On/Off()`         |
+| `BeatMouseDown += -=`         |  `BeatMouseDown.On/Off()`             |
+| `BeatMouseMove += -=`         |  `BeatMouseMove.On/Off()`             |
+| `BeatMouseUp += -=`           |  `BeatMouseUp.On/Off()`               |
+| `Loaded += -=`                |  `ScoreLoaded.On/Off()`               |
+| `Resize += -=`                |  `Resize.On/Off()`                    |
+| `RenderStarted += -=`         |  `RenderStarted.On/Off()`             |
+| `RenderFinished += -=`        |  `RenderFinished.On/Off()`            |
+| `PostRenderFinished += -=`    |  `PostRenderFinished.On/Off()`        |
+| `Error += -=`                 |  `Error.On/Off()`                     |
+| `ReadyForPlayback += -=`      |  `PlayerReady.On/Off()`               |
+| `PlayerFinished += -=`        |  `PlayerFinished.On/Off()`            |
+| `SoundFontLoaded += -=`       |  `SoundFontLoaded.On/Off()`           |
+| `MidiLoaded += -=`            |  `MidiFileLoade.On/Off()`             |
+| `PlayerStateChanged += -=`    |  `PlayerStateChanged.On/Off()`        |
+| `PlayerPositionChanged += -=` |  `PlayerPositionChanged.On/Off()`     |
+| `SoundFontLoad += -=`         |  `SoundFontLoad.On/Off()`             |
+
+### Double based Type System
+
+At many places where you would likely expect an `int` value you will now find `double` values. This does not necessarily mean that 
+decimal values should be filled or are supported but it is rather a side effect that we do not know from the TypeScript codebase whether
+a property, parameter or variable would be an integer. We plan to improve the situation on the types in future but for now we 
+advise developers to be careful when passing in values to alphaTab and report potential errors that are not handled. 
+
+Internally alphaTab will try to cut off decimal parts of values where they are not needed but there might be places where this is missed. 
+
+### Error Handling
+
+The new error reporting system is fully based on `Exceptions` and you should use the corresponding exception types to determine the type of error. 
+For a higher level categorization also the `AlphaTabError.Type` property can be checked. The previous string value identifying the category has been removed. 
