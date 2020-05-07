@@ -177,3 +177,13 @@ table.type-table td {
 table.type-table td>p {
   margin-bottom: 0.5em;
 }
+
+
+img.thumbnail {
+  max-width: 400px;
+  transition: transform .2s;
+}
+
+img.thumbnail:hover {
+  transform: scale(1.5);
+}

@@ -2,10 +2,82 @@
 title: Configuration (.net)
 ---
 
+Now with alphaTab [being part](/docs/getting-started/installation-net) of your project it is time for customization.
+alphaTab has quite a list of settings, events and API methods to interact with.
+
 ## Setup
+
+On the installation guide you already saw that the setup of alphaTab depends on the UI framework you're using. 
+
+### Console 
+
+For non-UI usage there is not much more to say than: Use the classes available. This usage might be a bit more complicated
+than relying on the pre-built UI components and will need some reading. Feel free to contact us if you need assistance on 
+getting certain things to run. Beside that it might be the easiest to [check on how alphaTab](https://github.com/CoderLine/alphaTab/tree/develop/src.csharp) is used to built the controls provided. 
+
+### WPF
+
+For WPF we provide a control with the main functionality out of the box. Just embed the control to your XAML and hook it up
+via code or via bindings. 
+
+```xml
+<Window x:Class="AlphaTab.Samples.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wpf="clr-namespace:AlphaTab.Wpf;assembly=AlphaTab.Windows"
+        Title="AlphaTab" Height="800" Width="600" WindowState="Maximized">
+    <wpf:AlphaTab Tracks="{Binding TracksToDisplay}">
+    </wpf:AlphaTab>
+</Window>
+```
+
+### WinForms
+
+For WinForms we provide a similar control like for WPF despite it has a bit a reduced feature set. 
+WinForms lacks of some capabilities to provide all features. The lack of proper transparency support
+makes it hardly possible to show semi-transparent cursors during playback. When it comes to the 
+available features of display and actual playback everything is there out of the box. 
+
+Just drag an instance of the alphaTab control into your UI via the designer or set it up manually on code. 
+
+```cs
+var control = new AlphaTab.WinForms.AlphaTabControl();
+control.Dock = System.Windows.Forms.DockStyle.Fill;
+this.Controls.Add(control);
+control.Tracks = new []{ score.Tracks[0] };
+```
 
 ## Settings
 
+The settings are important to configure the display of alphaTab as you prefer it. 
+
+For the console setup you will need to create manually a new instance of the `Settings` class and pass it on wherever it is needed. 
+
+For the WPF and WinForms controls they expose a `Settings` property which can be used to change any desired configuration. 
+Changes on the settings object itself are not automatically detected and it is required to call `control.Api.UpdateSettings()` to trigger
+an update of alphaTab. 
+
+Additionally both control expose a `Tracks` property which can be filled to change the tracks being rendered by alphaTab. 
+
 ## Events
 
+Event registration happens on the alphaTab classes. For the console variant you would hook up to the events 
+of the `ScoreRenderer` while for the UI controls you would hook up to the events of the `Api` property. 
+
+Events are subscribed and unsubscribed via `EventName.On(handler)` and `EventName.Off(handler)`. 
+AlphaTab is not using the C# event features in favor of consistency with the web version. 
+
+```cs
+control.Api.PlayedBeatChanged.On(beat=> {
+    UpdateFretboard(beat);
+});
+```
+
 ## API
+
+The main alphaTab API is available only on the UI controls via the `Api` property. It provides a 
+handy set of methods, properties and events to control alphaTab. 
+
+```cs
+cs.Api.Tex("\\title \"Hello AlphaTab\" . 3.3*4");
+```

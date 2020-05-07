@@ -14,15 +14,13 @@ You can either install alphaTab wia NPM or just download the package manually an
 
 You can head over to GitHub and grab the latest version of the NPM package and download it manually. 
 
-https://github.com/Danielku15/alphaTab/packages/205124
+> 
 
 Unpack the assets to your project and you're all set to start developing. 
 
 ### NPM
 
-We provide NPM packages via GitHub and soon also via npmjs.com. 
-For installing via GitHub Package Registry you might need to configure your NPM first. Follow [this Guide](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#installing-a-package) for that. 
-After that just install the package via 
+We provide NPM packages via npmjs.com. Just install the package via: 
 
 ```
 npm install @coderline/alphatab
@@ -30,6 +28,14 @@ npm install @coderline/alphatab
 
 And alphaTab is downloaded to your node_modules for usage in your application. 
 
+### CDN
+
+We currently do not provide a CDN on our own but there are various CDNs on top of NPM. 
+You can use one of these to integrate alphaTab to your installation.
+
+> https://www.jsdelivr.com/package/npm/@coderline/alphatab
+>
+> https://unpkg.com/@coderline/alphatab
 
 ## Initializing alphaTab
 
@@ -37,6 +43,7 @@ Once you have alphaTab in your project simply include it and start using it. The
 alphaTab and use it. You can also check out our [tutorials](/docs/tutorial) to learn in a more stepwise approach how to continue.
 
 ```html
+<script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
 <!-- Include alphaTab -->
 <script src="alphaTab.js"></script>
 <!-- Create Element which should contain alphaTab -->
