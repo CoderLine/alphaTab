@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +12,7 @@ namespace AlphaTab
         public const bool SupportsTextDecoder = true;
         public static void PlatformInit()
         {
+            
         }
 
 
@@ -46,6 +47,7 @@ namespace AlphaTab
                     return new GdiCanvas();
                 })
             );
+            renderEngines.Set("default", renderEngines.Get("skia")!);
         }
     }
 }

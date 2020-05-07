@@ -9,7 +9,6 @@ import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWo
 import { BrowserUiFacade } from '@src/platform/javascript/BrowserUiFacade';
 import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/util/Logger';
 
 /**
  * @target web

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -103,8 +103,7 @@ namespace AlphaTab.Wpf
             var canvas = new WrapPanel
             {
                 VerticalAlignment = VerticalAlignment.Top,
-                Orientation = Orientation.Horizontal,
-                Opacity = 0.5
+                Orientation = Orientation.Horizontal
             };
             return new FrameworkElementContainer(canvas);
         }
@@ -223,7 +222,8 @@ namespace AlphaTab.Wpf
             var beatCursor = new System.Windows.Shapes.Rectangle
             {
                 Fill = SettingsContainer.BeatCursorFill,
-                IsHitTestVisible = false
+                IsHitTestVisible = false,
+                Width = 3
             };
 
             cursorWrapper.Children.Add(selectionWrapper);

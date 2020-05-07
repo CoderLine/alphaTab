@@ -350,8 +350,8 @@ export class Environment {
                 return new CssFontSvgCanvas();
             })
         );
-        Environment.createPlatformSpecificRenderEngines(renderEngines);
         renderEngines.set('default', renderEngines.get('svg')!);
+        Environment.createPlatformSpecificRenderEngines(renderEngines);
         return renderEngines;
     }
 
