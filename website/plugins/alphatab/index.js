@@ -9,7 +9,7 @@ module.exports = function() {
             tagName: 'script',
             attributes: {
               type: 'text/javascript',
-              src: '/js/alphaTab/alphaTab.js'
+              src: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.js'
             }
           },
           {

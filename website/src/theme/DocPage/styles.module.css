@@ -15,6 +15,7 @@
   width: 300px;
   position: relative;
   top: calc(-1 * var(--ifm-navbar-height));
+  flex-shrink: 0;
 }
 
 .docMainContainer {
