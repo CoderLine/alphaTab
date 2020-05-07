@@ -19,15 +19,15 @@ alphaTab is a cross platform music notation and guitar tablature rendering libra
 
 # Downloads
 
-The latest binaries based  are available for download at either npmjs.org or MyGet.
+The latest binaries based  are available for download at either npmjs.org or NuGet.org.
 Use the links below to grab the binaries from the latest builds. Please do not use the GitHub releases yet, they are not maintained. We recommend using package managers to pull the files to your projects. 
 
-> Until the official 1.0 release we recommend to use `develop` branch.
+> Until the official 1.0 release we recommend to use `develop` branch which are available as "pre-release" versions on the package registries.
 
 &nbsp; | &nbsp;
 --- | --- |
 **JavaScript** | [NPM](https://www.npmjs.com/package/@coderline/alphatab)
-**.net** | [MyGet](https://www.myget.org/feed/coderline/package/nuget/AlphaTab)
+**.net** | [NuGet](https://www.nuget.org/profiles/CoderLine)
 
 # Features
 alphaTab mostly focuses on web based platforms allowing music notation to be embedded into websites and browser based apps but is designed to be used also from .net based platforms like Windows, UWP and Xamarin.

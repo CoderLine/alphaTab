@@ -42,8 +42,8 @@ jobs:
         with:
           dotnet-version: '3.1.100'
         env:
-          NUGET_AUTH_TOKEN: ${{secrets.MYGET_API_KEY}}
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
       - run: npm install
       - run: npm run build-csharp-ci
-      - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{secrets.MYGET_API_KEY}} -s https://www.myget.org/F/coderline/api/v2/package
-      - run: dotnet nuget push src.csharp\AlphaTab.Windows\bin\Release\*.nupkg -k ${{secrets.MYGET_API_KEY}} -s https://www.myget.org/F/coderline/api/v2/package
+      - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+      - run: dotnet nuget push src.csharp\AlphaTab.Windows\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
