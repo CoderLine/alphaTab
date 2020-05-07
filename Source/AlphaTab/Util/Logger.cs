@@ -1,6 +1,6 @@
 namespace AlphaTab.Util
 {
-    internal class Logger
+    public class Logger
     {
         public static LogLevel LogLevel { get; set; }
 
