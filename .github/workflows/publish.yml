@@ -3,6 +3,7 @@ on:
   push:
     branches: 
       - develop
+      - feature/typescript
 
 jobs:
   nighty_web:
