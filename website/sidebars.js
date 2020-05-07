@@ -11,17 +11,18 @@ const sidebars = {
 	"Getting Started (.net)": [
 		"getting-started/installation-net",
 		"getting-started/configuration-net"
+	], 
+	"Guides": [
+		"guides/lowlevel-apis",
+		"guides/styling-player",
+		"guides/breaking-changes-095-096",
+		"guides/breaking-changes-097-098"
 	],
 	"API Reference": [
 		"reference/settings",
 		"reference/api",
-		"reference/events"
-	], 
-	"Guides": [
-		"guides/styling-player",
-		"guides/breaking-changes-095-096",
-		"guides/breaking-changes-097-098"
-
+		"reference/scorerenderer",
+		"reference/alphasynth"
 	]
   },
   tutorial: {
