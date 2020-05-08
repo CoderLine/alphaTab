@@ -12,7 +12,7 @@ namespace AlphaTab.Rendering.Effects
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
-            return beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0 &&
+            return !settings.Notation.HideSectionInfo && beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0 &&
                    beat.Voice.Bar.MasterBar.IsSectionStart;
         }
 

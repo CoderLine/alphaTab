@@ -367,6 +367,18 @@ namespace AlphaTab
         public bool HideChordDiagrams { get; set; } = false;
 
         /// <summary>
+        /// Whether to display the beat information
+        /// </summary>
+        [JsonName("hideBeatInfo")]
+        public bool HideBeatInfo { get; set; } = false;
+
+        /// <summary>
+        /// Whether to display the section information
+        /// </summary>
+        [JsonName("hideSectionInfo")]
+        public bool HideSectionInfo { get; set; } = false;
+
+        /// <summary>
         /// Whether to show rhythm notation in the guitar tablature.
         /// </summary>
         [JsonName("rhythmMode")]
