@@ -13,7 +13,6 @@ import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@src/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { TuningGlyph } from '@src/rendering/glyphs/TuningGlyph';
-import { HeaderFooterElements } from '@src/rendering/layout/HeaderFooterElements';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { RenderStaff } from '@src/rendering/staves/RenderStaff';
@@ -21,6 +20,7 @@ import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/util/Logger';
 import { EventEmitterOfT } from '@src/EventEmitter';
+import { NotationSettings, NotationElement } from '@src/NotationSettings';
 
 /**
  * This is the base public class for creating new layouting engines for the score renderer.
@@ -34,7 +34,7 @@ export abstract class ScoreLayout {
     public width: number = 0;
     public height: number = 0;
 
-    protected scoreInfoGlyphs: Map<HeaderFooterElements, TextGlyph> = new Map();
+    protected scoreInfoGlyphs: Map<NotationElement, TextGlyph> = new Map();
     protected chordDiagrams: ChordDiagramContainerGlyph | null = null;
     protected tuningGlyph: TuningGlyph | null = null;
 
@@ -69,56 +69,58 @@ export abstract class ScoreLayout {
 
     private createScoreInfoGlyphs(): void {
         Logger.debug('ScoreLayout', 'Creating score info glyphs');
-        let flags: HeaderFooterElements = this.renderer.settings.notation.hideInfo
-            ? HeaderFooterElements.None
-            : HeaderFooterElements.All;
+        let notation: NotationSettings = this.renderer.settings.notation;
         let score: Score = this.renderer.score!;
         let res: RenderingResources = this.renderer.settings.display.resources;
-        this.scoreInfoGlyphs = new Map<HeaderFooterElements, TextGlyph>();
-        if (score.title && (flags & HeaderFooterElements.Title) !== 0) {
+        this.scoreInfoGlyphs = new Map<NotationElement, TextGlyph>();
+        if (score.title && notation.isNotationElementVisible(NotationElement.ScoreTitle)) {
             this.scoreInfoGlyphs.set(
-                HeaderFooterElements.Title,
+                NotationElement.ScoreTitle,
                 new TextGlyph(0, 0, score.title, res.titleFont, TextAlign.Center)
             );
         }
-        if (score.subTitle && (flags & HeaderFooterElements.SubTitle) !== 0) {
+        if (score.subTitle && notation.isNotationElementVisible(NotationElement.ScoreSubTitle)) {
             this.scoreInfoGlyphs.set(
-                HeaderFooterElements.SubTitle,
+                NotationElement.ScoreSubTitle,
                 new TextGlyph(0, 0, score.subTitle, res.subTitleFont, TextAlign.Center)
             );
         }
-        if (score.artist && (flags & HeaderFooterElements.Artist) !== 0) {
+        if (score.artist && notation.isNotationElementVisible(NotationElement.ScoreArtist)) {
             this.scoreInfoGlyphs.set(
-                HeaderFooterElements.Artist,
+                NotationElement.ScoreArtist,
                 new TextGlyph(0, 0, score.artist, res.subTitleFont, TextAlign.Center)
             );
         }
-        if (score.album && (flags & HeaderFooterElements.Album) !== 0) {
+        if (score.album && notation.isNotationElementVisible(NotationElement.ScoreAlbum)) {
             this.scoreInfoGlyphs.set(
-                HeaderFooterElements.Album,
+                NotationElement.ScoreAlbum,
                 new TextGlyph(0, 0, score.album, res.subTitleFont, TextAlign.Center)
             );
         }
-        if (score.music && score.music === score.words && (flags & HeaderFooterElements.WordsAndMusic) !== 0) {
+        if (
+            score.music &&
+            score.music === score.words &&
+            notation.isNotationElementVisible(NotationElement.ScoreWordsAndMusic)
+        ) {
             this.scoreInfoGlyphs.set(
-                HeaderFooterElements.WordsAndMusic,
+                NotationElement.ScoreWordsAndMusic,
                 new TextGlyph(0, 0, 'Music and Words by ' + score.words, res.wordsFont, TextAlign.Center)
             );
         } else {
-            if (score.music && (flags & HeaderFooterElements.Music) !== 0) {
+            if (score.music && notation.isNotationElementVisible(NotationElement.ScoreWordsAndMusic)) {
                 this.scoreInfoGlyphs.set(
-                    HeaderFooterElements.Music,
+                    NotationElement.ScoreMusic,
                     new TextGlyph(0, 0, 'Music by ' + score.music, res.wordsFont, TextAlign.Right)
                 );
             }
-            if (score.words && (flags & HeaderFooterElements.Words) !== 0) {
+            if (score.words && notation.isNotationElementVisible(NotationElement.ScoreWords)) {
                 this.scoreInfoGlyphs.set(
-                    HeaderFooterElements.Words,
+                    NotationElement.ScoreWords,
                     new TextGlyph(0, 0, 'Words by ' + score.words, res.wordsFont, TextAlign.Left)
                 );
             }
         }
-        if (!this.renderer.settings.notation.hideTuning) {
+        if (notation.isNotationElementVisible(NotationElement.GuitarTuning)) {
             let staffWithTuning: Staff | null = null;
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
@@ -140,9 +142,12 @@ export abstract class ScoreLayout {
             }
         }
         // chord diagram glyphs
-        if (!this.renderer.settings.notation.hideChordDiagrams) {
+        if (notation.isNotationElementVisible(NotationElement.ChordDiagrams)) {
             this.chordDiagrams = new ChordDiagramContainerGlyph(0, 0);
-            this.chordDiagrams.renderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
+            this.chordDiagrams.renderer = new BarRendererBase(
+                this.renderer,
+                this.renderer.tracks![0].staves[0].bars[0]
+            );
             let chords: Map<string, Chord> = new Map<string, Chord>();
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {

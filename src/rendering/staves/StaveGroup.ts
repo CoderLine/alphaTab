@@ -12,6 +12,7 @@ import { Bounds } from '@src/rendering/utils/Bounds';
 import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
 import { RenderingResources } from '@src/RenderingResources';
+import { NotationElement } from '@src/NotationSettings';
 
 /**
  * A Staff consists of a list of different staves and groups
@@ -140,7 +141,7 @@ export class StaveGroup {
     private calculateAccoladeSpacing(tracks: Track[]): void {
         if (!this._accoladeSpacingCalculated && this.index === 0) {
             this._accoladeSpacingCalculated = true;
-            if (this.layout.renderer.settings.notation.hideTrackNames) {
+            if (!this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.TrackNames)) {
                 this.accoladeSpacing = 0;
             } else {
                 let canvas: ICanvas = this.layout.renderer.canvas!;
@@ -271,7 +272,7 @@ export class StaveGroup {
                     let accoladeStart: number = firstStart - barSize * 4;
                     let accoladeEnd: number = lastEnd + barSize * 4;
                     // text
-                    if (this.index === 0 && !this.layout.renderer.settings.notation.hideTrackNames) {
+                    if (this.index === 0 && this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.TrackNames)) {
                         canvas.fillText(
                             g.track.shortName,
                             cx + StaveGroup.AccoladeLabelSpacing * this.layout.scale,

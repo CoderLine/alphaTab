@@ -3,6 +3,7 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { GhostParenthesisGlyph } from '@src/rendering/glyphs/GhostParenthesisGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import { NotationElement } from '@src/NotationSettings';
 
 export class GhostNoteInfo {
     public line: number = 0;
@@ -29,7 +30,7 @@ export class GhostNoteContainerGlyph extends Glyph {
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let line: number = sr.getNoteLine(n);
         let hasParenthesis: boolean =
-            n.isGhost || (this.isTiedBend(n) && sr.settings.notation.showParenthesisForTiedBends);
+            n.isGhost || (this.isTiedBend(n) && sr.settings.notation.isNotationElementVisible(NotationElement.ParenthesisOnTiedBends));
         this.addParenthesisOnLine(line, hasParenthesis);
     }
 

@@ -72,6 +72,219 @@ export enum NotationMode {
 }
 
 /**
+ * Lists all major music notation elements that are part
+ * of the music sheet and can be dynamically controlled to be shown
+ * or hidden.
+ */
+export enum NotationElement {
+    /**
+     * The score title shown at the start of the music sheet.
+     */
+    ScoreTitle,
+    
+    /**
+     * The score subtitle shown at the start of the music sheet.
+     */
+    ScoreSubTitle,
+        
+    /**
+     * The score artist shown at the start of the music sheet.
+     */
+    ScoreArtist,
+    
+    /**
+     * The score album shown at the start of the music sheet.
+     */
+    ScoreAlbum,
+
+    /**
+     * The score words author shown at the start of the music sheet.
+     */
+    ScoreWords,
+    
+    /**
+     * The score music author shown at the start of the music sheet.
+     */
+    ScoreMusic,
+
+    /**
+     * The score words&music author shown at the start of the music sheet.
+     */
+    ScoreWordsAndMusic,
+    
+    /**
+     * The score copyright owner shown at the start of the music sheet.
+     */
+    ScoreCopyright,
+    
+
+    /**
+     * The tuning information of the guitar shown
+     * above the staves.
+     */
+    GuitarTuning,
+    /**
+     * The track names which are shown in the accolade.
+     */
+    TrackNames,
+    /**
+     * The chord diagrams for guitars. Usually shown
+     * below the score info.
+     */
+    ChordDiagrams,
+
+    /**
+     * Parenthesis that are shown for tied bends
+     * if they are preceeded by bends.
+     */
+    ParenthesisOnTiedBends,
+
+    /**
+     * The tab number for tied notes if the
+     * bend of a note is increased at that point.
+     */
+    TabNotesOnTiedBends,
+
+    /**
+     * Zero tab numbers on "dive whammys".
+     */
+    ZerosOnDiveWhammys,
+
+    /**
+     * The alternate endings information on repeats shown above the staff.
+     */
+    EffectAlternateEndings,
+
+    /**
+     * The information about the fret on which the capo is placed shown above the staff.
+     */
+    EffectCapo,
+
+    /**
+     * The chord names shown above beats shown above the staff.
+     */
+    EffectChordNames,
+
+    /**
+     * The crescendo/decrescendo angle  shown above the staff.
+     */
+    EffectCrescendo,
+
+    /**
+     * The beat dynamics  shown above the staff.
+     */
+    EffectDynamics,
+
+    /**
+     * The curved angle for fade in/out effects  shown above the staff.
+     */
+    EffectFadeIn,
+
+    /**
+     * The fermata symbol shown above the staff.
+     */
+    EffectFermata,
+
+    /**
+     * The fingering information.
+     */
+    EffectFingering,
+
+    /**
+     * The harmonics names shown above the staff.
+     * (does not represent the harmonic note heads)
+     */
+    EffectHarmonics,
+
+    /**
+     * The let ring name and line above the staff.
+     */
+    EffectLetRing,
+
+    /**
+     * The lyrics of the track shown above the staff.
+     */
+    EffectLyrics,
+
+    /**
+     * The section markers shown above the staff.
+     */
+    EffectMarker,
+
+    /**
+     * The ottava symbol and lines shown above the staff.
+     */
+    EffectOttavia,
+
+    /**
+     * The palm mute name and line shown above the staff.
+     */
+    EffectPalmMute,
+
+    /**
+     * The pick slide information shown above the staff.
+     * (does not control the pick slide lines)
+     */
+    EffectPickSlide,
+
+    /**
+     * The pick stroke symbols shown above the staff.
+     */
+    EffectPickStroke,
+
+    /**
+     * The slight beat vibrato waves shown above the staff.
+     */
+    EffectSlightBeatVibrato,
+
+    /**
+     * The slight note vibrato waves shown above the staff.
+     */
+    EffectSlightNoteVibrato,
+
+    /**
+     * The tap/slap/pop effect names shown above the staff.
+     */
+    EffectTap,
+
+    /**
+     * The tempo information shown above the staff.
+     */
+    EffectTempo,
+
+    /**
+     * The additional beat text shown above the staff.
+     */
+    EffectText,
+
+    /**
+     * The trill name and waves shown above the staff.
+     */
+    EffectTrill,
+
+    /**
+     * The triplet feel symbol shown above the staff.
+     */
+    EffectTripletFeel,
+
+    /**
+     * The whammy bar information shown above the staff.
+     * (does not control the whammy lines shown within the staff)
+     */
+    EffectWhammyBar,
+
+    /**
+     * The wide beat vibrato waves shown above the staff.
+     */
+    EffectWideBeatVibrato,
+
+    /**
+     * The wide note vibrato waves shown above the staff.
+     */
+    EffectWideNoteVibrato
+}
+
+/**
  * The notation settings control how various music notation elements are shown and behaving
  * @json
  */
@@ -87,24 +300,19 @@ export class NotationSettings {
     public fingeringMode: FingeringMode = FingeringMode.ScoreDefault;
 
     /**
-     * Whether to display the song information or not.
+     * Gets or sets the configuration on whether music notation elements are visible or not.
+     * If notation elements are not specified, the default configuration will be applied.
      */
-    public hideInfo: boolean = false;
+    public elements: Map<NotationElement, boolean> = new Map();
 
     /**
-     * Whether to display the tuning information or not.
+     * Gets the default configuration of the {@see notationElements} setting. Do not modify
+     * this map as it might not result in the expected side effects.
+     * If items are not listed explicitly in this list, they are considered visible.
      */
-    public hideTuning: boolean = false;
-
-    /**
-     * Whether to display the track names in the accolade or not.
-     */
-    public hideTrackNames: boolean = false;
-
-    /**
-     * Whether to display the chord diagrams or not.
-     */
-    public hideChordDiagrams: boolean = false;
+    public static defaultElements: Map<NotationElement, boolean> = new Map([
+        [NotationElement.ZerosOnDiveWhammys, false]
+    ]);
 
     /**
      * Whether to show rhythm notation in the guitar tablature.
@@ -140,23 +348,6 @@ export class NotationSettings {
     public extendBendArrowsOnTiedNotes: boolean = true;
 
     /**
-     * If set to true the note heads on tied notes
-     * will have parenthesis if they are preceeded by bends.
-     */
-    public showParenthesisForTiedBends: boolean = true;
-
-    /**
-     * If set to true a tab number will be shown in case
-     * a bend is increased on a tied note.
-     */
-    public showTabNoteOnTiedBend: boolean = true;
-
-    /**
-     * If set to true, 0 is shown on dive whammy bars.
-     */
-    public showZeroOnDiveWhammy: boolean = false;
-
-    /**
      * If set to true, line effects (like w/bar, let-ring etc)
      * are drawn until the end of the beat instead of the start.
      */
@@ -167,4 +358,19 @@ export class NotationSettings {
      * between slur start and end.
      */
     public slurHeight: number = 7.0;
+
+    /**
+     * Gets whether the given music notation element should be shown
+     * @param element the element to check
+     * @returns true if the element should be shown, otherwise false.
+     */
+    public isNotationElementVisible(element: NotationElement): boolean {
+        if (this.elements.has(element)) {
+            return this.elements.get(element)!;
+        }
+        if (NotationSettings.defaultElements.has(element)) {
+            return NotationSettings.defaultElements.get(element)!;
+        }
+        return true;
+    }
 }
