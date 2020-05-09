@@ -30,10 +30,6 @@ export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
         return true;
     }
 
-    public abstract get sizingMode(): EffectBarGlyphSizing;
-
-    public abstract createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph;
-
     public canExpand(from: Beat, to: Beat): boolean {
         return true;
     }

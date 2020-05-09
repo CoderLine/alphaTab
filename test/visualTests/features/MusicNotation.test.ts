@@ -1,13 +1,21 @@
 import { LayoutMode, StaveProfile } from '@src/DisplaySettings';
 import { Settings } from '@src/Settings';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
+import { NotationElement } from '@src/NotationSettings';
 
 describe('MusicNotationTests', () => {
     it('clefs', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         settings.display.layoutMode = LayoutMode.Page;
-        settings.notation.hideInfo = true;
+        settings.notation.elements.set(NotationElement.ScoreAlbum, false);
+        settings.notation.elements.set(NotationElement.ScoreArtist, false);
+        settings.notation.elements.set(NotationElement.ScoreCopyright, false);
+        settings.notation.elements.set(NotationElement.ScoreMusic, false);
+        settings.notation.elements.set(NotationElement.ScoreSubTitle, false);
+        settings.notation.elements.set(NotationElement.ScoreTitle, false);
+        settings.notation.elements.set(NotationElement.ScoreWords, false);
+        settings.notation.elements.set(NotationElement.ScoreWordsAndMusic, false);
         await VisualTestHelper.runVisualTest('features/music-notation/clefs.gpx', settings);
     });
 
