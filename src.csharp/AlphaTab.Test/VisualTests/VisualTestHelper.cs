@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AlphaTab.Core;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Importer;
+using AlphaTab.Io;
+using AlphaTab.Model;
 using AlphaTab.Rendering;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkiaSharp;
@@ -14,7 +17,51 @@ namespace AlphaTab.VisualTests
     public class VisualTestHelper
     {
         public static async Task RunVisualTest(string inputFile, Settings? settings = null,
-            IList<double>? tracks = null)
+            IList<double>? tracks = null, string? message = null)
+        {
+            try
+            {
+                var inputFileData =
+                    await TestPlatform.LoadFile($"test-data/visual-tests/{inputFile}");
+                var referenceFileName = TestPlatform.ChangeExtension(inputFile, ".png");
+                var score = ScoreLoader.LoadScoreFromBytes(inputFileData, settings);
+
+                await VisualTestHelper.RunVisualTestScore(score, referenceFileName, settings,
+                    tracks, message);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail($"Failed to run visual test {e}");
+            }
+        }
+
+        public static async Task RunVisualTestTex(string tex, string referenceFileName,
+            Settings? settings = null,
+            IList<double>? tracks = null, string? message = null)
+        {
+            try
+            {
+                if (settings == null)
+                {
+                    settings = new Settings();
+                }
+
+                var importer = new AlphaTexImporter();
+                importer.Init(ByteBuffer.FromString(tex), settings);
+                var score = importer.ReadScore();
+
+                await VisualTestHelper.RunVisualTestScore(score, referenceFileName, settings,
+                    tracks, message);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail($"Failed to run visual test {e}");
+            }
+        }
+
+        public static async Task RunVisualTestScore(Score score, string referenceFileName,
+            Settings? settings = null,
+            IList<double>? tracks = null, string? message = null)
         {
             if (settings == null)
             {
@@ -30,13 +77,8 @@ namespace AlphaTab.VisualTests
             settings.Core.EnableLazyLoading = false;
             settings.Core.UseWorkers = false;
 
-            inputFile = $"test-data/visual-tests/{inputFile}";
-
-            var inputFileData = await TestPlatform.LoadFile(inputFile);
-            var referenceFileName = TestPlatform.ChangeExtension(inputFile, ".png");
             var referenceFileData =
                 await TestPlatform.LoadFile(referenceFileName);
-            var score = ScoreLoader.LoadScoreFromBytes(inputFileData, settings);
 
             var result = new List<RenderFinishedEventArgs>();
             var totalWidth = 0.0;
@@ -70,7 +112,8 @@ namespace AlphaTab.VisualTests
                     totalHeight,
                     result,
                     referenceFileName,
-                    referenceFileData
+                    referenceFileData,
+                    message
                 );
             }
             else
@@ -81,7 +124,7 @@ namespace AlphaTab.VisualTests
 
         private static async Task CompareVisualResult(double totalWidth, double totalHeight,
             List<RenderFinishedEventArgs> result, string referenceFileName,
-            Uint8Array referenceFileData)
+            Uint8Array referenceFileData, string? message)
         {
             // TODO: get Skia to render like Chrome
             // https://github.com/mono/SkiaSharp/issues/1253
@@ -152,7 +195,6 @@ namespace AlphaTab.VisualTests
 
                     using (compareResult.Output)
                     {
-
                         Assert.IsTrue(compareResult.SizesMatch, "Dimensions differ");
                         if (compareResult.Mismatch > 0.01)
                         {

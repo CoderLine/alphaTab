@@ -107,7 +107,7 @@ export abstract class ScoreLayout {
                 new TextGlyph(0, 0, 'Music and Words by ' + score.words, res.wordsFont, TextAlign.Center)
             );
         } else {
-            if (score.music && notation.isNotationElementVisible(NotationElement.ScoreWordsAndMusic)) {
+            if (score.music && notation.isNotationElementVisible(NotationElement.ScoreMusic)) {
                 this.scoreInfoGlyphs.set(
                     NotationElement.ScoreMusic,
                     new TextGlyph(0, 0, 'Music by ' + score.music, res.wordsFont, TextAlign.Right)
@@ -136,9 +136,10 @@ export abstract class ScoreLayout {
             // tuning info
             if (staffWithTuning) {
                 let tuning: Tuning | null = Tuning.findTuning(staffWithTuning.tuning);
-                if (tuning) {
-                    this.tuningGlyph = new TuningGlyph(0, 0, this.scale, res, tuning);
+                if (!tuning) {
+                    tuning = new Tuning('', staffWithTuning.tuning, false);
                 }
+                this.tuningGlyph = new TuningGlyph(0, 0, this.scale, res, tuning);
             }
         }
         // chord diagram glyphs

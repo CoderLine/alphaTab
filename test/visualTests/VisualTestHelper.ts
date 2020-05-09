@@ -7,13 +7,55 @@ import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { CoreSettings } from '@src/CoreSettings';
 import { Environment } from '@src/Environment';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { ByteBuffer } from '@src/io/ByteBuffer';
 
 /**
  * @partial
  * @target web
  */
 export class VisualTestHelper {
-    public static async runVisualTest(inputFile: string, settings?: Settings, tracks?: number[]): Promise<void> {
+    public static async runVisualTest(inputFile: string, settings?: Settings, tracks?: number[], message?: string): Promise<void> {
+        try {
+            const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
+            const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
+            let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
+
+            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message);
+        } catch (e) {
+            fail(`Failed to run visual test ${e}`);
+        }
+    }
+
+    public static async runVisualTestTex(
+        tex: string,
+        referenceFileName: string,
+        settings?: Settings,
+        tracks?: number[],
+        message?: string
+    ): Promise<void> {
+        try {
+            if (!settings) {
+                settings = new Settings();
+            }
+
+            const importer = new AlphaTexImporter();
+            importer.init(ByteBuffer.fromString(tex), settings);
+            let score: Score = importer.readScore();
+
+            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message);
+        } catch (e) {
+            fail(`Failed to run visual test ${e}`);
+        }
+    }
+
+    public static async runVisualTestScore(
+        score: Score,
+        referenceFileName: string,
+        settings?: Settings,
+        tracks?: number[],
+        message?: string
+    ): Promise<void> {
         try {
             if (!settings) {
                 settings = new Settings();
@@ -26,10 +68,7 @@ export class VisualTestHelper {
             settings.core.engine = 'html5';
             settings.core.enableLazyLoading = false;
 
-            const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
-            const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
             const referenceFileData = await TestPlatform.loadFile(`test-data/visual-tests/${referenceFileName}`);
-            let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
             const renderElement = document.createElement('div');
             renderElement.style.width = '1300px';
@@ -75,7 +114,7 @@ export class VisualTestHelper {
                     result.push(e);
                     resolve();
                 });
-                api.error.on((e) => {
+                api.error.on(e => {
                     reject(`Failed to render image: ${e}`);
                 });
                 api.renderScore(score, tracks);
@@ -95,7 +134,8 @@ export class VisualTestHelper {
                 totalHeight,
                 result,
                 referenceFileName,
-                referenceFileData
+                referenceFileData,
+                message
             );
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
@@ -145,7 +185,8 @@ export class VisualTestHelper {
         totalHeight: number,
         result: RenderFinishedEventArgs[],
         referenceFileName: string,
-        referenceFileData: Uint8Array
+        referenceFileData: Uint8Array,
+        message?: string
     ): Promise<void> {
         // create final full image
         const actual = document.createElement('canvas');
@@ -197,7 +238,7 @@ export class VisualTestHelper {
             toEqualVisually: VisualTestHelper.toEqualVisually
         });
 
-        (expect(actual) as any).toEqualVisually(expected);
+        (expect(actual) as any).toEqualVisually(expected, message);
     }
 
     private static toEqualVisually(
@@ -205,7 +246,7 @@ export class VisualTestHelper {
         _customEqualityTesters: ReadonlyArray<jasmine.CustomEqualityTester>
     ): jasmine.CustomMatcher {
         return {
-            compare(actual: HTMLCanvasElement, expected: HTMLCanvasElement): jasmine.CustomMatcherResult {
+            compare(actual: HTMLCanvasElement, expected: HTMLCanvasElement, message?:string): jasmine.CustomMatcherResult {
                 const actualImageData = actual.getContext('2d')!.getImageData(0, 0, actual.width, actual.height);
 
                 const expectedImageData = expected
@@ -249,14 +290,14 @@ export class VisualTestHelper {
                     }
                 } catch (e) {
                     result.pass = false;
-                    result.message = `Error comparing images: ${e}`;
+                    result.message = `Error comparing images: ${e}, ${message}`;
                 }
 
                 const jasmineRequire = Environment.globalThis.jasmineRequire;
                 if (!result.pass && jasmineRequire.html) {
                     const dom = document.createElement('div');
                     dom.innerHTML = `
-                        <strong>Error:</strong> ${result.message}<br/>
+                        <strong>Error:</strong> ${result.message} (${message})<br/>
                         <strong>Expected:</strong> 
                         <div class="expected" style="border: 1px solid #000"></div>
                         <strong>Actual:</strong> 

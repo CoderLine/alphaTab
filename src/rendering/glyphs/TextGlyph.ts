@@ -23,12 +23,12 @@ export class TextGlyph extends EffectGlyph {
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         canvas.font = this.font;
         let old: TextAlign = canvas.textAlign;
+        canvas.textAlign = this.textAlign;
         let y: number = cy + this.y;
         for (let line of this._lines) {
-            canvas.textAlign = this.textAlign;
             canvas.fillText(line, cx + this.x, y);
-            canvas.textAlign = old;
             y += this.font.size;
         }
+        canvas.textAlign = old;
     }
 }

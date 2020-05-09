@@ -81,17 +81,17 @@ export enum NotationElement {
      * The score title shown at the start of the music sheet.
      */
     ScoreTitle,
-    
+
     /**
      * The score subtitle shown at the start of the music sheet.
      */
     ScoreSubTitle,
-        
+
     /**
      * The score artist shown at the start of the music sheet.
      */
     ScoreArtist,
-    
+
     /**
      * The score album shown at the start of the music sheet.
      */
@@ -101,7 +101,7 @@ export enum NotationElement {
      * The score words author shown at the start of the music sheet.
      */
     ScoreWords,
-    
+
     /**
      * The score music author shown at the start of the music sheet.
      */
@@ -111,22 +111,23 @@ export enum NotationElement {
      * The score words&music author shown at the start of the music sheet.
      */
     ScoreWordsAndMusic,
-    
+
     /**
      * The score copyright owner shown at the start of the music sheet.
      */
     ScoreCopyright,
-    
 
     /**
      * The tuning information of the guitar shown
      * above the staves.
      */
     GuitarTuning,
+
     /**
      * The track names which are shown in the accolade.
      */
     TrackNames,
+    
     /**
      * The chord diagrams for guitars. Usually shown
      * below the score info.
