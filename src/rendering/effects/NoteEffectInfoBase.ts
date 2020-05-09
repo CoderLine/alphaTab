@@ -1,8 +1,5 @@
 import { Beat } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
 
