@@ -21,8 +21,9 @@ namespace AlphaTab.VisualTests
         {
             try
             {
+                inputFile = $"test-data/visual-tests/{inputFile}";
                 var inputFileData =
-                    await TestPlatform.LoadFile($"test-data/visual-tests/{inputFile}");
+                    await TestPlatform.LoadFile(inputFile);
                 var referenceFileName = TestPlatform.ChangeExtension(inputFile, ".png");
                 var score = ScoreLoader.LoadScoreFromBytes(inputFileData, settings);
 
@@ -46,6 +47,7 @@ namespace AlphaTab.VisualTests
                     settings = new Settings();
                 }
 
+                referenceFileName = $"test-data/visual-tests/{referenceFileName}";
                 var importer = new AlphaTexImporter();
                 importer.Init(ByteBuffer.FromString(tex), settings);
                 var score = importer.ReadScore();
