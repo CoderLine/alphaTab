@@ -3,12 +3,13 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { FadeInGlyph } from '@src/rendering/glyphs/FadeInGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
+import { NotationElement } from '@src/NotationSettings';
 
-export class FadeInEffectInfo implements IEffectBarRendererInfo {
-    public get effectId(): string {
-        return 'fade-in';
+export class FadeInEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectFadeIn;
     }
 
     public get hideOnMultiTrack(): boolean {

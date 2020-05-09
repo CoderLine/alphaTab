@@ -4,12 +4,13 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { CrescendoGlyph } from '@src/rendering/glyphs/CrescendoGlyph';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
+import { NotationElement } from '@src/NotationSettings';
 
-export class CrescendoEffectInfo implements IEffectBarRendererInfo {
-    public get effectId(): string {
-        return 'crescendo';
+export class CrescendoEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectCrescendo;
     }
 
     public get hideOnMultiTrack(): boolean {

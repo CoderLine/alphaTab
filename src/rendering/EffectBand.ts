@@ -7,7 +7,7 @@ import { EffectBarRenderer } from '@src/rendering/EffectBarRenderer';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 
 export class EffectBand extends Glyph {
     private _uniqueEffectGlyphs: EffectGlyph[][] = [];
@@ -20,10 +20,10 @@ export class EffectBand extends Glyph {
     public lastBeat: Beat | null = null;
     public height: number = 0;
     public voice: Voice;
-    public info: IEffectBarRendererInfo;
+    public info: EffectBarRendererInfo;
     public slot: EffectBandSlot | null = null;
 
-    public constructor(voice: Voice, info: IEffectBarRendererInfo) {
+    public constructor(voice: Voice, info: EffectBarRendererInfo) {
         super(0, 0);
         this.voice = voice;
         this.info = info;

@@ -3,12 +3,13 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { TempoGlyph } from '@src/rendering/glyphs/TempoGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
+import { NotationElement } from '@src/NotationSettings';
 
-export class TempoEffectInfo implements IEffectBarRendererInfo {
-    public get effectId(): string {
-        return 'tempo';
+export class TempoEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectTempo;
     }
 
     public get hideOnMultiTrack(): boolean {

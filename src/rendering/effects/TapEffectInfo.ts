@@ -4,13 +4,14 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
+import { NotationElement } from '@src/NotationSettings';
 
-export class TapEffectInfo implements IEffectBarRendererInfo {
-    public get effectId(): string {
-        return 'tap';
+export class TapEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectTap;
     }
 
     public get hideOnMultiTrack(): boolean {

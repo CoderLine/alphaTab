@@ -3,10 +3,10 @@ import { Note } from '@src/model/Note';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
 
-export abstract class NoteEffectInfoBase implements IEffectBarRendererInfo {
+export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
     protected lastCreateInfo: Note[] | null = null;
 
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
@@ -21,8 +21,6 @@ export abstract class NoteEffectInfoBase implements IEffectBarRendererInfo {
     }
 
     protected abstract shouldCreateGlyphForNote(note: Note): boolean;
-
-    public abstract get effectId(): string;
 
     public get hideOnMultiTrack(): boolean {
         return false;

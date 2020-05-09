@@ -41,7 +41,7 @@ import { WhammyBarEffectInfo } from '@src/rendering/effects/WhammyBarEffectInfo'
 import { WideBeatVibratoEffectInfo } from '@src/rendering/effects/WideBeatVibratoEffectInfo';
 import { WideNoteVibratoEffectInfo } from '@src/rendering/effects/WideNoteVibratoEffectInfo';
 import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { HorizontalScreenLayout } from '@src/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@src/rendering/layout/PageViewLayout';
@@ -446,7 +446,7 @@ export class Environment {
                 new LyricsEffectInfo()
             ])
         ]);
-        let tabEffectInfos: IEffectBarRendererInfo[] = [
+        let tabEffectInfos: EffectBarRendererInfo[] = [
             new TempoEffectInfo(),
             new TripletFeelEffectInfo(),
             new MarkerEffectInfo(),

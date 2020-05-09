@@ -6,13 +6,19 @@ import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { NoteEffectInfoBase } from '@src/rendering/effects/NoteEffectInfoBase';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@src/rendering/glyphs/LineRangedGlyph';
+import { NotationElement } from '@src/NotationSettings';
 
 export class HarmonicsEffectInfo extends NoteEffectInfoBase {
     private _harmonicType: HarmonicType;
     private _beat: Beat | null = null;
     private _effectId: string;
+
     public get effectId(): string {
         return this._effectId;
+    }
+
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectHarmonics;
     }
 
     public constructor(harmonicType: HarmonicType) {

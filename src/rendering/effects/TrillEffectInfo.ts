@@ -5,10 +5,11 @@ import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { NoteEffectInfoBase } from '@src/rendering/effects/NoteEffectInfoBase';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { TrillGlyph } from '@src/rendering/glyphs/TrillGlyph';
+import { NotationElement } from '@src/NotationSettings';
 
 export class TrillEffectInfo extends NoteEffectInfoBase {
-    public get effectId(): string {
-        return 'trill';
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectTrill;
     }
 
     protected shouldCreateGlyphForNote(note: Note): boolean {

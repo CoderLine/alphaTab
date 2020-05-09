@@ -3,12 +3,13 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { AlternateEndingsGlyph } from '@src/rendering/glyphs/AlternateEndingsGlyph';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
+import { NotationElement } from '@src/NotationSettings';
 
-export class AlternateEndingsEffectInfo implements IEffectBarRendererInfo {
-    public get effectId(): string {
-        return 'alternate-feel';
+export class AlternateEndingsEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectAlternateEndings;
     }
 
     public get hideOnMultiTrack(): boolean {

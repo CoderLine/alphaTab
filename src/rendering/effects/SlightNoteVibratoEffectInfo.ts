@@ -6,10 +6,11 @@ import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { NoteEffectInfoBase } from '@src/rendering/effects/NoteEffectInfoBase';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
+import { NotationElement } from '@src/NotationSettings';
 
 export class SlightNoteVibratoEffectInfo extends NoteEffectInfoBase {
-    public get effectId(): string {
-        return 'slight-note-vibrato';
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectSlightNoteVibrato;
     }
 
     protected shouldCreateGlyphForNote(note: Note): boolean {
