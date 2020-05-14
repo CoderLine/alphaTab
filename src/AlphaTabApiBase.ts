@@ -131,8 +131,8 @@ export class AlphaTabApiBase<TSettings> {
         initialResizeEventInfo.settings = this.settings;
         this.onResize(initialResizeEventInfo);
         this.renderer.preRender.on(this.onRenderStarted.bind(this));
-        this.renderer.renderFinished.on(_ => {
-            this.onRenderFinished();
+        this.renderer.renderFinished.on(renderingResult => {
+            this.onRenderFinished(renderingResult);
         });
         this.renderer.postRenderFinished.on(() => {
             let duration: number = Date.now() - this._startTime;
@@ -1093,10 +1093,10 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'renderStarted', resize);
     }
 
-    public renderFinished: IEventEmitter = new EventEmitter();
-    private onRenderFinished(): void {
-        (this.renderFinished as EventEmitter).trigger();
-        this.uiFacade.triggerEvent(this.container, 'renderFinished', null);
+    public renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    private onRenderFinished(renderingResult: RenderFinishedEventArgs): void {
+        (this.renderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(renderingResult);
+        this.uiFacade.triggerEvent(this.container, 'renderFinished', renderingResult);
     }
 
     public postRenderFinished: IEventEmitter = new EventEmitter();
