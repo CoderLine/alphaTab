@@ -185,9 +185,11 @@ export class TinySoundFont {
     }
 
     public setupMetronomeChannel(volume: number): void {
-        this.channelSetVolume(SynthConstants.MetronomeChannel, 1);
         this.channelSetMixVolume(SynthConstants.MetronomeChannel, volume);
-        this.channelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
+        if(volume > 0) {
+            this.channelSetVolume(SynthConstants.MetronomeChannel, 1);
+            this.channelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
+        }
     }
 
     /**
