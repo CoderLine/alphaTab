@@ -7,7 +7,7 @@ import { EffectBandSizingInfo } from '@src/rendering/EffectBandSizingInfo';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 
 /**
@@ -15,12 +15,12 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
  * like the vibrato.
  */
 export class EffectBarRenderer extends BarRendererBase {
-    private _infos: IEffectBarRendererInfo[];
+    private _infos: EffectBarRendererInfo[];
     private _bands: EffectBand[] = [];
     private _bandLookup: Map<string, EffectBand> = new Map();
     public sizingInfo: EffectBandSizingInfo | null = null;
 
-    public constructor(renderer: ScoreRenderer, bar: Bar, infos: IEffectBarRendererInfo[]) {
+    public constructor(renderer: ScoreRenderer, bar: Bar, infos: EffectBarRendererInfo[]) {
         super(renderer, bar);
         this._infos = infos;
     }

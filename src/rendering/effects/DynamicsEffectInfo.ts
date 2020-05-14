@@ -3,12 +3,13 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { DynamicsGlyph } from '@src/rendering/glyphs/DynamicsGlyph';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
+import { NotationElement } from '@src/NotationSettings';
 
-export class DynamicsEffectInfo implements IEffectBarRendererInfo {
-    public get effectId(): string {
-        return 'dynamics';
+export class DynamicsEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectDynamics
     }
 
     public get hideOnMultiTrack(): boolean {

@@ -1,19 +1,19 @@
 import { Beat } from '@src/model/Beat';
 import { Fingers } from '@src/model/Fingers';
 import { Note } from '@src/model/Note';
-import { FingeringMode } from '@src/NotationSettings';
+import { FingeringMode, NotationElement } from '@src/NotationSettings';
 import { TextAlign } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
 
-export class FingeringEffectInfo implements IEffectBarRendererInfo {
-    public get effectId(): string {
-        return 'fingering';
+export class FingeringEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectFingering;
     }
 
     public get hideOnMultiTrack(): boolean {

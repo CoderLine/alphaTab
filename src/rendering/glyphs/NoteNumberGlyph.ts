@@ -7,6 +7,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { NotationElement } from '@src/NotationSettings';
 
 export class NoteNumberGlyph extends Glyph {
     private _note: Note;
@@ -44,7 +45,7 @@ export class NoteNumberGlyph extends Glyph {
         } else if (
             n.beat.index === 0 ||
             ((n.bendType === BendType.Bend || n.bendType === BendType.BendRelease) &&
-                this.renderer.settings.notation.showTabNoteOnTiedBend)
+                this.renderer.settings.notation.isNotationElementVisible(NotationElement.TabNotesOnTiedBends))
         ) {
             this._noteString = '(' + (n.tieOrigin!.fret - n.beat.voice.bar.staff.transpositionPitch) + ')';
         } else {

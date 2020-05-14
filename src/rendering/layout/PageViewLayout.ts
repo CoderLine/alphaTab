@@ -1,6 +1,5 @@
 import { ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
-import { HeaderFooterElements } from '@src/rendering/layout/HeaderFooterElements';
 import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
@@ -9,6 +8,7 @@ import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/util/Logger';
 import { EventEmitterOfT } from '@src/EventEmitter';
+import { NotationElement } from '@src/NotationSettings';
 
 /**
  * This layout arranges the bars into a fixed width and dynamic height region.
@@ -117,12 +117,12 @@ export class PageViewLayout extends ScoreLayout {
         Logger.debug(this.name, 'Layouting score info');
         let scale: number = this.scale;
         let res: RenderingResources = this.renderer.settings.display.resources;
-        let centeredGlyphs: HeaderFooterElements[] = [
-            HeaderFooterElements.Title,
-            HeaderFooterElements.SubTitle,
-            HeaderFooterElements.Artist,
-            HeaderFooterElements.Album,
-            HeaderFooterElements.WordsAndMusic
+        let centeredGlyphs: NotationElement[] = [
+            NotationElement.ScoreTitle,
+            NotationElement.ScoreSubTitle,
+            NotationElement.ScoreArtist,
+            NotationElement.ScoreAlbum,
+            NotationElement.ScoreWordsAndMusic
         ];
         for (let i: number = 0; i < centeredGlyphs.length; i++) {
             if (this.scoreInfoGlyphs.has(centeredGlyphs[i])) {
@@ -135,16 +135,16 @@ export class PageViewLayout extends ScoreLayout {
         }
         let musicOrWords: boolean = false;
         let musicOrWordsHeight: number = 0;
-        if (this.scoreInfoGlyphs.has(HeaderFooterElements.Music)) {
-            let glyph: TextGlyph = this.scoreInfoGlyphs.get(HeaderFooterElements.Music)!;
+        if (this.scoreInfoGlyphs.has(NotationElement.ScoreMusic)) {
+            let glyph: TextGlyph = this.scoreInfoGlyphs.get(NotationElement.ScoreMusic)!;
             glyph.x = this.width - this._pagePadding![2];
             glyph.y = y;
             glyph.textAlign = TextAlign.Right;
             musicOrWords = true;
             musicOrWordsHeight = glyph.font.size;
         }
-        if (this.scoreInfoGlyphs.has(HeaderFooterElements.Words)) {
-            let glyph: TextGlyph = this.scoreInfoGlyphs.get(HeaderFooterElements.Words)!;
+        if (this.scoreInfoGlyphs.has(NotationElement.ScoreWords)) {
+            let glyph: TextGlyph = this.scoreInfoGlyphs.get(NotationElement.ScoreWords)!;
             glyph.x = x;
             glyph.y = y;
             glyph.textAlign = TextAlign.Left;

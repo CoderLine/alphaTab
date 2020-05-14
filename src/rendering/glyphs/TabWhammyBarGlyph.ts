@@ -2,7 +2,7 @@ import { Beat } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
 import { WhammyType } from '@src/model/WhammyType';
-import { NotationMode } from '@src/NotationSettings';
+import { NotationMode, NotationElement } from '@src/NotationSettings';
 import { ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
@@ -76,7 +76,7 @@ export class TabWhammyBarGlyph extends Glyph {
         if (
             topOffset > 0 ||
             this._beat.whammyBarPoints[0].value !== 0 ||
-            this.renderer.settings.notation.showZeroOnDiveWhammy
+            this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys)
         ) {
             topOffset += this.renderer.resources.tablatureFont.size * 2;
         }
@@ -229,7 +229,7 @@ export class TabWhammyBarGlyph extends Glyph {
         if (isFirst && !this._beat.isContinuedWhammy && !this._isSimpleDip) {
             let y: number = y1;
             y -= res.tablatureFont.size + 2 * this.scale;
-            if (this.renderer.settings.notation.showZeroOnDiveWhammy) {
+            if (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys)) {
                 canvas.fillText('0', x1, y);
             }
             if (slurText) {
@@ -239,7 +239,7 @@ export class TabWhammyBarGlyph extends Glyph {
         }
         let dV: number = Math.abs(secondPt.value);
         if (
-            (dV !== 0 || (this.renderer.settings.notation.showZeroOnDiveWhammy && !this._isSimpleDip)) &&
+            (dV !== 0 || (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys) && !this._isSimpleDip)) &&
             firstPt.value !== secondPt.value
         ) {
             let s: string = '';

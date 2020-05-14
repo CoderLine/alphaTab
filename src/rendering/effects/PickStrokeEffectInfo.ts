@@ -4,12 +4,13 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { PickStrokeGlyph } from '@src/rendering/glyphs/PickStrokeGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
+import { NotationElement } from '@src/NotationSettings';
 
-export class PickStrokeEffectInfo implements IEffectBarRendererInfo {
-    public get effectId(): string {
-        return 'pick-stroke';
+export class PickStrokeEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectPickStroke;
     }
 
     public get hideOnMultiTrack(): boolean {

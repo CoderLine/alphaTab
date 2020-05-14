@@ -4,12 +4,13 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { LyricsGlyph } from '@src/rendering/glyphs/LyricsGlyph';
-import { IEffectBarRendererInfo } from '@src/rendering/IEffectBarRendererInfo';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
+import { NotationElement } from '@src/NotationSettings';
 
-export class LyricsEffectInfo implements IEffectBarRendererInfo {
-    public get effectId(): string {
-        return 'lyrics';
+export class LyricsEffectInfo extends EffectBarRendererInfo {
+    public get notationElement(): NotationElement {
+        return NotationElement.EffectLyrics;
     }
 
     public get hideOnMultiTrack(): boolean {

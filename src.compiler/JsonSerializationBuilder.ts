@@ -72,10 +72,14 @@ function hasFlag(type: ts.Type, flag: ts.TypeFlags): boolean {
 function isImmutable(type: ts.Type): boolean {
     const declaration = type.symbol.valueDeclaration;
     if (declaration) {
-        return !!ts.getJSDocTags(declaration).find(t=>t.tagName.text === 'json_immutable');
+        return !!ts.getJSDocTags(declaration).find(t => t.tagName.text === 'json_immutable');
     }
 
     return false;
+}
+
+function isMap(type: ts.Type): boolean {
+    return type.symbol.name === 'Map';
 }
 
 function generateToJsonBodyForClass(
@@ -154,6 +158,51 @@ function generateFillToJsonBodyForClass(
                         assignToJsonName(ts.createCall(ts.createPropertyAccess(accessField(), 'slice'), [], []))
                     );
                 }
+            } else if (isMap(type.type)) {
+                const mapType = type.type as ts.TypeReference;
+                if (!isEnumType(mapType.typeArguments[0]) || !isPrimitiveType(mapType.typeArguments[1])) {
+                    throw new Error('only Map<EnumType, Primitive> maps are supported extend if needed!');
+                }
+                // json.jsonName = { } as any;
+                // this.fieldName.forEach((val, key) => (json.jsonName as any)[key] = val))
+                statements.push(
+                    assignToJsonName(
+                        ts.createAsExpression(
+                            ts.createObjectLiteral(),
+                            ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+                        )
+                    )
+                );
+                statements.push(
+                    ts.createExpressionStatement(
+                        ts.createCall(ts.createPropertyAccess(accessField(), 'forEach'), undefined, [
+                            ts.createArrowFunction(
+                                undefined,
+                                undefined,
+                                [
+                                    ts.createParameter(undefined, undefined, undefined, '$mv'),
+                                    ts.createParameter(undefined, undefined, undefined, '$mk')
+                                ],
+                                undefined,
+                                ts.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+                                ts.createBlock([
+                                    ts.createExpressionStatement(
+                                        ts.createAssignment(
+                                            ts.createElementAccess(
+                                                ts.createAsExpression(
+                                                    accessJsonName(),
+                                                    ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+                                                ),
+                                                ts.createIdentifier('$mk')
+                                            ),
+                                            ts.createIdentifier('$mv')
+                                        )
+                                    )
+                                ])
+                            )
+                        ])
+                    )
+                );
             } else if (isImmutable(type.type)) {
                 // json.jsonName = TypeName.toJson(this.fieldName);
                 statements.push(
@@ -295,6 +344,61 @@ function generateFillFromJsonBodyForClass(
         )
     ]);
 }
+
+function createEnumMapping(value: string, type: ts.Type): ts.Expression {
+    // isNan(parseInt(value)) ? Enum[Object.keys(Enum).find($k => $k.toLowerCase() === value.toLowerCase()] : parseInt(value)
+    return ts.createConditional(
+        ts.createCall(ts.createIdentifier('isNaN'), undefined, [
+            ts.createCall(ts.createIdentifier('parseInt'), undefined, [ts.createIdentifier(value)])
+        ]),
+        ts.createToken(ts.SyntaxKind.QuestionToken),
+        ts.createElementAccess(
+            ts.createIdentifier(type.symbol.name),
+            ts.createCall(
+                // Object.keys(EnumName).find
+                ts.createPropertyAccess(
+                    // Object.keys(EnumName)
+                    ts.createCall(
+                        ts.createPropertyAccess(ts.createIdentifier('Object'), 'keys'),
+                        [],
+                        [ts.createIdentifier(type.symbol.name)]
+                    ),
+                    'find'
+                ),
+                [],
+                [
+                    ts.createArrowFunction(
+                        [],
+                        [],
+                        [ts.createParameter(undefined, undefined, undefined, '$k')],
+                        undefined,
+                        ts.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+                        ts.createBinary(
+                            ts.createCall(
+                                // $.toLowerCase()
+                                ts.createPropertyAccess(ts.createIdentifier('$k'), 'toLowerCase'),
+                                [],
+                                []
+                            ),
+                            // ===
+                            ts.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                            // value.toLowerCase()
+                            ts.createCall(
+                                // $.toLowerCase()
+                                ts.createPropertyAccess(ts.createIdentifier(value), 'toLowerCase'),
+                                [],
+                                []
+                            )
+                        )
+                    )
+                ]
+            )
+        ),
+        ts.createToken(ts.SyntaxKind.ColonToken),
+        ts.createCall(ts.createIdentifier('parseInt'), undefined, [ts.createIdentifier(value)])
+    );
+}
+
 function generateSetPropertyMethodBodyForClass(
     program: ts.Program,
     classDeclaration: ts.ClassDeclaration,
@@ -320,80 +424,9 @@ function generateSetPropertyMethodBodyForClass(
         };
 
         if (isEnumType(type.type)) {
-            // this.fieldName = typeof value === "string" ? EnumName[Object.keys(EnumName).find(k => k.toLowerCase() == value.toLowerCase())] : value
+            // this.fieldName = enummapping
             // return true;
-            caseStatements.push(
-                assignField(
-                    ts.createConditional(
-                        ts.createBinary(
-                            ts.createTypeOf(ts.createIdentifier('value')),
-                            ts.SyntaxKind.EqualsEqualsEqualsToken,
-                            ts.createStringLiteral('string')
-                        ),
-                        ts.createToken(ts.SyntaxKind.QuestionToken),
-                        ts.createElementAccess(
-                            ts.createIdentifier(type.type.symbol.name),
-                            ts.createCall(
-                                // Object.keys(EnumName).find
-                                ts.createPropertyAccess(
-                                    // Object.keys(EnumName)
-                                    ts.createCall(
-                                        ts.createPropertyAccess(
-                                            ts.createIdentifier("Object"),
-                                            "keys"
-                                        ),
-                                        [],
-                                        [
-                                            ts.createIdentifier(type.type.symbol.name)
-                                        ]
-                                    ),
-                                    "find"
-                                ),
-                                [],
-                                [
-                                    ts.createArrowFunction(
-                                        [],
-                                        [],
-                                        [
-                                            ts.createParameter(
-                                                undefined,
-                                                undefined,
-                                                undefined,
-                                                "$k"
-                                            )
-                                        ],
-                                        undefined, 
-                                        ts.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-                                        ts.createBinary(
-                                            ts.createCall(
-                                                // $.toLowerCase()
-                                                ts.createPropertyAccess(
-                                                    ts.createIdentifier("$k"),
-                                                    "toLowerCase"
-                                                ),
-                                                [], []
-                                            ),
-                                            // ===
-                                            ts.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
-                                            // value.toLowerCase()
-                                            ts.createCall(
-                                                // $.toLowerCase()
-                                                ts.createPropertyAccess(
-                                                    ts.createIdentifier("value"),
-                                                    "toLowerCase"
-                                                ),
-                                                [], []
-                                            )
-                                        )
-                                    )
-                                ]
-                            )
-                        ),
-                        ts.createToken(ts.SyntaxKind.ColonToken),
-                        ts.createIdentifier('value')
-                    )
-                )
-            );
+            caseStatements.push(assignField(createEnumMapping('value', type.type)));
             caseStatements.push(ts.createReturn(ts.createTrue()));
         } else if (isPrimitiveType(type.type)) {
             // this.fieldName = value
@@ -427,6 +460,49 @@ function generateSetPropertyMethodBodyForClass(
                 );
             }
 
+            caseStatements.push(ts.createReturn(ts.createTrue()));
+        } else if (isMap(type.type)) {
+            // this.fieldName = new Map();
+            // for(let key in value) {
+            //   if(value.hasOwnProperty(key) this.fieldName.set(<enummapping>, value[key]);
+            // }
+            // return true;
+
+            const mapType = type.type as ts.TypeReference;
+            if (!isEnumType(mapType.typeArguments[0]) || !isPrimitiveType(mapType.typeArguments[1])) {
+                throw new Error('only Map<EnumType, Primitive> maps are supported extend if needed!');
+            }
+
+            caseStatements.push(assignField(ts.createNew(ts.createIdentifier('Map'), undefined, [])));
+            caseStatements.push(
+                ts.createForIn(
+                    ts.createVariableDeclarationList(
+                        [ts.createVariableDeclaration(ts.createIdentifier('$mk'), undefined, undefined)],
+                        ts.NodeFlags.Let
+                    ),
+                    ts.createIdentifier('value'),
+                    ts.createIf(
+                        ts.createCall(
+                            ts.createPropertyAccess(ts.createIdentifier('value'), 'hasOwnProperty'),
+                            undefined,
+                            [ts.createIdentifier('$mk')]
+                        ),
+                        ts.createExpressionStatement(
+                            ts.createCall(
+                                ts.createPropertyAccess(
+                                    ts.createPropertyAccess(ts.createThis(), ts.createIdentifier(fieldName)),
+                                    ts.createIdentifier('set')
+                                ),
+                                undefined,
+                                [
+                                    createEnumMapping('$mk', mapType.typeArguments![0]),
+                                    ts.createElementAccess(ts.createIdentifier('value'), ts.createIdentifier('$mk'))
+                                ]
+                            )
+                        )
+                    )
+                )
+            );
             caseStatements.push(ts.createReturn(ts.createTrue()));
         } else if (isImmutable(type.type)) {
             // this.fieldName = TypeName.fromJson(value)!
@@ -594,18 +670,18 @@ function rewriteClassForJsonSerialization(
     classDeclaration.members.forEach(member => {
         if (ts.isPropertyDeclaration(member)) {
             const propertyDeclaration = member as ts.PropertyDeclaration;
+            if (!propertyDeclaration.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)) {
+                const jsonNames = [member.name.getText(sourceFile)];
 
-            const jsonNames = [member.name.getText(sourceFile)];
+                if (ts.getJSDocTags(member).find(t => t.tagName.text === 'json_on_parent')) {
+                    jsonNames.push('');
+                }
 
-            if(ts.getJSDocTags(member).find(t=>t.tagName.text === 'json_on_parent')) {
-                jsonNames.push('');
+                propertiesToSerialize.push({
+                    property: propertyDeclaration,
+                    jsonNames: jsonNames
+                });
             }
-            
-            propertiesToSerialize.push({
-                property: propertyDeclaration,
-                jsonNames: jsonNames
-            });
-
             newMembers.push(member);
         } else if (ts.isMethodDeclaration(member)) {
             if (ts.isIdentifier(member.name)) {
@@ -847,7 +923,7 @@ export default function (program: ts.Program) {
         return (sourceFile: ts.SourceFile) => {
             function visitor(node: ts.Node): ts.Node {
                 if (ts.isClassDeclaration(node)) {
-                    if(ts.getJSDocTags(node).find(t=>t.tagName.text === 'json')) {
+                    if (ts.getJSDocTags(node).find(t => t.tagName.text === 'json')) {
                         return rewriteClassForJsonSerialization(program, node, sourceFile);
                     }
                 }

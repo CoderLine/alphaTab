@@ -1,7 +1,7 @@
 import { CoreSettings } from '@src/CoreSettings';
 import { DisplaySettings } from '@src/DisplaySettings';
 import { ImporterSettings } from '@src/ImporterSettings';
-import { FingeringMode, NotationMode, NotationSettings } from '@src/NotationSettings';
+import { FingeringMode, NotationMode, NotationSettings, NotationElement } from '@src/NotationSettings';
 import { PlayerSettings } from '@src/PlayerSettings';
 
 /**
@@ -82,9 +82,9 @@ export class Settings {
         this.notation.smallGraceTabNotes = false;
         this.notation.fingeringMode = FingeringMode.SingleNoteEffectBand;
         this.notation.extendBendArrowsOnTiedNotes = false;
-        this.notation.showParenthesisForTiedBends = false;
-        this.notation.showTabNoteOnTiedBend = false;
-        this.notation.showZeroOnDiveWhammy = true;
+        this.notation.elements.set(NotationElement.ParenthesisOnTiedBends, false);
+        this.notation.elements.set(NotationElement.TabNotesOnTiedBends, false);
+        this.notation.elements.set(NotationElement.ZerosOnDiveWhammys, true);
     }
 
     public static get songBook(): Settings {
