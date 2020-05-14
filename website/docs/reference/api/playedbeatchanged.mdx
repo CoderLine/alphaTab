@@ -48,7 +48,7 @@ This event is fired when the played beat changed.
 <TabItem value="js">
 
 ```js
-const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playedBeatChanged.on((beat) => {
     updateFretboard(beat);
 });

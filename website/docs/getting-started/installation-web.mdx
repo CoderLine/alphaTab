@@ -60,7 +60,7 @@ alphaTab and use it. You can also check out our [tutorials](/docs/tutorial) to l
 <!-- Initialize alphaTab -->
 <script type="text/javascript">
 const element = document.getElementById('alphaTab');
-const api = new alphaTab.platform.javaScript.AlphaTabApi(element);
+const api = new alphaTab.AlphaTabApi(element);
 </script>
 ```
 
@@ -73,7 +73,7 @@ export class InitDemo extends React.Component {
 	}
 	componentDidMount() {
         const element = document.getElementById('alphaTab');
-        this.state.api = new alphaTab.platform.javaScript.AlphaTabApi(element);
+        this.state.api = new alphaTab.AlphaTabApi(element);
     }
     render() {
         return (

@@ -20,11 +20,12 @@ introduce.
 In most cases developers weren't in the need to use all the exposed classes of alphaTab and rather could stick to the main API surface
 and just access the properties. Property names did not change on this version. The main changes can be summarized as: 
 
-* The main API class was moved from `alphaTab.platform.javaScript.AlphaTabApi` to `alphaTab.alphaTabApi`
+* The main API class was moved from `alphaTab.AlphaTabApi` to `alphaTab.alphaTabApi`
 * Enums have now clean names like `alphaTab.LayoutMode`
 * Interfaces have been removed
 * The `AlphaTexExporter` was fully removed. 
 * Check for changed event names that were used.
+* Check for new settings on hiding notation elements.
 * Use the new `on/off` event subscription if you used API object events. 
 
 In case you used various classes from the `alphaTab` module directly, you can find fhe full changes can be found below for migration. 
@@ -308,3 +309,20 @@ Internally alphaTab will try to cut off decimal parts of values where they are n
 
 The new error reporting system is fully based on `Exceptions` and you should use the corresponding exception types to determine the type of error. 
 For a higher level categorization also the `AlphaTabError.Type` property can be checked. The previous string value identifying the category has been removed. 
+
+## New options for hiding elements
+
+This version also changes some options on hiding/showing individual notation elements. 
+
+Previously the `NotationSettings` had following settings: 
+
+- `hideInfo` - To hide the general song info
+- `hideTuning` - To hide the guitar tuning
+- `hideTrackNames` - To hide the track names in the accolade
+- `hideChordDiagrams` - To hide the chord diagrams
+- `showParenthesisForTiedBends` - To show parenthesis for note heads on tied bends
+- `showTabNoteOnTiedBends` - To show the tab note number on tied bends
+- `showZeroOnDiveWhammy` - To show the number 0 on dive whammy effects. 
+
+All these settings have been unified under the new setting [`NotationSettings.elements`](/docs/reference/settings/notation/elements). 
+Please check the docs there on how to show or hide the elements. 

@@ -64,7 +64,7 @@ This event is fired when the playback state changed.
 <TabItem value="js">
 
 ```js
-const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playerStateChanged.on((args) => {
     updatePlayerControls(args.state, args.stopped);
 });

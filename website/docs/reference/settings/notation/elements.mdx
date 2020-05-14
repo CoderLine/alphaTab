@@ -1,0 +1,305 @@
+---
+title: Notation.Elements
+jsName: notation.elements
+jsonName: notation.elements
+domName: data-notation-elements
+category: Notation
+description: Render the song information or not.
+sidebarPath: /docs/reference/settings
+since: 0.9.8
+---
+
+import PropertyDescription from "../../../../src/property-description";
+import { TypeTable, TypeRow } from "../../../../src/type-table";
+
+## Description
+
+AlphaTab has quite a set of notation elements that are usually shown by default or only shown when using
+the `SongBook` notation mode. This setting allows showing/hiding individual notation elements like the
+song information or the track names.
+
+For each element you can configure whether it is visible or not. The setting is a Map/Dictionary where
+the key is the element to configure and the value is a boolean value whether it should be visible or not. 
+
+<PropertyDescription metadata={metadata} />
+
+<table className="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Element</th>
+            <th>Description</th>
+            <th>Default Visibility</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>ScoreTitle</td>
+            <td>The score title shown at the start of the music sheet.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ScoreSubTitle</td>
+            <td>The score subtitle shown at the start of the music sheet.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ScoreArtist</td>
+            <td>The score artist shown at the start of the music sheet.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ScoreAlbum</td>
+            <td>The score album shown at the start of the music sheet.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ScoreWords</td>
+            <td>The score words author shown at the start of the music sheet.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ScoreMusic</td>
+            <td>The score music author shown at the start of the music sheet.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ScoreWordsAndMusic</td>
+            <td>The score words&music author shown at the start of the music sheet.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ScoreCopyright</td>
+            <td>The score copyright owner shown at the start of the music sheet.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>GuitarTuning</td>
+            <td>The tuning information of the guitar shown above the staves.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>TrackNames</td>
+            <td>The track names which are shown in the accolade.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ChordDiagrams</td>
+            <td>The chord diagrams for guitars. Usually shown below the score info.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ParenthesisOnTiedBends</td>
+            <td>
+                Parenthesis that are shown for tied bends if they are preceeded by bends.
+            </td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>TabNotesOnTiedBends</td>
+            <td>
+                The tab number for tied notes if the bend of a note is increased at that
+                point.
+            </td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>ZerosOnDiveWhammys</td>
+            <td>Zero tab numbers on "dive whammys".</td>
+            <td>not visible</td>
+        </tr>
+        <tr>
+            <td>EffectAlternateEndings</td>
+            <td>The alternate endings information on repeats shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectCapo</td>
+            <td>
+                The information about the fret on which the capo is placed shown above the
+                staff.
+            </td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectChordNames</td>
+            <td>The chord names shown above beats shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectCrescendo</td>
+            <td>The crescendo/decrescendo angle shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectDynamics</td>
+            <td>The beat dynamics shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectFadeIn</td>
+            <td>The curved angle for fade in/out effects shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectFermata</td>
+            <td>The fermata symbol shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectFingering</td>
+            <td>The fingering information.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectHarmonics</td>
+            <td>
+                The harmonics names shown above the staff. (does not represent the harmonic
+                note heads)
+            </td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectLetRing</td>
+            <td>The let ring name and line above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectLyrics</td>
+            <td>The lyrics of the track shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectMarker</td>
+            <td>The section markers shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectOttavia</td>
+            <td>The ottava symbol and lines shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectPalmMute</td>
+            <td>The palm mute name and line shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectPickSlide</td>
+            <td>
+                The pick slide information shown above the staff. (does not control the pick
+                slide lines)
+            </td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectPickStroke</td>
+            <td>The pick stroke symbols shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectSlightBeatVibrato</td>
+            <td>The slight beat vibrato waves shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectSlightNoteVibrato</td>
+            <td>The slight note vibrato waves shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectTap</td>
+            <td>The tap/slap/pop effect names shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectTempo</td>
+            <td>The tempo information shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectText</td>
+            <td>The additional beat text shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectTrill</td>
+            <td>The trill name and waves shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectTripletFeel</td>
+            <td>The triplet feel symbol shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectWhammyBar</td>
+            <td>
+                The whammy bar information shown above the staff. (does not control the
+                whammy lines shown within the staff)
+            </td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectWideBeatVibrato</td>
+            <td>The wide beat vibrato waves shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+        <tr>
+            <td>EffectWideNoteVibrato</td>
+            <td>The wide note vibrato waves shown above the staff.</td>
+            <td>visible</td>
+        </tr>
+
+    </tbody>
+
+</table>
+
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+Internally the setting is a [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) where the key must be a `alphaTab.NotationElement` enumeration value. 
+For JSON input the usual enumeration serialization applies where also the names can be used. The names 
+are case insensitive.  
+
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'), {
+    notation: {
+        elements: {
+            scoreTitle: false,
+            trackNames: false
+        }
+    }
+});
+api.settings.notation.elements.set(alphaTab.NotationElement.EffectWhammyBar, false);
+```
+
+</TabItem>
+<TabItem value="html">
+
+For data attributes currently a full object must be embedded in the attribute value. 
+
+```js
+<div id="alphaTab" data-notation-elements='{"ScoreTitle": false, "TrackNames": false}'></div>
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+var settings = new AlphaTab.Settings();
+settings.Notation.Elements[AlphaTab.NotationElement.ScoreTitle] = false;
+settings.Notation.Elements[AlphaTab.NotationElement.TrackNames] = false;
+```
+
+</TabItem>
+</Tabs>

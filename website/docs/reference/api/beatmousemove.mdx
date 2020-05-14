@@ -51,7 +51,7 @@ This event is fired whenever the user moves the mouse over a beat after the user
 <TabItem value="js">
 
 ```js
-const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.beatMouseMove.on((beat) => {
     expandSelectionToBeat(beat);
 });

@@ -470,7 +470,7 @@ export default class AlphaTab extends React.Component {
         console.log(this.state.settings);
 
         this.setState({
-            api: new alphaTab.platform.javaScript.AlphaTabApi(this.refs.alphaTab, this.state.settings)
+            api: new alphaTab.AlphaTabApi(this.refs.alphaTab, this.state.settings)
         })
     }
 

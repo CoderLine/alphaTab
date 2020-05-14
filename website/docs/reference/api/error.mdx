@@ -50,7 +50,7 @@ Instead a signal to this error handlers will be sent.
 <TabItem value="js">
 
 ```js
-const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.error.on((error) {
     displayError(error);
 });

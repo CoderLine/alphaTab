@@ -46,7 +46,7 @@ This event is fired when the SoundFont is being loaded and reports the progress 
 <TabItem value="js">
 
 ```js
-const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.soundFontLoad.on((e) => {
     updateProgress(e.loaded, e.total);
 });

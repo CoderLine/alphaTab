@@ -54,7 +54,7 @@ The parameter is null if the mouse was released somewhere beside the beat.
 <TabItem value="js">
 
 ```js
-const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.beatMouseUp.on((beat) => {
     hideSelection(beat);
 });

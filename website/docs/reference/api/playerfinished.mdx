@@ -43,7 +43,7 @@ None
 <TabItem value="js">
 
 ```js
-const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playerFinished.on((args) => {
     // speed trainer
     api.playbackSpeed = Math.min(1.0, api.playbackSpeed + 0.1);
@@ -78,7 +78,7 @@ at.addEventListener('alphaTab.finished', (e) => {
 }, false);
 
 
-api = new alphaTab.platform.javaScript.AlphaTabApi(at);
+api = new alphaTab.AlphaTabApi(at);
 api.isLooping = true;
 api.playbackSpeed = 0.5;
 api.play()

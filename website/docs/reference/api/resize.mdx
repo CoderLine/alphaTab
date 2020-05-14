@@ -73,7 +73,7 @@ considered. This allows to implement scenarios where maybe the scale or the layo
 <TabItem value="js">
 
 ```js
-const api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.resize.on((args) => {
     args.settings.scale = args.newWidth > 1300 
         ? 1.5 
