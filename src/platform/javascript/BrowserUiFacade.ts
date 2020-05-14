@@ -118,13 +118,13 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     public initialize(api: AlphaTabApiBase<unknown>, raw: unknown): void {
         this._api = api;
         let settings: Settings;
-
         if (raw instanceof Settings) {
             settings = raw;
         } else {
             settings = new Settings();
             settings.fillFromJson(raw);
         }
+        
         let dataAttributes: Map<string, unknown> = this.getDataAttributes();
         settings.fillFromDataAttributes(dataAttributes);
         if (settings.notation.notationMode === NotationMode.SongBook) {
