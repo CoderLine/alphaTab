@@ -215,7 +215,7 @@ export class JsonConverter {
                 Section.copyTo(masterBar.section, masterBar2.section!);
             }
 
-            masterBar2.fermata = {} as any;
+            masterBar2.fermata = new Map<number, Fermata>();
             masterBar.fermata.forEach((fermata, fermataId) => {
                 let fermata2: any = {} as any;
                 masterBar2.fermata.set(fermataId, fermata2);
@@ -427,12 +427,11 @@ export class JsonConverter {
                 Section.copyTo(masterBar.section, masterBar2.section);
             }
 
-            for (let key of Object.keys(masterBar.fermata)) {
-                let fermata: Fermata = (masterBar.fermata as any)[key];
+            JsonConverter.jsObjectMapForEach(masterBar.fermata, (fermata, key) => {
                 let fermata2: Fermata = new Fermata();
                 Fermata.copyTo(fermata, fermata2);
-                masterBar2.addFermata(parseInt(key), fermata2);
-            }
+                masterBar2.addFermata(typeof key === 'string' ? parseInt(key) : key, fermata2);
+            });
             score2.addMasterBar(masterBar2);
         }
     }
