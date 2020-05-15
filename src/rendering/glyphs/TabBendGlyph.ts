@@ -285,7 +285,10 @@ export class TabBendGlyph extends Glyph {
                     this.paintBend(note, new TabBendRenderPoint(0, 0), firstPt, startX, topY, dX, slurText, canvas);
                 }
                 if (note.bendType !== BendType.Prebend) {
-                    this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
+                    if(i === 0) {
+                        startX += 2 * this.scale;
+                    }
+                    this.paintBend(note, firstPt, secondPt, startX , topY, dX, slurText, canvas);
                 } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
                     secondPt = new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.value);
                     secondPt.lineValue = firstPt.lineValue;
@@ -319,7 +322,7 @@ export class TabBendGlyph extends Glyph {
         let r: TabBarRenderer = this.renderer as TabBarRenderer;
         let res: RenderingResources = this.renderer.resources;
         let overflowOffset: number = r.lineOffset / 2;
-        let x1: number = cx + dX * firstPt.offset + 2 * this.scale;
+        let x1: number = cx + dX * firstPt.offset;
         let bendValueHeight: number = TabBendGlyph.BendValueHeight * this.scale;
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
