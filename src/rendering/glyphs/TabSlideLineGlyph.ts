@@ -127,7 +127,7 @@ export class TabSlideLineGlyph extends Glyph {
                 break;
             case SlideOutType.PickSlideDown:
                 startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, true);
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, false) - sizeY * 2;
+                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, false);
                 endX =
                     cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.EndBeat);
                 endY = startY + sizeY * 3;
@@ -135,7 +135,7 @@ export class TabSlideLineGlyph extends Glyph {
                 break;
             case SlideOutType.PickSlideUp:
                 startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, true);
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, false) + sizeY;
+                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, false);
                 endX =
                     cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.EndBeat);
                 endY = startY - sizeY * 3;
