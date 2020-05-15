@@ -25,7 +25,7 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
         switch (this._type) {
             case VibratoType.Slight:
                 this._symbol = MusicFontSymbol.WaveHorizontalSlight;
-                this._symbolSize = 10 * this._scale;
+                this._symbolSize = 9 * this._scale;
                 this._symbolOffset = 8.5 * this._scale;
                 symbolHeight = 6 * this._scale;
                 break;

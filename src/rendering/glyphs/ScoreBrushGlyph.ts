@@ -30,7 +30,7 @@ export class ScoreBrushGlyph extends Glyph {
             if (this._beat.brushType === BrushType.ArpeggioUp) {
                 let lineStartY: number = startY - arrowSize;
                 let lineEndY: number = endY - arrowSize;
-                canvas.beginRotate(cx + this.x + 2 * this.scale, lineEndY, -90);
+                canvas.beginRotate(cx + this.x + 5 * this.scale, lineEndY, -90);
                 let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();
@@ -46,7 +46,7 @@ export class ScoreBrushGlyph extends Glyph {
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
                 let lineStartY: number = startY + arrowSize;
                 let lineEndY: number = endY + arrowSize;
-                canvas.beginRotate(cx + this.x + 7 * this.scale, lineStartY, 90);
+                canvas.beginRotate(cx + this.x + 5 * this.scale, lineStartY, 90);
                 let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();

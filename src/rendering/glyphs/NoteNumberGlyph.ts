@@ -7,7 +7,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { NotationElement } from '@src/NotationSettings';
+import { NotationElement, NotationMode } from '@src/NotationSettings';
 
 export class NoteNumberGlyph extends Glyph {
     private _note: Note;
@@ -43,7 +43,7 @@ export class NoteNumberGlyph extends Glyph {
                 this._noteString = '<' + this._noteString + '>';
             }
         } else if (
-            n.beat.index === 0 ||
+            (n.beat.index === 0 && this.renderer.settings.notation.notationMode == NotationMode.GuitarPro) ||
             ((n.bendType === BendType.Bend || n.bendType === BendType.BendRelease) &&
                 this.renderer.settings.notation.isNotationElementVisible(NotationElement.TabNotesOnTiedBends))
         ) {
