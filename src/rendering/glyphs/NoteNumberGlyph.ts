@@ -60,7 +60,7 @@ export class NoteNumberGlyph extends Glyph {
                 case HarmonicType.Tap:
                 case HarmonicType.Semi:
                 case HarmonicType.Feedback:
-                    let s: string = fret + n.harmonicValue.toString();
+                    let s: string = (fret + n.harmonicValue).toString();
                     // only first decimal char
                     let i: number = s.indexOf(String.fromCharCode(46));
                     if (i >= 0) {
