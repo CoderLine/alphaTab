@@ -115,7 +115,7 @@ export class TinySoundFont {
                 for (let i: number = 0; i < this._midiEventCounts[x]; i++) {
                     let m: SynthEvent | undefined = this._midiEventQueue.pop();
                     if (m) {
-                        if (m.isMetronome) {
+                        if (m.isMetronome && this.metronomeVolume > 0) {
                             this.channelNoteOff(SynthConstants.MetronomeChannel, 33);
                             this.channelNoteOn(SynthConstants.MetronomeChannel, 33, 95 / 127);
                         } else if (m.event) {
@@ -992,27 +992,10 @@ export class TinySoundFont {
         this.fontSamples = hydra.fontSamples;
 
         for (let phdrIndex: number = 0; phdrIndex < hydra.phdrs.length - 1; phdrIndex++) {
-            let sortedIndex: number = 0;
             const phdr: HydraPhdr = hydra.phdrs[phdrIndex];
-
-            for (let otherPhdrIndex: number = 0; otherPhdrIndex < hydra.phdrs.length; otherPhdrIndex++) {
-                let otherPhdr: HydraPhdr = hydra.phdrs[otherPhdrIndex];
-                if (otherPhdrIndex === phdrIndex || otherPhdr.bank > phdr.bank) {
-                    continue;
-                } else if (otherPhdr.bank < phdr.bank) {
-                    sortedIndex++;
-                } else if (otherPhdr.preset > phdr.preset) {
-                    continue;
-                } else if (otherPhdr.preset < phdr.preset) {
-                    sortedIndex++;
-                } else if (otherPhdrIndex < phdrIndex) {
-                    sortedIndex++;
-                }
-            }
-
             let regionIndex: number = 0;
             
-            const preset: Preset = (this._presets[sortedIndex] = new Preset());
+            const preset: Preset = (this._presets[phdrIndex] = new Preset());
             preset.name = phdr.presetName;
             preset.bank = phdr.bank;
             preset.presetNumber = phdr.preset;
