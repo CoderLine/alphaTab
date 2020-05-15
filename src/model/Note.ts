@@ -565,23 +565,7 @@ export class Note {
         let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
         // connect ties
         if (this.isTieDestination) {
-            if (this.tieOrigin) {
-                this.tieOrigin.tieDestination = this;
-            } else {
-                let tieOrigin: Note | null = Note.findTieOrigin(this);
-                if (!tieOrigin) {
-                    this.isTieDestination = false;
-                } else {
-                    this.tieOrigin = tieOrigin;
-                    this.tieOrigin.tieDestination = this;
-                    this.fret = this.tieOrigin.fret;
-                    this.octave = this.tieOrigin.octave;
-                    this.tone = this.tieOrigin.tone;
-                    if (this.tieOrigin.hasBend) {
-                        this.bendOrigin = this.tieOrigin;
-                    }
-                }
-            }
+            this.chain();
             // implicit let ring
             if (isSongBook && this.tieOrigin && this.tieOrigin.isLetRing) {
                 this.isLetRing = true;
@@ -764,5 +748,27 @@ export class Note {
             previousBeat = previousBeat.previousBeat;
         }
         return null;
+    }
+
+    public chain() {
+        if(!this.isTieDestination) {
+            return;
+        }
+        
+        if (!this.tieOrigin) {
+            this.tieOrigin = Note.findTieOrigin(this);
+        }
+
+        if (!this.tieOrigin) {
+            this.isTieDestination = false;
+        } else {
+            this.tieOrigin.tieDestination = this;
+            this.fret = this.tieOrigin.fret;
+            this.octave = this.tieOrigin.octave;
+            this.tone = this.tieOrigin.tone;
+            if (this.tieOrigin.hasBend) {
+                this.bendOrigin = this.tieOrigin;
+            }
+        }
     }
 }

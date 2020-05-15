@@ -73,6 +73,8 @@ export class Voice {
                 beat.nextBeat!.previousBeat = beat;
             }
         }
+
+        beat.chain();
     }
 
     public addGraceBeat(beat: Beat): void {

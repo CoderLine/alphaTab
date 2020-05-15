@@ -704,17 +704,29 @@ export class Beat {
             cloneBeat.id = Beat._globalBeatId++;
             for (let i: number = 0, j: number = cloneBeat.notes.length; i < j; i++) {
                 let cloneNote: Note = cloneBeat.notes[i];
+                let note: Note = this.notes[i];
+
                 // remove bend on cloned note
                 cloneNote.bendType = BendType.None;
                 cloneNote.maxBendPoint = null;
                 cloneNote.bendPoints = [];
                 cloneNote.bendStyle = BendStyle.Default;
                 cloneNote.id = Note.GlobalNoteId++;
+
+                // fix ties
+                if(note.isTieOrigin) {
+                    cloneNote.tieDestination = note.tieDestination!;
+                    note.tieDestination!.tieOrigin = cloneNote;
+                }
+                if(note.isTieDestination) {
+                    cloneNote.tieOrigin = note.tieOrigin;
+                    note.tieOrigin!.tieDestination = cloneNote;
+                }
+
                 // if the note has a bend which is continued on the next note
                 // we need to convert this note into a hold bend
-                let note: Note = this.notes[i];
                 if (note.hasBend && note.isTieOrigin) {
-                    let tieDestination: Note | null = Note.nextNoteOnSameLine(note);
+                    let tieDestination: Note | null = Note.findTieOrigin(note);
                     if (tieDestination && tieDestination.hasBend) {
                         cloneNote.bendType = BendType.Hold;
                         let lastPoint: BendPoint = note.bendPoints[note.bendPoints.length - 1];
@@ -765,5 +777,11 @@ export class Beat {
             return this.noteValueLookup.get(noteRealValue)!;
         }
         return null;
+    }
+
+    public chain() {
+        for(const n of this.notes) {
+            n.chain();
+        }
     }
 }
