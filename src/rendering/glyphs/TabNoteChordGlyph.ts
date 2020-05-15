@@ -39,7 +39,7 @@ export class TabNoteChordGlyph extends Glyph {
             return (
                 this.y +
                 this.notesPerString.get(note.string)!.y +
-                (aboveNote ? -this.notesPerString.get(note.string)!.height / 2 : 0)
+                (aboveNote ? (-this.notesPerString.get(note.string)!.height / 2 - 3 * this.scale) : 0)
             );
         }
         return 0;

@@ -319,7 +319,7 @@ export class TabBendGlyph extends Glyph {
         let r: TabBarRenderer = this.renderer as TabBarRenderer;
         let res: RenderingResources = this.renderer.resources;
         let overflowOffset: number = r.lineOffset / 2;
-        let x1: number = cx + dX * firstPt.offset;
+        let x1: number = cx + dX * firstPt.offset + 2 * this.scale;
         let bendValueHeight: number = TabBendGlyph.BendValueHeight * this.scale;
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
