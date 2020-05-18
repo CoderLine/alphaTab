@@ -1,9 +1,9 @@
 import { Note } from '@src/model/Note';
-import { ScoreTieGlyph } from '@src/rendering/glyphs/ScoreTieGlyph';
+import { ScoreLegatoGlyph } from './ScoreLegatoGlyph';
 
-export class ScoreSlurGlyph extends ScoreTieGlyph {
+export class ScoreSlurGlyph extends ScoreLegatoGlyph {
     public constructor(startNote: Note, endNote: Note, forEnd: boolean = false) {
-        super(startNote, endNote, forEnd);
+        super(startNote.beat, endNote.beat, forEnd);
     }
 
     protected getTieHeight(startX: number, startY: number, endX: number, endY: number): number {

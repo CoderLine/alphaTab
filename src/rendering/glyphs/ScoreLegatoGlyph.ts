@@ -4,7 +4,8 @@ import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { Duration } from '@src/model/Duration';
+import { GraceType } from '@src/model/GraceType';
 
 export class ScoreLegatoGlyph extends TieGlyph {
     public constructor(startBeat: Beat, endBeat: Beat, forEnd: boolean = false) {
@@ -13,7 +14,6 @@ export class ScoreLegatoGlyph extends TieGlyph {
 
     public doLayout(): void {
         super.doLayout();
-        this.yOffset = NoteHeadGlyph.NoteHeadHeight / 2;
     }
 
     protected getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
@@ -29,60 +29,76 @@ export class ScoreLegatoGlyph extends TieGlyph {
         }
     }
 
-    protected getStartY(noteRenderer: BarRendererBase, direction: BeamDirection): number {
+    protected getStartY(): number {
         if (this.startBeat!.isRest) {
             // below all lines
-            return (noteRenderer as ScoreBarRenderer).getScoreY(9, 0);
+            return (this.startNoteRenderer as ScoreBarRenderer).getScoreY(9, 0);
         }
-        switch (direction) {
+        switch (this.tieDirection) {
             case BeamDirection.Up:
                 // below lowest note
-                return noteRenderer.getNoteY(this.startBeat!.minNote!, NoteYPosition.Center);
+                return this.startNoteRenderer!.getNoteY(this.startBeat!.maxNote!, NoteYPosition.Top);
             default:
-                return noteRenderer.getNoteY(this.startBeat!.maxNote!, NoteYPosition.Center);
+                return this.startNoteRenderer!.getNoteY(this.startBeat!.minNote!, NoteYPosition.Bottom);
         }
     }
 
-    protected getEndY(noteRenderer: BarRendererBase, direction: BeamDirection): number {
-        const scoreBarRenderer =  (noteRenderer as ScoreBarRenderer);
+    protected getEndY(): number {
+        const endNoteScoreRenderer = this.endNoteRenderer as ScoreBarRenderer;
         if (this.endBeat!.isRest) {
-            switch (direction) {
+            switch (this.tieDirection) {
                 case BeamDirection.Up:
-                    return scoreBarRenderer.getScoreY(9, 0);
+                    return endNoteScoreRenderer.getScoreY(9, 0);
                 default:
-                    return scoreBarRenderer.getScoreY(0, 0);
+                    return endNoteScoreRenderer.getScoreY(0, 0);
             }
         }
 
-        const startBeamDirection = scoreBarRenderer.getBeatDirection(this.startBeat!);
-        const endBeamDirection = scoreBarRenderer.getBeatDirection(this.endBeat!);
+        const startBeamDirection = (this.startNoteRenderer as ScoreBarRenderer).getBeatDirection(this.startBeat!);
+        const endBeamDirection = endNoteScoreRenderer.getBeatDirection(this.endBeat!);
 
-        if(startBeamDirection !== endBeamDirection && endBeamDirection === direction) {
-            switch(direction) {
-                case BeamDirection.Up:
-                    // stem upper end
-                    return scoreBarRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.Bottom)
-                default:
-                    // stem lower end
-                    return scoreBarRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.Top);
+        if (startBeamDirection !== endBeamDirection && this.startBeat!.graceType === GraceType.None) {
+            if (endBeamDirection === this.tieDirection) {
+                switch (this.tieDirection) {
+                    case BeamDirection.Up:
+                        // stem upper end
+                        return endNoteScoreRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.TopWithStem);
+                    default:
+                        // stem lower end
+                        return endNoteScoreRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.BottomWithStem);
+                }
+            } else {
+                switch (this.tieDirection) {
+                    case BeamDirection.Up:
+                        // stem upper end
+                        return endNoteScoreRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.BottomWithStem);
+                    default:
+                        // stem lower end
+                        return endNoteScoreRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.TopWithStem);
+                }
             }
         }
 
-        switch (direction) {
+        switch (this.tieDirection) {
             case BeamDirection.Up:
                 // below lowest note
-                return (noteRenderer as ScoreBarRenderer).getNoteY(this.endBeat!.minNote!, NoteYPosition.Bottom);
+                return endNoteScoreRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.Top);
             default:
                 // above highest note
-                return (noteRenderer as ScoreBarRenderer).getNoteY(this.endBeat!.maxNote!, NoteYPosition.Top);
+                return endNoteScoreRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.Bottom);
         }
     }
 
-    protected getStartX(noteRenderer: BarRendererBase, direction: BeamDirection): number {
-        return noteRenderer.getBeatX(this.startBeat!, BeatXPosition.OnNotes);
+    protected getStartX(): number {
+        return this.startNoteRenderer!.getBeatX(this.startBeat!, BeatXPosition.MiddleNotes);
     }
 
-    protected getEndX(noteRenderer: BarRendererBase, direction: BeamDirection): number {
-        return noteRenderer.getBeatX(this.endBeat!, BeatXPosition.OnNotes);
+    protected getEndX(): number {
+        const endBeamDirection = (this.endNoteRenderer as ScoreBarRenderer).getBeatDirection(this.endBeat!);
+        return this.endNoteRenderer!.getBeatX(
+            this.endBeat!,
+            this.endBeat!.duration > Duration.Whole &&
+            endBeamDirection === this.tieDirection ? BeatXPosition.Stem : BeatXPosition.MiddleNotes
+        );
     }
 }

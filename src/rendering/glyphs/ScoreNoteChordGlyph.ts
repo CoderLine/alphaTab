@@ -59,7 +59,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
             switch (requestedPosition) {
                 case NoteYPosition.TopWithStem:
-                    pos -= n.height / 2 + (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
+                    pos -= (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
                     break;
                 case NoteYPosition.Top:
                     pos -= n.height / 2;
@@ -70,7 +70,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                     pos += n.height / 2;
                     break;
                 case NoteYPosition.BottomWithStem:
-                    pos += n.height / 2 + (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
+                    pos += (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
                     break;
             }
 
