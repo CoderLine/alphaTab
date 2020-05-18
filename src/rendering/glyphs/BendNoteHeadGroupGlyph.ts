@@ -38,25 +38,16 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         }
     }
 
-    public getNoteValueY(noteValue: number, aboveNote: boolean = false): number {
-        if (this._noteValueLookup.has(noteValue)) {
-            return this.y + this._noteValueLookup.get(noteValue)!.y + (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * NoteHeadGlyph.GraceScale * this.scale) / 2 : 0);
-        }
-        return 0;
-    }
-
     public containsNoteValue(noteValue: number): boolean {
         return this._noteValueLookup.has(noteValue);
     }
 
-    public getNoteX(noteValue: number, onMiddle: boolean = true): number {
+    public getNoteValueY(noteValue: number): number {
         if (this._noteValueLookup.has(noteValue)) {
-            let n: Glyph = this._noteValueLookup.get(noteValue)!;
-            let pos: number = this.x + n.x;
-            if (onMiddle) {
-                pos += n.width / 2.0;
-            }
-            return pos;
+            return (
+                this.y +
+                this._noteValueLookup.get(noteValue)!.y
+            );
         }
         return 0;
     }

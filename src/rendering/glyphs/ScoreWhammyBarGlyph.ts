@@ -15,6 +15,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { RenderingResources } from '@src/RenderingResources';
 import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { NoteYPosition } from '../BarRendererBase';
 
 export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     public static readonly SimpleDipHeight: number = TabWhammyBarGlyph.PerHalfSize * 2;
@@ -115,13 +116,15 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         let textalign: TextAlign = canvas.textAlign;
         for (let i: number = 0; i < beat.notes.length; i++) {
             let note: Note = beat.notes[i];
-            let startY: number = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(note, true);
+            let startY: number = cy + startNoteRenderer.y;
             if (i > 0 && i >= ((this._beat.notes.length / 2) | 0)) {
                 direction = BeamDirection.Down;
             }
 
             if (direction === BeamDirection.Down) {
-                startY += NoteHeadGlyph.NoteHeadHeight * this.scale;
+                startY += startNoteRenderer.getNoteY(note, NoteYPosition.Bottom);
+            } else {
+                startY += startNoteRenderer.getNoteY(note, NoteYPosition.Top);
             }
 
             let endX: number = cx + startNoteRenderer.x;
@@ -158,13 +161,13 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             let bendTie: boolean = false;
 
             if (this.BendNoteHeads.length > 0 && this.BendNoteHeads[0].containsNoteValue(endValue)) {
-                endY = this.BendNoteHeads[0].getNoteValueY(endValue, false) + heightOffset;
+                endY = this.BendNoteHeads[0].getNoteValueY(endValue) + heightOffset;
                 bendTie = true;
             } else if (
                 endNoteRenderer &&
                 ((note.isTieOrigin && note.tieDestination!.beat.hasWhammyBar) || note.beat.isContinuedWhammy)
             ) {
-                endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(note.tieDestination!, true);
+                endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(note.tieDestination!, NoteYPosition.Top);
                 bendTie = true;
                 if (direction === BeamDirection.Down) {
                     endY += NoteHeadGlyph.NoteHeadHeight * this.scale;
@@ -173,7 +176,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                 if (!endNoteRenderer) {
                     endY = startY;
                 } else {
-                    endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(note.tieDestination!, true);
+                    endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(note.tieDestination!, NoteYPosition.Top);
                 }
                 if (direction === BeamDirection.Down) {
                     endY += NoteHeadGlyph.NoteHeadHeight * this.scale;
@@ -285,7 +288,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         this.BendNoteHeads[0].y = cy + startNoteRenderer.y;
                         this.BendNoteHeads[0].paint(0, 0, canvas);
                         let middleValue: number = this.getBendNoteValue(note, beat.whammyBarPoints[1]);
-                        let middleY: number = this.BendNoteHeads[0].getNoteValueY(middleValue, false) + heightOffset;
+                        let middleY: number = this.BendNoteHeads[0].getNoteValueY(middleValue) + heightOffset;
                         this.drawBendSlur(
                             canvas,
                             startX,
@@ -299,7 +302,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         this.BendNoteHeads[1].x = endX - this.BendNoteHeads[1].noteHeadOffset;
                         this.BendNoteHeads[1].y = cy + startNoteRenderer.y;
                         this.BendNoteHeads[1].paint(0, 0, canvas);
-                        endY = this.BendNoteHeads[1].y + this.BendNoteHeads[1].getNoteValueY(endValue, false) + heightOffset;
+                        endY = this.BendNoteHeads[1].y + this.BendNoteHeads[1].getNoteValueY(endValue) + heightOffset;
                         this.drawBendSlur(
                             canvas,
                             middleX,

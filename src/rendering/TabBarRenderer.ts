@@ -2,12 +2,11 @@ import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
 import { TupletGroup } from '@src/model/TupletGroup';
 import { Voice } from '@src/model/Voice';
 import { TabRhythmMode } from '@src/NotationSettings';
 import { ICanvas, TextAlign } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
 import { BeamGlyph } from '@src/rendering/glyphs/BeamGlyph';
@@ -48,24 +47,6 @@ export class TabBarRenderer extends BarRendererBase {
 
     public get lineOffset(): number {
         return (TabBarRenderer.LineSpacing + 1) * this.scale;
-    }
-
-    public getNoteX(note: Note, onEnd: boolean = true): number {
-        let beat: TabBeatGlyph = this.getOnNotesGlyphForBeat(note.beat) as TabBeatGlyph;
-        if (beat) {
-            return (
-                beat.container.x + beat.container.voiceContainer.x + beat.x + beat.noteNumbers!.getNoteX(note, onEnd)
-            );
-        }
-        return 0;
-    }
-
-    public getNoteY(note: Note, aboveNote: boolean = false): number {
-        let beat: TabBeatGlyph = this.getOnNotesGlyphForBeat(note.beat) as TabBeatGlyph;
-        if (beat) {
-            return beat.noteNumbers!.getNoteY(note, aboveNote);
-        }
-        return 0;
     }
 
     protected updateSizes(): void {
@@ -310,7 +291,7 @@ export class TabBarRenderer extends BarRendererBase {
                         this._tupletSize;
                 } else {
                     y1 +=
-                        startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, false) +
+                        startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Top) +
                         this.lineOffset / 2;
                 }
                 if (h.direction === BeamDirection.Up) {
@@ -534,7 +515,7 @@ export class TabBarRenderer extends BarRendererBase {
                     this.height - this.settings.notation.rhythmHeight * this.settings.display.scale - this._tupletSize;
             } else {
                 y1 +=
-                    startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, false) + this.lineOffset / 2;
+                    startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Top) + this.lineOffset / 2;
             }
             if (h.direction === BeamDirection.Up) {
                 beatLineX -= startGlyph.width / 2;

@@ -358,7 +358,7 @@ export class NotationSettings {
      * Gets or sets the height for slurs. The factor is multiplied with the a logarithmic distance
      * between slur start and end.
      */
-    public slurHeight: number = 7.0;
+    public slurHeight: number = 5.0;
 
     /**
      * Gets whether the given music notation element should be shown

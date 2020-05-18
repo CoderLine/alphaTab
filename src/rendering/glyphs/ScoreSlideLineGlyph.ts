@@ -4,14 +4,13 @@ import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { VibratoType } from '@src/model/VibratoType';
 import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { BarRendererBase, NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { ScoreBeatPreNotesGlyph } from '@src/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class ScoreSlideLineGlyph extends Glyph {
     private _outType: SlideOutType;
@@ -39,27 +38,22 @@ export class ScoreSlideLineGlyph extends Glyph {
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let sizeX: number = 12 * this.scale;
-        let offsetX: number = 1 * this.scale;
-        let startX: number = 0;
-        let startY: number = 0;
-        let endX: number = 0;
-        let endY: number = 0;
+        let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - 2 * this.scale;
+        let endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+        let startX = endX - sizeX;
+        let startY: number = cy + startNoteRenderer.y;
+
         switch (this._inType) {
             case SlideInType.IntoFromBelow:
-                endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, false) - offsetX;
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true) + NoteHeadGlyph.NoteHeadHeight / 2;
-                startX = endX - sizeX;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true) + NoteHeadGlyph.NoteHeadHeight;
+                startY += startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
                 break;
             case SlideInType.IntoFromAbove:
-                endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, false) - offsetX;
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true) + NoteHeadGlyph.NoteHeadHeight / 2;
-                startX = endX - sizeX;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true);
+                startY += startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Top);
                 break;
             default:
                 return;
         }
+
         let accidentalsWidth: number = this.getAccidentalsWidth(startNoteRenderer, this._startNote.beat);
         startX -= accidentalsWidth;
         endX -= accidentalsWidth;
@@ -77,7 +71,9 @@ export class ScoreSlideLineGlyph extends Glyph {
     private drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let sizeX: number = 12 * this.scale;
-        let offsetX: number = 1 * this.scale;
+        let startOffsetX: number = 3 * this.scale;
+        let endOffsetX: number = 1 * this.scale;
+        let offsetY: number = 2 * this.scale;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -90,15 +86,8 @@ export class ScoreSlideLineGlyph extends Glyph {
                     cx +
                     startNoteRenderer.x +
                     startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes) +
-                    offsetX;
-                let isUp: boolean = this._startNote.slideTarget!.realValue > this._startNote.realValue;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, false);
-                let lineOffset: number = 0.25 * NoteHeadGlyph.NoteHeadHeight * this.scale;
-                if (isUp) {
-                    startY += lineOffset;
-                } else {
-                    startY -= lineOffset;
-                }
+                    startOffsetX;
+                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 if (this._startNote.slideTarget) {
                     let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
                         this.renderer.staff.staveId,
@@ -112,13 +101,16 @@ export class ScoreSlideLineGlyph extends Glyph {
                             cx +
                             endNoteRenderer.x +
                             endNoteRenderer.getBeatX(this._startNote.slideTarget.beat, BeatXPosition.PreNotes) -
-                            offsetX;
-                        endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(this._startNote.slideTarget, false);
-                        if (isUp) {
-                            endY -= lineOffset;
-                        } else {
-                            endY += lineOffset;
-                        }
+                            endOffsetX;
+                        endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(this._startNote.slideTarget, NoteYPosition.Center);
+                    }
+
+                    if(this._startNote.slideTarget.realValue > this._startNote.realValue) {
+                        startY += offsetY;
+                        endY -= offsetY;
+                    } else {
+                        startY -= offsetY;
+                        endY += offsetY;
                     }
                 } else {
                     endX = cx + startNoteRenderer.x + this._parent.x;
@@ -126,21 +118,21 @@ export class ScoreSlideLineGlyph extends Glyph {
                 }
                 break;
             case SlideOutType.OutUp:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, true) + offsetX * 2;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true) + NoteHeadGlyph.NoteHeadHeight / 2;
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right);
+                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endX = startX + sizeX;
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true);
+                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Top);
                 break;
             case SlideOutType.OutDown:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, true) + offsetX * 2;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true) + NoteHeadGlyph.NoteHeadHeight / 2;
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right);
+                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endX = startX + sizeX;
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true) + NoteHeadGlyph.NoteHeadHeight;
+                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
                 break;
             case SlideOutType.PickSlideUp:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, true) + offsetX * 2;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true);
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true) - NoteHeadGlyph.NoteHeadHeight;
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + startOffsetX;
+                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Top);
                 endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                 if (
                     this._startNote.beat.nextBeat &&
@@ -154,9 +146,9 @@ export class ScoreSlideLineGlyph extends Glyph {
                 waves = true;
                 break;
             case SlideOutType.PickSlideDown:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, true) + offsetX * 2;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true);
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, true) + NoteHeadGlyph.NoteHeadHeight;
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + startOffsetX;
+                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
                 endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                 if (
                     this._startNote.beat.nextBeat &&
@@ -187,7 +179,7 @@ export class ScoreSlideLineGlyph extends Glyph {
             let b: number = endX - startX;
             let a: number = endY - startY;
             let c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
-            let angle: number = (Math.asin(a / c) * (180 / Math.PI)) as number;
+            let angle: number = Math.asin(a / c) * (180 / Math.PI);
             canvas.beginRotate(startX, startY, angle);
             let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
             glyph.renderer = this.renderer;

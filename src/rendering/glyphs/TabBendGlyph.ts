@@ -4,7 +4,7 @@ import { BendType } from '@src/model/BendType';
 import { Color } from '@src/model/Color';
 import { Note } from '@src/model/Note';
 import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { BarRendererBase, NoteYPosition, NoteXPosition } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TabBendRenderPoint } from '@src/rendering/glyphs/TabBendRenderPoint';
@@ -250,7 +250,7 @@ export class TabBendGlyph extends Glyph {
             if (renderPoints[0].value > 0 || note.isContinuedBend) {
                 startX += startNoteRenderer.getBeatX(note.beat, BeatXPosition.MiddleNotes);
             } else {
-                startX += startNoteRenderer.getNoteX(note, true);
+                startX += startNoteRenderer.getNoteX(note, NoteXPosition.Right);
             }
             // canvas.Color = Color.Random();
             // canvas.FillRect(
@@ -327,9 +327,9 @@ export class TabBendGlyph extends Glyph {
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
             if (secondPt.offset === firstPt.offset) {
-                y1 += r.getNoteY(note.beat.maxStringNote!, true);
+                y1 += r.getNoteY(note.beat.maxStringNote!, NoteYPosition.Top);
             } else {
-                y1 += r.getNoteY(note, false);
+                y1 += r.getNoteY(note, NoteYPosition.Center);
             }
         } else {
             y1 += overflowOffset;
@@ -337,7 +337,7 @@ export class TabBendGlyph extends Glyph {
         let x2: number = cx + dX * secondPt.offset;
         let y2: number = cy - bendValueHeight * secondPt.lineValue;
         if (secondPt.lineValue === 0) {
-            y2 += r.getNoteY(note, false);
+            y2 += r.getNoteY(note, NoteYPosition.Center);
         } else {
             y2 += overflowOffset;
         }

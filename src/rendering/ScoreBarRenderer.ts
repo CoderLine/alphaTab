@@ -59,29 +59,9 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     public getBeatDirection(beat: Beat): BeamDirection {
         let g: ScoreBeatGlyph | null = this.getOnNotesGlyphForBeat(beat) as ScoreBeatGlyph;
         if (g) {
-            return g.noteHeads!.direction;
+            return g.noteHeads ? g.noteHeads.direction : BeamDirection.Up;
         }
         return BeamDirection.Up;
-    }
-
-    public getNoteX(note: Note, onEnd: boolean = true): number {
-        let g: ScoreBeatGlyph = this.getOnNotesGlyphForBeat(note.beat) as ScoreBeatGlyph;
-        if (g) {
-            let x: number = g.container.voiceContainer.x + g.container.x + g.x;
-            if (onEnd) {
-                x += g.width;
-            }
-            return x;
-        }
-        return 0;
-    }
-
-    public getNoteY(note: Note, aboveNote: boolean = false): number {
-        let beat: ScoreBeatGlyph = this.getOnNotesGlyphForBeat(note.beat) as ScoreBeatGlyph;
-        if (beat) {
-            return beat.noteHeads!.getNoteY(note, aboveNote);
-        }
-        return 0;
     }
 
     public get lineOffset(): number {
@@ -290,7 +270,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         canvas.textAlign = oldAlign;
     }
 
-    private getStemSize(helper: BeamingHelper): number {
+    public getStemSize(helper: BeamingHelper): number {
         let size: number =
             helper.beats.length === 1
                 ? this.getFooterStemSize(helper.shortestDuration)

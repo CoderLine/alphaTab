@@ -21,6 +21,51 @@ import { Bounds } from '@src/rendering/utils/Bounds';
 import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
+import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
+
+/**
+ * Lists the different position modes for {@link BarRendererBase.getNoteY}
+ */
+export enum NoteYPosition {
+    /**
+     * Gets the note y-position on top of the note stem or tab number.
+     */
+    TopWithStem,
+    /**
+     * Gets the note y-position on top of the note head or tab number.
+     */
+    Top,
+    /**
+     * Gets the note y-position on the center of the note head or tab number.
+     */
+    Center,
+    /**
+     * Gets the note y-position on the bottom of the note head or tab number.
+     */
+    Bottom,
+    /**
+     * Gets the note y-position on the bottom of the note stem or tab number.
+     */
+    BottomWithStem
+}
+
+/**
+ * Lists the different position modes for {@link BarRendererBase.getNoteX}
+ */
+export enum NoteXPosition {
+    /**
+     * Gets the note x-position on left of the note head or tab number.
+     */
+    Left,
+    /**
+     * Gets the note x-position on the center of the note head or tab number.
+     */
+    Center,
+    /**
+     * Gets the note x-position on the right of the note head or tab number.
+     */
+    Right
+}
 
 /**
  * This is the base public class for creating blocks which can render bars.
@@ -256,7 +301,7 @@ export class BarRendererBase {
         return this.getBeatContainer(beat).preNotes;
     }
 
-    public getOnNotesGlyphForBeat(beat: Beat): BeatGlyphBase {
+    public getOnNotesGlyphForBeat(beat: Beat): BeatOnNoteGlyphBase {
         return this.getBeatContainer(beat).onNotes;
     }
 
@@ -345,10 +390,6 @@ export class BarRendererBase {
         return this._postBeatGlyphs.x;
     }
 
-    public getNoteX(note: Note, onEnd: boolean = true): number {
-        return 0;
-    }
-
     public getBeatX(beat: Beat, requestedPosition: BeatXPosition = BeatXPosition.PreNotes): number {
         let container: BeatContainerGlyph = this.getBeatContainer(beat);
         if (container) {
@@ -359,6 +400,11 @@ export class BarRendererBase {
                     return container.voiceContainer.x + container.x + container.onNotes.x;
                 case BeatXPosition.MiddleNotes:
                     return container.voiceContainer.x + container.x + container.onTimeX;
+                case BeatXPosition.Stem:
+                    return (
+                        container.voiceContainer.x +
+                        container.onNotes.beamingHelper.getBeatLineX(beat)
+                    );
                 case BeatXPosition.PostNotes:
                     return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.width;
                 case BeatXPosition.EndBeat:
@@ -368,7 +414,19 @@ export class BarRendererBase {
         return 0;
     }
 
-    public getNoteY(note: Note, aboveNote: boolean = false): number {
+    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+        let beat = this.getOnNotesGlyphForBeat(note.beat);
+        if (beat) {
+            return beat.container.x + beat.container.voiceContainer.x + beat.x + beat.getNoteX(note, requestedPosition);
+        }
+        return 0;
+    }
+
+    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+        let beat = this.getOnNotesGlyphForBeat(note.beat);
+        if (beat) {
+            return beat.getNoteY(note, requestedPosition);
+        }
         return 0;
     }
 

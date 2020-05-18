@@ -110,6 +110,7 @@ export class Environment {
             .at-surface * {
                 cursor: default;
                 vertical-align: top;
+                overflow: visible;
             }
             .at {
                  font-family: 'alphaTab';

@@ -11,9 +11,13 @@ export enum BeatXPosition {
      */
     OnNotes,
     /**
-     * Gets the middel-notes position which is located after in the middle the note heads.
+     * Gets the middle-notes position which is located after in the middle the note heads.
      */
     MiddleNotes,
+    /**
+     * Gets position of the stem for this beat
+     */
+    Stem,
     /**
      * Get the post-notes position which is located at after the note heads.
      */

@@ -1,46 +1,43 @@
 import { Beat } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { BarRendererBase, NoteYPosition, NoteXPosition } from '@src/rendering/BarRendererBase';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 export class TabTieGlyph extends TieGlyph {
-    protected StartNote: Note;
-    protected EndNote: Note;
-    protected ForSlide: boolean;
+    protected startNote: Note;
+    protected endNote: Note;
 
-    public constructor(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean = false) {
+    public constructor(startNote: Note, endNote: Note, forEnd: boolean = false) {
         super(startNote.beat, endNote.beat, forEnd);
-        this.StartNote = startNote;
-        this.EndNote = endNote;
-        this.ForSlide = forSlide;
-    }
-
-    private get offset(): number {
-        return this.ForSlide ? 5 * this.scale : 0;
+        this.startNote = startNote;
+        this.endNote = endNote;
     }
 
     protected getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
-        return TabTieGlyph.getBeamDirection_Note(this.StartNote);
+        return TabTieGlyph.getBeamDirectionForNote(this.startNote);
     }
 
-    protected static getBeamDirection_Note(note: Note): BeamDirection {
+    protected static getBeamDirectionForNote(note: Note): BeamDirection {
         return note.string > 3 ? BeamDirection.Up : BeamDirection.Down;
     }
 
-    protected getStartY(noteRenderer: BarRendererBase, direction: BeamDirection): number {
-        return noteRenderer.getNoteY(this.StartNote, false) - this.offset;
+    protected getStartY(): number {
+        if(this.tieDirection === BeamDirection.Up) {
+            return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
+        }
+        return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Bottom);
     }
 
-    protected getEndY(noteRenderer: BarRendererBase, direction: BeamDirection): number {
-        return noteRenderer.getNoteY(this.EndNote, false) - this.offset;
+    protected getEndY(): number {
+        return this.getStartY();
     }
 
-    protected getStartX(noteRenderer: BarRendererBase): number {
-        return noteRenderer.getNoteX(this.StartNote, true);
+    protected getStartX(): number {
+        return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Center);
     }
 
-    protected getEndX(noteRenderer: BarRendererBase): number {
-        return noteRenderer.getNoteX(this.EndNote, false);
+    protected getEndX(): number {
+        return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Center);
     }
 }

@@ -26,21 +26,18 @@ export class NoteHeadGlyph extends MusicFontGlyph {
         switch (this._duration) {
             case Duration.QuadrupleWhole:
                 this.width = 14 * scale;
-                this.height = NoteHeadGlyph.NoteHeadHeight * scale;
                 break;
             case Duration.DoubleWhole:
                 this.width = 14 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
-                this.height = NoteHeadGlyph.NoteHeadHeight * scale;
                 break;
             case Duration.Whole:
                 this.width = 14 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
-                this.height = NoteHeadGlyph.NoteHeadHeight * scale;
                 break;
             default:
                 this.width = 10 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
-                this.height = NoteHeadGlyph.NoteHeadHeight * scale;
                 break;
         }
+        this.height = NoteHeadGlyph.NoteHeadHeight * scale;
     }
 
     private static getSymbol(duration: Duration): MusicFontSymbol {

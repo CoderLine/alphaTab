@@ -10,6 +10,10 @@ export class TieGlyph extends Glyph {
     protected yOffset: number = 0;
     protected forEnd: boolean;
 
+    protected startNoteRenderer: BarRendererBase | null = null;
+    protected endNoteRenderer: BarRendererBase | null = null;
+    protected tieDirection: BeamDirection = BeamDirection.Up;
+
     public constructor(startBeat: Beat | null, endBeat: Beat | null, forEnd: boolean) {
         super(0, 0);
         this.startBeat = startBeat;
@@ -27,14 +31,15 @@ export class TieGlyph extends Glyph {
         }
 
         // TODO fix nullability of start/end beat,
-        let startNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
+        let startNoteRenderer = (this.startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.startBeat!.voice.bar
-        );
-        let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
+        ));
+        let endNoteRenderer = (this.endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.endBeat.voice.bar
-        );
+        ));
+
         let startX: number = 0;
         let endX: number = 0;
         let startY: number = 0;
@@ -42,33 +47,33 @@ export class TieGlyph extends Glyph {
         let shouldDraw: boolean = false;
         // if we are on the tie start, we check if we
         // either can draw till the end note, or we just can draw till the bar end
-        let direction: BeamDirection = !startNoteRenderer
+        this.tieDirection = !startNoteRenderer
             ? this.getBeamDirection(this.endBeat, endNoteRenderer!)
             : this.getBeamDirection(this.startBeat!, startNoteRenderer);
         if (!this.forEnd && startNoteRenderer) {
             // line break or bar break
             if (startNoteRenderer !== endNoteRenderer) {
-                startX = cx + startNoteRenderer.x + this.getStartX(startNoteRenderer);
-                startY = cy + startNoteRenderer.y + this.getStartY(startNoteRenderer, direction) + this.yOffset;
+                startX = cx + startNoteRenderer.x + this.getStartX();
+                startY = cy + startNoteRenderer.y + this.getStartY() + this.yOffset;
                 // line break: to bar end
                 if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
                     endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                     endY = startY;
                 } else {
-                    endX = cx + endNoteRenderer.x + this.getEndX(endNoteRenderer);
-                    endY = cy + endNoteRenderer.y + this.getEndY(endNoteRenderer, direction) + this.yOffset;
+                    endX = cx + endNoteRenderer.x + this.getEndX();
+                    endY = cy + endNoteRenderer.y + this.getEndY() + this.yOffset;
                 }
             } else {
-                startX = cx + startNoteRenderer.x + this.getStartX(startNoteRenderer);
-                endX = cx + endNoteRenderer.x + this.getEndX(endNoteRenderer);
-                startY = cy + startNoteRenderer.y + this.getStartY(startNoteRenderer, direction) + this.yOffset;
-                endY = cy + endNoteRenderer.y + this.getEndY(endNoteRenderer, direction) + this.yOffset;
+                startX = cx + startNoteRenderer.x + this.getStartX();
+                endX = cx + endNoteRenderer.x + this.getEndX();
+                startY = cy + startNoteRenderer.y + this.getStartY() + this.yOffset;
+                endY = cy + endNoteRenderer.y + this.getEndY() + this.yOffset;
             }
             shouldDraw = true;
         } else if (!startNoteRenderer || startNoteRenderer.staff !== endNoteRenderer!.staff) {
             startX = cx + endNoteRenderer!.x;
-            endX = cx + endNoteRenderer!.x + this.getEndX(endNoteRenderer!);
-            startY = cy + endNoteRenderer!.y + this.getEndY(endNoteRenderer!, direction) + this.yOffset;
+            endX = cx + endNoteRenderer!.x + this.getEndX();
+            startY = cy + endNoteRenderer!.y + this.getEndY() + this.yOffset;
             endY = startY;
             shouldDraw = true;
         }
@@ -80,7 +85,7 @@ export class TieGlyph extends Glyph {
                 startY,
                 endX,
                 endY,
-                direction === BeamDirection.Down,
+                this.tieDirection === BeamDirection.Down,
                 this.getTieHeight(startX, startY, endX, endY),
                 4
             );
@@ -96,19 +101,19 @@ export class TieGlyph extends Glyph {
         return BeamDirection.Down;
     }
 
-    protected getStartY(noteRenderer: BarRendererBase, direction: BeamDirection): number {
+    protected getStartY(): number {
         return 0;
     }
 
-    protected getEndY(noteRenderer: BarRendererBase, direction: BeamDirection): number {
+    protected getEndY(): number {
         return 0;
     }
 
-    protected getStartX(noteRenderer: BarRendererBase): number {
+    protected getStartX(): number {
         return 0;
     }
 
-    protected getEndX(noteRenderer: BarRendererBase): number {
+    protected getEndX(): number {
         return 0;
     }
 
@@ -126,6 +131,7 @@ export class TieGlyph extends Glyph {
         if (x1 === x2 && y1 === y2) {
             return;
         }
+
         // ensure endX > startX
         if (x2 < x1) {
             let t: number = x1;
@@ -135,6 +141,7 @@ export class TieGlyph extends Glyph {
             y1 = y2;
             y2 = t;
         }
+
         //
         // calculate control points
         //

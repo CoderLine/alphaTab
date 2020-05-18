@@ -13,6 +13,7 @@ import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();
@@ -31,25 +32,49 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return this.beamingHelper.direction;
     }
 
-    public getNoteX(note: Note, onEnd: boolean = true): number {
+    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         if (this._noteGlyphLookup.has(note.id)) {
-            let n: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
-            let pos: number = this.x + n.x;
-            if (onEnd) {
-                pos += n.width;
+            let n = this._noteGlyphLookup.get(note.id)!;
+
+            let pos = this.x;
+            switch (requestedPosition) {
+                case NoteXPosition.Left:
+                    break;
+                case NoteXPosition.Center:
+                    pos += n.width / 2;
+                    break;
+                case NoteXPosition.Right:
+                    pos += n.width;
+                    break;
             }
             return pos;
         }
         return 0;
     }
 
-    public getNoteY(note: Note, aboveNote: boolean = false): number {
+    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         if (this._noteGlyphLookup.has(note.id)) {
-            return (
-                this.y +
-                this._noteGlyphLookup.get(note.id)!.y +
-                (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * this.scale) / 2 : 0)
-            );
+            const n = this._noteGlyphLookup.get(note.id)!;
+            let pos = this.y + n.y;
+
+            switch (requestedPosition) {
+                case NoteYPosition.TopWithStem:
+                    pos -= n.height / 2 + (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
+                    break;
+                case NoteYPosition.Top:
+                    pos -= n.height / 2;
+                    break;
+                case NoteYPosition.Center:
+                    break;
+                case NoteYPosition.Bottom:
+                    pos += n.height / 2;
+                    break;
+                case NoteYPosition.BottomWithStem:
+                    pos += n.height / 2 + (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
+                    break;
+            }
+
+            return pos;
         }
         return 0;
     }

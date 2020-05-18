@@ -12,5 +12,6 @@ export class RideCymbalGlyph extends MusicFontGlyph {
 
     public doLayout(): void {
         this.width = 9 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+        this.height = NoteHeadGlyph.NoteHeadHeight * this.scale;
     }
 }

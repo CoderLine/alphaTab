@@ -5,7 +5,7 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { RenderingResources } from '@src/RenderingResources';
+import { NoteYPosition } from '../BarRendererBase';
 
 export class TabBrushGlyph extends Glyph {
     private _beat: Beat;
@@ -20,13 +20,11 @@ export class TabBrushGlyph extends Glyph {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
-        // TODO: Create webfont version
         let tabBarRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        let res: RenderingResources = this.renderer.resources;
         let startY: number =
-            cy + this.x + (tabBarRenderer.getNoteY(this._beat.maxNote!, false) - res.tablatureFont.size / 2);
+            cy + this.x + (tabBarRenderer.getNoteY(this._beat.maxNote!, NoteYPosition.Top));
         let endY: number =
-            cy + this.y + tabBarRenderer.getNoteY(this._beat.minNote!, false) + res.tablatureFont.size / 2;
+            cy + this.y + tabBarRenderer.getNoteY(this._beat.minNote!, NoteYPosition.Bottom);
         let arrowX: number = (cx + this.x + this.width / 2) | 0;
         let arrowSize: number = 8 * this.scale;
         if (this._beat.brushType !== BrushType.None) {
@@ -36,7 +34,7 @@ export class TabBrushGlyph extends Glyph {
                 canvas.lineTo(arrowX, endY);
                 canvas.stroke();
             } else if (this._beat.brushType === BrushType.ArpeggioUp) {
-                let lineStartY: number = startY - arrowSize;
+                let lineStartY: number = startY;
                 let lineEndY: number = endY - arrowSize;
                 canvas.beginRotate(cx + this.x + 4 * this.scale, lineEndY, -90);
                 let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
@@ -47,7 +45,7 @@ export class TabBrushGlyph extends Glyph {
                 canvas.endRotate();
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
                 let lineStartY: number = startY + arrowSize;
-                let lineEndY: number = endY + arrowSize;
+                let lineEndY: number = endY;
                 canvas.beginRotate(cx + this.x + 4 * this.scale, lineStartY, 90);
                 let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
                 glyph.renderer = this.renderer;

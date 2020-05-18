@@ -5,6 +5,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { RenderingResources } from '@src/RenderingResources';
+import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
 
 export class TabNoteChordGlyph extends Glyph {
     private _notes: NoteNumberGlyph[] = [];
@@ -22,25 +23,45 @@ export class TabNoteChordGlyph extends Glyph {
         this._isGrace = isGrace;
     }
 
-    public getNoteX(note: Note, onEnd: boolean = true): number {
+    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         if (this.notesPerString.has(note.string)) {
-            let n: NoteNumberGlyph = this.notesPerString.get(note.string)!;
-            let pos: number = this.x + n.x;
-            if (onEnd) {
-                pos += n.width;
+            let n = this.notesPerString.get(note.string)!;
+
+            let pos = this.x + n.x;
+            switch (requestedPosition) {
+                case NoteXPosition.Left:
+                    break;
+                case NoteXPosition.Center:
+                    pos += n.width / 2;
+                    break;
+                case NoteXPosition.Right:
+                    pos += n.width;
+                    break;
             }
             return pos;
         }
         return 0;
     }
 
-    public getNoteY(note: Note, aboveNote: boolean = false): number {
+    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         if (this.notesPerString.has(note.string)) {
-            return (
-                this.y +
-                this.notesPerString.get(note.string)!.y +
-                (aboveNote ? (-this.notesPerString.get(note.string)!.height / 2 - 3 * this.scale) : 0)
-            );
+            const n = this.notesPerString.get(note.string)!;
+            let pos = this.y + n.y;
+
+            switch (requestedPosition) {
+                case NoteYPosition.Top:
+                case NoteYPosition.TopWithStem:
+                    pos -= n.height / 2 + 2 * this.scale;
+                    break;
+                case NoteYPosition.Center:
+                    break;
+                case NoteYPosition.Bottom:
+                case NoteYPosition.BottomWithStem:
+                    pos += n.height / 2;
+                    break;
+            }
+
+            return pos;
         }
         return 0;
     }
@@ -61,7 +82,7 @@ export class TabNoteChordGlyph extends Glyph {
         }
         this.noteStringWidth = noteStringWidth;
         let tabHeight: number = this.renderer.resources.tablatureFont.size;
-        let effectY: number = this.getNoteY(this.minStringNote!, false) + tabHeight / 2;
+        let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
         // TODO: take care of actual glyph height
         let effectSpacing: number = 7 * this.scale;
         this.beatEffects.forEach(g => {

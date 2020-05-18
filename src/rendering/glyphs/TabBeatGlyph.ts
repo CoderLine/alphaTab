@@ -12,10 +12,19 @@ import { TabRestGlyph } from '@src/rendering/glyphs/TabRestGlyph';
 import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
 import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
 
 export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public noteNumbers: TabNoteChordGlyph | null = null;
     public restGlyph: TabRestGlyph | null = null;
+
+    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+        return this.noteNumbers ? this.noteNumbers.getNoteX(note, requestedPosition) : 0;
+    }
+    
+    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+        return this.noteNumbers ? this.noteNumbers.getNoteY(note, requestedPosition) : 0;
+    }
 
     public doLayout(): void {
         let tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;

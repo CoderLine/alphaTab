@@ -21,10 +21,19 @@ import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 import { ScoreWhammyBarGlyph } from '@src/rendering/glyphs/ScoreWhammyBarGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
+
+    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+        return this.noteHeads ? this.noteHeads.getNoteX(note, requestedPosition) : 0;
+    }
+    
+    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+        return this.noteHeads ? this.noteHeads.getNoteY(note, requestedPosition) : 0;
+    }
 
     public updateBeamingHelper(): void {
         if (this.noteHeads) {

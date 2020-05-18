@@ -34,11 +34,11 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
         let renderer: TabBarRenderer = this.renderer as TabBarRenderer;
         if (n.isTieOrigin && renderer.showTiedNotes && n.tieDestination!.isVisible) {
-            let tie: TabTieGlyph = new TabTieGlyph(n, n.tieDestination!, false, false);
+            let tie: TabTieGlyph = new TabTieGlyph(n, n.tieDestination!, false);
             this.ties.push(tie);
         }
         if (n.isTieDestination && renderer.showTiedNotes) {
-            let tie: TabTieGlyph = new TabTieGlyph(n.tieOrigin!, n, false, true);
+            let tie: TabTieGlyph = new TabTieGlyph(n.tieOrigin!, n, true);
             this.ties.push(tie);
         }
         // start effect slur on first beat
