@@ -89,14 +89,8 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             this.ties.push(tie);
         }
         // start effect slur on first beat
-        if (!this._effectSlur && n.beat.isEffectSlurOrigin && n.beat.effectSlurDestination) {
-            let direction: BeamDirection = this.onNotes.beamingHelper.direction;
-            let startNote: Note = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
-            let endNote: Note =
-                direction === BeamDirection.Up
-                    ? n.beat.effectSlurDestination.minNote!
-                    : n.beat.effectSlurDestination.maxNote!;
-            this._effectSlur = new ScoreSlurGlyph(startNote, endNote, false);
+        if (!this._effectSlur && n.isEffectSlurOrigin && n.effectSlurDestination) {
+            this._effectSlur = new ScoreSlurGlyph(n, n.effectSlurDestination, false);
             this.ties.push(this._effectSlur);
         }
         // end effect slur on last beat
