@@ -36,7 +36,7 @@ describe('LayoutTests', () => {
         await VisualTestHelper.runVisualTest('features/layout/horizontal-layout.gp5', settings);
     });
 
-    it('horizontalLayoutBar5To8', async () => {
+    it('horizontal-layout-bar5to8', async () => {
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         settings.display.startBar = 5;

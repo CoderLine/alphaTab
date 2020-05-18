@@ -271,7 +271,7 @@ export class VisualTestHelper {
                         expected.width,
                         expected.height,
                         {
-                            threshold: 0.2,
+                            threshold: 0.1,
                             includeAA: false,
                             diffMask: true,
                             alpha: 1
@@ -282,7 +282,7 @@ export class VisualTestHelper {
 
                     let totalPixels = expected.width * expected.height;
                     let percentDifference = (differentPixels / totalPixels) * 100;
-                    result.pass = percentDifference < 0.5;
+                    result.pass = differentPixels < 100;
 
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);

@@ -291,7 +291,7 @@ export class TabBarRenderer extends BarRendererBase {
                         this._tupletSize;
                 } else {
                     y1 +=
-                        startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Top) +
+                        startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
                         this.lineOffset / 2;
                 }
                 if (h.direction === BeamDirection.Up) {
@@ -515,7 +515,7 @@ export class TabBarRenderer extends BarRendererBase {
                     this.height - this.settings.notation.rhythmHeight * this.settings.display.scale - this._tupletSize;
             } else {
                 y1 +=
-                    startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Top) + this.lineOffset / 2;
+                    startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
             }
             if (h.direction === BeamDirection.Up) {
                 beatLineX -= startGlyph.width / 2;

@@ -31,7 +31,7 @@
     "build": "ttsc --project tsconfig.build.json && rollup -c rollup.config.js",
     "build-ci": "npm run clean && npm run build && npm pack",
     "start": "node scripts/setup-playground.js && npm run build && concurrently --kill-others \"ttsc --project tsconfig.build.json --watch\" \"rollup -c rollup.config.js -w\" \"http-server -o playground/control.html \"",
-    "test": "ttsc --project tsconfig.json && karma start karma.conf.js --browsers Chrome --no-single-run --reporters spec,kjhtml",
+    "test": "ttsc --project tsconfig.json && concurrently --kill-others \"ttsc --project tsconfig.json -w\" \"karma start karma.conf.js --browsers Chrome --no-single-run --reporters spec,kjhtml\"",
     "test-ci": "ttsc --project tsconfig.json && karma start karma.conf.js --browsers ChromeHeadless --single-run --reporters spec",
     "generate-csharp": "ts-node --project tsconfig.build-csharp.json src.compiler/csharp/CSharpTranspiler.ts --project tsconfig.build-csharp.json && node scripts/update-csharp-version.js",
     "build-csharp": "npm run generate-csharp && cd src.csharp && dotnet build -c Release",

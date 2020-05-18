@@ -302,7 +302,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         this.BendNoteHeads[1].x = endX - this.BendNoteHeads[1].noteHeadOffset;
                         this.BendNoteHeads[1].y = cy + startNoteRenderer.y;
                         this.BendNoteHeads[1].paint(0, 0, canvas);
-                        endY = this.BendNoteHeads[1].y + this.BendNoteHeads[1].getNoteValueY(endValue) + heightOffset;
+                        endY = this.BendNoteHeads[1].getNoteValueY(endValue) + heightOffset;
                         this.drawBendSlur(
                             canvas,
                             middleX,
