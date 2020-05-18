@@ -32,7 +32,7 @@ export class TabNoteChordGlyph extends Glyph {
                 case NoteXPosition.Left:
                     break;
                 case NoteXPosition.Center:
-                    pos += n.width / 2;
+                    pos += n.noteStringWidth / 2;
                     break;
                 case NoteXPosition.Right:
                     pos += n.width;
