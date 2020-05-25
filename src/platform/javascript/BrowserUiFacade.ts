@@ -14,7 +14,7 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Settings } from '@src/Settings';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { IUiFacade } from '@src/platform/IUiFacade';
 import { AlphaSynthWebAudioOutput } from '@src/platform/javascript/AlphaSynthWebAudioOutput';

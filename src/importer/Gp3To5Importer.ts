@@ -37,7 +37,7 @@ import { TripletFeel } from '@src/model/TripletFeel';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 export class Gp3To5Importer extends ScoreImporter {

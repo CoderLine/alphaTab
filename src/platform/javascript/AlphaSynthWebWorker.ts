@@ -4,7 +4,7 @@ import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
 import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 
 /**

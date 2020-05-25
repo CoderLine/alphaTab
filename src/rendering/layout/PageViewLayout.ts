@@ -6,7 +6,7 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { RenderingResources } from '@src/RenderingResources';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { EventEmitterOfT } from '@src/EventEmitter';
 import { NotationElement } from '@src/NotationSettings';
 

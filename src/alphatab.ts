@@ -86,6 +86,7 @@ import { Settings } from '@src/Settings';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { FormatError } from '@src/FormatError';
 import { LogLevel } from '@src/LogLevel';
+import { Logger } from '@src/Logger';
 import { FileLoadError } from '@src/FileLoadError';
 
 import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
@@ -112,7 +113,8 @@ export {
     RenderingResources,
     ResizeEventArgs,
     Settings,
-    LogLevel
+    LogLevel,
+    Logger
 };
 
 import { ScoreImporter } from '@src/importer/ScoreImporter';

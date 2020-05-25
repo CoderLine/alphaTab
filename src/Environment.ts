@@ -51,7 +51,7 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
 import { Settings } from '@src/Settings';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;

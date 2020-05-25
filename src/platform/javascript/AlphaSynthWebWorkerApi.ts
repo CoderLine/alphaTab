@@ -10,7 +10,7 @@ import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '
 import { FileLoadError } from '@src/FileLoadError';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { ProgressEventArgs } from '@src/ProgressEventArgs';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
 

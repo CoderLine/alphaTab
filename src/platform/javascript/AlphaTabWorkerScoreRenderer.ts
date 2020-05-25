@@ -7,7 +7,7 @@ import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 
 /**
  * @target web

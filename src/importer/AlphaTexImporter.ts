@@ -29,7 +29,7 @@ import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { ModelUtils, TuningParseResult } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 

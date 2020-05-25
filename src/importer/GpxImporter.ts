@@ -4,7 +4,7 @@ import { GpxFileSystem } from '@src/importer/GpxFileSystem';
 import { PartConfiguration } from '@src/importer/PartConfiguration';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { Score } from '@src/model/Score';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { IOHelper } from '@src/io/IOHelper';
 

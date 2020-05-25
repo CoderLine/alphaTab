@@ -8,7 +8,7 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 
 declare var VbAjaxLoader: any;
 

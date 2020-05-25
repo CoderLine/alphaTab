@@ -37,7 +37,7 @@ import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
 import { ResizeEventArgs } from '@src/ResizeEventArgs';
 import { Settings } from '@src/Settings';
 
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 

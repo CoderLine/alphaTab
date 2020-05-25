@@ -5,7 +5,7 @@ import { Track } from '@src/model/Track';
 import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 
 /**
  * @target web

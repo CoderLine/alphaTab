@@ -24,7 +24,7 @@ import { Voice } from '@src/synth/synthesis/Voice';
 import { VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceEnvelope';
 import { SynthHelper } from '@src/synth/SynthHelper';
 import { TypeConversions } from '@src/io/TypeConversions';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 
 /**

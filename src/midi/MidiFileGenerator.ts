@@ -35,7 +35,7 @@ import { WhammyType } from '@src/model/WhammyType';
 import { NotationMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
 
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;

@@ -17,7 +17,7 @@ import { NotationMode } from '@src/NotationSettings';
 import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
 import { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 /**

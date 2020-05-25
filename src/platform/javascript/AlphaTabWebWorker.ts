@@ -4,7 +4,7 @@ import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { FontSizes } from '@src/platform/svg/FontSizes';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 
 /**

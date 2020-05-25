@@ -9,7 +9,7 @@ import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 
 /**
  * This is the main wrapper of the rendering engine which

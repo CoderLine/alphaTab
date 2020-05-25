@@ -14,7 +14,7 @@ import { Note } from '@src/model/Note';
 import { PlaybackInformation } from '@src/model/PlaybackInformation';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import {
     BendEvent,
     ControlChangeEvent,

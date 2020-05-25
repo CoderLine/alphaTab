@@ -19,7 +19,7 @@ import { Voice } from '@src/model/Voice';
 import { WhammyType } from '@src/model/WhammyType';
 import { NotationMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 
 /**
  * A beat is a single block within a bar. A beat is a combination

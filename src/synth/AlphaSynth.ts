@@ -11,7 +11,7 @@ import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import { SynthHelper } from '@src/synth/SynthHelper';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
 

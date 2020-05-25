@@ -5,7 +5,7 @@ import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { EventEmitterOfT } from '@src/EventEmitter';
 
 export class HorizontalScreenLayoutPartialInfo {

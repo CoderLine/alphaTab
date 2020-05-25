@@ -3,7 +3,7 @@ import { GpxImporter } from '@src/importer/GpxImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 

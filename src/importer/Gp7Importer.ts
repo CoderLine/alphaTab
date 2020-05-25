@@ -6,7 +6,7 @@ import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 
 import { Score } from '@src/model/Score';
 
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 
 import { ZipEntry, ZipReader } from '@src/zip/ZipReader';
 import { IOHelper } from '@src/io/IOHelper';

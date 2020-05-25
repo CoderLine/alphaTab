@@ -7,7 +7,7 @@ import { PlaybackRange } from '@src/synth/PlaybackRange';
 import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
-import { Logger } from '@src/util/Logger';
+import { Logger } from '@src/Logger';
 
 export class MidiFileSequencerTempoChange {
     public bpm: number;
