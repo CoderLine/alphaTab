@@ -26,8 +26,12 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: https://registry.npmjs.org/
-      - name: Publish to GitHub Package Registry
+      - name: Publish to GitHub Package Registry (alpha)
         run: npm publish --tag alpha --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+      - name: Publish to GitHub Package Registry (latest)
+        run: npm publish --tag latest --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 
