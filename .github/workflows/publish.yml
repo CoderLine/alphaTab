@@ -30,8 +30,8 @@ jobs:
         run: npm publish --tag alpha --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-      - name: Publish to GitHub Package Registry (latest)
-        run: npm publish --tag latest --access public
+      - name: Mark alpha as latest
+        run: npm dist-tag add @coderline/alphatab@alpha latest
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 
