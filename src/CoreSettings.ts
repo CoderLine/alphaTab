@@ -18,6 +18,32 @@ export class CoreSettings {
     public fontDirectory: string | null = null;
 
     /**
+     * Gets or sets the file to load directly after initializing alphaTab.
+     * @target web
+     */
+    public file: string | null = null;
+
+    /**
+     * Gets or sets whether the UI element contains alphaTex code that should be
+     * used to initialize alphaTab.
+     * @target web
+     */
+    public tex: boolean = false;
+
+    /**
+     * Gets or sets the initial tracks that should be loaded for the score. 
+     * @target web
+     */
+    public tracks: unknown = null;
+
+    /**
+     * Gets or sets the interval in which alphaTab should check whether the 
+     * target element for rendering is already visible. 
+     * @target web
+     */
+    public visibilityCheckInterval: number = 500;
+
+    /**
      * Gets or sets whether lazy loading for displayed elements is enabled.
      */
     public enableLazyLoading: boolean = true;

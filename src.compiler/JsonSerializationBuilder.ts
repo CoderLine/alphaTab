@@ -44,6 +44,9 @@ function isPrimitiveType(type: ts.Type) {
     if (hasFlag(type, ts.TypeFlags.BigInt)) {
         return true;
     }
+    if (hasFlag(type, ts.TypeFlags.Unknown)) {
+        return true;
+    }
 
     return isEnumType(type);
 }

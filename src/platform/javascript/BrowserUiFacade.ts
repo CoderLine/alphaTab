@@ -136,35 +136,18 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             api.container.resize.on(this.showSvgsInViewPort.bind(this));
         }
         this.setupFontCheckers(settings);
-        // get track data to parse
-        let tracksData: unknown;
-        let options: any = raw;
-        if (options && options.tracks) {
-            tracksData = options.tracks;
-        } else {
-            if (dataAttributes.has('tracks')) {
-                tracksData = dataAttributes.get('tracks');
-            } else {
-                tracksData = 0;
-            }
-        }
-        this._initialTrackIndexes = this.parseTracks(tracksData);
+      
+        this._initialTrackIndexes = this.parseTracks(settings.core.tracks);
         this._contents = '';
         let element: HtmlElementContainer = api.container as HtmlElementContainer;
-        if (dataAttributes.has('tex') && element.element.innerText) {
+        if (settings.core.tex) {
             this._contents = element.element.innerHTML;
             element.element.innerHTML = '';
         }
         this.createStyleElement(settings);
-        if (options && options.file) {
-            this._file = options.file;
-        } else if (dataAttributes.has('file')) {
-            this._file = dataAttributes.get('file') as string;
-        }
-        this._visibilityCheckInterval = 500;
-        if (options && options.visibilityCheckInterval) {
-            this._visibilityCheckInterval = options.visibilityCheckInterval;
-        }
+        this._file = settings.core.file;
+
+        this._visibilityCheckInterval = settings.core.visibilityCheckInterval;
     }
 
     private setupFontCheckers(settings: Settings): void {
