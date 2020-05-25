@@ -33,7 +33,7 @@ export class ConsoleLogger implements ILogger {
 
 export class Logger {
     public static logLevel: LogLevel = LogLevel.Info;
-    public static logger:ILogger = new ConsoleLogger();
+    public static log:ILogger = new ConsoleLogger();
 
     private static shouldLog(level: LogLevel): boolean {
         return Logger.logLevel !== LogLevel.None && level >= Logger.logLevel;
@@ -41,25 +41,25 @@ export class Logger {
 
     public static debug(category: string, msg: string, ...details: unknown[]): void {
         if (Logger.shouldLog(LogLevel.Debug)) {
-            Logger.logger.debug(category, msg, ...details);
+            Logger.log.debug(category, msg, ...details);
         }
     }
 
     public static warning(category: string, msg: string, ...details: unknown[]): void {
         if (Logger.shouldLog(LogLevel.Warning)) {
-            Logger.logger.warning(category, msg, ...details);
+            Logger.log.warning(category, msg, ...details);
         }
     }
 
     public static info(category: string, msg: string, ...details: unknown[]): void {
         if (Logger.shouldLog(LogLevel.Info)) {
-            Logger.logger.info(category, msg, ...details);
+            Logger.log.info(category, msg, ...details);
         }
     }
 
     public static error(category: string, msg: string, ...details: unknown[]): void {
         if (Logger.shouldLog(LogLevel.Error)) {
-            Logger.logger.error(category, msg, ...details);
+            Logger.log.error(category, msg, ...details);
         }
     }
 }

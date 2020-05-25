@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using AlphaTab.Core;
 using AlphaTab.Model;
 using AlphaTab.Rendering.Glyphs;
-using AlphaTab.Util;
 using SkiaSharp;
 using String = AlphaTab.Core.EcmaScript.String;
 
