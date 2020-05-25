@@ -39,15 +39,15 @@ namespace AlphaTab.Platform.CSharp
             return new ManagedThreadScoreRenderer(Api.Settings, BeginInvoke);
         }
 
+        protected abstract Stream OpenDefaultSoundFont();
+
         public IAlphaSynth CreateWorkerPlayer()
         {
             var player = new ManagedThreadAlphaSynthWorkerApi(CreateSynthOutput(),
                 Api.Settings.Core.LogLevel, BeginInvoke);
             player.Ready.On(() =>
             {
-                using (var sf =
-                    typeof(ManagedUiFacade<>).Assembly.GetManifestResourceStream(
-                        typeof(ManagedUiFacade<>), "default.sf2"))
+                using (var sf = OpenDefaultSoundFont())
                 using (var ms = new MemoryStream())
                 {
                     sf.CopyTo(ms);

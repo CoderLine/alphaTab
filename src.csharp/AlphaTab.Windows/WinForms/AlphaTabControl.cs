@@ -70,7 +70,7 @@ namespace AlphaTab.WinForms
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public AlphaTabApiBase<AlphaTabControl> Api { get; }
+        public AlphaTabApiBase<AlphaTabControl> Api { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AlphaTabControl"/> class.
@@ -85,9 +85,14 @@ namespace AlphaTab.WinForms
             Settings = new Settings();
             Settings.Player.EnablePlayer = true;
             Settings.Player.EnableCursor = true;
+        }
 
+        /// <inheritdoc />
+        protected override void OnHandleCreated(EventArgs e)
+        {
             Api = new AlphaTabApiBase<AlphaTabControl>(new WinFormsUiFacade(this, _layoutPanel),
                 this);
+            base.OnHandleCreated(e);
         }
 
         /// <inheritdoc />

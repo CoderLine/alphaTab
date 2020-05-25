@@ -17,8 +17,12 @@ namespace AlphaTab.Samples.WinForms
         public MainWindow()
         {
             InitializeComponent();
-            alphaTabControl1.Api.Player.StateChanged.On(OnPlayerStateChanged);
+            alphaTabControl1.HandleCreated += (sender, args) =>
+            {
+                alphaTabControl1.Api.Player.StateChanged.On(OnPlayerStateChanged);
+            };
         }
+
 
         private void OnPlayerStateChanged(PlayerStateChangedEventArgs e)
         {

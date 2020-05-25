@@ -19,6 +19,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <EmbeddedResource Include="..\..\font\sonivox\sonivox.sf2" Link="default.sf2" />
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="NAudio" Version="1.10.0" />
     </ItemGroup>
 

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -66,6 +67,12 @@ namespace AlphaTab.Wpf
                 },
                 value => { InternalRootContainerBecameVisible -= value; }
             );
+        }
+
+        protected override Stream OpenDefaultSoundFont()
+        {
+            return typeof(NAudioSynthOutput).Assembly.GetManifestResourceStream(
+                typeof(NAudioSynthOutput), "default.sf2");
         }
 
         public override void Initialize(AlphaTabApiBase<AlphaTab> api, AlphaTab control)

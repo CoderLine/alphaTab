@@ -21,7 +21,6 @@
 
     <ItemGroup>
         <EmbeddedResource Include="..\..\font\bravura\Bravura.ttf" Link="Platform\CSharp\Bravura.ttf" />
-        <EmbeddedResource Include="..\..\font\sonivox\sonivox.sf2" Link="Platform\CSharp\default.sf2" />
     </ItemGroup>
 
     <ItemGroup>
