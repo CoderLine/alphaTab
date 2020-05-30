@@ -37,7 +37,7 @@ export class TabBrushGlyph extends Glyph {
                 let lineStartY: number = startY;
                 let lineEndY: number = endY - arrowSize;
                 canvas.beginRotate(cx + this.x + 4 * this.scale, lineEndY, -90);
-                let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
+                let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();
                 glyph.width = Math.abs(lineEndY - lineStartY);
@@ -47,7 +47,7 @@ export class TabBrushGlyph extends Glyph {
                 let lineStartY: number = startY + arrowSize;
                 let lineEndY: number = endY;
                 canvas.beginRotate(cx + this.x + 4 * this.scale, lineStartY, 90);
-                let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
+                let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();
                 glyph.width = Math.abs(lineEndY - lineStartY);

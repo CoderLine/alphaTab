@@ -10,13 +10,15 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
     private _symbol: MusicFontSymbol = MusicFontSymbol.None;
     private _symbolSize: number = 0;
     private _symbolOffset: number = 0;
+    private _partialWaves: boolean;
 
-    public constructor(x: number, y: number, type: VibratoType, scale: number = 1.2) {
+    public constructor(x: number, y: number, type: VibratoType, scale: number = 1.2, partialWaves: boolean = false) {
         super(BeatXPosition.EndBeat);
         this._type = type;
         this._scale = scale;
         this.x = x;
         this.y = y;
+        this._partialWaves = partialWaves;
     }
 
     public doLayout(): void {
@@ -43,7 +45,15 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
         let startX: number = cx + this.x;
         let width: number = endX - startX;
         let step: number = this._symbolSize * this.scale;
-        let loops: number = Math.max(1, Math.floor(width / step));
+
+        let loops: number = width / step;
+        if (!this._partialWaves) {
+            loops = Math.floor(loops);
+        }
+        if (loops < 1) {
+            loops = 1;
+        }
+
         let loopX: number = 0;
 
         for (let i: number = 0; i < loops; i++) {
