@@ -36,11 +36,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         if (this._noteGlyphLookup.has(note.id)) {
             let n = this._noteGlyphLookup.get(note.id)!;
 
-            let pos = this.x;
+            let pos = this.x + n.x + this._noteHeadPadding;
             switch (requestedPosition) {
                 case NoteXPosition.Left:
                     break;
-                case NoteXPosition.Center:
+                case NoteXPosition.Center: 
                     pos += n.width / 2;
                     break;
                 case NoteXPosition.Right:

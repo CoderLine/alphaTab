@@ -8,7 +8,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _infos: ScoreNoteGlyphInfo[] = [];
-    private _noteHeadPadding: number = 0;
+    protected _noteHeadPadding: number = 0;
 
     public minNote: ScoreNoteGlyphInfo | null = null;
     public maxNote: ScoreNoteGlyphInfo | null = null;

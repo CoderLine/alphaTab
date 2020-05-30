@@ -416,9 +416,9 @@ export class BarRendererBase {
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
-        let beat = this.getOnNotesGlyphForBeat(note.beat);
-        if (beat) {
-            return beat.container.x + beat.container.voiceContainer.x + beat.x + beat.getNoteX(note, requestedPosition);
+        let container: BeatContainerGlyph = this.getBeatContainer(note.beat);
+        if (container) {
+            return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.getNoteX(note, requestedPosition);
         }
         return 0;
     }

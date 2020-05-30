@@ -38,7 +38,6 @@ import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { Logger } from '@src/alphatab';
 
 /**
  * This structure represents a duration within a gpif
