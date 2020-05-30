@@ -43,8 +43,9 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
         let startX: number = cx + this.x;
         let width: number = endX - startX;
         let step: number = this._symbolSize * this.scale;
-        let loops: number = Math.max(1, width / step);
+        let loops: number = Math.max(1, Math.floor(width / step));
         let loopX: number = 0;
+
         for (let i: number = 0; i < loops; i++) {
             canvas.fillMusicFontSymbol(
                 cx + this.x + loopX,
