@@ -278,6 +278,7 @@ export class BarRendererBase {
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
+        g.renderer = this;
         this._preBeatGlyphs.addGlyph(g);
     }
 

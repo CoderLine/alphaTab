@@ -103,13 +103,17 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         let noteLine: number = sr.getNoteLine(n);
         let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
         if (accidental !== AccidentalType.None) {
-            accidentals.addGlyph(new AccidentalGlyph(0, sr.getScoreY(noteLine, 0), accidental, isGrace));
+            let g = new AccidentalGlyph(0, sr.getScoreY(noteLine, 0), accidental, isGrace);
+            g.renderer = this.renderer;
+            accidentals.addGlyph(g);
         }
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             let harmonicFret: number = n.displayValue + n.harmonicPitch;
             accidental = sr.accidentalHelper.applyAccidentalForValue(n.beat, harmonicFret, isGrace);
             noteLine = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
-            accidentals.addGlyph(new AccidentalGlyph(0, sr.getScoreY(noteLine, 0), accidental, isGrace));
+            let g = new AccidentalGlyph(0, sr.getScoreY(noteLine, 0), accidental, isGrace);
+            g.renderer = this.renderer;
+            accidentals.addGlyph(g);
         }
     }
 

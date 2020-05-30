@@ -16,6 +16,10 @@ export class ScoreTieGlyph extends TieGlyph {
         this.endNote = endNote;
     }
 
+    protected shouldDrawBendSlur() {
+        return this.renderer.settings.notation.extendBendArrowsOnTiedNotes && !!this.startNote.bendOrigin && this.startNote.isTieOrigin;
+    }
+
     public doLayout(): void {
         super.doLayout();
     }
