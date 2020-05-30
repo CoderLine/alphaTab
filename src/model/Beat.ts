@@ -702,6 +702,7 @@ export class Beat {
             // and generate a placeholder beat with tied notes
             let cloneBeat: Beat = this.clone();
             cloneBeat.id = Beat._globalBeatId++;
+            cloneBeat.pickStroke = PickStroke.None;
             for (let i: number = 0, j: number = cloneBeat.notes.length; i < j; i++) {
                 let cloneNote: Note = cloneBeat.notes[i];
                 let note: Note = this.notes[i];
