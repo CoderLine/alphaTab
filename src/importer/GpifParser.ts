@@ -37,6 +37,8 @@ import { XmlDocument } from '@src/xml/XmlDocument';
 
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { MidiUtils } from '@src/midi/MidiUtils';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { Logger } from '@src/alphatab';
 
 /**
  * This structure represents a duration within a gpif
@@ -1103,6 +1105,16 @@ export class GpifParser {
                         break;
                     case 'FreeText':
                         beat.text = c.innerText;
+                        break;
+                    case 'TransposedPitchStemOrientation':
+                        switch (c.innerText) {
+                            case 'Upward':
+                                beat.preferredBeamDirection = BeamDirection.Up;
+                                break;
+                            case 'Downward':
+                                beat.preferredBeamDirection = BeamDirection.Down;
+                                break;
+                        }
                         break;
                     case 'Dynamic':
                         switch (c.innerText) {

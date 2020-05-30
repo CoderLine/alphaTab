@@ -20,6 +20,7 @@ import { WhammyType } from '@src/model/WhammyType';
 import { NotationMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 /**
  * A beat is a single block within a bar. A beat is a combination
@@ -328,6 +329,11 @@ export class Beat {
      */
     public invertBeamDirection: boolean = false;
 
+    /**
+     * Gets or sets the preferred beam direction as specified in the input source.
+     */
+    public preferredBeamDirection: BeamDirection | null = null;
+
     public isEffectSlurOrigin: boolean = false;
 
     public get isEffectSlurDestination(): boolean {
@@ -373,6 +379,7 @@ export class Beat {
         dst.dynamics = src.dynamics;
         dst.isLegatoOrigin = src.isLegatoOrigin;
         dst.invertBeamDirection = src.invertBeamDirection;
+        dst.preferredBeamDirection = src.preferredBeamDirection;
         dst.whammyBarType = src.whammyBarType;
         dst.isContinuedWhammy = src.isContinuedWhammy;
         dst.ottava = src.ottava;
@@ -428,7 +435,7 @@ export class Beat {
                 }
             }
         }
-
+        
         if (point === this.minWhammyPoint) {
             this.minWhammyPoint = null;
             for (let currentPoint of this.whammyBarPoints) {

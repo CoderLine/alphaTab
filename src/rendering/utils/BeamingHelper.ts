@@ -74,6 +74,7 @@ export class BeamingHelper {
 
     public maxNoteBeat: Beat | null = null;
     public invertBeamDirection: boolean = false;
+    public preferredBeamDirection: BeamDirection | null = null;
     public isGrace: boolean = false;
 
     public constructor(staff: Staff) {
@@ -135,6 +136,10 @@ export class BeamingHelper {
     }
 
     private calculateDirection(): BeamDirection {
+        if (this.preferredBeamDirection !== null) {
+            return this.preferredBeamDirection;
+        }
+
         if (!this.voice) {
             return BeamDirection.Up;
         }
@@ -192,6 +197,10 @@ export class BeamingHelper {
             add = true;
         }
         if (add) {
+            if (beat.preferredBeamDirection !== null) {
+                this.preferredBeamDirection = beat.preferredBeamDirection;
+            }
+
             this.beats.push(beat);
             if (beat.graceType !== GraceType.None) {
                 this.isGrace = true;
