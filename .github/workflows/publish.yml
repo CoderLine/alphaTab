@@ -27,13 +27,13 @@ jobs:
           node-version: '12.x'
           registry-url: https://registry.npmjs.org/
       - name: Publish to GitHub Package Registry (alpha)
-        run: npm publish --tag alpha --access public
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-      - name: Mark alpha as latest
-        run: npm dist-tag add @coderline/alphatab@alpha latest
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+      # - name: Mark alpha as latest
+      #   run: npm dist-tag add @coderline/alphatab@alpha latest
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 
   nightly_csharp:
     name: C#
