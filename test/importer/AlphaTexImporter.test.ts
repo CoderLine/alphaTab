@@ -27,7 +27,7 @@ describe('AlphaTexImporterTest', () => {
         return importer.readScore();
     };
 
-    it('ensureMetadataParsing_Issue73', () => {
+    it('ensure-metadata-parsing-issue73', () => {
         const tex = `\\title Test
         \\words test
         \\music alphaTab
@@ -89,7 +89,7 @@ describe('AlphaTexImporterTest', () => {
         }
     });
 
-    it('testTuning', () => {
+    it('tuning', () => {
         const tex = `\\tuning E4 B3 G3 D3 A2 E2
         .
         0.5.1`;
@@ -98,7 +98,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].tuning.join(',')).toEqual(Tuning.getDefaultTuningFor(6)!.tunings.join(','));
     });
 
-    it('deadNotes1_Issue79', () => {
+    it('dead-notes1-issue79', () => {
         let tex: string = ':4 x.3';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -108,7 +108,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).toEqual(true);
     });
 
-    it('deadNotes2_Issue79', () => {
+    it('dead-notes2-issue79', () => {
         let tex: string = ':4 3.3{x}';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -118,7 +118,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).toEqual(true);
     });
 
-    it('trill_Issue79', () => {
+    it('trill-issue79', () => {
         let tex: string = ':4 3.3{tr 5 16}';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -130,7 +130,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillFret).toEqual(5);
     });
 
-    it('tremolo_Issue79', () => {
+    it('tremolo-issue79', () => {
         let tex: string = ':4 3.3{tr 5 16}';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -142,7 +142,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillFret).toEqual(5);
     });
 
-    it('tremoloPicking_Issue79', () => {
+    it('tremolo-picking-issue79', () => {
         let tex: string = ':4 3.3{tp 16}';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -153,7 +153,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tremoloSpeed).toEqual(Duration.Sixteenth);
     });
 
-    it('hamonics_Issue79', () => {
+    it('hamonics-issue79', () => {
         let tex: string = ':8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -170,7 +170,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).toEqual(HarmonicType.Semi);
     });
 
-    it('hamonicsRenderingText_Issue79', () => {
+    it('hamonics-rendering-text-issue79', () => {
         let tex: string = ':8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}';
         let score: Score = parseTex(tex);
         let settings: Settings = new Settings();
@@ -205,7 +205,7 @@ describe('AlphaTexImporterTest', () => {
         ).toBeTruthy();
     });
 
-    it('grace_Issue79', () => {
+    it('grace-issue79', () => {
         let tex: string = ':8 3.3{gr} 3.3{gr ob}';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -215,7 +215,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].graceType).toEqual(GraceType.OnBeat);
     });
 
-    it('testLeftHandFingerSingleNote', () => {
+    it('left-hand-finger-single-note', () => {
         let tex: string = ':8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5}';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -236,7 +236,7 @@ describe('AlphaTexImporterTest', () => {
         );
     });
 
-    it('testRightHandFingerSingleNote', () => {
+    it('right-hand-finger-single-note', () => {
         let tex: string = ':8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{rf 5}';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -257,7 +257,7 @@ describe('AlphaTexImporterTest', () => {
         );
     });
 
-    it('testLeftHandFingerChord', () => {
+    it('left-hand-finger-chord', () => {
         let tex: string = ':8 (3.1{lf 1} 3.2{lf 2} 3.3{lf 3} 3.4{lf 4} 3.5{lf 5})';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -279,7 +279,7 @@ describe('AlphaTexImporterTest', () => {
         );
     });
 
-    it('testRightHandFingerChord', () => {
+    it('right-hand-finger-chord', () => {
         let tex: string = ':8 (3.1{rf 1} 3.2{rf 2} 3.3{rf 3} 3.4{rf 4} 3.5{rf 5})';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -301,7 +301,7 @@ describe('AlphaTexImporterTest', () => {
         );
     });
 
-    it('testUnstringed', () => {
+    it('unstringed', () => {
         let tex: string = '\\tuning piano . c4 c#4 d4 d#4 | c4 db4 d4 eb4';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -326,7 +326,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].realValue).toEqual(63);
     });
 
-    it('testMultiStaffDefaultSettings', () => {
+    it('multi-staff-default-settings', () => {
         let tex: string = '1.1 | 1.1 | \\staff 2.1 | 2.1';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -341,7 +341,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[1].bars.length).toEqual(2);
     });
 
-    it('testMultiStaffDefaultSettingsBraces', () => {
+    it('multi-staff-default-settings-braces', () => {
         let tex: string = '1.1 | 1.1 | \\staff{} 2.1 | 2.1';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -356,7 +356,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[1].bars.length).toEqual(2);
     });
 
-    it('testSingleStaffWithSetting', () => {
+    it('single-staff-with-setting', () => {
         let tex: string = '\\staff{score} 1.1 | 1.1';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -367,7 +367,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars.length).toEqual(2);
     });
 
-    it('testMultiStaffWithSettings', () => {
+    it('multi-staff-with-settings', () => {
         const tex = `\\staff{score} 1.1 | 1.1 |
         \\staff{tabs} \\capo 2 2.1 | 2.1 |
         \\staff{score tabs} \\tuning A1 D2 A2 D3 G3 B3 E4 3.1 | 3.1`;
@@ -388,7 +388,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[2].tuning.length).toEqual(7);
     });
 
-    it('testMultiTrack', () => {
+    it('multi-track', () => {
         let tex: string = '\\track "First" 1.1 | 1.1 | \\track "Second" 2.2 | 2.2';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(2);
@@ -409,7 +409,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[1].staves[0].bars.length).toEqual(2);
     });
 
-    it('testMultiTrackNames', () => {
+    it('multi-track-names', () => {
         let tex: string =
             '\\track 1.1 | 1.1 | \\track "Only Long Name" 2.2 | 2.2 | \\track "Very Long Name" "shrt" 3.3 | 3.3 ';
         let score: Score = parseTex(tex);
@@ -441,7 +441,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[2].staves[0].bars.length).toEqual(2);
     });
 
-    it('testMultiTrackMultiStaff', () => {
+    it('multi-track-multi-staff', () => {
         const tex = `\\track "Piano"
             \\staff{score} \\tuning piano \\instrument acousticgrandpiano
             c4 d4 e4 f4 |
@@ -517,7 +517,7 @@ describe('AlphaTexImporterTest', () => {
         }
     });
 
-    it('testMultiTrackMultiStaffInconsistentBars', () => {
+    it('multi-track-multi-staff-inconsistent-bars', () => {
         let tex: string = `
          \\track "Piano"
             \\staff{score} \\tuning piano \\instrument acousticgrandpiano
@@ -606,7 +606,7 @@ describe('AlphaTexImporterTest', () => {
         }
     });
 
-    it('testSlides', () => {
+    it('slides', () => {
         let tex: string = '3.3{sl} 4.3 | 3.3{ss} 4.3 | 3.3{sib} 3.3{sia} 3.3{sou} 3.3{sod} | 3.3{psd} 3.3{psu}';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -637,7 +637,7 @@ describe('AlphaTexImporterTest', () => {
         );
     });
 
-    it('testSection', () => {
+    it('section', () => {
         let tex: string = '\\section Intro 1.1 | 1.1 | \\section "Chorus 01" 1.1 | \\section S Solo';
         let score: Score = parseTex(tex);
         expect(score.tracks.length).toEqual(1);
@@ -654,7 +654,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[3].section!.marker).toEqual('S');
     });
 
-    it('testPopSlapTap', () => {
+    it('pop-slap-tap', () => {
         let tex: string = '3.3{p} 3.3{s} 3.3{tt} r';
         let score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].pop).toBe(true);
@@ -662,7 +662,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tap).toBe(true);
     });
 
-    it('testTripletFeelNumeric', () => {
+    it('triplet-feel-numeric', () => {
         let tex: string = '\\tf 0 | \\tf 1 | \\tf 2 | \\tf 3 | \\tf 4 | \\tf 5 | \\tf 6';
         let score: Score = parseTex(tex);
         expect(score.masterBars[0].tripletFeel).toEqual(TripletFeel.NoTripletFeel);
@@ -674,7 +674,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[6].tripletFeel).toEqual(TripletFeel.Scottish8th);
     });
 
-    it('testTripletFeelLongNames', () => {
+    it('triplet-feel-long-names', () => {
         let tex: string =
             '\\tf none | \\tf triplet-16th | \\tf triplet-8th | \\tf dotted-16th | \\tf dotted-8th | \\tf scottish-16th | \\tf scottish-8th';
         let score: Score = parseTex(tex);
@@ -687,7 +687,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[6].tripletFeel).toEqual(TripletFeel.Scottish8th);
     });
 
-    it('testTripletFeelShortNames', () => {
+    it('triplet-feel-short-names', () => {
         let tex: string = '\\tf no | \\tf t16 | \\tf t8 | \\tf d16 | \\tf d8 | \\tf s16 | \\tf s8';
         let score: Score = parseTex(tex);
         expect(score.masterBars[0].tripletFeel).toEqual(TripletFeel.NoTripletFeel);
@@ -699,7 +699,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[6].tripletFeel).toEqual(TripletFeel.Scottish8th);
     });
 
-    it('testTripletFeelMultiBar', () => {
+    it('triplet-feel-multi-bar', () => {
         let tex: string = '\\tf t16 | | | \\tf t8 | | | \\tf no | | ';
         let score: Score = parseTex(tex);
         expect(score.masterBars[0].tripletFeel).toEqual(TripletFeel.Triplet16th);
@@ -713,7 +713,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[8].tripletFeel).toEqual(TripletFeel.NoTripletFeel);
     });
 
-    it('testTupletRepeat', () => {
+    it('tuplet-repeat', () => {
         let tex: string = ':8 5.3{tu 3}*3';
         let score: Score = parseTex(tex);
         let durations: Duration[] = [Duration.Eighth, Duration.Eighth, Duration.Eighth];
@@ -733,7 +733,7 @@ describe('AlphaTexImporterTest', () => {
         expect(i).toEqual(durations.length);
     });
 
-    it('testSimpleAnacrusis', () => {
+    it('simple-anacrusis', () => {
         let tex: string = '\\ac 3.3 3.3 | 1.1 2.1 3.1 4.1';
         let score: Score = parseTex(tex);
         expect(score.masterBars[0].isAnacrusis).toBe(true);
@@ -741,7 +741,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[1].calculateDuration()).toEqual(3840);
     });
 
-    it('testMultiBarAnacrusis', () => {
+    it('multi-bar-anacrusis', () => {
         let tex: string = '\\ac 3.3 3.3 | \\ac 3.3 3.3 | 1.1 2.1 3.1 4.1';
         let score: Score = parseTex(tex);
         expect(score.masterBars[0].isAnacrusis).toBe(true);
@@ -751,7 +751,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[2].calculateDuration()).toEqual(3840);
     });
 
-    it('testRandomAnacrusis', () => {
+    it('random-anacrusis', () => {
         let tex: string = '\\ac 3.3 3.3 | 1.1 2.1 3.1 4.1 | \\ac 3.3 3.3 | 1.1 2.1 3.1 4.1';
         let score: Score = parseTex(tex);
         expect(score.masterBars[0].isAnacrusis).toBe(true);
@@ -764,7 +764,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[3].calculateDuration()).toEqual(3840);
     });
 
-    it('testRepeat', () => {
+    it('repeat', () => {
         let tex: string =
             '\\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \\rc 2 1.3 2.3 3.3 4.3 | \\ro \\rc 3 1.3 2.3 3.3 4.3 |';
         let score: Score = parseTex(tex);
@@ -774,7 +774,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[3].repeatCount).toEqual(3);
     });
 
-    it('testDefaultTranspositionOnInstruments', () => {
+    it('default-transposition-on-instruments', () => {
         let tex: string = `
             \\track "Piano with Grand Staff" "pno."
                 \\staff{score} \\tuning piano \\instrument acousticgrandpiano
@@ -795,7 +795,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[1].staves[0].displayTranspositionPitch).toEqual(-12);
     });
 
-    it('testDynamics', () => {
+    it('dynamics', () => {
         let tex: string = '1.1.8{dy ppp} 1.1{dy pp} 1.1{dy p} 1.1{dy mp} 1.1{dy mf} 1.1{dy f} 1.1{dy ff} 1.1{dy fff}';
         let score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).toEqual(DynamicValue.PPP);
@@ -808,7 +808,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].dynamics).toEqual(DynamicValue.FFF);
     });
 
-    it('testDynamicsAuto', () => {
+    it('dynamics-auto', () => {
         let tex: string = '1.1.4{dy ppp} 1.1 1.1{dy mp} 1.1';
         let score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).toEqual(DynamicValue.PPP);
@@ -817,7 +817,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].dynamics).toEqual(DynamicValue.MP);
     });
 
-    it('testDynamicsAutoResetOnTrack', () => {
+    it('dynamics-auto-reset-on-track', () => {
         let tex: string = '1.1.4{dy ppp} 1.1 \\track "Second" 1.1.4';
         let score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).toEqual(DynamicValue.PPP);
@@ -825,7 +825,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[1].staves[0].bars[0].voices[0].beats[0].dynamics).toEqual(DynamicValue.F);
     });
 
-    it('testDynamicsAutoResetOnStaff', () => {
+    it('dynamics-auto-reset-on-staff', () => {
         let tex: string = '1.1.4{dy ppp} 1.1 \\staff 1.1.4';
         let score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).toEqual(DynamicValue.PPP);
@@ -833,12 +833,21 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[1].bars[0].voices[0].beats[0].dynamics).toEqual(DynamicValue.F);
     });
 
-    it('testCrescendo', () => {
+    it('crescendo', () => {
         let tex: string = '1.1.4{dec} 1.1{dec} 1.1{cre} 1.1{cre}';
         let score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].crescendo).toEqual(CrescendoType.Decrescendo);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].crescendo).toEqual(CrescendoType.Decrescendo);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].crescendo).toEqual(CrescendoType.Crescendo);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].crescendo).toEqual(CrescendoType.Crescendo);
+    });
+
+    it('left-hand-tapping', () => {
+        let tex: string = ':4 1.1{lht} 1.1 1.1{lht} 1.1';
+        let score: Score = parseTex(tex);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isLeftHandTapped).toEqual(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isLeftHandTapped).toEqual(false);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isLeftHandTapped).toEqual(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLeftHandTapped).toEqual(false);
     });
 });

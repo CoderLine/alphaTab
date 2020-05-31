@@ -63,7 +63,7 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
         );
     }
     private isEndCentered() {
-        return (
+        return this._startNote.beat.graceType === GraceType.None && (
             (this._endNote === this._endNote.beat.maxNote && this.tieDirection === BeamDirection.Up) ||
             (this._endNote === this._endNote.beat.minNote && this.tieDirection === BeamDirection.Down)
         );

@@ -282,7 +282,12 @@ export enum NotationElement {
     /**
      * The wide note vibrato waves shown above the staff.
      */
-    EffectWideNoteVibrato
+    EffectWideNoteVibrato,
+
+    /**
+     * The left hand tap symbol shown above the staff.
+     */
+    EffectLeftHandTap
 }
 
 /**

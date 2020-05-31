@@ -131,6 +131,19 @@ export class Html5Canvas implements ICanvas {
         this.fill();
     }
 
+    public strokeCircle(x: number, y: number, radius: number): void {
+        this._context.beginPath();
+        this._context.arc(
+            (x | 0),
+            (y | 0),
+            radius,
+            0,
+            Math.PI * 2,
+            true
+        );
+        this.stroke();
+    }
+
     public fill(): void {
         this._context.fill();
     }

@@ -1555,6 +1555,9 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (syData === 'h') {
                 this._sy = this.newSy();
                 note.isHammerPullOrigin = true;
+            } else if (syData === 'lht') {
+                this._sy = this.newSy();
+                note.isLeftHandTapped = true;
             } else if (syData === 'g') {
                 this._sy = this.newSy();
                 note.isGhost = true;

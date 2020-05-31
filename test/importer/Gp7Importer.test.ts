@@ -750,6 +750,16 @@ describe('Gp7ImporterTest', () => {
         expect(score.masterBars[0].calculateDuration()).toEqual(1920);
         expect(score.masterBars[1].calculateDuration()).toEqual(3840);
     });
+    
+    it('left-hand-tap', async () => {
+        const reader = await prepareGp7ImporterWithFile('guitarpro7/left-hand-tap.gp');
+        let score: Score = reader.readScore();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isLeftHandTapped).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].isLeftHandTapped).toBe(true);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].notes[0].isLeftHandTapped).toBe(true);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[6].notes[0].isLeftHandTapped).toBe(true);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[9].notes[0].isLeftHandTapped).toBe(true);
+    });
 
     it('fermata', async () => {
         const reader = await prepareGp7ImporterWithFile('guitarpro7/fermata.gp');

@@ -15,7 +15,12 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
  * @target web
  */
 export class VisualTestHelper {
-    public static async runVisualTest(inputFile: string, settings?: Settings, tracks?: number[], message?: string): Promise<void> {
+    public static async runVisualTest(
+        inputFile: string,
+        settings?: Settings,
+        tracks?: number[],
+        message?: string
+    ): Promise<void> {
         try {
             const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
             const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
@@ -246,7 +251,27 @@ export class VisualTestHelper {
         _customEqualityTesters: ReadonlyArray<jasmine.CustomEqualityTester>
     ): jasmine.CustomMatcher {
         return {
-            compare(actual: HTMLCanvasElement, expected: HTMLCanvasElement, message?:string): jasmine.CustomMatcherResult {
+            compare(
+                actual: HTMLCanvasElement,
+                expected: HTMLCanvasElement,
+                message?: string
+            ): jasmine.CustomMatcherResult {
+                const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
+                const oldActual = actual;
+                if (sizeMismatch) {
+                    const newActual = document.createElement('canvas');
+                    newActual.width = expected.width;
+                    newActual.height = expected.height;
+
+                    const newActualContext = newActual.getContext('2d')!;
+                    newActualContext.drawImage(actual, 0, 0);
+                    newActualContext.strokeStyle = 'red'
+                    newActualContext.lineWidth = 2;
+                    newActualContext.strokeRect(0,0, newActual.width, newActual.height);
+
+                    actual = newActual;
+                }
+
                 const actualImageData = actual.getContext('2d')!.getImageData(0, 0, actual.width, actual.height);
 
                 const expectedImageData = expected
@@ -263,6 +288,7 @@ export class VisualTestHelper {
                     pass: true,
                     message: ''
                 };
+
                 try {
                     let differentPixels = pixelmatch(
                         new Uint8Array(expectedImageData.data.buffer),
@@ -287,6 +313,9 @@ export class VisualTestHelper {
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
                         result.message = `Difference between original and new image is too big: ${differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
+                    } else if(sizeMismatch) {
+                        result.message = `Image sizes do not match: ${expected.width}/${expected.height} vs ${oldActual.width}/${oldActual.height}`;
+                        result.pass = false;
                     }
                 } catch (e) {
                     result.pass = false;
@@ -308,7 +337,7 @@ export class VisualTestHelper {
 
                     actual.ondblclick = () => {
                         const a = document.createElement('a');
-                        a.href = actual.toDataURL('image/png');
+                        a.href = oldActual.toDataURL('image/png');
                         a.download = expected.dataset.filename ?? 'reference.png';
                         document.body.appendChild(a);
                         a.click();

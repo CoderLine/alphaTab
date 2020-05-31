@@ -14,7 +14,17 @@ export class TabTieGlyph extends TieGlyph {
         this.endNote = endNote;
     }
 
+    protected getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
+        if(this.startNote === this.endNote) {
+            return 15;
+        }
+        return super.getTieHeight(startX, startY, endX, endY);
+    }
+
     protected getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
+        if(this.startNote === this.endNote) {
+            return BeamDirection.Up;
+        }
         return TabTieGlyph.getBeamDirectionForNote(this.startNote);
     }
 
@@ -23,6 +33,10 @@ export class TabTieGlyph extends TieGlyph {
     }
 
     protected getStartY(): number {
+        if(this.startNote === this.endNote) {
+            return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Center);
+        }
+
         if(this.tieDirection === BeamDirection.Up) {
             return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
         }
@@ -34,10 +48,16 @@ export class TabTieGlyph extends TieGlyph {
     }
 
     protected getStartX(): number {
+        if(this.startNote === this.endNote) {
+            return this.getEndX() - 20 * this.scale;
+        }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Center);
     }
 
     protected getEndX(): number {
+        if(this.startNote === this.endNote) {
+            return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Left);
+        }
         return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Center);
     }
 }

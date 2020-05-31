@@ -19,6 +19,7 @@ import { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { PickStroke } from './PickStroke';
 
 /**
  * A note is a single played sound on a fretted instrument.
@@ -124,6 +125,11 @@ export class Note {
      * Gets or sets whether this note is visible on the music sheet.
      */
     public isVisible: boolean = true;
+
+    /**
+     * Gets a value indicating whether the note is left hand tapped. 
+     */
+    public isLeftHandTapped: boolean = false;
 
     /**
      * Gets or sets whether this note starts a hammeron or pulloff.
@@ -537,6 +543,7 @@ export class Note {
         dst.bendStyle = src.bendStyle;
         dst.isContinuedBend = src.isContinuedBend;
         dst.isVisible = src.isVisible;
+        dst.isLeftHandTapped = src.isLeftHandTapped;
     }
 
     public clone(): Note {
@@ -610,14 +617,14 @@ export class Note {
                 break;
         }
         let effectSlurDestination: Note | null = null;
-        if (this.isHammerPullOrigin) {
+        if (this.isHammerPullOrigin && this.hammerPullDestination) {
             effectSlurDestination = this.hammerPullDestination;
         } else if (this.slideOutType === SlideOutType.Legato && this.slideTarget) {
             effectSlurDestination = this.slideTarget;
         }
         if (effectSlurDestination) {
             this.hasEffectSlur = true;
-            if (this.effectSlurOrigin) {
+            if (this.effectSlurOrigin && this.beat.pickStroke === PickStroke.None) {
                 this.effectSlurOrigin.effectSlurDestination = effectSlurDestination;
                 this.effectSlurOrigin.effectSlurDestination.effectSlurOrigin = this.effectSlurOrigin;
                 this.effectSlurOrigin = null;

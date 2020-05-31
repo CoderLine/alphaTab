@@ -41,6 +41,10 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
             let tie: TabTieGlyph = new TabTieGlyph(n.tieOrigin!, n, true);
             this.ties.push(tie);
         }
+        if(n.isLeftHandTapped) {
+            let tapSlur: TabTieGlyph = new TabTieGlyph(n, n, false);
+            this.ties.push(tapSlur);
+        }
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
             let expanded: boolean = false;

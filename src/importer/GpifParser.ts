@@ -1590,6 +1590,9 @@ export class GpifParser {
                                 // if (FindChildElement(node, "Enable"))
                                 //     note.isHammerPullDestination = true;
                                 break;
+                            case 'LeftHandTapped':
+                                note.isLeftHandTapped = true;
+                                break;
                             case 'Slide':
                                 let slideFlags: number = parseInt(c.findChildElement('Flags')!.innerText);
                                 if ((slideFlags & 1) !== 0) {

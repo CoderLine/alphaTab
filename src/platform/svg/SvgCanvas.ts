@@ -91,6 +91,14 @@ export abstract class SvgCanvas implements ICanvas {
         this.fill();
     }
 
+    public strokeCircle(x: number, y: number, radius: number): void {
+        this._currentPathIsEmpty = false;
+        //
+        // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
+        this._currentPath += ` M${x - radius},${y} A1,1 0 0,0 ${x + radius},${y} A1,1 0 0,0 ${x - radius},${y} z`;
+        this.stroke();
+    }
+
     public fill(): void {
         if (!this._currentPathIsEmpty) {
             this.buffer += `<path d="${this._currentPath}"`;

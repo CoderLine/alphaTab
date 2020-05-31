@@ -52,6 +52,7 @@ import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
 import { Settings } from '@src/Settings';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
+import { LeftHandTapEffectInfo } from './rendering/effects/LeftHandTapEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -387,6 +388,7 @@ export class Environment {
                 new SlightBeatVibratoEffectInfo(),
                 new WideNoteVibratoEffectInfo(),
                 new SlightNoteVibratoEffectInfo(),
+                new LeftHandTapEffectInfo(),
                 new AlternateEndingsEffectInfo()
             ]),
             new ScoreBarRendererFactory(),
@@ -413,7 +415,8 @@ export class Environment {
                 new FingeringEffectInfo(),
                 new PalmMuteEffectInfo(),
                 new PickStrokeEffectInfo(),
-                new PickSlideEffectInfo()
+                new PickSlideEffectInfo(),
+                new LeftHandTapEffectInfo()
             ]),
             new TabBarRendererFactory(false, false, false)
         ]);
@@ -437,6 +440,7 @@ export class Environment {
                 new PalmMuteEffectInfo(),
                 new PickStrokeEffectInfo(),
                 new PickSlideEffectInfo(),
+                new LeftHandTapEffectInfo(),
                 new AlternateEndingsEffectInfo()
             ]),
             new ScoreBarRendererFactory(),
@@ -472,6 +476,7 @@ export class Environment {
             new PalmMuteEffectInfo(),
             new PickStrokeEffectInfo(),
             new PickSlideEffectInfo(),
+            new LeftHandTapEffectInfo(),
             new AlternateEndingsEffectInfo()
         ];
         staveProfiles.set(StaveProfile.Tab, [

@@ -10,13 +10,6 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
     public static readonly EndPadding: number = ((10 / 2) | 0) + 3;
     protected BendNoteHeads: BendNoteHeadGroupGlyph[] = [];
 
-    public doLayout(): void {
-        for (const head of this.BendNoteHeads) {
-            head.renderer = this.renderer;
-            head.doLayout();
-        }
-    }
-
     protected drawBendSlur(
         canvas: ICanvas,
         x1: number,
@@ -28,6 +21,15 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
         slurText?: string
     ): void {
         TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, scale, slurText);
+    }
+
+    public doLayout(): void {
+        super.doLayout();
+        this.width = 0;
+        for (let noteHeads of this.BendNoteHeads) {
+            noteHeads.doLayout();
+            this.width += noteHeads.width + 10 * this.scale;
+        }
     }
 
     protected getBeamDirection(beat: Beat, noteRenderer: ScoreBarRenderer): BeamDirection {

@@ -50,6 +50,7 @@ export interface ICanvas {
     strokeRect(x: number, y: number, w: number, h: number): void;
 
     fillCircle(x: number, y: number, radius: number): void;
+    strokeCircle(x: number, y: number, radius: number): void;
 
     font: Font;
 
