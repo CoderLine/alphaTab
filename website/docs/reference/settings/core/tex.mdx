@@ -1,0 +1,37 @@
+---
+title: Core.Tex
+jsName: core.tex;tex
+jsonName: core.tex;tex
+domName: data-core-tex;data-tex
+category: Core - JavaScript Specific
+description: Whether the contents of the DOM element should be loaded as alphaTex.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting allows you to fill alphaTex code into the DOM element and make alphaTab automatically 
+load it when initializing. Note that this setting is only interpreted once on initialization.
+
+```html
+<div id="alphaTab" data-tex="true">\title "Simple alphaTex init" . 3.3*4</div>
+<script>
+const api = new alphaTab.AlphaTabApi(document.getElementById('alphaTab'));
+</script>
+```
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="boolean" />
+</TypeTable>
+
+## Default Value
+
+`false`

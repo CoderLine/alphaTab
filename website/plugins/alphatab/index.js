@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function(context, options) {
   return {
     name: 'alphatab',
 
@@ -9,7 +9,7 @@ module.exports = function() {
             tagName: 'script',
             attributes: {
               type: 'text/javascript',
-              src: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.js'
+              src: options.alphaTab || 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/alphaTab.min.js'
             }
           },
           {

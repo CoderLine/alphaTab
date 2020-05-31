@@ -118,6 +118,7 @@ module.exports = {
     [
       path.resolve(__dirname, './plugins/alphatab'),
       {
+        alphaTab: process.env.ALPHATAB
       }
     ]
   ],

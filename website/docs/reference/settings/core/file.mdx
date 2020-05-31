@@ -1,0 +1,31 @@
+---
+title: Core.File
+jsName: core.file;file
+jsonName: core.file;file
+domName: data-core-file;data-file
+category: Core - JavaScript Specific
+description: The full URL to the input file to be loaded.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+AlphaTab can automatically load and render a file after initialization. This eliminates the need of manually calling
+one of the load methods which are available. alphaTab will automatically initiate an `XMLHttpRequest` after initialization
+to load and display the provided url of this setting. Note that this setting is only interpreted once on initialization.
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="string" />
+</TypeTable>
+
+## Default Value
+
+`null`

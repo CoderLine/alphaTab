@@ -1,0 +1,39 @@
+---
+title: Core.Tracks
+jsName: core.tracks;tracks
+jsonName: core.tracks;tracks
+domName: data-core-tracks;data-tracks
+category: Core - JavaScript Specific
+description: The tracks to display for the initally loaded file.
+sidebarPath: /docs/reference/settings
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting can be used in combinition with the `file` or `tex` option. It controls which of the tracks
+of the initially loaded file should be displayed.
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="all">
+        If the `all` string is provided, all tracks of the song will be displayed. 
+    </TypeRow>
+    <TypeRow type="all" name="number">
+        If a single number is provided, the value represents the 0-based index of the track to display. 
+    </TypeRow>
+    <TypeRow type="all" name="number[]">
+        If a number array is provided, the values represent the 0-based indexes of the tracks to display.
+    </TypeRow>
+</TypeTable>
+
+
+## Default Value
+
+`null`
