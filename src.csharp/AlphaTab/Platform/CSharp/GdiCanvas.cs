@@ -355,6 +355,17 @@ namespace AlphaTab.Platform.CSharp
             _currentY = y;
             Fill();
         }
+        
+        public void StrokeCircle(double x, double y, double radius)
+        {
+            _currentPath.StartFigure();
+            _currentPath.AddEllipse((float) (x - radius), (float) (y - radius), (float) radius * 2,
+                (float) radius * 2);
+            _currentPath.CloseFigure();
+            _currentX = x;
+            _currentY = y;
+            Stroke();
+        }
 
         public void Fill()
         {

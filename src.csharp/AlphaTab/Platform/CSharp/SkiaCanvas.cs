@@ -206,6 +206,14 @@ namespace AlphaTab.Platform.CSharp
             Fill();
         }
 
+        public void StrokeCircle(double x, double y, double radius)
+        {
+            BeginPath();
+            _path.AddCircle((float)x, (float)y, (float)radius);
+            ClosePath();
+            Stroke();
+        }
+
         public void Fill()
         {
             using (var paint = CreatePaint())

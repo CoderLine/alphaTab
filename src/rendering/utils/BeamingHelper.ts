@@ -136,8 +136,9 @@ export class BeamingHelper {
     }
 
     private calculateDirection(): BeamDirection {
-        if (this.preferredBeamDirection !== null) {
-            return this.preferredBeamDirection;
+        let preferredBeamDirection = this.preferredBeamDirection;
+        if (preferredBeamDirection !== null) {
+            return preferredBeamDirection;
         }
 
         if (!this.voice) {
