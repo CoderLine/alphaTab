@@ -127,7 +127,7 @@ export class Note {
     public isVisible: boolean = true;
 
     /**
-     * Gets a value indicating whether the note is left hand tapped. 
+     * Gets a value indicating whether the note is left hand tapped.
      */
     public isLeftHandTapped: boolean = false;
 
@@ -599,10 +599,11 @@ export class Note {
         }
         // set hammeron/pulloffs
         if (this.isHammerPullOrigin) {
-            if (!nextNoteOnLine.value) {
+            this.hammerPullDestination = Note.findHammerPullDestination(this);
+
+            if (!this.hammerPullDestination) {
                 this.isHammerPullOrigin = false;
             } else {
-                this.hammerPullDestination = nextNoteOnLine.value;
                 this.hammerPullDestination.hammerPullOrigin = this;
             }
         }
@@ -726,6 +727,55 @@ export class Note {
         return null;
     }
 
+    static findHammerPullDestination(note: Note): Note | null {
+        // For Hammer-Pull destinations we have 2 potential candidates
+        // 1. A note on the same string
+        // 2. A note on a different string, but with a left-hand-tapping applied
+
+        // for the second case we have a special logic to search for notes:
+        // 1. We first search on lower strings, then on higher strings
+        // 2. If we find a note with a left-hand-tap applied it becomes the target
+        // 3. If we find a note without a left-hand-tap we stop searching in this direction
+
+        let nextBeat: Beat | null = note.beat.nextBeat;
+        // keep searching in same bar
+        while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note.MaxOffsetForSameLineSearch) {
+            // 1. same string first
+            let noteOnString: Note | null = nextBeat.getNoteOnString(note.string);
+            if (noteOnString) {
+                return noteOnString;
+            }
+
+            // 2. search toward lower strings
+            for (let str = note.string; str > 0; str--) {
+                noteOnString = nextBeat.getNoteOnString(str);
+                if (noteOnString) {
+                    if (noteOnString.isLeftHandTapped) {
+                        return noteOnString;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            // 3. search toward higher strings
+            for (let str = note.string; str <= note.beat.voice.bar.staff.tuning.length; str++) {
+                noteOnString = nextBeat.getNoteOnString(str);
+                if (noteOnString) {
+                    if (noteOnString.isLeftHandTapped) {
+                        return noteOnString;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            // nothing found, search on next beat
+            nextBeat = nextBeat.nextBeat;
+        }
+        return null;
+    }
+
     public static findTieOrigin(note: Note): Note | null {
         let previousBeat: Beat | null = note.beat.previousBeat;
         // keep searching in same bar
@@ -758,10 +808,10 @@ export class Note {
     }
 
     public chain() {
-        if(!this.isTieDestination) {
+        if (!this.isTieDestination) {
             return;
         }
-        
+
         if (!this.tieOrigin) {
             this.tieOrigin = Note.findTieOrigin(this);
         }

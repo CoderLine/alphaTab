@@ -41,7 +41,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
             let tie: TabTieGlyph = new TabTieGlyph(n.tieOrigin!, n, true);
             this.ties.push(tie);
         }
-        if(n.isLeftHandTapped) {
+        if (n.isLeftHandTapped && !n.isHammerPullDestination) {
             let tapSlur: TabTieGlyph = new TabTieGlyph(n, n, false);
             this.ties.push(tapSlur);
         }
