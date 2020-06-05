@@ -80,7 +80,7 @@ describe('MidiFileGeneratorTest', () => {
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 12),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
             new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -89,26 +89,26 @@ describe('MidiFileGeneratorTest', () => {
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 12),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
             new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new TimeSignatureEvent(0, 4, 4),
             new TempoEvent(0, 120),
 
             // bend effect
-            new BendEvent(0, 0, info.secondaryChannel, 32), // no bend
-            new BendEvent(0, 0, info.secondaryChannel, 32),
-            new BendEvent(87, 0, info.secondaryChannel, 33),
-            new BendEvent(174, 0, info.secondaryChannel, 34),
-            new BendEvent(261, 0, info.secondaryChannel, 35),
-            new BendEvent(349, 0, info.secondaryChannel, 36),
-            new BendEvent(436, 0, info.secondaryChannel, 37),
-            new BendEvent(523, 0, info.secondaryChannel, 38),
-            new BendEvent(610, 0, info.secondaryChannel, 39),
-            new BendEvent(698, 0, info.secondaryChannel, 40),
-            new BendEvent(785, 0, info.secondaryChannel, 41),
-            new BendEvent(872, 0, info.secondaryChannel, 42),
-            new BendEvent(959, 0, info.secondaryChannel, 43),
+            new BendEvent(0, 0, info.secondaryChannel, 8192), // no bend
+            new BendEvent(0, 0, info.secondaryChannel, 8192),
+            new BendEvent(1 * 80, 0, info.secondaryChannel, 8277),
+            new BendEvent(2 * 80, 0, info.secondaryChannel, 8363),
+            new BendEvent(3 * 80, 0, info.secondaryChannel, 8448),
+            new BendEvent(4 * 80, 0, info.secondaryChannel, 8533),
+            new BendEvent(5 * 80, 0, info.secondaryChannel, 8619),
+            new BendEvent(6 * 80, 0, info.secondaryChannel, 8704),
+            new BendEvent(7 * 80, 0, info.secondaryChannel, 8789),
+            new BendEvent(8 * 80, 0, info.secondaryChannel, 8875),
+            new BendEvent(9 * 80, 0, info.secondaryChannel, 8960),
+            new BendEvent(10 * 80, 0, info.secondaryChannel, 9045),
+            new BendEvent(11 * 80, 0, info.secondaryChannel, 9131),
 
             // note itself
             new NoteEvent(
@@ -121,7 +121,7 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // reset bend
-            new BendEvent(960, 0, info.primaryChannel, 32),
+            new BendEvent(960, 0, info.primaryChannel, 8192),
             new NoteEvent(
                 960,
                 0,
@@ -137,9 +137,10 @@ describe('MidiFileGeneratorTest', () => {
         for (let i: number = 0; i < handler.midiEvents.length; i++) {
             Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
             if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(handler.midiEvents[i])).toEqual(
+                expect(expectedEvents[i].equals(handler.midiEvents[i]))
+                .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
+                .toEqual(
                     true,
-                    `${expectedEvents[i]} !== ${handler.midiEvents[i]}`
                 );
             }
         }
@@ -202,7 +203,7 @@ describe('MidiFileGeneratorTest', () => {
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 12),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
             new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -211,46 +212,46 @@ describe('MidiFileGeneratorTest', () => {
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 12),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
             new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new TimeSignatureEvent(0, 4, 4),
             new TempoEvent(0, 120),
 
             // on beat
-            new BendEvent(ticks[0], 0, info.primaryChannel, 32),
+            new BendEvent(ticks[0], 0, info.primaryChannel, 8192),
             new NoteEvent(ticks[0], 0, info.primaryChannel, 3840, 67, DynamicValue.F),
 
-            new BendEvent(ticks[1], 0, info.primaryChannel, 32),
+            new BendEvent(ticks[1], 0, info.primaryChannel, 8192),
             new NoteEvent(ticks[1], 0, info.primaryChannel, 120, 67, DynamicValue.F),
 
-            new BendEvent(ticks[2], 0, info.primaryChannel, 32),
+            new BendEvent(ticks[2], 0, info.primaryChannel, 8192),
             new NoteEvent(ticks[2], 0, info.primaryChannel, 3720, 67, DynamicValue.F),
 
             // before beat
-            new BendEvent(ticks[3], 0, info.primaryChannel, 32),
+            new BendEvent(ticks[3], 0, info.primaryChannel, 8192),
             new NoteEvent(ticks[3], 0, info.primaryChannel, 3720, 67, DynamicValue.F),
 
-            new BendEvent(ticks[4], 0, info.primaryChannel, 32),
+            new BendEvent(ticks[4], 0, info.primaryChannel, 8192),
             new NoteEvent(ticks[4], 0, info.primaryChannel, 120, 67, DynamicValue.F),
 
-            new BendEvent(ticks[5], 0, info.primaryChannel, 32),
+            new BendEvent(ticks[5], 0, info.primaryChannel, 8192),
             new NoteEvent(ticks[5], 0, info.primaryChannel, 3840, 67, DynamicValue.F),
 
             // bend beat
-            new BendEvent(ticks[6], 0, info.secondaryChannel, 32),
-            new BendEvent(ticks[6] + 13 * 0, 0, info.secondaryChannel, 32),
-            new BendEvent(ticks[6] + 13 * 1, 0, info.secondaryChannel, 33),
-            new BendEvent(ticks[6] + 13 * 2, 0, info.secondaryChannel, 34),
-            new BendEvent(ticks[6] + 13 * 3, 0, info.secondaryChannel, 35),
-            new BendEvent(ticks[6] + 13 * 4, 0, info.secondaryChannel, 36),
-            new BendEvent(ticks[6] + 13 * 5, 0, info.secondaryChannel, 37),
-            new BendEvent(ticks[6] + 13 * 6, 0, info.secondaryChannel, 38),
-            new BendEvent(ticks[6] + 13 * 7, 0, info.secondaryChannel, 39),
-            new BendEvent(ticks[6] + 13 * 8, 0, info.secondaryChannel, 40),
-            new BendEvent(ticks[6] + 13 * 9, 0, info.secondaryChannel, 41),
-            new BendEvent(ticks[6] + 13 * 10, 0, info.secondaryChannel, 42),
-            new BendEvent(ticks[6] + 13 * 11 + 1, 0, info.secondaryChannel, 43),
+            new BendEvent(ticks[6], 0, info.secondaryChannel, 8192),
+            new BendEvent(ticks[6] + 12 * 0, 0, info.secondaryChannel, 8192),
+            new BendEvent(ticks[6] + 12 * 1, 0, info.secondaryChannel, 8277),
+            new BendEvent(ticks[6] + 12 * 2, 0, info.secondaryChannel, 8363),
+            new BendEvent(ticks[6] + 12 * 3, 0, info.secondaryChannel, 8448),
+            new BendEvent(ticks[6] + 12 * 4, 0, info.secondaryChannel, 8533),
+            new BendEvent(ticks[6] + 12 * 5, 0, info.secondaryChannel, 8619),
+            new BendEvent(ticks[6] + 12 * 6, 0, info.secondaryChannel, 8704),
+            new BendEvent(ticks[6] + 12 * 7, 0, info.secondaryChannel, 8789),
+            new BendEvent(ticks[6] + 12 * 8, 0, info.secondaryChannel, 8875),
+            new BendEvent(ticks[6] + 12 * 9, 0, info.secondaryChannel, 8960),
+            new BendEvent(ticks[6] + 12 * 10, 0, info.secondaryChannel, 9045),
+            new BendEvent(ticks[6] + 12 * 11, 0, info.secondaryChannel, 9131),
             new NoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, DynamicValue.F),
 
             // end of track
@@ -260,10 +261,9 @@ describe('MidiFileGeneratorTest', () => {
         for (let i: number = 0; i < handler.midiEvents.length; i++) {
             Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
             if (i < expectedEvents.length) {
-                expect(handler.midiEvents[i].equals(expectedEvents[i])).toEqual(
-                    true,
-                    `${expectedEvents[i]} !== ${handler.midiEvents[i]}`
-                );
+                expect(handler.midiEvents[i].equals(expectedEvents[i]))
+                .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
+                .toEqual(true);
             }
         }
         expect(handler.midiEvents.length).toEqual(expectedEvents.length);
@@ -271,7 +271,7 @@ describe('MidiFileGeneratorTest', () => {
 
     it('bend-multi-point', () => {
         let tex: string = ':4 15.6{b(0 4 0)} 15.6';
-        let score: Score = parseTex(tex);
+        let score: Score = parseTex(tex); 
         expect(score.tracks.length).toEqual(1);
         expect(score.tracks[0].staves[0].bars.length).toEqual(1);
         expect(score.tracks[0].staves[0].bars[0].voices.length).toEqual(1);
@@ -291,7 +291,7 @@ describe('MidiFileGeneratorTest', () => {
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 12),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
             new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -300,39 +300,39 @@ describe('MidiFileGeneratorTest', () => {
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 12),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
             new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new TimeSignatureEvent(0, 4, 4),
             new TempoEvent(0, 120),
 
             // bend effect
-            new BendEvent(0, 0, info.secondaryChannel, 32), // no bend
-            new BendEvent(0, 0, info.secondaryChannel, 32),
-            new BendEvent(43, 0, info.secondaryChannel, 33),
-            new BendEvent(87, 0, info.secondaryChannel, 34),
-            new BendEvent(130, 0, info.secondaryChannel, 35),
-            new BendEvent(174, 0, info.secondaryChannel, 36),
-            new BendEvent(218, 0, info.secondaryChannel, 37),
-            new BendEvent(261, 0, info.secondaryChannel, 38),
-            new BendEvent(305, 0, info.secondaryChannel, 39),
-            new BendEvent(349, 0, info.secondaryChannel, 40),
-            new BendEvent(392, 0, info.secondaryChannel, 41),
-            new BendEvent(436, 0, info.secondaryChannel, 42),
-            new BendEvent(479, 0, info.secondaryChannel, 43), // full bend
+            new BendEvent(0, 0, info.secondaryChannel, 8192), // no bend
+            new BendEvent(0 * 40, 0, info.secondaryChannel, 8192),
+            new BendEvent(1 * 40, 0, info.secondaryChannel, 8277),
+            new BendEvent(2 * 40, 0, info.secondaryChannel, 8363),
+            new BendEvent(3 * 40, 0, info.secondaryChannel, 8448),
+            new BendEvent(4 * 40, 0, info.secondaryChannel, 8533),
+            new BendEvent(5 * 40, 0, info.secondaryChannel, 8619),
+            new BendEvent(6 * 40, 0, info.secondaryChannel, 8704),
+            new BendEvent(7 * 40, 0, info.secondaryChannel, 8789),
+            new BendEvent(8 * 40, 0, info.secondaryChannel, 8875),
+            new BendEvent(9 * 40, 0, info.secondaryChannel, 8960),
+            new BendEvent(10 * 40, 0, info.secondaryChannel, 9045),
+            new BendEvent(11 * 40, 0, info.secondaryChannel, 9131),
+            new BendEvent(12 * 40, 0, info.secondaryChannel, 9216), // full bend
 
-            new BendEvent(480, 0, info.secondaryChannel, 43), // full bend
-            new BendEvent(523, 0, info.secondaryChannel, 42),
-            new BendEvent(567, 0, info.secondaryChannel, 41),
-            new BendEvent(610, 0, info.secondaryChannel, 40),
-            new BendEvent(654, 0, info.secondaryChannel, 39),
-            new BendEvent(698, 0, info.secondaryChannel, 38),
-            new BendEvent(741, 0, info.secondaryChannel, 37),
-            new BendEvent(785, 0, info.secondaryChannel, 36),
-            new BendEvent(829, 0, info.secondaryChannel, 35),
-            new BendEvent(872, 0, info.secondaryChannel, 34),
-            new BendEvent(916, 0, info.secondaryChannel, 33),
-            new BendEvent(959, 0, info.secondaryChannel, 32), // no bend
+            new BendEvent(13 * 40, 0, info.secondaryChannel, 9131), // full bend
+            new BendEvent(14 * 40, 0, info.secondaryChannel, 9045),
+            new BendEvent(15 * 40, 0, info.secondaryChannel, 8960),
+            new BendEvent(16 * 40, 0, info.secondaryChannel, 8875),
+            new BendEvent(17 * 40, 0, info.secondaryChannel, 8789),
+            new BendEvent(18 * 40, 0, info.secondaryChannel, 8704),
+            new BendEvent(19 * 40, 0, info.secondaryChannel, 8619),
+            new BendEvent(20 * 40, 0, info.secondaryChannel, 8533),
+            new BendEvent(21 * 40, 0, info.secondaryChannel, 8448),
+            new BendEvent(22 * 40, 0, info.secondaryChannel, 8363),
+            new BendEvent(23 * 40, 0, info.secondaryChannel, 8277), // no bend
 
             // note itself
             new NoteEvent(
@@ -345,7 +345,7 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // reset bend
-            new BendEvent(960, 0, info.primaryChannel, 32), // finish
+            new BendEvent(960, 0, info.primaryChannel, 8192), // finish
             new NoteEvent(
                 960,
                 0,
@@ -359,9 +359,10 @@ describe('MidiFileGeneratorTest', () => {
         for (let i: number = 0; i < handler.midiEvents.length; i++) {
             Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
             if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(handler.midiEvents[i])).toEqual(
-                    true,
-                    `${expectedEvents[i]} !== ${handler.midiEvents[i]}`
+                expect(expectedEvents[i].equals(handler.midiEvents[i]))
+                .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
+                .toEqual(
+                    true                   
                 );
             }
         }

@@ -171,7 +171,7 @@ export class TinySoundFont {
             case MidiEventType.ChannelAftertouch:
                 break;
             case MidiEventType.PitchBend:
-                this.channelSetPitchWheel(channel, data1 | (data2 << 8));
+                this.channelSetPitchWheel(channel, data1 | (data2 << 7));
                 break;
         }
     }

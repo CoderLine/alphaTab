@@ -8,6 +8,7 @@ import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { DynamicValue } from '@src/model/DynamicValue';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 /**
  * This implementation of the {@link IMidiFileHandler}
@@ -116,11 +117,17 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public addBend(track: number, tick: number, channel: number, value: number): void {
+        if (value >= SynthConstants.MaxPitchWheel) {
+            value = SynthConstants.MaxPitchWheel;
+        } else {
+            value = Math.floor(value);
+        }
+
         const message: MidiEvent = new MidiEvent(
             tick,
             this.makeCommand(MidiEventType.PitchBend, channel),
-            0,
-            AlphaSynthMidiFileHandler.fixValue(value)
+            value & 0x7F, 
+            (value >> 7) & 0x7F
         );
         this._midiFile.addEvent(message);
     }

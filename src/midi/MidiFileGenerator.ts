@@ -36,6 +36,7 @@ import { NotationMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -138,14 +139,14 @@ export class MidiFileGenerator {
         this._handler.addControlChange(track.index, 0, channel, ControllerType.VolumeCoarse, volume);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.PanCoarse, balance);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.ExpressionControllerCoarse, 127);
-       
+
         // set parameter that is being updated (0) -> PitchBendRangeCoarse
         this._handler.addControlChange(track.index, 0, channel, ControllerType.RegisteredParameterFine, 0);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.RegisteredParameterCourse, 0);
-       
+
         // Set PitchBendRangeCoarse to 12
         this._handler.addControlChange(track.index, 0, channel, ControllerType.DataEntryFine, 0);
-        this._handler.addControlChange(track.index, 0, channel, ControllerType.DataEntryCoarse, 12);
+        this._handler.addControlChange(track.index, 0, channel, ControllerType.DataEntryCoarse, MidiFileGenerator.PitchBendRangeInSemitones);
         this._handler.addProgramChange(track.index, 0, channel, playbackInfo.program);
     }
 
@@ -229,7 +230,7 @@ export class MidiFileGenerator {
     private generateBeat(beat: Beat, barStartTick: number, realBar: Bar): void {
         let beatStart: number = beat.playbackStart;
         let audioDuration: number = beat.playbackDuration;
-        
+
         if (beat.voice.bar.isEmpty) {
             audioDuration = beat.voice.bar.masterBar.calculateDuration();
         } else if (
@@ -401,16 +402,19 @@ export class MidiFileGenerator {
             note.hasBend || note.beat.hasWhammyBar || note.beat.vibrato !== VibratoType.None
                 ? track.playbackInfo.secondaryChannel
                 : track.playbackInfo.primaryChannel;
-        let initialBend: number = MidiFileGenerator.DefaultBend;
+        let initialBend: number = 0;
 
         if (note.hasBend) {
-            initialBend += Math.round(note.bendPoints[0].value * MidiFileGenerator.DefaultBendSemitone);
+            initialBend = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
         } else if (note.beat.hasWhammyBar) {
-            initialBend += Math.round(note.beat.whammyBarPoints[0].value * MidiFileGenerator.DefaultBendSemitone);
+            initialBend = MidiFileGenerator.getPitchWheel(note.beat.whammyBarPoints[0].value);
         } else if (note.isTieDestination) {
-            initialBend = 0;
+            initialBend = -1;
+        } else {
+            initialBend = MidiFileGenerator.getPitchWheel(0);
         }
-        if (initialBend > 0) {
+
+        if (initialBend >= 0) {
             this._handler.addBend(track.index, noteStart, channel, initialBend);
         }
 
@@ -652,7 +656,7 @@ export class MidiFileGenerator {
                     track.index,
                     (noteStart + phase) | 0,
                     channel,
-                    MidiFileGenerator.DefaultBend + bend
+                    MidiFileGenerator.getPitchWheel(bend)
                 );
                 phase += resolution;
             }
@@ -660,8 +664,34 @@ export class MidiFileGenerator {
         }
     }
 
-    private static readonly DefaultBend: number = 0x20;
-    private static readonly DefaultBendSemitone: number = 2.75;
+    /**
+     * Maximum semitones that are supported in bends in one direction (up or down)
+     * GP has 8 full tones on whammys. 
+     */
+    private static readonly PitchBendRangeInSemitones = 8 * 2;
+    /**
+     * The value on how many pitch-values are used for one semitone
+     */
+    private static readonly PitchValuePerSemitone: number = SynthConstants.DefaultPitchWheel / MidiFileGenerator.PitchBendRangeInSemitones;
+
+    /**
+     * How many intermediate steps should be generated on a bend per semitone.
+     */
+    private static readonly BendBreakpointsPerSemitone = 6;
+
+    /**
+     * The pitch value per intermediate bend-step
+     */
+    private static readonly PitchValuePerBreakpoint = MidiFileGenerator.PitchValuePerSemitone / MidiFileGenerator.BendBreakpointsPerSemitone;
+
+
+    /**
+     * Calculates the midi pitch wheel value for the give bend value.  
+     */
+    public static getPitchWheel(bendValue: number) {
+        // bend values are 1/4 notes therefore we only take half a semitone value per bend value
+        return SynthConstants.DefaultPitchWheel + (bendValue / 2) * MidiFileGenerator.PitchValuePerSemitone;
+    }
 
     private generateBend(note: Note, noteStart: number, noteDuration: MidiNoteDuration, channel: number): void {
         let bendPoints: BendPoint[] = note.bendPoints;
@@ -795,9 +825,7 @@ export class MidiFileGenerator {
                         playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, note.bendPoints[1].value));
                         break;
                     case BendStyle.Fast:
-                        const preBendValue: number =
-                            MidiFileGenerator.DefaultBend +
-                            note.bendPoints[0].value * MidiFileGenerator.DefaultBendSemitone;
+                        const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
                         this._handler.addBend(track.index, noteStart, channel, preBendValue | 0);
                         if (!finalBendValue || finalBendValue < note.bendPoints[1].value) {
                             finalBendValue = note.bendPoints[1].value;
@@ -824,9 +852,7 @@ export class MidiFileGenerator {
                         playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, note.bendPoints[1].value));
                         break;
                     case BendStyle.Fast:
-                        const preBendValue: number =
-                            MidiFileGenerator.DefaultBend +
-                            note.bendPoints[0].value * MidiFileGenerator.DefaultBendSemitone;
+                        const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
                         this._handler.addBend(track.index, noteStart, channel, preBendValue | 0);
                         this.generateSongBookWhammyOrBend(
                             noteStart,
@@ -856,10 +882,8 @@ export class MidiFileGenerator {
         const startTick: number = bendAtBeginning ? noteStart : noteStart + duration - bendDuration;
         const ticksBetweenPoints: number = bendDuration / (bendValues.length - 1);
         for (let i: number = 0; i < bendValues.length - 1; i++) {
-            const currentBendValue: number =
-                MidiFileGenerator.DefaultBend + bendValues[i] * MidiFileGenerator.DefaultBendSemitone;
-            const nextBendValue: number =
-                MidiFileGenerator.DefaultBend + bendValues[i + 1] * MidiFileGenerator.DefaultBendSemitone;
+            const currentBendValue: number = MidiFileGenerator.getPitchWheel(bendValues[i]);
+            const nextBendValue: number = MidiFileGenerator.getPitchWheel(bendValues[i + 1]);
             const tick: number = startTick + ticksBetweenPoints * i;
             this.generateBendValues(tick, channel, track, ticksBetweenPoints, currentBendValue, nextBendValue);
         }
@@ -949,8 +973,7 @@ export class MidiFileGenerator {
                         playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, bendPoints[1].value));
                         break;
                     case BendStyle.Fast:
-                        const preDiveValue: number =
-                            MidiFileGenerator.DefaultBend + bendPoints[0].value * MidiFileGenerator.DefaultBendSemitone;
+                        const preDiveValue: number = MidiFileGenerator.getPitchWheel(bendPoints[0].value);
                         this._handler.addBend(track.index, noteStart, channel, preDiveValue | 0);
                         const whammyDuration: number = Math.min(
                             duration,
@@ -984,10 +1007,8 @@ export class MidiFileGenerator {
             const currentPoint: BendPoint = playedBendPoints[i];
             const nextPoint: BendPoint = playedBendPoints[i + 1];
             // calculate the midi pitchbend values start and end values
-            const currentBendValue: number =
-                MidiFileGenerator.DefaultBend + currentPoint.value * MidiFileGenerator.DefaultBendSemitone;
-            const nextBendValue: number =
-                MidiFileGenerator.DefaultBend + nextPoint.value * MidiFileGenerator.DefaultBendSemitone;
+            const currentBendValue: number = MidiFileGenerator.getPitchWheel(currentPoint.value);
+            const nextBendValue: number = MidiFileGenerator.getPitchWheel(nextPoint.value);
             // how many midi ticks do we have to spend between this point and the next one?
             const ticksBetweenPoints: number = ticksPerPosition * (nextPoint.offset - currentPoint.offset);
             // we will generate one pitchbend message for each value
@@ -1005,19 +1026,22 @@ export class MidiFileGenerator {
         currentBendValue: number,
         nextBendValue: number
     ): void {
-        const ticksPerValue: number = ticksBetweenPoints / Math.abs(nextBendValue - currentBendValue);
+        const numberOfSemitones = Math.abs(nextBendValue - currentBendValue) / MidiFileGenerator.PitchValuePerSemitone;
+        const numberOfSteps = numberOfSemitones * MidiFileGenerator.BendBreakpointsPerSemitone;
+        const ticksPerStep: number = ticksBetweenPoints / numberOfSteps;
+
         // bend up
         if (currentBendValue < nextBendValue) {
             while (currentBendValue <= nextBendValue) {
                 this._handler.addBend(track.index, currentTick | 0, channel, Math.round(currentBendValue));
-                currentBendValue++;
-                currentTick += ticksPerValue;
+                currentBendValue += MidiFileGenerator.PitchValuePerBreakpoint;
+                currentTick += ticksPerStep;
             }
         } else if (currentBendValue > nextBendValue) {
             while (currentBendValue >= nextBendValue) {
                 this._handler.addBend(track.index, currentTick | 0, channel, Math.round(currentBendValue));
-                currentBendValue--;
-                currentTick += ticksPerValue;
+                currentBendValue -= MidiFileGenerator.PitchValuePerBreakpoint;
+                currentTick += ticksPerStep;
             }
         } else {
             this._handler.addBend(track.index, currentTick | 0, channel, Math.round(currentBendValue));

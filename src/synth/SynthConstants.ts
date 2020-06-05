@@ -12,4 +12,13 @@ export class SynthConstants {
     public static readonly MaxProgram: number = 127;
     public static readonly MinPlaybackSpeed: number = 0.125;
     public static readonly MaxPlaybackSpeed: number = 8;
+
+    /**
+     * The Midi Pitch bend message is a 15-bit value
+     */
+    public static readonly MaxPitchWheel: number = 16384;
+    /**
+     * The pitch wheel value for no pitch change at all.
+     */
+    public static readonly DefaultPitchWheel: number = SynthConstants.MaxPitchWheel / 2;
 }
