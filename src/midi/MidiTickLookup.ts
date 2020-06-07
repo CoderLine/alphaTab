@@ -2,7 +2,6 @@ import { BeatTickLookup } from '@src/midi/BeatTickLookup';
 import { MasterBarTickLookup } from '@src/midi/MasterBarTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { Beat } from '@src/model/Beat';
-import { GraceType } from '@src/model/GraceType';
 import { MasterBar } from '@src/model/MasterBar';
 import { Track } from '@src/model/Track';
 
@@ -133,7 +132,6 @@ export class MidiTickLookup {
         for (let b: number = index + 1; b < beats.length; b++) {
             const currentBeat: BeatTickLookup = beats[b];
             if (
-                currentBeat.beat.graceType === GraceType.None &&
                 currentBeat.start > beat.start &&
                 trackLookup.has(currentBeat.beat.voice.bar.staff.track.index)
             ) {
@@ -148,7 +146,6 @@ export class MidiTickLookup {
             for (let b: number = 0; b < beats.length; b++) {
                 const currentBeat: BeatTickLookup = beats[b];
                 if (
-                    currentBeat.beat.graceType === GraceType.None &&
                     trackLookup.has(currentBeat.beat.voice.bar.staff.track.index)
                 ) {
                     nextBeat = currentBeat;
