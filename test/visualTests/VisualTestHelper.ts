@@ -2,13 +2,13 @@ import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
-import pixelmatch from 'pixelmatch';
 import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { CoreSettings } from '@src/CoreSettings';
 import { Environment } from '@src/Environment';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
+import { PixelMatch } from './PixelMatch';
 
 /**
  * @partial
@@ -265,9 +265,9 @@ export class VisualTestHelper {
 
                     const newActualContext = newActual.getContext('2d')!;
                     newActualContext.drawImage(actual, 0, 0);
-                    newActualContext.strokeStyle = 'red'
+                    newActualContext.strokeStyle = 'red';
                     newActualContext.lineWidth = 2;
-                    newActualContext.strokeRect(0,0, newActual.width, newActual.height);
+                    newActualContext.strokeRect(0, 0, newActual.width, newActual.height);
 
                     actual = newActual;
                 }
@@ -290,7 +290,7 @@ export class VisualTestHelper {
                 };
 
                 try {
-                    let differentPixels = pixelmatch(
+                    let match = PixelMatch.match(
                         new Uint8Array(expectedImageData.data.buffer),
                         new Uint8Array(actualImageData.data.buffer),
                         new Uint8Array(diffImageData.data.buffer),
@@ -306,14 +306,15 @@ export class VisualTestHelper {
 
                     diffContext.putImageData(diffImageData, 0, 0);
 
-                    let totalPixels = expected.width * expected.height;
-                    let percentDifference = (differentPixels / totalPixels) * 100;
-                    result.pass = differentPixels < 100;
+                    // only pixels that are not transparent are relevant for the diff-ratio
+                    let totalPixels = match.totalPixels - match.transparentPixels;
+                    let percentDifference = (match.differentPixels / totalPixels) * 100;
+                    result.pass = percentDifference < 0.5;
 
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
-                        result.message = `Difference between original and new image is too big: ${differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
-                    } else if(sizeMismatch) {
+                        result.message = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
+                    } else if (sizeMismatch) {
                         result.message = `Image sizes do not match: ${expected.width}/${expected.height} vs ${oldActual.width}/${oldActual.height}`;
                         result.pass = false;
                     }

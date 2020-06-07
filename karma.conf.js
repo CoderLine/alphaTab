@@ -35,7 +35,6 @@ module.exports = function (config) {
       plugins: [
         resolve({
           mappings: {
-            "pixelmatch": "node_modules/pixelmatch/index.js",
             "@src": "dist/lib.test/src",
             "@test": "dist/lib.test/test"
           }          
