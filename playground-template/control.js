@@ -252,7 +252,7 @@ function setupControl(selector) {
     control.querySelectorAll('.at-zoom-options a').forEach(function (a) {
         a.onclick = function (e) {
             e.preventDefault();
-            at.settings.scale = parseInt(e.target.innerText) / 100.0;
+            at.settings.display.scale = parseInt(e.target.innerText) / 100.0;
             control.querySelector('.at-zoom-label').innerText = e.target.innerText;
             at.updateSettings();
             at.render();
