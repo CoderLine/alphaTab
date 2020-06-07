@@ -675,15 +675,14 @@ export class MidiFileGenerator {
     private static readonly PitchValuePerSemitone: number = SynthConstants.DefaultPitchWheel / MidiFileGenerator.PitchBendRangeInSemitones;
 
     /**
-     * How many intermediate steps should be generated on a bend per semitone.
+     * The minimum number of breakpoints generated per semitone bend. 
      */
-    private static readonly BendBreakpointsPerSemitone = 6;
+    private static readonly MinBreakpointsPerSemitone = 6;
 
     /**
-     * The pitch value per intermediate bend-step
+     * How long until a new breakpoint is generated for a bend. 
      */
-    private static readonly PitchValuePerBreakpoint = MidiFileGenerator.PitchValuePerSemitone / MidiFileGenerator.BendBreakpointsPerSemitone;
-
+    private static readonly MillisecondsPerBreakpoint = 150;
 
     /**
      * Calculates the midi pitch wheel value for the give bend value.  
@@ -1026,25 +1025,24 @@ export class MidiFileGenerator {
         currentBendValue: number,
         nextBendValue: number
     ): void {
+        const millisBetweenPoints = MidiUtils.ticksToMillis(ticksBetweenPoints, this._currentTempo);
         const numberOfSemitones = Math.abs(nextBendValue - currentBendValue) / MidiFileGenerator.PitchValuePerSemitone;
-        const numberOfSteps = numberOfSemitones * MidiFileGenerator.BendBreakpointsPerSemitone;
-        const ticksPerStep: number = ticksBetweenPoints / numberOfSteps;
-
-        // bend up
-        if (currentBendValue < nextBendValue) {
-            while (currentBendValue <= nextBendValue) {
-                this._handler.addBend(track.index, currentTick | 0, channel, Math.round(currentBendValue));
-                currentBendValue += MidiFileGenerator.PitchValuePerBreakpoint;
-                currentTick += ticksPerStep;
-            }
-        } else if (currentBendValue > nextBendValue) {
-            while (currentBendValue >= nextBendValue) {
-                this._handler.addBend(track.index, currentTick | 0, channel, Math.round(currentBendValue));
-                currentBendValue -= MidiFileGenerator.PitchValuePerBreakpoint;
-                currentTick += ticksPerStep;
-            }
-        } else {
+        const numberOfSteps = Math.max(
+            MidiFileGenerator.MinBreakpointsPerSemitone * numberOfSemitones,
+            millisBetweenPoints / MidiFileGenerator.MillisecondsPerBreakpoint
+        );
+        const ticksPerBreakpoint: number = ticksBetweenPoints / numberOfSteps;
+        const pitchPerBreakpoint = (nextBendValue - currentBendValue) / numberOfSteps;
+    
+        for(let i = 0; i < numberOfSteps; i++) {
             this._handler.addBend(track.index, currentTick | 0, channel, Math.round(currentBendValue));
+            currentBendValue += pitchPerBreakpoint;
+            currentTick += ticksPerBreakpoint;
+        }
+
+        // final bend value if needed
+        if(currentBendValue < nextBendValue) {
+            this._handler.addBend(track.index, currentTick | 0, channel, nextBendValue);
         }
     }
 

@@ -307,8 +307,8 @@ describe('MidiFileGeneratorTest', () => {
             new TempoEvent(0, 120),
 
             // bend effect
-            new BendEvent(0, 0, info.secondaryChannel, 8192), // no bend
-            new BendEvent(0 * 40, 0, info.secondaryChannel, 8192),
+            new BendEvent(0, 0, info.secondaryChannel, 8192), 
+            new BendEvent(0 * 40, 0, info.secondaryChannel, 8192), // no bend
             new BendEvent(1 * 40, 0, info.secondaryChannel, 8277),
             new BendEvent(2 * 40, 0, info.secondaryChannel, 8363),
             new BendEvent(3 * 40, 0, info.secondaryChannel, 8448),
@@ -321,8 +321,7 @@ describe('MidiFileGeneratorTest', () => {
             new BendEvent(10 * 40, 0, info.secondaryChannel, 9045),
             new BendEvent(11 * 40, 0, info.secondaryChannel, 9131),
             new BendEvent(12 * 40, 0, info.secondaryChannel, 9216), // full bend
-
-            new BendEvent(13 * 40, 0, info.secondaryChannel, 9131), // full bend
+            new BendEvent(13 * 40, 0, info.secondaryChannel, 9131), 
             new BendEvent(14 * 40, 0, info.secondaryChannel, 9045),
             new BendEvent(15 * 40, 0, info.secondaryChannel, 8960),
             new BendEvent(16 * 40, 0, info.secondaryChannel, 8875),
@@ -332,7 +331,8 @@ describe('MidiFileGeneratorTest', () => {
             new BendEvent(20 * 40, 0, info.secondaryChannel, 8533),
             new BendEvent(21 * 40, 0, info.secondaryChannel, 8448),
             new BendEvent(22 * 40, 0, info.secondaryChannel, 8363),
-            new BendEvent(23 * 40, 0, info.secondaryChannel, 8277), // no bend
+            new BendEvent(23 * 40, 0, info.secondaryChannel, 8277),
+            new BendEvent(24 * 40, 0, info.secondaryChannel, 8192), // no bend
 
             // note itself
             new NoteEvent(
