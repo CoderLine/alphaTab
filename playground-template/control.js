@@ -265,16 +265,16 @@ function setupControl(selector) {
             const settings = at.settings;
             switch (e.target.dataset.layout) {
                 case 'page':
-                    settings.layout.mode = 'page';
-                    settings.scrollMode = 1;
+                    settings.display.layoutMode = alphaTab.LayoutMode.Page;
+                    settings.player.scrollMode = alphaTab.ScrollMode.Continuous;
                     break;
                 case 'horizontal-bar':
-                    settings.layout.mode = 'horizontal';
-                    settings.scrollMode = 1;
+                    settings.display.layoutMode = alphaTab.LayoutMode.Horizontal;
+                    settings.player.scrollMode = alphaTab.ScrollMode.Continuous;
                     break;
                 case 'horizontal-screen':
-                    settings.layout.mode = 'horizontal';
-                    settings.scrollMode = 2;
+                    settings.display.layoutMode = alphaTab.LayoutMode.Horizontal;
+                    settings.player.scrollMode = alphaTab.ScrollMode.OffScreen;
                     break;
             }
 
