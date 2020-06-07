@@ -197,12 +197,16 @@ export class MidiFileSequencer {
     private fillMidiEventQueueLimited(maxMilliseconds: number): boolean {
         let millisecondsPerBuffer: number =
             (TinySoundFont.MicroBufferSize / this._synthesizer.outSampleRate) * 1000 * this.playbackSpeed;
-        if (maxMilliseconds > 0 && maxMilliseconds < millisecondsPerBuffer) {
-            millisecondsPerBuffer = maxMilliseconds;
+        let endTime: number = this.internalEndTime;
+        if (maxMilliseconds > 0) {
+            // ensure that first microbuffer does not already exceed max time
+            if( maxMilliseconds < millisecondsPerBuffer) {
+                millisecondsPerBuffer = maxMilliseconds;
+            }
+            endTime = Math.min(this.internalEndTime, this._currentTime + maxMilliseconds);
         }
 
         let anyEventsDispatched: boolean = false;
-        let endTime: number = this.internalEndTime;
         for (let i: number = 0; i < TinySoundFont.MicroBufferCount; i++) {
             this._currentTime += millisecondsPerBuffer;
             while (
@@ -213,6 +217,9 @@ export class MidiFileSequencer {
                 this._synthesizer.dispatchEvent(i, this._synthData[this._eventIndex]);
                 this._eventIndex++;
                 anyEventsDispatched = true;
+            }
+            if(this._currentTime >= endTime) {
+                break;   
             }
         }
 

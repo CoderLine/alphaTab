@@ -914,7 +914,10 @@ export class AlphaTabApiBase<TSettings> {
                     this._selectionStart.beat.voice.bar.masterBar
                 );
                 // move to selection start
-                this.cursorUpdateBeat(this._selectionStart.beat, null, 0, false, null);
+                this._currentBeat = null; // reset current beat so it is updating the cursor
+                if(this._playerState === PlayerState.Paused) {
+                    this.cursorUpdateBeat(this._selectionStart.beat, null, 0, false, [this._selectionStart.beat]);
+                }
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
                 // set playback range
                 if (this._selectionEnd && this._selectionStart.beat !== this._selectionEnd.beat) {
