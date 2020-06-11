@@ -383,3 +383,30 @@ input[type="range"]::-moz-range-thumb {
   left: 0;
   font-size: 8px;
 }
+
+@media screen and (max-width: 920px) {
+  .at-player-right > *:not(.at-logo) {
+    display: none !important;
+  }
+
+  .at-wrap {
+    height: 60vh;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .at-footer * {
+    font-size: 12px !important;
+  }
+  .at-logo img {
+    height: 18px;
+  }
+
+  .at-sidebar{
+    display: none;
+  }
+
+  .at-viewport {
+    left: 0 !important;
+  }
+}
