@@ -39,61 +39,57 @@ body > * {
 
 .at-wrap {
     position: relative;
-    margin: 30px;
+    width: 80%;
+    height: 80vh;
+    margin: 0 auto;
     border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 
-    display: grid;
-    grid-template-columns: 70px 1fr;
-    grid-template-rows: 1fr auto;
-    grid-template-areas:
-        'sidebar viewport'
-        'footer  footer';
+.at-content {
+    flex: 1 1 auto;
+    overflow: hidden;
+    position: relative;
+}
+
+.at-footer {
+    flex: 0 0 auto;
+    background: #436d9d;
+    color: #fff;
 }
 
 .at-sidebar {
-    grid-area: sidebar;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-    overflow-x: hidden;
-    overflow-y: hidden;
+    max-width: 70px;
+    width: auto;
     display: flex;
     align-content: stretch;
     z-index: 1001;
     position: absolute;
-    height: 100%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow: hidden;
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
     background: #f7f7f7;
 }
 
-.at-sidebar-content {
-    width: 69px;
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
-    transition: width 0.2s;
-}
-
 .at-sidebar:hover {
-    width: auto;
+    max-width: 400px;
+    transition: max-width 0.2s;
     overflow-y: auto;
-}
-.at-sidebar:hover .at-sidebar-content {
-    width: 340px;
-}
-
-.at-sidebar h1 {
-    font-size: 18px;
-    font-weight: 400;
-    padding-bottom: 12px;
-    padding-left: 24px;
-    padding-top: 24px;
 }
 
 .at-viewport {
-    grid-area: viewport;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     overflow-y: auto;
+    position: absolute;
+    top: 0;
+    left: 70px;
+    right: 0;
+    bottom: 0;
     padding-right: 20px;
-}
-
-.at-footer {
-    grid-area: footer;
 }
 
 .at-song-title {
@@ -104,14 +100,13 @@ body > * {
     display: grid;
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
-    grid-template-areas:
-        'icon title'
-        'icon controls';
+    grid-template-areas: 'icon title' 'icon controls';
     padding: 5px;
     transition: background 0.2s;
     grid-gap: 5px;
     cursor: pointer;
 }
+
 .at-track:hover {
     background: rgba(0, 0, 0, 0.1);
 }
@@ -135,6 +130,7 @@ body > * {
 .at-track.active {
     background: rgba(0, 0, 0, 0.03);
 }
+
 .at-track.active > .at-track-icon {
     color: #4972a1;
     opacity: 1;
@@ -144,14 +140,17 @@ body > * {
     grid-area: title;
     font-weight: 500;
 }
+
 .at-track > .at-track-controls {
     grid-area: controls;
     display: flex;
     align-items: center;
 }
+
 .at-track > .at-track-controls > * {
     margin: 0 2px;
 }
+
 .at-track > .at-track-controls > button.active:hover {
     background: transparent;
 }
@@ -201,7 +200,7 @@ input[type='range']::-moz-range-thumb {
     transition-delay: 0;
 }
 
-.at-wrap.loading .at-overlay, 
+.at-wrap.loading .at-overlay,
 .at-wrap.dragging .at-overlay {
     visibility: visible;
     opacity: 1;
@@ -230,19 +229,9 @@ input[type='range']::-moz-range-thumb {
     align-content: center;
     align-items: center;
 }
-.at-player-left i.fas {
-    font-size: 24px;
-    color: rgba(0, 0, 0, 0.5);
-}
-.at-player-right i.fas {
-    font-size: 18px;
-    color: rgba(0, 0, 0, 0.5);
-}
-.at-player-left > * {
-    margin-right: 5px;
-}
+.at-player-left > *,
 .at-player-right > * {
-    margin-left: 5px;
+    margin-right: 4px;
 }
 
 .at-player-left > a.disabled,
@@ -251,26 +240,66 @@ input[type='range']::-moz-range-thumb {
     color: rgba(0, 0, 0, 0.3);
 }
 
-.at-play-pause i.fas,
-a.active i.fas {
-    color: #4972a1;
-}
-
-.at-play-pause i.fas {
-    font-size: 32px;
-    color: #4972a1;
-}
-
-.at-times-values {
+.at-footer a {
+    color: #fff;
     display: flex;
-    justify-content: flex-start;
-    align-content: center;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    box-sizing: content-box;
     align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
 }
-.at-times-values > div {
-    padding: 3px;
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+
+.at-footer a > i {
+    vertical-align: top;
+    font-size: 16px;
+}
+
+.at-footer .btn {
+    padding: 4px;
+    color: #fff;
+    border-radius: 0;
+    height: 40px;
+}
+
+.at-footer .btn:hover {
+    background: #5588c7;
+}
+
+.at-footer a.active,
+.at-footer a:hover {
+    background: #5588c7;
+    text-decoration: none;
+}
+
+.at-footer .dropdown-menu {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+    border: 0;
+    border-radius: 4px;
+    color: #fff;
+}
+
+.at-footer .dropdown-item {
+    color: initial;
+    width: auto;
+    height: auto;
+    text-align: left;
+    justify-content: start;
+}
+
+.at-footer .dropdown-item > i {
+    margin-right: 4px;
+}
+
+.at-footer .dropdown-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.at-time-position {
+    font-weight: bold;
 }
 
 .at-time-slider {
@@ -285,8 +314,10 @@ a.active i.fas {
 }
 
 .at-speed-value {
-    font-size: 0.8em;
+    font-size: 0.8rem;
+    margin: 0 0.5em;
 }
+
 /** Circular Progress Bar https://jsfiddle.net/bootstrapious/3xnomecr  **/
 .progress {
     width: 28px;
@@ -355,4 +386,31 @@ a.active i.fas {
     top: 0;
     left: 0;
     font-size: 8px;
+}
+
+@media screen and (max-width: 920px) {
+    .at-player-right > *:not(.at-logo) {
+        display: none !important;
+    }
+
+    .at-wrap {
+        height: 60vh;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .at-footer * {
+        font-size: 12px !important;
+    }
+    .at-logo img {
+        height: 18px;
+    }
+
+    .at-sidebar {
+        display: none;
+    }
+
+    .at-viewport {
+        left: 0 !important;
+    }
 }

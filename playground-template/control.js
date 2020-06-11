@@ -132,31 +132,9 @@ function setupControl(selector) {
         });
 
         currentTempo = score.tempo;
-        updateMasterBarTimes(score.masterBars[0]);
     });
-
-    const barPositionLabel = control.querySelector('.at-bar-position');
-    const timeSignatureLabel = control.querySelector('.at-time-signature');
-    const tempoLabel = control.querySelector('.at-tempo');
 
     let currentTempo = 0;
-
-    function updateMasterBarTimes(currentMasterBar) {
-        const masterBarCount = currentMasterBar.score.masterBars.length;
-        if (currentMasterBar.tempoAutomation != null) {
-            currentTempo = currentMasterBar.tempoAutomation.value | 0;
-        }
-
-        barPositionLabel.innerText = currentMasterBar.index + 1 + ' / ' + masterBarCount;
-        timeSignatureLabel.innerText =
-            currentMasterBar.timeSignatureNumerator + ' / ' + currentMasterBar.timeSignatureDenominator;
-        tempoLabel.innerText = currentTempo;
-    }
-
-    at.playedBeatChanged.on(function (beat) {
-        updateMasterBarTimes(beat.voice.bar.masterBar);
-    });
-
     const timePositionLabel = control.querySelector('.at-time-position');
     const timeSliderValue = control.querySelector('.at-time-slider-value');
 
@@ -190,11 +168,11 @@ function setupControl(selector) {
     at.playerStateChanged.on(function (args) {
         const icon = playPauseButton.querySelector('i');
         if (args.state == 0) {
-            icon.classList.remove('fa-pause-circle');
-            icon.classList.add('fa-play-circle');
+            icon.classList.remove('fa-pause');
+            icon.classList.add('fa-play');
         } else {
-            icon.classList.remove('fa-play-circle');
-            icon.classList.add('fa-pause-circle');
+            icon.classList.remove('fa-play');
+            icon.classList.add('fa-pause');
         }
     });
 
@@ -223,16 +201,13 @@ function setupControl(selector) {
         }
     };
 
-    control.querySelector('.at-speed').oninput = function (e) {
-        e.stopPropagation();
-        at.playbackSpeed = e.target.value / 100.0;
-        e.target.title = e.target.value + '%';
-        if (e.target.value == '100') {
-            control.querySelector('.at-speed-value').innerText = '';
-        } else {
-            control.querySelector('.at-speed-value').innerText = e.target.value + '%';
-        }
-    };
+    control.querySelectorAll('.at-speed-options a').forEach(function (a) {
+        a.onclick = function (e) {
+            e.preventDefault();
+            at.playbackSpeed = parseFloat(e.target.innerText);
+            control.querySelector('.at-speed-label').innerText = e.target.innerText;
+        };
+    });
 
     control.querySelector('.at-loop').onclick = function (e) {
         e.stopPropagation();

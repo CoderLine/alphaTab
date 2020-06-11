@@ -28,7 +28,11 @@ module.exports = function (config) {
     },
 
     client: {
-      clearContext: false
+      clearContext: false,
+      jasmine: {
+        random: false,
+        stopSpecOnExpectationFailure: false
+      }
     },
 
     rollupPreprocessor: {

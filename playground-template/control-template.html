@@ -4,35 +4,30 @@
             <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status"></div>
         </div>
     </div>
-    <div class="at-sidebar">
-        <div class="at-sidebar-content">
-            <div class="at-track-list"></div>
+    <div class="at-content">
+        <div class="at-sidebar">
+            <div class="at-sidebar-content">
+                <div class="at-track-list"></div>
+            </div>
         </div>
-    </div>
-    <div class="at-viewport">
-        <div
-            class="at-canvas"
-            id="alphaTab"
-            data-file="/test-data/audio/full-song.gp5"
-            data-tracks="3"
-            data-player-scrolloffsetx="-10"
-            data-player-enableplayer="true"
-            data-player-soundfont="/font/sonivox/sonivox.sf2"
-        ></div>
+        <div class="at-viewport">
+            <div
+                class="at-canvas"
+                id="alphaTab"
+                data-file="/test-data/audio/full-song.gp5"
+                data-player-scrolloffsetx="-10"
+                data-notation-notationmode="songbook"
+                data-player-enableplayer="true"
+                data-player-soundfont="/font/sonivox/sonivox.sf2"
+            ></div>
+        </div>
     </div>
     <div class="at-footer">
-        <div class="at-times">
-            <div class="at-time-slider">
-                <div class="at-time-slider-value"></div>
-            </div>
-            <div class="at-times-values">
-                <div class="at-bar-position" data-toggle="tooltip" data-placement="top" title="Bar Position"></div>
-                <div class="at-time-signature" data-toggle="tooltip" data-placement="top" title="Time Signature"></div>
-                <div class="at-time-position" data-toggle="tooltip" data-placement="top" title="Time Position"></div>
-                <div class="at-tempo" data-toggle="tooltip" data-placement="top" title="Tempo"></div>
-            </div>
+        <div class="at-time-slider">
+            <div class="at-time-slider-value"></div>
         </div>
         <div class="at-player">
+            
             <div class="at-player-left">
                 <a href="#" class="at-stop disabled" data-toggle="tooltip" data-placement="top" title="Stop">
                     <i class="fas fa-step-backward"></i>
@@ -45,8 +40,32 @@
                     data-placement="top"
                     title="Play/Pause"
                 >
-                    <i class="fas fa-play-circle"></i>
+                    <i class="fas fa-play"></i>
                 </a>
+
+                <div class="btn-group dropup">
+                    <button
+                        type="button"
+                        class="btn dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                    >
+                        <i class="fas fa-search"></i>
+                        <span class="at-speed-label">1x</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu at-speed-options">
+                        <a class="dropdown-item" href="#">0.25x</a>
+                        <a class="dropdown-item" href="#">0.5x</a>
+                        <a class="dropdown-item" href="#">0.75x</a>
+                        <a class="dropdown-item" href="#">0.9x</a>
+                        <a class="dropdown-item" href="#">1x</a>
+                        <a class="dropdown-item" href="#">1.1x</a>
+                        <a class="dropdown-item" href="#">1.25x</a>
+                        <a class="dropdown-item" href="#">1.50x</a>
+                        <a class="dropdown-item" href="#">2x</a>
+                    </div>
+                </div>
 
                 <div class="at-player-loading progress">
                     <span class="progress-left">
@@ -62,14 +81,10 @@
                     </div>
                 </div>
                 <div class="at-song-details">
-                    <div class="at-song-title"></div>
-                    <div class="at-song-artist"></div>
+                    <span class="at-song-title"></span> - 
+                    <span class="at-song-artist"></span>
                 </div>
-                <div>
-                    <span class="at-speed-label">Speed</span>
-                    <input type="range" min="0" max="300" step="10" value="100" class="at-speed" />
-                    <span class="at-speed-value"></span>
-                </div>
+                <div class="at-time-position" data-toggle="tooltip" data-placement="top" title="Time Position"></div>
             </div>
 
             <div class="at-player-right">
