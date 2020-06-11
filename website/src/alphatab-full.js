@@ -93,95 +93,43 @@ class TrackItem extends React.Component {
     }
 }
 
-class Times extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            currentTime: 0,
-            endTime: 1,
-            currentBarIndex: 0,
-            totalBarCount: 1,
-            timeSignatureNumerator: 4,
-            timeSignatureDenominator: 4,
-            tempo: 120
-        };
-    }
-    render() {
-        return (
-            <div className="at-times">
-                <div className="at-time-slider">
-                    <div className="at-time-slider-value" style={{ width: ((this.state.currentTime / this.state.endTime) * 100).toFixed(2) + '%' }}></div>
-                </div>
-                <div className="at-times-values">
-                    <div className="at-bar-position"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Bar Position">
-                        {this.state.currentBarIndex + 1} / {this.state.totalBarCount}
-                    </div>
-                    <div className="at-time-signature"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Time Signature">
-                        {this.state.timeSignatureNumerator} / {this.state.timeSignatureDenominator}
-                    </div>
-                    <div className="at-time-position"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Time Position">
-                        {this.formatDuration(this.state.currentTime)} / {this.formatDuration(this.state.endTime)}
-                    </div>
-                    <div className="at-tempo"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Tempo">
-                        {this.state.tempo}
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    formatDuration(milliseconds) {
-        let seconds = milliseconds / 1000;
-        const minutes = (seconds / 60) | 0;
-        seconds = (seconds - (minutes * 60)) | 0;
-        return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-    }
-}
-
 class PlaybackSpeedSlider extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            speed: 100
+            speed: 1
         }
     }
 
-    onSpeedChange(e) {
-        e.stopPropagation();
-        if(this.props.api) {
+    setSpeed(e) {
+        e.preventDefault();
+        const api = this.props.api;
+        if(api) {
+            const speed = parseFloat(e.target.innerText);
             this.setState({
-                speed: e.target.value
-            });
-            this.props.api.playbackSpeed = e.target.value / 100.0;
+                speed: speed
+            })
+            this.props.api.playbackSpeed = speed;
         }
     }
 
     render() {
         return (
-            <div>
-                <span className="at-speed-label">
-                    Speed 
-                    {this.state.speed !== 100 && <span className="at-speed-value">({this.state.speed}%)</span>}
-                </span>
-                <input type="range"
-                    min="0"
-                    max="300"
-                    step="10"
-                    defaultValue={this.state.speed}
-                    onInput={this.onSpeedChange.bind(this)}
-                    className="at-speed" />
+            <div className="btn-group dropup">
+                <button type="button" className="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span className="at-speed-label" ref="currentValue">{(this.state.speed)}x</span>
+                </button>
+                <div className="dropdown-menu at-speed-options">
+                <a className="dropdown-item" href="#" onClick={this.setSpeed.bind(this)}>0.25x</a>
+                <a className="dropdown-item" href="#" onClick={this.setSpeed.bind(this)}>0.5x</a>
+                <a className="dropdown-item" href="#" onClick={this.setSpeed.bind(this)}>0.75x</a>
+                <a className="dropdown-item" href="#" onClick={this.setSpeed.bind(this)}>0.9x</a>
+                <a className="dropdown-item" href="#" onClick={this.setSpeed.bind(this)}>1x</a>
+                <a className="dropdown-item" href="#" onClick={this.setSpeed.bind(this)}>1.1x</a>
+                <a className="dropdown-item" href="#" onClick={this.setSpeed.bind(this)}>1.25x</a>
+                <a className="dropdown-item" href="#" onClick={this.setSpeed.bind(this)}>1.50x</a>
+                <a className="dropdown-item" href="#" onClick={this.setSpeed.bind(this)}>2x</a>
+                </div>
             </div>
         );
     }
@@ -211,7 +159,7 @@ class LayoutSelector extends React.Component {
                 <button type="button" className="btn dropdown-toggle at-layout-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Layout
                 </button>
-                <div className="dropdown-menu at-layout-options">
+                <div className="dropdown-menu dropdown-menu-right at-layout-options">
                 <a className="dropdown-item" 
                     href="#" 
                     onClick={this.selectLayout.bind(this, 1, 2)}>
@@ -263,7 +211,7 @@ class ZoomLevelSelector extends React.Component {
                 <i className="fas fa-search"></i>
                 <span className="at-zoom-label" ref="currentValue">{this.state.zoom}%</span>
                 </button>
-                <div className="dropdown-menu at-zoom-options">
+                <div className="dropdown-menu dropdown-menu-right at-zoom-options">
                 <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>25%</a>
                 <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>50%</a>
                 <a className="dropdown-item" href="#" onClick={this.setZoom.bind(this)}>75%</a>
@@ -286,8 +234,7 @@ class ScoreDetails extends React.Component {
     render() {
         return (
             <div className="at-song-details">
-                <div className="at-song-title">{this.props.score?.title}</div>
-                <div className="at-song-artist">{this.props.score?.artist}</div>
+                <span className="at-song-title">{this.props.score?.title}</span> - <span className="at-song-artist">{this.props.score?.artist}</span>
             </div>
         );
     }
@@ -385,8 +332,19 @@ class PlayerControlsGroup extends React.Component {
         }
     }
 
+    formatDuration(milliseconds) {
+        let seconds = milliseconds / 1000;
+        const minutes = (seconds / 60) | 0;
+        seconds = (seconds - (minutes * 60)) | 0;
+        return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    }
+
     render() {
         return (
+            <>
+            <div className="at-time-slider">
+                    <div className="at-time-slider-value" style={{ width: ((this.state.currentTime / this.state.endTime) * 100).toFixed(2) + '%' }}></div>
+            </div>
             <div className="at-player">
                 <div className="at-player-left">
                     <a href="#"
@@ -403,11 +361,18 @@ class PlayerControlsGroup extends React.Component {
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Play/Pause">
-                        <i className={"fas " + (this.state.isPlaying ? "fa-pause-circle" : "fa-play-circle")}></i>
+                        <i className={"fas " + (this.state.isPlaying ? "fa-pause" : "fa-play")}></i>
                     </a>
+                    <PlaybackSpeedSlider api={this.props.api} />
                     <PlayerProgressIndicator percentage={this.state.soundFontLoadPercentage} />
                     <ScoreDetails score={this.props.api?.score} />
-                    <PlaybackSpeedSlider api={this.props.api} />
+                    
+                    <div className="at-time-position"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Time Position">
+                        {this.formatDuration(this.state.currentTime)} / {this.formatDuration(this.state.endTime)}
+                    </div>
                 </div>
 
                 <div className="at-player-right">
@@ -437,8 +402,13 @@ class PlayerControlsGroup extends React.Component {
                     </a>
                     <ZoomLevelSelector api={this.props.api} />
                     <LayoutSelector api={this.props.api} />
+
+                    <div className="at-logo">
+                        powered by <img src="/img/alphatab.png" />
+                    </div>
                 </div>
             </div>
+            </>
         );
     }
 }
@@ -453,7 +423,7 @@ export default class AlphaTab extends React.Component {
                         scrollElement: this.refs.viewPort,
                         scrollOffsetY: -10,
                         enablePlayer: true,
-                        soundFont: '/js/alphaTab/default.sf2'
+                        soundFont: '/js/alphaTab/soundfont/sonivox.sf2'
                     }
                 }
             ),
@@ -484,7 +454,7 @@ export default class AlphaTab extends React.Component {
             this._currentTempo = currentMasterBar.tempoAutomation.value | 0;
         }
 
-        this.refs.times.setState({
+        this.refs.playerControls.setState({
             timeSignatureNumerator: currentMasterBar.timeSignatureNumerator,
             timeSignatureDenominator: currentMasterBar.timeSignatureDenominator,
             currentBarIndex: (currentMasterBar.index + 1),
@@ -497,10 +467,9 @@ export default class AlphaTab extends React.Component {
 
     setupEvents() {
         const at = this.refs.alphaTab;
-        const times = this.refs.times;
         const playerControls = this.refs.playerControls;
 
-        at.addEventListener('alphaTab.loaded', (e) => {
+        at.addEventListener('alphaTab.scoreLoaded', (e) => {
             this.setState({
                 score: e.detail
             });
@@ -520,7 +489,7 @@ export default class AlphaTab extends React.Component {
             });
         });
 
-        at.addEventListener('alphaTab.render', (e) => {
+        at.addEventListener('alphaTab.renderStarted', (e) => {
             const isResize = e.detail;
             const selectedTracks = new Map();
             this.state.api.tracks.forEach((t) => { selectedTracks.set(t.index, t); });
@@ -530,24 +499,23 @@ export default class AlphaTab extends React.Component {
             });
         });
 
-        at.addEventListener('alphaTab.rendered', (e) => {
+        at.addEventListener('alphaTab.renderFinished', (e) => {
             this.setState({
                 isLoading: false
             });
         });
 
         let previousTime = -1;
-        at.addEventListener('alphaTab.positionChanged', (e) => {
+        at.addEventListener('alphaTab.playerPositionChanged', (e) => {
             var args = e.detail;                
             
             // reduce number of UI updates to second changes. 
             const currentSeconds = (args.currentTime / 1000) | 0;
-            if(currentSeconds == previousTime) {
+            if(currentSeconds == previousTime || currentSeconds === 0) {
                 return;
             }
             previousTime = currentSeconds;
-            
-            times.setState(args);
+            playerControls.setState(args);
         });
 
         at.addEventListener('alphaTab.soundFontLoad', function (e) {
@@ -577,26 +545,27 @@ export default class AlphaTab extends React.Component {
                     </div>
                 }
 
-                <div className="at-sidebar">
-                    <div className="at-sidebar-content">
-                        <div className="at-track-list">
-                            {this.state.score?.tracks.map(t =>
-                                <TrackItem
-                                    key={t.index}
-                                    api={this.state.api}
-                                    isSelected={this.state.selectedTracks?.has(t.index)}
-                                    track={t} />
-                            )}
+                <div className="at-content">
+                    <div className="at-sidebar">
+                        <div className="at-sidebar-content">
+                            <div className="at-track-list">
+                                {this.state.score?.tracks.map(t =>
+                                    <TrackItem
+                                        key={t.index}
+                                        api={this.state.api}
+                                        isSelected={this.state.selectedTracks?.has(t.index)}
+                                        track={t} />
+                                )}
+                            </div>
                         </div>
+                    </div>
+
+                    <div className="at-viewport" ref="viewPort">
+                        <div className="at-canvas" ref="alphaTab"></div>
                     </div>
                 </div>
 
-                <div className="at-viewport" ref="viewPort">
-                    <div className="at-canvas" ref="alphaTab"></div>
-                </div>
-
                 <div className="at-footer">
-                    <Times ref="times" />
                     <PlayerControlsGroup ref="playerControls" api={this.state.api} />
                 </div>
             </div>

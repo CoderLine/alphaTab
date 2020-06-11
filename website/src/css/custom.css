@@ -187,3 +187,8 @@ img.thumbnail {
 img.thumbnail:hover {
   transform: scale(1.5);
 }
+
+.buorg {
+  border: 0;
+  background: #f7f7f7;
+}

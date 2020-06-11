@@ -93,10 +93,9 @@ function Home() {
           </div>
         </div>
       </header>
-      <main class="main-at">
+      <main className="main-at">
         <AlphaTab settings={ { 
-          file: "/files/Nightwish.gp5",
-          tracks: 3          
+          file: "/files/canon.gp"
         } } />
         {features && features.length && (
           <section className={styles.features}>

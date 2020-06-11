@@ -9,6 +9,13 @@ module.exports = function(context, options) {
             tagName: 'script',
             attributes: {
               type: 'text/javascript',
+              src: '/js/browser-update.js'
+            }
+          },
+          {
+            tagName: 'script',
+            attributes: {
+              type: 'text/javascript',
               src: options.alphaTab || 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/alphaTab.min.js'
             }
           },

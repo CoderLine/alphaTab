@@ -29,7 +29,6 @@ function loadAllPages() {
 export function getPageList(baseUrl) {
     if (!allPages) {
         allPages = loadAllPages();
-        console.log('All Pages of docs loaded', allPages);
     }
     return new Collection(allPages.filter(p => p.prop('id', '').indexOf(baseUrl) === 0));
 }
