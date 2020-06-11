@@ -103,7 +103,7 @@ Each event has an `.on(handler)` and `.off(handler)` function to subscribe or un
 
 ```js
 const api = new alphaTab.AlphaTabApi(element);
-api.loaded.on( (score) => {
+api.scoreLoaded.on( (score) => {
     console.log('Score was loaded!', score);
 });
 ```
@@ -117,7 +117,7 @@ To access potential parameters that are passed along the event, you will need to
 For raw DOM events, the info object will be contained in the [`detail`](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/detail) property of the DOM event. 
 
 ```js
-element.addEventListener('alphaTab.loaded', (e) => {
+element.addEventListener('alphaTab.scoreLoaded', (e) => {
     console.log('Score was loaded!', e.detail);
 });
 ```
@@ -125,7 +125,7 @@ element.addEventListener('alphaTab.loaded', (e) => {
 For jQuery events the object related to the event will be the second parameter: 
 
 ```js
-$(element).on('alphaTab.loaded', (e, score) => {
+$(element).on('alphaTab.scoreLoaded', (e, score) => {
     console.log('Score was loaded!', score);
 });
 ```
