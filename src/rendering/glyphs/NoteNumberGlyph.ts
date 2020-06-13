@@ -8,6 +8,7 @@ import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NotationElement, NotationMode } from '@src/NotationSettings';
+import { BeatBounds } from '../utils/BeatBounds';
 
 export class NoteNumberGlyph extends Glyph {
     private _note: Note;
@@ -101,15 +102,16 @@ export class NoteNumberGlyph extends Glyph {
         canvas.fillText(this._trillNoteString!, x + this.noteStringWidth + 3 * this.scale, cy + this.y);
         this.renderer.scoreRenderer.canvas!.font = prevFont;
         canvas.fillText(this._noteString!, x, cy + this.y);
-        if (this.renderer.settings.core.includeNoteBounds) {
-            let noteBounds: NoteBounds = new NoteBounds();
-            noteBounds.note = this._note;
-            noteBounds.noteHeadBounds = new Bounds();
-            noteBounds.noteHeadBounds.x = cx + this.x;
-            noteBounds.noteHeadBounds.y = cy + this.y;
-            noteBounds.noteHeadBounds.w = this.width;
-            noteBounds.noteHeadBounds.h = this.height;
-            this.renderer.scoreRenderer.boundsLookup!.addNote(noteBounds);
-        }
+    }
+
+    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+        let noteBounds: NoteBounds = new NoteBounds();
+        noteBounds.note = this._note;
+        noteBounds.noteHeadBounds = new Bounds();
+        noteBounds.noteHeadBounds.x = cx + this.x;
+        noteBounds.noteHeadBounds.y = cy + this.y - this.height/2;
+        noteBounds.noteHeadBounds.w = this.width;
+        noteBounds.noteHeadBounds.h = this.height;
+        this.renderer.scoreRenderer.boundsLookup!.addNote(noteBounds);
     }
 }

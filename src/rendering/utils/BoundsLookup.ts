@@ -285,8 +285,6 @@ export class BoundsLookup {
         if (!beatBounds) {
             return null;
         }
-        x -= beatBounds.barBounds.masterBarBounds.staveGroupBounds.realBounds.x;
-        y -= beatBounds.barBounds.masterBarBounds.staveGroupBounds.realBounds.y;
         return beatBounds.findNoteAtPos(x, y);
     }
 }

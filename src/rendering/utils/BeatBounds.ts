@@ -41,6 +41,7 @@ export class BeatBounds {
         if (!this.notes) {
             this.notes = [];
         }
+        bounds.beatBounds = this;
         this.notes.push(bounds);
     }
 

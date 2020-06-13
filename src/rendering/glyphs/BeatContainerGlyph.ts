@@ -7,6 +7,9 @@ import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import { BarBounds } from '../utils/BarBounds';
+import { BeatBounds } from '../utils/BeatBounds';
+import { Bounds } from '../utils/Bounds';
 
 export class BeatContainerGlyph extends Glyph {
     public voiceContainer: VoiceContainerGlyph;
@@ -166,5 +169,31 @@ export class BeatContainerGlyph extends Glyph {
             t.paint(staffX, staffY, canvas);
         }
         canvas.endGroup();
+    }
+
+    public buildBoundingsLookup(barBounds:BarBounds, cx:number, cy:number, isEmptyBar:boolean) {
+        let beatBoundings: BeatBounds = new BeatBounds();
+        beatBoundings.beat = this.beat;
+        beatBoundings.visualBounds = new Bounds();
+        beatBoundings.visualBounds.x = cx + this.x + this.onNotes.x;
+        beatBoundings.visualBounds.y = barBounds.visualBounds.y;
+        beatBoundings.visualBounds.w = this.onNotes.width;
+        beatBoundings.visualBounds.h = barBounds.visualBounds.h;
+
+        beatBoundings.realBounds = new Bounds();
+        beatBoundings.realBounds.x = cx + this.x;
+        beatBoundings.realBounds.y = barBounds.realBounds.y;
+        beatBoundings.realBounds.w = this.width;
+        beatBoundings.realBounds.h = barBounds.realBounds.h;
+
+        if (isEmptyBar) {
+            beatBoundings.visualBounds.x = cx + this.x;
+            beatBoundings.realBounds.x = beatBoundings.visualBounds.x;
+        }
+        barBounds.addBeat(beatBoundings);
+
+        if(this.renderer.settings.core.includeNoteBounds) {
+            this.onNotes.buildBoundingsLookup(beatBoundings, cx + this.x, cy + this.y);
+        }
     }
 }

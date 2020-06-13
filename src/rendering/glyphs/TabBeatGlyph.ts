@@ -13,6 +13,7 @@ import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
 import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
+import { BeatBounds } from '../utils/BeatBounds';
 
 export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public noteNumbers: TabNoteChordGlyph | null = null;
@@ -24,6 +25,12 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return this.noteNumbers ? this.noteNumbers.getNoteY(note, requestedPosition) : 0;
+    }
+
+    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
+        if(this.noteNumbers) {
+            this.noteNumbers.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
+        }
     }
 
     public doLayout(): void {

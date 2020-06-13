@@ -16,7 +16,6 @@ import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
 import { RenderStaff } from '@src/rendering/staves/RenderStaff';
 import { BarBounds } from '@src/rendering/utils/BarBounds';
 import { BarHelpers } from '@src/rendering/utils/BarHelpers';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { RenderingResources } from '@src/RenderingResources';
@@ -324,7 +323,7 @@ export class BarRendererBase {
 
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
         let barBounds: BarBounds = new BarBounds();
-        barBounds.bar = this.bar!;
+        barBounds.bar = this.bar;
         barBounds.visualBounds = new Bounds();
         barBounds.visualBounds.x = cx + this.x;
         barBounds.visualBounds.y = cy + this.y + this.topPadding;
@@ -339,29 +338,11 @@ export class BarRendererBase {
 
         masterBarBounds.addBar(barBounds);
         this._voiceContainers.forEach((c, index) => {
-            let isEmptyBar: boolean = this.bar!.isEmpty && index === 0;
+            let isEmptyBar: boolean = this.bar.isEmpty && index === 0;
             if (!c.voice.isEmpty || isEmptyBar) {
                 for (let i: number = 0, j: number = c.beatGlyphs.length; i < j; i++) {
                     let bc: BeatContainerGlyph = c.beatGlyphs[i];
-                    let beatBoundings: BeatBounds = new BeatBounds();
-                    beatBoundings.beat = bc.beat;
-                    beatBoundings.visualBounds = new Bounds();
-                    beatBoundings.visualBounds.x = cx + this.x + c.x + bc.x + bc.onNotes.x;
-                    beatBoundings.visualBounds.y = barBounds.visualBounds.y;
-                    beatBoundings.visualBounds.w = bc.onNotes.width;
-                    beatBoundings.visualBounds.h = barBounds.visualBounds.h;
-
-                    beatBoundings.realBounds = new Bounds();
-                    beatBoundings.realBounds.x = cx + this.x + c.x + bc.x;
-                    beatBoundings.realBounds.y = barBounds.realBounds.y;
-                    beatBoundings.realBounds.w = bc.width;
-                    beatBoundings.realBounds.h = barBounds.realBounds.h;
-
-                    if (isEmptyBar) {
-                        beatBoundings.visualBounds.x = cx + this.x;
-                        beatBoundings.realBounds.x = beatBoundings.visualBounds.x;
-                    }
-                    barBounds.addBeat(beatBoundings);
+                    bc.buildBoundingsLookup(barBounds, cx + this.x + c.x, cy + this.y + c.y, isEmptyBar);
                 }
             }
         });

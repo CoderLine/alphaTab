@@ -14,6 +14,7 @@ import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
+import { BeatBounds } from '../utils/BeatBounds';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();
@@ -128,6 +129,23 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
     }
 
+    
+    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
+        for (let note of this._notes) {
+            if (this._noteGlyphLookup.has(note.id)) {
+                let glyph: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
+                let noteBounds: NoteBounds = new NoteBounds();
+                noteBounds.note = note;
+                noteBounds.noteHeadBounds = new Bounds();
+                noteBounds.noteHeadBounds.x = cx + this.x  + this._noteHeadPadding + glyph.x;
+                noteBounds.noteHeadBounds.y = cy + this.y + glyph.y - glyph.height / 2;
+                noteBounds.noteHeadBounds.w = glyph.width;
+                noteBounds.noteHeadBounds.h = glyph.height;
+                beatBounds.addNote(noteBounds);
+            }
+        }
+    }
+
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         // TODO: this method seems to be quite heavy according to the profiler, why?
         let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
@@ -148,21 +166,6 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             g.paint(cx + this.x, cy + this.y, canvas);
             effectY += effectSpacing;
         });
-        if (this.renderer.settings.core.includeNoteBounds) {
-            for (let note of this._notes) {
-                if (this._noteGlyphLookup.has(note.id)) {
-                    let glyph: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
-                    let noteBounds: NoteBounds = new NoteBounds();
-                    noteBounds.note = note;
-                    noteBounds.noteHeadBounds = new Bounds();
-                    noteBounds.noteHeadBounds.x = cx + this.x + glyph.x;
-                    noteBounds.noteHeadBounds.y = cy + this.y + glyph.y;
-                    noteBounds.noteHeadBounds.w = glyph.width;
-                    noteBounds.noteHeadBounds.h = glyph.height;
-                    this.renderer.scoreRenderer.boundsLookup!.addNote(noteBounds);
-                }
-            }
-        }
         super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {
             this._tremoloPicking.paint(cx, cy, canvas);

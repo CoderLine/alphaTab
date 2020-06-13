@@ -6,6 +6,7 @@ import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { RenderingResources } from '@src/RenderingResources';
 import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
+import { BeatBounds } from '../utils/BeatBounds';
 
 export class TabNoteChordGlyph extends Glyph {
     private _notes: NoteNumberGlyph[] = [];
@@ -21,6 +22,12 @@ export class TabNoteChordGlyph extends Glyph {
     public constructor(x: number, y: number, isGrace: boolean) {
         super(x, y);
         this._isGrace = isGrace;
+    }
+
+    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
+        for(const note of this._notes) {
+            note.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
+        }
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {

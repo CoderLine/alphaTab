@@ -22,6 +22,7 @@ import { ScoreWhammyBarGlyph } from '@src/rendering/glyphs/ScoreWhammyBarGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
+import { BeatBounds } from '../utils/BeatBounds';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: ScoreNoteChordGlyph | null = null;
@@ -29,6 +30,12 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         return this.noteHeads ? this.noteHeads.getNoteX(note, requestedPosition) : 0;
+    }
+
+    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
+        if(this.noteHeads) {
+            this.noteHeads.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
+        }
     }
     
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
