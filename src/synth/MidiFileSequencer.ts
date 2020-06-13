@@ -306,10 +306,4 @@ export class MidiFileSequencer {
             this._eventIndex = 0;
         }
     }
-
-    public setChannelProgram(channel: number, program: number): void {
-        if (this._firstProgramEventPerChannel.has(channel)) {
-            this._firstProgramEventPerChannel.get(channel)!.event!.data1 = program;
-        }
-    }
 }
