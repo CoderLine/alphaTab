@@ -105,7 +105,7 @@ export interface IAlphaSynth {
     loadMidiFile(midi: MidiFile): void;
 
     /**
-     * Gets the mute state of a channel.
+     * Sets the mute state of a channel.
      * @param channel The channel number
      * @param mute true if the channel should be muted, otherwise false.
      */
@@ -129,13 +129,6 @@ export interface IAlphaSynth {
      * @param volume The volume of of the channel (0.0-1.0)
      */
     setChannelVolume(channel: number, volume: number): void;
-
-    /**
-     * Gets or sets the current and initial program of the given channel.
-     * @param channel The channel number.
-     * @param program The midi program.
-     */
-    setChannelProgram(channel: number, program: number): void;
 
     /**
      * This event is fired when the player is ready to be interacted with.

@@ -286,11 +286,13 @@ import { PlaybackRange } from '@src/synth/PlaybackRange';
 import { PlayerState } from '@src/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi'
 
 export const synth = {
     AlphaSynth,
     PlaybackRange,
     PlayerState,
     PlayerStateChangedEventArgs,
-    PositionChangedEventArgs
+    PositionChangedEventArgs,
+    AlphaSynthWebWorkerApi
 };

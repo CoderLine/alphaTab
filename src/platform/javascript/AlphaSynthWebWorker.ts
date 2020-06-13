@@ -32,7 +32,6 @@ export class AlphaSynthWebWorker {
     public static readonly CmdSetChannelMute: string = AlphaSynthWebWorker.CmdPrefix + 'setChannelMute';
     public static readonly CmdSetChannelSolo: string = AlphaSynthWebWorker.CmdPrefix + 'setChannelSolo';
     public static readonly CmdSetChannelVolume: string = AlphaSynthWebWorker.CmdPrefix + 'setChannelVolume';
-    public static readonly CmdSetChannelProgram: string = AlphaSynthWebWorker.CmdPrefix + 'setChannelProgram';
     public static readonly CmdResetChannelStates: string = AlphaSynthWebWorker.CmdPrefix + 'resetChannelStates';
     public static readonly CmdReady: string = AlphaSynthWebWorker.CmdPrefix + 'ready';
     public static readonly CmdReadyForPlayback: string = AlphaSynthWebWorker.CmdPrefix + 'readyForPlayback';
@@ -136,9 +135,6 @@ export class AlphaSynthWebWorker {
                 break;
             case 'alphaSynth.setChannelVolume':
                 this._player.setChannelVolume(data.channel, data.volume);
-                break;
-            case 'alphaSynth.setChannelProgram':
-                this._player.setChannelProgram(data.channel, data.program);
                 break;
             case 'alphaSynth.resetChannelStates':
                 this._player.resetChannelStates();

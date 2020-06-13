@@ -289,12 +289,6 @@ export class AlphaSynth implements IAlphaSynth {
         this._synthesizer.channelSetMixVolume(channel, volume);
     }
 
-    public setChannelProgram(channel: number, program: number): void {
-        program = SynthHelper.clamp(program, SynthConstants.MinProgram, SynthConstants.MaxProgram);
-        this._sequencer.setChannelProgram(channel, program);
-        this._synthesizer.channelSetPresetNumber(channel, program, false);
-    }
-
     private onSamplesPlayed(sampleCount: number): void {
         let playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
         this.updateTimePosition(this._timePosition + playedMillis);

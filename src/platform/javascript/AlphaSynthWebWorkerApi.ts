@@ -306,15 +306,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public setChannelProgram(channel: number, program: number): void {
-        program = SynthHelper.clamp(program, SynthConstants.MinProgram, SynthConstants.MaxProgram);
-        this._synth.postMessage({
-            cmd: 'alphaSynth.setChannelProgram',
-            channel: channel,
-            program: program
-        });
-    }
-
     public handleWorkerMessage(e: MessageEvent): void {
         let data: any = e.data;
         let cmd: string = data.cmd;
