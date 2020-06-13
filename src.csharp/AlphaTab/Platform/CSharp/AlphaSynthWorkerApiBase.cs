@@ -151,11 +151,6 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnWorkerThread(() => { Player.SetChannelVolume(channel, volume); });
         }
 
-        public void SetChannelProgram(double channel, double program)
-        {
-            DispatchOnWorkerThread(() => { Player.SetChannelProgram(channel, program); });
-        }
-
         public IEventEmitter Ready { get; } = new EventEmitter();
         public IEventEmitter ReadyForPlayback { get; } = new EventEmitter();
         public IEventEmitter Finished { get; } = new EventEmitter();
