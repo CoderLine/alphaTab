@@ -47,7 +47,6 @@ namespace AlphaTab.VisualTests
                     settings = new Settings();
                 }
 
-                referenceFileName = $"test-data/visual-tests/{referenceFileName}";
                 var importer = new AlphaTexImporter();
                 importer.Init(ByteBuffer.FromString(tex), settings);
                 var score = importer.ReadScore();
@@ -78,6 +77,10 @@ namespace AlphaTab.VisualTests
             settings.Core.Engine = "skia";
             settings.Core.EnableLazyLoading = false;
             settings.Core.UseWorkers = false;
+			
+			if(!referenceFileName.StartsWith("test-data/")) {
+				referenceFileName = $"test-data/visual-tests/{referenceFileName}";
+			}
 
             var referenceFileData =
                 await TestPlatform.LoadFile(referenceFileName);
