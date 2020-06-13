@@ -17,8 +17,6 @@
  */
 'use strict';
 
-type RGBTuple = [number, number, number];
-
 interface Options {
     /**
      * Matching threshold, ranges from 0 to 1. Smaller values make the comparison more sensitive.
@@ -40,18 +38,18 @@ interface Options {
      * The color of anti-aliased pixels in the diff output.
      * @default [255, 255, 0]
      */
-    aaColor?: RGBTuple;
+    aaColor?: number[];
     /**
      * The color of differing pixels in the diff output.
      * @default [255, 0, 0]
      */
-    diffColor?: RGBTuple;
+    diffColor?: number[];
     /**
      * An alternative color to use for dark on light differences to differentiate between "added" and "removed" parts.
      * If not provided, all differing pixels use the color specified by `diffColor`.
      * @default null
      */
-    diffColorAlt?: RGBTuple;
+    diffColorAlt?: number[];
     /**
      * Draw the diff over a transparent background (a mask), rather than over the original image.
      * Will not draw anti-aliased pixels (if detected)
