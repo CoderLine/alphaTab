@@ -647,7 +647,7 @@ export default class AlphaTab extends React.Component {
             scrollElement: this.refs.viewPort,
             scrollOffsetY: -10,
             enablePlayer: true,
-            soundFont: "/js/alphaTab/soundfont/sonivox.sf2",
+            soundFont: "https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/soundfont/sonivox.sf2",
           },
         }
       ),
