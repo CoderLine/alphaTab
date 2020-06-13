@@ -265,7 +265,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             this._api.renderer.width = this.rootContainer.width | 0;
             this._api.renderer.updateSettings(this._api.settings);
             if (this._contents) {
-                this._api.tex(this._contents);
+                this._api.tex(this._contents, this._initialTrackIndexes ?? undefined);
+                this._initialTrackIndexes = null;
             } else if (this._file) {
                 ScoreLoader.loadScoreAsync(
                     this._file,
@@ -341,7 +342,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 } else {
                     value = parseInt((item as any).toString());
                 }
-                if (value >= 0) {
+                if (value >= 0 || value === -1) {
                     tracks.push(value);
                 }
             }
