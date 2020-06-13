@@ -1,0 +1,36 @@
+---
+title: SetChannelMute
+jsName: setChannelMute
+category: Methods
+description: Mutes or unmutes a single midi channel.
+sidebarPath: /docs/reference/alphasynth
+since: 0.9.6
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Mutes or unmutes a single midi channel.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void SetChannelMute(int channel, bool mute)">
+        Sets the mute state of a channel.
+    </TypeRow>
+    <TypeRow type="js" name="function setChannelMute(channel, mute)">
+        Sets the mute state of a channel
+    </TypeRow>
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="channel" type="number">
+        The midi channel to mute or unmute.
+    </ParameterRow>
+    <ParameterRow platform="all" name="solo" type="bool">
+        A value indicating whether the channel should be muted or unmuted.
+    </ParameterRow>
+</ParameterTable>

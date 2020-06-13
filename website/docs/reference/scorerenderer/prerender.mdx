@@ -1,0 +1,33 @@
+---
+title: PreRender
+jsName: preRender
+category: Events
+description: Occurs before the rendering of the tracks starts
+sidebarPath: /docs/reference/scorerenderer
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when the rendering of the whole music sheet is starting. All
+preparations are completed and the layout and render sequence is about to start. 
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action" />    
+    <TypeRow type="js" name="function()" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="resize" type="bool">
+        Whether the rendering is triggered from a resize.  
+    </ParameterRow>
+</ParameterTable>

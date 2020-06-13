@@ -1,0 +1,36 @@
+---
+title: UpdateSettings
+jsName: updateSettings
+category: Methods
+description: Updates the settings to the given object.
+sidebarPath: /docs/reference/scorerenderer
+since: 0.9.6
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+This method updates the settings to the given object. On some platforms like JavaScript
+the settings object will need to be passed on to the corresponding worker to be really updated. 
+It is recommended to make this call after updating any properties of the settings object to ensure
+it is really passed on to all components. 
+
+This method will not trigger automatically any re-rendering.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void UpdateSettings(Settings settings)" />
+    <TypeRow type="js" name="function updateSettings(settings)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="settings" type="AlphaTab.Settings">
+        The new settings object to use within alphaTab.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Nothing. 

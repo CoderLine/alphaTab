@@ -1,0 +1,21 @@
+---
+title: IsReady
+jsName: isReady
+category: Properties
+description: If the synthesizer is ready for interaction.
+sidebarPath: /docs/reference/alphasynth
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../src/property-description';
+
+## Description
+The audio synthesis engine is running always asynchronously in some worker or thread. 
+Before any interaction with alphaSynth can be done it needs to initialize this worker first. 
+This property indicates whether the worker is already ready. 
+
+The [`ready`](/docs/reference/alphasynth/ready) event is fired when the value changes to true. 
+
+This event is signaled as soon as the background worker and the audio output are initialized.
+
+<PropertyDescription metadata={metadata} />

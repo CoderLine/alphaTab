@@ -1,0 +1,34 @@
+---
+title: Error
+jsName: error
+category: Events
+description: This event is fired when an error within alphatab occurred.
+sidebarPath: /docs/reference/scorerenderer
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when an error within alphatab occurred. Use this event as global error handler to show errors
+to end-users. Due to the asynchronous nature of alphaTab, no call to the API will directly throw an error if it fails.
+Instead a signal to this error handlers will be sent. 
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action<Error>" />    
+    <TypeRow type="js" name="function(error)" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="details" type="Error">
+        The object containing the error details. 
+    </ParameterRow>
+</ParameterTable>

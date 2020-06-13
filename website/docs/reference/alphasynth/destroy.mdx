@@ -1,0 +1,30 @@
+---
+title: Destroy
+jsName: destroy
+category: Methods
+description: Destroys the synthesizer and all related components.
+sidebarPath: /docs/reference/alphasynth
+since: 0.9.6
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+This method destroys the audio synthesizer renderer and by this closes all potentially opened
+contexts and shuts down any worker. 
+
+If you dynamically create/destroy renderers it is recommended to always call this method
+to ensure all resources are leaked. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void Destroy()" />
+    <TypeRow type="js" name="function destroy()" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+Nothing

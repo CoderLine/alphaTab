@@ -1,0 +1,32 @@
+---
+title: MidiLoadFailed
+jsName: midiLoadFailed
+category: Events
+description: This event is fired when the loading of the Midi failed.
+sidebarPath: /docs/reference/alphasynth
+since: 0.9.6
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when an error while loading the Midi failed.
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action<Error>" />    
+    <TypeRow type="js" name="function(error)" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="details" type="Error">
+        The object containing the error details. 
+    </ParameterRow>
+</ParameterTable>

@@ -1,0 +1,32 @@
+---
+title: ResizeRender
+jsName: resizeRender
+category: Methods
+description: Initiates a resize-optimized re-rendering of the score using the current settings.
+sidebarPath: /docs/reference/scorerenderer
+since: 0.9.6
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+This method can be used if only re-fitting of the score into a new width should be done. 
+alphaTab internally keeps all the information about the music notation elements like
+where they are placed and how they are connected. This is a rather expensive operation 
+but it is only required to be done once. 
+
+In case the UI is resized, this method can be used to trigger a rearrangement of the existing elements
+into the newly available space.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void ResizeRender()" />
+    <TypeRow type="js" name="function resizeRender()" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+Nothing

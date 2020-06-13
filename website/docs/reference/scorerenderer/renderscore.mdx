@@ -1,0 +1,35 @@
+---
+title: RenderScore
+jsName: renderScore
+category: Methods
+description: Initiates the rendering of the specified tracks of the given score.
+sidebarPath: /docs/reference/scorerenderer
+since: 0.9.6
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+This method initiates the rendering of the specified tracks of the given score. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void RenderScore(Score score, IList<double> trackIndexes)" />
+    <TypeRow type="js" name="function resizeRender(score, trackIndexes)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="score" type="AlphaTab.Model.Score">
+        The score of which the tracks should be taken for rendering.
+    </ParameterRow>
+    <ParameterRow platform="all" name="trackIndexes" type="number[]">
+        The indexes to the tracks which should be layed out and rendered. 
+    </ParameterRow>
+</ParameterTable>
+
+
+### Returns
+Nothing. The render result is computed asynchronously and can be obtained via events like `partialRenderFinished`.

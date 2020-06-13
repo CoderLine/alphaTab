@@ -1,0 +1,36 @@
+---
+title: PartialRenderFinished
+jsName: partialRenderFinished
+category: Events
+description: Occurs whenever a part of the whole music sheet is rendered and can be displayed.
+sidebarPath: /docs/reference/scorerenderer
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+AlphaTab does not render the whole music sheet into a single canvas but rather
+splits it down into smaller chunks. This allows faster display of results to the user
+and avoids issues related to browser restrictions (like maximum canvas sizes).
+
+This even is fired whenever one chunk of the music sheet is completed. 
+
+<EventDescription metadata={metadata} />
+    
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action" />    
+    <TypeRow type="js" name="function()" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="resize" type="bool">
+        Whether the rendering is triggered from a resize.  
+    </ParameterRow>
+</ParameterTable>

@@ -1,0 +1,26 @@
+---
+title: LoadSoundFont
+jsName: loadSoundFont
+category: Methods
+description: Triggers a load of the soundfont from the given data.
+sidebarPath: /docs/reference/alphasynth
+since: 0.9.6
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+
+Same behavior as [`Api.LoadSoundFont`](/docs/reference/api/loadsoundfont) but only raw byte arrays are accepted
+as parameter.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void LoadSoundFont(byte[] raw)">
+        Load the soundfont from the given raw bytes.
+    </TypeRow>
+    <TypeRow type="js" name="function loadSoundFont(uint8array)">
+        Load the soundfont from the given raw bytes.
+    </TypeRow>
+</TypeTable>

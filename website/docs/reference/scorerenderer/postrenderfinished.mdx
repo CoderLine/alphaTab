@@ -1,0 +1,28 @@
+---
+title: PostRenderFinished
+jsName: postRenderFinished
+category: Events
+description: This event is fired when the rendering of the whole music sheet is finished, and all handlers of RenderFinished ran.
+sidebarPath: /docs/reference/scorerenderer
+since: 0.9.4
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+This event is fired when the rendering of the whole music sheet is finished, and all handlers of RenderFinished ran. When this 
+handlers are called, the whole rendering and display pipeline is completed. 
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="Action" />    
+    <TypeRow type="js" name="function()" />    
+</TypeTable>
+
+## Parameters
+None

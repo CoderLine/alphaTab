@@ -1,0 +1,50 @@
+---
+title: BoundsLookup
+jsName: boundsLookup
+category: Properties
+description: The lookup which allows fast access to beats at a given position
+sidebarPath: /docs/reference/scorerenderer
+since: 0.9.6
+---
+
+import PropertyDescription from '../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import BoundsLookupViewer from '../../../src/bounds-lookup-viewer';
+
+## Description
+After the rendering completed alphaTab exposes via this lookup the location of the individual
+notation elements. The lookup provides fast access to the bars and beats at a given location.
+If the [`IncludeNoteBounds`](/docs/reference/settings/core/includenoteboudns) option was activated
+also the location of the individual notes can be obtained. 
+
+<PropertyDescription metadata={metadata} />
+
+The property contains a `BoundsLookup` instance which follows a hierarchical structure that represents
+the tree of rendered elements. 
+
+The hierarchy is: `staveGroups > bars(1) > bars(2) > beats > notes`
+
+* `staveGroups` - Represent the bounds of the invidual "lines" where staves are contained. 
+* `bars(1)` - Represent the bounds of all bars for a particular master bar across all tracks.
+* `bars(2)` - Represent the bounds of an individual bar of a track. The bounds on y-axis span the region of the staff and notes might exceed this bounds. 
+* `beats` - Represent the bounds of the individual beats within a track. The bounds on y-axis are equal to the bar bounds.
+* `notes` - Represent the bounds of the individual note heads/numbers within a track. 
+
+Each bounds hierarchy have a `visualBounds` and `realBounds`. 
+
+* `visualBounds` - Represent the area covering all visually visible elements
+* `realBounds` - Represents the actual bounds of the elements in this beat including whitespace areas. 
+* `noteHeadBounds` (only on `notes` level) - Represents the area of the note heads or number based on the staff 
+
+You can check out the individual sizes and regions 
+
+<BoundsLookupViewer tex="true" tracks="all">{`
+\\track "Guitar 1"
+12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
+14.1.2 :8 17.2 15.1 14.1{h} 17.2 |
+15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b(0 4 4 0)}.4 |
+15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 |
+12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}
+\\track "Guitar 2"
+3.3 
+`}</BoundsLookupViewer>

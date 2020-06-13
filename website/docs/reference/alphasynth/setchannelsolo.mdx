@@ -1,0 +1,38 @@
+---
+title: SetChannelSolo
+jsName: setChannelSolo
+category: Methods
+description: Flags a single midi channel to e played solo or not.
+sidebarPath: /docs/reference/alphasynth
+since: 0.9.6
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Flags a single midi channel to e played solo or not. As soon as the first channel
+is marked as playing solo, all channels which are not flagged as solo are not played.
+Multiple channels can be flagged as solo playing. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void SetChannelSolo(int channel, bool solo)">
+        Sets the solo state of a channel.
+    </TypeRow>
+    <TypeRow type="js" name="function setChannelSolo(channel, solo)">
+        Sets the solo state of a channel
+    </TypeRow>
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="channel" type="number">
+        The midi channel play solo or not.
+    </ParameterRow>
+    <ParameterRow platform="all" name="solo" type="bool">
+        A value indicating whether the channel should be played solo or not.
+    </ParameterRow>
+</ParameterTable>

@@ -2,9 +2,8 @@
 title: Low Level APIs
 ---
 
-:::note
-This page is still work in progress.
-:::
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 This guide explains how to use the low level APIs of alphaTab in case the full API object cannot be used or is not needed. 
 
@@ -12,14 +11,269 @@ The full API object is usually linked directly to a UI via a `IUiFacade`. There 
 for the different platforms like for Web, .net WPF and .net WinForms. 
 
 In scenarios where none of these UI platforms are used or if not even a UI exists, you will need to use the low level APIs 
-of alphaTab to setup the individual steps manually. 
+of alphaTab to setup the individual steps manually. The following examples show the
+most typical scenarios that you will likely need when using alphaTab.
 
 ## Loading Files via ScoreLoader
 
+One of the most common tasks is to load a `Score` object from a binary buffer,
+the `AlphaTab.Importer.ScoreLoader` class offers an easy mechanism to take a buffer,
+and try loading it with the available importers. 
+Internally alphaTab has a list of `ScoreImporter` implementations for the different file formats 
+which are tried one after another to parse the provided buffer into a `Score` object. If the buffer cannot be converted
+a `AlphaTab.Importer.UnsupportedFormatError` is thrown.
+
+The `LoadScoreFromBytes` method accepts as first parameter the raw byte buffer and as second optional parameter 
+a `AlphaTab.Settings` object which might control some aspects of the import sequence. 
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const xhr = new XMLHttpRequest();
+xhr.open('GET', 'MyFile.gp', true);
+xhr.responseType = 'arraybuffer';
+xhr.onload = () => {
+    const data = new Uint8Array(xhr.response);
+    const settings = new alphaTab.Settings();
+    let score: Score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(data, settings);
+};
+xhr.send();
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+var data = System.IO.File.ReadAllBytes('MyFile.gp'); 
+var settings = new AlphaTab.Settings();
+var score = AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(data, settings);
+```
+
+</TabItem>
+</Tabs>
 
 ## Rendering Files via ScoreRenderer
 
+The `AlphaTab.Rendering.ScoreRenderer` is the main component which takes a `Score` and `Settings` as input, 
+and then generates a rendered music sheet. Setting up a `ScoreRenderer` is fairly easy if you know the following basics:
+
+1. The ScoreRenderer needs to know the target width if you use a Top-To-Bottom Layout
+2. The music sheet is rendered in individual chunks which are provided via the events `partialRenderFinished` and `renderFinished` 
+3. AlphaTab internally keeps the information about the rendered score when rendering with `renderScore`, afterwards optimized rendering with resizing can be done via `resizeRender`
+
+The ScoreRenderer does not provide rendering in a background worker (aka. Thread) out of the box.
+This logic is part of the `AlphaTabApi` which wraps a ScoreRenderer into a worker.
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+// 1. Setup renderer
+const score = /* Load score here */;
+const settings = new alphaTab.Settings();
+settings.core.engine = 'svg';
+const renderer = new alphaTab.rendering.ScoreRenderer(settings);
+renderer.width = 1200;
+
+// 2. Listen to Events 
+let svgChunks = [];
+renderer.preRender.on(isResize => {
+    svgChunks = []; // clear on new rendering
+});
+renderer.partialRenderFinished.on(r => {
+    svgChunks.push({
+        svg: r.renderResult, // svg string
+        width: r.width,
+        height: r.height
+    });
+});
+renderer.renderFinished.on(r => {
+    displayResult(svgChunks, r.totalWidth, r.totalHeight);
+});
+
+// 3. Fire off rendering
+renderer.renderScore(score, [0]);
+
+// 4. resize
+renderer.width = 800;
+renderer.resizeRender();
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+// 1. Setup renderer
+var score = /* Load score here */;
+var settings = new AlphaTab.Settings();
+settings.Core.Engine = "svg";
+var renderer = new AlphaTab.Rendering.ScoreRenderer(settings);
+renderer.Width = 1200;
+
+// 2. Listen to Events 
+var svgChunks = new List<(string svg, double width, double height)>();
+renderer.PreRender.On(isResize => {
+    svgChunks.Clear(); // clear on new rendering
+});
+renderer.PartialRenderFinished.On(r => {
+    svgChunks.Add((
+        svg: (string)r.RenderResult, // svg string
+        width: r.Width,
+        height: r.Height
+    ));
+});
+renderer.RenderFinished.On(r => {
+    DisplayResult(svgChunks, r.TotalWidth, r.TotalHeight);
+});
+
+// 3. Fire off rendering
+renderer.RenderScore(score, new List<double> { 0 });
+
+// 4. resize
+renderer.Width = 800;
+renderer.ResizeRender();
+```
+
+</TabItem>
+</Tabs>
+
 ## Generating Midi Files via MidiFileGenerator
 
+AlphaTab has components for translating a `Score` object into a `MidiFile` which 
+can then be passed on to other components to write it to a file or feed it into a 
+Midi Synthesis engine. The main classes related to midi generation are: 
+
+1. The `AlphaTab.Midi.MidiFileGenerator` which contains all the logic for emitting the right midi events for a `Score` using an `IMidiFileHandler` 
+2. The `AlphaTab.Midi.AlphaSynthMidiFileHandler` which fills a `AlphaTab.Midi.MidiFile` object with events. 
+3. The `AlphaTab.Midi.MidiFile` representing a Sequence of Midi Events that can be passed on to AlphaSynth or be written into a file. 
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const score = /* Load score here */;
+const settings = new alphaTab.Settings();
+
+// Setup generator and midi file handler
+const midiFile = new alphaTab.midi.MidiFile();
+const handler = new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile);
+const generator = new alphaTab.midi.MidiFileGenerator(score, settings, handler);
+
+// start generation
+generator.generate();
+
+// use midi file
+saveToFile(midiFile);
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+var score = /* Load score here */;
+var settings = new AlphaTab.Settings();
+
+// Setup generator and midi file handler
+var midiFile = new AlphaTab.Midi.MidiFile();
+var handler = new AlphaTab.Midi.AlphaSynthMidiFileHandler(midiFile);
+var generator = new AlphaTab.Midi.MidiFileGenerator(score, settings, handler);
+
+// start generation
+generator.Generate();
+
+// use midi file
+SaveToFile(midiFile);
+```
+
+</TabItem>
+</Tabs>
 
 ## Playing Files via AlphaSynth
+
+A midi file as such is not very interesting, but it becomes interesting when you can play it. 
+AlphaTab has a component named AlphaSynth which is a SoundFont2 based midi synthesizer. 
+It can take a SoundFont2 file and a Midi File generated by alphaTab, and play it on the 
+corresponding target platform via an `IOutput` implementation. 
+
+The following examples show how to use the main component `AlphaSynth` which is usually running within a worker or thread 
+to ensure smooth playback.  
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const midifile = /* Load score and convert it to midi here */;
+const soundFont = /* Load SoundFont2 as Uint8Array here */;
+
+// Setup player
+const player = new alphaTab.synth.AlphaSynth(
+    new AlphaSynthWebAudioOutput() // the output to use
+);
+player.loadSoundFont(soundFont);
+player.loadMidiFile(midiFile);
+player.play();
+```
+
+For the Web version of alphaTab provides an out-of-the-box implementation 
+for operating alphaSynth within a WebWorker and playing the audio via Web Audio API 
+on the main browser thread: `alphaTab.synth.AlphaSynthWebWorkerApi`.
+The API is the same as on the normal `AlphaSynth` object but 
+it needs a bit more input on creation but then the rest works as above. 
+
+```js
+
+const player = new alphaTab.synth.AlphaSynthWebWorkerApi(
+    new AlphaSynthWebAudioOutput(), // the output to be used on the main browser thread
+    pathToAlphaSynthScriptFile, // this script will be used to launch the worker, must point to the main file containing alphaTab
+    alphaTab.LogLevel.Info // the log level to use
+);
+player.loadSoundFont(soundFont);
+player.loadMidiFile(midiFile);
+player.play();
+
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+var midifile = /* Load score and convert it to midi here */;
+var soundFont = /* Load SoundFont2 as Uint8Array here */;
+
+// Setup player
+// Note: NAudio already does the playback in an own worker thread, 
+// you might just want to separate the overall AlphaSynth component from your main 
+// application to not block user interaction. 
+var player = new AlphaTab.Synth.AlphaSynth(new NAudioSynthOutput());
+player.LoadSoundFont(soundFont);
+player.LoadMidiFile(midiFile);
+player.Play();
+```
+
+</TabItem>
+</Tabs>

@@ -1,0 +1,28 @@
+---
+title: LoadMidiFile
+jsName: loadMidiFile
+category: Methods
+description: Triggers a load of the given midi file.
+sidebarPath: /docs/reference/alphasynth
+since: 0.9.6
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Loads a midi file structure for playback in alphaSynth. The `MidiFile` structure
+follows a Standard Midi File (SMF) format 0 structure where only one single track
+with all midi events is contained.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="bool LoadMidiFile(MidiFile midiFile)">
+        Load the given midi file structure.
+    </TypeRow>
+    <TypeRow type="js" name="function loadMidiFile(midiFile)">
+        Load the given midi file structure.
+    </TypeRow>
+</TypeTable>
+
+

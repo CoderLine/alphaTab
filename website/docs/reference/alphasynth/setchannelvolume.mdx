@@ -1,0 +1,34 @@
+---
+title: SetChannelVolume
+jsName: setChannelVolume
+category: Methods
+description: Sets the current and initial volume of the given channel.
+sidebarPath: /docs/reference/alphasynth
+since: 0.9.6
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Sets the current and initial volume of the given channel. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="void SetChannelVolume(int channel, double volume)">
+    </TypeRow>
+    <TypeRow type="js" name="function setChannelVolume(channel, volume)">
+    </TypeRow>
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="channel" type="number">
+        The midi channel to set the volume for. 
+    </ParameterRow>
+    <ParameterRow platform="all" name="Volume" type="number">
+        The volume as percentage. 
+    </ParameterRow>
+</ParameterTable>

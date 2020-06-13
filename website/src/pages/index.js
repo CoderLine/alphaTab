@@ -95,7 +95,8 @@ function Home() {
       </header>
       <main className="main-at">
         <AlphaTab settings={ { 
-          file: "/files/canon.gp"
+          file: "/files/canon.gp",
+          tracks: [0, 1]
         } } />
         {features && features.length && (
           <section className={styles.features}>
