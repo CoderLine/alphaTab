@@ -239,23 +239,24 @@ export class VisualTestHelper {
             'expected-image'
         );
 
-        jasmine.addMatchers({
+        jasmine.addAsyncMatchers({
             toEqualVisually: VisualTestHelper.toEqualVisually
         });
 
-        (expect(actual) as any).toEqualVisually(expected, message);
+        await (expectAsync(actual) as any).toEqualVisually(expected, referenceFileName, message);
     }
 
     private static toEqualVisually(
         _utils: jasmine.MatchersUtil,
         _customEqualityTesters: ReadonlyArray<jasmine.CustomEqualityTester>
-    ): jasmine.CustomMatcher {
+    ): jasmine.CustomAsyncMatcher {
         return {
-            compare(
+            async compare(
                 actual: HTMLCanvasElement,
                 expected: HTMLCanvasElement,
+                expectedFileName: string,
                 message?: string
-            ): jasmine.CustomMatcherResult {
+            ): Promise<jasmine.CustomMatcherResult> {
                 const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
                 const oldActual = actual;
                 if (sizeMismatch) {
@@ -314,6 +315,7 @@ export class VisualTestHelper {
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
                         result.message = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
+                        await VisualTestHelper.saveFiles(expectedFileName, actual, diff);
                     } else if (sizeMismatch) {
                         result.message = `Image sizes do not match: ${expected.width}/${expected.height} vs ${oldActual.width}/${oldActual.height}`;
                         result.pass = false;
@@ -356,5 +358,108 @@ export class VisualTestHelper {
                 return result;
             }
         };
+    }
+
+    static async saveFiles(name: string, actual: HTMLCanvasElement, diff: HTMLCanvasElement): Promise<void> {
+        const actualData = await VisualTestHelper.toPngBlob(actual);
+        const diffData = await VisualTestHelper.toPngBlob(diff);
+
+        return new Promise((resolve, reject) => {
+            let x: XMLHttpRequest = new XMLHttpRequest();
+            x.open('POST', 'http://localhost:8090/save-visual-error/', true);
+            x.onload = () => {
+                resolve();
+            };
+            x.onerror = () => {
+                reject();
+            };
+            const data = new FormData();
+            data.append('name', name);
+            data.append('actual', actualData, VisualTestHelper.createFileName(name, 'actual'));
+            data.append('diff', diffData, VisualTestHelper.createFileName(name, 'diff'));
+            x.send(data);
+        });
+    }
+
+    static async toPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+        return new Promise((resolve, reject) => {
+            canvas.toBlob(blob => {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject();
+                }
+            }, 'image/png');
+        });
+    }
+
+    static createFileName(oldName: string, part: string) {
+        oldName = oldName.split('\\').join('/');
+        let i = oldName.lastIndexOf('/');
+        if (i >= 0) {
+            oldName = oldName.substr(i + 1);
+        }
+
+        i = oldName.lastIndexOf('.');
+        if (i >= 0) {
+            oldName = oldName.substr(0, i) + '-' + part + oldName.substr(i);
+        } else {
+            oldName += '-' + part;
+        }
+        return oldName;
+    }
+
+    static base64ArrayBuffer(bytes: Uint8Array) {
+        let base64 = '';
+        const encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+        const byteLength = bytes.byteLength;
+        const byteRemainder = byteLength % 3;
+        const mainLength = byteLength - byteRemainder;
+
+        let a;
+        let b;
+        let c;
+        let d;
+        let chunk;
+
+        // Main loop deals with bytes in chunks of 3
+        for (let i = 0; i < mainLength; i += 3) {
+            // Combine the three bytes into a single integer
+            chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
+
+            // Use bitmasks to extract 6-bit segments from the triplet
+            a = (chunk & 16515072) >> 18; // 16515072 = (2^6 - 1) << 18
+            b = (chunk & 258048) >> 12; // 258048   = (2^6 - 1) << 12
+            c = (chunk & 4032) >> 6; // 4032     = (2^6 - 1) << 6
+            d = chunk & 63; // 63       = 2^6 - 1
+
+            // Convert the raw binary segments to the appropriate ASCII encoding
+            base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d];
+        }
+
+        // Deal with the remaining bytes and padding
+        if (byteRemainder === 1) {
+            chunk = bytes[mainLength];
+
+            a = (chunk & 252) >> 2; // 252 = (2^6 - 1) << 2
+
+            // Set the 4 least significant bits to zero
+            b = (chunk & 3) << 4; // 3   = 2^2 - 1
+
+            base64 += `${encodings[a]}${encodings[b]}==`;
+        } else if (byteRemainder === 2) {
+            chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1];
+
+            a = (chunk & 64512) >> 10; // 64512 = (2^6 - 1) << 10
+            b = (chunk & 1008) >> 4; // 1008  = (2^6 - 1) << 4
+
+            // Set the 2 least significant bits to zero
+            c = (chunk & 15) << 2; // 15    = 2^4 - 1
+
+            base64 += `${encodings[a]}${encodings[b]}${encodings[c]}=`;
+        }
+
+        return base64;
     }
 }
