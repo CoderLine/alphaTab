@@ -183,10 +183,11 @@ export class PixelMatch {
     // based on "Anti-aliased Pixel and Intensity Slope Detector" paper by V. Vysniauskas, 2009
 
     static antialiased(img: Uint8Array, x1: number, y1: number, width: number, height: number, img2: Uint8Array) {
-        const x0 = Math.max(x1 - 1, 0);
-        const y0 = Math.max(y1 - 1, 0);
-        const x2 = Math.min(x1 + 1, width - 1);
-        const y2 = Math.min(y1 + 1, height - 1);
+        const distance = 1;
+        const x0 = Math.max(x1 - distance, 0);
+        const y0 = Math.max(y1 - distance, 0);
+        const x2 = Math.min(x1 + distance, width - 1);
+        const y2 = Math.min(y1 + distance, height - 1);
         const pos = (y1 * width + x1) * 4;
         let zeroes = x1 === x0 || x1 === x2 || y1 === y0 || y1 === y2 ? 1 : 0;
         let min = 0;
@@ -240,10 +241,11 @@ export class PixelMatch {
 
     // check if a pixel has 3+ adjacent pixels of the same color.
     static hasManySiblings(img: Uint8Array, x1: number, y1: number, width: number, height: number) {
-        const x0 = Math.max(x1 - 1, 0);
-        const y0 = Math.max(y1 - 1, 0);
-        const x2 = Math.min(x1 + 1, width - 1);
-        const y2 = Math.min(y1 + 1, height - 1);
+        const distance = 1;
+        const x0 = Math.max(x1 - distance, 0);
+        const y0 = Math.max(y1 - distance, 0);
+        const x2 = Math.min(x1 + distance, width - 1);
+        const y2 = Math.min(y1 + distance, height - 1);
         const pos = (y1 * width + x1) * 4;
         let zeroes = x1 === x0 || x1 === x2 || y1 === y0 || y1 === y2 ? 1 : 0;
 

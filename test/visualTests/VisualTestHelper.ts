@@ -298,7 +298,7 @@ export class VisualTestHelper {
                         expected.width,
                         expected.height,
                         {
-                            threshold: 0.1,
+                            threshold: 0.3,
                             includeAA: false,
                             diffMask: true,
                             alpha: 1
@@ -310,12 +310,12 @@ export class VisualTestHelper {
                     // only pixels that are not transparent are relevant for the diff-ratio
                     let totalPixels = match.totalPixels - match.transparentPixels;
                     let percentDifference = (match.differentPixels / totalPixels) * 100;
-                    result.pass = percentDifference < 0.5;
+                    result.pass = percentDifference < 1;
 
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
                         result.message = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
-                        await VisualTestHelper.saveFiles(expectedFileName, actual, diff);
+                        await VisualTestHelper.saveFiles(expectedFileName, expected, actual, diff);
                     } else if (sizeMismatch) {
                         result.message = `Image sizes do not match: ${expected.width}/${expected.height} vs ${oldActual.width}/${oldActual.height}`;
                         result.pass = false;
@@ -360,7 +360,13 @@ export class VisualTestHelper {
         };
     }
 
-    static async saveFiles(name: string, actual: HTMLCanvasElement, diff: HTMLCanvasElement): Promise<void> {
+    static async saveFiles(
+        name: string,
+        expected: HTMLCanvasElement,
+        actual: HTMLCanvasElement,
+        diff: HTMLCanvasElement
+    ): Promise<void> {
+        const expectedData = await VisualTestHelper.toPngBlob(expected);
         const actualData = await VisualTestHelper.toPngBlob(actual);
         const diffData = await VisualTestHelper.toPngBlob(diff);
 
@@ -375,6 +381,7 @@ export class VisualTestHelper {
             };
             const data = new FormData();
             data.append('name', name);
+            data.append('expected', expectedData, VisualTestHelper.createFileName(name, 'expected'));
             data.append('actual', actualData, VisualTestHelper.createFileName(name, 'actual'));
             data.append('diff', diffData, VisualTestHelper.createFileName(name, 'diff'));
             x.send(data);

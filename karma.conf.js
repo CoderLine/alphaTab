@@ -58,6 +58,10 @@ module.exports = function (config) {
                     '/save-visual-error',
                     upload.fields([
                         {
+                            name: 'expected',
+                            maxCount: 1
+                        },
+                        {
                             name: 'actual',
                             maxCount: 1
                         },
