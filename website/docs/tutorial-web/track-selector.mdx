@@ -2,6 +2,189 @@
 title: Track Selector
 ---
 
-# Simple Selector
 
-# More controls
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+In many files that alphaTab supports there might be more than just one instrument contained. 
+There might be multiple guitars, drums or other instruments where the notation is available. 
+Users would like to switch between the individual tracks. 
+
+Later when the player is available we will allow users to mute individual tracks, change their volume
+or play individual tracks solo. This way they can use alphaTab to play along their favourite song. The track selector will go into the sidebar. 
+Let's first extend our `index.html` with a template that we will use for all items in the track selector:
+
+<Tabs
+  defaultValue="dom"
+  values={[
+    { label: 'New DOM', value: 'dom', },
+    { label: 'Additional CSS', value: 'css', },
+  ]
+}>
+<TabItem value="dom">
+
+```html
+<!-- New in head tag -->
+<script src="https://kit.fontawesome.com/b43f0e512e.js"></script>
+<!-- Changed sidebar -->
+<div class="at-sidebar">
+  <div class="at-sidebar-content">
+    <div class="at-track-list"></div>
+  </div>
+</div>
+<!-- New below wrapper -->
+<template id="at-track-template">
+  <div class="at-track">
+    <div class="at-track-icon">
+      <i class="fas fa-guitar"></i>
+    </div>
+    <div class="at-track-details">
+      <div class="at-track-name"></div>
+      <div class="at-track-controls">
+      </div>
+    </div>
+  </div>
+</template>
+```
+
+</TabItem>
+<TabItem value="css">
+
+```css
+/** Sidebar (now with hover expansion) **/
+.at-sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  max-width: 70px;
+  width: auto;
+  display: flex;
+  align-content: stretch;
+  z-index: 1001;
+  overflow: hidden;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  background: #f7f7f7;
+}
+.at-sidebar:hover {
+  max-width: 400px;
+  transition: max-width 0.2s;
+  overflow-y: auto;
+}
+
+/** Track selector **/
+.at-track {
+  display: flex;
+  position: relative;
+  padding: 5px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.at-track:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+.at-track > .at-track-icon,
+.at-track > .at-track-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.at-track > .at-track-icon {
+  flex-shrink: 0;
+  font-size: 32px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  width: 64px;
+  height: 64px;
+  margin-right: 5px;
+  align-items: center;
+}
+.at-track-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.at-track:hover > .at-track-icon {
+  opacity: 0.8;
+}
+.at-track.active {
+  background: rgba(0, 0, 0, 0.03);
+}
+.at-track.active > .at-track-icon {
+  color: #4972a1;
+  opacity: 1;
+}
+.at-track > .at-track-name {
+  font-weight: 500;
+}
+.at-track .at-track-controls {
+  display: flex;
+  align-items: center;
+}
+.at-track .at-track-controls > * {
+  margin: 0 2px;
+}
+```
+</TabItem>
+</Tabs>
+
+Let's take a closer look at the new UI element. We have one column for the icon of the track and another one for the details of the track. 
+In the details we show the name and have a placeholder for some future player related controls. I added FontAwesome to have some icons available.
+Nothing very specific to alphaTab again, just more a general software development thing.
+
+Now the real magic with alphaTab happens, we will listen again to some events and fill the UI accordingly. 
+This will be also the first time that we signal again based on some UI interaction that alphaTab should do something. 
+When a user clicks on an item, we want to render the selected track:
+
+```js
+// track selector
+function createTrackItem(track) {
+  const trackItem = document
+    .querySelector("#at-track-template")
+    .content.cloneNode(true).firstElementChild;
+  trackItem.querySelector(".at-track-name").innerText = track.name;
+  trackItem.track = track;
+  trackItem.onclick = (e) => {
+    e.stopPropagation();
+    api.renderTracks([track]);
+  };
+  return trackItem;
+}
+const trackList = wrapper.querySelector(".at-track-list");
+api.scoreLoaded.on((score) => {
+  // clear items
+  trackList.innerHTML = "";
+  // generate a track item for all tracks of the score
+  score.tracks.forEach((track) => {
+    trackList.appendChild(createTrackItem(track));
+  });
+});
+api.renderStarted.on(() => {
+  // collect tracks being rendered
+  const tracks = new Map();
+  api.tracks.forEach((t) => {
+    tracks.set(t.index, t);
+  });
+  // mark the item as active or not
+  const trackItems = trackList.querySelectorAll(".at-track");
+  trackItems.forEach((trackItem) => {
+    if (tracks.has(trackItem.track.index)) {
+      trackItem.classList.add("active");
+    } else {
+      trackItem.classList.remove("active");
+    }
+  });
+});
+```
+
+The code above should be easy understandable but let's have a closer look on what happens there. 
+
+We have a small helper function which creates the DOM element for a given track. It will use the template 
+tag to create this element and then we just fill some data in. Upon click we tell alphaTab to render the given track. 
+
+Below that helper function we listen to the `scoreLoaded` which is fired once the data model for the song is loaded. 
+There we iterate all tracks, create a item for the selector and fill it into the sidebar. 
+
+Last but not least we add another listener to the `renderStarted` event which will mark the currently rendered
+tracks as active in the sidebar via CSS class.
+
+<img src="/img/tutorial-web/track-selector.png" height="400" />

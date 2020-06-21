@@ -1,3 +1,40 @@
 ---
 title: Setup Project
 ---
+
+First we will set the stage for our new component. For simplicity we will put all our code into one `index.html`.
+We also will be using the Content Delivery Network (CDN) jsdelivr.com to consume alphaTab into our project so there
+will not be a need for any webserver, opening this index.html in your browser of choice will work for all steps in 
+this tutorial. 
+
+If you prefer, you can also organize the project already into individual JavaScript and CSS files.
+
+As a step 1 create an `index.html` in any folder and open it the editor of your choice and your browser. 
+
+<img src="/img/tutorial-web/project-setup-1.png" />
+
+Once done we will add the basic wireframe of our page and include alphaTab. For this put the following code into 
+your `index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>AlphaTab Tutorial</title>
+    <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.js"></script>
+    <style type="text/css">
+      /* Our Styles will go here */
+    </style>
+  </head>
+  <body>
+    <!-- Our whole component will go into this wrapper -->
+    <div class="at-wrap"></div>
+    <script type="text/javascript">
+      // Our JavaScript code will go here
+    </script>
+  </body>
+</html>
+```
+
+But now the page is still empty. In the next step we will setup alphaTab and show some music notation.
