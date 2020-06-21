@@ -5,6 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+ /**
+  * alphaTab adjustments: show "since" badge
+  */
 import React from 'react';
 
 import Head from '@docusaurus/Head';
@@ -72,15 +75,21 @@ function DocItem(props) {
       keywords,
       hide_title: hideTitle,
       hide_table_of_contents: hideTableOfContents,
-      since: since
+      since: since,
+      full_width: fullWidth
     },
   } = DocContent;
   
   const metaImageUrl = siteUrl + useBaseUrl(metaImage);
 
+  const bodyAttributes = {};
+  if(fullWidth) {
+    bodyAttributes["class"] = "fullWidth";
+  }
+
   return (
     <>
-      <Head>
+      <Head bodyAttributes={bodyAttributes}>
         {title && (
           <title>
             {title} | {siteTitle}

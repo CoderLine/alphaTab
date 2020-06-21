@@ -15,7 +15,6 @@
   width: 300px;
   position: relative;
   top: calc(-1 * var(--ifm-navbar-height));
-  flex-shrink: 0;
 }
 
 .docMainContainer {
@@ -26,4 +25,9 @@
   .docPage {
     display: inherit;
   }
+}
+
+/** alphaTab adjustment */
+.docSidebarContainer {
+  flex-shrink: 0;
 }

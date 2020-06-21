@@ -7,12 +7,15 @@
   --ifm-color-primary-lighter: #578cc7;
   --ifm-color-primary-lightest: #739fd1;
   --ifm-code-font-size: 95%;
-  --ifm-container-width: 100%;
   --ifm-font-size-base: 16px;
   --ifm-font-family-base: system-ui, -apple-system, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont,
   'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
   'Segoe UI Emoji', 'Segoe UI Symbol';
   --ifm-heading-font-family: Ubuntu, var(--ifm-font-family-base);
+}
+
+.fullWidth {
+  --ifm-container-width: 100%;
 }
 
 h1,

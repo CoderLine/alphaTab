@@ -5,8 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+ /**
+  * alphaTab adjustment: pass on location to sidebar for sidebar redirection
+  */
 import React, {useState, useCallback} from 'react';
-import { matchPath } from "react-router";
 import classnames from 'classnames';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -121,6 +123,7 @@ function DocSidebar(props) {
     siteConfig: {themeConfig: {navbar: {title, logo = {}} = {}}} = {},
   } = useDocusaurusContext();
   const logoUrl = useBaseUrl(logo.src);
+
   const {
     docsSidebars,
     path,
