@@ -2,8 +2,81 @@
 title: Player
 ---
 
-# Basic setup
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-# Additional Controls
 
-# Playback indicator
+## Basic setup
+
+Now as we have the basic component ready, it is time to get some sound into the game. 
+AlphaTab comes with an audio synthesis engine, named AlphaSynth to play the songs
+via Midi and a SoundFont2 file. 
+
+To get the player configured is also quite easy: 
+
+1. We tell alphaTab that we want the player active and where to find the SoundFont2 file that should be used. 
+Luckily alphaTab ships a free SoundFont2 file for usage on your website. 
+2. We tell alphaTab how the cursors should look like
+3. We add some UI elements for the user to start/pause the playback and show the current position.
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'Initialize Player', value: 'js', },
+    { label: 'Cursor Styles', value: 'css', },
+  ]
+}>
+<TabItem value="js">
+
+```js
+const settings = {
+  file: "https://www2.alphatab.net/files/canon.gp",
+  player: {
+      enablePlayer: true,
+      soundFont: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/soundfont/sonivox.sf2'
+  }
+};
+const api = new alphaTab.AlphaTabApi(main, settings);
+```
+
+</TabItem>
+<TabItem value="css">
+
+```css
+.at-cursor-bar {
+  /* Defines the color of the bar background when a bar is played */
+  background: rgba(255, 242, 0, 0.25);
+}
+
+.at-selection div {
+  /* Defines the color of the selection background */
+  background: rgba(64, 64, 255, 0.1);
+}
+
+.at-cursor-beat {
+  /* Defines the beat cursor */
+  background: rgba(64, 64, 255, 0.75);
+  width: 3px;
+}
+
+.at-highlight * {
+  /* Defines the color of the music symbols when they are being played (svg) */
+  fill: #0078ff;
+  stroke: #0078ff;
+}
+```
+</TabItem>
+</Tabs>
+
+## Loading indicator
+
+Just like alphaTab, alphaSynth might need some time to initialize and load all required data. 
+Especially the SoundFonts can become quite big and might need some time to load. So we will
+add a small loading indicator to our footer so that the user will know once the player is ready
+for usage. 
+
+## Main Player Controls
+
+## Showing the current time
+
+## Extending the Track Selector

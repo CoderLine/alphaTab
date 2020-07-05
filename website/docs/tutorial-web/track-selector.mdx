@@ -2,9 +2,10 @@
 title: Track Selector
 ---
 
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+
+## Build the track selector
 
 In many files that alphaTab supports there might be more than just one instrument contained. 
 There might be multiple guitars, drums or other instruments where the notation is available. 
@@ -130,6 +131,11 @@ Let's first extend our `index.html` with a template that we will use for all ite
 Let's take a closer look at the new UI element. We have one column for the icon of the track and another one for the details of the track. 
 In the details we show the name and have a placeholder for some future player related controls. I added FontAwesome to have some icons available.
 Nothing very specific to alphaTab again, just more a general software development thing.
+
+:::caution
+Do not use this FontAwesome CDN link from this tutorial. Head over to https://fontawesome.com/
+to create your own personal kit for usage on your website. 
+:::
 
 Now the real magic with alphaTab happens, we will listen again to some events and fill the UI accordingly. 
 This will be also the first time that we signal again based on some UI interaction that alphaTab should do something. 
