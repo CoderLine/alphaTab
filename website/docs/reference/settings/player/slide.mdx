@@ -17,11 +17,13 @@ export var SlideSettings = [
     {
         name: 'SimpleSlidePitchOffset',
         defaultValue: 6,
+        type: 'int',
         description: 'The 1/4 tones (bend value) offset that simple slides like slide-out-below or slide-in-above use.'
     },
     {
         name: 'SimpleSlideDurationRatio',
         defaultValue: 0.25,
+        type: 'double',
         description: 
             'The percentage which the simple slides should take up from the whole note. for "slide into" ' +
             'effects the slide will take place from time 0 where the note is plucked to 25% of the overall ' +
@@ -30,6 +32,7 @@ export var SlideSettings = [
     {
         name: 'ShiftSlideDurationRatio',
         defaultValue: 0.5,
+        type: 'double',
         description: 'The percentage which the legato and shift slides should take up ' +
                     ' from the whole note. For a value 0.5 the sliding will start at 50% of the overall note duration ' +
                     ' and finish at 100%.'
@@ -50,7 +53,7 @@ export function SlideRow({setting}) {
                 <CodeBadge type="html" name={setting.name.toLowerCase()} />
             </td>
             <td>
-                <CodeBadge type="all" name="int" />
+                <CodeBadge type="all" name={setting.type} />
             </td>
             <td>{setting.defaultValue}</td>
             <td>
@@ -87,10 +90,12 @@ AlphaTab supports various types of slides which can be grouped into 3 types:
 * Shift Slides
 * Legato Slides
 
+
 * Slide into from below
 * Slide into from above
 * Slide out to below
 * Slide out to above 
+
 
 * Pick Slide out to above
 * Pick Slide out to below
