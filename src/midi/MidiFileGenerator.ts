@@ -40,7 +40,7 @@ import { SynthConstants } from '@src/synth/SynthConstants';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
-    public untilTieEnd: number = 0;
+    public untilTieOrSlideEnd: number = 0;
     public letRingEnd: number = 0;
 }
 
@@ -146,7 +146,13 @@ export class MidiFileGenerator {
 
         // Set PitchBendRangeCoarse to 12
         this._handler.addControlChange(track.index, 0, channel, ControllerType.DataEntryFine, 0);
-        this._handler.addControlChange(track.index, 0, channel, ControllerType.DataEntryCoarse, MidiFileGenerator.PitchBendRangeInSemitones);
+        this._handler.addControlChange(
+            track.index,
+            0,
+            channel,
+            ControllerType.DataEntryCoarse,
+            MidiFileGenerator.PitchBendRangeInSemitones
+        );
         this._handler.addProgramChange(track.index, 0, channel, playbackInfo.program);
     }
 
@@ -157,7 +163,8 @@ export class MidiFileGenerator {
 
     private generateMasterBar(masterBar: MasterBar, previousMasterBar: MasterBar | null, currentTick: number): void {
         // time signature
-        if (!previousMasterBar ||
+        if (
+            !previousMasterBar ||
             previousMasterBar.timeSignatureDenominator !== masterBar.timeSignatureDenominator ||
             previousMasterBar.timeSignatureNumerator !== masterBar.timeSignatureNumerator
         ) {
@@ -394,7 +401,7 @@ export class MidiFileGenerator {
         const brushOffset: number = note.isStringed && note.string <= brushInfo.length ? brushInfo[note.string - 1] : 0;
         const noteStart: number = beatStart + brushOffset;
         const noteDuration: MidiNoteDuration = this.getNoteDuration(note, beatDuration);
-        noteDuration.untilTieEnd -= brushOffset;
+        noteDuration.untilTieOrSlideEnd -= brushOffset;
         noteDuration.noteOnly -= brushOffset;
         noteDuration.letRingEnd -= brushOffset;
         const dynamicValue: DynamicValue = MidiFileGenerator.getDynamicValue(note);
@@ -408,7 +415,10 @@ export class MidiFileGenerator {
             initialBend = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
         } else if (note.beat.hasWhammyBar) {
             initialBend = MidiFileGenerator.getPitchWheel(note.beat.whammyBarPoints[0].value);
-        } else if (note.isTieDestination) {
+        } else if (
+            note.isTieDestination ||
+            (note.slideOrigin && note.slideOrigin.slideOutType === SlideOutType.Legato)
+        ) {
             initialBend = -1;
         } else {
             initialBend = MidiFileGenerator.getPitchWheel(0);
@@ -447,13 +457,15 @@ export class MidiFileGenerator {
         } else if (note.beat.hasWhammyBar && note.index === 0) {
             this.generateWhammy(note.beat, noteStart, noteDuration, channel);
         } else if (note.slideInType !== SlideInType.None || note.slideOutType !== SlideOutType.None) {
-            // TODO GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
+            this.generateSlide(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
         } else if (note.vibrato !== VibratoType.None) {
             this.generateVibrato(note, noteStart, noteDuration, channel);
         }
 
-        if (!note.isTieDestination) {
-            let noteSoundDuration: number = Math.max(noteDuration.untilTieEnd, noteDuration.letRingEnd);
+        // for tied notes, and target notes of legato slides we do not pick the note
+        // the previous one is extended
+        if (!note.isTieDestination && (!note.slideOrigin || note.slideOrigin.slideOutType !== SlideOutType.Legato)) {
+            let noteSoundDuration: number = Math.max(noteDuration.untilTieOrSlideEnd, noteDuration.letRingEnd);
             this._handler.addNote(track.index, noteStart, noteSoundDuration, noteKey, dynamicValue, channel);
         }
     }
@@ -461,11 +473,11 @@ export class MidiFileGenerator {
     private getNoteDuration(note: Note, duration: number): MidiNoteDuration {
         const durationWithEffects: MidiNoteDuration = new MidiNoteDuration();
         durationWithEffects.noteOnly = duration;
-        durationWithEffects.untilTieEnd = duration;
+        durationWithEffects.untilTieOrSlideEnd = duration;
         durationWithEffects.letRingEnd = duration;
         if (note.isDead) {
             durationWithEffects.noteOnly = this.applyStaticDuration(MidiFileGenerator.DefaultDurationDead, duration);
-            durationWithEffects.untilTieEnd = durationWithEffects.noteOnly;
+            durationWithEffects.untilTieOrSlideEnd = durationWithEffects.noteOnly;
             durationWithEffects.letRingEnd = durationWithEffects.noteOnly;
             return durationWithEffects;
         }
@@ -474,13 +486,13 @@ export class MidiFileGenerator {
                 MidiFileGenerator.DefaultDurationPalmMute,
                 duration
             );
-            durationWithEffects.untilTieEnd = durationWithEffects.noteOnly;
+            durationWithEffects.untilTieOrSlideEnd = durationWithEffects.noteOnly;
             durationWithEffects.letRingEnd = durationWithEffects.noteOnly;
             return durationWithEffects;
         }
         if (note.isStaccato) {
             durationWithEffects.noteOnly = (duration / 2) | 0;
-            durationWithEffects.untilTieEnd = durationWithEffects.noteOnly;
+            durationWithEffects.untilTieOrSlideEnd = durationWithEffects.noteOnly;
             durationWithEffects.letRingEnd = durationWithEffects.noteOnly;
             return durationWithEffects;
         }
@@ -494,8 +506,9 @@ export class MidiFileGenerator {
                         endNote,
                         endNote.beat.playbackDuration
                     );
-                    const endTick: number = endNote.beat.absolutePlaybackStart + tieDestinationDuration.untilTieEnd;
-                    durationWithEffects.untilTieEnd = endTick - startTick;
+                    const endTick: number =
+                        endNote.beat.absolutePlaybackStart + tieDestinationDuration.untilTieOrSlideEnd;
+                    durationWithEffects.untilTieOrSlideEnd = endTick - startTick;
                 } else {
                     // for continuing ties, take the current duration + the one from the destination
                     // this branch will be entered as part of the recusion of the if branch
@@ -503,8 +516,19 @@ export class MidiFileGenerator {
                         endNote,
                         endNote.beat.playbackDuration
                     );
-                    durationWithEffects.untilTieEnd = duration + tieDestinationDuration.untilTieEnd;
+                    durationWithEffects.untilTieOrSlideEnd = duration + tieDestinationDuration.untilTieOrSlideEnd;
                 }
+            }
+        } else if (note.slideOutType === SlideOutType.Legato) {
+            const endNote: Note = note.slideTarget!;
+            if (endNote) {
+                const startTick: number = note.beat.absolutePlaybackStart;
+                const slideTargetDuration: MidiNoteDuration = this.getNoteDuration(
+                    endNote,
+                    endNote.beat.playbackDuration
+                );
+                const endTick: number = endNote.beat.absolutePlaybackStart + slideTargetDuration.untilTieOrSlideEnd;
+                durationWithEffects.untilTieOrSlideEnd = endTick - startTick;
             }
         }
 
@@ -539,7 +563,7 @@ export class MidiFileGenerator {
                 durationWithEffects.letRingEnd = letRingEnd;
             }
         } else {
-            durationWithEffects.letRingEnd = durationWithEffects.untilTieEnd;
+            durationWithEffects.letRingEnd = durationWithEffects.untilTieOrSlideEnd;
         }
         return durationWithEffects;
     }
@@ -666,30 +690,88 @@ export class MidiFileGenerator {
 
     /**
      * Maximum semitones that are supported in bends in one direction (up or down)
-     * GP has 8 full tones on whammys. 
+     * GP has 8 full tones on whammys.
      */
     private static readonly PitchBendRangeInSemitones = 8 * 2;
     /**
      * The value on how many pitch-values are used for one semitone
      */
-    private static readonly PitchValuePerSemitone: number = SynthConstants.DefaultPitchWheel / MidiFileGenerator.PitchBendRangeInSemitones;
+    private static readonly PitchValuePerSemitone: number =
+        SynthConstants.DefaultPitchWheel / MidiFileGenerator.PitchBendRangeInSemitones;
 
     /**
-     * The minimum number of breakpoints generated per semitone bend. 
+     * The minimum number of breakpoints generated per semitone bend.
      */
     private static readonly MinBreakpointsPerSemitone = 6;
 
     /**
-     * How long until a new breakpoint is generated for a bend. 
+     * How long until a new breakpoint is generated for a bend.
      */
     private static readonly MillisecondsPerBreakpoint = 150;
 
     /**
-     * Calculates the midi pitch wheel value for the give bend value.  
+     * Calculates the midi pitch wheel value for the give bend value.
      */
     public static getPitchWheel(bendValue: number) {
         // bend values are 1/4 notes therefore we only take half a semitone value per bend value
         return SynthConstants.DefaultPitchWheel + (bendValue / 2) * MidiFileGenerator.PitchValuePerSemitone;
+    }
+
+    private generateSlide(
+        note: Note,
+        noteStart: number,
+        noteDuration: MidiNoteDuration,
+        noteKey: number,
+        dynamicValue: DynamicValue,
+        channel: number
+    ) {
+        let duration: number =
+            note.slideOutType === SlideOutType.Legato ? noteDuration.noteOnly : noteDuration.untilTieOrSlideEnd;
+        let playedBendPoints: BendPoint[] = [];
+        let track: Track = note.beat.voice.bar.staff.track;
+
+        const simpleSlidePitchOffset = this._settings.player.slide.simpleSlidePitchOffset;
+        const simpleSlideDurationOffset = Math.floor(BendPoint.MaxPosition * this._settings.player.slide.simpleSlideDurationRatio);
+        const shiftSlideDurationOffset = Math.floor(BendPoint.MaxPosition * this._settings.player.slide.shiftSlideDurationRatio);
+
+        // Shift Slide: Play note, move up to target note, play end note
+        // Legato Slide: Play note, move up to target note, no pick on end note, just keep it ringing
+
+        // 2 bend points: one on 0/0, dy/MaxPos.
+
+        // Slide into from above/below: Play note on lower pitch, slide into it quickly at start
+        // Slide out above/blow: Play note on normal pitch, slide out quickly at end
+
+        switch (note.slideInType) {
+            case SlideInType.IntoFromAbove:
+                playedBendPoints.push(new BendPoint(0, simpleSlidePitchOffset));
+                playedBendPoints.push(new BendPoint(simpleSlideDurationOffset, 0));
+                break;
+            case SlideInType.IntoFromBelow:
+                playedBendPoints.push(new BendPoint(0, -simpleSlidePitchOffset));
+                playedBendPoints.push(new BendPoint(simpleSlideDurationOffset, 0));
+                break;
+        }
+
+        switch (note.slideOutType) {
+            case SlideOutType.Legato:
+            case SlideOutType.Shift:
+                playedBendPoints.push(new BendPoint(shiftSlideDurationOffset, 0));
+                // normal note values are in 1/2 tones, bends are in 1/4 tones
+                const dy = (note.slideTarget!.realValue - note.realValue) * 2;
+                playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, dy));
+                break;
+            case SlideOutType.OutDown:
+                playedBendPoints.push(new BendPoint(BendPoint.MaxPosition - simpleSlideDurationOffset, 0));
+                playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, -simpleSlidePitchOffset));
+                break;
+            case SlideOutType.OutUp:
+                playedBendPoints.push(new BendPoint(BendPoint.MaxPosition - simpleSlideDurationOffset, 0));
+                playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, simpleSlidePitchOffset));
+                break;
+        }
+
+        this.generateWhammyOrBend(noteStart, channel, duration, playedBendPoints, track);
     }
 
     private generateBend(note: Note, noteStart: number, noteDuration: MidiNoteDuration, channel: number): void {
@@ -798,11 +880,7 @@ export class MidiFileGenerator {
                             duration,
                             track,
                             false,
-                            [
-                                note.bendPoints[0].value,
-                                note.bendPoints[1].value,
-                                note.bendPoints[2].value
-                            ],
+                            [note.bendPoints[0].value, note.bendPoints[1].value, note.bendPoints[2].value],
                             bendDuration
                         );
                         return;
@@ -1033,15 +1111,15 @@ export class MidiFileGenerator {
         );
         const ticksPerBreakpoint: number = ticksBetweenPoints / numberOfSteps;
         const pitchPerBreakpoint = (nextBendValue - currentBendValue) / numberOfSteps;
-    
-        for(let i = 0; i < numberOfSteps; i++) {
+
+        for (let i = 0; i < numberOfSteps; i++) {
             this._handler.addBend(track.index, currentTick | 0, channel, Math.round(currentBendValue));
             currentBendValue += pitchPerBreakpoint;
             currentTick += ticksPerBreakpoint;
         }
 
         // final bend value if needed
-        if(currentBendValue < nextBendValue) {
+        if (currentBendValue < nextBendValue) {
             this._handler.addBend(track.index, currentTick | 0, channel, nextBendValue);
         }
     }
@@ -1059,7 +1137,7 @@ export class MidiFileGenerator {
         let trillLength: number = MidiUtils.toTicks(note.trillSpeed);
         let realKey: boolean = true;
         let tick: number = noteStart;
-        let end: number = noteStart + noteDuration.untilTieEnd;
+        let end: number = noteStart + noteDuration.untilTieOrSlideEnd;
         while (tick + 10 < end) {
             // only the rest on last trill play
             if (tick + trillLength >= end) {
@@ -1082,7 +1160,7 @@ export class MidiFileGenerator {
         const track: Track = note.beat.voice.bar.staff.track;
         let tpLength: number = MidiUtils.toTicks(note.beat.tremoloSpeed!);
         let tick: number = noteStart;
-        const end: number = noteStart + noteDuration.untilTieEnd;
+        const end: number = noteStart + noteDuration.untilTieOrSlideEnd;
         while (tick + 10 < end) {
             // only the rest on last trill play
             if (tick + tpLength >= end) {
