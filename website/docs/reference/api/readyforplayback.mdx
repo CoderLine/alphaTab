@@ -1,6 +1,6 @@
 ---
-title: ReadyForPlayback
-jsName: readyForPlayback
+title: PlayerReady
+jsName: playerReady
 domName: alphaTab.playerReady
 category: Events - Player
 description: This event is fired when all required data for playback is loaded and ready.
@@ -45,7 +45,7 @@ none
 
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-api.readyForPlayback.on(() => {
+api.playerReady.on(() => {
     enablePlayerControls();
 });
 ```
@@ -73,10 +73,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.playerReady', () 
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.ReadyForPlayback += () => 
+api.PlayerReady.On(() => 
 {
     EnablePlayerControls()
-};
+});
 ```
 
 </TabItem>
