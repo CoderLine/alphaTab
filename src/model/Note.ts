@@ -234,6 +234,11 @@ export class Note {
     public slideTarget: Note | null = null;
 
     /**
+     * Gets or sets the source note for several slide types.
+     */
+    public slideOrigin: Note | null = null;
+
+    /**
      * Gets or sets whether a vibrato is played on the note.
      */
     public vibrato: VibratoType = VibratoType.None;
@@ -614,6 +619,8 @@ export class Note {
                 this.slideTarget = nextNoteOnLine.value;
                 if (!this.slideTarget) {
                     this.slideOutType = SlideOutType.None;
+                } else {
+                    this.slideTarget.slideOrigin = this;
                 }
                 break;
         }

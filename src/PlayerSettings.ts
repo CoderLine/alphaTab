@@ -63,6 +63,34 @@ export class VibratoPlaybackSettings {
 }
 
 /**
+ * This object defines the details on how to generate the slide effects.
+ * @json
+ */
+export class SlidePlaybackSettings {
+    /**
+     * Gets or sets 1/4 tones (bend value) offset that
+     * simple slides like slide-out-below or slide-in-above use.
+     */
+    public simpleSlidePitchOffset: number = 6;
+
+    /**
+     * Gets or sets the percentage which the simple slides should take up
+     * from the whole note. for "slide into" effects the slide will take place
+     * from time 0 where the note is plucked to 25% of the overall note duration.
+     * For "slide out" effects the slide will start 75% and finish at 100% of the overall
+     * note duration.
+     */
+    public simpleSlideDurationRatio: number = 0.25;
+
+    /**
+     * Gets or sets the percentage which the legato and shift slides should take up
+     * from the whole note. For a value 0.5 the sliding will start at 50% of the overall note duration
+     * and finish at 100%
+     */
+    public shiftSlideDurationRatio: number = 0.5;
+}
+
+/**
  * The player settings control how the audio playback and UI is behaving.
  * @json
  */
@@ -127,6 +155,11 @@ export class PlayerSettings {
      * Gets or sets the settings on how the vibrato audio is generated.
      */
     public readonly vibrato: VibratoPlaybackSettings = new VibratoPlaybackSettings();
+
+    /**
+     * Gets or sets the setitngs on how the slide audio is generated.
+     */
+    public readonly slide: SlidePlaybackSettings = new SlidePlaybackSettings();
 
     /**
      * Gets or sets whether the triplet feel should be applied/played during audio playback.
