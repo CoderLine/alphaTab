@@ -1,0 +1,106 @@
+---
+title: Player.Slide
+jsName: player.slide
+jsonName: player.slide
+domName: data-player-slide-*
+category: Player
+description: The Slide settings allow control how the different slide types are generated for audio. 
+sidebarPath: /docs/reference/settings
+since: 0.9.9
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+import CodeBadge from '../../../../src/code-badge';
+
+export var SlideSettings = [
+    {
+        name: 'SimpleSlidePitchOffset',
+        defaultValue: 6,
+        description: 'The 1/4 tones (bend value) offset that simple slides like slide-out-below or slide-in-above use.'
+    },
+    {
+        name: 'SimpleSlideDurationRatio',
+        defaultValue: 0.25,
+        description: 
+            'The percentage which the simple slides should take up from the whole note. for "slide into" ' +
+            'effects the slide will take place from time 0 where the note is plucked to 25% of the overall ' +
+            'note duration. For "slide out" effects the slide will start 75% and finish at 100% of the overall note duration.'
+    },
+    {
+        name: 'ShiftSlideDurationRatio',
+        defaultValue: 0.5,
+        description: 'The percentage which the legato and shift slides should take up ' +
+                    ' from the whole note. For a value 0.5 the sliding will start at 50% of the overall note duration ' +
+                    ' and finish at 100%.'
+    }
+];
+
+export function toCamelCase(v) {
+    return v.substr(0, 1).toLowerCase() + v.substr(1);
+}
+
+export function SlideRow({setting}) {  
+    return (
+        <tr>
+            <td>
+                <CodeBadge type="net" name={setting.name} /><br />
+                <CodeBadge type="js" name={toCamelCase(setting.name)} /><br />
+                <CodeBadge type="json" name={toCamelCase(setting.name)} /><br />
+                <CodeBadge type="html" name={setting.name.toLowerCase()} />
+            </td>
+            <td>
+                <CodeBadge type="all" name="int" />
+            </td>
+            <td>{setting.defaultValue}</td>
+            <td>
+                {setting.description}
+            </td>
+        </tr>
+    );
+}
+
+export function SlideTable() {
+    const settings = SlideSettings.map(c => <SlideRow setting={c} />);
+    return (
+        <table className="table table-striped table-condensed type-table">
+            <thead>
+                <tr>
+                    <th>Setting</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                    <th>Summary</th>
+                </tr>
+            </thead>    
+            <tbody> 
+                {settings}
+            </tbody>
+        </table>
+    );
+}
+
+
+## Description
+
+AlphaTab supports various types of slides which can be grouped into 3 types: 
+
+* Shift Slides
+* Legato Slides
+
+* Slide into from below
+* Slide into from above
+* Slide out to below
+* Slide out to above 
+
+* Pick Slide out to above
+* Pick Slide out to below
+
+For the first 2 groups the audio generation can be adapted. For the pick slide the audio generation cannot be adapted
+as there is no mechanism yet in alphaTab to play pick slides to make them sound real. 
+
+For the first group only the duration or start point of the slide can be configured while for the second group
+the duration/start-point and the pitch offset can be configured. 
+
+## Slide Settings
+
+<SlideTable />
