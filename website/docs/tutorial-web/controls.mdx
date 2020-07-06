@@ -24,7 +24,7 @@ just usual web development we will go through this rather quick:
   defaultValue="dom"
   values={[
     { label: 'New DOM', value: 'dom', },
-    { label: 'Additional CSS', value: 'css', },
+    { label: 'New CSS', value: 'css', },
   ]
 }>
 <TabItem value="dom">
@@ -146,7 +146,7 @@ and tell alphaTab what to do.
 
 ## Song Info
 
-To fill the song info we will again subscribe to the `scoreLoaded` event which we used
+To fill the song info we will again subscribe to the [`scoreLoaded`](/docs/reference/api/scoreloaded) event which we used
 to fill the track selector. Then we just fetch the placeholder elements and fill them with 
 the corresponding values from the data model: 
 
@@ -160,7 +160,7 @@ api.scoreLoaded.on((score)=>{
 ## Metronome
 
 The metronome will become relevant when we activate the player in the next step, but we
-can already create the control which will set the metronome volume bases on the toggle button state:
+can already create the control which will set the metronome volume based on the toggle button state:
 
 ```js
 const metronome = wrapper.querySelector('.at-controls .at-metronome');
@@ -175,13 +175,14 @@ metronome.onclick = () => {
 ```
 
 We toggle the `active` CSS class as visual indication whether the feature is active or not. 
-THen we check for the visual state to really tell alphaTab whether the metronome should be 
-active or not by setting the `metronomeValue`.
+Then we check for the visual state to really tell alphaTab whether the metronome should be 
+active or not by setting the [`metronomeValue`](/docs/reference/api/metronomevolume).
 
 ## Looping
 
 The looping is similar to the metronome. We will use the `active` class to decide whether
-the looping should be active. It also will only be relevant once we have the player feature enabled:
+the looping should be active using the [`isLooping`](/docs/reference/api/islooping) option. 
+It also will only be relevant once we have the player feature enabled:
 
 ```js
 const loop = wrapper.querySelector('.at-controls .at-loop');
@@ -223,8 +224,7 @@ zoom.onchange = ()=>{
 };
 ```
 
-Updating the zoom level is a bit more complex than the previous tasks but still rather simple: 
-
+Updating the zoom level is a bit more effort than the previous tasks but still not very complicated:  
 First we fill the settings with the new scale. Then we tell alphaTab to read this updated settings 
 and re-render the music sheet.
 
@@ -407,15 +407,6 @@ layout.onchange = () => {
       font-weight: 500;
     }
 
-    .at-track .at-track-controls {
-      display: flex;
-      align-items: center;
-    }
-
-    .at-track .at-track-controls>* {
-      margin: 0 2px;
-    }
-
     /** Footer **/
     .at-controls {
       flex: 0 0 auto;
@@ -549,7 +540,6 @@ layout.onchange = () => {
       </div>
       <div class="at-track-details">
         <div class="at-track-name"></div>
-        <div class="at-track-controls"></div>
       </div>
     </div>
   </template>
@@ -561,7 +551,7 @@ layout.onchange = () => {
 
     // initialize alphatab
     const settings = {
-      file: "https://www2.alphatab.net/files/canon.gp",
+      file: "https://www.alphatab.net/files/canon.gp",
     };
     const api = new alphaTab.AlphaTabApi(main, settings);
 

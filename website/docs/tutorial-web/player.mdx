@@ -8,14 +8,14 @@ import TabItem from '@theme/TabItem';
 
 ## Basic setup
 
-Now as we have the basic component ready, it is time to get some sound into the game. 
-AlphaTab comes with an audio synthesis engine, named AlphaSynth to play the songs
+Now as we have the basic component ready, it is time to add some sound. 
+AlphaTab comes with an audio synthesis engine named AlphaSynth to play the songs
 via Midi and a SoundFont2 file. 
 
 To get the player configured is also quite easy: 
 
 1. We tell alphaTab that we want the player active and where to find the SoundFont2 file that should be used. 
-Luckily alphaTab ships a free SoundFont2 file for usage on your website. 
+alphaTab ships a free SoundFont2 file for usage on your website. 
 2. We tell alphaTab how the cursors should look like
 3. We add some UI elements for the user to start/pause the playback and show the current position.
 
@@ -30,7 +30,7 @@ Luckily alphaTab ships a free SoundFont2 file for usage on your website.
 
 ```js
 const settings = {
-  file: "https://www2.alphatab.net/files/canon.gp",
+  file: "https://www.alphatab.net/files/canon.gp",
   player: {
       enablePlayer: true,
       soundFont: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/soundfont/sonivox.sf2'
@@ -87,7 +87,7 @@ nice looking progress indicator on your site.
   defaultValue="dom"
   values={[
     { label: 'New DOM', value: 'dom', },
-    { label: 'Additional JavaScript', value: 'js', },
+    { label: 'New JavaScript', value: 'js', },
   ]
 }>
 <TabItem value="dom">
@@ -105,8 +105,8 @@ in which we will show the percentage value.
 </TabItem>
 <TabItem value="js">
 
-We will use the `soundFontLoad` event to indicate the load progress of the (usually larger) SoundFont.
-The `playerReady` will tell us when to hide the whole indicator.  
+We will use the [`soundFontLoad`](/docs/reference/api/soundfontload) event to indicate the load progress of the (usually larger) SoundFont.
+The [`playerReady`](/docs/reference/api/readyforplayback) will tell us when to hide the whole indicator.  
 
 ```js
 const playerIndicator = wrapper.querySelector(
@@ -129,8 +129,8 @@ Now we need to add the required controls for the users to play and pause the aud
 We will add one button for play/pause which will change the icon depending on the current playback state. 
 And we will also add one button which stops the playback and moves the cursor back to start.
 
-We will use the `api.playPause()` and `api.stop()` to send the right signals to alphaTab and we use the 
-`api.playerStateChanged` event to update the button icon. To ensure that the user does not interact with the player
+We will use the [`playPause()`](/docs/reference/api/playpause) and [`stop()`](/docs/reference/api/stop) to send the right signals to alphaTab and we use the 
+[`playerStateChanged`](/docs/reference/api/playerstatechanged) event to update the button icon. To ensure that the user does not interact with the player
 before it is ready, we will keep the buttons disabled until the player is ready. 
 
 <Tabs
@@ -431,15 +431,6 @@ api.playerPositionChanged.on((e) => {
         font-weight: 500;
       }
 
-      .at-track .at-track-controls {
-        display: flex;
-        align-items: center;
-      }
-
-      .at-track .at-track-controls > * {
-        margin: 0 2px;
-      }
-
       /** Footer **/
       .at-controls {
         flex: 0 0 auto;
@@ -607,7 +598,6 @@ api.playerPositionChanged.on((e) => {
         </div>
         <div class="at-track-details">
           <div class="at-track-name"></div>
-          <div class="at-track-controls"></div>
         </div>
       </div>
     </template>
@@ -619,7 +609,7 @@ api.playerPositionChanged.on((e) => {
 
       // initialize alphatab
       const settings = {
-        file: "https://www2.alphatab.net/files/canon.gp",
+        file: "https://www.alphatab.net/files/canon.gp",
         player: {
           enablePlayer: true,
           soundFont:

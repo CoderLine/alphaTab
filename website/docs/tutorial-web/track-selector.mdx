@@ -7,19 +7,18 @@ import TabItem from '@theme/TabItem';
 
 ## Build the track selector
 
-In many files that alphaTab supports there might be more than just one instrument contained. 
-There might be multiple guitars, drums or other instruments where the notation is available. 
+In many files that alphaTab supports, there might be more than just one instrument contained. 
+There can be vocals, guitars, drums or other instruments where the notation is available. 
 Users would like to switch between the individual tracks. 
 
-Later when the player is available we will allow users to mute individual tracks, change their volume
-or play individual tracks solo. This way they can use alphaTab to play along their favourite song. The track selector will go into the sidebar. 
-Let's first extend our `index.html` with a template that we will use for all items in the track selector:
+The track selector will go into the sidebar, so let's extend our `index.html` with a template that we will use for all items in the track selector and
+lets add some place in the sidebar where the items will go.
 
 <Tabs
   defaultValue="dom"
   values={[
     { label: 'New DOM', value: 'dom', },
-    { label: 'Additional CSS', value: 'css', },
+    { label: 'New CSS', value: 'css', },
   ]
 }>
 <TabItem value="dom">
@@ -41,7 +40,6 @@ Let's first extend our `index.html` with a template that we will use for all ite
     </div>
     <div class="at-track-details">
       <div class="at-track-name"></div>
-      <div class="at-track-controls">
       </div>
     </div>
   </div>
@@ -117,32 +115,25 @@ Let's first extend our `index.html` with a template that we will use for all ite
 .at-track > .at-track-name {
   font-weight: 500;
 }
-.at-track .at-track-controls {
-  display: flex;
-  align-items: center;
-}
-.at-track .at-track-controls > * {
-  margin: 0 2px;
-}
 ```
 </TabItem>
 </Tabs>
 
 Let's take a closer look at the new UI element. We have one column for the icon of the track and another one for the details of the track. 
-In the details we show the name and have a placeholder for some future player related controls. I added FontAwesome to have some icons available.
-Nothing very specific to alphaTab again, just more a general software development thing.
+In the details we show the name and other future controls for volume and muting could go there. 
+In this tutorial we will use FontAwesome to have some icons.
 
 :::caution
 Do not use this FontAwesome CDN link from this tutorial. Head over to https://fontawesome.com/
 to create your own personal kit for usage on your website. 
 :::
 
-Now the real magic with alphaTab happens, we will listen again to some events and fill the UI accordingly. 
-This will be also the first time that we signal again based on some UI interaction that alphaTab should do something. 
-When a user clicks on an item, we want to render the selected track:
+Now the real magic happens as we will hook this up with alphaTab. We will listen again to some events and fill the UI accordingly. 
+This will be also the first time that we signal based on some UI interaction that alphaTab should do something. 
+When a user clicks on an item, we want to render the selected track.
 
 ```js
-// track selector
+// helper function to create individual items
 function createTrackItem(track) {
   const trackItem = document
     .querySelector("#at-track-template")
@@ -151,11 +142,16 @@ function createTrackItem(track) {
   trackItem.track = track;
   trackItem.onclick = (e) => {
     e.stopPropagation();
+    // here we use some API function of alphaTab. 
+    // check the reference docs for the details.
     api.renderTracks([track]);
   };
   return trackItem;
 }
+
+
 const trackList = wrapper.querySelector(".at-track-list");
+// fill track list when the score is loaded
 api.scoreLoaded.on((score) => {
   // clear items
   trackList.innerHTML = "";
@@ -164,9 +160,12 @@ api.scoreLoaded.on((score) => {
     trackList.appendChild(createTrackItem(track));
   });
 });
+
+// mark the rendered track as active in the list
 api.renderStarted.on(() => {
   // collect tracks being rendered
   const tracks = new Map();
+  // here we access the currently rendered tracks of alphaTab
   api.tracks.forEach((t) => {
     tracks.set(t.index, t);
   });
@@ -187,10 +186,10 @@ The code above should be easy understandable but let's have a closer look on wha
 We have a small helper function which creates the DOM element for a given track. It will use the template 
 tag to create this element and then we just fill some data in. Upon click we tell alphaTab to render the given track. 
 
-Below that helper function we listen to the `scoreLoaded` which is fired once the data model for the song is loaded. 
+Below that helper function we listen to the [`scoreLoaded`](/docs/reference/api/scoreloaded) event which is fired once the data model for the song is loaded. 
 There we iterate all tracks, create a item for the selector and fill it into the sidebar. 
 
-Last but not least we add another listener to the `renderStarted` event which will mark the currently rendered
+Last but not least we add another listener to the [`renderStarted`](/docs/reference/api/renderstarted) event which will mark the currently rendered
 tracks as active in the sidebar via CSS class.
 
 <img src="/img/tutorial-web/track-selector.png" height="400" />
@@ -334,13 +333,6 @@ tracks as active in the sidebar via CSS class.
       .at-track > .at-track-name {
         font-weight: 500;
       }
-      .at-track .at-track-controls {
-        display: flex;
-        align-items: center;
-      }
-      .at-track .at-track-controls > * {
-        margin: 0 2px;
-      }
     </style>
   </head>
   <body>
@@ -372,7 +364,6 @@ tracks as active in the sidebar via CSS class.
         </div>
         <div class="at-track-details">
           <div class="at-track-name"></div>
-          <div class="at-track-controls"></div>
         </div>
       </div>
     </template>
