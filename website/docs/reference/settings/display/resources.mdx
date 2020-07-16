@@ -115,7 +115,7 @@ export function ResourceRow({resource, type}) {
                 <CodeBadge type="js" name={resource.name} /><br />
                 <CodeBadge type="json" name={resource.name} /><br />
                 <CodeBadge type="html" name={resource.name.toLowerCase()} /><br />
-                <CodeBadge type="net" name={toUpperCase(resource.name)} />
+                <CodeBadge type="net" name={toPascalCase(resource.name)} />
             </td>
             <td>
                 <CodeBadge type="all" name={type} />
