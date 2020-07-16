@@ -66,7 +66,7 @@ export function buildNames(property) {
     }
     
     let jQueryNames = property.props('jQueryName');
-    if (jQueryNames.length === 0) {
+    if (property.prop('jQuery', true) && jQueryNames.length === 0) {
         if(category.startsWith('Events')) {
             jQueryNames = tojQueryEventNames(jsNames);
         } else if(category.startsWith('Methods')) {
@@ -79,7 +79,7 @@ export function buildNames(property) {
     }
 
     let domNames = property.props('domName');
-    if (domNames.length === 0) {
+    if (property.prop('dom', true) && domNames.length === 0) {
         if(category.startsWith('Events')) {
             domNames = toDomEventNames(jsNames);
         } else if(category.startsWith('Methods')) {

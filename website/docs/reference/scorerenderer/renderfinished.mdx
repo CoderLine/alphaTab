@@ -1,6 +1,7 @@
 ---
-title: RenderFinished
-jsName: renderFinished
+title: renderFinished
+jQuery: false
+dom: false
 category: Events
 description: This event is fired when the rendering of the whole music sheet is finished.
 sidebarPath: /docs/reference/scorerenderer
@@ -20,32 +21,32 @@ the display component to visually display the rendered components when this even
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action<AlphaTab.Rendering.RenderFinishedEventArgs>" />    
     <TypeRow type="js" name="function(e)" />    
+    <TypeRow type="net" name="Action<AlphaTab.Rendering.RenderFinishedEventArgs>" />    
 </TypeTable>
 
 ## AlphaTab.Rendering.RenderFinishedEventArgs Properties
 
 <ParameterTable>
-    <ParameterRow platform="all" name="width" type="number">
+    <ParameterRow platform="all" name="width" type="int">
         The width of the current rendering result.
     </ParameterRow>
-    <ParameterRow platform="all" name="height" type="number">
+    <ParameterRow platform="all" name="height" type="int">
         The height of the current rendering result.
     </ParameterRow>
-    <ParameterRow platform="all" name="totalWidth" type="number">
+    <ParameterRow platform="all" name="totalWidth" type="int">
         The currently known total width of the final music sheet. 
     </ParameterRow>
-    <ParameterRow platform="all" name="totalHeight" type="number">
+    <ParameterRow platform="all" name="totalHeight" type="int">
         The currently known total height of the final music sheet.
     </ParameterRow>
-    <ParameterRow platform="all" name="firstMasterBarIndex" type="number">
+    <ParameterRow platform="all" name="firstMasterBarIndex" type="int">
         The index of the first masterbar that was rendered in this result.
     </ParameterRow>
-    <ParameterRow platform="all" name="lastMasterBarIndex" type="number">
+    <ParameterRow platform="all" name="lastMasterBarIndex" type="int">
         The last masterbar that was rendered in this result.
     </ParameterRow>
-    <ParameterRow platform="all" name="renderResult" type="unknown/object">
+    <ParameterRow platform="all" name="renderResult" type="object">
         The render engine specific result object which contains the rendered music sheet:
         - For `svg` it will contain the raw SVG string, 
         - For `html5` it will contain a HTML5 canvas DOM element

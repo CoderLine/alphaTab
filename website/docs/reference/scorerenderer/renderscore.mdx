@@ -1,6 +1,7 @@
 ---
-title: RenderScore
-jsName: renderScore
+title: renderScore
+jQuery: false
+dom: false
 category: Methods
 description: Initiates the rendering of the specified tracks of the given score.
 sidebarPath: /docs/reference/scorerenderer
@@ -15,8 +16,8 @@ This method initiates the rendering of the specified tracks of the given score.
 ## Signatures
 
 <TypeTable>
-    <TypeRow type="net" name="void RenderScore(Score score, IList<double> trackIndexes)" />
     <TypeRow type="js" name="function resizeRender(score, trackIndexes)" />
+    <TypeRow type="net" name="void RenderScore(Score score, IList<double> trackIndexes)" />
 </TypeTable>
 
 ### Parameters
@@ -25,7 +26,7 @@ This method initiates the rendering of the specified tracks of the given score.
     <ParameterRow platform="all" name="score" type="AlphaTab.Model.Score">
         The score of which the tracks should be taken for rendering.
     </ParameterRow>
-    <ParameterRow platform="all" name="trackIndexes" type="number[]">
+    <ParameterRow platform="all" name="trackIndexes" type="int[]">
         The indexes to the tracks which should be layed out and rendered. 
     </ParameterRow>
 </ParameterTable>
