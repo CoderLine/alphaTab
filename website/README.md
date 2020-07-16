@@ -1,6 +1,6 @@
 # alphaTab Website and Documentation
 
-![enter image description here](https://raw.githubusercontent.com/CoderLine/alphaTab/develop/Images/banner.png)
+![alphaTab](https://raw.githubusercontent.com/CoderLine/alphaTab/develop/img/banner.png)
 
 This repository contains the website and documentation of alphaTab. Head over to the main product repository to learn more. 
 
