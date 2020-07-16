@@ -1,7 +1,5 @@
 ---
-title: BeatMouseUp
-jsName: beatMouseUp
-domName: alphaTab.beatMouseUp
+title: beatMouseUp
 category: Events - Player
 description: This event is fired whenever the user releases the mouse after a mouse press on a beat.
 sidebarPath: /docs/reference/api
@@ -24,18 +22,22 @@ The parameter is null if the mouse was released somewhere beside the beat.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
     <TypeRow type="js" name="function(beat, originalEvent)" />    
+    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
 </TypeTable>
 
 ## Parameters
 
 <ParameterTable>
-    <ParameterRow platform="all" name="beat" type="AlphaTab.Model.Beat">
+    <ParameterRow platform="js" name="beat" type="alphaTab.model.Beat">
         Beat on which the mouse was released over after mouse down.
         Might be null if no beat could be found in near location.
     </ParameterRow>
-    <ParameterRow platform="jquery" name="originalEvent" type="MouseEvent">
+    <ParameterRow platform="net" name="beat" type="AlphaTab.Model.Beat">
+        Beat on which the mouse was released over after mouse down.
+        Might be null if no beat could be found in near location.
+    </ParameterRow>
+    <ParameterRow platform="js-jquery" name="originalEvent" type="MouseEvent">
         The original mouse event that lead to trigger of the beat event. For the DOM event it is stored in the event.originalEvent.
     </ParameterRow>
 </ParameterTable>
@@ -86,10 +88,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseUp', (e)
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.BeatMouseUp += beat => 
+api.BeatMouseUp.On(beat => 
 {
     HideSelection(beat);
-};
+});
 ```
 
 </TabItem>

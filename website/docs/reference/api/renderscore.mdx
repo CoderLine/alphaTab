@@ -1,7 +1,5 @@
 ---
-title: RenderScore()
-jsName: renderScore()
-jQueryName: alphaTab('renderScore')
+title: renderScore
 category: Methods - Core
 description: Initiates a rendering of the given score.
 sidebarPath: /docs/reference/api
@@ -17,46 +15,67 @@ Initiates a rendering of the score.
 ## Signatures
 
 <TypeTable>
-    <TypeRow type="net" name="bool RenderScore(Score score)" />
-    <TypeRow type="net" name="bool RenderScore(Score score, int[] tracks)" />
     <TypeRow type="js" name="function renderScore(score)" />
     <TypeRow type="js" name="function renderScore(score, tracks)" />
     <TypeRow type="jquery" name="alphaTab('renderScore', score, tracks)" />
     <TypeRow type="jquery" name="alphaTab('renderScore', tracks)" />
+    <TypeRow type="net" name="bool RenderScore(Score score)" />
+    <TypeRow type="net" name="bool RenderScore(Score score, int[] tracks)" />
 </TypeTable>
 
 ### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="all" name="score" type="AlphaTab.Model.Score">
+    <ParameterRow platform="net" name="score" type="AlphaTab.Model.Score">
         The score that contains the tracks to be rendered.
     </ParameterRow>
-    <ParameterRow platform="all" name="tracks" type="AlphaTab.Model.Track[]">
+    <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Track[]">
         The indexes of the tracks that should be rendered. If not provided, the first track of the song will be rendered.
     </ParameterRow>
+    <ParameterRow platform="js" name="score" type="alphaTab.model.Score">
+        The score that contains the tracks to be rendered.
+    </ParameterRow>
+    <ParameterRow platform="js" name="tracks" type="alphaTab.model.Track[]">
+        The indexes of the tracks that should be rendered. If not provided, the first track of the song will be rendered.
+    </ParameterRow>    
 </ParameterTable>
 
 ### Returns
 Nothing
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-api.RenderScore(GenerateScore(), new [] { 2, 3 });
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.RenderScore(generateScore(),[ 2, 3 ]);
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 var at = $('#alphaTab');
 var score = at.alphaTab('score');
 at.alphaTab('renderScore', generateScore(), [ 2, 3 ]);
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.RenderScore(GenerateScore(), new [] { 2, 3 });
+```
+
+</TabItem>
+</Tabs>

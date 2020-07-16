@@ -1,7 +1,5 @@
 ---
-title: RenderStarted
-jsName: renderStarted
-domName: alphaTab.render
+title: renderStarted
 category: Events - Core
 description: This event is fired when the rendering of the whole music sheet is starting.
 sidebarPath: /docs/reference/api
@@ -23,8 +21,8 @@ preparations are completed and the layout and render sequence is about to start.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action" />    
     <TypeRow type="js" name="function()" />    
+    <TypeRow type="net" name="Action" />    
 </TypeTable>
 
 ## Parameters
@@ -59,7 +57,7 @@ api.renderStarted.on(() => {
 <TabItem value="jq">
 
 ```js
-$('#alphaTab').on('alphaTab.render', () => {
+$('#alphaTab').on('alphaTab.renderStarted', () => {
     updateProgressBar("Rendering");
 });
 ```
@@ -68,7 +66,7 @@ $('#alphaTab').on('alphaTab.render', () => {
 <TabItem value="html">
 
 ```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.render', (e) => {
+document.querySelector('#alphaTab').addEventListener('alphaTab.renderStarted', (e) => {
     updateProgressBar("Rendering");
 }, false);
 ```
@@ -78,10 +76,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.render', (e) => {
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.RenderStarted += () => 
+api.RenderStarted.On(() => 
 {
     UpdateProgressBar("Rendering");
-};
+});
 ```
 
 </TabItem>

@@ -1,7 +1,5 @@
 ---
-title: PlayerStateChanged
-jsName: playerStateChanged
-domName: alphaTab.playerStateChanged
+title: playerStateChanged
 category: Events - Player
 description: This event is fired when the playback state changed.
 sidebarPath: /docs/reference/api
@@ -22,30 +20,33 @@ This event is fired when the playback state changed.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action<PlayerStateChangedEventArgs>" />    
     <TypeRow type="js" name="function(e)" />    
+    <TypeRow type="net" name="Action<PlayerStateChangedEventArgs>" />    
 </TypeTable>
 
 ## Parameters
 
 <ParameterTable>
-    <ParameterRow platform="all" name="args" type="AlphaTab.Audio.Synth.PlayerStateChangedEventArgs">
+    <ParameterRow platform="js" name="args" type="alphaTab.synth.PlayerStateChangedEventArgs">
+        The information about the player state change event. 
+    </ParameterRow>
+    <ParameterRow platform="net" name="args" type="AlphaTab.Synth.PlayerStateChangedEventArgs">
         The information about the player state change event. 
     </ParameterRow>
 </ParameterTable>
 
-## AlphaTab.Audio.Synth.PlayerStateChangedEventArgs Properties
+## PlayerStateChangedEventArgs Properties
 
 <ParameterTable>
-    <ParameterRow platform="net" name="State" type="AlphaTab.Audio.Synth.PlayerState">
-        The new state of the player.  
-    </ParameterRow>
-    <ParameterRow platform="js" name="state" type="int">
+    <ParameterRow platform="js" name="state" type="alphaTab.synth.PlayerState">
         The new state of the player. <br />
         `0` - Paused
         `1` - Playing
     </ParameterRow>
-    <ParameterRow platform="js" name="stopped" type="bool">
+    <ParameterRow platform="net" name="State" type="AlphaTab.Synth.PlayerState">
+        The new state of the player.  
+    </ParameterRow>
+    <ParameterRow platform="all" name="stopped" type="bool">
         Whether the playback was fully stopped (including jump to start) or only paused.
     </ParameterRow>
 </ParameterTable>
@@ -94,10 +95,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.playerStateChange
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.PlayerStateChanged += args => 
+api.PlayerStateChanged.On(args => 
 {
     UpdatePlayerControls(args);
-};
+});
 ```
 
 </TabItem>

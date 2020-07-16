@@ -1,7 +1,5 @@
 ---
-title: Print()
-jsName: print()
-jQueryName: alphaTab('print')
+title: print
 javaScriptOnly: true
 category: Methods - Core
 description: Opens a popup window with the rendered music notation for printing.
@@ -42,15 +40,33 @@ This function opens a popup window which is filled with a by-default A4 optimize
 ### Returns
 Nothing
 
-## Example - JavaScript
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.print();
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 $('#alphaTab').alphaTab('print');
 ```
+
+</TabItem>
+</Tabs>
+
+## Example - JavaScript
+
+
+## Example - jQuery

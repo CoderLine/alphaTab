@@ -1,7 +1,5 @@
 ---
-title: PlaybackRange
-jsName: playbackRange
-jQueryName: alphaTab('playbackRange')
+title: playbackRange
 category: Properties - Player
 description: The range of the song that should be played
 sidebarPath: /docs/reference/api
@@ -17,7 +15,8 @@ Gets or sets the range of the song that should be played. The range is defined i
 ## Types
 
 <TypeTable>
-    <TypeRow type="all" name="AlphaTab.Audio.Synth.Synthesis.PlaybackRange" />
+    <TypeRow type="js" name="alphaTab.synth.PlaybackRange" />
+    <TypeRow type="net" name="AlphaTab.Synth.PlaybackRange" />
 </TypeTable>
 
 ## PlaybackRange Properties
@@ -33,8 +32,8 @@ Gets or sets the range of the song that should be played. The range is defined i
     <tbody>    
         <tr>
             <td>
-                <CodeBadge type="net" name="StartTick" /><br />
-                <CodeBadge type="js" name="startTick" />
+                <CodeBadge type="js" name="startTick" /><br />
+                <CodeBadge type="net" name="StartTick" />
             </td>
             <td><code>int</code></td>
             <td>
@@ -43,8 +42,8 @@ Gets or sets the range of the song that should be played. The range is defined i
         </tr>  
         <tr>
             <td>
-                <CodeBadge type="net" name="EndTick" /><br />
-                <CodeBadge type="js" name="endTick" />
+                <CodeBadge type="js" name="endTick" /><br />
+                <CodeBadge type="net" name="EndTick" />
             </td>
             <td><code>int</code></td>
             <td>
@@ -58,22 +57,37 @@ Gets or sets the range of the song that should be played. The range is defined i
 
 `null`
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-api.PlaybackRange = new PlaybackRange { StartTick = 1000, EndTick = 50000 };
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playbackRange = { startTick: 1000, endTick: 50000 };
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 $('#alphaTab').alphaTab('playbackRange', { startTick: 1000, endTick: 50000 })
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.PlaybackRange = new PlaybackRange { StartTick = 1000, EndTick = 50000 };
+```
+
+</TabItem>
+</Tabs>

@@ -1,7 +1,5 @@
 ---
-title: RenderFinished
-jsName: renderFinished
-domName: alphaTab.rendered
+title: renderFinished
 category: Events - Core
 description: This event is fired when the rendering of the whole music sheet is finished.
 sidebarPath: /docs/reference/api
@@ -23,8 +21,8 @@ the display component to visually display the rendered components when this even
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action" />    
     <TypeRow type="js" name="function()" />    
+    <TypeRow type="net" name="Action" />    
 </TypeTable>
 
 ## Parameters
@@ -54,7 +52,7 @@ api.renderFinished.on(() => {
 <TabItem value="jq">
 
 ```js
-$('#alphaTab').on('alphaTab.rendered', () => {
+$('#alphaTab').on('alphaTab.renderFinished', () => {
     updateProgressBar("Finishing");
 });
 ```
@@ -63,7 +61,7 @@ $('#alphaTab').on('alphaTab.rendered', () => {
 <TabItem value="html">
 
 ```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.rendered', (e) => {
+document.querySelector('#alphaTab').addEventListener('alphaTab.renderFinished', (e) => {
     updateProgressBar("Finishing");
 }, false);
 ```
@@ -73,10 +71,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.rendered', (e) =>
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.RenderFinished += () => 
+api.RenderFinished.On(() => 
 {
     UpdateProgressBar("Finishing");
-};
+});
 ```
 
 </TabItem>

@@ -1,7 +1,5 @@
 ---
-title: BeatMouseMove
-jsName: beatMouseMove
-domName: alphaTab.beatMouseMove
+title: beatMouseMove
 category: Events - Player
 description: This event is fired whenever the user moves the mouse over a beat after the user already pressed the button on a beat.
 sidebarPath: /docs/reference/api
@@ -22,18 +20,21 @@ This event is fired whenever the user moves the mouse over a beat after the user
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
     <TypeRow type="js" name="function(beat, originalEvent)" />    
+    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
 </TypeTable>
 
 ## Parameters
 
 <ParameterTable>
-    <ParameterRow platform="all" name="beat" type="AlphaTab.Model.Beat">
+    <ParameterRow platform="js" name="beat" type="alphaTab.model.beat">
         Beat on which the mouse was hovered over during mouse down. 
     </ParameterRow>
-    <ParameterRow platform="jquery" name="originalEvent" type="MouseEvent">
+    <ParameterRow platform="js-jquery" name="originalEvent" type="MouseEvent">
         The original mouse event that lead to trigger of the beat event. For the DOM event it is stored in the event.originalEvent.
+    </ParameterRow>
+    <ParameterRow platform="net" name="beat" type="AlphaTab.Model.Beat">
+        Beat on which the mouse was hovered over during mouse down. 
     </ParameterRow>
 </ParameterTable>
 
@@ -83,10 +84,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseMove', (
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.BeatMouseMove += beat => 
+api.BeatMouseMove.On(beat => 
 {
     ExpandSelectionToBeat(beat);
-};
+});
 ```
 
 </TabItem>

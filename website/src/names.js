@@ -9,7 +9,7 @@ function toPascalCase(v) {
     return v.map(toPascalCase);
 }
 
-function toDomNames(jsNames, wildCard) {
+function toDomSettingNames(jsNames, wildCard) {
     return jsNames.map(v => {
         const parts = v.split('.');
         if (wildCard) {
@@ -24,8 +24,35 @@ function toDomNames(jsNames, wildCard) {
         return domName;
     });
 }
+
+function toDomEventNames(jsNames) {
+    return jsNames.map(v => {
+        return `alphaTab.${v}`;
+    });
+}
+
+function tojQueryEventNames(jsNames) {
+    return jsNames.map(v => {
+        return `alphaTab.${v}`;
+    });
+}
+
+function tojQueryMethodNames(jsNames) {
+    return jsNames.map(v => {
+        return `alphaTab('${v}')`;
+    });
+}
+
+function tojQueryPropertyNames(jsNames) {
+    return jsNames.map(v => {
+        return `alphaTab('${v}')`;
+    });
+}
+
 export function buildNames(property) {
     const javaScriptOnly = property.prop('javaScriptOnly', false);
+    const domWildcard = property.prop('domWildcard', false);
+    const category = property.prop('category', '');
 
     let jsNames = property.props('title');
 
@@ -39,13 +66,34 @@ export function buildNames(property) {
     }
     
     let jQueryNames = property.props('jQueryName');
-    if (property.prop('jQuery', false) && jQueryNames.length === 0) {
-        jQueryNames = jsNames;
+    if (jQueryNames.length === 0) {
+        if(category.startsWith('Events')) {
+            jQueryNames = tojQueryEventNames(jsNames);
+        } else if(category.startsWith('Methods')) {
+            jQueryNames = tojQueryMethodNames(jsNames);
+        } else if(category.startsWith('Properties')) {
+            jQueryNames = tojQueryPropertyNames(jsNames);
+        } else if(property.prop('jQuery', false)) {
+            jQueryNames = jsNames;
+        }   
     }
 
     let domNames = property.props('domName');
     if (domNames.length === 0) {
-        domNames = toDomNames(jsNames);
+        if(category.startsWith('Events')) {
+            domNames = toDomEventNames(jsNames);
+        } else if(category.startsWith('Methods')) {
+            // no DOM method names on API
+        } else if(category.startsWith('Properties')) {
+            // no DOM properties on API
+        } else {
+            domNames = toDomSettingNames(jsNames, domWildcard);
+        }        
+    }
+
+    if(category.startsWith('Methods')) {
+        jsNames = jsNames.map(v=> `${v}()`);
+        csNames = csNames.map(v=> `${v}()`);
     }
 
     return {

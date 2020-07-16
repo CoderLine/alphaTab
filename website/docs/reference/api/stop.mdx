@@ -1,7 +1,5 @@
 ---
-title: Stop()
-jsName: stop()
-jQueryName: alphaTab('stop')
+title: stop
 category: Methods - Player
 description: Stops the playback of the current song, and moves the playback position back to the start.
 sidebarPath: /docs/reference/api
@@ -17,9 +15,9 @@ it will move the playback position to the start of this range, not the whole son
 ## Signatures
 
 <TypeTable>
-    <TypeRow type="net" name="void Stop()" />
     <TypeRow type="js" name="function stop()" />
     <TypeRow type="jquery" name="alphaTab('stop')" />
+    <TypeRow type="net" name="void Stop()" />
 </TypeTable>
 
 ### Parameters
@@ -28,22 +26,37 @@ None
 ### Returns
 Nothing
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-api.Stop();
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.stop();
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 $('#alphaTab').alphaTab('stop');
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Stop();
+```
+
+</TabItem>
+</Tabs>

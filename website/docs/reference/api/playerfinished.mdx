@@ -1,7 +1,5 @@
 ---
-title: PlayerFinished
-jsName: playerFinished
-domName: alphaTab.finished
+title: playerFinished
 category: Events - Player
 description: This event is fired when the playback of the whole song finished.
 sidebarPath: /docs/reference/api
@@ -22,8 +20,8 @@ This event is fired when the playback of the whole song finished. This event is 
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action" />    
     <TypeRow type="js" name="function()" />    
+    <TypeRow type="net" name="Action" />    
 </TypeTable>
 
 ## Parameters
@@ -89,11 +87,11 @@ api.play()
 
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
-api.Finished += () => 
+api.Finished.On(() => 
 {
     // speed trainer
     api.PlaybackSpeed = Math.Min(1.0, api.PlaybackSpeed + 0.1);
-};
+});
 api.IsLooping = true;
 api.PlaybackSpeed = 0.5;
 api.Play();

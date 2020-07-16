@@ -1,7 +1,5 @@
 ---
-title: Error
-jsName: error
-domName: alphaTab.error
+title: error
 category: Events - Core
 description: This event is fired when an error within alphatab occurred.
 sidebarPath: /docs/reference/api
@@ -79,10 +77,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.error', (e) => {
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.Error += (error) => 
+api.Error.On((error) => 
 {
     DisplayError(error);
-};
+});
 ```
 
 </TabItem>

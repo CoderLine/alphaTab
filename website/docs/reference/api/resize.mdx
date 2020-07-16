@@ -1,7 +1,5 @@
 ---
-title: Resize
-jsName: resize
-domName: alphaTab.resize
+title: resize
 category: Events - Core
 description: This event is fired when alphaTab was resized and is about to rerender the music notation.
 sidebarPath: /docs/reference/api
@@ -24,37 +22,40 @@ considered. This allows to implement scenarios where maybe the scale or the layo
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action<ResizeEventArgs>" />    
     <TypeRow type="js" name="function(e)" />    
+    <TypeRow type="net" name="Action<ResizeEventArgs>" />    
 </TypeTable>
 
 ## Parameters
 
 <ParameterTable>
-    <ParameterRow platform="all" name="args" type="AlphaTab.ResizeEventArgs">
+    <ParameterRow platform="net" name="args" type="AlphaTab.ResizeEventArgs">
+        The information about the resize event.  
+    </ParameterRow>
+    <ParameterRow platform="js" name="args" type="alphaTab.ResizeEventArgs">
         The information about the resize event.  
     </ParameterRow>
 </ParameterTable>
 
-## AlphaTab.ResizeEventArgs Properties
+## ResizeEventArgs Properties
 
 <ParameterTable>
-    <ParameterRow platform="net" name="OldWidth" type="int">
-        The size before the resizing happened. 
-    </ParameterRow>
     <ParameterRow platform="js" name="oldWidth" type="int">
         The size before the resizing happened. 
     </ParameterRow>
-    <ParameterRow platform="net" name="NewWidth" type="int">
-        The size after the resize was complete. 
+    <ParameterRow platform="net" name="OldWidth" type="int">
+        The size before the resizing happened. 
     </ParameterRow>
     <ParameterRow platform="js" name="newWidth" type="int">
         The size after the resize was complete. 
     </ParameterRow>
-    <ParameterRow platform="net" name="Settings" type="AlphaTab.Settings">
-        The settings currently used for rendering. 
+    <ParameterRow platform="net" name="NewWidth" type="int">
+        The size after the resize was complete. 
     </ParameterRow>
     <ParameterRow platform="js" name="settings" type="AlphaTab.Settings">
+        The settings currently used for rendering. 
+    </ParameterRow>
+    <ParameterRow platform="net" name="Settings" type="AlphaTab.Settings">
         The settings currently used for rendering. 
     </ParameterRow>
 </ParameterTable>
@@ -108,12 +109,12 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.resize', function
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.Resize += args => 
+api.Resize.On(args => 
 {
     args.Settings.Scale = args.NewWidth > 1300 
         ? 1.5f 
         : (args.NewWidth > 800) ? 1.3f : 1;
-};
+});
 ```
 
 </TabItem>

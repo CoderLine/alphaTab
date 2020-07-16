@@ -1,7 +1,5 @@
 ---
-title: UpdateSettings()
-jsName: updateSettings()
-jQueryName: alphaTab('updateSettings')
+title: updateSettings
 category: Methods - Core
 description: Applies any changes that were done to the settings object and informs the Renderer about any new values to consider.
 sidebarPath: /docs/reference/api
@@ -18,9 +16,9 @@ to trigger an update of the settings in all components. Then a re-rendering can 
 ## Signatures
 
 <TypeTable>
-    <TypeRow type="net" name="void UpdateSettings()" />
     <TypeRow type="js" name="function updateSettings()" />
     <TypeRow type="jquery" name="alphaTab('updateSettings')" />
+    <TypeRow type="net" name="void UpdateSettings()" />
 </TypeTable>
 
 ### Parameters
@@ -29,7 +27,37 @@ None
 ### Returns
 Nothing
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.settings.scale = 2.0;
+api.updateSettings();
+api.render();
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+var at = $('#alphaTab');
+at.alphaTab('settings').scale = 2.0;
+at.alphaTab('updateSettings');
+at.alphaTab('render');
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
@@ -39,20 +67,5 @@ api.UpdateSettings();
 api.Render()
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-api.settings.scale = 2.0;
-api.updateSettings();
-api.render();
-```
-
-## Example - jQuery
-
-```js
-var at = $('#alphaTab');
-at.alphaTab('settings').scale = 2.0;
-at.alphaTab('updateSettings');
-at.alphaTab('render');
-```
+</TabItem>
+</Tabs>

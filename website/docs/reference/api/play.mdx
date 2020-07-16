@@ -1,7 +1,5 @@
 ---
-title: Play()
-jsName: play()
-jQueryName: alphaTab('play')
+title: play
 category: Methods - Player
 description: Starts the playback of the current song.
 sidebarPath: /docs/reference/api
@@ -16,9 +14,9 @@ Starts the playback of the current song if possible.Reasons for not starting can
 ## Signatures
 
 <TypeTable>
-    <TypeRow type="net" name="void Play()" />
     <TypeRow type="js" name="function play()" />
     <TypeRow type="jquery" name="alphaTab('play')" />
+    <TypeRow type="net" name="void Play()" />
 </TypeTable>
 
 ### Parameters
@@ -27,22 +25,37 @@ None
 ### Returns
 true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing.
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-api.Play();
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.play();
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 $('#alphaTab').alphaTab('play');
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Play();
+```
+
+</TabItem>
+</Tabs>

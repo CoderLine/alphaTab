@@ -1,7 +1,5 @@
 ---
-title: PostRenderFinished
-jsName: postRenderFinished
-domName: alphaTab.postRenderFinished
+title: postRenderFinished
 category: Events - Core
 description: This event is fired when the rendering of the whole music sheet is finished, and all handlers of RenderFinished ran.
 sidebarPath: /docs/reference/api
@@ -23,8 +21,8 @@ handlers are called, the whole rendering and display pipeline is completed.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action" />    
     <TypeRow type="js" name="function()" />    
+    <TypeRow type="net" name="Action" />    
 </TypeTable>
 
 ## Parameters
@@ -73,10 +71,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.postRendered', (e
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.PostRenderFinished += () => 
+api.PostRenderFinished.On(() => 
 {
     HideLoadingIndicator();
-};
+});
 ```
 
 </TabItem>

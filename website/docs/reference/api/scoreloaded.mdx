@@ -1,7 +1,5 @@
 ---
-title: ScoreLoaded
-jsName: scoreLoaded
-domName: alphaTab.scoreLoaded
+title: scoreLoaded
 category: Events - Core
 description: This event is fired whenever a new song is loaded
 sidebarPath: /docs/reference/api
@@ -24,13 +22,16 @@ This allows any modification of the score before further processing.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action<AlphaTab.Model.Score>" />    
     <TypeRow type="js" name="function(score)" />    
+    <TypeRow type="net" name="Action<AlphaTab.Model.Score>" />    
 </TypeTable>
 
 ## Parameters
 
 <ParameterTable>
+    <ParameterRow platform="js" name="score" type="alphaTab.model.Score">
+        The score that was loaded with applied transpositions. 
+    </ParameterRow>
     <ParameterRow platform="all" name="score" type="AlphaTab.Model.Score">
         The score that was loaded with applied transpositions. 
     </ParameterRow>

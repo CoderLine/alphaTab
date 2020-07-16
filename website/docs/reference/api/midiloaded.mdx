@@ -1,7 +1,5 @@
 ---
-title: MidiLoaded
-jsName: midiFileLoaded
-domName: alphaTab.midiFileLoaded
+title: midiLoaded
 category: Events - Player
 description: This event is fired when the Midi file needed for playback was loaded.
 sidebarPath: /docs/reference/api
@@ -22,8 +20,8 @@ This event is fired when the Midi file needed for playback was loaded.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action" />    
     <TypeRow type="js" name="function()" />    
+    <TypeRow type="net" name="Action" />    
 </TypeTable>
 
 ## Parameters
@@ -72,10 +70,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.midiFileLoaded', 
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.MidiLoaded += () => 
+api.MidiLoaded.On(() => 
 {
     HideGeneratingAudioIndicator();
-};
+});
 ```
 
 </TabItem>

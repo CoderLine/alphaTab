@@ -1,7 +1,5 @@
 ---
-title: PlayerPositionChanged
-jsName: playerPositionChanged
-domName: alphaTab.positionChanged
+title: playerPositionChanged
 category: Events - Player
 description: This event is fired when the playback state changed.
 sidebarPath: /docs/reference/api
@@ -22,44 +20,47 @@ This event is fired when the current playback position of the song changed.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action<PositionChangedEventArgs>" />    
     <TypeRow type="js" name="function(e)" />    
+    <TypeRow type="net" name="Action<PositionChangedEventArgs>" />    
 </TypeTable>
 
 ## Parameters
 
 <ParameterTable>
-    <ParameterRow platform="all" name="args" type="AlphaTab.PositionChangedEventArgs">
+    <ParameterRow platform="js" name="args" type="alphaTab.synth.PositionChangedEventArgs">
+        The information about the player position. 
+    </ParameterRow>
+    <ParameterRow platform="net" name="args" type="AlphaTab.Synth.PositionChangedEventArgs">
         The information about the player position. 
     </ParameterRow>
 </ParameterTable>
 
-## AlphaTab.PositionChangedEventArgs Properties
+## PositionChangedEventArgs Properties
 
 <ParameterTable>
-    <ParameterRow platform="net" name="CurrentTime" type="double">
-        The current time position within the song in milliseconds.
-    </ParameterRow>
     <ParameterRow platform="js" name="currentTime" type="number">
         The current time position within the song in milliseconds.
     </ParameterRow>
-    <ParameterRow platform="net" name="EndTime" type="double">
+    <ParameterRow platform="net" name="CurrentTime" type="double">
         The current time position within the song in milliseconds.
     </ParameterRow>
     <ParameterRow platform="js" name="endTime" type="number">
         The total length of the song in milliseconds.
     </ParameterRow>
-    <ParameterRow platform="net" name="CurrentTick" type="double">
-        The current time position within the song in midi ticks.
+    <ParameterRow platform="net" name="EndTime" type="double">
+        The current time position within the song in milliseconds.
     </ParameterRow>
     <ParameterRow platform="js" name="currentTick" type="number">
         The current time position within the song in midi ticks.
     </ParameterRow>
-    <ParameterRow platform="net" name="EndTick" type="double">
+    <ParameterRow platform="net" name="CurrentTick" type="double">
         The current time position within the song in midi ticks.
     </ParameterRow>
     <ParameterRow platform="js" name="endTick" type="number">
         The total length of the song in midi ticks.
+    </ParameterRow>
+    <ParameterRow platform="net" name="EndTick" type="double">
+        The current time position within the song in midi ticks.
     </ParameterRow>
 </ParameterTable>
 
@@ -107,10 +108,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.positionChanged',
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.PlayerPositionChanged += args => 
+api.PlayerPositionChanged.On(args => 
 {
     UpdatePlayerPosition(args);
-};
+});
 ```
 
 </TabItem>

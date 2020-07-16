@@ -1,7 +1,5 @@
 ---
-title: PlayedBeatChanged
-jsName: playedBeatChanged
-domName: alphaTab.playedBeatChanged
+title: playedBeatChanged
 category: Events - Player
 description: This event is fired when the played beat changed.
 sidebarPath: /docs/reference/api
@@ -22,14 +20,17 @@ This event is fired when the played beat changed.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
     <TypeRow type="js" name="function(beat)" />    
+    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
 </TypeTable>
 
 ## Parameters
 
 <ParameterTable>
-    <ParameterRow platform="all" name="beat" type="AlphaTab.Model.Beat">
+    <ParameterRow platform="js" name="beat" type="alphaTab.model.Beat">
+        The new beat that is now being played.. 
+    </ParameterRow>    
+    <ParameterRow platform="net" name="beat" type="AlphaTab.Model.Beat">
         The new beat that is now being played.. 
     </ParameterRow>
 </ParameterTable>
@@ -78,10 +79,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.playedBeatChanged
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.PlayedBeatChanged += beat => 
+api.PlayedBeatChanged.On(beat => 
 {
     UpdateFretboard(beat);
-};
+});
 ```
 
 </TabItem>

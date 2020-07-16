@@ -1,7 +1,5 @@
 ---
-title: MetronomeVolume
-jsName: metronomeVolume
-jQueryName: alphaTab('metronomeVolume')
+title: metronomeVolume
 category: Properties - Player
 description: The metronome volume as percentage
 sidebarPath: /docs/reference/api
@@ -16,29 +14,44 @@ Gets or sets the volume of the metronome. By default the metronome is disabled b
 ## Types
 
 <TypeTable>
-    <TypeRow type="all" name="float" />
+    <TypeRow type="all" name="double" />
 </TypeTable>
 
 ## Default Value
 
 `0.0`
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-api.MetronomeVolume = 0.5f;
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.metronomeVolume = 0.5;
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 $('#alphaTab').alphaTab('metronomeVolume', 0.5)
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.MetronomeVolume = 0.5;
+```
+
+</TabItem>
+</Tabs>

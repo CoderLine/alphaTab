@@ -1,7 +1,5 @@
 ---
-title: Player
-jsName: player
-jQueryName: alphaTab('player')
+title: player
 category: Properties - Player
 description: The alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback.
 sidebarPath: /docs/reference/api
@@ -11,30 +9,46 @@ since:  0.9.4
 import {TypeTable, TypeRow} from '../../../src/type-table';
 
 ## Description
-Gets access to the underling `AlphaTab.Audio.Synth.IAlphaSynth` that is used for the audio playback. 
+Gets access to the underling `alphaTab.synth.IAlphaSynth` that is used for the audio playback. 
 
 ## Types
 
 <TypeTable>
-    <TypeRow type="all" name="AlphaTab.Audio.Synth.IAlphaSynth" />
+    <TypeRow type="js" name="alphaTab.synth.IAlphaSynth" />
+    <TypeRow type="net" name="AlphaTab.Synth.IAlphaSynth" />
 </TypeTable>
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-SetupPlayerEvents(api.Player);
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 setupPlayerEvents(api.settings);
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 setupPlayerEvents($('#alphaTab').alphaTab('player'));
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+SetupPlayerEvents(api.Player);
+```
+
+</TabItem>
+</Tabs>

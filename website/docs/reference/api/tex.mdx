@@ -1,7 +1,5 @@
 ---
-title: Tex()
-jsName: tex()
-jQueryName: alphaTab('tex')
+title: tex
 category: Methods - Core
 description: Tells alphaTab to render the given alphaTex.
 sidebarPath: /docs/reference/api
@@ -17,12 +15,12 @@ Tells alphaTab to render the given alphaTex.
 ## Signatures
 
 <TypeTable>
-    <TypeRow type="net" name="void Tex(string tex)" />
-    <TypeRow type="net" name="void Tex(string tex, int[] tracks)" />
     <TypeRow type="js" name="function tex(tex)" />
     <TypeRow type="js" name="function tex(tex, tracks)" />
     <TypeRow type="jquery" name="alphaTab('tex', tex)" />
     <TypeRow type="jquery" name="alphaTab('tex', tex, tracks)" />
+    <TypeRow type="net" name="void Tex(string tex)" />
+    <TypeRow type="net" name="void Tex(string tex, int[] tracks)" />
 </TypeTable>
 
 ### Parameters
@@ -42,23 +40,39 @@ Tells alphaTab to render the given alphaTex.
 ### Returns
 Nothing
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-api.Tex("\title 'Test' . 3.3.4");
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.tex("\title 'Test' . 3.3.4");
 ```
 
-## Example - jQuery
+
+</TabItem>
+<TabItem value="jq">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 $('#alphaTab').alphaTab('tex', "\title 'Test' . 3.3.4");
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Tex("\title 'Test' . 3.3.4");
+```
+
+</TabItem>
+</Tabs>

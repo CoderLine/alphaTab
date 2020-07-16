@@ -1,6 +1,5 @@
 ---
-title: ChangeTrackMute()
-jsName: changeTrackMute()
+title: changeTrackMute
 jQueryName: alphaTab('muteTracks')
 category: Methods - Player
 description: Changes the given tracks to be muted or not.
@@ -18,14 +17,17 @@ for playback. If the track shares the channels with another track, all tracks wi
 ## Signatures
 
 <TypeTable>
-    <TypeRow type="net" name="void ChangeTrackMute(Track[] tracks, bool mute)" />
     <TypeRow type="js" name="function changeTrackMute(tracks, mute)" />
     <TypeRow type="jquery" name="alphaTab('muteTracks', tracks, mute)" />
+    <TypeRow type="net" name="void ChangeTrackMute(Track[] tracks, bool mute)" />
 </TypeTable>
 
 ### Parameters
 <ParameterTable>
-    <ParameterRow platform="all" name="tracks" type="AlphaTab.Model.Tracks[]">
+    <ParameterRow platform="js" name="tracks" type="alphaTab.model.Tracks[]">
+        The array of tracks that should be muted.
+    </ParameterRow>
+    <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Tracks[]">
         The array of tracks that should be muted.
     </ParameterRow>
     <ParameterRow platform="all" name="mute" type="bool">
@@ -36,25 +38,39 @@ for playback. If the track shares the channels with another track, all tracks wi
 ### Returns
 Nothing
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-api.ChangeTrackMute(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, true);
-```
-
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 var at = $('#alphaTab');
 var tracks = at.alphaTab('tracks');
 at.alphaTab('muteTracks', [tracks[0], tracks[1]], true);
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.ChangeTrackMute(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, true);
+```
+
+</TabItem>
+</Tabs>

@@ -1,7 +1,5 @@
 ---
-title: PlayerState
-jsName: playerState
-jQueryName: alphaTab('playerState')
+title: playerState
 category: Properties - Player
 description: The current player state
 sidebarPath: /docs/reference/api
@@ -16,30 +14,45 @@ Gets the current player state, meaning whether it is paused or playing.
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="AlphaTab.Audio.Synth.PlayerState" />
-    <TypeRow type="js" name="int">
+    <TypeRow type="js" name="alphaTab.synth.PlayerState">
         `0` for paused<br />
         `1` for playing
     </TypeRow>
+    <TypeRow type="net" name="AlphaTab.Synth.PlayerState" />
 </TypeTable>
 
-## Example - C#
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+if(api.playerState != alphaTab.synth.PlayerState.Playing) api.play();
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+var at = $('#alphaTab');
+if(at.alphaTab('playerState') != alphaTab.synth.PlayerState.Playing) at.alphaTab('play');
+```
+
+</TabItem>
+<TabItem value="cs">
 
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 if(api.PlayerState != PlayerState.Playing) api.Play();
 ```
 
-## Example - JavaScript
-
-```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-if(api.playerState != 1) api.play();
-```
-
-## Example - jQuery
-
-```js
-var at = $('#alphaTab');
-if(at.alphaTab('playerState') != 1) at.alphaTab('play');
-```
+</TabItem>
+</Tabs>

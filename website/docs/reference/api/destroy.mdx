@@ -1,7 +1,5 @@
 ---
-title: Destroy()
-jsName: destroy()
-jQueryName: alphaTab('destroy')
+title: destroy
 category: Methods - Core
 description: Destroys the alphaTab control and restores the initial state of the UI.
 sidebarPath: /docs/reference/api
@@ -29,22 +27,37 @@ None
 ### Returns
 Nothing
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-api.Destroy();
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.destroy();
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 $('#alphaTab').alphaTab('destroy');
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.Destroy();
+```
+
+</TabItem>
+</Tabs>

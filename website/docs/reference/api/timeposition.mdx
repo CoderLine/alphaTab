@@ -1,7 +1,5 @@
 ---
-title: TimePosition
-jsName: timePosition
-jQueryName: alphaTab('timePosition')
+title: timePosition
 category: Properties - Player
 description: The position within the song in milliseconds
 sidebarPath: /docs/reference/api
@@ -19,22 +17,37 @@ Gets or sets the player position in milliseconds.
     <TypeRow type="all" name="int" />
 </TypeTable>
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-api.TimePosition = 4000;
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.timePosition = 4000;
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 $('#alphaTab').alphaTab('timePosition', 4000)
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.TimePosition = 4000;
+```
+
+</TabItem>
+</Tabs>

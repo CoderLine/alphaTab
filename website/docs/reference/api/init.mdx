@@ -1,7 +1,6 @@
 ---
-title: Initialize
+title: AlphaTabApi
 javaScriptOnly: true
-jsName:
 jQueryName: alphaTab()
 category: Methods - Core
 description: Initializes AlphaTab.
@@ -32,10 +31,23 @@ This jQuery specific function initializes alphaTab. For other systems this is no
 ### Returns
 Nothing
 
-## Example - jQuery
+## Examples
+
+<Tabs
+  defaultValue="jq"
+  values={[
+    { label: 'jQuery', value: 'jq', }
+  ]
+}>
+<TabItem value="jq">
+
 
 ```js
 $('#alphaTab').alphaTab({
     scale: 1.5
 });
 ```
+
+</TabItem>
+</Tabs>
+

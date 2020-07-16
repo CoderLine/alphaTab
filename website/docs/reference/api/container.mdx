@@ -1,7 +1,5 @@
 ---
-title: Container
-jsName: container
-jQueryName: alphaTab('container')
+title: container
 category: Properties - Core
 description: The UI container that holds the whole alphaTab control. 
 sidebarPath: /docs/reference/api
@@ -19,25 +17,41 @@ Gets the UI container that represents the element on which alphaTab was initiali
     <TypeRow type="all" name="AlphaTab.UI.IContainer" />
     <TypeRow type="net-wf" name="AlphaTab.Platform.CSharp.WinForms.ControlContainer" />
     <TypeRow type="net-wpf" name="AlphaTab.Platform.CSharp.Wpf.FrameworkElementContainer" />
-    <TypeRow type="js" name="AlphaTab.UI.HtmlElementContainer" />
+    <TypeRow type="js" name="alphaTab.platform.javascript.HtmlElementContainer" />
 </TypeTable>
 
-## Example - C#
+## Examples
 
-```csharp
-var api = new AlphaTabApi<MyControl>(...);
-var container = api.Container;
-```
-
-## Example - JavaScript
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 var container = api.container;
 ```
 
-## Example - jQuery
+</TabItem>
+<TabItem value="jq">
 
 ```js
 var container = $('#alphaTab').alphaTab('container');
 ```
+
+</TabItem>
+<TabItem value="cs">
+
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+var container = api.Container;
+```
+
+</TabItem>
+</Tabs>
