@@ -1,0 +1,25 @@
+<Project>
+  <PropertyGroup>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+
+    <MainVersion>0.9.8</MainVersion>
+    <BuildNumber Condition=" '$(BuildNumber)' == ''">$(GITHUB_RUN_NUMBER)</BuildNumber>
+    <BuildNumber Condition=" '$(BuildNumber)' == ''">0</BuildNumber>
+
+    <Version>$(MainVersion)-alpha.$(BuildNumber)</Version>
+    <AssemblyVersion>$(MainVersion).$(BuildNumber)</AssemblyVersion>
+    <FileVersion>$(MainVersion).$(BuildNumber)</FileVersion>
+    <Authors>Danielku15</Authors>
+    <Company>CoderLine</Company>
+    <Product>AlphaTab</Product>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Description>alphaTab is a cross platform music notation and guitar tablature rendering library.</Description>
+    <Copyright>Copyright © 2020, Daniel Kuschny and Contributors</Copyright>
+    <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://www.alphatab.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CoderLine/alphaTab</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>music,notation,engraver,renderer</PackageTags>
+  </PropertyGroup>
+</Project>

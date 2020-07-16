@@ -1,0 +1,81 @@
+{
+  "name": "@coderline/alphatab",
+  "version": "0.9.9",
+  "description": "alphaTab is a music notation and guitar tablature rendering library",
+  "keywords": [
+    "guitar",
+    "music-notation",
+    "music-sheet",
+    "html5",
+    "svg",
+    "guitar-tablature"
+  ],
+  "homepage": "https://alphatab.net",
+  "bugs": {
+    "url": "https://github.com/coderline/alphaTab/issues"
+  },
+  "author": "Daniel Kuschny",
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coderline/alphaTab"
+  },
+  "main": "dist/alphaTab.js",
+  "typings": "dist/alphaTab.d.ts",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "lint": "tslint --project tsconfig.build.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "build": "ttsc --project tsconfig.build.json && rollup -c rollup.config.js",
+    "build-ci": "npm run clean && npm run build && npm pack",
+    "start": "node scripts/setup-playground.js && npm run build && concurrently --kill-others \"ttsc --project tsconfig.build.json --watch\" \"rollup -c rollup.config.js -w\" \"http-server -o playground/control.html \"",
+    "test": "ttsc --project tsconfig.json && concurrently --kill-others \"ttsc --project tsconfig.json -w\" \"karma start karma.conf.js --browsers Chrome --no-single-run --reporters spec,kjhtml\"",
+    "test-ci": "ttsc --project tsconfig.json && karma start karma.conf.js --browsers ChromeHeadless --single-run --reporters spec",
+    "generate-csharp": "ts-node --project tsconfig.build-csharp.json src.compiler/csharp/CSharpTranspiler.ts --project tsconfig.build-csharp.json && node scripts/update-csharp-version.js",
+    "build-csharp": "npm run generate-csharp && cd src.csharp && dotnet build -c Release",
+    "build-csharp-ci": "npm run clean && npm run generate-csharp && cd src.csharp && dotnet build -c Release",
+    "test-csharp": "cd src.csharp && dotnet test",
+    "test-csharp-ci": "cd src.csharp && dotnet test"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@types/jasmine": "^3.5.10",
+    "concurrently": "^5.1.0",
+    "cors": "^2.8.5",
+    "fs-extra": "^9.0.0",
+    "git-branch": "^2.0.1",
+    "http-server": "^0.12.1",
+    "karma": "^4.4.1",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-express-http-server": "0.0.1",
+    "karma-jasmine": "^3.1.1",
+    "karma-jasmine-html-reporter": "^1.5.3",
+    "karma-rollup-preprocessor": "^7.0.5",
+    "karma-spec-reporter": "0.0.32",
+    "multer": "^1.4.2",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.3.3",
+    "rollup-plugin-copy": "^3.3.0",
+    "rollup-plugin-dts": "^1.4.0",
+    "rollup-plugin-license": "^2.0.0",
+    "rollup-plugin-terser": "^5.3.0",
+    "terser": "^4.6.11",
+    "ts-node": "^8.8.2",
+    "tslint": "^6.1.1",
+    "tslint-config-prettier": "^1.15.0",
+    "tslint-config-standard": "^9.0.0",
+    "ttypescript": "^1.5.10",
+    "typescript": "^3.8.3"
+  },
+  "files": [
+    "/dist/alphaTab.js",
+    "/dist/alphaTab.min.js",
+    "/dist/alphaTab.d.ts",
+    "/dist/font/Bravura.*",
+    "/dist/font/*.txt",
+    "/dist/soundfont/*",
+    "LICENSE.header"
+  ]
+}

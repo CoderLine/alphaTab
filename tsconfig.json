@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist/lib.test",
+    "declarationDir": "dist/types.test",
+    "paths": {
+      "@src*": [
+        "src*"
+      ],
+      "@test*": [
+        "test*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "test"
+  ]
+}
