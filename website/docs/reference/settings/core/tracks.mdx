@@ -1,8 +1,7 @@
 ---
-title: Core.Tracks
-jsName: core.tracks;tracks
-jsonName: core.tracks;tracks
-domName: data-core-tracks;data-tracks
+title: core.tracks
+javaScriptOnly: true
+jsOnParent: true
 category: Core - JavaScript Specific
 description: The tracks to display for the initally loaded file.
 sidebarPath: /docs/reference/settings
@@ -22,13 +21,13 @@ of the initially loaded file should be displayed.
 ## Types
 
 <TypeTable>
-    <TypeRow type="all" name="all">
+    <TypeRow type="all" name="'all'">
         If the `all` string is provided, all tracks of the song will be displayed. 
     </TypeRow>
-    <TypeRow type="all" name="number">
+    <TypeRow type="all" name="int">
         If a single number is provided, the value represents the 0-based index of the track to display. 
     </TypeRow>
-    <TypeRow type="all" name="number[]">
+    <TypeRow type="all" name="int[]">
         If a number array is provided, the values represent the 0-based indexes of the tracks to display.
     </TypeRow>
 </TypeTable>

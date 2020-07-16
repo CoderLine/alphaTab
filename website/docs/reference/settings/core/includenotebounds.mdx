@@ -1,8 +1,6 @@
 ---
-title: Core.IncludeNoteBounds
-jsName: core.includeNoteBounds;includeNoteBounds
-jsonName: core.includeNoteBounds;includeNoteBounds
-domName: data-core-includenotebounds;data-includenotebounds
+title: core.includeNoteBounds
+jsOnParent: true
 category: Core
 description: Gets or sets whether in the BoundsLookup also the position and area of each individual note is provided.
 sidebarPath: /docs/reference/settings
@@ -36,13 +34,12 @@ const settings = {
         includeNoteBounds: true
     }
 };
-let api = null;
-document.querySelector('#alphaTab').addEventListener('alphaTab.rendered', function() {
+let api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+api.renderFinished.on(function() {
     var lookup = api.renderer.boundsLookup;
     var x = 100;
     var y = 100;
     var beat = lookup.getBeatAtPos(x, y);
     var note = lookup.getNoteAtPos(beat, x, y); 
 });
-api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'), settings);
 ```

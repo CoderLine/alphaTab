@@ -1,8 +1,6 @@
 ---
-title: Display.StaveProfile
-jsName: display.staveProfile;staveProfile
-jsonName: display.staveProfile;staveProfile
-domName: data-display-staveprofile;data-staveprofile
+title: display.staveProfile
+jsOnParent: true
 category: Display
 description: The stave profile defining which staves are shown for the music sheet. 
 sidebarPath: /docs/reference/settings
@@ -21,26 +19,33 @@ AlphaTab has various stave profiles that define which staves will be shown in fo
 ## Types
 
 <TypeTable>
-    <TypeRow name="AlphaTab.StaveProfile" type="net">
+    <TypeRow name="alphaTab.StaveProfile" type="js">
         `Default` -  The profile is auto detected by the track configurations.<br />
         `ScoreTab` -  Standard music notation and guitar tablature are rendered.<br />
         `Score` -  Only standard music notation is rendered.<br />
         `Tab` -  Only guitar tablature is rendered.<br />
         `TabMixed` -  Only guitar tablature is rendered, but also rests and time signatures are not shown. This profile is typically used in multi-track scenarios.<br />
     </TypeRow>
-    <TypeRow name="string" type="js">
+    <TypeRow name="string" type="json-js-html">
         `default`<br />
         `scoretab`<br />
         `score`<br />
         `tab`<br />
         `tabmixed`    
     </TypeRow>
-    <TypeRow name="int" type="js-html">
+    <TypeRow name="int" type="json-js-html">
         `0` - Default<br />
         `1` - ScoreTab<br />
         `2` - Score<br />
         `3` - Tab<br />
         `4` - TabMixed  
+    </TypeRow>
+    <TypeRow name="AlphaTab.StaveProfile" type="net">
+        `Default`<br />
+        `ScoreTab`<br />
+        `Score`<br />
+        `Tab`<br />
+        `TabMixed`<br />
     </TypeRow>
 </TypeTable>
 

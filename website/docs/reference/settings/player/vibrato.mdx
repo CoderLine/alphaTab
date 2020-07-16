@@ -1,8 +1,6 @@
 ---
-title: Player.Vibrato
-jsName: player.vibrato
-jsonName: player.vibrato
-domName: data-player-vibrato-*
+title: player.vibrato
+domWildCard: true
 category: Player
 description: The Vibrato settings allow control how the different vibrato types are generated for audio. 
 sidebarPath: /docs/reference/settings
@@ -15,59 +13,59 @@ import CodeBadge from '../../../../src/code-badge';
 
 export var VibratoSettings = [
     {
-        name: 'BeatSlightAmplitude',
+        name: 'beatSlightAmplitude',
         defaultValue: 3,
         description: 'The amplitude for the beat-slight vibrato in semitones.'
     },
     {
-        name: 'BeatSlightLength',
+        name: 'beatSlightLength',
         defaultValue: 240,
         description: 'The wavelength of the beat-slight vibrato in midi ticks.'
     },
     {
-        name: 'BeatWideAmplitude',
+        name: 'beatWideAmplitude',
         defaultValue: 3,
         description: 'The amplitude for the beat-wide vibrato in semitones.'
     },
     {
-        name: 'BeatWideLength',
+        name: 'beatWideLength',
         defaultValue: 240,
         description: 'The wavelength of the beat-wide vibrato in midi ticks.'
     },
     {
-        name: 'NoteSlightAmplitude',
+        name: 'noteSlightAmplitude',
         defaultValue: 2,
         description: 'The amplitude for the note-slight vibrato in semitones.'
     },
     {
-        name: 'NoteSlightLength',
+        name: 'noteSlightLength',
         defaultValue: 480,
         description: 'The wavelength of the note-slight vibrato in midi ticks.'
     },
     {
-        name: 'NoteWideAmplitude',
+        name: 'noteWideAmplitude',
         defaultValue: 2,
         description: 'The amplitude for the note-wide vibrato in semitones.'
     },
     {
-        name: 'NoteWideLength',
+        name: 'noteWideLength',
         defaultValue: 480,
         description: 'The wavelength of the note-wide vibrato in midi ticks.'
     }
 ];
 
-export function toCamelCase(v) {
-    return v.substr(0, 1).toLowerCase() + v.substr(1);
+export function toPascalCase(v) {
+    return v.substr(0, 1).toUpperCase() + v.substr(1);
 }
 
 export function VibratoRow({setting}) {  
     return (
         <tr>
             <td>
-                <CodeBadge type="net" name={setting.name} /><br />
-                <CodeBadge type="js" name={toCamelCase(setting.name)} /><br />
-                <CodeBadge type="json" name={toCamelCase(setting.name)} /><br />
-                <CodeBadge type="html" name={setting.name.toLowerCase()} />
+                <CodeBadge type="js" name={setting.name} /><br />
+                <CodeBadge type="json" name={setting.name} /><br />
+                <CodeBadge type="html" name={setting.name.toLowerCase()} /><br />
+                <CodeBadge type="net" name={toPascalCase(setting.name)} />
             </td>
             <td>
                 <CodeBadge type="all" name="int" />

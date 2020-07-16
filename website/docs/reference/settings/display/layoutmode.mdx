@@ -1,8 +1,6 @@
 ---
-title: Display.LayoutMode
-jsName: display.layoutMode
-jsonName: display.layoutMode
-domName: data-display-layoutmode
+title: display.layoutMode
+jsOnParent: true
 category: Display
 description: The layouting mode used to arrange the the notation.
 sidebarPath: /docs/reference/settings
@@ -21,9 +19,21 @@ AlphaTab has various layout engines that arrange the rendered bars differently. 
 ## Types
 
 <TypeTable>
-    <TypeRow name="string" type="all">
-        `page` - The bars are aligned in a [page-style fashion](/docs/showcase/layouts#page-layout")<br /> 
-        `horizontal` - The bars are aligned in a [left-to-right](/docs/showcase/layouts#horizontal-layout)
+    <TypeRow type="js" name="alphaTab.LayoutMode">
+        `Page` - The bars are aligned in a [page-style fashion](/docs/showcase/layouts#page-layout")<br />
+        `Horizontal`  - The bars are aligned in a [left-to-right](/docs/showcase/layouts#horizontal-layout)
+    </TypeRow>
+    <TypeRow type="json-js-html" name="string">
+        `page`<br />
+        `horizontal`
+    </TypeRow>
+    <TypeRow type="json-js-html" name="int">
+        `0` - Page<br />
+        `1` - Horizontal
+    </TypeRow>
+    <TypeRow type="net" name="AlphaTab.LayoutMode">
+        `Page`<br />
+        `Horizontal`
     </TypeRow>
 </TypeTable>
 

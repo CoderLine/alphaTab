@@ -1,8 +1,5 @@
 ---
-title: Notation.NotationMode
-jsName: notation.notationMode
-jsonName: notation.notationMode
-domName: data-notation-notationmode
+title: notation.notationMode
 category: Notation
 description: Gets or sets the mode to use for display and play music notation elements.
 sidebarPath: /docs/reference/settings
@@ -34,29 +31,41 @@ Tied notes with let ring are not shown in standard notation. Let ring does not c
             
 4. **Settings**
 Following default setting values are applied:
-* `SmallGraceTabNotes = false`
-* `FingeringMode = FingeringMode.SingleNoteEffectBand`
-* `ExtendBendArrowsOnTiedNotes = false`
-* `ShowParenthesisForTiedBends = false`
-* `ShowTabNoteOnTiedBend = false`
-* `ShowZeroOnDiveWhammy = true`
+```js
+{
+    notation: {
+        smallGraceTabNotes: false,
+        fingeringMode: alphaTab.FingeringMode.SingleNoteEffectBandm
+        extendBendArrowsOnTiedNotes: false
+    },
+    elements: {
+        parenthesisOnTiedBends: false,
+        tabNotesOnTiedBends: false,
+        zerosOnDiveWhammys: true
+    }
+}
+```
 
 <PropertyDescription metadata={metadata} />
 
 ## Types
 
 <TypeTable>
+    <TypeRow name="alphaTab.DisplayMode" type="js">
+        `SongBook`<br />
+        `GuitarPro`
+    </TypeRow>
+    <TypeRow name="string" type="json-js-html">
+        `SongBook`<br />
+        `GuitarPro`
+    </TypeRow>
+    <TypeRow name="int" type="json-js-html">
+        `0` - SongBook<br />
+        `1` - GuitarPro
+    </TypeRow>
     <TypeRow name="AlphaTab.DisplayMode" type="net">
         `SongBook`<br />
         `GuitarPro`
-    </TypeRow>
-    <TypeRow name="string" type="json-html">
-        `SongBook`<br />
-        `GuitarPro`
-    </TypeRow>
-    <TypeRow name="int" type="js-html">
-        `0` (SongBook)<br />
-        `1` (GuitarPro)
     </TypeRow>
 </TypeTable>
 

@@ -1,32 +1,32 @@
 import React from 'react';
-import {Page} from './page'
+import { Page } from './page'
 import CodeBadge from './code-badge'
+import { buildNames } from './names';
 
-export default function PropertyDescription({metadata}) {
+export default function PropertyDescription({ metadata }) {
     const page = new Page(metadata);
-    const dotNetName = page.prop("title");
-    const jsNames = page.props("jsName");
-    const jsonNames = page.props("jsonName");
-    const domNames = page.props("domName");
+    const { jsNames, csNames, jQueryNames, domNames } = buildNames(page);
     return (
         <table className="table table-striped table-condensed type-table">
             <tbody>
-                <tr>
-                    <td><CodeBadge type="net" name={dotNetName} /></td>
-                </tr>
-                {jsNames.map((name, index) => (
-                    <tr key={index}>
-                        <td><CodeBadge type="js" name={name} /></td>
+                {jsNames.map(n => (
+                    <tr>
+                        <td><CodeBadge type="js" name={n} /></td>
                     </tr>
                 ))}
-                {jsonNames.map((name, index) => (
-                    <tr key={index}>
-                        <td><CodeBadge type="json" name={name} /></td>
+                {jsNames.map(n => (
+                    <tr>
+                        <td><CodeBadge type="json" name={n} /></td>
                     </tr>
                 ))}
-                {domNames.map((name, index) => (
-                    <tr key={index}>
-                        <td><CodeBadge type="html" name={name} /></td>
+                {domNames.map(n => (
+                    <tr>
+                        <td><CodeBadge type="html" name={n} /></td>
+                    </tr>
+                ))}
+                {csNames.map(n => (
+                    <tr>
+                        <td><CodeBadge type="net" name={n} /></td>
                     </tr>
                 ))}
             </tbody>

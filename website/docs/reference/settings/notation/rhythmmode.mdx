@@ -1,8 +1,5 @@
 ---
-title: Notation.RhythmMode
-jsName: notation.rhythmMode
-jsonName: notation.rhythmMode
-domName: data-notation-rhythmmode
+title: notation.rhythmMode
 category: Notation
 description: Controls how the rhythm notation is rendered for tab staves. 
 sidebarPath: /docs/reference/settings
@@ -21,20 +18,25 @@ This setting enables the display of rhythm notation on tab staffs. [Demo](/docs/
 ## Types
 
 <TypeTable>
-    <TypeRow name="AlphaTab.TabRhythmMode" type="net">
+    <TypeRow name="alphaTab.TabRhythmMode" type="js">
         `Hidden` -  No rhythm notation is shown<br />
         `ShowWithBeams` - Rhythm notation is rendered with all beats having individual beams<br />
         `ShowWithBars` - Rhythm notation is rendered with normal bars like on standard notation
     </TypeRow>
-    <TypeRow name="string" type="json-html">
+    <TypeRow name="string" type="json-js-html">
         `hidden`<br />
         `showwithbeams`<br />
         `showwithbars`
     </TypeRow>
-    <TypeRow name="int" type="js-html">
+    <TypeRow name="int" type="json-js-html">
         `0` - Hidden<br />
         `1` - ShowWithBeams<br />
         `2` - ShowWithBars
+    </TypeRow>
+    <TypeRow name="AlphaTab.TabRhythmMode" type="net">
+        `Hidden`<br />
+        `ShowWithBeams`<br />
+        `ShowWithBars`
     </TypeRow>
 </TypeTable>
 

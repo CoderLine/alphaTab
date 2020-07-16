@@ -1,8 +1,7 @@
 ---
-title: Display.Resources
-jsName: display.resources;resources
-jsonName: display.resources;resources
-domName: data-display-resources-*;data-resources-*
+title: display.resources
+domWildcard: true
+jsOnParent: true
 category: Display
 description: Allows adjusting of the used fonts and colors for rendering.
 sidebarPath: /docs/reference/settings
@@ -16,107 +15,107 @@ import getPageList from '../../../../src/page';
 export var Resources = {
 	colors: [
 		{
-			name: 'BarNumberColor',
+			name: 'barNumberColor',
 			defaultValue: 'rgb(200, 0, 0)',
 			description: 'The color to use for displaying the bar numbers above the music sheet.',
 		},
 		{
-			name: 'BarSeparatorColor',
+			name: 'barSeparatorColor',
 			defaultValue: 'rgb(34, 34, 17)',
 			description: 'The color to use for rendering bar separators, the accolade and repeat signs.',
 		},
 		{
-			name: 'MainGlyphColor',
+			name: 'mainGlyphColor',
 			defaultValue: 'rgb(0, 0, 0)',
 			description: 'The color to use for music notation elements of the primary voice.',
 		},
 		{
-			name: 'ScoreInfoColor',
+			name: 'scoreInfoColor',
 			defaultValue: 'rgb(0, 0, 0)',
 			description: 'The color to use for displaying the song information above the music sheets.',
 		},
 		{
-			name: 'SecondaryGlyphColor',
+			name: 'secondaryGlyphColor',
 			defaultValue: 'rgb(0,0,0,0.4)',
 			description: 'The color to use for music notation elements of the secondary voices.',
 		},
 		{
-			name: 'StaffLineColor',
+			name: 'staffLineColor',
 			defaultValue: 'rgb(165, 165, 165)',
 			description: 'The color to use for rendering the lines of staves.',
 		},
 	],
 	fonts: [
 		{
-			name: 'BarNumberFont',
+			name: 'barNumberFont',
 			defaultValue: '11px Arial',
 			description: 'The font to use for displaying the bar numbers above the music sheet.',
 		}, 
 		{
-			name: 'CopyrightFont',
+			name: 'copyrightFont',
 			defaultValue: 'bold 12px Arial',
 			description: 'The font to use for displaying the songs copyright information in the header of the music sheet.,',
 		},
 		{
-			name: 'EffectFont',
+			name: 'effectFont',
 			defaultValue: 'italic 12px Georgia',
 			description: 'The font to use for displaying certain effect related elements in the music sheet.',
 		},
 		{
-			name: 'FingeringFont',
+			name: 'fingeringFont',
 			defaultValue: '14px Georgia',
 			description: 'The font to use for displaying finger information in the music sheet.',
 		},
 		{
-			name: 'FretboardNumberFont',
+			name: 'fretboardNumberFont',
 			defaultValue: '11px Arial',
 			description: 'The font to use for displaying the fretboard numbers in chord diagrams.',
 		},
 		{
-			name: 'GraceFont',
+			name: 'graceFont',
 			defaultValue: '11px Arial',
 			description: 'The font to use for grace notation related texts in the music sheet.',
 		},
 		{
-			name: 'MarkerFont',
+			name: 'markerFont',
 			defaultValue: 'bold 14px Georgia',
 			description: 'The font to use for section marker labels shown above the music sheet.',
 		},
 		{
-			name: 'SubTitleFont',
+			name: 'subTitleFont',
 			defaultValue: '20px Georgia',
 			description: 'The font to use for displaying the songs subtitle in the header of the music sheet.',
 		},
 		{
-			name: 'TablatureFont',
+			name: 'tablatureFont',
 			defaultValue: '13px Arial',
 			description: 'The font to use for displaying the guitar tablature numbers in the music sheet.',
 		},
 		{
-			name: 'TitleFont',
+			name: 'titleFont',
 			defaultValue: '32px Georgia',
 			description: 'The font to use for displaying the songs title in the header of the music sheet.',
 		},
 		{
-			name: 'WordsFont',
+			name: 'wordsFont',
 			defaultValue: '15px Arial',
 			description: 'The font to use for displaying the lyrics information in the header of the music sheet.',
 		}
 	]
 };
 
-export function toCamelCase(v) {
-    return v.substr(0, 1).toLowerCase() + v.substr(1);
+export function toPascalCase(v) {
+    return v.substr(0, 1).toUpperCase() + v.substr(1);
 }
 
 export function ResourceRow({resource, type}) {  
     return (
         <tr>
             <td>
-                <CodeBadge type="net" name={resource.name} /><br />
-                <CodeBadge type="js" name={toCamelCase(resource.name)} /><br />
-                <CodeBadge type="json" name={toCamelCase(resource.name)} /><br />
-                <CodeBadge type="html" name={resource.name.toLowerCase()} />
+                <CodeBadge type="js" name={resource.name} /><br />
+                <CodeBadge type="json" name={resource.name} /><br />
+                <CodeBadge type="html" name={resource.name.toLowerCase()} /><br />
+                <CodeBadge type="net" name={toUpperCase(resource.name)} />
             </td>
             <td>
                 <CodeBadge type="all" name={type} />
@@ -160,12 +159,12 @@ Due to space reasons in the following table the common prefix of the settings ar
 
 | Platform   | Prefix                    | Example Usage                                                      |
 |------------|---------------------------|--------------------------------------------------------------------|
-| .net       | `Display.Resources.`      | `settings.Display.Resources.WordsFonts = ...`                      |
 | JavaScript | `display.resources.`      | `settings.display.resources.wordsFont = ...`                       |
 | JSON       | `display.resources.`      | `var settings = { display: { resources: { wordsFonts: '...'} } };` |
 | JSON       | `resources.`              | `var settings = { resources: { wordsFonts: '...'} };`              |
 | HTML       | `data-display-resources-` | `<div data-display-resources-wordsfont="...">`                     |
 | HTML       | `data-resources-`         | `<div data-resources-wordsfont="...">`                             |
+| .net       | `Display.Resources.`      | `settings.Display.Resources.WordsFonts = ...`                      |
 
 
 ## Resources
@@ -177,13 +176,14 @@ Following resources exist for adjusting the style.
 
 ### Fonts
 
-For the .net platform any installed font on the system can be used. Simply construct the `Font` object to configure your desired fonts. 
-
 For the JavaScript platform any font that might be installed on the client machines can be used. 
 Any additional fonts can be added via WebFonts. The rendering of the score will be delayed until it is detected that the font was loaded. 
 Simply use any CSS font property compliant string as configuration. Relative font sizes with percentual values are not supported, remaining values will be considered if supported.
 
+For the .net platform any installed font on the system can be used. Simply construct the `Font` object to configure your desired fonts. 
+
 ### Colors
 
-On .net simply construct the `Color` object to configure your desired color. 
 For JavaScript you can use any CSS font property compliant string. (#RGB, #RGBA, #RRGGBB, #RRGGBBAA, rgb(r,g,b), rgba(r,g,b,a) )
+
+On .net simply construct the `Color` object to configure your desired color. 

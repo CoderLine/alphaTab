@@ -1,8 +1,6 @@
 ---
-title: Player.Slide
-jsName: player.slide
-jsonName: player.slide
-domName: data-player-slide-*
+title: player.slide
+domWildCard: true
 category: Player
 description: The Slide settings allow control how the different slide types are generated for audio. 
 sidebarPath: /docs/reference/settings
@@ -15,13 +13,13 @@ import CodeBadge from '../../../../src/code-badge';
 
 export var SlideSettings = [
     {
-        name: 'SimpleSlidePitchOffset',
+        name: 'simpleSlidePitchOffset',
         defaultValue: 6,
         type: 'int',
         description: 'The 1/4 tones (bend value) offset that simple slides like slide-out-below or slide-in-above use.'
     },
     {
-        name: 'SimpleSlideDurationRatio',
+        name: 'simpleSlideDurationRatio',
         defaultValue: 0.25,
         type: 'double',
         description: 
@@ -30,7 +28,7 @@ export var SlideSettings = [
             'note duration. For "slide out" effects the slide will start 75% and finish at 100% of the overall note duration.'
     },
     {
-        name: 'ShiftSlideDurationRatio',
+        name: 'shiftSlideDurationRatio',
         defaultValue: 0.5,
         type: 'double',
         description: 'The percentage which the legato and shift slides should take up ' +
@@ -39,18 +37,18 @@ export var SlideSettings = [
     }
 ];
 
-export function toCamelCase(v) {
-    return v.substr(0, 1).toLowerCase() + v.substr(1);
+export function toPascalCase(v) {
+    return v.substr(0, 1).toUpperCase() + v.substr(1);
 }
 
 export function SlideRow({setting}) {  
     return (
         <tr>
             <td>
-                <CodeBadge type="net" name={setting.name} /><br />
-                <CodeBadge type="js" name={toCamelCase(setting.name)} /><br />
-                <CodeBadge type="json" name={toCamelCase(setting.name)} /><br />
-                <CodeBadge type="html" name={setting.name.toLowerCase()} />
+                <CodeBadge type="js" name={setting.name} /><br />
+                <CodeBadge type="json" name={setting.name} /><br />
+                <CodeBadge type="html" name={setting.name.toLowerCase()} /> <br />
+                <CodeBadge type="net" name={toPascalCase(setting.name)} />
             </td>
             <td>
                 <CodeBadge type="all" name={setting.type} />
