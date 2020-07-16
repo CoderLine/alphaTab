@@ -29,10 +29,6 @@ jobs:
         run: npm publish --access public --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-      - name: Mark alpha as latest (until stable release 1.0)
-        run: npm dist-tag add @coderline/alphatab@alpha latest
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 
   nightly_csharp:
     name: C#
