@@ -10,7 +10,7 @@ import AlphaTab from "../alphatab-full";
 const features = [
   {
     title: <>Responsive Display</>,
-    imageUrl: "img/undraw_docusaurus_mountain.svg",
+    imageUrl: "img/undraw-responsive.svg",
     description: (
       <>
         Depending on the available screen resolution alphaTab can resize
@@ -20,7 +20,7 @@ const features = [
   },
   {
     title: <>Designed for Cross Platform usage</>,
-    imageUrl: "img/undraw_docusaurus_tree.svg",
+    imageUrl: "img/undraw-cross-platform.svg",
     description: (
       <>
         The core of alphaTab is designed to run without external dependencies
@@ -32,7 +32,7 @@ const features = [
   },
   {
     title: <>Audio Playback</>,
-    imageUrl: "img/undraw_docusaurus_react.svg",
+    imageUrl: "img/undraw-audio.svg",
     description: (
       <>
         The built-in audio synthesizer allows users to hear what they are
@@ -45,7 +45,7 @@ const features = [
   },
   {
     title: <>Powerful API</>,
-    imageUrl: "img/undraw_docusaurus_react.svg",
+    imageUrl: "img/undraw-api.svg",
     description: (
       <>
         Use the alphaTab APIs to build your customized look&amp;feel on top of
@@ -61,7 +61,9 @@ function Feature({ imageUrl, title, description }) {
   return (
     <div className={styles.feature}>
       {imgUrl && (
-          <img className={styles.featureImage} src={imgUrl} alt={title} />
+          <div className={styles.featureImageWrap}>
+            <img className={styles.featureImage} src={imgUrl} alt={title} />
+          </div>
       )}
       <div className={styles.featureDescription}>
         <h3>{title}</h3>

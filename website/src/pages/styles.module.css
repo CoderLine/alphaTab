@@ -36,17 +36,25 @@
 }
 
 .feature:nth-child(even) .featureDescription,
-.feature:nth-child(odd) .featureImage {
+.feature:nth-child(odd) .featureImageWrap {
   order: 0;
   margin-right: 1em;
 }
 
 .feature:nth-child(odd) .featureDescription,
-.feature:nth-child(even) .featureImage {
+.feature:nth-child(even) .featureImageWrap {
   order: 1;
 }
 
-.featureImage {
+.featureImageWrap {
   height: 200px;
   width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.featureImage {
+  width: 200px;
+  max-width: 200px;
 }
