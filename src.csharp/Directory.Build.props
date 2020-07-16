@@ -3,7 +3,7 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
 
-    <MainVersion>0.9.8</MainVersion>
+    <MainVersion>1.0.0</MainVersion>
     <BuildNumber Condition=" '$(BuildNumber)' == ''">$(GITHUB_RUN_NUMBER)</BuildNumber>
     <BuildNumber Condition=" '$(BuildNumber)' == ''">0</BuildNumber>
 
