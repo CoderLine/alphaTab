@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Wpf
@@ -31,7 +31,7 @@ namespace AlphaTab.Wpf
         {
             var relativeControl = ((FrameworkElementContainer)relativeTo).Control;
             var position = _args.GetPosition(relativeControl);
-            return (float)position.X;
+            return (float)position.Y;
         }
 
         public void PreventDefault()
