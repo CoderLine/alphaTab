@@ -2,10 +2,39 @@
 title: Introduction
 ---
 
-:::info
-The tutorials are still work in progress but will be available soon. 
-:::
-
 # What are we building?
 
+We will build a component which connects all main aspects of alphaTab together. 
+The result will look similar to what you might have already seen on the homepage: 
+
+<img src="/img/tutorial-net/result.png" height="400" />
+
+The overall outline of the tutorial can be seen in the menu and we will step by step
+add each feature until we have a full player component which displays music sheets.
+After this tutorial you should have all knowledge needed to use alphaTab in your own 
+project. 
+
+This tutorial will leave out some features which are provided on the control of the homepage
+but you will learn all required steps to build the remaining parts.
+
 # Prerequisites
+
+As a pre-requisite you should be already familiar at least with the basics of .net WPF development.
+As alphaTab is a **library** (or **SDK** if you like) for building apps/websites that
+want to show music sheets basic knowledge about software development is needed. 
+
+We will be using WPF as UI framework. For simplicity we will rather leave out aspects like following a clean MVVM pattern 
+which you would likely follow in a proper solution. Goal of this tutorial is to show you the usage and inteaction with alphaTab 
+and not teach WPF development. 
+
+Most aspects of the tutorial can be directly mapped to the usage in WinForms as the provided components/controls are very similar. 
+The WinForms version suffers of some restrictions due to it's nature of mapping native OS controls to .net. WPF provides a lot of
+nice features like hardware accelleration on the rendering and very flexible layouting mechanisms. 
+
+We will target the .net core 3.1 runtime in this tutorial as we decided not to publish a .net 4.8 package. If you have an urgent 
+need of supporting the classical .net framework feel free to reach out to us.  
+
+To follow this tutorial you will need to have a .net IDE installed. We will use Visual Studio 2019 Community edition
+but beside the project setup anyhow most of things will happen on code level so feel free to use any IDE you are familiar with. 
+
+So, let's get started! :wink:

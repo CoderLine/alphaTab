@@ -267,7 +267,7 @@ let previousTime = -1;
 api.playerPositionChanged.on((e) => {
   // reduce number of UI updates to second changes.
   const currentSeconds = (e.currentTime / 1000) | 0;
-  if (currentSeconds == previousTime || currentSeconds === 0) {
+  if (currentSeconds == previousTime) {
     return;
   }
 
@@ -775,7 +775,7 @@ api.playerPositionChanged.on((e) => {
       api.playerPositionChanged.on((e) => {
         // reduce number of UI updates to second changes.
         const currentSeconds = (e.currentTime / 1000) | 0;
-        if (currentSeconds == previousTime || currentSeconds === 0) {
+        if (currentSeconds == previousTime) {
           return;
         }
 
