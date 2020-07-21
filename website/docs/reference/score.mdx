@@ -1,0 +1,114 @@
+---
+title: Data Model
+---
+
+The core of alphaTab is the data model. It contains all the information about a music piece like the title, author, instruments contained down to the 
+individual notes and their effects. 
+
+Everything in alphaTab is built around this data model: 
+
+- Importers fill them from the supported file formats
+- The ScoreRenderer generates a visual tree with glyphs to render the notes
+- The MidiFileGenerator produces a MidiFile from the notes for audio playback. 
+
+The data model of alphaTab tries to avoid storing any **visual** information. It is a semantic description of the music sheet on which tracks, bars, notes etc. exist 
+and what effects they have. 
+
+This documentation will not go through all the individual properties of the data model but rather describe the rough structure and where to find what. 
+We recommend to have a look at the code documentation (TS doc, XML doc). 
+
+Direct modification of this data model is usually not easily possible. The importers do the complicated job there to build the right structure and wrap-up 
+the consistency of the model. While some modifications might be possible and are reflected after a re-rendering, others might fully break the rendering pipeline 
+due to the inconsistencies or unexpected values. 
+
+## Main Hierarchy
+
+The main hierarchy of alphaTab starts of with the `alphaTab.model.Score` class. From there a hierarchical structure is going down to the indivdual note:
+
+Score > Track > Staff > Bar > Voice > Beat > Note
+
+Some general facts about the data model: 
+
+* Each hierarchy level provides usually bidirectional navigation within the hierarchy. e.g. from a note you can navigate fully up to the score. 
+* Many hierarchy level provide a dual-linked-list mechanism to navigate back and forth in time. e.g. from a beat you can navigate to the next beat of the same voice and track. 
+* The score provides a `finish` method which consolidates many aspects of the data model like resolving tied notes, calculating times and linking elements.
+
+### Score
+
+The `Score` class contains some high-level information like the song title, artist, copyright holder and main tempo.
+It also contains a `stylesheet` property which is the only place in the data model where potentially some visual information is stored. 
+Some file formats like Guitar Pro give some additional hints on how to render the music sheet. 
+
+### MasterBar (Score.masterBars)
+
+The `MasterBar` items stored in `score.masterBars` contain information which is valid across all tracks for a particular bar or measure.
+
+This includes information like time signatures, key signatures or repeats. alphaTab expects all bars of all tracks to follow the same 
+playback sequence. Pieces where maybe the first instrument is repeating the first bar 5 times while the second insturment is continuing. 
+
+This is needed to consistently align the music notation elements when rendering multiple tracks at the same time, or when handling the audio playback.
+
+### Track (Score.tracks)
+
+A [`Track`](https://en.wikipedia.org/wiki/Part_(music)) (aka. Part) represents a single instrument of the overall music piece. Like the lead guitar or the drums. 
+
+The track has a name and defines some playback information via the `playbackInfo` property. 
+The `playbackInfo` of the track contains info like the midi channels and program used for playback. 
+
+The track contains on the next level the individual staves which contribute to the instrument. 
+
+### Staff (Score.tracks[].staves)
+
+A [`Staff`](https://en.wikipedia.org/wiki/Staff_(music)) is the logical separation of the track into the individually played parts on the instrument. 
+Like on a piano two separate staves might indicate what notes to play on the left and right hand. 
+
+This staff object in the data model must not be confused with a "visual" staff when the music sheet is rendered. 
+A single staff in the data model, might result in 2 visual staffs being rendered: one staff for the standard notation, a second staff for the guitar tabs. 
+
+The staff is again just a container for the individual bars of the song. It contains some information about which visual staves to show or the string tuning for fretted instruments.
+
+### Bar (Score.tracks[].staves[].bars)
+
+A [`Bar`](https://en.wikipedia.org/wiki/Bar_(music)) (aka. measure) is another container to bring us closer to the individual notes.
+Bars split the staff into segments separated with vertical lines when rendered. 
+
+The bar itself defines some basics like the clef shown or if simile marks indicate a repeats. 
+
+The bars contain voices as a next level. 
+
+### Voice (Score.tracks[].staves[].voices[])
+
+A [`Voice`](https://en.wikipedia.org/wiki/Voicing_(music)) allows to have multiple independent notes placed within the same bar indicating the simultaneous playing of them with different duration.
+
+The voice is again just a container for the individual beats played in it. 
+
+### Beat (Score.tracks[].staves[].voices[].beats)
+
+A [`Beat`](https://en.wikipedia.org/wiki/Chord_(music)) (aka. Chord) group multiple notes played at the same time with the same length. 
+
+This is the first level here we have a bit more information about the actual music notation like: the durations, tuplets, lyrics, whammy bar effects, chord diagrams, grace notes, etc. 
+
+The notes will ultimately contain the individual notes. 
+
+### Beat (Score.tracks[].staves[].voices[].beats[].notes)
+
+A [`Note`](https://en.wikipedia.org/wiki/Note_(music)) represents a single musical sound played by the instrument. 
+
+In alphaTab there can be 3 types of notes: 
+
+1. Fretted notes where the note pitch is determined by combining the string tuning of the staff, and the fret played on a particular string of the instrument. 
+2. Piano notes where the note pitch is determined by combining an octave and the tone within this octave. 
+3. Percussion notes where the a combination of the percussion element and a variation indicate what to play.
+
+Notes have a huge set of annotations and effects which can influence the display and playback like: 
+
+* Hammer-Ons/Pull-Offs
+* Harmonics
+* Accentuations
+* Bends
+* Palm Mutes / Let Rings
+* Slides
+* and much more...
+
+
+

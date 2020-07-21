@@ -21,6 +21,7 @@ const sidebars = {
 	"API Reference": [
 		"reference/settings",
 		"reference/api",
+		"reference/score",
 		"reference/scorerenderer",
 		"reference/alphasynth"
 	]
