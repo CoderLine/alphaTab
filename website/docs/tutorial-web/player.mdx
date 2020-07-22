@@ -110,7 +110,7 @@ The [`playerReady`](/docs/reference/api/readyforplayback) will tell us when to h
 
 ```js
 const playerIndicator = wrapper.querySelector(
-  ".at-controls .at-player .at-player-progress"
+  ".at-controls .at-player-progress"
 );
 api.soundFontLoad.on((e) => {
   const percentage = Math.floor((e.loaded / e.total) * 100);
