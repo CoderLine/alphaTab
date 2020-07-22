@@ -2,14 +2,9 @@
   <PropertyGroup>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-
-    <MainVersion>1.0.0</MainVersion>
-    <BuildNumber Condition=" '$(BuildNumber)' == ''">$(GITHUB_RUN_NUMBER)</BuildNumber>
-    <BuildNumber Condition=" '$(BuildNumber)' == ''">0</BuildNumber>
-
-    <Version>$(MainVersion)-alpha.$(BuildNumber)</Version>
-    <AssemblyVersion>$(MainVersion).$(BuildNumber)</AssemblyVersion>
-    <FileVersion>$(MainVersion).$(BuildNumber)</FileVersion>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
     <Authors>Danielku15</Authors>
     <Company>CoderLine</Company>
     <Product>AlphaTab</Product>
@@ -21,5 +16,7 @@
     <RepositoryUrl>https://github.com/CoderLine/alphaTab</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>music,notation,engraver,renderer</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>	
   </PropertyGroup>
 </Project>
