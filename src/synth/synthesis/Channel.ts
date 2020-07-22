@@ -7,6 +7,7 @@ export class Channel {
     public presetIndex: number = 0;
     public bank: number = 0;
     public pitchWheel: number = 0;
+    public perNotePitchWheel: Map<number, number> = new Map<number, number>();
     public midiPan: number = 0;
     public midiVolume: number = 0;
     public midiExpression: number = 0;

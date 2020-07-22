@@ -17,10 +17,8 @@ export class Channels {
         voice.playingChannel = this.activeChannel;
         voice.mixVolume = c.mixVolume;
         voice.noteGainDb += c.gainDb;
-        voice.calcPitchRatio(
-            c.pitchWheel === 8192 ? c.tuning : (c.pitchWheel / 16383.0) * c.pitchRange * 2.0 - c.pitchRange + c.tuning,
-            tinySoundFont.outSampleRate
-        );
+
+        voice.updatePitchRatio(c, tinySoundFont.outSampleRate);
         
         if (newpan <= -0.5) {
             voice.panFactorLeft = 1.0;
