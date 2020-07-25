@@ -1,0 +1,18 @@
+body {
+    padding: 30px;
+}
+.at-wrap {
+    height: 80vh;
+    margin: 0;
+}
+.editor-wrap {
+    height: 20vh;
+    position: relative;
+}
+.editor-wrap > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}

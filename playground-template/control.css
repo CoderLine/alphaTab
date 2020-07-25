@@ -1,0 +1,416 @@
+.at-cursor-bar {
+    /* Defines the color of the bar background when a bar is played */
+    background: rgba(255, 242, 0, 0.25);
+}
+
+.at-selection div {
+    /* Defines the color of the selection background */
+    background: rgba(64, 64, 255, 0.2);
+}
+
+.at-cursor-beat {
+    /* Defines the beat cursor */
+    background: rgba(64, 64, 255, 0.75);
+    width: 3px;
+}
+
+.at-highlight * {
+    /* Defines the color of the music symbols when they are being played (svg) */
+    fill: #0078ff;
+    stroke: #0078ff;
+}
+
+html,
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    height: 100vh;
+}
+
+body {
+    display: flex;
+    align-content: stretch;
+    flex-direction: column;
+}
+
+body > * {
+    overflow: hidden;
+}
+
+.at-wrap {
+    position: relative;
+    width: 80%;
+    height: 80vh;
+    margin: 0 auto;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.at-content {
+    flex: 1 1 auto;
+    overflow: hidden;
+    position: relative;
+}
+
+.at-footer {
+    flex: 0 0 auto;
+    background: #436d9d;
+    color: #fff;
+}
+
+.at-sidebar {
+    max-width: 70px;
+    width: auto;
+    display: flex;
+    align-content: stretch;
+    z-index: 1001;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow: hidden;
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    background: #f7f7f7;
+}
+
+.at-sidebar:hover {
+    max-width: 400px;
+    transition: max-width 0.2s;
+    overflow-y: auto;
+}
+
+.at-viewport {
+    overflow-y: auto;
+    position: absolute;
+    top: 0;
+    left: 70px;
+    right: 0;
+    bottom: 0;
+    padding-right: 20px;
+}
+
+.at-song-title {
+    font-weight: 500;
+}
+
+.at-track {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas: 'icon title' 'icon controls';
+    padding: 5px;
+    transition: background 0.2s;
+    grid-gap: 5px;
+    cursor: pointer;
+}
+
+.at-track:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.at-track > .at-track-icon {
+    grid-area: icon;
+    font-size: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    width: 64px;
+    height: 64px;
+}
+
+.at-track:hover > .at-track-icon {
+    opacity: 0.8;
+}
+
+.at-track.active {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.at-track.active > .at-track-icon {
+    color: #4972a1;
+    opacity: 1;
+}
+
+.at-track > .at-track-name {
+    grid-area: title;
+    font-weight: 500;
+}
+
+.at-track > .at-track-controls {
+    grid-area: controls;
+    display: flex;
+    align-items: center;
+}
+
+.at-track > .at-track-controls > * {
+    margin: 0 2px;
+}
+
+.at-track > .at-track-controls > button.active:hover {
+    background: transparent;
+}
+
+input[type='range'] {
+    -webkit-appearance: none;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    height: 5px;
+}
+
+input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #4972a1;
+    cursor: pointer;
+}
+
+input[type='range']::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #4972a1;
+    cursor: pointer;
+}
+
+.at-overlay {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1002;
+    backdrop-filter: blur(3px);
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: flex-start;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease-in-out;
+    transition-delay: 0;
+}
+
+.at-wrap.loading .at-overlay,
+.at-wrap.dragging .at-overlay {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0.2s;
+}
+
+.at-overlay-content {
+    margin-top: 20px;
+    background: #fff;
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+}
+
+.at-overlay-content > .spinner-border {
+    color: #4972a1;
+}
+
+.at-player {
+    display: flex;
+    justify-content: space-between;
+}
+.at-player > div {
+    padding: 3px;
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    align-items: center;
+}
+.at-player-left > *,
+.at-player-right > * {
+    margin-right: 4px;
+}
+
+.at-player-left > a.disabled,
+.at-player-left > a.disabled:hover,
+.at-player-left > a.disabled:active {
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.at-footer a {
+    color: #fff;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    box-sizing: content-box;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+}
+
+.at-footer a > i {
+    vertical-align: top;
+    font-size: 16px;
+}
+
+.at-footer .btn {
+    padding: 4px;
+    color: #fff;
+    border-radius: 0;
+    height: 40px;
+}
+
+.at-footer .btn:hover {
+    background: #5588c7;
+}
+
+.at-footer a.active,
+.at-footer a:hover {
+    background: #5588c7;
+    text-decoration: none;
+}
+
+.at-footer .dropdown-menu {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+    border: 0;
+    border-radius: 4px;
+    color: #fff;
+}
+
+.at-footer .dropdown-item {
+    color: initial;
+    width: auto;
+    height: auto;
+    text-align: left;
+    justify-content: start;
+}
+
+.at-footer .dropdown-item > i {
+    margin-right: 4px;
+}
+
+.at-footer .dropdown-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.at-time-position {
+    font-weight: bold;
+}
+
+.at-time-slider {
+    height: 4px;
+    background: #d9d9d9;
+}
+
+.at-time-slider-value {
+    height: 4px;
+    background: #4972a1;
+    width: 0;
+}
+
+.at-speed-value {
+    font-size: 0.8rem;
+    margin: 0 0.5em;
+}
+
+/** Circular Progress Bar https://jsfiddle.net/bootstrapious/3xnomecr  **/
+.progress {
+    width: 28px;
+    height: 28px;
+    background: none;
+    position: relative;
+}
+
+.progress::after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #eee;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.progress > span {
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+}
+
+.progress .progress-left {
+    left: 0;
+}
+
+.progress .progress-bar {
+    width: 100%;
+    height: 100%;
+    background: none;
+    position: absolute;
+    top: 0;
+    border: 3px solid #4972a1;
+}
+
+.progress .progress-left .progress-bar {
+    left: 100%;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-left: 0;
+    -webkit-transform-origin: center left;
+    transform-origin: center left;
+}
+
+.progress .progress-right {
+    right: 0;
+}
+
+.progress .progress-right .progress-bar {
+    left: -100%;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-right: 0;
+    -webkit-transform-origin: center right;
+    transform-origin: center right;
+}
+
+.progress .progress-value {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 8px;
+}
+
+@media screen and (max-width: 920px) {
+    .at-player-right > *:not(.at-logo) {
+        display: none !important;
+    }
+
+    .at-wrap {
+        height: 60vh;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .at-footer * {
+        font-size: 12px !important;
+    }
+    .at-logo img {
+        height: 18px;
+    }
+
+    .at-sidebar {
+        display: none;
+    }
+
+    .at-viewport {
+        left: 0 !important;
+    }
+}

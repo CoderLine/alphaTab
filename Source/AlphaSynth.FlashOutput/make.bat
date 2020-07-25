@@ -1,1 +1,0 @@
-haxe -main FlashOutputDevice -swf ..\..\Build\JavaScript\AlphaSynth.FlashOutput.swf

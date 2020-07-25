@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+    <PropertyGroup>
+        <RootNamespace>AlphaTab</RootNamespace>
+        <AssemblyName>AlphaTab.Windows</AssemblyName>
+        <PackageId>AlphaTab.Windows</PackageId>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
+        <NoWarn>$(NoWarn);NU5105</NoWarn>
+        <Nullable>enable</Nullable>
+        <LangVersion>8</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AlphaTab\AlphaTab.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="..\..\font\sonivox\sonivox.sf2" Link="default.sf2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NAudio" Version="1.10.0" />
+    </ItemGroup>
+
+</Project>

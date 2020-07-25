@@ -1,5 +1,0 @@
-package system;
-
-interface IFormatProvider 
-{
-}

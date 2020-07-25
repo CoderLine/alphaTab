@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "AlphaTab.Samples.Player": {
-      "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)\\Samples\\JavaScript\\Files\\NightWish.gp5 $(SolutionDir)\\Build\\JavaScript\\default.sf2"
-    }
-  }
-}

@@ -4,8 +4,15 @@ I am happy that you are interested in alphaTab and want to contribute by enterin
 
 ## Before entering an issue
 
+**Please follow the provided templates when entering issues. It is crucial to provide the asked information to reduce the effort on our side to handle all the incoming requests. We see a strong tendency of people not providing the asked information and we need to make multiple rounds to find out first what's happening on their side. It should be possible for every developer to take 2 additional minutes of time to enter issues in a proper structured way and by this reduce a multiple of this time on our side.**
+
+**We will close issues not following the template without further discussion.**
+
+Beside that: 
+
 * Check if your topic has already been covered. Use the search function and respond to an existing issue instead of opening a new one if you find a match. 
-* Use the templates! The templates should cover all kind of requests and help me to keep everything organized. 
+* Double check you are using the right template. We get a lot of feature requests or bug reports as via the question template. If something is not yet available or not working, it is very likely not a question but rather a missing feature or misbehavior. 
+
 
 ## Contributing Code
 

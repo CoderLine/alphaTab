@@ -1,0 +1,50 @@
+name: Publish
+on: 
+  push:
+    branches: 
+      - develop
+
+jobs:
+  nighty_web:
+    name: Web
+    runs-on: windows-latest
+    steps:
+      # Checkout the repo
+      - uses: actions/checkout@v2
+        
+      # Build Project
+      - uses: actions/setup-node@master
+      - name: Build Project
+        run: |
+            npm install
+            node ./scripts/update-version.js alpha ${{github.run_number}}
+            npm run build-ci
+
+      # Publish to GitHub Package Registry
+      - uses: actions/setup-node@master
+        with:
+          node-version: '12.x'
+          registry-url: https://registry.npmjs.org/
+      - name: Publish to GitHub Package Registry (alpha)
+        run: npm publish --access public --tag alpha
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+
+  nightly_csharp:
+    name: C#
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.100'
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
+      - run: npm install
+      - run: node ./scripts/update-csharp-version.js alpha ${{github.run_number}}
+      - run: npm run build-csharp-ci
+      - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+      - run: dotnet nuget push src.csharp\AlphaTab.Windows\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
