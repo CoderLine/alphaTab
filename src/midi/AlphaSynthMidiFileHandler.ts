@@ -9,6 +9,7 @@ import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { Midi20PerNotePitchBendEvent } from './Midi20ChannelVoiceEvent';
 
 /**
  * This implementation of the {@link IMidiFileHandler}
@@ -128,6 +129,26 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
             this.makeCommand(MidiEventType.PitchBend, channel),
             value & 0x7F, 
             (value >> 7) & 0x7F
+        );
+        this._midiFile.addEvent(message);
+    }
+
+    public addNoteBend(track: number, tick: number, channel: number, key: number, value: number): void {
+        if (value >= SynthConstants.MaxPitchWheel) {
+            value = SynthConstants.MaxPitchWheel;
+        } else {
+            value = Math.floor(value);
+        }
+
+        // map midi 1.0 range of 0-16384     (0x4000)
+        // to midi 2.0 range of 0-4294967296 (0x100000000)
+        value = value * SynthConstants.MaxPitchWheel20 / SynthConstants.MaxPitchWheel
+
+        const message = new Midi20PerNotePitchBendEvent(
+            tick,
+            this.makeCommand(MidiEventType.PerNotePitchBend, channel),
+            key,
+            value
         );
         this._midiFile.addEvent(message);
     }

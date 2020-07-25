@@ -26,6 +26,7 @@ import { SynthHelper } from '@src/synth/SynthHelper';
 import { TypeConversions } from '@src/io/TypeConversions';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
 
 /**
  * This is a tiny soundfont based synthesizer.
@@ -173,6 +174,16 @@ export class TinySoundFont {
             case MidiEventType.PitchBend:
                 this.channelSetPitchWheel(channel, data1 | (data2 << 7));
                 break;
+            case MidiEventType.PerNotePitchBend:
+                const midi20 = e as Midi20PerNotePitchBendEvent;
+                let perNotePitchWheel = midi20.pitch;
+                // midi 2.0 -> midi 1.0
+                perNotePitchWheel = perNotePitchWheel * SynthConstants.MaxPitchWheel / SynthConstants.MaxPitchWheel20;
+                this.channelSetPerNotePitchWheel(channel,
+                    midi20.noteKey,
+                    perNotePitchWheel
+                );
+                break;
         }
     }
 
@@ -186,7 +197,7 @@ export class TinySoundFont {
 
     public setupMetronomeChannel(volume: number): void {
         this.channelSetMixVolume(SynthConstants.MetronomeChannel, volume);
-        if(volume > 0) {
+        if (volume > 0) {
             this.channelSetVolume(SynthConstants.MetronomeChannel, 1);
             this.channelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
         }
@@ -210,6 +221,7 @@ export class TinySoundFont {
             for (const c of this._channels.channelList) {
                 c.presetIndex = c.bank = 0;
                 c.pitchWheel = c.midiPan = 8192;
+                c.perNotePitchWheel.clear();
                 c.midiVolume = c.midiExpression = 16383;
                 c.midiRpn = 0xffff;
                 c.midiData = 0;
@@ -572,6 +584,9 @@ export class TinySoundFont {
             }
         }
 
+        let c: Channel = this.channelInit(channel);
+        c.perNotePitchWheel.delete(key);
+
         if (!matchFirst) {
             return;
         }
@@ -598,6 +613,9 @@ export class TinySoundFont {
      * @param channel channel number
      */
     public channelNoteOffAll(channel: number): void {
+        let c: Channel = this.channelInit(channel);
+        c.perNotePitchWheel.clear();
+
         for (const v of this._voices) {
             if (
                 v.playingPreset !== -1 &&
@@ -614,6 +632,9 @@ export class TinySoundFont {
      * @param channel channel number
      */
     public channelSoundsOffAll(channel: number): void {
+        let c: Channel = this.channelInit(channel);
+        c.perNotePitchWheel.clear();
+
         for (let v of this._voices) {
             if (v.playingPreset !== -1 &&
                 v.playingChannel === channel &&
@@ -689,7 +710,7 @@ export class TinySoundFont {
         if (presetIndex === -1) {
             return false;
         }
-        
+
         c.presetIndex = TypeConversions.int32ToUint16(presetIndex);
         c.bank = TypeConversions.int32ToUint16(bank);
         return true;
@@ -753,13 +774,25 @@ export class TinySoundFont {
         this.channelApplyPitch(channel, c);
     }
 
-    private channelApplyPitch(channel: number, c: Channel): void {
-        const pitchShift: number = c.pitchWheel === 8192 
-        ? c.tuning 
-        : (c.pitchWheel / 16383.0 * c.pitchRange * 2) - c.pitchRange + c.tuning;
+    /**
+     * @param channel channel number
+     * @param key note value between 0 and 127
+     * @param pitchWheel pitch wheel position 0 to 16383 (default 8192 unpitched)
+     */
+    public channelSetPerNotePitchWheel(channel: number, key: number, pitchWheel: number): void {
+        const c: Channel = this.channelInit(channel);
+        if(c.perNotePitchWheel.has(key) && c.perNotePitchWheel.get(key) === pitchWheel) {
+            return;
+        }
+
+        c.perNotePitchWheel.set(key, pitchWheel);
+        this.channelApplyPitch(channel, c, key);
+    }
+
+    private channelApplyPitch(channel: number, c: Channel, key:number = -1): void {
         for (const v of this._voices) {
-            if (v.playingChannel === channel && v.playingPreset !== -1) {
-                v.calcPitchRatio(pitchShift, this.outSampleRate);
+            if (v.playingChannel === channel && v.playingPreset !== -1 && (key == -1 || v.playingKey === key)) {
+                v.updatePitchRatio(c, this.outSampleRate);
             }
         }
     }
@@ -994,7 +1027,7 @@ export class TinySoundFont {
         for (let phdrIndex: number = 0; phdrIndex < hydra.phdrs.length - 1; phdrIndex++) {
             const phdr: HydraPhdr = hydra.phdrs[phdrIndex];
             let regionIndex: number = 0;
-            
+
             const preset: Preset = (this._presets[phdrIndex] = new Preset());
             preset.name = phdr.presetName;
             preset.bank = phdr.bank;
