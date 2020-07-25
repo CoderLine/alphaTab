@@ -161,9 +161,10 @@ export interface IUiFacade<TSettings> {
     /**
      * Attempts a load of the score represented by the given data object.
      * @param data The data object to decode
+     * @param append Whether to fully replace or append the data from the given soundfont.
      * @returns true if the data object is supported and a load was initiated, otherwise false
      */
-    loadSoundFont(data: unknown): boolean;
+    loadSoundFont(data: unknown, append: boolean): boolean;
 
     /**
      * This events is fired when the {@link canRender} property changes.

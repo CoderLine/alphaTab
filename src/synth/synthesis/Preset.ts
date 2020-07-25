@@ -9,4 +9,5 @@ export class Preset {
     public presetNumber: number = 0;
     public bank: number = 0;
     public regions: Region[] | null = null;
+    public fontSamples: Float32Array | null = null;
 }

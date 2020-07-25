@@ -247,7 +247,12 @@ export class AlphaTabApiBase<TSettings> {
             let score: Score = tracks[0].score;
             for (let track of tracks) {
                 if (track.score !== score) {
-                    this.onError(new AlphaTabError(AlphaTabErrorType.General, 'All rendered tracks must belong to the same score.'));
+                    this.onError(
+                        new AlphaTabError(
+                            AlphaTabErrorType.General,
+                            'All rendered tracks must belong to the same score.'
+                        )
+                    );
                     return;
                 }
             }
@@ -334,13 +339,24 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * Attempts a load of the score represented by the given data object.
      * @param data The data object to decode
+     * @param append Whether to fully replace or append the data from the given soundfont.
      * @returns true if the data object is supported and a load was initiated, otherwise false
      */
-    public loadSoundFont(data: unknown): boolean {
+    public loadSoundFont(data: unknown, append: boolean = false): boolean {
         if (!this.player) {
             return false;
         }
-        return this.uiFacade.loadSoundFont(data);
+        return this.uiFacade.loadSoundFont(data, append);
+    }
+
+    /**
+     * Resets all loaded soundfonts as if they were not loaded.
+     */
+    public resetSoundFonts(): void {
+        if (!this.player) {
+            return;
+        }
+        this.player.resetSoundFonts();
     }
 
     /**
@@ -915,7 +931,7 @@ export class AlphaTabApiBase<TSettings> {
                 );
                 // move to selection start
                 this._currentBeat = null; // reset current beat so it is updating the cursor
-                if(this._playerState === PlayerState.Paused) {
+                if (this._playerState === PlayerState.Paused) {
                     this.cursorUpdateBeat(this._selectionStart.beat, null, 0, false, [this._selectionStart.beat]);
                 }
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;

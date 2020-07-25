@@ -104,13 +104,14 @@ export class TinySoundFont {
     private fillWorkingBuffer(silent: boolean): Float32Array {
         // Break the process loop into sections representing the smallest timeframe before the midi controls need to be updated
         // the bigger the timeframe the more efficent the process is, but playback quality will be reduced.
-        const buffer: Float32Array = new Float32Array(TinySoundFont.MicroBufferSize * TinySoundFont.MicroBufferCount * SynthConstants.AudioChannels);
+        const buffer: Float32Array = new Float32Array(
+            TinySoundFont.MicroBufferSize * TinySoundFont.MicroBufferCount * SynthConstants.AudioChannels
+        );
         let bufferPos: number = 0;
         const anySolo: boolean = this._isAnySolo;
 
         // process in micro-buffers
         for (let x: number = 0; x < TinySoundFont.MicroBufferCount; x++) {
-
             // process events for first microbuffer
             if (this._midiEventQueue.length > 0) {
                 for (let i: number = 0; i < this._midiEventCounts[x]; i++) {
@@ -178,11 +179,8 @@ export class TinySoundFont {
                 const midi20 = e as Midi20PerNotePitchBendEvent;
                 let perNotePitchWheel = midi20.pitch;
                 // midi 2.0 -> midi 1.0
-                perNotePitchWheel = perNotePitchWheel * SynthConstants.MaxPitchWheel / SynthConstants.MaxPitchWheel20;
-                this.channelSetPerNotePitchWheel(channel,
-                    midi20.noteKey,
-                    perNotePitchWheel
-                );
+                perNotePitchWheel = (perNotePitchWheel * SynthConstants.MaxPitchWheel) / SynthConstants.MaxPitchWheel20;
+                this.channelSetPerNotePitchWheel(channel, midi20.noteKey, perNotePitchWheel);
                 break;
         }
     }
@@ -233,14 +231,13 @@ export class TinySoundFont {
         }
     }
 
-    private _presets: Preset[] | null = null;
+    public presets: Preset[] | null = null;
     private _voices: Voice[] = [];
     private _channels: Channels | null = null;
     private _voicePlayIndex: number = 0;
-    public fontSamples: Float32Array = new Float32Array(0);
 
     public get presetCount(): number {
-        return this._presets?.length ?? 0;
+        return this.presets?.length ?? 0;
     }
 
     /**
@@ -263,8 +260,10 @@ export class TinySoundFont {
      */
     public reset(): void {
         for (let v of this._voices) {
-            if (v.playingPreset !== -1 &&
-                (v.ampEnv.segment < VoiceEnvelopeSegment.Release || v.ampEnv.parameters!.release !== 0)) {
+            if (
+                v.playingPreset !== -1 &&
+                (v.ampEnv.segment < VoiceEnvelopeSegment.Release || v.ampEnv.parameters!.release !== 0)
+            ) {
                 v.endQuick(this.outSampleRate);
             }
         }
@@ -290,12 +289,12 @@ export class TinySoundFont {
      * @param vel velocity as a float between 0.0 (equal to note off) and 1.0 (full)
      */
     public noteOn(presetIndex: number, key: number, vel: number): void {
-        if (!this._presets) {
+        if (!this.presets) {
             return;
         }
 
         const midiVelocity: number = (vel * 127) | 0;
-        if (presetIndex < 0 || presetIndex >= this._presets.length) {
+        if (presetIndex < 0 || presetIndex >= this.presets.length) {
             return;
         }
 
@@ -306,8 +305,9 @@ export class TinySoundFont {
 
         // Play all matching regions.
         const voicePlayIndex: number = this._voicePlayIndex++;
-        for (const region of this._presets[presetIndex].regions!) {
-            if (key < region.loKey ||
+        for (const region of this.presets[presetIndex].regions!) {
+            if (
+                key < region.loKey ||
                 key > region.hiKey ||
                 midiVelocity < region.loVel ||
                 midiVelocity > region.hiVel
@@ -407,7 +407,8 @@ export class TinySoundFont {
         let matchLast: Voice | null = null;
         let matches: Voice[] = [];
         for (let v of this._voices) {
-            if (v.playingPreset !== presetIndex ||
+            if (
+                v.playingPreset !== presetIndex ||
                 v.playingKey !== key ||
                 v.ampEnv.segment >= VoiceEnvelopeSegment.Release
             ) {
@@ -424,10 +425,10 @@ export class TinySoundFont {
 
         if (!matchFirst) {
             return;
-
         }
         for (const v of matches) {
-            if (v !== matchFirst &&
+            if (
+                v !== matchFirst &&
                 v !== matchLast &&
                 (v.playIndex !== matchFirst.playIndex ||
                     v.playingPreset !== presetIndex ||
@@ -510,12 +511,13 @@ export class TinySoundFont {
      * Returns the preset index from a bank and preset number, or -1 if it does not exist in the loaded SoundFont
      */
     private getPresetIndex(bank: number, presetNumber: number): number {
-        if (!this._presets) {
+        if (!this.presets) {
             return -1;
         }
 
-        for (let i: number = 0; i < this._presets.length; i++) {
-            let preset: Preset = this._presets[i];
+        // search reverse (last import wins)
+        for (let i: number = this.presets.length - 1; i >= 0; i--) {
+            let preset: Preset = this.presets[i];
             if (preset.presetNumber === presetNumber && preset.bank === bank) {
                 return i;
             }
@@ -528,10 +530,10 @@ export class TinySoundFont {
      * @param presetIndex
      */
     public getPresetName(presetIndex: number): string | null {
-        if (!this._presets) {
+        if (!this.presets) {
             return null;
         }
-        return presetIndex < 0 || presetIndex >= this._presets.length ? null : this._presets[presetIndex].name;
+        return presetIndex < 0 || presetIndex >= this.presets.length ? null : this.presets[presetIndex].name;
     }
 
     /**
@@ -567,7 +569,8 @@ export class TinySoundFont {
         let matchLast: Voice | null = null;
         for (const v of this._voices) {
             // Find the first and last entry in the voices list with matching channel, key and look up the smallest play index
-            if (v.playingPreset === -1 ||
+            if (
+                v.playingPreset === -1 ||
                 v.playingChannel !== channel ||
                 v.playingKey !== key ||
                 v.ampEnv.segment >= VoiceEnvelopeSegment.Release
@@ -593,7 +596,8 @@ export class TinySoundFont {
 
         for (const v of matches) {
             // Stop all voices with matching channel, key and the smallest play index which was enumerated above
-            if (v !== matchFirst &&
+            if (
+                v !== matchFirst &&
                 v !== matchLast &&
                 (v.playIndex !== matchFirst.playIndex ||
                     v.playingPreset === -1 ||
@@ -636,7 +640,8 @@ export class TinySoundFont {
         c.perNotePitchWheel.clear();
 
         for (let v of this._voices) {
-            if (v.playingPreset !== -1 &&
+            if (
+                v.playingPreset !== -1 &&
                 v.playingChannel === channel &&
                 (v.ampEnv.segment < VoiceEnvelopeSegment.Release || v.ampEnv.parameters!.release === 0)
             ) {
@@ -646,7 +651,7 @@ export class TinySoundFont {
     }
 
     /**
-     * 
+     *
      * @param channel channel number
      * @param presetIndex preset index <= 0 and > {@link presetCount}
      */
@@ -677,17 +682,8 @@ export class TinySoundFont {
         } else {
             presetIndex = this.getPresetIndex(c.bank & 0x7ff, presetNumber);
         }
-
-        if (presetIndex === -1) {
-            presetIndex = this.getPresetIndex(0, presetNumber);
-        }
-
-        if (presetIndex !== -1) {
-            c.presetIndex = presetIndex;
-            return true;
-        }
-
-        return false;
+        c.presetIndex = presetIndex;
+        return (presetIndex !== -1);
     }
 
     /**
@@ -781,7 +777,7 @@ export class TinySoundFont {
      */
     public channelSetPerNotePitchWheel(channel: number, key: number, pitchWheel: number): void {
         const c: Channel = this.channelInit(channel);
-        if(c.perNotePitchWheel.has(key) && c.perNotePitchWheel.get(key) === pitchWheel) {
+        if (c.perNotePitchWheel.has(key) && c.perNotePitchWheel.get(key) === pitchWheel) {
             return;
         }
 
@@ -789,7 +785,7 @@ export class TinySoundFont {
         this.channelApplyPitch(channel, c, key);
     }
 
-    private channelApplyPitch(channel: number, c: Channel, key:number = -1): void {
+    private channelApplyPitch(channel: number, c: Channel, key: number = -1): void {
         for (const v of this._voices) {
             if (v.playingChannel === channel && v.playingPreset !== -1 && (key == -1 || v.playingKey === key)) {
                 v.updatePitchRatio(c, this.outSampleRate);
@@ -1020,18 +1016,21 @@ export class TinySoundFont {
             : 0.0;
     }
 
-    public loadPresets(hydra: Hydra): void {
-        this._presets = new Array<Preset>(hydra.phdrs.length - 1);
-        this.fontSamples = hydra.fontSamples;
+    public resetPresets():void {
+        this.presets = [];
+    }
 
+    public loadPresets(hydra: Hydra, append: boolean): void {
+        const newPresets = new Array<Preset>(hydra.phdrs.length - 1);
         for (let phdrIndex: number = 0; phdrIndex < hydra.phdrs.length - 1; phdrIndex++) {
             const phdr: HydraPhdr = hydra.phdrs[phdrIndex];
             let regionIndex: number = 0;
 
-            const preset: Preset = (this._presets[phdrIndex] = new Preset());
+            const preset: Preset = (newPresets[phdrIndex] = new Preset());
             preset.name = phdr.presetName;
             preset.bank = phdr.bank;
             preset.presetNumber = phdr.preset;
+            preset.fontSamples = hydra.fontSamples;
             let regionNum: number = 0;
 
             for (
@@ -1268,10 +1267,10 @@ export class TinySoundFont {
 
                                     zoneRegion.tune += shdr.pitchCorrection;
                                     zoneRegion.sampleRate = shdr.sampleRate;
-                                    if (zoneRegion.end !== 0 && zoneRegion.end < this.fontSamples.length) {
+                                    if (zoneRegion.end !== 0 && zoneRegion.end < preset.fontSamples.length) {
                                         zoneRegion.end++;
                                     } else {
-                                        zoneRegion.end = this.fontSamples.length;
+                                        zoneRegion.end = preset.fontSamples.length;
                                     }
 
                                     preset.regions[regionIndex] = new Region(zoneRegion);
@@ -1305,6 +1304,14 @@ export class TinySoundFont {
                 if (pbag === hydra.pbags[phdr.presetBagNdx] && !hadGenInstrument) {
                     globalRegion = presetRegion;
                 }
+            }
+        }
+
+        if (!append || !this.presets) {
+            this.presets = newPresets;
+        } else {
+            for (const preset of newPresets) {
+                this.presets.push(preset);
             }
         }
     }
