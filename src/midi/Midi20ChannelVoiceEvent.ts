@@ -23,7 +23,7 @@ export class Midi20PerNotePitchBendEvent extends MidiEvent {
         let b: Uint8Array = new Uint8Array([
             0x40,
             this.message & 0xff,
-            this.noteKey,
+            this.noteKey & 0xff,
 
             0x00 /* reserved */,
             /* 32bit pitch integer */

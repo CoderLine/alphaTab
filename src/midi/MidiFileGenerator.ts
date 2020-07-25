@@ -780,7 +780,7 @@ export class MidiFileGenerator {
         let bendPoints: BendPoint[] = note.bendPoints;
         let track: Track = note.beat.voice.bar.staff.track;
 
-        const addBend = (tick: number, value: number) => {
+        const addBend: (tick: number, value: number) => void = (tick, value) => {
             this._handler.addNoteBend(track.index, tick, channel, noteKey, value);
         };
 
@@ -976,7 +976,7 @@ export class MidiFileGenerator {
             noteStart--;
         }
 
-        const addBend = (tick: number, value: number) => {
+        const addBend: (tick: number, value: number) => void = (tick, value) => {
             this._handler.addBend(track.index, tick, channel, value);
         };
 
