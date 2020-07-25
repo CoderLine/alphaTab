@@ -17,6 +17,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import {
     BendEvent,
+    NoteBendEvent,
     ControlChangeEvent,
     FlatMidiEventGenerator,
     MidiEvent as FlatMidiEvent,
@@ -97,18 +98,18 @@ describe('MidiFileGeneratorTest', () => {
 
             // bend effect
             new BendEvent(0, 0, info.secondaryChannel, 8192), // no bend
-            new BendEvent(0, 0, info.secondaryChannel, 8192),
-            new BendEvent(1 * 80, 0, info.secondaryChannel, 8277),
-            new BendEvent(2 * 80, 0, info.secondaryChannel, 8363),
-            new BendEvent(3 * 80, 0, info.secondaryChannel, 8448),
-            new BendEvent(4 * 80, 0, info.secondaryChannel, 8533),
-            new BendEvent(5 * 80, 0, info.secondaryChannel, 8619),
-            new BendEvent(6 * 80, 0, info.secondaryChannel, 8704),
-            new BendEvent(7 * 80, 0, info.secondaryChannel, 8789),
-            new BendEvent(8 * 80, 0, info.secondaryChannel, 8875),
-            new BendEvent(9 * 80, 0, info.secondaryChannel, 8960),
-            new BendEvent(10 * 80, 0, info.secondaryChannel, 9045),
-            new BendEvent(11 * 80, 0, info.secondaryChannel, 9131),
+            new NoteBendEvent(0, 0, info.secondaryChannel, note.realValue, 8192),
+            new NoteBendEvent(1 * 80, 0, info.secondaryChannel, note.realValue, 8277),
+            new NoteBendEvent(2 * 80, 0, info.secondaryChannel, note.realValue, 8363),
+            new NoteBendEvent(3 * 80, 0, info.secondaryChannel, note.realValue, 8448),
+            new NoteBendEvent(4 * 80, 0, info.secondaryChannel, note.realValue, 8533),
+            new NoteBendEvent(5 * 80, 0, info.secondaryChannel, note.realValue, 8619),
+            new NoteBendEvent(6 * 80, 0, info.secondaryChannel, note.realValue, 8704),
+            new NoteBendEvent(7 * 80, 0, info.secondaryChannel, note.realValue, 8789),
+            new NoteBendEvent(8 * 80, 0, info.secondaryChannel, note.realValue, 8875),
+            new NoteBendEvent(9 * 80, 0, info.secondaryChannel, note.realValue, 8960),
+            new NoteBendEvent(10 * 80, 0, info.secondaryChannel, note.realValue, 9045),
+            new NoteBendEvent(11 * 80, 0, info.secondaryChannel, note.realValue, 9131),
 
             // note itself
             new NoteEvent(
@@ -240,18 +241,18 @@ describe('MidiFileGeneratorTest', () => {
 
             // bend beat
             new BendEvent(ticks[6], 0, info.secondaryChannel, 8192),
-            new BendEvent(ticks[6] + 12 * 0, 0, info.secondaryChannel, 8192),
-            new BendEvent(ticks[6] + 12 * 1, 0, info.secondaryChannel, 8277),
-            new BendEvent(ticks[6] + 12 * 2, 0, info.secondaryChannel, 8363),
-            new BendEvent(ticks[6] + 12 * 3, 0, info.secondaryChannel, 8448),
-            new BendEvent(ticks[6] + 12 * 4, 0, info.secondaryChannel, 8533),
-            new BendEvent(ticks[6] + 12 * 5, 0, info.secondaryChannel, 8619),
-            new BendEvent(ticks[6] + 12 * 6, 0, info.secondaryChannel, 8704),
-            new BendEvent(ticks[6] + 12 * 7, 0, info.secondaryChannel, 8789),
-            new BendEvent(ticks[6] + 12 * 8, 0, info.secondaryChannel, 8875),
-            new BendEvent(ticks[6] + 12 * 9, 0, info.secondaryChannel, 8960),
-            new BendEvent(ticks[6] + 12 * 10, 0, info.secondaryChannel, 9045),
-            new BendEvent(ticks[6] + 12 * 11, 0, info.secondaryChannel, 9131),
+            new NoteBendEvent(ticks[6] + 12 * 0, 0, info.secondaryChannel, 67, 8192),
+            new NoteBendEvent(ticks[6] + 12 * 1, 0, info.secondaryChannel, 67, 8277),
+            new NoteBendEvent(ticks[6] + 12 * 2, 0, info.secondaryChannel, 67, 8363),
+            new NoteBendEvent(ticks[6] + 12 * 3, 0, info.secondaryChannel, 67, 8448),
+            new NoteBendEvent(ticks[6] + 12 * 4, 0, info.secondaryChannel, 67, 8533),
+            new NoteBendEvent(ticks[6] + 12 * 5, 0, info.secondaryChannel, 67, 8619),
+            new NoteBendEvent(ticks[6] + 12 * 6, 0, info.secondaryChannel, 67, 8704),
+            new NoteBendEvent(ticks[6] + 12 * 7, 0, info.secondaryChannel, 67, 8789),
+            new NoteBendEvent(ticks[6] + 12 * 8, 0, info.secondaryChannel, 67, 8875),
+            new NoteBendEvent(ticks[6] + 12 * 9, 0, info.secondaryChannel, 67, 8960),
+            new NoteBendEvent(ticks[6] + 12 * 10, 0, info.secondaryChannel, 67, 9045),
+            new NoteBendEvent(ticks[6] + 12 * 11, 0, info.secondaryChannel, 67, 9131),
             new NoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, DynamicValue.F),
 
             // end of track
@@ -308,31 +309,31 @@ describe('MidiFileGeneratorTest', () => {
 
             // bend effect
             new BendEvent(0, 0, info.secondaryChannel, 8192), 
-            new BendEvent(0 * 40, 0, info.secondaryChannel, 8192), // no bend
-            new BendEvent(1 * 40, 0, info.secondaryChannel, 8277),
-            new BendEvent(2 * 40, 0, info.secondaryChannel, 8363),
-            new BendEvent(3 * 40, 0, info.secondaryChannel, 8448),
-            new BendEvent(4 * 40, 0, info.secondaryChannel, 8533),
-            new BendEvent(5 * 40, 0, info.secondaryChannel, 8619),
-            new BendEvent(6 * 40, 0, info.secondaryChannel, 8704),
-            new BendEvent(7 * 40, 0, info.secondaryChannel, 8789),
-            new BendEvent(8 * 40, 0, info.secondaryChannel, 8875),
-            new BendEvent(9 * 40, 0, info.secondaryChannel, 8960),
-            new BendEvent(10 * 40, 0, info.secondaryChannel, 9045),
-            new BendEvent(11 * 40, 0, info.secondaryChannel, 9131),
-            new BendEvent(12 * 40, 0, info.secondaryChannel, 9216), // full bend
-            new BendEvent(13 * 40, 0, info.secondaryChannel, 9131), 
-            new BendEvent(14 * 40, 0, info.secondaryChannel, 9045),
-            new BendEvent(15 * 40, 0, info.secondaryChannel, 8960),
-            new BendEvent(16 * 40, 0, info.secondaryChannel, 8875),
-            new BendEvent(17 * 40, 0, info.secondaryChannel, 8789),
-            new BendEvent(18 * 40, 0, info.secondaryChannel, 8704),
-            new BendEvent(19 * 40, 0, info.secondaryChannel, 8619),
-            new BendEvent(20 * 40, 0, info.secondaryChannel, 8533),
-            new BendEvent(21 * 40, 0, info.secondaryChannel, 8448),
-            new BendEvent(22 * 40, 0, info.secondaryChannel, 8363),
-            new BendEvent(23 * 40, 0, info.secondaryChannel, 8277),
-            new BendEvent(24 * 40, 0, info.secondaryChannel, 8192), // no bend
+            new NoteBendEvent(0 * 40, 0, info.secondaryChannel, note.realValue, 8192), // no bend
+            new NoteBendEvent(1 * 40, 0, info.secondaryChannel, note.realValue, 8277),
+            new NoteBendEvent(2 * 40, 0, info.secondaryChannel, note.realValue, 8363),
+            new NoteBendEvent(3 * 40, 0, info.secondaryChannel, note.realValue, 8448),
+            new NoteBendEvent(4 * 40, 0, info.secondaryChannel, note.realValue, 8533),
+            new NoteBendEvent(5 * 40, 0, info.secondaryChannel, note.realValue, 8619),
+            new NoteBendEvent(6 * 40, 0, info.secondaryChannel, note.realValue, 8704),
+            new NoteBendEvent(7 * 40, 0, info.secondaryChannel, note.realValue, 8789),
+            new NoteBendEvent(8 * 40, 0, info.secondaryChannel, note.realValue, 8875),
+            new NoteBendEvent(9 * 40, 0, info.secondaryChannel, note.realValue, 8960),
+            new NoteBendEvent(10 * 40, 0, info.secondaryChannel,note.realValue, 9045),
+            new NoteBendEvent(11 * 40, 0, info.secondaryChannel,note.realValue, 9131),
+            new NoteBendEvent(12 * 40, 0, info.secondaryChannel,note.realValue, 9216), // full bend
+            new NoteBendEvent(13 * 40, 0, info.secondaryChannel,note.realValue, 9131), 
+            new NoteBendEvent(14 * 40, 0, info.secondaryChannel,note.realValue, 9045),
+            new NoteBendEvent(15 * 40, 0, info.secondaryChannel,note.realValue, 8960),
+            new NoteBendEvent(16 * 40, 0, info.secondaryChannel,note.realValue, 8875),
+            new NoteBendEvent(17 * 40, 0, info.secondaryChannel,note.realValue, 8789),
+            new NoteBendEvent(18 * 40, 0, info.secondaryChannel,note.realValue, 8704),
+            new NoteBendEvent(19 * 40, 0, info.secondaryChannel,note.realValue, 8619),
+            new NoteBendEvent(20 * 40, 0, info.secondaryChannel,note.realValue, 8533),
+            new NoteBendEvent(21 * 40, 0, info.secondaryChannel,note.realValue, 8448),
+            new NoteBendEvent(22 * 40, 0, info.secondaryChannel,note.realValue, 8363),
+            new NoteBendEvent(23 * 40, 0, info.secondaryChannel,note.realValue, 8277),
+            new NoteBendEvent(24 * 40, 0, info.secondaryChannel,note.realValue, 8192), // no bend
 
             // note itself
             new NoteEvent(
@@ -434,4 +435,132 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualMidiStartTimes.join(',')).toEqual(expectedMidiStartTimes.join(','));
         expect(actualMidiDurations.join(',')).toEqual(expectedMidiDurations.join(','));
     });
+
+    it('beat-multi-bend', () => {
+        let tex: string = ':4 (15.6{b(0 4)} 14.6{b(0 8)}) 15.6';
+        let score: Score = parseTex(tex);
+        expect(score.tracks.length).toEqual(1);
+        expect(score.tracks[0].staves[0].bars.length).toEqual(1);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).toEqual(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toEqual(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).toEqual(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes.length).toEqual(1);
+        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+        let info: PlaybackInformation = score.tracks[0].playbackInfo;
+        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        let note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1];
+        let expectedEvents: FlatMidiEvent[] = [
+            // channel init
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+
+            new TimeSignatureEvent(0, 4, 4),
+            new TempoEvent(0, 120),
+
+            // bend effect (note 1)
+            new BendEvent(0, 0, info.secondaryChannel, 8192), // no bend
+            new NoteBendEvent(0, 0, info.secondaryChannel, note1.realValue, 8192),
+            new NoteBendEvent(1 * 80, 0, info.secondaryChannel, note1.realValue, 8277),
+            new NoteBendEvent(2 * 80, 0, info.secondaryChannel, note1.realValue, 8363),
+            new NoteBendEvent(3 * 80, 0, info.secondaryChannel, note1.realValue, 8448),
+            new NoteBendEvent(4 * 80, 0, info.secondaryChannel, note1.realValue, 8533),
+            new NoteBendEvent(5 * 80, 0, info.secondaryChannel, note1.realValue, 8619),
+            new NoteBendEvent(6 * 80, 0, info.secondaryChannel, note1.realValue, 8704),
+            new NoteBendEvent(7 * 80, 0, info.secondaryChannel, note1.realValue, 8789),
+            new NoteBendEvent(8 * 80, 0, info.secondaryChannel, note1.realValue, 8875),
+            new NoteBendEvent(9 * 80, 0, info.secondaryChannel, note1.realValue, 8960),
+            new NoteBendEvent(10 * 80, 0, info.secondaryChannel, note1.realValue, 9045),
+            new NoteBendEvent(11 * 80, 0, info.secondaryChannel, note1.realValue, 9131),
+
+            // note itself
+            new NoteEvent(
+                0,
+                0,
+                info.secondaryChannel,
+                MidiUtils.toTicks(note1.beat.duration),
+                note1.realValue,
+                note1.dynamics
+            ),
+
+            // bend effect (note 2)
+            new BendEvent(0, 0, info.secondaryChannel, 8192), // no bend
+            new NoteBendEvent(0, 0, info.secondaryChannel, note2.realValue, 8192),
+            new NoteBendEvent(1 * 40, 0, info.secondaryChannel, note2.realValue, 8277),
+            new NoteBendEvent(2 * 40, 0, info.secondaryChannel, note2.realValue, 8363),
+            new NoteBendEvent(3 * 40, 0, info.secondaryChannel, note2.realValue, 8448),
+            new NoteBendEvent(4 * 40, 0, info.secondaryChannel, note2.realValue, 8533),
+            new NoteBendEvent(5 * 40, 0, info.secondaryChannel, note2.realValue, 8619),
+            new NoteBendEvent(6 * 40, 0, info.secondaryChannel, note2.realValue, 8704),
+            new NoteBendEvent(7 * 40, 0, info.secondaryChannel, note2.realValue, 8789),
+            new NoteBendEvent(8 * 40, 0, info.secondaryChannel, note2.realValue, 8875),
+            new NoteBendEvent(9 * 40, 0, info.secondaryChannel, note2.realValue, 8960),
+            new NoteBendEvent(10 * 40, 0, info.secondaryChannel, note2.realValue, 9045),
+            new NoteBendEvent(11 * 40, 0, info.secondaryChannel, note2.realValue, 9131),
+            new NoteBendEvent(12 * 40, 0, info.secondaryChannel, note2.realValue, 9216),
+            new NoteBendEvent(13 * 40, 0, info.secondaryChannel, note2.realValue, 9301),
+            new NoteBendEvent(14 * 40, 0, info.secondaryChannel, note2.realValue, 9387),
+            new NoteBendEvent(15 * 40, 0, info.secondaryChannel, note2.realValue, 9472),
+            new NoteBendEvent(16 * 40, 0, info.secondaryChannel, note2.realValue, 9557),
+            new NoteBendEvent(17 * 40, 0, info.secondaryChannel, note2.realValue, 9643),
+            new NoteBendEvent(18 * 40, 0, info.secondaryChannel, note2.realValue, 9728),
+            new NoteBendEvent(19 * 40, 0, info.secondaryChannel, note2.realValue, 9813),
+            new NoteBendEvent(20 * 40, 0, info.secondaryChannel, note2.realValue, 9899),
+            new NoteBendEvent(21 * 40, 0, info.secondaryChannel, note2.realValue, 9984),
+            new NoteBendEvent(22 * 40, 0, info.secondaryChannel, note2.realValue, 10069),
+            new NoteBendEvent(23 * 40, 0, info.secondaryChannel, note2.realValue, 10155),
+
+            // note itself
+            new NoteEvent(
+                0,
+                0,
+                info.secondaryChannel,
+                MidiUtils.toTicks(note2.beat.duration),
+                note2.realValue,
+                note2.dynamics
+            ),
+
+            // reset bend
+            new BendEvent(960, 0, info.primaryChannel, 8192),
+            new NoteEvent(
+                960,
+                0,
+                info.primaryChannel,
+                MidiUtils.toTicks(note1.beat.duration),
+                note1.realValue,
+                note1.dynamics
+            ),
+
+            // end of track
+            new TrackEndEvent(3840, 0) // 3840 = end of bar
+        ];
+        for (let i: number = 0; i < handler.midiEvents.length; i++) {
+            Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
+            if (i < expectedEvents.length) {
+                expect(expectedEvents[i].equals(handler.midiEvents[i]))
+                .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
+                .toEqual(
+                    true,
+                );
+            }
+        }
+        expect(handler.midiEvents.length).toEqual(expectedEvents.length);
+    });
+
 });
