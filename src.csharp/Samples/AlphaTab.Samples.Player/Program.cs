@@ -44,7 +44,7 @@ namespace AlphaTab.Samples.Player
                     currentTime, e.CurrentTick, endTime, e.EndTick);
             });
             player.ReadyForPlayback.On(() => { Console.WriteLine("Ready for playback"); });
-            player.LoadSoundFont(File.ReadAllBytes(args[1]));
+            player.LoadSoundFont(File.ReadAllBytes(args[1]), false);
             player.LoadMidiFile(midiFile);
 
             Console.WriteLine("Start playing");

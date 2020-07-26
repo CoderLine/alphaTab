@@ -235,21 +235,21 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return false;
     }
 
-    public loadSoundFont(data: unknown): boolean {
+    public loadSoundFont(data: unknown, append: boolean): boolean {
         if (!this._api.player) {
             return false;
         }
 
         if (data instanceof ArrayBuffer) {
-            this._api.player.loadSoundFont(new Uint8Array(data));
+            this._api.player.loadSoundFont(new Uint8Array(data), append);
             return true;
         }
         if (data instanceof Uint8Array) {
-            this._api.player.loadSoundFont(data);
+            this._api.player.loadSoundFont(data, append);
             return true;
         }
         if (typeof data === 'string') {
-            (this._api as AlphaTabApi).loadSoundFontFromUrl(data);
+            (this._api as AlphaTabApi).loadSoundFontFromUrl(data, append);
             return true;
         }
         return false;
@@ -475,7 +475,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         } else {
             player.ready.on(() => {
                 if (this._api.settings.player.soundFont) {
-                    (this._api as AlphaTabApi).loadSoundFontFromUrl(this._api.settings.player.soundFont);
+                    (this._api as AlphaTabApi).loadSoundFontFromUrl(this._api.settings.player.soundFont, false);
                 }
             });
         }

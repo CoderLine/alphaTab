@@ -244,17 +244,14 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public loadSoundFontFromUrl(url: string, progress: (e: ProgressEventArgs) => void): void {
+    public loadSoundFontFromUrl(url: string, append: boolean, progress: (e: ProgressEventArgs) => void): void {
         Logger.debug('AlphaSynth', `Start loading Soundfont from url ${url}`);
         let request: XMLHttpRequest = new XMLHttpRequest();
         request.open('GET', url, true, null, null);
         request.responseType = 'arraybuffer';
         request.onload = _ => {
             let buffer: Uint8Array = new Uint8Array(request.response);
-            this._synth.postMessage({
-                cmd: 'alphaSynth.loadSoundFontBytes',
-                data: buffer
-            });
+            this.loadSoundFont(buffer, append);
         };
         request.onerror = e => {
             Logger.error('AlphaSynth', 'Loading failed: ' + (e as any).message);
