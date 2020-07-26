@@ -116,6 +116,10 @@ export class JQueryAlphaTab {
         context.loadSoundFont(value, append);
     }
 
+    public resetSoundFonts(element: jQuery, context: AlphaTabApi): void {
+        context.resetSoundFonts();
+    }
+
     public pause(element: jQuery, context: AlphaTabApi): void {
         context.pause();
     }
