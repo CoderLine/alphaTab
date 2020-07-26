@@ -19,9 +19,9 @@
     "@docusaurus/theme-classic": "^2.0.0-alpha.48",
     "@docusaurus/theme-search-algolia": "^2.0.0-alpha.48",
     "classnames": "^2.2.6",
-    "markdown-it": "^10.0.0",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
+    "react-markdown": "^4.3.1",
     "remark-admonitions": "^1.1.0"
   },
   "devDependencies": {

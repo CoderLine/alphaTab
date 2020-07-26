@@ -15,6 +15,7 @@ const sidebars = {
 	"Guides": [
 		"guides/lowlevel-apis",
 		"guides/styling-player",
+		"guides/multiple-soundfonts",
 		"guides/breaking-changes-095-096",
 		"guides/breaking-changes-097-098"
 	],
