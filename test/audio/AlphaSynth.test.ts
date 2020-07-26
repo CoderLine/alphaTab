@@ -25,7 +25,7 @@ describe('AlphaSynthTests', () => {
         gen.generate();
         let testOutput: TestOutput = new TestOutput();
         let synth: AlphaSynth = new AlphaSynth(testOutput);
-        synth.loadSoundFont(data);
+        synth.loadSoundFont(data, false);
         synth.loadMidiFile(midi);
         synth.play();
         let finished: boolean = false;

@@ -121,9 +121,14 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnWorkerThread(() => { Player.Stop(); });
         }
 
-        public void LoadSoundFont(Uint8Array data)
+        public void ResetSoundFonts()
         {
-            DispatchOnWorkerThread(() => { Player.LoadSoundFont(data); });
+            DispatchOnWorkerThread(() => { Player.ResetSoundFonts(); });
+        }
+
+        public void LoadSoundFont(Uint8Array data, bool append)
+        {
+            DispatchOnWorkerThread(() => { Player.LoadSoundFont(data, append); });
         }
 
         public void LoadMidiFile(MidiFile midi)

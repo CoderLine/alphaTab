@@ -138,12 +138,13 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
     }
 
     public soundFontLoad: IEventEmitterOfT<ProgressEventArgs> = new EventEmitterOfT<ProgressEventArgs>();
-    public loadSoundFontFromUrl(url: string): void {
+    public loadSoundFontFromUrl(url: string, append: boolean): void {
         if (!this.player) {
             return;
         }
         (this.player as AlphaSynthWebWorkerApi).loadSoundFontFromUrl(
             url,
+            append,
             e => {
                 (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger(e);
                 this.uiFacade.triggerEvent(this.container, 'soundFontLoad', e);

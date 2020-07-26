@@ -223,7 +223,14 @@ export class AlphaSynth implements IAlphaSynth {
         );
     }
 
-    public loadSoundFont(data: Uint8Array): void {
+    public resetSoundFonts(): void {
+        this.stop();
+        this._synthesizer.resetPresets();
+        this._isSoundFontLoaded = false;
+        (this.soundFontLoaded as EventEmitter).trigger();
+    }
+
+    public loadSoundFont(data: Uint8Array, append:boolean): void {
         this.pause();
 
         let input: ByteBuffer = ByteBuffer.fromBuffer(data);
@@ -231,7 +238,7 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'Loading soundfont from bytes');
             let soundFont: Hydra = new Hydra();
             soundFont.load(input);
-            this._synthesizer.loadPresets(soundFont);
+            this._synthesizer.loadPresets(soundFont, append);
             this._isSoundFontLoaded = true;
             (this.soundFontLoaded as EventEmitter).trigger();
 

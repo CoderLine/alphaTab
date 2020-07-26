@@ -51,7 +51,7 @@ namespace AlphaTab.Platform.CSharp
                 using (var ms = new MemoryStream())
                 {
                     sf.CopyTo(ms);
-                    player.LoadSoundFont(new Uint8Array(ms.ToArray()));
+                    player.LoadSoundFont(new Uint8Array(ms.ToArray()), false);
                 }
             });
             return player;
@@ -124,19 +124,19 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
-        public bool LoadSoundFont(object? data)
+        public bool LoadSoundFont(object? data, bool append)
         {
             switch (data)
             {
                 case byte[] bytes:
-                    Api.Player.LoadSoundFont(new Uint8Array(bytes));
+                    Api.Player.LoadSoundFont(new Uint8Array(bytes), append);
                     return true;
                 case Stream stream:
                 {
                     using (var ms = new MemoryStream())
                     {
                         stream.CopyTo(ms);
-                        Api.Player.LoadSoundFont(new Uint8Array(ms.ToArray()));
+                        Api.Player.LoadSoundFont(new Uint8Array(ms.ToArray()), append);
                     }
 
                     return true;

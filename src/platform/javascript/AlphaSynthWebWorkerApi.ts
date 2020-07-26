@@ -7,12 +7,12 @@ import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventA
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { SynthHelper } from '@src/synth/SynthHelper';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { FileLoadError } from '@src/FileLoadError';
 import { JsonConverter } from '@src/model/JsonConverter';
-import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { ProgressEventArgs } from '@src/alphatab';
+import { FileLoadError } from '@src/FileLoadError';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -236,24 +236,22 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public loadSoundFont(data: Uint8Array): void {
+    public loadSoundFont(data: Uint8Array, append: boolean): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.loadSoundFontBytes',
-            data: data
+            data: data,
+            append: append
         });
     }
 
-    public loadSoundFontFromUrl(url: string, progress: (e: ProgressEventArgs) => void): void {
+    public loadSoundFontFromUrl(url: string, append: boolean, progress: (e: ProgressEventArgs) => void): void {
         Logger.debug('AlphaSynth', `Start loading Soundfont from url ${url}`);
         let request: XMLHttpRequest = new XMLHttpRequest();
         request.open('GET', url, true, null, null);
         request.responseType = 'arraybuffer';
         request.onload = _ => {
             let buffer: Uint8Array = new Uint8Array(request.response);
-            this._synth.postMessage({
-                cmd: 'alphaSynth.loadSoundFontBytes',
-                data: buffer
-            });
+            this.loadSoundFont(buffer, append);
         };
         request.onerror = e => {
             Logger.error('AlphaSynth', 'Loading failed: ' + (e as any).message);
@@ -266,6 +264,12 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
             progress(new ProgressEventArgs(e.loaded, e.total));
         };
         request.send();
+    }
+
+    public resetSoundFonts(): void {
+        this._synth.postMessage({
+            cmd: 'alphaSynth.resetSoundFonts'
+        });
     }
 
     public loadMidiFile(midi: MidiFile): void {

@@ -13,37 +13,6 @@ import { Environment } from '@src/Environment';
  * @target web
  */
 export class AlphaSynthWebWorker {
-    public static readonly CmdPrefix: string = 'alphaSynth.';
-    public static readonly CmdInitialize: string = AlphaSynthWebWorker.CmdPrefix + 'initialize';
-    public static readonly CmdSetLogLevel: string = AlphaSynthWebWorker.CmdPrefix + 'setLogLevel';
-    public static readonly CmdSetMasterVolume: string = AlphaSynthWebWorker.CmdPrefix + 'setMasterVolume';
-    public static readonly CmdSetMetronomeVolume: string = AlphaSynthWebWorker.CmdPrefix + 'setMetronomeVolume';
-    public static readonly CmdSetPlaybackSpeed: string = AlphaSynthWebWorker.CmdPrefix + 'setPlaybackSpeed';
-    public static readonly CmdSetTickPosition: string = AlphaSynthWebWorker.CmdPrefix + 'setTickPosition';
-    public static readonly CmdSetTimePosition: string = AlphaSynthWebWorker.CmdPrefix + 'setTimePosition';
-    public static readonly CmdSetPlaybackRange: string = AlphaSynthWebWorker.CmdPrefix + 'setPlaybackRange';
-    public static readonly CmdSetIsLooping: string = AlphaSynthWebWorker.CmdPrefix + 'setIsLooping';
-    public static readonly CmdPlay: string = AlphaSynthWebWorker.CmdPrefix + 'play';
-    public static readonly CmdPause: string = AlphaSynthWebWorker.CmdPrefix + 'pause';
-    public static readonly CmdPlayPause: string = AlphaSynthWebWorker.CmdPrefix + 'playPause';
-    public static readonly CmdStop: string = AlphaSynthWebWorker.CmdPrefix + 'stop';
-    public static readonly CmdLoadSoundFontBytes: string = AlphaSynthWebWorker.CmdPrefix + 'loadSoundFontBytes';
-    public static readonly CmdLoadMidi: string = AlphaSynthWebWorker.CmdPrefix + 'loadMidi';
-    public static readonly CmdSetChannelMute: string = AlphaSynthWebWorker.CmdPrefix + 'setChannelMute';
-    public static readonly CmdSetChannelSolo: string = AlphaSynthWebWorker.CmdPrefix + 'setChannelSolo';
-    public static readonly CmdSetChannelVolume: string = AlphaSynthWebWorker.CmdPrefix + 'setChannelVolume';
-    public static readonly CmdResetChannelStates: string = AlphaSynthWebWorker.CmdPrefix + 'resetChannelStates';
-    public static readonly CmdReady: string = AlphaSynthWebWorker.CmdPrefix + 'ready';
-    public static readonly CmdReadyForPlayback: string = AlphaSynthWebWorker.CmdPrefix + 'readyForPlayback';
-    public static readonly CmdPositionChanged: string = AlphaSynthWebWorker.CmdPrefix + 'positionChanged';
-    public static readonly CmdPlayerStateChanged: string = AlphaSynthWebWorker.CmdPrefix + 'playerStateChanged';
-    public static readonly CmdFinished: string = AlphaSynthWebWorker.CmdPrefix + 'finished';
-    public static readonly CmdSoundFontLoaded: string = AlphaSynthWebWorker.CmdPrefix + 'soundFontLoaded';
-    public static readonly CmdSoundFontLoadFailed: string = AlphaSynthWebWorker.CmdPrefix + 'soundFontLoadFailed';
-    public static readonly CmdMidiLoaded: string = AlphaSynthWebWorker.CmdPrefix + 'midiLoaded';
-    public static readonly CmdMidiLoadFailed: string = AlphaSynthWebWorker.CmdPrefix + 'midiLoadFailed';
-    public static readonly CmdLog: string = AlphaSynthWebWorker.CmdPrefix + 'log';
-
     private _player: AlphaSynth;
     private _main: IWorkerScope;
 
@@ -122,7 +91,10 @@ export class AlphaSynthWebWorker {
                 this._player.stop();
                 break;
             case 'alphaSynth.loadSoundFontBytes':
-                this._player.loadSoundFont(data.data);
+                this._player.loadSoundFont(data.data, data.append);
+                break;
+            case 'alphaSynth.resetSoundFonts':
+                this._player.resetSoundFonts();
                 break;
             case 'alphaSynth.loadMidi':
                 this._player.loadMidiFile(JsonConverter.jsObjectToMidiFile(data.midi));

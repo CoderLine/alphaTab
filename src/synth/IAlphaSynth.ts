@@ -95,8 +95,14 @@ export interface IAlphaSynth {
     /**
      * Loads a soundfont from the given data
      * @param data a byte array to load the data from
+     * @param append Whether to fully replace or append the data from the given soundfont.
      */
-    loadSoundFont(data: Uint8Array): void;
+    loadSoundFont(data: Uint8Array, append: boolean): void;
+
+    /**
+     * Resets all loaded soundfonts as if they were not loaded.
+     */
+    resetSoundFonts(): void;
 
     /**
      * Loads the given midi file structure.
