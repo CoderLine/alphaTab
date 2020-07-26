@@ -15,28 +15,28 @@ This function initiates a load of the soundfont using the given data. The suppor
 ## Signatures
 
 <TypeTable>
-    <TypeRow type="js" name="function loadSoundFont(arraybuffer)">
+    <TypeRow type="js" name="function loadSoundFont(arraybuffer, append)">
         Load the soundfont from the given raw bytes.
     </TypeRow>
-    <TypeRow type="js" name="function loadSoundFont(uint8array)">
+    <TypeRow type="js" name="function loadSoundFont(uint8array, append)">
         Load the soundfont from the given raw bytes.
     </TypeRow>
-    <TypeRow type="js" name="function loadSoundFont(url)">
+    <TypeRow type="js" name="function loadSoundFont(url, append)">
         Load the soundfont from the given URL via AJAX.
     </TypeRow>
-    <TypeRow type="js" name="alphaTab('loadSoundFont', arraybuffer)">
+    <TypeRow type="js" name="alphaTab('loadSoundFont', arraybuffer, append)">
         Load the soundfont from the given raw bytes.
     </TypeRow>
-    <TypeRow type="js" name="alphaTab('loadSoundFont', uint8array)">
+    <TypeRow type="js" name="alphaTab('loadSoundFont', uint8array, append)">
         Load the soundfont from the given raw bytes.
     </TypeRow>
-    <TypeRow type="js" name="alphaTab('loadSoundFont', url)">
+    <TypeRow type="js" name="alphaTab('loadSoundFont', url, append)">
         Load the soundfont from the given URL via AJAX.
     </TypeRow>
-    <TypeRow type="net" name="bool LoadSoundFont(byte[] raw)">
+    <TypeRow type="net" name="bool LoadSoundFont(byte[] raw, append)">
         Load the soundfont from the given raw bytes.
     </TypeRow>
-    <TypeRow type="net" name="bool LoadSoundFont(Stream raw)">
+    <TypeRow type="net" name="bool LoadSoundFont(Stream raw, append)">
         Load the soundfont from the given stream.
     </TypeRow>
 </TypeTable>
@@ -58,6 +58,10 @@ This function initiates a load of the soundfont using the given data. The suppor
     </ParameterRow>
     <ParameterRow platform="net" name="raw" type="System.IO.Stream">
         The stream containing a SoundFont2 file.
+    </ParameterRow>
+    <ParameterRow platform="all" name="append" type="boolean">
+        Whether to append the presets of the new soundfont to the already loaded
+        ones. <span class="badge badge--info">Since: 1.1.0-alpha.34</span>
     </ParameterRow>
 </ParameterTable>
 

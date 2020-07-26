@@ -1,0 +1,24 @@
+---
+title: Use multiple SoundFonts to reduce traffic 
+---
+
+Since alphaTab v1.1 you can load multiple soundfonts into alphaTab depending on the 
+needs of the song loaded. This guide will show you how to setup alphaTab in a way
+that it loads only individual soundfonts from the server depending on the ones
+needed by the loaded score. 
+
+## Data Preparation
+
+First we need to slice down our SoundFont into smaller chunks. We will use [Polyphone](https://www.polyphone-soundfonts.com/)
+a free SoundFont editor to do this. 
+
+The slicing that makes sense, strongly depends on what kind of music pieces you plan to offer to your users. 
+For simplicity in this example we will just slice the soundfont into 2 files: 
+
+1. sonivox-main.sf2 containing all guitars (midi 24-31) and drums 
+2. sonivox-others.sf2 containing the other files
+
+You can of course go that far to put each instrument into an own file. A typical music piece usually
+will not contain more than 4-5 different instruments which should still allow fast download of the files. 
+Modern browser limit the number of concurrent requests to the server, so you might slow down the data loading. 
+
