@@ -107,7 +107,8 @@ export class AccidentalHelper {
             this.maxNoteValue = noteValue;
             this.maxNoteValueBeat = note.beat;
         }
-        return this.getAccidental(line, noteValue, quarterBend);
+
+        return this.getAccidental(line, noteValue, quarterBend, note.accidentalMode);
     }
 
     /**
@@ -132,10 +133,10 @@ export class AccidentalHelper {
             this.maxNoteValue = noteValue;
             this.maxNoteValueBeat = relatedBeat;
         }
-        return this.getAccidental(line, noteValue, quarterBend);
+        return this.getAccidental(line, noteValue, quarterBend, NoteAccidentalMode.Default);
     }
 
-    private getAccidental(line: number, noteValue: number, quarterBend: boolean): AccidentalType {
+    private getAccidental(line: number, noteValue: number, quarterBend: boolean, accidentalMode: NoteAccidentalMode): AccidentalType {
         let accidentalToSet: AccidentalType = AccidentalType.None;
         if (!this._bar.staff.isPercussion) {
             let ks: number = this._bar.masterBar.keySignature;
@@ -146,6 +147,16 @@ export class AccidentalHelper {
             // determine whether the current note requires an accidental according to the key signature
             let hasNoteAccidentalForKeySignature: boolean = AccidentalHelper.KeySignatureLookup[ksi][index];
             let isAccidentalNote: boolean = AccidentalHelper.AccidentalNotes[index];
+
+            switch (accidentalMode) {
+                case NoteAccidentalMode.ForceSharp:
+                case NoteAccidentalMode.ForceDoubleSharp:
+                case NoteAccidentalMode.ForceFlat:
+                case NoteAccidentalMode.ForceDoubleFlat:
+                    isAccidentalNote = true;
+                    break;
+            }
+
             if (quarterBend) {
                 accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
             } else {
@@ -168,6 +179,17 @@ export class AccidentalHelper {
                     return AccidentalType.SharpQuarterNoteUp;
                 case AccidentalType.Flat:
                     return AccidentalType.FlatQuarterNoteUp;
+            }
+        } else {
+            switch (accidentalMode) {
+                case NoteAccidentalMode.ForceSharp:
+                    return AccidentalType.Sharp;
+                case NoteAccidentalMode.ForceDoubleSharp:
+                    return AccidentalType.DoubleSharp;
+                case NoteAccidentalMode.ForceFlat:
+                    return AccidentalType.Flat;
+                case NoteAccidentalMode.ForceDoubleFlat:
+                    return AccidentalType.DoubleFlat;
             }
         }
         return accidentalToSet;
@@ -192,6 +214,7 @@ export class AccidentalHelper {
         let clef: Clef = this._bar.clef;
         let index: number = value % 12;
         let octave: number = ((value / 12) | 0) - 1;
+
         // Initial Position
         let steps: number = AccidentalHelper.OctaveSteps[clef];
         // Move to Octave

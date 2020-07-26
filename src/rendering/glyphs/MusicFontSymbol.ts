@@ -93,6 +93,8 @@ export enum MusicFontSymbol {
     AccidentalFlat = 0xe260,
     AccidentalNatural = 0xe261,
     AccidentalSharp = 0xe262,
+    AccidentalDoubleSharp = 0xe263,
+    AccidentalDoubleFlat = 0xe264,
     AccidentalQuarterToneFlatArrowUp = 0xe270,
     AccidentalQuarterToneSharpArrowUp = 0xe274,
     AccidentalQuarterToneNaturalArrowUp = 0xe272,

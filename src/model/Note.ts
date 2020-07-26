@@ -306,6 +306,16 @@ export class Note {
     public accidentalMode: NoteAccidentalMode = NoteAccidentalMode.Default;
 
     /**
+     * Gets or sets the octave on which this note is displayed (overrides auto-positioning of note).
+     */
+    public displayOctave: number = -1;
+
+    /**
+     * Gets or sets the tone of this note within the octave at which the note is displayed (overrides auto-positioning of note).
+     */
+    public displayTone: number = -1;
+
+    /**
      * Gets or sets the reference to the parent beat to which this note belongs to.
      */
     public beat!: Beat;
@@ -455,6 +465,10 @@ export class Note {
     }
 
     public get displayValueWithoutBend(): number {
+        // if(this.displayOctave !== -1 && this.displayTone !== -1) {
+        //     return this.displayOctave * 12 + this.displayTone - this.beat.voice.bar.staff.displayTranspositionPitch;
+        // }
+
         let noteValue: number = this.realValue;
         if (this.harmonicType !== HarmonicType.Natural && this.harmonicType !== HarmonicType.None) {
             noteValue -= this.harmonicPitch;
@@ -539,6 +553,8 @@ export class Note {
         dst.trillSpeed = src.trillSpeed;
         dst.durationPercent = src.durationPercent;
         dst.accidentalMode = src.accidentalMode;
+        dst.displayOctave = src.displayOctave;
+        dst.displayTone = src.displayTone;
         dst.dynamics = src.dynamics;
         dst.octave = src.octave;
         dst.tone = src.tone;
