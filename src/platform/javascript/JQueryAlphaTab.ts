@@ -112,8 +112,8 @@ export class JQueryAlphaTab {
         context.changeTrackVolume(tracks, volume);
     }
 
-    public loadSoundFont(element: jQuery, context: AlphaTabApi, value: unknown): void {
-        context.loadSoundFont(value);
+    public loadSoundFont(element: jQuery, context: AlphaTabApi, value: unknown, append: boolean): void {
+        context.loadSoundFont(value, append);
     }
 
     public pause(element: jQuery, context: AlphaTabApi): void {
