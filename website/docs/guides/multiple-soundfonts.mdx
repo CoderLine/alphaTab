@@ -1,11 +1,18 @@
 ---
-title: Use multiple SoundFonts to reduce traffic 
+title: Use multiple SoundFonts to reduce traffic
+since: 1.1.0-alpha.34 
 ---
 
 Since alphaTab v1.1 you can load multiple soundfonts into alphaTab depending on the 
 needs of the song loaded. This guide will show you how to setup alphaTab in a way
 that it loads only individual soundfonts from the server depending on the ones
 needed by the loaded score. 
+
+
+:::note tl;dr
+Detect in the `scoreLoaded` event which midi programs your tracks need, load the SoundFonts manually via Ajax and use 
+ `api.loadSoundFont(data, true)` with the second parameter to true to load multiple soundfonts into the synthesizer for playback.
+:::
 
 ## Data Preparation
 
@@ -22,3 +29,113 @@ You can of course go that far to put each instrument into an own file. A typical
 will not contain more than 4-5 different instruments which should still allow fast download of the files. 
 Modern browser limit the number of concurrent requests to the server, so you might slow down the data loading. 
 
+First we make 2 copies of the main soundfont file and rename them as above. 
+
+<img src="/img/guides/multiple-soundfonts/files.png" />
+
+Then we open the first file in Polyphone, and select all presets beside 000:24-000:31 and 128:000, right-click them and request deletion: 
+
+<img src="/img/guides/multiple-soundfonts/delete.png" />
+
+After that we clean from the instruments all entries which are not used in the presets.
+This is quite easy, we can select **all** instruments and request deletion, Polyphone will not delete the ones which are in use 
+
+<img src="/img/guides/multiple-soundfonts/delete-instruments.png" />
+
+And we do the same with the samples group, select all and hit delete. After that you can save the file. 
+
+With the second file we do it reverse: we delete the presets 000:24-000:31 and 128:000 and keep the rest. 
+And now we have one small and one larger file: 
+
+<img src="/img/guides/multiple-soundfonts/files-after.png" />
+
+## Setup alphaTab 
+
+Now we need to hook into some alphaTab events to load the right soundfonts when they are needed. 
+The example below will already give some hints on how you might want to manage the downloads. 
+
+```html
+<div>Progress <span id="progressValue">0%</div>
+<button id="playPause" disabled="disabled">Play/Pause</button>
+<div id="alphaTab"></div>
+<script type="text/javascript">
+	const el = document.querySelector('#alphaTab');
+	const playPause = document.querySelector('#playPause');
+	const at = new alphaTab.AlphaTabApi(el, {
+		file: 'guitar-only.gp',
+		player: {
+			enablePlayer: true
+		}
+	});			
+	playPause.onclick = e => {
+		e.preventDefault();
+		at.playPause();
+	};
+	
+	
+	const progress = new Map();
+	function updateLoadingIndicator() {
+		let loaded = 0;
+		let total = 0;
+		progress.forEach(value => {
+			loaded += value.loaded;
+			total += value.total;
+		});
+	
+		document.querySelector('#progressValue').innerText = Math.floor( (loaded / total) * 100 ) + '%';
+		if(total === loaded) {
+			playPause.removeAttribute('disabled');
+		}
+	}
+	
+	function loadSoundFont(url) {
+		// only load once
+		if(progress.has(url)) {
+			return; 
+		}
+		
+		// assume 100KB as avg. size before we actually know it. 
+		progress.set(url, { loaded: 0, total: 100 * 1024});
+	
+		// load via ajax
+		const request = new XMLHttpRequest();
+		request.open('GET', url, true);
+		request.responseType = 'arraybuffer';
+		request.onload = () => {
+			const buffer = new Uint8Array(request.response);
+			at.loadSoundFont(buffer, true);
+		};
+		request.onprogress = e => {
+			progress.set(url, e);
+			updateLoadingIndicator();
+		};
+		request.send();
+	}			
+	
+	// when a score is loaded, trigger load of soundfonts depending on programs. 
+	at.scoreLoaded.on(score => {
+		score.tracks.forEach(track => {
+			const program = track.playbackInfo.program;
+			if(track.playbackInfo === 9 /* drums */ || (program >= 24 && program <= 31)) {
+				loadSoundFont('sonivox-main.sf2');
+			} else {
+				loadSoundFont('sonivox-others.sf2');
+			}
+		});
+	});
+</script>
+```
+
+Let's recap what we're doing here. First we setup alphaTab with the player enabled but no SoundFont configured yet. 
+Then we add a handler to the `scoreLoaded` event which will be fired when a new music piece was loaded. Then we will inspect
+the midi programs of the individual tracks and dynamically initiate the loading of the SoundFonts. 
+
+The SoundFont loader uses a `Map` to avoid multiple loading of SoundFonts and keep track of the overall download progress. 
+In simple words: The `loadSoundFont` loads a soundfont if needed, reports the progress and initiates a SoundFont load in alphaTab once downloaded. 
+The important aspect is the second parameter of the `loadSoundFont` which indicates that the presets from the soundfont should be added and not replaced. 
+
+If we check the logic with two different files, one with guitar only, the other with a mix of instruments, we can see how only the required soundfonts are loaded.
+
+
+<img src="/img/guides/multiple-soundfonts/guitar-only.png" />
+<img src="/img/guides/multiple-soundfonts/with-piano.png" />
