@@ -5,11 +5,12 @@ import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class AccidentalGlyph extends MusicFontGlyph {
     private _isGrace: boolean;
+    private _accidentalType: AccidentalType;
 
     public constructor(x: number, y: number, accidentalType: AccidentalType, isGrace: boolean = false) {
         super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, AccidentalGlyph.getMusicSymbol(accidentalType));
-        this._isGrace = false;
         this._isGrace = isGrace;
+        this._accidentalType = accidentalType;
     }
 
     private static getMusicSymbol(accidentalType: AccidentalType): MusicFontSymbol {
@@ -26,11 +27,23 @@ export class AccidentalGlyph extends MusicFontGlyph {
                 return MusicFontSymbol.AccidentalQuarterToneSharpArrowUp;
             case AccidentalType.FlatQuarterNoteUp:
                 return MusicFontSymbol.AccidentalQuarterToneFlatArrowUp;
+            case AccidentalType.DoubleSharp:
+                return MusicFontSymbol.AccidentalDoubleSharp;
+            case AccidentalType.DoubleFlat:
+                return MusicFontSymbol.AccidentalDoubleFlat;
         }
         return MusicFontSymbol.None;
     }
 
     public doLayout(): void {
-        this.width = 8 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+        switch (this._accidentalType) {
+            case AccidentalType.DoubleFlat:
+                this.width = 18;
+                break;
+            default:
+                this.width = 8;
+                break;
+        }
+        this.width = this.width * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
     }
 }

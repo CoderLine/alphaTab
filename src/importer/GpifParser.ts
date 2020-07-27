@@ -38,6 +38,7 @@ import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 
 /**
  * This structure represents a duration within a gpif
@@ -1534,6 +1535,9 @@ export class GpifParser {
                             case 'Tone':
                                 note.tone = parseInt(c.findChildElement('Step')!.innerText);
                                 break;
+                            case 'ConcertPitch':
+                                this.parseConcertPitch(c, note);
+                                break;
                             case 'Bended':
                                 isBended = true;
                                 break;
@@ -1638,6 +1642,33 @@ export class GpifParser {
                 note.addBendPoint(new BendPoint((BendPoint.MaxPosition / 2) | 0, bendMiddleValue));
             }
             note.addBendPoint(bendDestination);
+        }
+    }
+    private parseConcertPitch(node: XmlNode, note: Note) {
+        const pitch = node.findChildElement('Pitch');
+        if (pitch) {
+            for (let c of pitch.childNodes) {
+                if (c.nodeType === XmlNodeType.Element) {
+                    switch (c.localName) {
+                        case 'Accidental':
+                            switch (c.innerText) {
+                                case 'x':
+                                    note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
+                                    break;
+                                case '#':
+                                    note.accidentalMode = NoteAccidentalMode.ForceSharp;
+                                    break;
+                                case 'b':
+                                    note.accidentalMode = NoteAccidentalMode.ForceFlat;
+                                    break;
+                                case 'bb':
+                                    note.accidentalMode = NoteAccidentalMode.ForceDoubleFlat;
+                                    break;
+                            }
+                            break;
+                    }
+                }
+            }
         }
     }
 

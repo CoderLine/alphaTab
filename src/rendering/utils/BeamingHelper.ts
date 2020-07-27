@@ -10,9 +10,9 @@ import { Voice } from '@src/model/Voice';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatLinePositions } from '@src/rendering/utils/BeatLinePositions';
 import { IBeamYCalculator } from '@src/rendering/utils/IBeamYCalculator';
-import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MidiUtils } from '@src/midi/MidiUtils';
+import { AccidentalHelper } from './AccidentalHelper';
 
 /**
  * This public class helps drawing beams and bars for notes.
@@ -82,15 +82,8 @@ export class BeamingHelper {
         this.beats = [];
     }
 
-    private getValue(n: Note): number {
-        if (this._staff.isPercussion) {
-            return PercussionMapper.mapNoteForDisplay(n.displayValue);
-        }
-        return n.displayValue;
-    }
-
     private getMaxValue(n: Note): number {
-        let value: number = this.getValue(n);
+        let value: number = AccidentalHelper.getNoteValue(n);
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             value = n.realValue - this._staff.displayTranspositionPitch;
         }
@@ -98,7 +91,7 @@ export class BeamingHelper {
     }
 
     private getMinValue(n: Note): number {
-        return this.getValue(n);
+        return AccidentalHelper.getNoteValue(n);
     }
 
     public getBeatLineX(beat: Beat): number {
@@ -241,7 +234,7 @@ export class BeamingHelper {
             return;
         }
 
-        let value: number = this.getValue(note);
+        let value: number = AccidentalHelper.getNoteValue(note);
         if (this.beats.length === 1 && this.beats[0] === note.beat) {
             if (this.firstMinNoteValue === -1 || value < this.firstMinNoteValue) {
                 this.firstMinNoteValue = value;

@@ -434,24 +434,23 @@ export class Note {
         return 0;
     }
 
-    public get displayValue(): number {
-        let noteValue: number = this.displayValueWithoutBend;
+    public get initialBendValue(): number {
         if (this.hasBend) {
-            noteValue += (this.bendPoints[0].value / 2) | 0;
+            return (this.bendPoints[0].value / 2) | 0;
         } else if (this.bendOrigin) {
-            noteValue += (this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2) | 0;
+            return (this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2) | 0;
         } else if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
-            noteValue +=
-                (this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2) | 0;
+            return (this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2) | 0;
         } else if (this.beat.hasWhammyBar) {
-            noteValue += (this.beat.whammyBarPoints[0].value / 2) | 0;
+            return (this.beat.whammyBarPoints[0].value / 2) | 0;
         } else if (this.beat.isContinuedWhammy) {
-            noteValue +=
-                (this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value /
-                    2) |
-                0;
+            return (this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value / 2) | 0;
         }
-        return noteValue;
+        return 0;
+    }
+
+    public get displayValue(): number {
+        return this.displayValueWithoutBend + this.initialBendValue;
     }
 
     public get displayValueWithoutBend(): number {
@@ -507,7 +506,7 @@ export class Note {
         if (this.beat.isContinuedWhammy) {
             return (
                 this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value %
-                    2 !==
+                2 !==
                 0
             );
         }
@@ -575,6 +574,7 @@ export class Note {
     public finish(settings: Settings): void {
         let nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
         let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
+
         // connect ties
         if (this.isTieDestination) {
             this.chain();
@@ -716,6 +716,12 @@ export class Note {
             }
         } else if (this.bendPoints.length === 0) {
             this.bendType = BendType.None;
+        }
+
+        // initial bend pitch offsets and forced accidentals don't play well together
+        // we reset it
+        if(this.initialBendValue > 0) {
+            this.accidentalMode = NoteAccidentalMode.Default;
         }
     }
 
