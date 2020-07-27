@@ -1,5 +1,6 @@
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
+import { AccidentalGlyph } from './AccidentalGlyph';
 
 class AccidentalColumnInfo {
     public x: number = 0;
@@ -8,8 +9,10 @@ class AccidentalColumnInfo {
 }
 
 export class AccidentalGroupGlyph extends GlyphGroup {
-    public constructor() {
+    private _isGrace:boolean;
+    public constructor(isGrace:boolean) {
         super(0, 0);
+        this._isGrace = isGrace;
     }
 
     public doLayout(): void {
@@ -35,7 +38,7 @@ export class AccidentalGroupGlyph extends GlyphGroup {
         columns.push(new AccidentalColumnInfo());
         let accidentalHeight: number = 21 * this.scale;
         for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
-            let g: Glyph = this.glyphs[i];
+            let g = this.glyphs[i] as AccidentalGlyph;
             g.renderer = this.renderer;
             g.doLayout();
             // find column where glyph fits into
@@ -61,19 +64,22 @@ export class AccidentalGroupGlyph extends GlyphGroup {
         // Place accidentals in columns
         //
         let padding: number = 2 * this.scale;
-        this.width = padding;
-        let columnX = 0;
+        this.width = 0;
         for (const column of columns) {
             this.width += column.width;
-            column.x = columnX - column.width;
-            columnX = column.x;
-        }   
+            column.x = this.width;
+        }
+        this.width += padding;
 
         for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
             let g: Glyph = this.glyphs[i];
 
             const column = columns[g.x];
-            g.x = padding + (this.width + column.x);
+            g.x = padding + (this.width - column.x);
+        }
+
+        if(this._isGrace) {
+            this.width += padding;
         }
     }
 }

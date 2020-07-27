@@ -11,6 +11,10 @@ export enum NoteAccidentalMode {
      */
     SwapAccidentals,
     /**
+     * This will try to ensure that no accidental is shown.
+     */
+    ForceNone,
+    /**
      * This will move the note one line down and applies a Naturalize.
      */
     ForceNatural,
@@ -29,5 +33,5 @@ export enum NoteAccidentalMode {
     /**
      * This will move the note two half notes up with a double flag symbol.
      */
-    ForceDoubleFlat
+    ForceDoubleFlat,
 }

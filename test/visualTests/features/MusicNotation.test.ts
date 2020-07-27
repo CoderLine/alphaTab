@@ -22,7 +22,7 @@ describe('MusicNotationTests', () => {
     it('key-signatures', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
-        await VisualTestHelper.runVisualTest('features/music-notation/key-signatures.gp5', settings);
+        await VisualTestHelper.runVisualTest('features/music-notation/key-signatures.gp', settings);
     });
 
     it('time-signatures', async () => {
@@ -41,5 +41,11 @@ describe('MusicNotationTests', () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('features/music-notation/accidentals.gp5', settings);
+    });
+
+    it('forced-accidentals', async () => {
+        let settings: Settings = new Settings();
+        settings.display.staveProfile = StaveProfile.Score;
+        await VisualTestHelper.runVisualTest('features/music-notation/forced-accidentals.gp', settings, [0, 1]);
     });
 });

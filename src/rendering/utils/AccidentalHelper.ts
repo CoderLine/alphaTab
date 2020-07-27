@@ -72,7 +72,7 @@ export class AccidentalHelper {
      */
     private static FlatNoteSteps: number[] = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6];
 
-    private _registeredAccidentals: Map<number, boolean> = new Map();
+    private _registeredAccidentals: Map<number, AccidentalType> = new Map();
     private _appliedScoreLines: Map<number, number> = new Map();
     private _appliedScoreLinesByValue: Map<number, number> = new Map();
     private _notesByValue: Map<number, Note> = new Map();
@@ -86,6 +86,31 @@ export class AccidentalHelper {
         this._bar = bar;
     }
 
+    public static getNoteValue(note: Note) {
+        let staff: Staff = note.beat.voice.bar.staff;
+        let noteValue: number = staff.isPercussion
+            ? PercussionMapper.mapNoteForDisplay(note.displayValue)
+            : note.displayValue;
+
+        // adjust note height according to accidentals enforced
+        switch (note.accidentalMode) {
+            case NoteAccidentalMode.ForceDoubleFlat:
+                noteValue += 2;
+                break;
+            case NoteAccidentalMode.ForceDoubleSharp:
+                noteValue -= 2;
+                break;
+            case NoteAccidentalMode.ForceFlat:
+                noteValue += 1;
+                break;
+            case NoteAccidentalMode.ForceSharp:
+                noteValue -= 1;
+                break;
+        }
+        
+        return noteValue;
+    }
+
     /**
      * Calculates the accidental for the given note and assignes the value to it.
      * The new accidental type is also registered within the current scope
@@ -93,12 +118,9 @@ export class AccidentalHelper {
      * @returns
      */
     public applyAccidental(note: Note): AccidentalType {
-        let staff: Staff = this._bar.staff;
-        let noteValue: number = staff.isPercussion
-            ? PercussionMapper.mapNoteForDisplay(note.displayValue)
-            : note.displayValue;
+        const noteValue = AccidentalHelper.getNoteValue(note);
+
         let quarterBend: boolean = note.hasQuarterToneOffset;
-        let line: number = this.registerNoteLine(note, noteValue);
         if (this.minNoteValue === -1 || noteValue < this.minNoteValue) {
             this.minNoteValue = noteValue;
             this.minNoteValueBeat = note.beat;
@@ -108,7 +130,7 @@ export class AccidentalHelper {
             this.maxNoteValueBeat = note.beat;
         }
 
-        return this.getAccidental(line, noteValue, quarterBend, note.accidentalMode);
+        return this.getAccidental(noteValue, quarterBend, note);
     }
 
     /**
@@ -124,7 +146,6 @@ export class AccidentalHelper {
         if (staff.isPercussion) {
             noteValue = PercussionMapper.mapNoteForDisplay(noteValue);
         }
-        let line: number = this.registerNoteValueLine(noteValue);
         if (this.minNoteValue === -1 || noteValue < this.minNoteValue) {
             this.minNoteValue = noteValue;
             this.minNoteValueBeat = relatedBeat;
@@ -133,79 +154,121 @@ export class AccidentalHelper {
             this.maxNoteValue = noteValue;
             this.maxNoteValueBeat = relatedBeat;
         }
-        return this.getAccidental(line, noteValue, quarterBend, NoteAccidentalMode.Default);
+        return this.getAccidental(noteValue, quarterBend);
     }
 
-    private getAccidental(line: number, noteValue: number, quarterBend: boolean, accidentalMode: NoteAccidentalMode): AccidentalType {
+    private getAccidental(noteValue: number, quarterBend: boolean, note: Note | null = null): AccidentalType {
+        const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
+
+        let line: number = this.calculateNoteLine(noteValue, accidentalMode);
+        if (note) {
+            this._appliedScoreLines.set(note.id, line);
+            this._notesByValue.set(noteValue, note);
+        } else {
+            this._appliedScoreLinesByValue.set(noteValue, line);
+        }
+
         let accidentalToSet: AccidentalType = AccidentalType.None;
+
         if (!this._bar.staff.isPercussion) {
             let ks: number = this._bar.masterBar.keySignature;
             let ksi: number = ks + 7;
             let index: number = noteValue % 12;
-            // the key signature symbol required according to
-            let keySignatureAccidental: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
-            // determine whether the current note requires an accidental according to the key signature
-            let hasNoteAccidentalForKeySignature: boolean = AccidentalHelper.KeySignatureLookup[ksi][index];
-            let isAccidentalNote: boolean = AccidentalHelper.AccidentalNotes[index];
 
-            switch (accidentalMode) {
-                case NoteAccidentalMode.ForceSharp:
-                case NoteAccidentalMode.ForceDoubleSharp:
-                case NoteAccidentalMode.ForceFlat:
-                case NoteAccidentalMode.ForceDoubleFlat:
-                    isAccidentalNote = true;
-                    break;
-            }
+            let accidentalForKeySignature: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
+            let hasKeySignatureAccidentalSetForNote: boolean = AccidentalHelper.KeySignatureLookup[ksi][index];
+            let hasNoteAccidentalWithinOctave: boolean = AccidentalHelper.AccidentalNotes[index];
+
+            // the general logic is like this: 
+            // - we check if the key signature has an accidental defined
+            // - we calculate which accidental a note needs according to its index in the octave
+            // - if the accidental is already placed at this line, nothing needs to be done, otherwise we place it
+            // - if there should not be an accidental, but there is one in the key signature, we clear it. 
+
+            // the exceptions are: 
+            // - for quarter bends we just place the corresponding accidental
+            // - the accidental mode can enforce the accidentals for the note 
 
             if (quarterBend) {
-                accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                accidentalToSet = hasNoteAccidentalWithinOctave ? accidentalForKeySignature : AccidentalType.Natural;
+                switch (accidentalToSet) {
+                    case AccidentalType.Natural:
+                        accidentalToSet = AccidentalType.NaturalQuarterNoteUp;
+                        break;
+                    case AccidentalType.Sharp:
+                        accidentalToSet = AccidentalType.SharpQuarterNoteUp;
+                        break;
+                    case AccidentalType.Flat:
+                        accidentalToSet = AccidentalType.FlatQuarterNoteUp;
+                        break;
+                }
             } else {
-                let isAccidentalRegistered: boolean = this._registeredAccidentals.has(line);
-                if (hasNoteAccidentalForKeySignature !== isAccidentalNote && !isAccidentalRegistered) {
-                    this._registeredAccidentals.set(line, true);
-                    accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
-                } else if (hasNoteAccidentalForKeySignature === isAccidentalNote && isAccidentalRegistered) {
-                    this._registeredAccidentals.delete(line);
-                    accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                // define which accidental should be shown ignoring what might be set on the KS already
+                switch (accidentalMode) {
+                    case NoteAccidentalMode.ForceSharp:
+                        accidentalToSet = AccidentalType.Sharp;
+                        hasNoteAccidentalWithinOctave = true;
+                        break;
+                    case NoteAccidentalMode.ForceDoubleSharp:
+                        accidentalToSet = AccidentalType.DoubleSharp;
+                        hasNoteAccidentalWithinOctave = true;
+                        break;
+                    case NoteAccidentalMode.ForceFlat:
+                        accidentalToSet = AccidentalType.Flat;
+                        hasNoteAccidentalWithinOctave = true;
+                        break;
+                    case NoteAccidentalMode.ForceDoubleFlat:
+                        accidentalToSet = AccidentalType.DoubleFlat;
+                        hasNoteAccidentalWithinOctave = true;
+                        break;
+                    default:
+                        // if note has an accidental in the octave, we place a symbol 
+                        // according to the Key Signature
+                        if (hasNoteAccidentalWithinOctave) {
+                            accidentalToSet = accidentalForKeySignature;
+                        } else if (hasKeySignatureAccidentalSetForNote) {
+                            // note does not get an accidental, but KS defines one -> Naturalize
+                            accidentalToSet = AccidentalType.Natural;
+                        }
+                        break;
+                }
+
+                // do we need an accidental on the note?
+                if (accidentalToSet !== AccidentalType.None) {
+                    // if we already have an accidental on this line we will reset it if it's the same
+                    if (this._registeredAccidentals.has(line)) {
+                        if (this._registeredAccidentals.get(line) === accidentalToSet) {
+                            accidentalToSet = AccidentalType.None;
+                        }
+                    }
+                    // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
+                    else if (hasKeySignatureAccidentalSetForNote && accidentalToSet === accidentalForKeySignature) {
+                        accidentalToSet = AccidentalType.None;
+                    }
+
+                    // register the new accidental on the line if any. 
+                    if (accidentalToSet != AccidentalType.None) {
+                        this._registeredAccidentals.set(line, accidentalToSet);
+                    }
+                }
+                else {
+                    // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
+                    // and clear the registration
+                    if (this._registeredAccidentals.has(line)) {
+                        // if there is already a naturalize symbol on the line, we don't care. 
+                        if (this._registeredAccidentals.get(line) === AccidentalType.Natural) {
+                            accidentalToSet = AccidentalType.None;
+                        } else {
+                            accidentalToSet = AccidentalType.Natural;
+                            this._registeredAccidentals.set(line, accidentalToSet);
+                        }
+                    } else {
+                        this._registeredAccidentals.delete(line);
+                    }
                 }
             }
         }
-        // TODO: change accidentalToSet according to note.AccidentalMode
-        if (quarterBend) {
-            switch (accidentalToSet) {
-                case AccidentalType.Natural:
-                    return AccidentalType.NaturalQuarterNoteUp;
-                case AccidentalType.Sharp:
-                    return AccidentalType.SharpQuarterNoteUp;
-                case AccidentalType.Flat:
-                    return AccidentalType.FlatQuarterNoteUp;
-            }
-        } else {
-            switch (accidentalMode) {
-                case NoteAccidentalMode.ForceSharp:
-                    return AccidentalType.Sharp;
-                case NoteAccidentalMode.ForceDoubleSharp:
-                    return AccidentalType.DoubleSharp;
-                case NoteAccidentalMode.ForceFlat:
-                    return AccidentalType.Flat;
-                case NoteAccidentalMode.ForceDoubleFlat:
-                    return AccidentalType.DoubleFlat;
-            }
-        }
         return accidentalToSet;
-    }
-
-    private registerNoteLine(n: Note, noteValue: number): number {
-        let steps: number = this.calculateNoteLine(noteValue, n.accidentalMode);
-        this._appliedScoreLines.set(n.id, steps);
-        this._notesByValue.set(noteValue, n);
-        return steps;
-    }
-
-    private registerNoteValueLine(noteValue: number): number {
-        let steps: number = this.calculateNoteLine(noteValue, NoteAccidentalMode.Default);
-        this._appliedScoreLinesByValue.set(noteValue, steps);
-        return steps;
     }
 
     private calculateNoteLine(noteValue: number, mode: NoteAccidentalMode): number {

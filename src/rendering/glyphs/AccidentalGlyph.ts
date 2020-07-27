@@ -41,7 +41,7 @@ export class AccidentalGlyph extends MusicFontGlyph {
                 this.width = 18;
                 break;
             default:
-                this.width = 9;
+                this.width = 8;
                 break;
         }
         this.width = this.width * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;

@@ -38,7 +38,6 @@ import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { ModelUtils } from '@src/model/ModelUtils';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 
 /**
@@ -1651,12 +1650,6 @@ export class GpifParser {
             for (let c of pitch.childNodes) {
                 if (c.nodeType === XmlNodeType.Element) {
                     switch (c.localName) {
-                        case 'Octave':
-                            note.displayOctave = parseInt(c.innerText);
-                            break;
-                        case 'Step':
-                            note.displayTone = ModelUtils.getToneForText(c.innerText);
-                            break;
                         case 'Accidental':
                             switch (c.innerText) {
                                 case 'x':
