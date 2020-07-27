@@ -1,0 +1,71 @@
+---
+title: Song Details
+since: 1.0.0
+---
+
+alphaTab follows the approach of Guitar Pro and shows the song details like title and artist only on the page layout. 
+On the horizontal layout no details are shown. This is mainly because only the page layout with a known width at the start
+can properly align the song details as header. 
+
+While alphaTab could align also show the song details left aligned, this has caused some other issues on layouting and hence
+the recommendation has become a different one. 
+
+Instead of relying on the built-in functionality to show the song details we recommend to you to show the details
+somewhere outside of alphaTab on your page.
+
+The song details can be obtained on the [`scoreLoaded`](/docs/reference/api/scoreloaded/) where the full [data model](/docs/reference/score) can be accessed. 
+
+At the same time you might want to disable that alphaTab also shows the song information when using the page layout using the [notation.elements](/docs/reference/settings/notation/elements/) setting.
+This will allow you to build a way better integrated UI for your website than relying on the built-in song detail rendering. 
+
+```html
+<style>
+#song-details {
+	font-family: 'Georgia';
+}
+/* Hide empty elements */
+#song-details > *:empty {
+   display: none;
+}
+#song-details h1, #song-details h2 {
+    text-align: center;
+}
+</style>
+<div id="song-details">
+    <h1 class="title"></h1>
+    <h2 class="subtitle"></h2>
+    <h2 class="artist"></h2>
+    <h3 class="album"></h3>
+</div>
+<div id="alphaTab"></div>
+<script>
+const songDetails = document.querySelector('#song-details');
+const at = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'), {
+	display: {
+		layoutMode: 'horizontal'
+	}
+    notation: {
+        elements: {
+            ScoreTitle: false,
+            ScoreSubTitle: false,
+            ScoreArtist: false,
+            ScoreAlbum: false,
+            ScoreWords: false,
+            ScoreMusic: false,
+            ScoreWordsAndMusic: false,
+            ScoreCopyright: false
+        }
+    }
+});
+at.scoreLoaded.on(score => {
+	songDetails.querySelector('.title').innerText = score.title;
+	songDetails.querySelector('.subTitle').innerText = score.subTitle;
+	songDetails.querySelector('.artist').innerText = score.artist;
+	songDetails.querySelector('.album').innerText = score.album;
+})
+</script>
+```
+
+This will result in something like:
+
+<img src="/img/guides/song-details/result.png" />
