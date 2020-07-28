@@ -35,6 +35,7 @@ import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { Color } from '@src/model/Color';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
@@ -47,6 +48,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     private static readonly StemWidth: number = 1.3;
 
     public simpleWhammyOverflow: number = 0;
+    private _firstLineY:number = 0;
 
     public accidentalHelper: AccidentalHelper;
 
@@ -74,19 +76,24 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         this.topPadding = glyphOverflow;
         this.bottomPadding = glyphOverflow;
         this.height = this.lineOffset * 4 + this.topPadding + this.bottomPadding;
+
+        let staffContentHeight = this.height - this.topPadding - this.bottomPadding;
+        let actualLineHeight = (this.bar.staff.standardNotationLineCount - 1) * this.lineOffset;
+        this._firstLineY = this.topPadding + (staffContentHeight - actualLineHeight) / 2;
+
         super.updateSizes();
     }
 
     public doLayout(): void {
         super.doLayout();
-        if (!this.bar.isEmpty && this.accidentalHelper.maxNoteValueBeat) {
+        if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
             let top: number = this.getScoreY(0, 0);
             let bottom: number = this.getScoreY(8, 0);
             let whammyOffset: number = this.simpleWhammyOverflow;
             this.registerOverflowTop(whammyOffset);
-            let maxNoteY: number = this.getYPositionForNoteValue(this.accidentalHelper.maxNoteValue);
+            let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine, 0);
             let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
-                this.accidentalHelper.maxNoteValueBeat
+                this.accidentalHelper.maxLineBeat
             );
             if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
@@ -101,9 +108,9 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             if (maxNoteY < top) {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
             }
-            let minNoteY: number = this.getYPositionForNoteValue(this.accidentalHelper.minNoteValue);
+            let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine, 0);
             let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
-                this.accidentalHelper.minNoteValueBeat!
+                this.accidentalHelper.minLineBeat!
             );
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
@@ -590,6 +597,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             switch (this.bar.clef) {
                 case Clef.Neutral:
                     offset = 6;
+                    correction = 1;
                     break;
                 case Clef.F4:
                     offset = 4;
@@ -606,6 +614,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                     break;
             }
             this.createStartSpacing();
+            
             this.addPreBeatGlyph(
                 new ClefGlyph(0, this.getScoreY(offset, correction), this.bar.clef, this.bar.clefOttava)
             );
@@ -764,26 +773,23 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
      * @returns
      */
     public getScoreY(steps: number, correction: number = 0): number {
-        return (this.lineOffset / 2) * steps + correction * this.scale;
+        return this.lineOffset + (this.lineOffset / 2) * steps + correction * this.scale;
     }
 
     // private static readonly Random Random = new Random();
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
+        canvas.color = new Color(255,0,0,80);
+        canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
         let res: RenderingResources = this.resources;
-        // var c = new Color((byte)Platform.Random(255),
-        //                  (byte)Platform.Random(255),
-        //                  (byte)Platform.Random(255),
-        //                  100);
-        // canvas.Color = c;
-        // canvas.FillRect(cx + X, cy + Y, Width, Height);
         //
         // draw string lines
         //
         canvas.color = res.staffLineColor;
-        let lineY: number = cy + this.y + this.topPadding;
+
+        let lineY: number = cy + this.y + this._firstLineY;
         let lineOffset: number = this.lineOffset;
-        for (let i: number = 0; i < 5; i++) {
+        for (let i: number = 0; i < this.bar.staff.standardNotationLineCount; i++) {
             if (i > 0) {
                 lineY += lineOffset;
             }

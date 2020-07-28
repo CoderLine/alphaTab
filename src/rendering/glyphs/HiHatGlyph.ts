@@ -6,7 +6,7 @@ export class HiHatGlyph extends MusicFontGlyph {
     private _isGrace: boolean;
 
     public constructor(x: number, y: number, isGrace: boolean) {
-        super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteHiHat);
+        super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteCircleX);
         this._isGrace = isGrace;
     }
 

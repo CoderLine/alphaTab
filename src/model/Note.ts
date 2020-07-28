@@ -14,7 +14,6 @@ import { SlideOutType } from '@src/model/SlideOutType';
 import { Staff } from '@src/model/Staff';
 import { VibratoType } from '@src/model/VibratoType';
 import { NotationMode } from '@src/NotationSettings';
-import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
 import { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 import { Logger } from '@src/Logger';
@@ -108,18 +107,109 @@ export class Note {
     public tone: number = -1;
 
     public get isPercussion(): boolean {
-        return !this.isStringed && this.element >= 0 && this.variation >= 0;
+        return !this.isStringed && this.percussionMidiNumber >= 0;
     }
 
     /**
-     * Gets or sets the percusson element.
+     * Gets or sets the midi number of the percussion element. 
+     * The percussion elements are as per the following list (based on GP7):
+     * - 029 Ride (choke)
+     * - 030 Cymbal (hit)
+     * - 031 Snare (side stick)
+     * - 033 Snare (side stick)
+     * - 034 Snare (hit)
+     * - 035 Kick (hit)
+     * - 036 Kick (hit)
+     * - 037 Snare (side stick)
+     * - 038 Snare (hit)
+     * - 039 Hand Clap (hit)
+     * - 040 Snare (hit)
+     * - 041 Low Floor Tom (hit)
+     * - 042 Hi-Hat (closed)
+     * - 043 Very Low Tom (hit)
+     * - 044 Pedal Hi-Hat (hit)
+     * - 045 Low Tom (hit)
+     * - 046 Hi-Hat (open)
+     * - 047 Mid Tom (hit)
+     * - 048 High Tom (hit)
+     * - 049 Crash high (hit)
+     * - 050 High Floor Tom (hit)
+     * - 051 Ride (middle)
+     * - 052 Chana (hit)
+     * - 053 Ride (bell)
+     * - 054 Tambourine (hit)
+     * - 055 Splash (hit)
+     * - 056 Cowbell medium (hit)
+     * - 057 Crash medium (hit)
+     * - 058 Vibraslap (hit)
+     * - 059 Ride (edge)
+     * - 060 Hand (hit)
+     * - 061 Hand (hit)
+     * - 062 Conga high (mute)
+     * - 063 Conga high (hit)
+     * - 064 Conga low (hit)
+     * - 065 Timbale high (hit)
+     * - 066 Timbale low (hit)
+     * - 067 Agogo high (hit)
+     * - 068 Agogo tow (hit)
+     * - 069 Cabasa (hit)
+     * - 070 Left Maraca (hit)
+     * - 071 Whistle high (hit)
+     * - 072 Whistle low (hit)
+     * - 073 Guiro (hit)
+     * - 074 Guiro (scrap-return)
+     * - 075 Claves (hit)
+     * - 076 Woodblock high (hit)
+     * - 077 Woodblock low (hit)
+     * - 078 Cuica (mute)
+     * - 079 Cuica (open)
+     * - 080 Triangle (rnute)
+     * - 081 Triangle (hit)
+     * - 082 Shaker (hit)
+     * - 083 Tinkle Bell (hat)
+     * - 083 Jingle Bell (hit)
+     * - 084 Bell Tree (hit)
+     * - 085 Castanets (hit)
+     * - 086 Surdo (hit)
+     * - 087 Surdo (mute)
+     * - 091 Snare (rim shot)
+     * - 092 Hi-Hat (half)
+     * - 093 Ride (edge)
+     * - 094 Ride (choke)
+     * - 095 Splash (choke)
+     * - 096 China (choke)
+     * - 097 Crash high (choke)
+     * - 098 Crash medium (choke)
+     * - 099 Cowbell low (hit)
+     * - 100 Cowbell low (tip)
+     * - 101 Cowbell medium (tip)
+     * - 102 Cowbell high (hit)
+     * - 103 Cowbell high (tip)
+     * - 104 Hand (mute)
+     * - 105 Hand (slap)
+     * - 106 Hand (mute)
+     * - 107 Hand (slap)
+     * - 108 Conga low (slap)
+     * - 109 Conga low (mute)
+     * - 110 Conga high (slap)
+     * - 111 Tambourine (return)
+     * - 112 Tambourine (roll)
+     * - 113 Tambourine (hand)
+     * - 114 Grancassa (hit)
+     * - 115 Piatti (hat)
+     * - 116 Piatti (hand)
+     * - 117 Cabasa (return)
+     * - 118 Left Maraca (return)
+     * - 119 Right Maraca (hit)
+     * - 120 Right Maraca (return)
+     * - 122 Shaker (return)
+     * - 123 Bell Tee (return)
+     * - 124 Golpe (thumb)
+     * - 125 Golpe (finger)
+     * - 126 Ride (middle)
+     * - 127 Ride (bell)
      */
-    public element: number = -1;
-
-    /**
-     * Gets or sets the variation of this note.
-     */
-    public variation: number = -1;
+    public percussionMidiNumber: number = -1;
 
     /**
      * Gets or sets whether this note is visible on the music sheet.
@@ -340,7 +430,7 @@ export class Note {
 
     public get realValue(): number {
         if (this.isPercussion) {
-            return PercussionMapper.midiFromElementVariation(this);
+            return this.percussionMidiNumber;
         }
         if (this.isStringed) {
             if (this.harmonicType === HarmonicType.Natural) {
@@ -541,8 +631,8 @@ export class Note {
         dst.dynamics = src.dynamics;
         dst.octave = src.octave;
         dst.tone = src.tone;
-        dst.element = src.element;
-        dst.variation = src.variation;
+        dst.percussionMidiNumber = src.percussionMidiNumber;
+        dst.percussionMidiNumber = src.percussionMidiNumber;
         dst.bendType = src.bendType;
         dst.bendStyle = src.bendStyle;
         dst.isContinuedBend = src.isContinuedBend;

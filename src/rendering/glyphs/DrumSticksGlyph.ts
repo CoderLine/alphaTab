@@ -6,7 +6,7 @@ export class DrumSticksGlyph extends MusicFontGlyph {
     private _isGrace: boolean;
 
     public constructor(x: number, y: number, isGrace: boolean) {
-        super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteSideStick);
+        super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteXBlack);
         this._isGrace = isGrace;
     }
 

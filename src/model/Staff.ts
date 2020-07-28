@@ -76,6 +76,12 @@ export class Staff {
      */
     public isPercussion: boolean = false;
 
+    /**
+     * The number of lines shown for the standard notation. 
+     * For some percussion instruments this number might vary. 
+     */
+    public standardNotationLineCount: number = 5;
+
     public static copyTo(src: Staff, dst: Staff): void {
         dst.capo = src.capo;
         dst.index = src.index;
@@ -85,6 +91,7 @@ export class Staff {
         dst.showStandardNotation = src.showStandardNotation;
         dst.showTablature = src.showTablature;
         dst.isPercussion = src.isPercussion;
+        dst.standardNotationLineCount = src.standardNotationLineCount;
     }
 
     public finish(settings: Settings): void {

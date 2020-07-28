@@ -39,6 +39,7 @@ import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
 
 /**
  * This structure represents a duration within a gpif
@@ -416,6 +417,12 @@ export class GpifParser {
                             for (let staff of track.staves) {
                                 staff.isPercussion = true;
                             }
+                        }
+                        break;
+                    case 'LineCount':
+                        const lineCount = parseInt(c.innerText);
+                        for (let staff of track.staves) {
+                            staff.standardNotationLineCount = lineCount;
                         }
                         break;
                 }
@@ -1464,6 +1471,10 @@ export class GpifParser {
         let bendMiddleOffset1: number | null = null;
         let bendMiddleOffset2: number | null = null;
         let bendDestination: BendPoint | null = null;
+
+        // GP6 had percussion as element+variation
+        let element: number = -1;
+        let variation: number = -1;
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -1477,10 +1488,13 @@ export class GpifParser {
                                 note.fret = parseInt(c.findChildElement('Fret')!.innerText);
                                 break;
                             case 'Element':
-                                note.element = parseInt(c.findChildElement('Element')!.innerText);
+                                element = parseInt(c.findChildElement('Element')!.innerText);
                                 break;
                             case 'Variation':
-                                note.variation = parseInt(c.findChildElement('Variation')!.innerText);
+                                variation = parseInt(c.findChildElement('Variation')!.innerText);
+                                break;
+                            case 'Midi':
+                                note.percussionMidiNumber = parseInt(c.findChildElement('Number')!.innerText);
                                 break;
                             case 'Tapped':
                                 this._tappedNotes.set(noteId, true);
@@ -1624,6 +1638,7 @@ export class GpifParser {
                 }
             }
         }
+
         if (isBended) {
             if (!bendOrigin) {
                 bendOrigin = new BendPoint(0, 0);
@@ -1643,7 +1658,13 @@ export class GpifParser {
             }
             note.addBendPoint(bendDestination);
         }
+
+        // map GP6 element and variation combos to midi numbers
+        if (element !== -1 && variation !== -1) {
+            note.percussionMidiNumber = PercussionMapper.midiFromElementVariation(element, variation);
+        }
     }
+
     private parseConcertPitch(node: XmlNode, note: Note) {
         const pitch = node.findChildElement('Pitch');
         if (pitch) {
@@ -1802,7 +1823,12 @@ export class GpifParser {
                                             if (this._notesOfBeat.has(beatId)) {
                                                 for (let noteId of this._notesOfBeat.get(beatId)!) {
                                                     if (noteId !== GpifParser.InvalidId) {
-                                                        beat.addNote(this._noteById.get(noteId)!.clone());
+                                                        const note = this._noteById.get(noteId)!.clone();
+                                                        // reset midi value for non-percussion staves
+                                                        if (!staff.isPercussion) {
+                                                            note.percussionMidiNumber = -1;
+                                                        }
+                                                        beat.addNote(note);
                                                         if (this._tappedNotes.has(noteId)) {
                                                             beat.tap = true;
                                                         }

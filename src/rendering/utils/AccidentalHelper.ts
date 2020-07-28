@@ -4,8 +4,6 @@ import { Beat } from '@src/model/Beat';
 import { Clef } from '@src/model/Clef';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { Staff } from '@src/model/Staff';
-import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
@@ -60,7 +58,7 @@ export class AccidentalHelper {
      * Those are the amount of steps for the different clefs in case of a note value 0
      * [Neutral, C3, C4, F4, G2]
      */
-    private static OctaveSteps: number[] = [40, 34, 32, 28, 40];
+    private static OctaveSteps: number[] = [38, 32, 30, 26, 38];
 
     /**
      * The step offsets of the notes within an octave in case of for sharp keysignatures
@@ -77,20 +75,31 @@ export class AccidentalHelper {
     private _appliedScoreLinesByValue: Map<number, number> = new Map();
     private _notesByValue: Map<number, Note> = new Map();
 
-    public maxNoteValueBeat: Beat | null = null;
-    public minNoteValueBeat: Beat | null = null;
-    public maxNoteValue: number = -1;
-    public minNoteValue: number = -1;
+    /**
+     * The beat on which the highest note of this helper was added.
+     * Used together with beaming helper to calculate overflow.
+     */
+    public maxLineBeat: Beat | null = null;
+    /**
+     * The beat on which the lowest note of this helper was added.
+     * Used together with beaming helper to calculate overflow.
+     */
+    public minLineBeat: Beat | null = null;
+    /**
+     * The line of the highest note added to this helper.
+     */
+    public maxLine: number = -1;
+    /**
+     * The line of the lowest note added to this helper.
+     */
+    public minLine: number = -1;
 
     public constructor(bar: Bar) {
         this._bar = bar;
     }
 
     public static getNoteValue(note: Note) {
-        let staff: Staff = note.beat.voice.bar.staff;
-        let noteValue: number = staff.isPercussion
-            ? PercussionMapper.mapNoteForDisplay(note.displayValue)
-            : note.displayValue;
+        let noteValue: number = note.displayValue;
 
         // adjust note height according to accidentals enforced
         switch (note.accidentalMode) {
@@ -107,7 +116,7 @@ export class AccidentalHelper {
                 noteValue -= 1;
                 break;
         }
-        
+
         return noteValue;
     }
 
@@ -119,18 +128,8 @@ export class AccidentalHelper {
      */
     public applyAccidental(note: Note): AccidentalType {
         const noteValue = AccidentalHelper.getNoteValue(note);
-
         let quarterBend: boolean = note.hasQuarterToneOffset;
-        if (this.minNoteValue === -1 || noteValue < this.minNoteValue) {
-            this.minNoteValue = noteValue;
-            this.minNoteValueBeat = note.beat;
-        }
-        if (this.maxNoteValue === -1 || noteValue > this.maxNoteValue) {
-            this.maxNoteValue = noteValue;
-            this.maxNoteValueBeat = note.beat;
-        }
-
-        return this.getAccidental(noteValue, quarterBend, note);
+        return this.getAccidental(noteValue, quarterBend, note, note.beat);
     }
 
     /**
@@ -142,35 +141,19 @@ export class AccidentalHelper {
      * @returns
      */
     public applyAccidentalForValue(relatedBeat: Beat, noteValue: number, quarterBend: boolean): AccidentalType {
-        let staff: Staff = this._bar.staff;
-        if (staff.isPercussion) {
-            noteValue = PercussionMapper.mapNoteForDisplay(noteValue);
-        }
-        if (this.minNoteValue === -1 || noteValue < this.minNoteValue) {
-            this.minNoteValue = noteValue;
-            this.minNoteValueBeat = relatedBeat;
-        }
-        if (this.maxNoteValue === -1 || noteValue > this.maxNoteValue) {
-            this.maxNoteValue = noteValue;
-            this.maxNoteValueBeat = relatedBeat;
-        }
-        return this.getAccidental(noteValue, quarterBend);
+        return this.getAccidental(noteValue, quarterBend, null, relatedBeat);
     }
 
-    private getAccidental(noteValue: number, quarterBend: boolean, note: Note | null = null): AccidentalType {
-        const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
-
-        let line: number = this.calculateNoteLine(noteValue, accidentalMode);
-        if (note) {
-            this._appliedScoreLines.set(note.id, line);
-            this._notesByValue.set(noteValue, note);
-        } else {
-            this._appliedScoreLinesByValue.set(noteValue, line);
-        }
-
+    private getAccidental(noteValue: number, quarterBend: boolean, note: Note | null = null, relatedBeat: Beat): AccidentalType {
         let accidentalToSet: AccidentalType = AccidentalType.None;
+        let line:number = 0;
 
         if (!this._bar.staff.isPercussion) {
+            // 
+        } else {
+            const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
+            let line: number = this.calculateNoteLine(noteValue, accidentalMode, note);
+            
             let ks: number = this._bar.masterBar.keySignature;
             let ksi: number = ks + 7;
             let index: number = noteValue % 12;
@@ -268,10 +251,27 @@ export class AccidentalHelper {
                 }
             }
         }
+        
+        if (note) {
+            this._appliedScoreLines.set(note.id, line);
+            this._notesByValue.set(noteValue, note);
+        } else {
+            this._appliedScoreLinesByValue.set(noteValue, line);
+        }
+
+        if (this.minLine === -1 || this.minLine > line) {
+            this.minLine = line;
+            this.minLineBeat = relatedBeat;
+        }
+        if (this.maxLine === -1 || this.maxLine < line) {
+            this.maxLine = line;
+            this.maxLineBeat = relatedBeat;
+        }
+
         return accidentalToSet;
     }
 
-    private calculateNoteLine(noteValue: number, mode: NoteAccidentalMode): number {
+    private calculateNoteLine(noteValue: number, mode: NoteAccidentalMode, note: Note | null): number {
         let value: number = noteValue;
         let ks: number = this._bar.masterBar.keySignature;
         let clef: Clef = this._bar.clef;
@@ -295,6 +295,7 @@ export class AccidentalHelper {
                 break;
         }
         steps -= stepList[index];
+
         return steps;
     }
 
