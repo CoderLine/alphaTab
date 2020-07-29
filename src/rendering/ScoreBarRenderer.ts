@@ -41,8 +41,8 @@ import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
  */
 export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculator {
     public static readonly StaffId: string = 'score';
-    private static SharpKsSteps: number[] = [1, 4, 0, 3, 6, 2, 5];
-    private static FlatKsSteps: number[] = [5, 2, 6, 3, 7, 4, 8];
+    private static SharpKsSteps: number[] = [-1, 2, -2, 1, 4, 0, 3];
+    private static FlatKsSteps: number[] = [3, 0, 4, 1, 5, 2, 6];
     private static readonly LineSpacing: number = 8;
     private static readonly StemWidth: number = 1.3;
 
@@ -87,7 +87,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
             let top: number = this.getScoreY(-2, 0);
-            let bottom: number = this.getScoreY(10, 0);
+            let bottom: number = this.getScoreY(6, 0);
             let whammyOffset: number = this.simpleWhammyOverflow;
             this.registerOverflowTop(whammyOffset);
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine, 0);
@@ -291,31 +291,21 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         let size: number = 0;
         switch (duration) {
             case Duration.QuadrupleWhole:
-                size = 6;
-                break;
             case Duration.Half:
-                size = 6;
-                break;
             case Duration.Quarter:
-                size = 6;
-                break;
             case Duration.Eighth:
-                size = 6;
-                break;
             case Duration.Sixteenth:
-                size = 6;
+                size = 4;
                 break;
             case Duration.ThirtySecond:
-                size = 7;
-                break;
             case Duration.SixtyFourth:
-                size = 7;
+                size = 5;
                 break;
             case Duration.OneHundredTwentyEighth:
-                size = 9;
+                size = 7;
                 break;
             case Duration.TwoHundredFiftySixth:
-                size = 10;
+                size = 8;
                 break;
             default:
                 size = 0;
@@ -328,34 +318,18 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         let size: number = 0;
         switch (duration) {
             case Duration.QuadrupleWhole:
-                size = 6;
-                break;
             case Duration.Half:
-                size = 6;
-                break;
             case Duration.Quarter:
-                size = 6;
-                break;
             case Duration.Eighth:
-                size = 6;
-                break;
             case Duration.Sixteenth:
-                size = 6;
-                break;
             case Duration.ThirtySecond:
-                size = 6;
-                break;
             case Duration.SixtyFourth:
-                size = 6;
-                break;
             case Duration.OneHundredTwentyEighth:
-                size = 6;
-                break;
             case Duration.TwoHundredFiftySixth:
-                size = 6;
+                size = 4;
                 break;
             default:
-                size = 0;
+                size = -2;
                 break;
         }
         return this.getScoreY(size, 0);

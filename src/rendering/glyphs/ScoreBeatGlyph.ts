@@ -113,48 +113,48 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 let offset: number = 0;
                 switch (this.container.beat.duration) {
                     case Duration.QuadrupleWhole:
-                        line = 6;
-                        dotLine = 5;
-                        break;
-                    case Duration.DoubleWhole:
-                        line = 6;
-                        dotLine = 5;
-                        break;
-                    case Duration.Whole:
                         line = 4;
                         dotLine = 5;
                         break;
+                    case Duration.DoubleWhole:
+                        line = 4;
+                        dotLine = 5;
+                        break;
+                    case Duration.Whole:
+                        line = 2;
+                        dotLine = 5;
+                        break;
                     case Duration.Half:
-                        line = 6;
+                        line = 4;
                         dotLine = 5;
                         break;
                     case Duration.Quarter:
-                        line = 6;
+                        line = 4;
                         offset = -2;
                         dotLine = 5;
                         break;
                     case Duration.Eighth:
-                        line = 6;
+                        line = 4;
                         dotLine = 5;
                         break;
                     case Duration.Sixteenth:
-                        line = 6;
+                        line = 4;
                         dotLine = 5;
                         break;
                     case Duration.ThirtySecond:
-                        line = 6;
+                        line = 4;
                         dotLine = 3;
                         break;
                     case Duration.SixtyFourth:
-                        line = 6;
+                        line = 4;
                         dotLine = 3;
                         break;
                     case Duration.OneHundredTwentyEighth:
-                        line = 6;
+                        line = 4;
                         dotLine = 3;
                         break;
                     case Duration.TwoHundredFiftySixth:
-                        line = 6;
+                        line = 4;
                         dotLine = 3;
                         break;
                 }
