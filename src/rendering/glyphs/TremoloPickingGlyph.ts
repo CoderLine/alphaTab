@@ -14,11 +14,11 @@ export class TremoloPickingGlyph extends MusicFontGlyph {
     private static getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.ThirtySecond:
-                return MusicFontSymbol.TremoloPickingThirtySecond;
+                return MusicFontSymbol.Tremolo3;
             case Duration.Sixteenth:
-                return MusicFontSymbol.TremoloPickingSixteenth;
+                return MusicFontSymbol.Tremolo2;
             case Duration.Eighth:
-                return MusicFontSymbol.TremoloPickingEighth;
+                return MusicFontSymbol.Tremolo1;
             default:
                 return MusicFontSymbol.None;
         }

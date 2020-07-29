@@ -32,7 +32,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     0.8,
-                    MusicFontSymbol.Ottava15ma,
+                    MusicFontSymbol.QuindicesimaAlta,
                     false
                 );
                 break;
@@ -42,7 +42,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     0.8,
-                    MusicFontSymbol.Ottava8va,
+                    MusicFontSymbol.OttavaAlta,
                     false
                 );
                 break;
@@ -52,7 +52,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     0.8,
-                    MusicFontSymbol.Ottava8vb,
+                    MusicFontSymbol.OttavaBassaVb,
                     false
                 );
                 break;
@@ -63,7 +63,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     0.8,
-                    [MusicFontSymbol.Ottava15, MusicFontSymbol.OttavaMBaseline, MusicFontSymbol.OttavaBBaseline],
+                    [MusicFontSymbol.Quindicesima, MusicFontSymbol.OctaveBaselineM, MusicFontSymbol.OctaveBaselineB],
                     false
                 );
                 break;

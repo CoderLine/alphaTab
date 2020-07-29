@@ -28,7 +28,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
                 0,
                 this.commonY,
                 this.commonScale,
-                MusicFontSymbol.TimeSignatureCutCommon
+                MusicFontSymbol.TimeSigCutCommon
             );
             common.width = 14 * this.scale;
             this.addGlyph(common);
@@ -38,7 +38,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
                 0,
                 this.commonY,
                 this.commonScale,
-                MusicFontSymbol.TimeSignatureCommon
+                MusicFontSymbol.TimeSigCommon
             );
             common.width = 14 * this.scale;
             this.addGlyph(common);

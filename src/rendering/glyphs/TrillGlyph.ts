@@ -30,7 +30,7 @@ export class TrillGlyph extends EffectGlyph {
                 cx + this.x + loopX,
                 loopY,
                 waveScale,
-                MusicFontSymbol.WaveHorizontalSlight,
+                MusicFontSymbol.WiggleTrill,
                 false
             );
             loopX += step;

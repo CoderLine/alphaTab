@@ -5,6 +5,7 @@ import { Clef } from '@src/model/Clef';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { PercussionMapper } from './PercussionMapper';
 
 /**
  * This small utilty public class allows the assignment of accidentals within a
@@ -148,11 +149,11 @@ export class AccidentalHelper {
         let accidentalToSet: AccidentalType = AccidentalType.None;
         let line:number = 0;
 
-        if (!this._bar.staff.isPercussion) {
-            // 
+        if (this._bar.staff.isPercussion) {
+            line = PercussionMapper.getArticulation(noteValue)?.staffLine ?? 0;
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
-            let line: number = this.calculateNoteLine(noteValue, accidentalMode, note);
+            line = this.calculateNoteLine(noteValue, accidentalMode, note);
             
             let ks: number = this._bar.masterBar.keySignature;
             let ksi: number = ks + 7;
@@ -259,11 +260,11 @@ export class AccidentalHelper {
             this._appliedScoreLinesByValue.set(noteValue, line);
         }
 
-        if (this.minLine === -1 || this.minLine > line) {
+        if (this.minLine === -1 || this.minLine < line) {
             this.minLine = line;
             this.minLineBeat = relatedBeat;
         }
-        if (this.maxLine === -1 || this.maxLine < line) {
+        if (this.maxLine === -1 || this.maxLine > line) {
             this.maxLine = line;
             this.maxLineBeat = relatedBeat;
         }

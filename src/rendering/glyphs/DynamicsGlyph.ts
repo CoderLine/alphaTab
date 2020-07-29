@@ -20,13 +20,13 @@ export class DynamicsGlyph extends MusicFontGlyph {
             case DynamicValue.PP:
                 return MusicFontSymbol.DynamicPP;
             case DynamicValue.P:
-                return MusicFontSymbol.DynamicP;
+                return MusicFontSymbol.DynamicPiano;
             case DynamicValue.MP:
                 return MusicFontSymbol.DynamicMP;
             case DynamicValue.MF:
                 return MusicFontSymbol.DynamicMF;
             case DynamicValue.F:
-                return MusicFontSymbol.DynamicF;
+                return MusicFontSymbol.DynamicForte;
             case DynamicValue.FF:
                 return MusicFontSymbol.DynamicFF;
             case DynamicValue.FFF:

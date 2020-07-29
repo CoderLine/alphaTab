@@ -860,6 +860,12 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((flags & 0x08) !== 0) {
             this.readNoteEffects(track, voice, beat, newNote);
         }
+
+        if(bar.staff.isPercussion) {
+            newNote.percussionMidiNumber = newNote.fret;
+            newNote.string = -1;
+            newNote.fret = -1;
+        }
     }
 
     public toDynamicValue(value: number): DynamicValue {

@@ -17,9 +17,9 @@ export class DiamondNoteHeadGlyph extends MusicFontGlyph {
             case Duration.DoubleWhole:
             case Duration.Whole:
             case Duration.Half:
-                return MusicFontSymbol.NoteHarmonicWhole;
+                return MusicFontSymbol.NoteheadDiamondWhiteWide;
             default:
-                return MusicFontSymbol.NoteHarmonic;
+                return MusicFontSymbol.NoteheadDiamondBlackWide;
         }
     }
 

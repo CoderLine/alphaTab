@@ -174,7 +174,7 @@ export class Environment {
      */
     public static bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(
         'alphaTab',
-        `&#${MusicFontSymbol.ClefG};`
+        `&#${MusicFontSymbol.GClef};`
     );
 
     /**

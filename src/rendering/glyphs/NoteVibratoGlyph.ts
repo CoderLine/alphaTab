@@ -26,13 +26,13 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
         let symbolHeight: number = 0;
         switch (this._type) {
             case VibratoType.Slight:
-                this._symbol = MusicFontSymbol.WaveHorizontalSlight;
+                this._symbol = MusicFontSymbol.WiggleTrill;
                 this._symbolSize = 9 * this._scale;
                 this._symbolOffset = 8.5 * this._scale;
                 symbolHeight = 6 * this._scale;
                 break;
             case VibratoType.Wide:
-                this._symbol = MusicFontSymbol.WaveHorizontalWide;
+                this._symbol = MusicFontSymbol.WiggleVibratoMediumFast;
                 this._symbolSize = 10 * this._scale;
                 this._symbolOffset = 7 * this._scale;
                 symbolHeight = 10 * this._scale;

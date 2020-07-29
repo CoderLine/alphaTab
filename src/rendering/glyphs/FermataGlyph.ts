@@ -11,11 +11,11 @@ export class FermataGlyph extends MusicFontGlyph {
     private static getSymbol(accentuation: FermataType): MusicFontSymbol {
         switch (accentuation) {
             case FermataType.Short:
-                return MusicFontSymbol.FermataShort;
+                return MusicFontSymbol.FermataShortAbove;
             case FermataType.Medium:
-                return MusicFontSymbol.FermataMedium;
+                return MusicFontSymbol.FermataAbove;
             case FermataType.Long:
-                return MusicFontSymbol.FermataLong;
+                return MusicFontSymbol.FermataLongAbove;
             default:
                 return MusicFontSymbol.None;
         }

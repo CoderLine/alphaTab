@@ -431,7 +431,7 @@ export class BarRendererBase {
                     cx + this.x + (this.width - 20 * this.scale) / 2,
                     cy + this.y + this.height / 2,
                     1,
-                    MusicFontSymbol.SimileMarkSimple,
+                    MusicFontSymbol.Repeat1Bar,
                     false
                 );
                 break;
@@ -440,7 +440,7 @@ export class BarRendererBase {
                     cx + this.x - (28 * this.scale) / 2,
                     cy + this.y + this.height / 2,
                     1,
-                    MusicFontSymbol.SimileMarkDouble,
+                    MusicFontSymbol.Repeat2Bars,
                     false
                 );
                 break;

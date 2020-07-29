@@ -88,6 +88,7 @@ export class GpifParser {
     private _tappedNotes!: Map<string, boolean>;
     private _lyricsByTrack!: Map<string, Lyrics[]>;
     private _hasAnacrusis: boolean = false;
+    private _instrumentArticulations!: number[];
 
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<string, Automation[]>();
@@ -106,6 +107,7 @@ export class GpifParser {
         this._noteById = new Map<string, Note>();
         this._tappedNotes = new Map<string, boolean>();
         this._lyricsByTrack = new Map<string, Lyrics[]>();
+        this._instrumentArticulations = [];
 
         let dom: XmlDocument;
         try {
@@ -334,6 +336,8 @@ export class GpifParser {
     }
 
     private parseTrack(node: XmlNode): void {
+        this._instrumentArticulations = [];
+
         let track: Track = new Track();
         track.ensureStaveCount(1);
         let staff: Staff = track.staves[0];
@@ -419,6 +423,9 @@ export class GpifParser {
                             }
                         }
                         break;
+                    case 'Elements':
+                        this.parseElements(c);
+                        break;
                     case 'LineCount':
                         const lineCount = parseInt(c.innerText);
                         for (let staff of track.staves) {
@@ -428,6 +435,54 @@ export class GpifParser {
                 }
             }
         }
+    }
+    private parseElements(node: XmlNode) {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'Element':
+                        this.parseElement(c);
+                        break;
+                }
+            }
+        }
+    }
+
+    private parseElement(node: XmlNode) {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'Articulations':
+                        this.parseArticulations(c);
+                        break;
+                }
+            }
+        }
+    }
+    private parseArticulations(node: XmlNode) {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'Articulation':
+                        this.parseArticulation(c);
+                        break;
+                }
+            }
+        }
+    }
+
+    private parseArticulation(node: XmlNode) {
+        let inputMidiNumber = 0;
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'InputMidiNumbers':
+                        inputMidiNumber = parseInt(c.innerText);
+                        break;
+                }
+            }
+        }
+        this._instrumentArticulations.push(inputMidiNumber);
     }
 
     private parseStaves(track: Track, node: XmlNode): void {
@@ -1458,6 +1513,12 @@ export class GpifParser {
                                 break;
                         }
                         break;
+                    case 'InstrumentArticulation':
+                        const articulationIndex = parseInt(c.innerText);
+                        if (articulationIndex < this._instrumentArticulations.length) {
+                            note.percussionMidiNumber = this._instrumentArticulations[articulationIndex];
+                        }
+                        break;
                 }
             }
         }
@@ -1492,9 +1553,6 @@ export class GpifParser {
                                 break;
                             case 'Variation':
                                 variation = parseInt(c.findChildElement('Variation')!.innerText);
-                                break;
-                            case 'Midi':
-                                note.percussionMidiNumber = parseInt(c.findChildElement('Number')!.innerText);
                                 break;
                             case 'Tapped':
                                 this._tappedNotes.set(noteId, true);
@@ -1825,7 +1883,10 @@ export class GpifParser {
                                                     if (noteId !== GpifParser.InvalidId) {
                                                         const note = this._noteById.get(noteId)!.clone();
                                                         // reset midi value for non-percussion staves
-                                                        if (!staff.isPercussion) {
+                                                        if (staff.isPercussion) {
+                                                            note.fret = -1;
+                                                            note.string = -1;
+                                                        } else {
                                                             note.percussionMidiNumber = -1;
                                                         }
                                                         beat.addNote(note);

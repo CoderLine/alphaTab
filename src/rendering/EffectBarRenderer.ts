@@ -9,6 +9,7 @@ import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import { Color } from '@src/model/Color';
 
 /**
  * This renderer is responsible for displaying effects above or below the other staves
@@ -126,6 +127,9 @@ export class EffectBarRenderer extends BarRendererBase {
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         this.paintBackground(cx, cy, canvas);
+        // canvas.color = new Color(255, 0, 0, 100);
+        // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
+
         for (let effectBand of this._bands) {
             canvas.color =
                 effectBand.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;

@@ -12,9 +12,9 @@ export class AccentuationGlyph extends MusicFontGlyph {
             case AccentuationType.None:
                 return MusicFontSymbol.None;
             case AccentuationType.Normal:
-                return MusicFontSymbol.Accentuation;
+                return MusicFontSymbol.ArticAccentAbove;
             case AccentuationType.Heavy:
-                return MusicFontSymbol.HeavyAccentuation;
+                return MusicFontSymbol.ArticMarcatoAbove;
             default:
                 return MusicFontSymbol.None;
         }

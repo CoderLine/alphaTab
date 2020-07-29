@@ -15,7 +15,7 @@ export class ScoreRestGlyph extends MusicFontGlyph {
     public static getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.QuadrupleWhole:
-                return MusicFontSymbol.RestQuadrupleWhole;
+                return MusicFontSymbol.RestLonga;
             case Duration.DoubleWhole:
                 return MusicFontSymbol.RestDoubleWhole;
             case Duration.Whole:

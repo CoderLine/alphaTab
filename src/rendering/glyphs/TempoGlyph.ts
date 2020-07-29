@@ -24,7 +24,7 @@ export class TempoGlyph extends EffectGlyph {
             cx + this.x,
             cy + this.y + this.height * 0.8,
             this.scale * NoteHeadGlyph.GraceScale,
-            MusicFontSymbol.Tempo,
+            MusicFontSymbol.NoteQuarterUp,
             false
         );
         canvas.fillText('= ' + this._tempo, cx + this.x + this.height / 2, cy + this.y + canvas.font.size / 2);

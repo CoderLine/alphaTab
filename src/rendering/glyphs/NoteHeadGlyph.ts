@@ -43,15 +43,15 @@ export class NoteHeadGlyph extends MusicFontGlyph {
     private static getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.QuadrupleWhole:
-                return MusicFontSymbol.NoteQuadrupleWhole;
+                return MusicFontSymbol.NoteheadDoubleWholeSquare;
             case Duration.DoubleWhole:
-                return MusicFontSymbol.NoteDoubleWhole;
+                return MusicFontSymbol.NoteheadDoubleWhole;
             case Duration.Whole:
-                return MusicFontSymbol.NoteWhole;
+                return MusicFontSymbol.NoteheadWhole;
             case Duration.Half:
-                return MusicFontSymbol.NoteHalf;
+                return MusicFontSymbol.NoteheadHalf;
             default:
-                return MusicFontSymbol.NoteQuarter;
+                return MusicFontSymbol.NoteheadBlack;
         }
     }
 }

@@ -30,7 +30,7 @@ export class PickStrokeEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new PickStrokeGlyph(0, 0, beat.pickStroke);
+        return new PickStrokeGlyph(0, 0, beat.pickStroke, true);
     }
 
     public canExpand(from: Beat, to: Beat): boolean {

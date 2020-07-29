@@ -35,7 +35,6 @@ import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { Color } from '@src/model/Color';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
@@ -87,8 +86,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     public doLayout(): void {
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
-            let top: number = this.getScoreY(0, 0);
-            let bottom: number = this.getScoreY(8, 0);
+            let top: number = this.getScoreY(-2, 0);
+            let bottom: number = this.getScoreY(10, 0);
             let whammyOffset: number = this.simpleWhammyOverflow;
             this.registerOverflowTop(whammyOffset);
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine, 0);
@@ -596,21 +595,21 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             let correction: number = 0;
             switch (this.bar.clef) {
                 case Clef.Neutral:
-                    offset = 6;
+                    offset = 4;
                     correction = 1;
                     break;
                 case Clef.F4:
-                    offset = 4;
+                    offset = 2;
                     correction = -1;
                     break;
                 case Clef.C3:
-                    offset = 6;
-                    break;
-                case Clef.C4:
                     offset = 4;
                     break;
+                case Clef.C4:
+                    offset = 2;
+                    break;
                 case Clef.G2:
-                    offset = 8;
+                    offset = 6;
                     break;
             }
             this.createStartSpacing();
@@ -638,7 +637,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
         }
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreY(-0.5, 0), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreY(-2.5, 0), this.bar.index + 1));
         if (this.bar.isEmpty) {
             this.addPreBeatGlyph(new SpacingGlyph(0, 0, 30 * this.scale));
         }
@@ -743,7 +742,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
                 0,
-                this.getScoreY(2, 0),
+                this.getScoreY(0, 0),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon
@@ -779,8 +778,6 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     // private static readonly Random Random = new Random();
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
-        canvas.color = new Color(255,0,0,80);
-        canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
         let res: RenderingResources = this.resources;
         //
         // draw string lines
