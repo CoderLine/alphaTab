@@ -14,6 +14,6 @@ export class GuitarGolpeGlyph extends MusicFontGlyph {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx - 7 * this.scale, cy, canvas);
+        super.paint(cx, cy + this.height, canvas);
     }
 }

@@ -20,8 +20,8 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _notes: Note[] = [];
     private _tremoloPicking: Glyph | null = null;
 
-    public aboveBeatEffects: Map<string, Glyph> = new Map();
-    public belowBeatEffects: Map<string, Glyph> = new Map();
+    public aboveBeatEffects: Map<string, EffectGlyph> = new Map();
+    public belowBeatEffects: Map<string, EffectGlyph> = new Map();
     public beat!: Beat;
     public beamingHelper!: BeamingHelper;
 
@@ -156,28 +156,29 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         //
         // Note Effects only painted once
         //
-        let aboveBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line + 5);
-        let belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
-        let aboveEffectSpacing = 7 * this.scale;
-        let belowEffectSpacing = -aboveEffectSpacing;
+        let aboveBeatEffectsY = 0;
+        let belowBeatEffectsY = 0;
+        let belowEffectSpacing = 1;
+        let aboveEffectSpacing = -belowEffectSpacing;
 
-        if (this.beamingHelper.direction === BeamDirection.Down) {
-            let temp = aboveBeatEffectsY;
-            aboveBeatEffectsY = belowBeatEffectsY;
-            belowBeatEffectsY = temp;
-
+        if (this.beamingHelper.direction == BeamDirection.Up) {
+            belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line);
+            aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
+        } else {
+            belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 1);
+            aboveBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line + 1);
             aboveEffectSpacing *= -1;
-            belowBeatEffectsY *= -1;
+            belowEffectSpacing *= -1;
         }
 
         this.aboveBeatEffects.forEach(g => {
-            g.paint(cx + this.x + this.width / 2, cy + this.y + aboveBeatEffectsY, canvas);
-            aboveBeatEffectsY += aboveEffectSpacing;
+            aboveBeatEffectsY += aboveEffectSpacing * g.height;
+            g.paint(cx + this.x + 2 * this.scale, cy + this.y + aboveBeatEffectsY, canvas);
         });
 
         this.belowBeatEffects.forEach(g => {
-            g.paint(cx + this.x + this.width / 2, cy + this.y + belowBeatEffectsY, canvas);
-            belowBeatEffectsY += belowEffectSpacing;
+            belowBeatEffectsY += belowEffectSpacing * g.height;
+            g.paint(cx + this.x + 2 * this.scale, cy + this.y + belowBeatEffectsY, canvas);
         });
         super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {

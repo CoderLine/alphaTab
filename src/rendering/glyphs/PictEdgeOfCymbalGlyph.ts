@@ -13,6 +13,6 @@ export class PictEdgeOfCymbalGlyph extends MusicFontGlyph {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx - 5 * this.scale, cy - this.height, canvas);
+        super.paint(cx - 3 * this.scale, cy + this.height, canvas);
     }
 }

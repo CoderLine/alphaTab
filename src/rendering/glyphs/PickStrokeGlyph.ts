@@ -5,11 +5,9 @@ import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class PickStrokeGlyph extends MusicFontGlyph {
-    private _shiftDown: boolean;
 
-    public constructor(x: number, y: number, pickStroke: PickStroke, shiftDown: boolean = false) {
+    public constructor(x: number, y: number, pickStroke: PickStroke) {
         super(x, y, NoteHeadGlyph.GraceScale, PickStrokeGlyph.getSymbol(pickStroke));
-        this._shiftDown = shiftDown;
     }
 
     public doLayout(): void {
@@ -18,10 +16,7 @@ export class PickStrokeGlyph extends MusicFontGlyph {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
-        if(this._shiftDown) {
-            cy += this.height;
-        }
-        super.paint(cx, cy, canvas);
+        super.paint(cx, cy + this.height, canvas);
     }
 
     private static getSymbol(pickStroke: PickStroke): MusicFontSymbol {

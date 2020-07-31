@@ -1,6 +1,7 @@
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { ICanvas } from '@src/platform/ICanvas';
 
 export class ArticStaccatoAboveGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number) {
@@ -8,7 +9,11 @@ export class ArticStaccatoAboveGlyph extends MusicFontGlyph {
     }
 
     public doLayout(): void {
-        this.width = 3 * this.scale;
-        this.height = 3 * this.scale;
+        this.width = NoteHeadGlyph.QuarterNoteHeadWidth * this.scale;
+        this.height = 7 * this.scale;
+    }
+
+    public paint(cx: number, cy: number, canvas: ICanvas): void {
+        super.paint(cx + 3 * this.scale, cy + 5 * this.scale, canvas);
     }
 }

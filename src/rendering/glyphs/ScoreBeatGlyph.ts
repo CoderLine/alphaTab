@@ -237,13 +237,13 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         }
         if (n.isStaccato && !this.noteHeads!.aboveBeatEffects.has('Staccato')) {
-            this.noteHeads!.aboveBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
+            this.noteHeads!.belowBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
         }
         if (n.accentuated === AccentuationType.Normal && !this.noteHeads!.aboveBeatEffects.has('Accent')) {
-            this.noteHeads!.aboveBeatEffects.set('Accent', new AccentuationGlyph(0, 0, AccentuationType.Normal));
+            this.noteHeads!.belowBeatEffects.set('Accent', new AccentuationGlyph(0, 0, AccentuationType.Normal));
         }
         if (n.accentuated === AccentuationType.Heavy && !this.noteHeads!.aboveBeatEffects.has('HAccent')) {
-            this.noteHeads!.aboveBeatEffects.set('HAccent', new AccentuationGlyph(0, 0, AccentuationType.Heavy));
+            this.noteHeads!.belowBeatEffects.set('HAccent', new AccentuationGlyph(0, 0, AccentuationType.Heavy));
         }
 
         if (n.isPercussion) {
@@ -261,10 +261,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         effectContainer.set('ArticStaccatoAbove', new ArticStaccatoAboveGlyph(0, 0));
                         break;
                     case MusicFontSymbol.StringsUpBow:
-                        effectContainer.set('StringsUpBow', new PickStrokeGlyph(-3 * this.scale, 0, PickStroke.Up));
+                        effectContainer.set('StringsUpBow', new PickStrokeGlyph(0, 0, PickStroke.Up));
                         break;
                     case MusicFontSymbol.StringsDownBow:
-                        effectContainer.set('StringsDownBow', new PickStrokeGlyph(-3 * this.scale, 0, PickStroke.Down));
+                        effectContainer.set('StringsDownBow', new PickStrokeGlyph(0, 0, PickStroke.Down));
                         break;
                     case MusicFontSymbol.GuitarGolpe:
                         effectContainer.set('GuitarGolpe', new GuitarGolpeGlyph(0, 0));
