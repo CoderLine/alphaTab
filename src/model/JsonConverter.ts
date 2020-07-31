@@ -82,6 +82,11 @@ export class JsonConverter {
             track2.playbackInfo = {} as any;
             PlaybackInformation.copyTo(track.playbackInfo, track2.playbackInfo);
 
+            track2.percussionStaffLines = new Map<number, number>();
+            track.percussionStaffLines.forEach((line, instrument) => {
+                track2.percussionStaffLines.set(instrument, line);
+            });
+
             JsonConverter.stavesToJsObject(track, track2);
             score2.tracks.push(track2);
         }
@@ -292,6 +297,10 @@ export class JsonConverter {
             score2.addTrack(track2);
             PlaybackInformation.copyTo(track.playbackInfo, track2.playbackInfo);
 
+            JsonConverter.jsObjectMapForEach(track.percussionStaffLines, (line, instrument) => {
+                track2.percussionStaffLines.set(instrument, line);
+            });
+
             JsonConverter.jsObjectToStaves(track, track2, allNotes, notesToLink);
         }
     }
@@ -491,7 +500,7 @@ export class JsonConverter {
             } else if (midiEvent instanceof MetaNumberEvent) {
                 midiEvent2.type = 'MetaNumberEvent';
                 midiEvent2.value = midiEvent.value;
-            } else if(midiEvent instanceof Midi20PerNotePitchBendEvent) {
+            } else if (midiEvent instanceof Midi20PerNotePitchBendEvent) {
                 midiEvent2.type = 'Midi20PerNotePitchBendEvent';
                 midiEvent2.noteKey = midiEvent.noteKey;
                 midiEvent2.pitch = midiEvent.pitch;

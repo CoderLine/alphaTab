@@ -47,6 +47,12 @@ export class Track {
      */
     public shortName: string = '';
 
+    /**
+     * Gets or sets a mapping on which staff liens particular percussion instruments
+     * should be shown.
+     */
+    public percussionStaffLines:Map<number, number> = new Map<number, number>();
+
     public ensureStaveCount(staveCount: number): void {
         while (this.staves.length < staveCount) {
             this.addStaff(new Staff());

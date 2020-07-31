@@ -89,6 +89,7 @@ export class GpifParser {
     private _lyricsByTrack!: Map<string, Lyrics[]>;
     private _hasAnacrusis: boolean = false;
     private _instrumentArticulations!: number[];
+    private _percussionInstrumentByElementName!: Map<string, number>;
 
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<string, Automation[]>();
@@ -108,7 +109,7 @@ export class GpifParser {
         this._tappedNotes = new Map<string, boolean>();
         this._lyricsByTrack = new Map<string, Lyrics[]>();
         this._instrumentArticulations = [];
-
+        this._percussionInstrumentByElementName = new Map<string, number>();
         let dom: XmlDocument;
         try {
             dom = new XmlDocument(xml);
@@ -337,6 +338,7 @@ export class GpifParser {
 
     private parseTrack(node: XmlNode): void {
         this._instrumentArticulations = [];
+        this._percussionInstrumentByElementName = new Map<string, number>();
 
         let track: Track = new Track();
         track.ensureStaveCount(1);
@@ -367,6 +369,9 @@ export class GpifParser {
                         break;
                     case 'InstrumentSet':
                         this.parseInstrumentSet(track, c);
+                        break;
+                    case 'NotationPatch':
+                        this.parseNotationPatch(track, c);
                         break;
                     case 'ShortName':
                         track.shortName = c.innerText;
@@ -405,6 +410,24 @@ export class GpifParser {
         this._tracksById.set(trackId, track);
     }
 
+    private parseNotationPatch(track: Track, node: XmlNode) {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'LineCount':
+                        const lineCount = parseInt(c.innerText);
+                        for (let staff of track.staves) {
+                            staff.standardNotationLineCount = lineCount;
+                        }
+                        break;
+                    case 'Elements':
+                        this.parseElements(track, c);
+                        break;
+                }
+            }
+        }
+    }
+
     private parseInstrumentSet(track: Track, node: XmlNode): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
@@ -424,7 +447,7 @@ export class GpifParser {
                         }
                         break;
                     case 'Elements':
-                        this.parseElements(c);
+                        this.parseElements(track, c);
                         break;
                     case 'LineCount':
                         const lineCount = parseInt(c.innerText);
@@ -436,53 +459,71 @@ export class GpifParser {
             }
         }
     }
-    private parseElements(node: XmlNode) {
+    private parseElements(track: Track, node: XmlNode) {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Element':
-                        this.parseElement(c);
+                        this.parseElement(track, c);
                         break;
                 }
             }
         }
     }
 
-    private parseElement(node: XmlNode) {
+    private parseElement(track: Track, node: XmlNode) {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Articulations':
-                        this.parseArticulations(c);
+                        this.parseArticulations(track, c);
                         break;
                 }
             }
         }
     }
-    private parseArticulations(node: XmlNode) {
+    private parseArticulations(track: Track, node: XmlNode) {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Articulation':
-                        this.parseArticulation(c);
+                        this.parseArticulation(track, c);
                         break;
                 }
             }
         }
     }
 
-    private parseArticulation(node: XmlNode) {
-        let inputMidiNumber = 0;
+    private parseArticulation(track: Track, node: XmlNode) {
+        let inputMidiNumber = -1;
+        let elementName = '';
+        let staffLine = -1;
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'InputMidiNumbers':
                         inputMidiNumber = parseInt(c.innerText);
                         break;
+                    case 'Name':
+                        elementName = c.innerText;
+                        break;
+                    case 'StaffLine':
+                        staffLine = parseInt(c.innerText);
+                        break;
                 }
             }
         }
-        this._instrumentArticulations.push(inputMidiNumber);
+
+        if (inputMidiNumber !== -1) {
+            this._instrumentArticulations.push(inputMidiNumber);
+            this._percussionInstrumentByElementName.set(elementName, inputMidiNumber);
+        } else if(elementName && this._percussionInstrumentByElementName.has(elementName)) {
+            inputMidiNumber = this._percussionInstrumentByElementName.get(elementName)!;
+        }
+
+        if(inputMidiNumber !== -1 && staffLine !== -1) {
+            track.percussionStaffLines.set(inputMidiNumber, staffLine);
+        }
     }
 
     private parseStaves(track: Track, node: XmlNode): void {

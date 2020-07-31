@@ -147,14 +147,18 @@ export class AccidentalHelper {
 
     private getAccidental(noteValue: number, quarterBend: boolean, note: Note | null = null, relatedBeat: Beat): AccidentalType {
         let accidentalToSet: AccidentalType = AccidentalType.None;
-        let line:number = 0;
+        let line: number = 0;
 
         if (this._bar.staff.isPercussion) {
-            line = PercussionMapper.getArticulation(noteValue)?.staffLine ?? 0;
+            if (this._bar.staff.track.percussionStaffLines.has(noteValue)) {
+                line = this._bar.staff.track.percussionStaffLines.get(noteValue)!;
+            } else {
+                line = PercussionMapper.getArticulation(noteValue)?.staffLine ?? 0;
+            }
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
-            line = this.calculateNoteLine(noteValue, accidentalMode, note);
-            
+            line = this.calculateNoteLine(noteValue, accidentalMode);
+
             let ks: number = this._bar.masterBar.keySignature;
             let ksi: number = ks + 7;
             let index: number = noteValue % 12;
@@ -252,7 +256,7 @@ export class AccidentalHelper {
                 }
             }
         }
-        
+
         if (note) {
             this._appliedScoreLines.set(note.id, line);
             this._notesByValue.set(noteValue, note);
@@ -272,7 +276,7 @@ export class AccidentalHelper {
         return accidentalToSet;
     }
 
-    private calculateNoteLine(noteValue: number, mode: NoteAccidentalMode, note: Note | null): number {
+    private calculateNoteLine(noteValue: number, mode: NoteAccidentalMode): number {
         let value: number = noteValue;
         let ks: number = this._bar.masterBar.keySignature;
         let clef: Clef = this._bar.clef;
