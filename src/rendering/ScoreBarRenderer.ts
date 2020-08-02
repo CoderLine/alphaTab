@@ -47,7 +47,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     private static readonly StemWidth: number = 1.3;
 
     public simpleWhammyOverflow: number = 0;
-    private _firstLineY:number = 0;
+    private _firstLineY: number = 0;
 
     public accidentalHelper: AccidentalHelper;
 
@@ -76,14 +76,19 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         this.bottomPadding = glyphOverflow;
         this.height = this.lineOffset * 4 + this.topPadding + this.bottomPadding;
 
-        let staffContentHeight = this.height - this.topPadding - this.bottomPadding;
-        let actualLineHeight = (this.bar.staff.standardNotationLineCount - 1) * this.lineOffset;
-        this._firstLineY = this.topPadding + (staffContentHeight - actualLineHeight) / 2;
+        this.updateFirstLineY();
 
         super.updateSizes();
     }
 
+    private updateFirstLineY() {
+        let fullLineHeight = this.lineOffset * 4;
+        let actualLineHeight = (this.bar.staff.standardNotationLineCount - 1) * this.lineOffset;
+        this._firstLineY = this.topPadding + (fullLineHeight - actualLineHeight) / 2;
+    }
+
     public doLayout(): void {
+        this.updateFirstLineY();
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
             let top: number = this.getScoreY(-2, 0);
@@ -295,23 +300,23 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             case Duration.Quarter:
             case Duration.Eighth:
             case Duration.Sixteenth:
-                size = 4;
+                size = 6;
                 break;
             case Duration.ThirtySecond:
             case Duration.SixtyFourth:
-                size = 5;
-                break;
-            case Duration.OneHundredTwentyEighth:
                 size = 7;
                 break;
+            case Duration.OneHundredTwentyEighth:
+                size = 9;
+                break;
             case Duration.TwoHundredFiftySixth:
-                size = 8;
+                size = 10;
                 break;
             default:
                 size = 0;
                 break;
         }
-        return this.getScoreY(size, 0);
+        return this.getScoreHeight(size);
     }
 
     private getFooterStemSize(duration: Duration): number {
@@ -326,13 +331,13 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             case Duration.SixtyFourth:
             case Duration.OneHundredTwentyEighth:
             case Duration.TwoHundredFiftySixth:
-                size = 4;
+                size = 6;
                 break;
             default:
-                size = -2;
+                size = 0;
                 break;
         }
-        return this.getScoreY(size, 0);
+        return this.getScoreHeight(size);
     }
 
     public getYPositionForNoteValue(noteValue: number): number {
@@ -569,7 +574,9 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             let correction: number = 0;
             switch (this.bar.clef) {
                 case Clef.Neutral:
-                    offset = 4;
+                    offset = this.bar.staff.isPercussion
+                        ? (this.bar.staff.standardNotationLineCount - 1) / 2
+                        : 4;
                     correction = 1;
                     break;
                 case Clef.F4:
@@ -587,7 +594,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                     break;
             }
             this.createStartSpacing();
-            
+
             this.addPreBeatGlyph(
                 new ClefGlyph(0, this.getScoreY(offset, correction), this.bar.clef, this.bar.clefOttava)
             );
@@ -713,10 +720,15 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
 
     private createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+
+        const lines = this.bar.staff.isPercussion
+            ? this.bar.staff.standardNotationLineCount - 1
+            : 4;
+
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
                 0,
-                this.getScoreY(0, 0),
+                this.getScoreY(lines, 0),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon
@@ -746,7 +758,17 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
      * @returns
      */
     public getScoreY(steps: number, correction: number = 0): number {
-        return this.lineOffset + (this.lineOffset / 2) * steps + correction * this.scale;
+        return this._firstLineY + this.lineOffset + this.getScoreHeight(steps) + correction * this.scale;
+    }
+
+    /**
+     * Gets the height of an element that spans the given amount of steps.
+     * @param steps the amount of steps while 2 steps are one line
+     * @param correction
+     * @returns
+     */
+    public getScoreHeight(steps: number): number {
+        return (this.lineOffset / 2) * steps;
     }
 
     // private static readonly Random Random = new Random();
