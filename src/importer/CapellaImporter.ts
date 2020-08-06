@@ -26,10 +26,10 @@ export class CapellaImporter extends ScoreImporter {
         let fileSystem: ZipReader = new ZipReader(this.data);
         let entries: ZipEntry[];
         let xml: string | null = null;
-        try {
-            entries = fileSystem.read();
+        entries = fileSystem.read();
 
-            Logger.debug(this.name, 'Zip entries loaded');
+        Logger.debug(this.name, 'Zip entries loaded');
+        if (entries.length > 0) {
             for (let entry of entries) {
                 switch (entry.fileName) {
                     case 'score.xml':
@@ -37,7 +37,7 @@ export class CapellaImporter extends ScoreImporter {
                         break;
                 }
             }
-        } catch (e) {
+        } else {
             this.data.reset();
             xml = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
         }

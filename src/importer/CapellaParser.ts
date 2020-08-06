@@ -44,9 +44,9 @@ class GuitarDrawObject extends DrawObject {
     public chord: Chord = new Chord();
 }
 
-class SlurDrawObject extends DrawObject {}
+class SlurDrawObject extends DrawObject { }
 
-class WavyLineDrawObject extends DrawObject {}
+class WavyLineDrawObject extends DrawObject { }
 
 class TupletBracketDrawObject extends DrawObject {
     public number: number = 0;
@@ -66,7 +66,7 @@ class OctaveClefDrawObject extends DrawObject {
     public octave: number = 1;
 }
 
-class TrillDrawObject extends DrawObject {}
+class TrillDrawObject extends DrawObject { }
 
 class StaffLayout {
     public defaultClef: Clef = Clef.G2;
@@ -84,10 +84,18 @@ class Bracket {
     public curly: boolean = false;
 }
 
+class CapellaVoiceState {
+    public currentBarIndex: number = -1;
+    public currentBarComplete: boolean = true;
+    public currentBarDuration: number = 0;
+    public currentPosition: number = 0;
+    public voiceStemDir: BeamDirection | null = null;
+}
+
 export class CapellaParser {
     public score!: Score;
     private _trackChannel: number = 0;
-
+    private _forceFlags: boolean = false;
     private _galleryObjects!: Map<string, DrawObject>;
 
     private _voiceCounts!: Map<number /*track*/, number /*count*/>;
@@ -372,6 +380,7 @@ export class CapellaParser {
                 this.score.tempo = parseInt(element.attributes.get('tempo')!);
             }
         }
+        this._forceFlags = element.getAttribute('beamGrouping') === '0';
 
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
@@ -385,11 +394,12 @@ export class CapellaParser {
     }
 
     private parseStaves(systemElement: XmlNode, element: XmlNode) {
+        let firstBarIndex = this.score.masterBars.length;
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'staff':
-                        this.parseStaff(systemElement, c);
+                        this.parseStaff(systemElement, firstBarIndex, c);
                         break;
                 }
             }
@@ -397,10 +407,11 @@ export class CapellaParser {
     }
 
     private _timeSignature: MasterBar = new MasterBar();
-    private _currentStaffLayout: StaffLayout | null = null;
+    private _currentStaffLayout!: StaffLayout;
 
-    private parseStaff(systemElement: XmlNode, element: XmlNode) {
-        this._currentStaffLayout = this._staffLayoutLookup.get(element.getAttribute('layout'))!;
+    private parseStaff(systemElement: XmlNode, firstBarIndex: number, element: XmlNode) {
+        const staffId = element.getAttribute('layout');
+        this._currentStaffLayout = this._staffLayoutLookup.get(staffId)!;
         this._timeSignature.timeSignatureNumerator = 4;
         this._timeSignature.timeSignatureDenominator = 4;
         this._timeSignature.timeSignatureCommon = false;
@@ -408,11 +419,18 @@ export class CapellaParser {
         this.parseTime(element.getAttribute('defaultTime'));
         const staff = this._staffLookup.get(this._currentStaffLayout.index)!;
 
+        // there might be systems where this staff is not contained
+        // so we create bars until the current staff to ensure the right
+        // alignment
+        while (staff.bars.length < firstBarIndex) {
+            this.addNewBar(staff);
+        }
+
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'voices':
-                        this.parseVoices(staff, systemElement, c);
+                        this.parseVoices(staffId, staff, systemElement, firstBarIndex, c);
                         break;
                 }
             }
@@ -441,13 +459,13 @@ export class CapellaParser {
                 break;
         }
     }
-    private parseVoices(staff: Staff, systemElement: XmlNode, element: XmlNode) {
+    private parseVoices(staffId: string, staff: Staff, systemElement: XmlNode, firstBarIndex: number, element: XmlNode) {
         let voiceIndex = 0;
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'voice':
-                        this.parseVoice(staff, systemElement, voiceIndex, c);
+                        this.parseVoice(staffId, staff, systemElement, voiceIndex, firstBarIndex, c);
                         voiceIndex++;
                         break;
                 }
@@ -455,9 +473,17 @@ export class CapellaParser {
         }
     }
 
+    private getOrCreateBar(staff: Staff, barIndex: number): Bar {
+        if (barIndex < staff.bars.length) {
+            return staff.bars[barIndex];
+        }
+        return this.addNewBar(staff);
+    }
+
     private addNewBar(staff: Staff) {
         // voice tags always start a new bar
         let currentBar: Bar = new Bar();
+        currentBar.forceFlags = this._forceFlags;
         currentBar.clef = this._currentStaffLayout!.defaultClef;
         staff.addBar(currentBar);
 
@@ -471,132 +497,171 @@ export class CapellaParser {
                 master.tripletFeel = master.previousMasterBar!.tripletFeel;
             }
 
-            master.timeSignatureDenominator = this._timeSignature.timeSignatureNumerator;
-            master.timeSignatureNumerator = this._timeSignature.timeSignatureDenominator;
+            master.timeSignatureDenominator = this._timeSignature.timeSignatureDenominator;
+            master.timeSignatureNumerator = this._timeSignature.timeSignatureNumerator;
             master.timeSignatureCommon = this._timeSignature.timeSignatureCommon;
         }
         return currentBar;
     }
 
-    private parseVoice(staff: Staff, systemElement: XmlNode, voiceIndex: number, element: XmlNode) {
+
+    private _voiceStates: Map<string, CapellaVoiceState> = new Map();
+    private _currentVoiceState!: CapellaVoiceState;
+    private _currentBar!: Bar;
+    private _currentVoice!: Voice;
+
+    private newBar(staff: Staff, voiceIndex: number) {
+        this._currentVoiceState.currentBarIndex++;
+        this._currentBar = this.getOrCreateBar(staff, this._currentVoiceState.currentBarIndex);
+        this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration();
+        this._currentVoiceState.currentBarComplete = false;
+        this._currentVoiceState.currentPosition = 0;
+
+        this.ensureVoice(staff, voiceIndex);
+    }
+
+
+    private parseVoice(staffId: string, staff: Staff, systemElement: XmlNode, voiceIndex: number, firstBarIndex: number, element: XmlNode) {
+        // when we reach a voice tag, we reset the reader to the state of continuing this voice. 
+        // each voice individually advances with the chords added to it. 
+        // bars within voices can span across staffs
+        // so we keep a state for each voice, and restore it before continuing on reading notes 
+        const voiceStateKey = staffId + "_" + voiceIndex;
+        if (!this._voiceStates.has(voiceStateKey)) {
+            // first occurence of the instrument, we create a state, and create all bars including voice
+            this._currentVoiceState = new CapellaVoiceState();
+            this._voiceStates.set(voiceStateKey, this._currentVoiceState);
+            this.newBar(staff, voiceIndex);
+        } else {
+            this._currentVoiceState = this._voiceStates.get(voiceStateKey)!;
+        }
+
+
         // voice tags always start a new bar
-        let currentBar!: Bar;
-        let currentVoice!: Voice;
+        if (element.attributes.has('stemDir')) {
+            switch (element.attributes.get('stemDir')!) {
+                case 'up':
+                    this._currentVoiceState.voiceStemDir = BeamDirection.Up;
+                    break;
+                case 'down':
+                    this._currentVoiceState.voiceStemDir = BeamDirection.Down;
+                    break;
+                default:
+                    this._currentVoiceState.voiceStemDir = null;
+                    break;
+            }
+        } else {
+            this._currentVoiceState.voiceStemDir = null;
+        }
+
         const noteObjects = element.findChildElement('noteObjects');
 
-        let barDuration = 0;
-        let currentDuration = 0;
-        let currentBarComplete = false;
-
-        let newBar = () => {
-            currentBar = this.addNewBar(staff);
-            barDuration = currentBar.masterBar.calculateDuration();
-            currentDuration = 0;
-            currentBarComplete = false;
-
-            while (currentBar.voices.length < voiceIndex + 1) {
-                currentBar.addVoice(new Voice());
-            }
-
-            if (
-                !this._voiceCounts.has(staff.track.index) ||
-                this._voiceCounts.get(staff.track.index)! < currentBar.voices.length
-            ) {
-                this._voiceCounts.set(staff.track.index, currentBar.voices.length);
-            }
-
-            currentVoice = currentBar.voices[voiceIndex];
-        };
-
-        newBar();
         if (systemElement.attributes.has('tempo')) {
-            currentBar.masterBar.tempoAutomation = new Automation();
-            currentBar.masterBar.tempoAutomation.isLinear = true;
-            currentBar.masterBar.tempoAutomation.type = AutomationType.Tempo;
-            currentBar.masterBar.tempoAutomation.value = parseInt(systemElement.attributes.get('tempo')!);
+            this._currentBar.masterBar.tempoAutomation = new Automation();
+            this._currentBar.masterBar.tempoAutomation.isLinear = true;
+            this._currentBar.masterBar.tempoAutomation.type = AutomationType.Tempo;
+            this._currentBar.masterBar.tempoAutomation.value = parseInt(systemElement.attributes.get('tempo')!);
         }
 
         if (noteObjects) {
             for (let c of noteObjects.childNodes) {
                 if (c.nodeType === XmlNodeType.Element) {
-                    if (currentBarComplete) {
-                        newBar();
+                    if (this._currentVoiceState.currentBarComplete) {
+                        this.newBar(staff, voiceIndex);
                     }
+
                     switch (c.localName) {
                         case 'clefSign':
-                            currentBar.clef = this.parseClef(c.getAttribute('clef'));
+                            this._currentBar.clef = this.parseClef(c.getAttribute('clef'));
                             break;
                         case 'keySign':
-                            currentBar.masterBar.keySignature = parseInt(c.getAttribute('fifths'));
+                            this._currentBar.masterBar.keySignature = parseInt(c.getAttribute('fifths'));
                             break;
                         case 'timeSign':
                             this.parseTime(c.getAttribute('time'));
-                            currentBar.masterBar.timeSignatureDenominator = this._timeSignature.timeSignatureNumerator;
-                            currentBar.masterBar.timeSignatureNumerator = this._timeSignature.timeSignatureDenominator;
-                            currentBar.masterBar.timeSignatureCommon = this._timeSignature.timeSignatureCommon;
-                            barDuration = currentBar.masterBar.calculateDuration();
+                            this._currentBar.masterBar.timeSignatureDenominator = this._timeSignature.timeSignatureDenominator;
+                            this._currentBar.masterBar.timeSignatureNumerator = this._timeSignature.timeSignatureNumerator;
+                            this._currentBar.masterBar.timeSignatureCommon = this._timeSignature.timeSignatureCommon;
+                            this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration();
                             break;
                         case 'barLine':
                             switch (c.getAttribute('type')) {
                                 case 'single':
-                                    currentBarComplete = true;
+                                    this._currentVoiceState.currentBarComplete = true;
                                     break;
                                 case 'double':
-                                    currentBar.masterBar.isDoubleBar = true;
-                                    currentBarComplete = true;
+                                    this._currentBar.masterBar.isDoubleBar = true;
+                                    this._currentVoiceState.currentBarComplete = true;
                                     break;
                                 case 'end':
                                     // nothing to do
                                     break;
                                 case 'repEnd':
                                     // TODO: alternate endings handling
-                                    currentBar.masterBar.repeatCount = this.findRepeatCount(c);
-                                    currentBarComplete = true;
+                                    this._currentBar.masterBar.repeatCount = this.findRepeatCount(c);
+                                    this._currentVoiceState.currentBarComplete = true;
                                     break;
                                 case 'repBegin':
-                                    currentBar.masterBar.isRepeatStart = true;
+                                    this._currentBar.masterBar.isRepeatStart = true;
                                     // no new bar here on purpose
                                     break;
                                 case 'repEndBegin':
                                     // TODO: alternate endings handling
-                                    currentBar.masterBar.repeatCount = this.findRepeatCount(c);
-                                    newBar(); // end-begin requires instant new bar
-                                    currentBar.masterBar.isRepeatStart = true;
+                                    this._currentBar.masterBar.repeatCount = this.findRepeatCount(c);
+                                    this.newBar(staff, voiceIndex); // end-begin requires instant new bar
+                                    this._currentBar.masterBar.isRepeatStart = true;
                                     break;
                                 case 'dashed':
-                                    currentBarComplete = true;
+                                    this._currentVoiceState.currentBarComplete = true;
                                     break;
                             }
                             break;
                         case 'chord':
                             let chordBeat = new Beat();
-                            this.parseDuration(currentBar, chordBeat, c.findChildElement('duration')!);
+                            if (this._currentVoiceState.voiceStemDir) {
+                                chordBeat.preferredBeamDirection = this._currentVoiceState.voiceStemDir;
+                            }
+                            this.parseDuration(this._currentBar, chordBeat, c.findChildElement('duration')!);
                             chordBeat.updateDurations();
-                            currentDuration += chordBeat.playbackDuration;
-                            currentVoice.addBeat(chordBeat);
+                            this._currentVoiceState.currentPosition += chordBeat.playbackDuration;
+                            this._currentVoice.addBeat(chordBeat);
 
                             this.parseChord(chordBeat, c);
 
-                            if (currentDuration >= barDuration) {
-                                currentBarComplete = true;
+                            if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
+                                this._currentVoiceState.currentBarComplete = true;
                             }
                             break;
                         case 'rest':
                             let restBeat = new Beat();
-                            this.parseDuration(currentBar, restBeat, c.findChildElement('duration')!);
+                            this.parseDuration(this._currentBar, restBeat, c.findChildElement('duration')!);
                             restBeat.updateDurations();
-                            currentDuration += restBeat.playbackDuration;
+                            this._currentVoiceState.currentPosition += restBeat.playbackDuration;
 
-                            currentVoice.addBeat(restBeat);
+                            this._currentVoice.addBeat(restBeat);
 
-                            if (currentDuration >= barDuration) {
-                                currentBarComplete = true;
+                            if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
+                                this._currentVoiceState.currentBarComplete = true;
                             }
                             break;
                     }
                 }
             }
         }
+    }
+
+    private ensureVoice(staff: Staff, voiceIndex: number) {
+        while (this._currentBar.voices.length < voiceIndex + 1) {
+            this._currentBar.addVoice(new Voice());
+        }
+
+        if (!this._voiceCounts.has(staff.track.index) ||
+            this._voiceCounts.get(staff.track.index)! < this._currentBar.voices.length
+        ) {
+            this._voiceCounts.set(staff.track.index, this._currentBar.voices.length);
+        }
+
+        this._currentVoice = this._currentBar.voices[voiceIndex];
     }
 
     private parseChord(beat: Beat, element: XmlNode) {

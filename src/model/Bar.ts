@@ -57,6 +57,11 @@ export class Bar {
      */
     public simileMark: SimileMark = SimileMark.None;
 
+    /**
+     * Gets or sets whether beam grouping should be disabled for this bar during rendering.
+     */
+    public forceFlags:boolean = false;
+
     public get masterBar(): MasterBar {
         return this.staff.track.score.masterBars[this.index];
     }
@@ -76,6 +81,7 @@ export class Bar {
         dst.clef = src.clef;
         dst.clefOttava = src.clefOttava;
         dst.simileMark = src.simileMark;
+        dst.forceFlags = src.forceFlags;
     }
 
     public addVoice(voice: Voice): void {
