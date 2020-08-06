@@ -25,7 +25,7 @@ export class FermataEffectInfo extends EffectBarRendererInfo {
     }
 
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
-        return !!beat.fermata;
+        return beat.voice.index === 0 && !!beat.fermata;
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {

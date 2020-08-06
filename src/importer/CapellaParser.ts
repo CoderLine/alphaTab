@@ -22,6 +22,8 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TextAlign } from '@src/platform/ICanvas';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { Logger } from '@src/alphatab';
+import { Fermata, FermataType } from '@src/model/Fermata';
+import { DynamicValue } from '@src/model/DynamicValue';
 
 class DrawObject {
     public noteRange: number = 1;
@@ -38,6 +40,7 @@ class TextDrawObject extends DrawObject {
     public align: TextAlign = TextAlign.Left;
     public frame: FrameType = FrameType.None;
     public text: string = '';
+    public fontFace: string = '';
 }
 
 class GuitarDrawObject extends DrawObject {
@@ -106,6 +109,7 @@ export class CapellaParser {
         this._tieStartIds = new Map<number, boolean>();
         this._voiceCounts = new Map();
         this._slurs = new Map<Beat, number>();
+        this._crescendo = new Map<Beat, WedgeDrawObject>();
 
         let dom: XmlDocument;
         try {
@@ -158,11 +162,29 @@ export class CapellaParser {
             }
         }
 
+        // TODO: unify this 
         this._slurs.forEach((noteRange, startBeat) => {
             let endBeat = startBeat;
             for (let i = 0; i < noteRange; i++) {
                 endBeat.isLegatoOrigin = true;
 
+                // advance to next
+                if (endBeat.index + 1 < endBeat.voice.beats.length) {
+                    endBeat = endBeat.voice.beats[endBeat.index + 1];
+                } else if (endBeat.voice.bar.index + 1 < endBeat.voice.bar.staff.bars.length) {
+                    const nextBar = endBeat.voice.bar.staff.bars[endBeat.voice.bar.index + 1];
+                    endBeat = nextBar.voices[endBeat.voice.index].beats[0];
+                } else {
+                    break;
+                }
+            }
+        });
+
+        this._crescendo.forEach((cre, startBeat) => {
+            const noteRange = cre.noteRange;
+            let endBeat = startBeat;
+            for (let i = 0; i < noteRange; i++) {
+                endBeat.crescendo = cre.decrescendo ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
                 // advance to next
                 if (endBeat.index + 1 < endBeat.voice.beats.length) {
                     endBeat = endBeat.voice.beats[endBeat.index + 1];
@@ -522,18 +544,15 @@ export class CapellaParser {
 
 
     private parseVoice(staffId: string, staff: Staff, systemElement: XmlNode, voiceIndex: number, firstBarIndex: number, element: XmlNode) {
-        // when we reach a voice tag, we reset the reader to the state of continuing this voice. 
-        // each voice individually advances with the chords added to it. 
-        // bars within voices can span across staffs
-        // so we keep a state for each voice, and restore it before continuing on reading notes 
         const voiceStateKey = staffId + "_" + voiceIndex;
         if (!this._voiceStates.has(voiceStateKey)) {
-            // first occurence of the instrument, we create a state, and create all bars including voice
             this._currentVoiceState = new CapellaVoiceState();
+            this._currentVoiceState.currentBarIndex = firstBarIndex - 1;
             this._voiceStates.set(voiceStateKey, this._currentVoiceState);
             this.newBar(staff, voiceIndex);
         } else {
             this._currentVoiceState = this._voiceStates.get(voiceStateKey)!;
+            this._currentVoiceState.currentBarComplete = true;
         }
 
 
@@ -584,11 +603,8 @@ export class CapellaParser {
                             this._currentBar.masterBar.timeSignatureCommon = this._timeSignature.timeSignatureCommon;
                             this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration();
                             break;
-                        case 'barLine':
+                        case 'barline':
                             switch (c.getAttribute('type')) {
-                                case 'single':
-                                    this._currentVoiceState.currentBarComplete = true;
-                                    break;
                                 case 'double':
                                     this._currentBar.masterBar.isDoubleBar = true;
                                     this._currentVoiceState.currentBarComplete = true;
@@ -614,6 +630,11 @@ export class CapellaParser {
                                 case 'dashed':
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
+                                case 'single':
+                                default:
+                                    this._currentVoiceState.currentBarComplete = true;
+                                    break;
+
                             }
                             break;
                         case 'chord':
@@ -722,6 +743,7 @@ export class CapellaParser {
     private _tieStarts!: Note[];
     private _tieStartIds!: Map<number, boolean>;
     private _slurs!: Map<Beat, number>;
+    private _crescendo!: Map<Beat, WedgeDrawObject>;
 
     private parseHead(beat: Beat, articulation: Note, element: XmlNode) {
         const note = new Note();
@@ -769,13 +791,25 @@ export class CapellaParser {
                         const obj = this.parseDrawObj(c);
                         if (obj) {
                             if (obj instanceof TextDrawObject) {
-                                beat.text = obj.text;
+                                if (obj.fontFace.startsWith('capella')) {
+                                    if (obj.text === 'u') {
+                                        beat.fermata = new Fermata();
+                                        beat.fermata.type = FermataType.Medium;
+                                    } else if (obj.text == 'f') {
+                                        beat.dynamics = DynamicValue.F;
+                                    } else if (obj.text == 'j') {
+                                        beat.dynamics = DynamicValue.MF;
+                                    }
+                                } else {
+                                    beat.text = obj.text;
+                                }
                             } else if (obj instanceof GuitarDrawObject) {
                                 // TODO: Chord
                             } else if (obj instanceof WavyLineDrawObject) {
                                 beat.vibrato = VibratoType.Slight;
                             } else if (obj instanceof WedgeDrawObject) {
                                 beat.crescendo = obj.decrescendo ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
+                                this._crescendo.set(beat, obj);
                             } else if (obj instanceof SlurDrawObject) {
                                 this._slurs.set(beat, obj.noteRange);
                             }
@@ -843,6 +877,7 @@ export class CapellaParser {
                             'Importer',
                             `Unsupported full-bar rest for time signature ${mb.timeSignatureNumerator}/${mb.timeSignatureDenominator}`
                         );
+                        beat.duration = Duration.Whole;
                     }
                 } else {
                     // TODO: multibar rests
@@ -857,15 +892,15 @@ export class CapellaParser {
 
         const tuplet = element.findChildElement('tuplet');
         if (tuplet) {
-            beat.tupletDenominator = parseInt(tuplet.getAttribute('count'));
+            beat.tupletNumerator = parseInt(tuplet.getAttribute('count'));
             const tripartiteMultiplicator = tuplet.getAttribute('tripartite') === 'true' ? 3 : 1;
-            const prolongDiff = tuplet.getAttribute('prolong') === 'true' ? 1 : 0;
+            const prolongDiff = tuplet.getAttribute('prolong') === 'true' ? 0 : 1;
 
             let power = 0;
-            while (tripartiteMultiplicator * Math.pow(2, power + prolongDiff) < beat.tupletDenominator) {
+            while (tripartiteMultiplicator * Math.pow(2, power + prolongDiff) < beat.tupletNumerator) {
                 power++;
             }
-            beat.tupletNumerator = tripartiteMultiplicator * Math.pow(2, power);
+            beat.tupletDenominator = tripartiteMultiplicator * Math.pow(2, power);
         }
     }
 
@@ -1089,7 +1124,23 @@ export class CapellaParser {
                 break;
         }
 
-        obj.text = element.innerText;
+        if (element.firstElement) {
+            for (let c of element.childNodes) {
+                if (c.nodeType === XmlNodeType.Element) {
+                    switch (c.localName) {
+                        case 'font':
+                            obj.fontFace = c.getAttribute('face');
+                            break;
+                        case 'content':
+                            obj.text = c.innerText;
+                            break;
+                    }
+                }
+            }
+        } else {
+            obj.text = element.innerText;
+        }
+
 
         return obj;
     }

@@ -749,7 +749,6 @@ export class Beat {
             this.updateDurations();
             this.voice.insertBeat(this, cloneBeat);
         }
-        this.fermata = this.voice.bar.masterBar.getFermata(this);
     }
 
     /**

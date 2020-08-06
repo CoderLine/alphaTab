@@ -166,6 +166,14 @@ export class Voice {
                 beat.playbackStart = currentPlaybackTick;
                 currentPlaybackTick = beat.playbackStart + beat.playbackDuration;
             }
+
+
+            if(beat.fermata) {
+                this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
+            } else {
+                beat.fermata = this.bar.masterBar.getFermata(beat);
+            }
+
             beat.finishTuplet();
             this._beatLookup.set(beat.displayStart, beat);
         }
