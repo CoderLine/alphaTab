@@ -24,6 +24,7 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { Logger } from '@src/alphatab';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { DynamicValue } from '@src/model/DynamicValue';
+import { Ottavia } from '@src/model/Ottavia';
 
 class DrawObject {
     public noteRange: number = 1;
@@ -77,6 +78,7 @@ class StaffLayout {
 
     public percussion: boolean = false;
     public instrument: number = 0;
+    public volume: number = 0;
     public transpose: number = 0;
     public index: number = 0;
 }
@@ -165,7 +167,7 @@ export class CapellaParser {
         // TODO: unify this 
         this._slurs.forEach((noteRange, startBeat) => {
             let endBeat = startBeat;
-            for (let i = 0; i < noteRange; i++) {
+            for (let i = 0; i < noteRange + 1; i++) {
                 endBeat.isLegatoOrigin = true;
 
                 // advance to next
@@ -183,7 +185,7 @@ export class CapellaParser {
         this._crescendo.forEach((cre, startBeat) => {
             const noteRange = cre.noteRange;
             let endBeat = startBeat;
-            for (let i = 0; i < noteRange; i++) {
+            for (let i = 0; i < noteRange + 1; i++) {
                 endBeat.crescendo = cre.decrescendo ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
                 // advance to next
                 if (endBeat.index + 1 < endBeat.voice.beats.length) {
@@ -279,6 +281,7 @@ export class CapellaParser {
                 currentTrack = new Track();
                 currentTrack.ensureStaveCount(1);
                 currentTrack.name = staffLayout.description;
+                currentTrack.playbackInfo.volume = Math.floor((staffLayout.volume / 128) * 16);
                 currentTrack.playbackInfo.program = staffLayout.instrument;
                 if (staffLayout.percussion) {
                     currentTrack.playbackInfo.primaryChannel = 9;
@@ -293,7 +296,7 @@ export class CapellaParser {
             const staff = currentTrack.staves[currentTrack.staves.length - 1];
             staff.isPercussion = staffLayout.percussion;
             staff.transpositionPitch = staffLayout.transpose;
-            staff.displayTranspositionPitch = 12;
+            staff.displayTranspositionPitch = 0;
             staff.showTablature = false; // capella does not have tabs
             this._staffLookup.set(staffLayout.index, staff);
         }
@@ -357,6 +360,9 @@ export class CapellaParser {
                         if (c.attributes.has('instr')) {
                             layout.instrument = parseInt(c.attributes.get('instr')!);
                         }
+                        if (c.attributes.has('volume')) {
+                            layout.volume = parseInt(c.attributes.get('volume')!);
+                        }
                         if (c.attributes.has('transpose')) {
                             layout.transpose = parseInt(c.attributes.get('transpose')!);
                         }
@@ -382,6 +388,16 @@ export class CapellaParser {
                 return Clef.C4;
         }
         return Clef.G2;
+    }
+
+    private parseClefOttava(v: string): Ottavia {
+        if (v.endsWith('-')) {
+            return Ottavia._8vb;
+        } else if (v.endsWith('+')) {
+            return Ottavia._8va;
+        }
+
+        return Ottavia.Regular;
     }
 
     private parseSystems(element: XmlNode) {
@@ -505,8 +521,12 @@ export class CapellaParser {
     private addNewBar(staff: Staff) {
         // voice tags always start a new bar
         let currentBar: Bar = new Bar();
-        currentBar.forceFlags = this._forceFlags;
-        currentBar.clef = this._currentStaffLayout!.defaultClef;
+        if(staff.bars.length > 0) {
+            currentBar.clef = staff.bars[staff.bars.length -1].clef;
+            currentBar.clefOttava = staff.bars[staff.bars.length -1].clefOttava;
+        } else {
+            currentBar.clef = this._currentStaffLayout!.defaultClef;
+        }
         staff.addBar(currentBar);
 
         // create masterbar if needed
@@ -592,6 +612,7 @@ export class CapellaParser {
                     switch (c.localName) {
                         case 'clefSign':
                             this._currentBar.clef = this.parseClef(c.getAttribute('clef'));
+                            this._currentBar.clefOttava = this.parseClefOttava(c.getAttribute('clef'));
                             break;
                         case 'keySign':
                             this._currentBar.masterBar.keySignature = parseInt(c.getAttribute('fifths'));
@@ -639,6 +660,7 @@ export class CapellaParser {
                             break;
                         case 'chord':
                             let chordBeat = new Beat();
+                            chordBeat.forceFlags = this._forceFlags;
                             if (this._currentVoiceState.voiceStemDir) {
                                 chordBeat.preferredBeamDirection = this._currentVoiceState.voiceStemDir;
                             }
@@ -655,6 +677,7 @@ export class CapellaParser {
                             break;
                         case 'rest':
                             let restBeat = new Beat();
+                            restBeat.forceFlags = this._forceFlags;
                             this.parseDuration(this._currentBar, restBeat, c.findChildElement('duration')!);
                             restBeat.updateDurations();
                             this._currentVoiceState.currentPosition += restBeat.playbackDuration;
@@ -723,6 +746,16 @@ export class CapellaParser {
                     case 'heads':
                         this.parseHeads(beat, articulation, c);
                         break;
+                    case 'beam':
+                        switch (c.getAttribute('group')) {
+                            case 'force':
+                                beat.forceFlags = false;
+                                break;
+                            case 'divide':
+                                beat.forceFlags = true;
+                                break;
+                        }
+                        break;
                 }
             }
         }
@@ -748,7 +781,7 @@ export class CapellaParser {
     private parseHead(beat: Beat, articulation: Note, element: XmlNode) {
         const note = new Note();
         const pitch = ModelUtils.parseTuning(element.getAttribute('pitch'));
-        note.octave = pitch!.octave;
+        note.octave = pitch!.octave - 1;
         note.tone = pitch!.noteValue;
         note.isStaccato = articulation.isStaccato;
         note.accentuated = articulation.accentuated;

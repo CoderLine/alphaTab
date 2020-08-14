@@ -196,7 +196,7 @@ export class BeamingHelper {
         let add: boolean = false;
         if (this.beats.length === 0) {
             add = true;
-        } else if(this.voice.bar.forceFlags) {
+        } else if(beat.forceFlags) {
             add = false;
         } else if (BeamingHelper.canJoin(this.beats[this.beats.length - 1], beat)) {
             add = true;

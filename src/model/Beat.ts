@@ -344,6 +344,11 @@ export class Beat {
 
     public effectSlurDestination: Beat | null = null;
 
+    /**
+     * Gets or sets whether beam grouping should be disabled for this bar during rendering.
+     */
+    public forceFlags:boolean = false;    
+
     public static copyTo(src: Beat, dst: Beat): void {
         dst.id = src.id;
         dst.index = src.index;
@@ -384,6 +389,7 @@ export class Beat {
         dst.isContinuedWhammy = src.isContinuedWhammy;
         dst.ottava = src.ottava;
         dst.whammyStyle = src.whammyStyle;
+        dst.forceFlags = src.forceFlags;
     }
 
     public clone(): Beat {

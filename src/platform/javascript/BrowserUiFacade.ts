@@ -418,7 +418,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 placeholder.style.width = renderResult.width + 'px';
                 placeholder.style.height = renderResult.height + 'px';
                 placeholder.style.display = 'inline-block';
-                if (this.isElementInViewPort(placeholder) || !this._api.settings.core.enableLazyLoading) {
+                if (!this._api.settings.core.enableLazyLoading || this.isElementInViewPort(placeholder)) {
                     this.replacePlaceholder(placeholder, body);
                 } else {
                     (placeholder as any)['svg'] = body;
