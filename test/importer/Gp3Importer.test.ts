@@ -4,6 +4,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Score } from '@src/model/Score';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
+import { HarmonicType } from '@src/model/HarmonicType';
 
 describe('Gp3ImporterTest', () => {
     it('score-info', async () => {
@@ -52,8 +53,14 @@ describe('Gp3ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLetRing).toBe(true);
     });
 
-    it('testGuitarPro3Harmonics', async () => {
-        // TODO: Find out about GP3 harmonics!
+    it('harmonics', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/harmonics.gp3');
+        let score: Score = reader.readScore();    
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).toBe(HarmonicType.Natural);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).toBe(HarmonicType.Artificial);
     });
 
     it('hammer', async () => {
