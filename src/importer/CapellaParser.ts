@@ -131,10 +131,7 @@ export class CapellaParser {
 
         this.consolidate();
 
-        const oldDetectAnacrusis = settings.importer.detectAnacrusis;
-        settings.importer.detectAnacrusis = true;
         this.score.finish(settings);
-        settings.importer.detectAnacrusis = oldDetectAnacrusis;
     }
 
     private consolidate() {
@@ -587,6 +584,10 @@ export class CapellaParser {
         element: XmlNode
     ) {
         const voiceStateKey = staffId + '_' + voiceIndex;
+        if(this._currentVoiceState && !this._currentVoiceState.currentBarComplete) {
+            this._currentBar.masterBar.isAnacrusis = true;
+        }
+
         if (!this._voiceStates.has(voiceStateKey)) {
             this._currentVoiceState = new CapellaVoiceState();
             this._currentVoiceState.currentBarIndex = firstBarIndex - 1;
@@ -650,14 +651,22 @@ export class CapellaParser {
                             switch (c.getAttribute('type')) {
                                 case 'double':
                                     this._currentBar.masterBar.isDoubleBar = true;
+                                    if(!this._currentVoiceState.currentBarComplete) {
+                                        this._currentBar.masterBar.isAnacrusis = true;
+                                    }
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
                                 case 'end':
-                                    // nothing to do
+                                    if(!this._currentVoiceState.currentBarComplete) {
+                                        this._currentBar.masterBar.isAnacrusis = true;
+                                    }
                                     break;
                                 case 'repEnd':
                                     // TODO: alternate endings handling
                                     this._currentBar.masterBar.repeatCount = this.findRepeatCount(c);
+                                    if(!this._currentVoiceState.currentBarComplete) {
+                                        this._currentBar.masterBar.isAnacrusis = true;
+                                    }
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
                                 case 'repBegin':
@@ -671,10 +680,16 @@ export class CapellaParser {
                                     this._currentBar.masterBar.isRepeatStart = true;
                                     break;
                                 case 'dashed':
+                                    if(!this._currentVoiceState.currentBarComplete) {
+                                        this._currentBar.masterBar.isAnacrusis = true;
+                                    }
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
                                 case 'single':
                                 default:
+                                    if(!this._currentVoiceState.currentBarComplete) {
+                                        this._currentBar.masterBar.isAnacrusis = true;
+                                    }
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
                             }

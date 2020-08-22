@@ -85,23 +85,9 @@ export class Bar {
     }
 
     public finish(settings: Settings): void {
-        let maxDuration = 0;
         for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
             let voice: Voice = this.voices[i];
             voice.finish(settings);
-            const duration = voice.calculateDuration();
-            if (duration > maxDuration && !voice.isEmpty) {
-                maxDuration = duration;
-            }
-        }
-
-        if (
-            settings.importer.detectAnacrusis &&
-            !this.masterBar.isAnacrusis &&
-            maxDuration > 0 &&
-            this.masterBar.calculateDuration() !== maxDuration
-        ) {
-            this.masterBar.isAnacrusis = true;
         }
     }
 
