@@ -26,6 +26,7 @@ import { Fermata, FermataType } from '@src/model/Fermata';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { Ottavia } from '@src/model/Ottavia';
 import { MidiUtils } from '@src/midi/MidiUtils';
+import { KeySignature } from '@src/model/KeySignature';
 
 class DrawObject {
     public noteRange: number = 1;
@@ -115,7 +116,7 @@ export class CapellaParser {
         this._galleryObjects = new Map<string, DrawObject>();
         this._tieStarts = [];
         this._tieStartIds = new Map<number, boolean>();
-        this._voiceCounts = new Map();
+        this._voiceCounts = new Map<number, number>();
         this._slurs = new Map<Beat, number>();
         this._crescendo = new Map<Beat, WedgeDrawObject>();
         this._isFirstSystem = true;
@@ -641,7 +642,7 @@ export class CapellaParser {
                             this._currentBar.clefOttava = this.parseClefOttava(c.getAttribute('clef'));
                             break;
                         case 'keySign':
-                            this._currentBar.masterBar.keySignature = parseInt(c.getAttribute('fifths'));
+                            this._currentBar.masterBar.keySignature = parseInt(c.getAttribute('fifths')) as KeySignature;
                             break;
                         case 'timeSign':
                             this.parseTime(c.getAttribute('time'));
@@ -965,8 +966,8 @@ export class CapellaParser {
     }
 
     private parseRestDurations(bar: Bar, element: XmlNode): Beat[] {
-        const base = element.getAttribute('base');
-        if (base.indexOf('/') !== -1) {
+        const durationBase = element.getAttribute('base');
+        if (durationBase.indexOf('/') !== -1) {
             let restBeat = new Beat();
             restBeat.beamingMode = this._beamingMode;
             this.parseDuration(bar, restBeat, element);
@@ -974,9 +975,8 @@ export class CapellaParser {
         }
 
         // for
-        const fullBars = parseInt(base);
+        const fullBars = parseInt(durationBase);
         if (fullBars === 1) {
-            const fullBars = parseInt(base);
             let restBeats: Beat[] = [];
             let remainingTicks = bar.masterBar.calculateDuration(false) * fullBars;
             let currentRestDuration = Duration.Whole;
@@ -987,7 +987,7 @@ export class CapellaParser {
                     currentRestDurationTicks > remainingTicks &&
                     currentRestDuration < Duration.TwoHundredFiftySixth
                 ) {
-                    currentRestDuration = currentRestDuration * 2;
+                    currentRestDuration = ((currentRestDuration as number) * 2) as Duration;
                     currentRestDurationTicks = MidiUtils.toTicks(currentRestDuration);
                 }
 
@@ -1012,7 +1012,7 @@ export class CapellaParser {
         }
     }
 
-    private parseDurationValue(s: String): Duration {
+    private parseDurationValue(s: string): Duration {
         switch (s) {
             case '2/1':
                 return Duration.DoubleWhole;
@@ -1039,8 +1039,8 @@ export class CapellaParser {
     }
 
     private parseDuration(bar: Bar, beat: Beat, element: XmlNode) {
-        const base = element.getAttribute('base');
-        beat.duration = this.parseDurationValue(base);
+        const durationBase = element.getAttribute('base');
+        beat.duration = this.parseDurationValue(durationBase);
 
         if (element.attributes.has('dots')) {
             beat.dots = parseInt(element.attributes.get('dots')!);
