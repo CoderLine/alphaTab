@@ -25,9 +25,12 @@ import { Logger } from '@src/alphatab';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { Ottavia } from '@src/model/Ottavia';
+import { MidiUtils } from '@src/midi/MidiUtils';
 
 class DrawObject {
     public noteRange: number = 1;
+    public x: number = 0;
+    public y: number = 0;
 }
 
 enum FrameType {
@@ -42,15 +45,17 @@ class TextDrawObject extends DrawObject {
     public frame: FrameType = FrameType.None;
     public text: string = '';
     public fontFace: string = '';
+    public weight: number = 0;
+    public height: number = 0;
 }
 
 class GuitarDrawObject extends DrawObject {
     public chord: Chord = new Chord();
 }
 
-class SlurDrawObject extends DrawObject { }
+class SlurDrawObject extends DrawObject {}
 
-class WavyLineDrawObject extends DrawObject { }
+class WavyLineDrawObject extends DrawObject {}
 
 class TupletBracketDrawObject extends DrawObject {
     public number: number = 0;
@@ -70,7 +75,7 @@ class OctaveClefDrawObject extends DrawObject {
     public octave: number = 1;
 }
 
-class TrillDrawObject extends DrawObject { }
+class TrillDrawObject extends DrawObject {}
 
 class StaffLayout {
     public defaultClef: Clef = Clef.G2;
@@ -104,6 +109,7 @@ export class CapellaParser {
     private _galleryObjects!: Map<string, DrawObject>;
 
     private _voiceCounts!: Map<number /*track*/, number /*count*/>;
+    private _isFirstSystem: boolean = true;
 
     public parseXml(xml: string, settings: Settings): void {
         this._galleryObjects = new Map<string, DrawObject>();
@@ -112,6 +118,7 @@ export class CapellaParser {
         this._voiceCounts = new Map();
         this._slurs = new Map<Beat, number>();
         this._crescendo = new Map<Beat, WedgeDrawObject>();
+        this._isFirstSystem = true;
 
         let dom: XmlDocument;
         try {
@@ -124,7 +131,10 @@ export class CapellaParser {
 
         this.consolidate();
 
+        const oldDetectAnacrusis = settings.importer.detectAnacrusis;
+        settings.importer.detectAnacrusis = true;
         this.score.finish(settings);
+        settings.importer.detectAnacrusis = oldDetectAnacrusis;
     }
 
     private consolidate() {
@@ -164,7 +174,7 @@ export class CapellaParser {
             }
         }
 
-        // TODO: unify this 
+        // TODO: unify this
         this._slurs.forEach((noteRange, startBeat) => {
             let endBeat = startBeat;
             for (let i = 0; i < noteRange + 1; i++) {
@@ -429,6 +439,8 @@ export class CapellaParser {
                 }
             }
         }
+
+        this._isFirstSystem = false;
     }
 
     private parseStaves(systemElement: XmlNode, element: XmlNode) {
@@ -497,7 +509,13 @@ export class CapellaParser {
                 break;
         }
     }
-    private parseVoices(staffId: string, staff: Staff, systemElement: XmlNode, firstBarIndex: number, element: XmlNode) {
+    private parseVoices(
+        staffId: string,
+        staff: Staff,
+        systemElement: XmlNode,
+        firstBarIndex: number,
+        element: XmlNode
+    ) {
         let voiceIndex = 0;
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
@@ -521,9 +539,9 @@ export class CapellaParser {
     private addNewBar(staff: Staff) {
         // voice tags always start a new bar
         let currentBar: Bar = new Bar();
-        if(staff.bars.length > 0) {
-            currentBar.clef = staff.bars[staff.bars.length -1].clef;
-            currentBar.clefOttava = staff.bars[staff.bars.length -1].clefOttava;
+        if (staff.bars.length > 0) {
+            currentBar.clef = staff.bars[staff.bars.length - 1].clef;
+            currentBar.clefOttava = staff.bars[staff.bars.length - 1].clefOttava;
         } else {
             currentBar.clef = this._currentStaffLayout!.defaultClef;
         }
@@ -546,7 +564,6 @@ export class CapellaParser {
         return currentBar;
     }
 
-
     private _voiceStates: Map<string, CapellaVoiceState> = new Map();
     private _currentVoiceState!: CapellaVoiceState;
     private _currentBar!: Bar;
@@ -558,13 +575,18 @@ export class CapellaParser {
         this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration();
         this._currentVoiceState.currentBarComplete = false;
         this._currentVoiceState.currentPosition = 0;
-
         this.ensureVoice(staff, voiceIndex);
     }
 
-
-    private parseVoice(staffId: string, staff: Staff, systemElement: XmlNode, voiceIndex: number, firstBarIndex: number, element: XmlNode) {
-        const voiceStateKey = staffId + "_" + voiceIndex;
+    private parseVoice(
+        staffId: string,
+        staff: Staff,
+        systemElement: XmlNode,
+        voiceIndex: number,
+        firstBarIndex: number,
+        element: XmlNode
+    ) {
+        const voiceStateKey = staffId + '_' + voiceIndex;
         if (!this._voiceStates.has(voiceStateKey)) {
             this._currentVoiceState = new CapellaVoiceState();
             this._currentVoiceState.currentBarIndex = firstBarIndex - 1;
@@ -572,9 +594,9 @@ export class CapellaParser {
             this.newBar(staff, voiceIndex);
         } else {
             this._currentVoiceState = this._voiceStates.get(voiceStateKey)!;
+            this._currentBar = this.getOrCreateBar(staff, this._currentVoiceState.currentBarIndex);
             this._currentVoiceState.currentBarComplete = true;
         }
-
 
         // voice tags always start a new bar
         if (element.attributes.has('stemDir')) {
@@ -655,7 +677,6 @@ export class CapellaParser {
                                 default:
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
-
                             }
                             break;
                         case 'chord':
@@ -676,16 +697,15 @@ export class CapellaParser {
                             }
                             break;
                         case 'rest':
-                            let restBeat = new Beat();
-                            restBeat.forceFlags = this._forceFlags;
-                            this.parseDuration(this._currentBar, restBeat, c.findChildElement('duration')!);
-                            restBeat.updateDurations();
-                            this._currentVoiceState.currentPosition += restBeat.playbackDuration;
-
-                            this._currentVoice.addBeat(restBeat);
-
-                            if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
-                                this._currentVoiceState.currentBarComplete = true;
+                            const restBeats = this.parseRestDurations(this._currentBar, c.findChildElement('duration')!);
+                            for(const restBeat of restBeats) {
+                                restBeat.updateDurations();
+                                this._currentVoiceState.currentPosition += restBeat.playbackDuration;
+                                this._currentVoice.addBeat(restBeat);
+    
+                                if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
+                                    this._currentVoiceState.currentBarComplete = true;
+                                }
                             }
                             break;
                     }
@@ -699,7 +719,8 @@ export class CapellaParser {
             this._currentBar.addVoice(new Voice());
         }
 
-        if (!this._voiceCounts.has(staff.track.index) ||
+        if (
+            !this._voiceCounts.has(staff.track.index) ||
             this._voiceCounts.get(staff.track.index)! < this._currentBar.voices.length
         ) {
             this._voiceCounts.set(staff.track.index, this._currentBar.voices.length);
@@ -833,6 +854,29 @@ export class CapellaParser {
                                     } else if (obj.text == 'j') {
                                         beat.dynamics = DynamicValue.MF;
                                     }
+                                } else if (
+                                    this._isFirstSystem &&
+                                    this.score.title === '' &&
+                                    obj.align === TextAlign.Center &&
+                                    obj.height > 16 &&
+                                    obj.weight > 400
+                                ) {
+                                    // bold large centered text is very likely the title
+                                    this.score.title = obj.text;
+                                } else if (
+                                    this._isFirstSystem &&
+                                    this.score.artist === '' &&
+                                    obj.align === TextAlign.Center &&
+                                    obj.y < 0
+                                ) {
+                                    this.score.artist = obj.text;
+                                } else if (
+                                    this._isFirstSystem &&
+                                    this.score.music === '' &&
+                                    obj.align === TextAlign.Right &&
+                                    obj.y < 0
+                                ) {
+                                    this.score.music = obj.text;
                                 } else {
                                     beat.text = obj.text;
                                 }
@@ -868,56 +912,83 @@ export class CapellaParser {
         }
     }
 
+    private parseRestDurations(bar: Bar, element: XmlNode): Beat[] {
+        const base = element.getAttribute('base');
+        if (base.indexOf('/') !== -1) {
+            let restBeat = new Beat();
+            restBeat.forceFlags = this._forceFlags;
+            this.parseDuration(bar, restBeat, element);
+            return [restBeat];
+        }
+
+        // for
+        const fullBars = parseInt(base);
+        if (fullBars === 1) {
+            const fullBars = parseInt(base);
+            let restBeats: Beat[] = [];
+            let remainingTicks = bar.masterBar.calculateDuration() * fullBars;
+            let currentRestDuration = Duration.Whole;
+            let currentRestDurationTicks = MidiUtils.toTicks(currentRestDuration);
+            while (remainingTicks > 0) {
+                // reduce to the duration that fits into the remaining time
+                while (
+                    currentRestDurationTicks > remainingTicks &&
+                    currentRestDuration < Duration.TwoHundredFiftySixth
+                ) {
+                    currentRestDuration = currentRestDuration * 2;
+                    currentRestDurationTicks = MidiUtils.toTicks(currentRestDuration);
+                }
+
+                // no duration will fit anymore
+                if (currentRestDurationTicks > remainingTicks) {
+                    break;
+                }
+
+                let restBeat = new Beat();
+                restBeat.forceFlags = this._forceFlags;
+                restBeat.duration = currentRestDuration;
+                restBeats.push(restBeat);
+
+                remainingTicks -= currentRestDurationTicks;
+            }
+
+            return restBeats;
+        } else {
+            // TODO: multibar rests
+            Logger.warning('Importer', `Multi-Bar rests are not supported`);
+            return [];
+        }
+    }
+
+    private parseDurationValue(s: String): Duration {
+        switch (s) {
+            case '2/1':
+                return Duration.DoubleWhole;
+            case '1/1':
+                return Duration.Whole;
+            case '1/2':
+                return Duration.Half;
+            case '1/4':
+                return Duration.Quarter;
+            case '1/8':
+                return Duration.Eighth;
+            case '1/16':
+                return Duration.Sixteenth;
+            case '1/32':
+                return Duration.ThirtySecond;
+            case '1/64':
+                return Duration.SixtyFourth;
+            case '1/128':
+                return Duration.OneHundredTwentyEighth;
+            default:
+                Logger.warning('Importer', 'Unsupported duration');
+                return Duration.Quarter;
+        }
+    }
+
     private parseDuration(bar: Bar, beat: Beat, element: XmlNode) {
         const base = element.getAttribute('base');
-        switch (base) {
-            case '2/1':
-                beat.duration = Duration.DoubleWhole;
-                break;
-            case '1/1':
-                beat.duration = Duration.Whole;
-                break;
-            case '1/2':
-                beat.duration = Duration.Half;
-                break;
-            case '1/4':
-                beat.duration = Duration.Quarter;
-                break;
-            case '1/8':
-                beat.duration = Duration.Eighth;
-                break;
-            case '1/16':
-                beat.duration = Duration.Sixteenth;
-                break;
-            case '1/32':
-                beat.duration = Duration.ThirtySecond;
-                break;
-            case '1/64':
-                beat.duration = Duration.SixtyFourth;
-                break;
-            case '1/128':
-                beat.duration = Duration.OneHundredTwentyEighth;
-                break;
-            default:
-                const fullBars = parseInt(base);
-                if (fullBars === 1) {
-                    // TODO: find better solution here
-                    const mb = bar.masterBar;
-                    if (mb.timeSignatureNumerator === mb.timeSignatureDenominator) {
-                        beat.duration = Duration.Whole;
-                    } else {
-                        Logger.warning(
-                            'Importer',
-                            `Unsupported full-bar rest for time signature ${mb.timeSignatureNumerator}/${mb.timeSignatureDenominator}`
-                        );
-                        beat.duration = Duration.Whole;
-                    }
-                } else {
-                    // TODO: multibar rests
-                    Logger.warning('Importer', `Multi-Bar rests are not supported`);
-                }
-                break;
-        }
+        beat.duration = this.parseDurationValue(base);
 
         if (element.attributes.has('dots')) {
             beat.dots = parseInt(element.attributes.get('dots')!);
@@ -1130,6 +1201,14 @@ export class CapellaParser {
 
     private parseText(element: XmlNode): TextDrawObject {
         const obj = new TextDrawObject();
+
+        if (element.attributes.has('x')) {
+            obj.x = parseFloat(element.attributes.get('x')!);
+        }
+        if (element.attributes.has('x')) {
+            obj.y = parseFloat(element.attributes.get('y')!);
+        }
+
         switch (element.getAttribute('align')) {
             case 'left':
                 obj.align = TextAlign.Left;
@@ -1163,6 +1242,15 @@ export class CapellaParser {
                     switch (c.localName) {
                         case 'font':
                             obj.fontFace = c.getAttribute('face');
+
+                            if (c.attributes.has('weight')) {
+                                obj.weight = parseInt(c.attributes.get('weight')!);
+                            }
+
+                            if (c.attributes.has('height')) {
+                                obj.height = parseInt(c.attributes.get('height')!);
+                            }
+
                             break;
                         case 'content':
                             obj.text = c.innerText;
@@ -1173,7 +1261,6 @@ export class CapellaParser {
         } else {
             obj.text = element.innerText;
         }
-
 
         return obj;
     }

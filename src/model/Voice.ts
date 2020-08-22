@@ -184,6 +184,7 @@ export class Voice {
             return 0;
         }
         let lastBeat: Beat = this.beats[this.beats.length - 1];
-        return lastBeat.playbackStart + lastBeat.playbackDuration;
+        let firstBeat: Beat = this.beats[0];
+        return lastBeat.playbackStart + lastBeat.playbackDuration - firstBeat.playbackStart;
     }
 }

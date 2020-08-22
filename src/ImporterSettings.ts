@@ -12,4 +12,9 @@ export class ImporterSettings {
      * If part-groups should be merged into a single track.
      */
     public mergePartGroupsInMusicXml: boolean = false;
+
+    /**
+     * Controls whether anacrusis should be auto-detected based on the completeness of bars.
+     */
+    public detectAnacrusis: boolean = false;
 }
