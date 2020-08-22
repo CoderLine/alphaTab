@@ -143,8 +143,8 @@ export class MasterBar {
     /**
      * Calculates the time spent in this bar. (unit: midi ticks)
      */
-    public calculateDuration(): number {
-        if (this.isAnacrusis) {
+    public calculateDuration(respectAnacrusis:boolean = true): number {
+        if (this.isAnacrusis && respectAnacrusis) {
             let duration: number = 0;
             for (let track of this.score.tracks) {
                 for (let staff of track.staves) {

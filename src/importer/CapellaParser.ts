@@ -2,7 +2,7 @@ import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
 import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Chord } from '@src/model/Chord';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
@@ -105,7 +105,7 @@ class CapellaVoiceState {
 export class CapellaParser {
     public score!: Score;
     private _trackChannel: number = 0;
-    private _forceFlags: boolean = false;
+    private _beamingMode: BeatBeamingMode = BeatBeamingMode.Auto;
     private _galleryObjects!: Map<string, DrawObject>;
 
     private _voiceCounts!: Map<number /*track*/, number /*count*/>;
@@ -174,7 +174,7 @@ export class CapellaParser {
         // TODO: unify this
         this._slurs.forEach((noteRange, startBeat) => {
             let endBeat = startBeat;
-            for (let i = 0; i < noteRange + 1; i++) {
+            for (let i = 0; i < noteRange; i++) {
                 endBeat.isLegatoOrigin = true;
 
                 // advance to next
@@ -425,7 +425,10 @@ export class CapellaParser {
                 this.score.tempo = parseInt(element.attributes.get('tempo')!);
             }
         }
-        this._forceFlags = element.getAttribute('beamGrouping') === '0';
+
+        if(element.getAttribute('beamGrouping') === '0') {
+            this._beamingMode = BeatBeamingMode.ForceSplitToNext;
+        }
 
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
@@ -569,7 +572,7 @@ export class CapellaParser {
     private newBar(staff: Staff, voiceIndex: number) {
         this._currentVoiceState.currentBarIndex++;
         this._currentBar = this.getOrCreateBar(staff, this._currentVoiceState.currentBarIndex);
-        this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration();
+        this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration(false);
         this._currentVoiceState.currentBarComplete = false;
         this._currentVoiceState.currentPosition = 0;
         this.ensureVoice(staff, voiceIndex);
@@ -584,7 +587,7 @@ export class CapellaParser {
         element: XmlNode
     ) {
         const voiceStateKey = staffId + '_' + voiceIndex;
-        if(this._currentVoiceState && !this._currentVoiceState.currentBarComplete) {
+        if (this._currentVoiceState && !this._currentVoiceState.currentBarComplete) {
             this._currentBar.masterBar.isAnacrusis = true;
         }
 
@@ -645,26 +648,28 @@ export class CapellaParser {
                             this._currentBar.masterBar.timeSignatureDenominator = this._timeSignature.timeSignatureDenominator;
                             this._currentBar.masterBar.timeSignatureNumerator = this._timeSignature.timeSignatureNumerator;
                             this._currentBar.masterBar.timeSignatureCommon = this._timeSignature.timeSignatureCommon;
-                            this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration();
+                            this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration(
+                                false
+                            );
                             break;
                         case 'barline':
                             switch (c.getAttribute('type')) {
                                 case 'double':
                                     this._currentBar.masterBar.isDoubleBar = true;
-                                    if(!this._currentVoiceState.currentBarComplete) {
+                                    if (!this._currentVoiceState.currentBarComplete) {
                                         this._currentBar.masterBar.isAnacrusis = true;
                                     }
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
                                 case 'end':
-                                    if(!this._currentVoiceState.currentBarComplete) {
+                                    if (!this._currentVoiceState.currentBarComplete) {
                                         this._currentBar.masterBar.isAnacrusis = true;
                                     }
                                     break;
                                 case 'repEnd':
                                     // TODO: alternate endings handling
                                     this._currentBar.masterBar.repeatCount = this.findRepeatCount(c);
-                                    if(!this._currentVoiceState.currentBarComplete) {
+                                    if (!this._currentVoiceState.currentBarComplete) {
                                         this._currentBar.masterBar.isAnacrusis = true;
                                     }
                                     this._currentVoiceState.currentBarComplete = true;
@@ -680,14 +685,14 @@ export class CapellaParser {
                                     this._currentBar.masterBar.isRepeatStart = true;
                                     break;
                                 case 'dashed':
-                                    if(!this._currentVoiceState.currentBarComplete) {
+                                    if (!this._currentVoiceState.currentBarComplete) {
                                         this._currentBar.masterBar.isAnacrusis = true;
                                     }
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
                                 case 'single':
                                 default:
-                                    if(!this._currentVoiceState.currentBarComplete) {
+                                    if (!this._currentVoiceState.currentBarComplete) {
                                         this._currentBar.masterBar.isAnacrusis = true;
                                     }
                                     this._currentVoiceState.currentBarComplete = true;
@@ -696,7 +701,8 @@ export class CapellaParser {
                             break;
                         case 'chord':
                             let chordBeat = new Beat();
-                            chordBeat.forceFlags = this._forceFlags;
+                            this.initFromPreviousBeat(chordBeat, this._currentVoice);
+                            chordBeat.beamingMode = this._beamingMode;
                             if (this._currentVoiceState.voiceStemDir) {
                                 chordBeat.preferredBeamDirection = this._currentVoiceState.voiceStemDir;
                             }
@@ -712,13 +718,20 @@ export class CapellaParser {
                             }
                             break;
                         case 'rest':
-                            const restBeats = this.parseRestDurations(this._currentBar, c.findChildElement('duration')!);
-                            for(const restBeat of restBeats) {
+                            const restBeats = this.parseRestDurations(
+                                this._currentBar,
+                                c.findChildElement('duration')!
+                            );
+                            for (const restBeat of restBeats) {
+                                this.initFromPreviousBeat(restBeat, this._currentVoice);
                                 restBeat.updateDurations();
                                 this._currentVoiceState.currentPosition += restBeat.playbackDuration;
                                 this._currentVoice.addBeat(restBeat);
-    
-                                if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
+
+                                if (
+                                    this._currentVoiceState.currentPosition >=
+                                    this._currentVoiceState.currentBarDuration
+                                ) {
                                     this._currentVoiceState.currentBarComplete = true;
                                 }
                             }
@@ -727,6 +740,26 @@ export class CapellaParser {
                 }
             }
         }
+    }
+
+    private initFromPreviousBeat(chordBeat: Beat, currentVoice: Voice) {
+        let previousBeat = this.getLastBeat(currentVoice);
+        if (previousBeat) {
+            chordBeat.dynamics = previousBeat.dynamics;
+        }
+    }
+
+    private getLastBeat(voice: Voice): Beat | null {
+        if (voice.beats.length > 0) {
+            return voice.beats[voice.beats.length - 1];
+        } else if (voice.bar.index > 0) {
+            const previousBar = voice.bar.staff.bars[voice.bar.index - 1];
+            if (voice.index < previousBar.voices.length) {
+                const previousVoice = previousBar.voices[voice.index];
+                return this.getLastBeat(previousVoice);
+            }
+        }
+        return null;
     }
 
     private ensureVoice(staff: Staff, voiceIndex: number) {
@@ -785,10 +818,10 @@ export class CapellaParser {
                     case 'beam':
                         switch (c.getAttribute('group')) {
                             case 'force':
-                                beat.forceFlags = false;
+                                beat.beamingMode = BeatBeamingMode.ForceMergeWithNext;
                                 break;
                             case 'divide':
-                                beat.forceFlags = true;
+                                beat.beamingMode = BeatBeamingMode.ForceSplitToNext;
                                 break;
                         }
                         break;
@@ -892,7 +925,7 @@ export class CapellaParser {
                                     obj.y < 0
                                 ) {
                                     this.score.music = obj.text;
-                                } else {
+                                } else if (!obj.text.startsWith('by capella')) {
                                     beat.text = obj.text;
                                 }
                             } else if (obj instanceof GuitarDrawObject) {
@@ -920,7 +953,11 @@ export class CapellaParser {
                         if (!beat.lyrics) {
                             beat.lyrics = [];
                         }
-                        beat.lyrics.push(c.innerText);
+                        let text = c.innerText;
+                        if (c.getAttribute('hyphen') === 'true') {
+                            text += '-';
+                        }
+                        beat.lyrics.push(text);
                         break;
                 }
             }
@@ -931,7 +968,7 @@ export class CapellaParser {
         const base = element.getAttribute('base');
         if (base.indexOf('/') !== -1) {
             let restBeat = new Beat();
-            restBeat.forceFlags = this._forceFlags;
+            restBeat.beamingMode = this._beamingMode;
             this.parseDuration(bar, restBeat, element);
             return [restBeat];
         }
@@ -941,7 +978,7 @@ export class CapellaParser {
         if (fullBars === 1) {
             const fullBars = parseInt(base);
             let restBeats: Beat[] = [];
-            let remainingTicks = bar.masterBar.calculateDuration() * fullBars;
+            let remainingTicks = bar.masterBar.calculateDuration(false) * fullBars;
             let currentRestDuration = Duration.Whole;
             let currentRestDurationTicks = MidiUtils.toTicks(currentRestDuration);
             while (remainingTicks > 0) {
@@ -960,7 +997,7 @@ export class CapellaParser {
                 }
 
                 let restBeat = new Beat();
-                restBeat.forceFlags = this._forceFlags;
+                restBeat.beamingMode = this._beamingMode;
                 restBeat.duration = currentRestDuration;
                 restBeats.push(restBeat);
 

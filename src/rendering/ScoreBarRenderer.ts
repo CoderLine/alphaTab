@@ -322,31 +322,31 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         let size: number = 0;
         switch (duration) {
             case Duration.QuadrupleWhole:
-                size = 7;
+                size = 6;
                 break;
             case Duration.Half:
-                size = 7;
+                size = 6;
                 break;
             case Duration.Quarter:
-                size = 7;
+                size = 6;
                 break;
             case Duration.Eighth:
-                size = 7;
+                size = 6;
                 break;
             case Duration.Sixteenth:
-                size = 7;
+                size = 6;
                 break;
             case Duration.ThirtySecond:
-                size = 7;
+                size = 6;
                 break;
             case Duration.SixtyFourth:
-                size = 7;
+                size = 6;
                 break;
             case Duration.OneHundredTwentyEighth:
-                size = 7;
+                size = 6;
                 break;
             case Duration.TwoHundredFiftySixth:
-                size = 7;
+                size = 6;
                 break;
             default:
                 size = 0;
