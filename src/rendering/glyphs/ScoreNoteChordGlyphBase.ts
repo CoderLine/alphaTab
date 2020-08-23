@@ -52,7 +52,6 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         let lastLine: number = 0;
         let anyDisplaced: boolean = false;
         let direction: BeamDirection = this.direction;
-        let lineOffset: number = this.scale * 1.5;
         let w: number = 0;
         for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
             let g: Glyph = this._infos[i].glyph;
@@ -60,7 +59,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             g.doLayout();
             let displace: boolean = false;
             if (i === 0) {
-                displacedX = g.width - lineOffset;
+                displacedX = g.width;
             } else {
                 // check if note needs to be repositioned
                 if (Math.abs(lastLine - this._infos[i].line) <= 1) {
@@ -86,7 +85,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             }
             g.x += this.noteStartX;
             lastLine = this._infos[i].line;
-            w = Math.max(w, g.x + g.width - lineOffset);
+            w = Math.max(w, g.x + g.width);
         }
         if (anyDisplaced) {
             this._noteHeadPadding = 0;

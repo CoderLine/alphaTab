@@ -85,6 +85,10 @@ export class RenderEngineFactory {
  */
 export class Environment {
     /**
+     * The font size of the music font in pixel. 
+     */
+    public static readonly MusicFontSize = 34;
+    /**
      * @target web
      */
     public static createStyleElement(elementDocument: HTMLDocument, fontDirectory: string | null) {
@@ -124,7 +128,7 @@ export class Environment {
                  line-height: 1;
                  -webkit-font-smoothing: antialiased;
                  -moz-osx-font-smoothing: grayscale;
-                 font-size: 34px;
+                 font-size: ${Environment.MusicFontSize}px;
                  overflow: visible !important;
             }`;
 

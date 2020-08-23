@@ -330,12 +330,11 @@ export class VisualTestHelper {
                     const dom = document.createElement('div');
                     dom.innerHTML = `
                         <strong>Error:</strong> ${result.message} (${message})<br/>
-                        <strong>Expected:</strong> 
-                        <div class="expected" style="border: 1px solid #000"></div>
-                        <strong>Actual:</strong> 
-                        <div class="actual" style="border: 1px solid #000"></div>
-                        <strong>Diff:</strong> 
-                        <div class="diff" style="border: 1px solid #000"></div>
+                        <div class="comparer" style="border: 1px solid #000">
+                            <div class="expected"></div>
+                            <div class="actual"></div>
+                            <div class="diff"></div>
+                        </div>
                     `;
 
                     actual.ondblclick = () => {
@@ -352,12 +351,95 @@ export class VisualTestHelper {
                     (dom as any).toString = function () {
                         return result.message;
                     };
+
+                    VisualTestHelper.initComparer(dom.querySelector('.comparer'));
+
                     (result as any).message = dom;
                 }
 
                 return result;
             }
         };
+    }
+
+    private static initComparer(el: HTMLElement | null) {
+        if (!el) {
+            return;
+        }
+        const ex = el.querySelector('.expected') as HTMLDivElement;
+        const ac = el.querySelector('.actual') as HTMLDivElement;
+        const df = el.querySelector('.diff') as HTMLDivElement;
+
+        const exCanvas = ex.querySelector('canvas')!;
+        const acCanvas = ac.querySelector('canvas')!;
+
+        const width = Math.max(exCanvas.width, acCanvas.width);
+        const height = Math.max(exCanvas.height, acCanvas.height);
+
+        el.style.width = width + 'px';
+        el.style.height = height + 60 + 'px';
+        el.style.position = 'relative';
+
+        ex.style.width = width + 'px';
+        ex.style.height = height + 'px';
+        ex.style.background = '#FFF';
+        ex.style.position = 'absolute';
+        ex.style.left = '0';
+        ex.style.top = '0';
+
+        ac.style.width = width / 2 + 'px';
+        ac.style.height = height + 'px';
+        ac.style.background = '#FFF';
+        ac.style.position = 'absolute';
+        ac.style.right = '0';
+        ac.style.top = '0';
+        ac.style.boxShadow = '-7px 0 10px -5px rgba(0,0,0,.5)';
+        ac.style.overflow = 'hidden';
+        acCanvas.style.position = 'absolute';
+        acCanvas.style.right = '0';
+        acCanvas.style.top = '0';
+
+        df.style.display = "none";
+        df.style.width = width + 'px';
+        df.style.height = height + 'px';
+        df.style.background = '#FFF';
+        df.style.position = 'absolute';
+        df.style.left = '0';
+        df.style.top = '0';
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = '0';
+        slider.max = '1';
+        slider.step = '0.001';
+        slider.value = '0.5';
+        slider.style.position = 'absolute';
+        slider.style.bottom = '30px';
+        slider.style.right = '0';
+        slider.style.left = '0';
+        slider.style.width = '100%';
+        slider.oninput = () => {
+            ac.style.width = width * (1 - parseFloat(slider.value)) + 'px';
+        };
+        el.appendChild(slider);
+
+        const diffToggleLabel = document.createElement('label');
+        diffToggleLabel.style.position = "absolute";
+        diffToggleLabel.style.left = "0";
+        diffToggleLabel.style.bottom = "0";
+        
+        const diffToggle = document.createElement('input');
+        diffToggle.type = 'checkbox';
+        diffToggleLabel.appendChild(diffToggle);
+        diffToggleLabel.appendChild(document.createTextNode('Show Diff'));
+        diffToggle.onchange = ()=> {
+            if(diffToggle.checked) {
+                df.style.display = 'block';
+            } else {
+                df.style.display = 'none';
+            }
+        };
+        el.appendChild(diffToggleLabel);
     }
 
     static async saveFiles(

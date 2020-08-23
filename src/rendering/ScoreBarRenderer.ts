@@ -14,7 +14,7 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
-import { BeamGlyph } from '@src/rendering/glyphs/BeamGlyph';
+import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { ClefGlyph } from '@src/rendering/glyphs/ClefGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { RepeatCloseGlyph } from '@src/rendering/glyphs/RepeatCloseGlyph';
@@ -43,8 +43,6 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     public static readonly StaffId: string = 'score';
     private static SharpKsSteps: number[] = [-1, 2, -2, 1, 4, 0, 3];
     private static FlatKsSteps: number[] = [3, 0, 4, 1, 5, 2, 6];
-    private static readonly LineSpacing: number = 8;
-    private static readonly StemWidth: number = 1.3;
 
     public simpleWhammyOverflow: number = 0;
     private _firstLineY: number = 0;
@@ -66,7 +64,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     }
 
     public get lineOffset(): number {
-        return (ScoreBarRenderer.LineSpacing + 1) * this.scale;
+        return (BarRendererBase.LineSpacing + 1) * this.scale;
     }
 
     protected updateSizes(): void {
@@ -296,7 +294,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             case Duration.Quarter:
             case Duration.Eighth:
             case Duration.Sixteenth:
-                size = 7;
+                size = 6;
                 break;
             case Duration.ThirtySecond:
                 size = 8;
@@ -305,10 +303,10 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                 size = 9;
                 break;
             case Duration.OneHundredTwentyEighth:
-                size = 10;
+                size = 9;
                 break;
             case Duration.TwoHundredFiftySixth:
-                size = 11;
+                size = 10;
                 break;
             default:
                 size = 0;
@@ -360,7 +358,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             //
             // draw line
             //
-            let beatLineX: number = h.getBeatLineX(beat) + this.scale;
+            let beatLineX: number = h.getBeatLineX(beat);
             let direction: BeamDirection = h.direction;
             let y1: number = cy + this.y;
             y1 +=
@@ -383,8 +381,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             }
             this.paintFingering(canvas, beat, cx + this.x + beatLineX, direction, fingeringY);
             let brokenBarOffset: number = 6 * this.scale * scaleMod;
-            let barSpacing: number = 7 * this.scale * scaleMod;
-            let barSize: number = (ScoreBarRenderer.LineSpacing / 2) * this.scale * scaleMod;
+            let barSpacing: number = (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * this.scale * scaleMod;
+            let barSize: number = BarRendererBase.BeamThickness * this.scale * scaleMod;
             let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             let barStart: number = cy + this.y;
             if (direction === BeamDirection.Down) {
@@ -404,7 +402,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                     // full bar?
                     if (BeamingHelper.isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
                         barStartX = beatLineX;
-                        barEndX = h.getBeatLineX(h.beats[i + 1]) + this.scale;
+                        barEndX = h.getBeatLineX(h.beats[i + 1]);
                     } else if (i === 0 || !BeamingHelper.isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
                         barStartX = beatLineX;
                         barEndX = barStartX + brokenBarOffset;
@@ -463,7 +461,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         // draw line
         //
         let stemSize: number = this.getFooterStemSize(h.shortestDuration);
-        let beatLineX: number = h.getBeatLineX(beat) + this.scale;
+        let beatLineX: number = h.getBeatLineX(beat);
         let direction: BeamDirection = h.direction;
         let topY: number = this.getYPositionForNoteValue(h.maxNoteValue);
         let bottomY: number = this.getYPositionForNoteValue(h.minNoteValue);
@@ -486,7 +484,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         ) {
             return;
         }
-        canvas.lineWidth = ScoreBarRenderer.StemWidth * this.scale;
+        canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
         canvas.beginPath();
         canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
         canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
@@ -506,10 +504,10 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             canvas.stroke();
         }
         //
-        // Draw beam
+        // Draw flag
         //
         if (beat.duration > Duration.Quarter || isGrace) {
-            let glyph: BeamGlyph = new BeamGlyph(beatLineX - this.scale / 2, beamY, beat.duration, direction, isGrace);
+            let glyph: FlagGlyph = new FlagGlyph(beatLineX, beamY, beat.duration, direction, isGrace);
             glyph.renderer = this;
             glyph.doLayout();
             glyph.paint(cx + this.x, cy + this.y, canvas);
@@ -612,7 +610,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
         }
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreHeight(1), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreHeight(-0.5), this.bar.index + 1));
         if (this.bar.isEmpty) {
             this.addPreBeatGlyph(new SpacingGlyph(0, 0, 30 * this.scale));
         }
@@ -749,7 +747,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
      * @returns
      */
     public getScoreY(steps: number, correction: number = 0): number {
-        return this._firstLineY + this.lineOffset + this.getScoreHeight(steps) + correction * this.scale;
+        return this._firstLineY + this.lineOffset + this.getScoreHeight(steps) + 
+                correction * this.scale * BarRendererBase.StaffLineThickness;
     }
 
     /**
@@ -775,7 +774,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
 
         for (let i: number = 0; i < this.bar.staff.standardNotationLineCount; i++) {
             const lineY = cy + this.y + this.getScoreY(i * 2);
-            canvas.fillRect(cx + this.x, lineY | 0, this.width, this.scale);
+            canvas.fillRect(cx + this.x, lineY | 0, this.width, this.scale * BarRendererBase.StaffLineThickness);
         }
         canvas.color = res.mainGlyphColor;
 

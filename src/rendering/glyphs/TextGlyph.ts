@@ -21,6 +21,8 @@ export class TextGlyph extends EffectGlyph {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
+        let color = canvas.color ;
+        canvas.color = color;
         canvas.font = this.font;
         let old: TextAlign = canvas.textAlign;
         canvas.textAlign = this.textAlign;

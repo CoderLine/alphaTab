@@ -70,6 +70,13 @@ export enum NoteXPosition {
  * This is the base public class for creating blocks which can render bars.
  */
 export class BarRendererBase {
+    public static readonly LineSpacing: number = 8;
+    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.LineSpacing;
+    public static readonly StaffLineThickness: number =
+        0.13 /*bravura staffLineThickness */ * BarRendererBase.LineSpacing;
+    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.LineSpacing;
+    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.LineSpacing;
+
     private _preBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
     private _voiceContainers: Map<number, VoiceContainerGlyph> = new Map();
     private _postBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
@@ -383,10 +390,7 @@ export class BarRendererBase {
                 case BeatXPosition.MiddleNotes:
                     return container.voiceContainer.x + container.x + container.onTimeX;
                 case BeatXPosition.Stem:
-                    return (
-                        container.voiceContainer.x +
-                        container.onNotes.beamingHelper.getBeatLineX(beat)
-                    );
+                    return container.voiceContainer.x + container.onNotes.beamingHelper.getBeatLineX(beat);
                 case BeatXPosition.PostNotes:
                     return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.width;
                 case BeatXPosition.EndBeat:
@@ -399,7 +403,12 @@ export class BarRendererBase {
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         let container: BeatContainerGlyph = this.getBeatContainer(note.beat);
         if (container) {
-            return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.getNoteX(note, requestedPosition);
+            return (
+                container.voiceContainer.x +
+                container.x +
+                container.onNotes.x +
+                container.onNotes.getNoteX(note, requestedPosition)
+            );
         }
         return 0;
     }

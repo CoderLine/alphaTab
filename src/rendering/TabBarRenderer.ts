@@ -9,7 +9,7 @@ import { ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
-import { BeamGlyph } from '@src/rendering/glyphs/BeamGlyph';
+import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { RepeatCloseGlyph } from '@src/rendering/glyphs/RepeatCloseGlyph';
 import { RepeatCountGlyph } from '@src/rendering/glyphs/RepeatCountGlyph';
@@ -225,10 +225,10 @@ export class TabBarRenderer extends BarRendererBase {
             }
             let lineX: number = 0;
             for (let line of tabNotes[i]) {
-                canvas.fillRect(cx + this.x + lineX, lineY | 0, line[0] - lineX, this.scale);
+                canvas.fillRect(cx + this.x + lineX, lineY | 0, line[0] - lineX, this.scale * BarRendererBase.StaffLineThickness);
                 lineX = line[0] + line[1];
             }
-            canvas.fillRect(cx + this.x + lineX, lineY | 0, this.width - lineX, this.scale);
+            canvas.fillRect(cx + this.x + lineX, lineY | 0, this.width - lineX, this.scale * BarRendererBase.StaffLineThickness);
         }
         canvas.color = res.mainGlyphColor;
         this.paintSimileMark(cx, cy, canvas);
@@ -530,7 +530,7 @@ export class TabBarRenderer extends BarRendererBase {
             // Draw beam
             //
             if (beat.duration > Duration.Quarter) {
-                let glyph: BeamGlyph = new BeamGlyph(0, 0, beat.duration, BeamDirection.Down, false);
+                let glyph: FlagGlyph = new FlagGlyph(0, 0, beat.duration, BeamDirection.Down, false);
                 glyph.renderer = this;
                 glyph.doLayout();
                 glyph.paint(cx + this.x + beatLineX, y2, canvas);

@@ -5,8 +5,8 @@ import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
 
 export class NoteHeadGlyph extends MusicFontGlyph {
     public static readonly GraceScale: number = 0.75;
-    public static readonly NoteHeadHeight: number = 9;
-    public static readonly QuarterNoteHeadWidth: number = 10;
+    public static readonly NoteHeadHeight: number = 8;
+    public static readonly QuarterNoteHeadWidth: number = 9;
     private _isGrace: boolean;
     private _duration: Duration;
 
@@ -34,7 +34,7 @@ export class NoteHeadGlyph extends MusicFontGlyph {
                 this.width = 14 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
                 break;
             default:
-                this.width = 10 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+                this.width = NoteHeadGlyph.QuarterNoteHeadWidth * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
                 break;
         }
         this.height = NoteHeadGlyph.NoteHeadHeight * scale;
