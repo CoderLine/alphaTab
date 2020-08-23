@@ -72,8 +72,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     protected updateSizes(): void {
         let res: RenderingResources = this.resources;
         let glyphOverflow: number = res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2;
-        this.topPadding = glyphOverflow;
-        this.bottomPadding = glyphOverflow;
+        this.topPadding = glyphOverflow * this.scale;
+        this.bottomPadding = glyphOverflow * this.scale;
         this.height = this.lineOffset * 4 + this.topPadding + this.bottomPadding;
 
         this.updateFirstLineY();
@@ -84,7 +84,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     private updateFirstLineY() {
         let fullLineHeight = this.lineOffset * 4;
         let actualLineHeight = (this.bar.staff.standardNotationLineCount - 1) * this.lineOffset;
-        this._firstLineY = this.topPadding + (fullLineHeight - actualLineHeight) / 2;
+        this._firstLineY = (fullLineHeight - actualLineHeight) / 2;
     }
 
     public doLayout(): void {
@@ -571,17 +571,13 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             this.bar.clefOttava !== this.bar.previousBar!.clefOttava
         ) {
             let offset: number = 0;
-            let correction: number = 0;
+            let correction: number = 0.5;
             switch (this.bar.clef) {
                 case Clef.Neutral:
-                    offset = this.bar.staff.isPercussion
-                        ? (this.bar.staff.standardNotationLineCount - 1) / 2
-                        : 4;
-                    correction = 1;
+                    offset = this.bar.staff.standardNotationLineCount - 1;
                     break;
                 case Clef.F4:
                     offset = 2;
-                    correction = -1;
                     break;
                 case Clef.C3:
                     offset = 4;
@@ -721,10 +717,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     private createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
 
-        const lines = this.bar.staff.isPercussion
-            ? this.bar.staff.standardNotationLineCount - 1
-            : 4;
-
+        const lines = this.bar.staff.standardNotationLineCount - 1;
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
                 0,
@@ -758,7 +751,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
      * @returns
      */
     public getScoreY(steps: number, correction: number = 0): number {
-        return this._firstLineY + this.lineOffset + this.getScoreHeight(steps) + correction * this.scale;
+        return this._firstLineY +  this.lineOffset + this.getScoreHeight(steps) + correction * this.scale;
     }
 
     /**
@@ -775,20 +768,19 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
         let res: RenderingResources = this.resources;
+        // canvas.color = Color.random(100);
+        // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
         //
         // draw string lines
         //
         canvas.color = res.staffLineColor;
 
-        let lineY: number = cy + this.y + this._firstLineY;
-        let lineOffset: number = this.lineOffset;
         for (let i: number = 0; i < this.bar.staff.standardNotationLineCount; i++) {
-            if (i > 0) {
-                lineY += lineOffset;
-            }
+            const lineY = cy + this.y + this.getScoreY(i * 2);
             canvas.fillRect(cx + this.x, lineY | 0, this.width, this.scale);
         }
         canvas.color = res.mainGlyphColor;
+
         this.paintSimileMark(cx, cy, canvas);
     }
 }

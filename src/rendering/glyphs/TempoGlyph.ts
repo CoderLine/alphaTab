@@ -1,4 +1,4 @@
-import { ICanvas } from '@src/platform/ICanvas';
+import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
 import { RenderingResources } from '@src/RenderingResources';
@@ -14,19 +14,21 @@ export class TempoGlyph extends EffectGlyph {
 
     public doLayout(): void {
         super.doLayout();
-        this.height = 25 * this.scale;
+        this.height = 27 * this.scale;
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         let res: RenderingResources = this.renderer.resources;
         canvas.font = res.markerFont;
+        const noteHeadHeight = this.scale * NoteHeadGlyph.GraceScale * NoteHeadGlyph.NoteHeadHeight;
         canvas.fillMusicFontSymbol(
             cx + this.x,
-            cy + this.y + this.height * 0.8,
+            cy + this.y + this.height - noteHeadHeight / 2,
             this.scale * NoteHeadGlyph.GraceScale,
             MusicFontSymbol.NoteQuarterUp,
             false
         );
-        canvas.fillText('= ' + this._tempo, cx + this.x + this.height / 2, cy + this.y + canvas.font.size / 2);
+        canvas.textBaseline = TextBaseline.Middle;
+        canvas.fillText('= ' + this._tempo, cx + this.x + this.height / 2, cy + this.y + this.height / 2);
     }
 }

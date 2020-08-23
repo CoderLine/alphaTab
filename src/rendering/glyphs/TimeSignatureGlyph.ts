@@ -16,9 +16,6 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         this._isCommon = isCommon;
     }
 
-    protected abstract get commonY(): number;
-    protected abstract get numeratorY(): number;
-    protected abstract get denominatorY(): number;
     protected abstract get commonScale(): number;
     protected abstract get numberScale(): number;
 
@@ -26,7 +23,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         if (this._isCommon && this._numerator === 2 && this._denominator === 2) {
             let common: MusicFontGlyph = new MusicFontGlyph(
                 0,
-                this.commonY,
+                0,
                 this.commonScale,
                 MusicFontSymbol.TimeSigCutCommon
             );
@@ -36,7 +33,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         } else if (this._isCommon && this._numerator === 4 && this._denominator === 4) {
             let common: MusicFontGlyph = new MusicFontGlyph(
                 0,
-                this.commonY,
+                0,
                 this.commonScale,
                 MusicFontSymbol.TimeSigCommon
             );
@@ -44,8 +41,9 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
             this.addGlyph(common);
             super.doLayout();
         } else {
-            let numerator: NumberGlyph = new NumberGlyph(0, this.numeratorY, this._numerator, this.numberScale);
-            let denominator: NumberGlyph = new NumberGlyph(0, this.denominatorY, this._denominator, this.numberScale);
+            const numberHeight = NumberGlyph.height * this.scale;
+            let numerator: NumberGlyph = new NumberGlyph(0, -numberHeight / 2, this._numerator, this.numberScale);
+            let denominator: NumberGlyph = new NumberGlyph(0, numberHeight / 2, this._denominator, this.numberScale);
             this.addGlyph(numerator);
             this.addGlyph(denominator);
             super.doLayout();

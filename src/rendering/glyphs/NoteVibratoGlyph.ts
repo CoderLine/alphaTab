@@ -3,6 +3,7 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { Color } from '@src/model/Color';
 
 export class NoteVibratoGlyph extends GroupedEffectGlyph {
     private _type: VibratoType;
@@ -59,8 +60,8 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
         for (let i: number = 0; i < loops; i++) {
             canvas.fillMusicFontSymbol(
                 cx + this.x + loopX,
-                cy + this.y + this._symbolOffset,
-                this._scale,
+                cy + this.y + this.height * 2,
+                this._scale * this.scale,
                 this._symbol,
                 false
             );

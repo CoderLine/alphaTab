@@ -58,7 +58,7 @@ export class GhostNoteContainerGlyph extends Glyph {
             return a.line - b.line;
         });
         let previousGlyph: GhostParenthesisGlyph | null = null;
-        let sizePerLine: number = sr.getScoreHeight(1, 0);
+        let sizePerLine: number = sr.getScoreHeight(1);
         for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
             let g: GhostParenthesisGlyph;
             if (!this._infos[i].isGhost) {
