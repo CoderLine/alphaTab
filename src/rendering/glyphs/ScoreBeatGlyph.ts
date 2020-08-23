@@ -81,7 +81,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         new SpacingGlyph(
                             0,
                             0,
-                            4 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) * this.scale
+                            4 *
+                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
+                                this.scale
                         )
                     );
                     this.addGlyph(ghost);
@@ -108,56 +110,20 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
             } else {
-                let dotLine: number = 0;
-                let line: number = 0;
                 let offset: number = 0;
-                switch (this.container.beat.duration) {
-                    case Duration.QuadrupleWhole:
-                        line = 4;
-                        dotLine = 5;
-                        break;
-                    case Duration.DoubleWhole:
-                        line = 4;
-                        dotLine = 5;
-                        break;
-                    case Duration.Whole:
-                        line = 2;
-                        dotLine = 5;
-                        break;
-                    case Duration.Half:
-                        line = 4;
-                        dotLine = 5;
-                        break;
-                    case Duration.Quarter:
-                        line = 4;
-                        offset = -2;
-                        dotLine = 5;
-                        break;
-                    case Duration.Eighth:
-                        line = 4;
-                        dotLine = 5;
-                        break;
-                    case Duration.Sixteenth:
-                        line = 4;
-                        dotLine = 5;
-                        break;
-                    case Duration.ThirtySecond:
-                        line = 4;
-                        dotLine = 3;
-                        break;
-                    case Duration.SixtyFourth:
-                        line = 4;
-                        dotLine = 3;
-                        break;
-                    case Duration.OneHundredTwentyEighth:
-                        line = 4;
-                        dotLine = 3;
-                        break;
-                    case Duration.TwoHundredFiftySixth:
-                        line = 4;
-                        dotLine = 3;
-                        break;
+                let line = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
+
+                // this positioning is quite strange, for most staff line counts
+                // the whole/rest are aligned as half below the whole rest. 
+                // but for staff line count 1 and 3 they are aligned centered on the same line. 
+                if (
+                    this.container.beat.duration === Duration.Whole &&
+                    this.renderer.bar.staff.standardNotationLineCount !== 1 &&
+                    this.renderer.bar.staff.standardNotationLineCount !== 3
+                ) {
+                    line -= 2;
                 }
+
                 let y: number = sr.getScoreY(line, offset);
                 this.restGlyph = new ScoreRestGlyph(0, y, this.container.beat.duration);
                 this.restGlyph.beat = this.container.beat;
@@ -170,7 +136,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         let group: GlyphGroup = new GlyphGroup(0, 0);
-                        this.createBeatDot(dotLine, group);
+                        this.createBeatDot(line, group);
                         this.addGlyph(group);
                     }
                 }
@@ -198,7 +164,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             if (articulation) {
                 return new PercussionNoteHeadGlyph(0, 0, articulation, n.beat.duration, isGrace);
             } else {
-                Logger.warning('Rendering', `No articulation found for percussion instrument ${n.percussionMidiNumber}`)
+                Logger.warning(
+                    'Rendering',
+                    `No articulation found for percussion instrument ${n.percussionMidiNumber}`
+                );
             }
         }
         if (n.isDead) {
@@ -249,9 +218,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (n.isPercussion) {
             const articulation = PercussionMapper.getArticulation(n.percussionMidiNumber);
             if (articulation && articulation.techniqueSymbolPlacement !== TextBaseline.Middle) {
-                const effectContainer = articulation.techniqueSymbolPlacement === TextBaseline.Top
-                    ? this.noteHeads!.aboveBeatEffects
-                    : this.noteHeads!.belowBeatEffects;
+                const effectContainer =
+                    articulation.techniqueSymbolPlacement === TextBaseline.Top
+                        ? this.noteHeads!.aboveBeatEffects
+                        : this.noteHeads!.belowBeatEffects;
 
                 switch (articulation.techniqueSymbol) {
                     case MusicFontSymbol.PictEdgeOfCymbal:

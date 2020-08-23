@@ -3,14 +3,12 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
-import { Color } from '@src/model/Color';
 
 export class NoteVibratoGlyph extends GroupedEffectGlyph {
     private _type: VibratoType;
     private _scale: number = 0;
     private _symbol: MusicFontSymbol = MusicFontSymbol.None;
     private _symbolSize: number = 0;
-    private _symbolOffset: number = 0;
     private _partialWaves: boolean;
 
     public constructor(x: number, y: number, type: VibratoType, scale: number = 1.2, partialWaves: boolean = false) {
@@ -29,13 +27,11 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
             case VibratoType.Slight:
                 this._symbol = MusicFontSymbol.WiggleTrill;
                 this._symbolSize = 9 * this._scale;
-                this._symbolOffset = 8.5 * this._scale;
                 symbolHeight = 6 * this._scale;
                 break;
             case VibratoType.Wide:
                 this._symbol = MusicFontSymbol.WiggleVibratoMediumFast;
                 this._symbolSize = 10 * this._scale;
-                this._symbolOffset = 7 * this._scale;
                 symbolHeight = 10 * this._scale;
                 break;
         }

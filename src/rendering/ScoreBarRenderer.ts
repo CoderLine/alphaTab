@@ -96,9 +96,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             let whammyOffset: number = this.simpleWhammyOverflow;
             this.registerOverflowTop(whammyOffset);
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine, 0);
-            let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
-                this.accidentalHelper.maxLineBeat
-            );
+            let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
             if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
                 maxNoteY -= maxNoteHelper.fingeringCount * this.resources.graceFont.size;
@@ -113,9 +111,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
             }
             let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine, 0);
-            let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
-                this.accidentalHelper.minLineBeat!
-            );
+            let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
                 minNoteY += minNoteHelper.fingeringCount * this.resources.graceFont.size;
@@ -300,17 +296,19 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             case Duration.Quarter:
             case Duration.Eighth:
             case Duration.Sixteenth:
-                size = 6;
-                break;
-            case Duration.ThirtySecond:
-            case Duration.SixtyFourth:
                 size = 7;
                 break;
-            case Duration.OneHundredTwentyEighth:
+            case Duration.ThirtySecond:
+                size = 8;
+                break;
+            case Duration.SixtyFourth:
                 size = 9;
                 break;
-            case Duration.TwoHundredFiftySixth:
+            case Duration.OneHundredTwentyEighth:
                 size = 10;
+                break;
+            case Duration.TwoHundredFiftySixth:
+                size = 11;
                 break;
             default:
                 size = 0;
@@ -614,7 +612,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
         }
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreY(-2.5, 0), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreHeight(1), this.bar.index + 1));
         if (this.bar.isEmpty) {
             this.addPreBeatGlyph(new SpacingGlyph(0, 0, 30 * this.scale));
         }
@@ -751,7 +749,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
      * @returns
      */
     public getScoreY(steps: number, correction: number = 0): number {
-        return this._firstLineY +  this.lineOffset + this.getScoreHeight(steps) + correction * this.scale;
+        return this._firstLineY + this.lineOffset + this.getScoreHeight(steps) + correction * this.scale;
     }
 
     /**
