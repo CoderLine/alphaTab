@@ -17,7 +17,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
     private _beat: Beat;
     private _showParenthesis: boolean = false;
     private _noteValueLookup: Map<number, Glyph> = new Map();
-    private _accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph(true);
+    private _accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
     private _preNoteParenthesis: GhostNoteContainerGlyph | null = null;
     private _postNoteParenthesis: GhostNoteContainerGlyph | null = null;
     public isEmpty: boolean = true;

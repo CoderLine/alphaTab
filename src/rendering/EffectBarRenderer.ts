@@ -110,7 +110,7 @@ export class EffectBarRenderer extends BarRendererBase {
         }
     }
 
-    private createVoiceGlyphs(v: Voice): void {
+    protected createVoiceGlyphs(v: Voice): void {
         for (let b of v.beats) {
             // we create empty glyphs as alignment references and to get the
             // effect bar sized

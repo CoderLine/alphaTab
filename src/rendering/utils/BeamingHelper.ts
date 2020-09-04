@@ -77,6 +77,15 @@ export class BeamingHelper {
     public preferredBeamDirection: BeamDirection | null = null;
     public isGrace: boolean = false;
 
+    public get hasLine(): boolean {
+        return this.beats.length === 1 && this.beats[0].duration > Duration.Whole;
+    }
+
+    public get hasFlag(): boolean {
+        return this.beats.length === 1 &&
+            (this.beats[0].duration > Duration.Quarter || this.beats[0].graceType != GraceType.None);
+    }
+
     public constructor(staff: Staff) {
         this._staff = staff;
         this.beats = [];

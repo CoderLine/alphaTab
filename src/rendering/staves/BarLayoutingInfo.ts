@@ -3,6 +3,7 @@ import { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { Spring } from '@src/rendering/staves/Spring';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { ICanvas } from '@src/platform/ICanvas';
 
 /**
  * This public class stores size information about a stave.
@@ -82,10 +83,9 @@ export class BarLayoutingInfo {
         }
     }
 
-    public updateMinStretchForce(force: number): void {
+    private updateMinStretchForce(force: number): void {
         if (this.minStretchForce < force) {
             this.minStretchForce = force;
-            this.version++;
         }
     }
 
@@ -175,12 +175,68 @@ export class BarLayoutingInfo {
             totalSpringConstant += 1 / currentSpring.springConstant;
         }
         this.totalSpringConstant = 1 / totalSpringConstant;
+
         // calculate the force required to have at least the minimum size.
-        for (let i: number = 0; i < sortedSprings.length; i++) {
-            let force: number = sortedSprings[i].springWidth * sortedSprings[i].springConstant;
-            this.updateMinStretchForce(force);
+        this.minStretchForce = 0;
+        for (let i: number = 1; i < sortedSprings.length; i++) {
+            let previousSpring = sortedSprings[i - 1];
+            let currentSpring = sortedSprings[i];
+
+            // We take the space required between previous and current spring
+            // and calculate the force needed so that the previous spring
+            // reserves enough space
+            let requiredSpace = previousSpring.postSpringWidth + currentSpring.preSpringWidth;
+            let requiredSpaceForce = requiredSpace * previousSpring.springConstant;
+            this.updateMinStretchForce(requiredSpaceForce);
         }
     }
+
+    public height: number = 0;
+    public paint(_cx: number, _cy: number, _canvas: ICanvas) {}
+
+    // public height: number = 30;
+    // public paint(cx: number, cy: number, canvas: ICanvas) {
+    //     let sortedSprings: Spring[] = this._timeSortedSprings;
+    //     if (sortedSprings.length === 0) {
+    //         return;
+    //     }
+
+    //     const settings = canvas.settings;
+    //     const force = Math.max(settings.display.stretchForce, this.minStretchForce);
+
+    //     const height = this.height * settings.display.scale;
+    //     cy -= height;
+
+
+    //     canvas.color = settings.display.resources.mainGlyphColor;
+    //     const font = settings.display.resources.effectFont.clone();
+    //     font.size *= 0.8;
+    //     canvas.font = font;
+    //     canvas.fillText(force.toFixed(2), cx, cy);
+
+    //     cy += settings.display.resources.effectFont.size * 1.5;
+
+    //     let springX: number = sortedSprings[0].preSpringWidth;
+    //     for (let i: number = 0; i < sortedSprings.length; i++) {
+    //         const spring = sortedSprings[i];
+
+    //         canvas.color = new Color(0, 0, 255, 100);
+    //         canvas.fillRect(cx + springX - spring.preSpringWidth, cy,
+    //             spring.preSpringWidth, height / 2);
+
+    //         canvas.color = new Color(0, 255, 0, 100);
+    //         canvas.fillRect(cx + springX, cy,
+    //             spring.postSpringWidth, height / 2);
+
+    //         canvas.color = settings.display.resources.mainGlyphColor;
+    //         canvas.moveTo(cx + springX, cy);
+    //         canvas.lineTo(cx + springX, cy + height / 2);
+    //         canvas.stroke();
+
+
+    //         springX += this.calculateWidth(force, spring.springConstant);
+    //     }
+    // }
 
     private calculateSpringConstant(spring: Spring, duration: number): number {
         if (duration <= 0) {
@@ -190,7 +246,7 @@ export class BarLayoutingInfo {
             spring.smallestDuration = duration;
         }
         let minDuration: number = spring.smallestDuration;
-        let phi: number = 1 + 0.6 * Math.log2(duration / BarLayoutingInfo.MinDuration);
+        let phi: number = 1 + 0.85 * Math.log2(duration / BarLayoutingInfo.MinDuration);
         return (minDuration / duration) * (1 / (phi * BarLayoutingInfo.MinDurationWidth));
     }
 

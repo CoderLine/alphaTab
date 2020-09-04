@@ -34,7 +34,7 @@ export class NoteHeadGlyph extends MusicFontGlyph {
                 this.width = 14 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
                 break;
             default:
-                this.width = 10 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+                this.width = NoteHeadGlyph.QuarterNoteHeadWidth * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
                 break;
         }
         this.height = NoteHeadGlyph.NoteHeadHeight * scale;

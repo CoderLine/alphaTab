@@ -86,16 +86,16 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             }
             g.x += this.noteStartX;
             lastLine = this._infos[i].line;
-            w = Math.max(w, g.x + g.width - lineOffset);
+            w = Math.max(w, g.x + g.width);
         }
         if (anyDisplaced) {
             this._noteHeadPadding = 0;
-            this.upLineX = displacedX;
+            this.upLineX = displacedX - lineOffset;
             this.downLineX = displacedX;
         } else {
             this._noteHeadPadding = direction === BeamDirection.Down ? -displacedX : 0;
             w += this._noteHeadPadding;
-            this.upLineX = w;
+            this.upLineX = w - lineOffset;
             this.downLineX = 0;
         }
         this.displacedX = displacedX;
