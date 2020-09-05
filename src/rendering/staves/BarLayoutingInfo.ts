@@ -12,7 +12,7 @@ import { ICanvas } from '@src/platform/ICanvas';
  */
 export class BarLayoutingInfo {
     private static readonly MinDuration: number = 30;
-    private static readonly MinDurationWidth: number = 10;
+    private static readonly MinDurationWidth: number = 7.5;
 
     private _timeSortedSprings: Spring[] = [];
     private _xMin: number = 0;

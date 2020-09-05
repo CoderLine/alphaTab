@@ -90,7 +90,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         }
         if (anyDisplaced) {
             this._noteHeadPadding = 0;
-            this.upLineX = displacedX - lineOffset;
+            this.upLineX = displacedX;
             this.downLineX = displacedX;
         } else {
             this._noteHeadPadding = direction === BeamDirection.Down ? -displacedX : 0;

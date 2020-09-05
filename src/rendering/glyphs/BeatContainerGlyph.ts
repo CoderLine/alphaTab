@@ -39,6 +39,9 @@ export class BeatContainerGlyph extends Glyph {
         if(helper && helper.hasFlag) {
             postBeatStretch += FlagGlyph.FlagWidth * this.scale;
         }
+        for(const tie of this.ties) {
+            postBeatStretch += tie.width;
+        }
 
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
         // store sizes for special renderers like the EffectBarRenderer

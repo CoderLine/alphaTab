@@ -84,6 +84,13 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             }
             if (!accidentals.isEmpty) {
                 this.accidentals = accidentals;
+                this.addGlyph(
+                    new SpacingGlyph(
+                        0,
+                        0,
+                        2 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) * this.scale
+                    )
+                );
                 this.addGlyph(accidentals);
                 this.addGlyph(
                     new SpacingGlyph(
