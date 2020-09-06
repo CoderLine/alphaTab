@@ -273,7 +273,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     public getStemSize(helper: BeamingHelper): number {
         let size: number =
             helper.beats.length === 1
-                ? this.getFooterStemSize(helper.shortestDuration)
+                ? this.getFlagStemSize(helper.shortestDuration)
                 : this.getBarStemSize(helper.shortestDuration);
         if (helper.isGrace) {
             size = size * NoteHeadGlyph.GraceScale;
@@ -318,7 +318,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         return this.getScoreY(size, 0);
     }
 
-    private getFooterStemSize(duration: Duration): number {
+    private getFlagStemSize(duration: Duration): number {
         let size: number = 0;
         switch (duration) {
             case Duration.QuadrupleWhole:
@@ -479,7 +479,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         //
         // draw line
         //
-        let stemSize: number = this.getFooterStemSize(h.shortestDuration);
+        let stemSize: number = this.getFlagStemSize(h.shortestDuration);
         let beatLineX: number = h.getBeatLineX(beat) + this.scale;
         let direction: BeamDirection = h.direction;
         let topY: number = this.getYPositionForNoteValue(h.maxNoteValue);

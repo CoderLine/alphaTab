@@ -12,7 +12,7 @@ import { ICanvas } from '@src/platform/ICanvas';
  */
 export class BarLayoutingInfo {
     private static readonly MinDuration: number = 30;
-    private static readonly MinDurationWidth: number = 7.5;
+    private static readonly MinDurationWidth: number = 7;
 
     private _timeSortedSprings: Spring[] = [];
     private _xMin: number = 0;
@@ -178,15 +178,28 @@ export class BarLayoutingInfo {
 
         // calculate the force required to have at least the minimum size.
         this.minStretchForce = 0;
-        for (let i: number = 1; i < sortedSprings.length; i++) {
-            let previousSpring = sortedSprings[i - 1];
-            let currentSpring = sortedSprings[i];
+        // We take the space required between current and next spring
+        // and calculate the force needed so that the current spring
+        // reserves enough space
 
-            // We take the space required between previous and current spring
-            // and calculate the force needed so that the previous spring
-            // reserves enough space
-            let requiredSpace = previousSpring.postSpringWidth + currentSpring.preSpringWidth;
-            let requiredSpaceForce = requiredSpace * previousSpring.springConstant;
+        for (let i: number = 0; i < sortedSprings.length; i++) {
+            let currentSpring = sortedSprings[i];
+            let requiredSpace = 0;
+
+            if (i === sortedSprings.length - 1) {
+                requiredSpace = currentSpring.postSpringWidth;
+            } else {
+                let nextSpring = sortedSprings[i + 1];
+                requiredSpace = currentSpring.postSpringWidth + nextSpring.preSpringWidth;
+            }
+
+            // for the first spring we need to ensure we take the initial 
+            // pre-spring width into account
+            if (i === 0) {
+                requiredSpace += currentSpring.preSpringWidth;
+            }
+
+            let requiredSpaceForce = requiredSpace * currentSpring.springConstant;
             this.updateMinStretchForce(requiredSpaceForce);
         }
     }
@@ -207,7 +220,6 @@ export class BarLayoutingInfo {
     //     const height = this.height * settings.display.scale;
     //     cy -= height;
 
-
     //     canvas.color = settings.display.resources.mainGlyphColor;
     //     const font = settings.display.resources.effectFont.clone();
     //     font.size *= 0.8;
@@ -221,18 +233,15 @@ export class BarLayoutingInfo {
     //         const spring = sortedSprings[i];
 
     //         canvas.color = new Color(0, 0, 255, 100);
-    //         canvas.fillRect(cx + springX - spring.preSpringWidth, cy,
-    //             spring.preSpringWidth, height / 2);
+    //         canvas.fillRect(cx + springX - spring.preSpringWidth, cy, spring.preSpringWidth, height / 2);
 
     //         canvas.color = new Color(0, 255, 0, 100);
-    //         canvas.fillRect(cx + springX, cy,
-    //             spring.postSpringWidth, height / 2);
+    //         canvas.fillRect(cx + springX, cy, spring.postSpringWidth, height / 2);
 
     //         canvas.color = settings.display.resources.mainGlyphColor;
     //         canvas.moveTo(cx + springX, cy);
     //         canvas.lineTo(cx + springX, cy + height / 2);
     //         canvas.stroke();
-
 
     //         springX += this.calculateWidth(force, spring.springConstant);
     //     }
@@ -255,7 +264,11 @@ export class BarLayoutingInfo {
     }
 
     public calculateVoiceWidth(force: number): number {
-        return this.calculateWidth(force, this.totalSpringConstant);
+        let width = this.calculateWidth(force, this.totalSpringConstant);
+        if(this._timeSortedSprings.length > 0) {
+            width += this._timeSortedSprings[0].preSpringWidth
+        }
+        return width;
     }
 
     public calculateWidth(force: number, springConstant: number): number {
