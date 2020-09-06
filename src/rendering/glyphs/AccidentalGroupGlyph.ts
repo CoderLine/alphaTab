@@ -9,10 +9,8 @@ class AccidentalColumnInfo {
 }
 
 export class AccidentalGroupGlyph extends GlyphGroup {
-    private _isGrace:boolean;
-    public constructor(isGrace:boolean) {
+    public constructor() {
         super(0, 0);
-        this._isGrace = isGrace;
     }
 
     public doLayout(): void {
@@ -63,23 +61,17 @@ export class AccidentalGroupGlyph extends GlyphGroup {
         //
         // Place accidentals in columns
         //
-        let padding: number = 2 * this.scale;
         this.width = 0;
         for (const column of columns) {
             this.width += column.width;
             column.x = this.width;
         }
-        this.width += padding;
 
         for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
             let g: Glyph = this.glyphs[i];
 
             const column = columns[g.x];
-            g.x = padding + (this.width - column.x);
-        }
-
-        if(this._isGrace) {
-            this.width += padding;
+            g.x = (this.width - column.x);
         }
     }
 }

@@ -337,7 +337,6 @@ export class VisualTestHelper {
                         <strong>Diff:</strong> 
                         <div class="diff" style="border: 1px solid #000"></div>
                     `;
-
                     actual.ondblclick = () => {
                         const a = document.createElement('a');
                         a.href = oldActual.toDataURL('image/png');

@@ -15,7 +15,6 @@ export class VoiceContainerGlyph extends GlyphGroup {
 
     public beatGlyphs: BeatContainerGlyph[];
     public voice: Voice;
-    public minWidth: number = 0;
     public tupletGroups: TupletGroup[];
 
     public constructor(x: number, y: number, voice: Voice) {
@@ -84,17 +83,11 @@ export class VoiceContainerGlyph extends GlyphGroup {
     }
 
     public doLayout(): void {
-        this.minWidth = this.width;
     }
 
-    // private static Random Random = new Random();
     public paint(cx: number, cy: number, canvas: ICanvas): void {
-        // canvas.Color = Color.Random();
-        // canvas.StrokeRect(cx + X, cy + Y, Width, 100);
-        // if (Voice.Index===0)
-        // {
-        //    PaintSprings(cx + X, cy + Y, canvas);
-        // }
+        // canvas.color = Color.random();
+        // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
         canvas.color =
             this.voice.index === 0
                 ? this.renderer.resources.mainGlyphColor

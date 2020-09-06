@@ -10,6 +10,7 @@ import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
 import { BarBounds } from '../utils/BarBounds';
 import { BeatBounds } from '../utils/BeatBounds';
 import { Bounds } from '../utils/Bounds';
+import { FlagGlyph } from './FlagGlyph';
 
 export class BeatContainerGlyph extends Glyph {
     public voiceContainer: VoiceContainerGlyph;
@@ -32,13 +33,16 @@ export class BeatContainerGlyph extends Glyph {
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
         let preBeatStretch: number = this.onTimeX;
-        let postBeatStretch: number = 0;
-        for (let tie of this.ties) {
-            if (tie.width > postBeatStretch) {
-                postBeatStretch = tie.width;
-            }
+        let postBeatStretch: number = this.onNotes.width - this.onNotes.centerX;
+        // make space for flag
+        const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
+        if(helper && helper.hasFlag) {
+            postBeatStretch += FlagGlyph.FlagWidth * this.scale;
         }
-        postBeatStretch += this.onNotes.x + (this.onNotes.width - this.onNotes.centerX);
+        for(const tie of this.ties) {
+            postBeatStretch += tie.width;
+        }
+
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
         // store sizes for special renderers like the EffectBarRenderer
         layoutings.setPreBeatSize(this.beat, this.preNotes.width);
@@ -124,41 +128,41 @@ export class BeatContainerGlyph extends Glyph {
             return;
         }
         canvas.beginGroup(BeatContainerGlyph.getGroupId(this.beat));
-        // var c = canvas.Color;
-        // var ta = canvas.TextAlign;
-        // canvas.Color = new Color(255, 0, 0);
-        // canvas.TextAlign = TextAlign.Left;
-        // canvas.FillText(Beat.DisplayStart.ToString(), cx + X, cy + Y - 10);
-        // canvas.Color = c;
-        // canvas.TextAlign = ta;
-        // canvas.Color = Color.Random();
-        // canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
-        // var oldColor = canvas.Color;
-        // canvas.Color = new Color((byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), 100);
-        // canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
-        // canvas.Color = oldColor;
-        // canvas.Color = new Color(200, 0, 0, 100);
-        // canvas.StrokeRect(cx + X, cy + Y + 15 * Beat.Voice.Index, Width, 10);
-        // canvas.Font = new Font("Arial", 10);
-        // canvas.Color = new Color(0, 0, 0);
-        // canvas.FillText(Beat.Voice.Index + ":" + Beat.Index, cx + X, cy + Y + 15 * Beat.Voice.Index);
-        // if (Beat.Voice.Index===0)
-        // {
-        //    canvas.Color = new Color(200, 0, 0, 100);
-        //    canvas.StrokeRect(cx + X, cy + Y + PreNotes.Y + 30, Width, 10);
+        // var c = canvas.color;
+        // var ta = canvas.textAlign;
+        // canvas.color = new Color(255, 0, 0);
+        // canvas.textAlign = TextAlign.Left;
+        // canvas.fillText(this.beat.displayStart.toString(), cx + this.x, cy + this.y - 10);
+        // canvas.color = c;
+        // canvas.textAlign = ta;
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
+        // var oldColor = canvas.color;
+        // canvas.color = Color.random(100);
+        // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
+        // canvas.color = oldColor;
+        // canvas.color = new Color(200, 0, 0, 100);
+        // canvas.strokeRect(cx + this.x, cy + this.y + 15 * this.beat.voice.index, this.width, 10);
+        // canvas.font = new Font("Arial", 10);
+        // canvas.color = new Color(0, 0, 0);
+        // canvas.fillText(this.beat.voice.index + ":" + this.beat.index, cx + this.x, cy + this.y + 15 * this.beat.voice.index);
+
+        // if (this.beat.voice.index === 0) {
+        //     canvas.color = new Color(200, 0, 0, 100);
+        //     canvas.strokeRect(cx + this.x, cy + this.y + this.preNotes.y + 30, this.width, 10);
         // }
+
         this.preNotes.paint(cx + this.x, cy + this.y, canvas);
-        // if (Beat.Voice.Index===0)
-        // {
-        //    canvas.Color = new Color(200, 0, 0, 100);
-        //    canvas.StrokeRect(cx + X + PreNotes.X, cy + Y + PreNotes.Y, PreNotes.Width, 10);
+        // if (this.beat.voice.index === 0) {
+        //     canvas.color = new Color(200, 0, 0, 100);
+        //     canvas.strokeRect(cx + this.x + this.preNotes.x, cy + this.y + this.preNotes.y, this.preNotes.width, 10);
         // }
         this.onNotes.paint(cx + this.x, cy + this.y, canvas);
-        // if (Beat.Voice.Index===0)
-        // {
-        //    canvas.Color = new Color(0, 200, 0, 100);
-        //    canvas.StrokeRect(cx + X + OnNotes.X, cy + Y + OnNotes.Y + 10, OnNotes.Width, 10);
+        // if (this.beat.voice.index === 0) {
+        //     canvas.color = new Color(0, 200, 0, 100);
+        //     canvas.strokeRect(cx + this.x + this.onNotes.x, cy + this.y + this.onNotes.y - 10, this.onNotes.width, 10);
         // }
+
         // paint the ties relative to the whole staff,
         // reason: we have possibly multiple staves involved and need to calculate the correct positions.
         let staffX: number = cx - this.voiceContainer.x - this.renderer.x;
@@ -171,7 +175,7 @@ export class BeatContainerGlyph extends Glyph {
         canvas.endGroup();
     }
 
-    public buildBoundingsLookup(barBounds:BarBounds, cx:number, cy:number, isEmptyBar:boolean) {
+    public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number, isEmptyBar: boolean) {
         let beatBoundings: BeatBounds = new BeatBounds();
         beatBoundings.beat = this.beat;
         beatBoundings.visualBounds = new Bounds();
@@ -192,7 +196,7 @@ export class BeatContainerGlyph extends Glyph {
         }
         barBounds.addBeat(beatBoundings);
 
-        if(this.renderer.settings.core.includeNoteBounds) {
+        if (this.renderer.settings.core.includeNoteBounds) {
             this.onNotes.buildBoundingsLookup(beatBoundings, cx + this.x, cy + this.y);
         }
     }

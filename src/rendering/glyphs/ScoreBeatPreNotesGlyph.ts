@@ -25,7 +25,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
 
     public doLayout(): void {
         if (!this.container.beat.isRest) {
-            let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph(this.container.beat.graceType != GraceType.None);
+            let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             let ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
             ghost.renderer = this.renderer;
             this._prebends = new BendNoteHeadGroupGlyph(this.container.beat, true);
@@ -84,12 +84,19 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             }
             if (!accidentals.isEmpty) {
                 this.accidentals = accidentals;
+                this.addGlyph(
+                    new SpacingGlyph(
+                        0,
+                        0,
+                        2 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) * this.scale
+                    )
+                );
                 this.addGlyph(accidentals);
                 this.addGlyph(
                     new SpacingGlyph(
                         0,
                         0,
-                        4 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) * this.scale
+                        2 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) * this.scale
                     )
                 );
             }
