@@ -50,12 +50,12 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public get masterVolume(): number {
-        return this._synthesizer.globalGainDb;
+        return this._synthesizer.masterVolume;
     }
 
     public set masterVolume(value: number) {
         value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
-        this._synthesizer.globalGainDb = value;
+        this._synthesizer.masterVolume = value;
     }
 
     public get metronomeVolume(): number {
