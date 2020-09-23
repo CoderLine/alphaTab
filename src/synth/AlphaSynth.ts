@@ -173,7 +173,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public play(): boolean {
-        if (this.state === PlayerState.Playing || !this.isReadyForPlayback) {
+        if (this.state === PlayerState.Playing || !this._isMidiLoaded) {
             return false;
         }
         this.output.activate();
@@ -188,7 +188,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public pause(): void {
-        if (this.state === PlayerState.Paused || !this.isReadyForPlayback) {
+        if (this.state === PlayerState.Paused || !this._isMidiLoaded) {
             return;
         }
         Logger.debug('AlphaSynth', 'Pausing playback');
@@ -201,7 +201,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public playPause(): void {
-        if (this.state === PlayerState.Playing || !this.isReadyForPlayback) {
+        if (this.state === PlayerState.Playing || !this._isMidiLoaded) {
             this.pause();
         } else {
             this.play();
@@ -209,7 +209,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public stop(): void {
-        if (!this.isReadyForPlayback) {
+        if (!this._isMidiLoaded) {
             return;
         }
         Logger.debug('AlphaSynth', 'Stopping playback');
