@@ -101,6 +101,8 @@ class CapellaVoiceState {
     public currentBarDuration: number = 0;
     public currentPosition: number = 0;
     public voiceStemDir: BeamDirection | null = null;
+    public repeatCount: number = 0;
+    public repeatEnd: MasterBar | null = null;
 }
 
 export class CapellaParser {
@@ -117,7 +119,7 @@ export class CapellaParser {
         this._tieStarts = [];
         this._tieStartIds = new Map<number, boolean>();
         this._voiceCounts = new Map<number, number>();
-        this._slurs = new Map<Beat, number>();
+        this._slurs = new Map<Beat, SlurDrawObject>();
         this._crescendo = new Map<Beat, WedgeDrawObject>();
         this._isFirstSystem = true;
 
@@ -172,29 +174,24 @@ export class CapellaParser {
             }
         }
 
-        // TODO: unify this
-        this._slurs.forEach((noteRange, startBeat) => {
-            let endBeat = startBeat;
-            for (let i = 0; i < noteRange; i++) {
-                endBeat.isLegatoOrigin = true;
-
-                // advance to next
-                if (endBeat.index + 1 < endBeat.voice.beats.length) {
-                    endBeat = endBeat.voice.beats[endBeat.index + 1];
-                } else if (endBeat.voice.bar.index + 1 < endBeat.voice.bar.staff.bars.length) {
-                    const nextBar = endBeat.voice.bar.staff.bars[endBeat.voice.bar.index + 1];
-                    endBeat = nextBar.voices[endBeat.voice.index].beats[0];
-                } else {
-                    break;
-                }
-            }
+        CapellaParser.applyEffectRange(this._slurs, (_, beat) => {
+            beat.isLegatoOrigin = true;
         });
 
-        this._crescendo.forEach((cre, startBeat) => {
-            const noteRange = cre.noteRange;
+        CapellaParser.applyEffectRange(this._crescendo, (cre, beat) => {
+            beat.crescendo = cre.decrescendo ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
+        });
+    }
+
+    private static applyEffectRange<T extends DrawObject>(
+        effects: Map<Beat, T>,
+        applyEffect: (effect: T, beat: Beat) => void
+    ) {
+        effects.forEach((effect, startBeat) => {
+            const noteRange = effect.noteRange;
             let endBeat = startBeat;
-            for (let i = 0; i < noteRange + 1; i++) {
-                endBeat.crescendo = cre.decrescendo ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
+            for (let i = 0; i < noteRange; i++) {
+                applyEffect(effect, endBeat);
                 // advance to next
                 if (endBeat.index + 1 < endBeat.voice.beats.length) {
                     endBeat = endBeat.voice.beats[endBeat.index + 1];
@@ -427,7 +424,7 @@ export class CapellaParser {
             }
         }
 
-        if(element.getAttribute('beamGrouping') === '0') {
+        if (element.getAttribute('beamGrouping') === '0') {
             this._beamingMode = BeatBeamingMode.ForceSplitToNext;
         }
 
@@ -544,7 +541,7 @@ export class CapellaParser {
             currentBar.clef = staff.bars[staff.bars.length - 1].clef;
             currentBar.clefOttava = staff.bars[staff.bars.length - 1].clefOttava;
         } else {
-            currentBar.clef = this._currentStaffLayout!.defaultClef;
+            currentBar.clef = this._currentStaffLayout.defaultClef;
         }
         staff.addBar(currentBar);
 
@@ -632,7 +629,7 @@ export class CapellaParser {
         if (noteObjects) {
             for (let c of noteObjects.childNodes) {
                 if (c.nodeType === XmlNodeType.Element) {
-                    if (this._currentVoiceState.currentBarComplete) {
+                    if (this._currentVoiceState.currentBarComplete && c.localName !== 'barline') {
                         this.newBar(staff, voiceIndex);
                     }
 
@@ -642,7 +639,9 @@ export class CapellaParser {
                             this._currentBar.clefOttava = this.parseClefOttava(c.getAttribute('clef'));
                             break;
                         case 'keySign':
-                            this._currentBar.masterBar.keySignature = parseInt(c.getAttribute('fifths')) as KeySignature;
+                            this._currentBar.masterBar.keySignature = parseInt(
+                                c.getAttribute('fifths')
+                            ) as KeySignature;
                             break;
                         case 'timeSign':
                             this.parseTime(c.getAttribute('time'));
@@ -668,20 +667,28 @@ export class CapellaParser {
                                     }
                                     break;
                                 case 'repEnd':
-                                    // TODO: alternate endings handling
-                                    this._currentBar.masterBar.repeatCount = this.findRepeatCount(c);
+                                    this._currentVoiceState.repeatEnd = this._currentBar.masterBar;
+                                    if(this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
+                                        this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
+                                    }
+                                    this.parseBarDrawObject(c);
                                     if (!this._currentVoiceState.currentBarComplete) {
                                         this._currentBar.masterBar.isAnacrusis = true;
                                     }
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
                                 case 'repBegin':
+                                    this.newBar(staff, voiceIndex); // repeat-start requires instant new bar
                                     this._currentBar.masterBar.isRepeatStart = true;
-                                    // no new bar here on purpose
+                                    this._currentVoiceState.repeatEnd = null;
+                                    this._currentVoiceState.repeatCount = 0;
                                     break;
                                 case 'repEndBegin':
-                                    // TODO: alternate endings handling
-                                    this._currentBar.masterBar.repeatCount = this.findRepeatCount(c);
+                                    this._currentVoiceState.repeatEnd = this._currentBar.masterBar;
+                                    if(this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
+                                        this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
+                                    }
+                                    this.parseBarDrawObject(c);
                                     this.newBar(staff, voiceIndex); // end-begin requires instant new bar
                                     this._currentBar.masterBar.isRepeatStart = true;
                                     break;
@@ -845,7 +852,7 @@ export class CapellaParser {
 
     private _tieStarts!: Note[];
     private _tieStartIds!: Map<number, boolean>;
-    private _slurs!: Map<Beat, number>;
+    private _slurs!: Map<Beat, SlurDrawObject>;
     private _crescendo!: Map<Beat, WedgeDrawObject>;
 
     private parseHead(beat: Beat, articulation: Note, element: XmlNode) {
@@ -898,9 +905,9 @@ export class CapellaParser {
                                     if (obj.text === 'u') {
                                         beat.fermata = new Fermata();
                                         beat.fermata.type = FermataType.Medium;
-                                    } else if (obj.text == 'f') {
+                                    } else if (obj.text === 'f') {
                                         beat.dynamics = DynamicValue.F;
-                                    } else if (obj.text == 'j') {
+                                    } else if (obj.text === 'j') {
                                         beat.dynamics = DynamicValue.MF;
                                     }
                                 } else if (
@@ -935,14 +942,62 @@ export class CapellaParser {
                                 beat.vibrato = VibratoType.Slight;
                             } else if (obj instanceof WedgeDrawObject) {
                                 beat.crescendo = obj.decrescendo ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
+                                obj.noteRange++;
                                 this._crescendo.set(beat, obj);
                             } else if (obj instanceof SlurDrawObject) {
-                                this._slurs.set(beat, obj.noteRange);
+                                this._slurs.set(beat, obj);
+                            } else if (obj instanceof VoltaDrawObject) {
+                                this.applyVolta(obj);
                             }
                         }
                         break;
                 }
             }
+        }
+    }
+
+    private parseBarDrawObject(element: XmlNode) {
+        for (let c of element.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'drawObj':
+                        const obj = this.parseDrawObj(c);
+                        if (obj) {
+                            if (obj instanceof VoltaDrawObject) {
+                                this.applyVolta(obj);
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    private applyVolta(obj: VoltaDrawObject) {
+        if (obj.lastNumber > 0) {
+            this._currentVoiceState.repeatCount = obj.lastNumber;
+            if (this._currentVoiceState.repeatEnd && 
+                this._currentVoiceState.repeatEnd.repeatCount < this._currentVoiceState.repeatCount) {
+                this._currentVoiceState.repeatEnd.repeatCount = this._currentVoiceState.repeatCount;
+            }
+        } else if (obj.firstNumber > 0) {
+            this._currentVoiceState.repeatCount = obj.firstNumber;
+            if (this._currentVoiceState.repeatEnd &&
+                this._currentVoiceState.repeatEnd.repeatCount < this._currentVoiceState.repeatCount) {
+                this._currentVoiceState.repeatEnd.repeatCount = this._currentVoiceState.repeatCount;
+            }
+        }
+
+        if (obj.lastNumber > 0 && obj.firstNumber > 0) {
+            let alternateEndings = 0;
+            for (let i = obj.firstNumber; i <= obj.lastNumber; i++) {
+                alternateEndings |= 0x01 << (i - 1);
+            }
+            this._currentBar.masterBar.alternateEndings = alternateEndings;
+        } else if (obj.lastNumber > 0) {
+            this._currentBar.masterBar.alternateEndings = 0x01 << (obj.lastNumber - 1);
+        } else if(obj.firstNumber > 0) {
+            this._currentBar.masterBar.alternateEndings = 0x01 << (obj.firstNumber - 1);
         }
     }
 
@@ -1058,27 +1113,6 @@ export class CapellaParser {
             }
             beat.tupletDenominator = tripartiteMultiplicator * Math.pow(2, power);
         }
-    }
-
-    private findRepeatCount(barLineNode: XmlNode): number {
-        const drawObjects = barLineNode.findChildElement('drawObjects');
-        if (drawObjects) {
-            for (let c of drawObjects.childNodes) {
-                if (c.nodeType === XmlNodeType.Element) {
-                    switch (c.localName) {
-                        case 'drawObj':
-                            const obj = this.parseDrawObj(c);
-                            if (obj) {
-                                if (obj instanceof VoltaDrawObject) {
-                                    return obj.lastNumber;
-                                }
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-        return 2;
     }
 
     private parsePageObjects(element: XmlNode) {
