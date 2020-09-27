@@ -945,7 +945,9 @@ export class CapellaParser {
                                 obj.noteRange++;
                                 this._crescendo.set(beat, obj);
                             } else if (obj instanceof SlurDrawObject) {
-                                this._slurs.set(beat, obj);
+                                // NOTE: casting needed for C#
+                                const slur = obj as any as SlurDrawObject;
+                                this._slurs.set(beat, slur);
                             } else if (obj instanceof VoltaDrawObject) {
                                 this.applyVolta(obj);
                             }
