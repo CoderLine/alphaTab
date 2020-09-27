@@ -623,7 +623,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
             if (this.bar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreY(-3), this.bar.masterBar.repeatCount));
+                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreY(-4), this.bar.masterBar.repeatCount));
             }
         } else {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));

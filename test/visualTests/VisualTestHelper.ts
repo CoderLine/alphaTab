@@ -9,6 +9,7 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PixelMatch } from './PixelMatch';
+import { Html5Canvas } from '@src/platform/javascript/Html5Canvas';
 
 /**
  * @partial
@@ -71,6 +72,7 @@ export class VisualTestHelper {
 
             settings.core.fontDirectory = CoreSettings.ensureFullUrl('/base/font/bravura/');
             settings.core.engine = 'html5';
+            Html5Canvas.HighDpiFactor = 1; // TODO: upscale all test images to compare on higher scale. 
             settings.core.enableLazyLoading = false;
 
             const referenceFileData = await TestPlatform.loadFile(`test-data/visual-tests/${referenceFileName}`);
@@ -310,8 +312,8 @@ export class VisualTestHelper {
                     // only pixels that are not transparent are relevant for the diff-ratio
                     let totalPixels = match.totalPixels - match.transparentPixels;
                     let percentDifference = (match.differentPixels / totalPixels) * 100;
-                    // result.pass = percentDifference < 1;
-                    result.pass = match.differentPixels < 30;
+                    result.pass = percentDifference < 1;
+                    // result.pass = match.differentPixels < 30;
 
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
