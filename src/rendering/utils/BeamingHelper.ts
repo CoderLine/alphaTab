@@ -282,17 +282,15 @@ export class BeamingHelper {
 
     public calculateBeamY(
         stemSize: number,
-        xCorrection: number,
         xPosition: number,
         scale: number,
         yPosition: IBeamYCalculator
     ): number {
-        return this.calculateBeamYWithDirection(stemSize, xCorrection, xPosition, scale, yPosition, this.direction);
+        return this.calculateBeamYWithDirection(stemSize, xPosition, scale, yPosition, this.direction);
     }
 
     public calculateBeamYWithDirection(
         stemSize: number,
-        xCorrection: number,
         xPosition: number,
         scale: number,
         yPosition: IBeamYCalculator,
@@ -324,12 +322,12 @@ export class BeamingHelper {
         ) {
             return yPosition.getYPositionForNoteValue(this.maxNoteValue) - stemSize;
         }
-        let startX: number = this.getBeatLineX(this.beats[0]) + xCorrection;
+        let startX: number = this.getBeatLineX(this.beats[0]);
         let startY: number =
             direction === BeamDirection.Up
                 ? yPosition.getYPositionForNoteValue(this.firstMaxNoteValue) - stemSize
                 : yPosition.getYPositionForNoteValue(this.firstMinNoteValue) + stemSize;
-        let endX: number = this.getBeatLineX(this.beats[this.beats.length - 1]) + xCorrection;
+        let endX: number = this.getBeatLineX(this.beats[this.beats.length - 1]);
         let endY: number =
             direction === BeamDirection.Up
                 ? yPosition.getYPositionForNoteValue(this.lastMaxNoteValue) - stemSize

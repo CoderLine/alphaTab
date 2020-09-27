@@ -1,3 +1,5 @@
+import { Color } from '@src/model/Color';
+import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';

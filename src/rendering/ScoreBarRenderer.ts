@@ -201,7 +201,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                     continue;
                 }
                 let direction: BeamDirection = beamingHelper.direction;
-                let tupletX: number = beamingHelper.getBeatLineX(beat) + this.scale;
+                let tupletX: number = beamingHelper.getBeatLineX(beat);
                 let tupletY: number = cy + this.y + this.calculateBeamY(beamingHelper, tupletX);
                 let offset: number = direction === BeamDirection.Up ? res.effectFont.size * 1.5 : -3 * this.scale;
                 canvas.font = res.effectFont;
@@ -216,8 +216,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                 let direction: BeamDirection = firstBeamingHelper.direction;
                 //
                 // Calculate the overall area of the tuplet bracket
-                let startX: number = firstBeamingHelper.getBeatLineX(firstBeat) + this.scale;
-                let endX: number = lastBeamingHelper.getBeatLineX(lastBeat) + this.scale;
+                let startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
+                let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
                 //
                 // Calculate how many space the text will need
                 canvas.font = res.effectFont;
@@ -342,12 +342,12 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
 
     public calculateBeamY(h: BeamingHelper, x: number): number {
         let stemSize: number = this.getStemSize(h);
-        return h.calculateBeamY(stemSize, this.scale, x, this.scale, this);
+        return h.calculateBeamY(stemSize, x, this.scale, this);
     }
 
     private calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         let stemSize: number = this.getStemSize(h);
-        return h.calculateBeamYWithDirection(stemSize, this.scale, x, this.scale, this, direction);
+        return h.calculateBeamYWithDirection(stemSize, x, this.scale, this, direction);
     }
 
     private paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
@@ -623,7 +623,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
             if (this.bar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreY(-1, -3), this.bar.masterBar.repeatCount));
+                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreY(-3), this.bar.masterBar.repeatCount));
             }
         } else {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));

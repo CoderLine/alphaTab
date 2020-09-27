@@ -121,10 +121,12 @@ export class TabBarRenderer extends BarRendererBase {
 
     private createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+
+        const lines = (this.bar.staff.tuning.length + 1) / 2;
         this.addPreBeatGlyph(
             new TabTimeSignatureGlyph(
                 0,
-                this.getTabY(0, 0),
+                this.getTabY(lines, 0),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon
@@ -322,7 +324,7 @@ export class TabBarRenderer extends BarRendererBase {
                         // full bar?
                         if (BeamingHelper.isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
                             barStartX = beatLineX;
-                            barEndX = h.getBeatLineX(h.beats[i + 1]) + this.scale;
+                            barEndX = h.getBeatLineX(h.beats[i + 1]);
                             let endGlyph: BeatGlyphBase = this.getOnNotesGlyphForBeat(h.beats[i + 1]);
                             if (h.direction === BeamDirection.Up) {
                                 barEndX -= endGlyph.width / 2;
