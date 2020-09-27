@@ -201,6 +201,27 @@ export class TinySoundFont {
         }
     }
 
+
+    public get masterVolume(): number {
+        return SynthHelper.decibelsToGain(this.globalGainDb);
+    }
+
+    public set masterVolume(value: number) {
+        var gainDb = SynthHelper.gainToDecibels(value);
+        const gainDBChange: number = gainDb - this.globalGainDb;
+        if (gainDBChange === 0) {
+            return;
+        }
+
+        for (const v of this._voices) {
+            if (v.playingPreset !== -1) {
+                v.noteGainDb += gainDBChange;
+            }
+        }
+
+        this.globalGainDb = gainDb;
+    }
+
     /**
      * Stop all playing notes immediatly and reset all channel parameters but keeps user
      * defined settings
@@ -1016,7 +1037,7 @@ export class TinySoundFont {
             : 0.0;
     }
 
-    public resetPresets():void {
+    public resetPresets(): void {
         this.presets = [];
     }
 
