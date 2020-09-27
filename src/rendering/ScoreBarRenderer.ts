@@ -461,7 +461,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         // draw line
         //
         let stemSize: number = this.getFlagStemSize(h.shortestDuration);
-        let beatLineX: number = h.getBeatLineX(beat) + this.scale;
+        let beatLineX: number = h.getBeatLineX(beat);
         let direction: BeamDirection = h.direction;
         let topY: number = this.getYPositionForNoteValue(h.maxNoteValue);
         let bottomY: number = this.getYPositionForNoteValue(h.minNoteValue);
@@ -607,9 +607,6 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             this.createTimeSignatureGlyphs();
         }
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreHeight(-0.5), this.bar.index + 1));
-        if (this.bar.isEmpty) {
-            this.addPreBeatGlyph(new SpacingGlyph(0, 0, 30 * this.scale));
-        }
     }
 
     protected createBeatGlyphs(): void {

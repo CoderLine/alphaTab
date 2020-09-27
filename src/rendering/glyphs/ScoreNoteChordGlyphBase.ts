@@ -60,7 +60,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             g.doLayout();
             let displace: boolean = false;
             if (i === 0) {
-                displacedX = g.width;
+                displacedX = g.width - lineOffset;
             } else {
                 // check if note needs to be repositioned
                 if (Math.abs(lastLine - this._infos[i].line) <= 1) {

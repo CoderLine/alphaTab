@@ -14,24 +14,19 @@ export class TempoGlyph extends EffectGlyph {
 
     public doLayout(): void {
         super.doLayout();
-        this.height = 27 * this.scale;
+        this.height = 25 * this.scale;
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         let res: RenderingResources = this.renderer.resources;
         canvas.font = res.markerFont;
-        const noteHeadHeight = this.scale * NoteHeadGlyph.GraceScale * NoteHeadGlyph.NoteHeadHeight;
-        const padding = 1 * this.scale;
         canvas.fillMusicFontSymbol(
             cx + this.x,
-            cy + this.y + this.height - noteHeadHeight / 2 - padding,
+            cy + this.y + this.height * 0.8,
             this.scale * NoteHeadGlyph.GraceScale,
             MusicFontSymbol.NoteQuarterUp,
             false
         );
-        const baseline = canvas.textBaseline;
-        canvas.textBaseline = TextBaseline.Middle;
-        canvas.fillText('= ' + this._tempo, cx + this.x + this.height / 2, cy + this.y + this.height / 2 - padding);
-        canvas.textBaseline = baseline;
+        canvas.fillText('= ' + this._tempo, cx + this.x + this.height / 2, cy + this.y + canvas.font.size / 2);	
     }
 }
