@@ -53,6 +53,7 @@ import { Settings } from '@src/Settings';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
 import { LeftHandTapEffectInfo } from './rendering/effects/LeftHandTapEffectInfo';
+import { CapellaImporter } from './importer/CapellaImporter';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -339,8 +340,9 @@ export class Environment {
             new Gp3To5Importer(),
             new GpxImporter(),
             new Gp7Importer(),
-            new AlphaTexImporter(),
-            new MusicXmlImporter()
+            new MusicXmlImporter(),
+            new CapellaImporter(),
+            new AlphaTexImporter()
         ];
     }
 

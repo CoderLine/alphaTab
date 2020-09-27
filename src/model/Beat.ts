@@ -23,6 +23,24 @@ import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 /**
+ * Lists the different modes on how beaming for a beat should be done. 
+ */
+export enum BeatBeamingMode {
+    /**
+     * Automatic beaming based on the timing rules. 
+     */
+    Auto,
+    /**
+     * Force a split to the next beat.
+     */
+    ForceSplitToNext,
+    /**
+     * Force a merge with the next beat. 
+     */
+    ForceMergeWithNext
+}
+
+/**
  * A beat is a single block within a bar. A beat is a combination
  * of several notes played at the same time.
  */
@@ -344,6 +362,11 @@ export class Beat {
 
     public effectSlurDestination: Beat | null = null;
 
+    /**
+     * Gets or sets how the beaming should be done for this beat.
+     */
+    public beamingMode:BeatBeamingMode = BeatBeamingMode.Auto;    
+
     public static copyTo(src: Beat, dst: Beat): void {
         dst.id = src.id;
         dst.index = src.index;
@@ -384,6 +407,7 @@ export class Beat {
         dst.isContinuedWhammy = src.isContinuedWhammy;
         dst.ottava = src.ottava;
         dst.whammyStyle = src.whammyStyle;
+        dst.beamingMode = src.beamingMode;
     }
 
     public clone(): Beat {
@@ -749,7 +773,6 @@ export class Beat {
             this.updateDurations();
             this.voice.insertBeat(this, cloneBeat);
         }
-        this.fermata = this.voice.bar.masterBar.getFermata(this);
     }
 
     /**

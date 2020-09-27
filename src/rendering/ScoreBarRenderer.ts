@@ -71,8 +71,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     protected updateSizes(): void {
         let res: RenderingResources = this.resources;
         let glyphOverflow: number = res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2;
-        this.topPadding = glyphOverflow;
-        this.bottomPadding = glyphOverflow;
+        this.topPadding = glyphOverflow * this.scale;
+        this.bottomPadding = glyphOverflow * this.scale;
         this.height = this.lineOffset * 4 + this.topPadding + this.bottomPadding;
         super.updateSizes();
     }
@@ -583,14 +583,13 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             this.bar.clefOttava !== this.bar.previousBar!.clefOttava
         ) {
             let offset: number = 0;
-            let correction: number = 0;
+            let correction: number = 0.5;
             switch (this.bar.clef) {
                 case Clef.Neutral:
                     offset = 6;
                     break;
                 case Clef.F4:
                     offset = 4;
-                    correction = -1;
                     break;
                 case Clef.C3:
                     offset = 6;
@@ -756,12 +755,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
         let res: RenderingResources = this.resources;
-        // var c = new Color((byte)Platform.Random(255),
-        //                  (byte)Platform.Random(255),
-        //                  (byte)Platform.Random(255),
-        //                  100);
-        // canvas.Color = c;
-        // canvas.FillRect(cx + X, cy + Y, Width, Height);
+        // canvas.color = Color.random(100);
+        // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
         //
         // draw string lines
         //
