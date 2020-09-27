@@ -107,9 +107,6 @@ export class TabBarRenderer extends BarRendererBase {
             this.createTimeSignatureGlyphs();
         }
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getTabY(-0.5, 0), this.bar.index + 1));
-        if (this.bar.isEmpty) {
-            this.addPreBeatGlyph(new SpacingGlyph(0, 0, 30 * this.scale));
-        }
     }
 
     private _startSpacing: boolean = false;
@@ -135,16 +132,7 @@ export class TabBarRenderer extends BarRendererBase {
         );
     }
 
-    protected createBeatGlyphs(): void {
-        for (let v: number = 0; v < this.bar.voices.length; v++) {
-            let voice: Voice = this.bar.voices[v];
-            if (this.hasVoiceContainer(voice)) {
-                this.createVoiceGlyphs(this.bar.voices[v]);
-            }
-        }
-    }
-
-    private createVoiceGlyphs(v: Voice): void {
+    protected createVoiceGlyphs(v: Voice): void {
         for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
             let b: Beat = v.beats[i];
             let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getOrCreateVoiceContainer(v));
@@ -527,7 +515,7 @@ export class TabBarRenderer extends BarRendererBase {
             canvas.lineTo(cx + this.x + beatLineX, y2);
             canvas.stroke();
             //
-            // Draw beam
+            // Draw Flag
             //
             if (beat.duration > Duration.Quarter) {
                 let glyph: FlagGlyph = new FlagGlyph(0, 0, beat.duration, BeamDirection.Down, false);

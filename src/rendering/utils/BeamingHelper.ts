@@ -1,5 +1,5 @@
 import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
@@ -76,6 +76,15 @@ export class BeamingHelper {
     public invertBeamDirection: boolean = false;
     public preferredBeamDirection: BeamDirection | null = null;
     public isGrace: boolean = false;
+
+    public get hasLine(): boolean {
+        return this.beats.length === 1 && this.beats[0].duration > Duration.Whole;
+    }
+
+    public get hasFlag(): boolean {
+        return this.beats.length === 1 &&
+            (this.beats[0].duration > Duration.Quarter || this.beats[0].graceType != GraceType.None);
+    }
 
     public constructor(staff: Staff) {
         this._staff = staff;
@@ -187,8 +196,18 @@ export class BeamingHelper {
         let add: boolean = false;
         if (this.beats.length === 0) {
             add = true;
-        } else if (BeamingHelper.canJoin(this.beats[this.beats.length - 1], beat)) {
-            add = true;
+        } else {
+            switch (this.beats[this.beats.length - 1].beamingMode) {
+                case BeatBeamingMode.Auto:
+                    add = BeamingHelper.canJoin(this.beats[this.beats.length - 1], beat);
+                    break;
+                case BeatBeamingMode.ForceSplitToNext:
+                    add = false;
+                    break;
+                case BeatBeamingMode.ForceMergeWithNext:
+                    add = true;
+                    break;
+            }
         }
         if (add) {
             if (beat.preferredBeamDirection !== null) {

@@ -71,6 +71,7 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         settings.core.useWorkers = false;
         settings.display.scale = 0.8;
         settings.display.stretchForce = 0.8;
+        settings.display.resources = this.settings.display.resources;
         let alphaTab: AlphaTabApi = new AlphaTabApi(a4, settings);
         alphaTab.renderer.postRenderFinished.on(() => {
             alphaTab.canvasElement.height = -1;

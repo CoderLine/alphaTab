@@ -185,6 +185,12 @@ namespace AlphaTab.Core
         {
             return s[(int) index];
         }
+		
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string CharAt(this string s, double index)
+        {
+            return s.Substring((int) index, 1);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToLowerCase(this string s)

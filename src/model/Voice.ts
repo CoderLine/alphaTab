@@ -166,6 +166,14 @@ export class Voice {
                 beat.playbackStart = currentPlaybackTick;
                 currentPlaybackTick = beat.playbackStart + beat.playbackDuration;
             }
+
+
+            if(beat.fermata) {
+                this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
+            } else {
+                beat.fermata = this.bar.masterBar.getFermata(beat);
+            }
+
             beat.finishTuplet();
             this._beatLookup.set(beat.displayStart, beat);
         }
@@ -176,6 +184,7 @@ export class Voice {
             return 0;
         }
         let lastBeat: Beat = this.beats[this.beats.length - 1];
-        return lastBeat.playbackStart + lastBeat.playbackDuration;
+        let firstBeat: Beat = this.beats[0];
+        return lastBeat.playbackStart + lastBeat.playbackDuration - firstBeat.playbackStart;
     }
 }

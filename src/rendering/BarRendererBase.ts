@@ -281,6 +281,7 @@ export class BarRendererBase {
         });
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
+        this.height += this.layoutingInfo.height * this.scale;
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -325,7 +326,9 @@ export class BarRendererBase {
     }
 
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
-        // no default brackgroundpainting
+        this.layoutingInfo.paint(cx + this.x + this._preBeatGlyphs.x + this._preBeatGlyphs.width, cy + this.y + this.height, canvas);
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x + this._preBeatGlyphs.x, cy + this.y, this._preBeatGlyphs.width, this.height);
     }
 
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
@@ -364,6 +367,15 @@ export class BarRendererBase {
     }
 
     protected createBeatGlyphs(): void {
+        for (let v: number = 0; v < this.bar.voices.length; v++) {
+            let voice: Voice = this.bar.voices[v];
+            if (this.hasVoiceContainer(voice)) {
+                this.createVoiceGlyphs(this.bar.voices[v]);
+            }
+        }
+    }
+
+    protected createVoiceGlyphs(v:Voice): void {
         // filled in subclasses
     }
 
@@ -390,7 +402,10 @@ export class BarRendererBase {
                 case BeatXPosition.MiddleNotes:
                     return container.voiceContainer.x + container.x + container.onTimeX;
                 case BeatXPosition.Stem:
-                    return container.voiceContainer.x + container.onNotes.beamingHelper.getBeatLineX(beat);
+                    const offset = container.onNotes.beamingHelper 
+                        ? container.onNotes.beamingHelper.getBeatLineX(beat)
+                        : container.onNotes.x + container.onNotes.width / 2;
+                    return container.voiceContainer.x + offset;
                 case BeatXPosition.PostNotes:
                     return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.width;
                 case BeatXPosition.EndBeat:

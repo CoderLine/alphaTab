@@ -289,8 +289,15 @@ export class GpifParser {
                         break;
                     case 'Value':
                         let parts: string[] = c.innerText.split(' ');
-                        value = parseFloat(parts[0]);
-                        reference = parseInt(parts[1]);
+                        // Issue 391: Some GPX files might have 
+                        // single floating point value. 
+                        if (parts.length === 1) {
+                            value = parseFloat(parts[0]);
+                            reference = 1;
+                        } else {
+                            value = parseFloat(parts[0]);
+                            reference = parseInt(parts[1]);
+                        }
                         break;
                     case 'Text':
                         text = c.innerText;

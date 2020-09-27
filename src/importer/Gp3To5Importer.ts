@@ -499,8 +499,11 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((flags & 0x04) !== 0) {
             newBeat.text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
         }
+        
+
+        let allNoteHarmonicType = HarmonicType.None;
         if ((flags & 0x08) !== 0) {
-            this.readBeatEffects(newBeat);
+            allNoteHarmonicType = this.readBeatEffects(newBeat);
         }
         if ((flags & 0x10) !== 0) {
             this.readMixTableChange(newBeat);
@@ -508,7 +511,13 @@ export class Gp3To5Importer extends ScoreImporter {
         let stringFlags: number = this.data.readByte();
         for (let i: number = 6; i >= 0; i--) {
             if ((stringFlags & (1 << i)) !== 0 && 6 - i < bar.staff.tuning.length) {
-                this.readNote(track, bar, voice, newBeat, 6 - i);
+                const note = this.readNote(track, bar, voice, newBeat, 6 - i);
+                if(allNoteHarmonicType !== HarmonicType.None) {
+                    note.harmonicType = allNoteHarmonicType;
+                    if(note.harmonicType === HarmonicType.Natural) {
+                        note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
+                    }
+                }
             }
         }
         if (this._versionNumber >= 500) {
@@ -614,7 +623,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
-    public readBeatEffects(beat: Beat): void {
+    public readBeatEffects(beat: Beat): HarmonicType {
         let flags: number = this.data.readByte();
         let flags2: number = 0;
         if (this._versionNumber >= 400) {
@@ -687,6 +696,16 @@ export class Gp3To5Importer extends ScoreImporter {
                     break;
             }
         }
+
+        if (this._versionNumber < 400) {
+            if ((flags & 0x04) !== 0) {
+                return HarmonicType.Natural;
+            } else if ((flags & 0x08) !== 0) {
+                return HarmonicType.Artificial;
+            }
+        }
+
+        return HarmonicType.None;
     }
 
     public readTremoloBarEffect(beat: Beat): void {
@@ -812,7 +831,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
-    public readNote(track: Track, bar: Bar, voice: Voice, beat: Beat, stringIndex: number): void {
+    public readNote(track: Track, bar: Bar, voice: Voice, beat: Beat, stringIndex: number): Note {
         let newNote: Note = new Note();
         newNote.string = bar.staff.tuning.length - stringIndex;
         let flags: number = this.data.readByte();
@@ -866,6 +885,7 @@ export class Gp3To5Importer extends ScoreImporter {
             newNote.string = -1;
             newNote.fret = -1;
         }
+        return newNote;
     }
 
     public toDynamicValue(value: number): DynamicValue {
@@ -915,14 +935,6 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         if ((flags2 & 0x10) !== 0) {
             this.readArtificialHarmonic(note);
-        } else if (this._versionNumber < 400) {
-            if ((flags & 0x04) !== 0) {
-                note.harmonicType = HarmonicType.Natural;
-                note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
-            }
-            if ((flags & 0x08) !== 0) {
-                note.harmonicType = HarmonicType.Artificial;
-            }
         }
         if ((flags2 & 0x20) !== 0) {
             this.readTrill(note);

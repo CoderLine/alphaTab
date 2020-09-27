@@ -152,7 +152,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         // TODO: draw stem at least at the center of the score staff.
         // check if we need to paint simple footer
         if (h.beats.length === 1) {
-            this.paintFooter(cx, cy, canvas, h);
+            this.paintFlag(cx, cy, canvas, h);
         } else {
             this.paintBar(cx, cy, canvas, h);
         }
@@ -278,7 +278,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     public getStemSize(helper: BeamingHelper): number {
         let size: number =
             helper.beats.length === 1
-                ? this.getFooterStemSize(helper.shortestDuration)
+                ? this.getFlagStemSize(helper.shortestDuration)
                 : this.getBarStemSize(helper.shortestDuration);
         if (helper.isGrace) {
             size = size * NoteHeadGlyph.GraceScale;
@@ -315,7 +315,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         return this.getScoreHeight(size);
     }
 
-    private getFooterStemSize(duration: Duration): number {
+    private getFlagStemSize(duration: Duration): number {
         let size: number = 0;
         switch (duration) {
             case Duration.QuadrupleWhole:
@@ -447,7 +447,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         canvas.fill();
     }
 
-    private paintFooter(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    private paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         let beat: Beat = h.beats[0];
         if (
             beat.graceType === GraceType.BendGrace ||
@@ -460,8 +460,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         //
         // draw line
         //
-        let stemSize: number = this.getFooterStemSize(h.shortestDuration);
-        let beatLineX: number = h.getBeatLineX(beat);
+        let stemSize: number = this.getFlagStemSize(h.shortestDuration);
+        let beatLineX: number = h.getBeatLineX(beat) + this.scale;
         let direction: BeamDirection = h.direction;
         let topY: number = this.getYPositionForNoteValue(h.maxNoteValue);
         let bottomY: number = this.getYPositionForNoteValue(h.minNoteValue);
@@ -477,11 +477,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             fingeringY = cy + this.y + topY;
         }
         this.paintFingering(canvas, beat, cx + this.x + beatLineX, direction, fingeringY);
-        if (
-            beat.duration === Duration.Whole ||
-            beat.duration === Duration.DoubleWhole ||
-            beat.duration === Duration.QuadrupleWhole
-        ) {
+        if (!h.hasLine) {
             return;
         }
         canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
@@ -506,8 +502,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         //
         // Draw flag
         //
-        if (beat.duration > Duration.Quarter || isGrace) {
-            let glyph: FlagGlyph = new FlagGlyph(beatLineX, beamY, beat.duration, direction, isGrace);
+        if (h.hasFlag) {
+            let glyph: FlagGlyph = new FlagGlyph(beatLineX - this.scale / 2, beamY, beat.duration, direction, isGrace);
             glyph.renderer = this;
             glyph.doLayout();
             glyph.paint(cx + this.x, cy + this.y, canvas);
@@ -725,7 +721,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         );
     }
 
-    private createVoiceGlyphs(v: Voice): void {
+    protected createVoiceGlyphs(v: Voice): void {
         for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
             let b: Beat = v.beats[i];
             let container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getOrCreateVoiceContainer(v));

@@ -207,9 +207,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     //
     // API communicating with the web worker
     public play(): boolean {
-        if (this.state === PlayerState.Playing || !this.isReadyForPlayback) {
-            return false;
-        }
         this._output.activate();
         this._synth.postMessage({
             cmd: 'alphaSynth.play'
