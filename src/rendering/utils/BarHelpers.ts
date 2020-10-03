@@ -3,12 +3,13 @@ import { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
 import { Voice } from '@src/model/Voice';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { BarRendererBase } from '../BarRendererBase';
 
 export class BarHelpers {
     public beamHelpers: BeamingHelper[][] = [];
     public beamHelperLookup: Map<number, BeamingHelper>[] = [];
 
-    public constructor(bar: Bar) {
+    public constructor(bar: Bar, barRenderer:BarRendererBase) {
         let currentBeamHelper: BeamingHelper | null = null;
         let currentGraceBeamHelper: BeamingHelper | null = null;
         if (bar) {
@@ -33,7 +34,7 @@ export class BarHelpers {
                                 helperForBeat.finish();
                             }
                             // if not possible, create the next beaming helper
-                            helperForBeat = new BeamingHelper(bar.staff);
+                            helperForBeat = new BeamingHelper(bar.staff, barRenderer);
                             helperForBeat.checkBeat(b);
                             if (b.graceType !== GraceType.None) {
                                 currentGraceBeamHelper = helperForBeat;

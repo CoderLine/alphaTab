@@ -117,7 +117,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         });
         let directionBeat: Beat = this._beat.graceType === GraceType.BendGrace ? this._beat.nextBeat! : this._beat;
         let direction: BeamDirection =
-            this._notes.length === 1 ? this.getBeamDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;
+            this._notes.length === 1 ? this.getTieDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;
         // draw slurs
         for (let i: number = 0; i < this._notes.length; i++) {
             let note: Note = this._notes[i];

@@ -99,6 +99,14 @@ export class AccidentalHelper {
         this._bar = bar;
     }
 
+    public static getPercussionLine(bar: Bar, noteValue: number): number {
+        if (bar.staff.track.percussionStaffLines.has(noteValue)) {
+            return bar.staff.track.percussionStaffLines.get(noteValue)!;
+        } else {
+            return PercussionMapper.getArticulation(noteValue)?.staffLine ?? 0;
+        }
+    }
+
     public static getNoteValue(note: Note) {
         let noteValue: number = note.displayValue;
 
@@ -145,16 +153,17 @@ export class AccidentalHelper {
         return this.getAccidental(noteValue, quarterBend, null, relatedBeat);
     }
 
-    private getAccidental(noteValue: number, quarterBend: boolean, note: Note | null = null, relatedBeat: Beat): AccidentalType {
+    private getAccidental(
+        noteValue: number,
+        quarterBend: boolean,
+        note: Note | null = null,
+        relatedBeat: Beat
+    ): AccidentalType {
         let accidentalToSet: AccidentalType = AccidentalType.None;
         let line: number = 0;
 
         if (this._bar.staff.isPercussion) {
-            if (this._bar.staff.track.percussionStaffLines.has(noteValue)) {
-                line = this._bar.staff.track.percussionStaffLines.get(noteValue)!;
-            } else {
-                line = PercussionMapper.getArticulation(noteValue)?.staffLine ?? 0;
-            }
+            line = AccidentalHelper.getPercussionLine(this._bar, noteValue);
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
             line = this.calculateNoteLine(noteValue, accidentalMode);
@@ -167,15 +176,15 @@ export class AccidentalHelper {
             let hasKeySignatureAccidentalSetForNote: boolean = AccidentalHelper.KeySignatureLookup[ksi][index];
             let hasNoteAccidentalWithinOctave: boolean = AccidentalHelper.AccidentalNotes[index];
 
-            // the general logic is like this: 
+            // the general logic is like this:
             // - we check if the key signature has an accidental defined
             // - we calculate which accidental a note needs according to its index in the octave
             // - if the accidental is already placed at this line, nothing needs to be done, otherwise we place it
-            // - if there should not be an accidental, but there is one in the key signature, we clear it. 
+            // - if there should not be an accidental, but there is one in the key signature, we clear it.
 
-            // the exceptions are: 
+            // the exceptions are:
             // - for quarter bends we just place the corresponding accidental
-            // - the accidental mode can enforce the accidentals for the note 
+            // - the accidental mode can enforce the accidentals for the note
 
             if (quarterBend) {
                 accidentalToSet = hasNoteAccidentalWithinOctave ? accidentalForKeySignature : AccidentalType.Natural;
@@ -210,7 +219,7 @@ export class AccidentalHelper {
                         hasNoteAccidentalWithinOctave = true;
                         break;
                     default:
-                        // if note has an accidental in the octave, we place a symbol 
+                        // if note has an accidental in the octave, we place a symbol
                         // according to the Key Signature
                         if (hasNoteAccidentalWithinOctave) {
                             accidentalToSet = accidentalForKeySignature;
@@ -234,16 +243,15 @@ export class AccidentalHelper {
                         accidentalToSet = AccidentalType.None;
                     }
 
-                    // register the new accidental on the line if any. 
+                    // register the new accidental on the line if any.
                     if (accidentalToSet != AccidentalType.None) {
                         this._registeredAccidentals.set(line, accidentalToSet);
                     }
-                }
-                else {
+                } else {
                     // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
                     // and clear the registration
                     if (this._registeredAccidentals.has(line)) {
-                        // if there is already a naturalize symbol on the line, we don't care. 
+                        // if there is already a naturalize symbol on the line, we don't care.
                         if (this._registeredAccidentals.get(line) === AccidentalType.Natural) {
                             accidentalToSet = AccidentalType.None;
                         } else {

@@ -29,10 +29,6 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         super();
     }
 
-    public get direction(): BeamDirection {
-        return this.beamingHelper.direction;
-    }
-
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         if (this._noteGlyphLookup.has(note.id)) {
             let n = this._noteGlyphLookup.get(note.id)!;
@@ -161,7 +157,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         let belowEffectSpacing = 1;
         let aboveEffectSpacing = -belowEffectSpacing;
 
-        if (this.beamingHelper.direction == BeamDirection.Up) {
+        if (this.beamingHelper.direction2 === BeamDirection.Up) {
             belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line);
             aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
         } else {

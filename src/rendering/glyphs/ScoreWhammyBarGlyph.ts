@@ -111,7 +111,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             beat.voice.bar
         )! as ScoreBarRenderer;
         let startX: number = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(beat, BeatXPosition.MiddleNotes);
-        let beatDirection: BeamDirection = this.getBeamDirection(beat, startNoteRenderer);
+        let beatDirection: BeamDirection = this.getTieDirection(beat, startNoteRenderer);
         let direction: BeamDirection = this._beat.notes.length === 1 ? beatDirection : BeamDirection.Up;
         let textalign: TextAlign = canvas.textAlign;
         for (let i: number = 0; i < beat.notes.length; i++) {

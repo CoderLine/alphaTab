@@ -166,6 +166,10 @@ export class TabBarRenderer extends BarRendererBase {
         return this.lineOffset * line + correction * this.scale;
     }
 
+    public get middleYPosition(): number {
+        return this.getTabY(this.bar.staff.tuning.length - 1);
+    }
+
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
         let res: RenderingResources = this.resources;
@@ -284,7 +288,7 @@ export class TabBarRenderer extends BarRendererBase {
                         startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
                         this.lineOffset / 2;
                 }
-                if (h.direction === BeamDirection.Up) {
+                if (h.direction2 === BeamDirection.Up) {
                     beatLineX -= startGlyph.width / 2;
                 } else {
                     beatLineX += startGlyph.width / 2;
@@ -326,7 +330,7 @@ export class TabBarRenderer extends BarRendererBase {
                             barStartX = beatLineX;
                             barEndX = h.getBeatLineX(h.beats[i + 1]);
                             let endGlyph: BeatGlyphBase = this.getOnNotesGlyphForBeat(h.beats[i + 1]);
-                            if (h.direction === BeamDirection.Up) {
+                            if (h.direction2 === BeamDirection.Up) {
                                 barEndX -= endGlyph.width / 2;
                             } else {
                                 barEndX += endGlyph.width / 2;
@@ -410,7 +414,7 @@ export class TabBarRenderer extends BarRendererBase {
                 }
                 let tupletX: number = beamingHelper.getBeatLineX(beat);
                 let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
-                if (beamingHelper.direction === BeamDirection.Up) {
+                if (beamingHelper.direction2 === BeamDirection.Up) {
                     tupletX -= startGlyph.width / 2;
                 } else {
                     tupletX += startGlyph.width / 2;
@@ -431,7 +435,7 @@ export class TabBarRenderer extends BarRendererBase {
                 let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
                 let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(firstBeat) as TabBeatGlyph;
                 let endGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(firstBeat) as TabBeatGlyph;
-                if (firstBeamingHelper.direction === BeamDirection.Up) {
+                if (firstBeamingHelper.direction2 === BeamDirection.Up) {
                     startX -= startGlyph.width / 2;
                     endX -= endGlyph.width / 2;
                 } else {
@@ -507,7 +511,7 @@ export class TabBarRenderer extends BarRendererBase {
                 y1 +=
                     startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
             }
-            if (h.direction === BeamDirection.Up) {
+            if (h.direction2 === BeamDirection.Up) {
                 beatLineX -= startGlyph.width / 2;
             } else {
                 beatLineX += startGlyph.width / 2;
