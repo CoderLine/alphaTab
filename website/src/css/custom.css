@@ -195,3 +195,12 @@ img.thumbnail:hover {
   border: 0;
   background: #f7f7f7;
 }
+
+.badge--header {
+  --ifm-header-badge-font-size: calc(var(--ifm-font-size-base) * 0.75);
+  --ifm-header-badge-padding-horizontal: calc(var(--ifm-font-size-base) * 0.5);
+  --ifm-header-badge-padding-vertical: calc(var(--ifm-font-size-base) * 0.25);
+
+  font-size: var(--ifm-header-badge-font-size) !important;
+  padding: var(--ifm-header-badge-padding-vertical) var(--ifm-header-badge-padding-horizontal);
+}
