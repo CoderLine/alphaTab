@@ -23,7 +23,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     private _beat: Beat;
 
     public constructor(beat: Beat) {
-        super();
+        super(0,0);
         this._beat = beat;
     }
 

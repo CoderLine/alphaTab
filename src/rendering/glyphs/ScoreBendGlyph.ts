@@ -22,7 +22,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
 
     public constructor(beat: Beat) {
-        super();
+        super(0,0);
         this._beat = beat;
     }
 
