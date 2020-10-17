@@ -2,7 +2,7 @@ import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { FontSizes } from '@src/platform/svg/FontSizes';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Settings } from '@src/Settings';
 
 /**

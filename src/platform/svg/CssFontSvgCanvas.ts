@@ -1,6 +1,6 @@
 import { TextAlign } from '@src/platform/ICanvas';
 import { SvgCanvas } from '@src/platform/svg/SvgCanvas';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements.

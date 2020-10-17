@@ -1,6 +1,6 @@
 import { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { RenderingResources } from '@src/RenderingResources';
 
 export class TrillGlyph extends EffectGlyph {
@@ -30,7 +30,7 @@ export class TrillGlyph extends EffectGlyph {
                 cx + this.x + loopX,
                 loopY,
                 waveScale,
-                MusicFontSymbol.WaveHorizontalSlight,
+                MusicFontSymbol.WiggleTrill,
                 false
             );
             loopX += step;

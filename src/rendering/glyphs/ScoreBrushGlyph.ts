@@ -27,16 +27,22 @@ export class ScoreBrushGlyph extends Glyph {
         let arrowX: number = cx + this.x + this.width / 2;
         let arrowSize: number = 8 * this.scale;
         if (this._beat.brushType !== BrushType.None) {
+            let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
+            glyph.renderer = this.renderer;
+            glyph.doLayout();
+
+            let waveOffset = -glyph.height / 2;
+
             if (this._beat.brushType === BrushType.ArpeggioUp) {
+
                 let lineStartY: number = startY + arrowSize;
                 let lineEndY: number = endY - arrowSize;
-                canvas.beginRotate(cx + this.x + 5 * this.scale, lineEndY, -90);
-                let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
-                glyph.renderer = this.renderer;
-                glyph.doLayout();
                 glyph.width = Math.abs(lineEndY - lineStartY);
-                glyph.paint(0, 0, canvas);
+              
+                canvas.beginRotate(cx + this.x + 5 * this.scale, lineEndY, -90);
+                glyph.paint(0, waveOffset, canvas);
                 canvas.endRotate();
+
                 canvas.beginPath();
                 canvas.moveTo(arrowX, endY);
                 canvas.lineTo(arrowX + arrowSize / 2, endY - arrowSize);
@@ -44,15 +50,15 @@ export class ScoreBrushGlyph extends Glyph {
                 canvas.closePath();
                 canvas.fill();
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
+
                 let lineStartY: number = startY + arrowSize;
                 let lineEndY: number = endY;
-                canvas.beginRotate(cx + this.x + 5 * this.scale, lineStartY, 90);
-                let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
-                glyph.renderer = this.renderer;
-                glyph.doLayout();
                 glyph.width = Math.abs(lineEndY - lineStartY);
-                glyph.paint(0, 0, canvas);
+
+                canvas.beginRotate(cx + this.x + 5 * this.scale, lineStartY, 90);
+                glyph.paint(0, waveOffset, canvas);
                 canvas.endRotate();
+
                 canvas.beginPath();
                 canvas.moveTo(arrowX, startY);
                 canvas.lineTo(arrowX + arrowSize / 2, startY + arrowSize);

@@ -1,5 +1,5 @@
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class DigitGlyph extends MusicFontGlyph {
     private _digit: number = 0;
@@ -12,7 +12,6 @@ export class DigitGlyph extends MusicFontGlyph {
     }
 
     public doLayout(): void {
-        this.y += 7 * this.scale;
         this.width = this.getDigitWidth(this._digit) * this.scale * this._scale;
     }
 
@@ -38,25 +37,25 @@ export class DigitGlyph extends MusicFontGlyph {
     private static getSymbol(digit: number): MusicFontSymbol {
         switch (digit) {
             case 0:
-                return MusicFontSymbol.Num0;
+                return MusicFontSymbol.TimeSig0;
             case 1:
-                return MusicFontSymbol.Num1;
+                return MusicFontSymbol.TimeSig1;
             case 2:
-                return MusicFontSymbol.Num2;
+                return MusicFontSymbol.TimeSig2;
             case 3:
-                return MusicFontSymbol.Num3;
+                return MusicFontSymbol.TimeSig3;
             case 4:
-                return MusicFontSymbol.Num4;
+                return MusicFontSymbol.TimeSig4;
             case 5:
-                return MusicFontSymbol.Num5;
+                return MusicFontSymbol.TimeSig5;
             case 6:
-                return MusicFontSymbol.Num6;
+                return MusicFontSymbol.TimeSig6;
             case 7:
-                return MusicFontSymbol.Num7;
+                return MusicFontSymbol.TimeSig7;
             case 8:
-                return MusicFontSymbol.Num8;
+                return MusicFontSymbol.TimeSig8;
             case 9:
-                return MusicFontSymbol.Num9;
+                return MusicFontSymbol.TimeSig9;
             default:
                 return MusicFontSymbol.None;
         }

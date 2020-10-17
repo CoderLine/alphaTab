@@ -114,7 +114,7 @@ export class EffectBarRenderer extends BarRendererBase {
         for (let b of v.beats) {
             // we create empty glyphs as alignment references and to get the
             // effect bar sized
-            let container: BeatContainerGlyph = new BeatContainerGlyph(b, this.getOrCreateVoiceContainer(v));
+            let container: BeatContainerGlyph = new BeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new BeatGlyphBase();
             container.onNotes = new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);
@@ -126,6 +126,9 @@ export class EffectBarRenderer extends BarRendererBase {
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         this.paintBackground(cx, cy, canvas);
+        // canvas.color = new Color(255, 0, 0, 100);
+        // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
+
         for (let effectBand of this._bands) {
             canvas.color =
                 effectBand.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;

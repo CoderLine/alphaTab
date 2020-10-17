@@ -6,12 +6,12 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
  * layouting and drawing of stacked symbols.
  */
 export class Glyph {
-    public x: number = 0;
-    public y: number = 0;
+    public x: number;
+    public y: number;
     public width: number = 0;
     public renderer!: BarRendererBase;
 
-    public constructor(x: number = 0, y: number = 0) {
+    public constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }

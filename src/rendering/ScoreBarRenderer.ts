@@ -10,7 +10,7 @@ import { TupletGroup } from '@src/model/TupletGroup';
 import { Voice } from '@src/model/Voice';
 import { FingeringMode, NotationMode } from '@src/NotationSettings';
 import { ICanvas, TextAlign } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
@@ -30,7 +30,6 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { IBeamYCalculator } from '@src/rendering/utils/IBeamYCalculator';
 import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
@@ -39,14 +38,13 @@ import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 /**
  * This BarRenderer renders a bar using standard music notation.
  */
-export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculator {
+export class ScoreBarRenderer extends BarRendererBase {
     public static readonly StaffId: string = 'score';
-    private static SharpKsSteps: number[] = [1, 4, 0, 3, 6, 2, 5];
-    private static FlatKsSteps: number[] = [5, 2, 6, 3, 7, 4, 8];
-    private static readonly LineSpacing: number = 8;
-    private static readonly StemWidth: number = 1.3;
+    private static SharpKsSteps: number[] = [-1, 2, -2, 1, 4, 0, 3];
+    private static FlatKsSteps: number[] = [3, 0, 4, 1, 5, 2, 6];
 
     public simpleWhammyOverflow: number = 0;
+    private _firstLineY: number = 0;
 
     public accidentalHelper: AccidentalHelper;
 
@@ -57,15 +55,11 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     }
 
     public getBeatDirection(beat: Beat): BeamDirection {
-        let g: ScoreBeatGlyph | null = this.getOnNotesGlyphForBeat(beat) as ScoreBeatGlyph;
-        if (g) {
-            return g.noteHeads ? g.noteHeads.direction : BeamDirection.Up;
-        }
-        return BeamDirection.Up;
+        return this.helpers.getBeamingHelperForBeat(beat).direction;
     }
 
     public get lineOffset(): number {
-        return (ScoreBarRenderer.LineSpacing + 1) * this.scale;
+        return (BarRendererBase.LineSpacing + 1) * this.scale;
     }
 
     protected updateSizes(): void {
@@ -74,20 +68,28 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         this.topPadding = glyphOverflow * this.scale;
         this.bottomPadding = glyphOverflow * this.scale;
         this.height = this.lineOffset * 4 + this.topPadding + this.bottomPadding;
+
+        this.updateFirstLineY();
+
         super.updateSizes();
     }
 
+    private updateFirstLineY() {
+        let fullLineHeight = this.lineOffset * 4;
+        let actualLineHeight = (this.bar.staff.standardNotationLineCount - 1) * this.lineOffset;
+        this._firstLineY = (fullLineHeight - actualLineHeight) / 2;
+    }
+
     public doLayout(): void {
+        this.updateFirstLineY();
         super.doLayout();
-        if (!this.bar.isEmpty && this.accidentalHelper.maxNoteValueBeat) {
-            let top: number = this.getScoreY(0, 0);
-            let bottom: number = this.getScoreY(8, 0);
+        if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
+            let top: number = this.getScoreY(-2, 0);
+            let bottom: number = this.getScoreY(6, 0);
             let whammyOffset: number = this.simpleWhammyOverflow;
             this.registerOverflowTop(whammyOffset);
-            let maxNoteY: number = this.getYPositionForNoteValue(this.accidentalHelper.maxNoteValue);
-            let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
-                this.accidentalHelper.maxNoteValueBeat
-            );
+            let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine, 0);
+            let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
             if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
                 maxNoteY -= maxNoteHelper.fingeringCount * this.resources.graceFont.size;
@@ -101,10 +103,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             if (maxNoteY < top) {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
             }
-            let minNoteY: number = this.getYPositionForNoteValue(this.accidentalHelper.minNoteValue);
-            let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
-                this.accidentalHelper.minNoteValueBeat!
-            );
+            let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine, 0);
+            let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
                 minNoteY += minNoteHelper.fingeringCount * this.resources.graceFont.size;
@@ -124,7 +124,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     private paintTuplets(cx: number, cy: number, canvas: ICanvas): void {
         for (let voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let container: VoiceContainerGlyph = this.getOrCreateVoiceContainer(voice);
+                let container: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                 for (let tupletGroup of container.tupletGroups) {
                     this.paintTupletHelper(cx + this.beatGlyphsStart, cy, canvas, tupletGroup);
                 }
@@ -196,7 +196,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                     continue;
                 }
                 let direction: BeamDirection = beamingHelper.direction;
-                let tupletX: number = beamingHelper.getBeatLineX(beat) + this.scale;
+                let tupletX: number = beamingHelper.getBeatLineX(beat);
                 let tupletY: number = cy + this.y + this.calculateBeamY(beamingHelper, tupletX);
                 let offset: number = direction === BeamDirection.Up ? res.effectFont.size * 1.5 : -3 * this.scale;
                 canvas.font = res.effectFont;
@@ -211,8 +211,8 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                 let direction: BeamDirection = firstBeamingHelper.direction;
                 //
                 // Calculate the overall area of the tuplet bracket
-                let startX: number = firstBeamingHelper.getBeatLineX(firstBeat) + this.scale;
-                let endX: number = lastBeamingHelper.getBeatLineX(lastBeat) + this.scale;
+                let startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
+                let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
                 //
                 // Calculate how many space the text will need
                 canvas.font = res.effectFont;
@@ -285,25 +285,17 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         let size: number = 0;
         switch (duration) {
             case Duration.QuadrupleWhole:
-                size = 6;
-                break;
             case Duration.Half:
-                size = 6;
-                break;
             case Duration.Quarter:
-                size = 6;
-                break;
             case Duration.Eighth:
-                size = 6;
-                break;
             case Duration.Sixteenth:
                 size = 6;
                 break;
             case Duration.ThirtySecond:
-                size = 7;
+                size = 8;
                 break;
             case Duration.SixtyFourth:
-                size = 7;
+                size = 9;
                 break;
             case Duration.OneHundredTwentyEighth:
                 size = 9;
@@ -315,36 +307,20 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                 size = 0;
                 break;
         }
-        return this.getScoreY(size, 0);
+        return this.getScoreHeight(size);
     }
 
     private getFlagStemSize(duration: Duration): number {
         let size: number = 0;
         switch (duration) {
             case Duration.QuadrupleWhole:
-                size = 6;
-                break;
             case Duration.Half:
-                size = 6;
-                break;
             case Duration.Quarter:
-                size = 6;
-                break;
             case Duration.Eighth:
-                size = 6;
-                break;
             case Duration.Sixteenth:
-                size = 6;
-                break;
             case Duration.ThirtySecond:
-                size = 6;
-                break;
             case Duration.SixtyFourth:
-                size = 6;
-                break;
             case Duration.OneHundredTwentyEighth:
-                size = 6;
-                break;
             case Duration.TwoHundredFiftySixth:
                 size = 6;
                 break;
@@ -352,22 +328,99 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                 size = 0;
                 break;
         }
-        return this.getScoreY(size, 0);
+        return this.getScoreHeight(size);
     }
 
-    public getYPositionForNoteValue(noteValue: number): number {
-        return this.getScoreY(this.accidentalHelper.getNoteLineForValue(noteValue, true), 0);
+    public get middleYPosition(): number {
+        return this.getScoreY(this.bar.staff.standardNotationLineCount - 1);
+    }
+
+    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+        let y = super.getNoteY(note, requestedPosition);
+        if (isNaN(y)) {
+            // NOTE: some might request the note position before the glyphs have been created
+            // e.g. the beaming helper, for these we just need a rough
+            // estimate on the position
+            const line = AccidentalHelper.computeLineWithoutAccidentals(this.bar, note);
+            y = this.getScoreY(line);
+        }
+        return y;
     }
 
     public calculateBeamY(h: BeamingHelper, x: number): number {
-        let stemSize: number = this.getStemSize(h);
-        return h.calculateBeamY(stemSize, this.scale, x, this.scale, this);
+        return this.calculateBeamYWithDirection(h, x, h.direction);
     }
 
     private calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         let stemSize: number = this.getStemSize(h);
-        return h.calculateBeamYWithDirection(stemSize, this.scale, x, this.scale, this, direction);
+
+        const firstBeat = h.beats[0];
+
+        // create a line between the min and max note of the group
+        if (h.beats.length === 1) {
+            if (direction === BeamDirection.Up) {
+                return this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize;
+            }
+            return this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
+        }
+
+        const lastBeat = h.beats[h.beats.length - 1];
+
+        // we use the min/max notes to place the beam along their real position
+        // we only want a maximum of 10 offset for their gradient
+        let maxDistance: number = 10 * this.scale;
+        // if the min note is not first or last, we can align notes directly to the position
+        // of the min note
+        const beatOfLowestNote = h.beatOfLowestNote;
+        const beatOfHighestNote = h.beatOfHighestNote;
+        if (
+            direction === BeamDirection.Down &&
+            beatOfLowestNote !== firstBeat &&
+            beatOfLowestNote !== lastBeat
+        ) {
+            return this.getScoreY(this.accidentalHelper.getMaxLine(beatOfLowestNote)) + stemSize;
+        }
+        if (
+            direction === BeamDirection.Up &&
+            beatOfHighestNote !== firstBeat &&
+            beatOfHighestNote !== lastBeat
+        ) {
+            return this.getScoreY(this.accidentalHelper.getMinLine(beatOfHighestNote)) - stemSize;
+        }
+
+        let startX: number = h.getBeatLineX(firstBeat);
+        let startY: number =
+            direction === BeamDirection.Up
+                ? this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize
+                : this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
+
+        let endX: number = h.getBeatLineX(lastBeat);
+        let endY: number =
+            direction === BeamDirection.Up
+                ? this.getScoreY(this.accidentalHelper.getMinLine(lastBeat)) - stemSize
+                : this.getScoreY(this.accidentalHelper.getMaxLine(lastBeat)) + stemSize;
+
+        // ensure the maxDistance
+        if (direction === BeamDirection.Down && startY > endY && startY - endY > maxDistance) {
+            endY = startY - maxDistance;
+        }
+        if (direction === BeamDirection.Down && endY > startY && endY - startY > maxDistance) {
+            startY = endY - maxDistance;
+        }
+        if (direction === BeamDirection.Up && startY < endY && endY - startY > maxDistance) {
+            endY = startY + maxDistance;
+        }
+        if (direction === BeamDirection.Up && endY < startY && startY - endY > maxDistance) {
+            startY = endY + maxDistance;
+        }
+        // get the y position of the given beat on this curve
+        if (startX === endX) {
+            return startY;
+        }
+        // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
+        return ((endY - startY) / (endX - startX)) * (x - startX) + startY;
     }
+
 
     private paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
@@ -377,13 +430,14 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             //
             // draw line
             //
-            let beatLineX: number = h.getBeatLineX(beat) + this.scale;
+            let beatLineX: number = h.getBeatLineX(beat);
             let direction: BeamDirection = h.direction;
             let y1: number = cy + this.y;
+
             y1 +=
                 direction === BeamDirection.Up
-                    ? this.getYPositionForNoteValue(h.getBeatMinValue(beat))
-                    : this.getYPositionForNoteValue(h.getBeatMaxValue(beat));
+                    ? this.getScoreY(this.accidentalHelper.getMaxLine(beat))
+                    : this.getScoreY(this.accidentalHelper.getMinLine(beat));
             let y2: number = cy + this.y;
             y2 += this.calculateBeamY(h, beatLineX);
             canvas.lineWidth = ScoreBarRenderer.StemWidth * this.scale;
@@ -400,8 +454,9 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             }
             this.paintFingering(canvas, beat, cx + this.x + beatLineX, direction, fingeringY);
             let brokenBarOffset: number = 6 * this.scale * scaleMod;
-            let barSpacing: number = 7 * this.scale * scaleMod;
-            let barSize: number = (ScoreBarRenderer.LineSpacing / 2) * this.scale * scaleMod;
+            let barSpacing: number =
+                (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * this.scale * scaleMod;
+            let barSize: number = BarRendererBase.BeamThickness * this.scale * scaleMod;
             let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             let barStart: number = cy + this.y;
             if (direction === BeamDirection.Down) {
@@ -421,7 +476,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
                     // full bar?
                     if (BeamingHelper.isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
                         barStartX = beatLineX;
-                        barEndX = h.getBeatLineX(h.beats[i + 1]) + this.scale;
+                        barEndX = h.getBeatLineX(h.beats[i + 1]);
                     } else if (i === 0 || !BeamingHelper.isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
                         barStartX = beatLineX;
                         barEndX = barStartX + brokenBarOffset;
@@ -480,10 +535,10 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         // draw line
         //
         let stemSize: number = this.getFlagStemSize(h.shortestDuration);
-        let beatLineX: number = h.getBeatLineX(beat) + this.scale;
+        let beatLineX: number = h.getBeatLineX(beat);
         let direction: BeamDirection = h.direction;
-        let topY: number = this.getYPositionForNoteValue(h.maxNoteValue);
-        let bottomY: number = this.getYPositionForNoteValue(h.minNoteValue);
+        let topY: number = this.getScoreY(this.accidentalHelper.getMinLine(beat));
+        let bottomY: number = this.getScoreY(this.accidentalHelper.getMaxLine(beat));
         let beamY: number = 0;
         let fingeringY: number = 0;
         if (direction === BeamDirection.Down) {
@@ -499,8 +554,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         if (!h.hasLine) {
             return;
         }
-
-        canvas.lineWidth = ScoreBarRenderer.StemWidth * this.scale;
+        canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
         canvas.beginPath();
         canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
         canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
@@ -586,22 +640,23 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             let correction: number = 0.5;
             switch (this.bar.clef) {
                 case Clef.Neutral:
-                    offset = 6;
+                    offset = this.bar.staff.standardNotationLineCount - 1;
                     break;
                 case Clef.F4:
-                    offset = 4;
+                    offset = 2;
                     break;
                 case Clef.C3:
-                    offset = 6;
-                    break;
-                case Clef.C4:
                     offset = 4;
                     break;
+                case Clef.C4:
+                    offset = 2;
+                    break;
                 case Clef.G2:
-                    offset = 8;
+                    offset = 6;
                     break;
             }
             this.createStartSpacing();
+
             this.addPreBeatGlyph(
                 new ClefGlyph(0, this.getScoreY(offset, correction), this.bar.clef, this.bar.clefOttava)
             );
@@ -625,7 +680,16 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
         }
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreY(-0.5, 0), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreHeight(-0.5), this.bar.index + 1));
+    }
+
+    protected createBeatGlyphs(): void {
+        for (let v: number = 0; v < this.bar.voices.length; v++) {
+            let voice: Voice = this.bar.voices[v];
+            if (this.hasVoiceContainer(voice)) {
+                this.createVoiceGlyphs(voice);
+            }
+        }
     }
 
     protected createPostBeatGlyphs(): void {
@@ -633,7 +697,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
             if (this.bar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreY(-1, -3), this.bar.masterBar.repeatCount));
+                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreY(-4), this.bar.masterBar.repeatCount));
             }
         } else {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
@@ -715,10 +779,12 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
 
     private createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+
+        const lines = this.bar.staff.standardNotationLineCount - 1;
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
                 0,
-                this.getScoreY(2, 0),
+                this.getScoreY(lines, 0),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon
@@ -729,7 +795,7 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
     protected createVoiceGlyphs(v: Voice): void {
         for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
             let b: Beat = v.beats[i];
-            let container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getOrCreateVoiceContainer(v));
+            let container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new ScoreBeatPreNotesGlyph();
             container.onNotes = new ScoreBeatGlyph();
             this.addBeatGlyph(container);
@@ -748,7 +814,22 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
      * @returns
      */
     public getScoreY(steps: number, correction: number = 0): number {
-        return (this.lineOffset / 2) * steps + correction * this.scale;
+        return (
+            this._firstLineY +
+            this.lineOffset +
+            this.getScoreHeight(steps) +
+            correction * this.scale * BarRendererBase.StaffLineThickness
+        );
+    }
+
+    /**
+     * Gets the height of an element that spans the given amount of steps.
+     * @param steps the amount of steps while 2 steps are one line
+     * @param correction
+     * @returns
+     */
+    public getScoreHeight(steps: number): number {
+        return (this.lineOffset / 2) * steps;
     }
 
     // private static readonly Random Random = new Random();
@@ -761,15 +842,13 @@ export class ScoreBarRenderer extends BarRendererBase implements IBeamYCalculato
         // draw string lines
         //
         canvas.color = res.staffLineColor;
-        let lineY: number = cy + this.y + this.topPadding;
-        let lineOffset: number = this.lineOffset;
-        for (let i: number = 0; i < 5; i++) {
-            if (i > 0) {
-                lineY += lineOffset;
-            }
-            canvas.fillRect(cx + this.x, lineY | 0, this.width, this.scale);
+
+        for (let i: number = 0; i < this.bar.staff.standardNotationLineCount; i++) {
+            const lineY = cy + this.y + this.getScoreY(i * 2);
+            canvas.fillRect(cx + this.x, lineY | 0, this.width, this.scale * BarRendererBase.StaffLineThickness);
         }
         canvas.color = res.mainGlyphColor;
+
         this.paintSimileMark(cx, cy, canvas);
     }
 }

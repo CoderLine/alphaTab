@@ -1,4 +1,5 @@
-﻿using AlphaTab.Rendering.Glyphs;
+﻿using AlphaTab.Model;
+using AlphaTab.Rendering.Glyphs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

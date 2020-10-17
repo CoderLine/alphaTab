@@ -32,7 +32,7 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
         }
     }
 
-    protected getBeamDirection(beat: Beat, noteRenderer: ScoreBarRenderer): BeamDirection {
+    protected getTieDirection(beat: Beat, noteRenderer: ScoreBarRenderer): BeamDirection {
         // invert direction (if stems go up, ties go down to not cross them)
         switch (noteRenderer.getBeatDirection(beat)) {
             case BeamDirection.Up:

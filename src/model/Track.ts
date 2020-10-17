@@ -5,6 +5,7 @@ import { PlaybackInformation } from '@src/model/PlaybackInformation';
 import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Settings } from '@src/Settings';
+import { InstrumentArticulation } from './InstrumentArticulation';
 
 /**
  * This public class describes a single track or instrument of score.
@@ -46,6 +47,12 @@ export class Track {
      * Gets or sets the short name of this track.
      */
     public shortName: string = '';
+
+    /**
+     * Gets or sets a mapping on which staff liens particular percussion instruments
+     * should be shown.
+     */
+    public percussionArticulations: InstrumentArticulation[] = [];
 
     public ensureStaveCount(staveCount: number): void {
         while (this.staves.length < staveCount) {

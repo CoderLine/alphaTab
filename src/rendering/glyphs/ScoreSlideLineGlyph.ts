@@ -176,15 +176,20 @@ export class ScoreSlideLineGlyph extends Glyph {
         endY: number
     ): void {
         if (waves) {
-            let b: number = endX - startX;
-            let a: number = endY - startY;
-            let c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
-            let angle: number = Math.asin(a / c) * (180 / Math.PI);
-            canvas.beginRotate(startX, startY, angle);
             let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
             glyph.renderer = this.renderer;
             glyph.doLayout();
+
+            startY -= glyph.height / 2;
+            endY -= glyph.height / 2;
+
+            let b: number = endX - startX;
+            let a: number = endY - startY;
+            let c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
             glyph.width = b;
+
+            let angle: number = Math.asin(a / c) * (180 / Math.PI);
+            canvas.beginRotate(startX, startY, angle);
             glyph.paint(0, 0, canvas);
             canvas.endRotate();
         } else {

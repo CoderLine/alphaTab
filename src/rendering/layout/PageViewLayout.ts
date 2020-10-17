@@ -130,7 +130,7 @@ export class PageViewLayout extends ScoreLayout {
                 glyph.x = this.width / 2;
                 glyph.y = y;
                 glyph.textAlign = TextAlign.Center;
-                y += glyph.font.size;
+                y += glyph.font.size * scale;
             }
         }
         let musicOrWords: boolean = false;
@@ -141,7 +141,7 @@ export class PageViewLayout extends ScoreLayout {
             glyph.y = y;
             glyph.textAlign = TextAlign.Right;
             musicOrWords = true;
-            musicOrWordsHeight = glyph.font.size;
+            musicOrWordsHeight = glyph.font.size * scale;
         }
         if (this.scoreInfoGlyphs.has(NotationElement.ScoreWords)) {
             let glyph: TextGlyph = this.scoreInfoGlyphs.get(NotationElement.ScoreWords)!;
@@ -149,7 +149,7 @@ export class PageViewLayout extends ScoreLayout {
             glyph.y = y;
             glyph.textAlign = TextAlign.Left;
             musicOrWords = true;
-            musicOrWordsHeight = glyph.font.size;
+            musicOrWordsHeight = glyph.font.size * scale;
         }
         if (musicOrWords) {
             y += musicOrWordsHeight;

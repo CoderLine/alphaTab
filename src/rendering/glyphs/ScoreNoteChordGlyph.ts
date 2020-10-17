@@ -12,7 +12,6 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
 import { BeatBounds } from '../utils/BeatBounds';
 
@@ -21,7 +20,8 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _notes: Note[] = [];
     private _tremoloPicking: Glyph | null = null;
 
-    public beatEffects: Map<string, Glyph> = new Map();
+    public aboveBeatEffects: Map<string, EffectGlyph> = new Map();
+    public belowBeatEffects: Map<string, EffectGlyph> = new Map();
     public beat!: Beat;
     public beamingHelper!: BeamingHelper;
 
@@ -41,7 +41,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             switch (requestedPosition) {
                 case NoteXPosition.Left:
                     break;
-                case NoteXPosition.Center: 
+                case NoteXPosition.Center:
                     pos += n.width / 2;
                     break;
                 case NoteXPosition.Right:
@@ -100,7 +100,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public doLayout(): void {
         super.doLayout();
         let direction: BeamDirection = this.direction;
-        this.beatEffects.forEach(effect => {
+        this.aboveBeatEffects.forEach(effect => {
+            effect.renderer = this.renderer;
+            effect.doLayout();
+        });
+        this.belowBeatEffects.forEach(effect => {
             effect.renderer = this.renderer;
             effect.doLayout();
         });
@@ -129,15 +133,15 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
     }
 
-    
-    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
+
+    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         for (let note of this._notes) {
             if (this._noteGlyphLookup.has(note.id)) {
                 let glyph: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
                 let noteBounds: NoteBounds = new NoteBounds();
                 noteBounds.note = note;
                 noteBounds.noteHeadBounds = new Bounds();
-                noteBounds.noteHeadBounds.x = cx + this.x  + this._noteHeadPadding + glyph.x;
+                noteBounds.noteHeadBounds.x = cx + this.x + this._noteHeadPadding + glyph.x;
                 noteBounds.noteHeadBounds.y = cy + this.y + glyph.y - glyph.height / 2;
                 noteBounds.noteHeadBounds.w = glyph.width;
                 noteBounds.noteHeadBounds.h = glyph.height;
@@ -152,19 +156,29 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         //
         // Note Effects only painted once
         //
-        let effectY: number =
-            this.beamingHelper.direction === BeamDirection.Up
-                ? scoreRenderer.getScoreY(this.maxNote!.line, 1.5 * NoteHeadGlyph.NoteHeadHeight)
-                : scoreRenderer.getScoreY(this.minNote!.line, -1.0 * NoteHeadGlyph.NoteHeadHeight);
-        // TODO: take care of actual glyph height
-        let effectSpacing: number =
-            this.beamingHelper.direction === BeamDirection.Up ? 7 * this.scale : -7 * this.scale;
+        let aboveBeatEffectsY = 0;
+        let belowBeatEffectsY = 0;
+        let belowEffectSpacing = 1;
+        let aboveEffectSpacing = -belowEffectSpacing;
 
-        this.beatEffects.forEach(g => {
-            g.y = effectY;
-            g.x = this.width / 2;
-            g.paint(cx + this.x, cy + this.y, canvas);
-            effectY += effectSpacing;
+        if (this.beamingHelper.direction === BeamDirection.Up) {
+            belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line);
+            aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
+        } else {
+            belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 1);
+            aboveBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line + 1);
+            aboveEffectSpacing *= -1;
+            belowEffectSpacing *= -1;
+        }
+
+        this.aboveBeatEffects.forEach(g => {
+            aboveBeatEffectsY += aboveEffectSpacing * g.height;
+            g.paint(cx + this.x + 2 * this.scale, cy + this.y + aboveBeatEffectsY, canvas);
+        });
+
+        this.belowBeatEffects.forEach(g => {
+            belowBeatEffectsY += belowEffectSpacing * g.height;
+            g.paint(cx + this.x + 2 * this.scale, cy + this.y + belowBeatEffectsY, canvas);
         });
         super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {

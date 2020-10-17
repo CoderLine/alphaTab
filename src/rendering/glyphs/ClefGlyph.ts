@@ -3,7 +3,7 @@ import { Ottavia } from '@src/model/Ottavia';
 import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class ClefGlyph extends MusicFontGlyph {
     private _clef: Clef;
@@ -32,15 +32,15 @@ export class ClefGlyph extends MusicFontGlyph {
     private static getSymbol(clef: Clef): MusicFontSymbol {
         switch (clef) {
             case Clef.Neutral:
-                return MusicFontSymbol.ClefNeutral;
+                return MusicFontSymbol.UnpitchedPercussionClef1;
             case Clef.C3:
-                return MusicFontSymbol.ClefC;
+                return MusicFontSymbol.CClef;
             case Clef.C4:
-                return MusicFontSymbol.ClefC;
+                return MusicFontSymbol.CClef;
             case Clef.F4:
-                return MusicFontSymbol.ClefF;
+                return MusicFontSymbol.FClef;
             case Clef.G2:
-                return MusicFontSymbol.ClefG;
+                return MusicFontSymbol.GClef;
             default:
                 return MusicFontSymbol.None;
         }
@@ -52,18 +52,18 @@ export class ClefGlyph extends MusicFontGlyph {
         let top: boolean = false;
         switch (this._clefOttava) {
             case Ottavia._15ma:
-                numberGlyph = new MusicFontGlyph(-4 * this.scale, 0, 0.5, MusicFontSymbol.Ottava15);
+                numberGlyph = new MusicFontGlyph(-4 * this.scale, 0, 0.5, MusicFontSymbol.Quindicesima);
                 top = true;
                 break;
             case Ottavia._8va:
-                numberGlyph = new MusicFontGlyph(-2 * this.scale, 0, 0.5, MusicFontSymbol.Ottava8);
+                numberGlyph = new MusicFontGlyph(-2 * this.scale, 0, 0.5, MusicFontSymbol.Ottava);
                 top = true;
                 break;
             case Ottavia._8vb:
-                numberGlyph = new MusicFontGlyph(-6 * this.scale, 0, 0.5, MusicFontSymbol.Ottava8);
+                numberGlyph = new MusicFontGlyph(-6 * this.scale, 0, 0.5, MusicFontSymbol.Ottava);
                 break;
             case Ottavia._15mb:
-                numberGlyph = new MusicFontGlyph(-8 * this.scale, 0, 0.5, MusicFontSymbol.Ottava15);
+                numberGlyph = new MusicFontGlyph(-8 * this.scale, 0, 0.5, MusicFontSymbol.Quindicesima);
                 break;
             default:
                 return;

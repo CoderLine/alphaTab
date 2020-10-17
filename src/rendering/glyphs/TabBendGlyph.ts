@@ -27,6 +27,10 @@ export class TabBendGlyph extends Glyph {
     private _releaseContinuedMinValue: number = -1;
     private _maxBendValue: number = -1;
 
+    public constructor() {
+        super(0, 0);
+    }
+
     public addBends(note: Note): void {
         this._notes.push(note);
         let renderPoints: TabBendRenderPoint[] = this.createRenderingPoints(note);
@@ -285,10 +289,10 @@ export class TabBendGlyph extends Glyph {
                     this.paintBend(note, new TabBendRenderPoint(0, 0), firstPt, startX, topY, dX, slurText, canvas);
                 }
                 if (note.bendType !== BendType.Prebend) {
-                    if(i === 0) {
+                    if (i === 0) {
                         startX += 2 * this.scale;
                     }
-                    this.paintBend(note, firstPt, secondPt, startX , topY, dX, slurText, canvas);
+                    this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                 } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
                     secondPt = new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.value);
                     secondPt.lineValue = firstPt.lineValue;

@@ -20,6 +20,7 @@ import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 import { Settings } from '@src/Settings';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
+import { InstrumentArticulation } from './InstrumentArticulation';
 
 interface SerializedNote {
     tieOriginId?: number;
@@ -81,6 +82,13 @@ export class JsonConverter {
 
             track2.playbackInfo = {} as any;
             PlaybackInformation.copyTo(track.playbackInfo, track2.playbackInfo);
+
+            track2.percussionArticulations = [];
+            for(const articulation of track.percussionArticulations) {
+                const articulation2 = {} as any;
+                InstrumentArticulation.copyTo(articulation, articulation2);
+                track2.percussionArticulations.push(articulation2);
+            }
 
             JsonConverter.stavesToJsObject(track, track2);
             score2.tracks.push(track2);
@@ -292,6 +300,12 @@ export class JsonConverter {
             score2.addTrack(track2);
             PlaybackInformation.copyTo(track.playbackInfo, track2.playbackInfo);
 
+            for(const articulation of track.percussionArticulations) {
+                const articulation2 = new InstrumentArticulation();
+                InstrumentArticulation.copyTo(articulation, articulation2);
+                track2.percussionArticulations.push(articulation2);
+            }
+
             JsonConverter.jsObjectToStaves(track, track2, allNotes, notesToLink);
         }
     }
@@ -491,7 +505,7 @@ export class JsonConverter {
             } else if (midiEvent instanceof MetaNumberEvent) {
                 midiEvent2.type = 'MetaNumberEvent';
                 midiEvent2.value = midiEvent.value;
-            } else if(midiEvent instanceof Midi20PerNotePitchBendEvent) {
+            } else if (midiEvent instanceof Midi20PerNotePitchBendEvent) {
                 midiEvent2.type = 'Midi20PerNotePitchBendEvent';
                 midiEvent2.noteKey = midiEvent.noteKey;
                 midiEvent2.pitch = midiEvent.pitch;

@@ -1,12 +1,12 @@
 import { Duration } from '@src/model/Duration';
 import { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class NoteHeadGlyph extends MusicFontGlyph {
     public static readonly GraceScale: number = 0.75;
-    public static readonly NoteHeadHeight: number = 9;
-    public static readonly QuarterNoteHeadWidth: number = 10;
+    public static readonly NoteHeadHeight: number = 8;
+    public static readonly QuarterNoteHeadWidth: number = 9;
     private _isGrace: boolean;
     private _duration: Duration;
 
@@ -43,15 +43,15 @@ export class NoteHeadGlyph extends MusicFontGlyph {
     private static getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.QuadrupleWhole:
-                return MusicFontSymbol.NoteQuadrupleWhole;
+                return MusicFontSymbol.NoteheadDoubleWholeSquare;
             case Duration.DoubleWhole:
-                return MusicFontSymbol.NoteDoubleWhole;
+                return MusicFontSymbol.NoteheadDoubleWhole;
             case Duration.Whole:
-                return MusicFontSymbol.NoteWhole;
+                return MusicFontSymbol.NoteheadWhole;
             case Duration.Half:
-                return MusicFontSymbol.NoteHalf;
+                return MusicFontSymbol.NoteheadHalf;
             default:
-                return MusicFontSymbol.NoteQuarter;
+                return MusicFontSymbol.NoteheadBlack;
         }
     }
 }

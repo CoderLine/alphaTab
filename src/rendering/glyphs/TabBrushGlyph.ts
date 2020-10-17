@@ -34,24 +34,28 @@ export class TabBrushGlyph extends Glyph {
                 canvas.lineTo(arrowX, endY);
                 canvas.stroke();
             } else if (this._beat.brushType === BrushType.ArpeggioUp) {
+                let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
+                glyph.renderer = this.renderer;
+                glyph.doLayout();
+    
                 let lineStartY: number = startY;
                 let lineEndY: number = endY - arrowSize;
-                canvas.beginRotate(cx + this.x + 4 * this.scale, lineEndY, -90);
-                let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
-                glyph.renderer = this.renderer;
-                glyph.doLayout();
                 glyph.width = Math.abs(lineEndY - lineStartY);
-                glyph.paint(0, 0, canvas);
+
+                canvas.beginRotate(cx + this.x + 4 * this.scale, lineEndY, -90);
+                glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
-                let lineStartY: number = startY + arrowSize;
-                let lineEndY: number = endY;
-                canvas.beginRotate(cx + this.x + 4 * this.scale, lineStartY, 90);
                 let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();
+
+                let lineStartY: number = startY + arrowSize;
+                let lineEndY: number = endY;
                 glyph.width = Math.abs(lineEndY - lineStartY);
-                glyph.paint(0, 0, canvas);
+                
+                canvas.beginRotate(cx + this.x + 4 * this.scale, lineStartY, 90);
+                glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();
             }
             if (this._beat.brushType === BrushType.BrushUp || this._beat.brushType === BrushType.ArpeggioUp) {
