@@ -2,14 +2,37 @@ import { TextBaseline } from "@src/platform/ICanvas";
 import { Duration } from "./Duration";
 import { MusicFontSymbol } from "./MusicFontSymbol";
 
+/**
+ * Describes an instrument articulation which is used for percussions. 
+ */
 export class InstrumentArticulation {
-    public name: string = "";
+    /**
+     * Gets or sets the line the note head should be shown for standard notation
+     */
     public staffLine: number;
+    /**
+     * Gets or sets the note head to display by default. 
+     */
     public noteHeadDefault: MusicFontSymbol;
+    /**
+     * Gets or sets the note head to display for half duration notes. 
+     */
     public noteHeadHalf: MusicFontSymbol;
+    /**
+     * Gets or sets the note head to display for whole duration notes. 
+     */
     public noteHeadWhole: MusicFontSymbol;
+    /**
+     * Gets or sets which additional technique symbol should be placed for the note head. 
+     */
     public techniqueSymbol: MusicFontSymbol;
+    /**
+     * Gets or sets where the technique symbol should be placed. 
+     */
     public techniqueSymbolPlacement: TextBaseline;
+    /**
+     * Gets or sets which midi number to use when playing the note.
+     */
     public outputMidiNumber: number;
 
     public constructor(staffLine: number = 0,
