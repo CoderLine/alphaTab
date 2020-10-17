@@ -4,147 +4,39 @@ import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 import { Note } from "@src/model/Note";
 
 export class PercussionMapper {
+    private static gp6ElementAndVariationToMidi: number[][] = [
+        // known GP6 elements and variations, analyzed from a GPX test file
+        // with all instruments inside manually aligned with the same names of articulations in GP7
+        // [{articulation index}]   // [{element number}] => {element name} ({variation[0]}, {variation[1]}, {variation[2]})
+        [35, 35, 35], // [0] => Kick (hit, unused, unused) 
+        [38, 91, 37], // [1] => Snare (hit, rim shot, side stick)
+        [99, 100, 99], // [2] => Cowbell low (hit, tip, unused)
+        [56, 100, 56], // [3] => Cowbell medium (hit, tip, unused)
+        [102, 103, 102], // [4] => Cowbell high (hit, tip, unused)
+        [43, 43, 43], // [5] => Tom very low (hit, unused, unused)
+        [45, 45, 45], // [6] => Tom low (hit, unused, unused)
+        [47, 47, 47], // [7] => Tom medium (hit, unused, unused)
+        [48, 48, 48], // [8] => Tom high (hit, unused, unused)
+        [50, 50, 50], // [9] => Tom very high (hit, unused, unused)
+        [42, 92, 46], // [10] => Hihat (closed, half, open)
+        [44, 44, 44], // [11] => Pedal hihat (hit, unused, unused)
+        [57, 98, 57], // [12] => Crash medium (hit, choke, unused)
+        [49, 97, 49], // [13] => Crash high (hit, choke, unused)
+        [55, 95, 55], // [14] => Splash (hit, choke, unused)
+        [51, 93, 127], // [15] => Ride (middle, edge, bell)
+        [52, 96, 52], // [16] => China (hit, choke, unused)
+    ];
 
-    /* 
-     * The following map was generated using the following procedure: 
-     * 1. Create a GP7 file with a drumkit track
-     * 2. Use the DrumKit View to create one note foreach midi note value
-     * 3. Export the file as GPX
-     * 4. Load the file in the browser using alphaTab and set a breakpoint in the GPX importer where the XML loaded from the container
-     * 5. Use the following snippet in the browser console to generate the map init code:
-     *      const parser = new DOMParser();
-     *      const xmlDoc = parser.parseFromString(xml, 'text/xml');
-     *      let program = 29;
-     *      const notes = xmlDoc.getElementsByTagName('Note');
-     *      const existing = new Map();
-     *      let s = '';
-     *      for(let i = 0; i < notes.length; i++) {
-     *          const note = notes[i];
-     *          const element = note.getElementsByTagName('Element');
-     *          const variation = note.getElementsByTagName('Element');
-     *          if(element.length === 1 && variation.length === 1) {
-     *              if(existing.has(`${element[0].textContent}_${variation[0].textContent}`)) {
-     *                s += `// Midi Program ${program} has no element/variation combination in GP6 \r\n`
-     *              } else {
-     *                s += `[PercussionMapper.elementAndVariationToMapKey(${element[0].textContent}, ${variation[0].textContent}), ${program}],\r\n`;
-     *                existing.set(`${element[0].textContent}_${variation[0].textContent}`, true);
-     *              }
-     *          } else {
-     *              s += `// Midi Program ${program} has no element/variation combination in GP6 \r\n`
-     *          }
-     *          program++;
-     *      }
-     *      copy(s) 
-     */
-    private static gp6ElementAndVariationToMidi: Map<number/*elementAndVariationToMapKey()*/, number/*Midi Number*/> = new Map([
-        // Midi Program 29 has no element/variation combination in GP6 
-        // Midi Program 30 has no element/variation combination in GP6 
-        // Midi Program 31 has no element/variation combination in GP6 
-        // Midi Program 32 has no element/variation combination in GP6 
-        // Midi Program 33 has no element/variation combination in GP6 
-        [PercussionMapper.elementAndVariationToMapKey(0, 0), 34],
-        // Midi Program 35 has no element/variation combination in GP6 
-        [PercussionMapper.elementAndVariationToMapKey(1, 1), 36],
-        // Midi Program 37 has no element/variation combination in GP6 
-        // Midi Program 38 has no element/variation combination in GP6 
-        // Midi Program 39 has no element/variation combination in GP6 
-        [PercussionMapper.elementAndVariationToMapKey(5, 5), 40],
-        [PercussionMapper.elementAndVariationToMapKey(10, 10), 41],
-        // Midi Program 42 has no element/variation combination in GP6 
-        [PercussionMapper.elementAndVariationToMapKey(11, 11), 43],
-        [PercussionMapper.elementAndVariationToMapKey(6, 6), 44],
-        // Midi Program 45 has no element/variation combination in GP6 
-        [PercussionMapper.elementAndVariationToMapKey(7, 7), 46],
-        [PercussionMapper.elementAndVariationToMapKey(8, 8), 47],
-        [PercussionMapper.elementAndVariationToMapKey(13, 13), 48],
-        [PercussionMapper.elementAndVariationToMapKey(9, 9), 49],
-        [PercussionMapper.elementAndVariationToMapKey(15, 15), 50],
-        [PercussionMapper.elementAndVariationToMapKey(16, 16), 51],
-        // Midi Program 52 has no element/variation combination in GP6 
-        // Midi Program 53 has no element/variation combination in GP6 
-        [PercussionMapper.elementAndVariationToMapKey(14, 14), 54],
-        [PercussionMapper.elementAndVariationToMapKey(3, 3), 55],
-        [PercussionMapper.elementAndVariationToMapKey(12, 12), 56],
-        // Midi Program 57 has no element/variation combination in GP6 
-        // Midi Program 58 has no element/variation combination in GP6 
-        // Midi Program 59 has no element/variation combination in GP6 
-        // Midi Program 60 has no element/variation combination in GP6 
-        // Midi Program 61 has no element/variation combination in GP6 
-        // Midi Program 62 has no element/variation combination in GP6 
-        // Midi Program 63 has no element/variation combination in GP6 
-        // Midi Program 64 has no element/variation combination in GP6 
-        // Midi Program 65 has no element/variation combination in GP6 
-        // Midi Program 66 has no element/variation combination in GP6 
-        // Midi Program 67 has no element/variation combination in GP6 
-        // Midi Program 68 has no element/variation combination in GP6 
-        // Midi Program 69 has no element/variation combination in GP6 
-        // Midi Program 70 has no element/variation combination in GP6 
-        // Midi Program 71 has no element/variation combination in GP6 
-        // Midi Program 72 has no element/variation combination in GP6 
-        // Midi Program 73 has no element/variation combination in GP6 
-        // Midi Program 74 has no element/variation combination in GP6 
-        // Midi Program 75 has no element/variation combination in GP6 
-        // Midi Program 76 has no element/variation combination in GP6 
-        // Midi Program 77 has no element/variation combination in GP6 
-        // Midi Program 78 has no element/variation combination in GP6 
-        // Midi Program 79 has no element/variation combination in GP6 
-        // Midi Program 80 has no element/variation combination in GP6 
-        // Midi Program 81 has no element/variation combination in GP6 
-        // Midi Program 82 has no element/variation combination in GP6 
-        // Midi Program 83 has no element/variation combination in GP6 
-        // Midi Program 84 has no element/variation combination in GP6 
-        // Midi Program 85 has no element/variation combination in GP6 
-        // Midi Program 86 has no element/variation combination in GP6 
-        // Midi Program 87 has no element/variation combination in GP6 
-        // Midi Program 88 has no element/variation combination in GP6 
-        // Midi Program 89 has no element/variation combination in GP6 
-        // Midi Program 90 has no element/variation combination in GP6 
-        // Midi Program 91 has no element/variation combination in GP6 
-        // Midi Program 92 has no element/variation combination in GP6 
-        // Midi Program 93 has no element/variation combination in GP6 
-        // Midi Program 94 has no element/variation combination in GP6 
-        [PercussionMapper.elementAndVariationToMapKey(2, 2), 95],
-        // Midi Program 96 has no element/variation combination in GP6 
-        // Midi Program 97 has no element/variation combination in GP6 
-        [PercussionMapper.elementAndVariationToMapKey(4, 4), 98],
-        // Midi Program 99 has no element/variation combination in GP6 
-        // Midi Program 100 has no element/variation combination in GP6 
-        // Midi Program 101 has no element/variation combination in GP6 
-        // Midi Program 102 has no element/variation combination in GP6 
-        // Midi Program 103 has no element/variation combination in GP6 
-        // Midi Program 104 has no element/variation combination in GP6 
-        // Midi Program 105 has no element/variation combination in GP6 
-        // Midi Program 106 has no element/variation combination in GP6 
-        // Midi Program 107 has no element/variation combination in GP6 
-        // Midi Program 108 has no element/variation combination in GP6 
-        // Midi Program 109 has no element/variation combination in GP6 
-        // Midi Program 110 has no element/variation combination in GP6 
-        // Midi Program 111 has no element/variation combination in GP6 
-        // Midi Program 112 has no element/variation combination in GP6 
-        // Midi Program 113 has no element/variation combination in GP6 
-        // Midi Program 114 has no element/variation combination in GP6 
-        // Midi Program 115 has no element/variation combination in GP6 
-        // Midi Program 116 has no element/variation combination in GP6 
-        // Midi Program 117 has no element/variation combination in GP6 
-        // Midi Program 118 has no element/variation combination in GP6 
-        // Midi Program 119 has no element/variation combination in GP6 
-        // Midi Program 120 has no element/variation combination in GP6 
-        // Midi Program 121 has no element/variation combination in GP6 
-        // Midi Program 122 has no element/variation combination in GP6 
-    ]);
 
-    private static elementAndVariationToMapKey(element: number, variation: number): number {
-        return ((element & 0xFFFF) << 16) | (variation & 0xFFFF);
-    }
-
-    public static midiFromElementVariation(element: number, variation: number): number {
-        const key = PercussionMapper.elementAndVariationToMapKey(element, variation);
-        if (PercussionMapper.gp6ElementAndVariationToMidi.has(key)) {
-            return PercussionMapper.gp6ElementAndVariationToMidi.get(key)!;
-        } else {
-            // unknown combination, should not happen, fallback to some default value (Snare hit)
-            return 38;
+    public static articulationFromElementVariation(element: number, variation: number): number {
+        if(element < PercussionMapper.gp6ElementAndVariationToMidi.length) {
+            if(variation >= PercussionMapper.gp6ElementAndVariationToMidi.length) {
+                variation = 0;
+            }
+            return PercussionMapper.gp6ElementAndVariationToMidi[element][variation];
         }
+        // unknown combination, should not happen, fallback to some default value (Snare hit)
+        return 38;
     }
 
     /*
