@@ -67,3 +67,7 @@
 .docLastUpdatedAt {
   font-weight: bold;
 }
+
+.tableOfContents :global(.badge--header) {
+  display: none;
+}
