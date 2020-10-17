@@ -23,7 +23,7 @@ import { PercussionMapper } from '../utils/PercussionMapper';
 import { PercussionNoteHeadGlyph } from './PercussionNoteHeadGlyph';
 import { Logger } from '@src/alphatab';
 import { ArticStaccatoAboveGlyph } from './ArticStaccatoAboveGlyph';
-import { MusicFontSymbol } from './MusicFontSymbol';
+import { MusicFontSymbol } from '../../model/MusicFontSymbol';
 import { TextBaseline } from '@src/platform/ICanvas';
 import { PictEdgeOfCymbalGlyph } from './PictEdgeOfCymbalGlyph';
 import { PickStrokeGlyph } from './PickStrokeGlyph';
@@ -160,13 +160,13 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private createNoteHeadGlyph(n: Note): EffectGlyph {
         let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
         if (n.beat.voice.bar.staff.isPercussion) {
-            const articulation = PercussionMapper.getArticulation(n.percussionMidiNumber);
+            const articulation = PercussionMapper.getArticulation(n);
             if (articulation) {
                 return new PercussionNoteHeadGlyph(0, 0, articulation, n.beat.duration, isGrace);
             } else {
                 Logger.warning(
                     'Rendering',
-                    `No articulation found for percussion instrument ${n.percussionMidiNumber}`
+                    `No articulation found for percussion instrument ${n.percussionArticulation}`
                 );
             }
         }
@@ -216,7 +216,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
 
         if (n.isPercussion) {
-            const articulation = PercussionMapper.getArticulation(n.percussionMidiNumber);
+            const articulation = PercussionMapper.getArticulation(n);
             if (articulation && articulation.techniqueSymbolPlacement !== TextBaseline.Middle) {
                 const effectContainer =
                     articulation.techniqueSymbolPlacement === TextBaseline.Top

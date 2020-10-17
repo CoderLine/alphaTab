@@ -40,7 +40,7 @@ import { TripletFeelEffectInfo } from '@src/rendering/effects/TripletFeelEffectI
 import { WhammyBarEffectInfo } from '@src/rendering/effects/WhammyBarEffectInfo';
 import { WideBeatVibratoEffectInfo } from '@src/rendering/effects/WideBeatVibratoEffectInfo';
 import { WideNoteVibratoEffectInfo } from '@src/rendering/effects/WideNoteVibratoEffectInfo';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { HorizontalScreenLayout } from '@src/rendering/layout/HorizontalScreenLayout';

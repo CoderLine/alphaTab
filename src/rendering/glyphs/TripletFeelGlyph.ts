@@ -2,7 +2,7 @@ import { Font } from '@src/model/Font';
 import { TripletFeel } from '@src/model/TripletFeel';
 import { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export enum TripletFeelGlyphBarType {

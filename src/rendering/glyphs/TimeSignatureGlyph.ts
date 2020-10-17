@@ -1,7 +1,7 @@
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
 
 export abstract class TimeSignatureGlyph extends GlyphGroup {

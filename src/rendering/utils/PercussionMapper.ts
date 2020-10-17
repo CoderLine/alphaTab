@@ -1,43 +1,7 @@
-import { MusicFontSymbol } from "../glyphs/MusicFontSymbol";
-import { Duration } from "@src/model/Duration";
+import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { TextBaseline } from "@src/platform/ICanvas";
-
-export class InstrumentArticulation {
-    public staffLine: number;
-    public noteHeadDefault: MusicFontSymbol;
-    public noteHeadHalf: MusicFontSymbol;
-    public noteHeadWhole: MusicFontSymbol;
-    public techniqueSymbol: MusicFontSymbol;
-    public techniqueSymbolPlacement: TextBaseline;
-    public outputMidiNumber: number;
-
-    public constructor(staffLine: number,
-        outputMidiNumber: number,
-        noteHeadDefault: MusicFontSymbol,
-        noteHeadHalf: MusicFontSymbol,
-        noteHeadWhole: MusicFontSymbol,
-        techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbolPlacement: TextBaseline = TextBaseline.Middle) {
-        this.outputMidiNumber = outputMidiNumber;
-        this.staffLine = staffLine;
-        this.noteHeadDefault = noteHeadDefault;
-        this.noteHeadHalf = noteHeadHalf !== MusicFontSymbol.None ? noteHeadHalf : noteHeadDefault;
-        this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
-        this.techniqueSymbol = techniqueSymbol;
-        this.techniqueSymbolPlacement = techniqueSymbolPlacement;
-    }
-
-    public getSymbol(duration: Duration): MusicFontSymbol {
-        switch (duration) {
-            case Duration.Whole:
-                return this.noteHeadWhole;
-            case Duration.Half:
-                return this.noteHeadHalf;
-            default:
-                return this.noteHeadDefault;
-        }
-    }
-}
+import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
+import { Note } from "@src/model/Note";
 
 export class PercussionMapper {
 
@@ -314,7 +278,19 @@ export class PercussionMapper {
         [34, new InstrumentArticulation(3, 38, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadBlack)]
     ]);
 
-    public static getArticulation(midiNumber: number): InstrumentArticulation | null {
+
+    public static getArticulation(n: Note): InstrumentArticulation | null {
+        const articulationIndex = n.percussionArticulation;
+
+        const trackArticulations = n.beat.voice.bar.staff.track.percussionArticulations;
+        if (articulationIndex < trackArticulations.length) {
+            return trackArticulations[articulationIndex];
+        }
+
+        return PercussionMapper.getArticulationByValue(articulationIndex);;
+    }
+
+    public static getArticulationByValue(midiNumber: number): InstrumentArticulation | null {
         if (PercussionMapper.instrumentArticulations.has(midiNumber)) {
             return PercussionMapper.instrumentArticulations.get(midiNumber)!;
         }

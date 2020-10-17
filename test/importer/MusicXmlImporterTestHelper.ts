@@ -194,7 +194,7 @@ export class MusicXmlImporterTestHelper {
             expect(actual.octave).toEqual(expected.octave, 'Mismatch on Octave');
             expect(actual.tone).toEqual(expected.tone, 'Mismatch on Tone');
         }
-        expect(actual.percussionMidiNumber).toEqual(expected.percussionMidiNumber, 'Mismatch on percussionMidiNumber');
+        expect(actual.percussionArticulation).toEqual(expected.percussionArticulation, 'Mismatch on percussionArticulation');
         expect(actual.isHammerPullOrigin).toEqual(expected.isHammerPullOrigin, 'Mismatch on IsHammerPullOrigin');
         expect(actual.harmonicType).toEqual(expected.harmonicType, 'Mismatch on HarmonicType');
         expect(actual.harmonicValue).toEqual(expected.harmonicValue, 'Mismatch on HarmonicValue');

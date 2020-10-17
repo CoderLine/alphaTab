@@ -40,6 +40,8 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
+import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This structure represents a duration within a gpif
@@ -88,8 +90,7 @@ export class GpifParser {
     private _tappedNotes!: Map<string, boolean>;
     private _lyricsByTrack!: Map<string, Lyrics[]>;
     private _hasAnacrusis: boolean = false;
-    private _instrumentArticulations!: number[];
-    private _percussionInstrumentByElementName!: Map<string, number>;
+    private _articulationByName!: Map<string, InstrumentArticulation>;
 
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<string, Automation[]>();
@@ -108,8 +109,6 @@ export class GpifParser {
         this._noteById = new Map<string, Note>();
         this._tappedNotes = new Map<string, boolean>();
         this._lyricsByTrack = new Map<string, Lyrics[]>();
-        this._instrumentArticulations = [];
-        this._percussionInstrumentByElementName = new Map<string, number>();
         let dom: XmlDocument;
         try {
             dom = new XmlDocument(xml);
@@ -344,14 +343,14 @@ export class GpifParser {
     }
 
     private parseTrack(node: XmlNode): void {
-        this._instrumentArticulations = [];
-        this._percussionInstrumentByElementName = new Map<string, number>();
+        this._articulationByName = new Map();
 
         let track: Track = new Track();
         track.ensureStaveCount(1);
         let staff: Staff = track.staves[0];
         staff.showStandardNotation = true;
         let trackId: string = node.getAttribute('id');
+
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -502,34 +501,97 @@ export class GpifParser {
     }
 
     private parseArticulation(track: Track, node: XmlNode) {
-        let inputMidiNumber = -1;
-        let elementName = '';
-        let staffLine = -1;
+        const articulation = new InstrumentArticulation();
+        articulation.outputMidiNumber = -1;
+        let name = "";
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
+                const txt = c.innerText;
                 switch (c.localName) {
-                    case 'InputMidiNumbers':
-                        inputMidiNumber = parseInt(c.innerText);
-                        break;
                     case 'Name':
-                        elementName = c.innerText;
+                        name = c.innerText;
+                        articulation.name = name;
+                        break;
+                    case 'OutputMidiNumber':
+                        if(txt.length > 0) {
+                            articulation.outputMidiNumber = parseInt(txt);
+                        }
+                        break;
+                    case 'Noteheads':
+                        const noteHeadsTxt = txt.split(' ');
+                        if (noteHeadsTxt.length >= 1) {
+                            articulation.noteHeadDefault = this.parseNoteHead(noteHeadsTxt[0]);
+                        }
+                        if (noteHeadsTxt.length >= 2) {
+                            articulation.noteHeadHalf = this.parseNoteHead(noteHeadsTxt[1]);
+                        }
+                        if (noteHeadsTxt.length >= 3) {
+                            articulation.noteHeadWhole = this.parseNoteHead(noteHeadsTxt[2]);
+                        }
+
+
+                        if (articulation.noteHeadHalf == MusicFontSymbol.None) {
+                            articulation.noteHeadHalf = articulation.noteHeadDefault;
+                        }
+
+                        if (articulation.noteHeadWhole == MusicFontSymbol.None) {
+                            articulation.noteHeadWhole = articulation.noteHeadDefault;
+                        }
+
+                        switch (noteHeadsTxt.length) {
+                            case 1:
+                            case 2:
+                            case 3:
+                                break;
+                        }
+
                         break;
                     case 'StaffLine':
-                        staffLine = parseInt(c.innerText);
+                        if (txt.length > 0) {
+                            articulation.staffLine = parseInt(txt);
+                        }
                         break;
                 }
             }
         }
 
-        if (inputMidiNumber !== -1) {
-            this._instrumentArticulations.push(inputMidiNumber);
-            this._percussionInstrumentByElementName.set(elementName, inputMidiNumber);
-        } else if(elementName && this._percussionInstrumentByElementName.has(elementName)) {
-            inputMidiNumber = this._percussionInstrumentByElementName.get(elementName)!;
+        if (articulation.outputMidiNumber !== -1) {
+            track.percussionArticulations.push(articulation);
+            if (name.length > 0) {
+                this._articulationByName.set(name, articulation);
+            }
+        }
+        else if(name.length > 0 && this._articulationByName.has(name)) {
+            this._articulationByName.get(name)!.staffLine = articulation.staffLine;
         }
 
-        if(inputMidiNumber !== -1 && staffLine !== -1) {
-            track.percussionStaffLines.set(inputMidiNumber, staffLine);
+    }
+
+    private parseNoteHead(txt: string): MusicFontSymbol {
+        switch (txt) {
+            case 'noteheadDoubleWholeSquare': return MusicFontSymbol.NoteheadDoubleWholeSquare;
+            case 'noteheadDoubleWhole': return MusicFontSymbol.NoteheadDoubleWhole;
+            case 'noteheadWhole': return MusicFontSymbol.NoteheadWhole;
+            case 'noteheadHalf': return MusicFontSymbol.NoteheadHalf;
+            case 'noteheadBlack': return MusicFontSymbol.NoteheadBlack;
+            case 'noteheadNull': return MusicFontSymbol.NoteheadNull;
+            case 'noteheadXOrnate': return MusicFontSymbol.NoteheadXOrnate;
+            case 'noteheadTriangleUpWhole': return MusicFontSymbol.NoteheadTriangleUpWhole;
+            case 'noteheadTriangleUpHalf': return MusicFontSymbol.NoteheadTriangleUpHalf;
+            case 'noteheadTriangleUpBlack': return MusicFontSymbol.NoteheadTriangleUpBlack;
+            case 'noteheadDiamondBlackWide': return MusicFontSymbol.NoteheadDiamondBlackWide;
+            case 'noteheadDiamondWhite': return MusicFontSymbol.NoteheadDiamondWhite;
+            case 'noteheadDiamondWhiteWide': return MusicFontSymbol.NoteheadDiamondWhiteWide;
+            case 'noteheadCircleX': return MusicFontSymbol.NoteheadCircleX;
+            case 'noteheadXWhole': return MusicFontSymbol.NoteheadXWhole;
+            case 'noteheadXHalf': return MusicFontSymbol.NoteheadXHalf;
+            case 'noteheadXBlack': return MusicFontSymbol.NoteheadXBlack;
+            case 'noteheadParenthesis': return MusicFontSymbol.NoteheadParenthesis;
+            case 'noteheadSlashedBlack2': return MusicFontSymbol.NoteheadSlashedBlack2;
+            case 'noteheadCircleSlash': return MusicFontSymbol.NoteheadCircleSlash;
+            case 'noteheadHeavyX': return MusicFontSymbol.NoteheadHeavyX;
+            case 'noteheadHeavyXHat': return MusicFontSymbol.NoteheadHeavyXHat;
+            default: return MusicFontSymbol.None;
         }
     }
 
@@ -1562,10 +1624,7 @@ export class GpifParser {
                         }
                         break;
                     case 'InstrumentArticulation':
-                        const articulationIndex = parseInt(c.innerText);
-                        if (articulationIndex < this._instrumentArticulations.length) {
-                            note.percussionMidiNumber = this._instrumentArticulations[articulationIndex];
-                        }
+                        note.percussionArticulation = parseInt(c.innerText);
                         break;
                 }
             }
@@ -1767,7 +1826,7 @@ export class GpifParser {
 
         // map GP6 element and variation combos to midi numbers
         if (element !== -1 && variation !== -1) {
-            note.percussionMidiNumber = PercussionMapper.midiFromElementVariation(element, variation);
+            note.percussionArticulation = PercussionMapper.midiFromElementVariation(element, variation);
         }
     }
 
@@ -1935,7 +1994,7 @@ export class GpifParser {
                                                             note.fret = -1;
                                                             note.string = -1;
                                                         } else {
-                                                            note.percussionMidiNumber = -1;
+                                                            note.percussionArticulation = -1;
                                                         }
                                                         beat.addNote(note);
                                                         if (this._tappedNotes.has(noteId)) {

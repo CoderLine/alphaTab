@@ -1,6 +1,6 @@
 import { Duration } from '@src/model/Duration';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class TremoloPickingGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, duration: Duration) {

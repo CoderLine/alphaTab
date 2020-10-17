@@ -881,7 +881,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
 
         if(bar.staff.isPercussion) {
-            newNote.percussionMidiNumber = newNote.fret;
+            newNote.percussionArticulation = newNote.fret;
             newNote.string = -1;
             newNote.fret = -1;
         }

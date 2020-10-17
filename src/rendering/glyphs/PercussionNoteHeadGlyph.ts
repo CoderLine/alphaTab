@@ -1,9 +1,9 @@
 import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from './NoteHeadGlyph';
-import { InstrumentArticulation } from '../utils/PercussionMapper';
 import { Duration } from '@src/model/Duration';
+import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 
 export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     private _isGrace: boolean;

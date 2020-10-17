@@ -100,14 +100,18 @@ export class AccidentalHelper {
     }
 
     public static getPercussionLine(bar: Bar, noteValue: number): number {
-        if (bar.staff.track.percussionStaffLines.has(noteValue)) {
-            return bar.staff.track.percussionStaffLines.get(noteValue)!;
+        if (noteValue < bar.staff.track.percussionArticulations.length) {
+            return bar.staff.track.percussionArticulations[noteValue]!.staffLine;
         } else {
-            return PercussionMapper.getArticulation(noteValue)?.staffLine ?? 0;
+            return PercussionMapper.getArticulationByValue(noteValue)?.staffLine ?? 0;
         }
     }
 
     public static getNoteValue(note: Note) {
+        if(note.isPercussion) {
+            return note.percussionArticulation;
+        }
+        
         let noteValue: number = note.displayValue;
 
         // adjust note height according to accidentals enforced

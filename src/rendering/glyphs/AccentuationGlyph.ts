@@ -1,6 +1,6 @@
 import { AccentuationType } from '@src/model/AccentuationType';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ICanvas } from '@src/platform/ICanvas';
 
 export class AccentuationGlyph extends MusicFontGlyph {

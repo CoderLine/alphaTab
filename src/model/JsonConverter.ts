@@ -20,6 +20,7 @@ import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 import { Settings } from '@src/Settings';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
+import { InstrumentArticulation } from './InstrumentArticulation';
 
 interface SerializedNote {
     tieOriginId?: number;
@@ -82,10 +83,12 @@ export class JsonConverter {
             track2.playbackInfo = {} as any;
             PlaybackInformation.copyTo(track.playbackInfo, track2.playbackInfo);
 
-            track2.percussionStaffLines = new Map<number, number>();
-            track.percussionStaffLines.forEach((line, instrument) => {
-                track2.percussionStaffLines.set(instrument, line);
-            });
+            track2.percussionArticulations = [];
+            for(const articulation of track.percussionArticulations) {
+                const articulation2 = {} as any;
+                InstrumentArticulation.copyTo(articulation, articulation2);
+                track2.percussionArticulations.push(articulation2);
+            }
 
             JsonConverter.stavesToJsObject(track, track2);
             score2.tracks.push(track2);
@@ -297,9 +300,11 @@ export class JsonConverter {
             score2.addTrack(track2);
             PlaybackInformation.copyTo(track.playbackInfo, track2.playbackInfo);
 
-            JsonConverter.jsObjectMapForEach(track.percussionStaffLines, (line, instrument) => {
-                track2.percussionStaffLines.set(instrument, line);
-            });
+            for(const articulation of track.percussionArticulations) {
+                const articulation2 = new InstrumentArticulation();
+                InstrumentArticulation.copyTo(articulation, articulation2);
+                track2.percussionArticulations.push(articulation2);
+            }
 
             JsonConverter.jsObjectToStaves(track, track2, allNotes, notesToLink);
         }

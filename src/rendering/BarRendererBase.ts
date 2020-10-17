@@ -9,7 +9,7 @@ import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';

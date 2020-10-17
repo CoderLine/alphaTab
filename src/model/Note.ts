@@ -107,12 +107,12 @@ export class Note {
     public tone: number = -1;
 
     public get isPercussion(): boolean {
-        return !this.isStringed && this.percussionMidiNumber >= 0;
+        return !this.isStringed && this.percussionArticulation >= 0;
     }
 
     /**
-     * Gets or sets the midi number of the percussion element. 
-     * The percussion elements are as per the following list (based on GP7):
+     * Gets or sets the index of percussion articulation in the related `track.percussionArticulations`.
+     * If the articulation is not listed in `track.percussionArticulations` the following list based on GP7 applies:
      * - 029 Ride (choke)
      * - 030 Cymbal (hit)
      * - 031 Snare (side stick)
@@ -209,7 +209,7 @@ export class Note {
      * - 126 Ride (middle)
      * - 127 Ride (bell)
      */
-    public percussionMidiNumber: number = -1;
+    public percussionArticulation: number = -1;
 
     /**
      * Gets or sets whether this note is visible on the music sheet.
@@ -430,7 +430,7 @@ export class Note {
 
     public get realValue(): number {
         if (this.isPercussion) {
-            return this.percussionMidiNumber;
+            return this.percussionArticulation;
         }
         if (this.isStringed) {
             if (this.harmonicType === HarmonicType.Natural) {
@@ -631,8 +631,7 @@ export class Note {
         dst.dynamics = src.dynamics;
         dst.octave = src.octave;
         dst.tone = src.tone;
-        dst.percussionMidiNumber = src.percussionMidiNumber;
-        dst.percussionMidiNumber = src.percussionMidiNumber;
+        dst.percussionArticulation = src.percussionArticulation;
         dst.bendType = src.bendType;
         dst.bendStyle = src.bendStyle;
         dst.isContinuedBend = src.isContinuedBend;
