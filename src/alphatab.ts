@@ -181,11 +181,13 @@ import { Fingers } from '@src/model/Fingers';
 import { FontStyle, Font } from '@src/model/Font';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
+import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
 import { MasterBar } from '@src/model/MasterBar';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { Ottavia } from '@src/model/Ottavia';
@@ -231,11 +233,13 @@ export const model = {
     Font,
     GraceType,
     HarmonicType,
+    InstrumentArticulation,
     JsonConverter,
     KeySignature,
     KeySignatureType,
     Lyrics,
     MasterBar,
+    MusicFontSymbol,
     Note,
     NoteAccidentalMode,
     Ottavia,
