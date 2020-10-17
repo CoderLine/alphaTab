@@ -37,6 +37,7 @@ import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -398,7 +399,13 @@ export class MidiFileGenerator {
     private generateNote(note: Note, beatStart: number, beatDuration: number, brushInfo: Int32Array): void {
         const track: Track = note.beat.voice.bar.staff.track;
         const staff: Staff = note.beat.voice.bar.staff;
-        const noteKey: number = note.realValue;
+        let noteKey: number = note.realValue;
+        if(note.isPercussion) {
+            const articulation = PercussionMapper.getArticulation(note);
+            if(articulation) {
+                noteKey = articulation.outputMidiNumber;
+            }
+        }
         const brushOffset: number = note.isStringed && note.string <= brushInfo.length ? brushInfo[note.string - 1] : 0;
         const noteStart: number = beatStart + brushOffset;
         const noteDuration: MidiNoteDuration = this.getNoteDuration(note, beatDuration);
