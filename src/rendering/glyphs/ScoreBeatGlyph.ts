@@ -19,7 +19,7 @@ import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
 import { BeatBounds } from '../utils/BeatBounds';
-import { PercussionMapper } from '../utils/PercussionMapper';
+import { PercussionMapper } from '../../model/PercussionMapper';
 import { PercussionNoteHeadGlyph } from './PercussionNoteHeadGlyph';
 import { Logger } from '@src/alphatab';
 import { ArticStaccatoAboveGlyph } from './ArticStaccatoAboveGlyph';

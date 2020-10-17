@@ -5,7 +5,7 @@ import { Clef } from '@src/model/Clef';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { PercussionMapper } from './PercussionMapper';
+import { PercussionMapper } from '../../model/PercussionMapper';
 
 
 class BeatLines {

@@ -4,7 +4,7 @@ import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 import { Note } from "@src/model/Note";
 
 export class PercussionMapper {
-    private static gp6ElementAndVariationToMidi: number[][] = [
+    private static gp6ElementAndVariationToArticulation: number[][] = [
         // known GP6 elements and variations, analyzed from a GPX test file
         // with all instruments inside manually aligned with the same names of articulations in GP7
         // [{articulation index}]   // [{element number}] => {element name} ({variation[0]}, {variation[1]}, {variation[2]})
@@ -29,11 +29,11 @@ export class PercussionMapper {
 
 
     public static articulationFromElementVariation(element: number, variation: number): number {
-        if(element < PercussionMapper.gp6ElementAndVariationToMidi.length) {
-            if(variation >= PercussionMapper.gp6ElementAndVariationToMidi.length) {
+        if (element < PercussionMapper.gp6ElementAndVariationToArticulation.length) {
+            if (variation >= PercussionMapper.gp6ElementAndVariationToArticulation.length) {
                 variation = 0;
             }
-            return PercussionMapper.gp6ElementAndVariationToMidi[element][variation];
+            return PercussionMapper.gp6ElementAndVariationToArticulation[element][variation];
         }
         // unknown combination, should not happen, fallback to some default value (Snare hit)
         return 38;
@@ -180,6 +180,26 @@ export class PercussionMapper {
         }
 
         return PercussionMapper.getArticulationByValue(articulationIndex);;
+    }
+
+    public static getElementAndVariation(n: Note): number[] {
+        const articulation = PercussionMapper.getArticulation(n);
+        if (!articulation) {
+            return [-1, -1];
+        }
+
+        // search for the first element/variation combination with the same midi output 
+        for (let element = 0; element < PercussionMapper.gp6ElementAndVariationToArticulation.length; element++) {
+            const variations = PercussionMapper.gp6ElementAndVariationToArticulation[element];
+            for (let variation = 0; variation < variations.length; variation++) {
+                const gp6Articulation = PercussionMapper.getArticulationByValue(variations[variation]);
+                if (gp6Articulation?.outputMidiNumber === articulation.outputMidiNumber) {
+                    return [element, variation];
+                }
+            }
+        }
+
+        return [-1, -1];
     }
 
     public static getArticulationByValue(midiNumber: number): InstrumentArticulation | null {

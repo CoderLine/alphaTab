@@ -19,6 +19,7 @@ import { Lazy } from '@src/util/Lazy';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PickStroke } from './PickStroke';
+import { PercussionMapper } from '@src/model/PercussionMapper';
 
 /**
  * A note is a single played sound on a fretted instrument.
@@ -108,6 +109,22 @@ export class Note {
 
     public get isPercussion(): boolean {
         return !this.isStringed && this.percussionArticulation >= 0;
+    }
+
+    /**
+     * Gets or sets the percusson element.
+     * @deprecated
+     */
+    public get element(): number {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[0] : -1;
+    }
+
+    /**
+     * Gets or sets the variation of this note.
+     * * @deprecated
+     */
+    public get variation(): number {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[1] : -1;
     }
 
     /**
@@ -809,7 +826,7 @@ export class Note {
 
         // initial bend pitch offsets and forced accidentals don't play well together
         // we reset it
-        if(this.initialBendValue > 0) {
+        if (this.initialBendValue > 0) {
             this.accidentalMode = NoteAccidentalMode.Default;
         }
     }

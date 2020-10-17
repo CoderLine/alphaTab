@@ -37,7 +37,7 @@ import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
+import { PercussionMapper } from '@src/model/PercussionMapper';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
