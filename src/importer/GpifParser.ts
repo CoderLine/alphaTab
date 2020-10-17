@@ -510,7 +510,6 @@ export class GpifParser {
                 switch (c.localName) {
                     case 'Name':
                         name = c.innerText;
-                        articulation.name = name;
                         break;
                     case 'OutputMidiNumber':
                         if(txt.length > 0) {

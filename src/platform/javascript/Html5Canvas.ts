@@ -1,7 +1,7 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { Settings } from '@src/Settings';
 
 /**
@@ -9,7 +9,6 @@ import { Settings } from '@src/Settings';
  * @target web
  */
 export class Html5Canvas implements ICanvas {
-    public static HighDpiFactor = 2;
     private _measureCanvas: HTMLCanvasElement;
     private _measureContext: CanvasRenderingContext2D;
     private _canvas: HTMLCanvasElement | null = null;
@@ -46,8 +45,8 @@ export class Html5Canvas implements ICanvas {
 
     public beginRender(width: number, height: number): void {
         this._canvas = document.createElement('canvas');
-        this._canvas.width = (width * Html5Canvas.HighDpiFactor) | 0;
-        this._canvas.height = (height * Html5Canvas.HighDpiFactor) | 0;
+        this._canvas.width = width | 0;
+        this._canvas.height = height | 0;
         this._canvas.style.width = width + 'px';
         this._canvas.style.height = height + 'px';
         this._context = this._canvas.getContext('2d')!;
@@ -81,28 +80,18 @@ export class Html5Canvas implements ICanvas {
     public set lineWidth(value: number) {
         this._lineWidth = value;
         if (this._context) {
-            this._context.lineWidth = value * Html5Canvas.HighDpiFactor;
+            this._context.lineWidth = value;
         }
     }
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this._context.fillRect(
-                (x * Html5Canvas.HighDpiFactor) | 0,
-                (y * Html5Canvas.HighDpiFactor) | 0,
-                w * Html5Canvas.HighDpiFactor,
-                h * Html5Canvas.HighDpiFactor
-            );
+            this._context.fillRect((x | 0), (y | 0), w, h);
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
-        this._context.strokeRect(
-            (x * Html5Canvas.HighDpiFactor) | 0,
-            (y * Html5Canvas.HighDpiFactor) | 0,
-            w * Html5Canvas.HighDpiFactor,
-            h * Html5Canvas.HighDpiFactor
-        );
+        this._context.strokeRect((x | 0), (y | 0), w, h);
     }
 
     public beginPath(): void {
@@ -114,39 +103,27 @@ export class Html5Canvas implements ICanvas {
     }
 
     public moveTo(x: number, y: number): void {
-        this._context.moveTo(x * Html5Canvas.HighDpiFactor, y * Html5Canvas.HighDpiFactor);
+        this._context.moveTo(x, y);
     }
 
     public lineTo(x: number, y: number): void {
-        this._context.lineTo(x * Html5Canvas.HighDpiFactor, y * Html5Canvas.HighDpiFactor);
+        this._context.lineTo(x, y);
     }
 
     public quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
-        this._context.quadraticCurveTo(
-            cpx * Html5Canvas.HighDpiFactor,
-            cpy * Html5Canvas.HighDpiFactor,
-            x * Html5Canvas.HighDpiFactor,
-            y * Html5Canvas.HighDpiFactor
-        );
+        this._context.quadraticCurveTo(cpx, cpy, x, y);
     }
 
     public bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void {
-        this._context.bezierCurveTo(
-            cp1x * Html5Canvas.HighDpiFactor,
-            cp1y * Html5Canvas.HighDpiFactor,
-            cp2x * Html5Canvas.HighDpiFactor,
-            cp2y * Html5Canvas.HighDpiFactor,
-            x * Html5Canvas.HighDpiFactor,
-            y * Html5Canvas.HighDpiFactor
-        );
+        this._context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
     }
 
     public fillCircle(x: number, y: number, radius: number): void {
         this._context.beginPath();
         this._context.arc(
-            x * Html5Canvas.HighDpiFactor,
-            y * Html5Canvas.HighDpiFactor,
-            radius * Html5Canvas.HighDpiFactor,
+            x,
+            y,
+            radius,
             0,
             Math.PI * 2,
             true
@@ -157,9 +134,9 @@ export class Html5Canvas implements ICanvas {
     public strokeCircle(x: number, y: number, radius: number): void {
         this._context.beginPath();
         this._context.arc(
-            x * Html5Canvas.HighDpiFactor,
-            y * Html5Canvas.HighDpiFactor,
-            radius * Html5Canvas.HighDpiFactor,
+            x,
+            y,
+            radius,
             0,
             Math.PI * 2,
             true
@@ -182,7 +159,7 @@ export class Html5Canvas implements ICanvas {
     public set font(value: Font) {
         this._font = value;
         if (this._context) {
-            this._context.font = value.toCssString(this.settings.display.scale * Html5Canvas.HighDpiFactor);
+            this._context.font = value.toCssString(this.settings.display.scale);
         }
         this._measureContext.font = value.toCssString(this.settings.display.scale);
     }
@@ -250,7 +227,7 @@ export class Html5Canvas implements ICanvas {
     }
 
     public fillText(text: string, x: number, y: number): void {
-        this._context.fillText(text, (x * Html5Canvas.HighDpiFactor) | 0, (y * Html5Canvas.HighDpiFactor) | 0);
+        this._context.fillText(text, x, y);
     }
 
     public measureText(text: string): number {
@@ -296,12 +273,12 @@ export class Html5Canvas implements ICanvas {
         let textAlign = this._context.textAlign;
         let baseLine = this._context.textBaseline;
         let font: string = this._context.font;
-        this._context.font = this._musicFont.toCssString(scale * Html5Canvas.HighDpiFactor);
+        this._context.font = this._musicFont.toCssString(scale);
         this._context.textBaseline = 'middle';
         if (centerAtPosition) {
             this._context.textAlign = 'center';
         }
-        this._context.fillText(symbols, (x * Html5Canvas.HighDpiFactor) | 0, (y * Html5Canvas.HighDpiFactor) | 0);
+        this._context.fillText(symbols, x, y);
         this._context.textBaseline = baseLine;
         this._context.font = font;
         this._context.textAlign = textAlign;
@@ -309,7 +286,7 @@ export class Html5Canvas implements ICanvas {
 
     public beginRotate(centerX: number, centerY: number, angle: number): void {
         this._context.save();
-        this._context.translate(centerX * Html5Canvas.HighDpiFactor, centerY * Html5Canvas.HighDpiFactor);
+        this._context.translate(centerX, centerY);
         this._context.rotate((angle * Math.PI) / 180.0);
     }
 
