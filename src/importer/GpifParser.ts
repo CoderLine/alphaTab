@@ -42,6 +42,7 @@ import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
 import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { TextBaseline } from '@src/platform/ICanvas';
 
 /**
  * This structure represents a duration within a gpif
@@ -512,8 +513,27 @@ export class GpifParser {
                         name = c.innerText;
                         break;
                     case 'OutputMidiNumber':
-                        if(txt.length > 0) {
+                        if (txt.length > 0) {
                             articulation.outputMidiNumber = parseInt(txt);
+                        }
+                        break;
+                    case 'TechniqueSymbol':
+                        articulation.techniqueSymbol = this.parseTechniqueSymbol(txt);
+                        break;
+                    case 'TechniquePlacement':
+                        switch (txt) {
+                            case 'outside':
+                                articulation.techniqueSymbolPlacement = TextBaseline.Bottom;
+                                break;
+                            case 'inside':
+                                articulation.techniqueSymbolPlacement = TextBaseline.Middle;
+                                break;
+                            case 'above':
+                                articulation.techniqueSymbolPlacement = TextBaseline.Bottom;
+                                break;
+                            case 'below':
+                                articulation.techniqueSymbolPlacement = TextBaseline.Top;
+                                break;
                         }
                         break;
                     case 'Noteheads':
@@ -560,10 +580,23 @@ export class GpifParser {
                 this._articulationByName.set(name, articulation);
             }
         }
-        else if(name.length > 0 && this._articulationByName.has(name)) {
+        else if (name.length > 0 && this._articulationByName.has(name)) {
             this._articulationByName.get(name)!.staffLine = articulation.staffLine;
         }
 
+    }
+
+    private parseTechniqueSymbol(txt: string): MusicFontSymbol {
+        switch (txt) {
+            case 'pictEdgeOfCymbal': return MusicFontSymbol.PictEdgeOfCymbal;
+            case 'articStaccatoAbove': return MusicFontSymbol.ArticStaccatoAbove;
+            case 'noteheadParenthesis': return MusicFontSymbol.NoteheadParenthesis;
+            case 'stringsUpBow': return MusicFontSymbol.StringsUpBow;
+            case 'stringsDownBow': return MusicFontSymbol.StringsDownBow;
+            case 'guitarGolpe': return MusicFontSymbol.GuitarGolpe;
+            case 'articStaccatoAbove': return MusicFontSymbol.ArticStaccatoAbove;
+            default: return MusicFontSymbol.None;
+        }
     }
 
     private parseNoteHead(txt: string): MusicFontSymbol {
