@@ -135,7 +135,7 @@ export class Note {
      * - 049 Crash high (hit)
      * - 050 High Floor Tom (hit)
      * - 051 Ride (middle)
-     * - 052 Chana (hit)
+     * - 052 China (hit)
      * - 053 Ride (bell)
      * - 054 Tambourine (hit)
      * - 055 Splash (hit)

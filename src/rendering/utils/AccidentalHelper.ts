@@ -150,7 +150,7 @@ export class AccidentalHelper {
     public applyAccidental(note: Note): AccidentalType {
         const noteValue = AccidentalHelper.getNoteValue(note);
         let quarterBend: boolean = note.hasQuarterToneOffset;
-        return this.getAccidental(noteValue, quarterBend, note, note.beat, false);
+        return this.getAccidental(noteValue, quarterBend, note.beat, false, note);
     }
 
     /**
@@ -163,7 +163,7 @@ export class AccidentalHelper {
      * @returns
      */
     public applyAccidentalForValue(relatedBeat: Beat, noteValue: number, quarterBend: boolean, isHelperNote: boolean): AccidentalType {
-        return this.getAccidental(noteValue, quarterBend, null, relatedBeat, isHelperNote);
+        return this.getAccidental(noteValue, quarterBend, relatedBeat, isHelperNote, null);
     }
 
     public static computeLineWithoutAccidentals(bar: Bar, note: Note) {
@@ -182,9 +182,9 @@ export class AccidentalHelper {
     private getAccidental(
         noteValue: number,
         quarterBend: boolean,
-        note: Note | null = null,
         relatedBeat: Beat,
-        isHelperNote: boolean
+        isHelperNote: boolean,
+        note: Note | null = null
     ): AccidentalType {
         let accidentalToSet: AccidentalType = AccidentalType.None;
         let line: number = 0;

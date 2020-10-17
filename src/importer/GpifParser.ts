@@ -344,7 +344,7 @@ export class GpifParser {
     }
 
     private parseTrack(node: XmlNode): void {
-        this._articulationByName = new Map();
+        this._articulationByName = new Map<string, InstrumentArticulation>();
 
         let track: Track = new Track();
         track.ensureStaveCount(1);
@@ -594,7 +594,6 @@ export class GpifParser {
             case 'stringsUpBow': return MusicFontSymbol.StringsUpBow;
             case 'stringsDownBow': return MusicFontSymbol.StringsDownBow;
             case 'guitarGolpe': return MusicFontSymbol.GuitarGolpe;
-            case 'articStaccatoAbove': return MusicFontSymbol.ArticStaccatoAbove;
             default: return MusicFontSymbol.None;
         }
     }
@@ -1858,7 +1857,7 @@ export class GpifParser {
 
         // map GP6 element and variation combos to midi numbers
         if (element !== -1 && variation !== -1) {
-            note.percussionArticulation = PercussionMapper.midiFromElementVariation(element, variation);
+            note.percussionArticulation = PercussionMapper.articulationFromElementVariation(element, variation);
         }
     }
 
