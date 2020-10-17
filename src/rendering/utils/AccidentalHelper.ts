@@ -153,6 +153,19 @@ export class AccidentalHelper {
         return this.getAccidental(noteValue, quarterBend, null, relatedBeat);
     }
 
+    public static computeLineWithoutAccidentals(bar:Bar, note: Note) {
+        let line: number = 0;
+        const noteValue = AccidentalHelper.getNoteValue(note);
+
+        if (bar.staff.isPercussion) {
+            line = AccidentalHelper.getPercussionLine(bar, noteValue);
+        } else {
+            const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
+            line = AccidentalHelper.calculateNoteLine(bar, noteValue, accidentalMode);
+        }
+        return line;
+    }
+
     private getAccidental(
         noteValue: number,
         quarterBend: boolean,
@@ -166,7 +179,7 @@ export class AccidentalHelper {
             line = AccidentalHelper.getPercussionLine(this._bar, noteValue);
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
-            line = this.calculateNoteLine(noteValue, accidentalMode);
+            line = AccidentalHelper.calculateNoteLine(this._bar, noteValue, accidentalMode);
 
             let ks: number = this._bar.masterBar.keySignature;
             let ksi: number = ks + 7;
@@ -284,10 +297,10 @@ export class AccidentalHelper {
         return accidentalToSet;
     }
 
-    private calculateNoteLine(noteValue: number, mode: NoteAccidentalMode): number {
+    private static calculateNoteLine(bar:Bar, noteValue: number, mode: NoteAccidentalMode): number {
         let value: number = noteValue;
-        let ks: number = this._bar.masterBar.keySignature;
-        let clef: Clef = this._bar.clef;
+        let ks: number = bar.masterBar.keySignature;
+        let clef: Clef = bar.clef;
         let index: number = value % 12;
         let octave: number = ((value / 12) | 0) - 1;
 

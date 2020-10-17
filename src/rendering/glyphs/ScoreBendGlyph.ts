@@ -214,7 +214,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     case BendType.PrebendRelease:
                         let preX: number =
                             cx + startNoteRenderer.x + startNoteRenderer.getBeatX(note.beat, BeatXPosition.PreNotes);
-                        preX += (startNoteRenderer.getBeatContainer(note.beat).preNotes as ScoreBeatPreNotesGlyph)
+                        preX += (startNoteRenderer.getPreNotesGlyphForBeat(note.beat) as ScoreBeatPreNotesGlyph)
                             .prebendNoteHeadOffset;
                         let preY: number =
                             cy +
@@ -306,7 +306,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     case BendType.PrebendRelease:
                         let preX: number =
                             cx + startNoteRenderer.x + startNoteRenderer.getBeatX(note.beat, BeatXPosition.PreNotes);
-                        preX += (startNoteRenderer.getBeatContainer(note.beat).preNotes as ScoreBeatPreNotesGlyph)
+                        preX += (startNoteRenderer.getPreNotesGlyphForBeat(note.beat) as ScoreBeatPreNotesGlyph)
                             .prebendNoteHeadOffset;
                         let preY: number =
                             cy +

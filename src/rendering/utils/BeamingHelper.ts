@@ -77,7 +77,7 @@ export class BeamingHelper {
 
     public getBeatLineX(beat: Beat): number {
         if (this.hasBeatLineX(beat)) {
-            if (this.direction2 === BeamDirection.Up) {
+            if (this.direction === BeamDirection.Up) {
                 return this._beatLineXPositions.get(beat.index)!.up;
             }
             return this._beatLineXPositions.get(beat.index)!.down;
@@ -103,10 +103,9 @@ export class BeamingHelper {
         return this._beatLineXPositions.get(beat.index)!;
     }
 
-    public direction2: BeamDirection = BeamDirection.Up;
-
+    public direction: BeamDirection = BeamDirection.Up;
     public finish(): void {
-        this.direction2 = this.calculateDirection();
+        this.direction = this.calculateDirection();
     }
 
     private calculateDirection(): BeamDirection {
@@ -141,7 +140,7 @@ export class BeamingHelper {
         const lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper!, NoteYPosition.Center);
         const avg = (highestNotePosition + lowestNotePosition) / 2;
 
-        return this.invert(avg < this._renderer.middleYPosition ? BeamDirection.Up : BeamDirection.Down);
+        return this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
     }
 
     private invert(direction: BeamDirection): BeamDirection {
@@ -261,7 +260,7 @@ export class BeamingHelper {
             this._lastBeatLowestNoteCompareValue = lowestValueForNote;
         }
 
-        if (this._lastBeatHighestNote || highestValueForNote > this._lastBeatHighestNoteCompareValue) {
+        if (!this._lastBeatHighestNote || highestValueForNote > this._lastBeatHighestNoteCompareValue) {
             this._lastBeatHighestNote = note;
             this._lastBeatHighestNoteCompareValue = highestValueForNote;
         }
@@ -277,7 +276,7 @@ export class BeamingHelper {
     }
 
     public calculateBeamY(stemSize: number, xPosition: number, scale: number): number {
-        return this.calculateBeamYWithDirection(stemSize, xPosition, scale, this.direction2);
+        return this.calculateBeamYWithDirection(stemSize, xPosition, scale, this.direction);
     }
 
     public calculateBeamYWithDirection(

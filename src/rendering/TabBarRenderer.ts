@@ -68,7 +68,7 @@ export class TabBarRenderer extends BarRendererBase {
             let hasTuplets: boolean = false;
             for (let voice of this.bar.voices) {
                 if (this.hasVoiceContainer(voice)) {
-                    let c: VoiceContainerGlyph = this.getOrCreateVoiceContainer(voice);
+                    let c: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                     if (c.tupletGroups.length > 0) {
                         hasTuplets = true;
                         break;
@@ -137,7 +137,7 @@ export class TabBarRenderer extends BarRendererBase {
     protected createVoiceGlyphs(v: Voice): void {
         for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
             let b: Beat = v.beats[i];
-            let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getOrCreateVoiceContainer(v));
+            let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new TabBeatPreNotesGlyph();
             container.onNotes = new TabBeatGlyph();
             this.addBeatGlyph(container);
@@ -186,7 +186,7 @@ export class TabBarRenderer extends BarRendererBase {
         }
         for (let voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let vc: VoiceContainerGlyph = this.getOrCreateVoiceContainer(voice);
+                let vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                 for (let bg of vc.beatGlyphs) {
                     let notes: TabBeatGlyph = bg.onNotes as TabBeatGlyph;
                     let noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
@@ -249,7 +249,7 @@ export class TabBarRenderer extends BarRendererBase {
     private paintTuplets(cx: number, cy: number, canvas: ICanvas): void {
         for (let voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let container: VoiceContainerGlyph = this.getOrCreateVoiceContainer(voice);
+                let container: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                 for (let tupletGroup of container.tupletGroups) {
                     this.paintTupletHelper(cx + this.beatGlyphsStart, cy, canvas, tupletGroup);
                 }
@@ -288,7 +288,7 @@ export class TabBarRenderer extends BarRendererBase {
                         startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
                         this.lineOffset / 2;
                 }
-                if (h.direction2 === BeamDirection.Up) {
+                if (h.direction === BeamDirection.Up) {
                     beatLineX -= startGlyph.width / 2;
                 } else {
                     beatLineX += startGlyph.width / 2;
@@ -329,8 +329,8 @@ export class TabBarRenderer extends BarRendererBase {
                         if (BeamingHelper.isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
                             barStartX = beatLineX;
                             barEndX = h.getBeatLineX(h.beats[i + 1]);
-                            let endGlyph: BeatGlyphBase = this.getOnNotesGlyphForBeat(h.beats[i + 1]);
-                            if (h.direction2 === BeamDirection.Up) {
+                            let endGlyph: BeatGlyphBase = this.getOnNotesGlyphForBeat(h.beats[i + 1])!;
+                            if (h.direction === BeamDirection.Up) {
                                 barEndX -= endGlyph.width / 2;
                             } else {
                                 barEndX += endGlyph.width / 2;
@@ -414,7 +414,7 @@ export class TabBarRenderer extends BarRendererBase {
                 }
                 let tupletX: number = beamingHelper.getBeatLineX(beat);
                 let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
-                if (beamingHelper.direction2 === BeamDirection.Up) {
+                if (beamingHelper.direction === BeamDirection.Up) {
                     tupletX -= startGlyph.width / 2;
                 } else {
                     tupletX += startGlyph.width / 2;
@@ -435,7 +435,7 @@ export class TabBarRenderer extends BarRendererBase {
                 let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
                 let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(firstBeat) as TabBeatGlyph;
                 let endGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(firstBeat) as TabBeatGlyph;
-                if (firstBeamingHelper.direction2 === BeamDirection.Up) {
+                if (firstBeamingHelper.direction === BeamDirection.Up) {
                     startX -= startGlyph.width / 2;
                     endX -= endGlyph.width / 2;
                 } else {
@@ -511,7 +511,7 @@ export class TabBarRenderer extends BarRendererBase {
                 y1 +=
                     startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
             }
-            if (h.direction2 === BeamDirection.Up) {
+            if (h.direction === BeamDirection.Up) {
                 beatLineX -= startGlyph.width / 2;
             } else {
                 beatLineX += startGlyph.width / 2;

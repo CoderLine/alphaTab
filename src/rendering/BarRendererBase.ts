@@ -126,7 +126,7 @@ export class BarRendererBase {
         this.scoreRenderer = renderer;
         this.bar = bar;
         if (bar) {
-            this.helpers = new BarHelpers(bar, this);
+            this.helpers = new BarHelpers(this);
         }
     }
 
@@ -243,6 +243,7 @@ export class BarRendererBase {
         if (!this.bar) {
             return;
         }
+        this.helpers.initialize();
         this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
         this._preBeatGlyphs.renderer = this;
         this._voiceContainers.clear();
@@ -265,10 +266,8 @@ export class BarRendererBase {
         this.updateSizes();
 
         // finish up all helpers
-        for(const v of this.helpers.beamHelpers)
-        {
-            for(const h of v)
-            {
+        for (const v of this.helpers.beamHelpers) {
+            for (const h of v) {
                 h.finish();
             }
         }
@@ -307,23 +306,23 @@ export class BarRendererBase {
         g.preNotes.renderer = this;
         g.onNotes.renderer = this;
         g.onNotes.beamingHelper = this.helpers.beamHelperLookup[g.beat.voice.index].get(g.beat.index)!;
-        this.getOrCreateVoiceContainer(g.beat.voice).addGlyph(g);
+        this.getVoiceContainer(g.beat.voice)!.addGlyph(g);
     }
 
-    protected getOrCreateVoiceContainer(voice: Voice): VoiceContainerGlyph {
-        return this._voiceContainers.get(voice.index)!;
+    protected getVoiceContainer(voice: Voice): VoiceContainerGlyph | undefined {
+        return this._voiceContainers.get(voice.index);
     }
 
-    public getBeatContainer(beat: Beat): BeatContainerGlyph {
-        return this.getOrCreateVoiceContainer(beat.voice).beatGlyphs[beat.index];
+    public getBeatContainer(beat: Beat): BeatContainerGlyph | undefined {
+        return this.getVoiceContainer(beat.voice)?.beatGlyphs[beat.index];
     }
 
-    public getPreNotesGlyphForBeat(beat: Beat): BeatGlyphBase {
-        return this.getBeatContainer(beat).preNotes;
+    public getPreNotesGlyphForBeat(beat: Beat): BeatGlyphBase | undefined {
+        return this.getBeatContainer(beat)?.preNotes;
     }
 
-    public getOnNotesGlyphForBeat(beat: Beat): BeatOnNoteGlyphBase {
-        return this.getBeatContainer(beat).onNotes;
+    public getOnNotesGlyphForBeat(beat: Beat): BeatOnNoteGlyphBase | undefined {
+        return this.getBeatContainer(beat)?.onNotes;
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -409,7 +408,7 @@ export class BarRendererBase {
     }
 
     public getBeatX(beat: Beat, requestedPosition: BeatXPosition = BeatXPosition.PreNotes): number {
-        let container: BeatContainerGlyph = this.getBeatContainer(beat);
+        let container = this.getBeatContainer(beat);
         if (container) {
             switch (requestedPosition) {
                 case BeatXPosition.PreNotes:
@@ -433,7 +432,7 @@ export class BarRendererBase {
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
-        let container: BeatContainerGlyph = this.getBeatContainer(note.beat);
+        let container = this.getBeatContainer(note.beat);
         if (container) {
             return (
                 container.voiceContainer.x +
@@ -450,7 +449,7 @@ export class BarRendererBase {
         if (beat) {
             return beat.getNoteY(note, requestedPosition);
         }
-        return 0;
+        return NaN;
     }
 
     public reLayout(): void {

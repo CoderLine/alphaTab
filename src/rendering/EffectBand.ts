@@ -164,7 +164,7 @@ export class EffectBand extends Glyph {
     private alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
         let g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
         let pos: Glyph;
-        let container: BeatContainerGlyph = this.renderer.getBeatContainer(beat);
+        let container: BeatContainerGlyph = this.renderer.getBeatContainer(beat)!;
         switch (sizing) {
             case EffectBarGlyphSizing.SinglePreBeat:
                 pos = container.preNotes;

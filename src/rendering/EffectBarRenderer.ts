@@ -114,7 +114,7 @@ export class EffectBarRenderer extends BarRendererBase {
         for (let b of v.beats) {
             // we create empty glyphs as alignment references and to get the
             // effect bar sized
-            let container: BeatContainerGlyph = new BeatContainerGlyph(b, this.getOrCreateVoiceContainer(v));
+            let container: BeatContainerGlyph = new BeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new BeatGlyphBase();
             container.onNotes = new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);

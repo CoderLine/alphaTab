@@ -22,6 +22,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         super(0, 0);
     }
 
+    public abstract get direction(): BeamDirection;
+
     protected add(noteGlyph: Glyph, noteLine: number): void {
         let info: ScoreNoteGlyphInfo = new ScoreNoteGlyphInfo(noteGlyph, noteLine);
         this._infos.push(info);

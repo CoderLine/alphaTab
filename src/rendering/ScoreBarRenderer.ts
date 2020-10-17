@@ -55,7 +55,7 @@ export class ScoreBarRenderer extends BarRendererBase {
     }
 
     public getBeatDirection(beat: Beat): BeamDirection {
-        return this.helpers.getBeamingHelperForBeat(beat).direction2;
+        return this.helpers.getBeamingHelperForBeat(beat).direction;
     }
 
     public get lineOffset(): number {
@@ -90,7 +90,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             this.registerOverflowTop(whammyOffset);
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine, 0);
             let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
-            if (maxNoteHelper.direction2 === BeamDirection.Up) {
+            if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
                 maxNoteY -= maxNoteHelper.fingeringCount * this.resources.graceFont.size;
                 if (maxNoteHelper.hasTuplet) {
@@ -105,7 +105,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             }
             let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine, 0);
             let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
-            if (minNoteHelper.direction2 === BeamDirection.Down) {
+            if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
                 minNoteY += minNoteHelper.fingeringCount * this.resources.graceFont.size;
             }
@@ -124,7 +124,7 @@ export class ScoreBarRenderer extends BarRendererBase {
     private paintTuplets(cx: number, cy: number, canvas: ICanvas): void {
         for (let voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let container: VoiceContainerGlyph = this.getOrCreateVoiceContainer(voice);
+                let container: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                 for (let tupletGroup of container.tupletGroups) {
                     this.paintTupletHelper(cx + this.beatGlyphsStart, cy, canvas, tupletGroup);
                 }
@@ -195,7 +195,7 @@ export class ScoreBarRenderer extends BarRendererBase {
                 if (!beamingHelper) {
                     continue;
                 }
-                let direction: BeamDirection = beamingHelper.direction2;
+                let direction: BeamDirection = beamingHelper.direction;
                 let tupletX: number = beamingHelper.getBeatLineX(beat);
                 let tupletY: number = cy + this.y + this.calculateBeamY(beamingHelper, tupletX);
                 let offset: number = direction === BeamDirection.Up ? res.effectFont.size * 1.5 : -3 * this.scale;
@@ -208,7 +208,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             let firstBeamingHelper: BeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstBeat.index)!;
             let lastBeamingHelper: BeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastBeat.index)!;
             if (firstBeamingHelper && lastBeamingHelper) {
-                let direction: BeamDirection = firstBeamingHelper.direction2;
+                let direction: BeamDirection = firstBeamingHelper.direction;
                 //
                 // Calculate the overall area of the tuplet bracket
                 let startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
@@ -228,12 +228,12 @@ export class ScoreBarRenderer extends BarRendererBase {
                 let startY: number = this.calculateBeamYWithDirection(
                     firstBeamingHelper,
                     startX,
-                    firstBeamingHelper.direction2
+                    firstBeamingHelper.direction
                 );
                 let endY: number = this.calculateBeamYWithDirection(
                     lastBeamingHelper,
                     endX,
-                    firstBeamingHelper.direction2
+                    firstBeamingHelper.direction
                 );
                 let k: number = (endY - startY) / (endX - startX);
                 let d: number = startY - k * startX;
@@ -335,6 +335,18 @@ export class ScoreBarRenderer extends BarRendererBase {
         return this.getScoreY(this.bar.staff.standardNotationLineCount - 1);
     }
 
+    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+        let y = super.getNoteY(note, requestedPosition);
+        if (isNaN(y)) {
+            // NOTE: some might request the note position before the glyphs have been created
+            // e.g. the beaming helper, for these we just need a rough
+            // estimate on the position
+            const line = AccidentalHelper.computeLineWithoutAccidentals(this.bar, note);
+            y = this.getScoreY(line);
+        }
+        return y;
+    }
+
     public calculateBeamY(h: BeamingHelper, x: number): number {
         let stemSize: number = this.getStemSize(h);
         return h.calculateBeamY(stemSize, x, this.scale);
@@ -354,7 +366,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             // draw line
             //
             let beatLineX: number = h.getBeatLineX(beat);
-            let direction: BeamDirection = h.direction2;
+            let direction: BeamDirection = h.direction;
             let y1: number = cy + this.y;
             y1 +=
                 direction === BeamDirection.Up
@@ -458,7 +470,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         //
         let stemSize: number = this.getFlagStemSize(h.shortestDuration);
         let beatLineX: number = h.getBeatLineX(beat);
-        let direction: BeamDirection = h.direction2;
+        let direction: BeamDirection = h.direction;
         let topY: number = this.getNoteY(h.highestNoteInHelper!, NoteYPosition.Center);
         let bottomY: number = this.getNoteY(h.lowestNoteInHelper!, NoteYPosition.Center);
         let beamY: number = 0;
@@ -717,7 +729,7 @@ export class ScoreBarRenderer extends BarRendererBase {
     protected createVoiceGlyphs(v: Voice): void {
         for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
             let b: Beat = v.beats[i];
-            let container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getOrCreateVoiceContainer(v));
+            let container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new ScoreBeatPreNotesGlyph();
             container.onNotes = new ScoreBeatGlyph();
             this.addBeatGlyph(container);
