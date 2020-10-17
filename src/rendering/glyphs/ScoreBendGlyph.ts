@@ -142,7 +142,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                     let endX: number = cx + startNoteRenderer.x + startNoteRenderer.width;
                     let noteValueToDraw: number = note.tieDestination!.realValue;
-                    startNoteRenderer.accidentalHelper.applyAccidentalForValue(note.beat, noteValueToDraw, false);
+                    startNoteRenderer.accidentalHelper.applyAccidentalForValue(note.beat, noteValueToDraw, false, true);
                     let endY: number =
                         cy +
                         startNoteRenderer.y +

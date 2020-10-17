@@ -58,7 +58,8 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         let accidental: AccidentalType = sr.accidentalHelper.applyAccidentalForValue(
             this._beat,
             noteValue,
-            quarterBend
+            quarterBend,
+            true
         );
         let line: number = sr.accidentalHelper.getNoteLineForValue(noteValue, false);
         noteHeadGlyph.y = sr.getScoreY(line, 0);

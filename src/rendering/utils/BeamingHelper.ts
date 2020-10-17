@@ -8,11 +8,16 @@ import { Note } from '@src/model/Note';
 import { Staff } from '@src/model/Staff';
 import { Voice } from '@src/model/Voice';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeatLinePositions } from '@src/rendering/utils/BeatLinePositions';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccidentalHelper } from './AccidentalHelper';
 import { BarRendererBase, NoteYPosition } from '../BarRendererBase';
+
+class BeatLinePositions {
+    public staffId: string = '';
+    public up: number = 0;
+    public down: number = 0;
+}
 
 /**
  * This public class helps drawing beams and bars for notes.
@@ -48,10 +53,10 @@ export class BeamingHelper {
     private _lastBeatHighestNote: Note | null = null;
     private _lastBeatHighestNoteCompareValue: number = -1;
 
-    public lowestNoteInHelper: Note | null = null;
+    private _lowestNoteInHelper: Note | null = null;
     private _lowestNoteCompareValueInHelper: number = -1;
 
-    public highestNoteInHelper: Note | null = null;
+    private _highestNoteInHelper: Note | null = null;
     private _highestNoteCompareValueInHelper: number = -1;
 
     public invertBeamDirection: boolean = false;
@@ -136,8 +141,8 @@ export class BeamingHelper {
         // the average line is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
-        const highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper!, NoteYPosition.Center);
-        const lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper!, NoteYPosition.Center);
+        const highestNotePosition = this._renderer.getNoteY(this._highestNoteInHelper!, NoteYPosition.Center);
+        const lowestNotePosition = this._renderer.getNoteY(this._lowestNoteInHelper!, NoteYPosition.Center);
         const avg = (highestNotePosition + lowestNotePosition) / 2;
 
         return this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
@@ -189,7 +194,6 @@ export class BeamingHelper {
             if (beat.graceType !== GraceType.None) {
                 this.isGrace = true;
             }
-            let positions: BeatLinePositions = this.getOrCreateBeatPositions(beat);
             if (beat.hasTuplet) {
                 this.hasTuplet = true;
             }
@@ -207,8 +211,6 @@ export class BeamingHelper {
             this._lastBeatHighestNote = null;
             this.checkNote(beat.minNote);
             this.checkNote(beat.maxNote);
-            positions.minNote = this._lastBeatLowestNote;
-            positions.maxNote = this._lastBeatHighestNote;
             if (this.shortestDuration < beat.duration) {
                 this.shortestDuration = beat.duration;
             }
@@ -265,83 +267,17 @@ export class BeamingHelper {
             this._lastBeatHighestNoteCompareValue = highestValueForNote;
         }
 
-        if (!this.lowestNoteInHelper || lowestValueForNote < this._lowestNoteCompareValueInHelper) {
-            this.lowestNoteInHelper = note;
+        if (!this._lowestNoteInHelper || lowestValueForNote < this._lowestNoteCompareValueInHelper) {
+            this._lowestNoteInHelper = note;
             this._lowestNoteCompareValueInHelper = lowestValueForNote;
         }
-        if (!this.highestNoteInHelper || highestValueForNote > this._highestNoteCompareValueInHelper) {
-            this.highestNoteInHelper = note;
+        if (!this._highestNoteInHelper || highestValueForNote > this._highestNoteCompareValueInHelper) {
+            this._highestNoteInHelper = note;
             this._highestNoteCompareValueInHelper = highestValueForNote;
         }
     }
 
-    public calculateBeamY(stemSize: number, xPosition: number, scale: number): number {
-        return this.calculateBeamYWithDirection(stemSize, xPosition, scale, this.direction);
-    }
-
-    public calculateBeamYWithDirection(
-        stemSize: number,
-        xPosition: number,
-        scale: number,
-        direction: BeamDirection
-    ): number {
-        // create a line between the min and max note of the group
-        if (this.beats.length === 1) {
-            if (direction === BeamDirection.Up) {
-                return this._renderer.getNoteY(this.highestNoteInHelper!, NoteYPosition.Center) - stemSize;
-            }
-            return this._renderer.getNoteY(this.lowestNoteInHelper!, NoteYPosition.Center) + stemSize;
-        }
-        // we use the min/max notes to place the beam along their real position
-        // we only want a maximum of 10 offset for their gradient
-        let maxDistance: number = 10 * scale;
-        // if the min note is not first or last, we can align notes directly to the position
-        // of the min note
-        if (
-            direction === BeamDirection.Down &&
-            this.lowestNoteInHelper!.beat !== this.beats[0] &&
-            this.lowestNoteInHelper!.beat !== this.beats[this.beats.length - 1]
-        ) {
-            return this._renderer.getNoteY(this.lowestNoteInHelper!, NoteYPosition.Center) + stemSize;
-        }
-        if (
-            direction === BeamDirection.Up &&
-            this.highestNoteInHelper!.beat !== this.beats[0] &&
-            this.highestNoteInHelper!.beat !== this.beats[this.beats.length - 1]
-        ) {
-            return this._renderer.getNoteY(this.highestNoteInHelper!, NoteYPosition.Center) - stemSize;
-        }
-        let startX: number = this.getBeatLineX(this.beats[0]);
-        let startY: number =
-            direction === BeamDirection.Up
-                ? this._renderer.getNoteY(this._firstBeatHighestNote!, NoteYPosition.Center) - stemSize
-                : this._renderer.getNoteY(this._firstBeatLowestNote!, NoteYPosition.Center) + stemSize;
-        let endX: number = this.getBeatLineX(this.beats[this.beats.length - 1]);
-        let endY: number =
-            direction === BeamDirection.Up
-                ? this._renderer.getNoteY(this._lastBeatHighestNote!, NoteYPosition.Center) - stemSize
-                : this._renderer.getNoteY(this._lastBeatLowestNote!, NoteYPosition.Center) + stemSize;
-        // ensure the maxDistance
-        if (direction === BeamDirection.Down && startY > endY && startY - endY > maxDistance) {
-            endY = startY - maxDistance;
-        }
-        if (direction === BeamDirection.Down && endY > startY && endY - startY > maxDistance) {
-            startY = endY - maxDistance;
-        }
-        if (direction === BeamDirection.Up && startY < endY && endY - startY > maxDistance) {
-            endY = startY + maxDistance;
-        }
-        if (direction === BeamDirection.Up && endY < startY && startY - endY > maxDistance) {
-            startY = endY + maxDistance;
-        }
-        // get the y position of the given beat on this curve
-        if (startX === endX) {
-            return startY;
-        }
-        // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
-        return ((endY - startY) / (endX - startX)) * (xPosition - startX) + startY;
-    }
-
+    
     // TODO: Check if this beaming is really correct, I'm not sure if we are connecting beats correctly
     private static canJoin(b1: Beat, b2: Beat): boolean {
         // is this a voice we can join with?
@@ -414,6 +350,14 @@ export class BeamingHelper {
         return ModelUtils.getIndex(a.duration) - 2 - barIndex > 0 && ModelUtils.getIndex(b.duration) - 2 - barIndex > 0;
     }
 
+    public get beatOfLowestNote(): Beat {
+        return this._lowestNoteInHelper!.beat;
+    }
+
+    public get beatOfHighestNote(): Beat {
+        return this._highestNoteInHelper!.beat;
+    }
+
     /**
      * Returns whether the the position of the given beat, was registered by the staff of the given ID
      * @param staffId
@@ -428,19 +372,5 @@ export class BeamingHelper {
             this._beatLineXPositions.get(beat.index)!.staffId === staffId ||
             !this._beatLineXPositions.get(beat.index)!.staffId
         );
-    }
-
-    public getBeatMinNote(beat: Beat): Note {
-        if (!this._beatLineXPositions.has(beat.index)) {
-            return beat.minNote!;
-        }
-        return this._beatLineXPositions.get(beat.index)!.minNote!;
-    }
-
-    public getBeatMaxNote(beat: Beat): Note {
-        if (!this._beatLineXPositions.has(beat.index)) {
-            return beat.maxNote!;
-        }
-        return this._beatLineXPositions.get(beat.index)!.maxNote!;
     }
 }

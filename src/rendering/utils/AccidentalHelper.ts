@@ -7,6 +7,13 @@ import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PercussionMapper } from './PercussionMapper';
 
+
+class BeatLines {
+    public maxLine: number = -1000;
+    public minLine: number = -1000;
+}
+
+
 /**
  * This small utilty public class allows the assignment of accidentals within a
  * desired scope.
@@ -75,6 +82,7 @@ export class AccidentalHelper {
     private _appliedScoreLines: Map<number, number> = new Map();
     private _appliedScoreLinesByValue: Map<number, number> = new Map();
     private _notesByValue: Map<number, Note> = new Map();
+    private _beatLines: Map<number, BeatLines> = new Map();
 
     /**
      * The beat on which the highest note of this helper was added.
@@ -89,11 +97,11 @@ export class AccidentalHelper {
     /**
      * The line of the highest note added to this helper.
      */
-    public maxLine: number = -1;
+    public maxLine: number = -1000;
     /**
      * The line of the lowest note added to this helper.
      */
-    public minLine: number = -1;
+    public minLine: number = -1000;
 
     public constructor(bar: Bar) {
         this._bar = bar;
@@ -108,10 +116,10 @@ export class AccidentalHelper {
     }
 
     public static getNoteValue(note: Note) {
-        if(note.isPercussion) {
+        if (note.isPercussion) {
             return note.percussionArticulation;
         }
-        
+
         let noteValue: number = note.displayValue;
 
         // adjust note height according to accidentals enforced
@@ -142,7 +150,7 @@ export class AccidentalHelper {
     public applyAccidental(note: Note): AccidentalType {
         const noteValue = AccidentalHelper.getNoteValue(note);
         let quarterBend: boolean = note.hasQuarterToneOffset;
-        return this.getAccidental(noteValue, quarterBend, note, note.beat);
+        return this.getAccidental(noteValue, quarterBend, note, note.beat, false);
     }
 
     /**
@@ -151,13 +159,14 @@ export class AccidentalHelper {
      * @param relatedBeat
      * @param noteValue
      * @param quarterBend
+     * @param isHelperNote true if the note registered via this call, is a small helper note (e.g. for bends) or false if it is a main note head (e.g. for harmonics)
      * @returns
      */
-    public applyAccidentalForValue(relatedBeat: Beat, noteValue: number, quarterBend: boolean): AccidentalType {
-        return this.getAccidental(noteValue, quarterBend, null, relatedBeat);
+    public applyAccidentalForValue(relatedBeat: Beat, noteValue: number, quarterBend: boolean, isHelperNote: boolean): AccidentalType {
+        return this.getAccidental(noteValue, quarterBend, null, relatedBeat, isHelperNote);
     }
 
-    public static computeLineWithoutAccidentals(bar:Bar, note: Note) {
+    public static computeLineWithoutAccidentals(bar: Bar, note: Note) {
         let line: number = 0;
         const noteValue = AccidentalHelper.getNoteValue(note);
 
@@ -174,7 +183,8 @@ export class AccidentalHelper {
         noteValue: number,
         quarterBend: boolean,
         note: Note | null = null,
-        relatedBeat: Beat
+        relatedBeat: Beat,
+        isHelperNote: boolean
     ): AccidentalType {
         let accidentalToSet: AccidentalType = AccidentalType.None;
         let line: number = 0;
@@ -289,19 +299,49 @@ export class AccidentalHelper {
             this._appliedScoreLinesByValue.set(noteValue, line);
         }
 
-        if (this.minLine === -1 || this.minLine < line) {
+        if (this.minLine === -1000 || this.minLine < line) {
             this.minLine = line;
             this.minLineBeat = relatedBeat;
         }
-        if (this.maxLine === -1 || this.maxLine > line) {
+        if (this.maxLine === -1000 || this.maxLine > line) {
             this.maxLine = line;
             this.maxLineBeat = relatedBeat;
+        }
+
+        if (!isHelperNote) {
+            let lines: BeatLines;
+            if (this._beatLines.has(relatedBeat.id)) {
+                lines = this._beatLines.get(relatedBeat.id)!;
+            }
+            else {
+                lines = new BeatLines();
+                this._beatLines.set(relatedBeat.id, lines);
+            }
+
+            if (lines.minLine === -1000 || line < lines.minLine) {
+                lines.minLine = line;
+            }
+            if (lines.minLine === -1000 || line > lines.maxLine) {
+                lines.maxLine = line;
+            }
         }
 
         return accidentalToSet;
     }
 
-    private static calculateNoteLine(bar:Bar, noteValue: number, mode: NoteAccidentalMode): number {
+    public getMaxLine(b: Beat): number {
+        return this._beatLines.has(b.id)
+            ? this._beatLines.get(b.id)!.maxLine
+            : 0;
+    }
+
+    public getMinLine(b: Beat): number {
+        return this._beatLines.has(b.id)
+            ? this._beatLines.get(b.id)!.minLine
+            : 0;
+    }
+
+    private static calculateNoteLine(bar: Bar, noteValue: number, mode: NoteAccidentalMode): number {
         let value: number = noteValue;
         let ks: number = bar.masterBar.keySignature;
         let clef: Clef = bar.clef;

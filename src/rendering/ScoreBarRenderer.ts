@@ -348,14 +348,79 @@ export class ScoreBarRenderer extends BarRendererBase {
     }
 
     public calculateBeamY(h: BeamingHelper, x: number): number {
-        let stemSize: number = this.getStemSize(h);
-        return h.calculateBeamY(stemSize, x, this.scale);
+        return this.calculateBeamYWithDirection(h, x, h.direction);
     }
 
     private calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         let stemSize: number = this.getStemSize(h);
-        return h.calculateBeamYWithDirection(stemSize, x, this.scale, direction);
+
+        const firstBeat = h.beats[0];
+
+        // create a line between the min and max note of the group
+        if (h.beats.length === 1) {
+            if (direction === BeamDirection.Up) {
+                return this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize;
+            }
+            return this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
+        }
+
+        const lastBeat = h.beats[h.beats.length - 1];
+
+        // we use the min/max notes to place the beam along their real position
+        // we only want a maximum of 10 offset for their gradient
+        let maxDistance: number = 10 * this.scale;
+        // if the min note is not first or last, we can align notes directly to the position
+        // of the min note
+        const beatOfLowestNote = h.beatOfLowestNote;
+        const beatOfHighestNote = h.beatOfHighestNote;
+        if (
+            direction === BeamDirection.Down &&
+            beatOfLowestNote !== firstBeat &&
+            beatOfLowestNote !== lastBeat
+        ) {
+            return this.getScoreY(this.accidentalHelper.getMaxLine(beatOfLowestNote)) + stemSize;
+        }
+        if (
+            direction === BeamDirection.Up &&
+            beatOfHighestNote !== firstBeat &&
+            beatOfHighestNote !== lastBeat
+        ) {
+            return this.getScoreY(this.accidentalHelper.getMinLine(beatOfHighestNote)) - stemSize;
+        }
+
+        let startX: number = h.getBeatLineX(firstBeat);
+        let startY: number =
+            direction === BeamDirection.Up
+                ? this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize
+                : this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
+
+        let endX: number = h.getBeatLineX(lastBeat);
+        let endY: number =
+            direction === BeamDirection.Up
+                ? this.getScoreY(this.accidentalHelper.getMinLine(lastBeat)) - stemSize
+                : this.getScoreY(this.accidentalHelper.getMaxLine(lastBeat)) + stemSize;
+
+        // ensure the maxDistance
+        if (direction === BeamDirection.Down && startY > endY && startY - endY > maxDistance) {
+            endY = startY - maxDistance;
+        }
+        if (direction === BeamDirection.Down && endY > startY && endY - startY > maxDistance) {
+            startY = endY - maxDistance;
+        }
+        if (direction === BeamDirection.Up && startY < endY && endY - startY > maxDistance) {
+            endY = startY + maxDistance;
+        }
+        if (direction === BeamDirection.Up && endY < startY && startY - endY > maxDistance) {
+            startY = endY + maxDistance;
+        }
+        // get the y position of the given beat on this curve
+        if (startX === endX) {
+            return startY;
+        }
+        // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
+        return ((endY - startY) / (endX - startX)) * (x - startX) + startY;
     }
+
 
     private paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
@@ -368,10 +433,11 @@ export class ScoreBarRenderer extends BarRendererBase {
             let beatLineX: number = h.getBeatLineX(beat);
             let direction: BeamDirection = h.direction;
             let y1: number = cy + this.y;
+
             y1 +=
                 direction === BeamDirection.Up
-                    ? this.getNoteY(h.getBeatMinNote(beat), NoteYPosition.Center)
-                    : this.getNoteY(h.getBeatMaxNote(beat), NoteYPosition.Center);
+                    ? this.getScoreY(this.accidentalHelper.getMaxLine(beat))
+                    : this.getScoreY(this.accidentalHelper.getMinLine(beat));
             let y2: number = cy + this.y;
             y2 += this.calculateBeamY(h, beatLineX);
             canvas.lineWidth = ScoreBarRenderer.StemWidth * this.scale;
@@ -471,8 +537,8 @@ export class ScoreBarRenderer extends BarRendererBase {
         let stemSize: number = this.getFlagStemSize(h.shortestDuration);
         let beatLineX: number = h.getBeatLineX(beat);
         let direction: BeamDirection = h.direction;
-        let topY: number = this.getNoteY(h.highestNoteInHelper!, NoteYPosition.Center);
-        let bottomY: number = this.getNoteY(h.lowestNoteInHelper!, NoteYPosition.Center);
+        let topY: number = this.getScoreY(this.accidentalHelper.getMinLine(beat));
+        let bottomY: number = this.getScoreY(this.accidentalHelper.getMaxLine(beat));
         let beamY: number = 0;
         let fingeringY: number = 0;
         if (direction === BeamDirection.Down) {
