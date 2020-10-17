@@ -190,7 +190,7 @@ export class TinySoundFont {
     }
 
     public set metronomeVolume(value: number) {
-        this.channelSetMixVolume(SynthConstants.MetronomeChannel, value);
+        this.setupMetronomeChannel(value);
     }
 
     public setupMetronomeChannel(volume: number): void {
