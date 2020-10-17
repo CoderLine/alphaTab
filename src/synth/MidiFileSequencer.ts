@@ -151,6 +151,16 @@ export class MidiFileSequencer {
             synthData.time = absTime;
             previousTick = mEvent.tick;
 
+            if (metronomeLength > 0) {
+                while (metronomeTick < absTick) {
+                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(this._synthData.length);
+                    this._synthData.push(metronome);
+                    metronome.time = metronomeTime;
+                    metronomeTick += metronomeLength;
+                    metronomeTime += metronomeLength * (60000.0 / (bpm * midiFile.division));
+                }
+            }
+
             if (mEvent.command === MidiEventType.Meta && mEvent.data1 === MetaEventType.Tempo) {
                 let meta: MetaNumberEvent = mEvent as MetaNumberEvent;
                 bpm = 60000000 / meta.value;
@@ -163,16 +173,6 @@ export class MidiFileSequencer {
                 let channel: number = mEvent.channel;
                 if (!this._firstProgramEventPerChannel.has(channel)) {
                     this._firstProgramEventPerChannel.set(channel, synthData);
-                }
-            }
-
-            if (metronomeLength > 0) {
-                while (metronomeTick < absTick) {
-                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(this._synthData.length);
-                    this._synthData.push(metronome);
-                    metronome.time = metronomeTime;
-                    metronomeTick += metronomeLength;
-                    metronomeTime += metronomeLength * (60000.0 / (bpm * midiFile.division));
                 }
             }
         }
