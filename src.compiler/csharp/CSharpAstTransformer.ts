@@ -495,6 +495,8 @@ export default class CSharpAstTransformer {
                 }
             } else if (ts.isVariableStatement(s)) {
                 this.visitTestClassProperty(csClass, s);
+            } else if (ts.isFunctionDeclaration(s)) {
+                this.visitTestClassMethod(csClass, s);
             } else {
                 this._context.addTsNodeDiagnostics(
                     s,
@@ -505,6 +507,40 @@ export default class CSharpAstTransformer {
         });
 
         this._csharpFile.namespace.declarations.push(csClass);
+    }
+
+    private visitTestClassMethod(parent: cs.ClassDeclaration, d: ts.FunctionDeclaration) {
+        const signature = this._context.typeChecker.getSignatureFromDeclaration(d);
+        const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
+
+        const csMethod: cs.MethodDeclaration = {
+            parent: parent,
+            nodeType: cs.SyntaxKind.MethodDeclaration,
+            isAbstract: false,
+            isOverride: false,
+            isStatic: false,
+            isVirtual: false,
+            name: this._context.toPascalCase((d.name as ts.Identifier).text),
+            parameters: [],
+            returnType: this.createUnresolvedTypeNode(null, d.type ?? d, returnType),
+            visibility: this.mapVisibility(d.modifiers),
+            tsNode: d,
+            skipEmit: this.shouldSkip(d)
+        };
+        csMethod.isAsync =
+            !!d.modifiers &&
+            !!d.modifiers.find(m => m.kind === ts.SyntaxKind.AsyncKeyword);
+
+        const type = this._context.typeChecker.getTypeAtLocation(d.name!);
+        csMethod.returnType.parent = csMethod;
+
+        d.parameters.forEach(p => csMethod.parameters.push(this.makeParameter(csMethod, p)));
+        this._declarationOrAssignmentTypeStack.push(type);
+        csMethod.body = this.visitBlock(csMethod, d.body as ts.Block);
+        this._declarationOrAssignmentTypeStack.pop();
+
+        parent.members.push(csMethod);
+        this._context.registerSymbol(csMethod);
     }
 
     private visitTestMethod(parent: cs.ClassDeclaration, d: ts.CallExpression) {
