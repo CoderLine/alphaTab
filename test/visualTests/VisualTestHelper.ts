@@ -73,7 +73,13 @@ export class VisualTestHelper {
             settings.core.engine = 'html5';
             settings.core.enableLazyLoading = false;
 
-            const referenceFileData = await TestPlatform.loadFile(`test-data/visual-tests/${referenceFileName}`);
+            let referenceFileData: Uint8Array;
+            try {
+                referenceFileData = await TestPlatform.loadFile(`test-data/visual-tests/${referenceFileName}`);
+            }
+            catch (e) {
+                referenceFileData = new Uint8Array(0);
+            }
 
             const renderElement = document.createElement('div');
             renderElement.style.width = '1300px';
@@ -153,22 +159,31 @@ export class VisualTestHelper {
         className: string
     ): Promise<HTMLCanvasElement> {
         return new Promise<HTMLCanvasElement>((resolve, reject) => {
-            const img = new Image();
-            img.src = 'data:image/png;base64,' + btoa(data.reduce((p, d) => p + String.fromCharCode(d), ''));
-            img.onload = function () {
+            if (data.length === 0) {
                 const canvas = document.createElement('canvas');
                 canvas.classList.add(className);
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
+                canvas.width = 1;
+                canvas.height = 1;
                 canvas.dataset.filename = filename.split('/').slice(-1)[0];
-                const context = canvas.getContext('2d')!;
-                context.drawImage(img, 0, 0);
-
                 resolve(canvas);
-            };
-            img.onerror = function (e) {
-                reject(e);
-            };
+            } else {
+                const img = new Image();
+                img.src = 'data:image/png;base64,' + btoa(data.reduce((p, d) => p + String.fromCharCode(d), ''));
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.classList.add(className);
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    canvas.dataset.filename = filename.split('/').slice(-1)[0];
+                    const context = canvas.getContext('2d')!;
+                    context.drawImage(img, 0, 0);
+
+                    resolve(canvas);
+                };
+                img.onerror = function (e) {
+                    reject(e);
+                };
+            }
         });
     }
 
@@ -316,7 +331,7 @@ export class VisualTestHelper {
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
                         result.message = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
-                        await VisualTestHelper.saveFiles(expectedFileName, expected, actual, diff);
+                        await VisualTestHelper.saveFiles(expectedFileName, expected, oldActual, diff);
                     } else if (sizeMismatch) {
                         result.message = `Image sizes do not match: ${expected.width}/${expected.height} vs ${oldActual.width}/${oldActual.height}`;
                         result.pass = false;
@@ -427,13 +442,13 @@ export class VisualTestHelper {
         diffToggleLabel.style.position = "absolute";
         diffToggleLabel.style.left = "0";
         diffToggleLabel.style.bottom = "0";
-        
+
         const diffToggle = document.createElement('input');
         diffToggle.type = 'checkbox';
         diffToggleLabel.appendChild(diffToggle);
         diffToggleLabel.appendChild(document.createTextNode('Show Diff'));
-        diffToggle.onchange = ()=> {
-            if(diffToggle.checked) {
+        diffToggle.onchange = () => {
+            if (diffToggle.checked) {
                 df.style.display = 'block';
             } else {
                 df.style.display = 'none';
@@ -464,7 +479,7 @@ export class VisualTestHelper {
             const data = new FormData();
             data.append('name', name);
             data.append('expected', expectedData, VisualTestHelper.createFileName(name, 'expected'));
-            data.append('actual', actualData, VisualTestHelper.createFileName(name, 'actual'));
+            data.append('actual', actualData, VisualTestHelper.createFileName(name, ''));
             data.append('diff', diffData, VisualTestHelper.createFileName(name, 'diff'));
             x.send(data);
         });
@@ -489,11 +504,15 @@ export class VisualTestHelper {
             oldName = oldName.substr(i + 1);
         }
 
+        if(part.length > 0) {
+            part = `-${part}`;
+        }
+
         i = oldName.lastIndexOf('.');
         if (i >= 0) {
-            oldName = oldName.substr(0, i) + '-' + part + oldName.substr(i);
+            oldName = oldName.substr(0, i) + part + oldName.substr(i);
         } else {
-            oldName += '-' + part;
+            oldName += part;
         }
         return oldName;
     }

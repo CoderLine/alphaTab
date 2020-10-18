@@ -43,7 +43,7 @@ describe('NotationElements', () => {
             const referenceName = testCases.get(element)!;
             await VisualTestHelper.runVisualTestTex(
                 tex,
-                `features/notation-elements/score-info-${referenceName}.png`,
+                `notation-elements/score-info-${referenceName}.png`,
                 settings,
                 undefined,
                 referenceName
@@ -56,7 +56,7 @@ describe('NotationElements', () => {
         settings.notation.elements.set(NotationElement.ScoreWordsAndMusic, true);
         await VisualTestHelper.runVisualTestTex(
             `\\album "Album" \\artist "Artist" \\copyright "Copyright" \\music "WordsAndMusic" \\subtitle "Subtitle" \\title "Title" \\words "WordsAndMusic" . 3.3*4`,
-            `features/notation-elements/score-info-words-and-music.png`,
+            `notation-elements/score-info-words-and-music.png`,
             settings,
             undefined,
             'words-and-music'
@@ -66,7 +66,7 @@ describe('NotationElements', () => {
         settings.notation.elements.clear();
         await VisualTestHelper.runVisualTestTex(
             tex,
-            `features/notation-elements/score-info-all.png`,
+            `notation-elements/score-info-all.png`,
             settings,
             undefined,
             'all'
@@ -80,7 +80,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.GuitarTuning, true);
-        await VisualTestHelper.runVisualTestTex(tex, `features/notation-elements/guitar-tuning-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/guitar-tuning-on.png`, settings);
     });
 
     it('guitar-tuning-off', async () => {
@@ -90,7 +90,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.GuitarTuning, false);
-        await VisualTestHelper.runVisualTestTex(tex, `features/notation-elements/guitar-tuning-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/guitar-tuning-off.png`, settings);
     });
 
     it('track-names-off', async () => {
@@ -100,7 +100,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TrackNames, false);
-        await VisualTestHelper.runVisualTestTex(tex, `features/notation-elements/track-names-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/track-names-off.png`, settings);
     });
 
     it('track-names-on', async () => {
@@ -110,7 +110,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TrackNames, true);
-        await VisualTestHelper.runVisualTestTex(tex, `features/notation-elements/track-names-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/track-names-on.png`, settings);
     });
 
     it('chord-diagrams-off', async () => {
@@ -120,7 +120,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ChordDiagrams, false);
-        await VisualTestHelper.runVisualTestTex(tex, `features/notation-elements/chord-diagrams-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/chord-diagrams-off.png`, settings);
     });
 
     it('chord-diagrams-on', async () => {
@@ -130,7 +130,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ChordDiagrams, true);
-        await VisualTestHelper.runVisualTestTex(tex, `features/notation-elements/chord-diagrams-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/chord-diagrams-on.png`, settings);
     });
 
     it('parenthesis-on-tied-bends-off', async () => {
@@ -142,7 +142,7 @@ describe('NotationElements', () => {
         settings.notation.elements.set(NotationElement.ParenthesisOnTiedBends, false);
         await VisualTestHelper.runVisualTestTex(
             tex,
-            `features/notation-elements/parenthesis-on-tied-bends-off.png`,
+            `notation-elements/parenthesis-on-tied-bends-off.png`,
             settings
         );
     });
@@ -156,7 +156,7 @@ describe('NotationElements', () => {
         settings.notation.elements.set(NotationElement.ParenthesisOnTiedBends, true);
         await VisualTestHelper.runVisualTestTex(
             tex,
-            `features/notation-elements/parenthesis-on-tied-bends-on.png`,
+            `notation-elements/parenthesis-on-tied-bends-on.png`,
             settings
         );
     });
@@ -170,7 +170,7 @@ describe('NotationElements', () => {
         settings.notation.elements.set(NotationElement.TabNotesOnTiedBends, false);
         await VisualTestHelper.runVisualTestTex(
             tex,
-            `features/notation-elements/tab-notes-on-tied-bends-off.png`,
+            `notation-elements/tab-notes-on-tied-bends-off.png`,
             settings
         );
     });
@@ -184,7 +184,7 @@ describe('NotationElements', () => {
         settings.notation.elements.set(NotationElement.TabNotesOnTiedBends, true);
         await VisualTestHelper.runVisualTestTex(
             tex,
-            `features/notation-elements/tab-notes-on-tied-bends-on.png`,
+            `notation-elements/tab-notes-on-tied-bends-on.png`,
             settings
         );
     });
@@ -198,7 +198,7 @@ describe('NotationElements', () => {
         settings.notation.elements.set(NotationElement.ZerosOnDiveWhammys, false);
         await VisualTestHelper.runVisualTestTex(
             tex,
-            `features/notation-elements/zeros-on-dive-whammys-off.png`,
+            `notation-elements/zeros-on-dive-whammys-off.png`,
             settings
         );
     });
@@ -212,7 +212,7 @@ describe('NotationElements', () => {
         settings.notation.elements.set(NotationElement.ZerosOnDiveWhammys, true);
         await VisualTestHelper.runVisualTestTex(
             tex,
-            `features/notation-elements/zeros-on-dive-whammys-on.png`,
+            `notation-elements/zeros-on-dive-whammys-on.png`,
             settings
         );
     });
@@ -225,7 +225,7 @@ describe('NotationElements', () => {
 
         settings.notation.elements.set(NotationElement.EffectTempo, false);
         settings.notation.elements.set(NotationElement.EffectTripletFeel, false);
-        await VisualTestHelper.runVisualTestTex(tex, `features/notation-elements/effects-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/effects-off.png`, settings);
     });
 
     it('effects-on', async () => {
@@ -236,6 +236,6 @@ describe('NotationElements', () => {
 
         settings.notation.elements.set(NotationElement.EffectTempo, true);
         settings.notation.elements.set(NotationElement.EffectTripletFeel, true);
-        await VisualTestHelper.runVisualTestTex(tex, `features/notation-elements/effects-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/effects-on.png`, settings);
     });
 });
