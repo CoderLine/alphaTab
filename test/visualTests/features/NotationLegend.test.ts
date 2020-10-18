@@ -96,11 +96,11 @@ describe('NotationLegend', () => {
     it('mixed-default', async () => { await runNotationLegendTest(`mixed-default.png`, 121, 7, false); });
     it('mixed-songbook', async () => { await runNotationLegendTest(`mixed-songbook.png`, 121, 7, true); });
 
-    async function runNotationLegendTest(referenceFileName: string, startBar: number, barCount: number, songBook: boolean) {
+    async function runNotationLegendTest(referenceFileName: string, startBar: number, barCount: number, songBook: boolean): Promise<void> {
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
-        settings.display.startBar = startBar,
-            settings.display.barCount = barCount;
+        settings.display.startBar = startBar;
+        settings.display.barCount = barCount;
         if (songBook) {
             settings.setSongBookModeSettings();
         }
