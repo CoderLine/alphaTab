@@ -597,7 +597,7 @@ export class CapellaParser {
         } else {
             this._currentVoiceState = this._voiceStates.get(voiceStateKey)!;
             this._currentBar = this.getOrCreateBar(staff, this._currentVoiceState.currentBarIndex);
-            this._currentVoiceState.currentBarComplete = true;
+            this.ensureVoice(staff, voiceIndex);
         }
 
         // voice tags always start a new bar
@@ -648,6 +648,8 @@ export class CapellaParser {
                             this._currentBar.masterBar.timeSignatureDenominator = this._timeSignature.timeSignatureDenominator;
                             this._currentBar.masterBar.timeSignatureNumerator = this._timeSignature.timeSignatureNumerator;
                             this._currentBar.masterBar.timeSignatureCommon = this._timeSignature.timeSignatureCommon;
+                            // NOTE: capella resets the current bar position to 0 whenever a timeSign is placed
+                            this._currentVoiceState.currentPosition = 0;
                             this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration(
                                 false
                             );
