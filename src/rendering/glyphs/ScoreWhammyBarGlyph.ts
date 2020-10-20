@@ -197,7 +197,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             22,
                             4
                         );
-                        canvas.fill();
                     }
                     break;
                 case WhammyType.Dive:
@@ -232,7 +231,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             22,
                             4
                         );
-                        canvas.fill();
                     }
                     break;
                 case WhammyType.Dip:
@@ -280,7 +278,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                                 22,
                                 4
                             );
-                            canvas.fill();
                         }
                     } else {
                         let middleX: number = (startX + endX) / 2;
