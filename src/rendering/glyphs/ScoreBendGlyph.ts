@@ -162,7 +162,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             22,
                             4
                         );
-                        canvas.fill();
                     } else {
                         this.drawBendSlur(
                             canvas,
@@ -194,7 +193,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             22,
                             4
                         );
-                        canvas.fill();
                     } else {
                         this.drawBendSlur(
                             canvas,

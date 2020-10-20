@@ -44,6 +44,5 @@ export class GhostParenthesisGlyph extends Glyph {
                 3
             );
         }
-        canvas.fill();
     }
 }
