@@ -457,6 +457,9 @@ export class AlphaTabApiBase<TSettings> {
     public set playbackRange(value: PlaybackRange | null) {
         if (this.player) {
             this.player.playbackRange = value;
+            if (this.settings.player.enableCursor) {
+                this.updateSelectionCursor(value);
+            }
         }
     }
 
@@ -798,7 +801,7 @@ export class AlphaTabApiBase<TSettings> {
                         if (
                             nextBeatBoundings &&
                             nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                                barBoundings.staveGroupBounds
+                            barBoundings.staveGroupBounds
                         ) {
                             nextBeatX = nextBeatBoundings.visualBounds.x;
                         }
@@ -960,6 +963,24 @@ export class AlphaTabApiBase<TSettings> {
         (this.beatMouseUp as EventEmitterOfT<Beat | null>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'beatMouseUp', beat, originalEvent);
         this._beatMouseDown = false;
+    }
+
+    private updateSelectionCursor(range: PlaybackRange | null) {
+        if (!this._tickCache) {
+            return;
+        }
+        if(range) {
+            const startBeat = this._tickCache.findBeat(this.tracks, range.startTick);
+            const endBeat = this._tickCache.findBeat(this.tracks, range.endTick);
+            if (startBeat && endBeat) {
+                const selectionStart = new SelectionInfo(startBeat.currentBeat);
+                const selectionEnd = new SelectionInfo(endBeat.currentBeat);
+                this.cursorSelectRange(selectionStart, selectionEnd);
+            }
+        } else {
+            this.cursorSelectRange(null, null);
+        }
+        
     }
 
     private setupClickHandling(): void {
