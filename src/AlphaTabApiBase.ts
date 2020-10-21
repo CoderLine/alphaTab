@@ -965,17 +965,22 @@ export class AlphaTabApiBase<TSettings> {
         this._beatMouseDown = false;
     }
 
-    private updateSelectionCursor(range: PlaybackRange) {
-        if (!range || !this._tickCache) {
+    private updateSelectionCursor(range: PlaybackRange | null) {
+        if (!this._tickCache) {
             return;
         }
-        const startBeat = this._tickCache.findBeat(this.tracks, range.startTick);
-        const endBeat = this._tickCache.findBeat(this.tracks, range.endTick);
-        if (startBeat && endBeat) {
-            const selectionStart = new SelectionInfo(startBeat.currentBeat);
-            const selectionEnd = new SelectionInfo(endBeat.currentBeat);
-            this.cursorSelectRange(selectionStart, selectionEnd);
+        if(range) {
+            const startBeat = this._tickCache.findBeat(this.tracks, range.startTick);
+            const endBeat = this._tickCache.findBeat(this.tracks, range.endTick);
+            if (startBeat && endBeat) {
+                const selectionStart = new SelectionInfo(startBeat.currentBeat);
+                const selectionEnd = new SelectionInfo(endBeat.currentBeat);
+                this.cursorSelectRange(selectionStart, selectionEnd);
+            }
+        } else {
+            this.cursorSelectRange(null, null);
         }
+        
     }
 
     private setupClickHandling(): void {
