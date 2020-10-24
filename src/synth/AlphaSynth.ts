@@ -156,7 +156,7 @@ export class AlphaSynth implements IAlphaSynth {
                 bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
 
                 // tell sequencer to check whether its work is done
-                if (this._sequencer.checkForStop()) {
+                if (this._sequencer.isFinished) {
                     break;
                 }
             }
