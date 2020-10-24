@@ -8,6 +8,7 @@ import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
 import { Logger } from '@src/Logger';
+import { AlphaSynth } from './AlphaSynth';
 
 export class MidiFileSequencerTempoChange {
     public bpm: number;
@@ -113,7 +114,7 @@ export class MidiFileSequencer {
 
         while (this._currentTime < finalTime) {
             if (this.fillMidiEventQueueLimited(finalTime - this._currentTime)) {
-                this._synthesizer.synthesizeSilent();
+                this._synthesizer.synthesizeSilent(AlphaSynth.MicroBufferSize);
             }
         }
 
@@ -196,7 +197,7 @@ export class MidiFileSequencer {
 
     private fillMidiEventQueueLimited(maxMilliseconds: number): boolean {
         let millisecondsPerBuffer: number =
-            (TinySoundFont.MicroBufferSize / this._synthesizer.outSampleRate) * 1000 * this.playbackSpeed;
+            (AlphaSynth.MicroBufferSize / this._synthesizer.outSampleRate) * 1000 * this.playbackSpeed;
         let endTime: number = this.internalEndTime;
         if (maxMilliseconds > 0) {
             // ensure that first microbuffer does not already exceed max time
@@ -207,20 +208,15 @@ export class MidiFileSequencer {
         }
 
         let anyEventsDispatched: boolean = false;
-        for (let i: number = 0; i < TinySoundFont.MicroBufferCount; i++) {
-            this._currentTime += millisecondsPerBuffer;
-            while (
-                this._eventIndex < this._synthData.length &&
-                this._synthData[this._eventIndex].time < this._currentTime &&
-                this._currentTime < endTime
-            ) {
-                this._synthesizer.dispatchEvent(i, this._synthData[this._eventIndex]);
-                this._eventIndex++;
-                anyEventsDispatched = true;
-            }
-            if(this._currentTime >= endTime) {
-                break;   
-            }
+        this._currentTime += millisecondsPerBuffer;
+        while (
+            this._eventIndex < this._synthData.length &&
+            this._synthData[this._eventIndex].time < this._currentTime &&
+            this._currentTime < endTime
+        ) {
+            this._synthesizer.dispatchEvent(this._synthData[this._eventIndex]);
+            this._eventIndex++;
+            anyEventsDispatched = true;
         }
 
         return anyEventsDispatched;
@@ -287,14 +283,16 @@ export class MidiFileSequencer {
         return !this.playbackRange ? this._endTime : this._playbackRangeEndTime;
     }
 
-    public checkForStop(): void {
+    public checkForStop(): boolean {
         if (this._currentTime >= this.internalEndTime) {
             let metronomeVolume: number = this._synthesizer.metronomeVolume;
             this._synthesizer.noteOffAll(true);
             this._synthesizer.resetSoft();
             this._synthesizer.setupMetronomeChannel(metronomeVolume);
             (this.finished as EventEmitter).trigger();
+            return true;
         }
+        return false;
     }
 
     public stop(): void {

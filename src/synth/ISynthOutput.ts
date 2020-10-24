@@ -17,12 +17,6 @@ export interface ISynthOutput {
     open(): void;
 
     /**
-     * Called when the sequencer finished the playback.
-     * This tells the output not to request any samples anymore after the existing buffers are finished.
-     */
-    sequencerFinished(): void;
-
-    /**
      * Called when the output should start the playback.
      */
     play(): void;
@@ -62,9 +56,4 @@ export interface ISynthOutput {
      * Fired when the output needs more samples to be played.
      */
     readonly sampleRequest: IEventEmitter;
-
-    /**
-     * Fired when the last samples after calling SequencerFinished have been played.
-     */
-    readonly finished: IEventEmitter;
 }
