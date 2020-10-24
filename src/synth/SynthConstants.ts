@@ -26,4 +26,7 @@ export class SynthConstants {
      * The pitch wheel value for no pitch change at all.
      */
     public static readonly DefaultPitchWheel: number = SynthConstants.MaxPitchWheel / 2;
+
+    public static readonly MicroBufferCount: number = 32;
+    public static readonly MicroBufferSize: number = 64;
 }

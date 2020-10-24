@@ -20,9 +20,6 @@ import { SynthConstants } from '@src/synth/SynthConstants';
  * play a {@link MidiFile} via a {@link ISynthOutput}.
  */
 export class AlphaSynth implements IAlphaSynth {
-    private static readonly MicroBufferCount: number = 32;
-    public static readonly MicroBufferSize: number = 64; // 64 stereo samples
-
     private _sequencer: MidiFileSequencer;
     private _synthesizer: TinySoundFont;
     private _isSoundFontLoaded: boolean = false;
@@ -148,15 +145,15 @@ export class AlphaSynth implements IAlphaSynth {
         });
         this.output.sampleRequest.on(() => {
             let samples: Float32Array = new Float32Array(
-                AlphaSynth.MicroBufferSize * AlphaSynth.MicroBufferCount * SynthConstants.AudioChannels
+                SynthConstants.MicroBufferSize * SynthConstants.MicroBufferCount * SynthConstants.AudioChannels
             );
             let bufferPos: number = 0;
 
-            for (let i = 0; i < AlphaSynth.MicroBufferCount; i++) {
+            for (let i = 0; i < SynthConstants.MicroBufferCount; i++) {
                 // synthesize buffer
                 this._sequencer.fillMidiEventQueue();
-                this._synthesizer.synthesize(samples, bufferPos, AlphaSynth.MicroBufferSize);
-                bufferPos += AlphaSynth.MicroBufferSize * SynthConstants.AudioChannels;
+                this._synthesizer.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
+                bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
 
                 // tell sequencer to check whether its work is done
                 if (this._sequencer.checkForStop()) {

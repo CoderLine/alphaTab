@@ -8,7 +8,7 @@ import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
 import { Logger } from '@src/Logger';
-import { AlphaSynth } from './AlphaSynth';
+import { SynthConstants } from './SynthConstants';
 
 export class MidiFileSequencerTempoChange {
     public bpm: number;
@@ -114,7 +114,7 @@ export class MidiFileSequencer {
 
         while (this._currentTime < finalTime) {
             if (this.fillMidiEventQueueLimited(finalTime - this._currentTime)) {
-                this._synthesizer.synthesizeSilent(AlphaSynth.MicroBufferSize);
+                this._synthesizer.synthesizeSilent(SynthConstants.MicroBufferSize);
             }
         }
 
@@ -197,7 +197,7 @@ export class MidiFileSequencer {
 
     private fillMidiEventQueueLimited(maxMilliseconds: number): boolean {
         let millisecondsPerBuffer: number =
-            (AlphaSynth.MicroBufferSize / this._synthesizer.outSampleRate) * 1000 * this.playbackSpeed;
+            (SynthConstants.MicroBufferSize / this._synthesizer.outSampleRate) * 1000 * this.playbackSpeed;
         let endTime: number = this.internalEndTime;
         if (maxMilliseconds > 0) {
             // ensure that first microbuffer does not already exceed max time
