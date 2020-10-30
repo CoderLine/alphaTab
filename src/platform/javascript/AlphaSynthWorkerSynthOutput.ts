@@ -9,15 +9,12 @@ import { Environment } from '@src/Environment';
  */
 export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public static readonly CmdOutputPrefix: string = 'alphaSynth.output.';
-    public static readonly CmdOutputSequencerFinished: string =
-        AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'sequencerFinished';
     public static readonly CmdOutputAddSamples: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'addSamples';
     public static readonly CmdOutputPlay: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'play';
     public static readonly CmdOutputPause: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'pause';
     public static readonly CmdOutputResetSamples: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'resetSamples';
     public static readonly CmdOutputSampleRequest: string =
         AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'sampleRequest';
-    public static readonly CmdOutputFinished: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'finished';
     public static readonly CmdOutputSamplesPlayed: string =
         AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'samplesPlayed';
 
@@ -45,9 +42,6 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
             case AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest:
                 (this.sampleRequest as EventEmitter).trigger();
                 break;
-            case AlphaSynthWorkerSynthOutput.CmdOutputFinished:
-                (this.finished as EventEmitter).trigger();
-                break;
             case AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed:
                 (this.samplesPlayed as EventEmitterOfT<number>).trigger(data.samples);
                 break;
@@ -57,13 +51,6 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public readonly ready: IEventEmitter = new EventEmitter();
     public readonly samplesPlayed: IEventEmitterOfT<number> = new EventEmitterOfT<number>();
     public readonly sampleRequest: IEventEmitter = new EventEmitter();
-    public readonly finished: IEventEmitter = new EventEmitter();
-
-    public sequencerFinished(): void {
-        this._worker.postMessage({
-            cmd: 'alphaSynth.output.sequencerFinished'
-        });
-    }
 
     public addSamples(samples: Float32Array): void {
         this._worker.postMessage({

@@ -21,14 +21,12 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
     private _source: AudioBufferSourceNode | null = null;
     private _audioNode: ScriptProcessorNode | null = null;
     private _circularBuffer!: CircularSampleBuffer;
-    private _finished: boolean = false;
 
     public get sampleRate(): number {
         return this._context ? this._context.sampleRate : AlphaSynthWebAudioOutput.PreferredSampleRate;
     }
 
     public open(): void {
-        this._finished = false;
         this.patchIosSampleRate();
         this._circularBuffer = new CircularSampleBuffer(
             AlphaSynthWebAudioOutput.BufferSize * AlphaSynthWebAudioOutput.BufferCount
@@ -75,11 +73,11 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
             context.close();
         }
     }
-    
+
     private createAudioContext(): AudioContext {
-        if('AudioContext' in Environment.globalThis) {
+        if ('AudioContext' in Environment.globalThis) {
             return new AudioContext();
-        } else if('webkitAudioContext' in Environment.globalThis) {
+        } else if ('webkitAudioContext' in Environment.globalThis) {
             return new webkitAudioContext();
         }
         throw new AlphaTabError(AlphaTabErrorType.General, "AudioContext not found");
@@ -101,7 +99,6 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         this._audioNode.onaudioprocess = this.generateSound.bind(this);
         this._circularBuffer.clear();
         this.requestBuffers();
-        this._finished = false;
         this._source = ctx.createBufferSource();
         this._source.buffer = this._buffer;
         this._source.loop = true;
@@ -120,10 +117,6 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
             this._audioNode.disconnect(0);
         }
         this._audioNode = null;
-    }
-
-    public sequencerFinished(): void {
-        this._finished = true;
     }
 
     public addSamples(f: Float32Array): void {
@@ -149,27 +142,18 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         let left: Float32Array = e.outputBuffer.getChannelData(0);
         let right: Float32Array = e.outputBuffer.getChannelData(1);
         let samples: number = left.length + right.length;
-        if (this._circularBuffer.count < samples) {
-            if (this._finished) {
-                (this.finished as EventEmitter).trigger();
-            }
-        } else {
-            let buffer: Float32Array = new Float32Array(samples);
-            this._circularBuffer.read(buffer, 0, buffer.length);
-            let s: number = 0;
-            for (let i: number = 0; i < left.length; i++) {
-                left[i] = buffer[s++];
-                right[i] = buffer[s++];
-            }
-            (this.samplesPlayed as EventEmitterOfT<number>).trigger(left.length);
+        let buffer: Float32Array = new Float32Array(samples);
+        this._circularBuffer.read(buffer, 0, Math.min(buffer.length, this._circularBuffer.count));
+        let s: number = 0;
+        for (let i: number = 0; i < left.length; i++) {
+            left[i] = buffer[s++];
+            right[i] = buffer[s++];
         }
-        if (!this._finished) {
-            this.requestBuffers();
-        }
+        (this.samplesPlayed as EventEmitterOfT<number>).trigger(left.length);
+        this.requestBuffers();
     }
 
     readonly ready: IEventEmitter = new EventEmitter();
     readonly samplesPlayed: IEventEmitterOfT<number> = new EventEmitterOfT<number>();
     readonly sampleRequest: IEventEmitter = new EventEmitter();
-    readonly finished: IEventEmitter = new EventEmitter();
 }

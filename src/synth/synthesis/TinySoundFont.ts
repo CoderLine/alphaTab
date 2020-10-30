@@ -36,11 +36,8 @@ import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
  *   - Support for modulators
  */
 export class TinySoundFont {
-    public static readonly MicroBufferCount: number = 32; // 4069 samples in total
-    public static readonly MicroBufferSize: number = 64; // 64 stereo samples
-
     private _midiEventQueue: SynthEvent[] = [];
-    private _midiEventCounts: Int32Array = new Int32Array(TinySoundFont.MicroBufferCount);
+    private _midiEventCount: number = 0;
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
     private _isAnySolo: boolean = false;
@@ -49,12 +46,12 @@ export class TinySoundFont {
         this.outSampleRate = sampleRate;
     }
 
-    public synthesize(): Float32Array {
-        return this.fillWorkingBuffer(false);
+    public synthesize(buffer: Float32Array, bufferPos: number, sampleCount: number) {
+        this.fillWorkingBuffer(buffer, bufferPos, sampleCount);
     }
 
-    public synthesizeSilent(): void {
-        this.fillWorkingBuffer(true);
+    public synthesizeSilent(sampleCount: number): void {
+        this.fillWorkingBuffer(null, 0, sampleCount);
     }
 
     public channelGetMixVolume(channel: number): number {
@@ -96,57 +93,49 @@ export class TinySoundFont {
         this._isAnySolo = false;
     }
 
-    public dispatchEvent(i: number, synthEvent: SynthEvent): void {
+    public dispatchEvent(synthEvent: SynthEvent): void {
         this._midiEventQueue.unshift(synthEvent);
-        this._midiEventCounts[i]++;
+        this._midiEventCount++;
     }
 
-    private fillWorkingBuffer(silent: boolean): Float32Array {
+    private fillWorkingBuffer(buffer: Float32Array | null, bufferPos: number, sampleCount: number) {
         // Break the process loop into sections representing the smallest timeframe before the midi controls need to be updated
         // the bigger the timeframe the more efficent the process is, but playback quality will be reduced.
-        const buffer: Float32Array = new Float32Array(
-            TinySoundFont.MicroBufferSize * TinySoundFont.MicroBufferCount * SynthConstants.AudioChannels
-        );
-        let bufferPos: number = 0;
         const anySolo: boolean = this._isAnySolo;
 
         // process in micro-buffers
-        for (let x: number = 0; x < TinySoundFont.MicroBufferCount; x++) {
-            // process events for first microbuffer
-            if (this._midiEventQueue.length > 0) {
-                for (let i: number = 0; i < this._midiEventCounts[x]; i++) {
-                    let m: SynthEvent | undefined = this._midiEventQueue.pop();
-                    if (m) {
-                        if (m.isMetronome && this.metronomeVolume > 0) {
-                            this.channelNoteOff(SynthConstants.MetronomeChannel, 33);
-                            this.channelNoteOn(SynthConstants.MetronomeChannel, 33, 95 / 127);
-                        } else if (m.event) {
-                            this.processMidiMessage(m.event);
-                        }
+        // process events for first microbuffer
+        if (this._midiEventQueue.length > 0) {
+            for (let i: number = 0; i < this._midiEventCount; i++) {
+                let m: SynthEvent | undefined = this._midiEventQueue.pop();
+                if (m) {
+                    if (m.isMetronome && this.metronomeVolume > 0) {
+                        this.channelNoteOff(SynthConstants.MetronomeChannel, 33);
+                        this.channelNoteOn(SynthConstants.MetronomeChannel, 33, 95 / 127);
+                    } else if (m.event) {
+                        this.processMidiMessage(m.event);
                     }
                 }
             }
-
-            // voice processing loop
-            for (const voice of this._voices) {
-                if (voice.playingPreset !== -1) {
-                    const channel: number = voice.playingChannel;
-                    // channel is muted if it is either explicitley muted, or another channel is set to solo but not this one.
-                    const isChannelMuted: boolean =
-                        this._mutedChannels.has(channel) || (anySolo && !this._soloChannels.has(channel));
-
-                    if (silent) {
-                        voice.kill();
-                    } else {
-                        voice.render(this, buffer, bufferPos, 64, isChannelMuted);
-                    }
-                }
-            }
-            bufferPos += TinySoundFont.MicroBufferSize * SynthConstants.AudioChannels;
         }
 
-        this._midiEventCounts.fill(0);
-        return buffer;
+        // voice processing loop
+        for (const voice of this._voices) {
+            if (voice.playingPreset !== -1) {
+                const channel: number = voice.playingChannel;
+                // channel is muted if it is either explicitley muted, or another channel is set to solo but not this one.
+                const isChannelMuted: boolean =
+                    this._mutedChannels.has(channel) || (anySolo && !this._soloChannels.has(channel));
+
+                if (!buffer) {
+                    voice.kill();
+                } else {
+                    voice.render(this, buffer, bufferPos, sampleCount, isChannelMuted);
+                }
+            }
+        }
+
+        this._midiEventCount = 0;
     }
 
     private processMidiMessage(e: MidiEvent): void {
