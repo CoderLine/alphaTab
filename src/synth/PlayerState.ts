@@ -9,5 +9,9 @@ export enum PlayerState {
     /**
      * Player is playing
      */
-    Playing
+    Playing,
+    /**
+     * Player is playing a one time midi sequence. 
+     */
+    PlayingOneTimeMidi
 }

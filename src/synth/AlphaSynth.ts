@@ -173,7 +173,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public play(): boolean {
-        if (this.state === PlayerState.Playing || !this._isMidiLoaded) {
+        if (this.state !== PlayerState.Paused || !this._isMidiLoaded) {
             return false;
         }
         this.output.activate();
@@ -201,7 +201,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public playPause(): void {
-        if (this.state === PlayerState.Playing || !this._isMidiLoaded) {
+        if (this.state !== PlayerState.Paused || !this._isMidiLoaded) {
             this.pause();
         } else {
             this.play();
@@ -221,6 +221,17 @@ export class AlphaSynth implements IAlphaSynth {
         (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
             new PlayerStateChangedEventArgs(this.state, true)
         );
+    }
+    
+    public playOneTimeMidiFile(midi: MidiFile, continueAfterFinish: boolean): void {
+        // pause current playback.
+        this.pause();
+        this._sequencer.loadOneTimeMidi(midi);
+        this.state = PlayerState.PlayingOneTimeMidi;
+        (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
+            new PlayerStateChangedEventArgs(this.state, false)
+        );
+        this.output.play();
     }
 
     public resetSoundFonts(): void {

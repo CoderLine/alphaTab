@@ -90,6 +90,9 @@ export class AlphaSynthWebWorker {
             case 'alphaSynth.stop':
                 this._player.stop();
                 break;
+            case 'alphaSynth.playOneTimeMidiFile':
+                this._player.playOneTimeMidiFile(JsonConverter.jsObjectToMidiFile(data.midi), data.continueAfterFinish);
+                break;
             case 'alphaSynth.loadSoundFontBytes':
                 this._player.loadSoundFont(data.data, data.append);
                 break;

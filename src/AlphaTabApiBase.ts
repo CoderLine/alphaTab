@@ -40,6 +40,8 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { AutomationType } from './model/Automation';
+import { ControllerType } from './midi/ControllerType';
 
 class SelectionInfo {
     public beat: Beat;
@@ -637,6 +639,25 @@ export class AlphaTabApiBase<TSettings> {
         this.player.stop();
     }
 
+    /**
+     * Triggers the play of the given beat. This will stop the any other current ongoing playback.
+     * @param beat the single beat to play
+     */
+    public playBeat(beat: Beat): void {
+        if (!this.player) {
+            return;
+        }
+
+        // we generate a new midi file containing only the beat
+        let midiFile: MidiFile = new MidiFile();
+        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        let generator: MidiFileGenerator = new MidiFileGenerator(beat.voice.bar.staff.track.score, this.settings, handler);
+        generator.generateSingleBeat(beat);
+
+        this.player.playOneTimeMidiFile(midiFile);
+    }
+
+
     private _cursorWrapper: IContainer | null = null;
     private _barCursor: IContainer | null = null;
     private _beatCursor: IContainer | null = null;
@@ -969,7 +990,7 @@ export class AlphaTabApiBase<TSettings> {
         if (!this._tickCache) {
             return;
         }
-        if(range) {
+        if (range) {
             const startBeat = this._tickCache.findBeat(this.tracks, range.startTick);
             const endBeat = this._tickCache.findBeat(this.tracks, range.endTick);
             if (startBeat && endBeat) {
@@ -980,7 +1001,7 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             this.cursorSelectRange(null, null);
         }
-        
+
     }
 
     private setupClickHandling(): void {

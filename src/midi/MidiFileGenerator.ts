@@ -157,7 +157,7 @@ export class MidiFileGenerator {
         this._handler.addProgramChange(track.index, 0, channel, playbackInfo.program);
     }
 
-    private static toChannelShort(data: number): number {
+    public static toChannelShort(data: number): number {
         const value: number = Math.max(-32768, Math.min(32767, data * 8 - 1));
         return Math.max(value, -1) + 1;
     }
@@ -1264,5 +1264,61 @@ export class MidiFileGenerator {
                 );
                 break;
         }
+    }
+
+    public generateSingleBeat(beat: Beat) {
+        // collect tempo and program at given beat
+        let tempo = -1;
+        let program = -1;
+
+        // traverse to previous beats until we maybe hit the automations needed
+        let currentBeat: Beat | null = beat;
+        while (currentBeat && (tempo === -1 || program === -1)) {
+            for (const automation of beat.automations) {
+                switch (automation.type) {
+                    case AutomationType.Instrument:
+                        program = automation.value;
+                        break;
+                    case AutomationType.Tempo:
+                        tempo = automation.value;
+                        break;
+                }
+            }
+            currentBeat = currentBeat.previousBeat;
+        }
+
+        const track = beat.voice.bar.staff.track;
+        const masterBar = beat.voice.bar.masterBar;
+        if (tempo === -1) {
+            tempo = masterBar.score.tempo;
+        }
+
+        if (program === -1) {
+            program = track.playbackInfo.program;
+        }
+
+        const volume = track.playbackInfo.volume;
+
+        // setup channel
+        this.generateTrack(track);
+        this._handler.addTimeSignature(0, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
+        this._handler.addTempo(0, tempo);
+
+        this._handler.addControlChange(
+            0,
+            0,
+            track.playbackInfo.primaryChannel,
+            ControllerType.VolumeCoarse,
+            volume
+        );
+        this._handler.addControlChange(
+            0,
+            0,
+            track.playbackInfo.secondaryChannel,
+            ControllerType.VolumeCoarse,
+            volume
+        );
+
+        this.generateBeat(beat, -beat.playbackStart /* to bring it to 0*/, beat.voice.bar);
     }
 }
