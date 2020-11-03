@@ -9,7 +9,6 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
-import {AlphaTabError} from "@src/AlphaTabError";
 
 /**
  * The ScoreLoader enables you easy loading of Scores using all
