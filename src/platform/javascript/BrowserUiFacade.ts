@@ -124,7 +124,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             settings = new Settings();
             settings.fillFromJson(raw);
         }
-        
+
         let dataAttributes: Map<string, unknown> = this.getDataAttributes();
         settings.fillFromDataAttributes(dataAttributes);
         if (settings.notation.notationMode === NotationMode.SongBook) {
@@ -136,7 +136,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             api.container.resize.on(this.showSvgsInViewPort.bind(this));
         }
         this.setupFontCheckers(settings);
-      
+
         this._initialTrackIndexes = this.parseTracks(settings.core.tracks);
         this._contents = '';
         let element: HtmlElementContainer = api.container as HtmlElementContainer;
@@ -229,7 +229,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             return true;
         }
         if (typeof data === 'string') {
-            ScoreLoader.loadScoreAsync(data, success, error, this._api.settings);
+            ScoreLoader.loadScoreAsync(data, this._api.settings)
+                .then(success)
+                .catch(error);
             return true;
         }
         return false;
@@ -270,15 +272,13 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             } else if (this._file) {
                 ScoreLoader.loadScoreAsync(
                     this._file,
-                    s => {
-                        this._api.renderScore(s, this._initialTrackIndexes ?? undefined);
-                        this._initialTrackIndexes = null;
-                    },
-                    e => {
-                        this._api.onError(e as Error);
-                    },
                     this._api.settings
-                );
+                ).then(s => {
+                    this._api.renderScore(s, this._initialTrackIndexes ?? undefined);
+                    this._initialTrackIndexes = null;
+                }).catch(e => {
+                    this._api.onError(e as Error);
+                });
             }
         });
     }
