@@ -9,6 +9,7 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
+import {AlphaTabError} from "@src/AlphaTabError";
 
 /**
  * The ScoreLoader enables you easy loading of Scores using all
@@ -26,7 +27,7 @@ export class ScoreLoader {
         path: string,
         settings?: Settings
     ): Promise<Score> {
-        return new Promise((resolve, reject) => {
+        return new Promise<Score>((resolve, reject) => {
             let xhr: XMLHttpRequest = new XMLHttpRequest();
             xhr.open('GET', path, true, null, null);
             xhr.responseType = 'arraybuffer';
