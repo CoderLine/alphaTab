@@ -856,4 +856,18 @@ describe('Gp7ImporterTest', () => {
         );
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].notes[0].fret).toEqual(20);
     });
+
+    it('beat-lyrics', async () => {
+        const reader = await prepareGp7ImporterWithFile('guitarpro7/beat-lyrics.gp');
+        let score: Score = reader.readScore();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].lyrics![0]).toBe("This");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics![0]).toBe("is");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).toBe("a");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![0]).toBe("test file");
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].lyrics![0]).toBe("for");
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].lyrics![0]).toBe("lyrics");
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].lyrics).toBe(null);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].lyrics).toBe(null);
+    });
+
 });

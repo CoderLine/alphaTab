@@ -92,6 +92,7 @@ export class GpifParser {
     private _lyricsByTrack!: Map<string, Lyrics[]>;
     private _hasAnacrusis: boolean = false;
     private _articulationByName!: Map<string, InstrumentArticulation>;
+    private _skipApplyLyrics: boolean = false;
 
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<string, Automation[]>();
@@ -110,6 +111,8 @@ export class GpifParser {
         this._noteById = new Map<string, Note>();
         this._tappedNotes = new Map<string, boolean>();
         this._lyricsByTrack = new Map<string, Lyrics[]>();
+        this._skipApplyLyrics = false;
+
         let dom: XmlDocument;
         try {
             dom = new XmlDocument(xml);
@@ -120,7 +123,7 @@ export class GpifParser {
         this.parseDom(dom);
         this.buildModel();
         this.score.finish(settings);
-        if (this._lyricsByTrack.size > 0) {
+        if (!this._skipApplyLyrics && this._lyricsByTrack.size > 0) {
             this._lyricsByTrack.forEach((lyrics, t) => {
                 let track: Track = this._tracksById.get(t)!;
                 track.applyLyrics(lyrics);
@@ -1396,10 +1399,30 @@ export class GpifParser {
                                 break;
                         }
                         break;
+                    case 'Lyrics':
+                        beat.lyrics = this.parseBeatLyrics(c);
+                        this._skipApplyLyrics = true;
+                        break;
                 }
             }
         }
         this._beatById.set(beatId, beat);
+    }
+
+    private parseBeatLyrics(node: XmlNode): string[] | null {
+        const lines: string[] = [];
+
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'Line':
+                        lines.push(c.innerText);
+                        break;
+                }
+            }
+        }
+
+        return lines;
     }
 
     private parseBeatXProperties(node: XmlNode, beat: Beat): void {
