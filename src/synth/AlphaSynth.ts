@@ -223,7 +223,7 @@ export class AlphaSynth implements IAlphaSynth {
         );
     }
     
-    public playOneTimeMidiFile(midi: MidiFile, continueAfterFinish: boolean): void {
+    public playOneTimeMidiFile(midi: MidiFile): void {
         // pause current playback.
         this.pause();
         this._sequencer.loadOneTimeMidi(midi);

@@ -134,6 +134,7 @@ export class MidiFileSequencer {
 
     public loadOneTimeMidi(midiFile: MidiFile): void {
         this._oneTimeState = this.createStateFromFile(midiFile);
+        this._currentState = this._oneTimeState;
     }
 
     public loadMidi(midiFile: MidiFile): void {

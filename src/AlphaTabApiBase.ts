@@ -654,7 +654,7 @@ export class AlphaTabApiBase<TSettings> {
         let generator: MidiFileGenerator = new MidiFileGenerator(beat.voice.bar.staff.track.score, this.settings, handler);
         generator.generateSingleBeat(beat);
 
-        this.player.playOneTimeMidiFile(midiFile);
+        this.player.playOneTimeMidiFile(midiFile, false);
     }
 
 

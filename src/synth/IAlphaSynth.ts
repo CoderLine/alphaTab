@@ -95,10 +95,8 @@ export interface IAlphaSynth {
     /**
      * Stops any ongoing playback and plays the given midi file instead. 
      * @param midi The midi file to play
-     * @param continueAfterFinish if set to true, the normal playback of the 
-     * song will continue/start after the given midi is finisehd. 
      */
-    playOneTimeMidiFile(midi: MidiFile, continueAfterFinish: boolean): void;
+    playOneTimeMidiFile(midi: MidiFile): void;
 
     /**
      * Loads a soundfont from the given data
