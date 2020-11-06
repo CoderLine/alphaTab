@@ -232,11 +232,10 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public playOneTimeMidiFile(midi: MidiFile, continueAfterFinish: boolean): void {
+    public playOneTimeMidiFile(midi: MidiFile): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.playOneTimeMidiFile',
-            midi: JsonConverter.midiFileToJsObject(midi),
-            continueAfterFinish: continueAfterFinish
+            midi: JsonConverter.midiFileToJsObject(midi)
         });
     }
 

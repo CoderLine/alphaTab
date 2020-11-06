@@ -40,8 +40,6 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { AutomationType } from './model/Automation';
-import { ControllerType } from './midi/ControllerType';
 
 class SelectionInfo {
     public beat: Beat;
@@ -654,7 +652,7 @@ export class AlphaTabApiBase<TSettings> {
         let generator: MidiFileGenerator = new MidiFileGenerator(beat.voice.bar.staff.track.score, this.settings, handler);
         generator.generateSingleBeat(beat);
 
-        this.player.playOneTimeMidiFile(midiFile, false);
+        this.player.playOneTimeMidiFile(midiFile);
     }
 
 

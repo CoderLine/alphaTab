@@ -1304,19 +1304,21 @@ export class MidiFileGenerator {
         this._handler.addTimeSignature(0, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
         this._handler.addTempo(0, tempo);
 
+     
+        let volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
         this._handler.addControlChange(
             0,
             0,
             track.playbackInfo.primaryChannel,
             ControllerType.VolumeCoarse,
-            volume
+            volumeCoarse
         );
         this._handler.addControlChange(
             0,
             0,
             track.playbackInfo.secondaryChannel,
             ControllerType.VolumeCoarse,
-            volume
+            volumeCoarse
         );
 
         this.generateBeat(beat, -beat.playbackStart /* to bring it to 0*/, beat.voice.bar);

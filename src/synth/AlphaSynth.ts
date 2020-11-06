@@ -231,8 +231,14 @@ export class AlphaSynth implements IAlphaSynth {
     public playOneTimeMidiFile(midi: MidiFile): void {
         // pause current playback.
         this.pause();
+        
         this._sequencer.loadOneTimeMidi(midi);
         this.state = PlayerState.PlayingOneTimeMidi;
+        
+        this._sequencer.stop();
+        this._synthesizer.noteOffAll(true);
+        this.tickPosition = 0;
+
         (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
             new PlayerStateChangedEventArgs(this.state, false)
         );
@@ -315,7 +321,6 @@ export class AlphaSynth implements IAlphaSynth {
     private onSamplesPlayed(sampleCount: number): void {
         let playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
         this.updateTimePosition(this._timePosition + playedMillis);
-
         this.checkForFinish();
     }
 
@@ -331,12 +336,17 @@ export class AlphaSynth implements IAlphaSynth {
 
         if (this._tickPosition >= endTick) {
             Logger.debug('AlphaSynth', 'Finished playback');
-            (this.finished as EventEmitter).trigger();
-
-            if (this.isLooping) {
-                this.tickPosition = startTick;
+            if(this.state === PlayerState.PlayingOneTimeMidi) {
+                this._sequencer.resetOneTimeMidi();
+                this.pause();
             } else {
-                this.stop();
+                (this.finished as EventEmitter).trigger();
+
+                if (this.isLooping) {
+                    this.tickPosition = startTick;
+                } else {
+                    this.stop();
+                }
             }
         }
     }
@@ -347,13 +357,16 @@ export class AlphaSynth implements IAlphaSynth {
         const currentTick: number = (this._tickPosition = this._sequencer.timePositionToTickPosition(currentTime));
         const endTime: number = this._sequencer.endTime;
         const endTick: number = this._sequencer.endTick;
-        Logger.debug(
-            'AlphaSynth',
-            `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount}`
-        );
-        (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-            new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick)
-        );
+
+        if(this.state !== PlayerState.PlayingOneTimeMidi) {
+            Logger.debug(
+                'AlphaSynth',
+                `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount}`
+            );
+            (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
+                new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick)
+            );
+        }
     }
 
     readonly ready: IEventEmitter = new EventEmitter();

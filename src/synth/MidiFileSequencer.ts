@@ -122,15 +122,9 @@ export class MidiFileSequencer {
         let start: number = Date.now();
         let finalTime: number = this._currentState.currentTime + milliseconds;
 
-<<<<<<< HEAD
         while (this._currentState.currentTime < finalTime) {
             if (this.fillMidiEventQueueLimited(finalTime - this._currentState.currentTime)) {
-                this._synthesizer.synthesizeSilent();
-=======
-        while (this._currentTime < finalTime) {
-            if (this.fillMidiEventQueueLimited(finalTime - this._currentTime)) {
                 this._synthesizer.synthesizeSilent(SynthConstants.MicroBufferSize);
->>>>>>> develop
             }
         }
 
@@ -145,6 +139,7 @@ export class MidiFileSequencer {
 
     public loadMidi(midiFile: MidiFile): void {
         this._mainState = this.createStateFromFile(midiFile);
+        this._currentState = this._mainState;
     }
 
     public createStateFromFile(midiFile: MidiFile): MidiSequencerState {
@@ -237,32 +232,15 @@ export class MidiFileSequencer {
         }
 
         let anyEventsDispatched: boolean = false;
-<<<<<<< HEAD
-        for (let i: number = 0; i < TinySoundFont.MicroBufferCount; i++) {
-            this._currentState.currentTime += millisecondsPerBuffer;
-            while (
-                this._currentState.eventIndex < this._currentState.synthData.length &&
-                this._currentState.synthData[this._currentState.eventIndex].time < this._currentState.currentTime &&
-                this._currentState.currentTime < endTime
-            ) {
-                this._synthesizer.dispatchEvent(i, this._currentState.synthData[this._currentState.eventIndex]);
-                this._currentState.eventIndex++;
-                anyEventsDispatched = true;
-            }
-            if (this._currentState.currentTime >= endTime) {
-                break;
-            }
-=======
-        this._currentTime += millisecondsPerBuffer;
+        this._currentState.currentTime += millisecondsPerBuffer;
         while (
-            this._eventIndex < this._synthData.length &&
-            this._synthData[this._eventIndex].time < this._currentTime &&
-            this._currentTime < endTime
+            this._currentState.eventIndex < this._currentState.synthData.length &&
+            this._currentState.synthData[this._currentState.eventIndex].time < this._currentState.currentTime &&
+            this._currentState.currentTime < endTime
         ) {
-            this._synthesizer.dispatchEvent(this._synthData[this._eventIndex]);
-            this._eventIndex++;
+            this._synthesizer.dispatchEvent(this._currentState.synthData[this._currentState.eventIndex]);
+            this._currentState.eventIndex++;
             anyEventsDispatched = true;
->>>>>>> develop
         }
 
         return anyEventsDispatched;
@@ -340,4 +318,9 @@ export class MidiFileSequencer {
             this._currentState.eventIndex = 0;
         }
     }
+
+    public resetOneTimeMidi() {
+        this._oneTimeState = null;
+        this._currentState = this._mainState;
+    }    
 }
