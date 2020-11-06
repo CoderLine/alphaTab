@@ -1,0 +1,74 @@
+---
+title: playBeat
+category: Methods - Player
+description: Triggers the play of the given beat.
+sidebarPath: /docs/reference/api
+since:  1.1.0-alpha.54
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Triggers the play of the given beat. This will stop the any other current ongoing playback.
+This method can be used in applications when individual beats need to be played for lesson or editor style purposes. 
+The player will not report any change in state or playback position during the playback of the requested beat. 
+It is a playback of audio separate to the main song playback. 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="js" name="function playBeat(beat)" />
+    <TypeRow type="jquery" name="alphaTab('playBeat', beat)" />
+    <TypeRow type="net" name="void PlayBeat(Beat beat)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="js" name="beat" type="alphaTab.model.Beat">
+        The single beat to play.
+    </ParameterRow>
+    <ParameterRow platform="net" name="beat" type="AlphaTab.Model.Beat">
+        The single beat to play.
+    </ParameterRow>
+</ParameterTable>
+
+
+### Returns
+
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.playBeat(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0]);
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+var beat = $('#alphaTab').alphaTab('score').tracks[0].staves[0].bars[0].voices[0].beats[0];
+$('#alphaTab').alphaTab('playBeat', beat);
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.PlayBeat(api.Score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0]);
+```
+
+</TabItem>
+</Tabs>
