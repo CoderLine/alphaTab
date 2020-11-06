@@ -44,6 +44,10 @@ export class MidiFileSequencer {
     private _currentState: MidiSequencerState;
     private _mainState: MidiSequencerState;
     private _oneTimeState: MidiSequencerState | null = null;
+    
+    public get isPlayingOneTimeMidi(): boolean {
+        return this._currentState == this._oneTimeState;
+    }
 
     public constructor(synthesizer: TinySoundFont) {
         this._synthesizer = synthesizer;

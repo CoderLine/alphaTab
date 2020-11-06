@@ -233,7 +233,6 @@ export class AlphaSynth implements IAlphaSynth {
         this.pause();
         
         this._sequencer.loadOneTimeMidi(midi);
-        this.state = PlayerState.PlayingOneTimeMidi;
         
         this._sequencer.stop();
         this._synthesizer.noteOffAll(true);
@@ -336,7 +335,7 @@ export class AlphaSynth implements IAlphaSynth {
 
         if (this._tickPosition >= endTick) {
             Logger.debug('AlphaSynth', 'Finished playback');
-            if(this.state === PlayerState.PlayingOneTimeMidi) {
+            if(this._sequencer.isPlayingOneTimeMidi) {
                 this._sequencer.resetOneTimeMidi();
                 this.pause();
             } else {
@@ -358,7 +357,7 @@ export class AlphaSynth implements IAlphaSynth {
         const endTime: number = this._sequencer.endTime;
         const endTick: number = this._sequencer.endTick;
 
-        if(this.state !== PlayerState.PlayingOneTimeMidi) {
+        if(!this._sequencer.isPlayingOneTimeMidi) {
             Logger.debug(
                 'AlphaSynth',
                 `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount}`

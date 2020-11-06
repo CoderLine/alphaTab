@@ -157,7 +157,7 @@ export class MidiFileGenerator {
         this._handler.addProgramChange(track.index, 0, channel, playbackInfo.program);
     }
 
-    public static toChannelShort(data: number): number {
+    private static toChannelShort(data: number): number {
         const value: number = Math.max(-32768, Math.min(32767, data * 8 - 1));
         return Math.max(value, -1) + 1;
     }
