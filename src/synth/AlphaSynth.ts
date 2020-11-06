@@ -143,30 +143,35 @@ export class AlphaSynth implements IAlphaSynth {
             (this.ready as EventEmitter).trigger();
             this.checkReadyForPlayback();
         });
-        this.output.finished.on(() => {
-            // stop everything
-            this.stop();
-            Logger.debug('AlphaSynth', 'Finished playback');
-            (this.finished as EventEmitter).trigger();
-            if (this._sequencer.isLooping) {
-                this.play();
-            }
-        });
         this.output.sampleRequest.on(() => {
-            // synthesize buffer
-            this._sequencer.fillMidiEventQueue();
-            let samples: Float32Array = this._synthesizer.synthesize();
+            let samples: Float32Array = new Float32Array(
+                SynthConstants.MicroBufferSize * SynthConstants.MicroBufferCount * SynthConstants.AudioChannels
+            );
+            let bufferPos: number = 0;
+
+            for (let i = 0; i < SynthConstants.MicroBufferCount; i++) {
+                // synthesize buffer
+                this._sequencer.fillMidiEventQueue();
+                this._synthesizer.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
+                bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
+
+                // tell sequencer to check whether its work is done
+                if (this._sequencer.isFinished) {
+                    break;
+                }
+            }
+
             // send it to output
+            if (bufferPos < samples.length) {
+                samples = samples.subarray(0, bufferPos);
+            }
             this.output.addSamples(samples);
-            // tell sequencer to check whether its work is done
-            this._sequencer.checkForStop();
         });
         this.output.samplesPlayed.on(this.onSamplesPlayed.bind(this));
 
         Logger.debug('AlphaSynth', 'Creating synthesizer');
         this._synthesizer = new TinySoundFont(this.output.sampleRate);
         this._sequencer = new MidiFileSequencer(this._synthesizer);
-        this._sequencer.finished.on(this.output.sequencerFinished.bind(this.output));
 
         Logger.debug('AlphaSynth', 'Opening output');
         this.output.open();
@@ -241,7 +246,7 @@ export class AlphaSynth implements IAlphaSynth {
         (this.soundFontLoaded as EventEmitter).trigger();
     }
 
-    public loadSoundFont(data: Uint8Array, append:boolean): void {
+    public loadSoundFont(data: Uint8Array, append: boolean): void {
         this.pause();
 
         let input: ByteBuffer = ByteBuffer.fromBuffer(data);
@@ -310,6 +315,30 @@ export class AlphaSynth implements IAlphaSynth {
     private onSamplesPlayed(sampleCount: number): void {
         let playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
         this.updateTimePosition(this._timePosition + playedMillis);
+
+        this.checkForFinish();
+    }
+
+    private checkForFinish() {
+        let startTick = 0;
+        let endTick = 0;
+        if (this.playbackRange) {
+            startTick = this.playbackRange.startTick;
+            endTick = this.playbackRange.endTick;
+        } else {
+            endTick = this._sequencer.endTick;
+        }
+
+        if (this._tickPosition >= endTick) {
+            Logger.debug('AlphaSynth', 'Finished playback');
+            (this.finished as EventEmitter).trigger();
+
+            if (this.isLooping) {
+                this.tickPosition = startTick;
+            } else {
+                this.stop();
+            }
+        }
     }
 
     private updateTimePosition(timePosition: number): void {
@@ -320,7 +349,7 @@ export class AlphaSynth implements IAlphaSynth {
         const endTick: number = this._sequencer.endTick;
         Logger.debug(
             'AlphaSynth',
-            `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTime}, Active Voices: ${this._synthesizer.activeVoiceCount}`
+            `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount}`
         );
         (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
             new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick)

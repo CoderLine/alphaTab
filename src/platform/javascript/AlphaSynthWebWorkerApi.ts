@@ -174,7 +174,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._output.ready.on(this.onOutputReady.bind(this));
         this._output.samplesPlayed.on(this.onOutputSamplesPlayed.bind(this));
         this._output.sampleRequest.on(this.onOutputSampleRequest.bind(this));
-        this._output.finished.on(this.onOutputFinished.bind(this));
         this._output.open();
         try {
             let script: string = "importScripts('" + alphaSynthScriptFile + "')";
@@ -357,9 +356,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 this.checkReadyForPlayback();
                 (this.midiLoadFailed as EventEmitterOfT<Error>).trigger(data.error);
                 break;
-            case 'alphaSynth.output.sequencerFinished':
-                this._output.sequencerFinished();
-                break;
             case 'alphaSynth.output.addSamples':
                 this._output.addSamples(data.samples);
                 break;
@@ -408,13 +404,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
             cmd: 'alphaSynth.output.sampleRequest'
         });
     }
-
-    public onOutputFinished(): void {
-        this._synth.postMessage({
-            cmd: 'alphaSynth.output.finished'
-        });
-    }
-
     public onOutputSamplesPlayed(samples: number): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.output.samplesPlayed',

@@ -18,7 +18,6 @@ namespace AlphaTab
 
         private DirectSoundOut _context;
         private CircularSampleBuffer _circularBuffer;
-        private bool _finished;
 
         /// <inheritdoc />
         public double SampleRate => PreferredSampleRate;
@@ -42,7 +41,6 @@ namespace AlphaTab
         /// <inheritdoc />
         public void Open()
         {
-            _finished = false;
             _circularBuffer = new CircularSampleBuffer(BufferSize * BufferCount);
 
             _context = new DirectSoundOut(100);
@@ -62,7 +60,6 @@ namespace AlphaTab
         /// </summary>
         public void Close()
         {
-            _finished = true;
             _context.Stop();
             _circularBuffer.Clear();
             _context.Dispose();
@@ -72,7 +69,6 @@ namespace AlphaTab
         public void Play()
         {
             RequestBuffers();
-            _finished = false;
             _context.Play();
         }
 
@@ -80,12 +76,6 @@ namespace AlphaTab
         public void Pause()
         {
             _context.Pause();
-        }
-
-        /// <inheritdoc />
-        public void SequencerFinished()
-        {
-            _finished = true;
         }
 
         /// <inheritdoc />
@@ -117,29 +107,16 @@ namespace AlphaTab
         /// <inheritdoc />
         public override int Read(float[] buffer, int offset, int count)
         {
-            if (_circularBuffer.Count < count)
-            {
-                if (_finished)
-                {
-                    ((EventEmitter) Finished).Trigger();
-                }
-            }
-            else
-            {
-                var read = new Float32Array(count);
-                _circularBuffer.Read(read, 0, read.Length);
+            var read = new Float32Array(count);
+            _circularBuffer.Read(read, 0, System.Math.Min(read.Length, _circularBuffer.Count));
 
-                Buffer.BlockCopy(read.Data, 0, buffer, offset * sizeof(float),
-                    count * sizeof(float));
+            Buffer.BlockCopy(read.Data, 0, buffer, offset * sizeof(float),
+                count * sizeof(float));
 
-                var samples = count / 2;
-                ((EventEmitterOfT<double>) SamplesPlayed).Trigger(samples);
-            }
+            var samples = count / 2;
+            ((EventEmitterOfT<double>) SamplesPlayed).Trigger(samples);
 
-            if (!_finished)
-            {
-                RequestBuffers();
-            }
+            RequestBuffers();
 
             return count;
         }
@@ -152,8 +129,5 @@ namespace AlphaTab
 
         /// <inheritdoc />
         public IEventEmitter SampleRequest { get; } = new EventEmitter();
-
-        /// <inheritdoc />
-        public IEventEmitter Finished { get; } = new EventEmitter();
     }
 }

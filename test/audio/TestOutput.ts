@@ -2,7 +2,6 @@ import { ISynthOutput } from '@src/synth/ISynthOutput';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 
 export class TestOutput implements ISynthOutput {
-    private _finished: boolean = false;
     public samples: number[] = [];
 
     public get sampleRate(): number {
@@ -14,20 +13,12 @@ export class TestOutput implements ISynthOutput {
         (this.ready as EventEmitter).trigger();
     }
 
-    public sequencerFinished(): void {
-        this._finished = true;
-    }
-
     public play(): void {
         // nothing to do
     }
 
     public next(): void {
-        if (this._finished) {
-            (this.finished as EventEmitter).trigger();
-        } else {
-            (this.sampleRequest as EventEmitter).trigger();
-        }
+        (this.sampleRequest as EventEmitter).trigger();
     }
 
     public pause(): void {
@@ -63,9 +54,4 @@ export class TestOutput implements ISynthOutput {
      * Fired when the output needs more samples to be played.
      */
     readonly sampleRequest: IEventEmitter = new EventEmitter();
-
-    /**
-     * Fired when the last samples after calling SequencerFinished have been played.
-     */
-    readonly finished: IEventEmitter = new EventEmitter();
 }

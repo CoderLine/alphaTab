@@ -10,6 +10,7 @@ import { VoiceEnvelope, VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceE
 import { VoiceLfo } from '@src/synth/synthesis/VoiceLfo';
 import { VoiceLowPass } from '@src/synth/synthesis/VoiceLowPass';
 import { SynthHelper } from '@src/synth/SynthHelper';
+import { SynthConstants } from '../SynthConstants';
 import { Channel } from './Channel';
 
 export class Voice {
@@ -18,7 +19,7 @@ export class Voice {
      * Increasing the value significantly lowers the CPU usage of the voice rendering.
      * If LFO affects the low-pass filter it can be hearable even as low as 8.
      */
-    private static readonly RenderEffectSampleBLock: number = 64;
+    private static readonly RenderEffectSampleBlock: number = SynthConstants.MicroBufferSize;
 
     public playingPreset: number = 0;
     public playingKey: number = 0;
@@ -180,7 +181,7 @@ export class Voice {
             let gainMono: number;
             let gainLeft: number;
             let gainRight: number = 0;
-            let blockSamples: number = numSamples > Voice.RenderEffectSampleBLock ? Voice.RenderEffectSampleBLock : numSamples;
+            let blockSamples: number = numSamples > Voice.RenderEffectSampleBlock ? Voice.RenderEffectSampleBlock : numSamples;
             numSamples -= blockSamples;
 
             if (dynamicLowpass) {
