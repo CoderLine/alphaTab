@@ -40,6 +40,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { Note } from './model/Note';
 
 class SelectionInfo {
     public beat: Beat;
@@ -651,6 +652,24 @@ export class AlphaTabApiBase<TSettings> {
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
         let generator: MidiFileGenerator = new MidiFileGenerator(beat.voice.bar.staff.track.score, this.settings, handler);
         generator.generateSingleBeat(beat);
+
+        this.player.playOneTimeMidiFile(midiFile);
+    }
+
+    /**
+     * Triggers the play of the given note. This will stop the any other current ongoing playback.
+     * @param beat the single note to play
+     */
+    public playNote(note: Note): void {
+        if (!this.player) {
+            return;
+        }
+
+        // we generate a new midi file containing only the beat
+        let midiFile: MidiFile = new MidiFile();
+        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        let generator: MidiFileGenerator = new MidiFileGenerator(note.beat.voice.bar.staff.track.score, this.settings, handler);
+        generator.generateSingleNote(note);
 
         this.player.playOneTimeMidiFile(midiFile);
     }

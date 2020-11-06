@@ -337,7 +337,9 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'Finished playback');
             if(this._sequencer.isPlayingOneTimeMidi) {
                 this._sequencer.resetOneTimeMidi();
-                this.pause();
+                this.state = PlayerState.Paused;
+                this.output.pause();
+                this._synthesizer.noteOffAll(false);
             } else {
                 (this.finished as EventEmitter).trigger();
 

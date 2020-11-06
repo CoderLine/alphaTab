@@ -1266,61 +1266,70 @@ export class MidiFileGenerator {
         }
     }
 
+    public prepareSingleBeat(beat: Beat) {
+         // collect tempo and program at given beat
+         let tempo = -1;
+         let program = -1;
+ 
+         // traverse to previous beats until we maybe hit the automations needed
+         let currentBeat: Beat | null = beat;
+         while (currentBeat && (tempo === -1 || program === -1)) {
+             for (const automation of beat.automations) {
+                 switch (automation.type) {
+                     case AutomationType.Instrument:
+                         program = automation.value;
+                         break;
+                     case AutomationType.Tempo:
+                         tempo = automation.value;
+                         break;
+                 }
+             }
+             currentBeat = currentBeat.previousBeat;
+         }
+ 
+         const track = beat.voice.bar.staff.track;
+         const masterBar = beat.voice.bar.masterBar;
+         if (tempo === -1) {
+             tempo = masterBar.score.tempo;
+         }
+ 
+         if (program === -1) {
+             program = track.playbackInfo.program;
+         }
+ 
+         const volume = track.playbackInfo.volume;
+ 
+         // setup channel
+         this.generateTrack(track);
+         this._handler.addTimeSignature(0, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
+         this._handler.addTempo(0, tempo);
+ 
+      
+         let volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
+         this._handler.addControlChange(
+             0,
+             0,
+             track.playbackInfo.primaryChannel,
+             ControllerType.VolumeCoarse,
+             volumeCoarse
+         );
+         this._handler.addControlChange(
+             0,
+             0,
+             track.playbackInfo.secondaryChannel,
+             ControllerType.VolumeCoarse,
+             volumeCoarse
+         );
+    }
+
     public generateSingleBeat(beat: Beat) {
-        // collect tempo and program at given beat
-        let tempo = -1;
-        let program = -1;
-
-        // traverse to previous beats until we maybe hit the automations needed
-        let currentBeat: Beat | null = beat;
-        while (currentBeat && (tempo === -1 || program === -1)) {
-            for (const automation of beat.automations) {
-                switch (automation.type) {
-                    case AutomationType.Instrument:
-                        program = automation.value;
-                        break;
-                    case AutomationType.Tempo:
-                        tempo = automation.value;
-                        break;
-                }
-            }
-            currentBeat = currentBeat.previousBeat;
-        }
-
-        const track = beat.voice.bar.staff.track;
-        const masterBar = beat.voice.bar.masterBar;
-        if (tempo === -1) {
-            tempo = masterBar.score.tempo;
-        }
-
-        if (program === -1) {
-            program = track.playbackInfo.program;
-        }
-
-        const volume = track.playbackInfo.volume;
-
-        // setup channel
-        this.generateTrack(track);
-        this._handler.addTimeSignature(0, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
-        this._handler.addTempo(0, tempo);
-
-     
-        let volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
-        this._handler.addControlChange(
-            0,
-            0,
-            track.playbackInfo.primaryChannel,
-            ControllerType.VolumeCoarse,
-            volumeCoarse
-        );
-        this._handler.addControlChange(
-            0,
-            0,
-            track.playbackInfo.secondaryChannel,
-            ControllerType.VolumeCoarse,
-            volumeCoarse
-        );
-
+        this.prepareSingleBeat(beat);
+       
         this.generateBeat(beat, -beat.playbackStart /* to bring it to 0*/, beat.voice.bar);
+    }
+
+    public generateSingleNote(note: Note) {
+        this.prepareSingleBeat(note.beat);
+        this.generateNote(note, -note.beat.playbackStart, note.beat.playbackDuration, new Int32Array(note.beat.voice.bar.staff.tuning.length));
     }
 }
