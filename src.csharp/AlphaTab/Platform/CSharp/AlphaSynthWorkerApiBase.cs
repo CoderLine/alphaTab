@@ -111,6 +111,11 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnWorkerThread(() => { Player.Pause(); });
         }
 
+        public void PlayOneTimeMidiFile(MidiFile midiFile)
+        {
+            DispatchOnWorkerThread(() => { Player.PlayOneTimeMidiFile(midiFile); });
+        }
+
         public void PlayPause()
         {
             DispatchOnWorkerThread(() => { Player.PlayPause(); });

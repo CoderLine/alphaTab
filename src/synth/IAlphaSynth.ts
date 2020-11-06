@@ -91,6 +91,12 @@ export interface IAlphaSynth {
      * Stopps the playback
      */
     stop(): void;
+    
+    /**
+     * Stops any ongoing playback and plays the given midi file instead. 
+     * @param midi The midi file to play
+     */
+    playOneTimeMidiFile(midi: MidiFile): void;
 
     /**
      * Loads a soundfont from the given data

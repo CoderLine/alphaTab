@@ -232,6 +232,13 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
+    public playOneTimeMidiFile(midi: MidiFile): void {
+        this._synth.postMessage({
+            cmd: 'alphaSynth.playOneTimeMidiFile',
+            midi: JsonConverter.midiFileToJsObject(midi)
+        });
+    }
+
     public loadSoundFont(data: Uint8Array, append: boolean): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.loadSoundFontBytes',
