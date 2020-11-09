@@ -15,8 +15,10 @@ function getTypeWithNullableInfo(checker: ts.TypeChecker, node: ts.TypeNode) {
         for (const t of node.types) {
             if (t.kind === ts.SyntaxKind.NullKeyword) {
                 isNullable = true;
+            } else if (ts.isLiteralTypeNode(t) && t.literal.kind === ts.SyntaxKind.NullKeyword) {
+                isNullable = true;
             } else if (type !== null) {
-                throw new Error('Multi union types on JSON settings not supported!');
+                throw new Error('Multi union types on JSON settings not supported: ' + node.getSourceFile().fileName + ':' + node.getText());
             } else {
                 type = checker.getTypeAtLocation(t);
             }
