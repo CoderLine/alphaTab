@@ -78,6 +78,9 @@ export class AlphaSynthWebWorker {
             case 'alphaSynth.setIsLooping':
                 this._player.isLooping = data.value;
                 break;
+            case 'alphaSynth.setCountInVolume':
+                this._player.countInVolume = data.value;
+                break;
             case 'alphaSynth.play':
                 this._player.play();
                 break;
