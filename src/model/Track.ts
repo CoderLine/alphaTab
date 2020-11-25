@@ -93,7 +93,7 @@ export class Track {
         let staff: Staff = this.staves[0];
         for (let li: number = 0; li < lyrics.length; li++) {
             let lyric: Lyrics = lyrics[li];
-            if (lyric.startBar >= 0) {
+            if (lyric.startBar >= 0 && lyric.startBar < staff.bars.length) {
                 let beat: Beat | null = staff.bars[lyric.startBar].voices[0].beats[0];
                 for (let ci: number = 0; ci < lyric.chunks.length && beat; ci++) {
                     // skip rests and empty beats
