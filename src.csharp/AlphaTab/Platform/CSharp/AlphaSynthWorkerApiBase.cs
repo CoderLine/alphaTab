@@ -59,6 +59,12 @@ namespace AlphaTab.Platform.CSharp
             set => DispatchOnWorkerThread(() => { Player.MasterVolume = value; });
         }
 
+        public double CountInVolume
+        {
+            get => Player.CountInVolume;
+            set => DispatchOnWorkerThread(() => { Player.CountInVolume = value; });
+        }
+
         public double MetronomeVolume
         {
             get => Player.MetronomeVolume;

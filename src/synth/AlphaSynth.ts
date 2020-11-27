@@ -27,6 +27,7 @@ export class AlphaSynth implements IAlphaSynth {
     private _tickPosition: number = 0;
     private _timePosition: number = 0;
     private _metronomeVolume: number = 0;
+    private _countInVolume: number = 0;
 
     /**
      * Gets the {@link ISynthOutput} used for playing the generated samples.
@@ -66,6 +67,15 @@ export class AlphaSynth implements IAlphaSynth {
         value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
         this._metronomeVolume = value;
         this._synthesizer.metronomeVolume = value;
+    }
+
+    public get countInVolume(): number {
+        return this._countInVolume;
+    }
+
+    public set countInVolume(value: number) {
+        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        this._countInVolume = value;
     }
 
     public get playbackSpeed(): number {
@@ -182,14 +192,27 @@ export class AlphaSynth implements IAlphaSynth {
             return false;
         }
         this.output.activate();
-        this._synthesizer.setupMetronomeChannel(this.metronomeVolume);
+                
+        this.playInternal();
+
+        if (this._countInVolume > 0) {
+            Logger.debug('AlphaSynth', 'Starting countin');
+            this._sequencer.startCountIn();
+            this._synthesizer.setupMetronomeChannel(this._countInVolume);
+            this.tickPosition = 0;
+        }
+
+        this.output.play();
+        return true;
+    }
+
+    private playInternal() {
         Logger.debug('AlphaSynth', 'Starting playback');
+        this._synthesizer.setupMetronomeChannel(this.metronomeVolume);
         this.state = PlayerState.Playing;
         (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
             new PlayerStateChangedEventArgs(this.state, false)
         );
-        this.output.play();
-        return true;
     }
 
     public pause(): void {
@@ -227,20 +250,17 @@ export class AlphaSynth implements IAlphaSynth {
             new PlayerStateChangedEventArgs(this.state, true)
         );
     }
-    
+
     public playOneTimeMidiFile(midi: MidiFile): void {
         // pause current playback.
         this.pause();
-        
+
         this._sequencer.loadOneTimeMidi(midi);
-        
+
         this._sequencer.stop();
         this._synthesizer.noteOffAll(true);
         this.tickPosition = 0;
 
-        (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
-            new PlayerStateChangedEventArgs(this.state, false)
-        );
         this.output.play();
     }
 
@@ -335,7 +355,11 @@ export class AlphaSynth implements IAlphaSynth {
 
         if (this._tickPosition >= endTick) {
             Logger.debug('AlphaSynth', 'Finished playback');
-            if(this._sequencer.isPlayingOneTimeMidi) {
+            if (this._sequencer.isPlayingCountIn) {
+                this._sequencer.resetCountIn();
+                this.timePosition = this._sequencer.currentTime;
+                this.playInternal()
+            } else if (this._sequencer.isPlayingOneTimeMidi) {
                 this._sequencer.resetOneTimeMidi();
                 this.state = PlayerState.Paused;
                 this.output.pause();
@@ -359,7 +383,7 @@ export class AlphaSynth implements IAlphaSynth {
         const endTime: number = this._sequencer.endTime;
         const endTick: number = this._sequencer.endTick;
 
-        if(!this._sequencer.isPlayingOneTimeMidi) {
+        if (!this._sequencer.isPlayingOneTimeMidi && !this._sequencer.isPlayingCountIn) {
             Logger.debug(
                 'AlphaSynth',
                 `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount}`

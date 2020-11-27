@@ -27,6 +27,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private _state: PlayerState = PlayerState.Paused;
     private _masterVolume: number = 0;
     private _metronomeVolume: number = 0;
+    private _countInVolume: number = 0;
     private _playbackSpeed: number = 0;
     private _tickPosition: number = 0;
     private _timePosition: number = 0;
@@ -79,6 +80,18 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._metronomeVolume = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setMetronomeVolume',
+            value: value
+        });
+    }
+    public get countInVolume(): number {
+        return this._countInVolume;
+    }
+
+    public set countInVolume(value: number) {
+        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        this._countInVolume = value;
+        this._synth.postMessage({
+            cmd: 'alphaSynth.setCountInVolume',
             value: value
         });
     }

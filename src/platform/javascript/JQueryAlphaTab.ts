@@ -166,6 +166,13 @@ export class JQueryAlphaTab {
         return context.metronomeVolume;
     }
 
+    public countInVolume(element: jQuery, context: AlphaTabApi, countInVolume?: number): number {
+        if (typeof countInVolume === 'number') {
+            context.countInVolume = countInVolume;
+        }
+        return context.countInVolume;
+    }
+
     public playbackSpeed(element: jQuery, context: AlphaTabApi, playbackSpeed?: number): number {
         if (typeof playbackSpeed === 'number') {
             context.playbackSpeed = playbackSpeed;

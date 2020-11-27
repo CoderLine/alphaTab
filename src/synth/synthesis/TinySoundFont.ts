@@ -27,6 +27,9 @@ import { TypeConversions } from '@src/io/TypeConversions';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
+import { MetaEventType } from '@src/midi/MetaEvent';
+import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
+import { MetaDataEvent } from '@src/midi/MetaDataEvent';
 
 /**
  * This is a tiny soundfont based synthesizer.
@@ -41,6 +44,10 @@ export class TinySoundFont {
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
     private _isAnySolo: boolean = false;
+
+    public currentTempo:number = 0;
+    public timeSignatureNumerator:number = 0;
+    public timeSignatureDenominator:number = 0;
 
     public constructor(sampleRate: number) {
         this.outSampleRate = sampleRate;
@@ -171,6 +178,17 @@ export class TinySoundFont {
                 // midi 2.0 -> midi 1.0
                 perNotePitchWheel = (perNotePitchWheel * SynthConstants.MaxPitchWheel) / SynthConstants.MaxPitchWheel20;
                 this.channelSetPerNotePitchWheel(channel, midi20.noteKey, perNotePitchWheel);
+                break;
+            case MidiEventType.Meta:
+                switch (e.data1 as MetaEventType) {
+                    case MetaEventType.Tempo:
+                        this.currentTempo = 60000000 / (e as MetaNumberEvent).value;
+                        break;
+                    case MetaEventType.TimeSignature:
+                        this.timeSignatureNumerator =  (e as MetaDataEvent).data[0];
+                        this.timeSignatureDenominator =  Math.pow(2, (e as MetaDataEvent).data[1]);
+                        break;
+                }
                 break;
         }
     }

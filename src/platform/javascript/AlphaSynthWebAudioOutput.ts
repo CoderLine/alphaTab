@@ -138,11 +138,16 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         }
     }
 
+    private _outputBuffer:Float32Array = new Float32Array(0);
     private generateSound(e: AudioProcessingEvent): void {
         let left: Float32Array = e.outputBuffer.getChannelData(0);
         let right: Float32Array = e.outputBuffer.getChannelData(1);
         let samples: number = left.length + right.length;
-        let buffer: Float32Array = new Float32Array(samples);
+        let buffer = this._outputBuffer;
+        if(buffer.length != samples) {
+            buffer = new Float32Array(samples);
+            this._outputBuffer = buffer;
+        }
         this._circularBuffer.read(buffer, 0, Math.min(buffer.length, this._circularBuffer.count));
         let s: number = 0;
         for (let i: number = 0; i < left.length; i++) {
