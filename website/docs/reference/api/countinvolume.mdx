@@ -1,0 +1,57 @@
+---
+title: countInVolume
+category: Properties - Player
+description: The volume of the count-in metronome ticks
+sidebarPath: /docs/reference/api
+since: 1.1.0-alpha.61
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+Gets or sets the volume of the metronome during the count-in of the song. By default the count-in is disabled but can be enabled by setting the volume different.
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="double" />
+</TypeTable>
+
+## Default Value
+
+`0.0`
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.countInVolume = 0.5;
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').alphaTab('countInVolume', 0.5)
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.CountInVolume = 0.5;
+```
+
+</TabItem>
+</Tabs>

@@ -438,6 +438,10 @@ To reduce the number of UI updates we debounce the frequency to updates per seco
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
+                <ToggleButton IsChecked="{Binding IsCountInActive}">
+                    <fa:IconBlock Icon="HourglassHalf" />
+                </ToggleButton>
+
                 <ToggleButton IsChecked="{Binding IsMetronomeActive}">
                     <fa:IconBlock Icon="Edit" />
                 </ToggleButton>
@@ -546,6 +550,21 @@ namespace AlphaTabTutorial
             }
         }
 
+        private bool _isCountInActive;
+        public bool IsCountInActive
+        {
+            get => _isCountInActive;
+            set
+            {
+                if (value == _isCountInActive) return;
+                _isCountInActive = value;
+                OnPropertyChanged();
+                if (AlphaTab.Api != null)
+                {
+                    AlphaTab.Api.CountInVolume = value ? 1 : 0;
+                }
+            }
+        }
 
         private bool _isMetronomeActive;
         public bool IsMetronomeActive

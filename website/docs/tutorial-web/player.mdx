@@ -16,8 +16,9 @@ To get the player configured is also quite easy:
 
 1. We tell alphaTab that we want the player active and where to find the SoundFont2 file that should be used. 
 alphaTab ships a free SoundFont2 file for usage on your website. 
-2. We tell alphaTab how the cursors should look like
-3. We add some UI elements for the user to start/pause the playback and show the current position.
+2. We tell alphaTab which element to scroll when the cursor moves. 
+3. We tell alphaTab how the cursors should look like
+4. We add some UI elements for the user to start/pause the playback and show the current position.
 
 <Tabs
   defaultValue="js"
@@ -33,7 +34,8 @@ const settings = {
   file: "https://www.alphatab.net/files/canon.gp",
   player: {
       enablePlayer: true,
-      soundFont: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/soundfont/sonivox.sf2'
+      soundFont: 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/soundfont/sonivox.sf2',
+      scrollElement: wrapper.querySelector('.at-viewport') // this is the element to scroll during playback
   }
 };
 const api = new alphaTab.AlphaTabApi(main, settings);
@@ -558,6 +560,9 @@ api.playerPositionChanged.on((e) => {
           <div class="at-song-position">00:00 / 00:00</div>
         </div>
         <div class="at-controls-right">
+          <a class="btn toggle at-count-in">
+            <i class="fas fa-hourglass-half"></i>
+          </a>        
           <a class="btn at-metronome">
             <i class="fas fa-edit"></i>
           </a>
@@ -612,8 +617,8 @@ api.playerPositionChanged.on((e) => {
         file: "https://www.alphatab.net/files/canon.gp",
         player: {
           enablePlayer: true,
-          soundFont:
-            "https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/soundfont/sonivox.sf2",
+          soundFont: "https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/soundfont/sonivox.sf2",
+          scrollElement: wrapper.querySelector('.at-viewport')
         },
       };
       const api = new alphaTab.AlphaTabApi(main, settings);
@@ -672,6 +677,16 @@ api.playerPositionChanged.on((e) => {
         wrapper.querySelector(".at-song-artist").innerText = score.artist;
       });
 
+      const countIn = wrapper.querySelector('.at-controls .at-count-in');
+      countIn.onclick = () => {
+        countIn.classList.toggle('active');
+        if (countIn.classList.contains('active')) {
+          api.countInVolume = 1;
+        } else {
+          api.countInVolume = 0;
+        }
+      };
+      
       const metronome = wrapper.querySelector(".at-controls .at-metronome");
       metronome.onclick = () => {
         metronome.classList.toggle("active");

@@ -26,6 +26,52 @@ The items we add to the left StackPanel in the toolbar where we have the open fi
 <TextBlock Text="{Binding Score.Artist}" />
 ```
 
+## Count-In
+
+The count-in will become relevant when we activate the player in the next step, but we
+can already create the control which will set the count-in volume based on the toggle button state. 
+This button we add to the right StackPanel in the toolbar. 
+
+<Tabs
+  defaultValue="xaml"
+  values={[
+    { label: 'New XAML', value: 'xaml', },
+    { label: 'New C#', value: 'cs', },
+  ]
+}>
+<TabItem value="xaml">
+
+```xml
+<ToggleButton IsChecked="{Binding IsCountInActive}">
+    <sharp:IconBlock Icon="HourglassHalf" />
+</ToggleButton>
+
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+private bool _isCountInActive;
+public bool IsCountInActive
+{
+    get => _isCountInActive;
+    set
+    {
+        if (value == _isCountInActive) return;
+        _isCountInActive = value;
+        OnPropertyChanged();
+        if (AlphaTab.Api != null)
+        {
+            AlphaTab.Api.CountInVolume = value ? 1 : 0;
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
 ## Metronome
 
 The metronome will become relevant when we activate the player in the next step, but we
@@ -580,6 +626,10 @@ public LayoutMode CurrentLayoutMode
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
+                <ToggleButton IsChecked="{Binding IsCountInActive}">
+                    <fa:IconBlock Icon="HourglassHalf" />
+                </ToggleButton>
+
                 <ToggleButton IsChecked="{Binding IsMetronomeActive}">
                     <fa:IconBlock Icon="Edit" />
                 </ToggleButton>
@@ -659,6 +709,7 @@ namespace AlphaTabTutorial
                 SelectedTrack = _score.Tracks[0];
             }
         }
+
         public Track SelectedTrack
         {
             get => _selectedTrack;
@@ -687,6 +738,21 @@ namespace AlphaTabTutorial
             }
         }
 
+        private bool _isCountInActive;
+        public bool IsCountInActive
+        {
+            get => _isCountInActive;
+            set
+            {
+                if (value == _isCountInActive) return;
+                _isCountInActive = value;
+                OnPropertyChanged();
+                if (AlphaTab.Api != null)
+                {
+                    AlphaTab.Api.CountInVolume = value ? 1 : 0;
+                }
+            }
+        }
 
         private bool _isMetronomeActive;
         public bool IsMetronomeActive

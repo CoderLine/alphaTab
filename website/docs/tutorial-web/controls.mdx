@@ -9,6 +9,7 @@ In the following steps of the tutorial we will add some basic controls for the e
 will allow them to:
 
 * See the song title and artist
+* Enable/Disable the count-in
 * Enable/Disable the metronome
 * Enable/Disable the looping
 * Print the music sheet
@@ -38,6 +39,9 @@ just usual web development we will go through this rather quick:
     </div>
   </div>
   <div class="at-controls-right">
+    <a class="btn toggle at-count-in">
+      <i class="fas fa-hourglass-half"></i>
+    </a>
     <a class="btn toggle at-metronome">
       <i class="fas fa-edit"></i>
     </a>
@@ -156,6 +160,27 @@ api.scoreLoaded.on((score)=>{
   wrapper.querySelector('.at-song-artist').innerText = score.artist;
 });
 ```
+
+## Count-In
+
+The count-in will become relevant when we activate the player in the next step, but we
+can already create the control which will set the volume based on the toggle button state:
+
+```js
+const countIn = wrapper.querySelector('.at-controls .at-count-in');
+countIn.onclick = () => {
+  countIn.classList.toggle('active');
+  if (countIn.classList.contains('active')) {
+    api.countInVolume = 1;
+  } else {
+    api.countInVolume = 0;
+  }
+};
+```
+
+We toggle the `active` CSS class as visual indication whether the feature is active or not. 
+Then we check for the visual state to really tell alphaTab whether the count-in should be 
+active or not by setting the [`countInVolume`](/docs/reference/api/countInVolume).
 
 ## Metronome
 
@@ -500,6 +525,9 @@ layout.onchange = () => {
         </div>
       </div>
       <div class="at-controls-right">
+        <a class="btn toggle at-count-in">
+          <i class="fas fa-hourglass-half"></i>
+        </a>
         <a class="btn at-metronome">
           <i class="fas fa-edit"></i>
         </a>
@@ -608,6 +636,16 @@ layout.onchange = () => {
       wrapper.querySelector('.at-song-title').innerText = score.title;
       wrapper.querySelector('.at-song-artist').innerText = score.artist;
     });
+
+    const countIn = wrapper.querySelector('.at-controls .at-count-in');
+    countIn.onclick = () => {
+      countIn.classList.toggle('active');
+      if (countIn.classList.contains('active')) {
+        api.countInVolume = 1;
+      } else {
+        api.countInVolume = 0;
+      }
+    };
 
     const metronome = wrapper.querySelector('.at-controls .at-metronome');
     metronome.onclick = () => {

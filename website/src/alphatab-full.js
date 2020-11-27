@@ -467,6 +467,7 @@ class PlayerControlsGroup extends React.Component {
     this.state = {
       soundFontLoadPercentage: 0,
       isLooping: false,
+      isCountInActive: false,
       isMetronomeActive: false,
       isPlaying: false,
     };
@@ -506,6 +507,17 @@ class PlayerControlsGroup extends React.Component {
         isMetronomeActive: isMetronomeActive,
       });
       this.props.api.metronomeVolume = isMetronomeActive ? 1 : 0;
+    }
+  }
+
+  toggleCountIn(e) {
+    e.preventDefault();
+    if (this.props.api) {
+      let isCountInActive = !this.state.isCountInActive;
+      this.setState({
+        isCountInActive: isCountInActive,
+      });
+      this.props.api.countInVolume = isCountInActive ? 1 : 0;
     }
   }
 
@@ -582,6 +594,20 @@ class PlayerControlsGroup extends React.Component {
           </div>
 
           <div className="at-player-right">
+            <a
+              href="#"
+              onClick={this.toggleCountIn.bind(this)}
+              className={
+                "at-count-in" +
+                (this.props.api?.isReadyForPlayback ? "" : " disabled") +
+                (this.state.isMetronomeActive ? " active" : "")
+              }
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Count-In"
+            >
+              <i className="fas fa-hourglass-half"></i>
+            </a>
             <a
               href="#"
               onClick={this.toggleMetronome.bind(this)}
