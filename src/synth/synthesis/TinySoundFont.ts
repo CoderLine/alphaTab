@@ -179,7 +179,7 @@ export class TinySoundFont {
                 this.channelSetPerNotePitchWheel(channel, midi20.noteKey, perNotePitchWheel);
                 break;
             case MidiEventType.Meta:
-                switch (e.data1) {
+                switch (e.data1 as MetaEventType) {
                     case MetaEventType.Tempo:
                         this.currentTempo = 60000000 / (e as MetaNumberEvent).value;
                         break;
