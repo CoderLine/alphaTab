@@ -422,6 +422,19 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
+    public get countInVolume(): number {
+        if (!this.player) {
+            return 0;
+        }
+        return this.player.countInVolume;
+    }
+
+    public set countInVolume(value: number) {
+        if (this.player) {
+            this.player.countInVolume = value;
+        }
+    }
+
     public get tickPosition(): number {
         if (!this.player) {
             return 0;

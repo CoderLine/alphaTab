@@ -192,13 +192,14 @@ export class AlphaSynth implements IAlphaSynth {
             return false;
         }
         this.output.activate();
+                
+        this.playInternal();
+
         if (this._countInVolume > 0) {
             Logger.debug('AlphaSynth', 'Starting countin');
             this._sequencer.startCountIn();
             this._synthesizer.setupMetronomeChannel(this._countInVolume);
             this.tickPosition = 0;
-        } else {
-            this.playInternal();
         }
 
         this.output.play();
@@ -355,8 +356,8 @@ export class AlphaSynth implements IAlphaSynth {
         if (this._tickPosition >= endTick) {
             Logger.debug('AlphaSynth', 'Finished playback');
             if (this._sequencer.isPlayingCountIn) {
-                this.tickPosition = 0;
                 this._sequencer.resetCountIn();
+                this.timePosition = this._sequencer.currentTime;
                 this.playInternal()
             } else if (this._sequencer.isPlayingOneTimeMidi) {
                 this._sequencer.resetOneTimeMidi();

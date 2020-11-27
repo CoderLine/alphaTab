@@ -76,6 +76,10 @@ export class MidiFileSequencer {
 
     public isLooping: boolean = false;
 
+    public get currentTime() {
+        return this._currentState.currentTime;
+    }
+
     /**
      * Gets the duration of the song in ticks.
      */
@@ -105,12 +109,6 @@ export class MidiFileSequencer {
             }
         }
 
-        // move back some ticks to ensure the on-time events are played
-        timePosition -= 25;
-        if (timePosition < 0) {
-            timePosition = 0;
-        }
-
         if (timePosition > this._currentState.currentTime) {
             this.silentProcess(timePosition - this._currentState.currentTime);
         } else if (timePosition < this._currentState.currentTime) {
@@ -138,6 +136,8 @@ export class MidiFileSequencer {
                 this._synthesizer.synthesizeSilent(SynthConstants.MicroBufferSize);
             }
         }
+
+        this._currentState.currentTime = finalTime;
 
         let duration: number = Date.now() - start;
         Logger.debug('Sequencer', 'Silent seek finished in ' + duration + 'ms');
