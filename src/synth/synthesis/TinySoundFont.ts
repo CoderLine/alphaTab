@@ -131,8 +131,9 @@ export class TinySoundFont {
             if (voice.playingPreset !== -1) {
                 const channel: number = voice.playingChannel;
                 // channel is muted if it is either explicitley muted, or another channel is set to solo but not this one.
-                const isChannelMuted: boolean =
-                    this._mutedChannels.has(channel) || (anySolo && !this._soloChannels.has(channel));
+                // exception. metronome is implicitly added in solo
+                const isChannelMuted: boolean = this._mutedChannels.has(channel)
+                    || (anySolo && channel != SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
 
                 if (!buffer) {
                     voice.kill();

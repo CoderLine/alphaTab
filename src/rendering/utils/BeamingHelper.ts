@@ -296,7 +296,7 @@ export class BeamingHelper {
             return true;
         }
         let m1: Bar = b1.voice.bar;
-        let m2: Bar = b1.voice.bar;
+        let m2: Bar = b2.voice.bar;
         // only join on same measure
         if (m1 !== m2) {
             return false;
