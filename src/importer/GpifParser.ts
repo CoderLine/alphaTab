@@ -1005,14 +1005,13 @@ export class GpifParser {
     }
 
     private parseChannelStripParameters(track: Track, node: XmlNode): void {
-        // track.playbackInfo.volume = Math.ceil(Math.random() * 15);
         if (node.firstChild && node.firstChild.value) {
             let parameters = node.firstChild.value.split(' ');
             for (let i = 0; i < parameters.length; i++) {
-                let value: number = +parameters[i];
+                let value: number = parseInt(parameters[i]);
                 switch (i) {
                     case 12:
-                        track.playbackInfo.volume = value * 16;
+                        track.playbackInfo.volume = Math.floor(value * 16);
                         break;
                 }
             }
