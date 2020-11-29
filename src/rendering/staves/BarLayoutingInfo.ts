@@ -260,6 +260,9 @@ export class BarLayoutingInfo {
     }
 
     public spaceToForce(space: number): number {
+        if(this._timeSortedSprings.length > 0) {
+            space -= this._timeSortedSprings[0].preSpringWidth
+        }
         return space * this.totalSpringConstant;
     }
 
