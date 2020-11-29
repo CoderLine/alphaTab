@@ -16,9 +16,17 @@ export class SynthConstants {
     /**
      * The Midi Pitch bend message is a 15-bit value
      */
-    public static readonly MaxPitchWheel: number = 16384;
+    public static readonly MaxPitchWheel: number = 0x4000;
+
+    /**
+     * The Midi 2.0 Pitch bend message is a 32-bit value
+     */
+    public static readonly MaxPitchWheel20: number = 0x100000000;
     /**
      * The pitch wheel value for no pitch change at all.
      */
     public static readonly DefaultPitchWheel: number = SynthConstants.MaxPitchWheel / 2;
+
+    public static readonly MicroBufferCount: number = 32;
+    public static readonly MicroBufferSize: number = 64;
 }

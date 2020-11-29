@@ -4,6 +4,7 @@ const dts = require('rollup-plugin-dts').default;
 const copy = require('rollup-plugin-copy');
 const branch = require('git-branch');
 const license = require('rollup-plugin-license');
+const serve = require('rollup-plugin-serve');
 
 const commonOutput = {
     name: 'alphaTab',
@@ -12,6 +13,8 @@ const commonOutput = {
         jQuery: 'jQuery'
     }
 };
+
+const isWatch = process.env.ROLLUP_WATCH;
 
 module.exports = [
     {
@@ -59,6 +62,13 @@ module.exports = [
                 mappings: {
                     '@src': 'dist/lib'
                 }
+            }),
+
+            isWatch && serve({
+                open: true,
+                openPage: '/playground/control.html',
+                contentBase: '', 
+                port: 8080
             })
         ]
     },

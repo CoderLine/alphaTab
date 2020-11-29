@@ -9,7 +9,7 @@ import { ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
-import { BeamGlyph } from '@src/rendering/glyphs/BeamGlyph';
+import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { RepeatCloseGlyph } from '@src/rendering/glyphs/RepeatCloseGlyph';
 import { RepeatCountGlyph } from '@src/rendering/glyphs/RepeatCountGlyph';
@@ -68,7 +68,7 @@ export class TabBarRenderer extends BarRendererBase {
             let hasTuplets: boolean = false;
             for (let voice of this.bar.voices) {
                 if (this.hasVoiceContainer(voice)) {
-                    let c: VoiceContainerGlyph = this.getOrCreateVoiceContainer(voice);
+                    let c: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                     if (c.tupletGroups.length > 0) {
                         hasTuplets = true;
                         break;
@@ -107,9 +107,6 @@ export class TabBarRenderer extends BarRendererBase {
             this.createTimeSignatureGlyphs();
         }
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getTabY(-0.5, 0), this.bar.index + 1));
-        if (this.bar.isEmpty) {
-            this.addPreBeatGlyph(new SpacingGlyph(0, 0, 30 * this.scale));
-        }
     }
 
     private _startSpacing: boolean = false;
@@ -124,10 +121,12 @@ export class TabBarRenderer extends BarRendererBase {
 
     private createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+
+        const lines = (this.bar.staff.tuning.length + 1) / 2;
         this.addPreBeatGlyph(
             new TabTimeSignatureGlyph(
                 0,
-                this.getTabY(0, 0),
+                this.getTabY(lines, 0),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon
@@ -135,19 +134,10 @@ export class TabBarRenderer extends BarRendererBase {
         );
     }
 
-    protected createBeatGlyphs(): void {
-        for (let v: number = 0; v < this.bar.voices.length; v++) {
-            let voice: Voice = this.bar.voices[v];
-            if (this.hasVoiceContainer(voice)) {
-                this.createVoiceGlyphs(this.bar.voices[v]);
-            }
-        }
-    }
-
-    private createVoiceGlyphs(v: Voice): void {
+    protected createVoiceGlyphs(v: Voice): void {
         for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
             let b: Beat = v.beats[i];
-            let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getOrCreateVoiceContainer(v));
+            let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new TabBeatPreNotesGlyph();
             container.onNotes = new TabBeatGlyph();
             this.addBeatGlyph(container);
@@ -176,6 +166,10 @@ export class TabBarRenderer extends BarRendererBase {
         return this.lineOffset * line + correction * this.scale;
     }
 
+    public get middleYPosition(): number {
+        return this.getTabY(this.bar.staff.tuning.length - 1);
+    }
+
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
         let res: RenderingResources = this.resources;
@@ -192,7 +186,7 @@ export class TabBarRenderer extends BarRendererBase {
         }
         for (let voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let vc: VoiceContainerGlyph = this.getOrCreateVoiceContainer(voice);
+                let vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                 for (let bg of vc.beatGlyphs) {
                     let notes: TabBeatGlyph = bg.onNotes as TabBeatGlyph;
                     let noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
@@ -225,10 +219,10 @@ export class TabBarRenderer extends BarRendererBase {
             }
             let lineX: number = 0;
             for (let line of tabNotes[i]) {
-                canvas.fillRect(cx + this.x + lineX, lineY | 0, line[0] - lineX, this.scale);
+                canvas.fillRect(cx + this.x + lineX, lineY | 0, line[0] - lineX, this.scale * BarRendererBase.StaffLineThickness);
                 lineX = line[0] + line[1];
             }
-            canvas.fillRect(cx + this.x + lineX, lineY | 0, this.width - lineX, this.scale);
+            canvas.fillRect(cx + this.x + lineX, lineY | 0, this.width - lineX, this.scale * BarRendererBase.StaffLineThickness);
         }
         canvas.color = res.mainGlyphColor;
         this.paintSimileMark(cx, cy, canvas);
@@ -255,7 +249,7 @@ export class TabBarRenderer extends BarRendererBase {
     private paintTuplets(cx: number, cy: number, canvas: ICanvas): void {
         for (let voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let container: VoiceContainerGlyph = this.getOrCreateVoiceContainer(voice);
+                let container: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                 for (let tupletGroup of container.tupletGroups) {
                     this.paintTupletHelper(cx + this.beatGlyphsStart, cy, canvas, tupletGroup);
                 }
@@ -334,8 +328,8 @@ export class TabBarRenderer extends BarRendererBase {
                         // full bar?
                         if (BeamingHelper.isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
                             barStartX = beatLineX;
-                            barEndX = h.getBeatLineX(h.beats[i + 1]) + this.scale;
-                            let endGlyph: BeatGlyphBase = this.getOnNotesGlyphForBeat(h.beats[i + 1]);
+                            barEndX = h.getBeatLineX(h.beats[i + 1]);
+                            let endGlyph: BeatGlyphBase = this.getOnNotesGlyphForBeat(h.beats[i + 1])!;
                             if (h.direction === BeamDirection.Up) {
                                 barEndX -= endGlyph.width / 2;
                             } else {
@@ -527,10 +521,10 @@ export class TabBarRenderer extends BarRendererBase {
             canvas.lineTo(cx + this.x + beatLineX, y2);
             canvas.stroke();
             //
-            // Draw beam
+            // Draw Flag
             //
             if (beat.duration > Duration.Quarter) {
-                let glyph: BeamGlyph = new BeamGlyph(0, 0, beat.duration, BeamDirection.Down, false);
+                let glyph: FlagGlyph = new FlagGlyph(0, 0, beat.duration, BeamDirection.Down, false);
                 glyph.renderer = this;
                 glyph.doLayout();
                 glyph.paint(cx + this.x + beatLineX, y2, canvas);

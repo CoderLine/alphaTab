@@ -1,7 +1,7 @@
 import { FermataType } from '@src/model/Fermata';
 import { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class FermataGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, fermata: FermataType) {
@@ -11,11 +11,11 @@ export class FermataGlyph extends MusicFontGlyph {
     private static getSymbol(accentuation: FermataType): MusicFontSymbol {
         switch (accentuation) {
             case FermataType.Short:
-                return MusicFontSymbol.FermataShort;
+                return MusicFontSymbol.FermataShortAbove;
             case FermataType.Medium:
-                return MusicFontSymbol.FermataMedium;
+                return MusicFontSymbol.FermataAbove;
             case FermataType.Long:
-                return MusicFontSymbol.FermataLong;
+                return MusicFontSymbol.FermataLongAbove;
             default:
                 return MusicFontSymbol.None;
         }

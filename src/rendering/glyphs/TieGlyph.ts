@@ -102,8 +102,6 @@ export class TieGlyph extends Glyph {
                     4
                 );
             }
-            
-            canvas.fill();
         }
     }
 
@@ -190,6 +188,7 @@ export class TieGlyph extends Glyph {
         canvas.quadraticCurveTo(cp1X, cp1Y, x2, y2);
         canvas.quadraticCurveTo(cp2X, cp2Y, x1, y1);
         canvas.closePath();
+        canvas.fill();
     }
 
     private static readonly BendSlurHeight: number = 11;

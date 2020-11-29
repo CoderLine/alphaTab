@@ -37,6 +37,7 @@ import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { PercussionMapper } from '@src/model/PercussionMapper';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -308,12 +309,13 @@ export class MidiFileGenerator {
                     break;
             }
             this.generateVibratorWithParams(
-                beat.voice.bar.staff.track,
                 barStartTick + beatStart,
                 beat.playbackDuration,
                 phaseLength,
                 bendAmplitude,
-                track.playbackInfo.secondaryChannel
+                (tick, value) => {
+                    this._handler.addBend(beat.voice.bar.staff.track.index, tick, track.playbackInfo.secondaryChannel, value);
+                }
             );
         }
     }
@@ -397,7 +399,13 @@ export class MidiFileGenerator {
     private generateNote(note: Note, beatStart: number, beatDuration: number, brushInfo: Int32Array): void {
         const track: Track = note.beat.voice.bar.staff.track;
         const staff: Staff = note.beat.voice.bar.staff;
-        const noteKey: number = note.realValue;
+        let noteKey: number = note.realValue;
+        if(note.isPercussion) {
+            const articulation = PercussionMapper.getArticulation(note);
+            if(articulation) {
+                noteKey = articulation.outputMidiNumber;
+            }
+        }
         const brushOffset: number = note.isStringed && note.string <= brushInfo.length ? brushInfo[note.string - 1] : 0;
         const noteStart: number = beatStart + brushOffset;
         const noteDuration: MidiNoteDuration = this.getNoteDuration(note, beatDuration);
@@ -453,13 +461,13 @@ export class MidiFileGenerator {
         //
         // All String Bending/Variation effects
         if (note.hasBend) {
-            this.generateBend(note, noteStart, noteDuration, channel);
+            this.generateBend(note, noteStart, noteDuration, noteKey, channel);
         } else if (note.beat.hasWhammyBar && note.index === 0) {
             this.generateWhammy(note.beat, noteStart, noteDuration, channel);
         } else if (note.slideInType !== SlideInType.None || note.slideOutType !== SlideOutType.None) {
             this.generateSlide(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
         } else if (note.vibrato !== VibratoType.None) {
-            this.generateVibrato(note, noteStart, noteDuration, channel);
+            this.generateVibrato(note, noteStart, noteDuration, noteKey, channel);
         }
 
         // for tied notes, and target notes of legato slides we do not pick the note
@@ -638,7 +646,7 @@ export class MidiFileGenerator {
         }
     }
 
-    private generateVibrato(note: Note, noteStart: number, noteDuration: MidiNoteDuration, channel: number): void {
+    private generateVibrato(note: Note, noteStart: number, noteDuration: MidiNoteDuration, noteKey: number, channel: number): void {
         let phaseLength: number = 0;
         let bendAmplitude: number = 0;
         switch (note.vibrato) {
@@ -654,16 +662,17 @@ export class MidiFileGenerator {
                 return;
         }
         const track: Track = note.beat.voice.bar.staff.track;
-        this.generateVibratorWithParams(track, noteStart, noteDuration.noteOnly, phaseLength, bendAmplitude, channel);
+        this.generateVibratorWithParams(noteStart, noteDuration.noteOnly, phaseLength, bendAmplitude, (tick, value) => {
+            this._handler.addNoteBend(track.index, tick, channel, noteKey, value);
+        });
     }
 
     private generateVibratorWithParams(
-        track: Track,
         noteStart: number,
         noteDuration: number,
         phaseLength: number,
         bendAmplitude: number,
-        channel: number
+        addBend: (tick: number, value: number) => void
     ): void {
         const resolution: number = 16;
         const phaseHalf: number = (phaseLength / 2) | 0;
@@ -676,10 +685,8 @@ export class MidiFileGenerator {
             const phaseDuration: number = noteStart + phaseLength < noteEnd ? phaseLength : noteEnd - noteStart;
             while (phase < phaseDuration) {
                 let bend: number = bendAmplitude * Math.sin((phase * Math.PI) / phaseHalf);
-                this._handler.addBend(
-                    track.index,
+                addBend(
                     (noteStart + phase) | 0,
-                    channel,
                     MidiFileGenerator.getPitchWheel(bend)
                 );
                 phase += resolution;
@@ -771,12 +778,19 @@ export class MidiFileGenerator {
                 break;
         }
 
-        this.generateWhammyOrBend(noteStart, channel, duration, playedBendPoints, track);
+        this.generateWhammyOrBend(noteStart, duration, playedBendPoints, (tick, value) => {
+            this._handler.addNoteBend(track.index, tick, channel, noteKey, value);
+        });
     }
 
-    private generateBend(note: Note, noteStart: number, noteDuration: MidiNoteDuration, channel: number): void {
+    private generateBend(note: Note, noteStart: number, noteDuration: MidiNoteDuration, noteKey: number, channel: number): void {
         let bendPoints: BendPoint[] = note.bendPoints;
         let track: Track = note.beat.voice.bar.staff.track;
+
+        const addBend: (tick: number, value: number) => void = (tick, value) => {
+            this._handler.addNoteBend(track.index, tick, channel, noteKey, value);
+        };
+
         // if bend is extended on next tied note, we directly bend to the final bend value
         let finalBendValue: number | null = null;
         // Bends are spread across all tied notes unless they have a bend on their own.
@@ -842,22 +856,20 @@ export class MidiFileGenerator {
                         if (note.beat.graceType === GraceType.BendGrace) {
                             this.generateSongBookWhammyOrBend(
                                 noteStart,
-                                channel,
                                 duration,
-                                track,
                                 true,
                                 [note.bendPoints[0].value, finalBendValue],
-                                bendDuration
+                                bendDuration,
+                                addBend
                             );
                         } else {
                             this.generateSongBookWhammyOrBend(
                                 noteStart,
-                                channel,
                                 duration,
-                                track,
                                 false,
                                 [note.bendPoints[0].value, finalBendValue],
-                                bendDuration
+                                bendDuration,
+                                addBend
                             );
                         }
                         return;
@@ -876,12 +888,11 @@ export class MidiFileGenerator {
                     case BendStyle.Fast:
                         this.generateSongBookWhammyOrBend(
                             noteStart,
-                            channel,
                             duration,
-                            track,
                             false,
                             [note.bendPoints[0].value, note.bendPoints[1].value, note.bendPoints[2].value],
-                            bendDuration
+                            bendDuration,
+                            addBend
                         );
                         return;
                 }
@@ -909,12 +920,11 @@ export class MidiFileGenerator {
                         }
                         this.generateSongBookWhammyOrBend(
                             noteStart,
-                            channel,
                             duration,
-                            track,
                             false,
                             [note.bendPoints[0].value, finalBendValue],
-                            bendDuration
+                            bendDuration,
+                            addBend
                         );
                         return;
                 }
@@ -933,28 +943,26 @@ export class MidiFileGenerator {
                         this._handler.addBend(track.index, noteStart, channel, preBendValue | 0);
                         this.generateSongBookWhammyOrBend(
                             noteStart,
-                            channel,
                             duration,
-                            track,
                             false,
                             [note.bendPoints[0].value, note.bendPoints[1].value],
-                            bendDuration
+                            bendDuration,
+                            addBend
                         );
                         return;
                 }
                 break;
         }
-        this.generateWhammyOrBend(noteStart, channel, duration, playedBendPoints, track);
+        this.generateWhammyOrBend(noteStart, duration, playedBendPoints, addBend);
     }
 
     private generateSongBookWhammyOrBend(
         noteStart: number,
-        channel: number,
         duration: number,
-        track: Track,
         bendAtBeginning: boolean,
         bendValues: number[],
-        bendDuration: number
+        bendDuration: number,
+        addBend: (tick: number, value: number) => void
     ): void {
         const startTick: number = bendAtBeginning ? noteStart : noteStart + duration - bendDuration;
         const ticksBetweenPoints: number = bendDuration / (bendValues.length - 1);
@@ -962,7 +970,7 @@ export class MidiFileGenerator {
             const currentBendValue: number = MidiFileGenerator.getPitchWheel(bendValues[i]);
             const nextBendValue: number = MidiFileGenerator.getPitchWheel(bendValues[i + 1]);
             const tick: number = startTick + ticksBetweenPoints * i;
-            this.generateBendValues(tick, channel, track, ticksBetweenPoints, currentBendValue, nextBendValue);
+            this.generateBendValues(tick, ticksBetweenPoints, currentBendValue, nextBendValue, addBend);
         }
     }
 
@@ -974,6 +982,10 @@ export class MidiFileGenerator {
         if (bendPoints[0].value > 0 && !beat.isContinuedWhammy) {
             noteStart--;
         }
+
+        const addBend: (tick: number, value: number) => void = (tick, value) => {
+            this._handler.addBend(track.index, tick, channel, value);
+        };
 
         let playedBendPoints: BendPoint[] = [];
         switch (beat.whammyBarType) {
@@ -996,12 +1008,11 @@ export class MidiFileGenerator {
                         );
                         this.generateSongBookWhammyOrBend(
                             noteStart,
-                            channel,
                             duration,
-                            track,
                             false,
                             [bendPoints[0].value, bendPoints[1].value],
-                            whammyDuration
+                            whammyDuration,
+                            addBend
                         );
                         return;
                 }
@@ -1023,12 +1034,11 @@ export class MidiFileGenerator {
                         );
                         this.generateSongBookWhammyOrBend(
                             noteStart,
-                            channel,
                             duration,
-                            track,
                             true,
                             [bendPoints[0].value, bendPoints[1].value, bendPoints[2].value],
-                            whammyDuration
+                            whammyDuration,
+                            addBend
                         );
                         return;
                 }
@@ -1058,26 +1068,24 @@ export class MidiFileGenerator {
                         );
                         this.generateSongBookWhammyOrBend(
                             noteStart,
-                            channel,
                             duration,
-                            track,
                             false,
                             [bendPoints[0].value, bendPoints[1].value],
-                            whammyDuration
+                            whammyDuration,
+                            addBend
                         );
                         return;
                 }
                 break;
         }
-        this.generateWhammyOrBend(noteStart, channel, duration, playedBendPoints, track);
+        this.generateWhammyOrBend(noteStart, duration, playedBendPoints, addBend);
     }
 
     private generateWhammyOrBend(
         noteStart: number,
-        channel: number,
         duration: number,
         playedBendPoints: BendPoint[],
-        track: Track
+        addBend: (tick: number, value: number) => void
     ): void {
         const ticksPerPosition: number = duration / BendPoint.MaxPosition;
         for (let i: number = 0; i < playedBendPoints.length - 1; i++) {
@@ -1091,17 +1099,16 @@ export class MidiFileGenerator {
             // we will generate one pitchbend message for each value
             // for this we need to calculate how many ticks to offset per value
             const tick: number = noteStart + ticksPerPosition * currentPoint.offset;
-            this.generateBendValues(tick, channel, track, ticksBetweenPoints, currentBendValue, nextBendValue);
+            this.generateBendValues(tick, ticksBetweenPoints, currentBendValue, nextBendValue, addBend);
         }
     }
 
     private generateBendValues(
         currentTick: number,
-        channel: number,
-        track: Track,
         ticksBetweenPoints: number,
         currentBendValue: number,
-        nextBendValue: number
+        nextBendValue: number,
+        addBend: (tick: number, value: number) => void
     ): void {
         const millisBetweenPoints = MidiUtils.ticksToMillis(ticksBetweenPoints, this._currentTempo);
         const numberOfSemitones = Math.abs(nextBendValue - currentBendValue) / MidiFileGenerator.PitchValuePerSemitone;
@@ -1113,14 +1120,14 @@ export class MidiFileGenerator {
         const pitchPerBreakpoint = (nextBendValue - currentBendValue) / numberOfSteps;
 
         for (let i = 0; i < numberOfSteps; i++) {
-            this._handler.addBend(track.index, currentTick | 0, channel, Math.round(currentBendValue));
+            addBend(currentTick | 0, Math.round(currentBendValue));
             currentBendValue += pitchPerBreakpoint;
             currentTick += ticksPerBreakpoint;
         }
 
         // final bend value if needed
         if (currentBendValue < nextBendValue) {
-            this._handler.addBend(track.index, currentTick | 0, channel, nextBendValue);
+            addBend(currentTick | 0, nextBendValue);
         }
     }
 
@@ -1257,5 +1264,72 @@ export class MidiFileGenerator {
                 );
                 break;
         }
+    }
+
+    public prepareSingleBeat(beat: Beat) {
+         // collect tempo and program at given beat
+         let tempo = -1;
+         let program = -1;
+ 
+         // traverse to previous beats until we maybe hit the automations needed
+         let currentBeat: Beat | null = beat;
+         while (currentBeat && (tempo === -1 || program === -1)) {
+             for (const automation of beat.automations) {
+                 switch (automation.type) {
+                     case AutomationType.Instrument:
+                         program = automation.value;
+                         break;
+                     case AutomationType.Tempo:
+                         tempo = automation.value;
+                         break;
+                 }
+             }
+             currentBeat = currentBeat.previousBeat;
+         }
+ 
+         const track = beat.voice.bar.staff.track;
+         const masterBar = beat.voice.bar.masterBar;
+         if (tempo === -1) {
+             tempo = masterBar.score.tempo;
+         }
+ 
+         if (program === -1) {
+             program = track.playbackInfo.program;
+         }
+ 
+         const volume = track.playbackInfo.volume;
+ 
+         // setup channel
+         this.generateTrack(track);
+         this._handler.addTimeSignature(0, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
+         this._handler.addTempo(0, tempo);
+ 
+      
+         let volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
+         this._handler.addControlChange(
+             0,
+             0,
+             track.playbackInfo.primaryChannel,
+             ControllerType.VolumeCoarse,
+             volumeCoarse
+         );
+         this._handler.addControlChange(
+             0,
+             0,
+             track.playbackInfo.secondaryChannel,
+             ControllerType.VolumeCoarse,
+             volumeCoarse
+         );
+    }
+
+    public generateSingleBeat(beat: Beat) {
+        this.prepareSingleBeat(beat);
+       
+        this.generateBeat(beat, -beat.playbackStart /* to bring it to 0*/, beat.voice.bar);
+    }
+
+    public generateSingleNote(note: Note) {
+        this.prepareSingleBeat(note.beat);
+        this.generateNote(note, -note.beat.playbackStart, note.beat.playbackDuration, new Int32Array(note.beat.voice.bar.staff.tuning.length));
     }
 }

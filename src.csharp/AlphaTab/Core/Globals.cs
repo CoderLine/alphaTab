@@ -4,6 +4,7 @@ namespace AlphaTab.Core
 {
     public static class Globals
     {
+        public const double NaN = double.NaN;
         public static Console Console { get; } = new Console();
 
         public static double ParseInt(string s)

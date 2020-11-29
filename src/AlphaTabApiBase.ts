@@ -40,6 +40,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { Note } from './model/Note';
 
 class SelectionInfo {
     public beat: Beat;
@@ -247,7 +248,12 @@ export class AlphaTabApiBase<TSettings> {
             let score: Score = tracks[0].score;
             for (let track of tracks) {
                 if (track.score !== score) {
-                    this.onError(new AlphaTabError(AlphaTabErrorType.General, 'All rendered tracks must belong to the same score.'));
+                    this.onError(
+                        new AlphaTabError(
+                            AlphaTabErrorType.General,
+                            'All rendered tracks must belong to the same score.'
+                        )
+                    );
                     return;
                 }
             }
@@ -334,13 +340,24 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * Attempts a load of the score represented by the given data object.
      * @param data The data object to decode
+     * @param append Whether to fully replace or append the data from the given soundfont.
      * @returns true if the data object is supported and a load was initiated, otherwise false
      */
-    public loadSoundFont(data: unknown): boolean {
+    public loadSoundFont(data: unknown, append: boolean = false): boolean {
         if (!this.player) {
             return false;
         }
-        return this.uiFacade.loadSoundFont(data);
+        return this.uiFacade.loadSoundFont(data, append);
+    }
+
+    /**
+     * Resets all loaded soundfonts as if they were not loaded.
+     */
+    public resetSoundFonts(): void {
+        if (!this.player) {
+            return;
+        }
+        this.player.resetSoundFonts();
     }
 
     /**
@@ -405,6 +422,19 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
+    public get countInVolume(): number {
+        if (!this.player) {
+            return 0;
+        }
+        return this.player.countInVolume;
+    }
+
+    public set countInVolume(value: number) {
+        if (this.player) {
+            this.player.countInVolume = value;
+        }
+    }
+
     public get tickPosition(): number {
         if (!this.player) {
             return 0;
@@ -441,6 +471,9 @@ export class AlphaTabApiBase<TSettings> {
     public set playbackRange(value: PlaybackRange | null) {
         if (this.player) {
             this.player.playbackRange = value;
+            if (this.settings.player.enableCursor) {
+                this.updateSelectionCursor(value);
+            }
         }
     }
 
@@ -618,6 +651,43 @@ export class AlphaTabApiBase<TSettings> {
         this.player.stop();
     }
 
+    /**
+     * Triggers the play of the given beat. This will stop the any other current ongoing playback.
+     * @param beat the single beat to play
+     */
+    public playBeat(beat: Beat): void {
+        if (!this.player) {
+            return;
+        }
+
+        // we generate a new midi file containing only the beat
+        let midiFile: MidiFile = new MidiFile();
+        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        let generator: MidiFileGenerator = new MidiFileGenerator(beat.voice.bar.staff.track.score, this.settings, handler);
+        generator.generateSingleBeat(beat);
+
+        this.player.playOneTimeMidiFile(midiFile);
+    }
+
+    /**
+     * Triggers the play of the given note. This will stop the any other current ongoing playback.
+     * @param beat the single note to play
+     */
+    public playNote(note: Note): void {
+        if (!this.player) {
+            return;
+        }
+
+        // we generate a new midi file containing only the beat
+        let midiFile: MidiFile = new MidiFile();
+        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        let generator: MidiFileGenerator = new MidiFileGenerator(note.beat.voice.bar.staff.track.score, this.settings, handler);
+        generator.generateSingleNote(note);
+
+        this.player.playOneTimeMidiFile(midiFile);
+    }
+
+
     private _cursorWrapper: IContainer | null = null;
     private _barCursor: IContainer | null = null;
     private _beatCursor: IContainer | null = null;
@@ -782,7 +852,7 @@ export class AlphaTabApiBase<TSettings> {
                         if (
                             nextBeatBoundings &&
                             nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                                barBoundings.staveGroupBounds
+                            barBoundings.staveGroupBounds
                         ) {
                             nextBeatX = nextBeatBoundings.visualBounds.x;
                         }
@@ -915,7 +985,7 @@ export class AlphaTabApiBase<TSettings> {
                 );
                 // move to selection start
                 this._currentBeat = null; // reset current beat so it is updating the cursor
-                if(this._playerState === PlayerState.Paused) {
+                if (this._playerState === PlayerState.Paused) {
                     this.cursorUpdateBeat(this._selectionStart.beat, null, 0, false, [this._selectionStart.beat]);
                 }
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
@@ -944,6 +1014,24 @@ export class AlphaTabApiBase<TSettings> {
         (this.beatMouseUp as EventEmitterOfT<Beat | null>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'beatMouseUp', beat, originalEvent);
         this._beatMouseDown = false;
+    }
+
+    private updateSelectionCursor(range: PlaybackRange | null) {
+        if (!this._tickCache) {
+            return;
+        }
+        if (range) {
+            const startBeat = this._tickCache.findBeat(this.tracks, range.startTick);
+            const endBeat = this._tickCache.findBeat(this.tracks, range.endTick);
+            if (startBeat && endBeat) {
+                const selectionStart = new SelectionInfo(startBeat.currentBeat);
+                const selectionEnd = new SelectionInfo(endBeat.currentBeat);
+                this.cursorSelectRange(selectionStart, selectionEnd);
+            }
+        } else {
+            this.cursorSelectRange(null, null);
+        }
+
     }
 
     private setupClickHandling(): void {

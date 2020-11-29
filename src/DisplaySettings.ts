@@ -89,7 +89,7 @@ export class DisplaySettings {
     /**
      * Gets or sets the resources used during rendering. This defines all fonts and colors used.
      */
-    public readonly resources: RenderingResources = new RenderingResources();
+    public resources: RenderingResources = new RenderingResources();
 
     /**
      * Gets or sets the padding between the music notation and the border.

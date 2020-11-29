@@ -73,7 +73,12 @@ export class VisualTestHelper {
             settings.core.engine = 'html5';
             settings.core.enableLazyLoading = false;
 
-            const referenceFileData = await TestPlatform.loadFile(`test-data/visual-tests/${referenceFileName}`);
+            let referenceFileData: Uint8Array;
+            try {
+                referenceFileData = await TestPlatform.loadFile(`test-data/visual-tests/${referenceFileName}`);
+            } catch (e) {
+                referenceFileData = new Uint8Array(0);
+            }
 
             const renderElement = document.createElement('div');
             renderElement.style.width = '1300px';
@@ -153,22 +158,31 @@ export class VisualTestHelper {
         className: string
     ): Promise<HTMLCanvasElement> {
         return new Promise<HTMLCanvasElement>((resolve, reject) => {
-            const img = new Image();
-            img.src = 'data:image/png;base64,' + btoa(data.reduce((p, d) => p + String.fromCharCode(d), ''));
-            img.onload = function () {
+            if (data.length === 0) {
                 const canvas = document.createElement('canvas');
                 canvas.classList.add(className);
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
+                canvas.width = 1;
+                canvas.height = 1;
                 canvas.dataset.filename = filename.split('/').slice(-1)[0];
-                const context = canvas.getContext('2d')!;
-                context.drawImage(img, 0, 0);
-
                 resolve(canvas);
-            };
-            img.onerror = function (e) {
-                reject(e);
-            };
+            } else {
+                const img = new Image();
+                img.src = 'data:image/png;base64,' + btoa(data.reduce((p, d) => p + String.fromCharCode(d), ''));
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.classList.add(className);
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    canvas.dataset.filename = filename.split('/').slice(-1)[0];
+                    const context = canvas.getContext('2d')!;
+                    context.drawImage(img, 0, 0);
+
+                    resolve(canvas);
+                };
+                img.onerror = function (e) {
+                    reject(e);
+                };
+            }
         });
     }
 
@@ -311,11 +325,12 @@ export class VisualTestHelper {
                     let totalPixels = match.totalPixels - match.transparentPixels;
                     let percentDifference = (match.differentPixels / totalPixels) * 100;
                     result.pass = percentDifference < 1;
+                    // result.pass = match.differentPixels < 30;
 
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
                         result.message = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
-                        await VisualTestHelper.saveFiles(expectedFileName, expected, actual, diff);
+                        await VisualTestHelper.saveFiles(expectedFileName, expected, oldActual, diff);
                     } else if (sizeMismatch) {
                         result.message = `Image sizes do not match: ${expected.width}/${expected.height} vs ${oldActual.width}/${oldActual.height}`;
                         result.pass = false;
@@ -330,14 +345,12 @@ export class VisualTestHelper {
                     const dom = document.createElement('div');
                     dom.innerHTML = `
                         <strong>Error:</strong> ${result.message} (${message})<br/>
-                        <strong>Expected:</strong> 
-                        <div class="expected" style="border: 1px solid #000"></div>
-                        <strong>Actual:</strong> 
-                        <div class="actual" style="border: 1px solid #000"></div>
-                        <strong>Diff:</strong> 
-                        <div class="diff" style="border: 1px solid #000"></div>
+                        <div class="comparer" style="border: 1px solid #000">
+                            <div class="expected"></div>
+                            <div class="actual"></div>
+                            <div class="diff"></div>
+                        </div>
                     `;
-
                     actual.ondblclick = () => {
                         const a = document.createElement('a');
                         a.href = oldActual.toDataURL('image/png');
@@ -352,12 +365,97 @@ export class VisualTestHelper {
                     (dom as any).toString = function () {
                         return result.message;
                     };
+
+                    VisualTestHelper.initComparer(dom.querySelector('.comparer'));
+
                     (result as any).message = dom;
                 }
 
                 return result;
             }
         };
+    }
+
+    private static initComparer(el: HTMLElement | null) {
+        if (!el) {
+            return;
+        }
+        const ex = el.querySelector('.expected') as HTMLDivElement;
+        const ac = el.querySelector('.actual') as HTMLDivElement;
+        const df = el.querySelector('.diff') as HTMLDivElement;
+
+        const exCanvas = ex.querySelector('canvas')!;
+        const acCanvas = ac.querySelector('canvas')!;
+
+        const width = Math.max(exCanvas.width, acCanvas.width);
+        const height = Math.max(exCanvas.height, acCanvas.height);
+
+        const controlsHeight = 60;
+
+        el.style.width = width + 'px';
+        el.style.height = height + controlsHeight + 'px';
+        el.style.position = 'relative';
+
+        ex.style.width = width + 'px';
+        ex.style.height = height + 'px';
+        ex.style.background = '#FFF';
+        ex.style.position = 'absolute';
+        ex.style.left = '0';
+        ex.style.top = controlsHeight + 'px';
+
+        ac.style.width = width / 2 + 'px';
+        ac.style.height = height + 'px';
+        ac.style.background = '#FFF';
+        ac.style.position = 'absolute';
+        ac.style.right = '0';
+        ac.style.top = controlsHeight + 'px';
+        ac.style.boxShadow = '-7px 0 10px -5px rgba(0,0,0,.5)';
+        ac.style.overflow = 'hidden';
+        acCanvas.style.position = 'absolute';
+        acCanvas.style.right = '0';
+        acCanvas.style.top = '0';
+
+        df.style.display = 'none';
+        df.style.width = width + 'px';
+        df.style.height = height + 'px';
+        df.style.background = '#FFF';
+        df.style.position = 'absolute';
+        df.style.left = '0';
+        df.style.top = controlsHeight + 'px';
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = '0';
+        slider.max = '1';
+        slider.step = '0.001';
+        slider.value = '0.5';
+        slider.style.position = 'absolute';
+        slider.style.top = '30px';
+        slider.style.right = '0';
+        slider.style.left = '0';
+        slider.style.width = '100%';
+        slider.oninput = () => {
+            ac.style.width = width * (1 - parseFloat(slider.value)) + 'px';
+        };
+        el.appendChild(slider);
+
+        const diffToggleLabel = document.createElement('label');
+        diffToggleLabel.style.position = 'absolute';
+        diffToggleLabel.style.left = '0';
+        diffToggleLabel.style.top = '0';
+
+        const diffToggle = document.createElement('input');
+        diffToggle.type = 'checkbox';
+        diffToggleLabel.appendChild(diffToggle);
+        diffToggleLabel.appendChild(document.createTextNode('Show Diff'));
+        diffToggle.onchange = () => {
+            if (diffToggle.checked) {
+                df.style.display = 'block';
+            } else {
+                df.style.display = 'none';
+            }
+        };
+        el.appendChild(diffToggleLabel);
     }
 
     static async saveFiles(
@@ -382,7 +480,7 @@ export class VisualTestHelper {
             const data = new FormData();
             data.append('name', name);
             data.append('expected', expectedData, VisualTestHelper.createFileName(name, 'expected'));
-            data.append('actual', actualData, VisualTestHelper.createFileName(name, 'actual'));
+            data.append('actual', actualData, VisualTestHelper.createFileName(name, ''));
             data.append('diff', diffData, VisualTestHelper.createFileName(name, 'diff'));
             x.send(data);
         });
@@ -407,11 +505,15 @@ export class VisualTestHelper {
             oldName = oldName.substr(i + 1);
         }
 
+        if (part.length > 0) {
+            part = `-${part}`;
+        }
+
         i = oldName.lastIndexOf('.');
         if (i >= 0) {
-            oldName = oldName.substr(0, i) + '-' + part + oldName.substr(i);
+            oldName = oldName.substr(0, i) + part + oldName.substr(i);
         } else {
-            oldName += '-' + part;
+            oldName += part;
         }
         return oldName;
     }

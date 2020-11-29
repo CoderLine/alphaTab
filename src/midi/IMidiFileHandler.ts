@@ -65,6 +65,18 @@ export interface IMidiFileHandler {
     addTempo(tick: number, tempo: number): void;
 
     /**
+     * Add a bend specific to a note to the generated midi file.
+     * The note does not need to be started, if this event is signaled, the next time a note 
+     * on this channel and key is played it will be affected. The note bend is cleared on a note-off for this key. 
+     * @param track The midi track on which the bend should change.
+     * @param tick The midi ticks when the bend should change.
+     * @param channel The midi channel on which the bend should change.
+     * @param channel The key of the note that should be affected by the bend. 
+     * @param value The new bend for the selected note.
+     */
+    addNoteBend(track: number, tick: number, channel: number, key: number, value: number): void;
+
+    /**
      * Add a bend to the generated midi file.
      * @param track The midi track on which the bend should change.
      * @param tick The midi ticks when the bend should change.

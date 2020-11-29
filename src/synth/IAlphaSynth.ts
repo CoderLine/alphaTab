@@ -67,6 +67,11 @@ export interface IAlphaSynth {
     isLooping: boolean;
 
     /**
+     * Gets or sets volume of the metronome during count-in. (range: 0.0-3.0, default 0.0 - no count in)
+     */
+    countInVolume: number;
+
+    /**
      * Destroys the synthesizer and all related components
      */
     destroy(): void;
@@ -93,10 +98,22 @@ export interface IAlphaSynth {
     stop(): void;
 
     /**
+     * Stops any ongoing playback and plays the given midi file instead. 
+     * @param midi The midi file to play
+     */
+    playOneTimeMidiFile(midi: MidiFile): void;
+
+    /**
      * Loads a soundfont from the given data
      * @param data a byte array to load the data from
+     * @param append Whether to fully replace or append the data from the given soundfont.
      */
-    loadSoundFont(data: Uint8Array): void;
+    loadSoundFont(data: Uint8Array, append: boolean): void;
+
+    /**
+     * Resets all loaded soundfonts as if they were not loaded.
+     */
+    resetSoundFonts(): void;
 
     /**
      * Loads the given midi file structure.

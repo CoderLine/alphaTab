@@ -23,7 +23,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     private _beat: Beat;
 
     public constructor(beat: Beat) {
-        super();
+        super(0,0);
         this._beat = beat;
     }
 
@@ -111,7 +111,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             beat.voice.bar
         )! as ScoreBarRenderer;
         let startX: number = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(beat, BeatXPosition.MiddleNotes);
-        let beatDirection: BeamDirection = this.getBeamDirection(beat, startNoteRenderer);
+        let beatDirection: BeamDirection = this.getTieDirection(beat, startNoteRenderer);
         let direction: BeamDirection = this._beat.notes.length === 1 ? beatDirection : BeamDirection.Up;
         let textalign: TextAlign = canvas.textAlign;
         for (let i: number = 0; i < beat.notes.length; i++) {
@@ -197,7 +197,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             22,
                             4
                         );
-                        canvas.fill();
                     }
                     break;
                 case WhammyType.Dive:
@@ -232,7 +231,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             22,
                             4
                         );
-                        canvas.fill();
                     }
                     break;
                 case WhammyType.Dip:
@@ -280,7 +278,6 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                                 22,
                                 4
                             );
-                            canvas.fill();
                         }
                     } else {
                         let middleX: number = (startX + endX) / 2;
@@ -319,7 +316,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                 case WhammyType.Predive:
                     let preX: number =
                         cx + startNoteRenderer.x + startNoteRenderer.getBeatX(note.beat, BeatXPosition.PreNotes);
-                    preX += (startNoteRenderer.getBeatContainer(note.beat).preNotes as ScoreBeatPreNotesGlyph)
+                    preX += (startNoteRenderer.getPreNotesGlyphForBeat(note.beat) as ScoreBeatPreNotesGlyph)
                         .prebendNoteHeadOffset;
                     let preY: number =
                         cy +

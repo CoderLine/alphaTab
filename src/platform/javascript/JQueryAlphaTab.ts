@@ -112,8 +112,12 @@ export class JQueryAlphaTab {
         context.changeTrackVolume(tracks, volume);
     }
 
-    public loadSoundFont(element: jQuery, context: AlphaTabApi, value: unknown): void {
-        context.loadSoundFont(value);
+    public loadSoundFont(element: jQuery, context: AlphaTabApi, value: unknown, append: boolean): void {
+        context.loadSoundFont(value, append);
+    }
+
+    public resetSoundFonts(element: jQuery, context: AlphaTabApi): void {
+        context.resetSoundFonts();
     }
 
     public pause(element: jQuery, context: AlphaTabApi): void {
@@ -160,6 +164,13 @@ export class JQueryAlphaTab {
             context.metronomeVolume = metronomeVolume;
         }
         return context.metronomeVolume;
+    }
+
+    public countInVolume(element: jQuery, context: AlphaTabApi, countInVolume?: number): number {
+        if (typeof countInVolume === 'number') {
+            context.countInVolume = countInVolume;
+        }
+        return context.countInVolume;
     }
 
     public playbackSpeed(element: jQuery, context: AlphaTabApi, playbackSpeed?: number): number {

@@ -51,6 +51,11 @@ export class FlatMidiEventGenerator implements IMidiFileHandler {
         this.midiEvents.push(e);
     }
 
+    public addNoteBend(track: number, tick: number, channel: number, key: number, value: number): void {
+        let e = new NoteBendEvent(tick, track, channel, key, value);
+        this.midiEvents.push(e);
+    }
+
     public finishTrack(track: number, tick: number): void {
         let e = new TrackEndEvent(tick, track);
         this.midiEvents.push(e);
@@ -328,6 +333,32 @@ export class BendEvent extends ChannelMidiEvent {
 
         if (obj instanceof BendEvent) {
             return this.value === obj.value;
+        }
+
+        return false;
+    }
+}
+export class NoteBendEvent extends ChannelMidiEvent {
+    public key: number;
+    public value: number;
+
+    public constructor(tick: number, track: number, channel: number, key: number, value: number) {
+        super(tick, track, channel);
+        this.key = key;
+        this.value = value;
+    }
+
+    public toString(): string {
+        return `NoteBend: ${super.toString()} Key[${this.key}] Value[${this.value}]`;
+    }
+
+    public equals(obj: unknown): boolean {
+        if (!super.equals(obj)) {
+            return false;
+        }
+
+        if (obj instanceof NoteBendEvent) {
+            return this.value === obj.value && this.key === obj.key;
         }
 
         return false;

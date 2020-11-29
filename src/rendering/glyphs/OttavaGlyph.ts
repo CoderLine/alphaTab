@@ -2,7 +2,7 @@ import { Ottavia } from '@src/model/Ottavia';
 import { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class OttavaGlyph extends GroupedEffectGlyph {
     private _ottava: Ottavia;
@@ -32,7 +32,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     0.8,
-                    MusicFontSymbol.Ottava15ma,
+                    MusicFontSymbol.QuindicesimaAlta,
                     false
                 );
                 break;
@@ -42,7 +42,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     0.8,
-                    MusicFontSymbol.Ottava8va,
+                    MusicFontSymbol.OttavaAlta,
                     false
                 );
                 break;
@@ -52,7 +52,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     0.8,
-                    MusicFontSymbol.Ottava8vb,
+                    MusicFontSymbol.OttavaBassaVb,
                     false
                 );
                 break;
@@ -63,7 +63,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
                     0.8,
-                    [MusicFontSymbol.Ottava15, MusicFontSymbol.OttavaMBaseline, MusicFontSymbol.OttavaBBaseline],
+                    [MusicFontSymbol.Quindicesima, MusicFontSymbol.OctaveBaselineM, MusicFontSymbol.OctaveBaselineB],
                     false
                 );
                 break;

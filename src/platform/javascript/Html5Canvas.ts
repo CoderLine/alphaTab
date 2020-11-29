@@ -1,7 +1,7 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
 import { Settings } from '@src/Settings';
 
 /**
@@ -103,11 +103,11 @@ export class Html5Canvas implements ICanvas {
     }
 
     public moveTo(x: number, y: number): void {
-        this._context.moveTo((x | 0), (y | 0));
+        this._context.moveTo(x, y);
     }
 
     public lineTo(x: number, y: number): void {
-        this._context.lineTo((x | 0), (y | 0));
+        this._context.lineTo(x, y);
     }
 
     public quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
@@ -121,8 +121,8 @@ export class Html5Canvas implements ICanvas {
     public fillCircle(x: number, y: number, radius: number): void {
         this._context.beginPath();
         this._context.arc(
-            (x | 0),
-            (y | 0),
+            x,
+            y,
             radius,
             0,
             Math.PI * 2,
@@ -134,8 +134,8 @@ export class Html5Canvas implements ICanvas {
     public strokeCircle(x: number, y: number, radius: number): void {
         this._context.beginPath();
         this._context.arc(
-            (x | 0),
-            (y | 0),
+            x,
+            y,
             radius,
             0,
             Math.PI * 2,
@@ -227,7 +227,7 @@ export class Html5Canvas implements ICanvas {
     }
 
     public fillText(text: string, x: number, y: number): void {
-        this._context.fillText(text, (x | 0), (y | 0));
+        this._context.fillText(text, x, y);
     }
 
     public measureText(text: string): number {
@@ -278,7 +278,7 @@ export class Html5Canvas implements ICanvas {
         if (centerAtPosition) {
             this._context.textAlign = 'center';
         }
-        this._context.fillText(symbols, (x | 0), (y | 0));
+        this._context.fillText(symbols, x, y);
         this._context.textBaseline = baseLine;
         this._context.font = font;
         this._context.textAlign = textAlign;

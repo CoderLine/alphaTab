@@ -2,7 +2,7 @@ import { Font } from '@src/model/Font';
 import { TripletFeel } from '@src/model/TripletFeel';
 import { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export enum TripletFeelGlyphBarType {
@@ -45,8 +45,8 @@ export class TripletFeelGlyph extends EffectGlyph {
                 break;
             case TripletFeel.Triplet8th:
                 this.renderBarNote(leftNoteX, noteY, TripletFeelGlyph.NoteScale, canvas, [TripletFeelGlyphBarType.Full]);
-                canvas.fillMusicFontSymbol(rightNoteX, noteY, TripletFeelGlyph.NoteScale, MusicFontSymbol.Tempo, false);
-                canvas.fillMusicFontSymbol(rightNoteX + TripletFeelGlyph.NoteSeparation * this.scale, noteY, TripletFeelGlyph.NoteScale, MusicFontSymbol.NoteEighth, false);
+                canvas.fillMusicFontSymbol(rightNoteX, noteY, TripletFeelGlyph.NoteScale, MusicFontSymbol.NoteQuarterUp, false);
+                canvas.fillMusicFontSymbol(rightNoteX + TripletFeelGlyph.NoteSeparation * this.scale, noteY, TripletFeelGlyph.NoteScale, MusicFontSymbol.NoteEighthUp, false);
                 this.renderTriplet(rightNoteX, cy, canvas);
                 break;
             case TripletFeel.Triplet16th:
@@ -112,7 +112,7 @@ export class TripletFeelGlyph extends EffectGlyph {
         canvas: ICanvas,
         bars: TripletFeelGlyphBarType[]
     ): void {
-        canvas.fillMusicFontSymbol(cx, noteY, noteScale, MusicFontSymbol.Tempo, false);
+        canvas.fillMusicFontSymbol(cx, noteY, noteScale, MusicFontSymbol.NoteQuarterUp, false);
         let partialBarWidth: number = (TripletFeelGlyph.NoteSeparation / 2) * this.scale;
         for (let i: number = 0; i < bars.length; i++) {
             switch (bars[i]) {
@@ -142,7 +142,7 @@ export class TripletFeelGlyph extends EffectGlyph {
                     break;
             }
         }
-        canvas.fillMusicFontSymbol(cx + TripletFeelGlyph.NoteSeparation * this.scale, noteY, noteScale, MusicFontSymbol.Tempo, false);
+        canvas.fillMusicFontSymbol(cx + TripletFeelGlyph.NoteSeparation * this.scale, noteY, noteScale, MusicFontSymbol.NoteQuarterUp, false);
     }
 
     private renderTriplet(cx: number, cy: number, canvas: ICanvas): void {

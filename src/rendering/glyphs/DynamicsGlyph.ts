@@ -1,6 +1,6 @@
 import { DynamicValue } from '@src/model/DynamicValue';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class DynamicsGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, dynamics: DynamicValue) {
@@ -20,13 +20,13 @@ export class DynamicsGlyph extends MusicFontGlyph {
             case DynamicValue.PP:
                 return MusicFontSymbol.DynamicPP;
             case DynamicValue.P:
-                return MusicFontSymbol.DynamicP;
+                return MusicFontSymbol.DynamicPiano;
             case DynamicValue.MP:
                 return MusicFontSymbol.DynamicMP;
             case DynamicValue.MF:
                 return MusicFontSymbol.DynamicMF;
             case DynamicValue.F:
-                return MusicFontSymbol.DynamicF;
+                return MusicFontSymbol.DynamicForte;
             case DynamicValue.FF:
                 return MusicFontSymbol.DynamicFF;
             case DynamicValue.FFF:

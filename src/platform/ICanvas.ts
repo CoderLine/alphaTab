@@ -1,6 +1,6 @@
 import { Color } from '@src/model/Color';
 import { Font } from '@src/model/Font';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Settings } from '@src/Settings';
 
 /**

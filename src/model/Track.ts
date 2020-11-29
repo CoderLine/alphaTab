@@ -5,6 +5,7 @@ import { PlaybackInformation } from '@src/model/PlaybackInformation';
 import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Settings } from '@src/Settings';
+import { InstrumentArticulation } from './InstrumentArticulation';
 
 /**
  * This public class describes a single track or instrument of score.
@@ -47,6 +48,12 @@ export class Track {
      */
     public shortName: string = '';
 
+    /**
+     * Gets or sets a mapping on which staff liens particular percussion instruments
+     * should be shown.
+     */
+    public percussionArticulations: InstrumentArticulation[] = [];
+
     public ensureStaveCount(staveCount: number): void {
         while (this.staves.length < staveCount) {
             this.addStaff(new Staff());
@@ -86,7 +93,7 @@ export class Track {
         let staff: Staff = this.staves[0];
         for (let li: number = 0; li < lyrics.length; li++) {
             let lyric: Lyrics = lyrics[li];
-            if (lyric.startBar >= 0) {
+            if (lyric.startBar >= 0 && lyric.startBar < staff.bars.length) {
                 let beat: Beat | null = staff.bars[lyric.startBar].voices[0].beats[0];
                 for (let ci: number = 0; ci < lyric.chunks.length && beat; ci++) {
                     // skip rests and empty beats

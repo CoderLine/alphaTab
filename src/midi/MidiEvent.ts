@@ -4,6 +4,12 @@ import { IWriteable } from '@src/io/IWriteable';
  * Lists all midi events.
  */
 export enum MidiEventType {
+
+    /**
+     * A per note pitch bend. (Midi 2.0)
+     */
+    PerNotePitchBend = 0x60,
+
     /**
      * A note is released.
      */

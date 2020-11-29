@@ -1,6 +1,6 @@
 import { TextAlign } from '@src/platform/ICanvas';
 import { SvgCanvas } from '@src/platform/svg/SvgCanvas';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements.
@@ -46,7 +46,7 @@ export class CssFontSvgCanvas extends SvgCanvas {
         symbols: string,
         centerAtPosition: boolean = false
     ): void {
-        this.buffer += `<g transform="translate(${(x | 0) - 0} ${(y | 0) - 0})" class="at" ><text`;
+        this.buffer += `<g transform="translate(${x} ${y})" class="at" ><text`;
         if (scale !== 1) {
             this.buffer += ` style="font-size: ${scale * 100}%; stroke:none"`;
         } else {

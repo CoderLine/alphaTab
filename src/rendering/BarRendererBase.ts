@@ -9,7 +9,7 @@ import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
@@ -70,6 +70,13 @@ export enum NoteXPosition {
  * This is the base public class for creating blocks which can render bars.
  */
 export class BarRendererBase {
+    public static readonly LineSpacing: number = 8;
+    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.LineSpacing;
+    public static readonly StaffLineThickness: number =
+        0.13 /*bravura staffLineThickness */ * BarRendererBase.LineSpacing;
+    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.LineSpacing;
+    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.LineSpacing;
+
     private _preBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
     private _voiceContainers: Map<number, VoiceContainerGlyph> = new Map();
     private _postBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
@@ -119,8 +126,12 @@ export class BarRendererBase {
         this.scoreRenderer = renderer;
         this.bar = bar;
         if (bar) {
-            this.helpers = new BarHelpers(bar);
+            this.helpers = new BarHelpers(this);
         }
+    }
+
+    public get middleYPosition(): number {
+        return 0;
     }
 
     public registerOverflowTop(topOverflow: number): void {
@@ -232,6 +243,7 @@ export class BarRendererBase {
         if (!this.bar) {
             return;
         }
+        this.helpers.initialize();
         this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
         this._preBeatGlyphs.renderer = this;
         this._voiceContainers.clear();
@@ -252,6 +264,13 @@ export class BarRendererBase {
         this.createBeatGlyphs();
         this.createPostBeatGlyphs();
         this.updateSizes();
+
+        // finish up all helpers
+        for (const v of this.helpers.beamHelpers) {
+            for (const h of v) {
+                h.finish();
+            }
+        }
     }
 
     protected hasVoiceContainer(voice: Voice): boolean {
@@ -274,6 +293,7 @@ export class BarRendererBase {
         });
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
+        this.height += this.layoutingInfo.height * this.scale;
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -285,24 +305,24 @@ export class BarRendererBase {
         g.renderer = this;
         g.preNotes.renderer = this;
         g.onNotes.renderer = this;
-        g.onNotes.beamingHelper = this.helpers!.beamHelperLookup[g.beat.voice.index].get(g.beat.index)!;
-        this.getOrCreateVoiceContainer(g.beat.voice).addGlyph(g);
+        g.onNotes.beamingHelper = this.helpers.beamHelperLookup[g.beat.voice.index].get(g.beat.index)!;
+        this.getVoiceContainer(g.beat.voice)!.addGlyph(g);
     }
 
-    protected getOrCreateVoiceContainer(voice: Voice): VoiceContainerGlyph {
-        return this._voiceContainers.get(voice.index)!;
+    protected getVoiceContainer(voice: Voice): VoiceContainerGlyph | undefined {
+        return this._voiceContainers.get(voice.index);
     }
 
-    public getBeatContainer(beat: Beat): BeatContainerGlyph {
-        return this.getOrCreateVoiceContainer(beat.voice).beatGlyphs[beat.index];
+    public getBeatContainer(beat: Beat): BeatContainerGlyph | undefined {
+        return this.getVoiceContainer(beat.voice)?.beatGlyphs[beat.index];
     }
 
-    public getPreNotesGlyphForBeat(beat: Beat): BeatGlyphBase {
-        return this.getBeatContainer(beat).preNotes;
+    public getPreNotesGlyphForBeat(beat: Beat): BeatGlyphBase | undefined {
+        return this.getBeatContainer(beat)?.preNotes;
     }
 
-    public getOnNotesGlyphForBeat(beat: Beat): BeatOnNoteGlyphBase {
-        return this.getBeatContainer(beat).onNotes;
+    public getOnNotesGlyphForBeat(beat: Beat): BeatOnNoteGlyphBase | undefined {
+        return this.getBeatContainer(beat)?.onNotes;
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -318,7 +338,13 @@ export class BarRendererBase {
     }
 
     protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
-        // no default brackgroundpainting
+        this.layoutingInfo.paint(
+            cx + this.x + this._preBeatGlyphs.x + this._preBeatGlyphs.width,
+            cy + this.y + this.height,
+            canvas
+        );
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x + this._preBeatGlyphs.x, cy + this.y, this._preBeatGlyphs.width, this.height);
     }
 
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
@@ -357,6 +383,15 @@ export class BarRendererBase {
     }
 
     protected createBeatGlyphs(): void {
+        for (let v: number = 0; v < this.bar.voices.length; v++) {
+            let voice: Voice = this.bar.voices[v];
+            if (this.hasVoiceContainer(voice)) {
+                this.createVoiceGlyphs(this.bar.voices[v]);
+            }
+        }
+    }
+
+    protected createVoiceGlyphs(v: Voice): void {
         // filled in subclasses
     }
 
@@ -373,7 +408,7 @@ export class BarRendererBase {
     }
 
     public getBeatX(beat: Beat, requestedPosition: BeatXPosition = BeatXPosition.PreNotes): number {
-        let container: BeatContainerGlyph = this.getBeatContainer(beat);
+        let container = this.getBeatContainer(beat);
         if (container) {
             switch (requestedPosition) {
                 case BeatXPosition.PreNotes:
@@ -383,10 +418,10 @@ export class BarRendererBase {
                 case BeatXPosition.MiddleNotes:
                     return container.voiceContainer.x + container.x + container.onTimeX;
                 case BeatXPosition.Stem:
-                    return (
-                        container.voiceContainer.x +
-                        container.onNotes.beamingHelper.getBeatLineX(beat)
-                    );
+                    const offset = container.onNotes.beamingHelper
+                        ? container.onNotes.beamingHelper.getBeatLineX(beat)
+                        : container.onNotes.x + container.onNotes.width / 2;
+                    return container.voiceContainer.x + offset;
                 case BeatXPosition.PostNotes:
                     return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.width;
                 case BeatXPosition.EndBeat:
@@ -397,9 +432,14 @@ export class BarRendererBase {
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
-        let container: BeatContainerGlyph = this.getBeatContainer(note.beat);
+        let container = this.getBeatContainer(note.beat);
         if (container) {
-            return container.voiceContainer.x + container.x + container.onNotes.x + container.onNotes.getNoteX(note, requestedPosition);
+            return (
+                container.voiceContainer.x +
+                container.x +
+                container.onNotes.x +
+                container.onNotes.getNoteX(note, requestedPosition)
+            );
         }
         return 0;
     }
@@ -409,7 +449,7 @@ export class BarRendererBase {
         if (beat) {
             return beat.getNoteY(note, requestedPosition);
         }
-        return 0;
+        return NaN;
     }
 
     public reLayout(): void {
@@ -425,13 +465,13 @@ export class BarRendererBase {
     }
 
     protected paintSimileMark(cx: number, cy: number, canvas: ICanvas): void {
-        switch (this.bar!.simileMark) {
+        switch (this.bar.simileMark) {
             case SimileMark.Simple:
                 canvas.fillMusicFontSymbol(
                     cx + this.x + (this.width - 20 * this.scale) / 2,
                     cy + this.y + this.height / 2,
                     1,
-                    MusicFontSymbol.SimileMarkSimple,
+                    MusicFontSymbol.Repeat1Bar,
                     false
                 );
                 break;
@@ -440,7 +480,7 @@ export class BarRendererBase {
                     cx + this.x - (28 * this.scale) / 2,
                     cy + this.y + this.height / 2,
                     1,
-                    MusicFontSymbol.SimileMarkDouble,
+                    MusicFontSymbol.Repeat2Bars,
                     false
                 );
                 break;

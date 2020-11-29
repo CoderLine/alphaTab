@@ -25,7 +25,7 @@ export class AlternateEndingsEffectInfo extends EffectBarRendererInfo {
     }
 
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
-        return beat.index === 0 && beat.voice.bar.masterBar.alternateEndings !== 0;
+        return beat.voice.index === 0 && beat.index === 0 && beat.voice.bar.masterBar.alternateEndings !== 0;
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {

@@ -14,12 +14,12 @@ import { SlideOutType } from '@src/model/SlideOutType';
 import { Staff } from '@src/model/Staff';
 import { VibratoType } from '@src/model/VibratoType';
 import { NotationMode } from '@src/NotationSettings';
-import { PercussionMapper } from '@src/rendering/utils/PercussionMapper';
 import { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PickStroke } from './PickStroke';
+import { PercussionMapper } from '@src/model/PercussionMapper';
 
 /**
  * A note is a single played sound on a fretted instrument.
@@ -108,18 +108,125 @@ export class Note {
     public tone: number = -1;
 
     public get isPercussion(): boolean {
-        return !this.isStringed && this.element >= 0 && this.variation >= 0;
+        return !this.isStringed && this.percussionArticulation >= 0;
     }
 
     /**
      * Gets or sets the percusson element.
+     * @deprecated
      */
-    public element: number = -1;
+    public get element(): number {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[0] : -1;
+    }
 
     /**
      * Gets or sets the variation of this note.
+     * * @deprecated
      */
-    public variation: number = -1;
+    public get variation(): number {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[1] : -1;
+    }
+
+    /**
+     * Gets or sets the index of percussion articulation in the related `track.percussionArticulations`.
+     * If the articulation is not listed in `track.percussionArticulations` the following list based on GP7 applies:
+     * - 029 Ride (choke)
+     * - 030 Cymbal (hit)
+     * - 031 Snare (side stick)
+     * - 033 Snare (side stick)
+     * - 034 Snare (hit)
+     * - 035 Kick (hit)
+     * - 036 Kick (hit)
+     * - 037 Snare (side stick)
+     * - 038 Snare (hit)
+     * - 039 Hand Clap (hit)
+     * - 040 Snare (hit)
+     * - 041 Low Floor Tom (hit)
+     * - 042 Hi-Hat (closed)
+     * - 043 Very Low Tom (hit)
+     * - 044 Pedal Hi-Hat (hit)
+     * - 045 Low Tom (hit)
+     * - 046 Hi-Hat (open)
+     * - 047 Mid Tom (hit)
+     * - 048 High Tom (hit)
+     * - 049 Crash high (hit)
+     * - 050 High Floor Tom (hit)
+     * - 051 Ride (middle)
+     * - 052 China (hit)
+     * - 053 Ride (bell)
+     * - 054 Tambourine (hit)
+     * - 055 Splash (hit)
+     * - 056 Cowbell medium (hit)
+     * - 057 Crash medium (hit)
+     * - 058 Vibraslap (hit)
+     * - 059 Ride (edge)
+     * - 060 Hand (hit)
+     * - 061 Hand (hit)
+     * - 062 Conga high (mute)
+     * - 063 Conga high (hit)
+     * - 064 Conga low (hit)
+     * - 065 Timbale high (hit)
+     * - 066 Timbale low (hit)
+     * - 067 Agogo high (hit)
+     * - 068 Agogo tow (hit)
+     * - 069 Cabasa (hit)
+     * - 070 Left Maraca (hit)
+     * - 071 Whistle high (hit)
+     * - 072 Whistle low (hit)
+     * - 073 Guiro (hit)
+     * - 074 Guiro (scrap-return)
+     * - 075 Claves (hit)
+     * - 076 Woodblock high (hit)
+     * - 077 Woodblock low (hit)
+     * - 078 Cuica (mute)
+     * - 079 Cuica (open)
+     * - 080 Triangle (rnute)
+     * - 081 Triangle (hit)
+     * - 082 Shaker (hit)
+     * - 083 Tinkle Bell (hat)
+     * - 083 Jingle Bell (hit)
+     * - 084 Bell Tree (hit)
+     * - 085 Castanets (hit)
+     * - 086 Surdo (hit)
+     * - 087 Surdo (mute)
+     * - 091 Snare (rim shot)
+     * - 092 Hi-Hat (half)
+     * - 093 Ride (edge)
+     * - 094 Ride (choke)
+     * - 095 Splash (choke)
+     * - 096 China (choke)
+     * - 097 Crash high (choke)
+     * - 098 Crash medium (choke)
+     * - 099 Cowbell low (hit)
+     * - 100 Cowbell low (tip)
+     * - 101 Cowbell medium (tip)
+     * - 102 Cowbell high (hit)
+     * - 103 Cowbell high (tip)
+     * - 104 Hand (mute)
+     * - 105 Hand (slap)
+     * - 106 Hand (mute)
+     * - 107 Hand (slap)
+     * - 108 Conga low (slap)
+     * - 109 Conga low (mute)
+     * - 110 Conga high (slap)
+     * - 111 Tambourine (return)
+     * - 112 Tambourine (roll)
+     * - 113 Tambourine (hand)
+     * - 114 Grancassa (hit)
+     * - 115 Piatti (hat)
+     * - 116 Piatti (hand)
+     * - 117 Cabasa (return)
+     * - 118 Left Maraca (return)
+     * - 119 Right Maraca (hit)
+     * - 120 Right Maraca (return)
+     * - 122 Shaker (return)
+     * - 123 Bell Tee (return)
+     * - 124 Golpe (thumb)
+     * - 125 Golpe (finger)
+     * - 126 Ride (middle)
+     * - 127 Ride (bell)
+     */
+    public percussionArticulation: number = -1;
 
     /**
      * Gets or sets whether this note is visible on the music sheet.
@@ -340,7 +447,7 @@ export class Note {
 
     public get realValue(): number {
         if (this.isPercussion) {
-            return PercussionMapper.midiFromElementVariation(this);
+            return this.percussionArticulation;
         }
         if (this.isStringed) {
             if (this.harmonicType === HarmonicType.Natural) {
@@ -434,24 +541,23 @@ export class Note {
         return 0;
     }
 
-    public get displayValue(): number {
-        let noteValue: number = this.displayValueWithoutBend;
+    public get initialBendValue(): number {
         if (this.hasBend) {
-            noteValue += (this.bendPoints[0].value / 2) | 0;
+            return (this.bendPoints[0].value / 2) | 0;
         } else if (this.bendOrigin) {
-            noteValue += (this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2) | 0;
+            return (this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2) | 0;
         } else if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
-            noteValue +=
-                (this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2) | 0;
+            return (this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2) | 0;
         } else if (this.beat.hasWhammyBar) {
-            noteValue += (this.beat.whammyBarPoints[0].value / 2) | 0;
+            return (this.beat.whammyBarPoints[0].value / 2) | 0;
         } else if (this.beat.isContinuedWhammy) {
-            noteValue +=
-                (this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value /
-                    2) |
-                0;
+            return (this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value / 2) | 0;
         }
-        return noteValue;
+        return 0;
+    }
+
+    public get displayValue(): number {
+        return this.displayValueWithoutBend + this.initialBendValue;
     }
 
     public get displayValueWithoutBend(): number {
@@ -507,7 +613,7 @@ export class Note {
         if (this.beat.isContinuedWhammy) {
             return (
                 this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value %
-                    2 !==
+                2 !==
                 0
             );
         }
@@ -542,8 +648,7 @@ export class Note {
         dst.dynamics = src.dynamics;
         dst.octave = src.octave;
         dst.tone = src.tone;
-        dst.element = src.element;
-        dst.variation = src.variation;
+        dst.percussionArticulation = src.percussionArticulation;
         dst.bendType = src.bendType;
         dst.bendStyle = src.bendStyle;
         dst.isContinuedBend = src.isContinuedBend;
@@ -575,6 +680,7 @@ export class Note {
     public finish(settings: Settings): void {
         let nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
         let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
+
         // connect ties
         if (this.isTieDestination) {
             this.chain();
@@ -716,6 +822,12 @@ export class Note {
             }
         } else if (this.bendPoints.length === 0) {
             this.bendType = BendType.None;
+        }
+
+        // initial bend pitch offsets and forced accidentals don't play well together
+        // we reset it
+        if (this.initialBendValue > 0) {
+            this.accidentalMode = NoteAccidentalMode.Default;
         }
     }
 

@@ -1,6 +1,6 @@
 import { Duration } from '@src/model/Duration';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { MusicFontSymbol } from '@src/rendering/glyphs/MusicFontSymbol';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 
 export class ScoreRestGlyph extends MusicFontGlyph {
@@ -15,7 +15,7 @@ export class ScoreRestGlyph extends MusicFontGlyph {
     public static getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.QuadrupleWhole:
-                return MusicFontSymbol.RestQuadrupleWhole;
+                return MusicFontSymbol.RestLonga;
             case Duration.DoubleWhole:
                 return MusicFontSymbol.RestDoubleWhole;
             case Duration.Whole:

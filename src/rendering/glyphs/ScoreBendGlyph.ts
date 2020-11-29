@@ -22,7 +22,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
 
     public constructor(beat: Beat) {
-        super();
+        super(0,0);
         this._beat = beat;
     }
 
@@ -117,7 +117,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         });
         let directionBeat: Beat = this._beat.graceType === GraceType.BendGrace ? this._beat.nextBeat! : this._beat;
         let direction: BeamDirection =
-            this._notes.length === 1 ? this.getBeamDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;
+            this._notes.length === 1 ? this.getTieDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;
         // draw slurs
         for (let i: number = 0; i < this._notes.length; i++) {
             let note: Note = this._notes[i];
@@ -142,7 +142,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                     let endX: number = cx + startNoteRenderer.x + startNoteRenderer.width;
                     let noteValueToDraw: number = note.tieDestination!.realValue;
-                    startNoteRenderer.accidentalHelper.applyAccidentalForValue(note.beat, noteValueToDraw, false);
+                    startNoteRenderer.accidentalHelper.applyAccidentalForValue(note.beat, noteValueToDraw, false, true);
                     let endY: number =
                         cy +
                         startNoteRenderer.y +
@@ -162,7 +162,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             22,
                             4
                         );
-                        canvas.fill();
                     } else {
                         this.drawBendSlur(
                             canvas,
@@ -194,7 +193,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             22,
                             4
                         );
-                        canvas.fill();
                     } else {
                         this.drawBendSlur(
                             canvas,
@@ -214,7 +212,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     case BendType.PrebendRelease:
                         let preX: number =
                             cx + startNoteRenderer.x + startNoteRenderer.getBeatX(note.beat, BeatXPosition.PreNotes);
-                        preX += (startNoteRenderer.getBeatContainer(note.beat).preNotes as ScoreBeatPreNotesGlyph)
+                        preX += (startNoteRenderer.getPreNotesGlyphForBeat(note.beat) as ScoreBeatPreNotesGlyph)
                             .prebendNoteHeadOffset;
                         let preY: number =
                             cy +
@@ -306,7 +304,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     case BendType.PrebendRelease:
                         let preX: number =
                             cx + startNoteRenderer.x + startNoteRenderer.getBeatX(note.beat, BeatXPosition.PreNotes);
-                        preX += (startNoteRenderer.getBeatContainer(note.beat).preNotes as ScoreBeatPreNotesGlyph)
+                        preX += (startNoteRenderer.getPreNotesGlyphForBeat(note.beat) as ScoreBeatPreNotesGlyph)
                             .prebendNoteHeadOffset;
                         let preY: number =
                             cy +

@@ -5,17 +5,13 @@ import { HarmonicType } from '@src/model/HarmonicType';
 import { Note } from '@src/model/Note';
 import { AccentuationGlyph } from '@src/rendering/glyphs/AccentuationGlyph';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { ChineseCymbalGlyph } from '@src/rendering/glyphs/ChineseCymbalGlyph';
 import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
 import { DeadNoteHeadGlyph } from '@src/rendering/glyphs/DeadNoteHeadGlyph';
 import { DiamondNoteHeadGlyph } from '@src/rendering/glyphs/DiamondNoteHeadGlyph';
-import { DrumSticksGlyph } from '@src/rendering/glyphs/DrumSticksGlyph';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { GhostNoteContainerGlyph } from '@src/rendering/glyphs/GhostNoteContainerGlyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { HiHatGlyph } from '@src/rendering/glyphs/HiHatGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { RideCymbalGlyph } from '@src/rendering/glyphs/RideCymbalGlyph';
 import { ScoreNoteChordGlyph } from '@src/rendering/glyphs/ScoreNoteChordGlyph';
 import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 import { ScoreWhammyBarGlyph } from '@src/rendering/glyphs/ScoreWhammyBarGlyph';
@@ -23,6 +19,16 @@ import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
 import { BeatBounds } from '../utils/BeatBounds';
+import { PercussionMapper } from '../../model/PercussionMapper';
+import { PercussionNoteHeadGlyph } from './PercussionNoteHeadGlyph';
+import { Logger } from '@src/alphatab';
+import { ArticStaccatoAboveGlyph } from './ArticStaccatoAboveGlyph';
+import { MusicFontSymbol } from '../../model/MusicFontSymbol';
+import { TextBaseline } from '@src/platform/ICanvas';
+import { PictEdgeOfCymbalGlyph } from './PictEdgeOfCymbalGlyph';
+import { PickStrokeGlyph } from './PickStrokeGlyph';
+import { PickStroke } from '@src/model/PickStroke';
+import { GuitarGolpeGlyph } from './GuitarGolpeGlyph';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: ScoreNoteChordGlyph | null = null;
@@ -32,12 +38,12 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         return this.noteHeads ? this.noteHeads.getNoteX(note, requestedPosition) : 0;
     }
 
-    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
-        if(this.noteHeads) {
+    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+        if (this.noteHeads) {
             this.noteHeads.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
         }
     }
-    
+
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return this.noteHeads ? this.noteHeads.getNoteY(note, requestedPosition) : 0;
     }
@@ -75,7 +81,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         new SpacingGlyph(
                             0,
                             0,
-                            4 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) * this.scale
+                            4 *
+                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
+                                this.scale
                         )
                     );
                     this.addGlyph(ghost);
@@ -102,56 +110,20 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
             } else {
-                let dotLine: number = 0;
-                let line: number = 0;
                 let offset: number = 0;
-                switch (this.container.beat.duration) {
-                    case Duration.QuadrupleWhole:
-                        line = 6;
-                        dotLine = 5;
-                        break;
-                    case Duration.DoubleWhole:
-                        line = 6;
-                        dotLine = 5;
-                        break;
-                    case Duration.Whole:
-                        line = 4;
-                        dotLine = 5;
-                        break;
-                    case Duration.Half:
-                        line = 6;
-                        dotLine = 5;
-                        break;
-                    case Duration.Quarter:
-                        line = 6;
-                        offset = -2;
-                        dotLine = 5;
-                        break;
-                    case Duration.Eighth:
-                        line = 6;
-                        dotLine = 5;
-                        break;
-                    case Duration.Sixteenth:
-                        line = 6;
-                        dotLine = 5;
-                        break;
-                    case Duration.ThirtySecond:
-                        line = 6;
-                        dotLine = 3;
-                        break;
-                    case Duration.SixtyFourth:
-                        line = 6;
-                        dotLine = 3;
-                        break;
-                    case Duration.OneHundredTwentyEighth:
-                        line = 6;
-                        dotLine = 3;
-                        break;
-                    case Duration.TwoHundredFiftySixth:
-                        line = 6;
-                        dotLine = 3;
-                        break;
+                let line = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
+
+                // this positioning is quite strange, for most staff line counts
+                // the whole/rest are aligned as half below the whole rest. 
+                // but for staff line count 1 and 3 they are aligned centered on the same line. 
+                if (
+                    this.container.beat.duration === Duration.Whole &&
+                    this.renderer.bar.staff.standardNotationLineCount !== 1 &&
+                    this.renderer.bar.staff.standardNotationLineCount !== 3
+                ) {
+                    line -= 2;
                 }
+
                 let y: number = sr.getScoreY(line, offset);
                 this.restGlyph = new ScoreRestGlyph(0, y, this.container.beat.duration);
                 this.restGlyph.beat = this.container.beat;
@@ -164,7 +136,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         let group: GlyphGroup = new GlyphGroup(0, 0);
-                        this.createBeatDot(dotLine, group);
+                        this.createBeatDot(line, group);
                         this.addGlyph(group);
                     }
                 }
@@ -185,63 +157,18 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         group.addGlyph(new CircleGlyph(0, sr.getScoreY(line, 0), 1.5 * this.scale));
     }
 
-    private static NormalKeys: Map<number, boolean> = new Map([
-        [32, true],
-        [34, true],
-        [35, true],
-        [36, true],
-        [38, true],
-        [39, true],
-        [40, true],
-        [41, true],
-        [43, true],
-        [45, true],
-        [47, true],
-        [48, true],
-        [50, true],
-        [55, true],
-        [56, true],
-        [58, true],
-        [60, true],
-        [61, true]
-    ]);
-    private static XKeys: Map<number, boolean> = new Map([
-        [31, true],
-        [33, true],
-        [37, true],
-        [42, true],
-        [44, true],
-        [54, true],
-        [62, true],
-        [63, true],
-        [64, true],
-        [65, true],
-        [66, true]
-    ]);
-
     private createNoteHeadGlyph(n: Note): EffectGlyph {
         let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
         if (n.beat.voice.bar.staff.isPercussion) {
-            let value: number = n.realValue;
-            if (value <= 30 || value >= 67 || ScoreBeatGlyph.NormalKeys.has(value)) {
-                return new NoteHeadGlyph(0, 0, Duration.Quarter, isGrace);
+            const articulation = PercussionMapper.getArticulation(n);
+            if (articulation) {
+                return new PercussionNoteHeadGlyph(0, 0, articulation, n.beat.duration, isGrace);
+            } else {
+                Logger.warning(
+                    'Rendering',
+                    `No articulation found for percussion instrument ${n.percussionArticulation}`
+                );
             }
-            if (ScoreBeatGlyph.XKeys.has(value)) {
-                return new DrumSticksGlyph(0, 0, isGrace);
-            }
-            if (value === 46) {
-                return new HiHatGlyph(0, 0, isGrace);
-            }
-            if (value === 49 || value === 57) {
-                return new DiamondNoteHeadGlyph(0, 0, n.beat.duration, isGrace);
-            }
-            if (value === 52) {
-                return new ChineseCymbalGlyph(0, 0, isGrace);
-            }
-            if (value === 51 || value === 53 || value === 59) {
-                return new RideCymbalGlyph(0, 0, isGrace);
-            }
-            return new NoteHeadGlyph(0, 0, Duration.Quarter, isGrace);
         }
         if (n.isDead) {
             return new DeadNoteHeadGlyph(0, 0, isGrace);
@@ -278,14 +205,42 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             noteHeadGlyph.y = sr.getScoreY(line, 0);
             this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         }
-        if (n.isStaccato && !this.noteHeads!.beatEffects.has('Staccato')) {
-            this.noteHeads!.beatEffects.set('Staccato', new CircleGlyph(0, 0, 1.5));
+        if (n.isStaccato && !this.noteHeads!.aboveBeatEffects.has('Staccato')) {
+            this.noteHeads!.belowBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
         }
-        if (n.accentuated === AccentuationType.Normal && !this.noteHeads!.beatEffects.has('Accent')) {
-            this.noteHeads!.beatEffects.set('Accent', new AccentuationGlyph(0, 0, AccentuationType.Normal));
+        if (n.accentuated === AccentuationType.Normal && !this.noteHeads!.aboveBeatEffects.has('Accent')) {
+            this.noteHeads!.belowBeatEffects.set('Accent', new AccentuationGlyph(0, 0, AccentuationType.Normal));
         }
-        if (n.accentuated === AccentuationType.Heavy && !this.noteHeads!.beatEffects.has('HAccent')) {
-            this.noteHeads!.beatEffects.set('HAccent', new AccentuationGlyph(0, 0, AccentuationType.Heavy));
+        if (n.accentuated === AccentuationType.Heavy && !this.noteHeads!.aboveBeatEffects.has('HAccent')) {
+            this.noteHeads!.belowBeatEffects.set('HAccent', new AccentuationGlyph(0, 0, AccentuationType.Heavy));
+        }
+
+        if (n.isPercussion) {
+            const articulation = PercussionMapper.getArticulation(n);
+            if (articulation && articulation.techniqueSymbolPlacement !== TextBaseline.Middle) {
+                const effectContainer =
+                    articulation.techniqueSymbolPlacement === TextBaseline.Top
+                        ? this.noteHeads!.aboveBeatEffects
+                        : this.noteHeads!.belowBeatEffects;
+
+                switch (articulation.techniqueSymbol) {
+                    case MusicFontSymbol.PictEdgeOfCymbal:
+                        effectContainer.set('PictEdgeOfCymbal', new PictEdgeOfCymbalGlyph(0, 0));
+                        break;
+                    case MusicFontSymbol.ArticStaccatoAbove:
+                        effectContainer.set('ArticStaccatoAbove', new ArticStaccatoAboveGlyph(0, 0));
+                        break;
+                    case MusicFontSymbol.StringsUpBow:
+                        effectContainer.set('StringsUpBow', new PickStrokeGlyph(0, 0, PickStroke.Up));
+                        break;
+                    case MusicFontSymbol.StringsDownBow:
+                        effectContainer.set('StringsDownBow', new PickStrokeGlyph(0, 0, PickStroke.Down));
+                        break;
+                    case MusicFontSymbol.GuitarGolpe:
+                        effectContainer.set('GuitarGolpe', new GuitarGolpeGlyph(0, 0));
+                        break;
+                }
+            }
         }
     }
 }

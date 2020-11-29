@@ -59,6 +59,12 @@ namespace AlphaTab.Platform.CSharp
             set => DispatchOnWorkerThread(() => { Player.MasterVolume = value; });
         }
 
+        public double CountInVolume
+        {
+            get => Player.CountInVolume;
+            set => DispatchOnWorkerThread(() => { Player.CountInVolume = value; });
+        }
+
         public double MetronomeVolume
         {
             get => Player.MetronomeVolume;
@@ -111,6 +117,11 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnWorkerThread(() => { Player.Pause(); });
         }
 
+        public void PlayOneTimeMidiFile(MidiFile midiFile)
+        {
+            DispatchOnWorkerThread(() => { Player.PlayOneTimeMidiFile(midiFile); });
+        }
+
         public void PlayPause()
         {
             DispatchOnWorkerThread(() => { Player.PlayPause(); });
@@ -121,9 +132,14 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnWorkerThread(() => { Player.Stop(); });
         }
 
-        public void LoadSoundFont(Uint8Array data)
+        public void ResetSoundFonts()
         {
-            DispatchOnWorkerThread(() => { Player.LoadSoundFont(data); });
+            DispatchOnWorkerThread(() => { Player.ResetSoundFonts(); });
+        }
+
+        public void LoadSoundFont(Uint8Array data, bool append)
+        {
+            DispatchOnWorkerThread(() => { Player.LoadSoundFont(data, append); });
         }
 
         public void LoadMidiFile(MidiFile midi)

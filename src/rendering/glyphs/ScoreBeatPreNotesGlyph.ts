@@ -84,12 +84,19 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             }
             if (!accidentals.isEmpty) {
                 this.accidentals = accidentals;
+                this.addGlyph(
+                    new SpacingGlyph(
+                        0,
+                        0,
+                        2 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) * this.scale
+                    )
+                );
                 this.addGlyph(accidentals);
                 this.addGlyph(
                     new SpacingGlyph(
                         0,
                         0,
-                        4 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) * this.scale
+                        2 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) * this.scale
                     )
                 );
             }
@@ -109,7 +116,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         }
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             let harmonicFret: number = n.displayValue + n.harmonicPitch;
-            accidental = sr.accidentalHelper.applyAccidentalForValue(n.beat, harmonicFret, isGrace);
+            accidental = sr.accidentalHelper.applyAccidentalForValue(n.beat, harmonicFret, isGrace, false);
             noteLine = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
             let g = new AccidentalGlyph(0, sr.getScoreY(noteLine, 0), accidental, isGrace);
             g.renderer = this.renderer;

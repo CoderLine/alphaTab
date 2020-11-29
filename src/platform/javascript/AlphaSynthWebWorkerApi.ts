@@ -7,12 +7,12 @@ import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventA
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { SynthHelper } from '@src/synth/SynthHelper';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { FileLoadError } from '@src/FileLoadError';
 import { JsonConverter } from '@src/model/JsonConverter';
-import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { ProgressEventArgs } from '@src/alphatab';
+import { FileLoadError } from '@src/FileLoadError';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -27,6 +27,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private _state: PlayerState = PlayerState.Paused;
     private _masterVolume: number = 0;
     private _metronomeVolume: number = 0;
+    private _countInVolume: number = 0;
     private _playbackSpeed: number = 0;
     private _tickPosition: number = 0;
     private _timePosition: number = 0;
@@ -79,6 +80,18 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._metronomeVolume = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setMetronomeVolume',
+            value: value
+        });
+    }
+    public get countInVolume(): number {
+        return this._countInVolume;
+    }
+
+    public set countInVolume(value: number) {
+        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        this._countInVolume = value;
+        this._synth.postMessage({
+            cmd: 'alphaSynth.setCountInVolume',
             value: value
         });
     }
@@ -174,7 +187,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._output.ready.on(this.onOutputReady.bind(this));
         this._output.samplesPlayed.on(this.onOutputSamplesPlayed.bind(this));
         this._output.sampleRequest.on(this.onOutputSampleRequest.bind(this));
-        this._output.finished.on(this.onOutputFinished.bind(this));
         this._output.open();
         try {
             let script: string = "importScripts('" + alphaSynthScriptFile + "')";
@@ -207,9 +219,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     //
     // API communicating with the web worker
     public play(): boolean {
-        if (this.state === PlayerState.Playing || !this.isReadyForPlayback) {
-            return false;
-        }
         this._output.activate();
         this._synth.postMessage({
             cmd: 'alphaSynth.play'
@@ -236,24 +245,29 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public loadSoundFont(data: Uint8Array): void {
+    public playOneTimeMidiFile(midi: MidiFile): void {
         this._synth.postMessage({
-            cmd: 'alphaSynth.loadSoundFontBytes',
-            data: data
+            cmd: 'alphaSynth.playOneTimeMidiFile',
+            midi: JsonConverter.midiFileToJsObject(midi)
         });
     }
 
-    public loadSoundFontFromUrl(url: string, progress: (e: ProgressEventArgs) => void): void {
+    public loadSoundFont(data: Uint8Array, append: boolean): void {
+        this._synth.postMessage({
+            cmd: 'alphaSynth.loadSoundFontBytes',
+            data: data,
+            append: append
+        });
+    }
+
+    public loadSoundFontFromUrl(url: string, append: boolean, progress: (e: ProgressEventArgs) => void): void {
         Logger.debug('AlphaSynth', `Start loading Soundfont from url ${url}`);
         let request: XMLHttpRequest = new XMLHttpRequest();
         request.open('GET', url, true, null, null);
         request.responseType = 'arraybuffer';
         request.onload = _ => {
             let buffer: Uint8Array = new Uint8Array(request.response);
-            this._synth.postMessage({
-                cmd: 'alphaSynth.loadSoundFontBytes',
-                data: buffer
-            });
+            this.loadSoundFont(buffer, append);
         };
         request.onerror = e => {
             Logger.error('AlphaSynth', 'Loading failed: ' + (e as any).message);
@@ -266,6 +280,12 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
             progress(new ProgressEventArgs(e.loaded, e.total));
         };
         request.send();
+    }
+
+    public resetSoundFonts(): void {
+        this._synth.postMessage({
+            cmd: 'alphaSynth.resetSoundFonts'
+        });
     }
 
     public loadMidiFile(midi: MidiFile): void {
@@ -348,9 +368,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 this.checkReadyForPlayback();
                 (this.midiLoadFailed as EventEmitterOfT<Error>).trigger(data.error);
                 break;
-            case 'alphaSynth.output.sequencerFinished':
-                this._output.sequencerFinished();
-                break;
             case 'alphaSynth.output.addSamples':
                 this._output.addSamples(data.samples);
                 break;
@@ -399,13 +416,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
             cmd: 'alphaSynth.output.sampleRequest'
         });
     }
-
-    public onOutputFinished(): void {
-        this._synth.postMessage({
-            cmd: 'alphaSynth.output.finished'
-        });
-    }
-
     public onOutputSamplesPlayed(samples: number): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.output.samplesPlayed',

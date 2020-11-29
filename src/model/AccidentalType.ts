@@ -29,5 +29,13 @@ export enum AccidentalType {
     /**
      * Flat for smear bends
      */
-    FlatQuarterNoteUp
+    FlatQuarterNoteUp,
+    /**
+     * Double Sharp, indicated by an 'x'
+     */
+    DoubleSharp,
+    /**
+     * Double Flat, indicated by 'bb'
+     */
+    DoubleFlat
 }

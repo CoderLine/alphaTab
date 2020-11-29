@@ -58,7 +58,8 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         let accidental: AccidentalType = sr.accidentalHelper.applyAccidentalForValue(
             this._beat,
             noteValue,
-            quarterBend
+            quarterBend,
+            true
         );
         let line: number = sr.accidentalHelper.getNoteLineForValue(noteValue, false);
         noteHeadGlyph.y = sr.getScoreY(line, 0);
@@ -87,6 +88,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             x += this._preNoteParenthesis!.width + BendNoteHeadGroupGlyph.ElementPadding * this.scale;
         }
         if (!this._accidentals.isEmpty) {
+            x += this._accidentals.width + BendNoteHeadGroupGlyph.ElementPadding * this.scale;
             this._accidentals.x = x;
             this._accidentals.renderer = this.renderer;
             this._accidentals.doLayout();

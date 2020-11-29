@@ -201,6 +201,17 @@ function setupControl(selector) {
         }
     };
 
+    control.querySelector('.at-count-in').onclick = function (e) {
+        e.stopPropagation();
+        const link = e.target.closest('a');
+        link.classList.toggle('active');
+        if (link.classList.contains('active')) {
+            at.countInVolume = 1;
+        } else {
+            at.countInVolume = 0;
+        }
+    };
+
     control.querySelectorAll('.at-speed-options a').forEach(function (a) {
         a.onclick = function (e) {
             e.preventDefault();
