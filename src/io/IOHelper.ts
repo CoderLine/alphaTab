@@ -1,6 +1,7 @@
 import { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
 import { Environment } from '@src/Environment';
+import { IWriteable } from './IWriteable';
 
 export class IOHelper {
     public static readInt32BE(input: IReadable): number {
@@ -154,7 +155,7 @@ export class IOHelper {
             return s;
         }
     }
-    
+
     private static detectEncoding(data: Uint8Array): string | null {
         if (data.length > 2 && data[0] === 0xfe && data[1] === 0xff) {
             return 'utf-16be';
@@ -169,5 +170,22 @@ export class IOHelper {
             return 'utf-32le';
         }
         return null;
-    }    
+    }
+
+    public static stringToBytes(s: string, encoding: string): Uint8Array {
+        // TODO GP7Export
+        return new Uint8Array(0);
+    }
+
+    public static writeInt32LE(o: IWriteable, v: number) {
+        // TODO GP7Export
+    }
+
+    public static writeUInt16LE(o: IWriteable, v: number) {
+        // TODO GP7Export
+    }
+
+    public static writeInt16LE(o: IWriteable, v: number) {
+        // TODO GP7Export
+    }
 }

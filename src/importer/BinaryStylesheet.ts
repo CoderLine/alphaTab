@@ -123,4 +123,9 @@ export class BinaryStylesheet {
     public addValue(key: string, value: unknown): void {
         this.raw.set(key, value);
     }
+
+    public static writeForScore(score: Score): Uint8Array {
+        // TODO GP7Export
+        return new Uint8Array(0);
+    }
 }

@@ -127,6 +127,14 @@ export const importer = {
     UnsupportedFormatError
 };
 
+import { ScoreExporter } from '@src/exporter/ScoreExporter';
+import { Gp7Exporter } from '@src/exporter/Gp7Exporter';
+
+export const exporter = {
+    ScoreExporter,
+    Gp7Exporter
+};
+
 import { BeatTickLookup } from '@src/midi/BeatTickLookup';
 import { MasterBarTickLookup } from '@src/midi/MasterBarTickLookup';
 import { MidiTickLookup, MidiTickLookupFindBeatResult } from '@src/midi/MidiTickLookup';

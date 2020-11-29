@@ -79,4 +79,9 @@ export class PartConfiguration {
             }
         }
     }
+
+    public static writeForScore(score: Score): Uint8Array {
+        // TODO GP7Export
+        return new Uint8Array(0);
+    }
 }

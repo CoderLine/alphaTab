@@ -57,7 +57,7 @@ class GpifRhythm {
 }
 
 /**
- * This public class can parse a score.gpif xml file into the model structure
+ * This class can parse a score.gpif xml file into the model structure
  */
 export class GpifParser {
     private static readonly InvalidId: string = '-1';
