@@ -414,6 +414,9 @@ export class GpifParser {
                     case 'Transpose':
                         this.parseTranspose(track, c);
                         break;
+                    case 'RSE':
+                        this.parseRSE(track, c);
+                        break;
                 }
             }
         }
@@ -974,6 +977,45 @@ export class GpifParser {
         }
         for (let staff of track.staves) {
             staff.displayTranspositionPitch = octave * 12 + chromatic;
+        }
+    }
+
+    private parseRSE(track: Track, node: XmlNode): void {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'ChannelStrip':
+                        this.parseChannelStrip(track, c);
+                        break;
+                }
+            }
+        }
+    }
+
+    private parseChannelStrip(track: Track, node: XmlNode): void {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'Parameters':
+                        this.parseChannelStripParameters(track, c);
+                        break;
+                }
+            }
+        }
+    }
+
+    private parseChannelStripParameters(track: Track, node: XmlNode): void {
+        // track.playbackInfo.volume = Math.ceil(Math.random() * 15);
+        if (node.firstChild && node.firstChild.value) {
+            let parameters = node.firstChild.value.split(' ');
+            for (let i = 0; i < parameters.length; i++) {
+                let value: number = +parameters[i];
+                switch (i) {
+                    case 12:
+                        track.playbackInfo.volume = value * 16;
+                        break;
+                }
+            }
         }
     }
 
