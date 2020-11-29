@@ -76,8 +76,7 @@ export class VisualTestHelper {
             let referenceFileData: Uint8Array;
             try {
                 referenceFileData = await TestPlatform.loadFile(`test-data/visual-tests/${referenceFileName}`);
-            }
-            catch (e) {
+            } catch (e) {
                 referenceFileData = new Uint8Array(0);
             }
 
@@ -391,8 +390,10 @@ export class VisualTestHelper {
         const width = Math.max(exCanvas.width, acCanvas.width);
         const height = Math.max(exCanvas.height, acCanvas.height);
 
+        const controlsHeight = 60;
+
         el.style.width = width + 'px';
-        el.style.height = height + 60 + 'px';
+        el.style.height = height + controlsHeight + 'px';
         el.style.position = 'relative';
 
         ex.style.width = width + 'px';
@@ -400,27 +401,27 @@ export class VisualTestHelper {
         ex.style.background = '#FFF';
         ex.style.position = 'absolute';
         ex.style.left = '0';
-        ex.style.top = '0';
+        ex.style.top = controlsHeight + 'px';
 
         ac.style.width = width / 2 + 'px';
         ac.style.height = height + 'px';
         ac.style.background = '#FFF';
         ac.style.position = 'absolute';
         ac.style.right = '0';
-        ac.style.top = '0';
+        ac.style.top = controlsHeight + 'px';
         ac.style.boxShadow = '-7px 0 10px -5px rgba(0,0,0,.5)';
         ac.style.overflow = 'hidden';
         acCanvas.style.position = 'absolute';
         acCanvas.style.right = '0';
         acCanvas.style.top = '0';
 
-        df.style.display = "none";
+        df.style.display = 'none';
         df.style.width = width + 'px';
         df.style.height = height + 'px';
         df.style.background = '#FFF';
         df.style.position = 'absolute';
         df.style.left = '0';
-        df.style.top = '0';
+        df.style.top = controlsHeight + 'px';
 
         const slider = document.createElement('input');
         slider.type = 'range';
@@ -429,7 +430,7 @@ export class VisualTestHelper {
         slider.step = '0.001';
         slider.value = '0.5';
         slider.style.position = 'absolute';
-        slider.style.bottom = '30px';
+        slider.style.top = '30px';
         slider.style.right = '0';
         slider.style.left = '0';
         slider.style.width = '100%';
@@ -439,9 +440,9 @@ export class VisualTestHelper {
         el.appendChild(slider);
 
         const diffToggleLabel = document.createElement('label');
-        diffToggleLabel.style.position = "absolute";
-        diffToggleLabel.style.left = "0";
-        diffToggleLabel.style.bottom = "0";
+        diffToggleLabel.style.position = 'absolute';
+        diffToggleLabel.style.left = '0';
+        diffToggleLabel.style.top = '0';
 
         const diffToggle = document.createElement('input');
         diffToggle.type = 'checkbox';
@@ -504,7 +505,7 @@ export class VisualTestHelper {
             oldName = oldName.substr(i + 1);
         }
 
-        if(part.length > 0) {
+        if (part.length > 0) {
             part = `-${part}`;
         }
 
