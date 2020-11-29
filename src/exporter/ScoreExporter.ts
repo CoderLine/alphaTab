@@ -1,4 +1,5 @@
 import { Settings } from '@src/alphatab';
+import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IWriteable } from '@src/io/IWriteable';
 import { Score } from '@src/model/Score';
 
@@ -16,6 +17,19 @@ export abstract class ScoreExporter {
     public init(data: IWriteable, settings: Settings): void {
         this.data = data;
         this.settings = settings;
+    }
+
+    /**
+     * Exports the given score to a binary buffer. 
+     * @param score The score to serialize
+     * @param settings  The settings to use during serialization
+     * @returns A byte buffer with the serialized score.
+     */
+    public export(score: Score, settings: Settings | null = null): Uint8Array {
+        const writable = ByteBuffer.withCapactiy(1024);
+        this.init(writable, settings ?? new Settings());
+        this.writeScore(score);
+        return writable.toArray();
     }
 
     public abstract get name(): string;

@@ -81,7 +81,8 @@ export class PartConfiguration {
     }
 
     public static writeForScore(score: Score): Uint8Array {
-        // TODO GP7Export
-        return new Uint8Array(0);
+        const writer = ByteBuffer.withCapactiy(0);
+        // TODO check for the right export of the settings. 
+        return writer.toArray();
     }
 }

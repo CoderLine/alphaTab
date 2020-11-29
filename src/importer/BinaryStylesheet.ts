@@ -125,7 +125,17 @@ export class BinaryStylesheet {
     }
 
     public static writeForScore(score: Score): Uint8Array {
-        // TODO GP7Export
-        return new Uint8Array(0);
+        const writer = ByteBuffer.withCapactiy(128);
+        IOHelper.writeInt32BE(writer, 1); // entry count
+
+        BinaryStylesheet.writeBooleanEntry(writer, 'StandardNotation/hideDynamics', score.stylesheet.hideDynamics);
+
+        return writer.toArray();
+    }
+
+    private static writeBooleanEntry(writer: ByteBuffer, key: string, value: boolean) {
+        GpBinaryHelpers.gpWriteString(writer, key);
+        writer.writeByte(DataType.Boolean as number);
+        writer.writeByte(value ? 1 : 0);
     }
 }

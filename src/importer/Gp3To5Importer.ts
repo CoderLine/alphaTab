@@ -39,6 +39,7 @@ import { Voice } from '@src/model/Voice';
 
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { IWriteable } from '@src/io/IWriteable';
 
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
@@ -499,7 +500,6 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((flags & 0x04) !== 0) {
             newBeat.text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
         }
-        
 
         let allNoteHarmonicType = HarmonicType.None;
         if ((flags & 0x08) !== 0) {
@@ -512,9 +512,9 @@ export class Gp3To5Importer extends ScoreImporter {
         for (let i: number = 6; i >= 0; i--) {
             if ((stringFlags & (1 << i)) !== 0 && 6 - i < bar.staff.tuning.length) {
                 const note = this.readNote(track, bar, voice, newBeat, 6 - i);
-                if(allNoteHarmonicType !== HarmonicType.None) {
+                if (allNoteHarmonicType !== HarmonicType.None) {
                     note.harmonicType = allNoteHarmonicType;
-                    if(note.harmonicType === HarmonicType.Natural) {
+                    if (note.harmonicType === HarmonicType.Natural) {
                         note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
                     }
                 }
@@ -880,7 +880,7 @@ export class Gp3To5Importer extends ScoreImporter {
             this.readNoteEffects(track, voice, beat, newNote);
         }
 
-        if(bar.staff.isPercussion) {
+        if (bar.staff.isPercussion) {
             newNote.percussionArticulation = newNote.fret;
             newNote.string = -1;
             newNote.fret = -1;
@@ -1178,7 +1178,7 @@ export class GpBinaryHelpers {
         bytes[2] = data.readByte();
         bytes[2] = data.readByte();
         bytes[1] = data.readByte();
-        
+
         let array: Float32Array = new Float32Array(bytes.buffer);
         return array[0];
     }
@@ -1231,6 +1231,12 @@ export class GpBinaryHelpers {
         return IOHelper.toString(b, encoding);
     }
 
+    public static gpWriteString(data: IWriteable, s: string): void {
+        const encoded = IOHelper.stringToBytes(s);
+        data.writeByte(s.length);
+        data.write(encoded, 0, encoded.length);
+    }
+
     /**
      * Reads a byte as size and the string itself.
      * Additionally it is ensured the specified amount of bytes is read.
@@ -1256,7 +1262,7 @@ class MixTableChange {
     public volume: number = -1;
     public balance: number = -1;
     public instrument: number = -1;
-    public tempoName: string = "";
+    public tempoName: string = '';
     public tempo: number = -1;
     public duration: number = -1;
 }
