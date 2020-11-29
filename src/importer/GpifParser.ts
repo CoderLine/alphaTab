@@ -115,9 +115,9 @@ export class GpifParser {
         this._lyricsByTrack = new Map<string, Lyrics[]>();
         this._skipApplyLyrics = false;
 
-        let dom: XmlDocument;
+        let dom: XmlDocument = new XmlDocument();
         try {
-            dom = new XmlDocument(xml);
+            dom.parse(xml);
         } catch (e) {
             throw new UnsupportedFormatError('Could not parse XML', e);
         }
@@ -294,8 +294,8 @@ export class GpifParser {
                         break;
                     case 'Value':
                         let parts: string[] = c.innerText.split(' ');
-                        // Issue 391: Some GPX files might have 
-                        // single floating point value. 
+                        // Issue 391: Some GPX files might have
+                        // single floating point value.
                         if (parts.length === 1) {
                             value = parseFloat(parts[0]);
                             reference = 1;
@@ -512,7 +512,7 @@ export class GpifParser {
     private parseArticulation(track: Track, node: XmlNode) {
         const articulation = new InstrumentArticulation();
         articulation.outputMidiNumber = -1;
-        let name = "";
+        let name = '';
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 const txt = c.innerText;
@@ -556,7 +556,6 @@ export class GpifParser {
                             articulation.noteHeadWhole = this.parseNoteHead(noteHeadsTxt[2]);
                         }
 
-
                         if (articulation.noteHeadHalf == MusicFontSymbol.None) {
                             articulation.noteHeadHalf = articulation.noteHeadDefault;
                         }
@@ -587,50 +586,78 @@ export class GpifParser {
             if (name.length > 0) {
                 this._articulationByName.set(name, articulation);
             }
-        }
-        else if (name.length > 0 && this._articulationByName.has(name)) {
+        } else if (name.length > 0 && this._articulationByName.has(name)) {
             this._articulationByName.get(name)!.staffLine = articulation.staffLine;
         }
-
     }
 
     private parseTechniqueSymbol(txt: string): MusicFontSymbol {
         switch (txt) {
-            case 'pictEdgeOfCymbal': return MusicFontSymbol.PictEdgeOfCymbal;
-            case 'articStaccatoAbove': return MusicFontSymbol.ArticStaccatoAbove;
-            case 'noteheadParenthesis': return MusicFontSymbol.NoteheadParenthesis;
-            case 'stringsUpBow': return MusicFontSymbol.StringsUpBow;
-            case 'stringsDownBow': return MusicFontSymbol.StringsDownBow;
-            case 'guitarGolpe': return MusicFontSymbol.GuitarGolpe;
-            default: return MusicFontSymbol.None;
+            case 'pictEdgeOfCymbal':
+                return MusicFontSymbol.PictEdgeOfCymbal;
+            case 'articStaccatoAbove':
+                return MusicFontSymbol.ArticStaccatoAbove;
+            case 'noteheadParenthesis':
+                return MusicFontSymbol.NoteheadParenthesis;
+            case 'stringsUpBow':
+                return MusicFontSymbol.StringsUpBow;
+            case 'stringsDownBow':
+                return MusicFontSymbol.StringsDownBow;
+            case 'guitarGolpe':
+                return MusicFontSymbol.GuitarGolpe;
+            default:
+                return MusicFontSymbol.None;
         }
     }
 
     private parseNoteHead(txt: string): MusicFontSymbol {
         switch (txt) {
-            case 'noteheadDoubleWholeSquare': return MusicFontSymbol.NoteheadDoubleWholeSquare;
-            case 'noteheadDoubleWhole': return MusicFontSymbol.NoteheadDoubleWhole;
-            case 'noteheadWhole': return MusicFontSymbol.NoteheadWhole;
-            case 'noteheadHalf': return MusicFontSymbol.NoteheadHalf;
-            case 'noteheadBlack': return MusicFontSymbol.NoteheadBlack;
-            case 'noteheadNull': return MusicFontSymbol.NoteheadNull;
-            case 'noteheadXOrnate': return MusicFontSymbol.NoteheadXOrnate;
-            case 'noteheadTriangleUpWhole': return MusicFontSymbol.NoteheadTriangleUpWhole;
-            case 'noteheadTriangleUpHalf': return MusicFontSymbol.NoteheadTriangleUpHalf;
-            case 'noteheadTriangleUpBlack': return MusicFontSymbol.NoteheadTriangleUpBlack;
-            case 'noteheadDiamondBlackWide': return MusicFontSymbol.NoteheadDiamondBlackWide;
-            case 'noteheadDiamondWhite': return MusicFontSymbol.NoteheadDiamondWhite;
-            case 'noteheadDiamondWhiteWide': return MusicFontSymbol.NoteheadDiamondWhiteWide;
-            case 'noteheadCircleX': return MusicFontSymbol.NoteheadCircleX;
-            case 'noteheadXWhole': return MusicFontSymbol.NoteheadXWhole;
-            case 'noteheadXHalf': return MusicFontSymbol.NoteheadXHalf;
-            case 'noteheadXBlack': return MusicFontSymbol.NoteheadXBlack;
-            case 'noteheadParenthesis': return MusicFontSymbol.NoteheadParenthesis;
-            case 'noteheadSlashedBlack2': return MusicFontSymbol.NoteheadSlashedBlack2;
-            case 'noteheadCircleSlash': return MusicFontSymbol.NoteheadCircleSlash;
-            case 'noteheadHeavyX': return MusicFontSymbol.NoteheadHeavyX;
-            case 'noteheadHeavyXHat': return MusicFontSymbol.NoteheadHeavyXHat;
-            default: return MusicFontSymbol.None;
+            case 'noteheadDoubleWholeSquare':
+                return MusicFontSymbol.NoteheadDoubleWholeSquare;
+            case 'noteheadDoubleWhole':
+                return MusicFontSymbol.NoteheadDoubleWhole;
+            case 'noteheadWhole':
+                return MusicFontSymbol.NoteheadWhole;
+            case 'noteheadHalf':
+                return MusicFontSymbol.NoteheadHalf;
+            case 'noteheadBlack':
+                return MusicFontSymbol.NoteheadBlack;
+            case 'noteheadNull':
+                return MusicFontSymbol.NoteheadNull;
+            case 'noteheadXOrnate':
+                return MusicFontSymbol.NoteheadXOrnate;
+            case 'noteheadTriangleUpWhole':
+                return MusicFontSymbol.NoteheadTriangleUpWhole;
+            case 'noteheadTriangleUpHalf':
+                return MusicFontSymbol.NoteheadTriangleUpHalf;
+            case 'noteheadTriangleUpBlack':
+                return MusicFontSymbol.NoteheadTriangleUpBlack;
+            case 'noteheadDiamondBlackWide':
+                return MusicFontSymbol.NoteheadDiamondBlackWide;
+            case 'noteheadDiamondWhite':
+                return MusicFontSymbol.NoteheadDiamondWhite;
+            case 'noteheadDiamondWhiteWide':
+                return MusicFontSymbol.NoteheadDiamondWhiteWide;
+            case 'noteheadCircleX':
+                return MusicFontSymbol.NoteheadCircleX;
+            case 'noteheadXWhole':
+                return MusicFontSymbol.NoteheadXWhole;
+            case 'noteheadXHalf':
+                return MusicFontSymbol.NoteheadXHalf;
+            case 'noteheadXBlack':
+                return MusicFontSymbol.NoteheadXBlack;
+            case 'noteheadParenthesis':
+                return MusicFontSymbol.NoteheadParenthesis;
+            case 'noteheadSlashedBlack2':
+                return MusicFontSymbol.NoteheadSlashedBlack2;
+            case 'noteheadCircleSlash':
+                return MusicFontSymbol.NoteheadCircleSlash;
+            case 'noteheadHeavyX':
+                return MusicFontSymbol.NoteheadHeavyX;
+            case 'noteheadHeavyXHat':
+                return MusicFontSymbol.NoteheadHeavyXHat;
+            default:
+                return MusicFontSymbol.None;
         }
     }
 

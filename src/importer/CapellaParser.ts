@@ -123,9 +123,9 @@ export class CapellaParser {
         this._crescendo = new Map<Beat, WedgeDrawObject>();
         this._isFirstSystem = true;
 
-        let dom: XmlDocument;
+        let dom: XmlDocument = new XmlDocument();
         try {
-            dom = new XmlDocument(xml);
+            dom.parse(xml);
         } catch (e) {
             throw new UnsupportedFormatError('Could not parse XML', e);
         }

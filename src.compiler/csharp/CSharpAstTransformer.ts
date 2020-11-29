@@ -2704,6 +2704,16 @@ export default class CSharpAstTransformer {
                                 break;
                         }
                         break;
+                    case 'String':
+                        switch (memberAccess.tsSymbol!.name) {
+                            case 'trimRight':
+                                memberAccess.member = 'TrimEnd';
+                                break;
+                            case 'trimLeft':
+                                memberAccess.member = 'TrimStart';
+                                break;
+                        }
+                        break;
                 }
             }
         }

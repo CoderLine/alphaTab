@@ -55,9 +55,9 @@ export class MusicXmlImporter extends ScoreImporter {
         this._tieStartIds = new Map<number, boolean>();
         this._slurStarts = new Map<string, Note>();
         let xml: string = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
-        let dom: XmlDocument;
+        let dom: XmlDocument = new XmlDocument();
         try {
-            dom = new XmlDocument(xml);
+            dom.parse(xml);
         } catch (e) {
             throw new UnsupportedFormatError('Unsupported format');
         }
