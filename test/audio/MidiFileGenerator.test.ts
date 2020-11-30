@@ -198,7 +198,7 @@ describe('MidiFileGeneratorTest', () => {
         let info: PlaybackInformation = score.tracks[0].playbackInfo;
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 96),
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
@@ -207,7 +207,7 @@ describe('MidiFileGeneratorTest', () => {
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
             new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 96),
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
             new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
