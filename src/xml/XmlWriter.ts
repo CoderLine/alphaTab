@@ -1,3 +1,4 @@
+import { XmlDocument } from './XmlDocument';
 import { XmlNode, XmlNodeType } from './XmlNode';
 
 export class XmlWriter {
@@ -72,9 +73,7 @@ export class XmlWriter {
                 if (this._xmlHeader) {
                     this.write('<?xml version="1.0" encoding="utf-8"?>');
                 }
-                for (const child of xml.childNodes) {
-                    this.writeNode(child);
-                }
+                this.writeNode((xml as XmlDocument).documentElement!);
                 break;
             case XmlNodeType.DocumentType:
                 this.write(`<!DOCTYPE ${xml.value}>`);

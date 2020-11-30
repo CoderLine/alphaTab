@@ -26,7 +26,7 @@ export abstract class ScoreExporter {
      * @returns A byte buffer with the serialized score.
      */
     public export(score: Score, settings: Settings | null = null): Uint8Array {
-        const writable = ByteBuffer.withCapactiy(1024);
+        const writable = ByteBuffer.withCapacity(1024);
         this.init(writable, settings ?? new Settings());
         this.writeScore(score);
         return writable.toArray();

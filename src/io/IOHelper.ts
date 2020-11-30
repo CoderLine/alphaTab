@@ -246,7 +246,7 @@ export class IOHelper {
     }
 
     public static writeInt16LE(o: IWriteable, v: number) {
-        o.writeByte((v >> 8) & 0xFF);
         o.writeByte((v >> 0) & 0xFF);
+        o.writeByte((v >> 8) & 0xFF);
     }
 }

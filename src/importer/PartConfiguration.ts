@@ -81,7 +81,7 @@ export class PartConfiguration {
     }
 
     public static writeForScore(score: Score): Uint8Array {
-        const writer = ByteBuffer.withCapactiy(0);
+        const writer = ByteBuffer.withCapacity(0);
         // TODO check for the right export of the settings. 
         return writer.toArray();
     }

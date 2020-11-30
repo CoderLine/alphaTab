@@ -29,6 +29,7 @@ export class Gp7Exporter extends ScoreExporter {
         Logger.debug(this.name, 'Writing ZIP entries');
         let fileSystem: ZipWriter = new ZipWriter(this.data);
         fileSystem.writeEntry(new ZipEntry('VERSION', IOHelper.stringToBytes('7.0')));
+        fileSystem.writeEntry(new ZipEntry('Content/', new Uint8Array(0)));
         fileSystem.writeEntry(new ZipEntry('Content/score.gpif', IOHelper.stringToBytes(gpifXml)));
         fileSystem.writeEntry(new ZipEntry('Content/BinaryStylesheet', binaryStylesheet));
         fileSystem.writeEntry(new ZipEntry('Content/PartConfiguration', partConfiguration));

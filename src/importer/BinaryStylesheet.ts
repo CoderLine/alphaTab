@@ -125,7 +125,7 @@ export class BinaryStylesheet {
     }
 
     public static writeForScore(score: Score): Uint8Array {
-        const writer = ByteBuffer.withCapactiy(128);
+        const writer = ByteBuffer.withCapacity(128);
         IOHelper.writeInt32BE(writer, 1); // entry count
 
         BinaryStylesheet.writeBooleanEntry(writer, 'StandardNotation/hideDynamics', score.stylesheet.hideDynamics);
