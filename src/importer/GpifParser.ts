@@ -1008,6 +1008,7 @@ export class GpifParser {
         if (node.firstChild && node.firstChild.value) {
             let parameters = node.firstChild.value.split(' ');
             if (parameters.length >= 12) {
+                track.playbackInfo.balance = Math.floor(parseFloat(parameters[11]) * 16);
                 track.playbackInfo.volume = Math.floor(parseFloat(parameters[12]) * 16);
             }
         }

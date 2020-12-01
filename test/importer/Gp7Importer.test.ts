@@ -881,6 +881,16 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[4].playbackInfo.volume).toBe(7);
         expect(score.tracks[5].playbackInfo.volume).toBe(3);
         expect(score.tracks[6].playbackInfo.volume).toBe(0);
+    });
 
+    it('track-balance', async () => {
+        const reader = await prepareGp7ImporterWithFile('guitarpro7/track-balance.gp');
+        let score: Score = reader.readScore();
+
+        expect(score.tracks[0].playbackInfo.balance).toBe(0);
+        expect(score.tracks[1].playbackInfo.balance).toBe(4);
+        expect(score.tracks[2].playbackInfo.balance).toBe(8);
+        expect(score.tracks[3].playbackInfo.balance).toBe(12);
+        expect(score.tracks[4].playbackInfo.balance).toBe(16);
     });
 });
