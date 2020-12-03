@@ -74,11 +74,11 @@ describe('XmlWriteTest', () => {
         let s: string = '<test/>';
         let xml: XmlDocument = new XmlDocument();
         xml.parse(s);
-        xml.documentElement!.attributes.set("lt", "<");
-        xml.documentElement!.attributes.set("gt", ">");
-        xml.documentElement!.attributes.set("amp", "&");
-        xml.documentElement!.attributes.set("apos", "'");
-        xml.documentElement!.attributes.set("quot", "\"");
+        xml.firstElement!.attributes.set("lt", "<");
+        xml.firstElement!.attributes.set("gt", ">");
+        xml.firstElement!.attributes.set("amp", "&");
+        xml.firstElement!.attributes.set("apos", "'");
+        xml.firstElement!.attributes.set("quot", "\"");
         expect(xml.toString()).toEqual('<test lt="&lt;" gt="&gt;" amp="&amp;" apos="&apos;" quot="&quot;"/>');
     });
 

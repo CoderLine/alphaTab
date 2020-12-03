@@ -206,7 +206,7 @@ export class CapellaParser {
     }
 
     private parseDom(dom: XmlDocument): void {
-        let root: XmlNode | null = dom.documentElement;
+        let root: XmlNode | null = dom.firstElement;
         if (!root) {
             return;
         }

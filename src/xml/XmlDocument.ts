@@ -26,8 +26,6 @@ import { XmlParser } from '@src/xml/XmlParser';
 import { XmlWriter } from './XmlWriter';
 
 export class XmlDocument extends XmlNode {
-    public documentElement: XmlNode | null = null;
-
     public constructor() {
         super();
         this.nodeType = XmlNodeType.Document;
@@ -35,12 +33,6 @@ export class XmlDocument extends XmlNode {
 
     public parse(xml: string) {
         XmlParser.parse(xml, 0, this);
-        for (let child of this.childNodes) {
-            if (child.nodeType === XmlNodeType.Element) {
-                this.documentElement = child;
-                break;
-            }
-        }
     }
 
     public toString(indention: string = '', xmlHeader:boolean = false): string {

@@ -49,7 +49,8 @@ import { NoteCloner } from '@src/generated/model/NoteCloner';
 /**
  * This structure represents a duration within a gpif
  */
-class GpifRhythm {
+export class GpifRhythm {
+    public id: string = '';
     public dots: number = 0;
     public tupletDenominator: number = -1;
     public tupletNumerator: number = -1;
@@ -134,7 +135,7 @@ export class GpifParser {
     }
 
     private parseDom(dom: XmlDocument): void {
-        let root: XmlNode | null = dom.documentElement;
+        let root: XmlNode | null = dom.firstElement;
         if (!root) {
             return;
         }
@@ -717,7 +718,7 @@ export class GpifParser {
                 break;
             case 'DiagramCollection':
             case 'ChordCollection':
-                this.parseDiagramCollection_Staff_XmlNode(staff, node);
+                this.parseDiagramCollectionForStaff(staff, node);
                 break;
             case 'CapoFret':
                 let capo: number = parseInt(node.findChildElement('Fret')!.innerText);
@@ -757,49 +758,49 @@ export class GpifParser {
         return lyrics;
     }
 
-    private parseDiagramCollection_Track_XmlNode(track: Track, node: XmlNode): void {
+    private parseDiagramCollectionForTrack(track: Track, node: XmlNode): void {
         let items: XmlNode = node.findChildElement('Items')!;
         for (let c of items.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Item':
-                        this.parseDiagramItem_Track_XmlNode(track, c);
+                        this.parseDiagramItemForTrack(track, c);
                         break;
                 }
             }
         }
     }
 
-    private parseDiagramCollection_Staff_XmlNode(staff: Staff, node: XmlNode): void {
+    private parseDiagramCollectionForStaff(staff: Staff, node: XmlNode): void {
         let items: XmlNode = node.findChildElement('Items')!;
         for (let c of items.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Item':
-                        this.parseDiagramItem_Staff_XmlNode(staff, c);
+                        this.parseDiagramItemForStaff(staff, c);
                         break;
                 }
             }
         }
     }
 
-    private parseDiagramItem_Track_XmlNode(track: Track, node: XmlNode): void {
+    private parseDiagramItemForTrack(track: Track, node: XmlNode): void {
         let chord: Chord = new Chord();
         let chordId: string = node.getAttribute('id');
         for (let staff of track.staves) {
             staff.addChord(chordId, chord);
         }
-        this.parseDiagramItem_Chord_XmlNode(chord, node);
+        this.parseDiagramItemForChord(chord, node);
     }
 
-    private parseDiagramItem_Staff_XmlNode(staff: Staff, node: XmlNode): void {
+    private parseDiagramItemForStaff(staff: Staff, node: XmlNode): void {
         let chord: Chord = new Chord();
         let chordId: string = node.getAttribute('id');
         staff.addChord(chordId, chord);
-        this.parseDiagramItem_Chord_XmlNode(chord, node);
+        this.parseDiagramItemForChord(chord, node);
     }
 
-    private parseDiagramItem_Chord_XmlNode(chord: Chord, node: XmlNode): void {
+    private parseDiagramItemForChord(chord: Chord, node: XmlNode): void {
         chord.name = node.getAttribute('name');
         let diagram: XmlNode = node.findChildElement('Diagram')!;
         let stringCount: number = parseInt(diagram.getAttribute('stringCount'));
@@ -901,7 +902,7 @@ export class GpifParser {
                 break;
             case 'DiagramCollection':
             case 'ChordCollection':
-                this.parseDiagramCollection_Track_XmlNode(track, node);
+                this.parseDiagramCollectionForTrack(track, node);
                 break;
             case 'CapoFret':
                 let capo: number = parseInt(node.findChildElement('Fret')!.innerText);
@@ -2001,6 +2002,7 @@ export class GpifParser {
     private parseRhythm(node: XmlNode): void {
         let rhythm: GpifRhythm = new GpifRhythm();
         let rhythmId: string = node.getAttribute('id');
+        rhythm.id = rhythmId;
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {

@@ -80,6 +80,14 @@ export class XmlNode {
         return null;
     }
 
+    public addElement(name: string): XmlNode {
+        const newNode = new XmlNode();
+        newNode.nodeType = XmlNodeType.Element;
+        newNode.localName = name;
+        this.addChild(newNode);
+        return newNode;
+    }
+
     public get innerText(): string {
         if (this.nodeType === XmlNodeType.Element || this.nodeType === XmlNodeType.Document) {
             let txt: string = '';
@@ -90,5 +98,20 @@ export class XmlNode {
             return s.trim();
         }
         return this.value ?? '';
+    }
+
+
+    public set innerText(s: string) {
+        const textNode = new XmlNode();
+        textNode.nodeType = XmlNodeType.Text;
+        textNode.value = s;
+        this.childNodes = [textNode];
+    }
+
+    public setCData(s:string) {
+        const textNode = new XmlNode();
+        textNode.nodeType = XmlNodeType.CDATA;
+        textNode.value = s;
+        this.childNodes = [textNode];
     }
 }
