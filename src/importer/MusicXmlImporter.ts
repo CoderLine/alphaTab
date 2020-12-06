@@ -1396,8 +1396,11 @@ export class MusicXmlImporter extends ScoreImporter {
                     case 'midi-program':
                         track.playbackInfo.program = parseInt(c.innerText);
                         break;
-                    case 'midi-volume':
-                        track.playbackInfo.volume = parseInt(c.innerText);
+                    case 'volume':
+                        track.playbackInfo.volume = Math.floor((parseInt(c.innerText) / 100) * 16);
+                        break;
+                    case 'pan':
+                        track.playbackInfo.balance = Math.max(0, Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16)));
                         break;
                 }
             }
