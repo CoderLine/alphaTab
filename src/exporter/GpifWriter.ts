@@ -1,4 +1,5 @@
 import { MidiUtils } from '@src/midi/MidiUtils';
+import { AccentuationType } from '@src/model/AccentuationType';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { BrushType } from '@src/model/BrushType';
@@ -7,7 +8,9 @@ import { CrescendoType } from '@src/model/CrescendoType';
 import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { Fermata, FermataType } from '@src/model/Fermata';
+import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
+import { HarmonicType } from '@src/model/HarmonicType';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
 import { MasterBar } from '@src/model/MasterBar';
@@ -15,9 +18,12 @@ import { Note } from '@src/model/Note';
 import { Ottavia } from '@src/model/Ottavia';
 import { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
+import { SlideInType } from '@src/model/SlideInType';
+import { SlideOutType } from '@src/model/SlideOutType';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
+import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { XmlDocument } from '@src/xml/XmlDocument';
@@ -58,7 +64,7 @@ export class GpifWriter {
         this.writeMasterBarsNode(gpif, score);
 
         const bars = gpif.addElement('Bars');
-        const voices = gpif.addElement('Voice');
+        const voices = gpif.addElement('Voices');
         const beats = gpif.addElement('Beats');
         const notes = gpif.addElement('Notes');
         const rhythms = gpif.addElement('Rhythms');
@@ -90,6 +96,219 @@ export class GpifWriter {
     private writeNoteNode(parent: XmlNode, note: Note) {
         const noteNode = parent.addElement('Note');
         noteNode.attributes.set('id', note.id.toString());
+
+        this.writeNoteProperties(noteNode, note);
+
+        if (note.isGhost) {
+            noteNode.addElement('AntiAccent').innerText = 'normal';
+        }
+
+        if (note.isLetRing) {
+            noteNode.addElement('LetRing');
+        }
+
+        if (note.isTrill) {
+            noteNode.addElement('Trill').innerText = note.trillValue!.toString();
+        }
+
+        let accentFlags = 0;
+        if (note.isStaccato) {
+            accentFlags |= 1;
+        }
+        switch (note.accentuated) {
+            case AccentuationType.Normal:
+                accentFlags |= 0x04;
+                break;
+            case AccentuationType.Heavy:
+                accentFlags |= 0x08;
+                break;
+        }
+
+        if (accentFlags > 0) {
+            noteNode.addElement('Accent').innerText = accentFlags.toString();
+        }
+
+        if (note.isTieOrigin || note.isTieDestination) {
+            const tie = noteNode.addElement('Tie');
+            tie.attributes.set('origin', note.isTieOrigin ? 'true' : 'false');
+            tie.attributes.set('destination', note.isTieOrigin ? 'true' : 'false');
+        }
+
+        switch (note.vibrato) {
+            case VibratoType.Slight:
+                noteNode.addElement('Vibrato').innerText = 'Slight';
+                break;
+            case VibratoType.Wide:
+                noteNode.addElement('Vibrato').innerText = 'Wide';
+                break;
+        }
+
+        if (note.isFingering) {
+            switch (note.leftHandFinger) {
+                case Fingers.Thumb:
+                    noteNode.addElement('LeftFingering').innerText = 'P';
+                    break;
+                case Fingers.IndexFinger:
+                    noteNode.addElement('LeftFingering').innerText = 'I';
+                    break;
+                case Fingers.MiddleFinger:
+                    noteNode.addElement('LeftFingering').innerText = 'M';
+                    break;
+                case Fingers.AnnularFinger:
+                    noteNode.addElement('LeftFingering').innerText = 'A';
+                    break;
+                case Fingers.LittleFinger:
+                    noteNode.addElement('LeftFingering').innerText = 'C';
+                    break;
+            }
+            switch (note.rightHandFinger) {
+                case Fingers.Thumb:
+                    noteNode.addElement('RightFingering').innerText = 'P';
+                    break;
+                case Fingers.IndexFinger:
+                    noteNode.addElement('RightFingering').innerText = 'I';
+                    break;
+                case Fingers.MiddleFinger:
+                    noteNode.addElement('RightFingering').innerText = 'M';
+                    break;
+                case Fingers.AnnularFinger:
+                    noteNode.addElement('RightFingering').innerText = 'A';
+                    break;
+                case Fingers.LittleFinger:
+                    noteNode.addElement('RightFingering').innerText = 'C';
+                    break;
+            }
+        }
+
+        if (note.percussionArticulation >= 0) {
+            noteNode.addElement('InstrumentArticulation').innerText = note.percussionArticulation.toString();
+        } else {
+            noteNode.addElement('InstrumentArticulation').innerText = '0';
+
+        }
+    }
+
+    private writeNoteProperties(parent: XmlNode, note: Note) {
+        const properties = parent.addElement('Properties');
+
+        this.writeConcertPitch(properties, note);
+        this.writeTransposedPitch(properties, note);
+
+
+        if (note.isStringed) {
+            this.writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
+            this.writeSimplePropertyNode(properties, 'Fret', 'Fret', note.fret.toString());
+        }
+
+        if (note.isPiano) {
+            this.writeSimplePropertyNode(properties, 'Octave', 'Number', note.octave.toString());
+            this.writeSimplePropertyNode(properties, 'Tone', 'Step', note.tone.toString());
+        }
+
+        if (note.beat.tap) {
+            this.writeSimplePropertyNode(properties, 'Tapped', 'Enable', null);
+        }
+
+        if (note.harmonicType !== HarmonicType.None) {
+            switch (note.harmonicType) {
+                case HarmonicType.Natural:
+                    this.writeSimplePropertyNode(properties, 'HarmonicType', 'HType', 'Natural');
+                    break;
+                case HarmonicType.Artificial:
+                    this.writeSimplePropertyNode(properties, 'HarmonicType', 'HType', 'Artificial');
+                    break;
+                case HarmonicType.Pinch:
+                    this.writeSimplePropertyNode(properties, 'HarmonicType', 'HType', 'Pinch');
+                    break;
+                case HarmonicType.Tap:
+                    this.writeSimplePropertyNode(properties, 'HarmonicType', 'HType', 'Tap');
+                    break;
+                case HarmonicType.Semi:
+                    this.writeSimplePropertyNode(properties, 'HarmonicType', 'HType', 'Semi');
+                    break;
+                case HarmonicType.Feedback:
+                    this.writeSimplePropertyNode(properties, 'HarmonicType', 'HType', 'Feedback');
+                    break;
+            }
+
+            if (note.harmonicValue !== 0) {
+                this.writeSimplePropertyNode(properties, 'HarmonicFret', 'HFret', note.harmonicValue.toString())
+            }
+        }
+
+
+        if (note.isDead) {
+            this.writeSimplePropertyNode(properties, 'Muted', 'Enable', null);
+        }
+
+        if (note.isPalmMute) {
+            this.writeSimplePropertyNode(properties, 'PalmMuted', 'Enable', null);
+        }
+
+        if (note.hasBend) {
+            this.writeBend(properties, note);
+        }
+
+        if (note.isHammerPullOrigin) {
+            this.writeSimplePropertyNode(properties, 'HopoOrigin', 'Enable', null);
+        }
+
+        if (note.isHammerPullDestination) {
+            this.writeSimplePropertyNode(properties, 'HopoDestination', 'Enable', null);
+        }
+
+        if (note.isLeftHandTapped) {
+            this.writeSimplePropertyNode(properties, 'LeftHandTapped', 'Enable', null);
+        }
+
+
+        let slideFlags = 0;
+        switch (note.slideInType) {
+            case SlideInType.IntoFromAbove:
+                slideFlags |= 16;
+                break;
+            case SlideInType.IntoFromBelow:
+                slideFlags |= 32;
+                break;
+        }
+        switch (note.slideOutType) {
+            case SlideOutType.Shift:
+                slideFlags |= 1;
+                break;
+            case SlideOutType.Legato:
+                slideFlags |= 2;
+                break;
+            case SlideOutType.OutDown:
+                slideFlags |= 4;
+                break;
+            case SlideOutType.OutUp:
+                slideFlags |= 8;
+                break;
+            case SlideOutType.PickSlideDown:
+                slideFlags |= 64;
+                break;
+            case SlideOutType.PickSlideUp:
+                slideFlags |= 128;
+                break;
+        }
+
+        if (slideFlags > 0) {
+            this.writeSimplePropertyNode(properties, 'Slide', 'Flags', slideFlags.toString());
+        }
+    }
+
+    private writeTransposedPitch(properties: XmlNode, note: Note) {
+    }
+
+    private writeConcertPitch(properties: XmlNode, note: Note) {
+        // TODO: handle accidentals
+        // let parts = Tuning.getTextPartsForTuning(note.realValue);
+        // this.writePitch(properties, parts[0])
+        // throw new Error('Method not implemented.');
+    }
+
+    private writeBend(properties: XmlNode, note: Note) {
+        // TODO: write bend
     }
 
     private writeBeatNode(parent: XmlNode, beat: Beat, rhythms: XmlNode) {
@@ -163,7 +382,9 @@ export class GpifWriter {
         }
 
         beatNode.addElement('ConcertPitchStemOrientation').innerText = 'Undefined';
-        beatNode.addElement('Notes').innerText = beat.notes.map(n => n.id).join(' ');
+        if(!beat.isRest) {
+            beatNode.addElement('Notes').innerText = beat.notes.map(n => n.id).join(' ');
+        }
 
         beatNode.addElement('Properties');
     }
@@ -258,8 +479,8 @@ export class GpifWriter {
         scoreNode.addElement('PageFooter').setCData('');
 
         // TODO: find out right avlues
-        scoreNode.addElement('ScoreSystemsDefaultLayout').setCData('2');
-        scoreNode.addElement('ScoreSystemsLayout').setCData('2 2 2 2 2 2 2');
+        scoreNode.addElement('ScoreSystemsDefaultLayout').setCData('4');
+        scoreNode.addElement('ScoreSystemsLayout').setCData('4');
 
         scoreNode.addElement('ScoreZoomPolicy').setCData('Value');
         scoreNode.addElement('ScoreZoom').setCData('1');
@@ -278,8 +499,16 @@ export class GpifWriter {
             masterTrackNode.addElement('Anacrusis');
         }
 
+        const initialTempoAutomation = automations.addElement('Automation');
+        initialTempoAutomation.addElement('Type').innerText = 'Tempo';
+        initialTempoAutomation.addElement('Linear').innerText = 'true';
+        initialTempoAutomation.addElement('Bar').innerText = "0";
+        initialTempoAutomation.addElement('Position').innerText = "0";
+        initialTempoAutomation.addElement('Visible').innerText = 'true';
+        initialTempoAutomation.addElement('Value').innerText = `${score.tempo} 2`;
+
         for (const mb of score.masterBars) {
-            if (mb.tempoAutomation) {
+            if (mb.index > 0 && mb.tempoAutomation) {
                 const tempoAutomation = automations.addElement('Automation');
                 tempoAutomation.addElement('Type').innerText = 'Tempo';
                 tempoAutomation.addElement('Linear').innerText = 'true';
@@ -313,8 +542,7 @@ export class GpifWriter {
 
         // TODO right value
         trackNode.addElement('SystemsDefautLayout').innerText = "3";
-        trackNode.addElement('SystemsLayout').innerText = "2 2 3 2 2 2 1";
-        trackNode.addElement('SystemsLayout').innerText = "2 2 3 2 2 2 1";
+        trackNode.addElement('SystemsLayout').innerText = "2";
 
         trackNode.addElement('AutoBrush');
         trackNode.addElement('PalmMute').innerText = '0';
@@ -399,7 +627,7 @@ export class GpifWriter {
         tuningProperty.addElement('LabelVisible').innerText = 'true';
 
         this.writeSimplePropertyNode(properties, 'PartialCapoFret', 'Fret', "0");
-        this.writeSimplePropertyNode(properties, 'PartialCapoStringFlags', 'Bitset', staff.tuning.map(_ => '0').join());
+        this.writeSimplePropertyNode(properties, 'PartialCapoStringFlags', 'Bitset', staff.tuning.map(_ => '0').join(''));
 
         this.writeDiagramCollection(properties, staff);
     }

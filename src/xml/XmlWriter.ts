@@ -1,4 +1,3 @@
-import { XmlDocument } from './XmlDocument';
 import { XmlNode, XmlNodeType } from './XmlNode';
 
 export class XmlWriter {
@@ -66,7 +65,7 @@ export class XmlWriter {
                 break;
             case XmlNodeType.CDATA:
                 if (xml.value) {
-                    this.write(`<![CDATA[${xml.value}]]`);
+                    this.write(`<![CDATA[${xml.value}]]>`);
                 }
                 break;
             case XmlNodeType.Document:
