@@ -1,6 +1,9 @@
 ---
-name: ❓ General Question
-about: Ask any question that is not covered in the documentation. 
+name: "❓ General Question"
+about: Ask any question that is not covered in the documentation.
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
