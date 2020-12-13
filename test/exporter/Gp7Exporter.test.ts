@@ -5,11 +5,17 @@ import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { Gp7Exporter } from '@src/exporter/Gp7Exporter';
 import { JsonConverter } from '@src/model/JsonConverter';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
 
 describe('Gp7ExporterTest', () => {
-    const prepareGp7ImporterWithFile: (name: string) => Promise<Gp7Importer> = async (name: string): Promise<Gp7Importer> => {
+    const loadScore: (name: string) => Promise<Score | null> = async (name: string): Promise<Score | null> => {
         const data = await TestPlatform.loadFile('test-data/' + name);
-        return prepareGp7ImporterWithBytes(data);
+        try {
+            return ScoreLoader.loadScoreFromBytes(data);
+        }
+        catch {
+            return null;
+        }
     };
 
     const prepareGp7ImporterWithBytes: (buffer: Uint8Array) => Gp7Importer = (buffer: Uint8Array): Gp7Importer => {
@@ -26,213 +32,143 @@ describe('Gp7ExporterTest', () => {
         const expectedType = typeof expected;
         const actualType = typeof actual;
 
-        expect(actualType).withContext(`Type Mismatch on hierarchy: ${path}`).toEqual(expectedType);
+        // NOTE: performance wise expect() seems quite expensive
+        // that's why we do a manual check for most asserts
+
+        if (actualType != expectedType) {
+            fail(`Type Mismatch on hierarchy: ${path}, '${actualType}' != '${expectedType}'`);
+        }
 
         switch (actualType) {
             case 'boolean':
-                expect(actual).withContext(`Boolean mismatch on hierarchy: ${path}`).toEqual(expected);
+                if ((actual as boolean) != (expected as boolean)) {
+                    fail(`Boolean mismatch on hierarchy: ${path}, '${actual}' != '${expected}'`);
+                }
                 break;
             case 'number':
-                expect(actual).withContext(`Number mismatch on hierarchy: ${path}`).toBeCloseTo(expected);
+                if (Math.abs((actual as number) - (expected as number)) >= 0.000001) {
+                    fail(`Number mismatch on hierarchy: ${path}, '${actual}' != '${expected}'`);
+                }
                 break;
             case 'object':
-                expect(Array.isArray(actual)).withContext(`Array Type Mismatch on hierarchy: ${path}`).toEqual(Array.isArray(expected));
-                expect(actual === null).withContext(`Null Mismatch on hierarchy: ${path}`).toEqual(expected === null);
-                if (actual) {
-                    if (Array.isArray(expected) && Array.isArray(actual)) {
-                        expect(actual.length).withContext(`Array Length Mismatch on hierarchy: ${path}`).toEqual(expected.length);
-                        for (let i = 0; i < actual.length; i++) {
-                            expectJsonEqual(expected[i], actual[i], `${path}[${i}]`);
+                if ((actual === null) !== (expected === null)) {
+                    fail(`Null mismatch on hierarchy: ${path}, '${actual}' != '${expected}'`);
+                } else if (actual) {
+                    if (Array.isArray(actual) !== Array.isArray(expected)) {
+                        fail(`IsArray mismatch on hierarchy: ${path}`);
+                    } else if (Array.isArray(actual) && Array.isArray(expected)) {
+                        if (actual.length !== expected.length) {
+                            fail(`Array Length mismatch on hierarchy: ${path}, ${actual.length} != ${expected.length}`);
+                        } else {
+                            for (let i = 0; i < actual.length; i++) {
+                                expectJsonEqual(expected[i], actual[i], `${path}[${i}]`);
+                            }
                         }
                     } else {
+
                         const expectedKeys = Object.keys(expected);
                         const actualKeys = Object.keys(actual);
                         expectedKeys.sort();
                         actualKeys.sort();
-                        expect(actualKeys.join(',')).withContext(`Object Keys Mismatch on hierarchy: ${path}`).toEqual(expectedKeys.join(','));
 
-                        for (const key of actualKeys) {
-                            switch (key) {
-                                // some ignored keys
-                                case 'id':
-                                case 'hammerPullOriginId':
-                                case 'hammerPullDestinationId':
-                                case 'tieOriginId':
-                                case 'tieDestinationId':
-                                    break;
-                                default:
-                                    expectJsonEqual(expected[key], actual[key], `${path}.${key}`);
-                                    break;
+                        const actualKeyList = actualKeys.join(',');
+                        const expectedKeyList = expectedKeys.join(',');
+                        if (actualKeyList !== expectedKeyList) {
+                            fail(`Object Keys mismatch on hierarchy: ${path}, '${actualKeyList}' != '${expectedKeyList}'`);
+                        } else {
+                            for (const key of actualKeys) {
+                                switch (key) {
+                                    // some ignored keys
+                                    case 'id':
+                                    case 'hammerPullOriginId':
+                                    case 'hammerPullDestinationId':
+                                    case 'tieOriginId':
+                                    case 'tieDestinationId':
+                                        break;
+                                    default:
+                                        expectJsonEqual(expected[key], actual[key], `${path}.${key}`);
+                                        break;
+                                }
                             }
+
                         }
                     }
                 }
                 break;
             case 'string':
-                expect(actual).withContext(`String mismatch on hierarchy: ${path}`).toEqual(expected);
+                if ((actual as string) != (expected as string)) {
+                    fail(`String mismatch on hierarchy: ${path}, '${actual}' != '${expected}'`);
+                }
                 break;
             case 'undefined':
-                expect(actual).withContext(`null mismatch on hierarchy: ${path}`).toEqual(expected);
+                if (actual !== expected) {
+                    fail(`null mismatch on hierarchy: ${path}, '${actual}' != '${expected}'`);
+                }
                 break;
         }
     }
 
     const testRoundTripEqual: (name: string) => Promise<void> = async (name: string): Promise<void> => {
-        const expected = (await prepareGp7ImporterWithFile(name)).readScore();
-        const exported = exportGp7(expected);
-        const actual = prepareGp7ImporterWithBytes(exported).readScore();
+        try {
+            const expected = await loadScore(name);
+            if (!expected) {
+                return;
+            }
 
-        const expectedJson = JsonConverter.scoreToJsObject(expected);
-        const actualJson = JsonConverter.scoreToJsObject(actual)
+            const exported = exportGp7(expected);
+            const actual = prepareGp7ImporterWithBytes(exported).readScore();
 
-        expectJsonEqual(expectedJson, actualJson, "<root>");
+            const expectedJson = JsonConverter.scoreToJsObject(expected);
+            const actualJson = JsonConverter.scoreToJsObject(actual)
+
+            expectJsonEqual(expectedJson, actualJson, '<' + name.substr(name.lastIndexOf('/') + 1) + '>');
+        } catch (e) {
+            fail(e);
+        }
     };
 
-    it('score-info', async () => {
-        await testRoundTripEqual('guitarpro7/score-info.gp');
-    });
+    const testRoundTripFolderEqual: (name: string) => Promise<void> = async (name: string): Promise<void> => {
+        const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
+        for (const file of files) {
+            await testRoundTripEqual(`${name}/${file}`);
+        }
+    };
 
-    it('notes', async () => {
-        await testRoundTripEqual('guitarpro7/notes.gp');
-    });
+    // Note: we just test all our importer and visual tests to cover all features
 
-    it('time-signatures', async () => {
-        await testRoundTripEqual('guitarpro7/time-signatures.gp');
-    });
+    it('importer', async () => {
+        await testRoundTripFolderEqual('guitarpro7');
+    }, 60000);
 
-    it('dead', async () => {
-        await testRoundTripEqual('guitarpro7/dead.gp');
-    });
+    // it('visual-effects-and-annotations', async () => {
+    //     await testRoundTripFolderEqual('visual-tests/effects-and-annotations');
+    // });
 
-    it('grace', async () => {
-        await testRoundTripEqual('guitarpro7/grace.gp');
-    });
+    // it('visual-general', async () => {
+    //     await testRoundTripFolderEqual('visual-tests/general');
+    // });
 
-    it('accentuations', async () => {
-        await testRoundTripEqual('guitarpro7/accentuations.gp');
-    });
+    // it('visual-guitar-tabs', async () => {
+    //     await testRoundTripFolderEqual('visual-tests/guitar-tabs');
+    // });
 
-    it('harmonics', async () => {
-        await testRoundTripEqual('guitarpro7/harmonics.gp');
-    });
+    // it('visual-layout', async () => {
+    //     await testRoundTripFolderEqual('visual-tests/layout');
+    // });
 
-    it('hammer', async () => {
-        await testRoundTripEqual('guitarpro7/hammer.gp');
-    });
+    // it('visual-music-notation', async () => {
+    //     await testRoundTripFolderEqual('visual-tests/music-notation');
+    // });
 
-    it('bend', async () => {
-        await testRoundTripEqual('guitarpro7/bends.gp');
-    });
+    // it('visual-notation-legend', async () => {
+    //     await testRoundTripFolderEqual('visual-tests/notation-legend');
+    // });
 
-    it('bends-advanced', async () => {
-        await testRoundTripEqual('guitarpro7/bends-advanced.gp');
-    });
+    // it('visual-special-notes', async () => {
+    //     await testRoundTripFolderEqual('visual-tests/special-notes');
+    // });
 
-    it('whammy-advanced', async () => {
-        await testRoundTripEqual('guitarpro7/whammy-advanced.gp');
-    });
-
-    it('tremolo', async () => {
-        await testRoundTripEqual('guitarpro7/tremolo.gp');
-    });
-
-    it('slides', async () => {
-        await testRoundTripEqual('guitarpro7/slides.gp');
-    });
-
-    it('vibrato', async () => {
-        await testRoundTripEqual('guitarpro7/vibrato.gp');
-    });
-
-    it('trills', async () => {
-        await testRoundTripEqual('guitarpro7/trills.gp');
-    });
-
-    it('other-effects', async () => {
-        await testRoundTripEqual('guitarpro7/other-effects.gp');
-    });
-
-    it('fingering', async () => {
-        await testRoundTripEqual('guitarpro7/fingering.gp');
-    });
-
-    it('stroke', async () => {
-        await testRoundTripEqual('guitarpro7/strokes.gp');
-    });
-
-    it('tuplets', async () => {
-        await testRoundTripEqual('guitarpro7/tuplets.gp');
-    });
-
-    it('ranges', async () => {
-        await testRoundTripEqual('guitarpro7/ranges.gp');
-    });
-
-    it('effects', async () => {
-        await testRoundTripEqual('guitarpro7/effects.gp');
-    });
-
-    it('serenade', async () => {
-        await testRoundTripEqual('guitarpro7/serenade.gp');
-    });
-
-    it('strings', async () => {
-        await testRoundTripEqual('guitarpro7/strings.gp');
-    });
-
-    it('key-signatures', async () => {
-        await testRoundTripEqual('guitarpro7/key-signatures.gp');
-    });
-
-    it('chords', async () => {
-        await testRoundTripEqual('guitarpro7/chords.gp');
-    });
-
-    it('colors', async () => {
-        await testRoundTripEqual('guitarpro7/colors.gp');
-    });
-
-    it('tremolo-vibrato', async () => {
-        await testRoundTripEqual('guitarpro7/tremolo-vibrato.gp');
-    });
-
-    it('ottavia', async () => {
-        await testRoundTripEqual('guitarpro7/ottavia.gp');
-    });
-
-    it('simile-mark', async () => {
-        await testRoundTripEqual('guitarpro7/simile-mark.gp');
-    });
-
-    it('anacrusis', async () => {
-        await testRoundTripEqual('guitarpro7/anacrusis.gp');
-    });
-
-    it('left-hand-tap', async () => {
-        await testRoundTripEqual('guitarpro7/left-hand-tap.gp');
-    });
-
-    it('fermata', async () => {
-        await testRoundTripEqual('guitarpro7/fermata.gp');
-    });
-
-    it('pick-slide', async () => {
-        await testRoundTripEqual('guitarpro7/pick-slide.gp');
-    });
-
-    it('beat-lyrics', async () => {
-        await testRoundTripEqual('guitarpro7/beat-lyrics.gp');
-    });
-
-    // TODO: 
-    // - test system layout
-    // - test playingstyle
-    // - test icons
-    // - test percussion tabs 
-    // - test ForcedSound 
-    // - test Program Changes 
-    // - test staff instrument 
-    // - test fingering 
-    // - test chords 
-    // - test special staff combinations (piano, non-tab)
+    // it('visual-special-tracks', async () => {
+    //     await testRoundTripFolderEqual('visual-tests/special-tracks');
+    // });
 });

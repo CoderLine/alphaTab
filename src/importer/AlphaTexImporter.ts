@@ -553,6 +553,9 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private score(): void {
+        if(this._sy === AlphaTexSymbols.Eof) {
+            this.errorMessage('Unexpected end of file');
+        }
         this.metaData();
         this.bars();
     }

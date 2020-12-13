@@ -95,6 +95,27 @@ module.exports = function (config) {
                         res.send(JSON.stringify('OK'));
                     }
                 );
+                app.post(
+                    '/list-files',
+                    upload.fields([
+                        {
+                            name: 'expected',
+                            maxCount: 1
+                        },
+                        {
+                            name: 'actual',
+                            maxCount: 1
+                        },
+                        {
+                            name: 'diff',
+                            maxCount: 1
+                        }
+                    ]),
+                    function (req, res) {
+                        log.info(`save visual error ${req.file}`);
+                        res.send(JSON.stringify('OK'));
+                    }
+                );
             }
         },
 

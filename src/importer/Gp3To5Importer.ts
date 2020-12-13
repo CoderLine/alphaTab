@@ -130,6 +130,14 @@ export class Gp3To5Importer extends ScoreImporter {
         this.readMasterBars();
         this.readTracks();
         this.readBars();
+
+        // To be more in line with the GP7 structure we create an
+        // initial tempo automation on the first masterbar
+        if (this._score.masterBars.length > 0) {
+            this._score.masterBars[0].tempoAutomation = Automation.buildTempoAutomation(false, 0, this._score.tempo, 2);
+            this._score.masterBars[0].tempoAutomation.text = this._score.tempoLabel;
+        }
+
         this._score.finish(this.settings);
         if (this._lyrics && this._lyricsTrack >= 0) {
             this._score.tracks[this._lyricsTrack].applyLyrics(this._lyrics);
@@ -322,6 +330,7 @@ export class Gp3To5Importer extends ScoreImporter {
             newMasterBar.tripletFeel = this._globalTripletFeel;
         }
         newMasterBar.isDoubleBar = (flags & 0x80) !== 0;
+
         this._score.addMasterBar(newMasterBar);
     }
 

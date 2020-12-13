@@ -1,3 +1,4 @@
+import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Bar } from '@src/model/Bar';
@@ -19,6 +20,7 @@ import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { Ottavia } from '@src/model/Ottavia';
 import { PickStroke } from '@src/model/PickStroke';
+import { PlaybackInformation } from '@src/model/PlaybackInformation';
 import { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
@@ -33,11 +35,170 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode } from '@src/xml/XmlNode';
 
+// Grabbed via Icon Picker beside track name in GP7
+enum GpifIconIds {
+    // Guitar & Basses
+    SteelGuitar = 1,
+    AcousticGuitar = 2,
+    TwelveStringGuitar = 3,
+    ElectricGuitar = 4,
+    Bass = 5,
+    ClassicalGuitar = 23,
+    UprightBass = 6,
+    Ukulele = 7,
+    Banjo = 8,
+    Mandolin = 9,
+    // Orchestral
+    Piano = 10,
+    Synth = 12,
+    Strings = 11,
+    Brass = 13,
+    Reed = 14,
+    Woodwind = 15,
+    Vocal = 16,
+    PitchedIdiophone = 17,
+    Fx = 21,
+    // Percussions
+    PercussionKit = 18,
+    Idiophone = 19,
+    Membraphone = 20
+}
+
 /**
  * This class can write a score.gpif XML from a given score model.
  */
 export class GpifWriter {
     private _rhythmIdLookup: Map<string, string> = new Map<string, string>();
+    private static IconLookup: Map<number, GpifIconIds> = new Map([
+        [0, GpifIconIds.Piano],
+        [1, GpifIconIds.Piano],
+        [2, GpifIconIds.Piano],
+        [3, GpifIconIds.Piano],
+        [4, GpifIconIds.Piano],
+        [5, GpifIconIds.Piano],
+        [6, GpifIconIds.Piano],
+        [7, GpifIconIds.Piano],
+        [8, GpifIconIds.PitchedIdiophone],
+        [9, GpifIconIds.PitchedIdiophone],
+        [10, GpifIconIds.PitchedIdiophone],
+        [11, GpifIconIds.PitchedIdiophone],
+        [12, GpifIconIds.PitchedIdiophone],
+        [13, GpifIconIds.PitchedIdiophone],
+        [14, GpifIconIds.PitchedIdiophone],
+        [15, GpifIconIds.Banjo],
+        [16, GpifIconIds.Piano],
+        [17, GpifIconIds.Piano],
+        [18, GpifIconIds.Piano],
+        [19, GpifIconIds.Piano],
+        [20, GpifIconIds.Piano],
+        [21, GpifIconIds.Piano],
+        [22, GpifIconIds.Woodwind],
+        [23, GpifIconIds.Piano],
+        [24, GpifIconIds.ClassicalGuitar],
+        [25, GpifIconIds.SteelGuitar],
+        [26, GpifIconIds.SteelGuitar],
+        [27, GpifIconIds.ElectricGuitar],
+        [28, GpifIconIds.ElectricGuitar],
+        [29, GpifIconIds.ElectricGuitar],
+        [30, GpifIconIds.SteelGuitar],
+        [31, GpifIconIds.SteelGuitar],
+        [32, GpifIconIds.Bass],
+        [33, GpifIconIds.Bass],
+        [34, GpifIconIds.Bass],
+        [35, GpifIconIds.Bass],
+        [36, GpifIconIds.Bass],
+        [37, GpifIconIds.Bass],
+        [38, GpifIconIds.Synth],
+        [39, GpifIconIds.Synth],
+        [40, GpifIconIds.Strings],
+        [41, GpifIconIds.Strings],
+        [42, GpifIconIds.Strings],
+        [43, GpifIconIds.Strings],
+        [44, GpifIconIds.Strings],
+        [45, GpifIconIds.Strings],
+        [46, GpifIconIds.Piano],
+        [47, GpifIconIds.Membraphone],
+        [48, GpifIconIds.Strings],
+        [49, GpifIconIds.Strings],
+        [50, GpifIconIds.Strings],
+        [51, GpifIconIds.Strings],
+        [52, GpifIconIds.Vocal],
+        [53, GpifIconIds.Vocal],
+        [54, GpifIconIds.Vocal],
+        [55, GpifIconIds.Synth],
+        [56, GpifIconIds.Brass],
+        [57, GpifIconIds.Brass],
+        [58, GpifIconIds.Brass],
+        [59, GpifIconIds.Brass],
+        [60, GpifIconIds.Brass],
+        [61, GpifIconIds.Brass],
+        [62, GpifIconIds.Brass],
+        [63, GpifIconIds.Brass],
+        [64, GpifIconIds.Reed],
+        [65, GpifIconIds.Reed],
+        [66, GpifIconIds.Reed],
+        [67, GpifIconIds.Reed],
+        [68, GpifIconIds.Reed],
+        [69, GpifIconIds.Reed],
+        [70, GpifIconIds.Reed],
+        [71, GpifIconIds.Reed],
+        [72, GpifIconIds.Reed],
+        [73, GpifIconIds.Woodwind],
+        [74, GpifIconIds.Woodwind],
+        [75, GpifIconIds.Woodwind],
+        [76, GpifIconIds.Woodwind],
+        [77, GpifIconIds.Woodwind],
+        [78, GpifIconIds.Woodwind],
+        [79, GpifIconIds.Woodwind],
+        [80, GpifIconIds.Synth],
+        [81, GpifIconIds.Synth],
+        [82, GpifIconIds.Synth],
+        [83, GpifIconIds.Synth],
+        [84, GpifIconIds.Synth],
+        [85, GpifIconIds.Synth],
+        [86, GpifIconIds.Synth],
+        [87, GpifIconIds.Synth],
+        [88, GpifIconIds.Synth],
+        [89, GpifIconIds.Synth],
+        [90, GpifIconIds.Synth],
+        [91, GpifIconIds.Synth],
+        [92, GpifIconIds.Synth],
+        [93, GpifIconIds.Synth],
+        [94, GpifIconIds.Synth],
+        [95, GpifIconIds.Synth],
+        [96, GpifIconIds.Fx],
+        [97, GpifIconIds.Fx],
+        [98, GpifIconIds.Fx],
+        [99, GpifIconIds.Fx],
+        [100, GpifIconIds.Fx],
+        [101, GpifIconIds.Fx],
+        [102, GpifIconIds.Fx],
+        [103, GpifIconIds.Fx],
+        [104, GpifIconIds.ElectricGuitar],
+        [105, GpifIconIds.Banjo],
+        [106, GpifIconIds.Ukulele],
+        [107, GpifIconIds.Banjo],
+        [108, GpifIconIds.PitchedIdiophone],
+        [109, GpifIconIds.Reed],
+        [110, GpifIconIds.Strings],
+        [111, GpifIconIds.Woodwind],
+        [112, GpifIconIds.PitchedIdiophone],
+        [113, GpifIconIds.Idiophone],
+        [114, GpifIconIds.PitchedIdiophone],
+        [115, GpifIconIds.Idiophone],
+        [116, GpifIconIds.Membraphone],
+        [117, GpifIconIds.Membraphone],
+        [118, GpifIconIds.Membraphone],
+        [119, GpifIconIds.Idiophone],
+        [120, GpifIconIds.Fx],
+        [121, GpifIconIds.Fx],
+        [122, GpifIconIds.Fx],
+        [123, GpifIconIds.Fx],
+        [124, GpifIconIds.Fx],
+        [125, GpifIconIds.Fx],
+        [126, GpifIconIds.Fx],
+        [127, GpifIconIds.Fx]
+    ])
 
     public writeXml(score: Score): string {
         const xmlDocument = new XmlDocument();
@@ -524,10 +685,10 @@ export class GpifWriter {
             this.writeBeatLyrics(beatNode, beat.lyrics);
         }
     }
-    
+
     private writeBeatLyrics(beatNode: XmlNode, lyrics: string[]) {
         const lyricsNode = beatNode.addElement('Lyrics');
-        for(const l of lyrics) {
+        for (const l of lyrics) {
             const line = lyricsNode.addElement('Line');
             line.setCData(l);
         }
@@ -709,7 +870,6 @@ export class GpifWriter {
         scoreNode.addElement('PageHeader').setCData('');
         scoreNode.addElement('PageFooter').setCData('');
 
-        // TODO: find out right avlues
         scoreNode.addElement('ScoreSystemsDefaultLayout').setCData('4');
         scoreNode.addElement('ScoreSystemsLayout').setCData('4');
 
@@ -777,19 +937,19 @@ export class GpifWriter {
         trackNode.addElement('ShortName').setCData(track.shortName);
         trackNode.addElement('Color').innerText = `${track.color.r} ${track.color.g} ${track.color.b}`;
 
-        // TODO right value
+        // Note: unclear what these values mean, various combinations in GP7 lead to these values
         trackNode.addElement('SystemsDefautLayout').innerText = "3";
-        trackNode.addElement('SystemsLayout').innerText = "2";
+        trackNode.addElement('SystemsLayout').innerText = "1";
 
         trackNode.addElement('AutoBrush');
         trackNode.addElement('PalmMute').innerText = '0';
 
-        // TODO: StringedPick for guitars
-        trackNode.addElement('PlayingStyle').innerText = 'Default';
+        trackNode.addElement('PlayingStyle').innerText = GeneralMidi.isGuitar(track.playbackInfo.program)
+            ? 'StringedPick'
+            : 'Default';
         trackNode.addElement('UseOneChannelPerString');
 
-        // TODO right values
-        trackNode.addElement('IconId').innerText = '8';
+        trackNode.addElement('IconId').innerText = GpifWriter.getIconId(track.playbackInfo).toString();
 
         this.writeInstrumentSetNode(trackNode, track);
         // TODO write notationpatch
@@ -797,7 +957,6 @@ export class GpifWriter {
 
         this.writeRseNode(trackNode, track);
 
-        // TODO right values
         trackNode.addElement('ForcedSound').innerText = '-1';
 
         this.writeSoundsNode(trackNode, track);
@@ -818,6 +977,16 @@ export class GpifWriter {
         this.writeStavesNode(trackNode, track);
 
         this.writeAutomations(trackNode, track);
+    }
+
+    private static getIconId(playbackInfo: PlaybackInformation): GpifIconIds {
+        if (playbackInfo.primaryChannel === 9) {
+            return GpifIconIds.PercussionKit;
+        }
+        if (GpifWriter.IconLookup.has(playbackInfo.program)) {
+            return GpifWriter.IconLookup.get(playbackInfo.program)!;
+        }
+        return GpifIconIds.SteelGuitar;
     }
 
     private writeAutomations(trackNode: XmlNode, _track: Track) {
@@ -859,17 +1028,60 @@ export class GpifWriter {
 
         const tuningProperty = this.writeSimplePropertyNode(properties, 'Tuning', 'Pitches', staff.tuning.slice().reverse().join(' '));
         tuningProperty.addElement('Flat');
-        // TODO: right values
-        tuningProperty.addElement('Instrument').innerText = 'Guitar';
-        tuningProperty.addElement('Label').setCData('');
-        tuningProperty.addElement('LabelVisible').innerText = 'true';
+
+        switch (staff.tuning.length) {
+            case 3:
+                tuningProperty.addElement('Instrument').innerText = 'Shamisen';
+                break;
+            case 4:
+                if (staff.track.playbackInfo.program === 105) {
+                    tuningProperty.addElement('Instrument').innerText = 'Banjo';
+                } else if (staff.track.playbackInfo.program == 42) {
+                    tuningProperty.addElement('Instrument').innerText = 'Cello';
+                } else if (staff.track.playbackInfo.program == 43) {
+                    tuningProperty.addElement('Instrument').innerText = 'Contrabass';
+                } else if (staff.track.playbackInfo.program == 40) {
+                    tuningProperty.addElement('Instrument').innerText = 'Violin';
+                } else if (staff.track.playbackInfo.program == 41) {
+                    tuningProperty.addElement('Instrument').innerText = 'Viola';
+                } else {
+                    tuningProperty.addElement('Instrument').innerText = 'Bass';
+                }
+                break;
+            case 5:
+                if (staff.track.playbackInfo.program === 105) {
+                    tuningProperty.addElement('Instrument').innerText = 'Banjo';
+                } else {
+                    tuningProperty.addElement('Instrument').innerText = 'Bass';
+                }
+                break;
+            case 6:
+                if (staff.track.playbackInfo.program === 105) {
+                    tuningProperty.addElement('Instrument').innerText = 'Banjo';
+                } else if (staff.track.playbackInfo.program <= 39) {
+                    tuningProperty.addElement('Instrument').innerText = 'Bass';
+                } else {
+                    tuningProperty.addElement('Instrument').innerText = 'Guitar';
+                }
+                break;
+            case 7:
+                if (staff.track.playbackInfo.program <= 39) {
+                    tuningProperty.addElement('Instrument').innerText = 'Bass';
+                } else {
+                    tuningProperty.addElement('Instrument').innerText = 'Guitar';
+                }
+                break;
+            default:
+                tuningProperty.addElement('Instrument').innerText = 'Guitar';
+                break;
+        }
+        tuningProperty.addElement('Label').setCData(staff.tuningName ?? "");
+        tuningProperty.addElement('LabelVisible').innerText = staff.tuningName ? "true" : "false";
 
         this.writeSimplePropertyNode(properties, 'PartialCapoFret', 'Fret', "0");
         this.writeSimplePropertyNode(properties, 'PartialCapoStringFlags', 'Bitset', staff.tuning.map(_ => '0').join(''));
 
         this.writeSimplePropertyNode(properties, 'TuningFlat', 'Enable', null);
-
-
 
         this.writeDiagramCollection(properties, staff);
     }
@@ -915,7 +1127,7 @@ export class GpifWriter {
             showFingering.attributes.set('value', chord.showFingering ? "true" : "false");
 
 
-            // TOOD Chord details
+            // TODO Chord details
         });
     }
 
@@ -1087,8 +1299,7 @@ export class GpifWriter {
             const alternateEndings: number[] = [];
             let bit = 0;
             while (remainingBits > 0) {
-
-                if ((remainingBits >> bit)) {
+                if ((remainingBits >> bit) & 0x01) {
                     alternateEndings.push(bit + 1);
                     // clear bit
                     remainingBits &= ~(1 << bit);
