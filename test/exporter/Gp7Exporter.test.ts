@@ -223,4 +223,16 @@ describe('Gp7ExporterTest', () => {
     it('beat-lyrics', async () => {
         await testRoundTripEqual('guitarpro7/beat-lyrics.gp');
     });
+
+    // TODO: 
+    // - test system layout
+    // - test playingstyle
+    // - test icons
+    // - test percussion tabs 
+    // - test ForcedSound 
+    // - test Program Changes 
+    // - test staff instrument 
+    // - test fingering 
+    // - test chords 
+    // - test special staff combinations (piano, non-tab)
 });

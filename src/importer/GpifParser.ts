@@ -1980,7 +1980,7 @@ export class GpifParser {
     }
 
     private toBendValue(gpxValue: number): number {
-        return (gpxValue * GpifParser.BendPointValueFactor);
+        return (gpxValue * GpifParser.BendPointValueFactor) | 0;
     }
 
     private toBendOffset(gpxOffset: number): number {

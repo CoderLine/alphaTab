@@ -318,7 +318,6 @@ export class GpifWriter {
         const pitch = property.addElement('Pitch');
         const stepElement = pitch.addElement('Step');
         const accidentalElement = pitch.addElement('Accidental');
-        // TODO: respect accidentalmode
         switch (step) {
             case 'C':
                 stepElement.innerText = 'C';
@@ -369,6 +368,22 @@ export class GpifWriter {
                 accidentalElement.innerText = '';
                 break;
         }
+
+        switch (accidental) {
+            case NoteAccidentalMode.ForceDoubleSharp:
+                accidentalElement.innerText = 'x';
+                break;
+            case NoteAccidentalMode.ForceSharp:
+                accidentalElement.innerText = '#';
+                break;
+            case NoteAccidentalMode.ForceFlat:
+                accidentalElement.innerText = 'b';
+                break;
+            case NoteAccidentalMode.ForceDoubleFlat:
+                accidentalElement.innerText = 'bb';
+                break;
+        }
+
         pitch.addElement('Octave').innerText = octave;
     }
 
@@ -504,11 +519,24 @@ export class GpifWriter {
 
         this.writeBeatProperties(beatNode, beat);
         this.writeBeatXProperties(beatNode, beat);
+
+        if (beat.lyrics && beat.lyrics.length > 0) {
+            this.writeBeatLyrics(beatNode, beat.lyrics);
+        }
     }
+    
+    private writeBeatLyrics(beatNode: XmlNode, lyrics: string[]) {
+        const lyricsNode = beatNode.addElement('Lyrics');
+        for(const l of lyrics) {
+            const line = lyricsNode.addElement('Line');
+            line.setCData(l);
+        }
+    }
+
     private writeBeatXProperties(beatNode: XmlNode, beat: Beat) {
         const beatProperties = beatNode.addElement('XProperties');
 
-        if(beat.brushDuration > 0) {
+        if (beat.brushDuration > 0) {
             this.writeSimpleXPropertyNode(beatProperties, '687935489', 'Int', beat.brushDuration.toString());
         }
     }
@@ -923,18 +951,18 @@ export class GpifWriter {
                     for (const beat of voice.beats) {
                         if (beat.lyrics) {
                             for (let l = 0; l < beat.lyrics.length; l++) {
-                                if (l >= beat.lyrics.length) {
+                                // initial create of the lines
+                                while (l >= lines.length) {
                                     const newLyrics = new Lyrics();
                                     newLyrics.startBar = bar.index;
+                                    newLyrics.text = '[Empty]';
                                     lines.push(newLyrics);
                                 }
 
                                 const line = lines[l];
-                                if (line.text.length > 0) {
-                                    line.text += ' ';
-                                }
-
-                                line.text += beat.lyrics[l];
+                                line.text = line.text == '[Empty]'
+                                    ? beat.lyrics[l]
+                                    : line.text + ' ' + beat.lyrics[l].split(' ').join('+');
                             }
                         }
                     }
@@ -1083,7 +1111,6 @@ export class GpifWriter {
             return;
         }
 
-        // TODO: Fermata
         if (masterBar.fermata.size > 0) {
             const fermatas = parent.addElement('Fermatas');
             masterBar.fermata.forEach((fermata, offset) => {
