@@ -235,6 +235,17 @@ function setupControl(selector) {
         at.print();
     };
 
+    control.querySelector('.at-download').onclick = function (e) {
+        const exporter = new alphaTab.exporter.Gp7Exporter();
+        const data = exporter.export(at.score, at.settings);
+        const a = document.createElement('a');
+        a.download = at.score.title + '.gp';
+        a.href = URL.createObjectURL(new Blob([data]));
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
     control.querySelectorAll('.at-zoom-options a').forEach(function (a) {
         a.onclick = function (e) {
             e.preventDefault();

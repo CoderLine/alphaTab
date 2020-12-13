@@ -13,11 +13,11 @@ export class Tuning {
         return includeOctave ? parts.join('') : parts[0];
     }
 
-    public static getTextPartsForTuning(tuning: number): string[] {
+    public static getTextPartsForTuning(tuning: number, octaveShift: number = -1): string[] {
         let octave: number = (tuning / 12) | 0;
         let note: number = tuning % 12;
         let notes: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-        return [notes[note], (octave - 1).toString()];
+        return [notes[note], (octave - octaveShift).toString()];
     }
 
     /**

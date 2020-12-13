@@ -2,6 +2,7 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
+import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
@@ -15,7 +16,9 @@ import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
 import { MasterBar } from '@src/model/MasterBar';
 import { Note } from '@src/model/Note';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { Ottavia } from '@src/model/Ottavia';
+import { PickStroke } from '@src/model/PickStroke';
 import { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
@@ -23,6 +26,7 @@ import { SlideOutType } from '@src/model/SlideOutType';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
+import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
@@ -117,10 +121,10 @@ export class GpifWriter {
         }
         switch (note.accentuated) {
             case AccentuationType.Normal:
-                accentFlags |= 0x04;
+                accentFlags |= 0x08;
                 break;
             case AccentuationType.Heavy:
-                accentFlags |= 0x08;
+                accentFlags |= 0x04;
                 break;
         }
 
@@ -131,7 +135,7 @@ export class GpifWriter {
         if (note.isTieOrigin || note.isTieDestination) {
             const tie = noteNode.addElement('Tie');
             tie.attributes.set('origin', note.isTieOrigin ? 'true' : 'false');
-            tie.attributes.set('destination', note.isTieOrigin ? 'true' : 'false');
+            tie.attributes.set('destination', note.isTieDestination ? 'true' : 'false');
         }
 
         switch (note.vibrato) {
@@ -265,10 +269,10 @@ export class GpifWriter {
         let slideFlags = 0;
         switch (note.slideInType) {
             case SlideInType.IntoFromAbove:
-                slideFlags |= 16;
+                slideFlags |= 32;
                 break;
             case SlideInType.IntoFromBelow:
-                slideFlags |= 32;
+                slideFlags |= 16;
                 break;
         }
         switch (note.slideOutType) {
@@ -298,18 +302,130 @@ export class GpifWriter {
     }
 
     private writeTransposedPitch(properties: XmlNode, note: Note) {
+        let parts = Tuning.getTextPartsForTuning(note.displayValueWithoutBend, 0);
+        this.writePitch(properties, "TransposedPitch", parts[0], parts[1], note.accidentalMode)
     }
 
     private writeConcertPitch(properties: XmlNode, note: Note) {
-        // TODO: handle accidentals
-        // let parts = Tuning.getTextPartsForTuning(note.realValue);
-        // this.writePitch(properties, parts[0])
-        // throw new Error('Method not implemented.');
+        let parts = Tuning.getTextPartsForTuning(note.realValue, 0);
+        this.writePitch(properties, "ConcertPitch", parts[0], parts[1], note.accidentalMode)
+    }
+
+    private writePitch(properties: XmlNode, propertyName: string, step: string, octave: string, accidental: NoteAccidentalMode) {
+        const property = properties.addElement('Property');
+        property.attributes.set('name', propertyName);
+
+        const pitch = property.addElement('Pitch');
+        const stepElement = pitch.addElement('Step');
+        const accidentalElement = pitch.addElement('Accidental');
+        // TODO: respect accidentalmode
+        switch (step) {
+            case 'C':
+                stepElement.innerText = 'C';
+                accidentalElement.innerText = '';
+                break;
+            case 'Db':
+                stepElement.innerText = 'C';
+                accidentalElement.innerText = '#';
+                break;
+            case 'D':
+                stepElement.innerText = 'D';
+                accidentalElement.innerText = '';
+                break;
+            case 'Eb':
+                stepElement.innerText = 'D';
+                accidentalElement.innerText = '#';
+                break;
+            case 'E':
+                stepElement.innerText = 'E';
+                accidentalElement.innerText = '';
+                break;
+            case 'F':
+                stepElement.innerText = 'F';
+                accidentalElement.innerText = '';
+                break;
+            case 'Gb':
+                stepElement.innerText = 'F';
+                accidentalElement.innerText = '#';
+                break;
+            case 'G':
+                stepElement.innerText = 'G';
+                accidentalElement.innerText = '';
+                break;
+            case 'Ab':
+                stepElement.innerText = 'G';
+                accidentalElement.innerText = '#';
+                break;
+            case 'A':
+                stepElement.innerText = 'A';
+                accidentalElement.innerText = '';
+                break;
+            case 'Bb':
+                stepElement.innerText = 'A';
+                accidentalElement.innerText = '#';
+                break;
+            case 'B':
+                stepElement.innerText = 'B';
+                accidentalElement.innerText = '';
+                break;
+        }
+        pitch.addElement('Octave').innerText = octave;
     }
 
     private writeBend(properties: XmlNode, note: Note) {
-        // TODO: write bend
+        if (note.hasBend && note.bendPoints.length <= 4) {
+            this.writeStandardBend(properties, note.bendPoints);
+        }
     }
+
+    private writeStandardBend(properties: XmlNode, bendPoints: BendPoint[]) {
+        this.writeSimplePropertyNode(properties, 'Bended', 'Enable', null);
+
+        var bendOrigin = bendPoints[0];
+        var bendDestination = bendPoints[bendPoints.length - 1];
+        var bendMiddle1: BendPoint;
+        var bendMiddle2: BendPoint;
+
+        switch (bendPoints.length) {
+            case 4:
+                bendMiddle1 = bendPoints[1];
+                bendMiddle2 = bendPoints[2];
+                break;
+            case 3:
+                bendMiddle1 = bendPoints[1];
+                bendMiddle2 = bendPoints[1];
+                break;
+            case 2:
+            default:
+                bendMiddle1 = new BendPoint(
+                    (bendOrigin.offset + bendDestination.offset) / 2,
+                    (bendOrigin.value + bendDestination.value) / 2
+                );
+                bendMiddle2 = bendMiddle1;
+                break;
+        }
+
+        this.writeSimplePropertyNode(properties, 'BendDestinationOffset', 'Float', this.toBendOffset(bendDestination.offset).toString());
+        this.writeSimplePropertyNode(properties, 'BendDestinationValue', 'Float', this.toBendValue(bendDestination.value).toString());
+
+        this.writeSimplePropertyNode(properties, 'BendMiddleOffset1', 'Float', this.toBendOffset(bendMiddle1.offset).toString());
+        this.writeSimplePropertyNode(properties, 'BendMiddleOffset2', 'Float', this.toBendOffset(bendMiddle2.offset).toString());
+        this.writeSimplePropertyNode(properties, 'BendMiddleValue', 'Float', this.toBendValue(bendMiddle1.value).toString());
+
+        this.writeSimplePropertyNode(properties, 'BendOriginOffset', 'Float', this.toBendOffset(bendOrigin.offset).toString());
+        this.writeSimplePropertyNode(properties, 'BendOriginValue', 'Float', this.toBendValue(bendOrigin.value).toString());
+    }
+
+    private toBendValue(value: number) {
+        // GPIF: 25 per quarternote
+        return value * 25;
+    }
+
+    private toBendOffset(value: number) {
+        // GPIF range: 0-100
+        return (value / BendPoint.MaxPosition) * 100.0;
+    }
+
 
     private writeBeatNode(parent: XmlNode, beat: Beat, rhythms: XmlNode) {
         const beatNode = parent.addElement('Beat');
@@ -382,11 +498,58 @@ export class GpifWriter {
         }
 
         beatNode.addElement('ConcertPitchStemOrientation').innerText = 'Undefined';
-        if(!beat.isRest) {
+        if (!beat.isRest) {
             beatNode.addElement('Notes').innerText = beat.notes.map(n => n.id).join(' ');
         }
 
-        beatNode.addElement('Properties');
+        this.writeBeatProperties(beatNode, beat);
+        this.writeBeatXProperties(beatNode, beat);
+    }
+    private writeBeatXProperties(beatNode: XmlNode, beat: Beat) {
+        const beatProperties = beatNode.addElement('XProperties');
+
+        if(beat.brushDuration > 0) {
+            this.writeSimpleXPropertyNode(beatProperties, '687935489', 'Int', beat.brushDuration.toString());
+        }
+    }
+
+    private writeBeatProperties(beatNode: XmlNode, beat: Beat) {
+        const beatProperties = beatNode.addElement('Properties');
+
+        switch (beat.brushType) {
+            case BrushType.BrushUp:
+                this.writeSimplePropertyNode(beatProperties, 'Brush', 'Direction', 'Up');
+                break;
+            case BrushType.BrushDown:
+                this.writeSimplePropertyNode(beatProperties, 'Brush', 'Direction', 'Down');
+                break;
+        }
+
+        switch (beat.pickStroke) {
+            case PickStroke.Up:
+                this.writeSimplePropertyNode(beatProperties, 'PickStroke', 'Direction', 'Up');
+                break;
+            case PickStroke.Down:
+                this.writeSimplePropertyNode(beatProperties, 'PickStroke', 'Direction', 'Down');
+                break;
+        }
+
+        if (beat.slap) {
+            this.writeSimplePropertyNode(beatProperties, 'Slapped', 'Enable', null);
+        }
+
+        if (beat.pop) {
+            this.writeSimplePropertyNode(beatProperties, 'Popped', 'Enable', null);
+        }
+
+        switch (beat.vibrato) {
+            case VibratoType.Wide:
+                this.writeSimplePropertyNode(beatProperties, 'VibratoWTremBar', 'Strength', 'Wide');
+                break;
+            case VibratoType.Slight:
+                this.writeSimplePropertyNode(beatProperties, 'VibratoWTremBar', 'Strength', 'Slight');
+                break;
+        }
     }
 
     private writeRhythm(parent: XmlNode, beat: Beat, rhythms: XmlNode) {
@@ -455,8 +618,48 @@ export class GpifWriter {
         parent.addElement('Rhythm').attributes.set('ref', rhythm);
     }
 
-    private writeWhammyNode(_parent: XmlNode, _beat: Beat) {
-        // TODO: whammy
+    private writeWhammyNode(parent: XmlNode, beat: Beat) {
+        if (beat.hasWhammyBar && beat.whammyBarPoints.length <= 4) {
+            this.writeStandardWhammy(parent, beat.whammyBarPoints);
+        }
+    }
+
+    private writeStandardWhammy(parent: XmlNode, whammyBarPoints: BendPoint[]) {
+
+        const whammyNode = parent.addElement('Whammy');
+        var whammyOrigin = whammyBarPoints[0];
+        var whammyDestination = whammyBarPoints[whammyBarPoints.length - 1];
+        var whammyMiddle1: BendPoint;
+        var whammyMiddle2: BendPoint;
+
+        switch (whammyBarPoints.length) {
+            case 4:
+                whammyMiddle1 = whammyBarPoints[1];
+                whammyMiddle2 = whammyBarPoints[2];
+                break;
+            case 3:
+                whammyMiddle1 = whammyBarPoints[1];
+                whammyMiddle2 = whammyBarPoints[1];
+                break;
+            case 2:
+            default:
+                whammyMiddle1 = new BendPoint(
+                    (whammyOrigin.offset + whammyDestination.offset) / 2,
+                    (whammyOrigin.value + whammyDestination.value) / 2
+                );
+                whammyMiddle2 = whammyMiddle1;
+                break;
+        }
+
+        whammyNode.attributes.set('destinationOffset', this.toBendOffset(whammyDestination.offset).toString());
+        whammyNode.attributes.set('destinationValue', this.toBendValue(whammyDestination.value).toString());
+
+        whammyNode.attributes.set('middleOffset1', this.toBendOffset(whammyMiddle1.offset).toString());
+        whammyNode.attributes.set('middleOffset2', this.toBendOffset(whammyMiddle2.offset).toString());
+        whammyNode.attributes.set('middleValue', this.toBendValue(whammyMiddle1.value).toString());
+
+        whammyNode.attributes.set('originOffset', this.toBendOffset(whammyOrigin.offset).toString());
+        whammyNode.attributes.set('originValue', this.toBendValue(whammyOrigin.value).toString());
     }
 
     private writeScoreNode(parent: XmlNode, score: Score) {
@@ -482,10 +685,10 @@ export class GpifWriter {
         scoreNode.addElement('ScoreSystemsDefaultLayout').setCData('4');
         scoreNode.addElement('ScoreSystemsLayout').setCData('4');
 
-        scoreNode.addElement('ScoreZoomPolicy').setCData('Value');
-        scoreNode.addElement('ScoreZoom').setCData('1');
+        scoreNode.addElement('ScoreZoomPolicy').innerText = 'Value';
+        scoreNode.addElement('ScoreZoom').innerText = '1';
         // not fully clear at this point so we rather activate it
-        scoreNode.addElement('MultiVoice').setCData('1>');
+        scoreNode.addElement('MultiVoice').innerText = '1>';
     }
 
     private writeMasterTrackNode(parent: XmlNode, score: Score) {
@@ -501,21 +704,27 @@ export class GpifWriter {
 
         const initialTempoAutomation = automations.addElement('Automation');
         initialTempoAutomation.addElement('Type').innerText = 'Tempo';
-        initialTempoAutomation.addElement('Linear').innerText = 'true';
+        initialTempoAutomation.addElement('Linear').innerText = 'false';
         initialTempoAutomation.addElement('Bar').innerText = "0";
         initialTempoAutomation.addElement('Position').innerText = "0";
         initialTempoAutomation.addElement('Visible').innerText = 'true';
         initialTempoAutomation.addElement('Value').innerText = `${score.tempo} 2`;
+        if (score.tempoLabel) {
+            initialTempoAutomation.addElement('Text').innerText = score.tempoLabel;
+        }
 
         for (const mb of score.masterBars) {
             if (mb.index > 0 && mb.tempoAutomation) {
                 const tempoAutomation = automations.addElement('Automation');
                 tempoAutomation.addElement('Type').innerText = 'Tempo';
-                tempoAutomation.addElement('Linear').innerText = 'true';
+                tempoAutomation.addElement('Linear').innerText = mb.tempoAutomation.isLinear ? 'true' : 'false';
                 tempoAutomation.addElement('Bar').innerText = mb.index.toString();
                 tempoAutomation.addElement('Position').innerText = mb.tempoAutomation.ratioPosition.toString();
                 tempoAutomation.addElement('Visible').innerText = 'true';
                 tempoAutomation.addElement('Value').innerText = `${mb.tempoAutomation.value} 2`;
+                if (mb.tempoAutomation.text) {
+                    tempoAutomation.addElement('Text').innerText = mb.tempoAutomation.text;
+                }
             }
         }
     }
@@ -602,7 +811,7 @@ export class GpifWriter {
         const channelStrip = rse.addElement('ChannelStrip');
         channelStrip.attributes.set('version', 'E56');
 
-        const channelStripParameters = rse.addElement('Parameters');
+        const channelStripParameters = channelStrip.addElement('Parameters');
         channelStripParameters.innerText = `0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1 0.5 ${track.playbackInfo.balance / 16} ${track.playbackInfo.volume / 16} 0.5 0.5 0.5`;
     }
 
@@ -618,6 +827,7 @@ export class GpifWriter {
         const properties = staffNode.addElement('Properties');
 
         this.writeSimplePropertyNode(properties, 'CapoFret', 'Fret', staff.capo.toString());
+        this.writeSimplePropertyNode(properties, 'FretCount', 'Fret', "24");
 
         const tuningProperty = this.writeSimplePropertyNode(properties, 'Tuning', 'Pitches', staff.tuning.slice().reverse().join(' '));
         tuningProperty.addElement('Flat');
@@ -628,6 +838,10 @@ export class GpifWriter {
 
         this.writeSimplePropertyNode(properties, 'PartialCapoFret', 'Fret', "0");
         this.writeSimplePropertyNode(properties, 'PartialCapoStringFlags', 'Bitset', staff.tuning.map(_ => '0').join(''));
+
+        this.writeSimplePropertyNode(properties, 'TuningFlat', 'Enable', null);
+
+
 
         this.writeDiagramCollection(properties, staff);
     }
@@ -677,11 +891,22 @@ export class GpifWriter {
         });
     }
 
-    private writeSimplePropertyNode(parent: XmlNode, propertyName: string, propertyValueTag: string, propertyValue: string | null) {
+    private writeSimplePropertyNode(parent: XmlNode, propertyName: string, propertyValueTagName: string, propertyValue: string | null) {
         const prop = parent.addElement('Property');
         prop.attributes.set('name', propertyName);
+        const propertyValueTag = prop.addElement(propertyValueTagName);
         if (propertyValue !== null) {
-            prop.addElement(propertyValueTag).innerText = propertyValue;
+            propertyValueTag.innerText = propertyValue;
+        }
+        return prop;
+    }
+
+    private writeSimpleXPropertyNode(parent: XmlNode, propertyId: string, propertyValueTagName: string, propertyValue: string | null) {
+        const prop = parent.addElement('XProperty');
+        prop.attributes.set('id', propertyId);
+        const propertyValueTag = prop.addElement(propertyValueTagName);
+        if (propertyValue !== null) {
+            propertyValueTag.innerText = propertyValue;
         }
         return prop;
     }
@@ -751,8 +976,8 @@ export class GpifWriter {
         const octaveTranspose = Math.floor(track.staves[0].displayTranspositionPitch / 12);
         const chromaticTranspose = track.staves[0].displayTranspositionPitch - (octaveTranspose * 12);
 
-        transpose.addElement('Chromatic').innerText = octaveTranspose.toString();
-        transpose.addElement('Octave').innerText = chromaticTranspose.toString();
+        transpose.addElement('Chromatic').innerText = chromaticTranspose.toString();
+        transpose.addElement('Octave').innerText = octaveTranspose.toString();
     }
 
     private writeInstrumentSetNode(trackNode: XmlNode, track: Track) {
@@ -902,15 +1127,20 @@ export class GpifWriter {
         const barNode = parent.addElement('Bar');
         barNode.attributes.set('id', bar.id.toString());
 
-        barNode.addElement('Voices').innerText = bar.voices.map(v => v.id).join(' ');
+        barNode.addElement('Voices').innerText = bar.voices.map(v => v.isEmpty ? '-1' : v.id).join(' ');
         barNode.addElement('Clef').innerText = Clef[bar.clef];
-        barNode.addElement('Ottavia').innerText = Clef[bar.clef].substr(1);
+        if (bar.clefOttava !== Ottavia.Regular) {
+            barNode.addElement('Ottavia').innerText = Ottavia[bar.clefOttava].substr(1);
+        }
         if (bar.simileMark !== SimileMark.None) {
             barNode.addElement('SimileMark').innerText = SimileMark[bar.simileMark];
         }
     }
 
     private writeVoiceNode(parent: XmlNode, voice: Voice) {
+        if (voice.isEmpty) {
+            return;
+        }
         const voiceNode = parent.addElement('Voice');
         voiceNode.attributes.set('id', voice.id.toString());
         voiceNode.addElement('Beats').innerText = voice.beats.map(v => v.id).join(' ');

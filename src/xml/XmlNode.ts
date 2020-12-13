@@ -111,7 +111,7 @@ export class XmlNode {
     public setCData(s:string) {
         const textNode = new XmlNode();
         textNode.nodeType = XmlNodeType.CDATA;
-        textNode.value = s;
+        textNode.value = s ?? "";
         this.childNodes = [textNode];
     }
 }

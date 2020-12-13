@@ -1980,11 +1980,11 @@ export class GpifParser {
     }
 
     private toBendValue(gpxValue: number): number {
-        return (gpxValue * GpifParser.BendPointValueFactor) | 0;
+        return (gpxValue * GpifParser.BendPointValueFactor);
     }
 
     private toBendOffset(gpxOffset: number): number {
-        return (gpxOffset * GpifParser.BendPointPositionFactor) | 0;
+        return (gpxOffset * GpifParser.BendPointPositionFactor);
     }
 
     private parseRhythms(node: XmlNode): void {

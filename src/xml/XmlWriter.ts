@@ -64,7 +64,7 @@ export class XmlWriter {
                 }
                 break;
             case XmlNodeType.CDATA:
-                if (xml.value) {
+                if (xml.value !== null) {
                     this.write(`<![CDATA[${xml.value}]]>`);
                 }
                 break;
