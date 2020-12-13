@@ -974,7 +974,6 @@ export class GpifWriter {
         trackNode.addElement('IconId').innerText = GpifWriter.getIconId(track.playbackInfo).toString();
 
         this.writeInstrumentSetNode(trackNode, track);
-        // TODO write notationpatch
         this.writeTransposeNode(trackNode, track);
 
         this.writeRseNode(trackNode, track);
@@ -1215,7 +1214,6 @@ export class GpifWriter {
         const sounds = trackNode.addElement('Sounds');
         const sound = sounds.addElement('Sound');
 
-        // TODO: right values
         sound.addElement('Name').setCData(`Track_${track.index}_Initial`);
         sound.addElement('Label').setCData('');
         sound.addElement('Path').setCData('');
@@ -1225,8 +1223,6 @@ export class GpifWriter {
         midi.addElement('LSB').innerText = '0';
         midi.addElement('MSB').innerText = '0';
         midi.addElement('Program').innerText = track.playbackInfo.program.toString();
-
-        // TODO: check if RSE is mandatory
 
         // TODO: generate sounds for all Program Changes. 
         // they need an item here with a name and then we refer to it on the automations
