@@ -16,6 +16,7 @@ import { HarmonicType } from '@src/model/HarmonicType';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
 import { MasterBar } from '@src/model/MasterBar';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { Ottavia } from '@src/model/Ottavia';
@@ -31,6 +32,7 @@ import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
+import { TextBaseline } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode } from '@src/xml/XmlNode';
@@ -64,141 +66,161 @@ enum GpifIconIds {
     Membraphone = 20
 }
 
+class GpifMidiProgramInfo {
+    public icon: GpifIconIds = GpifIconIds.Piano;
+    public instrumentSetName: string;
+    public instrumentSetType: string;
+
+    public constructor(icon: GpifIconIds, instrumentSetName: string, instrumentSetType: string | null = null) {
+        this.icon = icon;
+        this.instrumentSetName = instrumentSetName;
+        if (!instrumentSetType) {
+            const parts = instrumentSetName.split(' ');
+            parts[0] = parts[0].substr(0, 1).toLowerCase() + parts[0].substr(1);
+            this.instrumentSetType = parts.join('');
+        } else {
+            this.instrumentSetType = instrumentSetType;
+        }
+    }
+}
+
 /**
  * This class can write a score.gpif XML from a given score model.
  */
 export class GpifWriter {
     private _rhythmIdLookup: Map<string, string> = new Map<string, string>();
-    private static IconLookup: Map<number, GpifIconIds> = new Map([
-        [0, GpifIconIds.Piano],
-        [1, GpifIconIds.Piano],
-        [2, GpifIconIds.Piano],
-        [3, GpifIconIds.Piano],
-        [4, GpifIconIds.Piano],
-        [5, GpifIconIds.Piano],
-        [6, GpifIconIds.Piano],
-        [7, GpifIconIds.Piano],
-        [8, GpifIconIds.PitchedIdiophone],
-        [9, GpifIconIds.PitchedIdiophone],
-        [10, GpifIconIds.PitchedIdiophone],
-        [11, GpifIconIds.PitchedIdiophone],
-        [12, GpifIconIds.PitchedIdiophone],
-        [13, GpifIconIds.PitchedIdiophone],
-        [14, GpifIconIds.PitchedIdiophone],
-        [15, GpifIconIds.Banjo],
-        [16, GpifIconIds.Piano],
-        [17, GpifIconIds.Piano],
-        [18, GpifIconIds.Piano],
-        [19, GpifIconIds.Piano],
-        [20, GpifIconIds.Piano],
-        [21, GpifIconIds.Piano],
-        [22, GpifIconIds.Woodwind],
-        [23, GpifIconIds.Piano],
-        [24, GpifIconIds.ClassicalGuitar],
-        [25, GpifIconIds.SteelGuitar],
-        [26, GpifIconIds.SteelGuitar],
-        [27, GpifIconIds.ElectricGuitar],
-        [28, GpifIconIds.ElectricGuitar],
-        [29, GpifIconIds.ElectricGuitar],
-        [30, GpifIconIds.SteelGuitar],
-        [31, GpifIconIds.SteelGuitar],
-        [32, GpifIconIds.Bass],
-        [33, GpifIconIds.Bass],
-        [34, GpifIconIds.Bass],
-        [35, GpifIconIds.Bass],
-        [36, GpifIconIds.Bass],
-        [37, GpifIconIds.Bass],
-        [38, GpifIconIds.Synth],
-        [39, GpifIconIds.Synth],
-        [40, GpifIconIds.Strings],
-        [41, GpifIconIds.Strings],
-        [42, GpifIconIds.Strings],
-        [43, GpifIconIds.Strings],
-        [44, GpifIconIds.Strings],
-        [45, GpifIconIds.Strings],
-        [46, GpifIconIds.Piano],
-        [47, GpifIconIds.Membraphone],
-        [48, GpifIconIds.Strings],
-        [49, GpifIconIds.Strings],
-        [50, GpifIconIds.Strings],
-        [51, GpifIconIds.Strings],
-        [52, GpifIconIds.Vocal],
-        [53, GpifIconIds.Vocal],
-        [54, GpifIconIds.Vocal],
-        [55, GpifIconIds.Synth],
-        [56, GpifIconIds.Brass],
-        [57, GpifIconIds.Brass],
-        [58, GpifIconIds.Brass],
-        [59, GpifIconIds.Brass],
-        [60, GpifIconIds.Brass],
-        [61, GpifIconIds.Brass],
-        [62, GpifIconIds.Brass],
-        [63, GpifIconIds.Brass],
-        [64, GpifIconIds.Reed],
-        [65, GpifIconIds.Reed],
-        [66, GpifIconIds.Reed],
-        [67, GpifIconIds.Reed],
-        [68, GpifIconIds.Reed],
-        [69, GpifIconIds.Reed],
-        [70, GpifIconIds.Reed],
-        [71, GpifIconIds.Reed],
-        [72, GpifIconIds.Reed],
-        [73, GpifIconIds.Woodwind],
-        [74, GpifIconIds.Woodwind],
-        [75, GpifIconIds.Woodwind],
-        [76, GpifIconIds.Woodwind],
-        [77, GpifIconIds.Woodwind],
-        [78, GpifIconIds.Woodwind],
-        [79, GpifIconIds.Woodwind],
-        [80, GpifIconIds.Synth],
-        [81, GpifIconIds.Synth],
-        [82, GpifIconIds.Synth],
-        [83, GpifIconIds.Synth],
-        [84, GpifIconIds.Synth],
-        [85, GpifIconIds.Synth],
-        [86, GpifIconIds.Synth],
-        [87, GpifIconIds.Synth],
-        [88, GpifIconIds.Synth],
-        [89, GpifIconIds.Synth],
-        [90, GpifIconIds.Synth],
-        [91, GpifIconIds.Synth],
-        [92, GpifIconIds.Synth],
-        [93, GpifIconIds.Synth],
-        [94, GpifIconIds.Synth],
-        [95, GpifIconIds.Synth],
-        [96, GpifIconIds.Fx],
-        [97, GpifIconIds.Fx],
-        [98, GpifIconIds.Fx],
-        [99, GpifIconIds.Fx],
-        [100, GpifIconIds.Fx],
-        [101, GpifIconIds.Fx],
-        [102, GpifIconIds.Fx],
-        [103, GpifIconIds.Fx],
-        [104, GpifIconIds.ElectricGuitar],
-        [105, GpifIconIds.Banjo],
-        [106, GpifIconIds.Ukulele],
-        [107, GpifIconIds.Banjo],
-        [108, GpifIconIds.PitchedIdiophone],
-        [109, GpifIconIds.Reed],
-        [110, GpifIconIds.Strings],
-        [111, GpifIconIds.Woodwind],
-        [112, GpifIconIds.PitchedIdiophone],
-        [113, GpifIconIds.Idiophone],
-        [114, GpifIconIds.PitchedIdiophone],
-        [115, GpifIconIds.Idiophone],
-        [116, GpifIconIds.Membraphone],
-        [117, GpifIconIds.Membraphone],
-        [118, GpifIconIds.Membraphone],
-        [119, GpifIconIds.Idiophone],
-        [120, GpifIconIds.Fx],
-        [121, GpifIconIds.Fx],
-        [122, GpifIconIds.Fx],
-        [123, GpifIconIds.Fx],
-        [124, GpifIconIds.Fx],
-        [125, GpifIconIds.Fx],
-        [126, GpifIconIds.Fx],
-        [127, GpifIconIds.Fx]
+    private static MidiProgramInfoLookup: Map<number, GpifMidiProgramInfo> = new Map([
+        [0, new GpifMidiProgramInfo(GpifIconIds.Piano, "Acoustic Piano")],
+        [1, new GpifMidiProgramInfo(GpifIconIds.Piano, "Acoustic Piano")],
+        [2, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Piano")],
+        [3, new GpifMidiProgramInfo(GpifIconIds.Piano, "Acoustic Piano")],
+        [4, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Piano")],
+        [5, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Piano")],
+        [6, new GpifMidiProgramInfo(GpifIconIds.Piano, "Harpsichord")],
+        [7, new GpifMidiProgramInfo(GpifIconIds.Piano, "Harpsichord")],
+        [8, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Celesta")],
+        [9, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Vibraphone")],
+        [10, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Vibraphone")],
+        [11, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Vibraphone")],
+        [12, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Xylophone")],
+        [13, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Xylophone")],
+        [14, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Vibraphone")],
+        [15, new GpifMidiProgramInfo(GpifIconIds.Banjo, "Banjo")],
+        [16, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Organ")],
+        [17, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Organ")],
+        [18, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Organ")],
+        [19, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Organ")],
+        [20, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Organ")],
+        [21, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Organ")],
+        [22, new GpifMidiProgramInfo(GpifIconIds.Woodwind, "Recorder")],
+        [23, new GpifMidiProgramInfo(GpifIconIds.Piano, "Electric Organ")],
+        [24, new GpifMidiProgramInfo(GpifIconIds.ClassicalGuitar, "Nylon Guitar")],
+        [25, new GpifMidiProgramInfo(GpifIconIds.SteelGuitar, "Steel Guitar")],
+        [26, new GpifMidiProgramInfo(GpifIconIds.SteelGuitar, "Electric Guitar")],
+        [27, new GpifMidiProgramInfo(GpifIconIds.ElectricGuitar, "Electric Guitar")],
+        [28, new GpifMidiProgramInfo(GpifIconIds.ElectricGuitar, "Electric Guitar")],
+        [29, new GpifMidiProgramInfo(GpifIconIds.ElectricGuitar, "Electric Guitar")],
+        [30, new GpifMidiProgramInfo(GpifIconIds.SteelGuitar, "Electric Guitar")],
+        [31, new GpifMidiProgramInfo(GpifIconIds.SteelGuitar, "Electric Guitar")],
+        [32, new GpifMidiProgramInfo(GpifIconIds.Bass, "Acoustic Bass")],
+        [33, new GpifMidiProgramInfo(GpifIconIds.Bass, "Electric Bass")],
+        [34, new GpifMidiProgramInfo(GpifIconIds.Bass, "Electric Bass")],
+        [35, new GpifMidiProgramInfo(GpifIconIds.Bass, "Acoustic Bass")],
+        [36, new GpifMidiProgramInfo(GpifIconIds.Bass, "Electric Bass")],
+        [37, new GpifMidiProgramInfo(GpifIconIds.Bass, "Electric Bass")],
+        [38, new GpifMidiProgramInfo(GpifIconIds.Synth, "Synth Bass")],
+        [39, new GpifMidiProgramInfo(GpifIconIds.Synth, "Synth Bass")],
+        [40, new GpifMidiProgramInfo(GpifIconIds.Strings, "Violin")],
+        [41, new GpifMidiProgramInfo(GpifIconIds.Strings, "Viola")],
+        [42, new GpifMidiProgramInfo(GpifIconIds.Strings, "Cello")],
+        [43, new GpifMidiProgramInfo(GpifIconIds.Strings, "Contrabass")],
+        [44, new GpifMidiProgramInfo(GpifIconIds.Strings, "Violin")],
+        [45, new GpifMidiProgramInfo(GpifIconIds.Strings, "Violin")],
+        [46, new GpifMidiProgramInfo(GpifIconIds.Piano, "Harp")],
+        [47, new GpifMidiProgramInfo(GpifIconIds.Membraphone, "Timpani")],
+        [48, new GpifMidiProgramInfo(GpifIconIds.Strings, "Violin")],
+        [49, new GpifMidiProgramInfo(GpifIconIds.Strings, "Violin")],
+        [50, new GpifMidiProgramInfo(GpifIconIds.Strings, "Violin")],
+        [51, new GpifMidiProgramInfo(GpifIconIds.Strings, "Violin")],
+        [52, new GpifMidiProgramInfo(GpifIconIds.Vocal, "Voice")],
+        [53, new GpifMidiProgramInfo(GpifIconIds.Vocal, "Voice")],
+        [54, new GpifMidiProgramInfo(GpifIconIds.Vocal, "Voice")],
+        [55, new GpifMidiProgramInfo(GpifIconIds.Synth, "Pad Synthesizer")],
+        [56, new GpifMidiProgramInfo(GpifIconIds.Brass, "Trumpet")],
+        [57, new GpifMidiProgramInfo(GpifIconIds.Brass, "Trombone")],
+        [58, new GpifMidiProgramInfo(GpifIconIds.Brass, "Tuba")],
+        [59, new GpifMidiProgramInfo(GpifIconIds.Brass, "Trumpet")],
+        [60, new GpifMidiProgramInfo(GpifIconIds.Brass, "French Horn")],
+        [61, new GpifMidiProgramInfo(GpifIconIds.Brass, "Trumpet")],
+        [62, new GpifMidiProgramInfo(GpifIconIds.Brass, "Trumpet")],
+        [63, new GpifMidiProgramInfo(GpifIconIds.Brass, "Trumpet")],
+        [64, new GpifMidiProgramInfo(GpifIconIds.Reed, "Saxophone")],
+        [65, new GpifMidiProgramInfo(GpifIconIds.Reed, "Saxophone")],
+        [66, new GpifMidiProgramInfo(GpifIconIds.Reed, "Saxophone")],
+        [67, new GpifMidiProgramInfo(GpifIconIds.Reed, "Saxophone")],
+        [68, new GpifMidiProgramInfo(GpifIconIds.Reed, "Oboe")],
+        [69, new GpifMidiProgramInfo(GpifIconIds.Reed, "English Horn")],
+        [70, new GpifMidiProgramInfo(GpifIconIds.Reed, "Bassoon")],
+        [71, new GpifMidiProgramInfo(GpifIconIds.Reed, "Clarinet")],
+        [72, new GpifMidiProgramInfo(GpifIconIds.Reed, "Piccolo")],
+        [73, new GpifMidiProgramInfo(GpifIconIds.Woodwind, "Flute")],
+        [74, new GpifMidiProgramInfo(GpifIconIds.Woodwind, "Recorder")],
+        [75, new GpifMidiProgramInfo(GpifIconIds.Woodwind, "Flute")],
+        [76, new GpifMidiProgramInfo(GpifIconIds.Woodwind, "Recorder")],
+        [77, new GpifMidiProgramInfo(GpifIconIds.Woodwind, "Flute")],
+        [78, new GpifMidiProgramInfo(GpifIconIds.Woodwind, "Recorder")],
+        [79, new GpifMidiProgramInfo(GpifIconIds.Woodwind, "Flute")],
+        [80, new GpifMidiProgramInfo(GpifIconIds.Synth, "Lead Synthesizer")],
+        [81, new GpifMidiProgramInfo(GpifIconIds.Synth, "Lead Synthesizer")],
+        [82, new GpifMidiProgramInfo(GpifIconIds.Synth, "Lead Synthesizer")],
+        [83, new GpifMidiProgramInfo(GpifIconIds.Synth, "Lead Synthesizer")],
+        [84, new GpifMidiProgramInfo(GpifIconIds.Synth, "Lead Synthesizer")],
+        [85, new GpifMidiProgramInfo(GpifIconIds.Synth, "Lead Synthesizer")],
+        [86, new GpifMidiProgramInfo(GpifIconIds.Synth, "Lead Synthesizer")],
+        [87, new GpifMidiProgramInfo(GpifIconIds.Synth, "Lead Synthesizer")],
+        [88, new GpifMidiProgramInfo(GpifIconIds.Synth, "Pad Synthesizer")],
+        [89, new GpifMidiProgramInfo(GpifIconIds.Synth, "Pad Synthesizer")],
+        [90, new GpifMidiProgramInfo(GpifIconIds.Synth, "Pad Synthesizer")],
+        [91, new GpifMidiProgramInfo(GpifIconIds.Synth, "Pad Synthesizer")],
+        [92, new GpifMidiProgramInfo(GpifIconIds.Synth, "Pad Synthesizer")],
+        [93, new GpifMidiProgramInfo(GpifIconIds.Synth, "Pad Synthesizer")],
+        [94, new GpifMidiProgramInfo(GpifIconIds.Synth, "Pad Synthesizer")],
+        [95, new GpifMidiProgramInfo(GpifIconIds.Synth, "Pad Synthesizer")],
+        [96, new GpifMidiProgramInfo(GpifIconIds.Fx, "Pad Synthesizer")],
+        [97, new GpifMidiProgramInfo(GpifIconIds.Fx, "Pad Synthesizer")],
+        [98, new GpifMidiProgramInfo(GpifIconIds.Fx, "Pad Synthesizer")],
+        [99, new GpifMidiProgramInfo(GpifIconIds.Fx, "Pad Synthesizer")],
+        [100, new GpifMidiProgramInfo(GpifIconIds.Fx, "Lead Synthesizer")],
+        [101, new GpifMidiProgramInfo(GpifIconIds.Fx, "Lead Synthesizer")],
+        [102, new GpifMidiProgramInfo(GpifIconIds.Fx, "Lead Synthesizer")],
+        [103, new GpifMidiProgramInfo(GpifIconIds.Fx, "Trumpet")],
+        [104, new GpifMidiProgramInfo(GpifIconIds.ElectricGuitar, "Banjo")],
+        [105, new GpifMidiProgramInfo(GpifIconIds.Banjo, "Banjo")],
+        [106, new GpifMidiProgramInfo(GpifIconIds.Ukulele, "Ukulele")],
+        [107, new GpifMidiProgramInfo(GpifIconIds.Banjo, "Banjo")],
+        [108, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Xylophone")],
+        [109, new GpifMidiProgramInfo(GpifIconIds.Reed, "Bassoon")],
+        [110, new GpifMidiProgramInfo(GpifIconIds.Strings, "Violin")],
+        [111, new GpifMidiProgramInfo(GpifIconIds.Woodwind, "Flute")],
+        [112, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Xylophone")],
+        [113, new GpifMidiProgramInfo(GpifIconIds.Idiophone, "Celesta")],
+        [114, new GpifMidiProgramInfo(GpifIconIds.PitchedIdiophone, "Vibraphone")],
+        [115, new GpifMidiProgramInfo(GpifIconIds.Idiophone, "Xylophone")],
+        [116, new GpifMidiProgramInfo(GpifIconIds.Membraphone, "Xylophone")],
+        [117, new GpifMidiProgramInfo(GpifIconIds.Membraphone, "Xylophone")],
+        [118, new GpifMidiProgramInfo(GpifIconIds.Membraphone, "Xylophone")],
+        [119, new GpifMidiProgramInfo(GpifIconIds.Idiophone, "Celesta")],
+        [120, new GpifMidiProgramInfo(GpifIconIds.Fx, "Steel Guitar")],
+        [121, new GpifMidiProgramInfo(GpifIconIds.Fx, "Recorder")],
+        [122, new GpifMidiProgramInfo(GpifIconIds.Fx, "Recorder")],
+        [123, new GpifMidiProgramInfo(GpifIconIds.Fx, "Recorder")],
+        [124, new GpifMidiProgramInfo(GpifIconIds.Fx, "Recorder")],
+        [125, new GpifMidiProgramInfo(GpifIconIds.Fx, "Recorder")],
+        [126, new GpifMidiProgramInfo(GpifIconIds.Fx, "Recorder")],
+        [127, new GpifMidiProgramInfo(GpifIconIds.Fx, "Timpani")]
     ])
+
+    private static DrumKitProgramInfo: GpifMidiProgramInfo = new GpifMidiProgramInfo(GpifIconIds.PercussionKit, "Drums", "drumKit");
 
     public writeXml(score: Score): string {
         const xmlDocument = new XmlDocument();
@@ -981,10 +1003,10 @@ export class GpifWriter {
 
     private static getIconId(playbackInfo: PlaybackInformation): GpifIconIds {
         if (playbackInfo.primaryChannel === 9) {
-            return GpifIconIds.PercussionKit;
+            return GpifWriter.DrumKitProgramInfo.icon;
         }
-        if (GpifWriter.IconLookup.has(playbackInfo.program)) {
-            return GpifWriter.IconLookup.get(playbackInfo.program)!;
+        if (GpifWriter.MidiProgramInfoLookup.has(playbackInfo.program)) {
+            return GpifWriter.MidiProgramInfoLookup.get(playbackInfo.program)!.icon;
         }
         return GpifIconIds.SteelGuitar;
     }
@@ -1222,31 +1244,99 @@ export class GpifWriter {
 
     private writeInstrumentSetNode(trackNode: XmlNode, track: Track) {
         const instrumentSet = trackNode.addElement('InstrumentSet');
-        // TODO: create mapping of midi instruments to type
-        instrumentSet.addElement('Name').innerText = 'Steel Guitar';
-        instrumentSet.addElement('Type').innerText = 'steelGuitar';
 
         instrumentSet.addElement('LineCount').innerText = track.staves[0].standardNotationLineCount.toString();
 
-        // TODO: percussionArticulations
-        const elements = instrumentSet.addElement('Elements');
-        const element = elements.addElement('Element');
 
-        element.addElement('Pitched').innerText = 'Pitched';
-        element.addElement('Type').innerText = 'pitched';
-        element.addElement('SoundbankName').innerText = '';
+        if (track.percussionArticulations.length) {
+            instrumentSet.addElement('Name').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetName;
+            instrumentSet.addElement('Type').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetType;
+            let currentElementType: string = "";
+            let currentElementName: string = "";
+            let currentArticulations!: XmlNode;
+            let counterPerType = new Map<string, number>();
+            const elements = instrumentSet.addElement('Elements');
+            for (const articulation of track.percussionArticulations) {
+                if (!currentElementType || currentElementType !== articulation.elementType) {
+                    var currentElement = elements.addElement('Element');
 
-        const articulations = element.addElement('Articulations');
-        const articulation = articulations.addElement('Articulation');
+                    let name = articulation.elementType;
+                    if (counterPerType.has(name)) {
+                        const counter = counterPerType.get(name)!;
+                        name += ' ' + counter;
+                        counterPerType.set(name, counter + 1);
+                    } else {
+                        counterPerType.set(name, 1);
+                    }
 
-        articulation.addElement('Name').innerText = '';
-        articulation.addElement('StaffLine').innerText = '0';
-        articulation.addElement('Noteheads').innerText = 'noteheadBlack noteheadHalf noteheadWhole';
-        articulation.addElement('TechniquePlacement').innerText = 'outside';
-        articulation.addElement('TechniqueSymbol').innerText = '';
-        articulation.addElement('InputMidiNumbers').innerText = '';
-        articulation.addElement('OutputRSESound').innerText = '';
-        articulation.addElement('OutputMidiNumber').innerText = '0';
+                    currentElementName = name;
+                    currentElement.addElement('Name').innerText = name;
+                    currentElement.addElement('Type').innerText = articulation.elementType;
+
+                    currentArticulations = currentElement.addElement('Articulations');
+                }
+
+
+                const articulationNode = currentArticulations.addElement('Articulation');
+                articulationNode.addElement('Name').innerText = currentElementName + ' ' + currentArticulations.childNodes.length;
+                articulationNode.addElement('StaffLine').innerText = articulation.staffLine.toString();
+                articulationNode.addElement('NoteHeads').innerText = [
+                    this.mapMusicSymbol(articulation.noteHeadDefault),
+                    this.mapMusicSymbol(articulation.noteHeadHalf),
+                    this.mapMusicSymbol(articulation.noteHeadWhole)
+                ].join(' ');
+
+                switch (articulation.techniqueSymbolPlacement) {
+                    case TextBaseline.Top:
+                        articulationNode.addElement('TechniquePlacement').innerText = "below";
+                        break;
+                    case TextBaseline.Middle:
+                        articulationNode.addElement('TechniquePlacement').innerText = "inside";
+                        break;
+                    case TextBaseline.Bottom:
+                        articulationNode.addElement('TechniquePlacement').innerText = "above";
+                        break;
+                }
+                articulationNode.addElement('TechniqueSymbol').innerText = this.mapMusicSymbol(articulation.techniqueSymbol);
+                articulationNode.addElement('InputMidiNumbers').innerText = '';
+                articulationNode.addElement('OutputMidiNumber').innerText = articulation.outputMidiNumber.toString();
+            }
+        } else {
+            const programInfo = GpifWriter.MidiProgramInfoLookup.has(track.playbackInfo.program)
+                ? GpifWriter.MidiProgramInfoLookup.get(track.playbackInfo.program)!
+                : GpifWriter.MidiProgramInfoLookup.get(0)!;
+
+            instrumentSet.addElement('Name').innerText = programInfo.instrumentSetName;
+            instrumentSet.addElement('Type').innerText = programInfo.instrumentSetType;
+
+            // Only the simple pitched element for normal instruments
+            const elements = instrumentSet.addElement('Elements');
+            const element = elements.addElement('Element');
+
+            element.addElement('Pitched').innerText = 'Pitched';
+            element.addElement('Type').innerText = 'pitched';
+            element.addElement('SoundbankName').innerText = '';
+
+            const articulations = element.addElement('Articulations');
+            const articulation = articulations.addElement('Articulation');
+
+            articulation.addElement('Name').innerText = '';
+            articulation.addElement('StaffLine').innerText = '0';
+            articulation.addElement('Noteheads').innerText = 'noteheadBlack noteheadHalf noteheadWhole';
+            articulation.addElement('TechniquePlacement').innerText = 'outside';
+            articulation.addElement('TechniqueSymbol').innerText = '';
+            articulation.addElement('InputMidiNumbers').innerText = '';
+            articulation.addElement('OutputRSESound').innerText = '';
+            articulation.addElement('OutputMidiNumber').innerText = '0';
+        }
+    }
+
+    private mapMusicSymbol(symbol: MusicFontSymbol): string {
+        if (symbol === MusicFontSymbol.None) {
+            return '';
+        }
+        let s = MusicFontSymbol[symbol];
+        return s.substring(0, 1).toLowerCase() + s.substring(1);
     }
 
     private writeMasterBarsNode(parent: XmlNode, score: Score) {

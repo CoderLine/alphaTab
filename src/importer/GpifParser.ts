@@ -488,31 +488,34 @@ export class GpifParser {
     }
 
     private parseElement(track: Track, node: XmlNode) {
+        const type = node.findChildElement('Type')!.innerText;
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
+                    case 'Name':
                     case 'Articulations':
-                        this.parseArticulations(track, c);
+                        this.parseArticulations(track, c, type);
                         break;
                 }
             }
         }
     }
-    private parseArticulations(track: Track, node: XmlNode) {
+    private parseArticulations(track: Track, node: XmlNode, elementType: string) {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Articulation':
-                        this.parseArticulation(track, c);
+                        this.parseArticulation(track, c, elementType);
                         break;
                 }
             }
         }
     }
 
-    private parseArticulation(track: Track, node: XmlNode) {
+    private parseArticulation(track: Track, node: XmlNode, elementType:string) {
         const articulation = new InstrumentArticulation();
         articulation.outputMidiNumber = -1;
+        articulation.elementType = elementType;
         let name = '';
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
@@ -2161,7 +2164,7 @@ export class GpifParser {
                         break;
                     }
                 }
-                if(!hasPercussion) {
+                if (!hasPercussion) {
                     track.percussionArticulations = [];
                 }
             }

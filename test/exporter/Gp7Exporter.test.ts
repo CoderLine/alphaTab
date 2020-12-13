@@ -144,31 +144,31 @@ describe('Gp7ExporterTest', () => {
         await testRoundTripFolderEqual('visual-tests/effects-and-annotations');
     });
 
-    // it('visual-general', async () => {
-    //     await testRoundTripFolderEqual('visual-tests/general');
-    // });
+    it('visual-general', async () => {
+        await testRoundTripFolderEqual('visual-tests/general');
+    });
 
-    // it('visual-guitar-tabs', async () => {
-    //     await testRoundTripFolderEqual('visual-tests/guitar-tabs');
-    // });
+    it('visual-guitar-tabs', async () => {
+        await testRoundTripFolderEqual('visual-tests/guitar-tabs');
+    });
 
-    // it('visual-layout', async () => {
-    //     await testRoundTripFolderEqual('visual-tests/layout');
-    // });
+    it('visual-layout', async () => {
+        await testRoundTripFolderEqual('visual-tests/layout');
+    });
 
-    // it('visual-music-notation', async () => {
-    //     await testRoundTripFolderEqual('visual-tests/music-notation');
-    // });
+    it('visual-music-notation', async () => {
+        await testRoundTripFolderEqual('visual-tests/music-notation');
+    });
 
-    // it('visual-notation-legend', async () => {
-    //     await testRoundTripFolderEqual('visual-tests/notation-legend');
-    // });
+    it('visual-notation-legend', async () => {
+        await testRoundTripFolderEqual('visual-tests/notation-legend');
+    });
 
-    // it('visual-special-notes', async () => {
-    //     await testRoundTripFolderEqual('visual-tests/special-notes');
-    // });
+    it('visual-special-notes', async () => {
+        await testRoundTripFolderEqual('visual-tests/special-notes');
+    });
 
-    // it('visual-special-tracks', async () => {
-    //     await testRoundTripFolderEqual('visual-tests/special-tracks');
-    // });
+    it('visual-special-tracks', async () => {
+        await testRoundTripFolderEqual('visual-tests/special-tracks');
+    });
 });
