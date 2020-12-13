@@ -1,7 +1,3 @@
----
-assignees: Danielku15
----
-
 ### Issues
 <!-- Each pull request needs to be related to an issue, mention it here below -->
 Fixes #
