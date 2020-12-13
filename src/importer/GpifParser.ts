@@ -2151,6 +2151,20 @@ export class GpifParser {
                     trackIndex++;
                 }
             }
+
+            // clear out percussion articulations where not needed
+            for (const track of this.score.tracks) {
+                let hasPercussion = false;
+                for (const staff of track.staves) {
+                    if (staff.isPercussion) {
+                        hasPercussion = true;
+                        break;
+                    }
+                }
+                if(!hasPercussion) {
+                    track.percussionArticulations = [];
+                }
+            }
         }
         // build masterbar automations
         this._masterTrackAutomations.forEach((automations, barIndex) => {

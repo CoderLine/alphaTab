@@ -138,11 +138,11 @@ describe('Gp7ExporterTest', () => {
 
     it('importer', async () => {
         await testRoundTripFolderEqual('guitarpro7');
-    }, 60000);
+    });
 
-    // it('visual-effects-and-annotations', async () => {
-    //     await testRoundTripFolderEqual('visual-tests/effects-and-annotations');
-    // });
+    it('visual-effects-and-annotations', async () => {
+        await testRoundTripFolderEqual('visual-tests/effects-and-annotations');
+    });
 
     // it('visual-general', async () => {
     //     await testRoundTripFolderEqual('visual-tests/general');
