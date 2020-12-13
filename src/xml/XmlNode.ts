@@ -42,7 +42,7 @@ export class XmlNode {
     public addChild(node: XmlNode): void {
         this.childNodes.push(node);
         this.firstChild = node;
-        if (node.nodeType === XmlNodeType.Element) {
+        if (node.nodeType === XmlNodeType.Element || node.nodeType === XmlNodeType.CDATA) {
             this.firstElement = node;
         }
     }

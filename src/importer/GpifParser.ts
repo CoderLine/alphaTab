@@ -57,6 +57,17 @@ export class GpifRhythm {
     public value: Duration = Duration.Quarter;
 }
 
+class GpifSound {
+    public name: string = '';
+    public path: string = '';
+    public role: string = '';
+    public get uniqueId(): string {
+        return this.path + ';' + this.name + ';' + this.role;
+    }
+
+    public program: number = 0;
+}
+
 /**
  * This class can parse a score.gpif xml file into the model structure
  */
@@ -78,6 +89,7 @@ export class GpifParser {
     public score!: Score;
 
     private _masterTrackAutomations!: Map<string, Automation[]>;
+    private _automationsPerTrackAndBar!: Map<string, Map<string, Automation[]>>;
     private _tracksMapping!: string[];
     private _tracksById!: Map<string, Track>;
     private _masterBars!: MasterBar[];
@@ -93,12 +105,14 @@ export class GpifParser {
     private _notesOfBeat!: Map<string, string[]>;
     private _tappedNotes!: Map<string, boolean>;
     private _lyricsByTrack!: Map<string, Lyrics[]>;
+    private _soundsByTrack!: Map<string, Map<string, GpifSound>>;
     private _hasAnacrusis: boolean = false;
     private _articulationByName!: Map<string, InstrumentArticulation>;
     private _skipApplyLyrics: boolean = false;
 
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<string, Automation[]>();
+        this._automationsPerTrackAndBar = new Map<string, Map<string, Automation[]>>();
         this._tracksMapping = [];
         this._tracksById = new Map<string, Track>();
         this._masterBars = [];
@@ -114,6 +128,7 @@ export class GpifParser {
         this._noteById = new Map<string, Note>();
         this._tappedNotes = new Map<string, boolean>();
         this._lyricsByTrack = new Map<string, Lyrics[]>();
+        this._soundsByTrack = new Map<string, Map<string, GpifSound>>();
         this._skipApplyLyrics = false;
 
         let dom: XmlDocument = new XmlDocument();
@@ -245,7 +260,7 @@ export class GpifParser {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Automations':
-                        this.parseAutomations(c, this._masterTrackAutomations);
+                        this.parseAutomations(c, this._masterTrackAutomations, null);
                         break;
                     case 'Tracks':
                         this._tracksMapping = c.innerText.split(' ');
@@ -258,24 +273,25 @@ export class GpifParser {
         }
     }
 
-    private parseAutomations(node: XmlNode, automations: Map<string, Automation[]>): void {
+    private parseAutomations(node: XmlNode, automations: Map<string, Automation[]>, sounds: Map<string, GpifSound> | null): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Automation':
-                        this.parseAutomation(c, automations);
+                        this.parseAutomation(c, automations, sounds);
                         break;
                 }
             }
         }
     }
 
-    private parseAutomation(node: XmlNode, automations: Map<string, Automation[]>): void {
+    private parseAutomation(node: XmlNode, automations: Map<string, Automation[]>, sounds: Map<string, GpifSound> | null): void {
         let type: string | null = null;
         let isLinear: boolean = false;
         let barId: string | null = null;
         let ratioPosition: number = 0;
-        let value: number = 0;
+        let numberValue: number = 0;
+        let textValue: string | null = null;
         let reference: number = 0;
         let text: string | null = null;
         for (let c of node.childNodes) {
@@ -294,15 +310,19 @@ export class GpifParser {
                         ratioPosition = parseFloat(c.innerText);
                         break;
                     case 'Value':
-                        let parts: string[] = c.innerText.split(' ');
-                        // Issue 391: Some GPX files might have
-                        // single floating point value.
-                        if (parts.length === 1) {
-                            value = parseFloat(parts[0]);
-                            reference = 1;
+                        if (c.firstElement && c.firstElement.nodeType === XmlNodeType.CDATA) {
+                            textValue = c.innerText;
                         } else {
-                            value = parseFloat(parts[0]);
-                            reference = parseInt(parts[1]);
+                            let parts: string[] = c.innerText.split(' ');
+                            // Issue 391: Some GPX files might have
+                            // single floating point value.
+                            if (parts.length === 1) {
+                                numberValue = parseFloat(parts[0]);
+                                reference = 1;
+                            } else {
+                                numberValue = parseFloat(parts[0]);
+                                reference = parseInt(parts[1]);
+                            }
                         }
                         break;
                     case 'Text':
@@ -317,7 +337,12 @@ export class GpifParser {
         let automation: Automation | null = null;
         switch (type) {
             case 'Tempo':
-                automation = Automation.buildTempoAutomation(isLinear, ratioPosition, value, reference);
+                automation = Automation.buildTempoAutomation(isLinear, ratioPosition, numberValue, reference);
+                break;
+            case 'Sound':
+                if (textValue && sounds && sounds.has(textValue)) {
+                    automation = Automation.buildInstrumentAutomation(isLinear, ratioPosition, sounds.get(textValue)!.program);
+                }
                 break;
         }
         if (automation) {
@@ -401,7 +426,7 @@ export class GpifParser {
                         this.parseGeneralMidi(track, c);
                         break;
                     case 'Sounds':
-                        this.parseSounds(track, c);
+                        this.parseSounds(trackId, track, c);
                         break;
                     case 'PlaybackState':
                         let state: string = c.innerText;
@@ -420,10 +445,19 @@ export class GpifParser {
                     case 'RSE':
                         this.parseRSE(track, c);
                         break;
+                    case 'Automations':
+                        this.parseTrackAutomations(trackId, c);
+                        break;
                 }
             }
         }
         this._tracksById.set(trackId, track);
+    }
+
+    private parseTrackAutomations(trackId: string, c: XmlNode) {
+        const trackAutomations = new Map<string, Automation[]>()
+        this._automationsPerTrackAndBar.set(trackId, trackAutomations)
+        this.parseAutomations(c, trackAutomations, this._soundsByTrack.get(trackId)!);
     }
 
     private parseNotationPatch(track: Track, node: XmlNode) {
@@ -512,7 +546,7 @@ export class GpifParser {
         }
     }
 
-    private parseArticulation(track: Track, node: XmlNode, elementType:string) {
+    private parseArticulation(track: Track, node: XmlNode, elementType: string) {
         const articulation = new InstrumentArticulation();
         articulation.outputMidiNumber = -1;
         articulation.elementType = elementType;
@@ -943,36 +977,56 @@ export class GpifParser {
         }
     }
 
-    private parseSounds(track: Track, node: XmlNode): void {
+    private parseSounds(trackId: string, track: Track, node: XmlNode): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Sound':
-                        this.parseSound(track, c);
+                        this.parseSound(trackId, track, c);
                         break;
                 }
             }
         }
     }
 
-    private parseSound(track: Track, node: XmlNode): void {
+    private parseSound(trackId: string, track: Track, node: XmlNode): void {
+        const sound = new GpifSound();
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
+                    case 'Name':
+                        sound.name = c.innerText;
+                        break;
+                    case 'Path':
+                        sound.path = c.innerText;
+                        break;
+                    case 'Role':
+                        sound.role = c.innerText;
+                        break;
                     case 'MIDI':
-                        this.parseSoundMidi(track, c);
+                        this.parseSoundMidi(sound, c);
                         break;
                 }
             }
         }
+
+        if (sound.role === 'Factory' || track.playbackInfo.program === 0) {
+            track.playbackInfo.program = sound.program;
+        }
+
+        if (!this._soundsByTrack.has(trackId)) {
+            this._soundsByTrack.set(trackId, new Map<string, GpifSound>());
+        }
+
+        this._soundsByTrack.get(trackId)!.set(sound.uniqueId, sound);
     }
 
-    private parseSoundMidi(track: Track, node: XmlNode): void {
+    private parseSoundMidi(sound: GpifSound, node: XmlNode): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Program':
-                        track.playbackInfo.program = parseInt(c.innerText);
+                        sound.program = parseInt(c.innerText);
                         break;
                 }
             }
@@ -2155,8 +2209,14 @@ export class GpifParser {
                 }
             }
 
-            // clear out percussion articulations where not needed
-            for (const track of this.score.tracks) {
+            // clear out percussion articulations where not needed 
+            // and add automations
+            for (let trackId of this._tracksMapping) {
+                if (!trackId) {
+                    continue;
+                }
+                let track: Track = this._tracksById.get(trackId)!;
+
                 let hasPercussion = false;
                 for (const staff of track.staves) {
                     if (staff.isPercussion) {
@@ -2166,6 +2226,19 @@ export class GpifParser {
                 }
                 if (!hasPercussion) {
                     track.percussionArticulations = [];
+                }
+
+                if (this._automationsPerTrackAndBar.has(trackId)) {
+                    const trackAutomations = this._automationsPerTrackAndBar.get(trackId)!;
+                    trackAutomations.forEach((automations, barId) => {
+                        const bar = this._barsById.get(barId)!;
+                        if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
+                            const beat = bar.voices[0].beats[0];
+                            automations.forEach(a => {
+                                beat.automations.push(a);
+                            });
+                        }
+                    });
                 }
             }
         }
