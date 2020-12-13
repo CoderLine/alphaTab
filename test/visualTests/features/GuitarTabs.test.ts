@@ -8,20 +8,20 @@ describe('GuitarTabsTests', () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Tab;
         settings.notation.rhythmMode = TabRhythmMode.ShowWithBars;
-        await VisualTestHelper.runVisualTest('guitar-tabs/rhythm.gp5', settings);
+        await VisualTestHelper.runVisualTest('guitar-tabs/rhythm.gp', settings);
     });
 
     it('rhythm-with-beams', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Tab;
         settings.notation.rhythmMode = TabRhythmMode.ShowWithBeams;
-        await VisualTestHelper.runVisualTest('guitar-tabs/rhythm-with-beams.gp5', settings);
+        await VisualTestHelper.runVisualTest('guitar-tabs/rhythm-with-beams.gp', settings);
     });
 
     it('string-variations', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Tab;
-        await VisualTestHelper.runVisualTest('guitar-tabs/string-variations.gp5', settings);
+        await VisualTestHelper.runVisualTest('guitar-tabs/string-variations.gp', settings);
     });
 
 });
