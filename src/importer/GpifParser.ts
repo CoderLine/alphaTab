@@ -45,6 +45,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { TextBaseline } from '@src/platform/ICanvas';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { NoteCloner } from '@src/generated/model/NoteCloner';
+import { Logger } from '@src/alphatab';
 
 /**
  * This structure represents a duration within a gpif
@@ -522,7 +523,8 @@ export class GpifParser {
     }
 
     private parseElement(track: Track, node: XmlNode) {
-        const type = node.findChildElement('Type')!.innerText;
+        const typeElement = node.findChildElement('Type');
+        const type = typeElement ? typeElement.innerText : "";
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -600,13 +602,6 @@ export class GpifParser {
 
                         if (articulation.noteHeadWhole == MusicFontSymbol.None) {
                             articulation.noteHeadWhole = articulation.noteHeadDefault;
-                        }
-
-                        switch (noteHeadsTxt.length) {
-                            case 1:
-                            case 2:
-                            case 3:
-                                break;
                         }
 
                         break;
@@ -695,6 +690,7 @@ export class GpifParser {
             case 'noteheadHeavyXHat':
                 return MusicFontSymbol.NoteheadHeavyXHat;
             default:
+                Logger.warning('GPIF', 'Unknown notehead symbol', txt);
                 return MusicFontSymbol.None;
         }
     }
@@ -743,15 +739,28 @@ export class GpifParser {
         let propertyName: string = node.getAttribute('name');
         switch (propertyName) {
             case 'Tuning':
-                let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
-                let tuning = new Array<number>(tuningParts.length);
-                for (let i: number = 0; i < tuning.length; i++) {
-                    tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
+                for (let c of node.childNodes) {
+                    if (c.nodeType === XmlNodeType.Element) {
+                        switch (c.localName) {
+                            case 'Pitches':
+                                let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
+                                let tuning = new Array<number>(tuningParts.length);
+                                for (let i: number = 0; i < tuning.length; i++) {
+                                    tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
+                                }
+                                staff.tuning = tuning;
+                                break;
+                            case 'Label':
+                                staff.tuningName = c.innerText;
+                                break;
+                        }
+                    }
                 }
-                staff.tuning = tuning;
+
                 if (!staff.isPercussion) {
                     staff.showTablature = true;
                 }
+
                 break;
             case 'DiagramCollection':
             case 'ChordCollection':

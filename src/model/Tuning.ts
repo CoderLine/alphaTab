@@ -17,7 +17,7 @@ export class Tuning {
         let octave: number = (tuning / 12) | 0;
         let note: number = tuning % 12;
         let notes: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-        return [notes[note], (octave - octaveShift).toString()];
+        return [notes[note], (octave + octaveShift).toString()];
     }
 
     /**

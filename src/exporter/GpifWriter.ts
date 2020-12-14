@@ -486,13 +486,21 @@ export class GpifWriter {
     }
 
     private writeTransposedPitch(properties: XmlNode, note: Note) {
-        let parts = Tuning.getTextPartsForTuning(note.displayValueWithoutBend, 0);
-        this.writePitch(properties, "TransposedPitch", parts[0], parts[1], note.accidentalMode)
+        if (note.isPercussion) {
+            this.writePitch(properties, "ConcertPitch", "C", "-1", NoteAccidentalMode.Default);
+        } else {
+            let parts = Tuning.getTextPartsForTuning(note.displayValueWithoutBend, 0);
+            this.writePitch(properties, "TransposedPitch", parts[0], parts[1], note.accidentalMode)
+        }
     }
 
     private writeConcertPitch(properties: XmlNode, note: Note) {
-        let parts = Tuning.getTextPartsForTuning(note.realValue, 0);
-        this.writePitch(properties, "ConcertPitch", parts[0], parts[1], note.accidentalMode)
+        if (note.isPercussion) {
+            this.writePitch(properties, "ConcertPitch", "C", "-1", NoteAccidentalMode.Default);
+        } else {
+            let parts = Tuning.getTextPartsForTuning(note.realValue, 0);
+            this.writePitch(properties, "ConcertPitch", parts[0], parts[1], note.accidentalMode)
+        }
     }
 
     private writePitch(properties: XmlNode, propertyName: string, step: string, octave: string, accidental: NoteAccidentalMode) {
@@ -1071,7 +1079,7 @@ export class GpifWriter {
                                     soundAutomation.ratioPosition
                                 );
 
-                                if(isTrackSound) {
+                                if (isTrackSound) {
                                     trackSoundWritten = true;
                                 }
                             }
@@ -1114,7 +1122,11 @@ export class GpifWriter {
         this.writeSimplePropertyNode(properties, 'CapoFret', 'Fret', staff.capo.toString());
         this.writeSimplePropertyNode(properties, 'FretCount', 'Fret', "24");
 
-        const tuningProperty = this.writeSimplePropertyNode(properties, 'Tuning', 'Pitches', staff.tuning.slice().reverse().join(' '));
+        const tuningProperty = properties.addElement('Property');
+        tuningProperty.attributes.set('name', 'Tuning');
+        tuningProperty.addElement('Pitches').innerText = staff.tuning.slice().reverse().join(' ');
+        tuningProperty.addElement('Label').setCData(staff.tuningName);
+        tuningProperty.addElement('LabelVisible').innerText = staff.tuningName ? "true" : "false";
         tuningProperty.addElement('Flat');
 
         switch (staff.tuning.length) {
@@ -1163,8 +1175,6 @@ export class GpifWriter {
                 tuningProperty.addElement('Instrument').innerText = 'Guitar';
                 break;
         }
-        tuningProperty.addElement('Label').setCData(staff.tuningName ?? "");
-        tuningProperty.addElement('LabelVisible').innerText = staff.tuningName ? "true" : "false";
 
         this.writeSimplePropertyNode(properties, 'PartialCapoFret', 'Fret', "0");
         this.writeSimplePropertyNode(properties, 'PartialCapoStringFlags', 'Bitset', staff.tuning.map(_ => '0').join(''));
@@ -1325,7 +1335,7 @@ export class GpifWriter {
                 const articulationNode = currentArticulations.addElement('Articulation');
                 articulationNode.addElement('Name').innerText = currentElementName + ' ' + currentArticulations.childNodes.length;
                 articulationNode.addElement('StaffLine').innerText = articulation.staffLine.toString();
-                articulationNode.addElement('NoteHeads').innerText = [
+                articulationNode.addElement('Noteheads').innerText = [
                     this.mapMusicSymbol(articulation.noteHeadDefault),
                     this.mapMusicSymbol(articulation.noteHeadHalf),
                     this.mapMusicSymbol(articulation.noteHeadWhole)

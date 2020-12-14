@@ -124,7 +124,7 @@ export abstract class ScoreLayout {
             let staffWithTuning: Staff | null = null;
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
-                    if (!staff.isPercussion && staff.isStringed && staff.tuning.length > 0) {
+                    if (!staff.isPercussion && staff.isStringed && staff.tuning.length > 0 && staff.showTablature) {
                         staffWithTuning = staff;
                         break;
                     }
@@ -135,10 +135,13 @@ export abstract class ScoreLayout {
             }
             // tuning info
             if (staffWithTuning) {
-                let tuning: Tuning | null = Tuning.findTuning(staffWithTuning.tuning);
-                if (!tuning) {
-                    tuning = new Tuning('', staffWithTuning.tuning, false);
+                let tuning: Tuning;
+                if (staffWithTuning.tuningName) {
+                    tuning = new Tuning(staffWithTuning.tuningName, staffWithTuning.tuning, false);
+                } else {
+                    tuning = Tuning.findTuning(staffWithTuning.tuning) ?? new Tuning('', staffWithTuning.tuning, false);
                 }
+
                 this.tuningGlyph = new TuningGlyph(0, 0, this.scale, res, tuning);
             }
         }

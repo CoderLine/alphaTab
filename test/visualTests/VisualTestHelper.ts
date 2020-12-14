@@ -347,9 +347,10 @@ export class VisualTestHelper {
 
                 const jasmineRequire = Environment.globalThis.jasmineRequire;
                 if (!result.pass && jasmineRequire.html) {
+                    const errorMessage = `${result.message} (${message})`;
                     const dom = document.createElement('div');
                     dom.innerHTML = `
-                        <strong>Error:</strong> ${result.message} (${message})<br/>
+                        <strong>Error:</strong> ${errorMessage}<br/>
                         <div class="comparer" style="border: 1px solid #000">
                             <div class="expected"></div>
                             <div class="actual"></div>
@@ -367,11 +368,14 @@ export class VisualTestHelper {
                     dom.querySelector('.expected')!.appendChild(expected);
                     dom.querySelector('.actual')!.appendChild(actual);
                     dom.querySelector('.diff')!.appendChild(diff);
-                    (dom as any).toString = function () {
-                        return result.message;
-                    };
-
                     VisualTestHelper.initComparer(dom.querySelector('.comparer'));
+
+                    (dom as any).toString = function () {
+                        return errorMessage;
+                    };
+                    (dom as any)[Symbol.toPrimitive] = function() { 
+                        return errorMessage;
+                    };
 
                     (result as any).message = dom;
                 }
