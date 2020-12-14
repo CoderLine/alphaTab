@@ -1,6 +1,7 @@
 import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
+import { AutomationType } from '@src/model/Automation';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
@@ -980,7 +981,6 @@ export class GpifWriter {
 
         trackNode.addElement('ForcedSound').innerText = '-1';
 
-        this.writeSoundsNode(trackNode, track);
         this.writeMidiConnectionNode(trackNode, track);
 
         if (track.playbackInfo.isSolo) {
@@ -997,7 +997,7 @@ export class GpifWriter {
 
         this.writeStavesNode(trackNode, track);
 
-        this.writeAutomations(trackNode, track);
+        this.writeSoundsAndAutomations(trackNode, track);
     }
 
     private static getIconId(playbackInfo: PlaybackInformation): GpifIconIds {
@@ -1010,9 +1010,76 @@ export class GpifWriter {
         return GpifIconIds.SteelGuitar;
     }
 
-    private writeAutomations(trackNode: XmlNode, _track: Track) {
-        trackNode.addElement('Automations');
-        // TODO: instrument automations
+    private writeSoundAndAutomation(
+        soundsNode: XmlNode,
+        automationsNode: XmlNode,
+        name: string, path: string, role: string,
+        barIndex: number, program: number,
+        ratioPosition: number = 0) {
+
+        const soundNode = soundsNode.addElement('Sound');
+        soundNode.addElement('Name').setCData(name);
+        soundNode.addElement('Label').setCData(name);
+        soundNode.addElement('Path').setCData(path);
+        soundNode.addElement('Role').setCData(role);
+
+        const midi = soundNode.addElement('MIDI');
+        midi.addElement('LSB').innerText = '0';
+        midi.addElement('MSB').innerText = '0';
+        midi.addElement('Program').innerText = program.toString();
+
+        const automationNode = automationsNode.addElement('Automation');
+        automationNode.addElement('Type').innerText = 'Sound';
+        automationNode.addElement('Linear').innerText = 'false';
+        automationNode.addElement('Bar').innerText = barIndex.toString();
+        automationNode.addElement('Position').innerText = ratioPosition.toString();
+        automationNode.addElement('Visible').innerText = "true";
+        automationNode.addElement('Value').setCData(`${path};${name};${role}`);
+    }
+
+    private writeSoundsAndAutomations(trackNode: XmlNode, track: Track) {
+        const soundsNode = trackNode.addElement('Sounds');
+        const automationsNode = trackNode.addElement('Automations');
+
+        if (track.staves.length > 0 && track.staves[0].bars.length > 0) {
+            const trackSoundName = `Track_${track.index}_Initial`;
+            const trackSoundPath = `Midi/${track.playbackInfo.program}`;
+            const trackSoundRole = 'Factory';
+            let trackSoundWritten = false;
+
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            const soundAutomation = beat.getAutomation(AutomationType.Instrument);
+                            if (soundAutomation) {
+                                const isTrackSound = bar.index === 0 && beat.index === 0;
+                                const name = isTrackSound ? trackSoundName : `ProgramChange_${beat.id}`;
+                                const path = isTrackSound ? trackSoundPath : `Midi/${soundAutomation.value}`;
+                                const role = isTrackSound ? trackSoundRole : 'User';
+
+                                if (!isTrackSound && !trackSoundWritten) {
+                                    this.writeSoundAndAutomation(soundsNode, automationsNode,
+                                        trackSoundName, trackSoundPath, trackSoundRole,
+                                        track.staves[0].bars[0].index, track.playbackInfo.program
+                                    );
+                                }
+
+                                this.writeSoundAndAutomation(soundsNode, automationsNode,
+                                    name, path, role,
+                                    bar.index, soundAutomation.value,
+                                    soundAutomation.ratioPosition
+                                );
+
+                                if(isTrackSound) {
+                                    trackSoundWritten = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private writeMidiConnectionNode(trackNode: XmlNode, track: Track) {
@@ -1208,24 +1275,6 @@ export class GpifWriter {
             line.addElement('Text').setCData(lines[i].text);
             line.addElement('Offset').innerText = lines[i].startBar.toString();
         }
-    }
-
-    private writeSoundsNode(trackNode: XmlNode, track: Track) {
-        const sounds = trackNode.addElement('Sounds');
-        const sound = sounds.addElement('Sound');
-
-        sound.addElement('Name').setCData(`Track_${track.index}_Initial`);
-        sound.addElement('Label').setCData('');
-        sound.addElement('Path').setCData('');
-        sound.addElement('Role').setCData('');
-
-        const midi = sound.addElement('MIDI');
-        midi.addElement('LSB').innerText = '0';
-        midi.addElement('MSB').innerText = '0';
-        midi.addElement('Program').innerText = track.playbackInfo.program.toString();
-
-        // TODO: generate sounds for all Program Changes. 
-        // they need an item here with a name and then we refer to it on the automations
     }
 
     private writeTransposeNode(trackNode: XmlNode, track: Track) {

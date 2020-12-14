@@ -88,8 +88,8 @@ export class GpifParser {
 
     public score!: Score;
 
-    private _masterTrackAutomations!: Map<string, Automation[]>;
-    private _automationsPerTrackAndBar!: Map<string, Map<string, Automation[]>>;
+    private _masterTrackAutomations!: Map<number, Automation[]>;
+    private _automationsPerTrackIdAndBarIndex!: Map<string, Map<number, Automation[]>>;
     private _tracksMapping!: string[];
     private _tracksById!: Map<string, Track>;
     private _masterBars!: MasterBar[];
@@ -111,8 +111,8 @@ export class GpifParser {
     private _skipApplyLyrics: boolean = false;
 
     public parseXml(xml: string, settings: Settings): void {
-        this._masterTrackAutomations = new Map<string, Automation[]>();
-        this._automationsPerTrackAndBar = new Map<string, Map<string, Automation[]>>();
+        this._masterTrackAutomations = new Map<number, Automation[]>();
+        this._automationsPerTrackIdAndBarIndex = new Map<string, Map<number, Automation[]>>();
         this._tracksMapping = [];
         this._tracksById = new Map<string, Track>();
         this._masterBars = [];
@@ -273,7 +273,7 @@ export class GpifParser {
         }
     }
 
-    private parseAutomations(node: XmlNode, automations: Map<string, Automation[]>, sounds: Map<string, GpifSound> | null): void {
+    private parseAutomations(node: XmlNode, automations: Map<number, Automation[]>, sounds: Map<string, GpifSound> | null): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -285,10 +285,10 @@ export class GpifParser {
         }
     }
 
-    private parseAutomation(node: XmlNode, automations: Map<string, Automation[]>, sounds: Map<string, GpifSound> | null): void {
+    private parseAutomation(node: XmlNode, automations: Map<number, Automation[]>, sounds: Map<string, GpifSound> | null): void {
         let type: string | null = null;
         let isLinear: boolean = false;
-        let barId: string | null = null;
+        let barIndex: number = -1;
         let ratioPosition: number = 0;
         let numberValue: number = 0;
         let textValue: string | null = null;
@@ -304,7 +304,7 @@ export class GpifParser {
                         isLinear = c.innerText.toLowerCase() === 'true';
                         break;
                     case 'Bar':
-                        barId = c.innerText;
+                        barIndex = parseInt(c.innerText);
                         break;
                     case 'Position':
                         ratioPosition = parseFloat(c.innerText);
@@ -350,11 +350,11 @@ export class GpifParser {
                 automation.text = text;
             }
 
-            if (barId) {
-                if (!automations.has(barId)) {
-                    automations.set(barId, []);
+            if (barIndex >= 0) {
+                if (!automations.has(barIndex)) {
+                    automations.set(barIndex, []);
                 }
-                automations.get(barId)!.push(automation);
+                automations.get(barIndex)!.push(automation);
             }
         }
     }
@@ -455,8 +455,8 @@ export class GpifParser {
     }
 
     private parseTrackAutomations(trackId: string, c: XmlNode) {
-        const trackAutomations = new Map<string, Automation[]>()
-        this._automationsPerTrackAndBar.set(trackId, trackAutomations)
+        const trackAutomations = new Map<number, Automation[]>()
+        this._automationsPerTrackIdAndBarIndex.set(trackId, trackAutomations)
         this.parseAutomations(c, trackAutomations, this._soundsByTrack.get(trackId)!);
     }
 
@@ -2228,27 +2228,29 @@ export class GpifParser {
                     track.percussionArticulations = [];
                 }
 
-                if (this._automationsPerTrackAndBar.has(trackId)) {
-                    const trackAutomations = this._automationsPerTrackAndBar.get(trackId)!;
-                    trackAutomations.forEach((automations, barId) => {
-                        const bar = this._barsById.get(barId)!;
-                        if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
-                            const beat = bar.voices[0].beats[0];
-                            automations.forEach(a => {
-                                beat.automations.push(a);
-                            });
+                if (this._automationsPerTrackIdAndBarIndex.has(trackId)) {
+                    const trackAutomations = this._automationsPerTrackIdAndBarIndex.get(trackId)!;
+                    trackAutomations.forEach((automations, barNumber) => {
+                        if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
+                            const bar = track.staves[0].bars[barNumber];
+                            if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
+                                const beat = bar.voices[0].beats[0];
+                                automations.forEach(a => {
+                                    beat.automations.push(a);
+                                });
+                            }
                         }
                     });
                 }
             }
         }
         // build masterbar automations
-        this._masterTrackAutomations.forEach((automations, barIndex) => {
-            let masterBar: MasterBar = this.score.masterBars[parseInt(barIndex)];
+        this._masterTrackAutomations.forEach((automations, barNumber) => {
+            let masterBar: MasterBar = this.score.masterBars[barNumber];
             for (let i: number = 0, j: number = automations.length; i < j; i++) {
                 let automation: Automation = automations[i];
                 if (automation.type === AutomationType.Tempo) {
-                    if (barIndex === '0') {
+                    if (barNumber === 0) {
                         this.score.tempo = automation.value | 0;
                         if (automation.text) {
                             this.score.tempoLabel = automation.text;
