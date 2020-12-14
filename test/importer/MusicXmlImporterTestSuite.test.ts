@@ -596,30 +596,6 @@ describe('MusicXmlImporterTestSuiteTests', () => {
         );
     });
 
-    it('76a_TrackVolume', async () => {
-        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml-testsuite/76a-TrackVolume.musicxml'
-        );
-
-        expect(score.tracks[0].playbackInfo.volume).toBe(16);
-        expect(score.tracks[1].playbackInfo.volume).toBe(12);
-        expect(score.tracks[2].playbackInfo.volume).toBe(8);
-        expect(score.tracks[3].playbackInfo.volume).toBe(4);
-        expect(score.tracks[4].playbackInfo.volume).toBe(0);
-    });
-
-    it('75b_TrackBalance', async () => {
-        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml-testsuite/76b-TrackBalance.musicxml'
-        );
-
-        expect(score.tracks[0].playbackInfo.balance).toBe(0);
-        expect(score.tracks[1].playbackInfo.balance).toBe(4);
-        expect(score.tracks[2].playbackInfo.balance).toBe(8);
-        expect(score.tracks[3].playbackInfo.balance).toBe(12);
-        expect(score.tracks[4].playbackInfo.balance).toBe(16);
-    });
-
     it('99a_Sibelius5_IgnoreBeaming', async () => {
         await MusicXmlImporterTestHelper.testReferenceFile(
             'test-data/musicxml-testsuite/99a-Sibelius5-IgnoreBeaming.xml'
@@ -630,5 +606,29 @@ describe('MusicXmlImporterTestSuiteTests', () => {
         await MusicXmlImporterTestHelper.testReferenceFile(
             'test-data/musicxml-testsuite/99b-Lyrics-BeamsMelismata-IgnoreBeams.xml'
         );
+    });
+
+    it('Track_Volume', async () => {
+        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+            'test-data/musicxml3/track-volume-balance.musicxml'
+        );
+
+        expect(score.tracks[0].playbackInfo.volume).toBe(16);
+        expect(score.tracks[1].playbackInfo.volume).toBe(12);
+        expect(score.tracks[2].playbackInfo.volume).toBe(8);
+        expect(score.tracks[3].playbackInfo.volume).toBe(4);
+        expect(score.tracks[4].playbackInfo.volume).toBe(0);
+    });
+
+    it('Track_Balance', async () => {
+        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+            'test-data/musicxml3/track-volume-balance.musicxml'
+        );
+
+        expect(score.tracks[0].playbackInfo.balance).toBe(0);
+        expect(score.tracks[1].playbackInfo.balance).toBe(4);
+        expect(score.tracks[2].playbackInfo.balance).toBe(8);
+        expect(score.tracks[3].playbackInfo.balance).toBe(12);
+        expect(score.tracks[4].playbackInfo.balance).toBe(16);
     });
 });

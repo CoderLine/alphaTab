@@ -8,7 +8,7 @@
     <creator type="composer">Composer</creator>
     <encoding>
       <software>MuseScore 3.5.2</software>
-      <encoding-date>2020-12-06</encoding-date>
+      <encoding-date>2020-12-14</encoding-date>
       <supports element="accidental" type="yes"/>
       <supports element="beam" type="yes"/>
       <supports element="print" attribute="new-page" type="yes" value="yes"/>
@@ -63,7 +63,7 @@
         <midi-channel>1</midi-channel>
         <midi-program>1</midi-program>
         <volume>100</volume>
-        <pan>0</pan>
+        <pan>-90</pan>
         </midi-instrument>
       </score-part>
     <part-group type="stop" number="1"/>
@@ -81,7 +81,7 @@
         <midi-channel>2</midi-channel>
         <midi-program>1</midi-program>
         <volume>78.7402</volume>
-        <pan>0</pan>
+        <pan>-44</pan>
         </midi-instrument>
       </score-part>
     <part-group type="start" number="2">
@@ -116,7 +116,7 @@
         <midi-channel>4</midi-channel>
         <midi-program>1</midi-program>
         <volume>30.7087</volume>
-        <pan>0</pan>
+        <pan>46</pan>
         </midi-instrument>
       </score-part>
     <part-group type="stop" number="2"/>
@@ -131,7 +131,7 @@
         <midi-channel>5</midi-channel>
         <midi-program>1</midi-program>
         <volume>0</volume>
-        <pan>0</pan>
+        <pan>90</pan>
         </midi-instrument>
       </score-part>
     <part-group type="stop" number="1"/>
