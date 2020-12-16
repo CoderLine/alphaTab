@@ -885,7 +885,7 @@ export class CapellaParser {
                             }
                         } else if (c.attributes.has('end') && this._tieStarts.length > 0 && !note.isTieDestination) {
                             note.isTieDestination = true;
-                            note.tieOrigin = this._tieStarts[0];
+                            note.tieOriginNoteId = this._tieStarts[0].id;
                             this._tieStarts.splice(0, 1);
                             this._tieStartIds.delete(note.id);
                         }

@@ -248,14 +248,28 @@ export class Note {
     }
 
     /**
+     * Gets the origin note id of the hammeron/pull-off of this note.
+     */
+    public hammerPullOriginNoteId: number = -1;
+
+    /**
      * Gets the origin of the hammeron/pulloff of this note.
      */
-    public hammerPullOrigin: Note | null = null;
+    public get hammerPullOrigin(): Note | null {
+        return this.hammerPullOriginNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.hammerPullOriginNoteId);
+    }
+
+    /**
+     * Gets the destination note id of the hammeron/pull-off of this note.
+     */
+    public hammerPullDestinationNoteId: number = -1;
 
     /**
      * Gets the destination for the hammeron/pullof started by this note.
      */
-    public hammerPullDestination: Note | null = null;
+    public get hammerPullDestination(): Note | null  {
+        return this.hammerPullDestinationNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.hammerPullDestinationNoteId);
+    }
 
     public get isSlurOrigin(): boolean {
         return !!this.slurDestination;
@@ -266,15 +280,30 @@ export class Note {
      */
     public isSlurDestination: boolean = false;
 
+
+    /**
+     * Gets the note id where the slur of this note starts.
+     */
+    public slurOriginNoteId: number = -1;
+
     /**
      * Gets or sets the note where the slur of this note starts.
      */
-    public slurOrigin: Note | null = null;
+    public get slurOrigin(): Note | null {
+        return this.slurOriginNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.slurOriginNoteId);
+    }
+
+    /**
+     * Gets or sets the note id where the slur of this note ends.
+     */
+    public slurDestinationNoteId: number = -1;
 
     /**
      * Gets or sets the note where the slur of this note ends.
      */
-    public slurDestination: Note | null = null;
+    public get slurDestination(): Note | null {
+        return this.slurDestinationNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.slurDestinationNoteId);
+    }
 
     public get isHarmonic(): boolean {
         return this.harmonicType !== HarmonicType.None;
@@ -350,15 +379,30 @@ export class Note {
      */
     public vibrato: VibratoType = VibratoType.None;
 
-    /**
-     * Gets or sets the origin of the tied if this note is tied.
-     */
-    public tieOrigin: Note | null = null;
 
     /**
-     * Gets or sets the desination of the tie.
+     * Gets the origin note id of the tied if this note is tied.
      */
-    public tieDestination: Note | null = null;
+    public tieOriginNoteId: number = -1;
+
+    /**
+     * Gets the origin of the tied if this note is tied.
+     */
+    public get tieOrigin(): Note | null {
+        return this.tieOriginNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.tieOriginNoteId);
+    }
+
+    /**
+     * Gets the desination note id of the tie.
+     */
+    public tieDestinationNoteId: number = -1;
+
+    /**
+     * Gets the desination of the tie.
+     */
+    public get tieDestination(): Note | null {
+        return this.tieDestinationNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.tieDestinationNoteId);
+    }
 
     /**
      * Gets or sets whether this note is ends a tied note.
@@ -366,7 +410,7 @@ export class Note {
     public isTieDestination: boolean = false;
 
     public get isTieOrigin(): boolean {
-        return !!this.tieDestination;
+        return this.tieDestinationNoteId !== -1;
     }
 
     /**
@@ -710,12 +754,12 @@ export class Note {
         }
         // set hammeron/pulloffs
         if (this.isHammerPullOrigin) {
-            this.hammerPullDestination = Note.findHammerPullDestination(this);
-
-            if (!this.hammerPullDestination) {
+            let hammerPullDestination = Note.findHammerPullDestination(this);
+            if (!hammerPullDestination) {
                 this.isHammerPullOrigin = false;
             } else {
-                this.hammerPullDestination.hammerPullOrigin = this;
+                this.hammerPullDestinationNoteId = hammerPullDestination.id;
+                hammerPullDestination.hammerPullOriginNoteId = this.id;
             }
         }
         // set slides
@@ -751,7 +795,7 @@ export class Note {
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all bends
         if (this.bendPoints.length > 0 && this.bendType === BendType.Custom) {
-            let isContinuedBend: boolean = (this.isContinuedBend = !!this.tieOrigin && this.tieOrigin.hasBend);
+            let isContinuedBend: boolean = (this.isContinuedBend = this.isTieDestination && this.tieOrigin!.hasBend);
             if (this.bendPoints.length === 4) {
                 let origin: BendPoint = this.bendPoints[0];
                 let middle1: BendPoint = this.bendPoints[1];
@@ -927,22 +971,27 @@ export class Note {
     }
 
     public chain() {
+        this.beat.voice.bar.staff.track.score.registerNote(this);
         if (!this.isTieDestination) {
             return;
         }
 
-        if (!this.tieOrigin) {
-            this.tieOrigin = Note.findTieOrigin(this);
+        let tieOrigin: Note | null;
+        if (this.tieOriginNoteId === -1) {
+            tieOrigin = Note.findTieOrigin(this);
+            this.tieOriginNoteId = tieOrigin ? tieOrigin.id : -1;
+        } else {
+            tieOrigin = this.tieOrigin;
         }
 
-        if (!this.tieOrigin) {
+        if (!tieOrigin) {
             this.isTieDestination = false;
         } else {
-            this.tieOrigin.tieDestination = this;
-            this.fret = this.tieOrigin.fret;
-            this.octave = this.tieOrigin.octave;
-            this.tone = this.tieOrigin.tone;
-            if (this.tieOrigin.hasBend) {
+            tieOrigin.tieDestinationNoteId = this.id;
+            this.fret = tieOrigin.fret;
+            this.octave = tieOrigin.octave;
+            this.tone = tieOrigin.tone;
+            if (tieOrigin.hasBend) {
                 this.bendOrigin = this.tieOrigin;
             }
         }

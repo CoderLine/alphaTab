@@ -22,15 +22,6 @@ import { Settings } from '@src/Settings';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
 import { InstrumentArticulation } from './InstrumentArticulation';
 
-interface SerializedNote {
-    tieOriginId?: number;
-    tieDestinationId?: number;
-    slurOriginId?: number;
-    slurDestinationId?: number;
-    hammerPullOriginId?: number;
-    hammerPullDestinationId?: number;
-}
-
 /**
  * This class can convert a full {@link Score} instance to a simple JavaScript object and back for further
  * JSON serialization.
@@ -258,40 +249,15 @@ export class JsonConverter {
         Score.copyTo(score, score2);
         RenderStylesheet.copyTo(score.stylesheet, score2.stylesheet);
 
-        let allNotes: Map<number, Note> = new Map<number, Note>();
-        let notesToLink: Note[] = [];
-
         JsonConverter.jsObjectToMasterBars(score, score2);
 
-        JsonConverter.jsObjectToTracks(score, score2, allNotes, notesToLink);
+        JsonConverter.jsObjectToTracks(score, score2);
 
-        for (let note of notesToLink) {
-            let serializedNote = note as SerializedNote;
-
-            if (serializedNote.tieOriginId !== undefined) {
-                note.tieOrigin = allNotes.get(serializedNote.tieOriginId)!;
-            }
-            if (serializedNote.tieDestinationId !== undefined) {
-                note.tieDestination = allNotes.get(serializedNote.tieDestinationId)!;
-            }
-            if (serializedNote.slurOriginId !== undefined) {
-                note.slurOrigin = allNotes.get(serializedNote.slurOriginId)!;
-            }
-            if (serializedNote.slurDestinationId !== undefined) {
-                note.slurDestination = allNotes.get(serializedNote.slurDestinationId)!;
-            }
-            if (serializedNote.hammerPullOriginId !== undefined) {
-                note.hammerPullOrigin = allNotes.get(serializedNote.hammerPullOriginId)!;
-            }
-            if (serializedNote.hammerPullDestinationId !== undefined) {
-                note.hammerPullDestination = allNotes.get(serializedNote.hammerPullDestinationId)!;
-            }
-        }
         score2.finish(settings ?? new Settings());
         return score2;
     }
 
-    private static jsObjectToTracks(score: Score, score2: Score, allNotes: Map<number, Note>, notesToLink: Note[]) {
+    private static jsObjectToTracks(score: Score, score2: Score) {
         for (let t: number = 0; t < score.tracks.length; t++) {
             let track: Track = score.tracks[t];
             let track2: Track = new Track();
@@ -306,11 +272,11 @@ export class JsonConverter {
                 track2.percussionArticulations.push(articulation2);
             }
 
-            JsonConverter.jsObjectToStaves(track, track2, allNotes, notesToLink);
+            JsonConverter.jsObjectToStaves(track, track2);
         }
     }
 
-    private static jsObjectToStaves(track: Track, track2: Track, allNotes: Map<number, Note>, notesToLink: Note[]) {
+    private static jsObjectToStaves(track: Track, track2: Track) {
         for (let s: number = 0; s < track.staves.length; s++) {
             let staff: Staff = track.staves[s];
             let staff2: Staff = track2.staves[s];
@@ -321,7 +287,7 @@ export class JsonConverter {
                 staff2.addChord(chordId, chord2);
             });
 
-            JsonConverter.jsObjectToBars(staff, staff2, allNotes, notesToLink);
+            JsonConverter.jsObjectToBars(staff, staff2);
         }
     }
 
@@ -337,29 +303,29 @@ export class JsonConverter {
         }
     }
 
-    private static jsObjectToBars(staff: Staff, staff2: Staff, allNotes: Map<number, Note>, notesToLink: Note[]) {
+    private static jsObjectToBars(staff: Staff, staff2: Staff) {
         for (let b: number = 0; b < staff.bars.length; b++) {
             let bar: Bar = staff.bars[b];
             let bar2: Bar = new Bar();
             Bar.copyTo(bar, bar2);
             staff2.addBar(bar2);
 
-            JsonConverter.jsObjectToVoices(bar, bar2, allNotes, notesToLink);
+            JsonConverter.jsObjectToVoices(bar, bar2);
         }
     }
 
-    private static jsObjectToVoices(bar: Bar, bar2: Bar, allNotes: Map<number, Note>, notesToLink: Note[]) {
+    private static jsObjectToVoices(bar: Bar, bar2: Bar) {
         for (let v: number = 0; v < bar.voices.length; v++) {
             let voice: Voice = bar.voices[v];
             let voice2: Voice = new Voice();
             Voice.copyTo(voice, voice2);
             bar2.addVoice(voice2);
 
-            JsonConverter.jsObjectToBeats(voice, voice2, allNotes, notesToLink);
+            JsonConverter.jsObjectToBeats(voice, voice2);
         }
     }
 
-    private static jsObjectToBeats(voice: Voice, voice2: Voice, allNotes: Map<number, Note>, notesToLink: Note[]) {
+    private static jsObjectToBeats(voice: Voice, voice2: Voice) {
         for (let bb: number = 0; bb < voice.beats.length; bb++) {
             let beat: Beat = voice.beats[bb];
             let beat2: Beat = new Beat();
@@ -378,45 +344,16 @@ export class JsonConverter {
                 beat2.addWhammyBarPoint(point);
             }
 
-            JsonConverter.jsObjectToNotes(beat, beat2, allNotes, notesToLink);
+            JsonConverter.jsObjectToNotes(beat, beat2);
         }
     }
 
-    private static jsObjectToNotes(beat: Beat, beat2: Beat, allNotes: Map<number, Note>, notesToLink: Note[]) {
+    private static jsObjectToNotes(beat: Beat, beat2: Beat) {
         for (let n: number = 0; n < beat.notes.length; n++) {
             let note: Note = beat.notes[n];
             let note2: Note = new Note();
             Note.copyTo(note, note2);
             beat2.addNote(note2);
-            allNotes.set(note2.id, note2);
-
-            let serializedNote = note as SerializedNote;
-            let serializedNote2 = note2 as SerializedNote;
-
-            if (serializedNote.tieOriginId !== undefined) {
-                serializedNote2.tieOriginId = serializedNote.tieOriginId;
-                notesToLink.push(note2);
-            }
-            if (serializedNote.tieDestinationId !== undefined) {
-                serializedNote2.tieDestinationId = serializedNote.tieDestinationId;
-                notesToLink.push(note2);
-            }
-            if (serializedNote.slurOriginId !== undefined) {
-                serializedNote2.slurOriginId = serializedNote.slurOriginId;
-                notesToLink.push(note2);
-            }
-            if (serializedNote.slurDestinationId !== undefined) {
-                serializedNote2.slurDestinationId = serializedNote.slurDestinationId;
-                notesToLink.push(note2);
-            }
-            if (serializedNote.hammerPullOriginId !== undefined) {
-                serializedNote2.hammerPullOriginId = serializedNote.hammerPullOriginId;
-                notesToLink.push(note2);
-            }
-            if (serializedNote.hammerPullDestinationId !== undefined) {
-                serializedNote2.hammerPullDestinationId = serializedNote.hammerPullDestinationId;
-                notesToLink.push(note2);
-            }
 
             for (let i: number = 0; i < note.bendPoints.length; i++) {
                 let point: BendPoint = new BendPoint(0, 0);

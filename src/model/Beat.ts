@@ -747,12 +747,12 @@ export class Beat {
 
                 // fix ties
                 if(note.isTieOrigin) {
-                    cloneNote.tieDestination = note.tieDestination!;
-                    note.tieDestination!.tieOrigin = cloneNote;
+                    cloneNote.tieDestinationNoteId = note.tieDestination!.id;
+                    note.tieDestination!.tieOriginNoteId = cloneNote.id;
                 }
                 if(note.isTieDestination) {
-                    cloneNote.tieOrigin = note.tieOrigin;
-                    note.tieOrigin!.tieDestination = cloneNote;
+                    cloneNote.tieOriginNoteId = note.tieOrigin ? note.tieOrigin.id : -1;
+                    note.tieOrigin!.tieDestinationNoteId = cloneNote.id;
                 }
 
                 // if the note has a bend which is continued on the next note
