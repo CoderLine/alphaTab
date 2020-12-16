@@ -6,6 +6,7 @@ import { Settings } from '@src/Settings';
 /**
  * This class describes a single staff within a track. There are instruments like pianos
  * where a single track can contain multiple staffs.
+ * @json
  */
 export class Staff {
     /**
@@ -15,21 +16,24 @@ export class Staff {
 
     /**
      * Gets or sets the reference to the track this staff belongs to.
+     * @json_ignore
      */
     public track!: Track;
 
     /**
      * Gets or sets a list of all bars contained in this staff.
+     * @json_add addBar
      */
     public bars: Bar[] = [];
 
     /**
      * Gets or sets a list of all chords defined for this staff. {@link Beat.chordId} refers to entries in this lookup.
+     * @json_add addChord
      */
     public chords: Map<string, Chord> = new Map();
 
     /**
-     * Gets or sets the fret on which a capo is set. s
+     * Gets or sets the fret on which a capo is set.
      */
     public capo: number = 0;
 

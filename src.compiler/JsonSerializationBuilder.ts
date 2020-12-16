@@ -5,6 +5,7 @@ import { isEnumType } from './BuilderHelpers';
 import { wrapToNonNull } from './BuilderHelpers';
 import { isTypedArray } from './BuilderHelpers';
 import { isMap } from './BuilderHelpers';
+import { unwrapArrayItemType } from './BuilderHelpers';
 ;
 interface JsonProperty {
     property: ts.PropertyDeclaration;
@@ -21,8 +22,6 @@ function isImmutable(type: ts.Type): boolean {
 }
 
 function generateToJsonBodyForClass(
-    classDeclaration: ts.ClassDeclaration,
-    propertiesToSerialize: JsonProperty[],
     factory: ts.NodeFactory
 ): ts.Block {
     return factory.createBlock([
@@ -54,7 +53,6 @@ function generateToJsonBodyForClass(
 }
 function generateFillToJsonBodyForClass(
     program: ts.Program,
-    classDeclaration: ts.ClassDeclaration,
     propertiesToSerialize: JsonProperty[],
     factory: ts.NodeFactory
 ): ts.Block {
@@ -76,33 +74,71 @@ function generateFillToJsonBodyForClass(
         };
 
         if (jsonName) {
-            const type = getTypeWithNullableInfo(program.getTypeChecker(), prop.property.type);
+            const typeChecker = program.getTypeChecker();
+            const type = getTypeWithNullableInfo(typeChecker, prop.property.type);
             if (isPrimitiveType(type.type)) {
                 // json.jsonName = this.fieldName
                 statements.push(assignToJsonName(accessField()));
             } else if (isTypedArray(type.type)) {
-                // json.jsonName = this.fieldName ? this.fieldName.slice() : null
-                if (type.isNullable) {
-                    statements.push(
-                        assignToJsonName(
-                            factory.createConditionalExpression(
-                                accessField(),
-                                factory.createToken(ts.SyntaxKind.QuestionToken),
-                                factory.createCallExpression(factory.createPropertyAccessExpression(accessField(), 'slice'), [], []),
-                                factory.createToken(ts.SyntaxKind.ColonToken),
-                                factory.createNull()
+                const arrayItemType = unwrapArrayItemType(type.type, typeChecker);
+                if (!arrayItemType || isPrimitiveType(arrayItemType)) {
+                    // json.jsonName = this.fieldName ? this.fieldName.slice() : null
+                    if (type.isNullable) {
+                        statements.push(
+                            assignToJsonName(
+                                factory.createConditionalExpression(
+                                    accessField(),
+                                    factory.createToken(ts.SyntaxKind.QuestionToken),
+                                    factory.createCallExpression(factory.createPropertyAccessExpression(accessField(), 'slice'), [], []),
+                                    factory.createToken(ts.SyntaxKind.ColonToken),
+                                    factory.createNull()
+                                )
                             )
-                        )
-                    );
+                        );
+                    } else {
+                        statements.push(
+                            assignToJsonName(factory.createCallExpression(factory.createPropertyAccessExpression(accessField(), 'slice'), [], []))
+                        );
+                    }
                 } else {
-                    statements.push(
-                        assignToJsonName(factory.createCallExpression(factory.createPropertyAccessExpression(accessField(), 'slice'), [], []))
-                    );
+                    // json.jsonName = this.fieldName ? this.fieldName.map($li => $li.toJson()) : null
+                    const mapCall = factory.createCallExpression(factory.createPropertyAccessExpression(accessField(), 'map'), undefined, [
+                        factory.createArrowFunction(
+                            undefined,
+                            undefined,
+                            [factory.createParameterDeclaration(undefined, undefined, undefined, '$li')],
+                            undefined, factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+                            factory.createCallExpression(
+                                factory.createPropertyAccessExpression(
+                                    factory.createIdentifier('$li'),
+                                    'toJson'
+                                ),
+                                undefined, []
+                            )
+                        ),
+                    ]);
+                    if (type.isNullable) {
+                        statements.push(
+                            assignToJsonName(
+                                factory.createConditionalExpression(
+                                    accessField(),
+                                    factory.createToken(ts.SyntaxKind.QuestionToken),
+                                    mapCall,
+                                    factory.createToken(ts.SyntaxKind.ColonToken),
+                                    factory.createNull()
+                                )
+                            )
+                        );
+                    } else {
+                        statements.push(
+                            assignToJsonName(mapCall)
+                        );
+                    }
                 }
             } else if (isMap(type.type)) {
                 const mapType = type.type as ts.TypeReference;
-                if (!isEnumType(mapType.typeArguments[0]) || !isPrimitiveType(mapType.typeArguments[1])) {
-                    throw new Error('only Map<EnumType, Primitive> maps are supported extend if needed!');
+                if (!isPrimitiveType(mapType.typeArguments[0])) {
+                    throw new Error('only Map<Primitive, *> maps are supported extend if needed!');
                 }
                 // json.jsonName = { } as any;
                 // this.fieldName.forEach((val, key) => (json.jsonName as any)[key] = val))
@@ -216,7 +252,6 @@ function generateFillToJsonBodyForClass(
 }
 function generateFromJsonBodyForClass(
     classDeclaration: ts.ClassDeclaration,
-    propertiesToSerialize: JsonProperty[],
     factory: ts.NodeFactory
 ): ts.Block {
     const statements: ts.Statement[] = [];
@@ -263,8 +298,6 @@ function generateFromJsonBodyForClass(
     return factory.createBlock(statements);
 }
 function generateFillFromJsonBodyForClass(
-    classDeclaration: ts.ClassDeclaration,
-    propertiesToSerialize: JsonProperty[],
     factory: ts.NodeFactory
 ): ts.Block {
     return factory.createBlock([
@@ -347,7 +380,6 @@ function createEnumMapping(value: string, type: ts.Type, factory: ts.NodeFactory
 
 function generateSetPropertyMethodBodyForClass(
     program: ts.Program,
-    classDeclaration: ts.ClassDeclaration,
     propertiesToSerialize: JsonProperty[],
     factory: ts.NodeFactory
 ): ts.Block {
@@ -416,8 +448,22 @@ function generateSetPropertyMethodBodyForClass(
             // return true;
 
             const mapType = type.type as ts.TypeReference;
-            if (!isEnumType(mapType.typeArguments[0]) || !isPrimitiveType(mapType.typeArguments[1])) {
-                throw new Error('only Map<EnumType, Primitive> maps are supported extend if needed!');
+            if (!isPrimitiveType(mapType.typeArguments[0])) {
+                throw new Error('only Map<EnumType, *> maps are supported extend if needed!');
+            }
+
+            const mapKey = isEnumType(mapType.typeArguments[0])
+                ? createEnumMapping('$mk', mapType.typeArguments![0], factory)
+                : factory.createIdentifier('$mk');
+
+            let mapValue: ts.Expression = factory.createElementAccessExpression(factory.createIdentifier('value'), factory.createIdentifier('$mk'));
+            if (!isPrimitiveType(mapType.typeArguments[1])) {
+                mapValue = factory.createCallExpression(
+                    // TypeName.fromJson
+                    factory.createPropertyAccessExpression(factory.createIdentifier(mapType.typeArguments[1].symbol.name), 'fromJson'),
+                    [],
+                    [factory.createIdentifier('value')]
+                );
             }
 
             caseStatements.push(assignField(factory.createNewExpression(factory.createIdentifier('Map'), undefined, [])));
@@ -442,8 +488,8 @@ function generateSetPropertyMethodBodyForClass(
                                 ),
                                 undefined,
                                 [
-                                    createEnumMapping('$mk', mapType.typeArguments![0], factory),
-                                    factory.createElementAccessExpression(factory.createIdentifier('value'), factory.createIdentifier('$mk'))
+                                    mapKey,
+                                    mapValue
                                 ]
                             )
                         )
@@ -620,17 +666,19 @@ function rewriteClassForJsonSerialization(
     classDeclaration.members.forEach(member => {
         if (ts.isPropertyDeclaration(member)) {
             const propertyDeclaration = member as ts.PropertyDeclaration;
-            if (!propertyDeclaration.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)) {
+            if (!propertyDeclaration.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword || m.kind == ts.SyntaxKind.PrivateKeyword)) {
                 const jsonNames = [member.name.getText(sourceFile)];
 
                 if (ts.getJSDocTags(member).find(t => t.tagName.text === 'json_on_parent')) {
                     jsonNames.push('');
                 }
 
-                propertiesToSerialize.push({
-                    property: propertyDeclaration,
-                    jsonNames: jsonNames
-                });
+                if (!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_ignore')) {
+                    propertiesToSerialize.push({
+                        property: propertyDeclaration,
+                        jsonNames: jsonNames
+                    });
+                }
             }
             newMembers.push(member);
         } else if (ts.isMethodDeclaration(member)) {
@@ -823,35 +871,35 @@ function rewriteClassForJsonSerialization(
     toJsonMethod = updateMethodBody(
         toJsonMethod,
         ['obj'],
-        generateToJsonBodyForClass(classDeclaration, propertiesToSerialize, factory),
+        generateToJsonBodyForClass(factory),
         factory
     );
 
     fillToJsonMethod = updateMethodBody(
         fillToJsonMethod,
         ['json'],
-        generateFillToJsonBodyForClass(program, classDeclaration, propertiesToSerialize, factory),
+        generateFillToJsonBodyForClass(program, propertiesToSerialize, factory),
         factory
     );
 
     fromJsonMethod = updateMethodBody(
         fromJsonMethod,
         ['json'],
-        generateFromJsonBodyForClass(classDeclaration, propertiesToSerialize, factory),
+        generateFromJsonBodyForClass(classDeclaration, factory),
         factory
     );
 
     fillFromJsonMethod = updateMethodBody(
         fillFromJsonMethod,
         ['json'],
-        generateFillFromJsonBodyForClass(classDeclaration, propertiesToSerialize, factory),
+        generateFillFromJsonBodyForClass(factory),
         factory
     );
 
     setPropertyMethod = updateMethodBody(
         setPropertyMethod,
         ['property', 'value'],
-        generateSetPropertyMethodBodyForClass(program, classDeclaration, propertiesToSerialize, factory),
+        generateSetPropertyMethodBodyForClass(program, propertiesToSerialize, factory),
         factory
     );
 

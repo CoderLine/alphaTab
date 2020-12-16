@@ -8,6 +8,7 @@ import { Settings } from '@src/Settings';
 
 /**
  * A bar is a single block within a track, also known as Measure.
+ * @json
  */
 export class Bar {
     private static _globalBarId: number = 0;
@@ -24,11 +25,13 @@ export class Bar {
 
     /**
      * Gets or sets the next bar that comes after this bar.
+     * @json_ignore
      */
     public nextBar: Bar | null = null;
 
     /**
      * Gets or sets the previous bar that comes before this bar.
+     * @json_ignore
      */
     public previousBar: Bar | null = null;
 
@@ -44,11 +47,13 @@ export class Bar {
 
     /**
      * Gets or sets the reference to the parent staff.
+     * @json_ignore
      */
     public staff!: Staff;
 
     /**
      * Gets or sets the list of voices contained in this bar.
+     * @json_add addVoice
      */
     public voices: Voice[] = [];
 

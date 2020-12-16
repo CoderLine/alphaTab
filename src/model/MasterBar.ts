@@ -12,6 +12,7 @@ import { TripletFeel } from '@src/model/TripletFeel';
 /**
  * The MasterBar stores information about a bar which affects
  * all tracks.
+ * @json
  */
 export class MasterBar {
     public static readonly MaxAlternateEndings: number = 8;
@@ -23,11 +24,13 @@ export class MasterBar {
 
     /**
      * Gets or sets the next masterbar in the song.
+     * @json_ignore
      */
     public nextMasterBar: MasterBar | null = null;
 
     /**
      * Gets or sets the next masterbar in the song.
+     * @json_ignore
      */
     public previousMasterBar: MasterBar | null = null;
 
@@ -67,6 +70,7 @@ export class MasterBar {
 
     /**
      * Gets or sets the repeat group this bar belongs to.
+     * @json_ignore
      */
     public repeatGroup!: RepeatGroup;
 
@@ -106,6 +110,7 @@ export class MasterBar {
 
     /**
      * Gets or sets the reference to the score this song belongs to.
+     * @json_ignore
      */
     public score!: Score;
 

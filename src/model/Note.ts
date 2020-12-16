@@ -31,7 +31,7 @@ export class Note {
     public static GlobalNoteId: number = 0;
     /**
      * Gets or sets the unique id of this note.
-     * @computed
+     * @clone_ignore
      */
     public id: number = Note.GlobalNoteId++;
 
@@ -57,7 +57,7 @@ export class Note {
 
     /**
      * Gets or sets the note from which this note continues the bend.
-     * @computed
+     * @clone_ignore
      */
     public bendOrigin: Note | null = null;
 
@@ -74,7 +74,7 @@ export class Note {
 
     /**
      * Gets or sets the bend point with the highest bend value.
-     * @computed
+     * @clone_ignore
      */
     public maxBendPoint: BendPoint | null = null;
 
@@ -336,7 +336,7 @@ export class Note {
 
     /**
      * Gets or sets the destination note for the let-ring effect.
-     * @computed
+     * @clone_ignore
      */
     public letRingDestination: Note | null = null;
 
@@ -347,7 +347,7 @@ export class Note {
 
     /**
      * Gets or sets the destination note for the palm-mute effect.
-     * @computed
+     * @clone_ignore
      */
     public palmMuteDestination: Note | null = null;
 
@@ -373,13 +373,13 @@ export class Note {
 
     /**
      * Gets or sets the target note for several slide types.
-     * @computed
+     * @clone_ignore
      */
     public slideTarget: Note | null = null;
 
     /**
      * Gets or sets the source note for several slide types.
-     * @computed
+     * @clone_ignore
      */
     public slideOrigin: Note | null = null;
 
@@ -467,7 +467,7 @@ export class Note {
 
     /**
      * Gets or sets the reference to the parent beat to which this note belongs to.
-     * @computed
+     * @clone_ignore
      */
     public beat!: Beat;
 
@@ -485,12 +485,12 @@ export class Note {
     }
 
     /**
-     * @computed
+     * @clone_ignore
      */
     public effectSlurOrigin: Note | null = null;
 
     /**
-     * @computed
+     * @clone_ignore
      */
     public effectSlurDestination: Note | null = null;
 

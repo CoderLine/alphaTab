@@ -4,6 +4,7 @@ import { MusicFontSymbol } from "./MusicFontSymbol";
 
 /**
  * Describes an instrument articulation which is used for percussions. 
+ * @json
  */
 export class InstrumentArticulation {
     /**

@@ -1,5 +1,6 @@
 import * as ts from 'typescript';
 import { getTypeWithNullableInfo } from './BuilderHelpers';
+import { unwrapArrayItemType } from './BuilderHelpers';
 import { isPrimitiveType } from './BuilderHelpers';
 
 function isClonable(type: ts.Type): boolean {
@@ -13,23 +14,6 @@ function isClonable(type: ts.Type): boolean {
     }
 
     return false;
-}
-
-function unwrapArrayItemType(type: ts.Type, typeChecker: ts.TypeChecker): ts.Type | null {
-    if (type.symbol && type.symbol.name === 'Array') {
-        return (type as ts.TypeReference).typeArguments![0];
-    }
-
-    if (isPrimitiveType(type)) {
-        return null;
-    }
-
-    if (type.isUnion()) {
-        const nonNullable = typeChecker.getNonNullableType(type);
-        return unwrapArrayItemType(nonNullable, typeChecker);
-    }
-
-    return null;
 }
 
 function generateClonePropertyStatements(prop: ts.PropertyDeclaration, typeChecker: ts.TypeChecker, factory: ts.NodeFactory): ts.Statement[] {
@@ -237,7 +221,7 @@ function isCloneMember(propertyDeclaration: ts.PropertyDeclaration) {
         return false;
     }
 
-    if (ts.getJSDocTags(propertyDeclaration).find(t => t.tagName.text === 'computed')) {
+    if (ts.getJSDocTags(propertyDeclaration).find(t => t.tagName.text === 'clone_ignore')) {
         return false;
     }
 

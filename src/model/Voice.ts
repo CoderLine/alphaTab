@@ -8,6 +8,7 @@ import { Settings } from '@src/Settings';
 /**
  * A voice represents a group of beats
  * that can be played during a bar.
+ * @json
  */
 export class Voice {
     private _beatLookup!: Map<number, Beat>;
@@ -19,11 +20,13 @@ export class Voice {
 
     /**
      * Gets or sets the reference to the bar this voice belongs to.
+     * @json_ignore
      */
     public bar!: Bar;
 
     /**
      * Gets or sets the list of beats contained in this voice.
+     * @json_add addBeat
      */
     public beats: Beat[] = [];
 

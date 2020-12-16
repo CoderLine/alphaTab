@@ -10,6 +10,7 @@ import { InstrumentArticulation } from './InstrumentArticulation';
 /**
  * This public class describes a single track or instrument of score.
  * It is bascially a list of staffs containing individual music notation kinds.
+ * @json
  */
 export class Track {
     private static readonly ShortNameMaxLength: number = 10;
@@ -20,11 +21,13 @@ export class Track {
 
     /**
      * Gets or sets the reference this track belongs to.
+     * @json_ignore
      */
     public score!: Score;
 
     /**
      * Gets or sets the list of staffs that are defined for this track.
+     * @json_add addStaff
      */
     public staves: Staff[] = [];
 

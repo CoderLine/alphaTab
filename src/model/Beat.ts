@@ -43,6 +43,7 @@ export enum BeatBeamingMode {
 /**
  * A beat is a single block within a bar. A beat is a combination
  * of several notes played at the same time.
+ * @json
  * @cloneable
  */
 export class Beat {
@@ -50,7 +51,7 @@ export class Beat {
 
     /**
      * Gets or sets the unique id of this beat.
-     * @computed
+     * @clone_ignore
      */
     public id: number = Beat._globalBeatId++;
 
@@ -61,13 +62,15 @@ export class Beat {
 
     /**
      * Gets or sets the previous beat within the whole song.
-     * @computed
+     * @json_ignore
+     * @clone_ignore
      */
     public previousBeat: Beat | null = null;
 
     /**
      * Gets or sets the next beat within the whole song.
-     * @computed
+     * @json_ignore
+     * @clone_ignore
      */
     public nextBeat: Beat | null = null;
 
@@ -77,12 +80,14 @@ export class Beat {
 
     /**
      * Gets or sets the reference to the parent voice this beat belongs to.
-     * @computed
+     * @json_ignore
+     * @clone_ignore
      */
     public voice!: Voice;
 
     /**
      * Gets or sets the list of notes contained in this beat.
+     * @json_add addNote
      * @clone_add addCloneNote
      */
     public notes: Note[] = [];
@@ -130,25 +135,29 @@ export class Beat {
 
     /**
      * Gets or sets the note with the lowest pitch in this beat. Only visible notes are considered.
-     * @computed
+     * @json_ignore
+     * @clone_ignore
      */
     public minNote: Note | null = null;
 
     /**
      * Gets or sets the note with the highest pitch in this beat. Only visible notes are considered.
-     * @computed
+     * @json_ignore
+     * @clone_ignore
      */
     public maxNote: Note | null = null;
 
     /**
      * Gets or sets the note with the highest string number in this beat. Only visible notes are considered.
-     * @computed
+     * @json_ignore
+     * @clone_ignore
      */
     public maxStringNote: Note | null = null;
 
     /**
      * Gets or sets the note with the lowest string number in this beat. Only visible notes are considered.
-     * @computed
+     * @json_ignore
+     * @clone_ignore
      */
     public minStringNote: Note | null = null;
 
@@ -244,7 +253,8 @@ export class Beat {
     }
 
     /**
-     * @computed
+     * @clone_ignore
+     * @json_ignore
      */
     public tupletGroup: TupletGroup | null = null;
 
@@ -260,19 +270,22 @@ export class Beat {
 
     /**
      * Gets or sets the points defining the whammy bar usage.
+     * @json_add addWhammyBarPoint
      * @clone_add addWhammyBarPoint
      */
     public whammyBarPoints: BendPoint[] = [];
 
     /**
      * Gets or sets the highest point with for the highest whammy bar value.
-     * @computed
+     * @json_ignore
+     * @clone_ignore
      */
     public maxWhammyPoint: BendPoint | null = null;
 
     /**
      * Gets or sets the highest point with for the lowest whammy bar value.
-     * @computed
+     * @json_ignore
+     * @clone_ignore
      */
     public minWhammyPoint: BendPoint | null = null;
 
@@ -375,12 +388,14 @@ export class Beat {
     }
 
     /**
-     * @computed
+     * @clone_ignore
+     * @json_ignore
      */
     public effectSlurOrigin: Beat | null = null;
 
     /**
-     * @computed
+     * @clone_ignore
+     * @json_ignore
      */
     public effectSlurDestination: Beat | null = null;
 

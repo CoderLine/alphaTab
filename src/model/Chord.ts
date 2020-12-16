@@ -2,6 +2,7 @@ import { Staff } from '@src/model/Staff';
 
 /**
  * A chord definition.
+ * @json
  */
 export class Chord {
     /**
@@ -28,6 +29,7 @@ export class Chord {
 
     /**
      * Gets or sets the staff the chord belongs to.
+     * @json_ignore
      */
     public staff!: Staff;
 

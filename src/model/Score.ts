@@ -9,6 +9,7 @@ import { Note } from './Note';
  * The score is the root node of the complete
  * model. It stores the basic information of
  * a song and stores the sub components.
+ * @json
  */
 export class Score {
     private _noteByIdLookup: Map<number, Note> = new Map<number, Note>();
@@ -76,11 +77,13 @@ export class Score {
 
     /**
      * Gets or sets a list of all masterbars contained in this song.
+     * @json_add addMasterBar
      */
     public masterBars: MasterBar[] = [];
 
     /**
      * Gets or sets a list of all tracks contained in this song.
+     * @json_add addTrack
      */
     public tracks: Track[] = [];
 
@@ -142,5 +145,21 @@ export class Score {
         return this._noteByIdLookup.has(noteId)
             ? this._noteByIdLookup.get(noteId)!
             : null;
+    }
+
+    /**
+     * @target web
+     */
+    public static fromJson(json: any): Score {
+        // dynamically implemented via AST transformer
+        return new Score();
+    }
+
+    /**
+     * @target web
+     */
+    public static toJson(score: Score): unknown {
+        // dynamically implemented via AST transformer
+        return null;
     }
 }
