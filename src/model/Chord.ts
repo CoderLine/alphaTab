@@ -45,14 +45,4 @@ export class Chord {
      * Gets or sets whether the fingering is shown below the chord diagram.
      */
     public showFingering: boolean = true;
-
-    public static copyTo(src: Chord, dst: Chord): void {
-        dst.firstFret = src.firstFret;
-        dst.name = src.name;
-        dst.strings = src.strings.slice(0);
-        dst.barreFrets = src.barreFrets.slice(0);
-        dst.showName = src.showName;
-        dst.showDiagram = src.showDiagram;
-        dst.showFingering = src.showFingering;
-    }
 }

@@ -70,14 +70,6 @@ export class Bar {
         return true;
     }
 
-    public static copyTo(src: Bar, dst: Bar): void {
-        dst.id = src.id;
-        dst.index = src.index;
-        dst.clef = src.clef;
-        dst.clefOttava = src.clefOttava;
-        dst.simileMark = src.simileMark;
-    }
-
     public addVoice(voice: Voice): void {
         voice.bar = this;
         voice.index = this.voices.length;

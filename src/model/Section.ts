@@ -12,9 +12,4 @@ export class Section {
      * Gets or sets the descriptional text of this section.
      */
     public text: string = '';
-
-    public static copyTo(src: Section, dst: Section): void {
-        dst.marker = src.marker;
-        dst.text = src.text;
-    }
 }

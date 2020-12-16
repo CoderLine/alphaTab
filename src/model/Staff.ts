@@ -82,18 +82,6 @@ export class Staff {
      */
     public standardNotationLineCount: number = 5;
 
-    public static copyTo(src: Staff, dst: Staff): void {
-        dst.capo = src.capo;
-        dst.index = src.index;
-        dst.tuning = src.tuning.slice();
-        dst.transpositionPitch = src.transpositionPitch;
-        dst.displayTranspositionPitch = src.displayTranspositionPitch;
-        dst.showStandardNotation = src.showStandardNotation;
-        dst.showTablature = src.showTablature;
-        dst.isPercussion = src.isPercussion;
-        dst.standardNotationLineCount = src.standardNotationLineCount;
-    }
-
     public finish(settings: Settings): void {
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
             this.bars[i].finish(settings);

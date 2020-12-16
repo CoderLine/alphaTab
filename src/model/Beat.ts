@@ -43,12 +43,14 @@ export enum BeatBeamingMode {
 /**
  * A beat is a single block within a bar. A beat is a combination
  * of several notes played at the same time.
+ * @cloneable
  */
 export class Beat {
     private static _globalBeatId: number = 0;
 
     /**
      * Gets or sets the unique id of this beat.
+     * @computed
      */
     public id: number = Beat._globalBeatId++;
 
@@ -59,11 +61,13 @@ export class Beat {
 
     /**
      * Gets or sets the previous beat within the whole song.
+     * @computed
      */
     public previousBeat: Beat | null = null;
 
     /**
      * Gets or sets the next beat within the whole song.
+     * @computed
      */
     public nextBeat: Beat | null = null;
 
@@ -73,11 +77,13 @@ export class Beat {
 
     /**
      * Gets or sets the reference to the parent voice this beat belongs to.
+     * @computed
      */
     public voice!: Voice;
 
     /**
      * Gets or sets the list of notes contained in this beat.
+     * @clone_add addCloneNote
      */
     public notes: Note[] = [];
 
@@ -124,21 +130,25 @@ export class Beat {
 
     /**
      * Gets or sets the note with the lowest pitch in this beat. Only visible notes are considered.
+     * @computed
      */
     public minNote: Note | null = null;
 
     /**
      * Gets or sets the note with the highest pitch in this beat. Only visible notes are considered.
+     * @computed
      */
     public maxNote: Note | null = null;
 
     /**
      * Gets or sets the note with the highest string number in this beat. Only visible notes are considered.
+     * @computed
      */
     public maxStringNote: Note | null = null;
 
     /**
      * Gets or sets the note with the lowest string number in this beat. Only visible notes are considered.
+     * @computed
      */
     public minStringNote: Note | null = null;
 
@@ -233,6 +243,9 @@ export class Beat {
         );
     }
 
+    /**
+     * @computed
+     */
     public tupletGroup: TupletGroup | null = null;
 
     /**
@@ -247,16 +260,19 @@ export class Beat {
 
     /**
      * Gets or sets the points defining the whammy bar usage.
+     * @clone_add addWhammyBarPoint
      */
     public whammyBarPoints: BendPoint[] = [];
 
     /**
      * Gets or sets the highest point with for the highest whammy bar value.
+     * @computed
      */
     public maxWhammyPoint: BendPoint | null = null;
 
     /**
      * Gets or sets the highest point with for the lowest whammy bar value.
+     * @computed
      */
     public minWhammyPoint: BendPoint | null = null;
 
@@ -358,74 +374,20 @@ export class Beat {
         return !!this.effectSlurOrigin;
     }
 
+    /**
+     * @computed
+     */
     public effectSlurOrigin: Beat | null = null;
 
+    /**
+     * @computed
+     */
     public effectSlurDestination: Beat | null = null;
 
     /**
      * Gets or sets how the beaming should be done for this beat.
      */
     public beamingMode:BeatBeamingMode = BeatBeamingMode.Auto;    
-
-    public static copyTo(src: Beat, dst: Beat): void {
-        dst.id = src.id;
-        dst.index = src.index;
-        dst.isEmpty = src.isEmpty;
-        dst.duration = src.duration;
-        dst.dots = src.dots;
-        dst.fadeIn = src.fadeIn;
-        if (src.lyrics) {
-            dst.lyrics = new Array<string>(src.lyrics.length);
-            for (let i: number = 0; i < src.lyrics.length; i++) {
-                dst.lyrics[i] = src.lyrics[i];
-            }
-        }
-        dst.pop = src.pop;
-        dst.hasRasgueado = src.hasRasgueado;
-        dst.slap = src.slap;
-        dst.tap = src.tap;
-        dst.text = src.text;
-        dst.brushType = src.brushType;
-        dst.brushDuration = src.brushDuration;
-        dst.tupletDenominator = src.tupletDenominator;
-        dst.tupletNumerator = src.tupletNumerator;
-        dst.vibrato = src.vibrato;
-        dst.chordId = src.chordId;
-        dst.graceType = src.graceType;
-        dst.pickStroke = src.pickStroke;
-        dst.tremoloSpeed = src.tremoloSpeed;
-        dst.crescendo = src.crescendo;
-        dst.displayStart = src.displayStart;
-        dst.displayDuration = src.displayDuration;
-        dst.playbackStart = src.playbackStart;
-        dst.playbackDuration = src.playbackDuration;
-        dst.dynamics = src.dynamics;
-        dst.isLegatoOrigin = src.isLegatoOrigin;
-        dst.invertBeamDirection = src.invertBeamDirection;
-        dst.preferredBeamDirection = src.preferredBeamDirection;
-        dst.whammyBarType = src.whammyBarType;
-        dst.isContinuedWhammy = src.isContinuedWhammy;
-        dst.ottava = src.ottava;
-        dst.whammyStyle = src.whammyStyle;
-        dst.beamingMode = src.beamingMode;
-    }
-
-    public clone(): Beat {
-        let beat: Beat = new Beat();
-        let id: number = beat.id;
-        for (const p of this.whammyBarPoints) {
-            beat.addWhammyBarPoint(p.clone());
-        }
-        for (const n of this.notes) {
-            beat.addNoteInternal(n.clone(), n.realValue);
-        }
-        Beat.copyTo(this, beat);
-        for (const a of this.automations) {
-            beat.automations.push(a.clone());
-        }
-        beat.id = id;
-        return beat;
-    }
 
     public addWhammyBarPoint(point: BendPoint): void {
         this.whammyBarPoints.push(point);
@@ -472,6 +434,11 @@ export class Beat {
 
     public addNote(note: Note): void {
         this.addNoteInternal(note, -1);
+    }
+
+    // @ts-ignore
+    private addCloneNote(clone:Note, original:Note) {
+        this.addNoteInternal(clone, original.realValue);
     }
 
     private addNoteInternal(note: Note, realValue: number = -1): void {
@@ -808,6 +775,11 @@ export class Beat {
             return this.noteValueLookup.get(noteRealValue)!;
         }
         return null;
+    }
+
+    public clone(): Beat {
+        // dynamically implemented via AST transformer
+        return new Beat();
     }
 
     public chain() {

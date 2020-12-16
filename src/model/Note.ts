@@ -25,11 +25,13 @@ import { PercussionMapper } from '@src/model/PercussionMapper';
  * A note is a single played sound on a fretted instrument.
  * It consists of a fret offset and a string on which the note is played on.
  * It also can be modified by a lot of different effects.
+ * @cloneable
  */
 export class Note {
     public static GlobalNoteId: number = 0;
     /**
      * Gets or sets the unique id of this note.
+     * @computed
      */
     public id: number = Note.GlobalNoteId++;
 
@@ -55,6 +57,7 @@ export class Note {
 
     /**
      * Gets or sets the note from which this note continues the bend.
+     * @computed
      */
     public bendOrigin: Note | null = null;
 
@@ -65,11 +68,13 @@ export class Note {
 
     /**
      * Gets or sets a list of the points defining the bend behavior.
+     * @clone_add addBendPoint
      */
     public bendPoints: BendPoint[] = [];
 
     /**
      * Gets or sets the bend point with the highest bend value.
+     * @computed
      */
     public maxBendPoint: BendPoint | null = null;
 
@@ -267,7 +272,7 @@ export class Note {
     /**
      * Gets the destination for the hammeron/pullof started by this note.
      */
-    public get hammerPullDestination(): Note | null  {
+    public get hammerPullDestination(): Note | null {
         return this.hammerPullDestinationNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.hammerPullDestinationNoteId);
     }
 
@@ -331,6 +336,7 @@ export class Note {
 
     /**
      * Gets or sets the destination note for the let-ring effect.
+     * @computed
      */
     public letRingDestination: Note | null = null;
 
@@ -341,6 +347,7 @@ export class Note {
 
     /**
      * Gets or sets the destination note for the palm-mute effect.
+     * @computed
      */
     public palmMuteDestination: Note | null = null;
 
@@ -366,11 +373,13 @@ export class Note {
 
     /**
      * Gets or sets the target note for several slide types.
+     * @computed
      */
     public slideTarget: Note | null = null;
 
     /**
      * Gets or sets the source note for several slide types.
+     * @computed
      */
     public slideOrigin: Note | null = null;
 
@@ -458,6 +467,7 @@ export class Note {
 
     /**
      * Gets or sets the reference to the parent beat to which this note belongs to.
+     * @computed
      */
     public beat!: Beat;
 
@@ -474,8 +484,14 @@ export class Note {
         return !!this.effectSlurOrigin;
     }
 
+    /**
+     * @computed
+     */
     public effectSlurOrigin: Note | null = null;
 
+    /**
+     * @computed
+     */
     public effectSlurDestination: Note | null = null;
 
     public get stringTuning(): number {
@@ -662,53 +678,6 @@ export class Note {
             );
         }
         return false;
-    }
-
-    public static copyTo(src: Note, dst: Note): void {
-        dst.id = src.id;
-        dst.accentuated = src.accentuated;
-        dst.fret = src.fret;
-        dst.string = src.string;
-        dst.harmonicValue = src.harmonicValue;
-        dst.harmonicType = src.harmonicType;
-        dst.isGhost = src.isGhost;
-        dst.isLetRing = src.isLetRing;
-        dst.isPalmMute = src.isPalmMute;
-        dst.isDead = src.isDead;
-        dst.isStaccato = src.isStaccato;
-        dst.slideInType = src.slideInType;
-        dst.slideOutType = src.slideOutType;
-        dst.vibrato = src.vibrato;
-        dst.isTieDestination = src.isTieDestination;
-        dst.isSlurDestination = src.isSlurDestination;
-        dst.isHammerPullOrigin = src.isHammerPullOrigin;
-        dst.leftHandFinger = src.leftHandFinger;
-        dst.rightHandFinger = src.rightHandFinger;
-        dst.isFingering = src.isFingering;
-        dst.trillValue = src.trillValue;
-        dst.trillSpeed = src.trillSpeed;
-        dst.durationPercent = src.durationPercent;
-        dst.accidentalMode = src.accidentalMode;
-        dst.dynamics = src.dynamics;
-        dst.octave = src.octave;
-        dst.tone = src.tone;
-        dst.percussionArticulation = src.percussionArticulation;
-        dst.bendType = src.bendType;
-        dst.bendStyle = src.bendStyle;
-        dst.isContinuedBend = src.isContinuedBend;
-        dst.isVisible = src.isVisible;
-        dst.isLeftHandTapped = src.isLeftHandTapped;
-    }
-
-    public clone(): Note {
-        let n: Note = new Note();
-        let id: number = n.id;
-        Note.copyTo(this, n);
-        for (let i: number = 0, j: number = this.bendPoints.length; i < j; i++) {
-            n.addBendPoint(this.bendPoints[i].clone());
-        }
-        n.id = id;
-        return n;
     }
 
     public addBendPoint(point: BendPoint): void {
@@ -995,5 +964,10 @@ export class Note {
                 this.bendOrigin = this.tieOrigin;
             }
         }
+    }
+
+    public clone(): Note {
+        // dynamically implemented via AST transformer
+        return new Note();
     }
 }

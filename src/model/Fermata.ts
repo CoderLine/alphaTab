@@ -29,9 +29,4 @@ export class Fermata {
      * Gets or sets the actual lenght of the fermata.
      */
     public length: number = 0;
-
-    public static copyTo(src: Fermata, dst: Fermata): void {
-        dst.type = src.type;
-        dst.length = src.length;
-    }
 }

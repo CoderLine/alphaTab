@@ -36,7 +36,7 @@ export class Settings {
      * @target web
      */
     public setProperty(property: string, value: any): boolean {
-        // dynamically implemented via macro
+        // dynamically implemented via AST transformer
         return false;
     }
 

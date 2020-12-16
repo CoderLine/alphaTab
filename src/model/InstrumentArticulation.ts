@@ -51,16 +51,6 @@ export class InstrumentArticulation {
         this.techniqueSymbolPlacement = techniqueSymbolPlacement;
     }
 
-    public static copyTo(src: any, dst: InstrumentArticulation) {
-        dst.outputMidiNumber = src.outputMidiNumber;
-        dst.staffLine = src.staffLine;
-        dst.noteHeadDefault = src.noteHeadDefault;
-        dst.noteHeadHalf = src.noteHeadHalf;
-        dst.noteHeadWhole = src.noteHeadWhole;
-        dst.techniqueSymbol = src.techniqueSymbol;
-        dst.techniqueSymbolPlacement = src.techniqueSymbolPlacement;
-    }
-
     public getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.Whole:

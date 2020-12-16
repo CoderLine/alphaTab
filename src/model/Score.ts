@@ -89,21 +89,6 @@ export class Score {
      */
     public stylesheet: RenderStylesheet = new RenderStylesheet();
 
-    public static copyTo(src: Score, dst: Score): void {
-        dst.album = src.album;
-        dst.artist = src.artist;
-        dst.copyright = src.copyright;
-        dst.instructions = src.instructions;
-        dst.music = src.music;
-        dst.notices = src.notices;
-        dst.subTitle = src.subTitle;
-        dst.title = src.title;
-        dst.words = src.words;
-        dst.tab = src.tab;
-        dst.tempo = src.tempo;
-        dst.tempoLabel = src.tempoLabel;
-    }
-
     public rebuildRepeatGroups(): void {
         let currentGroup: RepeatGroup = new RepeatGroup();
         for (let bar of this.masterBars) {

@@ -32,11 +32,6 @@ export class Voice {
      */
     public isEmpty: boolean = true;
 
-    public static copyTo(src: Voice, dst: Voice): void {
-        dst.index = src.index;
-        dst.isEmpty = src.isEmpty;
-    }
-
     public insertBeat(after: Beat, newBeat: Beat): void {
         newBeat.nextBeat = after.nextBeat;
         if (newBeat.nextBeat) {

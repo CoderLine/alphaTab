@@ -37,6 +37,9 @@
       {
         "transform": "./src.compiler/JsonSerializationBuilder.ts"
       },
+      {
+        "transform": "./src.compiler/CloneBuilder.ts"
+      },
     ]
   },
   "include": [

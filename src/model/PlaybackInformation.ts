@@ -42,15 +42,4 @@ export class PlaybackInformation {
      * Gets or sets whether the track is playing alone.
      */
     public isSolo: boolean = false;
-
-    public static copyTo(src: PlaybackInformation, dst: PlaybackInformation): void {
-        dst.volume = src.volume;
-        dst.balance = src.balance;
-        dst.port = src.port;
-        dst.program = src.program;
-        dst.primaryChannel = src.primaryChannel;
-        dst.secondaryChannel = src.secondaryChannel;
-        dst.isMute = src.isMute;
-        dst.isSolo = src.isSolo;
-    }
 }

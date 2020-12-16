@@ -66,14 +66,6 @@ export class Track {
         this.staves.push(staff);
     }
 
-    public static copyTo(src: Track, dst: Track): void {
-        dst.name = src.name;
-        dst.shortName = src.shortName;
-        dst.index = src.index;
-        dst.color.raw = src.color.raw;
-        dst.color.rgba = src.color.rgba;
-    }
-
     public finish(settings: Settings): void {
         if (!this.shortName) {
             this.shortName = this.name;

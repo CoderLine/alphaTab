@@ -124,22 +124,6 @@ export class MasterBar {
      */
     public isAnacrusis: boolean = false;
 
-    public static copyTo(src: MasterBar, dst: MasterBar): void {
-        dst.isAnacrusis = src.isAnacrusis;
-        dst.alternateEndings = src.alternateEndings;
-        dst.index = src.index;
-        dst.keySignature = src.keySignature;
-        dst.keySignatureType = src.keySignatureType;
-        dst.isDoubleBar = src.isDoubleBar;
-        dst.isRepeatStart = src.isRepeatStart;
-        dst.repeatCount = src.repeatCount;
-        dst.timeSignatureNumerator = src.timeSignatureNumerator;
-        dst.timeSignatureDenominator = src.timeSignatureDenominator;
-        dst.timeSignatureCommon = src.timeSignatureCommon;
-        dst.tripletFeel = src.tripletFeel;
-        dst.start = src.start;
-    }
-
     /**
      * Calculates the time spent in this bar. (unit: midi ticks)
      */

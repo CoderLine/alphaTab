@@ -59,10 +59,6 @@ export class Font {
         this._css = this.toCssString(1);
     }
 
-    public clone(): Font {
-        return new Font(this.family, this.size, this.style);
-    }
-
     public toCssString(scale: number): string {
         if (!this._css || !(Math.abs(scale - this._cssScale) < 0.01)) {
             let buf: string = '';
