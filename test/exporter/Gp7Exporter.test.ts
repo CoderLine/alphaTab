@@ -13,7 +13,7 @@ describe('Gp7ExporterTest', () => {
         try {
             return ScoreLoader.loadScoreFromBytes(data);
         }
-        catch {
+        catch (e) {
             return null;
         }
     };
@@ -66,8 +66,8 @@ describe('Gp7ExporterTest', () => {
                         }
                     } else {
 
-                        const expectedKeys = Object.keys(expected);
-                        const actualKeys = Object.keys(actual);
+                        const expectedKeys = expected.keys();
+                        const actualKeys = actual.keys();
                         expectedKeys.sort();
                         actualKeys.sort();
 

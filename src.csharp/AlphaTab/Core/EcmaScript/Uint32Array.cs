@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Core.EcmaScript
 {
-    public class Int16Array : IEnumerable<short>
+    public class Uint32Array : IEnumerable<uint>
     {
-        private readonly short[] _data;
+        private readonly uint[] _data;
 
-        public Int16Array(double size)
+        public double Length => _data.Length;
+
+        public Uint32Array(double size)
         {
-            _data = new short[(int) size];
+            _data = new uint[(int) size];
         }
 
         public double this[double index]
@@ -19,12 +20,12 @@ namespace AlphaTab.Core.EcmaScript
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _data[(int) index];
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => _data[(int) index] = (short) value;
+            set => _data[(int) index] = (uint) value;
         }
 
-        public IEnumerator<short> GetEnumerator()
+        public IEnumerator<uint> GetEnumerator()
         {
-            return ((IEnumerable<short>)_data).GetEnumerator();
+            return ((IEnumerable<uint>)_data).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

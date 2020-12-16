@@ -184,7 +184,8 @@ export class IOHelper {
             const resArr = new Uint8Array(Len * 3);
 
             for (let point = 0, nextcode = 0, i = 0; i !== Len; ) {
-                (point = str.charCodeAt(i)), (i += 1);
+                point = str.charCodeAt(i);
+                i += 1;
                 if (point >= 0xd800 && point <= 0xdbff) {
                     if (i === Len) {
                         resArr[(resPos += 1)] = 0xef /*0b11101111*/;

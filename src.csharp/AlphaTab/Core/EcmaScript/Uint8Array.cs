@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Core.EcmaScript
 {
-    public class Uint8Array
+    public class Uint8Array : IEnumerable<byte>, IEnumerable<double>
     {
         private ArraySegment<byte> _data;
 
@@ -57,6 +58,21 @@ namespace AlphaTab.Core.EcmaScript
         public static implicit operator Uint8Array(byte[] v)
         {
             return new Uint8Array(v);
+        }
+
+        IEnumerator<double> IEnumerable<double>.GetEnumerator()
+        {
+            return _data.Select(d => (double) d).GetEnumerator();
+        }
+
+        public IEnumerator<byte> GetEnumerator()
+        {
+            return ((IEnumerable<byte>)_data).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

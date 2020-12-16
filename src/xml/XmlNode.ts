@@ -101,10 +101,10 @@ export class XmlNode {
     }
 
 
-    public set innerText(s: string) {
+    public set innerText(value: string) {
         const textNode = new XmlNode();
         textNode.nodeType = XmlNodeType.Text;
-        textNode.value = s;
+        textNode.value = value;
         this.childNodes = [textNode];
     }
 

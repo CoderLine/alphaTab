@@ -2244,9 +2244,9 @@ export class GpifParser {
                             const bar = track.staves[0].bars[barNumber];
                             if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
                                 const beat = bar.voices[0].beats[0];
-                                automations.forEach(a => {
+                                for(const a of automations) {
                                     beat.automations.push(a);
-                                });
+                                }
                             }
                         }
                     });

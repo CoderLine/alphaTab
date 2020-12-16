@@ -64,13 +64,13 @@ export class ZipWriter {
     private static buildCrc32Lookup(): Uint32Array {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
-        lookup.forEach((_, i, self) => {
+        for(let i = 0; i < lookup.length; i++) {
             let crc = i;
             for (let bit = 0; bit < 8; bit++) {
-                crc = crc & 1 ? (crc >>> 1) ^ poly : crc >>> 1;
+                crc = (crc & 1) === 1 ? (crc >>> 1) ^ poly : crc >>> 1;
             }
-            self[i] = crc;
-        });
+            lookup[i] = crc;
+        }
 
         return lookup;
     }
@@ -78,7 +78,7 @@ export class ZipWriter {
     // TypeScript definition, for reference.
     // export default function crc32( data: Buffer | Uint8Array | number[] ) {
     private static crc32(input: Uint8Array) {
-        return ~input.reduce((crc, byte) => ZipWriter.Crc32Lookup[(crc ^ byte) & 0xff] ^ (crc >>> 8), 0xffffffff);
+        return ~input.reduce((crc, b) => ZipWriter.Crc32Lookup[(crc ^ b) & 0xff] ^ (crc >>> 8), 0xffffffff);
     }
 
     public end() {

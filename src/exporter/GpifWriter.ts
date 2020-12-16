@@ -296,7 +296,7 @@ export class GpifWriter {
         }
 
         if (note.isTrill) {
-            noteNode.addElement('Trill').innerText = note.trillValue!.toString();
+            noteNode.addElement('Trill').innerText = note.trillValue.toString();
         }
 
         let accentFlags = 0;
@@ -1308,7 +1308,7 @@ export class GpifWriter {
             instrumentSet.addElement('Type').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetType;
             let currentElementType: string = "";
             let currentElementName: string = "";
-            let currentArticulations!: XmlNode;
+            let currentArticulations: XmlNode = null!;
             let counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
             for (const articulation of track.percussionArticulations) {
@@ -1444,7 +1444,7 @@ export class GpifWriter {
             const alternateEndings: number[] = [];
             let bit = 0;
             while (remainingBits > 0) {
-                if ((remainingBits >> bit) & 0x01) {
+                if (((remainingBits >> bit) & 0x01) == 0x01) {
                     alternateEndings.push(bit + 1);
                     // clear bit
                     remainingBits &= ~(1 << bit);
@@ -1510,7 +1510,7 @@ export class GpifWriter {
         const barNode = parent.addElement('Bar');
         barNode.attributes.set('id', bar.id.toString());
 
-        barNode.addElement('Voices').innerText = bar.voices.map(v => v.isEmpty ? '-1' : v.id).join(' ');
+        barNode.addElement('Voices').innerText = bar.voices.map(v => v.isEmpty ? '-1' : v.id.toString()).join(' ');
         barNode.addElement('Clef').innerText = Clef[bar.clef];
         if (bar.clefOttava !== Ottavia.Regular) {
             barNode.addElement('Ottavia').innerText = Ottavia[bar.clefOttava].substr(1);
