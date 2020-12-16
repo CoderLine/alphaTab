@@ -1,3 +1,4 @@
+import { slice } from 'lodash';
 import * as ts from 'typescript';
 import { getTypeWithNullableInfo } from './BuilderHelpers';
 import { isPrimitiveType } from './BuilderHelpers';
@@ -150,6 +151,17 @@ function generateFillToJsonBodyForClass(
                         )
                     )
                 );
+                const mapValue = isPrimitiveType(mapType.typeArguments[1])
+                    ? factory.createIdentifier('$mv')
+                    : factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            factory.createIdentifier('$mv'),
+                            'toJson'
+                        ),
+                        undefined,
+                        []
+                    );
+
                 statements.push(
                     factory.createExpressionStatement(
                         factory.createCallExpression(factory.createPropertyAccessExpression(accessField(), 'forEach'), undefined, [
@@ -172,7 +184,7 @@ function generateFillToJsonBodyForClass(
                                                 ),
                                                 factory.createIdentifier('$mk')
                                             ),
-                                            factory.createIdentifier('$mv')
+                                            mapValue
                                         )
                                     )
                                 ])
@@ -413,37 +425,108 @@ function generateSetPropertyMethodBodyForClass(
             caseStatements.push(assignField(factory.createIdentifier('value')));
             caseStatements.push(factory.createReturnStatement(factory.createTrue()));
         } else if (isTypedArray(type.type)) {
-            // nullable:
-            // this.fieldName = value ? value.slice() : null
-            // return true;
+            const arrayItemType = unwrapArrayItemType(type.type, typeChecker);
+            if (!arrayItemType || isPrimitiveType(arrayItemType)) {
+                // nullable:
+                // this.fieldName = value ? value.slice() : null
+                // return true;
 
-            // not nullable:
-            // this.fieldName = value.slice()
-            // return true;
-
-            if (type.isNullable) {
-                caseStatements.push(
-                    assignField(
-                        factory.createConditionalExpression(
-                            factory.createIdentifier('value'),
-                            factory.createToken(ts.SyntaxKind.QuestionToken),
-                            factory.createCallExpression(factory.createPropertyAccessExpression(factory.createIdentifier('value'), 'slice'), [], []),
-                            factory.createToken(ts.SyntaxKind.ColonToken),
-                            factory.createNull()
+                // not nullable:
+                // this.fieldName = value.slice()
+                // return true;
+                const sliceCall = factory.createCallExpression(factory.createPropertyAccessExpression(factory.createIdentifier('value'), 'slice'), [], []);
+                if (type.isNullable) {
+                    caseStatements.push(
+                        assignField(
+                            factory.createConditionalExpression(
+                                factory.createIdentifier('value'),
+                                factory.createToken(ts.SyntaxKind.QuestionToken),
+                                sliceCall,
+                                factory.createToken(ts.SyntaxKind.ColonToken),
+                                factory.createNull()
+                            )
                         )
-                    )
-                );
+                    );
+                } else {
+                    caseStatements.push(
+                        assignField(sliceCall)
+                    );
+                }
+                caseStatements.push(factory.createReturnStatement(factory.createTrue()));
             } else {
-                caseStatements.push(
-                    assignField(factory.createCallExpression(factory.createPropertyAccessExpression(factory.createIdentifier('value'), 'slice'), [], []))
-                );
+                const collectionAddMethod = ts.getJSDocTags(prop.property)
+                    .filter(t => t.tagName.text === 'json_add')
+                    .map(t => t.comment ?? "")[0];
+
+                // this.fieldName = [];
+                // for(const $li of value) {
+                //    this.addFieldName(Type.FromJson($li));
+                // }
+                // or
+                // for(const $li of value) {
+                //    this.fieldName.push(Type.FromJson($li));
+                // }
+                const loopItems = [
+                    assignField(factory.createArrayLiteralExpression(undefined)),
+                    factory.createForOfStatement(
+                        undefined,
+                        factory.createVariableDeclarationList(
+                            [factory.createVariableDeclaration('$li')],
+                            ts.NodeFlags.Const
+                        ),
+                        factory.createIdentifier('value'),
+                        factory.createExpressionStatement(
+                            collectionAddMethod
+                                // this.addFieldName(TypeName.FromJson($li))
+                                ? factory.createCallExpression(
+                                    factory.createPropertyAccessExpression(
+                                        factory.createThis(),
+                                        collectionAddMethod
+                                    ),
+                                    undefined,
+                                    [factory.createCallExpression(
+                                        factory.createPropertyAccessExpression(factory.createIdentifier(arrayItemType.symbol.name), 'fromJson'),
+                                        [],
+                                        [factory.createIdentifier('$li')]
+                                    )]
+                                )
+                                // this.fieldName.push(TypeName.FromJson($li))
+                                : factory.createCallExpression(
+                                    factory.createPropertyAccessExpression(
+                                        factory.createPropertyAccessExpression(
+                                            factory.createThis(),
+                                            fieldName
+                                        ),
+                                        'push'
+                                    ),
+                                    undefined,
+                                    [factory.createCallExpression(
+                                        factory.createPropertyAccessExpression(factory.createIdentifier(arrayItemType.symbol.name), 'fromJson'),
+                                        [],
+                                        [factory.createIdentifier('$li')]
+                                    )]
+                                )
+                        )
+                    )];
+
+                if (type.isNullable) {
+                    caseStatements.push(factory.createIfStatement(
+                        factory.createIdentifier('value'),
+                        factory.createBlock(loopItems)
+                    ));
+                } else {
+                    caseStatements.push(...loopItems);
+                }
             }
 
-            caseStatements.push(factory.createReturnStatement(factory.createTrue()));
         } else if (isMap(type.type)) {
             // this.fieldName = new Map();
             // for(let key in value) {
             //   if(value.hasOwnProperty(key) this.fieldName.set(<enummapping>, value[key]);
+            // }
+            // or 
+            // for(let key in value) {
+            //   if(value.hasOwnProperty(key) this.addFieldName(<enummapping>, value[key]);
             // }
             // return true;
 
@@ -466,6 +549,10 @@ function generateSetPropertyMethodBodyForClass(
                 );
             }
 
+            const collectionAddMethod = ts.getJSDocTags(prop.property)
+                .filter(t => t.tagName.text === 'json_add')
+                .map(t => t.comment ?? "")[0];
+
             caseStatements.push(assignField(factory.createNewExpression(factory.createIdentifier('Map'), undefined, [])));
             caseStatements.push(
                 factory.createForInStatement(
@@ -482,10 +569,12 @@ function generateSetPropertyMethodBodyForClass(
                         ),
                         factory.createExpressionStatement(
                             factory.createCallExpression(
-                                factory.createPropertyAccessExpression(
-                                    factory.createPropertyAccessExpression(factory.createThis(), factory.createIdentifier(fieldName)),
-                                    factory.createIdentifier('set')
-                                ),
+                                collectionAddMethod
+                                    ? factory.createPropertyAccessExpression(factory.createThis(), collectionAddMethod)
+                                    : factory.createPropertyAccessExpression(
+                                        factory.createPropertyAccessExpression(factory.createThis(), factory.createIdentifier(fieldName)),
+                                        factory.createIdentifier('set')
+                                    ),
                                 undefined,
                                 [
                                     mapKey,

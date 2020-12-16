@@ -25,6 +25,23 @@ export function getTypeWithNullableInfo(checker: ts.TypeChecker, node: ts.TypeNo
     };
 }
 
+export function unwrapArrayItemType(type: ts.Type, typeChecker: ts.TypeChecker): ts.Type | null {
+    if (type.symbol && type.symbol.name === 'Array') {
+        return (type as ts.TypeReference).typeArguments![0];
+    }
+
+    if (isPrimitiveType(type)) {
+        return null;
+    }
+
+    if (type.isUnion()) {
+        const nonNullable = typeChecker.getNonNullableType(type);
+        return unwrapArrayItemType(nonNullable, typeChecker);
+    }
+
+    return null;
+}
+
 
 export function isPrimitiveType(type: ts.Type) {
     if (hasFlag(type, ts.TypeFlags.Number)) {

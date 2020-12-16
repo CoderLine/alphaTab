@@ -35,8 +35,7 @@ export class JsonConverter {
      * @returns A serialized score object without ciruclar dependencies that can be used for further serializations.
      */
     public static scoreToJsObject(score: Score): unknown {
-        // TODO: new json serializer
-        return score;
+        return Score.toJson(score);
     }
 
     /**
@@ -56,10 +55,9 @@ export class JsonConverter {
      * @returns The converted score object.
      */
     public static jsObjectToScore(jsObject: any, settings?: Settings): Score {
-        let score2: Score = new Score();
-
-        score2.finish(settings ?? new Settings());
-        return score2;
+        let score: Score = Score.fromJson(jsObject);
+        score.finish(settings ?? new Settings());
+        return score;
     }
 
     public static jsObjectToMidiFile(midi: any): MidiFile {

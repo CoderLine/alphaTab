@@ -1,7 +1,6 @@
 import * as ts from 'typescript';
 import { getTypeWithNullableInfo } from './BuilderHelpers';
 import { unwrapArrayItemType } from './BuilderHelpers';
-import { isPrimitiveType } from './BuilderHelpers';
 
 function isClonable(type: ts.Type): boolean {
     if (!type.symbol) {
