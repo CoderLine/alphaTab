@@ -2,6 +2,7 @@
  * A single point of a bending graph. Used to
  * describe WhammyBar and String Bending effects.
  * @cloneable
+ * @json
  */
 export class BendPoint {
     public static readonly MaxPosition: number = 60;

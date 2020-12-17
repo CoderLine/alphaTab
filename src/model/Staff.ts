@@ -3,6 +3,11 @@ import { Chord } from '@src/model/Chord';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
 
+// TODO: TypeScript optimizes away (elides) some types if they are not used in any expression
+// the AST transformer reference is not respected so we add one manually
+Bar;
+Chord;
+
 /**
  * This class describes a single staff within a track. There are instruments like pianos
  * where a single track can contain multiple staffs.
@@ -30,7 +35,7 @@ export class Staff {
      * Gets or sets a list of all chords defined for this staff. {@link Beat.chordId} refers to entries in this lookup.
      * @json_add addChord
      */
-    public chords: Map<string, Chord> = new Map();
+    public chords: Map<string, Chord> = new Map<string, Chord>();
 
     /**
      * Gets or sets the fret on which a capo is set.

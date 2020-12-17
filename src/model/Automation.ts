@@ -23,6 +23,7 @@ export enum AutomationType {
 /**
  * Automations are used to change the behaviour of a song.
  * @cloneable
+ * @json
  */
 export class Automation {
     /**

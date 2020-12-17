@@ -21,11 +21,16 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { PickStroke } from './PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 
+// TODO: TypeScript optimizes away (elides) some types if they are not used in any expression
+// the AST transformer reference is not respected so we add one manually
+BendPoint;
+
 /**
  * A note is a single played sound on a fretted instrument.
  * It consists of a fret offset and a string on which the note is played on.
  * It also can be modified by a lot of different effects.
  * @cloneable
+ * @json
  */
 export class Note {
     public static GlobalNoteId: number = 0;
@@ -468,6 +473,7 @@ export class Note {
     /**
      * Gets or sets the reference to the parent beat to which this note belongs to.
      * @clone_ignore
+     * @json_ignore
      */
     public beat!: Beat;
 

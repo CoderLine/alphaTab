@@ -102,7 +102,12 @@ function generateFillToJsonBodyForClass(
                         );
                     }
                 } else {
-                    // json.jsonName = this.fieldName ? this.fieldName.map($li => $li.toJson()) : null
+                    // avoid the type being elided
+                    factory.createNotEmittedStatement(factory.createExpressionStatement(
+                        factory.createIdentifier(arrayItemType.symbol.name)
+                    ));
+
+                    // json.jsonName = this.fieldName ? this.fieldName.map($li => TypeName.toJson($li)) : null
                     const mapCall = factory.createCallExpression(factory.createPropertyAccessExpression(accessField(), 'map'), undefined, [
                         factory.createArrowFunction(
                             undefined,
@@ -110,11 +115,9 @@ function generateFillToJsonBodyForClass(
                             [factory.createParameterDeclaration(undefined, undefined, undefined, '$li')],
                             undefined, factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                             factory.createCallExpression(
-                                factory.createPropertyAccessExpression(
-                                    factory.createIdentifier('$li'),
-                                    'toJson'
-                                ),
-                                undefined, []
+                                factory.createPropertyAccessExpression(factory.createIdentifier(arrayItemType.symbol.name), 'toJson'),
+                                undefined,
+                                [factory.createIdentifier('$li')]
                             )
                         ),
                     ]);
@@ -151,15 +154,21 @@ function generateFillToJsonBodyForClass(
                         )
                     )
                 );
+
+                // avoid the type being elided
+
+                if (!isPrimitiveType(mapType.typeArguments[1])) {
+                    factory.createNotEmittedStatement(factory.createExpressionStatement(
+                        factory.createIdentifier(mapType.typeArguments[1].symbol.name)
+                    ));
+                }
+
                 const mapValue = isPrimitiveType(mapType.typeArguments[1])
                     ? factory.createIdentifier('$mv')
                     : factory.createCallExpression(
-                        factory.createPropertyAccessExpression(
-                            factory.createIdentifier('$mv'),
-                            'toJson'
-                        ),
+                        factory.createPropertyAccessExpression(factory.createIdentifier(mapType.typeArguments[1].symbol.name), 'toJson'),
                         undefined,
-                        []
+                        [factory.createIdentifier('$mv')]
                     );
 
                 statements.push(
@@ -417,7 +426,23 @@ function generateSetPropertyMethodBodyForClass(
         if (isEnumType(type.type)) {
             // this.fieldName = enummapping
             // return true;
-            caseStatements.push(assignField(createEnumMapping('value', type.type, factory)));
+            if (type.isNullable) {
+                caseStatements.push(assignField(
+                    factory.createConditionalExpression(
+                        factory.createBinaryExpression(
+                            factory.createIdentifier('value'),
+                            ts.SyntaxKind.EqualsEqualsEqualsToken,
+                            factory.createNull()
+                        ),
+                        factory.createToken(ts.SyntaxKind.QuestionToken),
+                        factory.createNull(),
+                        factory.createToken(ts.SyntaxKind.ColonToken),
+                        createEnumMapping('value', type.type, factory)
+                    )
+                ));
+            } else {
+                caseStatements.push(assignField(createEnumMapping('value', type.type, factory)));
+            }
             caseStatements.push(factory.createReturnStatement(factory.createTrue()));
         } else if (isPrimitiveType(type.type)) {
             // this.fieldName = value
@@ -517,6 +542,7 @@ function generateSetPropertyMethodBodyForClass(
                 } else {
                     caseStatements.push(...loopItems);
                 }
+                caseStatements.push(factory.createReturnStatement(factory.createTrue()));
             }
 
         } else if (isMap(type.type)) {
@@ -545,7 +571,7 @@ function generateSetPropertyMethodBodyForClass(
                     // TypeName.fromJson
                     factory.createPropertyAccessExpression(factory.createIdentifier(mapType.typeArguments[1].symbol.name), 'fromJson'),
                     [],
-                    [factory.createIdentifier('value')]
+                    [mapValue]
                 );
             }
 
@@ -734,7 +760,7 @@ function generateSetPropertyMethodBodyForClass(
     return factory.createBlock(statements);
 }
 
-function rewriteClassForJsonSerialization(
+export function rewriteClassForJsonSerialization(
     program: ts.Program,
     classDeclaration: ts.ClassDeclaration,
     sourceFile: ts.SourceFile,
@@ -755,7 +781,10 @@ function rewriteClassForJsonSerialization(
     classDeclaration.members.forEach(member => {
         if (ts.isPropertyDeclaration(member)) {
             const propertyDeclaration = member as ts.PropertyDeclaration;
-            if (!propertyDeclaration.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword || m.kind == ts.SyntaxKind.PrivateKeyword)) {
+            if (!propertyDeclaration.modifiers.find(m => 
+                    m.kind === ts.SyntaxKind.StaticKeyword || 
+                    m.kind === ts.SyntaxKind.PrivateKeyword || 
+                    m.kind === ts.SyntaxKind.ReadonlyKeyword)) {
                 const jsonNames = [member.name.getText(sourceFile)];
 
                 if (ts.getJSDocTags(member).find(t => t.tagName.text === 'json_on_parent')) {
@@ -957,6 +986,8 @@ function rewriteClassForJsonSerialization(
         );
     }
 
+    // let requiredTypes:ts.Identifier = [];
+
     toJsonMethod = updateMethodBody(
         toJsonMethod,
         ['obj'],
@@ -1009,22 +1040,4 @@ function rewriteClassForJsonSerialization(
         classDeclaration.heritageClauses,
         newMembers
     );
-}
-
-export default function (program: ts.Program) {
-    return (ctx: ts.TransformationContext) => {
-        return (sourceFile: ts.SourceFile) => {
-            function visitor(node: ts.Node): ts.Node {
-                if (ts.isClassDeclaration(node)) {
-                    if (ts.getJSDocTags(node).find(t => t.tagName.text === 'json')) {
-                        return rewriteClassForJsonSerialization(program, node, sourceFile, ctx.factory);
-                    }
-                }
-
-                return node;
-            }
-
-            return ts.visitEachChild(sourceFile, visitor, ctx);
-        };
-    };
 }

@@ -18,6 +18,7 @@ export enum FermataType {
 
 /**
  * Represents a fermata.
+ * @json
  */
 export class Fermata {
     /**

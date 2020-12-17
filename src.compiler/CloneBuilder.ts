@@ -227,7 +227,7 @@ function isCloneMember(propertyDeclaration: ts.PropertyDeclaration) {
     return true;
 }
 
-function rewriteClassForCloneable(
+export function rewriteClassForCloneable(
     classDeclaration: ts.ClassDeclaration,
     factory: ts.NodeFactory,
     typeChecker: ts.TypeChecker
@@ -302,22 +302,4 @@ function rewriteClassForCloneable(
         classDeclaration.heritageClauses,
         newMembers
     );
-}
-
-export default function (program: ts.Program) {
-    return (ctx: ts.TransformationContext) => {
-        return (sourceFile: ts.SourceFile) => {
-            function visitor(node: ts.Node): ts.Node {
-                if (ts.isClassDeclaration(node)) {
-                    if (ts.getJSDocTags(node).find(t => t.tagName.text === 'cloneable')) {
-                        return rewriteClassForCloneable(node, ctx.factory, program.getTypeChecker());
-                    }
-                }
-
-                return node;
-            }
-
-            return ts.visitEachChild(sourceFile, visitor, ctx);
-        };
-    };
 }

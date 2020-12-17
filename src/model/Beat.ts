@@ -22,6 +22,13 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
+// TODO: TypeScript optimizes away (elides) some types if they are not used in any expression
+// the AST transformer reference is not respected so we add one manually
+Note;
+Automation;
+BendPoint;
+Fermata;
+
 /**
  * Lists the different modes on how beaming for a beat should be done. 
  */
@@ -88,7 +95,7 @@ export class Beat {
     /**
      * Gets or sets the list of notes contained in this beat.
      * @json_add addNote
-     * @clone_add addCloneNote
+     * @clone_add addNote
      */
     public notes: Note[] = [];
 
@@ -448,25 +455,12 @@ export class Beat {
     }
 
     public addNote(note: Note): void {
-        this.addNoteInternal(note, -1);
-    }
-
-    // @ts-ignore
-    private addCloneNote(clone:Note, original:Note) {
-        this.addNoteInternal(clone, original.realValue);
-    }
-
-    private addNoteInternal(note: Note, realValue: number = -1): void {
         note.beat = this;
         note.index = this.notes.length;
         this.notes.push(note);
         if (note.isStringed) {
             this.noteStringLookup.set(note.string, note);
         }
-        if (realValue === -1) {
-            realValue = note.realValue;
-        }
-        this.noteValueLookup.set(realValue, note);
     }
 
     public removeNote(note: Note): void {
@@ -797,8 +791,9 @@ export class Beat {
         return new Beat();
     }
 
-    public chain() {
+    public chain() {    
         for(const n of this.notes) {
+            this.noteValueLookup.set(n.realValue, n);
             n.chain();
         }
     }

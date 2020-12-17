@@ -5,6 +5,12 @@ import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
 import { Note } from './Note';
 
+// TODO: TypeScript optimizes away (elides) some types if they are not used in any expression
+// the AST transformer reference is not respected so we add one manually
+MasterBar;
+RenderStylesheet;
+Track;
+
 /**
  * The score is the root node of the complete
  * model. It stores the basic information of
