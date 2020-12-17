@@ -26,21 +26,16 @@
     "baseUrl": ".",
     "paths": {
       "@src/*": [
-        "src/*"
+        "src/*",
       ]
     },
     "typeRoots": [
       "types",
       "node_modules/@types"
-    ],
-    "plugins": [
-      {
-        "transform": "./src.compiler/AlphaTabTransformations.ts"
-      }
     ]
   },
   "include": [
-    "src"
+    "src",
   ],
   "exclude": [
     "**/node_modules",

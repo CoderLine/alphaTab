@@ -7,9 +7,7 @@ export default function emit(program: ts.Program): ts.Diagnostic[] {
     const diagnostics: ts.Diagnostic[] = [];
 
     const context = new CSharpEmitterContext(program);
-
-    program.getRootFileNames().forEach(file => {
-        const sourceFile = program.getSourceFile(file)!;
+    sourceFiles.forEach(sourceFile => {
         const transformer = new CSharpAstTransformer(sourceFile, context);
         transformer.transform();
     });

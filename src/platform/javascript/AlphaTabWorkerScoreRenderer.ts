@@ -8,6 +8,7 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
+import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
  * @target web
@@ -59,7 +60,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     private serializeSettingsForWorker(settings: Settings): unknown {
-        let json: any = Settings.toJson(settings);
+        let json: any = SettingsSerializer.toJson(settings);
         // cut out player settings, they are only needed on UI thread side
         json.player = null;
         return json;

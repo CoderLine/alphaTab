@@ -21,6 +21,7 @@ import { NotationMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { BeatCloner } from '@src/generated/model/BeatCloner';
 
 // TODO: TypeScript optimizes away (elides) some types if they are not used in any expression
 // the AST transformer reference is not respected so we add one manually
@@ -128,6 +129,8 @@ export class Beat {
 
     /**
      * Gets or sets the fermata applied to this beat.
+     * @clone_ignore
+     * @json_ignore
      */
     public fermata: Fermata | null = null;
 
@@ -707,7 +710,7 @@ export class Beat {
         if (needCopyBeatForBend) {
             // if this beat is a simple bend convert it to a grace beat
             // and generate a placeholder beat with tied notes
-            let cloneBeat: Beat = this.clone();
+            let cloneBeat: Beat = BeatCloner.clone(this);
             cloneBeat.id = Beat._globalBeatId++;
             cloneBeat.pickStroke = PickStroke.None;
             for (let i: number = 0, j: number = cloneBeat.notes.length; i < j; i++) {
@@ -784,11 +787,6 @@ export class Beat {
             return this.noteValueLookup.get(noteRealValue)!;
         }
         return null;
-    }
-
-    public clone(): Beat {
-        // dynamically implemented via AST transformer
-        return new Beat();
     }
 
     public chain() {    

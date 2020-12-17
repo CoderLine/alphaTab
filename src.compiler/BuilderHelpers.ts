@@ -1,6 +1,17 @@
+import { indexOf } from 'lodash';
 import * as ts from 'typescript';
 
-export function getTypeWithNullableInfo(checker: ts.TypeChecker, node: ts.TypeNode) {
+export function addNewLines(stmts: ts.Statement[]) {
+    return stmts.map(stmt => ts.addSyntheticTrailingComment(stmt, ts.SyntaxKind.SingleLineCommentTrivia, '', true));
+}
+export function getTypeWithNullableInfo(checker: ts.TypeChecker, node: ts.TypeNode | undefined) {
+    if(!node) {
+        return {
+            isNullable: false,
+            type: {} as ts.Type
+        };
+    }
+
     let isNullable = false;
     let type: ts.Type | null = null;
     if (ts.isUnionTypeNode(node)) {
@@ -21,7 +32,7 @@ export function getTypeWithNullableInfo(checker: ts.TypeChecker, node: ts.TypeNo
 
     return {
         isNullable,
-        type
+        type: type as ts.Type
     };
 }
 
@@ -43,7 +54,11 @@ export function unwrapArrayItemType(type: ts.Type, typeChecker: ts.TypeChecker):
 }
 
 
-export function isPrimitiveType(type: ts.Type) {
+export function isPrimitiveType(type: ts.Type | null) {
+    if (!type) {
+        return false;
+    }
+
     if (hasFlag(type, ts.TypeFlags.Number)) {
         return true;
     }
@@ -61,6 +76,18 @@ export function isPrimitiveType(type: ts.Type) {
     }
 
     return isEnumType(type);
+}
+
+export function isNumberType(type: ts.Type | null) {
+    if (!type) {
+        return false;
+    }
+
+    if (hasFlag(type, ts.TypeFlags.Number)) {
+        return true;
+    }
+    
+    return false;
 }
 
 export function isEnumType(type: ts.Type) {
@@ -81,13 +108,13 @@ export function wrapToNonNull(isNullableType: boolean, expr: ts.Expression, fact
 }
 
 export function isTypedArray(type: ts.Type) {
-    return type.symbol.members.has(ts.escapeLeadingUnderscores('slice'));
+    return !!type.symbol.members?.has(ts.escapeLeadingUnderscores('slice'));
 }
 
 export function hasFlag(type: ts.Type, flag: ts.TypeFlags): boolean {
     return (type.flags & flag) === flag;
 }
 
-export function isMap(type: ts.Type): boolean {
-    return type.symbol.name === 'Map';
+export function isMap(type: ts.Type | null): boolean {
+    return !!(type && type.symbol?.name === 'Map');
 }

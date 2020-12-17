@@ -5,7 +5,7 @@
     "declarationDir": "dist/types.test",
     "paths": {
       "@src*": [
-        "src*"
+        "src*",
       ],
       "@test*": [
         "test*"

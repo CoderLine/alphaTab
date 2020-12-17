@@ -63,6 +63,7 @@ export class Note {
     /**
      * Gets or sets the note from which this note continues the bend.
      * @clone_ignore
+     * @json_ignore
      */
     public bendOrigin: Note | null = null;
 
@@ -80,6 +81,7 @@ export class Note {
     /**
      * Gets or sets the bend point with the highest bend value.
      * @clone_ignore
+     * @json_ignore
      */
     public maxBendPoint: BendPoint | null = null;
 
@@ -342,6 +344,7 @@ export class Note {
     /**
      * Gets or sets the destination note for the let-ring effect.
      * @clone_ignore
+     * @json_ignore
      */
     public letRingDestination: Note | null = null;
 
@@ -353,6 +356,7 @@ export class Note {
     /**
      * Gets or sets the destination note for the palm-mute effect.
      * @clone_ignore
+     * @json_ignore
      */
     public palmMuteDestination: Note | null = null;
 
@@ -379,12 +383,14 @@ export class Note {
     /**
      * Gets or sets the target note for several slide types.
      * @clone_ignore
+     * @json_ignore
      */
     public slideTarget: Note | null = null;
 
     /**
      * Gets or sets the source note for several slide types.
      * @clone_ignore
+     * @json_ignore
      */
     public slideOrigin: Note | null = null;
 
@@ -492,11 +498,13 @@ export class Note {
 
     /**
      * @clone_ignore
+     * @json_ignore
      */
     public effectSlurOrigin: Note | null = null;
 
     /**
      * @clone_ignore
+     * @json_ignore
      */
     public effectSlurDestination: Note | null = null;
 
@@ -970,10 +978,5 @@ export class Note {
                 this.bendOrigin = this.tieOrigin;
             }
         }
-    }
-
-    public clone(): Note {
-        // dynamically implemented via AST transformer
-        return new Note();
     }
 }

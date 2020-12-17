@@ -23,6 +23,7 @@ import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWorkerScoreRenderer';
 import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 import { Cursors } from '@src/platform/Cursors';
+import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
  * @target web
@@ -122,7 +123,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             settings = raw;
         } else {
             settings = new Settings();
-            settings.fillFromJson(raw);
+            SettingsSerializer.fillFromJson(settings, raw);
         }
         
         let dataAttributes: Map<string, unknown> = this.getDataAttributes();

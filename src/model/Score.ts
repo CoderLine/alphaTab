@@ -152,20 +152,4 @@ export class Score {
             ? this._noteByIdLookup.get(noteId)!
             : null;
     }
-
-    /**
-     * @target web
-     */
-    public static fromJson(json: any): Score {
-        // dynamically implemented via AST transformer
-        return new Score();
-    }
-
-    /**
-     * @target web
-     */
-    public static toJson(score: Score): unknown {
-        // dynamically implemented via AST transformer
-        return null;
-    }
 }

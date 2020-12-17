@@ -27,6 +27,30 @@
                 "TS_NODE_PROJECT": "tsconfig.build-csharp.json"
             }
         },
+
+        {
+            "name": "Launch TypeScript Generator",
+            "type": "node",
+            "request": "launch",
+            "args": [
+                "src.compiler/typescript/AlphaTabGenerator.ts",
+                "--project",
+                "tsconfig.build-csharp.json"
+            ],
+            "runtimeArgs": [
+                "--nolazy",
+                "-r",
+                "ts-node/register"
+            ],
+            "cwd": "${workspaceRoot}",
+            "protocol": "inspector",
+            "smartStep": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "env": {
+                "TS_NODE_PROJECT": "tsconfig.build-csharp.json"
+            }
+        },
+        
         {
             "name": "Launch JavaScript Compiler",
             "type": "node",

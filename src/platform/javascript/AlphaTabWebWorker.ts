@@ -6,6 +6,7 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
+import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
  * @target web
@@ -29,7 +30,7 @@ export class AlphaTabWebWorker {
         switch (cmd) {
             case 'alphaTab.initialize':
                 let settings: Settings = new Settings();
-                settings.fillFromJson(data.settings);
+                SettingsSerializer.fillFromJson(settings, data.settings);
                 Logger.logLevel = settings.core.logLevel;
                 this._renderer = new ScoreRenderer(settings);
                 this._renderer.partialRenderFinished.on(result => {
@@ -90,7 +91,7 @@ export class AlphaTabWebWorker {
     }
 
     private updateSettings(json: unknown): void {
-        this._renderer.settings.fillFromJson(json);
+        SettingsSerializer.fillFromJson(this._renderer.settings, json);
     }
 
     private renderMultiple(score: Score, trackIndexes: number[]): void {

@@ -1145,7 +1145,12 @@ export default class CSharpAstTransformer {
         classElement: ts.MethodDeclaration
     ) {
         const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
-        const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
+        if (!signature) {
+            console.log('no signature');
+        }
+        const returnType: ts.Type | undefined = signature
+            ? this._context.typeChecker.getReturnTypeOfSignature(signature)
+            : undefined;
 
         const csMethod: cs.MethodDeclaration = {
             parent: parent,
@@ -1350,7 +1355,7 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.VariableDeclaration,
             parent: parent,
             tsNode: s,
-            name: s.name.getText(),
+            name: (s.name as ts.Identifier).text,
             type: {} as cs.TypeNode
         } as cs.VariableDeclaration;
 
@@ -1798,7 +1803,7 @@ export default class CSharpAstTransformer {
 
         const csParameter: cs.ParameterDeclaration = {
             nodeType: cs.SyntaxKind.ParameterDeclaration,
-            name: p.name.getText(),
+            name: (p.name as ts.Identifier).text,
             parent: csMethod,
             type: this.createUnresolvedTypeNode(null, p.type ?? p, type),
             tsNode: p,

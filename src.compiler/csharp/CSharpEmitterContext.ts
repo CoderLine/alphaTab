@@ -809,7 +809,11 @@ export default class CSharpEmitterContext {
     }
 
     public isBooleanSmartCast(tsNode: ts.Node) {
-        let tsParent = tsNode.parent!;
+        let tsParent = tsNode.parent;
+        if(!tsParent) {
+            return false;
+        }
+
         while (tsParent.kind === ts.SyntaxKind.ParenthesizedExpression) {
             tsNode = tsParent;
             tsParent = tsParent.parent!;

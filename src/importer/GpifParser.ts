@@ -43,6 +43,8 @@ import { PercussionMapper } from '@src/model/PercussionMapper';
 import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { TextBaseline } from '@src/platform/ICanvas';
+import { BeatCloner } from '@src/generated/model/BeatCloner';
+import { NoteCloner } from '@src/generated/model/NoteCloner';
 
 /**
  * This structure represents a duration within a gpif
@@ -2066,7 +2068,7 @@ export class GpifParser {
                                         if (beatId !== GpifParser.InvalidId) {
                                             // important! we clone the beat because beats get reused
                                             // in gp6, our model needs to have unique beats.
-                                            let beat: Beat = this._beatById.get(beatId)!.clone();
+                                            let beat: Beat = BeatCloner.clone(this._beatById.get(beatId)!);
                                             voice.addBeat(beat);
                                             let rhythmId: string = this._rhythmOfBeat.get(beatId)!;
                                             let rhythm: GpifRhythm = this._rhythmById.get(rhythmId)!;
@@ -2079,7 +2081,7 @@ export class GpifParser {
                                             if (this._notesOfBeat.has(beatId)) {
                                                 for (let noteId of this._notesOfBeat.get(beatId)!) {
                                                     if (noteId !== GpifParser.InvalidId) {
-                                                        const note = this._noteById.get(noteId)!.clone();
+                                                        const note = NoteCloner.clone(this._noteById.get(noteId)!);
                                                         // reset midi value for non-percussion staves
                                                         if (staff.isPercussion) {
                                                             note.fret = -1;
