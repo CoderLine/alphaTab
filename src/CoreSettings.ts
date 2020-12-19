@@ -33,6 +33,7 @@ export class CoreSettings {
     /**
      * Gets or sets the initial tracks that should be loaded for the score. 
      * @target web
+     * @json_ignore
      */
     public tracks: unknown = null;
 

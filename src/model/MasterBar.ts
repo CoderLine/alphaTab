@@ -9,10 +9,6 @@ import { Score } from '@src/model/Score';
 import { Section } from '@src/model/Section';
 import { TripletFeel } from '@src/model/TripletFeel';
 
-// TODO: TypeScript optimizes away (elides) some types if they are not used in any expression
-// the AST transformer reference is not respected so we add one manually
-Fermata;
-
 /**
  * The MasterBar stores information about a bar which affects
  * all tracks.

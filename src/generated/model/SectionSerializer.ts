@@ -4,38 +4,37 @@
 // the code is regenerated.
 // </auto-generated>
 import { Section } from "@src/model/Section";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 export class SectionSerializer {
-    public static fromJson(json: any): Section {
-        const obj = new Section(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: Section, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: Section, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: Section | null): any {
+    public static toJson(obj: Section | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("marker"); 
+        writer.writeString(obj.marker); 
+        writer.writePropertyName("text"); 
+        writer.writeString(obj.text); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: Section, json: any): void {
-        json.marker = obj.marker; 
-        json.text = obj.text; 
-    }
-    public static setProperty(obj: Section, property: string, value: any): boolean {
+    public static setProperty(obj: Section, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "marker":
-                obj.marker = value;
+                obj.marker = (reader.readString()!);
                 return true;
             case "text":
-                obj.text = value;
+                obj.text = (reader.readString()!);
                 return true;
         } 
         return false; 

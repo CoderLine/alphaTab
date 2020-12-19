@@ -23,13 +23,6 @@ import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 
-// TODO: TypeScript optimizes away (elides) some types if they are not used in any expression
-// the AST transformer reference is not respected so we add one manually
-Note;
-Automation;
-BendPoint;
-Fermata;
-
 /**
  * Lists the different modes on how beaming for a beat should be done. 
  */

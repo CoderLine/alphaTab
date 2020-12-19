@@ -4,38 +4,37 @@
 // the code is regenerated.
 // </auto-generated>
 import { ImporterSettings } from "@src/ImporterSettings";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 export class ImporterSettingsSerializer {
-    public static fromJson(json: any): ImporterSettings {
-        const obj = new ImporterSettings(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: ImporterSettings, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: ImporterSettings, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: ImporterSettings | null): any {
+    public static toJson(obj: ImporterSettings | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("encoding"); 
+        writer.writeString(obj.encoding); 
+        writer.writePropertyName("mergePartGroupsInMusicXml"); 
+        writer.writeBoolean(obj.mergePartGroupsInMusicXml); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: ImporterSettings, json: any): void {
-        json.encoding = obj.encoding; 
-        json.mergePartGroupsInMusicXml = obj.mergePartGroupsInMusicXml; 
-    }
-    public static setProperty(obj: ImporterSettings, property: string, value: any): boolean {
+    public static setProperty(obj: ImporterSettings, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "encoding":
-                obj.encoding = value;
+                obj.encoding = (reader.readString()!);
                 return true;
             case "mergepartgroupsinmusicxml":
-                obj.mergePartGroupsInMusicXml = value;
+                obj.mergePartGroupsInMusicXml = (reader.readBoolean()!);
                 return true;
         } 
         return false; 

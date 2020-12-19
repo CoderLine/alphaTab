@@ -4,95 +4,91 @@
 // the code is regenerated.
 // </auto-generated>
 import { DisplaySettings } from "@src/DisplaySettings";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesSerializer";
 import { LayoutMode } from "@src/DisplaySettings";
 import { StaveProfile } from "@src/DisplaySettings";
-import { RenderingResources } from "@src/RenderingResources";
 export class DisplaySettingsSerializer {
-    public static fromJson(json: any): DisplaySettings {
-        const obj = new DisplaySettings(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: DisplaySettings, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: DisplaySettings, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: DisplaySettings | null): any {
+    public static toJson(obj: DisplaySettings | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("scale"); 
+        writer.writeNumber(obj.scale); 
+        writer.writePropertyName("stretchForce"); 
+        writer.writeNumber(obj.stretchForce); 
+        writer.writePropertyName("layoutMode"); 
+        writer.writeEnum(obj.layoutMode); 
+        writer.writePropertyName("staveProfile"); 
+        writer.writeEnum(obj.staveProfile); 
+        writer.writePropertyName("barsPerRow"); 
+        writer.writeNumber(obj.barsPerRow); 
+        writer.writePropertyName("startBar"); 
+        writer.writeNumber(obj.startBar); 
+        writer.writePropertyName("barCount"); 
+        writer.writeNumber(obj.barCount); 
+        writer.writePropertyName("barCountPerPartial"); 
+        writer.writeNumber(obj.barCountPerPartial); 
+        writer.writePropertyName("resources"); 
+        RenderingResourcesSerializer.toJson(obj.resources, writer); 
+        writer.writePropertyName("padding"); 
+        writer.writeFloat32Array(obj.padding); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: DisplaySettings, json: any): void {
-        json.scale = obj.scale; 
-        json.stretchForce = obj.stretchForce; 
-        json.layoutMode = obj.layoutMode; 
-        json.staveProfile = obj.staveProfile; 
-        json.barsPerRow = obj.barsPerRow; 
-        json.startBar = obj.startBar; 
-        json.barCount = obj.barCount; 
-        json.barCountPerPartial = obj.barCountPerPartial; 
-        if (json.resources) {
-            RenderingResourcesSerializer.fillToJson(obj.resources, json.resources);
-        }
-        else {
-            json.resources = (RenderingResourcesSerializer.toJson(obj.resources)!);
-        } 
-        json.padding = obj.padding ? obj.padding.slice() : null; 
-    }
-    public static setProperty(obj: DisplaySettings, property: string, value: any): boolean {
+    public static setProperty(obj: DisplaySettings, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "scale":
-                obj.scale = value;
+                obj.scale = (reader.readNumber()!);
                 return true;
             case "stretchforce":
-                obj.stretchForce = value;
+                obj.stretchForce = (reader.readNumber()!);
                 return true;
             case "layoutmode":
-                obj.layoutMode = isNaN(parseInt(value)) ? LayoutMode[Object.keys(LayoutMode).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof LayoutMode] : parseInt(value);
+                obj.layoutMode = (reader.readEnum<LayoutMode>(LayoutMode)!);
                 return true;
             case "staveprofile":
-                obj.staveProfile = isNaN(parseInt(value)) ? StaveProfile[Object.keys(StaveProfile).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof StaveProfile] : parseInt(value);
+                obj.staveProfile = (reader.readEnum<StaveProfile>(StaveProfile)!);
                 return true;
             case "barsperrow":
-                obj.barsPerRow = value;
+                obj.barsPerRow = (reader.readNumber()!);
                 return true;
             case "startbar":
-                obj.startBar = value;
+                obj.startBar = (reader.readNumber()!);
                 return true;
             case "barcount":
-                obj.barCount = value;
+                obj.barCount = (reader.readNumber()!);
                 return true;
             case "barcountperpartial":
-                obj.barCountPerPartial = value;
+                obj.barCountPerPartial = (reader.readNumber()!);
                 return true;
             case "padding":
-                obj.padding = value ? value.slice() : null;
+                obj.padding = reader.readFloat32Array();
                 return true;
         } 
         if (["resources"].indexOf(property) >= 0) {
-            if (obj.resources)
-                RenderingResourcesSerializer.fillFromJson(obj.resources, value);
-            else
-                obj.resources = RenderingResourcesSerializer.fromJson(value);
+            RenderingResourcesSerializer.fromJson(obj.resources, reader);
             return true;
         }
         else {
-            for (const $c of ["resources"])
-                if (property.indexOf($c) === 0) {
-                    if (!obj.resources) {
-                        obj.resources = new RenderingResources();
-                    }
-                    if (RenderingResourcesSerializer.setProperty(obj.resources, property.substring($c.length), value)) {
+            for (const c of ["resources"]) {
+                if (property.indexOf(c) === 0) {
+                    if (RenderingResourcesSerializer.setProperty(obj.resources, property.substring(c.length), reader)) {
                         return true;
                     }
                 }
+            }
         } 
         return false; 
     }

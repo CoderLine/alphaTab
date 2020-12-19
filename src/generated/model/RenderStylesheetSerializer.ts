@@ -4,34 +4,32 @@
 // the code is regenerated.
 // </auto-generated>
 import { RenderStylesheet } from "@src/model/RenderStylesheet";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 export class RenderStylesheetSerializer {
-    public static fromJson(json: any): RenderStylesheet {
-        const obj = new RenderStylesheet(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: RenderStylesheet, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: RenderStylesheet, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: RenderStylesheet | null): any {
+    public static toJson(obj: RenderStylesheet | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("hideDynamics"); 
+        writer.writeBoolean(obj.hideDynamics); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: RenderStylesheet, json: any): void {
-        json.hideDynamics = obj.hideDynamics; 
-    }
-    public static setProperty(obj: RenderStylesheet, property: string, value: any): boolean {
+    public static setProperty(obj: RenderStylesheet, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "hidedynamics":
-                obj.hideDynamics = value;
+                obj.hideDynamics = (reader.readBoolean()!);
                 return true;
         } 
         return false; 

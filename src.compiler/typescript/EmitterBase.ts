@@ -93,7 +93,7 @@ export default function createEmitter(jsDocMarker: string, generate: (program: t
         });
     }
 
-    return function emit(program: ts.Program) {
+    return function emit(program: ts.Program, _diagnostics: ts.Diagnostic[]) {
         program.getRootFileNames().forEach(file => {
             scanSourceFile(program, program.getSourceFile(file)!);
         });

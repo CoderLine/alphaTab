@@ -4,30 +4,108 @@
 // the code is regenerated.
 // </auto-generated>
 import { Settings } from "@src/Settings";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
+import { CoreSettingsSerializer } from "@src/generated/CoreSettingsSerializer";
+import { DisplaySettingsSerializer } from "@src/generated/DisplaySettingsSerializer";
+import { NotationSettingsSerializer } from "@src/generated/NotationSettingsSerializer";
+import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSerializer";
+import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
 export class SettingsSerializer {
-    public static fromJson(json: any): Settings {
-        const obj = new Settings(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
+    public static fromJson(obj: Settings, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        } 
     }
-    public static fillFromJson(obj: Settings, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
+    public static toJson(obj: Settings | null, writer: IJsonWriter): void {
+        if (!obj) {
+            writer.writeNull();
+            return;
+        } 
+        writer.writeStartObject(); 
+        writer.writePropertyName("core"); 
+        CoreSettingsSerializer.toJson(obj.core, writer); 
+        writer.writePropertyName("display"); 
+        DisplaySettingsSerializer.toJson(obj.display, writer); 
+        writer.writePropertyName("notation"); 
+        NotationSettingsSerializer.toJson(obj.notation, writer); 
+        writer.writePropertyName("importer"); 
+        ImporterSettingsSerializer.toJson(obj.importer, writer); 
+        writer.writePropertyName("player"); 
+        PlayerSettingsSerializer.toJson(obj.player, writer); 
+        writer.writeEndObject(); 
+    }
+    public static setProperty(obj: Settings, property: string, reader: IJsonReader): boolean {
+        switch (property) {
+        } 
+        if (["core", ""].indexOf(property) >= 0) {
+            CoreSettingsSerializer.fromJson(obj.core, reader);
+            return true;
+        }
+        else {
+            for (const c of ["core", ""]) {
+                if (property.indexOf(c) === 0) {
+                    if (CoreSettingsSerializer.setProperty(obj.core, property.substring(c.length), reader)) {
+                        return true;
+                    }
+                }
             }
         } 
-    }
-    public static toJson(obj: Settings | null): any {
-        if (!obj) {
-            return null;
+        if (["display", ""].indexOf(property) >= 0) {
+            DisplaySettingsSerializer.fromJson(obj.display, reader);
+            return true;
+        }
+        else {
+            for (const c of ["display", ""]) {
+                if (property.indexOf(c) === 0) {
+                    if (DisplaySettingsSerializer.setProperty(obj.display, property.substring(c.length), reader)) {
+                        return true;
+                    }
+                }
+            }
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
-    }
-    public static fillToJson(obj: Settings, json: any): void { }
-    public static setProperty(obj: Settings, property: string, value: any): boolean {
-        switch (property) {
+        if (["notation"].indexOf(property) >= 0) {
+            NotationSettingsSerializer.fromJson(obj.notation, reader);
+            return true;
+        }
+        else {
+            for (const c of ["notation"]) {
+                if (property.indexOf(c) === 0) {
+                    if (NotationSettingsSerializer.setProperty(obj.notation, property.substring(c.length), reader)) {
+                        return true;
+                    }
+                }
+            }
+        } 
+        if (["importer"].indexOf(property) >= 0) {
+            ImporterSettingsSerializer.fromJson(obj.importer, reader);
+            return true;
+        }
+        else {
+            for (const c of ["importer"]) {
+                if (property.indexOf(c) === 0) {
+                    if (ImporterSettingsSerializer.setProperty(obj.importer, property.substring(c.length), reader)) {
+                        return true;
+                    }
+                }
+            }
+        } 
+        if (["player"].indexOf(property) >= 0) {
+            PlayerSettingsSerializer.fromJson(obj.player, reader);
+            return true;
+        }
+        else {
+            for (const c of ["player"]) {
+                if (property.indexOf(c) === 0) {
+                    if (PlayerSettingsSerializer.setProperty(obj.player, property.substring(c.length), reader)) {
+                        return true;
+                    }
+                }
+            }
         } 
         return false; 
     }

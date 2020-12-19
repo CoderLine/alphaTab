@@ -4,45 +4,49 @@
 // the code is regenerated.
 // </auto-generated>
 import { Voice } from "@src/model/Voice";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
 export class VoiceSerializer {
-    public static fromJson(json: any): Voice {
-        const obj = new Voice(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: Voice, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: Voice, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: Voice | null): any {
+    public static toJson(obj: Voice | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("index"); 
+        writer.writeNumber(obj.index); 
+        writer.writePropertyName("beats"); 
+        writer.writeStartArray(); 
+        for (const i of obj.beats) {
+            BeatSerializer.toJson(i, writer);
+        } 
+        writer.writeEndArray(); 
+        writer.writePropertyName("isEmpty"); 
+        writer.writeBoolean(obj.isEmpty); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: Voice, json: any): void {
-        json.index = obj.index; 
-        json.beats = obj.beats.map($li => BeatSerializer.toJson($li)); 
-        json.isEmpty = obj.isEmpty; 
-    }
-    public static setProperty(obj: Voice, property: string, value: any): boolean {
+    public static setProperty(obj: Voice, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "index":
-                obj.index = value;
+                obj.index = (reader.readNumber()!);
                 return true;
             case "beats":
                 obj.beats = [];
-                for (const $li of value)
-                    obj.addBeat(BeatSerializer.fromJson($li));
+                for (const __li of value)
+                    obj.addBeat(BeatSerializer.fromJson(i, j));
                 return true;
             case "isempty":
-                obj.isEmpty = value;
+                obj.isEmpty = (reader.readBoolean()!);
                 return true;
         } 
         return false; 

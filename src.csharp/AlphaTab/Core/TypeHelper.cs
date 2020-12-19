@@ -185,7 +185,7 @@ namespace AlphaTab.Core
         {
             return s[(int) index];
         }
-		
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string CharAt(this string s, double index)
         {
@@ -251,6 +251,12 @@ namespace AlphaTab.Core
         public static bool IsTruthy(double s)
         {
             return !double.IsNaN(s) && s != 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<TResult> Map<TSource, TResult>(this IList<TSource> source, Func<TSource, TResult> func)
+        {
+            return source.Select(func).ToList();
         }
     }
 }

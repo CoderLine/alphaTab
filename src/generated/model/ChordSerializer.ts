@@ -4,58 +4,62 @@
 // the code is regenerated.
 // </auto-generated>
 import { Chord } from "@src/model/Chord";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 export class ChordSerializer {
-    public static fromJson(json: any): Chord {
-        const obj = new Chord(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: Chord, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: Chord, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: Chord | null): any {
+    public static toJson(obj: Chord | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("name"); 
+        writer.writeString(obj.name); 
+        writer.writePropertyName("firstFret"); 
+        writer.writeNumber(obj.firstFret); 
+        writer.writePropertyName("strings"); 
+        writer.writeNumberArray(obj.strings); 
+        writer.writePropertyName("barreFrets"); 
+        writer.writeNumberArray(obj.barreFrets); 
+        writer.writePropertyName("showName"); 
+        writer.writeBoolean(obj.showName); 
+        writer.writePropertyName("showDiagram"); 
+        writer.writeBoolean(obj.showDiagram); 
+        writer.writePropertyName("showFingering"); 
+        writer.writeBoolean(obj.showFingering); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: Chord, json: any): void {
-        json.name = obj.name; 
-        json.firstFret = obj.firstFret; 
-        json.strings = obj.strings.slice(); 
-        json.barreFrets = obj.barreFrets.slice(); 
-        json.showName = obj.showName; 
-        json.showDiagram = obj.showDiagram; 
-        json.showFingering = obj.showFingering; 
-    }
-    public static setProperty(obj: Chord, property: string, value: any): boolean {
+    public static setProperty(obj: Chord, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "name":
-                obj.name = value;
+                obj.name = (reader.readString()!);
                 return true;
             case "firstfret":
-                obj.firstFret = value;
+                obj.firstFret = (reader.readNumber()!);
                 return true;
             case "strings":
-                obj.strings = value.slice();
+                obj.strings = (reader.readNumberArray()!);
                 return true;
             case "barrefrets":
-                obj.barreFrets = value.slice();
+                obj.barreFrets = (reader.readNumberArray()!);
                 return true;
             case "showname":
-                obj.showName = value;
+                obj.showName = (reader.readBoolean()!);
                 return true;
             case "showdiagram":
-                obj.showDiagram = value;
+                obj.showDiagram = (reader.readBoolean()!);
                 return true;
             case "showfingering":
-                obj.showFingering = value;
+                obj.showFingering = (reader.readBoolean()!);
                 return true;
         } 
         return false; 

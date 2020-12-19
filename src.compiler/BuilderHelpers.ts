@@ -108,7 +108,7 @@ export function wrapToNonNull(isNullableType: boolean, expr: ts.Expression, fact
 }
 
 export function isTypedArray(type: ts.Type) {
-    return !!type.symbol.members?.has(ts.escapeLeadingUnderscores('slice'));
+    return !!type.symbol?.members?.has(ts.escapeLeadingUnderscores('slice'));
 }
 
 export function hasFlag(type: ts.Type, flag: ts.TypeFlags): boolean {

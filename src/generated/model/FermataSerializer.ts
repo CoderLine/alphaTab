@@ -4,39 +4,38 @@
 // the code is regenerated.
 // </auto-generated>
 import { Fermata } from "@src/model/Fermata";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { FermataType } from "@src/model/Fermata";
 export class FermataSerializer {
-    public static fromJson(json: any): Fermata {
-        const obj = new Fermata(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: Fermata, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: Fermata, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: Fermata | null): any {
+    public static toJson(obj: Fermata | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("type"); 
+        writer.writeEnum(obj.type); 
+        writer.writePropertyName("length"); 
+        writer.writeNumber(obj.length); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: Fermata, json: any): void {
-        json.type = obj.type; 
-        json.length = obj.length; 
-    }
-    public static setProperty(obj: Fermata, property: string, value: any): boolean {
+    public static setProperty(obj: Fermata, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "type":
-                obj.type = isNaN(parseInt(value)) ? FermataType[Object.keys(FermataType).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof FermataType] : parseInt(value);
+                obj.type = (reader.readEnum<FermataType>(FermataType)!);
                 return true;
             case "length":
-                obj.length = value;
+                obj.length = (reader.readNumber()!);
                 return true;
         } 
         return false; 

@@ -5,10 +5,6 @@ import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
 import { Settings } from '@src/Settings';
 
-// TODO: TypeScript optimizes away (elides) some types if they are not used in any expression
-// the AST transformer reference is not respected so we add one manually
-Beat;
-
 /**
  * A voice represents a group of beats
  * that can be played during a bar.

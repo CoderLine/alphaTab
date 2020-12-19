@@ -4,38 +4,37 @@
 // the code is regenerated.
 // </auto-generated>
 import { BendPoint } from "@src/model/BendPoint";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 export class BendPointSerializer {
-    public static fromJson(json: any): BendPoint {
-        const obj = new BendPoint(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: BendPoint, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: BendPoint, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: BendPoint | null): any {
+    public static toJson(obj: BendPoint | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("offset"); 
+        writer.writeNumber(obj.offset); 
+        writer.writePropertyName("value"); 
+        writer.writeNumber(obj.value); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: BendPoint, json: any): void {
-        json.offset = obj.offset; 
-        json.value = obj.value; 
-    }
-    public static setProperty(obj: BendPoint, property: string, value: any): boolean {
+    public static setProperty(obj: BendPoint, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "offset":
-                obj.offset = value;
+                obj.offset = (reader.readNumber()!);
                 return true;
             case "value":
-                obj.value = value;
+                obj.value = (reader.readNumber()!);
                 return true;
         } 
         return false; 

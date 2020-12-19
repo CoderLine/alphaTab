@@ -741,6 +741,9 @@ export default class CSharpAstPrinter {
             case cs.SyntaxKind.DefaultExpression:
                 this.writeDefaultExpression(expr as cs.DefaultExpression);
                 break;
+            case cs.SyntaxKind.TypeOfExpression:
+                this.writeTypeOfExpression(expr as cs.TypeOfExpression);
+                break;
             default:
                 throw new Error(`Unhandled expression type: ${cs.SyntaxKind[expr.nodeType]}`);
         }
@@ -750,6 +753,15 @@ export default class CSharpAstPrinter {
         if (expr.type) {
             this.write('(');
             this.writeType(expr.type);
+            this.write(')');
+        }
+    }
+
+    private writeTypeOfExpression(expr: cs.TypeOfExpression) {
+        this.write('typeof');
+        if (expr.expression) {
+            this.write('(');
+            this.writeExpression(expr.expression);
             this.write(')');
         }
     }

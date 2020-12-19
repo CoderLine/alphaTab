@@ -4,42 +4,42 @@
 // the code is regenerated.
 // </auto-generated>
 import { SlidePlaybackSettings } from "@src/PlayerSettings";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 export class SlidePlaybackSettingsSerializer {
-    public static fromJson(json: any): SlidePlaybackSettings {
-        const obj = new SlidePlaybackSettings(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: SlidePlaybackSettings, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: SlidePlaybackSettings, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: SlidePlaybackSettings | null): any {
+    public static toJson(obj: SlidePlaybackSettings | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("simpleSlidePitchOffset"); 
+        writer.writeNumber(obj.simpleSlidePitchOffset); 
+        writer.writePropertyName("simpleSlideDurationRatio"); 
+        writer.writeNumber(obj.simpleSlideDurationRatio); 
+        writer.writePropertyName("shiftSlideDurationRatio"); 
+        writer.writeNumber(obj.shiftSlideDurationRatio); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: SlidePlaybackSettings, json: any): void {
-        json.simpleSlidePitchOffset = obj.simpleSlidePitchOffset; 
-        json.simpleSlideDurationRatio = obj.simpleSlideDurationRatio; 
-        json.shiftSlideDurationRatio = obj.shiftSlideDurationRatio; 
-    }
-    public static setProperty(obj: SlidePlaybackSettings, property: string, value: any): boolean {
+    public static setProperty(obj: SlidePlaybackSettings, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "simpleslidepitchoffset":
-                obj.simpleSlidePitchOffset = value;
+                obj.simpleSlidePitchOffset = (reader.readNumber()!);
                 return true;
             case "simpleslidedurationratio":
-                obj.simpleSlideDurationRatio = value;
+                obj.simpleSlideDurationRatio = (reader.readNumber()!);
                 return true;
             case "shiftslidedurationratio":
-                obj.shiftSlideDurationRatio = value;
+                obj.shiftSlideDurationRatio = (reader.readNumber()!);
                 return true;
         } 
         return false; 

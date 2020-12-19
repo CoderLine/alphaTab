@@ -4,49 +4,63 @@
 // the code is regenerated.
 // </auto-generated>
 import { RenderingResources } from "@src/RenderingResources";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { Font } from "@src/model/Font";
 import { Color } from "@src/model/Color";
 export class RenderingResourcesSerializer {
-    public static fromJson(json: any): RenderingResources {
-        const obj = new RenderingResources(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: RenderingResources, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: RenderingResources, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: RenderingResources | null): any {
+    public static toJson(obj: RenderingResources | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("copyrightFont"); 
+        Font.toJson(obj.copyrightFont, writer); 
+        writer.writePropertyName("titleFont"); 
+        Font.toJson(obj.titleFont, writer); 
+        writer.writePropertyName("subTitleFont"); 
+        Font.toJson(obj.subTitleFont, writer); 
+        writer.writePropertyName("wordsFont"); 
+        Font.toJson(obj.wordsFont, writer); 
+        writer.writePropertyName("effectFont"); 
+        Font.toJson(obj.effectFont, writer); 
+        writer.writePropertyName("fretboardNumberFont"); 
+        Font.toJson(obj.fretboardNumberFont, writer); 
+        writer.writePropertyName("tablatureFont"); 
+        Font.toJson(obj.tablatureFont, writer); 
+        writer.writePropertyName("graceFont"); 
+        Font.toJson(obj.graceFont, writer); 
+        writer.writePropertyName("staffLineColor"); 
+        Color.toJson(obj.staffLineColor, writer); 
+        writer.writePropertyName("barSeparatorColor"); 
+        Color.toJson(obj.barSeparatorColor, writer); 
+        writer.writePropertyName("barNumberFont"); 
+        Font.toJson(obj.barNumberFont, writer); 
+        writer.writePropertyName("barNumberColor"); 
+        Color.toJson(obj.barNumberColor, writer); 
+        writer.writePropertyName("fingeringFont"); 
+        Font.toJson(obj.fingeringFont, writer); 
+        writer.writePropertyName("markerFont"); 
+        Font.toJson(obj.markerFont, writer); 
+        writer.writePropertyName("mainGlyphColor"); 
+        Color.toJson(obj.mainGlyphColor, writer); 
+        writer.writePropertyName("secondaryGlyphColor"); 
+        Color.toJson(obj.secondaryGlyphColor, writer); 
+        writer.writePropertyName("scoreInfoColor"); 
+        Color.toJson(obj.scoreInfoColor, writer); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: RenderingResources, json: any): void {
-        json.copyrightFont = (Font.toJson(obj.copyrightFont)!); 
-        json.titleFont = (Font.toJson(obj.titleFont)!); 
-        json.subTitleFont = (Font.toJson(obj.subTitleFont)!); 
-        json.wordsFont = (Font.toJson(obj.wordsFont)!); 
-        json.effectFont = (Font.toJson(obj.effectFont)!); 
-        json.fretboardNumberFont = (Font.toJson(obj.fretboardNumberFont)!); 
-        json.tablatureFont = (Font.toJson(obj.tablatureFont)!); 
-        json.graceFont = (Font.toJson(obj.graceFont)!); 
-        json.staffLineColor = (Color.toJson(obj.staffLineColor)!); 
-        json.barSeparatorColor = (Color.toJson(obj.barSeparatorColor)!); 
-        json.barNumberFont = (Font.toJson(obj.barNumberFont)!); 
-        json.barNumberColor = (Color.toJson(obj.barNumberColor)!); 
-        json.fingeringFont = (Font.toJson(obj.fingeringFont)!); 
-        json.markerFont = (Font.toJson(obj.markerFont)!); 
-        json.mainGlyphColor = (Color.toJson(obj.mainGlyphColor)!); 
-        json.secondaryGlyphColor = (Color.toJson(obj.secondaryGlyphColor)!); 
-        json.scoreInfoColor = (Color.toJson(obj.scoreInfoColor)!); 
-    }
-    public static setProperty(obj: RenderingResources, property: string, value: any): boolean {
+    public static setProperty(obj: RenderingResources, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "copyrightfont":
                 obj.copyrightFont = (Font.fromJson(value)!);

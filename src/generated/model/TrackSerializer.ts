@@ -4,88 +4,80 @@
 // the code is regenerated.
 // </auto-generated>
 import { Track } from "@src/model/Track";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { StaffSerializer } from "@src/generated/model/StaffSerializer";
 import { PlaybackInformationSerializer } from "@src/generated/model/PlaybackInformationSerializer";
 import { Color } from "@src/model/Color";
 import { InstrumentArticulationSerializer } from "@src/generated/model/InstrumentArticulationSerializer";
-import { PlaybackInformation } from "@src/model/PlaybackInformation";
 export class TrackSerializer {
-    public static fromJson(json: any): Track {
-        const obj = new Track(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: Track, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: Track, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: Track | null): any {
+    public static toJson(obj: Track | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
-    }
-    public static fillToJson(obj: Track, json: any): void {
-        json.index = obj.index; 
-        json.staves = obj.staves.map($li => StaffSerializer.toJson($li)); 
-        if (json.playbackInfo) {
-            PlaybackInformationSerializer.fillToJson(obj.playbackInfo, json.playbackInfo);
-        }
-        else {
-            json.playbackInfo = (PlaybackInformationSerializer.toJson(obj.playbackInfo)!);
+        writer.writeStartObject(); 
+        writer.writePropertyName("index"); 
+        writer.writeNumber(obj.index); 
+        writer.writePropertyName("staves"); 
+        writer.writeStartArray(); 
+        for (const i of obj.staves) {
+            StaffSerializer.toJson(i, writer);
         } 
-        json.color = (Color.toJson(obj.color)!); 
-        json.name = obj.name; 
-        json.shortName = obj.shortName; 
-        json.percussionArticulations = obj.percussionArticulations.map($li => InstrumentArticulationSerializer.toJson($li)); 
+        writer.writeEndArray(); 
+        writer.writePropertyName("playbackInfo"); 
+        PlaybackInformationSerializer.toJson(obj.playbackInfo, writer); 
+        writer.writePropertyName("color"); 
+        Color.toJson(obj.color, writer); 
+        writer.writePropertyName("name"); 
+        writer.writeString(obj.name); 
+        writer.writePropertyName("shortName"); 
+        writer.writeString(obj.shortName); 
+        writer.writePropertyName("percussionArticulations"); 
+        writer.writeStartArray(); 
+        for (const i of obj.percussionArticulations) {
+            InstrumentArticulationSerializer.toJson(i, writer);
+        } 
+        writer.writeEndArray(); 
+        writer.writeEndObject(); 
     }
-    public static setProperty(obj: Track, property: string, value: any): boolean {
+    public static setProperty(obj: Track, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "index":
-                obj.index = value;
+                obj.index = (reader.readNumber()!);
                 return true;
             case "staves":
                 obj.staves = [];
-                for (const $li of value)
-                    obj.addStaff(StaffSerializer.fromJson($li));
+                for (const __li of value)
+                    obj.addStaff(StaffSerializer.fromJson(i, j));
                 return true;
             case "color":
                 obj.color = (Color.fromJson(value)!);
                 return true;
             case "name":
-                obj.name = value;
+                obj.name = (reader.readString()!);
                 return true;
             case "shortname":
-                obj.shortName = value;
+                obj.shortName = (reader.readString()!);
                 return true;
             case "percussionarticulations":
                 obj.percussionArticulations = [];
-                for (const $li of value)
-                    obj.percussionArticulations.push(InstrumentArticulationSerializer.fromJson($li));
+                for (const __li of value)
+                    obj.percussionArticulations.push(InstrumentArticulationSerializer.fromJson(i, j));
                 return true;
         } 
         if (["playbackinfo"].indexOf(property) >= 0) {
-            if (obj.playbackInfo)
-                PlaybackInformationSerializer.fillFromJson(obj.playbackInfo, value);
-            else
-                obj.playbackInfo = PlaybackInformationSerializer.fromJson(value);
+            PlaybackInformationSerializer.fromJson(obj.playbackInfo, reader);
             return true;
-        }
-        else {
-            for (const $c of ["playbackinfo"])
-                if (property.indexOf($c) === 0) {
-                    if (!obj.playbackInfo) {
-                        obj.playbackInfo = new PlaybackInformation();
-                    }
-                    if (PlaybackInformationSerializer.setProperty(obj.playbackInfo, property.substring($c.length), value)) {
-                        return true;
-                    }
-                }
         } 
         return false; 
     }

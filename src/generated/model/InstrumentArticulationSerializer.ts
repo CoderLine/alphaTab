@@ -4,60 +4,64 @@
 // the code is regenerated.
 // </auto-generated>
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { TextBaseline } from "@src/platform/ICanvas";
 export class InstrumentArticulationSerializer {
-    public static fromJson(json: any): InstrumentArticulation {
-        const obj = new InstrumentArticulation(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: InstrumentArticulation, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: InstrumentArticulation, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: InstrumentArticulation | null): any {
+    public static toJson(obj: InstrumentArticulation | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("staffLine"); 
+        writer.writeNumber(obj.staffLine); 
+        writer.writePropertyName("noteHeadDefault"); 
+        writer.writeEnum(obj.noteHeadDefault); 
+        writer.writePropertyName("noteHeadHalf"); 
+        writer.writeEnum(obj.noteHeadHalf); 
+        writer.writePropertyName("noteHeadWhole"); 
+        writer.writeEnum(obj.noteHeadWhole); 
+        writer.writePropertyName("techniqueSymbol"); 
+        writer.writeEnum(obj.techniqueSymbol); 
+        writer.writePropertyName("techniqueSymbolPlacement"); 
+        writer.writeEnum(obj.techniqueSymbolPlacement); 
+        writer.writePropertyName("outputMidiNumber"); 
+        writer.writeNumber(obj.outputMidiNumber); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: InstrumentArticulation, json: any): void {
-        json.staffLine = obj.staffLine; 
-        json.noteHeadDefault = obj.noteHeadDefault; 
-        json.noteHeadHalf = obj.noteHeadHalf; 
-        json.noteHeadWhole = obj.noteHeadWhole; 
-        json.techniqueSymbol = obj.techniqueSymbol; 
-        json.techniqueSymbolPlacement = obj.techniqueSymbolPlacement; 
-        json.outputMidiNumber = obj.outputMidiNumber; 
-    }
-    public static setProperty(obj: InstrumentArticulation, property: string, value: any): boolean {
+    public static setProperty(obj: InstrumentArticulation, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "staffline":
-                obj.staffLine = value;
+                obj.staffLine = (reader.readNumber()!);
                 return true;
             case "noteheaddefault":
-                obj.noteHeadDefault = isNaN(parseInt(value)) ? MusicFontSymbol[Object.keys(MusicFontSymbol).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof MusicFontSymbol] : parseInt(value);
+                obj.noteHeadDefault = (reader.readEnum<MusicFontSymbol>(MusicFontSymbol)!);
                 return true;
             case "noteheadhalf":
-                obj.noteHeadHalf = isNaN(parseInt(value)) ? MusicFontSymbol[Object.keys(MusicFontSymbol).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof MusicFontSymbol] : parseInt(value);
+                obj.noteHeadHalf = (reader.readEnum<MusicFontSymbol>(MusicFontSymbol)!);
                 return true;
             case "noteheadwhole":
-                obj.noteHeadWhole = isNaN(parseInt(value)) ? MusicFontSymbol[Object.keys(MusicFontSymbol).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof MusicFontSymbol] : parseInt(value);
+                obj.noteHeadWhole = (reader.readEnum<MusicFontSymbol>(MusicFontSymbol)!);
                 return true;
             case "techniquesymbol":
-                obj.techniqueSymbol = isNaN(parseInt(value)) ? MusicFontSymbol[Object.keys(MusicFontSymbol).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof MusicFontSymbol] : parseInt(value);
+                obj.techniqueSymbol = (reader.readEnum<MusicFontSymbol>(MusicFontSymbol)!);
                 return true;
             case "techniquesymbolplacement":
-                obj.techniqueSymbolPlacement = isNaN(parseInt(value)) ? TextBaseline[Object.keys(TextBaseline).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof TextBaseline] : parseInt(value);
+                obj.techniqueSymbolPlacement = (reader.readEnum<TextBaseline>(TextBaseline)!);
                 return true;
             case "outputmidinumber":
-                obj.outputMidiNumber = value;
+                obj.outputMidiNumber = (reader.readNumber()!);
                 return true;
         } 
         return false; 

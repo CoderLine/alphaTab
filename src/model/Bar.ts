@@ -6,10 +6,6 @@ import { Staff } from '@src/model/Staff';
 import { Voice } from '@src/model/Voice';
 import { Settings } from '@src/Settings';
 
-// TODO: TypeScript optimizes away (elides) some types if they are not used in any expression
-// the AST transformer reference is not respected so we add one manually
-Voice;
-
 /**
  * A bar is a single block within a track, also known as Measure.
  * @json

@@ -4,75 +4,78 @@
 // the code is regenerated.
 // </auto-generated>
 import { CoreSettings } from "@src/CoreSettings";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { LogLevel } from "@src/LogLevel";
 export class CoreSettingsSerializer {
-    public static fromJson(json: any): CoreSettings {
-        const obj = new CoreSettings(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: CoreSettings, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: CoreSettings, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: CoreSettings | null): any {
+    public static toJson(obj: CoreSettings | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("scriptFile"); 
+        writer.writeString(obj.scriptFile); 
+        writer.writePropertyName("fontDirectory"); 
+        writer.writeString(obj.fontDirectory); 
+        writer.writePropertyName("file"); 
+        writer.writeString(obj.file); 
+        writer.writePropertyName("tex"); 
+        writer.writeBoolean(obj.tex); 
+        writer.writePropertyName("visibilityCheckInterval"); 
+        writer.writeNumber(obj.visibilityCheckInterval); 
+        writer.writePropertyName("enableLazyLoading"); 
+        writer.writeBoolean(obj.enableLazyLoading); 
+        writer.writePropertyName("engine"); 
+        writer.writeString(obj.engine); 
+        writer.writePropertyName("logLevel"); 
+        writer.writeEnum(obj.logLevel); 
+        writer.writePropertyName("useWorkers"); 
+        writer.writeBoolean(obj.useWorkers); 
+        writer.writePropertyName("includeNoteBounds"); 
+        writer.writeBoolean(obj.includeNoteBounds); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: CoreSettings, json: any): void {
-        json.scriptFile = obj.scriptFile; 
-        json.fontDirectory = obj.fontDirectory; 
-        json.file = obj.file; 
-        json.tex = obj.tex; 
-        json.tracks = obj.tracks; 
-        json.visibilityCheckInterval = obj.visibilityCheckInterval; 
-        json.enableLazyLoading = obj.enableLazyLoading; 
-        json.engine = obj.engine; 
-        json.logLevel = obj.logLevel; 
-        json.useWorkers = obj.useWorkers; 
-        json.includeNoteBounds = obj.includeNoteBounds; 
-    }
-    public static setProperty(obj: CoreSettings, property: string, value: any): boolean {
+    public static setProperty(obj: CoreSettings, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "scriptfile":
-                obj.scriptFile = value;
+                obj.scriptFile = reader.readString();
                 return true;
             case "fontdirectory":
-                obj.fontDirectory = value;
+                obj.fontDirectory = reader.readString();
                 return true;
             case "file":
-                obj.file = value;
+                obj.file = reader.readString();
                 return true;
             case "tex":
-                obj.tex = value;
-                return true;
-            case "tracks":
-                obj.tracks = value;
+                obj.tex = (reader.readBoolean()!);
                 return true;
             case "visibilitycheckinterval":
-                obj.visibilityCheckInterval = value;
+                obj.visibilityCheckInterval = (reader.readNumber()!);
                 return true;
             case "enablelazyloading":
-                obj.enableLazyLoading = value;
+                obj.enableLazyLoading = (reader.readBoolean()!);
                 return true;
             case "engine":
-                obj.engine = value;
+                obj.engine = (reader.readString()!);
                 return true;
             case "loglevel":
-                obj.logLevel = isNaN(parseInt(value)) ? LogLevel[Object.keys(LogLevel).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof LogLevel] : parseInt(value);
+                obj.logLevel = (reader.readEnum<LogLevel>(LogLevel)!);
                 return true;
             case "useworkers":
-                obj.useWorkers = value;
+                obj.useWorkers = (reader.readBoolean()!);
                 return true;
             case "includenotebounds":
-                obj.includeNoteBounds = value;
+                obj.includeNoteBounds = (reader.readBoolean()!);
                 return true;
         } 
         return false; 

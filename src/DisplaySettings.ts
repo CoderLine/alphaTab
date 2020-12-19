@@ -88,6 +88,7 @@ export class DisplaySettings {
 
     /**
      * Gets or sets the resources used during rendering. This defines all fonts and colors used.
+     * @json_partial_names
      */
     public resources: RenderingResources = new RenderingResources();
 

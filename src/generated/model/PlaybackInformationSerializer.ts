@@ -4,62 +4,67 @@
 // the code is regenerated.
 // </auto-generated>
 import { PlaybackInformation } from "@src/model/PlaybackInformation";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 export class PlaybackInformationSerializer {
-    public static fromJson(json: any): PlaybackInformation {
-        const obj = new PlaybackInformation(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: PlaybackInformation, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: PlaybackInformation, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: PlaybackInformation | null): any {
+    public static toJson(obj: PlaybackInformation | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("volume"); 
+        writer.writeNumber(obj.volume); 
+        writer.writePropertyName("balance"); 
+        writer.writeNumber(obj.balance); 
+        writer.writePropertyName("port"); 
+        writer.writeNumber(obj.port); 
+        writer.writePropertyName("program"); 
+        writer.writeNumber(obj.program); 
+        writer.writePropertyName("primaryChannel"); 
+        writer.writeNumber(obj.primaryChannel); 
+        writer.writePropertyName("secondaryChannel"); 
+        writer.writeNumber(obj.secondaryChannel); 
+        writer.writePropertyName("isMute"); 
+        writer.writeBoolean(obj.isMute); 
+        writer.writePropertyName("isSolo"); 
+        writer.writeBoolean(obj.isSolo); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: PlaybackInformation, json: any): void {
-        json.volume = obj.volume; 
-        json.balance = obj.balance; 
-        json.port = obj.port; 
-        json.program = obj.program; 
-        json.primaryChannel = obj.primaryChannel; 
-        json.secondaryChannel = obj.secondaryChannel; 
-        json.isMute = obj.isMute; 
-        json.isSolo = obj.isSolo; 
-    }
-    public static setProperty(obj: PlaybackInformation, property: string, value: any): boolean {
+    public static setProperty(obj: PlaybackInformation, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "volume":
-                obj.volume = value;
+                obj.volume = (reader.readNumber()!);
                 return true;
             case "balance":
-                obj.balance = value;
+                obj.balance = (reader.readNumber()!);
                 return true;
             case "port":
-                obj.port = value;
+                obj.port = (reader.readNumber()!);
                 return true;
             case "program":
-                obj.program = value;
+                obj.program = (reader.readNumber()!);
                 return true;
             case "primarychannel":
-                obj.primaryChannel = value;
+                obj.primaryChannel = (reader.readNumber()!);
                 return true;
             case "secondarychannel":
-                obj.secondaryChannel = value;
+                obj.secondaryChannel = (reader.readNumber()!);
                 return true;
             case "ismute":
-                obj.isMute = value;
+                obj.isMute = (reader.readBoolean()!);
                 return true;
             case "issolo":
-                obj.isSolo = value;
+                obj.isSolo = (reader.readBoolean()!);
                 return true;
         } 
         return false; 

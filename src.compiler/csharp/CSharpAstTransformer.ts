@@ -2017,13 +2017,27 @@ export default class CSharpAstTransformer {
     }
 
     private visitThisExpression(parent: cs.Node, expression: ts.ThisExpression) {
-        const csExpr = {
-            parent: parent,
-            tsNode: expression,
-            nodeType: cs.SyntaxKind.ThisLiteral
-        } as cs.ThisLiteral;
+        if (parent.nodeType === cs.SyntaxKind.MemberAccessExpression &&
+            parent.tsSymbol &&
+            this._context.isStaticSymbol(parent.tsSymbol)) {
+            const identifier = {
+                parent: parent,
+                tsNode: expression,
+                tsSymbol: this._context.typeChecker.getSymbolAtLocation(expression),
+                nodeType: cs.SyntaxKind.Identifier,
+                text: parent.tsSymbol.name
+            } as cs.Identifier;
 
-        return csExpr;
+            return identifier;
+        } else {
+            const csExpr = {
+                parent: parent,
+                tsNode: expression,
+                nodeType: cs.SyntaxKind.ThisLiteral
+            } as cs.ThisLiteral;
+
+            return csExpr;
+        }
     }
 
     private visitSuperLiteralExpression(parent: cs.Node, expression: ts.SuperExpression) {
@@ -2788,25 +2802,35 @@ export default class CSharpAstTransformer {
             return null;
         }
 
-        const csArg = {
-            expression: {} as cs.Expression,
-            nodeType: cs.SyntaxKind.CastExpression,
-            parent: parent,
-            tsNode: expression.argumentExpression,
-            type: {
-                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                type: cs.PrimitiveType.Int
-            } as cs.PrimitiveTypeNode
-        } as cs.CastExpression;
-        elementAccess.argumentExpression = csArg;
+        let type = symbol ? this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, expression.expression) : null;
+        if(type) {
+            type = this._context.typeChecker.getNonNullableType(type);
+        }
+        const isArrayAccessor = !symbol || (type && type.symbol && !!type.symbol.members?.has(ts.escapeLeadingUnderscores('slice')));
+        if (isArrayAccessor) {
+            const csArg = {
+                expression: {} as cs.Expression,
+                nodeType: cs.SyntaxKind.CastExpression,
+                parent: parent,
+                tsNode: expression.argumentExpression,
+                type: {
+                    nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                    type: cs.PrimitiveType.Int
+                } as cs.PrimitiveTypeNode
+            } as cs.CastExpression;
+            elementAccess.argumentExpression = csArg;
 
-        const par = {
-            nodeType: cs.SyntaxKind.ParenthesizedExpression,
-            parent: csArg,
-            expression: argumentExpression
-        } as cs.ParenthesizedExpression;
-        argumentExpression.parent = par;
-        csArg.expression = par;
+            const par = {
+                nodeType: cs.SyntaxKind.ParenthesizedExpression,
+                parent: csArg,
+                expression: argumentExpression
+            } as cs.ParenthesizedExpression;
+            argumentExpression.parent = par;
+            csArg.expression = par;
+        } else {
+            elementAccess.argumentExpression = argumentExpression;
+            argumentExpression.parent = elementAccess;
+        }
 
         return this.wrapToSmartCast(parent, elementAccess, expression);
     }
@@ -3004,6 +3028,7 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.NullLiteral
             } as cs.NullLiteral;
         }
+
         const identifier = {
             parent: parent,
             tsNode: expression,
@@ -3011,6 +3036,26 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.Identifier,
             text: expression.text
         } as cs.Identifier;
+
+        if (identifier.tsSymbol) {
+            switch (expression.parent.kind) {
+                case ts.SyntaxKind.PropertyAccessExpression:
+                case ts.SyntaxKind.BinaryExpression:
+                    break;
+                default:
+                    switch(identifier.tsSymbol.flags) {
+                        case ts.SymbolFlags.Alias:
+                            return {
+                                parent: parent,
+                                nodeType: cs.SyntaxKind.TypeOfExpression,
+                                tsNode: expression,
+                                expression: identifier
+                            } as cs.TypeOfExpression;
+                    }
+                    break;
+            }
+
+        }
 
         return this.wrapToSmartCast(parent, identifier, expression);
     }

@@ -3,11 +3,10 @@ import CSharpAstTransformer from './CSharpAstTransformer';
 import CSharpEmitterContext from './CSharpEmitterContext';
 import CSharpAstPrinter from './CSharpAstPrinter';
 
-export default function emit(program: ts.Program): ts.Diagnostic[] {
-    const diagnostics: ts.Diagnostic[] = [];
-
+export default function emit(program: ts.Program, diagnostics:ts.Diagnostic[]) {
     const context = new CSharpEmitterContext(program);
-    sourceFiles.forEach(sourceFile => {
+    program.getRootFileNames().forEach(file => {
+        const sourceFile = program.getSourceFile(file)!;
         const transformer = new CSharpAstTransformer(sourceFile, context);
         transformer.transform();
     });
@@ -24,6 +23,4 @@ export default function emit(program: ts.Program): ts.Diagnostic[] {
     }
 
     diagnostics.push(...context.diagnostics);
-
-    return diagnostics;
 }

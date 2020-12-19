@@ -62,9 +62,6 @@ export class Color {
         return new Color((Math.random() * 255) | 0, (Math.random() * 255) | 0, (Math.random() * 255) | 0, opacity);
     }
 
-    /**
-     * @target web
-     */
     public static fromJson(json: unknown): Color | null {
         if (!json) {
             return null;
@@ -145,9 +142,6 @@ export class Color {
         throw new FormatError('Unsupported format for color');
     }
 
-    /**
-     * @target web
-     */
     public static toJson(obj: Color): unknown {
         return obj.raw;
     }

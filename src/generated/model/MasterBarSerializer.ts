@@ -4,6 +4,9 @@
 // the code is regenerated.
 // </auto-generated>
 import { MasterBar } from "@src/model/MasterBar";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { SectionSerializer } from "@src/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { FermataSerializer } from "@src/generated/model/FermataSerializer";
@@ -14,142 +17,131 @@ import { Section } from "@src/model/Section";
 import { Automation } from "@src/model/Automation";
 import { Fermata } from "@src/model/Fermata";
 export class MasterBarSerializer {
-    public static fromJson(json: any): MasterBar {
-        const obj = new MasterBar(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: MasterBar, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: MasterBar, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: MasterBar | null): any {
+    public static toJson(obj: MasterBar | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
-    }
-    public static fillToJson(obj: MasterBar, json: any): void {
-        json.alternateEndings = obj.alternateEndings; 
-        json.index = obj.index; 
-        json.keySignature = obj.keySignature; 
-        json.keySignatureType = obj.keySignatureType; 
-        json.isDoubleBar = obj.isDoubleBar; 
-        json.isRepeatStart = obj.isRepeatStart; 
-        json.repeatCount = obj.repeatCount; 
-        json.timeSignatureNumerator = obj.timeSignatureNumerator; 
-        json.timeSignatureDenominator = obj.timeSignatureDenominator; 
-        json.timeSignatureCommon = obj.timeSignatureCommon; 
-        json.tripletFeel = obj.tripletFeel; 
-        if (json.section) {
-            if (obj.section) {
-                SectionSerializer.fillToJson(obj.section, json.section);
-            }
+        writer.writeStartObject(); 
+        writer.writePropertyName("alternateEndings"); 
+        writer.writeNumber(obj.alternateEndings); 
+        writer.writePropertyName("index"); 
+        writer.writeNumber(obj.index); 
+        writer.writePropertyName("keySignature"); 
+        writer.writeEnum(obj.keySignature); 
+        writer.writePropertyName("keySignatureType"); 
+        writer.writeEnum(obj.keySignatureType); 
+        writer.writePropertyName("isDoubleBar"); 
+        writer.writeBoolean(obj.isDoubleBar); 
+        writer.writePropertyName("isRepeatStart"); 
+        writer.writeBoolean(obj.isRepeatStart); 
+        writer.writePropertyName("repeatCount"); 
+        writer.writeNumber(obj.repeatCount); 
+        writer.writePropertyName("timeSignatureNumerator"); 
+        writer.writeNumber(obj.timeSignatureNumerator); 
+        writer.writePropertyName("timeSignatureDenominator"); 
+        writer.writeNumber(obj.timeSignatureDenominator); 
+        writer.writePropertyName("timeSignatureCommon"); 
+        writer.writeBoolean(obj.timeSignatureCommon); 
+        writer.writePropertyName("tripletFeel"); 
+        writer.writeEnum(obj.tripletFeel); 
+        writer.writePropertyName("section"); 
+        if (obj.section) {
+            SectionSerializer.toJson(obj.section, writer);
         }
-        else {
-            json.section = SectionSerializer.toJson(obj.section);
-        } 
-        if (json.tempoAutomation) {
-            if (obj.tempoAutomation) {
-                AutomationSerializer.fillToJson(obj.tempoAutomation, json.tempoAutomation);
-            }
+        else
+            writer.writeNull(); 
+        writer.writePropertyName("tempoAutomation"); 
+        if (obj.tempoAutomation) {
+            AutomationSerializer.toJson(obj.tempoAutomation, writer);
         }
-        else {
-            json.tempoAutomation = AutomationSerializer.toJson(obj.tempoAutomation);
-        } 
-        json.fermata = ({} as any); 
-        obj.fermata.forEach(($mv, $mk) => { (json.fermata as any)[$mk] = FermataSerializer.toJson($mv); }); 
-        json.start = obj.start; 
-        json.isAnacrusis = obj.isAnacrusis; 
+        else
+            writer.writeNull(); 
+        writer.writePropertyName("fermata"); 
+        writer.writeStartObject(); 
+        obj.fermata.forEach((k, v) => { writer.writePropertyName(k); FermataSerializer.toJson(m); }); 
+        writer.writeEndObject(); 
+        writer.writePropertyName("start"); 
+        writer.writeNumber(obj.start); 
+        writer.writePropertyName("isAnacrusis"); 
+        writer.writeBoolean(obj.isAnacrusis); 
+        writer.writeEndObject(); 
     }
-    public static setProperty(obj: MasterBar, property: string, value: any): boolean {
+    public static setProperty(obj: MasterBar, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "alternateendings":
-                obj.alternateEndings = value;
+                obj.alternateEndings = (reader.readNumber()!);
                 return true;
             case "index":
-                obj.index = value;
+                obj.index = (reader.readNumber()!);
                 return true;
             case "keysignature":
-                obj.keySignature = isNaN(parseInt(value)) ? KeySignature[Object.keys(KeySignature).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof KeySignature] : parseInt(value);
+                obj.keySignature = (reader.readEnum<KeySignature>(KeySignature)!);
                 return true;
             case "keysignaturetype":
-                obj.keySignatureType = isNaN(parseInt(value)) ? KeySignatureType[Object.keys(KeySignatureType).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof KeySignatureType] : parseInt(value);
+                obj.keySignatureType = (reader.readEnum<KeySignatureType>(KeySignatureType)!);
                 return true;
             case "isdoublebar":
-                obj.isDoubleBar = value;
+                obj.isDoubleBar = (reader.readBoolean()!);
                 return true;
             case "isrepeatstart":
-                obj.isRepeatStart = value;
+                obj.isRepeatStart = (reader.readBoolean()!);
                 return true;
             case "repeatcount":
-                obj.repeatCount = value;
+                obj.repeatCount = (reader.readNumber()!);
                 return true;
             case "timesignaturenumerator":
-                obj.timeSignatureNumerator = value;
+                obj.timeSignatureNumerator = (reader.readNumber()!);
                 return true;
             case "timesignaturedenominator":
-                obj.timeSignatureDenominator = value;
+                obj.timeSignatureDenominator = (reader.readNumber()!);
                 return true;
             case "timesignaturecommon":
-                obj.timeSignatureCommon = value;
+                obj.timeSignatureCommon = (reader.readBoolean()!);
                 return true;
             case "tripletfeel":
-                obj.tripletFeel = isNaN(parseInt(value)) ? TripletFeel[Object.keys(TripletFeel).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof TripletFeel] : parseInt(value);
+                obj.tripletFeel = (reader.readEnum<TripletFeel>(TripletFeel)!);
                 return true;
             case "fermata":
                 obj.fermata = new Map<number, Fermata>();
-                for (let $mk in value)
-                    if (value.hasOwnProperty($mk))
-                        obj.fermata.set(parseInt($mk), FermataSerializer.fromJson(value[$mk]));
+                for (let __mk in value)
+                    if (value.hasOwnProperty(__mk))
+                        obj.fermata.set(parseInt(__mk), FermataSerializer.fromJson(value[__mk]));
                 return true;
             case "start":
-                obj.start = value;
+                obj.start = (reader.readNumber()!);
                 return true;
             case "isanacrusis":
-                obj.isAnacrusis = value;
+                obj.isAnacrusis = (reader.readBoolean()!);
                 return true;
         } 
         if (["section"].indexOf(property) >= 0) {
-            if (obj.section)
-                SectionSerializer.fillFromJson(obj.section, value);
-            else
-                obj.section = value ? SectionSerializer.fromJson(value) : null;
+            if (reader.currentValueType !== JsonValueType.Null) {
+                obj.section = new Section();
+                SectionSerializer.fromJson(obj.section, reader);
+            }
+            else {
+                obj.section = null;
+            }
             return true;
-        }
-        else {
-            for (const $c of ["section"])
-                if (property.indexOf($c) === 0) {
-                    if (!obj.section) {
-                        obj.section = new Section();
-                    }
-                    if (SectionSerializer.setProperty(obj.section, property.substring($c.length), value)) {
-                        return true;
-                    }
-                }
         } 
         if (["tempoautomation"].indexOf(property) >= 0) {
-            if (obj.tempoAutomation)
-                AutomationSerializer.fillFromJson(obj.tempoAutomation, value);
-            else
-                obj.tempoAutomation = value ? AutomationSerializer.fromJson(value) : null;
+            if (reader.currentValueType !== JsonValueType.Null) {
+                obj.tempoAutomation = new Automation();
+                AutomationSerializer.fromJson(obj.tempoAutomation, reader);
+            }
+            else {
+                obj.tempoAutomation = null;
+            }
             return true;
-        }
-        else {
-            for (const $c of ["tempoautomation"])
-                if (property.indexOf($c) === 0) {
-                    if (!obj.tempoAutomation) {
-                        obj.tempoAutomation = new Automation();
-                    }
-                    if (AutomationSerializer.setProperty(obj.tempoAutomation, property.substring($c.length), value)) {
-                        return true;
-                    }
-                }
         } 
         return false; 
     }

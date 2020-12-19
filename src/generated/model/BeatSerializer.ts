@@ -4,6 +4,9 @@
 // the code is regenerated.
 // </auto-generated>
 import { Beat } from "@src/model/Beat";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { NoteSerializer } from "@src/generated/model/NoteSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
@@ -20,199 +23,246 @@ import { DynamicValue } from "@src/model/DynamicValue";
 import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
 export class BeatSerializer {
-    public static fromJson(json: any): Beat {
-        const obj = new Beat(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: Beat, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: Beat, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: Beat | null): any {
+    public static toJson(obj: Beat | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("id"); 
+        writer.writeNumber(obj.id); 
+        writer.writePropertyName("index"); 
+        writer.writeNumber(obj.index); 
+        writer.writePropertyName("notes"); 
+        writer.writeStartArray(); 
+        for (const i of obj.notes) {
+            NoteSerializer.toJson(i, writer);
+        } 
+        writer.writeEndArray(); 
+        writer.writePropertyName("isEmpty"); 
+        writer.writeBoolean(obj.isEmpty); 
+        writer.writePropertyName("whammyStyle"); 
+        writer.writeEnum(obj.whammyStyle); 
+        writer.writePropertyName("ottava"); 
+        writer.writeEnum(obj.ottava); 
+        writer.writePropertyName("isLegatoOrigin"); 
+        writer.writeBoolean(obj.isLegatoOrigin); 
+        writer.writePropertyName("duration"); 
+        writer.writeEnum(obj.duration); 
+        writer.writePropertyName("isLetRing"); 
+        writer.writeBoolean(obj.isLetRing); 
+        writer.writePropertyName("isPalmMute"); 
+        writer.writeBoolean(obj.isPalmMute); 
+        writer.writePropertyName("automations"); 
+        writer.writeStartArray(); 
+        for (const i of obj.automations) {
+            AutomationSerializer.toJson(i, writer);
+        } 
+        writer.writeEndArray(); 
+        writer.writePropertyName("dots"); 
+        writer.writeNumber(obj.dots); 
+        writer.writePropertyName("fadeIn"); 
+        writer.writeBoolean(obj.fadeIn); 
+        writer.writePropertyName("lyrics"); 
+        writer.writeStringArray(obj.lyrics); 
+        writer.writePropertyName("hasRasgueado"); 
+        writer.writeBoolean(obj.hasRasgueado); 
+        writer.writePropertyName("pop"); 
+        writer.writeBoolean(obj.pop); 
+        writer.writePropertyName("slap"); 
+        writer.writeBoolean(obj.slap); 
+        writer.writePropertyName("tap"); 
+        writer.writeBoolean(obj.tap); 
+        writer.writePropertyName("text"); 
+        writer.writeString(obj.text); 
+        writer.writePropertyName("brushType"); 
+        writer.writeEnum(obj.brushType); 
+        writer.writePropertyName("brushDuration"); 
+        writer.writeNumber(obj.brushDuration); 
+        writer.writePropertyName("tupletDenominator"); 
+        writer.writeNumber(obj.tupletDenominator); 
+        writer.writePropertyName("tupletNumerator"); 
+        writer.writeNumber(obj.tupletNumerator); 
+        writer.writePropertyName("isContinuedWhammy"); 
+        writer.writeBoolean(obj.isContinuedWhammy); 
+        writer.writePropertyName("whammyBarType"); 
+        writer.writeEnum(obj.whammyBarType); 
+        writer.writePropertyName("whammyBarPoints"); 
+        writer.writeStartArray(); 
+        for (const i of obj.whammyBarPoints) {
+            BendPointSerializer.toJson(i, writer);
+        } 
+        writer.writeEndArray(); 
+        writer.writePropertyName("vibrato"); 
+        writer.writeEnum(obj.vibrato); 
+        writer.writePropertyName("chordId"); 
+        writer.writeString(obj.chordId); 
+        writer.writePropertyName("graceType"); 
+        writer.writeEnum(obj.graceType); 
+        writer.writePropertyName("pickStroke"); 
+        writer.writeEnum(obj.pickStroke); 
+        writer.writePropertyName("tremoloSpeed"); 
+        writer.writeEnum(obj.tremoloSpeed); 
+        writer.writePropertyName("crescendo"); 
+        writer.writeEnum(obj.crescendo); 
+        writer.writePropertyName("displayStart"); 
+        writer.writeNumber(obj.displayStart); 
+        writer.writePropertyName("playbackStart"); 
+        writer.writeNumber(obj.playbackStart); 
+        writer.writePropertyName("displayDuration"); 
+        writer.writeNumber(obj.displayDuration); 
+        writer.writePropertyName("playbackDuration"); 
+        writer.writeNumber(obj.playbackDuration); 
+        writer.writePropertyName("dynamics"); 
+        writer.writeEnum(obj.dynamics); 
+        writer.writePropertyName("invertBeamDirection"); 
+        writer.writeBoolean(obj.invertBeamDirection); 
+        writer.writePropertyName("preferredBeamDirection"); 
+        writer.writeEnum(obj.preferredBeamDirection); 
+        writer.writePropertyName("isEffectSlurOrigin"); 
+        writer.writeBoolean(obj.isEffectSlurOrigin); 
+        writer.writePropertyName("beamingMode"); 
+        writer.writeEnum(obj.beamingMode); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: Beat, json: any): void {
-        json.id = obj.id; 
-        json.index = obj.index; 
-        json.notes = obj.notes.map($li => NoteSerializer.toJson($li)); 
-        json.isEmpty = obj.isEmpty; 
-        json.whammyStyle = obj.whammyStyle; 
-        json.ottava = obj.ottava; 
-        json.isLegatoOrigin = obj.isLegatoOrigin; 
-        json.duration = obj.duration; 
-        json.isLetRing = obj.isLetRing; 
-        json.isPalmMute = obj.isPalmMute; 
-        json.automations = obj.automations.map($li => AutomationSerializer.toJson($li)); 
-        json.dots = obj.dots; 
-        json.fadeIn = obj.fadeIn; 
-        json.lyrics = obj.lyrics ? obj.lyrics.slice() : null; 
-        json.hasRasgueado = obj.hasRasgueado; 
-        json.pop = obj.pop; 
-        json.slap = obj.slap; 
-        json.tap = obj.tap; 
-        json.text = obj.text; 
-        json.brushType = obj.brushType; 
-        json.brushDuration = obj.brushDuration; 
-        json.tupletDenominator = obj.tupletDenominator; 
-        json.tupletNumerator = obj.tupletNumerator; 
-        json.isContinuedWhammy = obj.isContinuedWhammy; 
-        json.whammyBarType = obj.whammyBarType; 
-        json.whammyBarPoints = obj.whammyBarPoints.map($li => BendPointSerializer.toJson($li)); 
-        json.vibrato = obj.vibrato; 
-        json.chordId = obj.chordId; 
-        json.graceType = obj.graceType; 
-        json.pickStroke = obj.pickStroke; 
-        json.tremoloSpeed = obj.tremoloSpeed; 
-        json.crescendo = obj.crescendo; 
-        json.displayStart = obj.displayStart; 
-        json.playbackStart = obj.playbackStart; 
-        json.displayDuration = obj.displayDuration; 
-        json.playbackDuration = obj.playbackDuration; 
-        json.dynamics = obj.dynamics; 
-        json.invertBeamDirection = obj.invertBeamDirection; 
-        json.preferredBeamDirection = obj.preferredBeamDirection; 
-        json.isEffectSlurOrigin = obj.isEffectSlurOrigin; 
-        json.beamingMode = obj.beamingMode; 
-    }
-    public static setProperty(obj: Beat, property: string, value: any): boolean {
+    public static setProperty(obj: Beat, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "id":
-                obj.id = value;
+                obj.id = (reader.readNumber()!);
                 return true;
             case "index":
-                obj.index = value;
+                obj.index = (reader.readNumber()!);
                 return true;
             case "notes":
                 obj.notes = [];
-                for (const $li of value)
-                    obj.addNote(NoteSerializer.fromJson($li));
+                for (const __li of value)
+                    obj.addNote(NoteSerializer.fromJson(i, j));
                 return true;
             case "isempty":
-                obj.isEmpty = value;
+                obj.isEmpty = (reader.readBoolean()!);
                 return true;
             case "whammystyle":
-                obj.whammyStyle = isNaN(parseInt(value)) ? BendStyle[Object.keys(BendStyle).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof BendStyle] : parseInt(value);
+                obj.whammyStyle = (reader.readEnum<BendStyle>(BendStyle)!);
                 return true;
             case "ottava":
-                obj.ottava = isNaN(parseInt(value)) ? Ottavia[Object.keys(Ottavia).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof Ottavia] : parseInt(value);
+                obj.ottava = (reader.readEnum<Ottavia>(Ottavia)!);
                 return true;
             case "islegatoorigin":
-                obj.isLegatoOrigin = value;
+                obj.isLegatoOrigin = (reader.readBoolean()!);
                 return true;
             case "duration":
-                obj.duration = isNaN(parseInt(value)) ? Duration[Object.keys(Duration).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof Duration] : parseInt(value);
+                obj.duration = (reader.readEnum<Duration>(Duration)!);
                 return true;
             case "isletring":
-                obj.isLetRing = value;
+                obj.isLetRing = (reader.readBoolean()!);
                 return true;
             case "ispalmmute":
-                obj.isPalmMute = value;
+                obj.isPalmMute = (reader.readBoolean()!);
                 return true;
             case "automations":
                 obj.automations = [];
-                for (const $li of value)
-                    obj.automations.push(AutomationSerializer.fromJson($li));
+                for (const __li of value)
+                    obj.automations.push(AutomationSerializer.fromJson(i, j));
                 return true;
             case "dots":
-                obj.dots = value;
+                obj.dots = (reader.readNumber()!);
                 return true;
             case "fadein":
-                obj.fadeIn = value;
+                obj.fadeIn = (reader.readBoolean()!);
                 return true;
             case "lyrics":
-                obj.lyrics = value ? value.slice() : null;
+                obj.lyrics = reader.readStringArray();
                 return true;
             case "hasrasgueado":
-                obj.hasRasgueado = value;
+                obj.hasRasgueado = (reader.readBoolean()!);
                 return true;
             case "pop":
-                obj.pop = value;
+                obj.pop = (reader.readBoolean()!);
                 return true;
             case "slap":
-                obj.slap = value;
+                obj.slap = (reader.readBoolean()!);
                 return true;
             case "tap":
-                obj.tap = value;
+                obj.tap = (reader.readBoolean()!);
                 return true;
             case "text":
-                obj.text = value;
+                obj.text = reader.readString();
                 return true;
             case "brushtype":
-                obj.brushType = isNaN(parseInt(value)) ? BrushType[Object.keys(BrushType).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof BrushType] : parseInt(value);
+                obj.brushType = (reader.readEnum<BrushType>(BrushType)!);
                 return true;
             case "brushduration":
-                obj.brushDuration = value;
+                obj.brushDuration = (reader.readNumber()!);
                 return true;
             case "tupletdenominator":
-                obj.tupletDenominator = value;
+                obj.tupletDenominator = (reader.readNumber()!);
                 return true;
             case "tupletnumerator":
-                obj.tupletNumerator = value;
+                obj.tupletNumerator = (reader.readNumber()!);
                 return true;
             case "iscontinuedwhammy":
-                obj.isContinuedWhammy = value;
+                obj.isContinuedWhammy = (reader.readBoolean()!);
                 return true;
             case "whammybartype":
-                obj.whammyBarType = isNaN(parseInt(value)) ? WhammyType[Object.keys(WhammyType).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof WhammyType] : parseInt(value);
+                obj.whammyBarType = (reader.readEnum<WhammyType>(WhammyType)!);
                 return true;
             case "whammybarpoints":
                 obj.whammyBarPoints = [];
-                for (const $li of value)
-                    obj.addWhammyBarPoint(BendPointSerializer.fromJson($li));
+                for (const __li of value)
+                    obj.addWhammyBarPoint(BendPointSerializer.fromJson(i, j));
                 return true;
             case "vibrato":
-                obj.vibrato = isNaN(parseInt(value)) ? VibratoType[Object.keys(VibratoType).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof VibratoType] : parseInt(value);
+                obj.vibrato = (reader.readEnum<VibratoType>(VibratoType)!);
                 return true;
             case "chordid":
-                obj.chordId = value;
+                obj.chordId = reader.readString();
                 return true;
             case "gracetype":
-                obj.graceType = isNaN(parseInt(value)) ? GraceType[Object.keys(GraceType).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof GraceType] : parseInt(value);
+                obj.graceType = (reader.readEnum<GraceType>(GraceType)!);
                 return true;
             case "pickstroke":
-                obj.pickStroke = isNaN(parseInt(value)) ? PickStroke[Object.keys(PickStroke).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof PickStroke] : parseInt(value);
+                obj.pickStroke = (reader.readEnum<PickStroke>(PickStroke)!);
                 return true;
             case "tremolospeed":
-                obj.tremoloSpeed = value === null ? null : isNaN(parseInt(value)) ? Duration[Object.keys(Duration).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof Duration] : parseInt(value);
+                obj.tremoloSpeed = reader.readEnum<Duration>(Duration);
                 return true;
             case "crescendo":
-                obj.crescendo = isNaN(parseInt(value)) ? CrescendoType[Object.keys(CrescendoType).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof CrescendoType] : parseInt(value);
+                obj.crescendo = (reader.readEnum<CrescendoType>(CrescendoType)!);
                 return true;
             case "displaystart":
-                obj.displayStart = value;
+                obj.displayStart = (reader.readNumber()!);
                 return true;
             case "playbackstart":
-                obj.playbackStart = value;
+                obj.playbackStart = (reader.readNumber()!);
                 return true;
             case "displayduration":
-                obj.displayDuration = value;
+                obj.displayDuration = (reader.readNumber()!);
                 return true;
             case "playbackduration":
-                obj.playbackDuration = value;
+                obj.playbackDuration = (reader.readNumber()!);
                 return true;
             case "dynamics":
-                obj.dynamics = isNaN(parseInt(value)) ? DynamicValue[Object.keys(DynamicValue).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof DynamicValue] : parseInt(value);
+                obj.dynamics = (reader.readEnum<DynamicValue>(DynamicValue)!);
                 return true;
             case "invertbeamdirection":
-                obj.invertBeamDirection = value;
+                obj.invertBeamDirection = (reader.readBoolean()!);
                 return true;
             case "preferredbeamdirection":
-                obj.preferredBeamDirection = value === null ? null : isNaN(parseInt(value)) ? BeamDirection[Object.keys(BeamDirection).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof BeamDirection] : parseInt(value);
+                obj.preferredBeamDirection = reader.readEnum<BeamDirection>(BeamDirection);
                 return true;
             case "iseffectslurorigin":
-                obj.isEffectSlurOrigin = value;
+                obj.isEffectSlurOrigin = (reader.readBoolean()!);
                 return true;
             case "beamingmode":
-                obj.beamingMode = isNaN(parseInt(value)) ? BeatBeamingMode[Object.keys(BeatBeamingMode).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof BeatBeamingMode] : parseInt(value);
+                obj.beamingMode = (reader.readEnum<BeatBeamingMode>(BeatBeamingMode)!);
                 return true;
         } 
         return false; 

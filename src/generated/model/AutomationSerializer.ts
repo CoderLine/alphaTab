@@ -4,51 +4,53 @@
 // the code is regenerated.
 // </auto-generated>
 import { Automation } from "@src/model/Automation";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { AutomationType } from "@src/model/Automation";
 export class AutomationSerializer {
-    public static fromJson(json: any): Automation {
-        const obj = new Automation(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: Automation, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: Automation, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: Automation | null): any {
+    public static toJson(obj: Automation | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("isLinear"); 
+        writer.writeBoolean(obj.isLinear); 
+        writer.writePropertyName("type"); 
+        writer.writeEnum(obj.type); 
+        writer.writePropertyName("value"); 
+        writer.writeNumber(obj.value); 
+        writer.writePropertyName("ratioPosition"); 
+        writer.writeNumber(obj.ratioPosition); 
+        writer.writePropertyName("text"); 
+        writer.writeString(obj.text); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: Automation, json: any): void {
-        json.isLinear = obj.isLinear; 
-        json.type = obj.type; 
-        json.value = obj.value; 
-        json.ratioPosition = obj.ratioPosition; 
-        json.text = obj.text; 
-    }
-    public static setProperty(obj: Automation, property: string, value: any): boolean {
+    public static setProperty(obj: Automation, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "islinear":
-                obj.isLinear = value;
+                obj.isLinear = (reader.readBoolean()!);
                 return true;
             case "type":
-                obj.type = isNaN(parseInt(value)) ? AutomationType[Object.keys(AutomationType).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof AutomationType] : parseInt(value);
+                obj.type = (reader.readEnum<AutomationType>(AutomationType)!);
                 return true;
             case "value":
-                obj.value = value;
+                obj.value = (reader.readNumber()!);
                 return true;
             case "ratioposition":
-                obj.ratioPosition = value;
+                obj.ratioPosition = (reader.readNumber()!);
                 return true;
             case "text":
-                obj.text = value;
+                obj.text = (reader.readString()!);
                 return true;
         } 
         return false; 

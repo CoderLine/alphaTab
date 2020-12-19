@@ -4,60 +4,67 @@
 // the code is regenerated.
 // </auto-generated>
 import { Bar } from "@src/model/Bar";
+import { IJsonReader } from "@src/io/IJsonReader";
+import { JsonValueType } from "@src/io/IJsonReader";
+import { IJsonWriter } from "@src/io/IJsonWriter";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
 import { Clef } from "@src/model/Clef";
 import { Ottavia } from "@src/model/Ottavia";
 import { SimileMark } from "@src/model/SimileMark";
 export class BarSerializer {
-    public static fromJson(json: any): Bar {
-        const obj = new Bar(); 
-        this.fillFromJson(obj, json); 
-        return obj; 
-    }
-    public static fillFromJson(obj: Bar, json: any): void {
-        if (json) {
-            for (const $k in json) {
-                this.setProperty(obj, $k.toLowerCase(), json[$k]);
-            }
+    public static fromJson(obj: Bar, reader: IJsonReader): void {
+        if (reader.currentValueType !== JsonValueType.Object) {
+            return;
+        } 
+        while (reader.nextProperty()) {
+            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
         } 
     }
-    public static toJson(obj: Bar | null): any {
+    public static toJson(obj: Bar | null, writer: IJsonWriter): void {
         if (!obj) {
-            return null;
+            writer.writeNull();
+            return;
         } 
-        const json: any = {}; 
-        this.fillToJson(obj, json); 
-        return json; 
+        writer.writeStartObject(); 
+        writer.writePropertyName("id"); 
+        writer.writeNumber(obj.id); 
+        writer.writePropertyName("index"); 
+        writer.writeNumber(obj.index); 
+        writer.writePropertyName("clef"); 
+        writer.writeEnum(obj.clef); 
+        writer.writePropertyName("clefOttava"); 
+        writer.writeEnum(obj.clefOttava); 
+        writer.writePropertyName("voices"); 
+        writer.writeStartArray(); 
+        for (const i of obj.voices) {
+            VoiceSerializer.toJson(i, writer);
+        } 
+        writer.writeEndArray(); 
+        writer.writePropertyName("simileMark"); 
+        writer.writeEnum(obj.simileMark); 
+        writer.writeEndObject(); 
     }
-    public static fillToJson(obj: Bar, json: any): void {
-        json.id = obj.id; 
-        json.index = obj.index; 
-        json.clef = obj.clef; 
-        json.clefOttava = obj.clefOttava; 
-        json.voices = obj.voices.map($li => VoiceSerializer.toJson($li)); 
-        json.simileMark = obj.simileMark; 
-    }
-    public static setProperty(obj: Bar, property: string, value: any): boolean {
+    public static setProperty(obj: Bar, property: string, reader: IJsonReader): boolean {
         switch (property) {
             case "id":
-                obj.id = value;
+                obj.id = (reader.readNumber()!);
                 return true;
             case "index":
-                obj.index = value;
+                obj.index = (reader.readNumber()!);
                 return true;
             case "clef":
-                obj.clef = isNaN(parseInt(value)) ? Clef[Object.keys(Clef).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof Clef] : parseInt(value);
+                obj.clef = (reader.readEnum<Clef>(Clef)!);
                 return true;
             case "clefottava":
-                obj.clefOttava = isNaN(parseInt(value)) ? Ottavia[Object.keys(Ottavia).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof Ottavia] : parseInt(value);
+                obj.clefOttava = (reader.readEnum<Ottavia>(Ottavia)!);
                 return true;
             case "voices":
                 obj.voices = [];
-                for (const $li of value)
-                    obj.addVoice(VoiceSerializer.fromJson($li));
+                for (const __li of value)
+                    obj.addVoice(VoiceSerializer.fromJson(i, j));
                 return true;
             case "similemark":
-                obj.simileMark = isNaN(parseInt(value)) ? SimileMark[Object.keys(SimileMark).find($k => $k.toLowerCase() === value.toLowerCase()) as keyof typeof SimileMark] : parseInt(value);
+                obj.simileMark = (reader.readEnum<SimileMark>(SimileMark)!);
                 return true;
         } 
         return false; 
