@@ -10,6 +10,7 @@ import { IJsonWriter } from "@src/io/IJsonWriter";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
 import { Clef } from "@src/model/Clef";
 import { Ottavia } from "@src/model/Ottavia";
+import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
 export class BarSerializer {
     public static fromJson(obj: Bar, reader: IJsonReader): void {
@@ -60,8 +61,11 @@ export class BarSerializer {
                 return true;
             case "voices":
                 obj.voices = [];
-                for (const __li of value)
-                    obj.addVoice(VoiceSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new Voice();
+                    VoiceSerializer.fromJson(i, reader)
+                    obj.addVoice(i);
+                }
                 return true;
             case "similemark":
                 obj.simileMark = (reader.readEnum<SimileMark>(SimileMark)!);

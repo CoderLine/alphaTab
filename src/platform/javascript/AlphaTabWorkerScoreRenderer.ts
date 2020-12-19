@@ -60,7 +60,8 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     private serializeSettingsForWorker(settings: Settings): unknown {
-        let json: any = SettingsSerializer.toJson(settings);
+        // TODO: create Web variant of JSON writer
+        let json: any = SettingsSerializer.toJson(settings, null!);
         // cut out player settings, they are only needed on UI thread side
         json.player = null;
         return json;

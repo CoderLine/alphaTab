@@ -24,6 +24,7 @@ import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWo
 import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 import { Cursors } from '@src/platform/Cursors';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
+import { IJsonReader } from '@src/io/IJsonReader';
 
 /**
  * @target web
@@ -123,7 +124,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             settings = raw;
         } else {
             settings = new Settings();
-            SettingsSerializer.fillFromJson(settings, raw);
+            // TODO: implement web variant of JSON reader
+            SettingsSerializer.fromJson(settings, raw as IJsonReader);
         }
         
         let dataAttributes: Map<string, unknown> = this.getDataAttributes();

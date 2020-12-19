@@ -8,6 +8,7 @@ import { IJsonReader } from "@src/io/IJsonReader";
 import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
+import { Beat } from "@src/model/Beat";
 export class VoiceSerializer {
     public static fromJson(obj: Voice, reader: IJsonReader): void {
         if (reader.currentValueType !== JsonValueType.Object) {
@@ -42,8 +43,11 @@ export class VoiceSerializer {
                 return true;
             case "beats":
                 obj.beats = [];
-                for (const __li of value)
-                    obj.addBeat(BeatSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new Beat();
+                    BeatSerializer.fromJson(i, reader)
+                    obj.addBeat(i);
+                }
                 return true;
             case "isempty":
                 obj.isEmpty = (reader.readBoolean()!);

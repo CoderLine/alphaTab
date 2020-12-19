@@ -1,4 +1,6 @@
 import { Environment } from '@src/Environment';
+import { IJsonReader, JsonValueType } from '@src/io/IJsonReader';
+import { IJsonWriter } from '@src/io/IJsonWriter';
 
 /**
  * Lists all flags for font styles.
@@ -79,101 +81,120 @@ export class Font {
         return this._css;
     }
 
-    public static fromJson(value: unknown): Font | null {
-        if (!value) {
-            return null;
-        }
-
-        if (value instanceof Font) {
-            return value;
-        }
-
-        if (typeof value === 'object' && (value as any).family) {
-            return new Font((value as any).family, (value as any).size, (value as any).style);
-        }
-
-        if (typeof value === 'string' && !Environment.isRunningInWorker) {
-            let el: HTMLElement = document.createElement('span');
-            el.setAttribute('style', 'font: ' + value);
-            let style: CSSStyleDeclaration = el.style;
-            if (!style.fontFamily) {
-                style.fontFamily = 'sans-serif';
-            }
-
-            let family: string = style.fontFamily;
-            if ((family.startsWith("'") && family.endsWith("'")) || (family.startsWith('"') && family.endsWith('"'))) {
-                family = family.substr(1, family.length - 2);
-            }
-
-            let fontSizeString: string = style.fontSize.toLowerCase();
-            let fontSize: number = 0;
-            // as per https://websemantics.uk/articles/font-size-conversion/
-            switch (fontSizeString) {
-                case 'xx-small':
-                    fontSize = 7;
-                    break;
-                case 'x-small':
-                    fontSize = 10;
-                    break;
-                case 'small':
-                case 'smaller':
-                    fontSize = 13;
-                    break;
-                case 'medium':
-                    fontSize = 16;
-                    break;
-                case 'large':
-                case 'larger':
-                    fontSize = 18;
-                    break;
-                case 'x-large':
-                    fontSize = 24;
-                    break;
-                case 'xx-large':
-                    fontSize = 32;
-                    break;
-                default:
-                    try {
-                        if (fontSizeString.endsWith('em')) {
-                            fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16;
-                        } else if (fontSizeString.endsWith('pt')) {
-                            fontSize = (parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16.0) / 12.0;
-                        } else if (fontSizeString.endsWith('px')) {
-                            fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2));
-                        } else {
-                            fontSize = 12;
+    public static fromJson(reader: IJsonReader): Font | null {
+        switch (reader.currentValueType) {
+            case JsonValueType.Null:
+                return null;
+            case JsonValueType.Object:
+                {
+                    let family = '';
+                    let size = 0;
+                    let style = FontStyle.Plain;
+                    while (reader.nextProperty()) {
+                        switch (reader.readPropertyName().toLowerCase()) {
+                            case 'family':
+                                family = reader.readString()!;
+                                break;
+                            case 'size':
+                                size = reader.readNumber()!;
+                                break;
+                            case 'style':
+                                style = reader.readEnum<FontStyle>(FontStyle)!;
+                                break;
                         }
-                    } catch (e) {
-                        fontSize = 12;
                     }
-                    break;
-            }
+                    return new Font(family, size, style);
+                }
+            case JsonValueType.String:
+                if (!Environment.isRunningInWorker) {
+                    const value = reader.readString();
+                    let el: HTMLElement = document.createElement('span');
+                    el.setAttribute('style', 'font: ' + value);
+                    let style: CSSStyleDeclaration = el.style;
+                    if (!style.fontFamily) {
+                        style.fontFamily = 'sans-serif';
+                    }
 
-            let fontStyle: FontStyle = FontStyle.Plain;
-            if (style.fontStyle === 'italic') {
-                fontStyle |= FontStyle.Italic;
-            }
-            let fontWeightString: string = style.fontWeight.toLowerCase();
-            switch (fontWeightString) {
-                case 'normal':
-                case 'lighter':
-                    break;
-                default:
-                    fontStyle |= FontStyle.Bold;
-                    break;
-            }
+                    let family: string = style.fontFamily;
+                    if ((family.startsWith("'") && family.endsWith("'")) || (family.startsWith('"') && family.endsWith('"'))) {
+                        family = family.substr(1, family.length - 2);
+                    }
 
-            return new Font(family, fontSize, fontStyle);
+                    let fontSizeString: string = style.fontSize.toLowerCase();
+                    let fontSize: number = 0;
+                    // as per https://websemantics.uk/articles/font-size-conversion/
+                    switch (fontSizeString) {
+                        case 'xx-small':
+                            fontSize = 7;
+                            break;
+                        case 'x-small':
+                            fontSize = 10;
+                            break;
+                        case 'small':
+                        case 'smaller':
+                            fontSize = 13;
+                            break;
+                        case 'medium':
+                            fontSize = 16;
+                            break;
+                        case 'large':
+                        case 'larger':
+                            fontSize = 18;
+                            break;
+                        case 'x-large':
+                            fontSize = 24;
+                            break;
+                        case 'xx-large':
+                            fontSize = 32;
+                            break;
+                        default:
+                            try {
+                                if (fontSizeString.endsWith('em')) {
+                                    fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16;
+                                } else if (fontSizeString.endsWith('pt')) {
+                                    fontSize = (parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16.0) / 12.0;
+                                } else if (fontSizeString.endsWith('px')) {
+                                    fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2));
+                                } else {
+                                    fontSize = 12;
+                                }
+                            } catch (e) {
+                                fontSize = 12;
+                            }
+                            break;
+                    }
+
+                    let fontStyle: FontStyle = FontStyle.Plain;
+                    if (style.fontStyle === 'italic') {
+                        fontStyle |= FontStyle.Italic;
+                    }
+                    let fontWeightString: string = style.fontWeight.toLowerCase();
+                    switch (fontWeightString) {
+                        case 'normal':
+                        case 'lighter':
+                            break;
+                        default:
+                            fontStyle |= FontStyle.Bold;
+                            break;
+                    }
+
+                    return new Font(family, fontSize, fontStyle);
+                }
+
+                return null;
+            default:
+                return null;
         }
-
-        return null;
     }
-    
-    public static toJson(font: Font): unknown {
-        return {
-            family: font.family,
-            size: font.size,
-            style: font.style
-        };
+
+    public static toJson(font: Font, writer: IJsonWriter): void {
+        writer.writeStartObject();
+        writer.writePropertyName('family');
+        writer.writeString(font.family);
+        writer.writePropertyName('size');
+        writer.writeNumber(font.size);
+        writer.writePropertyName('style');
+        writer.writeEnum<FontStyle>(font.style);
+        writer.writeEndObject();
     }
 }

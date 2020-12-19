@@ -11,6 +11,7 @@ import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
 import { AccentuationType } from "@src/model/AccentuationType";
 import { BendType } from "@src/model/BendType";
 import { BendStyle } from "@src/model/BendStyle";
+import { BendPoint } from "@src/model/BendPoint";
 import { HarmonicType } from "@src/model/HarmonicType";
 import { SlideInType } from "@src/model/SlideInType";
 import { SlideOutType } from "@src/model/SlideOutType";
@@ -148,8 +149,11 @@ export class NoteSerializer {
                 return true;
             case "bendpoints":
                 obj.bendPoints = [];
-                for (const __li of value)
-                    obj.bendPoints.push(BendPointSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new BendPoint();
+                    BendPointSerializer.fromJson(i, reader)
+                    obj.bendPoints.push(i);
+                }
                 return true;
             case "fret":
                 obj.fret = (reader.readNumber()!);

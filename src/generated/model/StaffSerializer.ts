@@ -9,6 +9,7 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 import { BarSerializer } from "@src/generated/model/BarSerializer";
 import { ChordSerializer } from "@src/generated/model/ChordSerializer";
+import { Bar } from "@src/model/Bar";
 import { Chord } from "@src/model/Chord";
 export class StaffSerializer {
     public static fromJson(obj: Staff, reader: IJsonReader): void {
@@ -35,7 +36,7 @@ export class StaffSerializer {
         writer.writeEndArray(); 
         writer.writePropertyName("chords"); 
         writer.writeStartObject(); 
-        obj.chords.forEach((k, v) => { writer.writePropertyName(k); ChordSerializer.toJson(m); }); 
+        obj.chords.forEach((v, k) => { writer.writePropertyName(k); ChordSerializer.toJson(v, writer); }); 
         writer.writeEndObject(); 
         writer.writePropertyName("capo"); 
         writer.writeNumber(obj.capo); 
@@ -64,14 +65,19 @@ export class StaffSerializer {
                 return true;
             case "bars":
                 obj.bars = [];
-                for (const __li of value)
-                    obj.addBar(BarSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new Bar();
+                    BarSerializer.fromJson(i, reader)
+                    obj.addBar(i);
+                }
                 return true;
             case "chords":
                 obj.chords = new Map<string, Chord>();
-                for (let __mk in value)
-                    if (value.hasOwnProperty(__mk))
-                        obj.addChord(__mk, ChordSerializer.fromJson(value[__mk]));
+                while (reader.nextProperty()) {
+                    const i = new Chord();
+                    ChordSerializer.fromJson(i, reader);
+                    obj.addChord(reader.readPropertyName(), i);
+                }
                 return true;
             case "capo":
                 obj.capo = (reader.readNumber()!);

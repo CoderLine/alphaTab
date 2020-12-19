@@ -11,6 +11,8 @@ import { StaffSerializer } from "@src/generated/model/StaffSerializer";
 import { PlaybackInformationSerializer } from "@src/generated/model/PlaybackInformationSerializer";
 import { Color } from "@src/model/Color";
 import { InstrumentArticulationSerializer } from "@src/generated/model/InstrumentArticulationSerializer";
+import { Staff } from "@src/model/Staff";
+import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 export class TrackSerializer {
     public static fromJson(obj: Track, reader: IJsonReader): void {
         if (reader.currentValueType !== JsonValueType.Object) {
@@ -57,11 +59,14 @@ export class TrackSerializer {
                 return true;
             case "staves":
                 obj.staves = [];
-                for (const __li of value)
-                    obj.addStaff(StaffSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new Staff();
+                    StaffSerializer.fromJson(i, reader)
+                    obj.addStaff(i);
+                }
                 return true;
             case "color":
-                obj.color = (Color.fromJson(value)!);
+                obj.color = (Color.fromJson(reader)!);
                 return true;
             case "name":
                 obj.name = (reader.readString()!);
@@ -71,8 +76,11 @@ export class TrackSerializer {
                 return true;
             case "percussionarticulations":
                 obj.percussionArticulations = [];
-                for (const __li of value)
-                    obj.percussionArticulations.push(InstrumentArticulationSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new InstrumentArticulation();
+                    InstrumentArticulationSerializer.fromJson(i, reader)
+                    obj.percussionArticulations.push(i);
+                }
                 return true;
         } 
         if (["playbackinfo"].indexOf(property) >= 0) {

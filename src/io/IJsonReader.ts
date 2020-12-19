@@ -11,7 +11,11 @@ export interface IJsonReader {
     readonly currentValueType: JsonValueType;
 
     readPropertyName(): string;
+    readPropertyNameAsEnum<T>(enumType: any): T;
+    readPropertyNameAsNumber(): number;
+
     nextProperty(): boolean;
+    nextArrayItem(): boolean;
 
     readString(): string | null;
     readEnum<T>(enumType: any): T | null;

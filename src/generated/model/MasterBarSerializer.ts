@@ -67,7 +67,7 @@ export class MasterBarSerializer {
             writer.writeNull(); 
         writer.writePropertyName("fermata"); 
         writer.writeStartObject(); 
-        obj.fermata.forEach((k, v) => { writer.writePropertyName(k); FermataSerializer.toJson(m); }); 
+        obj.fermata.forEach((v, k) => { writer.writePropertyName(k); FermataSerializer.toJson(v, writer); }); 
         writer.writeEndObject(); 
         writer.writePropertyName("start"); 
         writer.writeNumber(obj.start); 
@@ -112,9 +112,11 @@ export class MasterBarSerializer {
                 return true;
             case "fermata":
                 obj.fermata = new Map<number, Fermata>();
-                for (let __mk in value)
-                    if (value.hasOwnProperty(__mk))
-                        obj.fermata.set(parseInt(__mk), FermataSerializer.fromJson(value[__mk]));
+                while (reader.nextProperty()) {
+                    const i = new Fermata();
+                    FermataSerializer.fromJson(i, reader);
+                    obj.fermata.set(reader.readPropertyNameAsNumber(), i);
+                }
                 return true;
             case "start":
                 obj.start = (reader.readNumber()!);

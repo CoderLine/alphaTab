@@ -10,6 +10,8 @@ import { IJsonWriter } from "@src/io/IJsonWriter";
 import { MasterBarSerializer } from "@src/generated/model/MasterBarSerializer";
 import { TrackSerializer } from "@src/generated/model/TrackSerializer";
 import { RenderStylesheetSerializer } from "@src/generated/model/RenderStylesheetSerializer";
+import { MasterBar } from "@src/model/MasterBar";
+import { Track } from "@src/model/Track";
 export class ScoreSerializer {
     public static fromJson(obj: Score, reader: IJsonReader): void {
         if (reader.currentValueType !== JsonValueType.Object) {
@@ -105,13 +107,19 @@ export class ScoreSerializer {
                 return true;
             case "masterbars":
                 obj.masterBars = [];
-                for (const __li of value)
-                    obj.addMasterBar(MasterBarSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new MasterBar();
+                    MasterBarSerializer.fromJson(i, reader)
+                    obj.addMasterBar(i);
+                }
                 return true;
             case "tracks":
                 obj.tracks = [];
-                for (const __li of value)
-                    obj.addTrack(TrackSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new Track();
+                    TrackSerializer.fromJson(i, reader)
+                    obj.addTrack(i);
+                }
                 return true;
         } 
         if (["stylesheet"].indexOf(property) >= 0) {

@@ -10,11 +10,14 @@ import { IJsonWriter } from "@src/io/IJsonWriter";
 import { NoteSerializer } from "@src/generated/model/NoteSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
+import { Note } from "@src/model/Note";
 import { BendStyle } from "@src/model/BendStyle";
 import { Ottavia } from "@src/model/Ottavia";
 import { Duration } from "@src/model/Duration";
+import { Automation } from "@src/model/Automation";
 import { BrushType } from "@src/model/BrushType";
 import { WhammyType } from "@src/model/WhammyType";
+import { BendPoint } from "@src/model/BendPoint";
 import { VibratoType } from "@src/model/VibratoType";
 import { GraceType } from "@src/model/GraceType";
 import { PickStroke } from "@src/model/PickStroke";
@@ -143,8 +146,11 @@ export class BeatSerializer {
                 return true;
             case "notes":
                 obj.notes = [];
-                for (const __li of value)
-                    obj.addNote(NoteSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new Note();
+                    NoteSerializer.fromJson(i, reader)
+                    obj.addNote(i);
+                }
                 return true;
             case "isempty":
                 obj.isEmpty = (reader.readBoolean()!);
@@ -169,8 +175,11 @@ export class BeatSerializer {
                 return true;
             case "automations":
                 obj.automations = [];
-                for (const __li of value)
-                    obj.automations.push(AutomationSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new Automation();
+                    AutomationSerializer.fromJson(i, reader)
+                    obj.automations.push(i);
+                }
                 return true;
             case "dots":
                 obj.dots = (reader.readNumber()!);
@@ -216,8 +225,11 @@ export class BeatSerializer {
                 return true;
             case "whammybarpoints":
                 obj.whammyBarPoints = [];
-                for (const __li of value)
-                    obj.addWhammyBarPoint(BendPointSerializer.fromJson(i, j));
+                while (reader.nextArrayItem()) {
+                    const i = new BendPoint();
+                    BendPointSerializer.fromJson(i, reader)
+                    obj.addWhammyBarPoint(i);
+                }
                 return true;
             case "vibrato":
                 obj.vibrato = (reader.readEnum<VibratoType>(VibratoType)!);

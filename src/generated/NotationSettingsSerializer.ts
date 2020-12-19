@@ -32,7 +32,7 @@ export class NotationSettingsSerializer {
         writer.writeEnum(obj.fingeringMode); 
         writer.writePropertyName("elements"); 
         writer.writeStartObject(); 
-        obj.elements.forEach((k, v) => { writer.writePropertyName(k); v; }); 
+        obj.elements.forEach((v, k) => { writer.writePropertyName(k); writer.writeBoolean(v); }); 
         writer.writeEndObject(); 
         writer.writePropertyName("rhythmMode"); 
         writer.writeEnum(obj.rhythmMode); 
@@ -62,9 +62,9 @@ export class NotationSettingsSerializer {
                 return true;
             case "elements":
                 obj.elements = new Map<NotationElement, boolean>();
-                for (let __mk in value)
-                    if (value.hasOwnProperty(__mk))
-                        obj.elements.set(reader.readEnum<NotationElement>(NotationElement), value[__mk]);
+                while (reader.nextProperty()) {
+                    obj.elements.set(reader.readPropertyNameAsEnum<NotationElement>(NotationElement), (reader.readBoolean()!));
+                }
                 return true;
             case "rhythmmode":
                 obj.rhythmMode = (reader.readEnum<TabRhythmMode>(TabRhythmMode)!);

@@ -5,7 +5,7 @@ export interface IJsonWriter {
     writeStartArray(): void;
     writeEndArray(): void;
 
-    writePropertyName(name: string): void;
+    writePropertyName(name: any): void;
 
     writeString(value: string | null): void;
     writeNumber(value: number | null): void;

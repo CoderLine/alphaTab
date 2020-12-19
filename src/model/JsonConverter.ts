@@ -7,6 +7,7 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
 import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
+import { IJsonReader } from '@src/io/IJsonReader';
 
 /**
  * This class can convert a full {@link Score} instance to a simple JavaScript object and back for further
@@ -36,7 +37,8 @@ export class JsonConverter {
      * @returns A serialized score object without ciruclar dependencies that can be used for further serializations.
      */
     public static scoreToJsObject(score: Score): unknown {
-        return ScoreSerializer.toJson(score);
+        // TODO: create writer
+        return ScoreSerializer.toJson(score, null!);
     }
 
     /**
@@ -56,7 +58,9 @@ export class JsonConverter {
      * @returns The converted score object.
      */
     public static jsObjectToScore(jsObject: any, settings?: Settings): Score {
-        let score: Score = ScoreSerializer.fromJson(jsObject);
+        // TODO: create reader
+        let score: Score = new Score();
+        ScoreSerializer.fromJson(score, jsObject as IJsonReader);
         score.finish(settings ?? new Settings());
         return score;
     }
