@@ -8,33 +8,33 @@ import { IJsonReader } from "@src/io/IJsonReader";
 import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class ImporterSettingsSerializer {
-    public static fromJson(obj: ImporterSettings, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: ImporterSettings, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: ImporterSettings | null, writer: IJsonWriter): void {
+    public static toJson(obj: ImporterSettings | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("encoding"); 
-        writer.writeString(obj.encoding); 
-        writer.writePropertyName("mergePartGroupsInMusicXml"); 
-        writer.writeBoolean(obj.mergePartGroupsInMusicXml); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("encoding"); 
+        w.string(obj.encoding); 
+        w.prop("mergePartGroupsInMusicXml"); 
+        w.boolean(obj.mergePartGroupsInMusicXml); 
+        w.endObject(); 
     }
-    public static setProperty(obj: ImporterSettings, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: ImporterSettings, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "encoding":
-                obj.encoding = (reader.readString()!);
+                obj.encoding = (r.string()!);
                 return true;
             case "mergepartgroupsinmusicxml":
-                obj.mergePartGroupsInMusicXml = (reader.readBoolean()!);
+                obj.mergePartGroupsInMusicXml = (r.boolean()!);
                 return true;
         } 
         return false; 

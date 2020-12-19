@@ -10,47 +10,47 @@ import { IJsonWriter } from "@src/io/IJsonWriter";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
 import { Beat } from "@src/model/Beat";
 export class VoiceSerializer {
-    public static fromJson(obj: Voice, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Voice, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Voice | null, writer: IJsonWriter): void {
+    public static toJson(obj: Voice | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("index"); 
-        writer.writeNumber(obj.index); 
-        writer.writePropertyName("beats"); 
-        writer.writeStartArray(); 
+        w.startObject(); 
+        w.prop("index"); 
+        w.number(obj.index); 
+        w.prop("beats"); 
+        w.startArray(); 
         for (const i of obj.beats) {
-            BeatSerializer.toJson(i, writer);
+            BeatSerializer.toJson(i, w);
         } 
-        writer.writeEndArray(); 
-        writer.writePropertyName("isEmpty"); 
-        writer.writeBoolean(obj.isEmpty); 
-        writer.writeEndObject(); 
+        w.endArray(); 
+        w.prop("isEmpty"); 
+        w.boolean(obj.isEmpty); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Voice, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Voice, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "index":
-                obj.index = (reader.readNumber()!);
+                obj.index = (r.number()!);
                 return true;
             case "beats":
                 obj.beats = [];
-                while (reader.nextArrayItem()) {
+                while (r.nextItem()) {
                     const i = new Beat();
-                    BeatSerializer.fromJson(i, reader)
+                    BeatSerializer.fromJson(i, r)
                     obj.addBeat(i);
                 }
                 return true;
             case "isempty":
-                obj.isEmpty = (reader.readBoolean()!);
+                obj.isEmpty = (r.boolean()!);
                 return true;
         } 
         return false; 

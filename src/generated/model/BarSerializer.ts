@@ -13,62 +13,62 @@ import { Ottavia } from "@src/model/Ottavia";
 import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
 export class BarSerializer {
-    public static fromJson(obj: Bar, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Bar, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Bar | null, writer: IJsonWriter): void {
+    public static toJson(obj: Bar | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("id"); 
-        writer.writeNumber(obj.id); 
-        writer.writePropertyName("index"); 
-        writer.writeNumber(obj.index); 
-        writer.writePropertyName("clef"); 
-        writer.writeEnum(obj.clef); 
-        writer.writePropertyName("clefOttava"); 
-        writer.writeEnum(obj.clefOttava); 
-        writer.writePropertyName("voices"); 
-        writer.writeStartArray(); 
+        w.startObject(); 
+        w.prop("id"); 
+        w.number(obj.id); 
+        w.prop("index"); 
+        w.number(obj.index); 
+        w.prop("clef"); 
+        w.enum(obj.clef); 
+        w.prop("clefOttava"); 
+        w.enum(obj.clefOttava); 
+        w.prop("voices"); 
+        w.startArray(); 
         for (const i of obj.voices) {
-            VoiceSerializer.toJson(i, writer);
+            VoiceSerializer.toJson(i, w);
         } 
-        writer.writeEndArray(); 
-        writer.writePropertyName("simileMark"); 
-        writer.writeEnum(obj.simileMark); 
-        writer.writeEndObject(); 
+        w.endArray(); 
+        w.prop("simileMark"); 
+        w.enum(obj.simileMark); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Bar, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Bar, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "id":
-                obj.id = (reader.readNumber()!);
+                obj.id = (r.number()!);
                 return true;
             case "index":
-                obj.index = (reader.readNumber()!);
+                obj.index = (r.number()!);
                 return true;
             case "clef":
-                obj.clef = (reader.readEnum<Clef>(Clef)!);
+                obj.clef = (r.enum<Clef>(Clef)!);
                 return true;
             case "clefottava":
-                obj.clefOttava = (reader.readEnum<Ottavia>(Ottavia)!);
+                obj.clefOttava = (r.enum<Ottavia>(Ottavia)!);
                 return true;
             case "voices":
                 obj.voices = [];
-                while (reader.nextArrayItem()) {
+                while (r.nextItem()) {
                     const i = new Voice();
-                    VoiceSerializer.fromJson(i, reader)
+                    VoiceSerializer.fromJson(i, r)
                     obj.addVoice(i);
                 }
                 return true;
             case "similemark":
-                obj.simileMark = (reader.readEnum<SimileMark>(SimileMark)!);
+                obj.simileMark = (r.enum<SimileMark>(SimileMark)!);
                 return true;
         } 
         return false; 

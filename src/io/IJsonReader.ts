@@ -10,29 +10,29 @@ export interface IJsonReader {
     readonly currentProperty: string;
     readonly currentValueType: JsonValueType;
 
-    readPropertyName(): string;
-    readPropertyNameAsEnum<T>(enumType: any): T;
-    readPropertyNameAsNumber(): number;
+    prop(): string;
+    enumProp<T>(enumType: any): T;
+    numberProp(): number;
 
-    nextProperty(): boolean;
-    nextArrayItem(): boolean;
+    nextProp(): boolean;
+    nextItem(): boolean;
 
-    readString(): string | null;
-    readEnum<T>(enumType: any): T | null;
-    readNumber(): number | null;
-    readBoolean(): boolean | null;
+    string(): string | null;
+    enum<T>(enumType: any): T | null;
+    number(): number | null;
+    boolean(): boolean | null;
 
-    readStringArray(): string[] | null;
-    readEnumArray<T>(enumType: any): T[] | null;
-    readNumberArray(): number[] | null;
-    readBooleanArray(): boolean[] | null;
+    stringArray(): string[] | null;
+    enumArray<T>(enumType: any): T[] | null;
+    numberArray(): number[] | null;
+    booleanArray(): boolean[] | null;
 
-    readUint8Array(): Uint8Array | null;
-    readUint16Array(): Uint16Array | null;
-    readUint32Array(): Uint32Array | null;
-    readInt8Array(): Int8Array | null;
-    readInt16Array(): Int16Array | null;
-    readInt32Array(): Int32Array | null;
-    readFloat32Array(): Float32Array | null;
-    readFloat64Array(): Float64Array | null;
+    uint8Array(): Uint8Array | null;
+    uint16Array(): Uint16Array | null;
+    uint32Array(): Uint32Array | null;
+    int8Array(): Int8Array | null;
+    int16Array(): Int16Array | null;
+    int32Array(): Int32Array | null;
+    float32Array(): Float32Array | null;
+    float64Array(): Float64Array | null;
 }

@@ -9,83 +9,83 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 import { ScrollMode } from "@src/PlayerSettings";
 export class PlayerSettingsSerializer {
-    public static fromJson(obj: PlayerSettings, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: PlayerSettings, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: PlayerSettings | null, writer: IJsonWriter): void {
+    public static toJson(obj: PlayerSettings | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("soundFont"); 
-        writer.writeString(obj.soundFont); 
-        writer.writePropertyName("scrollElement"); 
-        writer.writeString(obj.scrollElement); 
-        writer.writePropertyName("enablePlayer"); 
-        writer.writeBoolean(obj.enablePlayer); 
-        writer.writePropertyName("enableCursor"); 
-        writer.writeBoolean(obj.enableCursor); 
-        writer.writePropertyName("enableUserInteraction"); 
-        writer.writeBoolean(obj.enableUserInteraction); 
-        writer.writePropertyName("scrollOffsetX"); 
-        writer.writeNumber(obj.scrollOffsetX); 
-        writer.writePropertyName("scrollOffsetY"); 
-        writer.writeNumber(obj.scrollOffsetY); 
-        writer.writePropertyName("scrollMode"); 
-        writer.writeEnum(obj.scrollMode); 
-        writer.writePropertyName("scrollSpeed"); 
-        writer.writeNumber(obj.scrollSpeed); 
-        writer.writePropertyName("songBookBendDuration"); 
-        writer.writeNumber(obj.songBookBendDuration); 
-        writer.writePropertyName("songBookDipDuration"); 
-        writer.writeNumber(obj.songBookDipDuration); 
-        writer.writePropertyName("playTripletFeel"); 
-        writer.writeBoolean(obj.playTripletFeel); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("soundFont"); 
+        w.string(obj.soundFont); 
+        w.prop("scrollElement"); 
+        w.string(obj.scrollElement); 
+        w.prop("enablePlayer"); 
+        w.boolean(obj.enablePlayer); 
+        w.prop("enableCursor"); 
+        w.boolean(obj.enableCursor); 
+        w.prop("enableUserInteraction"); 
+        w.boolean(obj.enableUserInteraction); 
+        w.prop("scrollOffsetX"); 
+        w.number(obj.scrollOffsetX); 
+        w.prop("scrollOffsetY"); 
+        w.number(obj.scrollOffsetY); 
+        w.prop("scrollMode"); 
+        w.enum(obj.scrollMode); 
+        w.prop("scrollSpeed"); 
+        w.number(obj.scrollSpeed); 
+        w.prop("songBookBendDuration"); 
+        w.number(obj.songBookBendDuration); 
+        w.prop("songBookDipDuration"); 
+        w.number(obj.songBookDipDuration); 
+        w.prop("playTripletFeel"); 
+        w.boolean(obj.playTripletFeel); 
+        w.endObject(); 
     }
-    public static setProperty(obj: PlayerSettings, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: PlayerSettings, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "soundfont":
-                obj.soundFont = reader.readString();
+                obj.soundFont = r.string();
                 return true;
             case "scrollelement":
-                obj.scrollElement = (reader.readString()!);
+                obj.scrollElement = (r.string()!);
                 return true;
             case "enableplayer":
-                obj.enablePlayer = (reader.readBoolean()!);
+                obj.enablePlayer = (r.boolean()!);
                 return true;
             case "enablecursor":
-                obj.enableCursor = (reader.readBoolean()!);
+                obj.enableCursor = (r.boolean()!);
                 return true;
             case "enableuserinteraction":
-                obj.enableUserInteraction = (reader.readBoolean()!);
+                obj.enableUserInteraction = (r.boolean()!);
                 return true;
             case "scrolloffsetx":
-                obj.scrollOffsetX = (reader.readNumber()!);
+                obj.scrollOffsetX = (r.number()!);
                 return true;
             case "scrolloffsety":
-                obj.scrollOffsetY = (reader.readNumber()!);
+                obj.scrollOffsetY = (r.number()!);
                 return true;
             case "scrollmode":
-                obj.scrollMode = (reader.readEnum<ScrollMode>(ScrollMode)!);
+                obj.scrollMode = (r.enum<ScrollMode>(ScrollMode)!);
                 return true;
             case "scrollspeed":
-                obj.scrollSpeed = (reader.readNumber()!);
+                obj.scrollSpeed = (r.number()!);
                 return true;
             case "songbookbendduration":
-                obj.songBookBendDuration = (reader.readNumber()!);
+                obj.songBookBendDuration = (r.number()!);
                 return true;
             case "songbookdipduration":
-                obj.songBookDipDuration = (reader.readNumber()!);
+                obj.songBookDipDuration = (r.number()!);
                 return true;
             case "playtripletfeel":
-                obj.playTripletFeel = (reader.readBoolean()!);
+                obj.playTripletFeel = (r.boolean()!);
                 return true;
         } 
         return false; 

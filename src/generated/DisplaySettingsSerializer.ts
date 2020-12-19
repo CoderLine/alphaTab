@@ -11,80 +11,80 @@ import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesS
 import { LayoutMode } from "@src/DisplaySettings";
 import { StaveProfile } from "@src/DisplaySettings";
 export class DisplaySettingsSerializer {
-    public static fromJson(obj: DisplaySettings, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: DisplaySettings, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: DisplaySettings | null, writer: IJsonWriter): void {
+    public static toJson(obj: DisplaySettings | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("scale"); 
-        writer.writeNumber(obj.scale); 
-        writer.writePropertyName("stretchForce"); 
-        writer.writeNumber(obj.stretchForce); 
-        writer.writePropertyName("layoutMode"); 
-        writer.writeEnum(obj.layoutMode); 
-        writer.writePropertyName("staveProfile"); 
-        writer.writeEnum(obj.staveProfile); 
-        writer.writePropertyName("barsPerRow"); 
-        writer.writeNumber(obj.barsPerRow); 
-        writer.writePropertyName("startBar"); 
-        writer.writeNumber(obj.startBar); 
-        writer.writePropertyName("barCount"); 
-        writer.writeNumber(obj.barCount); 
-        writer.writePropertyName("barCountPerPartial"); 
-        writer.writeNumber(obj.barCountPerPartial); 
-        writer.writePropertyName("resources"); 
-        RenderingResourcesSerializer.toJson(obj.resources, writer); 
-        writer.writePropertyName("padding"); 
-        writer.writeFloat32Array(obj.padding); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("scale"); 
+        w.number(obj.scale); 
+        w.prop("stretchForce"); 
+        w.number(obj.stretchForce); 
+        w.prop("layoutMode"); 
+        w.enum(obj.layoutMode); 
+        w.prop("staveProfile"); 
+        w.enum(obj.staveProfile); 
+        w.prop("barsPerRow"); 
+        w.number(obj.barsPerRow); 
+        w.prop("startBar"); 
+        w.number(obj.startBar); 
+        w.prop("barCount"); 
+        w.number(obj.barCount); 
+        w.prop("barCountPerPartial"); 
+        w.number(obj.barCountPerPartial); 
+        w.prop("resources"); 
+        RenderingResourcesSerializer.toJson(obj.resources, w); 
+        w.prop("padding"); 
+        w.float32Array(obj.padding); 
+        w.endObject(); 
     }
-    public static setProperty(obj: DisplaySettings, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: DisplaySettings, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "scale":
-                obj.scale = (reader.readNumber()!);
+                obj.scale = (r.number()!);
                 return true;
             case "stretchforce":
-                obj.stretchForce = (reader.readNumber()!);
+                obj.stretchForce = (r.number()!);
                 return true;
             case "layoutmode":
-                obj.layoutMode = (reader.readEnum<LayoutMode>(LayoutMode)!);
+                obj.layoutMode = (r.enum<LayoutMode>(LayoutMode)!);
                 return true;
             case "staveprofile":
-                obj.staveProfile = (reader.readEnum<StaveProfile>(StaveProfile)!);
+                obj.staveProfile = (r.enum<StaveProfile>(StaveProfile)!);
                 return true;
             case "barsperrow":
-                obj.barsPerRow = (reader.readNumber()!);
+                obj.barsPerRow = (r.number()!);
                 return true;
             case "startbar":
-                obj.startBar = (reader.readNumber()!);
+                obj.startBar = (r.number()!);
                 return true;
             case "barcount":
-                obj.barCount = (reader.readNumber()!);
+                obj.barCount = (r.number()!);
                 return true;
             case "barcountperpartial":
-                obj.barCountPerPartial = (reader.readNumber()!);
+                obj.barCountPerPartial = (r.number()!);
                 return true;
             case "padding":
-                obj.padding = reader.readFloat32Array();
+                obj.padding = r.float32Array();
                 return true;
         } 
         if (["resources"].indexOf(property) >= 0) {
-            RenderingResourcesSerializer.fromJson(obj.resources, reader);
+            RenderingResourcesSerializer.fromJson(obj.resources, r);
             return true;
         }
         else {
             for (const c of ["resources"]) {
                 if (property.indexOf(c) === 0) {
-                    if (RenderingResourcesSerializer.setProperty(obj.resources, property.substring(c.length), reader)) {
+                    if (RenderingResourcesSerializer.setProperty(obj.resources, property.substring(c.length), r)) {
                         return true;
                     }
                 }

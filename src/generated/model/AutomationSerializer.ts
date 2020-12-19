@@ -9,48 +9,48 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 import { AutomationType } from "@src/model/Automation";
 export class AutomationSerializer {
-    public static fromJson(obj: Automation, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Automation, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Automation | null, writer: IJsonWriter): void {
+    public static toJson(obj: Automation | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("isLinear"); 
-        writer.writeBoolean(obj.isLinear); 
-        writer.writePropertyName("type"); 
-        writer.writeEnum(obj.type); 
-        writer.writePropertyName("value"); 
-        writer.writeNumber(obj.value); 
-        writer.writePropertyName("ratioPosition"); 
-        writer.writeNumber(obj.ratioPosition); 
-        writer.writePropertyName("text"); 
-        writer.writeString(obj.text); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("isLinear"); 
+        w.boolean(obj.isLinear); 
+        w.prop("type"); 
+        w.enum(obj.type); 
+        w.prop("value"); 
+        w.number(obj.value); 
+        w.prop("ratioPosition"); 
+        w.number(obj.ratioPosition); 
+        w.prop("text"); 
+        w.string(obj.text); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Automation, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Automation, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "islinear":
-                obj.isLinear = (reader.readBoolean()!);
+                obj.isLinear = (r.boolean()!);
                 return true;
             case "type":
-                obj.type = (reader.readEnum<AutomationType>(AutomationType)!);
+                obj.type = (r.enum<AutomationType>(AutomationType)!);
                 return true;
             case "value":
-                obj.value = (reader.readNumber()!);
+                obj.value = (r.number()!);
                 return true;
             case "ratioposition":
-                obj.ratioPosition = (reader.readNumber()!);
+                obj.ratioPosition = (r.number()!);
                 return true;
             case "text":
-                obj.text = (reader.readString()!);
+                obj.text = (r.string()!);
                 return true;
         } 
         return false; 

@@ -8,33 +8,33 @@ import { IJsonReader } from "@src/io/IJsonReader";
 import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class BendPointSerializer {
-    public static fromJson(obj: BendPoint, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: BendPoint, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: BendPoint | null, writer: IJsonWriter): void {
+    public static toJson(obj: BendPoint | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("offset"); 
-        writer.writeNumber(obj.offset); 
-        writer.writePropertyName("value"); 
-        writer.writeNumber(obj.value); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("offset"); 
+        w.number(obj.offset); 
+        w.prop("value"); 
+        w.number(obj.value); 
+        w.endObject(); 
     }
-    public static setProperty(obj: BendPoint, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: BendPoint, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "offset":
-                obj.offset = (reader.readNumber()!);
+                obj.offset = (r.number()!);
                 return true;
             case "value":
-                obj.value = (reader.readNumber()!);
+                obj.value = (r.number()!);
                 return true;
         } 
         return false; 

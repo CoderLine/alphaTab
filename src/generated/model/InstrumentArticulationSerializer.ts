@@ -10,58 +10,58 @@ import { IJsonWriter } from "@src/io/IJsonWriter";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { TextBaseline } from "@src/platform/ICanvas";
 export class InstrumentArticulationSerializer {
-    public static fromJson(obj: InstrumentArticulation, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: InstrumentArticulation, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: InstrumentArticulation | null, writer: IJsonWriter): void {
+    public static toJson(obj: InstrumentArticulation | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("staffLine"); 
-        writer.writeNumber(obj.staffLine); 
-        writer.writePropertyName("noteHeadDefault"); 
-        writer.writeEnum(obj.noteHeadDefault); 
-        writer.writePropertyName("noteHeadHalf"); 
-        writer.writeEnum(obj.noteHeadHalf); 
-        writer.writePropertyName("noteHeadWhole"); 
-        writer.writeEnum(obj.noteHeadWhole); 
-        writer.writePropertyName("techniqueSymbol"); 
-        writer.writeEnum(obj.techniqueSymbol); 
-        writer.writePropertyName("techniqueSymbolPlacement"); 
-        writer.writeEnum(obj.techniqueSymbolPlacement); 
-        writer.writePropertyName("outputMidiNumber"); 
-        writer.writeNumber(obj.outputMidiNumber); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("staffLine"); 
+        w.number(obj.staffLine); 
+        w.prop("noteHeadDefault"); 
+        w.enum(obj.noteHeadDefault); 
+        w.prop("noteHeadHalf"); 
+        w.enum(obj.noteHeadHalf); 
+        w.prop("noteHeadWhole"); 
+        w.enum(obj.noteHeadWhole); 
+        w.prop("techniqueSymbol"); 
+        w.enum(obj.techniqueSymbol); 
+        w.prop("techniqueSymbolPlacement"); 
+        w.enum(obj.techniqueSymbolPlacement); 
+        w.prop("outputMidiNumber"); 
+        w.number(obj.outputMidiNumber); 
+        w.endObject(); 
     }
-    public static setProperty(obj: InstrumentArticulation, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: InstrumentArticulation, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "staffline":
-                obj.staffLine = (reader.readNumber()!);
+                obj.staffLine = (r.number()!);
                 return true;
             case "noteheaddefault":
-                obj.noteHeadDefault = (reader.readEnum<MusicFontSymbol>(MusicFontSymbol)!);
+                obj.noteHeadDefault = (r.enum<MusicFontSymbol>(MusicFontSymbol)!);
                 return true;
             case "noteheadhalf":
-                obj.noteHeadHalf = (reader.readEnum<MusicFontSymbol>(MusicFontSymbol)!);
+                obj.noteHeadHalf = (r.enum<MusicFontSymbol>(MusicFontSymbol)!);
                 return true;
             case "noteheadwhole":
-                obj.noteHeadWhole = (reader.readEnum<MusicFontSymbol>(MusicFontSymbol)!);
+                obj.noteHeadWhole = (r.enum<MusicFontSymbol>(MusicFontSymbol)!);
                 return true;
             case "techniquesymbol":
-                obj.techniqueSymbol = (reader.readEnum<MusicFontSymbol>(MusicFontSymbol)!);
+                obj.techniqueSymbol = (r.enum<MusicFontSymbol>(MusicFontSymbol)!);
                 return true;
             case "techniquesymbolplacement":
-                obj.techniqueSymbolPlacement = (reader.readEnum<TextBaseline>(TextBaseline)!);
+                obj.techniqueSymbolPlacement = (r.enum<TextBaseline>(TextBaseline)!);
                 return true;
             case "outputmidinumber":
-                obj.outputMidiNumber = (reader.readNumber()!);
+                obj.outputMidiNumber = (r.number()!);
                 return true;
         } 
         return false; 

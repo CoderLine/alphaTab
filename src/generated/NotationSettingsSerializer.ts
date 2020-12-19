@@ -12,83 +12,83 @@ import { FingeringMode } from "@src/NotationSettings";
 import { NotationElement } from "@src/NotationSettings";
 import { TabRhythmMode } from "@src/NotationSettings";
 export class NotationSettingsSerializer {
-    public static fromJson(obj: NotationSettings, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: NotationSettings, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: NotationSettings | null, writer: IJsonWriter): void {
+    public static toJson(obj: NotationSettings | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("notationMode"); 
-        writer.writeEnum(obj.notationMode); 
-        writer.writePropertyName("fingeringMode"); 
-        writer.writeEnum(obj.fingeringMode); 
-        writer.writePropertyName("elements"); 
-        writer.writeStartObject(); 
-        obj.elements.forEach((v, k) => { writer.writePropertyName(k); writer.writeBoolean(v); }); 
-        writer.writeEndObject(); 
-        writer.writePropertyName("rhythmMode"); 
-        writer.writeEnum(obj.rhythmMode); 
-        writer.writePropertyName("rhythmHeight"); 
-        writer.writeNumber(obj.rhythmHeight); 
-        writer.writePropertyName("transpositionPitches"); 
-        writer.writeNumberArray(obj.transpositionPitches); 
-        writer.writePropertyName("displayTranspositionPitches"); 
-        writer.writeNumberArray(obj.displayTranspositionPitches); 
-        writer.writePropertyName("smallGraceTabNotes"); 
-        writer.writeBoolean(obj.smallGraceTabNotes); 
-        writer.writePropertyName("extendBendArrowsOnTiedNotes"); 
-        writer.writeBoolean(obj.extendBendArrowsOnTiedNotes); 
-        writer.writePropertyName("extendLineEffectsToBeatEnd"); 
-        writer.writeBoolean(obj.extendLineEffectsToBeatEnd); 
-        writer.writePropertyName("slurHeight"); 
-        writer.writeNumber(obj.slurHeight); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("notationMode"); 
+        w.enum(obj.notationMode); 
+        w.prop("fingeringMode"); 
+        w.enum(obj.fingeringMode); 
+        w.prop("elements"); 
+        w.startObject(); 
+        obj.elements.forEach((v, k) => { w.prop(k); w.boolean(v); }); 
+        w.endObject(); 
+        w.prop("rhythmMode"); 
+        w.enum(obj.rhythmMode); 
+        w.prop("rhythmHeight"); 
+        w.number(obj.rhythmHeight); 
+        w.prop("transpositionPitches"); 
+        w.numberArray(obj.transpositionPitches); 
+        w.prop("displayTranspositionPitches"); 
+        w.numberArray(obj.displayTranspositionPitches); 
+        w.prop("smallGraceTabNotes"); 
+        w.boolean(obj.smallGraceTabNotes); 
+        w.prop("extendBendArrowsOnTiedNotes"); 
+        w.boolean(obj.extendBendArrowsOnTiedNotes); 
+        w.prop("extendLineEffectsToBeatEnd"); 
+        w.boolean(obj.extendLineEffectsToBeatEnd); 
+        w.prop("slurHeight"); 
+        w.number(obj.slurHeight); 
+        w.endObject(); 
     }
-    public static setProperty(obj: NotationSettings, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: NotationSettings, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "notationmode":
-                obj.notationMode = (reader.readEnum<NotationMode>(NotationMode)!);
+                obj.notationMode = (r.enum<NotationMode>(NotationMode)!);
                 return true;
             case "fingeringmode":
-                obj.fingeringMode = (reader.readEnum<FingeringMode>(FingeringMode)!);
+                obj.fingeringMode = (r.enum<FingeringMode>(FingeringMode)!);
                 return true;
             case "elements":
                 obj.elements = new Map<NotationElement, boolean>();
-                while (reader.nextProperty()) {
-                    obj.elements.set(reader.readPropertyNameAsEnum<NotationElement>(NotationElement), (reader.readBoolean()!));
+                while (r.nextProp()) {
+                    obj.elements.set(r.enumProp<NotationElement>(NotationElement), (r.boolean()!));
                 }
                 return true;
             case "rhythmmode":
-                obj.rhythmMode = (reader.readEnum<TabRhythmMode>(TabRhythmMode)!);
+                obj.rhythmMode = (r.enum<TabRhythmMode>(TabRhythmMode)!);
                 return true;
             case "rhythmheight":
-                obj.rhythmHeight = (reader.readNumber()!);
+                obj.rhythmHeight = (r.number()!);
                 return true;
             case "transpositionpitches":
-                obj.transpositionPitches = (reader.readNumberArray()!);
+                obj.transpositionPitches = (r.numberArray()!);
                 return true;
             case "displaytranspositionpitches":
-                obj.displayTranspositionPitches = (reader.readNumberArray()!);
+                obj.displayTranspositionPitches = (r.numberArray()!);
                 return true;
             case "smallgracetabnotes":
-                obj.smallGraceTabNotes = (reader.readBoolean()!);
+                obj.smallGraceTabNotes = (r.boolean()!);
                 return true;
             case "extendbendarrowsontiednotes":
-                obj.extendBendArrowsOnTiedNotes = (reader.readBoolean()!);
+                obj.extendBendArrowsOnTiedNotes = (r.boolean()!);
                 return true;
             case "extendlineeffectstobeatend":
-                obj.extendLineEffectsToBeatEnd = (reader.readBoolean()!);
+                obj.extendLineEffectsToBeatEnd = (r.boolean()!);
                 return true;
             case "slurheight":
-                obj.slurHeight = (reader.readNumber()!);
+                obj.slurHeight = (r.number()!);
                 return true;
         } 
         return false; 

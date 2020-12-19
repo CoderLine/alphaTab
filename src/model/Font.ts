@@ -90,16 +90,16 @@ export class Font {
                     let family = '';
                     let size = 0;
                     let style = FontStyle.Plain;
-                    while (reader.nextProperty()) {
-                        switch (reader.readPropertyName().toLowerCase()) {
+                    while (reader.nextProp()) {
+                        switch (reader.prop().toLowerCase()) {
                             case 'family':
-                                family = reader.readString()!;
+                                family = reader.string()!;
                                 break;
                             case 'size':
-                                size = reader.readNumber()!;
+                                size = reader.number()!;
                                 break;
                             case 'style':
-                                style = reader.readEnum<FontStyle>(FontStyle)!;
+                                style = reader.enum<FontStyle>(FontStyle)!;
                                 break;
                         }
                     }
@@ -107,7 +107,7 @@ export class Font {
                 }
             case JsonValueType.String:
                 if (!Environment.isRunningInWorker) {
-                    const value = reader.readString();
+                    const value = reader.string();
                     let el: HTMLElement = document.createElement('span');
                     el.setAttribute('style', 'font: ' + value);
                     let style: CSSStyleDeclaration = el.style;
@@ -188,13 +188,13 @@ export class Font {
     }
 
     public static toJson(font: Font, writer: IJsonWriter): void {
-        writer.writeStartObject();
-        writer.writePropertyName('family');
-        writer.writeString(font.family);
-        writer.writePropertyName('size');
-        writer.writeNumber(font.size);
-        writer.writePropertyName('style');
-        writer.writeEnum<FontStyle>(font.style);
-        writer.writeEndObject();
+        writer.startObject();
+        writer.prop('family');
+        writer.string(font.family);
+        writer.prop('size');
+        writer.number(font.size);
+        writer.prop('style');
+        writer.enum<FontStyle>(font.style);
+        writer.endObject();
     }
 }

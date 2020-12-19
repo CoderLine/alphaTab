@@ -13,117 +13,117 @@ import { RenderStylesheetSerializer } from "@src/generated/model/RenderStyleshee
 import { MasterBar } from "@src/model/MasterBar";
 import { Track } from "@src/model/Track";
 export class ScoreSerializer {
-    public static fromJson(obj: Score, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Score, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Score | null, writer: IJsonWriter): void {
+    public static toJson(obj: Score | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("album"); 
-        writer.writeString(obj.album); 
-        writer.writePropertyName("artist"); 
-        writer.writeString(obj.artist); 
-        writer.writePropertyName("copyright"); 
-        writer.writeString(obj.copyright); 
-        writer.writePropertyName("instructions"); 
-        writer.writeString(obj.instructions); 
-        writer.writePropertyName("music"); 
-        writer.writeString(obj.music); 
-        writer.writePropertyName("notices"); 
-        writer.writeString(obj.notices); 
-        writer.writePropertyName("subTitle"); 
-        writer.writeString(obj.subTitle); 
-        writer.writePropertyName("title"); 
-        writer.writeString(obj.title); 
-        writer.writePropertyName("words"); 
-        writer.writeString(obj.words); 
-        writer.writePropertyName("tab"); 
-        writer.writeString(obj.tab); 
-        writer.writePropertyName("tempo"); 
-        writer.writeNumber(obj.tempo); 
-        writer.writePropertyName("tempoLabel"); 
-        writer.writeString(obj.tempoLabel); 
-        writer.writePropertyName("masterBars"); 
-        writer.writeStartArray(); 
+        w.startObject(); 
+        w.prop("album"); 
+        w.string(obj.album); 
+        w.prop("artist"); 
+        w.string(obj.artist); 
+        w.prop("copyright"); 
+        w.string(obj.copyright); 
+        w.prop("instructions"); 
+        w.string(obj.instructions); 
+        w.prop("music"); 
+        w.string(obj.music); 
+        w.prop("notices"); 
+        w.string(obj.notices); 
+        w.prop("subTitle"); 
+        w.string(obj.subTitle); 
+        w.prop("title"); 
+        w.string(obj.title); 
+        w.prop("words"); 
+        w.string(obj.words); 
+        w.prop("tab"); 
+        w.string(obj.tab); 
+        w.prop("tempo"); 
+        w.number(obj.tempo); 
+        w.prop("tempoLabel"); 
+        w.string(obj.tempoLabel); 
+        w.prop("masterBars"); 
+        w.startArray(); 
         for (const i of obj.masterBars) {
-            MasterBarSerializer.toJson(i, writer);
+            MasterBarSerializer.toJson(i, w);
         } 
-        writer.writeEndArray(); 
-        writer.writePropertyName("tracks"); 
-        writer.writeStartArray(); 
+        w.endArray(); 
+        w.prop("tracks"); 
+        w.startArray(); 
         for (const i of obj.tracks) {
-            TrackSerializer.toJson(i, writer);
+            TrackSerializer.toJson(i, w);
         } 
-        writer.writeEndArray(); 
-        writer.writePropertyName("stylesheet"); 
-        RenderStylesheetSerializer.toJson(obj.stylesheet, writer); 
-        writer.writeEndObject(); 
+        w.endArray(); 
+        w.prop("stylesheet"); 
+        RenderStylesheetSerializer.toJson(obj.stylesheet, w); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Score, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Score, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "album":
-                obj.album = (reader.readString()!);
+                obj.album = (r.string()!);
                 return true;
             case "artist":
-                obj.artist = (reader.readString()!);
+                obj.artist = (r.string()!);
                 return true;
             case "copyright":
-                obj.copyright = (reader.readString()!);
+                obj.copyright = (r.string()!);
                 return true;
             case "instructions":
-                obj.instructions = (reader.readString()!);
+                obj.instructions = (r.string()!);
                 return true;
             case "music":
-                obj.music = (reader.readString()!);
+                obj.music = (r.string()!);
                 return true;
             case "notices":
-                obj.notices = (reader.readString()!);
+                obj.notices = (r.string()!);
                 return true;
             case "subtitle":
-                obj.subTitle = (reader.readString()!);
+                obj.subTitle = (r.string()!);
                 return true;
             case "title":
-                obj.title = (reader.readString()!);
+                obj.title = (r.string()!);
                 return true;
             case "words":
-                obj.words = (reader.readString()!);
+                obj.words = (r.string()!);
                 return true;
             case "tab":
-                obj.tab = (reader.readString()!);
+                obj.tab = (r.string()!);
                 return true;
             case "tempo":
-                obj.tempo = (reader.readNumber()!);
+                obj.tempo = (r.number()!);
                 return true;
             case "tempolabel":
-                obj.tempoLabel = (reader.readString()!);
+                obj.tempoLabel = (r.string()!);
                 return true;
             case "masterbars":
                 obj.masterBars = [];
-                while (reader.nextArrayItem()) {
+                while (r.nextItem()) {
                     const i = new MasterBar();
-                    MasterBarSerializer.fromJson(i, reader)
+                    MasterBarSerializer.fromJson(i, r)
                     obj.addMasterBar(i);
                 }
                 return true;
             case "tracks":
                 obj.tracks = [];
-                while (reader.nextArrayItem()) {
+                while (r.nextItem()) {
                     const i = new Track();
-                    TrackSerializer.fromJson(i, reader)
+                    TrackSerializer.fromJson(i, r)
                     obj.addTrack(i);
                 }
                 return true;
         } 
         if (["stylesheet"].indexOf(property) >= 0) {
-            RenderStylesheetSerializer.fromJson(obj.stylesheet, reader);
+            RenderStylesheetSerializer.fromJson(obj.stylesheet, r);
             return true;
         } 
         return false; 

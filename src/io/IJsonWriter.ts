@@ -1,27 +1,27 @@
 export interface IJsonWriter {
-    writeStartObject(): void;
-    writeEndObject(): void;
+    startObject(): void;
+    endObject(): void;
 
-    writeStartArray(): void;
-    writeEndArray(): void;
+    startArray(): void;
+    endArray(): void;
 
-    writePropertyName(name: any): void;
+    prop(name: any): void;
 
-    writeString(value: string | null): void;
-    writeNumber(value: number | null): void;
-    writeBoolean(value: boolean | null): void;
-    writeEnum<T>(value: T): void;
-    writeNull(): void;
-    writeStringArray(value: string[] | null): void;
-    writeNumberArray(value: number[] | null): void;
-    writeBooleanArray(value: boolean[] | null): void;
+    string(value: string | null): void;
+    number(value: number | null): void;
+    boolean(value: boolean | null): void;
+    enum<T>(value: T): void;
+    null(): void;
+    stringArray(value: string[] | null): void;
+    numberArray(value: number[] | null): void;
+    booleanArray(value: boolean[] | null): void;
 
-    writeUint8Array(value: Uint8Array | null): void;
-    writeUint16Array(value: Uint16Array | null): void;
-    writeUint32Array(value: Uint32Array | null): void;
-    writeInt8Array(value: Int8Array | null): void;
-    writeInt16Array(value: Int16Array | null): void;
-    writeInt32Array(value: Int32Array | null): void;
-    writeFloat32Array(value: Float32Array | null): void;
-    writeFloat64Array(value: Float64Array | null): void;
+    uint8Array(value: Uint8Array | null): void;
+    uint16Array(value: Uint16Array | null): void;
+    uint32Array(value: Uint32Array | null): void;
+    int8Array(value: Int8Array | null): void;
+    int16Array(value: Int16Array | null): void;
+    int32Array(value: Int32Array | null): void;
+    float32Array(value: Float32Array | null): void;
+    float64Array(value: Float64Array | null): void;
 }

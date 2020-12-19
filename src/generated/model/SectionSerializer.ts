@@ -8,33 +8,33 @@ import { IJsonReader } from "@src/io/IJsonReader";
 import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class SectionSerializer {
-    public static fromJson(obj: Section, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Section, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Section | null, writer: IJsonWriter): void {
+    public static toJson(obj: Section | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("marker"); 
-        writer.writeString(obj.marker); 
-        writer.writePropertyName("text"); 
-        writer.writeString(obj.text); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("marker"); 
+        w.string(obj.marker); 
+        w.prop("text"); 
+        w.string(obj.text); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Section, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Section, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "marker":
-                obj.marker = (reader.readString()!);
+                obj.marker = (r.string()!);
                 return true;
             case "text":
-                obj.text = (reader.readString()!);
+                obj.text = (r.string()!);
                 return true;
         } 
         return false; 

@@ -8,63 +8,63 @@ import { IJsonReader } from "@src/io/IJsonReader";
 import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class VibratoPlaybackSettingsSerializer {
-    public static fromJson(obj: VibratoPlaybackSettings, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: VibratoPlaybackSettings, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: VibratoPlaybackSettings | null, writer: IJsonWriter): void {
+    public static toJson(obj: VibratoPlaybackSettings | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("noteWideLength"); 
-        writer.writeNumber(obj.noteWideLength); 
-        writer.writePropertyName("noteWideAmplitude"); 
-        writer.writeNumber(obj.noteWideAmplitude); 
-        writer.writePropertyName("noteSlightLength"); 
-        writer.writeNumber(obj.noteSlightLength); 
-        writer.writePropertyName("noteSlightAmplitude"); 
-        writer.writeNumber(obj.noteSlightAmplitude); 
-        writer.writePropertyName("beatWideLength"); 
-        writer.writeNumber(obj.beatWideLength); 
-        writer.writePropertyName("beatWideAmplitude"); 
-        writer.writeNumber(obj.beatWideAmplitude); 
-        writer.writePropertyName("beatSlightLength"); 
-        writer.writeNumber(obj.beatSlightLength); 
-        writer.writePropertyName("beatSlightAmplitude"); 
-        writer.writeNumber(obj.beatSlightAmplitude); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("noteWideLength"); 
+        w.number(obj.noteWideLength); 
+        w.prop("noteWideAmplitude"); 
+        w.number(obj.noteWideAmplitude); 
+        w.prop("noteSlightLength"); 
+        w.number(obj.noteSlightLength); 
+        w.prop("noteSlightAmplitude"); 
+        w.number(obj.noteSlightAmplitude); 
+        w.prop("beatWideLength"); 
+        w.number(obj.beatWideLength); 
+        w.prop("beatWideAmplitude"); 
+        w.number(obj.beatWideAmplitude); 
+        w.prop("beatSlightLength"); 
+        w.number(obj.beatSlightLength); 
+        w.prop("beatSlightAmplitude"); 
+        w.number(obj.beatSlightAmplitude); 
+        w.endObject(); 
     }
-    public static setProperty(obj: VibratoPlaybackSettings, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: VibratoPlaybackSettings, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "notewidelength":
-                obj.noteWideLength = (reader.readNumber()!);
+                obj.noteWideLength = (r.number()!);
                 return true;
             case "notewideamplitude":
-                obj.noteWideAmplitude = (reader.readNumber()!);
+                obj.noteWideAmplitude = (r.number()!);
                 return true;
             case "noteslightlength":
-                obj.noteSlightLength = (reader.readNumber()!);
+                obj.noteSlightLength = (r.number()!);
                 return true;
             case "noteslightamplitude":
-                obj.noteSlightAmplitude = (reader.readNumber()!);
+                obj.noteSlightAmplitude = (r.number()!);
                 return true;
             case "beatwidelength":
-                obj.beatWideLength = (reader.readNumber()!);
+                obj.beatWideLength = (r.number()!);
                 return true;
             case "beatwideamplitude":
-                obj.beatWideAmplitude = (reader.readNumber()!);
+                obj.beatWideAmplitude = (r.number()!);
                 return true;
             case "beatslightlength":
-                obj.beatSlightLength = (reader.readNumber()!);
+                obj.beatSlightLength = (r.number()!);
                 return true;
             case "beatslightamplitude":
-                obj.beatSlightAmplitude = (reader.readNumber()!);
+                obj.beatSlightAmplitude = (r.number()!);
                 return true;
         } 
         return false; 

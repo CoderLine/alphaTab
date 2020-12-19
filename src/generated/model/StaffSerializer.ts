@@ -12,99 +12,99 @@ import { ChordSerializer } from "@src/generated/model/ChordSerializer";
 import { Bar } from "@src/model/Bar";
 import { Chord } from "@src/model/Chord";
 export class StaffSerializer {
-    public static fromJson(obj: Staff, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Staff, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Staff | null, writer: IJsonWriter): void {
+    public static toJson(obj: Staff | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("index"); 
-        writer.writeNumber(obj.index); 
-        writer.writePropertyName("bars"); 
-        writer.writeStartArray(); 
+        w.startObject(); 
+        w.prop("index"); 
+        w.number(obj.index); 
+        w.prop("bars"); 
+        w.startArray(); 
         for (const i of obj.bars) {
-            BarSerializer.toJson(i, writer);
+            BarSerializer.toJson(i, w);
         } 
-        writer.writeEndArray(); 
-        writer.writePropertyName("chords"); 
-        writer.writeStartObject(); 
-        obj.chords.forEach((v, k) => { writer.writePropertyName(k); ChordSerializer.toJson(v, writer); }); 
-        writer.writeEndObject(); 
-        writer.writePropertyName("capo"); 
-        writer.writeNumber(obj.capo); 
-        writer.writePropertyName("transpositionPitch"); 
-        writer.writeNumber(obj.transpositionPitch); 
-        writer.writePropertyName("displayTranspositionPitch"); 
-        writer.writeNumber(obj.displayTranspositionPitch); 
-        writer.writePropertyName("tuning"); 
-        writer.writeNumberArray(obj.tuning); 
-        writer.writePropertyName("tuningName"); 
-        writer.writeString(obj.tuningName); 
-        writer.writePropertyName("showTablature"); 
-        writer.writeBoolean(obj.showTablature); 
-        writer.writePropertyName("showStandardNotation"); 
-        writer.writeBoolean(obj.showStandardNotation); 
-        writer.writePropertyName("isPercussion"); 
-        writer.writeBoolean(obj.isPercussion); 
-        writer.writePropertyName("standardNotationLineCount"); 
-        writer.writeNumber(obj.standardNotationLineCount); 
-        writer.writeEndObject(); 
+        w.endArray(); 
+        w.prop("chords"); 
+        w.startObject(); 
+        obj.chords.forEach((v, k) => { w.prop(k); ChordSerializer.toJson(v, w); }); 
+        w.endObject(); 
+        w.prop("capo"); 
+        w.number(obj.capo); 
+        w.prop("transpositionPitch"); 
+        w.number(obj.transpositionPitch); 
+        w.prop("displayTranspositionPitch"); 
+        w.number(obj.displayTranspositionPitch); 
+        w.prop("tuning"); 
+        w.numberArray(obj.tuning); 
+        w.prop("tuningName"); 
+        w.string(obj.tuningName); 
+        w.prop("showTablature"); 
+        w.boolean(obj.showTablature); 
+        w.prop("showStandardNotation"); 
+        w.boolean(obj.showStandardNotation); 
+        w.prop("isPercussion"); 
+        w.boolean(obj.isPercussion); 
+        w.prop("standardNotationLineCount"); 
+        w.number(obj.standardNotationLineCount); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Staff, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Staff, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "index":
-                obj.index = (reader.readNumber()!);
+                obj.index = (r.number()!);
                 return true;
             case "bars":
                 obj.bars = [];
-                while (reader.nextArrayItem()) {
+                while (r.nextItem()) {
                     const i = new Bar();
-                    BarSerializer.fromJson(i, reader)
+                    BarSerializer.fromJson(i, r)
                     obj.addBar(i);
                 }
                 return true;
             case "chords":
                 obj.chords = new Map<string, Chord>();
-                while (reader.nextProperty()) {
+                while (r.nextProp()) {
                     const i = new Chord();
-                    ChordSerializer.fromJson(i, reader);
-                    obj.addChord(reader.readPropertyName(), i);
+                    ChordSerializer.fromJson(i, r);
+                    obj.addChord(r.prop(), i);
                 }
                 return true;
             case "capo":
-                obj.capo = (reader.readNumber()!);
+                obj.capo = (r.number()!);
                 return true;
             case "transpositionpitch":
-                obj.transpositionPitch = (reader.readNumber()!);
+                obj.transpositionPitch = (r.number()!);
                 return true;
             case "displaytranspositionpitch":
-                obj.displayTranspositionPitch = (reader.readNumber()!);
+                obj.displayTranspositionPitch = (r.number()!);
                 return true;
             case "tuning":
-                obj.tuning = (reader.readNumberArray()!);
+                obj.tuning = (r.numberArray()!);
                 return true;
             case "tuningname":
-                obj.tuningName = (reader.readString()!);
+                obj.tuningName = (r.string()!);
                 return true;
             case "showtablature":
-                obj.showTablature = (reader.readBoolean()!);
+                obj.showTablature = (r.boolean()!);
                 return true;
             case "showstandardnotation":
-                obj.showStandardNotation = (reader.readBoolean()!);
+                obj.showStandardNotation = (r.boolean()!);
                 return true;
             case "ispercussion":
-                obj.isPercussion = (reader.readBoolean()!);
+                obj.isPercussion = (r.boolean()!);
                 return true;
             case "standardnotationlinecount":
-                obj.standardNotationLineCount = (reader.readNumber()!);
+                obj.standardNotationLineCount = (r.number()!);
                 return true;
         } 
         return false; 

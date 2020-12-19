@@ -8,63 +8,63 @@ import { IJsonReader } from "@src/io/IJsonReader";
 import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class PlaybackInformationSerializer {
-    public static fromJson(obj: PlaybackInformation, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: PlaybackInformation, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: PlaybackInformation | null, writer: IJsonWriter): void {
+    public static toJson(obj: PlaybackInformation | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("volume"); 
-        writer.writeNumber(obj.volume); 
-        writer.writePropertyName("balance"); 
-        writer.writeNumber(obj.balance); 
-        writer.writePropertyName("port"); 
-        writer.writeNumber(obj.port); 
-        writer.writePropertyName("program"); 
-        writer.writeNumber(obj.program); 
-        writer.writePropertyName("primaryChannel"); 
-        writer.writeNumber(obj.primaryChannel); 
-        writer.writePropertyName("secondaryChannel"); 
-        writer.writeNumber(obj.secondaryChannel); 
-        writer.writePropertyName("isMute"); 
-        writer.writeBoolean(obj.isMute); 
-        writer.writePropertyName("isSolo"); 
-        writer.writeBoolean(obj.isSolo); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("volume"); 
+        w.number(obj.volume); 
+        w.prop("balance"); 
+        w.number(obj.balance); 
+        w.prop("port"); 
+        w.number(obj.port); 
+        w.prop("program"); 
+        w.number(obj.program); 
+        w.prop("primaryChannel"); 
+        w.number(obj.primaryChannel); 
+        w.prop("secondaryChannel"); 
+        w.number(obj.secondaryChannel); 
+        w.prop("isMute"); 
+        w.boolean(obj.isMute); 
+        w.prop("isSolo"); 
+        w.boolean(obj.isSolo); 
+        w.endObject(); 
     }
-    public static setProperty(obj: PlaybackInformation, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: PlaybackInformation, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "volume":
-                obj.volume = (reader.readNumber()!);
+                obj.volume = (r.number()!);
                 return true;
             case "balance":
-                obj.balance = (reader.readNumber()!);
+                obj.balance = (r.number()!);
                 return true;
             case "port":
-                obj.port = (reader.readNumber()!);
+                obj.port = (r.number()!);
                 return true;
             case "program":
-                obj.program = (reader.readNumber()!);
+                obj.program = (r.number()!);
                 return true;
             case "primarychannel":
-                obj.primaryChannel = (reader.readNumber()!);
+                obj.primaryChannel = (r.number()!);
                 return true;
             case "secondarychannel":
-                obj.secondaryChannel = (reader.readNumber()!);
+                obj.secondaryChannel = (r.number()!);
                 return true;
             case "ismute":
-                obj.isMute = (reader.readBoolean()!);
+                obj.isMute = (r.boolean()!);
                 return true;
             case "issolo":
-                obj.isSolo = (reader.readBoolean()!);
+                obj.isSolo = (r.boolean()!);
                 return true;
         } 
         return false; 

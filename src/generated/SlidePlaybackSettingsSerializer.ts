@@ -8,38 +8,38 @@ import { IJsonReader } from "@src/io/IJsonReader";
 import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class SlidePlaybackSettingsSerializer {
-    public static fromJson(obj: SlidePlaybackSettings, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: SlidePlaybackSettings, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: SlidePlaybackSettings | null, writer: IJsonWriter): void {
+    public static toJson(obj: SlidePlaybackSettings | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("simpleSlidePitchOffset"); 
-        writer.writeNumber(obj.simpleSlidePitchOffset); 
-        writer.writePropertyName("simpleSlideDurationRatio"); 
-        writer.writeNumber(obj.simpleSlideDurationRatio); 
-        writer.writePropertyName("shiftSlideDurationRatio"); 
-        writer.writeNumber(obj.shiftSlideDurationRatio); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("simpleSlidePitchOffset"); 
+        w.number(obj.simpleSlidePitchOffset); 
+        w.prop("simpleSlideDurationRatio"); 
+        w.number(obj.simpleSlideDurationRatio); 
+        w.prop("shiftSlideDurationRatio"); 
+        w.number(obj.shiftSlideDurationRatio); 
+        w.endObject(); 
     }
-    public static setProperty(obj: SlidePlaybackSettings, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: SlidePlaybackSettings, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "simpleslidepitchoffset":
-                obj.simpleSlidePitchOffset = (reader.readNumber()!);
+                obj.simpleSlidePitchOffset = (r.number()!);
                 return true;
             case "simpleslidedurationratio":
-                obj.simpleSlideDurationRatio = (reader.readNumber()!);
+                obj.simpleSlideDurationRatio = (r.number()!);
                 return true;
             case "shiftslidedurationratio":
-                obj.shiftSlideDurationRatio = (reader.readNumber()!);
+                obj.shiftSlideDurationRatio = (r.number()!);
                 return true;
         } 
         return false; 

@@ -69,13 +69,13 @@ export class Color {
             case JsonValueType.Number:
                 {
                     const c = new Color(0, 0, 0, 0);
-                    c.raw = reader.readNumber()!;
+                    c.raw = reader.number()!;
                     c.updateRgba();
                     return c;
                 }
             case JsonValueType.String:
                 {
-                    const json = reader.readString()!;
+                    const json = reader.string()!;
                     if (json.startsWith('#')) {
                         if (json.length === 4) {
                             // #RGB
@@ -143,6 +143,6 @@ export class Color {
     }
 
     public static toJson(obj: Color, writer: IJsonWriter): void {
-        writer.writeNumber(obj.raw);
+        writer.number(obj.raw);
     }
 }

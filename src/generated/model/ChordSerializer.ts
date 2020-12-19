@@ -8,58 +8,58 @@ import { IJsonReader } from "@src/io/IJsonReader";
 import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class ChordSerializer {
-    public static fromJson(obj: Chord, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Chord, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Chord | null, writer: IJsonWriter): void {
+    public static toJson(obj: Chord | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("name"); 
-        writer.writeString(obj.name); 
-        writer.writePropertyName("firstFret"); 
-        writer.writeNumber(obj.firstFret); 
-        writer.writePropertyName("strings"); 
-        writer.writeNumberArray(obj.strings); 
-        writer.writePropertyName("barreFrets"); 
-        writer.writeNumberArray(obj.barreFrets); 
-        writer.writePropertyName("showName"); 
-        writer.writeBoolean(obj.showName); 
-        writer.writePropertyName("showDiagram"); 
-        writer.writeBoolean(obj.showDiagram); 
-        writer.writePropertyName("showFingering"); 
-        writer.writeBoolean(obj.showFingering); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("name"); 
+        w.string(obj.name); 
+        w.prop("firstFret"); 
+        w.number(obj.firstFret); 
+        w.prop("strings"); 
+        w.numberArray(obj.strings); 
+        w.prop("barreFrets"); 
+        w.numberArray(obj.barreFrets); 
+        w.prop("showName"); 
+        w.boolean(obj.showName); 
+        w.prop("showDiagram"); 
+        w.boolean(obj.showDiagram); 
+        w.prop("showFingering"); 
+        w.boolean(obj.showFingering); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Chord, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Chord, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "name":
-                obj.name = (reader.readString()!);
+                obj.name = (r.string()!);
                 return true;
             case "firstfret":
-                obj.firstFret = (reader.readNumber()!);
+                obj.firstFret = (r.number()!);
                 return true;
             case "strings":
-                obj.strings = (reader.readNumberArray()!);
+                obj.strings = (r.numberArray()!);
                 return true;
             case "barrefrets":
-                obj.barreFrets = (reader.readNumberArray()!);
+                obj.barreFrets = (r.numberArray()!);
                 return true;
             case "showname":
-                obj.showName = (reader.readBoolean()!);
+                obj.showName = (r.boolean()!);
                 return true;
             case "showdiagram":
-                obj.showDiagram = (reader.readBoolean()!);
+                obj.showDiagram = (r.boolean()!);
                 return true;
             case "showfingering":
-                obj.showFingering = (reader.readBoolean()!);
+                obj.showFingering = (r.boolean()!);
                 return true;
         } 
         return false; 

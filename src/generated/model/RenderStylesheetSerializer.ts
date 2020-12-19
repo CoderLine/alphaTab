@@ -8,28 +8,28 @@ import { IJsonReader } from "@src/io/IJsonReader";
 import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class RenderStylesheetSerializer {
-    public static fromJson(obj: RenderStylesheet, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: RenderStylesheet, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: RenderStylesheet | null, writer: IJsonWriter): void {
+    public static toJson(obj: RenderStylesheet | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("hideDynamics"); 
-        writer.writeBoolean(obj.hideDynamics); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("hideDynamics"); 
+        w.boolean(obj.hideDynamics); 
+        w.endObject(); 
     }
-    public static setProperty(obj: RenderStylesheet, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: RenderStylesheet, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "hidedynamics":
-                obj.hideDynamics = (reader.readBoolean()!);
+                obj.hideDynamics = (r.boolean()!);
                 return true;
         } 
         return false; 

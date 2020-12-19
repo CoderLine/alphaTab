@@ -77,7 +77,7 @@ function generateFromJsonBody() {
     return ts.factory.createBlock(addNewLines([
         ts.factory.createIfStatement(
             ts.factory.createBinaryExpression(
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('reader'), 'currentValueType'),
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'currentValueType'),
                 ts.SyntaxKind.ExclamationEqualsEqualsToken,
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('JsonValueType'), 'Object'),
             ),
@@ -88,7 +88,7 @@ function generateFromJsonBody() {
 
         ts.factory.createWhileStatement(
             ts.factory.createCallExpression(
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('reader'), 'nextProperty'),
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'nextProp'),
                 undefined,
                 []
             ),
@@ -102,7 +102,7 @@ function generateFromJsonBody() {
                             ts.factory.createCallExpression(
                                 ts.factory.createPropertyAccessExpression(
                                     ts.factory.createCallExpression(
-                                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('reader'), 'readPropertyName'),
+                                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'prop'),
                                         undefined,
                                         []
                                     ),
@@ -111,7 +111,7 @@ function generateFromJsonBody() {
                                 undefined,
                                 []
                             ),
-                            ts.factory.createIdentifier('reader'),
+                            ts.factory.createIdentifier('r'),
                         ]
                     )
                 )
@@ -150,7 +150,7 @@ function createFromJsonMethod(input: ts.ClassDeclaration,
                 undefined,
                 undefined,
                 undefined,
-                'reader',
+                'r',
                 undefined,
                 ts.factory.createTypeReferenceNode('IJsonReader')
             )
@@ -171,28 +171,28 @@ function getWriteMethodNameForPrimitive(type: ts.Type, typeChecker: ts.TypeCheck
     const arrayItemType = unwrapArrayItemType(type, typeChecker);
 
     if (hasFlag(type, ts.TypeFlags.Number)) {
-        return "writeNumber";
+        return "number";
     }
     if (hasFlag(type, ts.TypeFlags.String)) {
-        return "writeString";
+        return "string";
     }
     if (hasFlag(type, ts.TypeFlags.Boolean)) {
-        return "writeBoolean";
+        return "boolean";
     }
 
     if (isEnumType(type)) {
-        return 'writeEnum';
+        return 'enum';
     }
 
     if (arrayItemType) {
         if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Number)) {
-            return "writeNumberArray";
+            return "numberArray";
         }
         if (isArray && hasFlag(arrayItemType, ts.TypeFlags.String)) {
-            return "writeStringArray";
+            return "stringArray";
         }
         if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Boolean)) {
-            return "writeBooleanArray";
+            return "booleanArray";
         }
     } else if (type.symbol) {
         switch (type.symbol.name) {
@@ -204,7 +204,7 @@ function getWriteMethodNameForPrimitive(type: ts.Type, typeChecker: ts.TypeCheck
             case 'Int32Array':
             case 'Float32Array':
             case 'Float64Array':
-                return 'write' + type.symbol.name;
+                return type.symbol.name.substring(0, 1).toLowerCase() + type.symbol.name.substring(1);
         }
     }
 
@@ -225,7 +225,7 @@ function generateToJsonBody(
         ),
         ts.factory.createBlock([
             ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writeNull'),
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'null'),
                 undefined, []
             )),
             ts.factory.createReturnStatement()
@@ -233,7 +233,7 @@ function generateToJsonBody(
     ))
 
     statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writeStartObject'),
+        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'startObject'),
         undefined, []
     )));
 
@@ -242,7 +242,7 @@ function generateToJsonBody(
         const jsonName = prop.jsonNames.filter(n => n !== '')[0];
 
         statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writePropertyName'),
+            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
             undefined,
             [
                 ts.factory.createStringLiteral(jsonName)
@@ -260,7 +260,7 @@ function generateToJsonBody(
 
         if (writeValueMethodName) {
             statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), writeValueMethodName),
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), writeValueMethodName),
                 undefined,
                 [
                     ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
@@ -275,7 +275,7 @@ function generateToJsonBody(
             importer(itemSerializer, findSerializerModule(arrayItemType, program.getCompilerOptions()));
 
             statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writeStartArray'),
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'startArray'),
                 undefined,
                 []
             )));
@@ -294,7 +294,7 @@ function generateToJsonBody(
                             undefined,
                             [
                                 ts.factory.createIdentifier('i'),
-                                ts.factory.createIdentifier('writer')
+                                ts.factory.createIdentifier('w')
                             ]
                         )
                     )
@@ -302,7 +302,7 @@ function generateToJsonBody(
             ));
 
             statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writeEndArray'),
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'endArray'),
                 undefined,
                 []
             )));
@@ -319,7 +319,7 @@ function generateToJsonBody(
                 itemSerializer = '';
                 writeValue = ts.factory.createCallExpression(
                     ts.factory.createPropertyAccessExpression(
-                        ts.factory.createIdentifier('writer'),
+                        ts.factory.createIdentifier('w'),
                         getWriteMethodNameForPrimitive(mapType.typeArguments![1], typeChecker)!
                     ),
                     undefined,
@@ -333,13 +333,13 @@ function generateToJsonBody(
                     undefined,
                     [
                         ts.factory.createIdentifier('v'),
-                        ts.factory.createIdentifier('writer')
+                        ts.factory.createIdentifier('w')
                     ]
                 );
             }
 
             statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writeStartObject'),
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'startObject'),
                 undefined,
                 []
             )));
@@ -360,7 +360,7 @@ function generateToJsonBody(
                             ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                             ts.factory.createBlock([
                                 ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-                                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writePropertyName'),
+                                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
                                     undefined,
                                     [ts.factory.createIdentifier('k')]
                                 )),
@@ -372,7 +372,7 @@ function generateToJsonBody(
             );
 
             statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writeEndObject'),
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'endObject'),
                 undefined,
                 []
             )));
@@ -387,7 +387,7 @@ function generateToJsonBody(
                         [],
                         [
                             ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
-                            ts.factory.createIdentifier('writer')
+                            ts.factory.createIdentifier('w')
                         ]
                     )
                 )
@@ -406,7 +406,7 @@ function generateToJsonBody(
                     [],
                     [
                         ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
-                        ts.factory.createIdentifier('writer'),
+                        ts.factory.createIdentifier('w'),
                     ]
                 ));
 
@@ -417,7 +417,7 @@ function generateToJsonBody(
                         writeValue
                     ]),
                     ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writeNull'),
+                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'null'),
                         undefined,
                         []
                     ))
@@ -429,7 +429,7 @@ function generateToJsonBody(
     }
 
     statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('writer'), 'writeEndObject'),
+        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'endObject'),
         undefined, []
     )));
 
@@ -471,7 +471,7 @@ function createToJsonMethod(program: ts.Program,
                 undefined,
                 undefined,
                 undefined,
-                'writer',
+                'w',
                 undefined,
                 ts.factory.createTypeReferenceNode('IJsonWriter')
             )
@@ -493,24 +493,24 @@ function getReadMethodNameForPrimitive(type: ts.Type, typeChecker: ts.TypeChecke
     const arrayItemType = unwrapArrayItemType(type, typeChecker);
 
     if (hasFlag(type, ts.TypeFlags.Number)) {
-        return "readNumber";
+        return "number";
     }
     if (hasFlag(type, ts.TypeFlags.String)) {
-        return "readString";
+        return "string";
     }
     if (hasFlag(type, ts.TypeFlags.Boolean)) {
-        return "readBoolean";
+        return "boolean";
     }
 
     if (arrayItemType) {
         if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Number)) {
-            return "readNumberArray";
+            return "numberArray";
         }
         if (isArray && hasFlag(arrayItemType, ts.TypeFlags.String)) {
-            return "readStringArray";
+            return "stringArray";
         }
         if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Boolean)) {
-            return "readBooleanArray";
+            return "booleanArray";
         }
     } else if (type.symbol) {
         switch (type.symbol.name) {
@@ -522,7 +522,7 @@ function getReadMethodNameForPrimitive(type: ts.Type, typeChecker: ts.TypeChecke
             case 'Int32Array':
             case 'Float32Array':
             case 'Float64Array':
-                return 'read' + type.symbol.name;
+                return type.symbol.name.substr(0, 1).toLowerCase() + type.symbol.name.substr(1);
         }
     }
 
@@ -533,8 +533,8 @@ function getReadMethodNameForPrimitive(type: ts.Type, typeChecker: ts.TypeChecke
 function createEnumMapping(type: ts.Type): ts.Expression {
     return ts.factory.createCallExpression(
         ts.factory.createPropertyAccessExpression(
-            ts.factory.createIdentifier('reader'),
-            'readEnum'
+            ts.factory.createIdentifier('r'),
+            'enum'
         ),
         [ts.factory.createTypeReferenceNode(type.symbol.name)],
         [
@@ -570,7 +570,7 @@ function generateSetPropertyBody(program: ts.Program,
         if (primitiveRead) {
             const read = ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(
-                    ts.factory.createIdentifier('reader'),
+                    ts.factory.createIdentifier('r'),
                     primitiveRead
                 ),
                 undefined,
@@ -616,7 +616,7 @@ function generateSetPropertyBody(program: ts.Program,
                 assignField(ts.factory.createArrayLiteralExpression(undefined)),
                 ts.factory.createWhileStatement(
                     ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('reader'), 'nextArrayItem'),
+                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'nextItem'),
                         undefined,
                         []
                     ),
@@ -639,7 +639,7 @@ function generateSetPropertyBody(program: ts.Program,
                             undefined,
                             [
                                 ts.factory.createIdentifier('i'),
-                                ts.factory.createIdentifier('reader')
+                                ts.factory.createIdentifier('r')
                             ]
                         ),
                         ts.factory.createExpressionStatement(
@@ -690,19 +690,19 @@ function generateSetPropertyBody(program: ts.Program,
             if (isEnumType(mapType.typeArguments![0])) {
                 importer(mapType.typeArguments![0].symbol!.name, findModule(mapType.typeArguments![0], program.getCompilerOptions()));
                 mapKey = ts.factory.createCallExpression(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('reader'), 'readPropertyNameAsEnum'),
+                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'enumProp'),
                     [ts.factory.createTypeReferenceNode(mapType.typeArguments![0].symbol!.name)],
                     [ts.factory.createIdentifier(mapType.typeArguments![0].symbol!.name)]
                 );
             } else if (isNumberType(mapType.typeArguments![0])) {
                 mapKey = ts.factory.createCallExpression(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('reader'), 'readPropertyNameAsNumber'),
+                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'numberProp'),
                     undefined,
                     []
                 );
             } else {
                 mapKey = ts.factory.createCallExpression(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('reader'), 'readPropertyName'),
+                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'prop'),
                     undefined,
                     []
                 );
@@ -714,7 +714,7 @@ function generateSetPropertyBody(program: ts.Program,
             if (primitiveReadForValue) {
                 mapValue = ts.factory.createNonNullExpression(ts.factory.createCallExpression(
                     ts.factory.createPropertyAccessExpression(
-                        ts.factory.createIdentifier('reader'),
+                        ts.factory.createIdentifier('r'),
                         primitiveReadForValue
                     ),
                     undefined,
@@ -739,7 +739,7 @@ function generateSetPropertyBody(program: ts.Program,
 
             caseStatements.push(ts.factory.createWhileStatement(
                 ts.factory.createCallExpression(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('reader'), 'nextProperty'),
+                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'nextProp'),
                     undefined,
                     []
                 ),
@@ -762,7 +762,7 @@ function generateSetPropertyBody(program: ts.Program,
                             undefined,
                             [
                                 ts.factory.createIdentifier('i'),
-                                ts.factory.createIdentifier('reader'),
+                                ts.factory.createIdentifier('r'),
                             ]
                         )
                     ),
@@ -799,7 +799,7 @@ function generateSetPropertyBody(program: ts.Program,
                             ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier(itemSerializer), 'fromJson'),
                             [],
                             [
-                                ts.factory.createIdentifier('reader')
+                                ts.factory.createIdentifier('r')
                             ]
                         ),
                         ts.factory
@@ -842,7 +842,7 @@ function generateSetPropertyBody(program: ts.Program,
                                         [],
                                         [
                                             ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
-                                            ts.factory.createIdentifier('reader')
+                                            ts.factory.createIdentifier('r')
                                         ]
                                     )
                                 ),
@@ -851,7 +851,7 @@ function generateSetPropertyBody(program: ts.Program,
                             : [
                                 ts.factory.createIfStatement(
                                     ts.factory.createBinaryExpression(
-                                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('reader'), 'currentValueType'),
+                                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'currentValueType'),
                                         ts.SyntaxKind.ExclamationEqualsEqualsToken,
                                         ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('JsonValueType'), 'Null'),
                                     ),
@@ -868,7 +868,7 @@ function generateSetPropertyBody(program: ts.Program,
                                                 [],
                                                 [
                                                     ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
-                                                    ts.factory.createIdentifier('reader')
+                                                    ts.factory.createIdentifier('r')
                                                 ]
                                             )
                                         )
@@ -929,7 +929,7 @@ function generateSetPropertyBody(program: ts.Program,
                                                             [],
                                                             [ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('c'), 'length')]
                                                         ),
-                                                        ts.factory.createIdentifier('reader')
+                                                        ts.factory.createIdentifier('r')
                                                     ]
                                                 ),
                                                 ts.factory.createBlock([
@@ -1005,7 +1005,7 @@ function createSetPropertyMethod(
                 undefined,
                 undefined,
                 undefined,
-                'reader',
+                'r',
                 undefined,
                 ts.factory.createTypeReferenceNode('IJsonReader')
             )

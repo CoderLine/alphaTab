@@ -9,33 +9,33 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 import { FermataType } from "@src/model/Fermata";
 export class FermataSerializer {
-    public static fromJson(obj: Fermata, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Fermata, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Fermata | null, writer: IJsonWriter): void {
+    public static toJson(obj: Fermata | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("type"); 
-        writer.writeEnum(obj.type); 
-        writer.writePropertyName("length"); 
-        writer.writeNumber(obj.length); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("type"); 
+        w.enum(obj.type); 
+        w.prop("length"); 
+        w.number(obj.length); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Fermata, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Fermata, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "type":
-                obj.type = (reader.readEnum<FermataType>(FermataType)!);
+                obj.type = (r.enum<FermataType>(FermataType)!);
                 return true;
             case "length":
-                obj.length = (reader.readNumber()!);
+                obj.length = (r.number()!);
                 return true;
         } 
         return false; 

@@ -26,255 +26,255 @@ import { DynamicValue } from "@src/model/DynamicValue";
 import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
 export class BeatSerializer {
-    public static fromJson(obj: Beat, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Beat, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Beat | null, writer: IJsonWriter): void {
+    public static toJson(obj: Beat | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("id"); 
-        writer.writeNumber(obj.id); 
-        writer.writePropertyName("index"); 
-        writer.writeNumber(obj.index); 
-        writer.writePropertyName("notes"); 
-        writer.writeStartArray(); 
+        w.startObject(); 
+        w.prop("id"); 
+        w.number(obj.id); 
+        w.prop("index"); 
+        w.number(obj.index); 
+        w.prop("notes"); 
+        w.startArray(); 
         for (const i of obj.notes) {
-            NoteSerializer.toJson(i, writer);
+            NoteSerializer.toJson(i, w);
         } 
-        writer.writeEndArray(); 
-        writer.writePropertyName("isEmpty"); 
-        writer.writeBoolean(obj.isEmpty); 
-        writer.writePropertyName("whammyStyle"); 
-        writer.writeEnum(obj.whammyStyle); 
-        writer.writePropertyName("ottava"); 
-        writer.writeEnum(obj.ottava); 
-        writer.writePropertyName("isLegatoOrigin"); 
-        writer.writeBoolean(obj.isLegatoOrigin); 
-        writer.writePropertyName("duration"); 
-        writer.writeEnum(obj.duration); 
-        writer.writePropertyName("isLetRing"); 
-        writer.writeBoolean(obj.isLetRing); 
-        writer.writePropertyName("isPalmMute"); 
-        writer.writeBoolean(obj.isPalmMute); 
-        writer.writePropertyName("automations"); 
-        writer.writeStartArray(); 
+        w.endArray(); 
+        w.prop("isEmpty"); 
+        w.boolean(obj.isEmpty); 
+        w.prop("whammyStyle"); 
+        w.enum(obj.whammyStyle); 
+        w.prop("ottava"); 
+        w.enum(obj.ottava); 
+        w.prop("isLegatoOrigin"); 
+        w.boolean(obj.isLegatoOrigin); 
+        w.prop("duration"); 
+        w.enum(obj.duration); 
+        w.prop("isLetRing"); 
+        w.boolean(obj.isLetRing); 
+        w.prop("isPalmMute"); 
+        w.boolean(obj.isPalmMute); 
+        w.prop("automations"); 
+        w.startArray(); 
         for (const i of obj.automations) {
-            AutomationSerializer.toJson(i, writer);
+            AutomationSerializer.toJson(i, w);
         } 
-        writer.writeEndArray(); 
-        writer.writePropertyName("dots"); 
-        writer.writeNumber(obj.dots); 
-        writer.writePropertyName("fadeIn"); 
-        writer.writeBoolean(obj.fadeIn); 
-        writer.writePropertyName("lyrics"); 
-        writer.writeStringArray(obj.lyrics); 
-        writer.writePropertyName("hasRasgueado"); 
-        writer.writeBoolean(obj.hasRasgueado); 
-        writer.writePropertyName("pop"); 
-        writer.writeBoolean(obj.pop); 
-        writer.writePropertyName("slap"); 
-        writer.writeBoolean(obj.slap); 
-        writer.writePropertyName("tap"); 
-        writer.writeBoolean(obj.tap); 
-        writer.writePropertyName("text"); 
-        writer.writeString(obj.text); 
-        writer.writePropertyName("brushType"); 
-        writer.writeEnum(obj.brushType); 
-        writer.writePropertyName("brushDuration"); 
-        writer.writeNumber(obj.brushDuration); 
-        writer.writePropertyName("tupletDenominator"); 
-        writer.writeNumber(obj.tupletDenominator); 
-        writer.writePropertyName("tupletNumerator"); 
-        writer.writeNumber(obj.tupletNumerator); 
-        writer.writePropertyName("isContinuedWhammy"); 
-        writer.writeBoolean(obj.isContinuedWhammy); 
-        writer.writePropertyName("whammyBarType"); 
-        writer.writeEnum(obj.whammyBarType); 
-        writer.writePropertyName("whammyBarPoints"); 
-        writer.writeStartArray(); 
+        w.endArray(); 
+        w.prop("dots"); 
+        w.number(obj.dots); 
+        w.prop("fadeIn"); 
+        w.boolean(obj.fadeIn); 
+        w.prop("lyrics"); 
+        w.stringArray(obj.lyrics); 
+        w.prop("hasRasgueado"); 
+        w.boolean(obj.hasRasgueado); 
+        w.prop("pop"); 
+        w.boolean(obj.pop); 
+        w.prop("slap"); 
+        w.boolean(obj.slap); 
+        w.prop("tap"); 
+        w.boolean(obj.tap); 
+        w.prop("text"); 
+        w.string(obj.text); 
+        w.prop("brushType"); 
+        w.enum(obj.brushType); 
+        w.prop("brushDuration"); 
+        w.number(obj.brushDuration); 
+        w.prop("tupletDenominator"); 
+        w.number(obj.tupletDenominator); 
+        w.prop("tupletNumerator"); 
+        w.number(obj.tupletNumerator); 
+        w.prop("isContinuedWhammy"); 
+        w.boolean(obj.isContinuedWhammy); 
+        w.prop("whammyBarType"); 
+        w.enum(obj.whammyBarType); 
+        w.prop("whammyBarPoints"); 
+        w.startArray(); 
         for (const i of obj.whammyBarPoints) {
-            BendPointSerializer.toJson(i, writer);
+            BendPointSerializer.toJson(i, w);
         } 
-        writer.writeEndArray(); 
-        writer.writePropertyName("vibrato"); 
-        writer.writeEnum(obj.vibrato); 
-        writer.writePropertyName("chordId"); 
-        writer.writeString(obj.chordId); 
-        writer.writePropertyName("graceType"); 
-        writer.writeEnum(obj.graceType); 
-        writer.writePropertyName("pickStroke"); 
-        writer.writeEnum(obj.pickStroke); 
-        writer.writePropertyName("tremoloSpeed"); 
-        writer.writeEnum(obj.tremoloSpeed); 
-        writer.writePropertyName("crescendo"); 
-        writer.writeEnum(obj.crescendo); 
-        writer.writePropertyName("displayStart"); 
-        writer.writeNumber(obj.displayStart); 
-        writer.writePropertyName("playbackStart"); 
-        writer.writeNumber(obj.playbackStart); 
-        writer.writePropertyName("displayDuration"); 
-        writer.writeNumber(obj.displayDuration); 
-        writer.writePropertyName("playbackDuration"); 
-        writer.writeNumber(obj.playbackDuration); 
-        writer.writePropertyName("dynamics"); 
-        writer.writeEnum(obj.dynamics); 
-        writer.writePropertyName("invertBeamDirection"); 
-        writer.writeBoolean(obj.invertBeamDirection); 
-        writer.writePropertyName("preferredBeamDirection"); 
-        writer.writeEnum(obj.preferredBeamDirection); 
-        writer.writePropertyName("isEffectSlurOrigin"); 
-        writer.writeBoolean(obj.isEffectSlurOrigin); 
-        writer.writePropertyName("beamingMode"); 
-        writer.writeEnum(obj.beamingMode); 
-        writer.writeEndObject(); 
+        w.endArray(); 
+        w.prop("vibrato"); 
+        w.enum(obj.vibrato); 
+        w.prop("chordId"); 
+        w.string(obj.chordId); 
+        w.prop("graceType"); 
+        w.enum(obj.graceType); 
+        w.prop("pickStroke"); 
+        w.enum(obj.pickStroke); 
+        w.prop("tremoloSpeed"); 
+        w.enum(obj.tremoloSpeed); 
+        w.prop("crescendo"); 
+        w.enum(obj.crescendo); 
+        w.prop("displayStart"); 
+        w.number(obj.displayStart); 
+        w.prop("playbackStart"); 
+        w.number(obj.playbackStart); 
+        w.prop("displayDuration"); 
+        w.number(obj.displayDuration); 
+        w.prop("playbackDuration"); 
+        w.number(obj.playbackDuration); 
+        w.prop("dynamics"); 
+        w.enum(obj.dynamics); 
+        w.prop("invertBeamDirection"); 
+        w.boolean(obj.invertBeamDirection); 
+        w.prop("preferredBeamDirection"); 
+        w.enum(obj.preferredBeamDirection); 
+        w.prop("isEffectSlurOrigin"); 
+        w.boolean(obj.isEffectSlurOrigin); 
+        w.prop("beamingMode"); 
+        w.enum(obj.beamingMode); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Beat, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Beat, property: string, r: IJsonReader): boolean {
         switch (property) {
             case "id":
-                obj.id = (reader.readNumber()!);
+                obj.id = (r.number()!);
                 return true;
             case "index":
-                obj.index = (reader.readNumber()!);
+                obj.index = (r.number()!);
                 return true;
             case "notes":
                 obj.notes = [];
-                while (reader.nextArrayItem()) {
+                while (r.nextItem()) {
                     const i = new Note();
-                    NoteSerializer.fromJson(i, reader)
+                    NoteSerializer.fromJson(i, r)
                     obj.addNote(i);
                 }
                 return true;
             case "isempty":
-                obj.isEmpty = (reader.readBoolean()!);
+                obj.isEmpty = (r.boolean()!);
                 return true;
             case "whammystyle":
-                obj.whammyStyle = (reader.readEnum<BendStyle>(BendStyle)!);
+                obj.whammyStyle = (r.enum<BendStyle>(BendStyle)!);
                 return true;
             case "ottava":
-                obj.ottava = (reader.readEnum<Ottavia>(Ottavia)!);
+                obj.ottava = (r.enum<Ottavia>(Ottavia)!);
                 return true;
             case "islegatoorigin":
-                obj.isLegatoOrigin = (reader.readBoolean()!);
+                obj.isLegatoOrigin = (r.boolean()!);
                 return true;
             case "duration":
-                obj.duration = (reader.readEnum<Duration>(Duration)!);
+                obj.duration = (r.enum<Duration>(Duration)!);
                 return true;
             case "isletring":
-                obj.isLetRing = (reader.readBoolean()!);
+                obj.isLetRing = (r.boolean()!);
                 return true;
             case "ispalmmute":
-                obj.isPalmMute = (reader.readBoolean()!);
+                obj.isPalmMute = (r.boolean()!);
                 return true;
             case "automations":
                 obj.automations = [];
-                while (reader.nextArrayItem()) {
+                while (r.nextItem()) {
                     const i = new Automation();
-                    AutomationSerializer.fromJson(i, reader)
+                    AutomationSerializer.fromJson(i, r)
                     obj.automations.push(i);
                 }
                 return true;
             case "dots":
-                obj.dots = (reader.readNumber()!);
+                obj.dots = (r.number()!);
                 return true;
             case "fadein":
-                obj.fadeIn = (reader.readBoolean()!);
+                obj.fadeIn = (r.boolean()!);
                 return true;
             case "lyrics":
-                obj.lyrics = reader.readStringArray();
+                obj.lyrics = r.stringArray();
                 return true;
             case "hasrasgueado":
-                obj.hasRasgueado = (reader.readBoolean()!);
+                obj.hasRasgueado = (r.boolean()!);
                 return true;
             case "pop":
-                obj.pop = (reader.readBoolean()!);
+                obj.pop = (r.boolean()!);
                 return true;
             case "slap":
-                obj.slap = (reader.readBoolean()!);
+                obj.slap = (r.boolean()!);
                 return true;
             case "tap":
-                obj.tap = (reader.readBoolean()!);
+                obj.tap = (r.boolean()!);
                 return true;
             case "text":
-                obj.text = reader.readString();
+                obj.text = r.string();
                 return true;
             case "brushtype":
-                obj.brushType = (reader.readEnum<BrushType>(BrushType)!);
+                obj.brushType = (r.enum<BrushType>(BrushType)!);
                 return true;
             case "brushduration":
-                obj.brushDuration = (reader.readNumber()!);
+                obj.brushDuration = (r.number()!);
                 return true;
             case "tupletdenominator":
-                obj.tupletDenominator = (reader.readNumber()!);
+                obj.tupletDenominator = (r.number()!);
                 return true;
             case "tupletnumerator":
-                obj.tupletNumerator = (reader.readNumber()!);
+                obj.tupletNumerator = (r.number()!);
                 return true;
             case "iscontinuedwhammy":
-                obj.isContinuedWhammy = (reader.readBoolean()!);
+                obj.isContinuedWhammy = (r.boolean()!);
                 return true;
             case "whammybartype":
-                obj.whammyBarType = (reader.readEnum<WhammyType>(WhammyType)!);
+                obj.whammyBarType = (r.enum<WhammyType>(WhammyType)!);
                 return true;
             case "whammybarpoints":
                 obj.whammyBarPoints = [];
-                while (reader.nextArrayItem()) {
+                while (r.nextItem()) {
                     const i = new BendPoint();
-                    BendPointSerializer.fromJson(i, reader)
+                    BendPointSerializer.fromJson(i, r)
                     obj.addWhammyBarPoint(i);
                 }
                 return true;
             case "vibrato":
-                obj.vibrato = (reader.readEnum<VibratoType>(VibratoType)!);
+                obj.vibrato = (r.enum<VibratoType>(VibratoType)!);
                 return true;
             case "chordid":
-                obj.chordId = reader.readString();
+                obj.chordId = r.string();
                 return true;
             case "gracetype":
-                obj.graceType = (reader.readEnum<GraceType>(GraceType)!);
+                obj.graceType = (r.enum<GraceType>(GraceType)!);
                 return true;
             case "pickstroke":
-                obj.pickStroke = (reader.readEnum<PickStroke>(PickStroke)!);
+                obj.pickStroke = (r.enum<PickStroke>(PickStroke)!);
                 return true;
             case "tremolospeed":
-                obj.tremoloSpeed = reader.readEnum<Duration>(Duration);
+                obj.tremoloSpeed = r.enum<Duration>(Duration);
                 return true;
             case "crescendo":
-                obj.crescendo = (reader.readEnum<CrescendoType>(CrescendoType)!);
+                obj.crescendo = (r.enum<CrescendoType>(CrescendoType)!);
                 return true;
             case "displaystart":
-                obj.displayStart = (reader.readNumber()!);
+                obj.displayStart = (r.number()!);
                 return true;
             case "playbackstart":
-                obj.playbackStart = (reader.readNumber()!);
+                obj.playbackStart = (r.number()!);
                 return true;
             case "displayduration":
-                obj.displayDuration = (reader.readNumber()!);
+                obj.displayDuration = (r.number()!);
                 return true;
             case "playbackduration":
-                obj.playbackDuration = (reader.readNumber()!);
+                obj.playbackDuration = (r.number()!);
                 return true;
             case "dynamics":
-                obj.dynamics = (reader.readEnum<DynamicValue>(DynamicValue)!);
+                obj.dynamics = (r.enum<DynamicValue>(DynamicValue)!);
                 return true;
             case "invertbeamdirection":
-                obj.invertBeamDirection = (reader.readBoolean()!);
+                obj.invertBeamDirection = (r.boolean()!);
                 return true;
             case "preferredbeamdirection":
-                obj.preferredBeamDirection = reader.readEnum<BeamDirection>(BeamDirection);
+                obj.preferredBeamDirection = r.enum<BeamDirection>(BeamDirection);
                 return true;
             case "iseffectslurorigin":
-                obj.isEffectSlurOrigin = (reader.readBoolean()!);
+                obj.isEffectSlurOrigin = (r.boolean()!);
                 return true;
             case "beamingmode":
-                obj.beamingMode = (reader.readEnum<BeatBeamingMode>(BeatBeamingMode)!);
+                obj.beamingMode = (r.enum<BeatBeamingMode>(BeatBeamingMode)!);
                 return true;
         } 
         return false; 

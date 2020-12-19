@@ -13,95 +13,95 @@ import { NotationSettingsSerializer } from "@src/generated/NotationSettingsSeria
 import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSerializer";
 import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
 export class SettingsSerializer {
-    public static fromJson(obj: Settings, reader: IJsonReader): void {
-        if (reader.currentValueType !== JsonValueType.Object) {
+    public static fromJson(obj: Settings, r: IJsonReader): void {
+        if (r.currentValueType !== JsonValueType.Object) {
             return;
         } 
-        while (reader.nextProperty()) {
-            this.setProperty(obj, reader.readPropertyName().toLowerCase(), reader);
+        while (r.nextProp()) {
+            this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
     }
-    public static toJson(obj: Settings | null, writer: IJsonWriter): void {
+    public static toJson(obj: Settings | null, w: IJsonWriter): void {
         if (!obj) {
-            writer.writeNull();
+            w.null();
             return;
         } 
-        writer.writeStartObject(); 
-        writer.writePropertyName("core"); 
-        CoreSettingsSerializer.toJson(obj.core, writer); 
-        writer.writePropertyName("display"); 
-        DisplaySettingsSerializer.toJson(obj.display, writer); 
-        writer.writePropertyName("notation"); 
-        NotationSettingsSerializer.toJson(obj.notation, writer); 
-        writer.writePropertyName("importer"); 
-        ImporterSettingsSerializer.toJson(obj.importer, writer); 
-        writer.writePropertyName("player"); 
-        PlayerSettingsSerializer.toJson(obj.player, writer); 
-        writer.writeEndObject(); 
+        w.startObject(); 
+        w.prop("core"); 
+        CoreSettingsSerializer.toJson(obj.core, w); 
+        w.prop("display"); 
+        DisplaySettingsSerializer.toJson(obj.display, w); 
+        w.prop("notation"); 
+        NotationSettingsSerializer.toJson(obj.notation, w); 
+        w.prop("importer"); 
+        ImporterSettingsSerializer.toJson(obj.importer, w); 
+        w.prop("player"); 
+        PlayerSettingsSerializer.toJson(obj.player, w); 
+        w.endObject(); 
     }
-    public static setProperty(obj: Settings, property: string, reader: IJsonReader): boolean {
+    public static setProperty(obj: Settings, property: string, r: IJsonReader): boolean {
         switch (property) {
         } 
         if (["core", ""].indexOf(property) >= 0) {
-            CoreSettingsSerializer.fromJson(obj.core, reader);
+            CoreSettingsSerializer.fromJson(obj.core, r);
             return true;
         }
         else {
             for (const c of ["core", ""]) {
                 if (property.indexOf(c) === 0) {
-                    if (CoreSettingsSerializer.setProperty(obj.core, property.substring(c.length), reader)) {
+                    if (CoreSettingsSerializer.setProperty(obj.core, property.substring(c.length), r)) {
                         return true;
                     }
                 }
             }
         } 
         if (["display", ""].indexOf(property) >= 0) {
-            DisplaySettingsSerializer.fromJson(obj.display, reader);
+            DisplaySettingsSerializer.fromJson(obj.display, r);
             return true;
         }
         else {
             for (const c of ["display", ""]) {
                 if (property.indexOf(c) === 0) {
-                    if (DisplaySettingsSerializer.setProperty(obj.display, property.substring(c.length), reader)) {
+                    if (DisplaySettingsSerializer.setProperty(obj.display, property.substring(c.length), r)) {
                         return true;
                     }
                 }
             }
         } 
         if (["notation"].indexOf(property) >= 0) {
-            NotationSettingsSerializer.fromJson(obj.notation, reader);
+            NotationSettingsSerializer.fromJson(obj.notation, r);
             return true;
         }
         else {
             for (const c of ["notation"]) {
                 if (property.indexOf(c) === 0) {
-                    if (NotationSettingsSerializer.setProperty(obj.notation, property.substring(c.length), reader)) {
+                    if (NotationSettingsSerializer.setProperty(obj.notation, property.substring(c.length), r)) {
                         return true;
                     }
                 }
             }
         } 
         if (["importer"].indexOf(property) >= 0) {
-            ImporterSettingsSerializer.fromJson(obj.importer, reader);
+            ImporterSettingsSerializer.fromJson(obj.importer, r);
             return true;
         }
         else {
             for (const c of ["importer"]) {
                 if (property.indexOf(c) === 0) {
-                    if (ImporterSettingsSerializer.setProperty(obj.importer, property.substring(c.length), reader)) {
+                    if (ImporterSettingsSerializer.setProperty(obj.importer, property.substring(c.length), r)) {
                         return true;
                     }
                 }
             }
         } 
         if (["player"].indexOf(property) >= 0) {
-            PlayerSettingsSerializer.fromJson(obj.player, reader);
+            PlayerSettingsSerializer.fromJson(obj.player, r);
             return true;
         }
         else {
             for (const c of ["player"]) {
                 if (property.indexOf(c) === 0) {
-                    if (PlayerSettingsSerializer.setProperty(obj.player, property.substring(c.length), reader)) {
+                    if (PlayerSettingsSerializer.setProperty(obj.player, property.substring(c.length), r)) {
                         return true;
                     }
                 }
