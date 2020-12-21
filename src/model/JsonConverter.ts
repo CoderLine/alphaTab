@@ -13,13 +13,13 @@ import { JsonObjectWriter } from '@src/io/IJsonWriter';
 /**
  * This class can convert a full {@link Score} instance to a simple JavaScript object and back for further
  * JSON serialization.
- * @target web
  */
 export class JsonConverter {
     /**
      * Converts the given score into a JSON encoded string.
      * @param score The score to serialize.
      * @returns A JSON encoded string that can be used togehter with  for conversion.
+     * @target web
      */
     public static scoreToJson(score: Score): string {
         let obj: unknown = JsonConverter.scoreToJsObject(score);
@@ -48,6 +48,7 @@ export class JsonConverter {
      * @param json The JSON string that was created via {@link Score}
      * @param settings The settings to use during conversion.
      * @returns The converted score object.
+     * @target web
      */
     public static jsonToScore(json: string, settings?: Settings): Score {
         return JsonConverter.jsObjectToScore(json, settings);
@@ -66,6 +67,9 @@ export class JsonConverter {
         return score;
     }
 
+    /**
+     * @target web
+     */
     public static jsObjectToMidiFile(midi: any): MidiFile {
         let midi2: MidiFile = new MidiFile();
         midi2.division = midi.division;
@@ -101,6 +105,9 @@ export class JsonConverter {
         return midi2;
     }
 
+    /**
+     * @target web
+     */
     public static midiFileToJsObject(midi: MidiFile): unknown {
         let midi2: any = {} as any;
         midi2.division = midi.division;

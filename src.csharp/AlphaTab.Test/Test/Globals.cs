@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test
 {
@@ -9,9 +10,9 @@ namespace AlphaTab.Test
             return new Expector<T>(actual);
         }
 
-        public static void Fail(string message)
+        public static void Fail(object message)
         {
-            Assert.Fail(message);
+            Assert.Fail(Convert.ToString(message));
         }
     }
 

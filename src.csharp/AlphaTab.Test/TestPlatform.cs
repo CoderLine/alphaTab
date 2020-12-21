@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using AlphaTab.Core.EcmaScript;
 
@@ -13,7 +15,7 @@ namespace AlphaTab
             await fs.CopyToAsync(ms);
             return new Uint8Array(ms.ToArray());
         }
-		
+
         public static Task<IList<string>> ListDirectory(string path)
         {
             return Task.FromResult((IList<string>)Directory.EnumerateFiles(path).ToList());

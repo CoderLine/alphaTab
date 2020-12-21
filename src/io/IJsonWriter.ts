@@ -9,6 +9,7 @@ export interface IJsonWriter {
 
     prop(name: any): void;
 
+    unknown(value: unknown, propName?: any): void;
     string(value: string | null, propName?: any): void;
     number(value: number | null, propName?: any): void;
     boolean(value: boolean | null, propName?: any): void;
@@ -18,6 +19,9 @@ export interface IJsonWriter {
     numberArray(value: number[] | null, propName?: any): void;
 }
 
+/**
+ * @target web
+ */
 export class JsonObjectWriter implements IJsonWriter {
     private _objectStack: any[] = [];
     private _currentPropertyName: string = '';
@@ -68,6 +72,10 @@ export class JsonObjectWriter implements IJsonWriter {
 
     public prop(name: any): void {
         this._currentPropertyName = name;
+    }
+
+    public unknown(value: unknown, propName?: any): void {
+        this.writeValue(value, propName);
     }
 
     public string(value: string | null, propName?: any): void {

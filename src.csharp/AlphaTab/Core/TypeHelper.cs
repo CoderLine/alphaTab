@@ -54,11 +54,12 @@ namespace AlphaTab.Core
             }
             else if (data is T[] array)
             {
-                Array.Reverse(array);
+                System.Array.Reverse(array);
             }
             else
             {
-                throw new NotSupportedException("Cannot reverse list of type " + data.GetType().FullName);
+                throw new NotSupportedException("Cannot reverse list of type " +
+                                                data.GetType().FullName);
             }
         }
 
@@ -153,17 +154,32 @@ namespace AlphaTab.Core
 
         public static void Sort<T>(this IList<T> data, Func<T, T, double> func)
         {
-            if (data is System.Collections.Generic.List<T> l)
+            switch (data)
             {
-                l.Sort((a, b) => (int) func(a, b));
+                case System.Collections.Generic.List<T> l:
+                    l.Sort((a, b) => (int) func(a, b));
+                    break;
+                case T[] array:
+                    System.Array.Sort(array, (a, b) => (int) func(a, b));
+                    break;
+                default:
+                    throw new NotSupportedException("Cannot sort list of type " +
+                                                    data.GetType().FullName);
             }
-            else if(data is T[] array)
+        }
+        public static void Sort<T>(this IList<T> data)
+        {
+            switch (data)
             {
-                Array.Sort(array, (a, b) => (int) func(a, b));
-            }
-            else
-            {
-                throw new NotSupportedException("Cannot sort list of type " + data.GetType().FullName);
+                case List<T> l:
+                    l.Sort();
+                    break;
+                case T[] array:
+                    System.Array.Sort(array);
+                    break;
+                default:
+                    throw new NotSupportedException("Cannot sort list of type " +
+                                                    data.GetType().FullName);
             }
         }
 
@@ -254,9 +270,40 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IList<TResult> Map<TSource, TResult>(this IList<TSource> source, Func<TSource, TResult> func)
+        public static IList<TResult> Map<TSource, TResult>(this IList<TSource> source,
+            Func<TSource, TResult> func)
         {
             return source.Select(func).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Substring(this string s, double startIndex, double length)
+        {
+            return s.Substring((int) startIndex, (int) length);
+        }
+
+        public static string TypeOf(object? actual)
+        {
+            switch (actual)
+            {
+                case string _:
+                    return "string";
+                case bool _:
+                    return "boolean";
+                case byte _:
+                case short _:
+                case int _:
+                case long _:
+                case sbyte _:
+                case ushort _:
+                case uint _:
+                case ulong _:
+                case float _:
+                case double _:
+                    return "number";
+                default:
+                    return "object";
+            }
         }
     }
 }

@@ -16,7 +16,7 @@ namespace AlphaTab.Core.EcmaScript
             var bytes = BitConverter.GetBytes((ushort) value);
             if (littleEndian != BitConverter.IsLittleEndian)
             {
-                Array.Reverse(bytes);
+                System.Array.Reverse(bytes);
             }
 
             Buffer.BlockCopy(bytes, 0, _buffer.Raw.Array, _buffer.Raw.Offset + (int) offset,
@@ -30,7 +30,7 @@ namespace AlphaTab.Core.EcmaScript
                 bytes.Length);
             if (littleEndian != BitConverter.IsLittleEndian)
             {
-                Array.Reverse(bytes);
+                System.Array.Reverse(bytes);
             }
 
             return BitConverter.ToInt16(bytes, 0);
@@ -41,7 +41,7 @@ namespace AlphaTab.Core.EcmaScript
             var bytes = BitConverter.GetBytes((short) value);
             if (littleEndian != BitConverter.IsLittleEndian)
             {
-                Array.Reverse(bytes);
+                System.Array.Reverse(bytes);
             }
 
             Buffer.BlockCopy(bytes, 0, _buffer.Raw.Array, _buffer.Raw.Offset + (int) offset,
@@ -55,7 +55,7 @@ namespace AlphaTab.Core.EcmaScript
                 bytes.Length);
             if (littleEndian != BitConverter.IsLittleEndian)
             {
-                Array.Reverse(bytes);
+                System.Array.Reverse(bytes);
             }
 
             return BitConverter.ToUInt32(bytes, 0);
@@ -66,7 +66,7 @@ namespace AlphaTab.Core.EcmaScript
             var bytes = BitConverter.GetBytes((int) value);
             if (littleEndian != BitConverter.IsLittleEndian)
             {
-                Array.Reverse(bytes);
+                System.Array.Reverse(bytes);
             }
 
             Buffer.BlockCopy(bytes, 0, _buffer.Raw.Array, _buffer.Raw.Offset + (int) offset, bytes
@@ -80,7 +80,7 @@ namespace AlphaTab.Core.EcmaScript
                 bytes.Length);
             if (littleEndian != BitConverter.IsLittleEndian)
             {
-                Array.Reverse(bytes);
+                System.Array.Reverse(bytes);
             }
 
             return BitConverter.ToUInt16(bytes, 0);

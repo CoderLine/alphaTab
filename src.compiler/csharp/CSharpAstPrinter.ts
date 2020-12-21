@@ -273,12 +273,12 @@ export default class CSharpAstPrinter {
                 defaultConstructor.parameters = constructorDeclaration.parameters;
                 defaultConstructor.baseConstructorArguments = constructorDeclaration.parameters.map(
                     p =>
-                        ({
-                            parent: defaultConstructor,
-                            nodeType: cs.SyntaxKind.Identifier,
-                            text: p.name,
-                            tsNode: defaultConstructor.tsNode
-                        } as cs.Identifier)
+                    ({
+                        parent: defaultConstructor,
+                        nodeType: cs.SyntaxKind.Identifier,
+                        text: p.name,
+                        tsNode: defaultConstructor.tsNode
+                    } as cs.Identifier)
                 );
                 this.writeMember(defaultConstructor);
             }
@@ -413,7 +413,7 @@ export default class CSharpAstPrinter {
                     this.write('where ');
                     this.write(p.name);
                     this.write(' : ');
-                    this.writeType(p.constraint);
+                    this.writeType(p.constraint, false, false, true);
                 }
             });
             this._indent--;
@@ -555,35 +555,52 @@ export default class CSharpAstPrinter {
         this.writeLine(';');
     }
 
-    private writeType(type: cs.TypeNode, forNew: boolean = false, asNativeArray: boolean = false) {
+    private writeType(type: cs.TypeNode, forNew: boolean = false, asNativeArray: boolean = false, forTypeConstraint: boolean = false) {
         if (!type) {
             console.log('ERR');
         }
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
-                switch ((type as cs.PrimitiveTypeNode).type) {
-                    case cs.PrimitiveType.Bool:
-                        this.write('bool');
-                        break;
-                    case cs.PrimitiveType.Dynamic:
-                        this.write('dynamic');
-                        break;
-                    case cs.PrimitiveType.Double:
-                        this.write('double');
-                        break;
-                    case cs.PrimitiveType.Int:
-                        this.write('int');
-                        break;
-                    case cs.PrimitiveType.Object:
-                        this.write('object');
-                        break;
-                    case cs.PrimitiveType.String:
-                        this.write('string');
-                        break;
-                    case cs.PrimitiveType.Void:
-                        this.write('void');
-                        break;
+                if (forTypeConstraint) {
+                    switch ((type as cs.PrimitiveTypeNode).type) {
+                        case cs.PrimitiveType.Bool:
+                        case cs.PrimitiveType.Int:
+                        case cs.PrimitiveType.Double:
+                            this.write('struct');
+                            break;
+                        case cs.PrimitiveType.Object:
+                        case cs.PrimitiveType.Dynamic:
+                        case cs.PrimitiveType.String:
+                        case cs.PrimitiveType.Void:
+                            this.write('class');
+                            break;
+                    }
+                } else {
+                    switch ((type as cs.PrimitiveTypeNode).type) {
+                        case cs.PrimitiveType.Bool:
+                            this.write('bool');
+                            break;
+                        case cs.PrimitiveType.Dynamic:
+                            this.write('dynamic');
+                            break;
+                        case cs.PrimitiveType.Double:
+                            this.write('double');
+                            break;
+                        case cs.PrimitiveType.Int:
+                            this.write('int');
+                            break;
+                        case cs.PrimitiveType.Object:
+                            this.write('object');
+                            break;
+                        case cs.PrimitiveType.String:
+                            this.write('string');
+                            break;
+                        case cs.PrimitiveType.Void:
+                            this.write('void');
+                            break;
+                    }
                 }
+
                 break;
             case cs.SyntaxKind.ArrayTypeNode:
                 const arrayType = type as cs.ArrayTypeNode;

@@ -17,14 +17,15 @@ export interface IJsonReader {
     endArray(): void;
 
     prop(): string;
-    enumProp<T>(enumType: any): T;
+    enumProp<T>(enumType: unknown): T;
     numberProp(): number;
 
     nextProp(): boolean;
     nextItem(): boolean;
 
+    unknown(): unknown;
     string(): string | null;
-    enum<T>(enumType: any): T | null;
+    enum<T extends number>(enumType: any): T | null;
     number(): number | null;
     boolean(): boolean | null;
 
@@ -32,6 +33,9 @@ export interface IJsonReader {
     numberArray(): number[] | null;
 }
 
+/**
+ * @target web
+ */
 interface ReaderStackItem {
     obj: any;
     currentIndex: number;
@@ -43,6 +47,9 @@ interface ReaderStackItem {
     currentObjectKeys: string[];
 }
 
+/**
+ * @target web
+ */
 export class JsonObjectReader implements IJsonReader {
     private _currentItem: ReaderStackItem | null = null;
     private _readStack: ReaderStackItem[] = [];
@@ -104,7 +111,7 @@ export class JsonObjectReader implements IJsonReader {
         return enumType[Object.keys(enumType).find(k => k.toLowerCase() === value.toLowerCase()) as any] as any;
     }
 
-    public enumProp<T>(enumType: any): T {
+    public enumProp<T>(enumType: unknown): T {
         const prop = this.prop();
         const num = parseInt(prop);
         return isNaN(num)
@@ -173,6 +180,10 @@ export class JsonObjectReader implements IJsonReader {
 
     public endArray(): void {
         this.endObject();
+    }
+
+    public unknown(): unknown {
+        return this.value<unknown>(this.currentValueType);
     }
 
     public string(): string | null {

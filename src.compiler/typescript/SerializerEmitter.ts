@@ -21,6 +21,7 @@ interface JsonProperty {
     partialNames: boolean;
     property: ts.PropertyDeclaration;
     jsonNames: string[];
+    target?: string;
 }
 
 function isImmutable(type: ts.Type | null): boolean {
@@ -182,6 +183,9 @@ function getWriteMethodNameForPrimitive(type: ts.Type, typeChecker: ts.TypeCheck
     const isArray = isTypedArray(type);
     const arrayItemType = unwrapArrayItemType(type, typeChecker);
 
+    if (hasFlag(type, ts.TypeFlags.Unknown)) {
+        return "unknown";
+    }
     if (hasFlag(type, ts.TypeFlags.Number)) {
         return "number";
     }
@@ -262,8 +266,10 @@ function generateToJsonBody(
 
         let writeValueMethodName: string | null = getWriteMethodNameForPrimitive(type.type!, typeChecker);
 
+        let propertyStatements: ts.Statement[] = [];
+
         if (writeValueMethodName) {
-            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+            propertyStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), writeValueMethodName),
                 undefined,
                 [
@@ -273,7 +279,7 @@ function generateToJsonBody(
             )));
         } else if (isArray) {
             // NOTE: nullable Object arrays are not yet supported
-            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+            propertyStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
                 undefined,
                 [
@@ -286,13 +292,13 @@ function generateToJsonBody(
             let itemSerializer = arrayItemType.symbol.name + "Serializer";
             importer(itemSerializer, findSerializerModule(arrayItemType, program.getCompilerOptions()));
 
-            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+            propertyStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'startArray'),
                 undefined,
                 []
             )));
 
-            statements.push(ts.factory.createForOfStatement(
+            propertyStatements.push(ts.factory.createForOfStatement(
                 undefined,
                 ts.factory.createVariableDeclarationList(
                     [ts.factory.createVariableDeclaration('i')],
@@ -313,14 +319,14 @@ function generateToJsonBody(
                 ])
             ));
 
-            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+            propertyStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'endArray'),
                 undefined,
                 []
             )));
         }
         else if (isMap(type.type)) {
-            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+            propertyStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
                 undefined,
                 [
@@ -358,13 +364,13 @@ function generateToJsonBody(
                 );
             }
 
-            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+            propertyStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'startObject'),
                 undefined,
                 []
             )));
 
-            statements.push(
+            propertyStatements.push(
                 ts.factory.createExpressionStatement(
                     ts.factory.createCallExpression(ts.factory.createPropertyAccessExpression(
                         ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName)
@@ -391,14 +397,14 @@ function generateToJsonBody(
                 )
             );
 
-            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+            propertyStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'endObject'),
                 undefined,
                 []
             )));
 
         } else if (isImmutable(type.type)) {
-            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+            propertyStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
                 undefined,
                 [
@@ -408,7 +414,7 @@ function generateToJsonBody(
 
             let itemSerializer = type.type.symbol.name;
             importer(itemSerializer, findModule(type.type, program.getCompilerOptions()));
-            statements.push(
+            propertyStatements.push(
                 ts.factory.createExpressionStatement(
                     ts.factory.createCallExpression(
                         ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier(itemSerializer), 'toJson'),
@@ -421,7 +427,7 @@ function generateToJsonBody(
                 )
             );
         } else {
-            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+            propertyStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
                 undefined,
                 [
@@ -443,7 +449,7 @@ function generateToJsonBody(
                 ));
 
             if (type.isNullable) {
-                statements.push(ts.factory.createIfStatement(
+                propertyStatements.push(ts.factory.createIfStatement(
                     ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
                     ts.factory.createBlock([
                         writeValue
@@ -455,9 +461,15 @@ function generateToJsonBody(
                     ))
                 ));
             } else {
-                statements.push(writeValue);
+                propertyStatements.push(writeValue);
             }
         }
+
+        if (prop.target) {
+            propertyStatements = propertyStatements.map(s => ts.addSyntheticLeadingComment(s, ts.SyntaxKind.MultiLineCommentTrivia, `@target ${prop.target}`, true));
+        }
+
+        statements.push(...propertyStatements);
     }
 
     statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
@@ -524,6 +536,9 @@ function getReadMethodNameForPrimitive(type: ts.Type, typeChecker: ts.TypeChecke
     const isArray = isTypedArray(type);
     const arrayItemType = unwrapArrayItemType(type, typeChecker);
 
+    if (hasFlag(type, ts.TypeFlags.Unknown)) {
+        return "unknown";
+    }
     if (hasFlag(type, ts.TypeFlags.Number)) {
         return "number";
     }
@@ -1003,13 +1018,15 @@ function generateSetPropertyBody(program: ts.Program,
 
         if (caseStatements.length > 0) {
             for (let i = 0; i < caseValues.length; i++) {
-                cases.push(
-                    ts.factory.createCaseClause(
-                        ts.factory.createStringLiteral(caseValues[i]),
-                        // last case gets the statements, others are fall through
-                        i < caseValues.length - 1 ? [] : caseStatements
-                    )
+                let caseClause = ts.factory.createCaseClause(
+                    ts.factory.createStringLiteral(caseValues[i]),
+                    // last case gets the statements, others are fall through
+                    i < caseValues.length - 1 ? [] : caseStatements
                 );
+                if (prop.target && i === 0) {
+                    caseClause = ts.addSyntheticLeadingComment(caseClause, ts.SyntaxKind.MultiLineCommentTrivia, `@target ${prop.target}`, true);
+                }
+                cases.push(caseClause);
             }
         }
     }
@@ -1096,7 +1113,8 @@ export default createEmitter('json', (program, input) => {
                     propertiesToSerialize.push({
                         property: propertyDeclaration,
                         jsonNames: jsonNames,
-                        partialNames: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_partial_names')
+                        partialNames: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_partial_names'),
+                        target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment
                     });
                 }
             }

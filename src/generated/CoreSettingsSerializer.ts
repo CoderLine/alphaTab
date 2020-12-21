@@ -25,10 +25,17 @@ export class CoreSettingsSerializer {
             return;
         } 
         w.startObject(); 
+        /*@target web*/
         w.string(obj.scriptFile, "scriptFile"); 
+        /*@target web*/
         w.string(obj.fontDirectory, "fontDirectory"); 
+        /*@target web*/
         w.string(obj.file, "file"); 
+        /*@target web*/
         w.boolean(obj.tex, "tex"); 
+        /*@target web*/
+        w.unknown(obj.tracks, "tracks"); 
+        /*@target web*/
         w.number(obj.visibilityCheckInterval, "visibilityCheckInterval"); 
         w.boolean(obj.enableLazyLoading, "enableLazyLoading"); 
         w.string(obj.engine, "engine"); 
@@ -39,18 +46,27 @@ export class CoreSettingsSerializer {
     }
     public static setProperty(obj: CoreSettings, property: string, r: IJsonReader): boolean {
         switch (property) {
+            /*@target web*/
             case "scriptfile":
                 obj.scriptFile = r.string();
                 return true;
+            /*@target web*/
             case "fontdirectory":
                 obj.fontDirectory = r.string();
                 return true;
+            /*@target web*/
             case "file":
                 obj.file = r.string();
                 return true;
+            /*@target web*/
             case "tex":
                 obj.tex = (r.boolean()!);
                 return true;
+            /*@target web*/
+            case "tracks":
+                obj.tracks = (r.unknown()!);
+                return true;
+            /*@target web*/
             case "visibilitycheckinterval":
                 obj.visibilityCheckInterval = (r.number()!);
                 return true;
