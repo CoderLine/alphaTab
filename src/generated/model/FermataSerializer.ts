@@ -10,12 +10,14 @@ import { IJsonWriter } from "@src/io/IJsonWriter";
 import { FermataType } from "@src/model/Fermata";
 export class FermataSerializer {
     public static fromJson(obj: Fermata, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Fermata | null, w: IJsonWriter): void {
         if (!obj) {
@@ -23,10 +25,8 @@ export class FermataSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("type"); 
-        w.enum(obj.type); 
-        w.prop("length"); 
-        w.number(obj.length); 
+        w.enum(obj.type, "type"); 
+        w.number(obj.length, "length"); 
         w.endObject(); 
     }
     public static setProperty(obj: Fermata, property: string, r: IJsonReader): boolean {

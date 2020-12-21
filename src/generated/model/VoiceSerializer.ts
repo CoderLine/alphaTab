@@ -11,12 +11,14 @@ import { BeatSerializer } from "@src/generated/model/BeatSerializer";
 import { Beat } from "@src/model/Beat";
 export class VoiceSerializer {
     public static fromJson(obj: Voice, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Voice | null, w: IJsonWriter): void {
         if (!obj) {
@@ -24,16 +26,14 @@ export class VoiceSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("index"); 
-        w.number(obj.index); 
+        w.number(obj.index, "index"); 
         w.prop("beats"); 
         w.startArray(); 
         for (const i of obj.beats) {
             BeatSerializer.toJson(i, w);
         } 
         w.endArray(); 
-        w.prop("isEmpty"); 
-        w.boolean(obj.isEmpty); 
+        w.boolean(obj.isEmpty, "isEmpty"); 
         w.endObject(); 
     }
     public static setProperty(obj: Voice, property: string, r: IJsonReader): boolean {
@@ -43,11 +43,13 @@ export class VoiceSerializer {
                 return true;
             case "beats":
                 obj.beats = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new Beat();
                     BeatSerializer.fromJson(i, r)
                     obj.addBeat(i);
                 }
+                r.endArray();
                 return true;
             case "isempty":
                 obj.isEmpty = (r.boolean()!);

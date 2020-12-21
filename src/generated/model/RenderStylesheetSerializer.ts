@@ -9,12 +9,14 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class RenderStylesheetSerializer {
     public static fromJson(obj: RenderStylesheet, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: RenderStylesheet | null, w: IJsonWriter): void {
         if (!obj) {
@@ -22,8 +24,7 @@ export class RenderStylesheetSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("hideDynamics"); 
-        w.boolean(obj.hideDynamics); 
+        w.boolean(obj.hideDynamics, "hideDynamics"); 
         w.endObject(); 
     }
     public static setProperty(obj: RenderStylesheet, property: string, r: IJsonReader): boolean {

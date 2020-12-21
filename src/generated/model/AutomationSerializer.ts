@@ -10,12 +10,14 @@ import { IJsonWriter } from "@src/io/IJsonWriter";
 import { AutomationType } from "@src/model/Automation";
 export class AutomationSerializer {
     public static fromJson(obj: Automation, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Automation | null, w: IJsonWriter): void {
         if (!obj) {
@@ -23,16 +25,11 @@ export class AutomationSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("isLinear"); 
-        w.boolean(obj.isLinear); 
-        w.prop("type"); 
-        w.enum(obj.type); 
-        w.prop("value"); 
-        w.number(obj.value); 
-        w.prop("ratioPosition"); 
-        w.number(obj.ratioPosition); 
-        w.prop("text"); 
-        w.string(obj.text); 
+        w.boolean(obj.isLinear, "isLinear"); 
+        w.enum(obj.type, "type"); 
+        w.number(obj.value, "value"); 
+        w.number(obj.ratioPosition, "ratioPosition"); 
+        w.string(obj.text, "text"); 
         w.endObject(); 
     }
     public static setProperty(obj: Automation, property: string, r: IJsonReader): boolean {

@@ -6,8 +6,8 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
+import { JsonObjectReader } from '@src/io/IJsonReader';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
-import { IJsonReader } from '@src/io/IJsonReader';
 
 /**
  * @target web
@@ -31,8 +31,7 @@ export class AlphaTabWebWorker {
         switch (cmd) {
             case 'alphaTab.initialize':
                 let settings: Settings = new Settings();
-                // TODO: create json reader
-                SettingsSerializer.fromJson(settings, data.settings as IJsonReader);
+                SettingsSerializer.fromJson(settings, new JsonObjectReader(data.settings));
                 Logger.logLevel = settings.core.logLevel;
                 this._renderer = new ScoreRenderer(settings);
                 this._renderer.partialRenderFinished.on(result => {
@@ -93,7 +92,7 @@ export class AlphaTabWebWorker {
     }
 
     private updateSettings(json: unknown): void {
-        SettingsSerializer.fromJson(this._renderer.settings, json as IJsonReader);
+        SettingsSerializer.fromJson(this._renderer.settings, new JsonObjectReader(json));
     }
 
     private renderMultiple(score: Score, trackIndexes: number[]): void {

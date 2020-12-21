@@ -9,12 +9,14 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class VibratoPlaybackSettingsSerializer {
     public static fromJson(obj: VibratoPlaybackSettings, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: VibratoPlaybackSettings | null, w: IJsonWriter): void {
         if (!obj) {
@@ -22,22 +24,14 @@ export class VibratoPlaybackSettingsSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("noteWideLength"); 
-        w.number(obj.noteWideLength); 
-        w.prop("noteWideAmplitude"); 
-        w.number(obj.noteWideAmplitude); 
-        w.prop("noteSlightLength"); 
-        w.number(obj.noteSlightLength); 
-        w.prop("noteSlightAmplitude"); 
-        w.number(obj.noteSlightAmplitude); 
-        w.prop("beatWideLength"); 
-        w.number(obj.beatWideLength); 
-        w.prop("beatWideAmplitude"); 
-        w.number(obj.beatWideAmplitude); 
-        w.prop("beatSlightLength"); 
-        w.number(obj.beatSlightLength); 
-        w.prop("beatSlightAmplitude"); 
-        w.number(obj.beatSlightAmplitude); 
+        w.number(obj.noteWideLength, "noteWideLength"); 
+        w.number(obj.noteWideAmplitude, "noteWideAmplitude"); 
+        w.number(obj.noteSlightLength, "noteSlightLength"); 
+        w.number(obj.noteSlightAmplitude, "noteSlightAmplitude"); 
+        w.number(obj.beatWideLength, "beatWideLength"); 
+        w.number(obj.beatWideAmplitude, "beatWideAmplitude"); 
+        w.number(obj.beatSlightLength, "beatSlightLength"); 
+        w.number(obj.beatSlightAmplitude, "beatSlightAmplitude"); 
         w.endObject(); 
     }
     public static setProperty(obj: VibratoPlaybackSettings, property: string, r: IJsonReader): boolean {

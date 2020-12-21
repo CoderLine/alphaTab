@@ -9,12 +9,14 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class SlidePlaybackSettingsSerializer {
     public static fromJson(obj: SlidePlaybackSettings, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: SlidePlaybackSettings | null, w: IJsonWriter): void {
         if (!obj) {
@@ -22,12 +24,9 @@ export class SlidePlaybackSettingsSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("simpleSlidePitchOffset"); 
-        w.number(obj.simpleSlidePitchOffset); 
-        w.prop("simpleSlideDurationRatio"); 
-        w.number(obj.simpleSlideDurationRatio); 
-        w.prop("shiftSlideDurationRatio"); 
-        w.number(obj.shiftSlideDurationRatio); 
+        w.number(obj.simpleSlidePitchOffset, "simpleSlidePitchOffset"); 
+        w.number(obj.simpleSlideDurationRatio, "simpleSlideDurationRatio"); 
+        w.number(obj.shiftSlideDurationRatio, "shiftSlideDurationRatio"); 
         w.endObject(); 
     }
     public static setProperty(obj: SlidePlaybackSettings, property: string, r: IJsonReader): boolean {

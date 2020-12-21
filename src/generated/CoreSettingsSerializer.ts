@@ -10,12 +10,14 @@ import { IJsonWriter } from "@src/io/IJsonWriter";
 import { LogLevel } from "@src/LogLevel";
 export class CoreSettingsSerializer {
     public static fromJson(obj: CoreSettings, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: CoreSettings | null, w: IJsonWriter): void {
         if (!obj) {
@@ -23,26 +25,16 @@ export class CoreSettingsSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("scriptFile"); 
-        w.string(obj.scriptFile); 
-        w.prop("fontDirectory"); 
-        w.string(obj.fontDirectory); 
-        w.prop("file"); 
-        w.string(obj.file); 
-        w.prop("tex"); 
-        w.boolean(obj.tex); 
-        w.prop("visibilityCheckInterval"); 
-        w.number(obj.visibilityCheckInterval); 
-        w.prop("enableLazyLoading"); 
-        w.boolean(obj.enableLazyLoading); 
-        w.prop("engine"); 
-        w.string(obj.engine); 
-        w.prop("logLevel"); 
-        w.enum(obj.logLevel); 
-        w.prop("useWorkers"); 
-        w.boolean(obj.useWorkers); 
-        w.prop("includeNoteBounds"); 
-        w.boolean(obj.includeNoteBounds); 
+        w.string(obj.scriptFile, "scriptFile"); 
+        w.string(obj.fontDirectory, "fontDirectory"); 
+        w.string(obj.file, "file"); 
+        w.boolean(obj.tex, "tex"); 
+        w.number(obj.visibilityCheckInterval, "visibilityCheckInterval"); 
+        w.boolean(obj.enableLazyLoading, "enableLazyLoading"); 
+        w.string(obj.engine, "engine"); 
+        w.enum(obj.logLevel, "logLevel"); 
+        w.boolean(obj.useWorkers, "useWorkers"); 
+        w.boolean(obj.includeNoteBounds, "includeNoteBounds"); 
         w.endObject(); 
     }
     public static setProperty(obj: CoreSettings, property: string, r: IJsonReader): boolean {

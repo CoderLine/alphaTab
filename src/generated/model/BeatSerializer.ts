@@ -27,12 +27,14 @@ import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
 export class BeatSerializer {
     public static fromJson(obj: Beat, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Beat | null, w: IJsonWriter): void {
         if (!obj) {
@@ -40,100 +42,60 @@ export class BeatSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("id"); 
-        w.number(obj.id); 
-        w.prop("index"); 
-        w.number(obj.index); 
+        w.number(obj.id, "id"); 
+        w.number(obj.index, "index"); 
         w.prop("notes"); 
         w.startArray(); 
         for (const i of obj.notes) {
             NoteSerializer.toJson(i, w);
         } 
         w.endArray(); 
-        w.prop("isEmpty"); 
-        w.boolean(obj.isEmpty); 
-        w.prop("whammyStyle"); 
-        w.enum(obj.whammyStyle); 
-        w.prop("ottava"); 
-        w.enum(obj.ottava); 
-        w.prop("isLegatoOrigin"); 
-        w.boolean(obj.isLegatoOrigin); 
-        w.prop("duration"); 
-        w.enum(obj.duration); 
-        w.prop("isLetRing"); 
-        w.boolean(obj.isLetRing); 
-        w.prop("isPalmMute"); 
-        w.boolean(obj.isPalmMute); 
+        w.boolean(obj.isEmpty, "isEmpty"); 
+        w.enum(obj.whammyStyle, "whammyStyle"); 
+        w.enum(obj.ottava, "ottava"); 
+        w.boolean(obj.isLegatoOrigin, "isLegatoOrigin"); 
+        w.enum(obj.duration, "duration"); 
         w.prop("automations"); 
         w.startArray(); 
         for (const i of obj.automations) {
             AutomationSerializer.toJson(i, w);
         } 
         w.endArray(); 
-        w.prop("dots"); 
-        w.number(obj.dots); 
-        w.prop("fadeIn"); 
-        w.boolean(obj.fadeIn); 
-        w.prop("lyrics"); 
-        w.stringArray(obj.lyrics); 
-        w.prop("hasRasgueado"); 
-        w.boolean(obj.hasRasgueado); 
-        w.prop("pop"); 
-        w.boolean(obj.pop); 
-        w.prop("slap"); 
-        w.boolean(obj.slap); 
-        w.prop("tap"); 
-        w.boolean(obj.tap); 
-        w.prop("text"); 
-        w.string(obj.text); 
-        w.prop("brushType"); 
-        w.enum(obj.brushType); 
-        w.prop("brushDuration"); 
-        w.number(obj.brushDuration); 
-        w.prop("tupletDenominator"); 
-        w.number(obj.tupletDenominator); 
-        w.prop("tupletNumerator"); 
-        w.number(obj.tupletNumerator); 
-        w.prop("isContinuedWhammy"); 
-        w.boolean(obj.isContinuedWhammy); 
-        w.prop("whammyBarType"); 
-        w.enum(obj.whammyBarType); 
+        w.number(obj.dots, "dots"); 
+        w.boolean(obj.fadeIn, "fadeIn"); 
+        w.stringArray(obj.lyrics, "lyrics"); 
+        w.boolean(obj.hasRasgueado, "hasRasgueado"); 
+        w.boolean(obj.pop, "pop"); 
+        w.boolean(obj.slap, "slap"); 
+        w.boolean(obj.tap, "tap"); 
+        w.string(obj.text, "text"); 
+        w.enum(obj.brushType, "brushType"); 
+        w.number(obj.brushDuration, "brushDuration"); 
+        w.number(obj.tupletDenominator, "tupletDenominator"); 
+        w.number(obj.tupletNumerator, "tupletNumerator"); 
+        w.boolean(obj.isContinuedWhammy, "isContinuedWhammy"); 
+        w.enum(obj.whammyBarType, "whammyBarType"); 
         w.prop("whammyBarPoints"); 
         w.startArray(); 
         for (const i of obj.whammyBarPoints) {
             BendPointSerializer.toJson(i, w);
         } 
         w.endArray(); 
-        w.prop("vibrato"); 
-        w.enum(obj.vibrato); 
-        w.prop("chordId"); 
-        w.string(obj.chordId); 
-        w.prop("graceType"); 
-        w.enum(obj.graceType); 
-        w.prop("pickStroke"); 
-        w.enum(obj.pickStroke); 
-        w.prop("tremoloSpeed"); 
-        w.enum(obj.tremoloSpeed); 
-        w.prop("crescendo"); 
-        w.enum(obj.crescendo); 
-        w.prop("displayStart"); 
-        w.number(obj.displayStart); 
-        w.prop("playbackStart"); 
-        w.number(obj.playbackStart); 
-        w.prop("displayDuration"); 
-        w.number(obj.displayDuration); 
-        w.prop("playbackDuration"); 
-        w.number(obj.playbackDuration); 
-        w.prop("dynamics"); 
-        w.enum(obj.dynamics); 
-        w.prop("invertBeamDirection"); 
-        w.boolean(obj.invertBeamDirection); 
-        w.prop("preferredBeamDirection"); 
-        w.enum(obj.preferredBeamDirection); 
-        w.prop("isEffectSlurOrigin"); 
-        w.boolean(obj.isEffectSlurOrigin); 
-        w.prop("beamingMode"); 
-        w.enum(obj.beamingMode); 
+        w.enum(obj.vibrato, "vibrato"); 
+        w.string(obj.chordId, "chordId"); 
+        w.enum(obj.graceType, "graceType"); 
+        w.enum(obj.pickStroke, "pickStroke"); 
+        w.enum(obj.tremoloSpeed, "tremoloSpeed"); 
+        w.enum(obj.crescendo, "crescendo"); 
+        w.number(obj.displayStart, "displayStart"); 
+        w.number(obj.playbackStart, "playbackStart"); 
+        w.number(obj.displayDuration, "displayDuration"); 
+        w.number(obj.playbackDuration, "playbackDuration"); 
+        w.enum(obj.dynamics, "dynamics"); 
+        w.boolean(obj.invertBeamDirection, "invertBeamDirection"); 
+        w.enum(obj.preferredBeamDirection, "preferredBeamDirection"); 
+        w.boolean(obj.isEffectSlurOrigin, "isEffectSlurOrigin"); 
+        w.enum(obj.beamingMode, "beamingMode"); 
         w.endObject(); 
     }
     public static setProperty(obj: Beat, property: string, r: IJsonReader): boolean {
@@ -146,11 +108,13 @@ export class BeatSerializer {
                 return true;
             case "notes":
                 obj.notes = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new Note();
                     NoteSerializer.fromJson(i, r)
                     obj.addNote(i);
                 }
+                r.endArray();
                 return true;
             case "isempty":
                 obj.isEmpty = (r.boolean()!);
@@ -167,19 +131,15 @@ export class BeatSerializer {
             case "duration":
                 obj.duration = (r.enum<Duration>(Duration)!);
                 return true;
-            case "isletring":
-                obj.isLetRing = (r.boolean()!);
-                return true;
-            case "ispalmmute":
-                obj.isPalmMute = (r.boolean()!);
-                return true;
             case "automations":
                 obj.automations = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new Automation();
                     AutomationSerializer.fromJson(i, r)
                     obj.automations.push(i);
                 }
+                r.endArray();
                 return true;
             case "dots":
                 obj.dots = (r.number()!);
@@ -225,11 +185,13 @@ export class BeatSerializer {
                 return true;
             case "whammybarpoints":
                 obj.whammyBarPoints = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new BendPoint();
                     BendPointSerializer.fromJson(i, r)
                     obj.addWhammyBarPoint(i);
                 }
+                r.endArray();
                 return true;
             case "vibrato":
                 obj.vibrato = (r.enum<VibratoType>(VibratoType)!);

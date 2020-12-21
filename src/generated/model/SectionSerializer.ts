@@ -9,12 +9,14 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class SectionSerializer {
     public static fromJson(obj: Section, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Section | null, w: IJsonWriter): void {
         if (!obj) {
@@ -22,10 +24,8 @@ export class SectionSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("marker"); 
-        w.string(obj.marker); 
-        w.prop("text"); 
-        w.string(obj.text); 
+        w.string(obj.marker, "marker"); 
+        w.string(obj.text, "text"); 
         w.endObject(); 
     }
     public static setProperty(obj: Section, property: string, r: IJsonReader): boolean {

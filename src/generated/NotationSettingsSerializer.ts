@@ -13,12 +13,14 @@ import { NotationElement } from "@src/NotationSettings";
 import { TabRhythmMode } from "@src/NotationSettings";
 export class NotationSettingsSerializer {
     public static fromJson(obj: NotationSettings, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: NotationSettings | null, w: IJsonWriter): void {
         if (!obj) {
@@ -26,30 +28,20 @@ export class NotationSettingsSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("notationMode"); 
-        w.enum(obj.notationMode); 
-        w.prop("fingeringMode"); 
-        w.enum(obj.fingeringMode); 
+        w.enum(obj.notationMode, "notationMode"); 
+        w.enum(obj.fingeringMode, "fingeringMode"); 
         w.prop("elements"); 
         w.startObject(); 
         obj.elements.forEach((v, k) => { w.prop(k); w.boolean(v); }); 
         w.endObject(); 
-        w.prop("rhythmMode"); 
-        w.enum(obj.rhythmMode); 
-        w.prop("rhythmHeight"); 
-        w.number(obj.rhythmHeight); 
-        w.prop("transpositionPitches"); 
-        w.numberArray(obj.transpositionPitches); 
-        w.prop("displayTranspositionPitches"); 
-        w.numberArray(obj.displayTranspositionPitches); 
-        w.prop("smallGraceTabNotes"); 
-        w.boolean(obj.smallGraceTabNotes); 
-        w.prop("extendBendArrowsOnTiedNotes"); 
-        w.boolean(obj.extendBendArrowsOnTiedNotes); 
-        w.prop("extendLineEffectsToBeatEnd"); 
-        w.boolean(obj.extendLineEffectsToBeatEnd); 
-        w.prop("slurHeight"); 
-        w.number(obj.slurHeight); 
+        w.enum(obj.rhythmMode, "rhythmMode"); 
+        w.number(obj.rhythmHeight, "rhythmHeight"); 
+        w.numberArray(obj.transpositionPitches, "transpositionPitches"); 
+        w.numberArray(obj.displayTranspositionPitches, "displayTranspositionPitches"); 
+        w.boolean(obj.smallGraceTabNotes, "smallGraceTabNotes"); 
+        w.boolean(obj.extendBendArrowsOnTiedNotes, "extendBendArrowsOnTiedNotes"); 
+        w.boolean(obj.extendLineEffectsToBeatEnd, "extendLineEffectsToBeatEnd"); 
+        w.number(obj.slurHeight, "slurHeight"); 
         w.endObject(); 
     }
     public static setProperty(obj: NotationSettings, property: string, r: IJsonReader): boolean {
@@ -62,9 +54,11 @@ export class NotationSettingsSerializer {
                 return true;
             case "elements":
                 obj.elements = new Map<NotationElement, boolean>();
+                r.startObject();
                 while (r.nextProp()) {
                     obj.elements.set(r.enumProp<NotationElement>(NotationElement), (r.boolean()!));
                 }
+                r.endObject();
                 return true;
             case "rhythmmode":
                 obj.rhythmMode = (r.enum<TabRhythmMode>(TabRhythmMode)!);

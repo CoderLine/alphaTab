@@ -22,12 +22,14 @@ import { NoteAccidentalMode } from "@src/model/NoteAccidentalMode";
 import { DynamicValue } from "@src/model/DynamicValue";
 export class NoteSerializer {
     public static fromJson(obj: Note, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Note | null, w: IJsonWriter): void {
         if (!obj) {
@@ -35,96 +37,54 @@ export class NoteSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("id"); 
-        w.number(obj.id); 
-        w.prop("index"); 
-        w.number(obj.index); 
-        w.prop("accentuated"); 
-        w.enum(obj.accentuated); 
-        w.prop("bendType"); 
-        w.enum(obj.bendType); 
-        w.prop("bendStyle"); 
-        w.enum(obj.bendStyle); 
-        w.prop("isContinuedBend"); 
-        w.boolean(obj.isContinuedBend); 
+        w.number(obj.id, "id"); 
+        w.number(obj.index, "index"); 
+        w.enum(obj.accentuated, "accentuated"); 
+        w.enum(obj.bendType, "bendType"); 
+        w.enum(obj.bendStyle, "bendStyle"); 
+        w.boolean(obj.isContinuedBend, "isContinuedBend"); 
         w.prop("bendPoints"); 
         w.startArray(); 
         for (const i of obj.bendPoints) {
             BendPointSerializer.toJson(i, w);
         } 
         w.endArray(); 
-        w.prop("fret"); 
-        w.number(obj.fret); 
-        w.prop("string"); 
-        w.number(obj.string); 
-        w.prop("octave"); 
-        w.number(obj.octave); 
-        w.prop("tone"); 
-        w.number(obj.tone); 
-        w.prop("percussionArticulation"); 
-        w.number(obj.percussionArticulation); 
-        w.prop("isVisible"); 
-        w.boolean(obj.isVisible); 
-        w.prop("isLeftHandTapped"); 
-        w.boolean(obj.isLeftHandTapped); 
-        w.prop("isHammerPullOrigin"); 
-        w.boolean(obj.isHammerPullOrigin); 
-        w.prop("hammerPullOriginNoteId"); 
-        w.number(obj.hammerPullOriginNoteId); 
-        w.prop("hammerPullDestinationNoteId"); 
-        w.number(obj.hammerPullDestinationNoteId); 
-        w.prop("isSlurDestination"); 
-        w.boolean(obj.isSlurDestination); 
-        w.prop("slurOriginNoteId"); 
-        w.number(obj.slurOriginNoteId); 
-        w.prop("slurDestinationNoteId"); 
-        w.number(obj.slurDestinationNoteId); 
-        w.prop("harmonicType"); 
-        w.enum(obj.harmonicType); 
-        w.prop("harmonicValue"); 
-        w.number(obj.harmonicValue); 
-        w.prop("isGhost"); 
-        w.boolean(obj.isGhost); 
-        w.prop("isLetRing"); 
-        w.boolean(obj.isLetRing); 
-        w.prop("isPalmMute"); 
-        w.boolean(obj.isPalmMute); 
-        w.prop("isDead"); 
-        w.boolean(obj.isDead); 
-        w.prop("isStaccato"); 
-        w.boolean(obj.isStaccato); 
-        w.prop("slideInType"); 
-        w.enum(obj.slideInType); 
-        w.prop("slideOutType"); 
-        w.enum(obj.slideOutType); 
-        w.prop("vibrato"); 
-        w.enum(obj.vibrato); 
-        w.prop("tieOriginNoteId"); 
-        w.number(obj.tieOriginNoteId); 
-        w.prop("tieDestinationNoteId"); 
-        w.number(obj.tieDestinationNoteId); 
-        w.prop("isTieDestination"); 
-        w.boolean(obj.isTieDestination); 
-        w.prop("leftHandFinger"); 
-        w.enum(obj.leftHandFinger); 
-        w.prop("rightHandFinger"); 
-        w.enum(obj.rightHandFinger); 
-        w.prop("isFingering"); 
-        w.boolean(obj.isFingering); 
-        w.prop("trillValue"); 
-        w.number(obj.trillValue); 
-        w.prop("trillSpeed"); 
-        w.enum(obj.trillSpeed); 
-        w.prop("durationPercent"); 
-        w.number(obj.durationPercent); 
-        w.prop("accidentalMode"); 
-        w.enum(obj.accidentalMode); 
-        w.prop("dynamics"); 
-        w.enum(obj.dynamics); 
-        w.prop("isEffectSlurOrigin"); 
-        w.boolean(obj.isEffectSlurOrigin); 
-        w.prop("hasEffectSlur"); 
-        w.boolean(obj.hasEffectSlur); 
+        w.number(obj.fret, "fret"); 
+        w.number(obj.string, "string"); 
+        w.number(obj.octave, "octave"); 
+        w.number(obj.tone, "tone"); 
+        w.number(obj.percussionArticulation, "percussionArticulation"); 
+        w.boolean(obj.isVisible, "isVisible"); 
+        w.boolean(obj.isLeftHandTapped, "isLeftHandTapped"); 
+        w.boolean(obj.isHammerPullOrigin, "isHammerPullOrigin"); 
+        w.number(obj.hammerPullOriginNoteId, "hammerPullOriginNoteId"); 
+        w.number(obj.hammerPullDestinationNoteId, "hammerPullDestinationNoteId"); 
+        w.boolean(obj.isSlurDestination, "isSlurDestination"); 
+        w.number(obj.slurOriginNoteId, "slurOriginNoteId"); 
+        w.number(obj.slurDestinationNoteId, "slurDestinationNoteId"); 
+        w.enum(obj.harmonicType, "harmonicType"); 
+        w.number(obj.harmonicValue, "harmonicValue"); 
+        w.boolean(obj.isGhost, "isGhost"); 
+        w.boolean(obj.isLetRing, "isLetRing"); 
+        w.boolean(obj.isPalmMute, "isPalmMute"); 
+        w.boolean(obj.isDead, "isDead"); 
+        w.boolean(obj.isStaccato, "isStaccato"); 
+        w.enum(obj.slideInType, "slideInType"); 
+        w.enum(obj.slideOutType, "slideOutType"); 
+        w.enum(obj.vibrato, "vibrato"); 
+        w.number(obj.tieOriginNoteId, "tieOriginNoteId"); 
+        w.number(obj.tieDestinationNoteId, "tieDestinationNoteId"); 
+        w.boolean(obj.isTieDestination, "isTieDestination"); 
+        w.enum(obj.leftHandFinger, "leftHandFinger"); 
+        w.enum(obj.rightHandFinger, "rightHandFinger"); 
+        w.boolean(obj.isFingering, "isFingering"); 
+        w.number(obj.trillValue, "trillValue"); 
+        w.enum(obj.trillSpeed, "trillSpeed"); 
+        w.number(obj.durationPercent, "durationPercent"); 
+        w.enum(obj.accidentalMode, "accidentalMode"); 
+        w.enum(obj.dynamics, "dynamics"); 
+        w.boolean(obj.isEffectSlurOrigin, "isEffectSlurOrigin"); 
+        w.boolean(obj.hasEffectSlur, "hasEffectSlur"); 
         w.endObject(); 
     }
     public static setProperty(obj: Note, property: string, r: IJsonReader): boolean {
@@ -149,11 +109,13 @@ export class NoteSerializer {
                 return true;
             case "bendpoints":
                 obj.bendPoints = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new BendPoint();
                     BendPointSerializer.fromJson(i, r)
-                    obj.bendPoints.push(i);
+                    obj.addBendPoint(i);
                 }
+                r.endArray();
                 return true;
             case "fret":
                 obj.fret = (r.number()!);

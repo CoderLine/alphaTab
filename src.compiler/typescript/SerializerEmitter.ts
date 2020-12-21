@@ -16,7 +16,6 @@ import { isMap } from '../BuilderHelpers';
 import { isEnumType } from '../BuilderHelpers';
 import { isNumberType } from '../BuilderHelpers';
 import { wrapToNonNull } from '../BuilderHelpers';
-import { arrayify } from 'tslint/lib/utils';
 
 interface JsonProperty {
     partialNames: boolean;
@@ -78,14 +77,20 @@ function generateFromJsonBody() {
         ts.factory.createIfStatement(
             ts.factory.createBinaryExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'currentValueType'),
-                ts.SyntaxKind.ExclamationEqualsEqualsToken,
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('JsonValueType'), 'Object'),
+                ts.SyntaxKind.EqualsEqualsEqualsToken,
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('JsonValueType'), 'Null'),
             ),
             ts.factory.createBlock([
                 ts.factory.createReturnStatement()
             ])
         ),
-
+        ts.factory.createExpressionStatement(
+            ts.factory.createCallExpression(
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'startObject'),
+                undefined,
+                []
+            )
+        ),
         ts.factory.createWhileStatement(
             ts.factory.createCallExpression(
                 ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'nextProp'),
@@ -116,7 +121,14 @@ function generateFromJsonBody() {
                     )
                 )
             ])
-        )
+        ),
+        ts.factory.createExpressionStatement(
+            ts.factory.createCallExpression(
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'endObject'),
+                undefined,
+                []
+            )
+        ),
     ]));
 }
 
@@ -241,14 +253,6 @@ function generateToJsonBody(
         const fieldName = (prop.property.name as ts.Identifier).text;
         const jsonName = prop.jsonNames.filter(n => n !== '')[0];
 
-        statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
-            undefined,
-            [
-                ts.factory.createStringLiteral(jsonName)
-            ]
-        )));
-
         if (!jsonName) {
             continue;
         }
@@ -264,10 +268,18 @@ function generateToJsonBody(
                 undefined,
                 [
                     ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
+                    ts.factory.createStringLiteral(jsonName),
                 ]
             )));
         } else if (isArray) {
             // NOTE: nullable Object arrays are not yet supported
+            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
+                undefined,
+                [
+                    ts.factory.createStringLiteral(jsonName)
+                ]
+            )));
 
             const arrayItemType = unwrapArrayItemType(type.type!, typeChecker)!;
 
@@ -308,6 +320,14 @@ function generateToJsonBody(
             )));
         }
         else if (isMap(type.type)) {
+            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
+                undefined,
+                [
+                    ts.factory.createStringLiteral(jsonName)
+                ]
+            )));
+
             const mapType = type.type as ts.TypeReference;
             if (!isPrimitiveType(mapType.typeArguments![0])) {
                 throw new Error('only Map<Primitive, *> maps are supported extend if needed!');
@@ -378,6 +398,14 @@ function generateToJsonBody(
             )));
 
         } else if (isImmutable(type.type)) {
+            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
+                undefined,
+                [
+                    ts.factory.createStringLiteral(jsonName)
+                ]
+            )));
+
             let itemSerializer = type.type.symbol.name;
             importer(itemSerializer, findModule(type.type, program.getCompilerOptions()));
             statements.push(
@@ -393,12 +421,16 @@ function generateToJsonBody(
                 )
             );
         } else {
-            if (!type.type.symbol) {
-                console.log('error');
-            }
+            statements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('w'), 'prop'),
+                undefined,
+                [
+                    ts.factory.createStringLiteral(jsonName)
+                ]
+            )));
+
             let itemSerializer = type.type.symbol.name + "Serializer";
             importer(itemSerializer, findSerializerModule(type.type, program.getCompilerOptions()));
-
 
             const writeValue: ts.Statement = ts.factory.createExpressionStatement(
                 ts.factory.createCallExpression(
@@ -614,6 +646,13 @@ function generateSetPropertyBody(program: ts.Program,
 
             const loopItems = [
                 assignField(ts.factory.createArrayLiteralExpression(undefined)),
+                ts.factory.createExpressionStatement(
+                    ts.factory.createCallExpression(
+                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'startArray'),
+                        undefined,
+                        []
+                    )
+                ),
                 ts.factory.createWhileStatement(
                     ts.factory.createCallExpression(
                         ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'nextItem'),
@@ -667,7 +706,14 @@ function generateSetPropertyBody(program: ts.Program,
                                 )
                         )
                     ].filter(s => !!s) as ts.Statement[])
-                )
+                ),
+                ts.factory.createExpressionStatement(
+                    ts.factory.createCallExpression(
+                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'endArray'),
+                        undefined,
+                        []
+                    )
+                ),
             ];
 
             if (type.isNullable) {
@@ -736,6 +782,10 @@ function generateSetPropertyBody(program: ts.Program,
                 typeChecker.typeToTypeNode(mapType.typeArguments![1], undefined, undefined)!,
             ], [])));
 
+            caseStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'startObject'),
+                undefined, []
+            )));
 
             caseStatements.push(ts.factory.createWhileStatement(
                 ts.factory.createCallExpression(
@@ -783,6 +833,12 @@ function generateSetPropertyBody(program: ts.Program,
                     )
                 ].filter(s => !!s) as ts.Statement[])
             ));
+
+            caseStatements.push(ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('r'), 'endObject'),
+                undefined, []
+            )));
+
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
         } else if (isImmutable(type.type)) {
             let itemSerializer = type.type.symbol.name;

@@ -14,12 +14,12 @@ import { NotationElement } from '@src/NotationSettings';
  * This layout arranges the bars into a fixed width and dynamic height region.
  */
 export class PageViewLayout extends ScoreLayout {
-    public static PagePadding: Float32Array = new Float32Array([40, 40, 40, 40]);
+    public static PagePadding: number[] = [40, 40, 40, 40];
     public static readonly GroupSpacing: number = 20;
     private _groups: StaveGroup[] = [];
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
     private _barsFromPreviousGroup: MasterBarsRenderers[] = [];
-    private _pagePadding: Float32Array | null = null;
+    private _pagePadding: number[] | null = null;
 
     public get name(): string {
         return 'PageView';
@@ -35,19 +35,19 @@ export class PageViewLayout extends ScoreLayout {
             this._pagePadding = PageViewLayout.PagePadding;
         }
         if (this._pagePadding.length === 1) {
-            this._pagePadding = new Float32Array([
+            this._pagePadding = [
                 this._pagePadding[0],
                 this._pagePadding[0],
                 this._pagePadding[0],
                 this._pagePadding[0]
-            ]);
+            ];
         } else if (this._pagePadding.length === 2) {
-            this._pagePadding = new Float32Array([
+            this._pagePadding = [
                 this._pagePadding[0],
                 this._pagePadding[1],
                 this._pagePadding[0],
                 this._pagePadding[1]
-            ]);
+            ];
         }
         let x: number = this._pagePadding[0];
         let y: number = this._pagePadding[1];

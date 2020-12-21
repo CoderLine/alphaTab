@@ -71,6 +71,7 @@ export class Note {
     /**
      * Gets or sets a list of the points defining the bend behavior.
      * @clone_add addBendPoint
+     * @json_add addBendPoint
      */
     public bendPoints: BendPoint[] = [];
 

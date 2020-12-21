@@ -8,6 +8,7 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
+import { JsonObjectWriter } from '@src/io/IJsonWriter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
@@ -23,7 +24,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     public constructor(api: AlphaTabApiBase<T>, settings: Settings) {
         this._api = api;
 
-        if(!settings.core.scriptFile) {
+        if (!settings.core.scriptFile) {
             Logger.error('Rendering', `Could not detect alphaTab script file, cannot initialize renderer`);
             return;
         }
@@ -60,9 +61,10 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     private serializeSettingsForWorker(settings: Settings): unknown {
-        // TODO: create Web variant of JSON writer
-        let json: any = SettingsSerializer.toJson(settings, null!);
+        const writer = new JsonObjectWriter();
+        SettingsSerializer.toJson(settings, writer);
         // cut out player settings, they are only needed on UI thread side
+        const json: any = writer.result;
         json.player = null;
         return json;
     }

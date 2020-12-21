@@ -18,12 +18,14 @@ import { Automation } from "@src/model/Automation";
 import { Fermata } from "@src/model/Fermata";
 export class MasterBarSerializer {
     public static fromJson(obj: MasterBar, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: MasterBar | null, w: IJsonWriter): void {
         if (!obj) {
@@ -31,28 +33,17 @@ export class MasterBarSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("alternateEndings"); 
-        w.number(obj.alternateEndings); 
-        w.prop("index"); 
-        w.number(obj.index); 
-        w.prop("keySignature"); 
-        w.enum(obj.keySignature); 
-        w.prop("keySignatureType"); 
-        w.enum(obj.keySignatureType); 
-        w.prop("isDoubleBar"); 
-        w.boolean(obj.isDoubleBar); 
-        w.prop("isRepeatStart"); 
-        w.boolean(obj.isRepeatStart); 
-        w.prop("repeatCount"); 
-        w.number(obj.repeatCount); 
-        w.prop("timeSignatureNumerator"); 
-        w.number(obj.timeSignatureNumerator); 
-        w.prop("timeSignatureDenominator"); 
-        w.number(obj.timeSignatureDenominator); 
-        w.prop("timeSignatureCommon"); 
-        w.boolean(obj.timeSignatureCommon); 
-        w.prop("tripletFeel"); 
-        w.enum(obj.tripletFeel); 
+        w.number(obj.alternateEndings, "alternateEndings"); 
+        w.number(obj.index, "index"); 
+        w.enum(obj.keySignature, "keySignature"); 
+        w.enum(obj.keySignatureType, "keySignatureType"); 
+        w.boolean(obj.isDoubleBar, "isDoubleBar"); 
+        w.boolean(obj.isRepeatStart, "isRepeatStart"); 
+        w.number(obj.repeatCount, "repeatCount"); 
+        w.number(obj.timeSignatureNumerator, "timeSignatureNumerator"); 
+        w.number(obj.timeSignatureDenominator, "timeSignatureDenominator"); 
+        w.boolean(obj.timeSignatureCommon, "timeSignatureCommon"); 
+        w.enum(obj.tripletFeel, "tripletFeel"); 
         w.prop("section"); 
         if (obj.section) {
             SectionSerializer.toJson(obj.section, w);
@@ -69,10 +60,8 @@ export class MasterBarSerializer {
         w.startObject(); 
         obj.fermata.forEach((v, k) => { w.prop(k); FermataSerializer.toJson(v, w); }); 
         w.endObject(); 
-        w.prop("start"); 
-        w.number(obj.start); 
-        w.prop("isAnacrusis"); 
-        w.boolean(obj.isAnacrusis); 
+        w.number(obj.start, "start"); 
+        w.boolean(obj.isAnacrusis, "isAnacrusis"); 
         w.endObject(); 
     }
     public static setProperty(obj: MasterBar, property: string, r: IJsonReader): boolean {
@@ -112,11 +101,13 @@ export class MasterBarSerializer {
                 return true;
             case "fermata":
                 obj.fermata = new Map<number, Fermata>();
+                r.startObject();
                 while (r.nextProp()) {
                     const i = new Fermata();
                     FermataSerializer.fromJson(i, r);
                     obj.fermata.set(r.numberProp(), i);
                 }
+                r.endObject();
                 return true;
             case "start":
                 obj.start = (r.number()!);

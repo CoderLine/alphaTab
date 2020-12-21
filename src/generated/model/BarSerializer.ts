@@ -14,12 +14,14 @@ import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
 export class BarSerializer {
     public static fromJson(obj: Bar, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Bar | null, w: IJsonWriter): void {
         if (!obj) {
@@ -27,22 +29,17 @@ export class BarSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("id"); 
-        w.number(obj.id); 
-        w.prop("index"); 
-        w.number(obj.index); 
-        w.prop("clef"); 
-        w.enum(obj.clef); 
-        w.prop("clefOttava"); 
-        w.enum(obj.clefOttava); 
+        w.number(obj.id, "id"); 
+        w.number(obj.index, "index"); 
+        w.enum(obj.clef, "clef"); 
+        w.enum(obj.clefOttava, "clefOttava"); 
         w.prop("voices"); 
         w.startArray(); 
         for (const i of obj.voices) {
             VoiceSerializer.toJson(i, w);
         } 
         w.endArray(); 
-        w.prop("simileMark"); 
-        w.enum(obj.simileMark); 
+        w.enum(obj.simileMark, "simileMark"); 
         w.endObject(); 
     }
     public static setProperty(obj: Bar, property: string, r: IJsonReader): boolean {
@@ -61,11 +58,13 @@ export class BarSerializer {
                 return true;
             case "voices":
                 obj.voices = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new Voice();
                     VoiceSerializer.fromJson(i, r)
                     obj.addVoice(i);
                 }
+                r.endArray();
                 return true;
             case "similemark":
                 obj.simileMark = (r.enum<SimileMark>(SimileMark)!);

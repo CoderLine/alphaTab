@@ -12,12 +12,14 @@ import { LayoutMode } from "@src/DisplaySettings";
 import { StaveProfile } from "@src/DisplaySettings";
 export class DisplaySettingsSerializer {
     public static fromJson(obj: DisplaySettings, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: DisplaySettings | null, w: IJsonWriter): void {
         if (!obj) {
@@ -25,26 +27,17 @@ export class DisplaySettingsSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("scale"); 
-        w.number(obj.scale); 
-        w.prop("stretchForce"); 
-        w.number(obj.stretchForce); 
-        w.prop("layoutMode"); 
-        w.enum(obj.layoutMode); 
-        w.prop("staveProfile"); 
-        w.enum(obj.staveProfile); 
-        w.prop("barsPerRow"); 
-        w.number(obj.barsPerRow); 
-        w.prop("startBar"); 
-        w.number(obj.startBar); 
-        w.prop("barCount"); 
-        w.number(obj.barCount); 
-        w.prop("barCountPerPartial"); 
-        w.number(obj.barCountPerPartial); 
+        w.number(obj.scale, "scale"); 
+        w.number(obj.stretchForce, "stretchForce"); 
+        w.enum(obj.layoutMode, "layoutMode"); 
+        w.enum(obj.staveProfile, "staveProfile"); 
+        w.number(obj.barsPerRow, "barsPerRow"); 
+        w.number(obj.startBar, "startBar"); 
+        w.number(obj.barCount, "barCount"); 
+        w.number(obj.barCountPerPartial, "barCountPerPartial"); 
         w.prop("resources"); 
         RenderingResourcesSerializer.toJson(obj.resources, w); 
-        w.prop("padding"); 
-        w.float32Array(obj.padding); 
+        w.numberArray(obj.padding, "padding"); 
         w.endObject(); 
     }
     public static setProperty(obj: DisplaySettings, property: string, r: IJsonReader): boolean {
@@ -74,7 +67,7 @@ export class DisplaySettingsSerializer {
                 obj.barCountPerPartial = (r.number()!);
                 return true;
             case "padding":
-                obj.padding = r.float32Array();
+                obj.padding = r.numberArray();
                 return true;
         } 
         if (["resources"].indexOf(property) >= 0) {

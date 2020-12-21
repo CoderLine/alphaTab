@@ -9,12 +9,14 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class BendPointSerializer {
     public static fromJson(obj: BendPoint, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: BendPoint | null, w: IJsonWriter): void {
         if (!obj) {
@@ -22,10 +24,8 @@ export class BendPointSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("offset"); 
-        w.number(obj.offset); 
-        w.prop("value"); 
-        w.number(obj.value); 
+        w.number(obj.offset, "offset"); 
+        w.number(obj.value, "value"); 
         w.endObject(); 
     }
     public static setProperty(obj: BendPoint, property: string, r: IJsonReader): boolean {

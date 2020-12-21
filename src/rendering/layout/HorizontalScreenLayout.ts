@@ -17,10 +17,10 @@ export class HorizontalScreenLayoutPartialInfo {
  * This layout arranges the bars all horizontally
  */
 export class HorizontalScreenLayout extends ScoreLayout {
-    public static PagePadding: Float32Array = new Float32Array([20, 20, 20, 20]);
+    public static PagePadding: number[] = [20, 20, 20, 20];
     public static readonly GroupSpacing: number = 20;
     private _group: StaveGroup | null = null;
-    private _pagePadding: Float32Array | null = null;
+    private _pagePadding: number[] | null = null;
 
     public get name(): string {
         return 'HorizontalScreen';
@@ -34,7 +34,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         return false;
     }
 
-    public resize(): void {}
+    public resize(): void { }
 
     protected doLayoutAndRender(): void {
         this._pagePadding = this.renderer.settings.display.padding;
@@ -42,19 +42,19 @@ export class HorizontalScreenLayout extends ScoreLayout {
             this._pagePadding = HorizontalScreenLayout.PagePadding;
         }
         if (this._pagePadding.length === 1) {
-            this._pagePadding = new Float32Array([
+            this._pagePadding = [
                 this._pagePadding[0],
                 this._pagePadding[0],
                 this._pagePadding[0],
                 this._pagePadding[0]
-            ]);
+            ];
         } else if (this._pagePadding.length === 2) {
-            this._pagePadding = new Float32Array([
+            this._pagePadding = [
                 this._pagePadding[0],
                 this._pagePadding[1],
                 this._pagePadding[0],
                 this._pagePadding[1]
-            ]);
+            ];
         }
         let score: Score = this.renderer.score!;
         let canvas: ICanvas = this.renderer.canvas!;
@@ -98,9 +98,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
                         Logger.debug(
                             this.name,
                             'Finished partial from bar ' +
-                                currentPartial.masterBars[0].index +
-                                ' to ' +
-                                currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                            currentPartial.masterBars[0].index +
+                            ' to ' +
+                            currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
                             null
                         );
                         currentPartial = new HorizontalScreenLayoutPartialInfo();
@@ -118,9 +118,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
             Logger.debug(
                 this.name,
                 'Finished partial from bar ' +
-                    currentPartial.masterBars[0].index +
-                    ' to ' +
-                    currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                currentPartial.masterBars[0].index +
+                ' to ' +
+                currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
                 null
             );
         }
@@ -140,9 +140,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
             Logger.debug(
                 this.name,
                 'Rendering partial from bar ' +
-                    partial.masterBars[0].index +
-                    ' to ' +
-                    partial.masterBars[partial.masterBars.length - 1].index,
+                partial.masterBars[0].index +
+                ' to ' +
+                partial.masterBars[partial.masterBars.length - 1].index,
                 null
             );
             this._group.paintPartial(

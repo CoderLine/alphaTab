@@ -9,12 +9,14 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class ImporterSettingsSerializer {
     public static fromJson(obj: ImporterSettings, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: ImporterSettings | null, w: IJsonWriter): void {
         if (!obj) {
@@ -22,10 +24,8 @@ export class ImporterSettingsSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("encoding"); 
-        w.string(obj.encoding); 
-        w.prop("mergePartGroupsInMusicXml"); 
-        w.boolean(obj.mergePartGroupsInMusicXml); 
+        w.string(obj.encoding, "encoding"); 
+        w.boolean(obj.mergePartGroupsInMusicXml, "mergePartGroupsInMusicXml"); 
         w.endObject(); 
     }
     public static setProperty(obj: ImporterSettings, property: string, r: IJsonReader): boolean {

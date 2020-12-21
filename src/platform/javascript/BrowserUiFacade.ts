@@ -23,8 +23,8 @@ import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWorkerScoreRenderer';
 import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 import { Cursors } from '@src/platform/Cursors';
+import { JsonObjectReader } from '@src/io/IJsonReader';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
-import { IJsonReader } from '@src/io/IJsonReader';
 
 /**
  * @target web
@@ -124,10 +124,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             settings = raw;
         } else {
             settings = new Settings();
-            // TODO: implement web variant of JSON reader
-            SettingsSerializer.fromJson(settings, raw as IJsonReader);
+            SettingsSerializer.fromJson(settings, new JsonObjectReader(raw));
         }
-        
+
         let dataAttributes: Map<string, unknown> = this.getDataAttributes();
         settings.fillFromDataAttributes(dataAttributes);
         if (settings.notation.notationMode === NotationMode.SongBook) {
@@ -139,7 +138,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             api.container.resize.on(this.showSvgsInViewPort.bind(this));
         }
         this.setupFontCheckers(settings);
-      
+
         this._initialTrackIndexes = this.parseTracks(settings.core.tracks);
         this._contents = '';
         let element: HtmlElementContainer = api.container as HtmlElementContainer;

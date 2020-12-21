@@ -95,5 +95,5 @@ export class DisplaySettings {
     /**
      * Gets or sets the padding between the music notation and the border.
      */
-    public padding: Float32Array | null = null;
+    public padding: number[] | null = null;
 }

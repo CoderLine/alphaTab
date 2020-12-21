@@ -15,12 +15,14 @@ import { Staff } from "@src/model/Staff";
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 export class TrackSerializer {
     public static fromJson(obj: Track, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Track | null, w: IJsonWriter): void {
         if (!obj) {
@@ -28,8 +30,7 @@ export class TrackSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("index"); 
-        w.number(obj.index); 
+        w.number(obj.index, "index"); 
         w.prop("staves"); 
         w.startArray(); 
         for (const i of obj.staves) {
@@ -40,10 +41,8 @@ export class TrackSerializer {
         PlaybackInformationSerializer.toJson(obj.playbackInfo, w); 
         w.prop("color"); 
         Color.toJson(obj.color, w); 
-        w.prop("name"); 
-        w.string(obj.name); 
-        w.prop("shortName"); 
-        w.string(obj.shortName); 
+        w.string(obj.name, "name"); 
+        w.string(obj.shortName, "shortName"); 
         w.prop("percussionArticulations"); 
         w.startArray(); 
         for (const i of obj.percussionArticulations) {
@@ -59,11 +58,13 @@ export class TrackSerializer {
                 return true;
             case "staves":
                 obj.staves = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new Staff();
                     StaffSerializer.fromJson(i, r)
                     obj.addStaff(i);
                 }
+                r.endArray();
                 return true;
             case "color":
                 obj.color = (Color.fromJson(r)!);
@@ -76,11 +77,13 @@ export class TrackSerializer {
                 return true;
             case "percussionarticulations":
                 obj.percussionArticulations = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new InstrumentArticulation();
                     InstrumentArticulationSerializer.fromJson(i, r)
                     obj.percussionArticulations.push(i);
                 }
+                r.endArray();
                 return true;
         } 
         if (["playbackinfo"].indexOf(property) >= 0) {

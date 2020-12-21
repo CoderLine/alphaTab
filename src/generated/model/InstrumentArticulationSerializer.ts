@@ -11,12 +11,14 @@ import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { TextBaseline } from "@src/platform/ICanvas";
 export class InstrumentArticulationSerializer {
     public static fromJson(obj: InstrumentArticulation, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: InstrumentArticulation | null, w: IJsonWriter): void {
         if (!obj) {
@@ -24,20 +26,13 @@ export class InstrumentArticulationSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("staffLine"); 
-        w.number(obj.staffLine); 
-        w.prop("noteHeadDefault"); 
-        w.enum(obj.noteHeadDefault); 
-        w.prop("noteHeadHalf"); 
-        w.enum(obj.noteHeadHalf); 
-        w.prop("noteHeadWhole"); 
-        w.enum(obj.noteHeadWhole); 
-        w.prop("techniqueSymbol"); 
-        w.enum(obj.techniqueSymbol); 
-        w.prop("techniqueSymbolPlacement"); 
-        w.enum(obj.techniqueSymbolPlacement); 
-        w.prop("outputMidiNumber"); 
-        w.number(obj.outputMidiNumber); 
+        w.number(obj.staffLine, "staffLine"); 
+        w.enum(obj.noteHeadDefault, "noteHeadDefault"); 
+        w.enum(obj.noteHeadHalf, "noteHeadHalf"); 
+        w.enum(obj.noteHeadWhole, "noteHeadWhole"); 
+        w.enum(obj.techniqueSymbol, "techniqueSymbol"); 
+        w.enum(obj.techniqueSymbolPlacement, "techniqueSymbolPlacement"); 
+        w.number(obj.outputMidiNumber, "outputMidiNumber"); 
         w.endObject(); 
     }
     public static setProperty(obj: InstrumentArticulation, property: string, r: IJsonReader): boolean {

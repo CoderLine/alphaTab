@@ -11,12 +11,14 @@ import { Font } from "@src/model/Font";
 import { Color } from "@src/model/Color";
 export class RenderingResourcesSerializer {
     public static fromJson(obj: RenderingResources, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: RenderingResources | null, w: IJsonWriter): void {
         if (!obj) {

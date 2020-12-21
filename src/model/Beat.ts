@@ -175,11 +175,13 @@ export class Beat {
 
     /**
      * Gets or sets whether any note in this beat has a let-ring applied.
+     * @json_ignore
      */
     public isLetRing: boolean = false;
 
     /**
      * Gets or sets whether any note in this beat has a palm-mute paplied.
+     * @json_ignore
      */
     public isPalmMute: boolean = false;
 

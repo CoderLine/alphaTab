@@ -14,12 +14,14 @@ import { MasterBar } from "@src/model/MasterBar";
 import { Track } from "@src/model/Track";
 export class ScoreSerializer {
     public static fromJson(obj: Score, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Score | null, w: IJsonWriter): void {
         if (!obj) {
@@ -27,30 +29,18 @@ export class ScoreSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("album"); 
-        w.string(obj.album); 
-        w.prop("artist"); 
-        w.string(obj.artist); 
-        w.prop("copyright"); 
-        w.string(obj.copyright); 
-        w.prop("instructions"); 
-        w.string(obj.instructions); 
-        w.prop("music"); 
-        w.string(obj.music); 
-        w.prop("notices"); 
-        w.string(obj.notices); 
-        w.prop("subTitle"); 
-        w.string(obj.subTitle); 
-        w.prop("title"); 
-        w.string(obj.title); 
-        w.prop("words"); 
-        w.string(obj.words); 
-        w.prop("tab"); 
-        w.string(obj.tab); 
-        w.prop("tempo"); 
-        w.number(obj.tempo); 
-        w.prop("tempoLabel"); 
-        w.string(obj.tempoLabel); 
+        w.string(obj.album, "album"); 
+        w.string(obj.artist, "artist"); 
+        w.string(obj.copyright, "copyright"); 
+        w.string(obj.instructions, "instructions"); 
+        w.string(obj.music, "music"); 
+        w.string(obj.notices, "notices"); 
+        w.string(obj.subTitle, "subTitle"); 
+        w.string(obj.title, "title"); 
+        w.string(obj.words, "words"); 
+        w.string(obj.tab, "tab"); 
+        w.number(obj.tempo, "tempo"); 
+        w.string(obj.tempoLabel, "tempoLabel"); 
         w.prop("masterBars"); 
         w.startArray(); 
         for (const i of obj.masterBars) {
@@ -107,19 +97,23 @@ export class ScoreSerializer {
                 return true;
             case "masterbars":
                 obj.masterBars = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new MasterBar();
                     MasterBarSerializer.fromJson(i, r)
                     obj.addMasterBar(i);
                 }
+                r.endArray();
                 return true;
             case "tracks":
                 obj.tracks = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new Track();
                     TrackSerializer.fromJson(i, r)
                     obj.addTrack(i);
                 }
+                r.endArray();
                 return true;
         } 
         if (["stylesheet"].indexOf(property) >= 0) {

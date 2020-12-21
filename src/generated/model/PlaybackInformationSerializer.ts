@@ -9,12 +9,14 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class PlaybackInformationSerializer {
     public static fromJson(obj: PlaybackInformation, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: PlaybackInformation | null, w: IJsonWriter): void {
         if (!obj) {
@@ -22,22 +24,14 @@ export class PlaybackInformationSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("volume"); 
-        w.number(obj.volume); 
-        w.prop("balance"); 
-        w.number(obj.balance); 
-        w.prop("port"); 
-        w.number(obj.port); 
-        w.prop("program"); 
-        w.number(obj.program); 
-        w.prop("primaryChannel"); 
-        w.number(obj.primaryChannel); 
-        w.prop("secondaryChannel"); 
-        w.number(obj.secondaryChannel); 
-        w.prop("isMute"); 
-        w.boolean(obj.isMute); 
-        w.prop("isSolo"); 
-        w.boolean(obj.isSolo); 
+        w.number(obj.volume, "volume"); 
+        w.number(obj.balance, "balance"); 
+        w.number(obj.port, "port"); 
+        w.number(obj.program, "program"); 
+        w.number(obj.primaryChannel, "primaryChannel"); 
+        w.number(obj.secondaryChannel, "secondaryChannel"); 
+        w.boolean(obj.isMute, "isMute"); 
+        w.boolean(obj.isSolo, "isSolo"); 
         w.endObject(); 
     }
     public static setProperty(obj: PlaybackInformation, property: string, r: IJsonReader): boolean {

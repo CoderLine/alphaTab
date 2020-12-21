@@ -13,12 +13,14 @@ import { Bar } from "@src/model/Bar";
 import { Chord } from "@src/model/Chord";
 export class StaffSerializer {
     public static fromJson(obj: Staff, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Staff | null, w: IJsonWriter): void {
         if (!obj) {
@@ -26,8 +28,7 @@ export class StaffSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("index"); 
-        w.number(obj.index); 
+        w.number(obj.index, "index"); 
         w.prop("bars"); 
         w.startArray(); 
         for (const i of obj.bars) {
@@ -38,24 +39,15 @@ export class StaffSerializer {
         w.startObject(); 
         obj.chords.forEach((v, k) => { w.prop(k); ChordSerializer.toJson(v, w); }); 
         w.endObject(); 
-        w.prop("capo"); 
-        w.number(obj.capo); 
-        w.prop("transpositionPitch"); 
-        w.number(obj.transpositionPitch); 
-        w.prop("displayTranspositionPitch"); 
-        w.number(obj.displayTranspositionPitch); 
-        w.prop("tuning"); 
-        w.numberArray(obj.tuning); 
-        w.prop("tuningName"); 
-        w.string(obj.tuningName); 
-        w.prop("showTablature"); 
-        w.boolean(obj.showTablature); 
-        w.prop("showStandardNotation"); 
-        w.boolean(obj.showStandardNotation); 
-        w.prop("isPercussion"); 
-        w.boolean(obj.isPercussion); 
-        w.prop("standardNotationLineCount"); 
-        w.number(obj.standardNotationLineCount); 
+        w.number(obj.capo, "capo"); 
+        w.number(obj.transpositionPitch, "transpositionPitch"); 
+        w.number(obj.displayTranspositionPitch, "displayTranspositionPitch"); 
+        w.numberArray(obj.tuning, "tuning"); 
+        w.string(obj.tuningName, "tuningName"); 
+        w.boolean(obj.showTablature, "showTablature"); 
+        w.boolean(obj.showStandardNotation, "showStandardNotation"); 
+        w.boolean(obj.isPercussion, "isPercussion"); 
+        w.number(obj.standardNotationLineCount, "standardNotationLineCount"); 
         w.endObject(); 
     }
     public static setProperty(obj: Staff, property: string, r: IJsonReader): boolean {
@@ -65,19 +57,23 @@ export class StaffSerializer {
                 return true;
             case "bars":
                 obj.bars = [];
+                r.startArray();
                 while (r.nextItem()) {
                     const i = new Bar();
                     BarSerializer.fromJson(i, r)
                     obj.addBar(i);
                 }
+                r.endArray();
                 return true;
             case "chords":
                 obj.chords = new Map<string, Chord>();
+                r.startObject();
                 while (r.nextProp()) {
                     const i = new Chord();
                     ChordSerializer.fromJson(i, r);
                     obj.addChord(r.prop(), i);
                 }
+                r.endObject();
                 return true;
             case "capo":
                 obj.capo = (r.number()!);

@@ -10,12 +10,14 @@ import { IJsonWriter } from "@src/io/IJsonWriter";
 import { ScrollMode } from "@src/PlayerSettings";
 export class PlayerSettingsSerializer {
     public static fromJson(obj: PlayerSettings, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: PlayerSettings | null, w: IJsonWriter): void {
         if (!obj) {
@@ -23,30 +25,18 @@ export class PlayerSettingsSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("soundFont"); 
-        w.string(obj.soundFont); 
-        w.prop("scrollElement"); 
-        w.string(obj.scrollElement); 
-        w.prop("enablePlayer"); 
-        w.boolean(obj.enablePlayer); 
-        w.prop("enableCursor"); 
-        w.boolean(obj.enableCursor); 
-        w.prop("enableUserInteraction"); 
-        w.boolean(obj.enableUserInteraction); 
-        w.prop("scrollOffsetX"); 
-        w.number(obj.scrollOffsetX); 
-        w.prop("scrollOffsetY"); 
-        w.number(obj.scrollOffsetY); 
-        w.prop("scrollMode"); 
-        w.enum(obj.scrollMode); 
-        w.prop("scrollSpeed"); 
-        w.number(obj.scrollSpeed); 
-        w.prop("songBookBendDuration"); 
-        w.number(obj.songBookBendDuration); 
-        w.prop("songBookDipDuration"); 
-        w.number(obj.songBookDipDuration); 
-        w.prop("playTripletFeel"); 
-        w.boolean(obj.playTripletFeel); 
+        w.string(obj.soundFont, "soundFont"); 
+        w.string(obj.scrollElement, "scrollElement"); 
+        w.boolean(obj.enablePlayer, "enablePlayer"); 
+        w.boolean(obj.enableCursor, "enableCursor"); 
+        w.boolean(obj.enableUserInteraction, "enableUserInteraction"); 
+        w.number(obj.scrollOffsetX, "scrollOffsetX"); 
+        w.number(obj.scrollOffsetY, "scrollOffsetY"); 
+        w.enum(obj.scrollMode, "scrollMode"); 
+        w.number(obj.scrollSpeed, "scrollSpeed"); 
+        w.number(obj.songBookBendDuration, "songBookBendDuration"); 
+        w.number(obj.songBookDipDuration, "songBookDipDuration"); 
+        w.boolean(obj.playTripletFeel, "playTripletFeel"); 
         w.endObject(); 
     }
     public static setProperty(obj: PlayerSettings, property: string, r: IJsonReader): boolean {

@@ -9,12 +9,14 @@ import { JsonValueType } from "@src/io/IJsonReader";
 import { IJsonWriter } from "@src/io/IJsonWriter";
 export class ChordSerializer {
     public static fromJson(obj: Chord, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Chord | null, w: IJsonWriter): void {
         if (!obj) {
@@ -22,20 +24,13 @@ export class ChordSerializer {
             return;
         } 
         w.startObject(); 
-        w.prop("name"); 
-        w.string(obj.name); 
-        w.prop("firstFret"); 
-        w.number(obj.firstFret); 
-        w.prop("strings"); 
-        w.numberArray(obj.strings); 
-        w.prop("barreFrets"); 
-        w.numberArray(obj.barreFrets); 
-        w.prop("showName"); 
-        w.boolean(obj.showName); 
-        w.prop("showDiagram"); 
-        w.boolean(obj.showDiagram); 
-        w.prop("showFingering"); 
-        w.boolean(obj.showFingering); 
+        w.string(obj.name, "name"); 
+        w.number(obj.firstFret, "firstFret"); 
+        w.numberArray(obj.strings, "strings"); 
+        w.numberArray(obj.barreFrets, "barreFrets"); 
+        w.boolean(obj.showName, "showName"); 
+        w.boolean(obj.showDiagram, "showDiagram"); 
+        w.boolean(obj.showFingering, "showFingering"); 
         w.endObject(); 
     }
     public static setProperty(obj: Chord, property: string, r: IJsonReader): boolean {

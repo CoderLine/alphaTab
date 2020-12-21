@@ -14,12 +14,14 @@ import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSeria
 import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
 export class SettingsSerializer {
     public static fromJson(obj: Settings, r: IJsonReader): void {
-        if (r.currentValueType !== JsonValueType.Object) {
+        if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
+        r.startObject(); 
         while (r.nextProp()) {
             this.setProperty(obj, r.prop().toLowerCase(), r);
         } 
+        r.endObject(); 
     }
     public static toJson(obj: Settings | null, w: IJsonWriter): void {
         if (!obj) {

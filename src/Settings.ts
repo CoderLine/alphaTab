@@ -3,6 +3,8 @@ import { DisplaySettings } from '@src/DisplaySettings';
 import { ImporterSettings } from '@src/ImporterSettings';
 import { FingeringMode, NotationMode, NotationSettings, NotationElement } from '@src/NotationSettings';
 import { PlayerSettings } from '@src/PlayerSettings';
+import { SettingsSerializer } from './generated/SettingsSerializer';
+import { JsonObjectReader } from './io/IJsonReader';
 
 /**
  * This public class contains instance specific settings for alphaTab
@@ -14,8 +16,7 @@ export class Settings {
      */
     public fillFromDataAttributes(dataAttributes: Map<string, unknown>): void {
         dataAttributes.forEach((v, k) => {
-            // TODO: replace data attribute settings
-            // SettingsSerializer.setProperty(this, k.toLowerCase(), v);
+            SettingsSerializer.setProperty(this, k.toLowerCase(), new JsonObjectReader(v));
         });
     }
 
