@@ -608,13 +608,20 @@ export default class CSharpAstPrinter {
                     this.writeType(arrayType.elementType);
                     this.write('[]');
                 } else {
-                    if (forNew) {
-                        this.write('System.Collections.Generic.List<');
+                    const isDynamicArray = arrayType.elementType.nodeType == cs.SyntaxKind.PrimitiveTypeNode
+                        && (arrayType.elementType as cs.PrimitiveTypeNode).type == cs.PrimitiveType.Dynamic;
+                    if (isDynamicArray && !forNew) {
+                        this.write('System.Collections.IList');
                     } else {
-                        this.write('System.Collections.Generic.IList<');
+                        if (forNew) {
+                            this.write('System.Collections.Generic.List<');
+                        } else {
+                            this.write('System.Collections.Generic.IList<');
+                        }
+                        this.writeType(arrayType.elementType);
+                        this.write('>');
                     }
-                    this.writeType(arrayType.elementType);
-                    this.write('>');
+
                 }
 
                 break;

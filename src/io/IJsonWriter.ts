@@ -7,16 +7,16 @@ export interface IJsonWriter {
     startArray(): void;
     endArray(): void;
 
-    prop(name: any): void;
+    prop(name: unknown): void;
 
-    unknown(value: unknown, propName?: any): void;
-    string(value: string | null, propName?: any): void;
-    number(value: number | null, propName?: any): void;
-    boolean(value: boolean | null, propName?: any): void;
-    enum<T>(value: T, propName?: any): void;
-    null(propName?: any): void;
-    stringArray(value: string[] | null, propName?: any): void;
-    numberArray(value: number[] | null, propName?: any): void;
+    unknown(value: unknown, propName?: unknown): void;
+    string(value: string | null, propName?: unknown): void;
+    number(value: number | null, propName?: unknown): void;
+    boolean(value: boolean | null, propName?: unknown): void;
+    enum<T>(value: T, propName?: unknown): void;
+    null(propName?: unknown): void;
+    stringArray(value: string[] | null, propName?: unknown): void;
+    numberArray(value: number[] | null, propName?: unknown): void;
 }
 
 /**
@@ -70,49 +70,49 @@ export class JsonObjectWriter implements IJsonWriter {
         this._objectStack.pop();
     }
 
-    public prop(name: any): void {
-        this._currentPropertyName = name;
+    public prop(name: unknown): void {
+        this._currentPropertyName = name as any;
     }
 
-    public unknown(value: unknown, propName?: any): void {
+    public unknown(value: unknown, propName?: unknown): void {
         this.writeValue(value, propName);
     }
 
-    public string(value: string | null, propName?: any): void {
+    public string(value: string | null, propName?: unknown): void {
         this.writeValue(value, propName);
     }
 
-    public number(value: number | null, propName?: any): void {
+    public number(value: number | null, propName?: unknown): void {
         this.writeValue(value, propName);
     }
 
-    public boolean(value: boolean | null, propName?: any): void {
+    public boolean(value: boolean | null, propName?: unknown): void {
         this.writeValue(value, propName);
     }
 
-    public enum<T>(value: T, propName?: any): void {
+    public enum<T>(value: T, propName?: unknown): void {
         this.writeValue(value, propName);
     }
 
-    public null(propName?: any): void {
+    public null(propName?: unknown): void {
         this.writeValue(null, propName);
     }
 
-    public stringArray(value: string[] | null, propName?: any): void {
+    public stringArray(value: string[] | null, propName?: unknown): void {
         this.writeValue(value, propName);
     }
 
-    public numberArray(value: number[] | null, propName?: any): void {
+    public numberArray(value: number[] | null, propName?: unknown): void {
         this.writeValue(value, propName);
     }
 
-    private writeValue(value: any, propName?: any) {
+    private writeValue(value: any, propName?: unknown) {
         if (this._objectStack.length > 0) {
             const currentObject = this._objectStack[this._objectStack.length - 1];
             if (Array.isArray(currentObject)) {
                 this._objectStack.push(value);
             } else if (typeof propName !== 'undefined') {
-                currentObject[propName] = value;
+                currentObject[propName as any] = value;
             } else {
                 currentObject[this._currentPropertyName] = value;
             }

@@ -1,10 +1,12 @@
-﻿namespace AlphaTab.Core.EcmaScript
+﻿using System.Collections;
+
+namespace AlphaTab.Core.EcmaScript
 {
     internal static class Array
     {
         public static bool IsArray(object? o)
         {
-            return o is System.Array;
+            return o is IList;
         }
     }
 }

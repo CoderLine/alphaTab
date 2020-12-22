@@ -17,7 +17,7 @@ export interface IJsonReader {
     endArray(): void;
 
     prop(): string;
-    enumProp<T>(enumType: unknown): T;
+    enumProp<T extends number>(enumType: unknown): T;
     numberProp(): number;
 
     nextProp(): boolean;

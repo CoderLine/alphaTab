@@ -277,9 +277,9 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Substring(this string s, double startIndex, double length)
+        public static string Substring(this string s, double startIndex, double endIndex)
         {
-            return s.Substring((int) startIndex, (int) length);
+            return s.Substring((int) startIndex, (int) (endIndex - startIndex));
         }
 
         public static string TypeOf(object? actual)
@@ -300,6 +300,7 @@ namespace AlphaTab.Core
                 case ulong _:
                 case float _:
                 case double _:
+                case Enum _:
                     return "number";
                 default:
                     return "object";

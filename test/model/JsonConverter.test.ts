@@ -50,7 +50,7 @@ describe('JsonConverterTest', () => {
                                 expectJsonEqual(expected[i], actual[i], `${path}[${i}]`);
                             }
                         }
-                    } else {
+                    } else if(!Array.isArray(actual)) {
 
                         const expectedKeys = Object.keys(expected);
                         const actualKeys = Object.keys(actual);

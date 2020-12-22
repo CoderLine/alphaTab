@@ -1,74 +1,157 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using AlphaTab.Io;
 
 namespace AlphaTab.Core
 {
     public class JsonObjectWriter : IJsonWriter
     {
-        public object? Result { get; }
+        private readonly Stack<object> _objectStack = new Stack<object>();
+
+        private string _currentPropertyName = "";
+
+
+        public object? Result { get; private set; }
+
         public void StartObject()
         {
-            throw new System.NotImplementedException();
+            if (_objectStack.Count > 0)
+            {
+                var newObject = new Dictionary<string, object>();
+                var currentObject = _objectStack.Peek();
+                _objectStack.Push(newObject);
+
+                switch (currentObject)
+                {
+                    case IList l:
+                        l.Add(newObject);
+                        break;
+                    case IDictionary<string, object> d:
+                        d[_currentPropertyName] = newObject;
+                        break;
+                    default:
+                        throw new InvalidOperationException("invalid object on write stack");
+                }
+            }
+            else
+            {
+                Result = new Dictionary<string, object>();
+                _objectStack.Push(Result);
+            }
         }
 
         public void EndObject()
         {
-            throw new System.NotImplementedException();
+            _objectStack.Pop();
         }
 
         public void StartArray()
         {
-            throw new System.NotImplementedException();
+            if (_objectStack.Count > 0)
+            {
+                var newObject = new List<object>();
+                var currentObject = _objectStack.Peek();
+                _objectStack.Push(newObject);
+
+                switch (currentObject)
+                {
+                    case IList l:
+                        l.Add(newObject);
+                        break;
+                    case IDictionary<string, object> d:
+                        d[_currentPropertyName] = newObject;
+                        break;
+                    default:
+                        throw new InvalidOperationException("invalid object on write stack");
+                }
+            }
+            else
+            {
+                Result = new List<object>();
+                _objectStack.Push(Result);
+            }
         }
 
         public void EndArray()
         {
-            throw new System.NotImplementedException();
+            _objectStack.Pop();
         }
 
-        public void Prop(dynamic name)
+        public void Prop(object? name)
         {
-            throw new System.NotImplementedException();
+            _currentPropertyName = Convert.ToString(name);
         }
 
-        public void Unknown(object? value, dynamic? propName = default)
+        public void Unknown(object? value, object? propName = null)
         {
-            throw new System.NotImplementedException();
+            WriteValue(value, propName);
         }
 
-        public void String(string? value, dynamic? propName = default)
+        public void String(string? value, object? propName = null)
         {
-            throw new System.NotImplementedException();
+            WriteValue(value, propName);
         }
 
-        public void Number(double? value, dynamic? propName = default)
+        public void Number(double? value, object? propName = null)
         {
-            throw new System.NotImplementedException();
+            WriteValue(value, propName);
         }
 
-        public void Boolean(bool? value, dynamic? propName = default)
+        public void Boolean(bool? value, object? propName = null)
         {
-            throw new System.NotImplementedException();
+            WriteValue(value, propName);
         }
 
-        public void Enum<T>(T value, dynamic? propName = default)
+        public void Enum<T>(T value, object? propName = null)
         {
-            throw new System.NotImplementedException();
+            WriteValue(value, propName);
         }
 
-        public void Null(dynamic? propName = default)
+        public void Null(object? propName = null)
         {
-            throw new System.NotImplementedException();
+            WriteValue(null, propName);
         }
 
-        public void StringArray(IList<string>? value, dynamic? propName = default)
+        public void StringArray(IList<string>? value, object? propName = null)
         {
-            throw new System.NotImplementedException();
+            WriteValue(value, propName);
         }
 
-        public void NumberArray(IList<double>? value, dynamic? propName = default)
+        public void NumberArray(IList<double>? value, object? propName = default)
         {
-            throw new System.NotImplementedException();
+            WriteValue(value, propName);
+        }
+
+        private void WriteValue(object? value, object? propName)
+        {
+            if (_objectStack.Count > 0)
+            {
+                var currentObject = _objectStack.Peek();
+                switch (currentObject)
+                {
+                    case IList l:
+                        l.Add(value);
+                        break;
+                    case IDictionary<string, object> d:
+                        if (propName != null)
+                        {
+                            d[Convert.ToString(propName)] = value;
+                        }
+                        else
+                        {
+                            d[_currentPropertyName] = value;
+                        }
+
+                        break;
+                    default:
+                        throw new InvalidOperationException("Cannot add new value to parent");
+                }
+            }
+            else
+            {
+                Result = value;
+            }
         }
     }
 }

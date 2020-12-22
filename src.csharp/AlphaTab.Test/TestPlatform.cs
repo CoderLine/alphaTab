@@ -18,7 +18,9 @@ namespace AlphaTab
 
         public static Task<IList<string>> ListDirectory(string path)
         {
-            return Task.FromResult((IList<string>)Directory.EnumerateFiles(path).ToList());
+            return Task.FromResult((IList<string>)Directory.EnumerateFiles(path)
+                .Select(Path.GetFileName)
+                .ToList());
         }
     }
 }
