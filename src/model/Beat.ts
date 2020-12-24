@@ -96,12 +96,14 @@ export class Beat {
     /**
      * Gets the lookup where the notes per string are registered.
      * If this staff contains string based notes this lookup allows fast access.
+     * @json_ignore
      */
     public readonly noteStringLookup: Map<number, Note> = new Map();
 
     /**
      * Gets the lookup where the notes per value are registered.
      * If this staff contains string based notes this lookup allows fast access.
+     * @json_ignore
      */
     public readonly noteValueLookup: Map<number, Note> = new Map();
 

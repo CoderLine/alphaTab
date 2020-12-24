@@ -1104,8 +1104,7 @@ export default createEmitter('json', (program, input) => {
             const propertyDeclaration = member as ts.PropertyDeclaration;
             if (!propertyDeclaration.modifiers!.find(m =>
                 m.kind === ts.SyntaxKind.StaticKeyword ||
-                m.kind === ts.SyntaxKind.PrivateKeyword ||
-                m.kind === ts.SyntaxKind.ReadonlyKeyword)) {
+                m.kind === ts.SyntaxKind.PrivateKeyword)) {
                 const jsonNames = [(member.name as ts.Identifier).text];
 
                 if (ts.getJSDocTags(member).find(t => t.tagName.text === 'json_on_parent')) {

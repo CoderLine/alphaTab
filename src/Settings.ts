@@ -26,26 +26,26 @@ export class Settings {
      * @json_on_parent
      * @json_partial_names
      */
-    public core: CoreSettings = new CoreSettings();
+    public readonly core: CoreSettings = new CoreSettings();
 
     /**
      * The display settings control how the general layout and display of alphaTab is done.
      * @json_on_parent
      * @json_partial_names
      */
-    public display: DisplaySettings = new DisplaySettings();
+    public readonly display: DisplaySettings = new DisplaySettings();
 
     /**
      * The notation settings control how various music notation elements are shown and behaving.
      * @json_partial_names
      */
-    public notation: NotationSettings = new NotationSettings();
+    public readonly notation: NotationSettings = new NotationSettings();
 
     /**
      * All settings related to importers that decode file formats.
      * @json_partial_names
      */
-    public importer: ImporterSettings = new ImporterSettings();
+    public readonly importer: ImporterSettings = new ImporterSettings();
 
     /**
      * Contains all player related settings

@@ -7,6 +7,8 @@ import { PlayerSettings } from "@src/PlayerSettings";
 import { JsonReader } from "@src/io/JsonReader";
 import { JsonValueType } from "@src/io/JsonReader";
 import { JsonWriter } from "@src/io/JsonWriter";
+import { VibratoPlaybackSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
+import { SlidePlaybackSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
 import { ScrollMode } from "@src/PlayerSettings";
 export class PlayerSettingsSerializer {
     public static fromJson(obj: PlayerSettings, r: JsonReader): void {
@@ -36,6 +38,10 @@ export class PlayerSettingsSerializer {
         w.number(obj.scrollSpeed, "scrollSpeed"); 
         w.number(obj.songBookBendDuration, "songBookBendDuration"); 
         w.number(obj.songBookDipDuration, "songBookDipDuration"); 
+        w.prop("vibrato"); 
+        VibratoPlaybackSettingsSerializer.toJson(obj.vibrato, w); 
+        w.prop("slide"); 
+        SlidePlaybackSettingsSerializer.toJson(obj.slide, w); 
         w.boolean(obj.playTripletFeel, "playTripletFeel"); 
         w.endObject(); 
     }
@@ -77,6 +83,32 @@ export class PlayerSettingsSerializer {
             case "playtripletfeel":
                 obj.playTripletFeel = (r.boolean()!);
                 return true;
+        } 
+        if (["vibrato"].indexOf(property) >= 0) {
+            VibratoPlaybackSettingsSerializer.fromJson(obj.vibrato, r);
+            return true;
+        }
+        else {
+            for (const c of ["vibrato"]) {
+                if (property.indexOf(c) === 0) {
+                    if (VibratoPlaybackSettingsSerializer.setProperty(obj.vibrato, property.substring(c.length), r)) {
+                        return true;
+                    }
+                }
+            }
+        } 
+        if (["slide"].indexOf(property) >= 0) {
+            SlidePlaybackSettingsSerializer.fromJson(obj.slide, r);
+            return true;
+        }
+        else {
+            for (const c of ["slide"]) {
+                if (property.indexOf(c) === 0) {
+                    if (SlidePlaybackSettingsSerializer.setProperty(obj.slide, property.substring(c.length), r)) {
+                        return true;
+                    }
+                }
+            }
         } 
         return false; 
     }
