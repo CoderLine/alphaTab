@@ -96,7 +96,7 @@ export class SlidePlaybackSettings {
  */
 export class PlayerSettings {
     /**
-     * Gets or sets the URl of the sound font to be loaded.
+     * Gets or sets the URL of the sound font to be loaded.
      */
     public soundFont: string | null = null;
 

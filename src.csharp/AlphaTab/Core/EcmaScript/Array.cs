@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AlphaTab.Core.EcmaScript
 {
@@ -7,6 +9,16 @@ namespace AlphaTab.Core.EcmaScript
         public static bool IsArray(object? o)
         {
             return o is IList;
+        }
+
+        public static IList<T> From<T>(IList<T> x)
+        {
+            return x;
+        }
+
+        public static IList<T> From<T>(IEnumerable<T> x)
+        {
+            return x.ToList();
         }
     }
 }

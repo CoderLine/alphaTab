@@ -4,14 +4,14 @@
 // the code is regenerated.
 // </auto-generated>
 import { DisplaySettings } from "@src/DisplaySettings";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesSerializer";
 import { LayoutMode } from "@src/DisplaySettings";
 import { StaveProfile } from "@src/DisplaySettings";
 export class DisplaySettingsSerializer {
-    public static fromJson(obj: DisplaySettings, r: IJsonReader): void {
+    public static fromJson(obj: DisplaySettings, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -21,7 +21,7 @@ export class DisplaySettingsSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: DisplaySettings | null, w: IJsonWriter): void {
+    public static toJson(obj: DisplaySettings | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -40,7 +40,7 @@ export class DisplaySettingsSerializer {
         w.numberArray(obj.padding, "padding"); 
         w.endObject(); 
     }
-    public static setProperty(obj: DisplaySettings, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: DisplaySettings, property: string, r: JsonReader): boolean {
         switch (property) {
             case "scale":
                 obj.scale = (r.number()!);

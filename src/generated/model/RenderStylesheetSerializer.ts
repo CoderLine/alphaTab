@@ -4,11 +4,11 @@
 // the code is regenerated.
 // </auto-generated>
 import { RenderStylesheet } from "@src/model/RenderStylesheet";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 export class RenderStylesheetSerializer {
-    public static fromJson(obj: RenderStylesheet, r: IJsonReader): void {
+    public static fromJson(obj: RenderStylesheet, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -18,7 +18,7 @@ export class RenderStylesheetSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: RenderStylesheet | null, w: IJsonWriter): void {
+    public static toJson(obj: RenderStylesheet | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -27,7 +27,7 @@ export class RenderStylesheetSerializer {
         w.boolean(obj.hideDynamics, "hideDynamics"); 
         w.endObject(); 
     }
-    public static setProperty(obj: RenderStylesheet, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: RenderStylesheet, property: string, r: JsonReader): boolean {
         switch (property) {
             case "hidedynamics":
                 obj.hideDynamics = (r.boolean()!);

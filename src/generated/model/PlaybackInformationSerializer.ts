@@ -4,11 +4,11 @@
 // the code is regenerated.
 // </auto-generated>
 import { PlaybackInformation } from "@src/model/PlaybackInformation";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 export class PlaybackInformationSerializer {
-    public static fromJson(obj: PlaybackInformation, r: IJsonReader): void {
+    public static fromJson(obj: PlaybackInformation, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -18,7 +18,7 @@ export class PlaybackInformationSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: PlaybackInformation | null, w: IJsonWriter): void {
+    public static toJson(obj: PlaybackInformation | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -34,7 +34,7 @@ export class PlaybackInformationSerializer {
         w.boolean(obj.isSolo, "isSolo"); 
         w.endObject(); 
     }
-    public static setProperty(obj: PlaybackInformation, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: PlaybackInformation, property: string, r: JsonReader): boolean {
         switch (property) {
             case "volume":
                 obj.volume = (r.number()!);

@@ -4,12 +4,12 @@
 // the code is regenerated.
 // </auto-generated>
 import { Fermata } from "@src/model/Fermata";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { FermataType } from "@src/model/Fermata";
 export class FermataSerializer {
-    public static fromJson(obj: Fermata, r: IJsonReader): void {
+    public static fromJson(obj: Fermata, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -19,7 +19,7 @@ export class FermataSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Fermata | null, w: IJsonWriter): void {
+    public static toJson(obj: Fermata | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -29,7 +29,7 @@ export class FermataSerializer {
         w.number(obj.length, "length"); 
         w.endObject(); 
     }
-    public static setProperty(obj: Fermata, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Fermata, property: string, r: JsonReader): boolean {
         switch (property) {
             case "type":
                 obj.type = (r.enum<FermataType>(FermataType)!);

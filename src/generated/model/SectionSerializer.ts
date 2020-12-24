@@ -4,11 +4,11 @@
 // the code is regenerated.
 // </auto-generated>
 import { Section } from "@src/model/Section";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 export class SectionSerializer {
-    public static fromJson(obj: Section, r: IJsonReader): void {
+    public static fromJson(obj: Section, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -18,7 +18,7 @@ export class SectionSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Section | null, w: IJsonWriter): void {
+    public static toJson(obj: Section | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -28,7 +28,7 @@ export class SectionSerializer {
         w.string(obj.text, "text"); 
         w.endObject(); 
     }
-    public static setProperty(obj: Section, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Section, property: string, r: JsonReader): boolean {
         switch (property) {
             case "marker":
                 obj.marker = (r.string()!);

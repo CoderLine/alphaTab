@@ -4,12 +4,12 @@
 // the code is regenerated.
 // </auto-generated>
 import { Automation } from "@src/model/Automation";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { AutomationType } from "@src/model/Automation";
 export class AutomationSerializer {
-    public static fromJson(obj: Automation, r: IJsonReader): void {
+    public static fromJson(obj: Automation, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -19,7 +19,7 @@ export class AutomationSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Automation | null, w: IJsonWriter): void {
+    public static toJson(obj: Automation | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -32,7 +32,7 @@ export class AutomationSerializer {
         w.string(obj.text, "text"); 
         w.endObject(); 
     }
-    public static setProperty(obj: Automation, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Automation, property: string, r: JsonReader): boolean {
         switch (property) {
             case "islinear":
                 obj.isLinear = (r.boolean()!);

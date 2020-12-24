@@ -4,15 +4,15 @@
 // the code is regenerated.
 // </auto-generated>
 import { Staff } from "@src/model/Staff";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { BarSerializer } from "@src/generated/model/BarSerializer";
 import { ChordSerializer } from "@src/generated/model/ChordSerializer";
 import { Bar } from "@src/model/Bar";
 import { Chord } from "@src/model/Chord";
 export class StaffSerializer {
-    public static fromJson(obj: Staff, r: IJsonReader): void {
+    public static fromJson(obj: Staff, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -22,7 +22,7 @@ export class StaffSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Staff | null, w: IJsonWriter): void {
+    public static toJson(obj: Staff | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -50,7 +50,7 @@ export class StaffSerializer {
         w.number(obj.standardNotationLineCount, "standardNotationLineCount"); 
         w.endObject(); 
     }
-    public static setProperty(obj: Staff, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Staff, property: string, r: JsonReader): boolean {
         switch (property) {
             case "index":
                 obj.index = (r.number()!);

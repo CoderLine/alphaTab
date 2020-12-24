@@ -1,6 +1,7 @@
 import * as cs from './CSharpAst';
 import * as ts from 'typescript';
 import * as path from 'path';
+import { indexOf } from 'lodash';
 
 type SymbolKey = string;
 
@@ -297,10 +298,13 @@ export default class CSharpEmitterContext {
                 return null;
             case 'Map':
                 const mapType = tsType as ts.TypeReference;
+                let mapKeyType: cs.TypeNode | null = null;
                 let mapValueType: cs.TypeNode | null = null;
                 if (typeArguments) {
+                    mapKeyType = this.resolveType(typeArguments[0]);
                     mapValueType = this.resolveType(typeArguments[1]);
                 } else if (mapType.typeArguments) {
+                    mapKeyType = this.getTypeFromTsType(node, mapType.typeArguments[0]);
                     mapValueType = this.getTypeFromTsType(node, mapType.typeArguments[1]);
                 }
 
@@ -334,7 +338,7 @@ export default class CSharpEmitterContext {
                     parent: node.parent,
                     tsNode: node.tsNode,
                     reference: this.buildCoreNamespace(tsSymbol) + (isValueType ? 'ValueTypeMap' : 'Map'),
-                    typeArguments: typeArguments
+                    typeArguments: [mapKeyType, mapValueType]
                 } as cs.TypeReference;
             case 'Array':
                 const arrayType = tsType as ts.TypeReference;
@@ -606,6 +610,13 @@ export default class CSharpEmitterContext {
         // any -> dynamic
         if ((tsType.flags & ts.TypeFlags.Any) !== 0) {
             return handleNullablePrimitive(cs.PrimitiveType.Dynamic);
+        }
+
+        // object -> object
+        if(tsType.flags === ts.TypeFlags.NonPrimitive && 'objectFlags' in tsType && 'intrinsicName' in tsType) {
+            const unknown = handleNullablePrimitive(cs.PrimitiveType.Object);
+            unknown.isNullable = true;
+            return unknown;
         }
 
         // unknown -> object
@@ -947,6 +958,7 @@ export default class CSharpEmitterContext {
 
         let declaredType = this.typeChecker.getTypeAtLocation(symbol.declarations[0]);
 
+        let contextualTypeNullable = contextualType;
         contextualType = this.typeChecker.getNonNullableType(contextualType);
         declaredType = this.typeChecker.getNonNullableType(declaredType);
 
@@ -991,7 +1003,7 @@ export default class CSharpEmitterContext {
         }
 
         return contextualType !== declaredType && !this.isTypeAssignable(contextualType, declaredType)
-            ? contextualType
+            ? contextualTypeNullable
             : null;
     }
     shouldSkipSmartCast(contextualType: ts.Type) {

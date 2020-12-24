@@ -4,9 +4,9 @@
 // the code is regenerated.
 // </auto-generated>
 import { MasterBar } from "@src/model/MasterBar";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { SectionSerializer } from "@src/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { FermataSerializer } from "@src/generated/model/FermataSerializer";
@@ -17,7 +17,7 @@ import { Section } from "@src/model/Section";
 import { Automation } from "@src/model/Automation";
 import { Fermata } from "@src/model/Fermata";
 export class MasterBarSerializer {
-    public static fromJson(obj: MasterBar, r: IJsonReader): void {
+    public static fromJson(obj: MasterBar, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -27,7 +27,7 @@ export class MasterBarSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: MasterBar | null, w: IJsonWriter): void {
+    public static toJson(obj: MasterBar | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -64,7 +64,7 @@ export class MasterBarSerializer {
         w.boolean(obj.isAnacrusis, "isAnacrusis"); 
         w.endObject(); 
     }
-    public static setProperty(obj: MasterBar, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: MasterBar, property: string, r: JsonReader): boolean {
         switch (property) {
             case "alternateendings":
                 obj.alternateEndings = (r.number()!);

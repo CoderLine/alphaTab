@@ -7,8 +7,9 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
 import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
-import { JsonObjectReader } from '@src/io/IJsonReader';
-import { JsonObjectWriter } from '@src/io/IJsonWriter';
+import { JsonReader } from '@src/io/JsonReader';
+import { JsonWriter } from '@src/io/JsonWriter';
+import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
  * This class can convert a full {@link Score} instance to a simple JavaScript object and back for further
@@ -38,7 +39,7 @@ export class JsonConverter {
      * @returns A serialized score object without ciruclar dependencies that can be used for further serializations.
      */
     public static scoreToJsObject(score: Score): unknown {
-        const writer = new JsonObjectWriter();
+        const writer = new JsonWriter();
         ScoreSerializer.toJson(score, writer);
         return writer.result;
     }
@@ -57,14 +58,36 @@ export class JsonConverter {
     /**
      * Converts the given JavaScript object into a score object.
      * @param jsObject The javascript object created via {@link Score}
-     * @pas The settings to use during conversion.
+     * @param settings The settings to use during conversion.
      * @returns The converted score object.
      */
     public static jsObjectToScore(jsObject: any, settings?: Settings): Score {
         let score: Score = new Score();
-        ScoreSerializer.fromJson(score, new JsonObjectReader(jsObject));
+        ScoreSerializer.fromJson(score, new JsonReader(jsObject));
         score.finish(settings ?? new Settings());
         return score;
+    }
+
+    /**
+     * Converts the settings object into a JavaScript object for transmission between components or saving purposes.
+     * @param settings The settings object to serialize
+     * @returns A serialized settings object without ciruclar dependencies that can be used for further serializations.
+     */
+    public static settingsToJsObject(settings: Settings): unknown {
+        const writer = new JsonWriter();
+        SettingsSerializer.toJson(settings, writer);
+        return writer.result;
+    }
+
+    /**
+    * Converts the given JavaScript object into a settings object.
+    * @param jsObject The javascript object created via {@link Settings}
+    * @returns The converted Settings object.
+    */
+    public static jsObjectToSettings(jsObject: any): Settings {
+        let settings: Settings = new Settings();
+        SettingsSerializer.fromJson(settings, new JsonReader(jsObject));
+        return settings;
     }
 
     /**

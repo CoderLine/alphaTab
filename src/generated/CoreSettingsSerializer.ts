@@ -4,12 +4,12 @@
 // the code is regenerated.
 // </auto-generated>
 import { CoreSettings } from "@src/CoreSettings";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { LogLevel } from "@src/LogLevel";
 export class CoreSettingsSerializer {
-    public static fromJson(obj: CoreSettings, r: IJsonReader): void {
+    public static fromJson(obj: CoreSettings, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -19,7 +19,7 @@ export class CoreSettingsSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: CoreSettings | null, w: IJsonWriter): void {
+    public static toJson(obj: CoreSettings | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -44,7 +44,7 @@ export class CoreSettingsSerializer {
         w.boolean(obj.includeNoteBounds, "includeNoteBounds"); 
         w.endObject(); 
     }
-    public static setProperty(obj: CoreSettings, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: CoreSettings, property: string, r: JsonReader): boolean {
         switch (property) {
             /*@target web*/
             case "scriptfile":

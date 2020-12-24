@@ -4,11 +4,11 @@
 // the code is regenerated.
 // </auto-generated>
 import { BendPoint } from "@src/model/BendPoint";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 export class BendPointSerializer {
-    public static fromJson(obj: BendPoint, r: IJsonReader): void {
+    public static fromJson(obj: BendPoint, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -18,7 +18,7 @@ export class BendPointSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: BendPoint | null, w: IJsonWriter): void {
+    public static toJson(obj: BendPoint | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -28,7 +28,7 @@ export class BendPointSerializer {
         w.number(obj.value, "value"); 
         w.endObject(); 
     }
-    public static setProperty(obj: BendPoint, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: BendPoint, property: string, r: JsonReader): boolean {
         switch (property) {
             case "offset":
                 obj.offset = (r.number()!);

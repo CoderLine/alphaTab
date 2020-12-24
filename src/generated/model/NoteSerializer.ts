@@ -4,9 +4,9 @@
 // the code is regenerated.
 // </auto-generated>
 import { Note } from "@src/model/Note";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
 import { AccentuationType } from "@src/model/AccentuationType";
 import { BendType } from "@src/model/BendType";
@@ -21,7 +21,7 @@ import { Duration } from "@src/model/Duration";
 import { NoteAccidentalMode } from "@src/model/NoteAccidentalMode";
 import { DynamicValue } from "@src/model/DynamicValue";
 export class NoteSerializer {
-    public static fromJson(obj: Note, r: IJsonReader): void {
+    public static fromJson(obj: Note, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -31,7 +31,7 @@ export class NoteSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Note | null, w: IJsonWriter): void {
+    public static toJson(obj: Note | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -87,7 +87,7 @@ export class NoteSerializer {
         w.boolean(obj.hasEffectSlur, "hasEffectSlur"); 
         w.endObject(); 
     }
-    public static setProperty(obj: Note, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Note, property: string, r: JsonReader): boolean {
         switch (property) {
             case "id":
                 obj.id = (r.number()!);

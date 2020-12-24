@@ -4,16 +4,16 @@
 // the code is regenerated.
 // </auto-generated>
 import { Bar } from "@src/model/Bar";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
 import { Clef } from "@src/model/Clef";
 import { Ottavia } from "@src/model/Ottavia";
 import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
 export class BarSerializer {
-    public static fromJson(obj: Bar, r: IJsonReader): void {
+    public static fromJson(obj: Bar, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -23,7 +23,7 @@ export class BarSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Bar | null, w: IJsonWriter): void {
+    public static toJson(obj: Bar | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -42,7 +42,7 @@ export class BarSerializer {
         w.enum(obj.simileMark, "simileMark"); 
         w.endObject(); 
     }
-    public static setProperty(obj: Bar, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Bar, property: string, r: JsonReader): boolean {
         switch (property) {
             case "id":
                 obj.id = (r.number()!);

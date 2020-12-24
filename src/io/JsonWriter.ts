@@ -1,46 +1,29 @@
-export interface IJsonWriter {
-    readonly result: unknown;
-
-    startObject(): void;
-    endObject(): void;
-
-    startArray(): void;
-    endArray(): void;
-
-    prop(name: unknown): void;
-
-    unknown(value: unknown, propName?: unknown): void;
-    string(value: string | null, propName?: unknown): void;
-    number(value: number | null, propName?: unknown): void;
-    boolean(value: boolean | null, propName?: unknown): void;
-    enum<T>(value: T, propName?: unknown): void;
-    null(propName?: unknown): void;
-    stringArray(value: string[] | null, propName?: unknown): void;
-    numberArray(value: number[] | null, propName?: unknown): void;
-}
+import { AlphaTabError } from "@src/alphatab";
+import { AlphaTabErrorType } from "@src/AlphaTabError";
 
 /**
- * @target web
+ * Represents a data writer to write data structures into a JSON-alike object hierarchy for further serialization.
+ * @partial
  */
-export class JsonObjectWriter implements IJsonWriter {
-    private _objectStack: any[] = [];
+export class JsonWriter {
+    private _objectStack: unknown[] = [];
     private _currentPropertyName: string = '';
 
-    public result: unknown = null;
+    public result: Map<string, unknown> | null = null;
 
     public startObject(): void {
         if (this._objectStack.length > 0) {
-            const newObject: any = {};
+            const newObject = new Map<string, unknown>();
             const currentObject = this._objectStack[this._objectStack.length - 1];
             this._objectStack.push(newObject);
 
             if (Array.isArray(currentObject)) {
                 currentObject.push(newObject);
             } else {
-                currentObject[this._currentPropertyName] = newObject;
+                (currentObject as Map<string, unknown>).set(this._currentPropertyName, newObject);
             }
         } else {
-            this.result = {};
+            this.result = new Map<string, unknown>();
             this._objectStack.push(this.result);
         }
     }
@@ -51,18 +34,17 @@ export class JsonObjectWriter implements IJsonWriter {
 
     public startArray(): void {
         if (this._objectStack.length > 0) {
-            const newObject: any = [];
+            const newObject: unknown[] = [];
             const currentObject = this._objectStack[this._objectStack.length - 1];
             this._objectStack.push(newObject);
 
             if (Array.isArray(currentObject)) {
                 currentObject.push(newObject);
             } else {
-                currentObject[this._currentPropertyName] = newObject;
+                (currentObject as Map<string, unknown>).set(this._currentPropertyName, newObject);
             }
         } else {
-            this.result = [];
-            this._objectStack.push(this.result);
+            throw new AlphaTabError(AlphaTabErrorType.General, 'Root object to be serialized cannot be an array');
         }
     }
 
@@ -71,7 +53,7 @@ export class JsonObjectWriter implements IJsonWriter {
     }
 
     public prop(name: unknown): void {
-        this._currentPropertyName = name as any;
+        this._currentPropertyName = (name as object).toString();
     }
 
     public unknown(value: unknown, propName?: unknown): void {
@@ -91,7 +73,7 @@ export class JsonObjectWriter implements IJsonWriter {
     }
 
     public enum<T>(value: T, propName?: unknown): void {
-        this.writeValue(value, propName);
+        this.writeValue(this.enumToNumber(value), propName);
     }
 
     public null(propName?: unknown): void {
@@ -111,13 +93,21 @@ export class JsonObjectWriter implements IJsonWriter {
             const currentObject = this._objectStack[this._objectStack.length - 1];
             if (Array.isArray(currentObject)) {
                 this._objectStack.push(value);
-            } else if (typeof propName !== 'undefined') {
-                currentObject[propName as any] = value;
             } else {
-                currentObject[this._currentPropertyName] = value;
+                if (typeof propName === 'undefined') {
+                    propName = this._currentPropertyName;
+                }
+                (currentObject as Map<string, unknown>).set((propName as object).toString(), value);
             }
         } else {
-            this.result = value;
+            throw new AlphaTabError(AlphaTabErrorType.General, 'Root object to be serialized cannot be a plain value');
         }
+    }
+
+    /**
+     * @target web
+     */
+    private enumToNumber<T>(value: T): number | null {
+        return value as unknown as number;
     }
 }

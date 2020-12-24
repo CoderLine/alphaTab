@@ -23,8 +23,7 @@ import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWorkerScoreRenderer';
 import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 import { Cursors } from '@src/platform/Cursors';
-import { JsonObjectReader } from '@src/io/IJsonReader';
-import { SettingsSerializer } from '@src/generated/SettingsSerializer';
+import { JsonConverter } from '@src/model/JsonConverter';
 
 /**
  * @target web
@@ -123,8 +122,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         if (raw instanceof Settings) {
             settings = raw;
         } else {
-            settings = new Settings();
-            SettingsSerializer.fromJson(settings, new JsonObjectReader(raw));
+            settings = JsonConverter.jsObjectToSettings(raw);
         }
 
         let dataAttributes: Map<string, unknown> = this.getDataAttributes();

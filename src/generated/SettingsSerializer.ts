@@ -4,16 +4,16 @@
 // the code is regenerated.
 // </auto-generated>
 import { Settings } from "@src/Settings";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { CoreSettingsSerializer } from "@src/generated/CoreSettingsSerializer";
 import { DisplaySettingsSerializer } from "@src/generated/DisplaySettingsSerializer";
 import { NotationSettingsSerializer } from "@src/generated/NotationSettingsSerializer";
 import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSerializer";
 import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
 export class SettingsSerializer {
-    public static fromJson(obj: Settings, r: IJsonReader): void {
+    public static fromJson(obj: Settings, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -23,7 +23,7 @@ export class SettingsSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Settings | null, w: IJsonWriter): void {
+    public static toJson(obj: Settings | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -41,9 +41,7 @@ export class SettingsSerializer {
         PlayerSettingsSerializer.toJson(obj.player, w); 
         w.endObject(); 
     }
-    public static setProperty(obj: Settings, property: string, r: IJsonReader): boolean {
-        switch (property) {
-        } 
+    public static setProperty(obj: Settings, property: string, r: JsonReader): boolean {
         if (["core", ""].indexOf(property) >= 0) {
             CoreSettingsSerializer.fromJson(obj.core, r);
             return true;

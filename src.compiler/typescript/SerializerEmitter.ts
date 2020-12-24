@@ -135,8 +135,8 @@ function generateFromJsonBody() {
 
 function createFromJsonMethod(input: ts.ClassDeclaration,
     importer: (name: string, module: string) => void) {
-    importer('IJsonReader', '@src/io/IJsonReader');
-    importer('JsonValueType', '@src/io/IJsonReader');
+    importer('JsonReader', '@src/io/JsonReader');
+    importer('JsonValueType', '@src/io/JsonReader');
     return ts.factory.createMethodDeclaration(
         undefined,
         [
@@ -165,7 +165,7 @@ function createFromJsonMethod(input: ts.ClassDeclaration,
                 undefined,
                 'r',
                 undefined,
-                ts.factory.createTypeReferenceNode('IJsonReader')
+                ts.factory.createTypeReferenceNode('JsonReader')
             )
         ],
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
@@ -485,7 +485,7 @@ function createToJsonMethod(program: ts.Program,
     propertiesToSerialize: JsonProperty[],
     importer: (name: string, module: string) => void
 ) {
-    importer('IJsonWriter', '@src/io/IJsonWriter');
+    importer('JsonWriter', '@src/io/JsonWriter');
     return ts.factory.createMethodDeclaration(
         undefined,
         [
@@ -517,7 +517,7 @@ function createToJsonMethod(program: ts.Program,
                 undefined,
                 'w',
                 undefined,
-                ts.factory.createTypeReferenceNode('IJsonWriter')
+                ts.factory.createTypeReferenceNode('JsonWriter')
             )
         ],
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
@@ -1031,8 +1031,11 @@ function generateSetPropertyBody(program: ts.Program,
         }
     }
 
-    const switchExpr = ts.factory.createSwitchStatement(ts.factory.createIdentifier('property'), ts.factory.createCaseBlock(cases));
-    statements.unshift(switchExpr);
+    if(cases.length > 0){
+        const switchExpr = ts.factory.createSwitchStatement(ts.factory.createIdentifier('property'), ts.factory.createCaseBlock(cases));
+        statements.unshift(switchExpr);
+    }
+
     statements.push(ts.factory.createReturnStatement(ts.factory.createFalse()));
 
     return ts.factory.createBlock(addNewLines(statements));
@@ -1080,7 +1083,7 @@ function createSetPropertyMethod(
                 undefined,
                 'r',
                 undefined,
-                ts.factory.createTypeReferenceNode('IJsonReader')
+                ts.factory.createTypeReferenceNode('JsonReader')
             )
         ],
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),

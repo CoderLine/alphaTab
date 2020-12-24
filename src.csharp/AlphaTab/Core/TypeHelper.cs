@@ -302,6 +302,8 @@ namespace AlphaTab.Core
                 case double _:
                 case Enum _:
                     return "number";
+                case null:
+                    return "undefined";
                 default:
                     return "object";
             }

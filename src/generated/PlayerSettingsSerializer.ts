@@ -4,12 +4,12 @@
 // the code is regenerated.
 // </auto-generated>
 import { PlayerSettings } from "@src/PlayerSettings";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { ScrollMode } from "@src/PlayerSettings";
 export class PlayerSettingsSerializer {
-    public static fromJson(obj: PlayerSettings, r: IJsonReader): void {
+    public static fromJson(obj: PlayerSettings, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -19,7 +19,7 @@ export class PlayerSettingsSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: PlayerSettings | null, w: IJsonWriter): void {
+    public static toJson(obj: PlayerSettings | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -39,7 +39,7 @@ export class PlayerSettingsSerializer {
         w.boolean(obj.playTripletFeel, "playTripletFeel"); 
         w.endObject(); 
     }
-    public static setProperty(obj: PlayerSettings, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: PlayerSettings, property: string, r: JsonReader): boolean {
         switch (property) {
             case "soundfont":
                 obj.soundFont = r.string();

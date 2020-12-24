@@ -4,13 +4,13 @@
 // the code is regenerated.
 // </auto-generated>
 import { Voice } from "@src/model/Voice";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
 import { Beat } from "@src/model/Beat";
 export class VoiceSerializer {
-    public static fromJson(obj: Voice, r: IJsonReader): void {
+    public static fromJson(obj: Voice, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -20,7 +20,7 @@ export class VoiceSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Voice | null, w: IJsonWriter): void {
+    public static toJson(obj: Voice | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -36,7 +36,7 @@ export class VoiceSerializer {
         w.boolean(obj.isEmpty, "isEmpty"); 
         w.endObject(); 
     }
-    public static setProperty(obj: Voice, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Voice, property: string, r: JsonReader): boolean {
         switch (property) {
             case "index":
                 obj.index = (r.number()!);

@@ -4,16 +4,16 @@
 // the code is regenerated.
 // </auto-generated>
 import { Score } from "@src/model/Score";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { MasterBarSerializer } from "@src/generated/model/MasterBarSerializer";
 import { TrackSerializer } from "@src/generated/model/TrackSerializer";
 import { RenderStylesheetSerializer } from "@src/generated/model/RenderStylesheetSerializer";
 import { MasterBar } from "@src/model/MasterBar";
 import { Track } from "@src/model/Track";
 export class ScoreSerializer {
-    public static fromJson(obj: Score, r: IJsonReader): void {
+    public static fromJson(obj: Score, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -23,7 +23,7 @@ export class ScoreSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Score | null, w: IJsonWriter): void {
+    public static toJson(obj: Score | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -57,7 +57,7 @@ export class ScoreSerializer {
         RenderStylesheetSerializer.toJson(obj.stylesheet, w); 
         w.endObject(); 
     }
-    public static setProperty(obj: Score, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Score, property: string, r: JsonReader): boolean {
         switch (property) {
             case "album":
                 obj.album = (r.string()!);

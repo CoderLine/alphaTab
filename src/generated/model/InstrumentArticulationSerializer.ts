@@ -4,13 +4,13 @@
 // the code is regenerated.
 // </auto-generated>
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { TextBaseline } from "@src/platform/ICanvas";
 export class InstrumentArticulationSerializer {
-    public static fromJson(obj: InstrumentArticulation, r: IJsonReader): void {
+    public static fromJson(obj: InstrumentArticulation, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -20,7 +20,7 @@ export class InstrumentArticulationSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: InstrumentArticulation | null, w: IJsonWriter): void {
+    public static toJson(obj: InstrumentArticulation | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -35,7 +35,7 @@ export class InstrumentArticulationSerializer {
         w.number(obj.outputMidiNumber, "outputMidiNumber"); 
         w.endObject(); 
     }
-    public static setProperty(obj: InstrumentArticulation, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: InstrumentArticulation, property: string, r: JsonReader): boolean {
         switch (property) {
             case "staffline":
                 obj.staffLine = (r.number()!);

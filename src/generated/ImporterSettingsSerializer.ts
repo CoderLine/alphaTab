@@ -4,11 +4,11 @@
 // the code is regenerated.
 // </auto-generated>
 import { ImporterSettings } from "@src/ImporterSettings";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 export class ImporterSettingsSerializer {
-    public static fromJson(obj: ImporterSettings, r: IJsonReader): void {
+    public static fromJson(obj: ImporterSettings, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -18,7 +18,7 @@ export class ImporterSettingsSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: ImporterSettings | null, w: IJsonWriter): void {
+    public static toJson(obj: ImporterSettings | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -28,7 +28,7 @@ export class ImporterSettingsSerializer {
         w.boolean(obj.mergePartGroupsInMusicXml, "mergePartGroupsInMusicXml"); 
         w.endObject(); 
     }
-    public static setProperty(obj: ImporterSettings, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: ImporterSettings, property: string, r: JsonReader): boolean {
         switch (property) {
             case "encoding":
                 obj.encoding = (r.string()!);

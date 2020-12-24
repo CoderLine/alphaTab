@@ -433,7 +433,8 @@ export default class CSharpAstTransformer {
         };
 
         if (p.constraint) {
-            csTypeParameter.constraint = this.createUnresolvedTypeNode(csTypeParameter, p.constraint);
+            let constraintType = (ts.isUnionTypeNode(p.constraint) ? p.constraint.types[0] : p.constraint);
+            csTypeParameter.constraint = this.createUnresolvedTypeNode(csTypeParameter, constraintType);
         }
 
         return csTypeParameter;
@@ -576,7 +577,8 @@ export default class CSharpAstTransformer {
                 tsNode: d.arguments[1]
             } as cs.PrimitiveTypeNode,
             visibility: cs.Visibility.Public,
-            tsNode: d
+            tsNode: d,
+            skipEmit: this.shouldSkip(d)
         };
 
         if (csMethod.name.match(/^[^a-zA-Z].*/)) {
@@ -1222,16 +1224,7 @@ export default class CSharpAstTransformer {
         if (classElement.typeParameters && classElement.typeParameters.length > 0) {
             csMethod.typeParameters = [];
             classElement.typeParameters.forEach(p => {
-                const csp = {
-                    parent: csMethod,
-                    name: p.name.text,
-                    nodeType: cs.SyntaxKind.TypeParameterDeclaration,
-                    tsNode: p
-                } as cs.TypeParameterDeclaration;
-                if (p.constraint) {
-                    csp.constraint = this.createUnresolvedTypeNode(csp, p.constraint);
-                }
-
+                const csp = this.visitTypeParameterDeclaration(csMethod, p);
                 csMethod.typeParameters!.push(csp);
             });
         }

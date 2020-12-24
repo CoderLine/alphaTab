@@ -1,5 +1,5 @@
-import { IJsonReader, JsonValueType } from '@src/io/IJsonReader';
-import { IJsonWriter } from '@src/io/IJsonWriter';
+import { JsonReader, JsonValueType } from '@src/io/JsonReader';
+import { JsonWriter } from '@src/io/JsonWriter';
 
 /**
  * A very basic font parser which parses the fields according to 
@@ -339,7 +339,7 @@ export class Font {
         return this._css;
     }
 
-    public static fromJson(reader: IJsonReader): Font | null {
+    public static fromJson(reader: JsonReader): Font | null {
         switch (reader.currentValueType) {
             case JsonValueType.Null:
                 return null;
@@ -348,6 +348,7 @@ export class Font {
                     let family = '';
                     let size = 0;
                     let style = FontStyle.Plain;
+                    reader.startObject();
                     while (reader.nextProp()) {
                         switch (reader.prop().toLowerCase()) {
                             case 'family':
@@ -361,6 +362,7 @@ export class Font {
                                 break;
                         }
                     }
+                    reader.endObject();
                     return new Font(family, size, style);
                 }
             case JsonValueType.String:
@@ -438,14 +440,11 @@ export class Font {
         }
     }
 
-    public static toJson(font: Font, writer: IJsonWriter): void {
+    public static toJson(font: Font, writer: JsonWriter): void {
         writer.startObject();
-        writer.prop('family');
-        writer.string(font.family);
-        writer.prop('size');
-        writer.number(font.size);
-        writer.prop('style');
-        writer.enum<FontStyle>(font.style);
+        writer.string(font.family, 'family');
+        writer.number(font.size, 'size');
+        writer.number(font.style, 'style');
         writer.endObject();
     }
 }

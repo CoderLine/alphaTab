@@ -4,9 +4,9 @@
 // the code is regenerated.
 // </auto-generated>
 import { Track } from "@src/model/Track";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { StaffSerializer } from "@src/generated/model/StaffSerializer";
 import { PlaybackInformationSerializer } from "@src/generated/model/PlaybackInformationSerializer";
 import { Color } from "@src/model/Color";
@@ -14,7 +14,7 @@ import { InstrumentArticulationSerializer } from "@src/generated/model/Instrumen
 import { Staff } from "@src/model/Staff";
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 export class TrackSerializer {
-    public static fromJson(obj: Track, r: IJsonReader): void {
+    public static fromJson(obj: Track, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -24,7 +24,7 @@ export class TrackSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Track | null, w: IJsonWriter): void {
+    public static toJson(obj: Track | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -51,7 +51,7 @@ export class TrackSerializer {
         w.endArray(); 
         w.endObject(); 
     }
-    public static setProperty(obj: Track, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Track, property: string, r: JsonReader): boolean {
         switch (property) {
             case "index":
                 obj.index = (r.number()!);

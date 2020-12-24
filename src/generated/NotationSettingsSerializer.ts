@@ -4,15 +4,15 @@
 // the code is regenerated.
 // </auto-generated>
 import { NotationSettings } from "@src/NotationSettings";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { NotationMode } from "@src/NotationSettings";
 import { FingeringMode } from "@src/NotationSettings";
 import { NotationElement } from "@src/NotationSettings";
 import { TabRhythmMode } from "@src/NotationSettings";
 export class NotationSettingsSerializer {
-    public static fromJson(obj: NotationSettings, r: IJsonReader): void {
+    public static fromJson(obj: NotationSettings, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -22,7 +22,7 @@ export class NotationSettingsSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: NotationSettings | null, w: IJsonWriter): void {
+    public static toJson(obj: NotationSettings | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -44,7 +44,7 @@ export class NotationSettingsSerializer {
         w.number(obj.slurHeight, "slurHeight"); 
         w.endObject(); 
     }
-    public static setProperty(obj: NotationSettings, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: NotationSettings, property: string, r: JsonReader): boolean {
         switch (property) {
             case "notationmode":
                 obj.notationMode = (r.enum<NotationMode>(NotationMode)!);

@@ -4,11 +4,11 @@
 // the code is regenerated.
 // </auto-generated>
 import { Chord } from "@src/model/Chord";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 export class ChordSerializer {
-    public static fromJson(obj: Chord, r: IJsonReader): void {
+    public static fromJson(obj: Chord, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -18,7 +18,7 @@ export class ChordSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Chord | null, w: IJsonWriter): void {
+    public static toJson(obj: Chord | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -33,7 +33,7 @@ export class ChordSerializer {
         w.boolean(obj.showFingering, "showFingering"); 
         w.endObject(); 
     }
-    public static setProperty(obj: Chord, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Chord, property: string, r: JsonReader): boolean {
         switch (property) {
             case "name":
                 obj.name = (r.string()!);

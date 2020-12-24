@@ -4,9 +4,9 @@
 // the code is regenerated.
 // </auto-generated>
 import { Beat } from "@src/model/Beat";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { NoteSerializer } from "@src/generated/model/NoteSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
@@ -26,7 +26,7 @@ import { DynamicValue } from "@src/model/DynamicValue";
 import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
 export class BeatSerializer {
-    public static fromJson(obj: Beat, r: IJsonReader): void {
+    public static fromJson(obj: Beat, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -36,7 +36,7 @@ export class BeatSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: Beat | null, w: IJsonWriter): void {
+    public static toJson(obj: Beat | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -98,7 +98,7 @@ export class BeatSerializer {
         w.enum(obj.beamingMode, "beamingMode"); 
         w.endObject(); 
     }
-    public static setProperty(obj: Beat, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: Beat, property: string, r: JsonReader): boolean {
         switch (property) {
             case "id":
                 obj.id = (r.number()!);

@@ -4,13 +4,13 @@
 // the code is regenerated.
 // </auto-generated>
 import { RenderingResources } from "@src/RenderingResources";
-import { IJsonReader } from "@src/io/IJsonReader";
-import { JsonValueType } from "@src/io/IJsonReader";
-import { IJsonWriter } from "@src/io/IJsonWriter";
+import { JsonReader } from "@src/io/JsonReader";
+import { JsonValueType } from "@src/io/JsonReader";
+import { JsonWriter } from "@src/io/JsonWriter";
 import { Font } from "@src/model/Font";
 import { Color } from "@src/model/Color";
 export class RenderingResourcesSerializer {
-    public static fromJson(obj: RenderingResources, r: IJsonReader): void {
+    public static fromJson(obj: RenderingResources, r: JsonReader): void {
         if (r.currentValueType === JsonValueType.Null) {
             return;
         } 
@@ -20,7 +20,7 @@ export class RenderingResourcesSerializer {
         } 
         r.endObject(); 
     }
-    public static toJson(obj: RenderingResources | null, w: IJsonWriter): void {
+    public static toJson(obj: RenderingResources | null, w: JsonWriter): void {
         if (!obj) {
             w.null();
             return;
@@ -62,7 +62,7 @@ export class RenderingResourcesSerializer {
         Color.toJson(obj.scoreInfoColor, w); 
         w.endObject(); 
     }
-    public static setProperty(obj: RenderingResources, property: string, r: IJsonReader): boolean {
+    public static setProperty(obj: RenderingResources, property: string, r: JsonReader): boolean {
         switch (property) {
             case "copyrightfont":
                 obj.copyrightFont = (Font.fromJson(r)!);

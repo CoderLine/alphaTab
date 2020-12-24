@@ -656,7 +656,7 @@ export default class CSharpAstPrinter {
                 this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
                 break;
         }
-        if (type.isNullable && !forNew) {
+        if (type.isNullable && !forNew && !forTypeConstraint) {
             this.write('?');
         }
     }

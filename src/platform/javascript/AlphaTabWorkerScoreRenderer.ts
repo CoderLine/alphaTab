@@ -8,8 +8,6 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
-import { JsonObjectWriter } from '@src/io/IJsonWriter';
-import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
  * @target web
@@ -61,12 +59,10 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     private serializeSettingsForWorker(settings: Settings): unknown {
-        const writer = new JsonObjectWriter();
-        SettingsSerializer.toJson(settings, writer);
+        const jsObject = JsonConverter.settingsToJsObject(settings);
         // cut out player settings, they are only needed on UI thread side
-        const json: any = writer.result;
-        json.player = null;
-        return json;
+        delete (jsObject as any).player;
+        return jsObject;
     }
 
     public render(): void {
