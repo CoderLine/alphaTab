@@ -14,6 +14,9 @@ import { SettingsSerializer } from '@src/generated/SettingsSerializer';
  * JSON serialization.
  */
 export class JsonConverter {
+    /**
+     * @target web
+     */
     private static jsonReplacer(_: any, v: any) {
         if (v instanceof Map) {
             if ('fromEntries' in Object) {
