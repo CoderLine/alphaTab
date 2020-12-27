@@ -21,6 +21,7 @@ import { NotationMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { BeatCloner } from '@src/generated/model/BeatCloner';
 
 /**
  * Lists the different modes on how beaming for a beat should be done. 
@@ -43,27 +44,35 @@ export enum BeatBeamingMode {
 /**
  * A beat is a single block within a bar. A beat is a combination
  * of several notes played at the same time.
+ * @json
+ * @cloneable
  */
 export class Beat {
     private static _globalBeatId: number = 0;
 
     /**
      * Gets or sets the unique id of this beat.
+     * @clone_ignore
      */
     public id: number = Beat._globalBeatId++;
 
     /**
      * Gets or sets the zero-based index of this beat within the voice.
+     * @json_ignore
      */
     public index: number = 0;
 
     /**
      * Gets or sets the previous beat within the whole song.
+     * @json_ignore
+     * @clone_ignore
      */
     public previousBeat: Beat | null = null;
 
     /**
      * Gets or sets the next beat within the whole song.
+     * @json_ignore
+     * @clone_ignore
      */
     public nextBeat: Beat | null = null;
 
@@ -73,23 +82,29 @@ export class Beat {
 
     /**
      * Gets or sets the reference to the parent voice this beat belongs to.
+     * @json_ignore
+     * @clone_ignore
      */
     public voice!: Voice;
 
     /**
      * Gets or sets the list of notes contained in this beat.
+     * @json_add addNote
+     * @clone_add addNote
      */
     public notes: Note[] = [];
 
     /**
      * Gets the lookup where the notes per string are registered.
      * If this staff contains string based notes this lookup allows fast access.
+     * @json_ignore
      */
     public readonly noteStringLookup: Map<number, Note> = new Map();
 
     /**
      * Gets the lookup where the notes per value are registered.
      * If this staff contains string based notes this lookup allows fast access.
+     * @json_ignore
      */
     public readonly noteValueLookup: Map<number, Note> = new Map();
 
@@ -110,6 +125,8 @@ export class Beat {
 
     /**
      * Gets or sets the fermata applied to this beat.
+     * @clone_ignore
+     * @json_ignore
      */
     public fermata: Fermata | null = null;
 
@@ -124,21 +141,29 @@ export class Beat {
 
     /**
      * Gets or sets the note with the lowest pitch in this beat. Only visible notes are considered.
+     * @json_ignore
+     * @clone_ignore
      */
     public minNote: Note | null = null;
 
     /**
      * Gets or sets the note with the highest pitch in this beat. Only visible notes are considered.
+     * @json_ignore
+     * @clone_ignore
      */
     public maxNote: Note | null = null;
 
     /**
      * Gets or sets the note with the highest string number in this beat. Only visible notes are considered.
+     * @json_ignore
+     * @clone_ignore
      */
     public maxStringNote: Note | null = null;
 
     /**
      * Gets or sets the note with the lowest string number in this beat. Only visible notes are considered.
+     * @json_ignore
+     * @clone_ignore
      */
     public minStringNote: Note | null = null;
 
@@ -153,11 +178,13 @@ export class Beat {
 
     /**
      * Gets or sets whether any note in this beat has a let-ring applied.
+     * @json_ignore
      */
     public isLetRing: boolean = false;
 
     /**
      * Gets or sets whether any note in this beat has a palm-mute paplied.
+     * @json_ignore
      */
     public isPalmMute: boolean = false;
 
@@ -233,6 +260,10 @@ export class Beat {
         );
     }
 
+    /**
+     * @clone_ignore
+     * @json_ignore
+     */
     public tupletGroup: TupletGroup | null = null;
 
     /**
@@ -247,16 +278,22 @@ export class Beat {
 
     /**
      * Gets or sets the points defining the whammy bar usage.
+     * @json_add addWhammyBarPoint
+     * @clone_add addWhammyBarPoint
      */
     public whammyBarPoints: BendPoint[] = [];
 
     /**
      * Gets or sets the highest point with for the highest whammy bar value.
+     * @json_ignore
+     * @clone_ignore
      */
     public maxWhammyPoint: BendPoint | null = null;
 
     /**
      * Gets or sets the highest point with for the lowest whammy bar value.
+     * @json_ignore
+     * @clone_ignore
      */
     public minWhammyPoint: BendPoint | null = null;
 
@@ -352,80 +389,31 @@ export class Beat {
      */
     public preferredBeamDirection: BeamDirection | null = null;
 
+    /**
+     * @json_ignore
+     */
     public isEffectSlurOrigin: boolean = false;
 
     public get isEffectSlurDestination(): boolean {
         return !!this.effectSlurOrigin;
     }
 
+    /**
+     * @clone_ignore
+     * @json_ignore
+     */
     public effectSlurOrigin: Beat | null = null;
 
+    /**
+     * @clone_ignore
+     * @json_ignore
+     */
     public effectSlurDestination: Beat | null = null;
 
     /**
      * Gets or sets how the beaming should be done for this beat.
      */
     public beamingMode:BeatBeamingMode = BeatBeamingMode.Auto;    
-
-    public static copyTo(src: Beat, dst: Beat): void {
-        dst.id = src.id;
-        dst.index = src.index;
-        dst.isEmpty = src.isEmpty;
-        dst.duration = src.duration;
-        dst.dots = src.dots;
-        dst.fadeIn = src.fadeIn;
-        if (src.lyrics) {
-            dst.lyrics = new Array<string>(src.lyrics.length);
-            for (let i: number = 0; i < src.lyrics.length; i++) {
-                dst.lyrics[i] = src.lyrics[i];
-            }
-        }
-        dst.pop = src.pop;
-        dst.hasRasgueado = src.hasRasgueado;
-        dst.slap = src.slap;
-        dst.tap = src.tap;
-        dst.text = src.text;
-        dst.brushType = src.brushType;
-        dst.brushDuration = src.brushDuration;
-        dst.tupletDenominator = src.tupletDenominator;
-        dst.tupletNumerator = src.tupletNumerator;
-        dst.vibrato = src.vibrato;
-        dst.chordId = src.chordId;
-        dst.graceType = src.graceType;
-        dst.pickStroke = src.pickStroke;
-        dst.tremoloSpeed = src.tremoloSpeed;
-        dst.crescendo = src.crescendo;
-        dst.displayStart = src.displayStart;
-        dst.displayDuration = src.displayDuration;
-        dst.playbackStart = src.playbackStart;
-        dst.playbackDuration = src.playbackDuration;
-        dst.dynamics = src.dynamics;
-        dst.isLegatoOrigin = src.isLegatoOrigin;
-        dst.invertBeamDirection = src.invertBeamDirection;
-        dst.preferredBeamDirection = src.preferredBeamDirection;
-        dst.whammyBarType = src.whammyBarType;
-        dst.isContinuedWhammy = src.isContinuedWhammy;
-        dst.ottava = src.ottava;
-        dst.whammyStyle = src.whammyStyle;
-        dst.beamingMode = src.beamingMode;
-    }
-
-    public clone(): Beat {
-        let beat: Beat = new Beat();
-        let id: number = beat.id;
-        for (const p of this.whammyBarPoints) {
-            beat.addWhammyBarPoint(p.clone());
-        }
-        for (const n of this.notes) {
-            beat.addNoteInternal(n.clone(), n.realValue);
-        }
-        Beat.copyTo(this, beat);
-        for (const a of this.automations) {
-            beat.automations.push(a.clone());
-        }
-        beat.id = id;
-        return beat;
-    }
 
     public addWhammyBarPoint(point: BendPoint): void {
         this.whammyBarPoints.push(point);
@@ -471,20 +459,12 @@ export class Beat {
     }
 
     public addNote(note: Note): void {
-        this.addNoteInternal(note, -1);
-    }
-
-    private addNoteInternal(note: Note, realValue: number = -1): void {
         note.beat = this;
         note.index = this.notes.length;
         this.notes.push(note);
         if (note.isStringed) {
             this.noteStringLookup.set(note.string, note);
         }
-        if (realValue === -1) {
-            realValue = note.realValue;
-        }
-        this.noteValueLookup.set(realValue, note);
     }
 
     public removeNote(note: Note): void {
@@ -731,7 +711,7 @@ export class Beat {
         if (needCopyBeatForBend) {
             // if this beat is a simple bend convert it to a grace beat
             // and generate a placeholder beat with tied notes
-            let cloneBeat: Beat = this.clone();
+            let cloneBeat: Beat = BeatCloner.clone(this);
             cloneBeat.id = Beat._globalBeatId++;
             cloneBeat.pickStroke = PickStroke.None;
             for (let i: number = 0, j: number = cloneBeat.notes.length; i < j; i++) {
@@ -747,12 +727,12 @@ export class Beat {
 
                 // fix ties
                 if(note.isTieOrigin) {
-                    cloneNote.tieDestination = note.tieDestination!;
-                    note.tieDestination!.tieOrigin = cloneNote;
+                    cloneNote.tieDestinationNoteId = note.tieDestination!.id;
+                    note.tieDestination!.tieOriginNoteId = cloneNote.id;
                 }
                 if(note.isTieDestination) {
-                    cloneNote.tieOrigin = note.tieOrigin;
-                    note.tieOrigin!.tieDestination = cloneNote;
+                    cloneNote.tieOriginNoteId = note.tieOrigin ? note.tieOrigin.id : -1;
+                    note.tieOrigin!.tieDestinationNoteId = cloneNote.id;
                 }
 
                 // if the note has a bend which is continued on the next note
@@ -810,8 +790,9 @@ export class Beat {
         return null;
     }
 
-    public chain() {
+    public chain() {    
         for(const n of this.notes) {
+            this.noteValueLookup.set(n.realValue, n);
             n.chain();
         }
     }

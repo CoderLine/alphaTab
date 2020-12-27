@@ -34,6 +34,27 @@ export class TestPlatform {
         });
     }
 
+    /**
+     * @target web
+     */
+    public static listDirectory(path: string): Promise<string[]> {
+        return new Promise<string[]>((resolve, reject) => {
+            let x: XMLHttpRequest = new XMLHttpRequest();
+            x.open('GET', 'http://localhost:8090/list-files?dir=' + path, true, null, null);
+            x.responseType = 'text';
+            x.onreadystatechange = () => {
+                if (x.readyState === XMLHttpRequest.DONE) {
+                    if (x.status === 200) {
+                        resolve(JSON.parse(x.responseText));
+                    } else {
+                        reject('Could not find path: ' + path + ', received:' + x.responseText);
+                    }
+                }
+            };
+            x.send();
+        });
+    }
+
     public static async loadFileAsString(path: string): Promise<string> {
         const data = await TestPlatform.loadFile(path);
         return IOHelper.toString(data, 'UTF-8');

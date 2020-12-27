@@ -15,6 +15,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 const cors = require('cors');
 const fs = require('fs');
+const path = require('path');
 
 module.exports = function (config) {
     config.set({
@@ -54,6 +55,25 @@ module.exports = function (config) {
             port: 8090,
             appVisitor: function (app, log) {
                 app.use(cors());
+                app.get(
+                    '/list-files',
+                    function (req, res) {
+                        log.info(`loading files from ${req.query.dir}`);
+
+                        const directoryPath = path.join(__dirname, req.query.dir);
+                        fs.readdir(directoryPath, (err, files) => {
+                            //handling error
+                            if (err) {
+                                res.status(400);
+                                res.send(JSON.stringify(`Error: ${err.message}`));
+                            } else {
+                                res.send(JSON.stringify(files.filter(f => 
+                                    fs.statSync(path.join(directoryPath, f)).isFile()
+                                )));
+                            }
+                        });
+                    }
+                );
                 app.post(
                     '/save-visual-error',
                     upload.fields([

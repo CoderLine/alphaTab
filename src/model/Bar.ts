@@ -8,6 +8,7 @@ import { Settings } from '@src/Settings';
 
 /**
  * A bar is a single block within a track, also known as Measure.
+ * @json
  */
 export class Bar {
     private static _globalBarId: number = 0;
@@ -19,16 +20,19 @@ export class Bar {
 
     /**
      * Gets or sets the zero-based index of this bar within the staff.
+     * @json_ignore
      */
     public index: number = 0;
 
     /**
      * Gets or sets the next bar that comes after this bar.
+     * @json_ignore
      */
     public nextBar: Bar | null = null;
 
     /**
      * Gets or sets the previous bar that comes before this bar.
+     * @json_ignore
      */
     public previousBar: Bar | null = null;
 
@@ -44,11 +48,13 @@ export class Bar {
 
     /**
      * Gets or sets the reference to the parent staff.
+     * @json_ignore
      */
     public staff!: Staff;
 
     /**
      * Gets or sets the list of voices contained in this bar.
+     * @json_add addVoice
      */
     public voices: Voice[] = [];
 
@@ -68,14 +74,6 @@ export class Bar {
             }
         }
         return true;
-    }
-
-    public static copyTo(src: Bar, dst: Bar): void {
-        dst.id = src.id;
-        dst.index = src.index;
-        dst.clef = src.clef;
-        dst.clefOttava = src.clefOttava;
-        dst.simileMark = src.simileMark;
     }
 
     public addVoice(voice: Voice): void {

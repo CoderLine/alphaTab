@@ -33,7 +33,7 @@ import { ModelUtils } from '@src/model/ModelUtils';
  */
 export class TabBarRenderer extends BarRendererBase {
     public static readonly StaffId: string = 'tab';
-    public static readonly LineSpacing: number = 10;
+    public static readonly TabLineSpacing: number = 10;
 
     private _tupletSize: number = 0;
 
@@ -46,7 +46,7 @@ export class TabBarRenderer extends BarRendererBase {
     }
 
     public get lineOffset(): number {
-        return (TabBarRenderer.LineSpacing + 1) * this.scale;
+        return (TabBarRenderer.TabLineSpacing + 1) * this.scale;
     }
 
     protected updateSizes(): void {

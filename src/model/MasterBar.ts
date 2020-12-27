@@ -12,6 +12,7 @@ import { TripletFeel } from '@src/model/TripletFeel';
 /**
  * The MasterBar stores information about a bar which affects
  * all tracks.
+ * @json
  */
 export class MasterBar {
     public static readonly MaxAlternateEndings: number = 8;
@@ -23,16 +24,19 @@ export class MasterBar {
 
     /**
      * Gets or sets the next masterbar in the song.
+     * @json_ignore
      */
     public nextMasterBar: MasterBar | null = null;
 
     /**
      * Gets or sets the next masterbar in the song.
+     * @json_ignore
      */
     public previousMasterBar: MasterBar | null = null;
 
     /**
      * Gets the zero based index of the masterbar.
+     * @json_ignore
      */
     public index: number = 0;
 
@@ -67,6 +71,7 @@ export class MasterBar {
 
     /**
      * Gets or sets the repeat group this bar belongs to.
+     * @json_ignore
      */
     public repeatGroup!: RepeatGroup;
 
@@ -106,6 +111,7 @@ export class MasterBar {
 
     /**
      * Gets or sets the reference to the score this song belongs to.
+     * @json_ignore
      */
     public score!: Score;
 
@@ -123,22 +129,6 @@ export class MasterBar {
      * Gets or sets a value indicating whether the master bar is an anacrusis (aka. pickup bar)
      */
     public isAnacrusis: boolean = false;
-
-    public static copyTo(src: MasterBar, dst: MasterBar): void {
-        dst.isAnacrusis = src.isAnacrusis;
-        dst.alternateEndings = src.alternateEndings;
-        dst.index = src.index;
-        dst.keySignature = src.keySignature;
-        dst.keySignatureType = src.keySignatureType;
-        dst.isDoubleBar = src.isDoubleBar;
-        dst.isRepeatStart = src.isRepeatStart;
-        dst.repeatCount = src.repeatCount;
-        dst.timeSignatureNumerator = src.timeSignatureNumerator;
-        dst.timeSignatureDenominator = src.timeSignatureDenominator;
-        dst.timeSignatureCommon = src.timeSignatureCommon;
-        dst.tripletFeel = src.tripletFeel;
-        dst.start = src.start;
-    }
 
     /**
      * Calculates the time spent in this bar. (unit: midi ticks)

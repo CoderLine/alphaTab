@@ -6,30 +6,35 @@ import { Settings } from '@src/Settings';
 /**
  * This class describes a single staff within a track. There are instruments like pianos
  * where a single track can contain multiple staffs.
+ * @json
  */
 export class Staff {
     /**
      * Gets or sets the zero-based index of this staff within the track.
+     * @json_ignore
      */
     public index: number = 0;
 
     /**
      * Gets or sets the reference to the track this staff belongs to.
+     * @json_ignore
      */
     public track!: Track;
 
     /**
      * Gets or sets a list of all bars contained in this staff.
+     * @json_add addBar
      */
     public bars: Bar[] = [];
 
     /**
      * Gets or sets a list of all chords defined for this staff. {@link Beat.chordId} refers to entries in this lookup.
+     * @json_add addChord
      */
-    public chords: Map<string, Chord> = new Map();
+    public chords: Map<string, Chord> = new Map<string, Chord>();
 
     /**
-     * Gets or sets the fret on which a capo is set. s
+     * Gets or sets the fret on which a capo is set.
      */
     public capo: number = 0;
 
@@ -81,18 +86,6 @@ export class Staff {
      * For some percussion instruments this number might vary. 
      */
     public standardNotationLineCount: number = 5;
-
-    public static copyTo(src: Staff, dst: Staff): void {
-        dst.capo = src.capo;
-        dst.index = src.index;
-        dst.tuning = src.tuning.slice();
-        dst.transpositionPitch = src.transpositionPitch;
-        dst.displayTranspositionPitch = src.displayTranspositionPitch;
-        dst.showStandardNotation = src.showStandardNotation;
-        dst.showTablature = src.showTablature;
-        dst.isPercussion = src.isPercussion;
-        dst.standardNotationLineCount = src.standardNotationLineCount;
-    }
 
     public finish(settings: Settings): void {
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {

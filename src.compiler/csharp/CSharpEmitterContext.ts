@@ -1,16 +1,11 @@
 import * as cs from './CSharpAst';
 import * as ts from 'typescript';
 import * as path from 'path';
+import { indexOf } from 'lodash';
 
 type SymbolKey = string;
 
 export default class CSharpEmitterContext {
-    public isNullableString(type: ts.Type) {
-        if (type.isUnion()) {
-            type = this.typeChecker.getNonNullableType(type);
-        }
-        return ((type.flags & ts.TypeFlags.String) || (type.flags & ts.TypeFlags.StringLiteral));
-    }
     private _fileLookup: Map<ts.SourceFile, cs.SourceFile> = new Map();
     private _symbolLookup: Map<SymbolKey, cs.NamedElement & cs.Node> = new Map();
     private _exportedSymbols: Map<SymbolKey, boolean> = new Map();
@@ -303,10 +298,13 @@ export default class CSharpEmitterContext {
                 return null;
             case 'Map':
                 const mapType = tsType as ts.TypeReference;
+                let mapKeyType: cs.TypeNode | null = null;
                 let mapValueType: cs.TypeNode | null = null;
                 if (typeArguments) {
+                    mapKeyType = this.resolveType(typeArguments[0]);
                     mapValueType = this.resolveType(typeArguments[1]);
                 } else if (mapType.typeArguments) {
+                    mapKeyType = this.getTypeFromTsType(node, mapType.typeArguments[0]);
                     mapValueType = this.getTypeFromTsType(node, mapType.typeArguments[1]);
                 }
 
@@ -340,7 +338,7 @@ export default class CSharpEmitterContext {
                     parent: node.parent,
                     tsNode: node.tsNode,
                     reference: this.buildCoreNamespace(tsSymbol) + (isValueType ? 'ValueTypeMap' : 'Map'),
-                    typeArguments: typeArguments
+                    typeArguments: [mapKeyType, mapValueType]
                 } as cs.TypeReference;
             case 'Array':
                 const arrayType = tsType as ts.TypeReference;
@@ -388,6 +386,10 @@ export default class CSharpEmitterContext {
     private resolveFunctionTypeFromTsType(node: cs.Node, tsType: ts.Type): cs.TypeNode | null {
         // typescript compiler API somehow does not provide proper type symbols
         // for function types, we need to attempt resolving the types via the function type declaration
+
+        if (!tsType.symbol || !tsType.symbol.declarations) {
+            return null;
+        }
 
         let functionTypeNode: ts.FunctionTypeNode | null = null;
         for (const declaration of tsType.symbol.declarations) {
@@ -610,6 +612,13 @@ export default class CSharpEmitterContext {
             return handleNullablePrimitive(cs.PrimitiveType.Dynamic);
         }
 
+        // object -> object
+        if(tsType.flags === ts.TypeFlags.NonPrimitive && 'objectFlags' in tsType && 'intrinsicName' in tsType) {
+            const unknown = handleNullablePrimitive(cs.PrimitiveType.Object);
+            unknown.isNullable = true;
+            return unknown;
+        }
+
         // unknown -> object
         if ((tsType.flags & ts.TypeFlags.Unknown) !== 0) {
             const unknown = handleNullablePrimitive(cs.PrimitiveType.Object);
@@ -809,7 +818,11 @@ export default class CSharpEmitterContext {
     }
 
     public isBooleanSmartCast(tsNode: ts.Node) {
-        let tsParent = tsNode.parent!;
+        let tsParent = tsNode.parent;
+        if (!tsParent) {
+            return false;
+        }
+
         while (tsParent.kind === ts.SyntaxKind.ParenthesizedExpression) {
             tsNode = tsParent;
             tsParent = tsParent.parent!;
@@ -945,6 +958,7 @@ export default class CSharpEmitterContext {
 
         let declaredType = this.typeChecker.getTypeAtLocation(symbol.declarations[0]);
 
+        let contextualTypeNullable = contextualType;
         contextualType = this.typeChecker.getNonNullableType(contextualType);
         declaredType = this.typeChecker.getNonNullableType(declaredType);
 
@@ -989,7 +1003,7 @@ export default class CSharpEmitterContext {
         }
 
         return contextualType !== declaredType && !this.isTypeAssignable(contextualType, declaredType)
-            ? contextualType
+            ? contextualTypeNullable
             : null;
     }
     shouldSkipSmartCast(contextualType: ts.Type) {
@@ -1007,6 +1021,7 @@ export default class CSharpEmitterContext {
         if (contextualType.symbol) {
             switch (contextualType.symbol.name) {
                 case 'ArrayLike':
+                case '__type':
                     return true;
             }
         }
@@ -1210,5 +1225,18 @@ export default class CSharpEmitterContext {
                 }
                 break;
         }
+    }
+
+    public isStaticSymbol(tsSymbol: ts.Symbol) {
+        return !!tsSymbol.declarations.find(d => d.modifiers &&
+            !!d.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)
+        );
+    }
+
+    public isNullableString(type: ts.Type) {
+        if (type.isUnion()) {
+            type = this.typeChecker.getNonNullableType(type);
+        }
+        return ((type.flags & ts.TypeFlags.String) || (type.flags & ts.TypeFlags.StringLiteral));
     }
 }

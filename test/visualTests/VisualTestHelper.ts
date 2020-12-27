@@ -9,6 +9,7 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PixelMatch } from './PixelMatch';
+import { JsonConverter } from '@src/model/JsonConverter';
 
 /**
  * @partial
@@ -127,7 +128,11 @@ export class VisualTestHelper {
                 api.error.on(e => {
                     reject(`Failed to render image: ${e}`);
                 });
-                api.renderScore(score, tracks);
+
+                // NOTE: on some platforms we serialize/deserialize the score objects
+                // this logic does the same just to ensure we get the right result
+                const renderScore = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
+                api.renderScore(renderScore, tracks);
             });
 
             await Promise.race([

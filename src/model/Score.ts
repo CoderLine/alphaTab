@@ -3,13 +3,16 @@ import { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { RepeatGroup } from '@src/model/RepeatGroup';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
+import { Note } from './Note';
 
 /**
  * The score is the root node of the complete
  * model. It stores the basic information of
  * a song and stores the sub components.
+ * @json
  */
 export class Score {
+    private _noteByIdLookup: Map<number, Note> = new Map<number, Note>();
     private _currentRepeatGroup: RepeatGroup = new RepeatGroup();
 
     /**
@@ -74,11 +77,13 @@ export class Score {
 
     /**
      * Gets or sets a list of all masterbars contained in this song.
+     * @json_add addMasterBar
      */
     public masterBars: MasterBar[] = [];
 
     /**
      * Gets or sets a list of all tracks contained in this song.
+     * @json_add addTrack
      */
     public tracks: Track[] = [];
 
@@ -86,21 +91,6 @@ export class Score {
      * Gets or sets the rendering stylesheet for this song.
      */
     public stylesheet: RenderStylesheet = new RenderStylesheet();
-
-    public static copyTo(src: Score, dst: Score): void {
-        dst.album = src.album;
-        dst.artist = src.artist;
-        dst.copyright = src.copyright;
-        dst.instructions = src.instructions;
-        dst.music = src.music;
-        dst.notices = src.notices;
-        dst.subTitle = src.subTitle;
-        dst.title = src.title;
-        dst.words = src.words;
-        dst.tab = src.tab;
-        dst.tempo = src.tempo;
-        dst.tempoLabel = src.tempoLabel;
-    }
 
     public rebuildRepeatGroups(): void {
         let currentGroup: RepeatGroup = new RepeatGroup();
@@ -140,8 +130,20 @@ export class Score {
     }
 
     public finish(settings: Settings): void {
+        this._noteByIdLookup.clear();
+
         for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
             this.tracks[i].finish(settings);
         }
+    }
+
+    public registerNote(note: Note) {
+        this._noteByIdLookup.set(note.id, note);
+    }
+
+    public getNoteById(noteId: number): Note | null {
+        return this._noteByIdLookup.has(noteId)
+            ? this._noteByIdLookup.get(noteId)!
+            : null;
     }
 }

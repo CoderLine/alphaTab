@@ -22,7 +22,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     public constructor(api: AlphaTabApiBase<T>, settings: Settings) {
         this._api = api;
 
-        if(!settings.core.scriptFile) {
+        if (!settings.core.scriptFile) {
             Logger.error('Rendering', `Could not detect alphaTab script file, cannot initialize renderer`);
             return;
         }
@@ -59,10 +59,10 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     private serializeSettingsForWorker(settings: Settings): unknown {
-        let json: any = Settings.toJson(settings);
+        const jsObject = JsonConverter.settingsToJsObject(settings)!;
         // cut out player settings, they are only needed on UI thread side
-        json.player = null;
-        return json;
+        jsObject.delete('player');
+        return jsObject;
     }
 
     public render(): void {

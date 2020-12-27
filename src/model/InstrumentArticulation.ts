@@ -4,6 +4,7 @@ import { MusicFontSymbol } from "./MusicFontSymbol";
 
 /**
  * Describes an instrument articulation which is used for percussions. 
+ * @json
  */
 export class InstrumentArticulation {
     /**
@@ -49,16 +50,6 @@ export class InstrumentArticulation {
         this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
         this.techniqueSymbol = techniqueSymbol;
         this.techniqueSymbolPlacement = techniqueSymbolPlacement;
-    }
-
-    public static copyTo(src: any, dst: InstrumentArticulation) {
-        dst.outputMidiNumber = src.outputMidiNumber;
-        dst.staffLine = src.staffLine;
-        dst.noteHeadDefault = src.noteHeadDefault;
-        dst.noteHeadHalf = src.noteHeadHalf;
-        dst.noteHeadWhole = src.noteHeadWhole;
-        dst.techniqueSymbol = src.techniqueSymbol;
-        dst.techniqueSymbolPlacement = src.techniqueSymbolPlacement;
     }
 
     public getSymbol(duration: Duration): MusicFontSymbol {

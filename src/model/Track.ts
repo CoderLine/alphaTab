@@ -10,21 +10,25 @@ import { InstrumentArticulation } from './InstrumentArticulation';
 /**
  * This public class describes a single track or instrument of score.
  * It is bascially a list of staffs containing individual music notation kinds.
+ * @json
  */
 export class Track {
     private static readonly ShortNameMaxLength: number = 10;
     /**
      * Gets or sets the zero-based index of this track.
+     * @json_ignore
      */
     public index: number = 0;
 
     /**
      * Gets or sets the reference this track belongs to.
+     * @json_ignore
      */
     public score!: Score;
 
     /**
      * Gets or sets the list of staffs that are defined for this track.
+     * @json_add addStaff
      */
     public staves: Staff[] = [];
 
@@ -64,14 +68,6 @@ export class Track {
         staff.index = this.staves.length;
         staff.track = this;
         this.staves.push(staff);
-    }
-
-    public static copyTo(src: Track, dst: Track): void {
-        dst.name = src.name;
-        dst.shortName = src.shortName;
-        dst.index = src.index;
-        dst.color.raw = src.color.raw;
-        dst.color.rgba = src.color.rgba;
     }
 
     public finish(settings: Settings): void {

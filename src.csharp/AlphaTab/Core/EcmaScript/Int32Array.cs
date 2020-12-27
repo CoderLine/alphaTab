@@ -26,7 +26,7 @@ namespace AlphaTab.Core.EcmaScript
         {
             if (i == 0)
             {
-                Array.Clear(_data, 0, _data.Length);
+                System.Array.Clear(_data, 0, _data.Length);
             }
             else
             {

@@ -32,6 +32,7 @@ import { Voice } from '@src/model/Voice';
 import { Logger } from '@src/Logger';
 import { ModelUtils, TuningParseResult } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { BeatCloner } from '@src/generated/model/BeatCloner';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -1035,7 +1036,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this.beatEffects(beat);
         for (let i: number = 0; i < beatRepeat - 1; i++) {
-            voice.addBeat(beat.clone());
+            voice.addBeat(BeatCloner.clone(beat));
         }
         return true;
     }

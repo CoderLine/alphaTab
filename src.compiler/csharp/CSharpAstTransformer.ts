@@ -282,7 +282,7 @@ export default class CSharpAstTransformer {
         additionalNestedNonExportsDeclarations?: ts.Declaration[],
         globalStatements?: ts.Statement[]
     ): ts.Node {
-        if (this.shouldSkip(node)) {
+        if (this.shouldSkip(node, false)) {
             return node;
         }
 
@@ -304,12 +304,21 @@ export default class CSharpAstTransformer {
         return node;
     }
 
-    private shouldSkip(node: ts.Node) {
-        const tags = ts.getJSDocTags(node).filter(t => t.tagName.text === 'target');
-        if (tags.length === 0) {
-            return false;
+    private shouldSkip(node: ts.Node, checkComments: boolean) {
+        if (checkComments) {
+            const text = node.getSourceFile().text;
+            // check for /*@target web*/ marker
+            const commentText = text.substr(node.getStart() - node.getLeadingTriviaWidth(), node.getLeadingTriviaWidth());
+            if(commentText.indexOf('/*@target web*/') >= 0) {
+                return true;
+            }
         }
-        return !tags.find(t => t.comment === 'csharp');
+        const tags = ts.getJSDocTags(node).filter(t => t.tagName.text === 'target');
+        if (tags.length > 0) {
+            return !tags.find(t => t.comment === 'csharp');
+        }
+
+        return false;
     }
 
     private visitEnumDeclaration(node: ts.EnumDeclaration) {
@@ -320,7 +329,7 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             members: [],
             tsNode: node,
-            skipEmit: this.shouldSkip(node),
+            skipEmit: this.shouldSkip(node, false),
             tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 
@@ -340,7 +349,7 @@ export default class CSharpAstTransformer {
             tsNode: enumMember,
             nodeType: cs.SyntaxKind.EnumMember,
             name: enumMember.name.getText(),
-            skipEmit: this.shouldSkip(enumMember)
+            skipEmit: this.shouldSkip(enumMember, false)
         };
 
         if (enumMember.initializer) {
@@ -375,7 +384,7 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             members: [],
             tsNode: node,
-            skipEmit: this.shouldSkip(node),
+            skipEmit: this.shouldSkip(node, false),
             tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 
@@ -417,7 +426,8 @@ export default class CSharpAstTransformer {
         };
 
         if (p.constraint) {
-            csTypeParameter.constraint = this.createUnresolvedTypeNode(csTypeParameter, p.constraint);
+            let constraintType = (ts.isUnionTypeNode(p.constraint) ? p.constraint.types[0] : p.constraint);
+            csTypeParameter.constraint = this.createUnresolvedTypeNode(csTypeParameter, constraintType);
         }
 
         return csTypeParameter;
@@ -525,7 +535,7 @@ export default class CSharpAstTransformer {
             returnType: this.createUnresolvedTypeNode(null, d.type ?? d, returnType),
             visibility: this.mapVisibility(d.modifiers),
             tsNode: d,
-            skipEmit: this.shouldSkip(d)
+            skipEmit: this.shouldSkip(d, true)
         };
         csMethod.isAsync =
             !!d.modifiers &&
@@ -560,7 +570,8 @@ export default class CSharpAstTransformer {
                 tsNode: d.arguments[1]
             } as cs.PrimitiveTypeNode,
             visibility: cs.Visibility.Public,
-            tsNode: d
+            tsNode: d,
+            skipEmit: this.shouldSkip(d, true)
         };
 
         if (csMethod.name.match(/^[^a-zA-Z].*/)) {
@@ -693,7 +704,7 @@ export default class CSharpAstTransformer {
             isAbstract: !!node.modifiers && !!node.modifiers.find(m => m.kind === ts.SyntaxKind.AbstractKeyword),
             partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
             members: [],
-            skipEmit: this.shouldSkip(node),
+            skipEmit: this.shouldSkip(node, false),
             tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 
@@ -866,7 +877,7 @@ export default class CSharpAstTransformer {
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: cs.Visibility.None,
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         if (classElement.name) {
@@ -928,7 +939,7 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 visibility: this.mapVisibility(classElement.modifiers),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-                skipEmit: this.shouldSkip(classElement)
+                skipEmit: this.shouldSkip(classElement, false)
             };
 
             if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
@@ -999,7 +1010,7 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 visibility: this.mapVisibility(classElement.modifiers),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-                skipEmit: this.shouldSkip(classElement)
+                skipEmit: this.shouldSkip(classElement, false)
             };
 
             if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
@@ -1061,7 +1072,7 @@ export default class CSharpAstTransformer {
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: visibility,
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         if (csProperty.visibility === cs.Visibility.Public || csProperty.visibility === cs.Visibility.Protected) {
@@ -1145,7 +1156,9 @@ export default class CSharpAstTransformer {
         classElement: ts.MethodDeclaration
     ) {
         const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
-        const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
+        const returnType: ts.Type | undefined = signature
+            ? this._context.typeChecker.getReturnTypeOfSignature(signature)
+            : undefined;
 
         const csMethod: cs.MethodDeclaration = {
             parent: parent,
@@ -1159,7 +1172,7 @@ export default class CSharpAstTransformer {
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: this.mapVisibility(classElement.modifiers),
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         if (classElement.name) {
@@ -1204,16 +1217,7 @@ export default class CSharpAstTransformer {
         if (classElement.typeParameters && classElement.typeParameters.length > 0) {
             csMethod.typeParameters = [];
             classElement.typeParameters.forEach(p => {
-                const csp = {
-                    parent: csMethod,
-                    name: p.name.text,
-                    nodeType: cs.SyntaxKind.TypeParameterDeclaration,
-                    tsNode: p
-                } as cs.TypeParameterDeclaration;
-                if (p.constraint) {
-                    csp.constraint = this.createUnresolvedTypeNode(csp, p.constraint);
-                }
-
+                const csp = this.visitTypeParameterDeclaration(csMethod, p);
                 csMethod.typeParameters!.push(csp);
             });
         }
@@ -1230,6 +1234,10 @@ export default class CSharpAstTransformer {
     }
 
     private visitStatement(parent: cs.Node, s: ts.Statement): cs.Statement | null {
+        if (this.shouldSkip(s, true)) {
+            return null;
+        }
+
         switch (s.kind) {
             case ts.SyntaxKind.EmptyStatement:
                 return this.visitEmptyStatement(parent, s as ts.EmptyStatement);
@@ -1350,7 +1358,7 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.VariableDeclaration,
             parent: parent,
             tsNode: s,
-            name: s.name.getText(),
+            name: (s.name as ts.Identifier).text,
             type: {} as cs.TypeNode
         } as cs.VariableDeclaration;
 
@@ -1650,6 +1658,10 @@ export default class CSharpAstTransformer {
     }
 
     private visitCaseClause(parent: cs.SwitchStatement, s: ts.CaseClause) {
+        if (this.shouldSkip(s, true)) {
+            return null;
+        }
+
         const caseClause = {
             nodeType: cs.SyntaxKind.CaseClause,
             parent: parent,
@@ -1741,7 +1753,7 @@ export default class CSharpAstTransformer {
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: cs.Visibility.None,
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         if (classElement.name) {
@@ -1798,7 +1810,7 @@ export default class CSharpAstTransformer {
 
         const csParameter: cs.ParameterDeclaration = {
             nodeType: cs.SyntaxKind.ParameterDeclaration,
-            name: p.name.getText(),
+            name: (p.name as ts.Identifier).text,
             parent: csMethod,
             type: this.createUnresolvedTypeNode(null, p.type ?? p, type),
             tsNode: p,
@@ -1836,7 +1848,7 @@ export default class CSharpAstTransformer {
             isStatic: false,
             visibility: this.mapVisibility(classElement.modifiers),
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         classElement.parameters.forEach(p => this.visitMethodParameter(csConstructor, p));
@@ -2012,13 +2024,27 @@ export default class CSharpAstTransformer {
     }
 
     private visitThisExpression(parent: cs.Node, expression: ts.ThisExpression) {
-        const csExpr = {
-            parent: parent,
-            tsNode: expression,
-            nodeType: cs.SyntaxKind.ThisLiteral
-        } as cs.ThisLiteral;
+        if (parent.nodeType === cs.SyntaxKind.MemberAccessExpression &&
+            parent.tsSymbol &&
+            this._context.isStaticSymbol(parent.tsSymbol)) {
+            const identifier = {
+                parent: parent,
+                tsNode: expression,
+                tsSymbol: this._context.typeChecker.getSymbolAtLocation(expression),
+                nodeType: cs.SyntaxKind.Identifier,
+                text: parent.tsSymbol.name
+            } as cs.Identifier;
 
-        return csExpr;
+            return identifier;
+        } else {
+            const csExpr = {
+                parent: parent,
+                tsNode: expression,
+                nodeType: cs.SyntaxKind.ThisLiteral
+            } as cs.ThisLiteral;
+
+            return csExpr;
+        }
     }
 
     private visitSuperLiteralExpression(parent: cs.Node, expression: ts.SuperExpression) {
@@ -2176,30 +2202,56 @@ export default class CSharpAstTransformer {
                     break;
             }
 
-            const toInt = ((bitOp.left as cs.ParenthesizedExpression).expression = {
-                parent: bitOp,
-                nodeType: cs.SyntaxKind.CastExpression,
-                expression: {} as cs.Expression,
-                type: {
-                    parent: null,
-                    nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                    type: cs.PrimitiveType.Int,
+            const leftType = this._context.typeChecker.getTypeAtLocation(expression.left);
+            const rightType = this._context.typeChecker.getTypeAtLocation(expression.right);
+
+            const isLeftEnum = (leftType.flags & ts.TypeFlags.Enum) || (leftType.flags & ts.TypeFlags.EnumLiteral);
+            const isRightEnum = (rightType.flags & ts.TypeFlags.Enum) || (rightType.flags & ts.TypeFlags.EnumLiteral);
+
+            if (!isLeftEnum || !isRightEnum) {
+                const toInt = ((bitOp.left as cs.ParenthesizedExpression).expression = {
+                    parent: bitOp,
+                    nodeType: cs.SyntaxKind.CastExpression,
+                    expression: {} as cs.Expression,
+                    type: {
+                        parent: null,
+                        nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                        type: cs.PrimitiveType.Int,
+                        tsNode: expression
+                    } as cs.PrimitiveTypeNode,
                     tsNode: expression
-                } as cs.PrimitiveTypeNode,
-                tsNode: expression
-            } as cs.CastExpression);
-            toInt.expression = this.visitExpression(assignment, expression.left)!;
-            if (!toInt.expression) {
-                return null;
-            }
+                } as cs.CastExpression);
+                toInt.expression = this.visitExpression(assignment, expression.left)!;
+                if (!toInt.expression) {
+                    return null;
+                }
 
-            (bitOp.right as cs.ParenthesizedExpression).expression = this.visitExpression(
-                bitOp.right,
-                expression.right
-            )!;
+                (bitOp.right as cs.ParenthesizedExpression).expression = this.visitExpression(
+                    bitOp.right,
+                    expression.right
+                )!;
 
-            if (!(bitOp.right as cs.ParenthesizedExpression).expression) {
-                return null;
+                if (!(bitOp.right as cs.ParenthesizedExpression).expression) {
+                    return null;
+                }
+            } else {
+                (bitOp.left as cs.ParenthesizedExpression).expression = this.visitExpression(
+                    assignment,
+                    expression.left
+                )!;
+
+                if (!(bitOp.right as cs.ParenthesizedExpression).expression) {
+                    return null;
+                }
+
+                (bitOp.right as cs.ParenthesizedExpression).expression = this.visitExpression(
+                    bitOp.right,
+                    expression.right
+                )!;
+
+                if (!(bitOp.right as cs.ParenthesizedExpression).expression) {
+                    return null;
+                }
             }
 
             return assignment;
@@ -2223,19 +2275,27 @@ export default class CSharpAstTransformer {
                 return null;
             }
 
-            switch (expression.operatorToken.kind) {
-                case ts.SyntaxKind.AmpersandToken:
-                case ts.SyntaxKind.GreaterThanGreaterThanToken:
-                case ts.SyntaxKind.LessThanLessThanToken:
-                case ts.SyntaxKind.BarToken:
-                    binaryExpression.left = this.makeInt(binaryExpression.left);
-                    binaryExpression.right = this.makeInt(binaryExpression.right);
-                    break;
-                case ts.SyntaxKind.SlashToken:
-                    if (expression.left.kind === ts.SyntaxKind.NumericLiteral && expression.right.kind === ts.SyntaxKind.NumericLiteral) {
-                        binaryExpression.right = this.makeDouble(binaryExpression.right);
-                    }
-                    break;
+            const leftType = this._context.typeChecker.getTypeAtLocation(expression.left);
+            const rightType = this._context.typeChecker.getTypeAtLocation(expression.right);
+
+            const isLeftEnum = (leftType.flags & ts.TypeFlags.Enum) || (leftType.flags & ts.TypeFlags.EnumLiteral);
+            const isRightEnum = (rightType.flags & ts.TypeFlags.Enum) || (rightType.flags & ts.TypeFlags.EnumLiteral);
+
+            if (!isLeftEnum || !isRightEnum) {
+                switch (expression.operatorToken.kind) {
+                    case ts.SyntaxKind.AmpersandToken:
+                    case ts.SyntaxKind.GreaterThanGreaterThanToken:
+                    case ts.SyntaxKind.LessThanLessThanToken:
+                    case ts.SyntaxKind.BarToken:
+                        binaryExpression.left = this.makeInt(binaryExpression.left);
+                        binaryExpression.right = this.makeInt(binaryExpression.right);
+                        break;
+                    case ts.SyntaxKind.SlashToken:
+                        if (expression.left.kind === ts.SyntaxKind.NumericLiteral && expression.right.kind === ts.SyntaxKind.NumericLiteral) {
+                            binaryExpression.right = this.makeDouble(binaryExpression.right);
+                        }
+                        break;
+                }
             }
 
             return binaryExpression;
@@ -2783,25 +2843,35 @@ export default class CSharpAstTransformer {
             return null;
         }
 
-        const csArg = {
-            expression: {} as cs.Expression,
-            nodeType: cs.SyntaxKind.CastExpression,
-            parent: parent,
-            tsNode: expression.argumentExpression,
-            type: {
-                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                type: cs.PrimitiveType.Int
-            } as cs.PrimitiveTypeNode
-        } as cs.CastExpression;
-        elementAccess.argumentExpression = csArg;
+        let type = symbol ? this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, expression.expression) : null;
+        if (type) {
+            type = this._context.typeChecker.getNonNullableType(type);
+        }
+        const isArrayAccessor = !symbol || (type && type.symbol && !!type.symbol.members?.has(ts.escapeLeadingUnderscores('slice')));
+        if (isArrayAccessor) {
+            const csArg = {
+                expression: {} as cs.Expression,
+                nodeType: cs.SyntaxKind.CastExpression,
+                parent: parent,
+                tsNode: expression.argumentExpression,
+                type: {
+                    nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                    type: cs.PrimitiveType.Int
+                } as cs.PrimitiveTypeNode
+            } as cs.CastExpression;
+            elementAccess.argumentExpression = csArg;
 
-        const par = {
-            nodeType: cs.SyntaxKind.ParenthesizedExpression,
-            parent: csArg,
-            expression: argumentExpression
-        } as cs.ParenthesizedExpression;
-        argumentExpression.parent = par;
-        csArg.expression = par;
+            const par = {
+                nodeType: cs.SyntaxKind.ParenthesizedExpression,
+                parent: csArg,
+                expression: argumentExpression
+            } as cs.ParenthesizedExpression;
+            argumentExpression.parent = par;
+            csArg.expression = par;
+        } else {
+            elementAccess.argumentExpression = argumentExpression;
+            argumentExpression.parent = elementAccess;
+        }
 
         return this.wrapToSmartCast(parent, elementAccess, expression);
     }
@@ -2999,6 +3069,7 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.NullLiteral
             } as cs.NullLiteral;
         }
+
         const identifier = {
             parent: parent,
             tsNode: expression,
@@ -3006,6 +3077,27 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.Identifier,
             text: expression.text
         } as cs.Identifier;
+
+        if (identifier.tsSymbol) {
+            switch (expression.parent.kind) {
+                case ts.SyntaxKind.PropertyAccessExpression:
+                case ts.SyntaxKind.BinaryExpression:
+                    break;
+                default:
+                    switch (identifier.tsSymbol.flags) {
+                        case ts.SymbolFlags.Alias:
+                        case ts.SymbolFlags.RegularEnum:
+                            return {
+                                parent: parent,
+                                nodeType: cs.SyntaxKind.TypeOfExpression,
+                                tsNode: expression,
+                                expression: identifier
+                            } as cs.TypeOfExpression;
+                    }
+                    break;
+            }
+
+        }
 
         return this.wrapToSmartCast(parent, identifier, expression);
     }

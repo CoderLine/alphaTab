@@ -75,6 +75,7 @@ export enum SyntaxKind {
     Identifier,
     DefaultExpression,
     ToDoExpression,
+    TypeOfExpression,
     
     Attribute
 }
@@ -377,6 +378,10 @@ export interface CastExpression extends Node {
 }
 
 export interface NonNullExpression extends Node {
+    expression: Expression;
+}
+
+export interface TypeOfExpression extends Node {
     expression: Expression;
 }
 

@@ -1,6 +1,8 @@
 /**
  * A single point of a bending graph. Used to
  * describe WhammyBar and String Bending effects.
+ * @cloneable
+ * @json
  */
 export class BendPoint {
     public static readonly MaxPosition: number = 60;
@@ -24,16 +26,5 @@ export class BendPoint {
     public constructor(offset: number = 0, value: number = 0) {
         this.offset = offset;
         this.value = value;
-    }
-
-    public static copyTo(src: BendPoint, dst: BendPoint): void {
-        dst.offset = src.offset;
-        dst.value = src.value;
-    }
-
-    public clone(): BendPoint {
-        let point: BendPoint = new BendPoint(0, 0);
-        BendPoint.copyTo(this, point);
-        return point;
     }
 }
