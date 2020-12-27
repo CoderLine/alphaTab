@@ -857,24 +857,29 @@ export default class CSharpAstPrinter {
     }
 
     private writeStringTemplateExpression(expr: cs.StringTemplateExpression) {
-        this.write('$@"');
+        this.write('string.Format(System.Globalization.CultureInfo.InvariantCulture, @"');
+        let exprs: cs.Expression[] = [];
         expr.chunks.forEach(c => {
             if (c.nodeType === cs.SyntaxKind.StringLiteral) {
                 const escapedText = (c as cs.StringLiteral).text
                     .split('"')
                     .join('""')
-                    .split('{')
-                    .join('{{')
-                    .split('}')
-                    .join('}}');
+                    .split('\n')
+                    .join('\\n')
+                    .split('\r')
+                    .join('\\r');
                 this.write(escapedText);
             } else {
-                this.write('{');
-                this.writeExpression(c as cs.Expression);
-                this.write('}');
+                this.write(`{${exprs.length}}`);
+                exprs.push(c as cs.Expression);
             }
         });
         this.write('"');
+        exprs.forEach(expr => {
+            this.write(', ');
+            this.writeExpression(expr);
+        })
+        this.write(')');
     }
 
     private writeIsExpression(expr: cs.IsExpression) {

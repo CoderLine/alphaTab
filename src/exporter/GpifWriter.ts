@@ -1205,9 +1205,9 @@ export class GpifWriter {
             const fretToStrings = new Map<number, number[]>();
 
             for (let i = 0; i < chord.strings.length; i++) {
-                const fretNode = diagram.addElement('Fret');
                 let chordFret = chord.strings[i];
                 if (chordFret !== -1) {
+                    const fretNode = diagram.addElement('Fret');
                     const chordString = (chord.strings.length - 1 - i);
                     fretNode.attributes.set('string', chordString.toString());
                     fretNode.attributes.set('fret', (chordFret - chord.firstFret + 1).toString());

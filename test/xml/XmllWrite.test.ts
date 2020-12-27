@@ -45,6 +45,13 @@ describe('XmlWriteTest', () => {
         expect(xml.toString("    ")).toEqual('<root>\n    <cc/>\n</root>');
     });
 
+    it('writeNumber', () => {
+        let s: string = '<root><cc>0.5</cc></root>';
+        let xml: XmlDocument = new XmlDocument();
+        xml.parse(s);
+        expect(xml.toString()).toEqual('<root><cc>0.5</cc></root>');
+    });
+
     it('writeMultiChild', () => {
         let s: string = '<root><cc></cc><cc></cc></root>';
         let xml: XmlDocument = new XmlDocument();
@@ -58,7 +65,7 @@ describe('XmlWriteTest', () => {
         let s: string = '<?xml version="1.0" encoding="utf-8"?><root></root>';
         let xml: XmlDocument = new XmlDocument();
         xml.parse(s);
-        expect(xml.toString(undefined, true)).toEqual('<?xml version="1.0" encoding="utf-8"?><root/>');
+        expect(xml.toString('', true)).toEqual('<?xml version="1.0" encoding="utf-8"?><root/>');
         expect(xml.toString("  ", true)).toEqual('<?xml version="1.0" encoding="utf-8"?>\n<root/>');
     });
 

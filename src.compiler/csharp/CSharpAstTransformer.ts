@@ -309,7 +309,7 @@ export default class CSharpAstTransformer {
             const text = node.getSourceFile().text;
             // check for /*@target web*/ marker
             const commentText = text.substr(node.getStart() - node.getLeadingTriviaWidth(), node.getLeadingTriviaWidth());
-            if(commentText.indexOf('/*@target web*/') >= 0) {
+            if (commentText.indexOf('/*@target web*/') >= 0) {
                 return true;
             }
         }
@@ -1228,6 +1228,15 @@ export default class CSharpAstTransformer {
             csMethod.body = this.visitBlock(csMethod, classElement.body);
         }
 
+        switch (csMethod.name) {
+            case 'ToString':
+                if(csMethod.parameters.length === 0) {
+                    csMethod.isVirtual = false;
+                    csMethod.isOverride = true;
+                }
+                break;
+        }
+
         parent.members.push(csMethod);
 
         this._context.registerSymbol(csMethod);
@@ -1980,6 +1989,10 @@ export default class CSharpAstTransformer {
         csExpr.operand = this.visitExpression(csExpr, expression.operand)!;
         if (!csExpr.operand) {
             return null;
+        }
+
+        if (csExpr.operator === "~") {
+            csExpr.operand = this.makeInt(csExpr.operand);
         }
 
         return csExpr;
@@ -2809,8 +2822,8 @@ export default class CSharpAstTransformer {
 
     private visitElementAccessExpression(parent: cs.Node, expression: ts.ElementAccessExpression) {
         // Enum[value] => value.ToString()
-        const symbol = this._context.typeChecker.getSymbolAtLocation(expression.expression);
-        if (symbol && symbol.flags & ts.SymbolFlags.Enum) {
+        const enumType = this._context.typeChecker.getTypeAtLocation(expression.expression);
+        if (enumType?.symbol && enumType.symbol.flags & ts.SymbolFlags.RegularEnum) {
             const callExpr = {
                 parent: parent,
                 arguments: [],
@@ -2853,6 +2866,7 @@ export default class CSharpAstTransformer {
             return null;
         }
 
+        const symbol = this._context.typeChecker.getSymbolAtLocation(expression.expression);
         let type = symbol ? this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, expression.expression) : null;
         if (type) {
             type = this._context.typeChecker.getNonNullableType(type);
@@ -2914,6 +2928,31 @@ export default class CSharpAstTransformer {
                 callExpression.arguments.push(e);
             }
         });
+
+        // number.ToString
+        const isNumberToString = ts.isPropertyAccessExpression(expression.expression) 
+            && this._context.typeChecker.getTypeAtLocation(expression.expression.expression).flags & ts.TypeFlags.Number
+            && (expression.expression.name as ts.Identifier).text === 'toString'
+            && expression.arguments.length === 0;
+
+        if(isNumberToString) {
+            const invariantCultureInfo = {
+                parent: parent,
+                nodeType: cs.SyntaxKind.MemberAccessExpression,
+                tsNode: expression,
+                expression: null!,
+                member: 'InvariantCulture'
+            } as cs.MemberAccessExpression;
+
+            invariantCultureInfo.expression = {
+                parent: invariantCultureInfo,
+                tsNode: expression.expression,
+                nodeType: cs.SyntaxKind.Identifier,
+                text: 'System.Globalization.CultureInfo'
+            } as cs.Identifier;
+
+            callExpression.arguments.push(invariantCultureInfo);
+        }
 
         if (expression.typeArguments) {
             callExpression.typeArguments = [];

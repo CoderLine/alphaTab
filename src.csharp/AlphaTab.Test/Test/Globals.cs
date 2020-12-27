@@ -42,6 +42,18 @@ namespace AlphaTab.Test
             Assert.AreEqual(expected, _actual, _message + message);
         }
 
+        public void ToBeCloseTo(double expected, string message = null)
+        {
+            if (_actual is IConvertible c)
+            {
+                Assert.AreEqual(expected, c.ToDouble(CultureInfo.InvariantCulture), 0.001, _message + message);
+            }
+            else
+            {
+                Assert.Fail("ToBeCloseTo can only be used with numeric operands");
+            }
+        }
+
         public void ToBe(object expected)
         {
             if (expected is int i && _actual is double)
