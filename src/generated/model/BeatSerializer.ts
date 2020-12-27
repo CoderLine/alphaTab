@@ -36,7 +36,6 @@ export class BeatSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("id", obj.id); 
-        o.set("index", obj.index); 
         o.set("notes", obj.notes.map(i => NoteSerializer.toJson(i))); 
         o.set("isEmpty", obj.isEmpty); 
         o.set("whammyStyle", (obj.whammyStyle as number)); 
@@ -72,7 +71,6 @@ export class BeatSerializer {
         o.set("dynamics", (obj.dynamics as number)); 
         o.set("invertBeamDirection", obj.invertBeamDirection); 
         o.set("preferredBeamDirection", (obj.preferredBeamDirection as number | null)); 
-        o.set("isEffectSlurOrigin", obj.isEffectSlurOrigin); 
         o.set("beamingMode", (obj.beamingMode as number)); 
         return o; 
     }
@@ -80,9 +78,6 @@ export class BeatSerializer {
         switch (property) {
             case "id":
                 obj.id = (v as number);
-                return true;
-            case "index":
-                obj.index = (v as number);
                 return true;
             case "notes":
                 obj.notes = [];
@@ -203,9 +198,6 @@ export class BeatSerializer {
                 return true;
             case "preferredbeamdirection":
                 obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(v, BeamDirection);
-                return true;
-            case "iseffectslurorigin":
-                obj.isEffectSlurOrigin = (v as boolean);
                 return true;
             case "beamingmode":
                 obj.beamingMode = (JsonHelper.parseEnum<BeatBeamingMode>(v, BeatBeamingMode)!);

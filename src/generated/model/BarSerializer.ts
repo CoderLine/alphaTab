@@ -23,7 +23,6 @@ export class BarSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("id", obj.id); 
-        o.set("index", obj.index); 
         o.set("clef", (obj.clef as number)); 
         o.set("clefOttava", (obj.clefOttava as number)); 
         o.set("voices", obj.voices.map(i => VoiceSerializer.toJson(i))); 
@@ -34,9 +33,6 @@ export class BarSerializer {
         switch (property) {
             case "id":
                 obj.id = (v as number);
-                return true;
-            case "index":
-                obj.index = (v as number);
                 return true;
             case "clef":
                 obj.clef = (JsonHelper.parseEnum<Clef>(v, Clef)!);

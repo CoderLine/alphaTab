@@ -36,6 +36,7 @@ export class MasterBar {
 
     /**
      * Gets the zero based index of the masterbar.
+     * @json_ignore
      */
     public index: number = 0;
 

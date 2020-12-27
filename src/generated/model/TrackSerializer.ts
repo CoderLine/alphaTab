@@ -23,7 +23,6 @@ export class TrackSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("index", obj.index); 
         o.set("staves", obj.staves.map(i => StaffSerializer.toJson(i))); 
         o.set("playbackInfo", PlaybackInformationSerializer.toJson(obj.playbackInfo)); 
         o.set("color", Color.toJson(obj.color)); 
@@ -34,9 +33,6 @@ export class TrackSerializer {
     }
     public static setProperty(obj: Track, property: string, v: unknown): boolean {
         switch (property) {
-            case "index":
-                obj.index = (v as number);
-                return true;
             case "staves":
                 obj.staves = [];
                 for (const o of (v as (Map<string, unknown> | null)[])) {

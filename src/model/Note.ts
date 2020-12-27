@@ -38,6 +38,7 @@ export class Note {
 
     /**
      * Gets or sets the zero-based index of this note within the beat.
+     * @json_ignore
      */
     public index: number = 0;
 
@@ -485,8 +486,16 @@ export class Note {
      */
     public dynamics: DynamicValue = DynamicValue.F;
 
+    /**
+     * @clone_ignore
+     * @json_ignore
+     */
     public isEffectSlurOrigin: boolean = false;
 
+    /**
+     * @clone_ignore
+     * @json_ignore
+     */
     public hasEffectSlur: boolean = false;
 
     public get isEffectSlurDestination(): boolean {

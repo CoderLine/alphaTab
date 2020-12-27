@@ -14,21 +14,42 @@ import { SettingsSerializer } from '@src/generated/SettingsSerializer';
  * JSON serialization.
  */
 export class JsonConverter {
+    private static jsonReplacer(_: any, v: any) {
+        if (v instanceof Map) {
+            if ('fromEntries' in Object) {
+                return (Object as any).fromEntries(v);
+            } else {
+                const o: any = {};
+                v.forEach((v, k) => o[k] = v);
+                return o;
+            }
+        }
+        else if (ArrayBuffer.isView(v)) {
+            return Array.apply([], [v]);
+        }
+        return v;
+    }
+
     /**
      * Converts the given score into a JSON encoded string.
      * @param score The score to serialize.
-     * @returns A JSON encoded string that can be used togehter with  for conversion.
+     * @returns A JSON encoded string.
      * @target web
      */
     public static scoreToJson(score: Score): string {
         let obj: unknown = JsonConverter.scoreToJsObject(score);
-        return JSON.stringify(obj, (_, v) => {
-            // patch arraybuffer to serialize as array
-            if (ArrayBuffer.isView(v)) {
-                return Array.apply([], [v]);
-            }
-            return v;
-        });
+        return JSON.stringify(obj, JsonConverter.jsonReplacer);
+    }
+
+    /**
+     * Converts the given JSON string back to a {@link Score} object.
+     * @param json The JSON string
+     * @param settings The settings to use during conversion.
+     * @returns The converted score object.
+     * @target web
+     */
+    public static jsonToScore(json: string, settings?: Settings): Score {
+        return JsonConverter.jsObjectToScore(JSON.parse(json), settings);
     }
 
     /**
@@ -38,17 +59,6 @@ export class JsonConverter {
      */
     public static scoreToJsObject(score: Score): unknown {
         return ScoreSerializer.toJson(score);
-    }
-
-    /**
-     * Converts the given JSON string back to a {@link Score} object.
-     * @param json The JSON string that was created via {@link Score}
-     * @param settings The settings to use during conversion.
-     * @returns The converted score object.
-     * @target web
-     */
-    public static jsonToScore(json: string, settings?: Settings): Score {
-        return JsonConverter.jsObjectToScore(json, settings);
     }
 
     /**
@@ -62,6 +72,28 @@ export class JsonConverter {
         ScoreSerializer.fromJson(score, jsObject);
         score.finish(settings ?? new Settings());
         return score;
+    }
+
+
+    /**
+     * Converts the given settings into a JSON encoded string.
+     * @param settings The settings to serialize.
+     * @returns A JSON encoded string.
+     * @target web
+     */
+    public static settingsToJson(settings: Settings): string {
+        let obj: unknown = JsonConverter.settingsToJsObject(settings);
+        return JSON.stringify(obj, JsonConverter.jsonReplacer);
+    }
+
+    /**
+     * Converts the given JSON string back to a {@link Score} object.
+     * @param json The JSON string
+     * @returns The converted settings object.
+     * @target web
+     */
+    public static jsonToSettings(json: string): Settings {
+        return JsonConverter.jsObjectToSettings(JSON.parse(json));
     }
 
     /**

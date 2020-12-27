@@ -16,6 +16,7 @@ export class Track {
     private static readonly ShortNameMaxLength: number = 10;
     /**
      * Gets or sets the zero-based index of this track.
+     * @json_ignore
      */
     public index: number = 0;
 

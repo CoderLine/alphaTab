@@ -21,7 +21,6 @@ export class StaffSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("index", obj.index); 
         o.set("bars", obj.bars.map(i => BarSerializer.toJson(i))); 
         {
             const m = new Map<string, unknown>();
@@ -41,9 +40,6 @@ export class StaffSerializer {
     }
     public static setProperty(obj: Staff, property: string, v: unknown): boolean {
         switch (property) {
-            case "index":
-                obj.index = (v as number);
-                return true;
             case "bars":
                 obj.bars = [];
                 for (const o of (v as (Map<string, unknown> | null)[])) {

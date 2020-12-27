@@ -15,6 +15,7 @@ export class Voice {
 
     /**
      * Gets or sets the zero-based index of this voice within the bar.
+     * @json_ignore
      */
     public index: number = 0;
 

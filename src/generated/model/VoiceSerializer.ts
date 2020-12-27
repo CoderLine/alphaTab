@@ -19,16 +19,12 @@ export class VoiceSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("index", obj.index); 
         o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i))); 
         o.set("isEmpty", obj.isEmpty); 
         return o; 
     }
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
         switch (property) {
-            case "index":
-                obj.index = (v as number);
-                return true;
             case "beats":
                 obj.beats = [];
                 for (const o of (v as (Map<string, unknown> | null)[])) {

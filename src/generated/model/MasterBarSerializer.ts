@@ -27,7 +27,6 @@ export class MasterBarSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("alternateEndings", obj.alternateEndings); 
-        o.set("index", obj.index); 
         o.set("keySignature", (obj.keySignature as number)); 
         o.set("keySignatureType", (obj.keySignatureType as number)); 
         o.set("isDoubleBar", obj.isDoubleBar); 
@@ -52,9 +51,6 @@ export class MasterBarSerializer {
         switch (property) {
             case "alternateendings":
                 obj.alternateEndings = (v as number);
-                return true;
-            case "index":
-                obj.index = (v as number);
                 return true;
             case "keysignature":
                 obj.keySignature = (JsonHelper.parseEnum<KeySignature>(v, KeySignature)!);

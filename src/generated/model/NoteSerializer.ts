@@ -31,7 +31,6 @@ export class NoteSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("id", obj.id); 
-        o.set("index", obj.index); 
         o.set("accentuated", (obj.accentuated as number)); 
         o.set("bendType", (obj.bendType as number)); 
         o.set("bendStyle", (obj.bendStyle as number)); 
@@ -71,17 +70,12 @@ export class NoteSerializer {
         o.set("durationPercent", obj.durationPercent); 
         o.set("accidentalMode", (obj.accidentalMode as number)); 
         o.set("dynamics", (obj.dynamics as number)); 
-        o.set("isEffectSlurOrigin", obj.isEffectSlurOrigin); 
-        o.set("hasEffectSlur", obj.hasEffectSlur); 
         return o; 
     }
     public static setProperty(obj: Note, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
                 obj.id = (v as number);
-                return true;
-            case "index":
-                obj.index = (v as number);
                 return true;
             case "accentuated":
                 obj.accentuated = (JsonHelper.parseEnum<AccentuationType>(v, AccentuationType)!);
@@ -204,12 +198,6 @@ export class NoteSerializer {
                 return true;
             case "dynamics":
                 obj.dynamics = (JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!);
-                return true;
-            case "iseffectslurorigin":
-                obj.isEffectSlurOrigin = (v as boolean);
-                return true;
-            case "haseffectslur":
-                obj.hasEffectSlur = (v as boolean);
                 return true;
         } 
         return false; 

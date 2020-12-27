@@ -58,6 +58,7 @@ export class Beat {
 
     /**
      * Gets or sets the zero-based index of this beat within the voice.
+     * @json_ignore
      */
     public index: number = 0;
 
@@ -388,6 +389,9 @@ export class Beat {
      */
     public preferredBeamDirection: BeamDirection | null = null;
 
+    /**
+     * @json_ignore
+     */
     public isEffectSlurOrigin: boolean = false;
 
     public get isEffectSlurDestination(): boolean {

@@ -11,6 +11,7 @@ import { Settings } from '@src/Settings';
 export class Staff {
     /**
      * Gets or sets the zero-based index of this staff within the track.
+     * @json_ignore
      */
     public index: number = 0;
 

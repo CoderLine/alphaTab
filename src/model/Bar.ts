@@ -20,6 +20,7 @@ export class Bar {
 
     /**
      * Gets or sets the zero-based index of this bar within the staff.
+     * @json_ignore
      */
     public index: number = 0;
 
