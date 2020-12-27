@@ -18,7 +18,13 @@ function createDiagnosticReporter(pretty?: boolean): ts.DiagnosticReporter {
     };
 }
 
-export default function (emit: (program: ts.Program, diagnostics: ts.Diagnostic[]) => void, handleErrors: boolean = false) {
+interface Emitter {
+    name: string,
+    emit(program: ts.Program, diagnostics: ts.Diagnostic[]): void;
+}
+
+export default function (emitters: Emitter[], handleErrors: boolean = false) {
+    console.log('Parsing...');
     const commandLine = ts.parseCommandLine(ts.sys.args);
     if (!ts.sys.fileExists(commandLine.options.project!)) {
         ts.sys.exit(ts.ExitStatus.InvalidProject_OutputsSkipped);
@@ -57,7 +63,10 @@ export default function (emit: (program: ts.Program, diagnostics: ts.Diagnostic[
 
     program.getTypeChecker();
 
-    emit(program, allDiagnostics);
+    for(const emitter of emitters) {
+        console.log(`[${emitter.name}] Emitting...`);
+        emitter.emit(program, allDiagnostics);
+    }
 
     if (handleErrors) {
         let diagnostics = ts.sortAndDeduplicateDiagnostics(allDiagnostics);
@@ -88,4 +97,6 @@ export default function (emit: (program: ts.Program, diagnostics: ts.Diagnostic[
             ts.sys.exit(ts.ExitStatus.Success);
         }
     }
+
+    console.log('Done');
 }

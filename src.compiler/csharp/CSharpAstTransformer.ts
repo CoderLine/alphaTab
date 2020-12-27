@@ -282,7 +282,7 @@ export default class CSharpAstTransformer {
         additionalNestedNonExportsDeclarations?: ts.Declaration[],
         globalStatements?: ts.Statement[]
     ): ts.Node {
-        if (this.shouldSkip(node)) {
+        if (this.shouldSkip(node, false)) {
             return node;
         }
 
@@ -304,25 +304,18 @@ export default class CSharpAstTransformer {
         return node;
     }
 
-    private shouldSkip(node: ts.Node) {
+    private shouldSkip(node: ts.Node, checkComments: boolean) {
+        if (checkComments) {
+            const text = node.getSourceFile().text;
+            // check for /*@target web*/ marker
+            const commentText = text.substr(node.getStart() - node.getLeadingTriviaWidth(), node.getLeadingTriviaWidth());
+            if(commentText.indexOf('/*@target web*/') >= 0) {
+                return true;
+            }
+        }
         const tags = ts.getJSDocTags(node).filter(t => t.tagName.text === 'target');
         if (tags.length > 0) {
             return !tags.find(t => t.comment === 'csharp');
-        }
-
-        const text = node.getSourceFile().text;
-        const targets = ts.getLeadingCommentRanges(text, node.getStart() - node.getLeadingTriviaWidth())
-            ?.map(r => {
-                let comment = text.substring(r.pos, r.end).trim();
-                if (comment.indexOf('/*@target') >= 0) {
-                    return comment.substring(9, comment.length - 2).trim();
-                } else {
-                    return '';
-                }
-            })
-            .filter(t => t.length > 0);
-        if (targets && targets.length > 0 && !targets.find(t => t === "csharp")) {
-            return true;
         }
 
         return false;
@@ -336,7 +329,7 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             members: [],
             tsNode: node,
-            skipEmit: this.shouldSkip(node),
+            skipEmit: this.shouldSkip(node, false),
             tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 
@@ -356,7 +349,7 @@ export default class CSharpAstTransformer {
             tsNode: enumMember,
             nodeType: cs.SyntaxKind.EnumMember,
             name: enumMember.name.getText(),
-            skipEmit: this.shouldSkip(enumMember)
+            skipEmit: this.shouldSkip(enumMember, false)
         };
 
         if (enumMember.initializer) {
@@ -391,7 +384,7 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             members: [],
             tsNode: node,
-            skipEmit: this.shouldSkip(node),
+            skipEmit: this.shouldSkip(node, false),
             tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 
@@ -542,7 +535,7 @@ export default class CSharpAstTransformer {
             returnType: this.createUnresolvedTypeNode(null, d.type ?? d, returnType),
             visibility: this.mapVisibility(d.modifiers),
             tsNode: d,
-            skipEmit: this.shouldSkip(d)
+            skipEmit: this.shouldSkip(d, true)
         };
         csMethod.isAsync =
             !!d.modifiers &&
@@ -578,7 +571,7 @@ export default class CSharpAstTransformer {
             } as cs.PrimitiveTypeNode,
             visibility: cs.Visibility.Public,
             tsNode: d,
-            skipEmit: this.shouldSkip(d)
+            skipEmit: this.shouldSkip(d, true)
         };
 
         if (csMethod.name.match(/^[^a-zA-Z].*/)) {
@@ -711,7 +704,7 @@ export default class CSharpAstTransformer {
             isAbstract: !!node.modifiers && !!node.modifiers.find(m => m.kind === ts.SyntaxKind.AbstractKeyword),
             partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
             members: [],
-            skipEmit: this.shouldSkip(node),
+            skipEmit: this.shouldSkip(node, false),
             tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 
@@ -884,7 +877,7 @@ export default class CSharpAstTransformer {
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: cs.Visibility.None,
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         if (classElement.name) {
@@ -946,7 +939,7 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 visibility: this.mapVisibility(classElement.modifiers),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-                skipEmit: this.shouldSkip(classElement)
+                skipEmit: this.shouldSkip(classElement, false)
             };
 
             if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
@@ -1017,7 +1010,7 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 visibility: this.mapVisibility(classElement.modifiers),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-                skipEmit: this.shouldSkip(classElement)
+                skipEmit: this.shouldSkip(classElement, false)
             };
 
             if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
@@ -1079,7 +1072,7 @@ export default class CSharpAstTransformer {
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: visibility,
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         if (csProperty.visibility === cs.Visibility.Public || csProperty.visibility === cs.Visibility.Protected) {
@@ -1179,7 +1172,7 @@ export default class CSharpAstTransformer {
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: this.mapVisibility(classElement.modifiers),
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         if (classElement.name) {
@@ -1241,7 +1234,7 @@ export default class CSharpAstTransformer {
     }
 
     private visitStatement(parent: cs.Node, s: ts.Statement): cs.Statement | null {
-        if (this.shouldSkip(s)) {
+        if (this.shouldSkip(s, true)) {
             return null;
         }
 
@@ -1665,10 +1658,10 @@ export default class CSharpAstTransformer {
     }
 
     private visitCaseClause(parent: cs.SwitchStatement, s: ts.CaseClause) {
-        if (this.shouldSkip(s)) {
+        if (this.shouldSkip(s, true)) {
             return null;
         }
-        
+
         const caseClause = {
             nodeType: cs.SyntaxKind.CaseClause,
             parent: parent,
@@ -1760,7 +1753,7 @@ export default class CSharpAstTransformer {
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: cs.Visibility.None,
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         if (classElement.name) {
@@ -1855,7 +1848,7 @@ export default class CSharpAstTransformer {
             isStatic: false,
             visibility: this.mapVisibility(classElement.modifiers),
             tsNode: classElement,
-            skipEmit: this.shouldSkip(classElement)
+            skipEmit: this.shouldSkip(classElement, false)
         };
 
         classElement.parameters.forEach(p => this.visitMethodParameter(csConstructor, p));

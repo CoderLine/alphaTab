@@ -3,7 +3,12 @@ import cloneEmit from './CloneEmitter';
 import serializerEmit from './SerializerEmitter';
 import transpiler from '../TranspilerBase'
 
-transpiler(cloneEmit);
-transpiler(serializerEmit);
+transpiler([{
+    name: 'Clone',
+    emit: cloneEmit
+}, {
+    name: 'Serializer',
+    emit: serializerEmit
+}]);
 
 ts.sys.exit(ts.ExitStatus.Success);
