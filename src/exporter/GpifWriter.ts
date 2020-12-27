@@ -386,12 +386,15 @@ export class GpifWriter {
         if (note.isStringed) {
             this.writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
             this.writeSimplePropertyNode(properties, 'Fret', 'Fret', note.fret.toString());
+            this.writeSimplePropertyNode(properties, 'Midi', 'Number', note.realValue.toString());
         }
 
         if (note.isPiano) {
             this.writeSimplePropertyNode(properties, 'Octave', 'Number', note.octave.toString());
             this.writeSimplePropertyNode(properties, 'Tone', 'Step', note.tone.toString());
+            this.writeSimplePropertyNode(properties, 'Midi', 'Number', note.realValue.toString());
         }
+
 
         if (note.beat.tap) {
             this.writeSimplePropertyNode(properties, 'Tapped', 'Enable', null);
@@ -487,95 +490,92 @@ export class GpifWriter {
 
     private writeTransposedPitch(properties: XmlNode, note: Note) {
         if (note.isPercussion) {
-            this.writePitch(properties, "ConcertPitch", "C", "-1", NoteAccidentalMode.Default);
+            this.writePitch(properties, "ConcertPitch", "C", "-1", '');
         } else {
-            let parts = Tuning.getTextPartsForTuning(note.displayValueWithoutBend, 0);
-            this.writePitch(properties, "TransposedPitch", parts[0], parts[1], note.accidentalMode)
+            this.writePitchForValue(properties, "TransposedPitch", note.displayValueWithoutBend, note.accidentalMode)
         }
     }
 
     private writeConcertPitch(properties: XmlNode, note: Note) {
         if (note.isPercussion) {
-            this.writePitch(properties, "ConcertPitch", "C", "-1", NoteAccidentalMode.Default);
+            this.writePitch(properties, "ConcertPitch", "C", "-1", '');
         } else {
-            let parts = Tuning.getTextPartsForTuning(note.realValue, 0);
-            this.writePitch(properties, "ConcertPitch", parts[0], parts[1], note.accidentalMode)
+            this.writePitchForValue(properties, "ConcertPitch", note.realValueWithoutHarmonic, note.accidentalMode)
         }
     }
 
-    private writePitch(properties: XmlNode, propertyName: string, step: string, octave: string, accidental: NoteAccidentalMode) {
+    private static readonly defaultAccidentals: string[] = ['', '#', '', '#', '', '', '#', '', '#', '', '#', ''];
+    private static readonly defaultSteps: string[] = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
+
+    private writePitchForValue(properties: XmlNode, propertyName: string, value: number, accidentalMode: NoteAccidentalMode) {
+        let index = 0;
+        let octave: number = 0;
+
+        let step = '';
+        let accidental = '';
+
+        function updateParts() {
+            index = value % 12;
+            octave = (value / 12) | 0;
+
+            step = GpifWriter.defaultSteps[index];
+            accidental = GpifWriter.defaultAccidentals[index];
+        }
+        updateParts();
+
+        switch (accidentalMode) {
+            case NoteAccidentalMode.Default:
+                break;
+            case NoteAccidentalMode.SwapAccidentals:
+                if(accidental === '#') {
+                    value += 1;
+                    updateParts();
+                    accidental = 'b';
+                }
+                break;
+            case NoteAccidentalMode.ForceNone:
+                accidental = '';
+                break;
+            case NoteAccidentalMode.ForceNatural:
+                accidental = ''
+                break;
+            case NoteAccidentalMode.ForceSharp:
+                accidental = '#';
+                break;
+            case NoteAccidentalMode.ForceDoubleSharp:
+                if(accidental === '#') {
+                    value -= 2;
+                    updateParts();
+                }
+                accidental = 'x';
+                break;
+            case NoteAccidentalMode.ForceFlat:
+                if(accidental === '#') {
+                    value += 1;
+                    updateParts();
+                }
+                accidental = 'b';
+                break;
+            case NoteAccidentalMode.ForceDoubleFlat:
+                if(accidental === '#') {
+                    value += 2;
+                    updateParts();
+                }
+                accidental = 'bb';
+                break;
+        }
+
+        this.writePitch(properties, propertyName, step, octave.toString(), accidental);
+    }
+
+    private writePitch(properties: XmlNode, propertyName: string, step: string, octave: string, accidental: string) {
         const property = properties.addElement('Property');
         property.attributes.set('name', propertyName);
 
         const pitch = property.addElement('Pitch');
-        const stepElement = pitch.addElement('Step');
-        const accidentalElement = pitch.addElement('Accidental');
-        switch (step) {
-            case 'C':
-                stepElement.innerText = 'C';
-                accidentalElement.innerText = '';
-                break;
-            case 'Db':
-                stepElement.innerText = 'C';
-                accidentalElement.innerText = '#';
-                break;
-            case 'D':
-                stepElement.innerText = 'D';
-                accidentalElement.innerText = '';
-                break;
-            case 'Eb':
-                stepElement.innerText = 'D';
-                accidentalElement.innerText = '#';
-                break;
-            case 'E':
-                stepElement.innerText = 'E';
-                accidentalElement.innerText = '';
-                break;
-            case 'F':
-                stepElement.innerText = 'F';
-                accidentalElement.innerText = '';
-                break;
-            case 'Gb':
-                stepElement.innerText = 'F';
-                accidentalElement.innerText = '#';
-                break;
-            case 'G':
-                stepElement.innerText = 'G';
-                accidentalElement.innerText = '';
-                break;
-            case 'Ab':
-                stepElement.innerText = 'G';
-                accidentalElement.innerText = '#';
-                break;
-            case 'A':
-                stepElement.innerText = 'A';
-                accidentalElement.innerText = '';
-                break;
-            case 'Bb':
-                stepElement.innerText = 'A';
-                accidentalElement.innerText = '#';
-                break;
-            case 'B':
-                stepElement.innerText = 'B';
-                accidentalElement.innerText = '';
-                break;
-        }
 
-        switch (accidental) {
-            case NoteAccidentalMode.ForceDoubleSharp:
-                accidentalElement.innerText = 'x';
-                break;
-            case NoteAccidentalMode.ForceSharp:
-                accidentalElement.innerText = '#';
-                break;
-            case NoteAccidentalMode.ForceFlat:
-                accidentalElement.innerText = 'b';
-                break;
-            case NoteAccidentalMode.ForceDoubleFlat:
-                accidentalElement.innerText = 'bb';
-                break;
-        }
-
+        pitch.addElement('Step').innerText = step;
+        pitch.addElement('Accidental').innerText = accidental;
         pitch.addElement('Octave').innerText = octave;
     }
 
@@ -656,7 +656,7 @@ export class GpifWriter {
             }
         }
         if (beat.hasChord) {
-            beatNode.addElement('Chord').innerText = beat.chordId!;
+            beatNode.addElement('Chord').setCData(beat.chordId!);
         }
         if (beat.crescendo !== CrescendoType.None) {
             beatNode.addElement('Hairpin').innerText = CrescendoType[beat.crescendo];
@@ -1181,12 +1181,13 @@ export class GpifWriter {
 
         this.writeSimplePropertyNode(properties, 'TuningFlat', 'Enable', null);
 
-        this.writeDiagramCollection(properties, staff);
+        this.writeDiagramCollection(properties, staff, 'DiagramCollection');
+        this.writeDiagramCollection(properties, staff, 'DiagramWorkingSet');
     }
 
-    private writeDiagramCollection(properties: XmlNode, staff: Staff) {
+    private writeDiagramCollection(properties: XmlNode, staff: Staff, name: string) {
         const diagramCollectionProperty = properties.addElement('Property');
-        diagramCollectionProperty.attributes.set('name', 'DiagramCollection');
+        diagramCollectionProperty.attributes.set('name', name);
         const diagramCollectionItems = diagramCollectionProperty.addElement('Items');
 
         staff.chords.forEach((chord, id) => {
@@ -1222,6 +1223,7 @@ export class GpifWriter {
             frets.sort();
 
             // try to rebuild the barre frets
+            const fingering = diagram.addElement('Fingering');
             if (chord.barreFrets.length > 0) {
                 const fingers = [
                     Fingers.LittleFinger,
@@ -1229,7 +1231,6 @@ export class GpifWriter {
                     Fingers.MiddleFinger,
                     Fingers.IndexFinger,
                 ];
-                const fingering = diagram.addElement('Fingering');
 
                 for (const fret of frets) {
                     const fretStrings = fretToStrings.get(fret)!;
@@ -1276,6 +1277,24 @@ export class GpifWriter {
 
 
             // TODO Chord details
+            const chordNode = diagram.addElement('Chord');
+            const keyNoteNode = chordNode.addElement('KeyNote');
+            keyNoteNode.attributes.set('step', 'C');
+            keyNoteNode.attributes.set('accidental', 'Natural');
+
+            const bassNoteNode = chordNode.addElement('BassNote');
+            bassNoteNode.attributes.set('step', 'C');
+            bassNoteNode.attributes.set('accidental', 'Natural');
+
+            const degree1Node = chordNode.addElement('Degree');
+            degree1Node.attributes.set('interval', 'Third');
+            degree1Node.attributes.set('alteration', 'Major');
+            degree1Node.attributes.set('omitted', 'false');
+
+            const degree2Node = chordNode.addElement('Degree');
+            degree2Node.attributes.set('interval', 'Fifth');
+            degree2Node.attributes.set('alteration', 'Perfect');
+            degree2Node.attributes.set('omitted', 'false');
         });
     }
 

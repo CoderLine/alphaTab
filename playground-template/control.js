@@ -239,7 +239,7 @@ function setupControl(selector) {
         const exporter = new alphaTab.exporter.Gp7Exporter();
         const data = exporter.export(at.score, at.settings);
         const a = document.createElement('a');
-        a.download = at.score.title + '.gp';
+        a.download = at.score.title.length > 0 ? at.score.title + '.gp' : 'song.gp';
         a.href = URL.createObjectURL(new Blob([data]));
         document.body.appendChild(a);
         a.click();

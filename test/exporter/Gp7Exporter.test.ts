@@ -36,13 +36,17 @@ describe('Gp7ExporterTest', () => {
                 return;
             }
 
+            const fileName = name.substr(name.lastIndexOf('/') + 1);
             const exported = exportGp7(expected);
+
+            await TestPlatform.saveFile(fileName, exported);
+
             const actual = prepareGp7ImporterWithBytes(exported).readScore();
 
             const expectedJson = JsonConverter.scoreToJsObject(expected);
             const actualJson = JsonConverter.scoreToJsObject(actual)
 
-            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + name.substr(name.lastIndexOf('/') + 1) + '>');
+            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>');
         } catch (e) {
             fail(e);
         }

@@ -526,14 +526,23 @@ export class Note {
     }
 
     public get realValue(): number {
+        let realValue = this.realValueWithoutHarmonic;
+        if (this.isStringed) {
+            if (this.harmonicType === HarmonicType.Natural) {
+                realValue = this.harmonicPitch + this.stringTuning - this.beat.voice.bar.staff.transpositionPitch;
+            } else {
+                realValue += this.harmonicPitch;
+            }
+        }
+        return realValue;
+    }
+
+    public get realValueWithoutHarmonic(): number {
         if (this.isPercussion) {
             return this.percussionArticulation;
         }
         if (this.isStringed) {
-            if (this.harmonicType === HarmonicType.Natural) {
-                return this.harmonicPitch + this.stringTuning - this.beat.voice.bar.staff.transpositionPitch;
-            }
-            return this.fret + this.stringTuning - this.beat.voice.bar.staff.transpositionPitch + this.harmonicPitch;
+            return this.fret + this.stringTuning - this.beat.voice.bar.staff.transpositionPitch;
         }
         if (this.isPiano) {
             return this.octave * 12 + this.tone - this.beat.voice.bar.staff.transpositionPitch;
