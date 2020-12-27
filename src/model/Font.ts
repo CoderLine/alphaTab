@@ -1,5 +1,4 @@
-import { JsonReader, JsonValueType } from '@src/io/JsonReader';
-import { JsonWriter } from '@src/io/JsonWriter';
+import { JsonHelper } from '@src/io/JsonHelper';
 
 /**
  * A very basic font parser which parses the fields according to 
@@ -339,35 +338,21 @@ export class Font {
         return this._css;
     }
 
-    public static fromJson(reader: JsonReader): Font | null {
-        switch (reader.currentValueType) {
-            case JsonValueType.Null:
+    public static fromJson(v:unknown): Font | null {
+        switch (typeof v) {
+            case 'undefined':
                 return null;
-            case JsonValueType.Object:
+            case 'object':
                 {
-                    let family = '';
-                    let size = 0;
-                    let style = FontStyle.Plain;
-                    reader.startObject();
-                    while (reader.nextProp()) {
-                        switch (reader.prop().toLowerCase()) {
-                            case 'family':
-                                family = reader.string()!;
-                                break;
-                            case 'size':
-                                size = reader.number()!;
-                                break;
-                            case 'style':
-                                style = reader.enum<FontStyle>(FontStyle)!;
-                                break;
-                        }
-                    }
-                    reader.endObject();
+                    const m = v as Map<string, unknown>;
+                    let family = m.get('family') as string;
+                    let size = m.get('size') as number;
+                    let style = JsonHelper.parseEnum<FontStyle>(m.get('style'), FontStyle)!;
                     return new Font(family, size, style);
                 }
-            case JsonValueType.String:
+            case 'string':
                 {
-                    const parser = new FontParser(reader.string()!);
+                    const parser = new FontParser(v as string);
                     parser.parse();
 
                     let family: string = parser.families[0];
@@ -440,11 +425,11 @@ export class Font {
         }
     }
 
-    public static toJson(font: Font, writer: JsonWriter): void {
-        writer.startObject();
-        writer.string(font.family, 'family');
-        writer.number(font.size, 'size');
-        writer.number(font.style, 'style');
-        writer.endObject();
+    public static toJson(font: Font): Map<string, unknown> {
+        const o = new Map<string, unknown>();
+        o.set('family', font.family);
+        o.set('size', font.size);
+        o.set('style', font.style as number);
+        return o;
     }
 }

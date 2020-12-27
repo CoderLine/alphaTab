@@ -17,7 +17,6 @@
         <Compile Include="../../dist/lib.csharp/src/**/*.cs">
             <Link>Generated\%(RecursiveDir)\%(Filename)%(Extension)</Link>
         </Compile>
-        <Compile Remove="..\..\dist\lib.csharp\src\util\**" />
     </ItemGroup>
 
     <ItemGroup>

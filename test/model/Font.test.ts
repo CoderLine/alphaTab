@@ -1,10 +1,8 @@
-import { JsonReader } from "@src/io/JsonReader";
 import { Font, FontStyle } from "@src/model/Font";
 
 describe('FontTests', () => {
     function parseText(text: string, expected: Font) {
-        const reader = new JsonReader(text);
-        const font = Font.fromJson(reader);
+        const font = Font.fromJson(text);
         expect(font!.family).toEqual(expected.family);
         expect(font!.isBold).toEqual(expected.isBold);
         expect(font!.isItalic).toEqual(expected.isItalic);

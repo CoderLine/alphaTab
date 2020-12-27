@@ -7,8 +7,6 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
 import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
-import { JsonReader } from '@src/io/JsonReader';
-import { JsonWriter } from '@src/io/JsonWriter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
@@ -39,9 +37,7 @@ export class JsonConverter {
      * @returns A serialized score object without ciruclar dependencies that can be used for further serializations.
      */
     public static scoreToJsObject(score: Score): unknown {
-        const writer = new JsonWriter();
-        ScoreSerializer.toJson(score, writer);
-        return writer.result;
+        return ScoreSerializer.toJson(score);
     }
 
     /**
@@ -61,9 +57,9 @@ export class JsonConverter {
      * @param settings The settings to use during conversion.
      * @returns The converted score object.
      */
-    public static jsObjectToScore(jsObject: any, settings?: Settings): Score {
+    public static jsObjectToScore(jsObject: unknown, settings?: Settings): Score {
         let score: Score = new Score();
-        ScoreSerializer.fromJson(score, new JsonReader(jsObject));
+        ScoreSerializer.fromJson(score, jsObject);
         score.finish(settings ?? new Settings());
         return score;
     }
@@ -73,10 +69,8 @@ export class JsonConverter {
      * @param settings The settings object to serialize
      * @returns A serialized settings object without ciruclar dependencies that can be used for further serializations.
      */
-    public static settingsToJsObject(settings: Settings): unknown {
-        const writer = new JsonWriter();
-        SettingsSerializer.toJson(settings, writer);
-        return writer.result;
+    public static settingsToJsObject(settings: Settings): Map<string, unknown> | null {
+        return SettingsSerializer.toJson(settings);
     }
 
     /**
@@ -84,9 +78,9 @@ export class JsonConverter {
     * @param jsObject The javascript object created via {@link Settings}
     * @returns The converted Settings object.
     */
-    public static jsObjectToSettings(jsObject: any): Settings {
+    public static jsObjectToSettings(jsObject: unknown): Settings {
         let settings: Settings = new Settings();
-        SettingsSerializer.fromJson(settings, new JsonReader(jsObject));
+        SettingsSerializer.fromJson(settings, jsObject);
         return settings;
     }
 

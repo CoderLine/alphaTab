@@ -1,7 +1,6 @@
 import { FingeringMode, LayoutMode, LogLevel, NotationMode, Settings, StaveProfile } from "@src/alphatab";
 import { SettingsSerializer } from "@src/generated/SettingsSerializer";
 import { ScoreLoader } from "@src/importer/ScoreLoader";
-import { JsonReader } from "@src/io/JsonReader";
 import { Color } from "@src/model/Color";
 import { Font, FontStyle } from "@src/model/Font";
 import { JsonConverter } from "@src/model/JsonConverter";
@@ -235,11 +234,11 @@ describe('JsonConverterTest', () => {
         raw.set('enableLazyLoading', false);
         // string enum 
         raw.set('logLevel', 'error');
-        raw.set('displayLayoutMode', 1.0);
+        raw.set('displayLayoutMode', 1.0 as number);
 
         // nested
         const display = new Map<string, unknown>();
-        display.set('scale', 5.0);
+        display.set('scale', 5.0 as number);
         raw.set('display', display);
 
         // json_partial_names
@@ -248,7 +247,7 @@ describe('JsonConverterTest', () => {
         // immutable
         raw.set('displayResourcesCopyrightFont', 'italic 18px Roboto');
 
-        SettingsSerializer.fromJson(settings, new JsonReader(raw));
+        SettingsSerializer.fromJson(settings, raw);
 
         expect(settings.core.enableLazyLoading).toEqual(false);
         expect(settings.core.logLevel).toEqual(LogLevel.Error);
@@ -281,7 +280,7 @@ describe('JsonConverterTest', () => {
             displayResourcesCopyrightFont: 'italic 18px Roboto'
         };
 
-        SettingsSerializer.fromJson(settings, new JsonReader(raw));
+        SettingsSerializer.fromJson(settings, raw);
 
         expect(settings.core.enableLazyLoading).toEqual(false);
         expect(settings.core.logLevel).toEqual(LogLevel.Error);

@@ -4,9 +4,7 @@
 // the code is regenerated.
 // </auto-generated>
 import { Track } from "@src/model/Track";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { StaffSerializer } from "@src/generated/model/StaffSerializer";
 import { PlaybackInformationSerializer } from "@src/generated/model/PlaybackInformationSerializer";
 import { Color } from "@src/model/Color";
@@ -14,80 +12,59 @@ import { InstrumentArticulationSerializer } from "@src/generated/model/Instrumen
 import { Staff } from "@src/model/Staff";
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 export class TrackSerializer {
-    public static fromJson(obj: Track, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Track, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Track | null, w: JsonWriter): void {
+    public static toJson(obj: Track | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.index, "index"); 
-        w.prop("staves"); 
-        w.startArray(); 
-        for (const i of obj.staves) {
-            StaffSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.prop("playbackInfo"); 
-        PlaybackInformationSerializer.toJson(obj.playbackInfo, w); 
-        w.prop("color"); 
-        Color.toJson(obj.color, w); 
-        w.string(obj.name, "name"); 
-        w.string(obj.shortName, "shortName"); 
-        w.prop("percussionArticulations"); 
-        w.startArray(); 
-        for (const i of obj.percussionArticulations) {
-            InstrumentArticulationSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("index", obj.index); 
+        o.set("staves", obj.staves.map(i => StaffSerializer.toJson(i))); 
+        o.set("playbackInfo", PlaybackInformationSerializer.toJson(obj.playbackInfo)); 
+        o.set("color", Color.toJson(obj.color)); 
+        o.set("name", obj.name); 
+        o.set("shortName", obj.shortName); 
+        o.set("percussionArticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i))); 
+        return o; 
     }
-    public static setProperty(obj: Track, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Track, property: string, v: unknown): boolean {
         switch (property) {
             case "index":
-                obj.index = (r.number()!);
+                obj.index = (v as number);
                 return true;
             case "staves":
                 obj.staves = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Staff();
-                    StaffSerializer.fromJson(i, r)
+                    StaffSerializer.fromJson(i, o)
                     obj.addStaff(i);
                 }
-                r.endArray();
                 return true;
             case "color":
-                obj.color = (Color.fromJson(r)!);
+                obj.color = (Color.fromJson(v)!);
                 return true;
             case "name":
-                obj.name = (r.string()!);
+                obj.name = (v as string);
                 return true;
             case "shortname":
-                obj.shortName = (r.string()!);
+                obj.shortName = (v as string);
                 return true;
             case "percussionarticulations":
                 obj.percussionArticulations = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new InstrumentArticulation();
-                    InstrumentArticulationSerializer.fromJson(i, r)
+                    InstrumentArticulationSerializer.fromJson(i, o)
                     obj.percussionArticulations.push(i);
                 }
-                r.endArray();
                 return true;
         } 
         if (["playbackinfo"].indexOf(property) >= 0) {
-            PlaybackInformationSerializer.fromJson(obj.playbackInfo, r);
+            PlaybackInformationSerializer.fromJson(obj.playbackInfo, (v as Map<string, unknown>));
             return true;
         } 
         return false; 

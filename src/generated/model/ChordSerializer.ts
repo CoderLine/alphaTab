@@ -4,57 +4,50 @@
 // the code is regenerated.
 // </auto-generated>
 import { Chord } from "@src/model/Chord";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 export class ChordSerializer {
-    public static fromJson(obj: Chord, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Chord, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Chord | null, w: JsonWriter): void {
+    public static toJson(obj: Chord | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.string(obj.name, "name"); 
-        w.number(obj.firstFret, "firstFret"); 
-        w.numberArray(obj.strings, "strings"); 
-        w.numberArray(obj.barreFrets, "barreFrets"); 
-        w.boolean(obj.showName, "showName"); 
-        w.boolean(obj.showDiagram, "showDiagram"); 
-        w.boolean(obj.showFingering, "showFingering"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("name", obj.name); 
+        o.set("firstFret", obj.firstFret); 
+        o.set("strings", obj.strings); 
+        o.set("barreFrets", obj.barreFrets); 
+        o.set("showName", obj.showName); 
+        o.set("showDiagram", obj.showDiagram); 
+        o.set("showFingering", obj.showFingering); 
+        return o; 
     }
-    public static setProperty(obj: Chord, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Chord, property: string, v: unknown): boolean {
         switch (property) {
             case "name":
-                obj.name = (r.string()!);
+                obj.name = (v as string);
                 return true;
             case "firstfret":
-                obj.firstFret = (r.number()!);
+                obj.firstFret = (v as number);
                 return true;
             case "strings":
-                obj.strings = (r.numberArray()!);
+                obj.strings = (v as number[]);
                 return true;
             case "barrefrets":
-                obj.barreFrets = (r.numberArray()!);
+                obj.barreFrets = (v as number[]);
                 return true;
             case "showname":
-                obj.showName = (r.boolean()!);
+                obj.showName = (v as boolean);
                 return true;
             case "showdiagram":
-                obj.showDiagram = (r.boolean()!);
+                obj.showDiagram = (v as boolean);
                 return true;
             case "showfingering":
-                obj.showFingering = (r.boolean()!);
+                obj.showFingering = (v as boolean);
                 return true;
         } 
         return false; 

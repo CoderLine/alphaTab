@@ -4,55 +4,41 @@
 // the code is regenerated.
 // </auto-generated>
 import { Voice } from "@src/model/Voice";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
 import { Beat } from "@src/model/Beat";
 export class VoiceSerializer {
-    public static fromJson(obj: Voice, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Voice, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Voice | null, w: JsonWriter): void {
+    public static toJson(obj: Voice | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.index, "index"); 
-        w.prop("beats"); 
-        w.startArray(); 
-        for (const i of obj.beats) {
-            BeatSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.boolean(obj.isEmpty, "isEmpty"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("index", obj.index); 
+        o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i))); 
+        o.set("isEmpty", obj.isEmpty); 
+        return o; 
     }
-    public static setProperty(obj: Voice, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Voice, property: string, v: unknown): boolean {
         switch (property) {
             case "index":
-                obj.index = (r.number()!);
+                obj.index = (v as number);
                 return true;
             case "beats":
                 obj.beats = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Beat();
-                    BeatSerializer.fromJson(i, r)
+                    BeatSerializer.fromJson(i, o)
                     obj.addBeat(i);
                 }
-                r.endArray();
                 return true;
             case "isempty":
-                obj.isEmpty = (r.boolean()!);
+                obj.isEmpty = (v as boolean);
                 return true;
         } 
         return false; 

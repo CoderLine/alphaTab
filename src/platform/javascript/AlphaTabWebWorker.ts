@@ -6,7 +6,6 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
-import { JsonReader } from '@src/io/JsonReader';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
@@ -91,7 +90,7 @@ export class AlphaTabWebWorker {
     }
 
     private updateSettings(json: unknown): void {
-        SettingsSerializer.fromJson(this._renderer.settings, new JsonReader(json));
+        SettingsSerializer.fromJson(this._renderer.settings, json);
     }
 
     private renderMultiple(score: Score, trackIndexes: number[]): void {

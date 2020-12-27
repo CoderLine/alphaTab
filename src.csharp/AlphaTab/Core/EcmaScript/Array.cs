@@ -11,11 +11,6 @@ namespace AlphaTab.Core.EcmaScript
             return o is IList;
         }
 
-        public static IList<T> From<T>(IList<T> x)
-        {
-            return x;
-        }
-
         public static IList<T> From<T>(IEnumerable<T> x)
         {
             return x.ToList();

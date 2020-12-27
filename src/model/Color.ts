@@ -1,6 +1,4 @@
 import { FormatError } from '@src/FormatError';
-import { JsonReader, JsonValueType } from '@src/io/JsonReader';
-import { JsonWriter } from '@src/io/JsonWriter';
 import { ModelUtils } from './ModelUtils';
 
 /**
@@ -64,18 +62,18 @@ export class Color {
         return new Color((Math.random() * 255) | 0, (Math.random() * 255) | 0, (Math.random() * 255) | 0, opacity);
     }
 
-    public static fromJson(reader: JsonReader): Color | null {
-        switch (reader.currentValueType) {
-            case JsonValueType.Number:
+    public static fromJson(v: unknown): Color | null {
+        switch (typeof v) {
+            case 'number':
                 {
                     const c = new Color(0, 0, 0, 0);
-                    c.raw = reader.number()!;
+                    c.raw = v as number;
                     c.updateRgba();
                     return c;
                 }
-            case JsonValueType.String:
+            case 'string':
                 {
-                    const json = reader.string()!;
+                    const json = v as string;
                     if (json.startsWith('#')) {
                         if (json.length === 4) {
                             // #RGB
@@ -142,7 +140,7 @@ export class Color {
         throw new FormatError('Unsupported format for color');
     }
 
-    public static toJson(obj: Color, writer: JsonWriter): void {
-        writer.number(obj.raw);
+    public static toJson(obj: Color): number {
+        return obj.raw;
     }
 }

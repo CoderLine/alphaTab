@@ -4,80 +4,72 @@
 // the code is regenerated.
 // </auto-generated>
 import { DisplaySettings } from "@src/DisplaySettings";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesSerializer";
 import { LayoutMode } from "@src/DisplaySettings";
 import { StaveProfile } from "@src/DisplaySettings";
 export class DisplaySettingsSerializer {
-    public static fromJson(obj: DisplaySettings, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: DisplaySettings, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: DisplaySettings | null, w: JsonWriter): void {
+    public static toJson(obj: DisplaySettings | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.scale, "scale"); 
-        w.number(obj.stretchForce, "stretchForce"); 
-        w.enum(obj.layoutMode, "layoutMode"); 
-        w.enum(obj.staveProfile, "staveProfile"); 
-        w.number(obj.barsPerRow, "barsPerRow"); 
-        w.number(obj.startBar, "startBar"); 
-        w.number(obj.barCount, "barCount"); 
-        w.number(obj.barCountPerPartial, "barCountPerPartial"); 
-        w.prop("resources"); 
-        RenderingResourcesSerializer.toJson(obj.resources, w); 
-        w.numberArray(obj.padding, "padding"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("scale", obj.scale); 
+        o.set("stretchForce", obj.stretchForce); 
+        o.set("layoutMode", (obj.layoutMode as number)); 
+        o.set("staveProfile", (obj.staveProfile as number)); 
+        o.set("barsPerRow", obj.barsPerRow); 
+        o.set("startBar", obj.startBar); 
+        o.set("barCount", obj.barCount); 
+        o.set("barCountPerPartial", obj.barCountPerPartial); 
+        o.set("resources", RenderingResourcesSerializer.toJson(obj.resources)); 
+        o.set("padding", obj.padding); 
+        return o; 
     }
-    public static setProperty(obj: DisplaySettings, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: DisplaySettings, property: string, v: unknown): boolean {
         switch (property) {
             case "scale":
-                obj.scale = (r.number()!);
+                obj.scale = (v as number);
                 return true;
             case "stretchforce":
-                obj.stretchForce = (r.number()!);
+                obj.stretchForce = (v as number);
                 return true;
             case "layoutmode":
-                obj.layoutMode = (r.enum<LayoutMode>(LayoutMode)!);
+                obj.layoutMode = (JsonHelper.parseEnum<LayoutMode>(v, LayoutMode)!);
                 return true;
             case "staveprofile":
-                obj.staveProfile = (r.enum<StaveProfile>(StaveProfile)!);
+                obj.staveProfile = (JsonHelper.parseEnum<StaveProfile>(v, StaveProfile)!);
                 return true;
             case "barsperrow":
-                obj.barsPerRow = (r.number()!);
+                obj.barsPerRow = (v as number);
                 return true;
             case "startbar":
-                obj.startBar = (r.number()!);
+                obj.startBar = (v as number);
                 return true;
             case "barcount":
-                obj.barCount = (r.number()!);
+                obj.barCount = (v as number);
                 return true;
             case "barcountperpartial":
-                obj.barCountPerPartial = (r.number()!);
+                obj.barCountPerPartial = (v as number);
                 return true;
             case "padding":
-                obj.padding = r.numberArray();
+                obj.padding = (v as number[] | null);
                 return true;
         } 
         if (["resources"].indexOf(property) >= 0) {
-            RenderingResourcesSerializer.fromJson(obj.resources, r);
+            RenderingResourcesSerializer.fromJson(obj.resources, (v as Map<string, unknown>));
             return true;
         }
         else {
             for (const c of ["resources"]) {
                 if (property.indexOf(c) === 0) {
-                    if (RenderingResourcesSerializer.setProperty(obj.resources, property.substring(c.length), r)) {
+                    if (RenderingResourcesSerializer.setProperty(obj.resources, property.substring(c.length), v)) {
                         return true;
                     }
                 }

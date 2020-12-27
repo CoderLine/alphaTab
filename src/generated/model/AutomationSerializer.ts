@@ -4,50 +4,43 @@
 // the code is regenerated.
 // </auto-generated>
 import { Automation } from "@src/model/Automation";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { AutomationType } from "@src/model/Automation";
 export class AutomationSerializer {
-    public static fromJson(obj: Automation, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Automation, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Automation | null, w: JsonWriter): void {
+    public static toJson(obj: Automation | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.boolean(obj.isLinear, "isLinear"); 
-        w.enum(obj.type, "type"); 
-        w.number(obj.value, "value"); 
-        w.number(obj.ratioPosition, "ratioPosition"); 
-        w.string(obj.text, "text"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("isLinear", obj.isLinear); 
+        o.set("type", (obj.type as number)); 
+        o.set("value", obj.value); 
+        o.set("ratioPosition", obj.ratioPosition); 
+        o.set("text", obj.text); 
+        return o; 
     }
-    public static setProperty(obj: Automation, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Automation, property: string, v: unknown): boolean {
         switch (property) {
             case "islinear":
-                obj.isLinear = (r.boolean()!);
+                obj.isLinear = (v as boolean);
                 return true;
             case "type":
-                obj.type = (r.enum<AutomationType>(AutomationType)!);
+                obj.type = (JsonHelper.parseEnum<AutomationType>(v, AutomationType)!);
                 return true;
             case "value":
-                obj.value = (r.number()!);
+                obj.value = (v as number);
                 return true;
             case "ratioposition":
-                obj.ratioPosition = (r.number()!);
+                obj.ratioPosition = (v as number);
                 return true;
             case "text":
-                obj.text = (r.string()!);
+                obj.text = (v as string);
                 return true;
         } 
         return false; 

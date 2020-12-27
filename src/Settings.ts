@@ -3,23 +3,12 @@ import { DisplaySettings } from '@src/DisplaySettings';
 import { ImporterSettings } from '@src/ImporterSettings';
 import { FingeringMode, NotationMode, NotationSettings, NotationElement } from '@src/NotationSettings';
 import { PlayerSettings } from '@src/PlayerSettings';
-import { SettingsSerializer } from './generated/SettingsSerializer';
-import { JsonReader } from './io/JsonReader';
 
 /**
  * This public class contains instance specific settings for alphaTab
  * @json
  */
 export class Settings {
-    /**
-     * @target web
-     */
-    public fillFromDataAttributes(dataAttributes: Map<string, unknown>): void {
-        dataAttributes.forEach((v, k) => {
-            SettingsSerializer.setProperty(this, k.toLowerCase(), new JsonReader(v));
-        });
-    }
-
     /**
      * The core settings control the general behavior of alphatab like
      * what modules are active.

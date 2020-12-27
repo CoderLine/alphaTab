@@ -59,9 +59,9 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     private serializeSettingsForWorker(settings: Settings): unknown {
-        const jsObject = JsonConverter.settingsToJsObject(settings);
+        const jsObject = JsonConverter.settingsToJsObject(settings)!;
         // cut out player settings, they are only needed on UI thread side
-        delete (jsObject as any).player;
+        jsObject.delete('player');
         return jsObject;
     }
 

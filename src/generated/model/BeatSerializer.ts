@@ -4,9 +4,7 @@
 // the code is regenerated.
 // </auto-generated>
 import { Beat } from "@src/model/Beat";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { NoteSerializer } from "@src/generated/model/NoteSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
@@ -26,217 +24,191 @@ import { DynamicValue } from "@src/model/DynamicValue";
 import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
 export class BeatSerializer {
-    public static fromJson(obj: Beat, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Beat, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Beat | null, w: JsonWriter): void {
+    public static toJson(obj: Beat | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.id, "id"); 
-        w.number(obj.index, "index"); 
-        w.prop("notes"); 
-        w.startArray(); 
-        for (const i of obj.notes) {
-            NoteSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.boolean(obj.isEmpty, "isEmpty"); 
-        w.enum(obj.whammyStyle, "whammyStyle"); 
-        w.enum(obj.ottava, "ottava"); 
-        w.boolean(obj.isLegatoOrigin, "isLegatoOrigin"); 
-        w.enum(obj.duration, "duration"); 
-        w.prop("automations"); 
-        w.startArray(); 
-        for (const i of obj.automations) {
-            AutomationSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.number(obj.dots, "dots"); 
-        w.boolean(obj.fadeIn, "fadeIn"); 
-        w.stringArray(obj.lyrics, "lyrics"); 
-        w.boolean(obj.hasRasgueado, "hasRasgueado"); 
-        w.boolean(obj.pop, "pop"); 
-        w.boolean(obj.slap, "slap"); 
-        w.boolean(obj.tap, "tap"); 
-        w.string(obj.text, "text"); 
-        w.enum(obj.brushType, "brushType"); 
-        w.number(obj.brushDuration, "brushDuration"); 
-        w.number(obj.tupletDenominator, "tupletDenominator"); 
-        w.number(obj.tupletNumerator, "tupletNumerator"); 
-        w.boolean(obj.isContinuedWhammy, "isContinuedWhammy"); 
-        w.enum(obj.whammyBarType, "whammyBarType"); 
-        w.prop("whammyBarPoints"); 
-        w.startArray(); 
-        for (const i of obj.whammyBarPoints) {
-            BendPointSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.enum(obj.vibrato, "vibrato"); 
-        w.string(obj.chordId, "chordId"); 
-        w.enum(obj.graceType, "graceType"); 
-        w.enum(obj.pickStroke, "pickStroke"); 
-        w.enum(obj.tremoloSpeed, "tremoloSpeed"); 
-        w.enum(obj.crescendo, "crescendo"); 
-        w.number(obj.displayStart, "displayStart"); 
-        w.number(obj.playbackStart, "playbackStart"); 
-        w.number(obj.displayDuration, "displayDuration"); 
-        w.number(obj.playbackDuration, "playbackDuration"); 
-        w.enum(obj.dynamics, "dynamics"); 
-        w.boolean(obj.invertBeamDirection, "invertBeamDirection"); 
-        w.enum(obj.preferredBeamDirection, "preferredBeamDirection"); 
-        w.boolean(obj.isEffectSlurOrigin, "isEffectSlurOrigin"); 
-        w.enum(obj.beamingMode, "beamingMode"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("id", obj.id); 
+        o.set("index", obj.index); 
+        o.set("notes", obj.notes.map(i => NoteSerializer.toJson(i))); 
+        o.set("isEmpty", obj.isEmpty); 
+        o.set("whammyStyle", (obj.whammyStyle as number)); 
+        o.set("ottava", (obj.ottava as number)); 
+        o.set("isLegatoOrigin", obj.isLegatoOrigin); 
+        o.set("duration", (obj.duration as number)); 
+        o.set("automations", obj.automations.map(i => AutomationSerializer.toJson(i))); 
+        o.set("dots", obj.dots); 
+        o.set("fadeIn", obj.fadeIn); 
+        o.set("lyrics", obj.lyrics); 
+        o.set("hasRasgueado", obj.hasRasgueado); 
+        o.set("pop", obj.pop); 
+        o.set("slap", obj.slap); 
+        o.set("tap", obj.tap); 
+        o.set("text", obj.text); 
+        o.set("brushType", (obj.brushType as number)); 
+        o.set("brushDuration", obj.brushDuration); 
+        o.set("tupletDenominator", obj.tupletDenominator); 
+        o.set("tupletNumerator", obj.tupletNumerator); 
+        o.set("isContinuedWhammy", obj.isContinuedWhammy); 
+        o.set("whammyBarType", (obj.whammyBarType as number)); 
+        o.set("whammyBarPoints", obj.whammyBarPoints.map(i => BendPointSerializer.toJson(i))); 
+        o.set("vibrato", (obj.vibrato as number)); 
+        o.set("chordId", obj.chordId); 
+        o.set("graceType", (obj.graceType as number)); 
+        o.set("pickStroke", (obj.pickStroke as number)); 
+        o.set("tremoloSpeed", (obj.tremoloSpeed as number | null)); 
+        o.set("crescendo", (obj.crescendo as number)); 
+        o.set("displayStart", obj.displayStart); 
+        o.set("playbackStart", obj.playbackStart); 
+        o.set("displayDuration", obj.displayDuration); 
+        o.set("playbackDuration", obj.playbackDuration); 
+        o.set("dynamics", (obj.dynamics as number)); 
+        o.set("invertBeamDirection", obj.invertBeamDirection); 
+        o.set("preferredBeamDirection", (obj.preferredBeamDirection as number | null)); 
+        o.set("isEffectSlurOrigin", obj.isEffectSlurOrigin); 
+        o.set("beamingMode", (obj.beamingMode as number)); 
+        return o; 
     }
-    public static setProperty(obj: Beat, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Beat, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (r.number()!);
+                obj.id = (v as number);
                 return true;
             case "index":
-                obj.index = (r.number()!);
+                obj.index = (v as number);
                 return true;
             case "notes":
                 obj.notes = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Note();
-                    NoteSerializer.fromJson(i, r)
+                    NoteSerializer.fromJson(i, o)
                     obj.addNote(i);
                 }
-                r.endArray();
                 return true;
             case "isempty":
-                obj.isEmpty = (r.boolean()!);
+                obj.isEmpty = (v as boolean);
                 return true;
             case "whammystyle":
-                obj.whammyStyle = (r.enum<BendStyle>(BendStyle)!);
+                obj.whammyStyle = (JsonHelper.parseEnum<BendStyle>(v, BendStyle)!);
                 return true;
             case "ottava":
-                obj.ottava = (r.enum<Ottavia>(Ottavia)!);
+                obj.ottava = (JsonHelper.parseEnum<Ottavia>(v, Ottavia)!);
                 return true;
             case "islegatoorigin":
-                obj.isLegatoOrigin = (r.boolean()!);
+                obj.isLegatoOrigin = (v as boolean);
                 return true;
             case "duration":
-                obj.duration = (r.enum<Duration>(Duration)!);
+                obj.duration = (JsonHelper.parseEnum<Duration>(v, Duration)!);
                 return true;
             case "automations":
                 obj.automations = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Automation();
-                    AutomationSerializer.fromJson(i, r)
+                    AutomationSerializer.fromJson(i, o)
                     obj.automations.push(i);
                 }
-                r.endArray();
                 return true;
             case "dots":
-                obj.dots = (r.number()!);
+                obj.dots = (v as number);
                 return true;
             case "fadein":
-                obj.fadeIn = (r.boolean()!);
+                obj.fadeIn = (v as boolean);
                 return true;
             case "lyrics":
-                obj.lyrics = r.stringArray();
+                obj.lyrics = (v as string[] | null);
                 return true;
             case "hasrasgueado":
-                obj.hasRasgueado = (r.boolean()!);
+                obj.hasRasgueado = (v as boolean);
                 return true;
             case "pop":
-                obj.pop = (r.boolean()!);
+                obj.pop = (v as boolean);
                 return true;
             case "slap":
-                obj.slap = (r.boolean()!);
+                obj.slap = (v as boolean);
                 return true;
             case "tap":
-                obj.tap = (r.boolean()!);
+                obj.tap = (v as boolean);
                 return true;
             case "text":
-                obj.text = r.string();
+                obj.text = (v as string | null);
                 return true;
             case "brushtype":
-                obj.brushType = (r.enum<BrushType>(BrushType)!);
+                obj.brushType = (JsonHelper.parseEnum<BrushType>(v, BrushType)!);
                 return true;
             case "brushduration":
-                obj.brushDuration = (r.number()!);
+                obj.brushDuration = (v as number);
                 return true;
             case "tupletdenominator":
-                obj.tupletDenominator = (r.number()!);
+                obj.tupletDenominator = (v as number);
                 return true;
             case "tupletnumerator":
-                obj.tupletNumerator = (r.number()!);
+                obj.tupletNumerator = (v as number);
                 return true;
             case "iscontinuedwhammy":
-                obj.isContinuedWhammy = (r.boolean()!);
+                obj.isContinuedWhammy = (v as boolean);
                 return true;
             case "whammybartype":
-                obj.whammyBarType = (r.enum<WhammyType>(WhammyType)!);
+                obj.whammyBarType = (JsonHelper.parseEnum<WhammyType>(v, WhammyType)!);
                 return true;
             case "whammybarpoints":
                 obj.whammyBarPoints = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new BendPoint();
-                    BendPointSerializer.fromJson(i, r)
+                    BendPointSerializer.fromJson(i, o)
                     obj.addWhammyBarPoint(i);
                 }
-                r.endArray();
                 return true;
             case "vibrato":
-                obj.vibrato = (r.enum<VibratoType>(VibratoType)!);
+                obj.vibrato = (JsonHelper.parseEnum<VibratoType>(v, VibratoType)!);
                 return true;
             case "chordid":
-                obj.chordId = r.string();
+                obj.chordId = (v as string | null);
                 return true;
             case "gracetype":
-                obj.graceType = (r.enum<GraceType>(GraceType)!);
+                obj.graceType = (JsonHelper.parseEnum<GraceType>(v, GraceType)!);
                 return true;
             case "pickstroke":
-                obj.pickStroke = (r.enum<PickStroke>(PickStroke)!);
+                obj.pickStroke = (JsonHelper.parseEnum<PickStroke>(v, PickStroke)!);
                 return true;
             case "tremolospeed":
-                obj.tremoloSpeed = r.enum<Duration>(Duration);
+                obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(v, Duration);
                 return true;
             case "crescendo":
-                obj.crescendo = (r.enum<CrescendoType>(CrescendoType)!);
+                obj.crescendo = (JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!);
                 return true;
             case "displaystart":
-                obj.displayStart = (r.number()!);
+                obj.displayStart = (v as number);
                 return true;
             case "playbackstart":
-                obj.playbackStart = (r.number()!);
+                obj.playbackStart = (v as number);
                 return true;
             case "displayduration":
-                obj.displayDuration = (r.number()!);
+                obj.displayDuration = (v as number);
                 return true;
             case "playbackduration":
-                obj.playbackDuration = (r.number()!);
+                obj.playbackDuration = (v as number);
                 return true;
             case "dynamics":
-                obj.dynamics = (r.enum<DynamicValue>(DynamicValue)!);
+                obj.dynamics = (JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!);
                 return true;
             case "invertbeamdirection":
-                obj.invertBeamDirection = (r.boolean()!);
+                obj.invertBeamDirection = (v as boolean);
                 return true;
             case "preferredbeamdirection":
-                obj.preferredBeamDirection = r.enum<BeamDirection>(BeamDirection);
+                obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(v, BeamDirection);
                 return true;
             case "iseffectslurorigin":
-                obj.isEffectSlurOrigin = (r.boolean()!);
+                obj.isEffectSlurOrigin = (v as boolean);
                 return true;
             case "beamingmode":
-                obj.beamingMode = (r.enum<BeatBeamingMode>(BeatBeamingMode)!);
+                obj.beamingMode = (JsonHelper.parseEnum<BeatBeamingMode>(v, BeatBeamingMode)!);
                 return true;
         } 
         return false; 

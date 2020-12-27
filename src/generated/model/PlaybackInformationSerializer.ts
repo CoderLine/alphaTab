@@ -4,61 +4,54 @@
 // the code is regenerated.
 // </auto-generated>
 import { PlaybackInformation } from "@src/model/PlaybackInformation";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 export class PlaybackInformationSerializer {
-    public static fromJson(obj: PlaybackInformation, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: PlaybackInformation, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: PlaybackInformation | null, w: JsonWriter): void {
+    public static toJson(obj: PlaybackInformation | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.volume, "volume"); 
-        w.number(obj.balance, "balance"); 
-        w.number(obj.port, "port"); 
-        w.number(obj.program, "program"); 
-        w.number(obj.primaryChannel, "primaryChannel"); 
-        w.number(obj.secondaryChannel, "secondaryChannel"); 
-        w.boolean(obj.isMute, "isMute"); 
-        w.boolean(obj.isSolo, "isSolo"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("volume", obj.volume); 
+        o.set("balance", obj.balance); 
+        o.set("port", obj.port); 
+        o.set("program", obj.program); 
+        o.set("primaryChannel", obj.primaryChannel); 
+        o.set("secondaryChannel", obj.secondaryChannel); 
+        o.set("isMute", obj.isMute); 
+        o.set("isSolo", obj.isSolo); 
+        return o; 
     }
-    public static setProperty(obj: PlaybackInformation, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: PlaybackInformation, property: string, v: unknown): boolean {
         switch (property) {
             case "volume":
-                obj.volume = (r.number()!);
+                obj.volume = (v as number);
                 return true;
             case "balance":
-                obj.balance = (r.number()!);
+                obj.balance = (v as number);
                 return true;
             case "port":
-                obj.port = (r.number()!);
+                obj.port = (v as number);
                 return true;
             case "program":
-                obj.program = (r.number()!);
+                obj.program = (v as number);
                 return true;
             case "primarychannel":
-                obj.primaryChannel = (r.number()!);
+                obj.primaryChannel = (v as number);
                 return true;
             case "secondarychannel":
-                obj.secondaryChannel = (r.number()!);
+                obj.secondaryChannel = (v as number);
                 return true;
             case "ismute":
-                obj.isMute = (r.boolean()!);
+                obj.isMute = (v as boolean);
                 return true;
             case "issolo":
-                obj.isSolo = (r.boolean()!);
+                obj.isSolo = (v as boolean);
                 return true;
         } 
         return false; 

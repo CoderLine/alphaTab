@@ -4,37 +4,30 @@
 // the code is regenerated.
 // </auto-generated>
 import { Section } from "@src/model/Section";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 export class SectionSerializer {
-    public static fromJson(obj: Section, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Section, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Section | null, w: JsonWriter): void {
+    public static toJson(obj: Section | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.string(obj.marker, "marker"); 
-        w.string(obj.text, "text"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("marker", obj.marker); 
+        o.set("text", obj.text); 
+        return o; 
     }
-    public static setProperty(obj: Section, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Section, property: string, v: unknown): boolean {
         switch (property) {
             case "marker":
-                obj.marker = (r.string()!);
+                obj.marker = (v as string);
                 return true;
             case "text":
-                obj.text = (r.string()!);
+                obj.text = (v as string);
                 return true;
         } 
         return false; 

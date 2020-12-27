@@ -4,70 +4,56 @@
 // the code is regenerated.
 // </auto-generated>
 import { Bar } from "@src/model/Bar";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
 import { Clef } from "@src/model/Clef";
 import { Ottavia } from "@src/model/Ottavia";
 import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
 export class BarSerializer {
-    public static fromJson(obj: Bar, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Bar, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Bar | null, w: JsonWriter): void {
+    public static toJson(obj: Bar | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.id, "id"); 
-        w.number(obj.index, "index"); 
-        w.enum(obj.clef, "clef"); 
-        w.enum(obj.clefOttava, "clefOttava"); 
-        w.prop("voices"); 
-        w.startArray(); 
-        for (const i of obj.voices) {
-            VoiceSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.enum(obj.simileMark, "simileMark"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("id", obj.id); 
+        o.set("index", obj.index); 
+        o.set("clef", (obj.clef as number)); 
+        o.set("clefOttava", (obj.clefOttava as number)); 
+        o.set("voices", obj.voices.map(i => VoiceSerializer.toJson(i))); 
+        o.set("simileMark", (obj.simileMark as number)); 
+        return o; 
     }
-    public static setProperty(obj: Bar, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Bar, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (r.number()!);
+                obj.id = (v as number);
                 return true;
             case "index":
-                obj.index = (r.number()!);
+                obj.index = (v as number);
                 return true;
             case "clef":
-                obj.clef = (r.enum<Clef>(Clef)!);
+                obj.clef = (JsonHelper.parseEnum<Clef>(v, Clef)!);
                 return true;
             case "clefottava":
-                obj.clefOttava = (r.enum<Ottavia>(Ottavia)!);
+                obj.clefOttava = (JsonHelper.parseEnum<Ottavia>(v, Ottavia)!);
                 return true;
             case "voices":
                 obj.voices = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Voice();
-                    VoiceSerializer.fromJson(i, r)
+                    VoiceSerializer.fromJson(i, o)
                     obj.addVoice(i);
                 }
-                r.endArray();
                 return true;
             case "similemark":
-                obj.simileMark = (r.enum<SimileMark>(SimileMark)!);
+                obj.simileMark = (JsonHelper.parseEnum<SimileMark>(v, SimileMark)!);
                 return true;
         } 
         return false; 

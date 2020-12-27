@@ -4,107 +4,98 @@
 // the code is regenerated.
 // </auto-generated>
 import { PlayerSettings } from "@src/PlayerSettings";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
-import { VibratoPlaybackSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
-import { SlidePlaybackSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
+import { JsonHelper } from "@src/io/JsonHelper";
+import { VibratoPlaybackSettingsSerializer } from "@src/generated/VibratoPlaybackSettingsSerializer";
+import { SlidePlaybackSettingsSerializer } from "@src/generated/SlidePlaybackSettingsSerializer";
 import { ScrollMode } from "@src/PlayerSettings";
 export class PlayerSettingsSerializer {
-    public static fromJson(obj: PlayerSettings, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: PlayerSettings, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: PlayerSettings | null, w: JsonWriter): void {
+    public static toJson(obj: PlayerSettings | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.string(obj.soundFont, "soundFont"); 
-        w.string(obj.scrollElement, "scrollElement"); 
-        w.boolean(obj.enablePlayer, "enablePlayer"); 
-        w.boolean(obj.enableCursor, "enableCursor"); 
-        w.boolean(obj.enableUserInteraction, "enableUserInteraction"); 
-        w.number(obj.scrollOffsetX, "scrollOffsetX"); 
-        w.number(obj.scrollOffsetY, "scrollOffsetY"); 
-        w.enum(obj.scrollMode, "scrollMode"); 
-        w.number(obj.scrollSpeed, "scrollSpeed"); 
-        w.number(obj.songBookBendDuration, "songBookBendDuration"); 
-        w.number(obj.songBookDipDuration, "songBookDipDuration"); 
-        w.prop("vibrato"); 
-        VibratoPlaybackSettingsSerializer.toJson(obj.vibrato, w); 
-        w.prop("slide"); 
-        SlidePlaybackSettingsSerializer.toJson(obj.slide, w); 
-        w.boolean(obj.playTripletFeel, "playTripletFeel"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("soundFont", obj.soundFont); 
+        o.set("scrollElement", obj.scrollElement); 
+        o.set("enablePlayer", obj.enablePlayer); 
+        o.set("enableCursor", obj.enableCursor); 
+        o.set("enableUserInteraction", obj.enableUserInteraction); 
+        o.set("scrollOffsetX", obj.scrollOffsetX); 
+        o.set("scrollOffsetY", obj.scrollOffsetY); 
+        o.set("scrollMode", (obj.scrollMode as number)); 
+        o.set("scrollSpeed", obj.scrollSpeed); 
+        o.set("songBookBendDuration", obj.songBookBendDuration); 
+        o.set("songBookDipDuration", obj.songBookDipDuration); 
+        o.set("vibrato", VibratoPlaybackSettingsSerializer.toJson(obj.vibrato)); 
+        o.set("slide", SlidePlaybackSettingsSerializer.toJson(obj.slide)); 
+        o.set("playTripletFeel", obj.playTripletFeel); 
+        return o; 
     }
-    public static setProperty(obj: PlayerSettings, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "soundfont":
-                obj.soundFont = r.string();
+                obj.soundFont = (v as string | null);
                 return true;
             case "scrollelement":
-                obj.scrollElement = (r.string()!);
+                obj.scrollElement = (v as string);
                 return true;
             case "enableplayer":
-                obj.enablePlayer = (r.boolean()!);
+                obj.enablePlayer = (v as boolean);
                 return true;
             case "enablecursor":
-                obj.enableCursor = (r.boolean()!);
+                obj.enableCursor = (v as boolean);
                 return true;
             case "enableuserinteraction":
-                obj.enableUserInteraction = (r.boolean()!);
+                obj.enableUserInteraction = (v as boolean);
                 return true;
             case "scrolloffsetx":
-                obj.scrollOffsetX = (r.number()!);
+                obj.scrollOffsetX = (v as number);
                 return true;
             case "scrolloffsety":
-                obj.scrollOffsetY = (r.number()!);
+                obj.scrollOffsetY = (v as number);
                 return true;
             case "scrollmode":
-                obj.scrollMode = (r.enum<ScrollMode>(ScrollMode)!);
+                obj.scrollMode = (JsonHelper.parseEnum<ScrollMode>(v, ScrollMode)!);
                 return true;
             case "scrollspeed":
-                obj.scrollSpeed = (r.number()!);
+                obj.scrollSpeed = (v as number);
                 return true;
             case "songbookbendduration":
-                obj.songBookBendDuration = (r.number()!);
+                obj.songBookBendDuration = (v as number);
                 return true;
             case "songbookdipduration":
-                obj.songBookDipDuration = (r.number()!);
+                obj.songBookDipDuration = (v as number);
                 return true;
             case "playtripletfeel":
-                obj.playTripletFeel = (r.boolean()!);
+                obj.playTripletFeel = (v as boolean);
                 return true;
         } 
         if (["vibrato"].indexOf(property) >= 0) {
-            VibratoPlaybackSettingsSerializer.fromJson(obj.vibrato, r);
+            VibratoPlaybackSettingsSerializer.fromJson(obj.vibrato, (v as Map<string, unknown>));
             return true;
         }
         else {
             for (const c of ["vibrato"]) {
                 if (property.indexOf(c) === 0) {
-                    if (VibratoPlaybackSettingsSerializer.setProperty(obj.vibrato, property.substring(c.length), r)) {
+                    if (VibratoPlaybackSettingsSerializer.setProperty(obj.vibrato, property.substring(c.length), v)) {
                         return true;
                     }
                 }
             }
         } 
         if (["slide"].indexOf(property) >= 0) {
-            SlidePlaybackSettingsSerializer.fromJson(obj.slide, r);
+            SlidePlaybackSettingsSerializer.fromJson(obj.slide, (v as Map<string, unknown>));
             return true;
         }
         else {
             for (const c of ["slide"]) {
                 if (property.indexOf(c) === 0) {
-                    if (SlidePlaybackSettingsSerializer.setProperty(obj.slide, property.substring(c.length), r)) {
+                    if (SlidePlaybackSettingsSerializer.setProperty(obj.slide, property.substring(c.length), v)) {
                         return true;
                     }
                 }

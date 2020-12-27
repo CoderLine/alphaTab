@@ -4,103 +4,88 @@
 // the code is regenerated.
 // </auto-generated>
 import { Staff } from "@src/model/Staff";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { BarSerializer } from "@src/generated/model/BarSerializer";
 import { ChordSerializer } from "@src/generated/model/ChordSerializer";
 import { Bar } from "@src/model/Bar";
 import { Chord } from "@src/model/Chord";
 export class StaffSerializer {
-    public static fromJson(obj: Staff, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Staff, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Staff | null, w: JsonWriter): void {
+    public static toJson(obj: Staff | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.index, "index"); 
-        w.prop("bars"); 
-        w.startArray(); 
-        for (const i of obj.bars) {
-            BarSerializer.toJson(i, w);
+        const o = new Map<string, unknown>(); 
+        o.set("index", obj.index); 
+        o.set("bars", obj.bars.map(i => BarSerializer.toJson(i))); 
+        {
+            const m = new Map<string, unknown>();
+            o.set("chords", m);
+            obj.chords.forEach((v, k) => m.set(k.toString(), ChordSerializer.toJson(v)));
         } 
-        w.endArray(); 
-        w.prop("chords"); 
-        w.startObject(); 
-        obj.chords.forEach((v, k) => { w.prop(k); ChordSerializer.toJson(v, w); }); 
-        w.endObject(); 
-        w.number(obj.capo, "capo"); 
-        w.number(obj.transpositionPitch, "transpositionPitch"); 
-        w.number(obj.displayTranspositionPitch, "displayTranspositionPitch"); 
-        w.numberArray(obj.tuning, "tuning"); 
-        w.string(obj.tuningName, "tuningName"); 
-        w.boolean(obj.showTablature, "showTablature"); 
-        w.boolean(obj.showStandardNotation, "showStandardNotation"); 
-        w.boolean(obj.isPercussion, "isPercussion"); 
-        w.number(obj.standardNotationLineCount, "standardNotationLineCount"); 
-        w.endObject(); 
+        o.set("capo", obj.capo); 
+        o.set("transpositionPitch", obj.transpositionPitch); 
+        o.set("displayTranspositionPitch", obj.displayTranspositionPitch); 
+        o.set("tuning", obj.tuning); 
+        o.set("tuningName", obj.tuningName); 
+        o.set("showTablature", obj.showTablature); 
+        o.set("showStandardNotation", obj.showStandardNotation); 
+        o.set("isPercussion", obj.isPercussion); 
+        o.set("standardNotationLineCount", obj.standardNotationLineCount); 
+        return o; 
     }
-    public static setProperty(obj: Staff, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Staff, property: string, v: unknown): boolean {
         switch (property) {
             case "index":
-                obj.index = (r.number()!);
+                obj.index = (v as number);
                 return true;
             case "bars":
                 obj.bars = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Bar();
-                    BarSerializer.fromJson(i, r)
+                    BarSerializer.fromJson(i, o)
                     obj.addBar(i);
                 }
-                r.endArray();
                 return true;
             case "chords":
                 obj.chords = new Map<string, Chord>();
-                r.startObject();
-                while (r.nextProp()) {
-                    const i = new Chord();
-                    ChordSerializer.fromJson(i, r);
-                    obj.addChord(r.prop(), i);
-                }
-                r.endObject();
+                (v as Map<string, unknown>).forEach((v, k) => {
+                    const i = new Chord(); 
+                    ChordSerializer.fromJson(i, (v as Map<string, unknown>)); 
+                    obj.addChord(k, i); 
+                });
                 return true;
             case "capo":
-                obj.capo = (r.number()!);
+                obj.capo = (v as number);
                 return true;
             case "transpositionpitch":
-                obj.transpositionPitch = (r.number()!);
+                obj.transpositionPitch = (v as number);
                 return true;
             case "displaytranspositionpitch":
-                obj.displayTranspositionPitch = (r.number()!);
+                obj.displayTranspositionPitch = (v as number);
                 return true;
             case "tuning":
-                obj.tuning = (r.numberArray()!);
+                obj.tuning = (v as number[]);
                 return true;
             case "tuningname":
-                obj.tuningName = (r.string()!);
+                obj.tuningName = (v as string);
                 return true;
             case "showtablature":
-                obj.showTablature = (r.boolean()!);
+                obj.showTablature = (v as boolean);
                 return true;
             case "showstandardnotation":
-                obj.showStandardNotation = (r.boolean()!);
+                obj.showStandardNotation = (v as boolean);
                 return true;
             case "ispercussion":
-                obj.isPercussion = (r.boolean()!);
+                obj.isPercussion = (v as boolean);
                 return true;
             case "standardnotationlinecount":
-                obj.standardNotationLineCount = (r.number()!);
+                obj.standardNotationLineCount = (v as number);
                 return true;
         } 
         return false; 

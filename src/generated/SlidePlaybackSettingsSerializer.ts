@@ -4,41 +4,34 @@
 // the code is regenerated.
 // </auto-generated>
 import { SlidePlaybackSettings } from "@src/PlayerSettings";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 export class SlidePlaybackSettingsSerializer {
-    public static fromJson(obj: SlidePlaybackSettings, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: SlidePlaybackSettings, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: SlidePlaybackSettings | null, w: JsonWriter): void {
+    public static toJson(obj: SlidePlaybackSettings | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.simpleSlidePitchOffset, "simpleSlidePitchOffset"); 
-        w.number(obj.simpleSlideDurationRatio, "simpleSlideDurationRatio"); 
-        w.number(obj.shiftSlideDurationRatio, "shiftSlideDurationRatio"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("simpleSlidePitchOffset", obj.simpleSlidePitchOffset); 
+        o.set("simpleSlideDurationRatio", obj.simpleSlideDurationRatio); 
+        o.set("shiftSlideDurationRatio", obj.shiftSlideDurationRatio); 
+        return o; 
     }
-    public static setProperty(obj: SlidePlaybackSettings, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: SlidePlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "simpleslidepitchoffset":
-                obj.simpleSlidePitchOffset = (r.number()!);
+                obj.simpleSlidePitchOffset = (v as number);
                 return true;
             case "simpleslidedurationratio":
-                obj.simpleSlideDurationRatio = (r.number()!);
+                obj.simpleSlideDurationRatio = (v as number);
                 return true;
             case "shiftslidedurationratio":
-                obj.shiftSlideDurationRatio = (r.number()!);
+                obj.shiftSlideDurationRatio = (v as number);
                 return true;
         } 
         return false; 

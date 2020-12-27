@@ -4,9 +4,7 @@
 // the code is regenerated.
 // </auto-generated>
 import { Note } from "@src/model/Note";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
 import { AccentuationType } from "@src/model/AccentuationType";
 import { BendType } from "@src/model/BendType";
@@ -21,209 +19,197 @@ import { Duration } from "@src/model/Duration";
 import { NoteAccidentalMode } from "@src/model/NoteAccidentalMode";
 import { DynamicValue } from "@src/model/DynamicValue";
 export class NoteSerializer {
-    public static fromJson(obj: Note, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Note, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Note | null, w: JsonWriter): void {
+    public static toJson(obj: Note | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.id, "id"); 
-        w.number(obj.index, "index"); 
-        w.enum(obj.accentuated, "accentuated"); 
-        w.enum(obj.bendType, "bendType"); 
-        w.enum(obj.bendStyle, "bendStyle"); 
-        w.boolean(obj.isContinuedBend, "isContinuedBend"); 
-        w.prop("bendPoints"); 
-        w.startArray(); 
-        for (const i of obj.bendPoints) {
-            BendPointSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.number(obj.fret, "fret"); 
-        w.number(obj.string, "string"); 
-        w.number(obj.octave, "octave"); 
-        w.number(obj.tone, "tone"); 
-        w.number(obj.percussionArticulation, "percussionArticulation"); 
-        w.boolean(obj.isVisible, "isVisible"); 
-        w.boolean(obj.isLeftHandTapped, "isLeftHandTapped"); 
-        w.boolean(obj.isHammerPullOrigin, "isHammerPullOrigin"); 
-        w.number(obj.hammerPullOriginNoteId, "hammerPullOriginNoteId"); 
-        w.number(obj.hammerPullDestinationNoteId, "hammerPullDestinationNoteId"); 
-        w.boolean(obj.isSlurDestination, "isSlurDestination"); 
-        w.number(obj.slurOriginNoteId, "slurOriginNoteId"); 
-        w.number(obj.slurDestinationNoteId, "slurDestinationNoteId"); 
-        w.enum(obj.harmonicType, "harmonicType"); 
-        w.number(obj.harmonicValue, "harmonicValue"); 
-        w.boolean(obj.isGhost, "isGhost"); 
-        w.boolean(obj.isLetRing, "isLetRing"); 
-        w.boolean(obj.isPalmMute, "isPalmMute"); 
-        w.boolean(obj.isDead, "isDead"); 
-        w.boolean(obj.isStaccato, "isStaccato"); 
-        w.enum(obj.slideInType, "slideInType"); 
-        w.enum(obj.slideOutType, "slideOutType"); 
-        w.enum(obj.vibrato, "vibrato"); 
-        w.number(obj.tieOriginNoteId, "tieOriginNoteId"); 
-        w.number(obj.tieDestinationNoteId, "tieDestinationNoteId"); 
-        w.boolean(obj.isTieDestination, "isTieDestination"); 
-        w.enum(obj.leftHandFinger, "leftHandFinger"); 
-        w.enum(obj.rightHandFinger, "rightHandFinger"); 
-        w.boolean(obj.isFingering, "isFingering"); 
-        w.number(obj.trillValue, "trillValue"); 
-        w.enum(obj.trillSpeed, "trillSpeed"); 
-        w.number(obj.durationPercent, "durationPercent"); 
-        w.enum(obj.accidentalMode, "accidentalMode"); 
-        w.enum(obj.dynamics, "dynamics"); 
-        w.boolean(obj.isEffectSlurOrigin, "isEffectSlurOrigin"); 
-        w.boolean(obj.hasEffectSlur, "hasEffectSlur"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("id", obj.id); 
+        o.set("index", obj.index); 
+        o.set("accentuated", (obj.accentuated as number)); 
+        o.set("bendType", (obj.bendType as number)); 
+        o.set("bendStyle", (obj.bendStyle as number)); 
+        o.set("isContinuedBend", obj.isContinuedBend); 
+        o.set("bendPoints", obj.bendPoints.map(i => BendPointSerializer.toJson(i))); 
+        o.set("fret", obj.fret); 
+        o.set("string", obj.string); 
+        o.set("octave", obj.octave); 
+        o.set("tone", obj.tone); 
+        o.set("percussionArticulation", obj.percussionArticulation); 
+        o.set("isVisible", obj.isVisible); 
+        o.set("isLeftHandTapped", obj.isLeftHandTapped); 
+        o.set("isHammerPullOrigin", obj.isHammerPullOrigin); 
+        o.set("hammerPullOriginNoteId", obj.hammerPullOriginNoteId); 
+        o.set("hammerPullDestinationNoteId", obj.hammerPullDestinationNoteId); 
+        o.set("isSlurDestination", obj.isSlurDestination); 
+        o.set("slurOriginNoteId", obj.slurOriginNoteId); 
+        o.set("slurDestinationNoteId", obj.slurDestinationNoteId); 
+        o.set("harmonicType", (obj.harmonicType as number)); 
+        o.set("harmonicValue", obj.harmonicValue); 
+        o.set("isGhost", obj.isGhost); 
+        o.set("isLetRing", obj.isLetRing); 
+        o.set("isPalmMute", obj.isPalmMute); 
+        o.set("isDead", obj.isDead); 
+        o.set("isStaccato", obj.isStaccato); 
+        o.set("slideInType", (obj.slideInType as number)); 
+        o.set("slideOutType", (obj.slideOutType as number)); 
+        o.set("vibrato", (obj.vibrato as number)); 
+        o.set("tieOriginNoteId", obj.tieOriginNoteId); 
+        o.set("tieDestinationNoteId", obj.tieDestinationNoteId); 
+        o.set("isTieDestination", obj.isTieDestination); 
+        o.set("leftHandFinger", (obj.leftHandFinger as number)); 
+        o.set("rightHandFinger", (obj.rightHandFinger as number)); 
+        o.set("isFingering", obj.isFingering); 
+        o.set("trillValue", obj.trillValue); 
+        o.set("trillSpeed", (obj.trillSpeed as number)); 
+        o.set("durationPercent", obj.durationPercent); 
+        o.set("accidentalMode", (obj.accidentalMode as number)); 
+        o.set("dynamics", (obj.dynamics as number)); 
+        o.set("isEffectSlurOrigin", obj.isEffectSlurOrigin); 
+        o.set("hasEffectSlur", obj.hasEffectSlur); 
+        return o; 
     }
-    public static setProperty(obj: Note, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Note, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (r.number()!);
+                obj.id = (v as number);
                 return true;
             case "index":
-                obj.index = (r.number()!);
+                obj.index = (v as number);
                 return true;
             case "accentuated":
-                obj.accentuated = (r.enum<AccentuationType>(AccentuationType)!);
+                obj.accentuated = (JsonHelper.parseEnum<AccentuationType>(v, AccentuationType)!);
                 return true;
             case "bendtype":
-                obj.bendType = (r.enum<BendType>(BendType)!);
+                obj.bendType = (JsonHelper.parseEnum<BendType>(v, BendType)!);
                 return true;
             case "bendstyle":
-                obj.bendStyle = (r.enum<BendStyle>(BendStyle)!);
+                obj.bendStyle = (JsonHelper.parseEnum<BendStyle>(v, BendStyle)!);
                 return true;
             case "iscontinuedbend":
-                obj.isContinuedBend = (r.boolean()!);
+                obj.isContinuedBend = (v as boolean);
                 return true;
             case "bendpoints":
                 obj.bendPoints = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new BendPoint();
-                    BendPointSerializer.fromJson(i, r)
+                    BendPointSerializer.fromJson(i, o)
                     obj.addBendPoint(i);
                 }
-                r.endArray();
                 return true;
             case "fret":
-                obj.fret = (r.number()!);
+                obj.fret = (v as number);
                 return true;
             case "string":
-                obj.string = (r.number()!);
+                obj.string = (v as number);
                 return true;
             case "octave":
-                obj.octave = (r.number()!);
+                obj.octave = (v as number);
                 return true;
             case "tone":
-                obj.tone = (r.number()!);
+                obj.tone = (v as number);
                 return true;
             case "percussionarticulation":
-                obj.percussionArticulation = (r.number()!);
+                obj.percussionArticulation = (v as number);
                 return true;
             case "isvisible":
-                obj.isVisible = (r.boolean()!);
+                obj.isVisible = (v as boolean);
                 return true;
             case "islefthandtapped":
-                obj.isLeftHandTapped = (r.boolean()!);
+                obj.isLeftHandTapped = (v as boolean);
                 return true;
             case "ishammerpullorigin":
-                obj.isHammerPullOrigin = (r.boolean()!);
+                obj.isHammerPullOrigin = (v as boolean);
                 return true;
             case "hammerpulloriginnoteid":
-                obj.hammerPullOriginNoteId = (r.number()!);
+                obj.hammerPullOriginNoteId = (v as number);
                 return true;
             case "hammerpulldestinationnoteid":
-                obj.hammerPullDestinationNoteId = (r.number()!);
+                obj.hammerPullDestinationNoteId = (v as number);
                 return true;
             case "isslurdestination":
-                obj.isSlurDestination = (r.boolean()!);
+                obj.isSlurDestination = (v as boolean);
                 return true;
             case "sluroriginnoteid":
-                obj.slurOriginNoteId = (r.number()!);
+                obj.slurOriginNoteId = (v as number);
                 return true;
             case "slurdestinationnoteid":
-                obj.slurDestinationNoteId = (r.number()!);
+                obj.slurDestinationNoteId = (v as number);
                 return true;
             case "harmonictype":
-                obj.harmonicType = (r.enum<HarmonicType>(HarmonicType)!);
+                obj.harmonicType = (JsonHelper.parseEnum<HarmonicType>(v, HarmonicType)!);
                 return true;
             case "harmonicvalue":
-                obj.harmonicValue = (r.number()!);
+                obj.harmonicValue = (v as number);
                 return true;
             case "isghost":
-                obj.isGhost = (r.boolean()!);
+                obj.isGhost = (v as boolean);
                 return true;
             case "isletring":
-                obj.isLetRing = (r.boolean()!);
+                obj.isLetRing = (v as boolean);
                 return true;
             case "ispalmmute":
-                obj.isPalmMute = (r.boolean()!);
+                obj.isPalmMute = (v as boolean);
                 return true;
             case "isdead":
-                obj.isDead = (r.boolean()!);
+                obj.isDead = (v as boolean);
                 return true;
             case "isstaccato":
-                obj.isStaccato = (r.boolean()!);
+                obj.isStaccato = (v as boolean);
                 return true;
             case "slideintype":
-                obj.slideInType = (r.enum<SlideInType>(SlideInType)!);
+                obj.slideInType = (JsonHelper.parseEnum<SlideInType>(v, SlideInType)!);
                 return true;
             case "slideouttype":
-                obj.slideOutType = (r.enum<SlideOutType>(SlideOutType)!);
+                obj.slideOutType = (JsonHelper.parseEnum<SlideOutType>(v, SlideOutType)!);
                 return true;
             case "vibrato":
-                obj.vibrato = (r.enum<VibratoType>(VibratoType)!);
+                obj.vibrato = (JsonHelper.parseEnum<VibratoType>(v, VibratoType)!);
                 return true;
             case "tieoriginnoteid":
-                obj.tieOriginNoteId = (r.number()!);
+                obj.tieOriginNoteId = (v as number);
                 return true;
             case "tiedestinationnoteid":
-                obj.tieDestinationNoteId = (r.number()!);
+                obj.tieDestinationNoteId = (v as number);
                 return true;
             case "istiedestination":
-                obj.isTieDestination = (r.boolean()!);
+                obj.isTieDestination = (v as boolean);
                 return true;
             case "lefthandfinger":
-                obj.leftHandFinger = (r.enum<Fingers>(Fingers)!);
+                obj.leftHandFinger = (JsonHelper.parseEnum<Fingers>(v, Fingers)!);
                 return true;
             case "righthandfinger":
-                obj.rightHandFinger = (r.enum<Fingers>(Fingers)!);
+                obj.rightHandFinger = (JsonHelper.parseEnum<Fingers>(v, Fingers)!);
                 return true;
             case "isfingering":
-                obj.isFingering = (r.boolean()!);
+                obj.isFingering = (v as boolean);
                 return true;
             case "trillvalue":
-                obj.trillValue = (r.number()!);
+                obj.trillValue = (v as number);
                 return true;
             case "trillspeed":
-                obj.trillSpeed = (r.enum<Duration>(Duration)!);
+                obj.trillSpeed = (JsonHelper.parseEnum<Duration>(v, Duration)!);
                 return true;
             case "durationpercent":
-                obj.durationPercent = (r.number()!);
+                obj.durationPercent = (v as number);
                 return true;
             case "accidentalmode":
-                obj.accidentalMode = (r.enum<NoteAccidentalMode>(NoteAccidentalMode)!);
+                obj.accidentalMode = (JsonHelper.parseEnum<NoteAccidentalMode>(v, NoteAccidentalMode)!);
                 return true;
             case "dynamics":
-                obj.dynamics = (r.enum<DynamicValue>(DynamicValue)!);
+                obj.dynamics = (JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!);
                 return true;
             case "iseffectslurorigin":
-                obj.isEffectSlurOrigin = (r.boolean()!);
+                obj.isEffectSlurOrigin = (v as boolean);
                 return true;
             case "haseffectslur":
-                obj.hasEffectSlur = (r.boolean()!);
+                obj.hasEffectSlur = (v as boolean);
                 return true;
         } 
         return false; 

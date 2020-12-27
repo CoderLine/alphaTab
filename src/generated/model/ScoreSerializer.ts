@@ -4,120 +4,98 @@
 // the code is regenerated.
 // </auto-generated>
 import { Score } from "@src/model/Score";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { MasterBarSerializer } from "@src/generated/model/MasterBarSerializer";
 import { TrackSerializer } from "@src/generated/model/TrackSerializer";
 import { RenderStylesheetSerializer } from "@src/generated/model/RenderStylesheetSerializer";
 import { MasterBar } from "@src/model/MasterBar";
 import { Track } from "@src/model/Track";
 export class ScoreSerializer {
-    public static fromJson(obj: Score, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: Score, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: Score | null, w: JsonWriter): void {
+    public static toJson(obj: Score | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.string(obj.album, "album"); 
-        w.string(obj.artist, "artist"); 
-        w.string(obj.copyright, "copyright"); 
-        w.string(obj.instructions, "instructions"); 
-        w.string(obj.music, "music"); 
-        w.string(obj.notices, "notices"); 
-        w.string(obj.subTitle, "subTitle"); 
-        w.string(obj.title, "title"); 
-        w.string(obj.words, "words"); 
-        w.string(obj.tab, "tab"); 
-        w.number(obj.tempo, "tempo"); 
-        w.string(obj.tempoLabel, "tempoLabel"); 
-        w.prop("masterBars"); 
-        w.startArray(); 
-        for (const i of obj.masterBars) {
-            MasterBarSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.prop("tracks"); 
-        w.startArray(); 
-        for (const i of obj.tracks) {
-            TrackSerializer.toJson(i, w);
-        } 
-        w.endArray(); 
-        w.prop("stylesheet"); 
-        RenderStylesheetSerializer.toJson(obj.stylesheet, w); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("album", obj.album); 
+        o.set("artist", obj.artist); 
+        o.set("copyright", obj.copyright); 
+        o.set("instructions", obj.instructions); 
+        o.set("music", obj.music); 
+        o.set("notices", obj.notices); 
+        o.set("subTitle", obj.subTitle); 
+        o.set("title", obj.title); 
+        o.set("words", obj.words); 
+        o.set("tab", obj.tab); 
+        o.set("tempo", obj.tempo); 
+        o.set("tempoLabel", obj.tempoLabel); 
+        o.set("masterBars", obj.masterBars.map(i => MasterBarSerializer.toJson(i))); 
+        o.set("tracks", obj.tracks.map(i => TrackSerializer.toJson(i))); 
+        o.set("stylesheet", RenderStylesheetSerializer.toJson(obj.stylesheet)); 
+        return o; 
     }
-    public static setProperty(obj: Score, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: Score, property: string, v: unknown): boolean {
         switch (property) {
             case "album":
-                obj.album = (r.string()!);
+                obj.album = (v as string);
                 return true;
             case "artist":
-                obj.artist = (r.string()!);
+                obj.artist = (v as string);
                 return true;
             case "copyright":
-                obj.copyright = (r.string()!);
+                obj.copyright = (v as string);
                 return true;
             case "instructions":
-                obj.instructions = (r.string()!);
+                obj.instructions = (v as string);
                 return true;
             case "music":
-                obj.music = (r.string()!);
+                obj.music = (v as string);
                 return true;
             case "notices":
-                obj.notices = (r.string()!);
+                obj.notices = (v as string);
                 return true;
             case "subtitle":
-                obj.subTitle = (r.string()!);
+                obj.subTitle = (v as string);
                 return true;
             case "title":
-                obj.title = (r.string()!);
+                obj.title = (v as string);
                 return true;
             case "words":
-                obj.words = (r.string()!);
+                obj.words = (v as string);
                 return true;
             case "tab":
-                obj.tab = (r.string()!);
+                obj.tab = (v as string);
                 return true;
             case "tempo":
-                obj.tempo = (r.number()!);
+                obj.tempo = (v as number);
                 return true;
             case "tempolabel":
-                obj.tempoLabel = (r.string()!);
+                obj.tempoLabel = (v as string);
                 return true;
             case "masterbars":
                 obj.masterBars = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new MasterBar();
-                    MasterBarSerializer.fromJson(i, r)
+                    MasterBarSerializer.fromJson(i, o)
                     obj.addMasterBar(i);
                 }
-                r.endArray();
                 return true;
             case "tracks":
                 obj.tracks = [];
-                r.startArray();
-                while (r.nextItem()) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Track();
-                    TrackSerializer.fromJson(i, r)
+                    TrackSerializer.fromJson(i, o)
                     obj.addTrack(i);
                 }
-                r.endArray();
                 return true;
         } 
         if (["stylesheet"].indexOf(property) >= 0) {
-            RenderStylesheetSerializer.fromJson(obj.stylesheet, r);
+            RenderStylesheetSerializer.fromJson(obj.stylesheet, (v as Map<string, unknown>));
             return true;
         } 
         return false; 

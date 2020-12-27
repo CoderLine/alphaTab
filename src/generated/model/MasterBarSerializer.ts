@@ -4,9 +4,7 @@
 // the code is regenerated.
 // </auto-generated>
 import { MasterBar } from "@src/model/MasterBar";
-import { JsonReader } from "@src/io/JsonReader";
-import { JsonValueType } from "@src/io/JsonReader";
-import { JsonWriter } from "@src/io/JsonWriter";
+import { JsonHelper } from "@src/io/JsonHelper";
 import { SectionSerializer } from "@src/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { FermataSerializer } from "@src/generated/model/FermataSerializer";
@@ -17,109 +15,93 @@ import { Section } from "@src/model/Section";
 import { Automation } from "@src/model/Automation";
 import { Fermata } from "@src/model/Fermata";
 export class MasterBarSerializer {
-    public static fromJson(obj: MasterBar, r: JsonReader): void {
-        if (r.currentValueType === JsonValueType.Null) {
+    public static fromJson(obj: MasterBar, m: unknown): void {
+        if (!m) {
             return;
         } 
-        r.startObject(); 
-        while (r.nextProp()) {
-            this.setProperty(obj, r.prop().toLowerCase(), r);
-        } 
-        r.endObject(); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
     }
-    public static toJson(obj: MasterBar | null, w: JsonWriter): void {
+    public static toJson(obj: MasterBar | null): Map<string, unknown> | null {
         if (!obj) {
-            w.null();
-            return;
+            return null;
         } 
-        w.startObject(); 
-        w.number(obj.alternateEndings, "alternateEndings"); 
-        w.number(obj.index, "index"); 
-        w.enum(obj.keySignature, "keySignature"); 
-        w.enum(obj.keySignatureType, "keySignatureType"); 
-        w.boolean(obj.isDoubleBar, "isDoubleBar"); 
-        w.boolean(obj.isRepeatStart, "isRepeatStart"); 
-        w.number(obj.repeatCount, "repeatCount"); 
-        w.number(obj.timeSignatureNumerator, "timeSignatureNumerator"); 
-        w.number(obj.timeSignatureDenominator, "timeSignatureDenominator"); 
-        w.boolean(obj.timeSignatureCommon, "timeSignatureCommon"); 
-        w.enum(obj.tripletFeel, "tripletFeel"); 
-        w.prop("section"); 
-        if (obj.section) {
-            SectionSerializer.toJson(obj.section, w);
-        }
-        else
-            w.null(); 
-        w.prop("tempoAutomation"); 
-        if (obj.tempoAutomation) {
-            AutomationSerializer.toJson(obj.tempoAutomation, w);
-        }
-        else
-            w.null(); 
-        w.prop("fermata"); 
-        w.startObject(); 
-        obj.fermata.forEach((v, k) => { w.prop(k); FermataSerializer.toJson(v, w); }); 
-        w.endObject(); 
-        w.number(obj.start, "start"); 
-        w.boolean(obj.isAnacrusis, "isAnacrusis"); 
-        w.endObject(); 
+        const o = new Map<string, unknown>(); 
+        o.set("alternateEndings", obj.alternateEndings); 
+        o.set("index", obj.index); 
+        o.set("keySignature", (obj.keySignature as number)); 
+        o.set("keySignatureType", (obj.keySignatureType as number)); 
+        o.set("isDoubleBar", obj.isDoubleBar); 
+        o.set("isRepeatStart", obj.isRepeatStart); 
+        o.set("repeatCount", obj.repeatCount); 
+        o.set("timeSignatureNumerator", obj.timeSignatureNumerator); 
+        o.set("timeSignatureDenominator", obj.timeSignatureDenominator); 
+        o.set("timeSignatureCommon", obj.timeSignatureCommon); 
+        o.set("tripletFeel", (obj.tripletFeel as number)); 
+        o.set("section", SectionSerializer.toJson(obj.section)); 
+        o.set("tempoAutomation", AutomationSerializer.toJson(obj.tempoAutomation)); 
+        {
+            const m = new Map<string, unknown>();
+            o.set("fermata", m);
+            obj.fermata.forEach((v, k) => m.set(k.toString(), FermataSerializer.toJson(v)));
+        } 
+        o.set("start", obj.start); 
+        o.set("isAnacrusis", obj.isAnacrusis); 
+        return o; 
     }
-    public static setProperty(obj: MasterBar, property: string, r: JsonReader): boolean {
+    public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
         switch (property) {
             case "alternateendings":
-                obj.alternateEndings = (r.number()!);
+                obj.alternateEndings = (v as number);
                 return true;
             case "index":
-                obj.index = (r.number()!);
+                obj.index = (v as number);
                 return true;
             case "keysignature":
-                obj.keySignature = (r.enum<KeySignature>(KeySignature)!);
+                obj.keySignature = (JsonHelper.parseEnum<KeySignature>(v, KeySignature)!);
                 return true;
             case "keysignaturetype":
-                obj.keySignatureType = (r.enum<KeySignatureType>(KeySignatureType)!);
+                obj.keySignatureType = (JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!);
                 return true;
             case "isdoublebar":
-                obj.isDoubleBar = (r.boolean()!);
+                obj.isDoubleBar = (v as boolean);
                 return true;
             case "isrepeatstart":
-                obj.isRepeatStart = (r.boolean()!);
+                obj.isRepeatStart = (v as boolean);
                 return true;
             case "repeatcount":
-                obj.repeatCount = (r.number()!);
+                obj.repeatCount = (v as number);
                 return true;
             case "timesignaturenumerator":
-                obj.timeSignatureNumerator = (r.number()!);
+                obj.timeSignatureNumerator = (v as number);
                 return true;
             case "timesignaturedenominator":
-                obj.timeSignatureDenominator = (r.number()!);
+                obj.timeSignatureDenominator = (v as number);
                 return true;
             case "timesignaturecommon":
-                obj.timeSignatureCommon = (r.boolean()!);
+                obj.timeSignatureCommon = (v as boolean);
                 return true;
             case "tripletfeel":
-                obj.tripletFeel = (r.enum<TripletFeel>(TripletFeel)!);
+                obj.tripletFeel = (JsonHelper.parseEnum<TripletFeel>(v, TripletFeel)!);
                 return true;
             case "fermata":
                 obj.fermata = new Map<number, Fermata>();
-                r.startObject();
-                while (r.nextProp()) {
-                    const i = new Fermata();
-                    FermataSerializer.fromJson(i, r);
-                    obj.fermata.set(r.numberProp(), i);
-                }
-                r.endObject();
+                (v as Map<string, unknown>).forEach((v, k) => {
+                    const i = new Fermata(); 
+                    FermataSerializer.fromJson(i, (v as Map<string, unknown>)); 
+                    obj.fermata.set(parseInt(k), i); 
+                });
                 return true;
             case "start":
-                obj.start = (r.number()!);
+                obj.start = (v as number);
                 return true;
             case "isanacrusis":
-                obj.isAnacrusis = (r.boolean()!);
+                obj.isAnacrusis = (v as boolean);
                 return true;
         } 
         if (["section"].indexOf(property) >= 0) {
-            if (r.currentValueType !== JsonValueType.Null) {
+            if (v) {
                 obj.section = new Section();
-                SectionSerializer.fromJson(obj.section, r);
+                SectionSerializer.fromJson(obj.section, (v as Map<string, unknown>));
             }
             else {
                 obj.section = null;
@@ -127,9 +109,9 @@ export class MasterBarSerializer {
             return true;
         } 
         if (["tempoautomation"].indexOf(property) >= 0) {
-            if (r.currentValueType !== JsonValueType.Null) {
+            if (v) {
                 obj.tempoAutomation = new Automation();
-                AutomationSerializer.fromJson(obj.tempoAutomation, r);
+                AutomationSerializer.fromJson(obj.tempoAutomation, (v as Map<string, unknown>));
             }
             else {
                 obj.tempoAutomation = null;
