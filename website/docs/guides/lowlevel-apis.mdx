@@ -277,3 +277,55 @@ player.Play();
 
 </TabItem>
 </Tabs>
+
+## Serialize Data Model from/to JSON 
+
+alphaTab can convert the data model (and also the settings object) from and to `Map` objects for further
+serialization via JSON or transmission over wire. The normal data model of alphaTab requires many references to be hooked up 
+and also the right object instances to be created. This graph cannot be simply written to a JSON e.g. via `JSON.stringify` but requires
+the right logic to do so.
+
+:::note
+
+The serialized JSON/Map should not be used for persisting the data model to disk or databases for later loading. 
+The format is not guaranteed to be compatible between different alphaTab versions and might change over time.
+This data structure can be used to transmit the data model between components using the same version of alphaTab like 
+backends+frontends.
+
+:::
+
+This logic can be accessed via the `alphaTab.model.JsonConverter` class. It provides 4 main operations for both `Score` and `Settings` objects: 
+
+1. `*ToJsObject` - Convert a `Score` or `Settings` object into a `Map` structure for further serialization 
+2. `jsObjectTo*` - Convert a `Map` structure back to a `Score` or `Settings` object.
+3. `*ToJson` - Convert a `Score` or `Settings` object into JSON encoded string (web only).
+4. `jsonTo*` - Convert a JSON encoded string back to a `Score` or `Settings` object (web only).
+
+For the conversions back to `Score` objects a `Settings` object can/should be passed on.
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const map = alphaTab.model.JsonConverter.scoreToJsObject(api.score);
+const json = alphaTab.model.JsonConverter.scoreToJson(api.score);
+const score = alphaTab.model.JsonConverter.jsObjectToScore(map, api.settings);
+const json = alphaTab.model.JsonConverter.jsonToScore(json, api.settings);
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+var map = AlphaTab.Model.JsonConverter.ScoreToJsObject(api.Score);
+var score = AlphaTab.Model.JsonConverter.JsObjectToScore(map, api.Settings);
+```
+
+</TabItem>
+</Tabs>
