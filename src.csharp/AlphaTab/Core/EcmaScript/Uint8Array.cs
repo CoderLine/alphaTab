@@ -14,6 +14,8 @@ namespace AlphaTab.Core.EcmaScript
 
         public ArrayBuffer Buffer => new ArrayBuffer(_data);
 
+        public ArraySegment<byte> Data => _data;
+
         public Uint8Array(byte[] data)
         {
             _data = new ArraySegment<byte>(data);

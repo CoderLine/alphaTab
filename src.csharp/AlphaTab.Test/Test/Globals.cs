@@ -46,7 +46,7 @@ namespace AlphaTab.Test
         {
             if (_actual is IConvertible c)
             {
-                Assert.AreEqual(expected, c.ToDouble(CultureInfo.InvariantCulture), 0.001, _message + message);
+                Assert.AreEqual(expected, c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), 0.001, _message + message);
             }
             else
             {

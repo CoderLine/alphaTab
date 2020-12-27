@@ -30,7 +30,6 @@ import { SlideOutType } from '@src/model/SlideOutType';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
-import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 import { TextBaseline } from '@src/platform/ICanvas';
@@ -514,13 +513,13 @@ export class GpifWriter {
         let step = '';
         let accidental = '';
 
-        function updateParts() {
+        const updateParts: () => void = () => {
             index = value % 12;
             octave = (value / 12) | 0;
 
             step = GpifWriter.defaultSteps[index];
             accidental = GpifWriter.defaultAccidentals[index];
-        }
+        };
         updateParts();
 
         switch (accidentalMode) {

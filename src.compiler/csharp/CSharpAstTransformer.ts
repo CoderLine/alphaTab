@@ -2298,8 +2298,10 @@ export default class CSharpAstTransformer {
                 switch (expression.operatorToken.kind) {
                     case ts.SyntaxKind.AmpersandToken:
                     case ts.SyntaxKind.GreaterThanGreaterThanToken:
+                    case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
                     case ts.SyntaxKind.LessThanLessThanToken:
                     case ts.SyntaxKind.BarToken:
+                    case ts.SyntaxKind.CaretToken:
                         binaryExpression.left = this.makeInt(binaryExpression.left);
                         binaryExpression.right = this.makeInt(binaryExpression.right);
                         break;
@@ -2712,6 +2714,9 @@ export default class CSharpAstTransformer {
                             case 'length':
                                 memberAccess.member = 'Count';
                                 break;
+                            case 'reverse':
+                                memberAccess.member = 'Reversed';
+                                break;    
                             case 'push':
                                 memberAccess.member = 'Add';
                                 break;
@@ -3265,9 +3270,8 @@ export default class CSharpAstTransformer {
             case ts.SyntaxKind.LessThanLessThanToken:
                 return '<<';
             case ts.SyntaxKind.GreaterThanGreaterThanToken:
-                return '>>';
             case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
-                return '>>>';
+                return '>>';
 
             case ts.SyntaxKind.LessThanToken:
                 return '<';

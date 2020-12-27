@@ -183,6 +183,29 @@ namespace AlphaTab.Core
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TResult Reduce<TInput, TResult>(this IEnumerable<TInput> source, Func<TResult, TInput, TResult> func, TResult seed)
+        {
+            return source.Aggregate(seed, func);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<TResult> Map<TInput, TResult>(this IEnumerable<TInput> source, Func<TInput, TResult> func)
+        {
+            return source.Select(func).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<TInput> Reversed<TInput>(this IEnumerable<TInput> source)
+        {
+            return source.Reverse();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Join<TInput>(this IEnumerable<TInput> source, string separator)
+        {
+            return string.Join(separator, source);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Substr(this string s, double start, double length)

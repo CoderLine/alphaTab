@@ -14,7 +14,7 @@ export class TestPlatform {
      * @target web
      */
     public static saveFile(name: string, data: Uint8Array): Promise<void> {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             let x: XMLHttpRequest = new XMLHttpRequest();
             x.open('POST', 'http://localhost:8090/save-file/', true);
             x.onload = () => {
