@@ -1201,13 +1201,63 @@ export class GpifWriter {
             diagram.attributes.set('baseFret', (chord.firstFret - 1).toString());
             diagram.attributes.set('barStates', chord.strings.map(_ => '1').join(' '));
 
+            const frets: number[] = [];
+            const fretToStrings = new Map<number, number[]>();
+
             for (let i = 0; i < chord.strings.length; i++) {
-                const fret = diagram.addElement('Fret');
-                fret.attributes.set('string', (chord.strings.length - 1 - i).toString());
-                fret.attributes.set('fret', chord.strings[i].toString());
+                const fretNode = diagram.addElement('Fret');
+                let chordFret = chord.strings[i];
+                if (chordFret !== -1) {
+                    const chordString = (chord.strings.length - 1 - i);
+                    fretNode.attributes.set('string', chordString.toString());
+                    fretNode.attributes.set('fret', (chordFret - chord.firstFret + 1).toString());
+                    if (!fretToStrings.has(chordFret)) {
+                        fretToStrings.set(chordFret, []);
+                        frets.push(chordFret);
+                    }
+                    fretToStrings.get(chordFret)!.push(chordString);
+                }
             }
 
-            // TODO fingering
+            frets.sort();
+
+            // try to rebuild the barre frets
+            if (chord.barreFrets.length > 0) {
+                const fingers = [
+                    Fingers.LittleFinger,
+                    Fingers.AnnularFinger,
+                    Fingers.MiddleFinger,
+                    Fingers.IndexFinger,
+                ];
+                const fingering = diagram.addElement('Fingering');
+
+                for (const fret of frets) {
+                    const fretStrings = fretToStrings.get(fret)!;
+                    if (fretStrings.length > 1 && chord.barreFrets.indexOf(fret) >= 0) {
+                        const finger = fingers.length > 0 ? fingers.pop() : Fingers.IndexFinger;
+                        for (const fretString of fretStrings) {
+                            const position = fingering.addElement('Position');
+                            switch (finger) {
+                                case Fingers.LittleFinger:
+                                    position.attributes.set('finger', 'Pinky');
+                                    break;
+                                case Fingers.AnnularFinger:
+                                    position.attributes.set('finger', 'Ring');
+                                    break;
+                                case Fingers.MiddleFinger:
+                                    position.attributes.set('finger', 'Middle');
+                                    break;
+                                case Fingers.IndexFinger:
+                                    position.attributes.set('finger', 'Index');
+                                    break;
+                            }
+                            position.attributes.set('fret', (fret - chord.firstFret + 1).toString());
+                            position.attributes.set('string', fretString.toString());
+                        }
+                    }
+                }
+            }
+
 
             const showName = diagram.addElement('Property');
             showName.attributes.set('name', 'ShowName');
@@ -1477,24 +1527,29 @@ export class GpifWriter {
     }
     private writeFermata(parent: XmlNode, offset: number, fermata: Fermata) {
 
-        let numerator = 0;
+        let numerator = -1;
         let denominator = 1;
-        while (denominator < 10) {
-            // Offset = (numerator / denominator) * QuarterTime
-            // (Offset / QuarterTime) * denominator = numerator
+        if (offset > 0) {
+            while (denominator < 10) {
+                // Offset = (numerator / denominator) * QuarterTime
+                // (Offset / QuarterTime) * denominator = numerator
 
-            numerator = (offset / MidiUtils.QuarterTime) * denominator;
+                numerator = (offset / MidiUtils.QuarterTime) * denominator;
 
-            // found a full digit match
-            if (numerator === Math.floor(numerator)) {
-                break;
+                // found a full digit match
+                if (numerator === Math.floor(numerator)) {
+                    break;
+                }
+
+                numerator = -1;
+                denominator++;
             }
-
+        } else {
             numerator = 0;
-            denominator++;
+            denominator = 1;
         }
 
-        if (numerator === 0) {
+        if (numerator === -1) {
             // No split found
             return;
         }
