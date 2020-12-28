@@ -1230,7 +1230,7 @@ export default class CSharpAstTransformer {
 
         switch (csMethod.name) {
             case 'ToString':
-                if(csMethod.parameters.length === 0) {
+                if (csMethod.parameters.length === 0) {
                     csMethod.isVirtual = false;
                     csMethod.isOverride = true;
                 }
@@ -2647,6 +2647,25 @@ export default class CSharpAstTransformer {
             });
 
             return csExpr;
+        } else if (this.isSetInitializer(expression)) {
+            const csExpr = {
+                parent: parent,
+                tsNode: expression,
+                nodeType: cs.SyntaxKind.InvocationExpression,
+                arguments: [],
+                expression: {} as cs.Expression
+            } as cs.InvocationExpression;
+
+            csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'SetInitializer');
+
+            expression.elements.forEach(e => {
+                const ex = this.visitExpression(csExpr, e);
+                if (ex) {
+                    csExpr.arguments.push(ex);
+                }
+            });
+
+            return csExpr;
         } else {
             const csExpr = {
                 parent: parent,
@@ -2687,6 +2706,15 @@ export default class CSharpAstTransformer {
         return false;
     }
 
+    private isSetInitializer(expression: ts.ArrayLiteralExpression) {
+        const isCandidate = expression.parent.kind === ts.SyntaxKind.NewExpression;
+        if (!isCandidate) {
+            return false;
+        }
+
+        return this._context.typeChecker.getTypeAtLocation(expression.parent).symbol.name === 'Set';
+    }
+
     private visitPropertyAccessExpression(parent: cs.Node, expression: ts.PropertyAccessExpression) {
         const memberAccess = {
             expression: {} as cs.Expression,
@@ -2716,7 +2744,7 @@ export default class CSharpAstTransformer {
                                 break;
                             case 'reverse':
                                 memberAccess.member = 'Reversed';
-                                break;    
+                                break;
                             case 'push':
                                 memberAccess.member = 'Add';
                                 break;
@@ -2935,12 +2963,12 @@ export default class CSharpAstTransformer {
         });
 
         // number.ToString
-        const isNumberToString = ts.isPropertyAccessExpression(expression.expression) 
+        const isNumberToString = ts.isPropertyAccessExpression(expression.expression)
             && this._context.typeChecker.getTypeAtLocation(expression.expression.expression).flags & ts.TypeFlags.Number
             && (expression.expression.name as ts.Identifier).text === 'toString'
             && expression.arguments.length === 0;
 
-        if(isNumberToString) {
+        if (isNumberToString) {
             const invariantCultureInfo = {
                 parent: parent,
                 nodeType: cs.SyntaxKind.MemberAccessExpression,

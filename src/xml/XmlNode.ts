@@ -90,6 +90,9 @@ export class XmlNode {
 
     public get innerText(): string {
         if (this.nodeType === XmlNodeType.Element || this.nodeType === XmlNodeType.Document) {
+            if(this.firstElement && this.firstElement.nodeType === XmlNodeType.CDATA) {
+                return this.firstElement.innerText;
+            }
             let txt: string = '';
             for (let c of this.childNodes) {
                 txt += c.innerText?.toString();

@@ -16,6 +16,11 @@ namespace AlphaTab.Core
             return new List<T>(values);
         }
 
+        public static IEnumerable<T> SetInitializer<T>(params T[] values)
+        {
+            return new List<T>(values);
+        }
+
         public static IList<T> Splice<T>(this IList<T> data, double start)
         {
             var count = data.Count - (int) start;

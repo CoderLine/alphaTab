@@ -31,7 +31,7 @@ describe('JsonConverterTest', () => {
             const actual = JsonConverter.jsObjectToScore(expectedJson);
             const actualJson = JsonConverter.scoreToJsObject(actual);
 
-            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + name.substr(name.lastIndexOf('/') + 1) + '>');
+            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + name.substr(name.lastIndexOf('/') + 1) + '>', null);
         } catch (e) {
             fail(e);
         }
@@ -135,7 +135,7 @@ describe('JsonConverterTest', () => {
         const actual = JsonConverter.jsObjectToSettings(expectedJson);
         const actualJson = JsonConverter.settingsToJsObject(actual);
 
-        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '');
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '', null);
     });
 
     it('settings-from-map', () => {

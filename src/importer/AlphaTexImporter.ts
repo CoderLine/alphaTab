@@ -984,9 +984,6 @@ export class AlphaTexImporter extends ScoreImporter {
         this.beatDuration();
         let beat: Beat = new Beat();
         voice.addBeat(beat);
-        if (voice.bar.masterBar.tempoAutomation && voice.beats.length === 1) {
-            beat.automations.push(voice.bar.masterBar.tempoAutomation);
-        }
         // notes
         if (this._sy === AlphaTexSymbols.LParensis) {
             this._sy = this.newSy();
@@ -1715,7 +1712,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this.error('tempo', AlphaTexSymbols.Number, true);
                 }
                 let tempoAutomation: Automation = new Automation();
-                tempoAutomation.isLinear = true;
+                tempoAutomation.isLinear = false;
                 tempoAutomation.type = AutomationType.Tempo;
                 tempoAutomation.value = this._syData as number;
                 master.tempoAutomation = tempoAutomation;
@@ -1761,6 +1758,14 @@ export class AlphaTexImporter extends ScoreImporter {
                     this.error('measure-effects', AlphaTexSymbols.String, false);
                 }
             }
+        }
+
+        if(master.index === 0 && !master.tempoAutomation) {
+            let tempoAutomation: Automation = new Automation();
+            tempoAutomation.isLinear = false;
+            tempoAutomation.type = AutomationType.Tempo;
+            tempoAutomation.value = this._score.tempo;
+            master.tempoAutomation = tempoAutomation;
         }
     }
 }

@@ -221,23 +221,23 @@ describe('MidiFileGeneratorTest', () => {
 
             // on beat
             new BendEvent(ticks[0], 0, info.primaryChannel, 8192),
-            new NoteEvent(ticks[0], 0, info.primaryChannel, 3840, 67, DynamicValue.F),
+            new NoteEvent(ticks[0], 0, info.primaryChannel, 3840, 67, DynamicValue.MF),
 
             new BendEvent(ticks[1], 0, info.primaryChannel, 8192),
-            new NoteEvent(ticks[1], 0, info.primaryChannel, 120, 67, DynamicValue.F),
+            new NoteEvent(ticks[1], 0, info.primaryChannel, 120, 67, DynamicValue.MF),
 
             new BendEvent(ticks[2], 0, info.primaryChannel, 8192),
-            new NoteEvent(ticks[2], 0, info.primaryChannel, 3720, 67, DynamicValue.F),
+            new NoteEvent(ticks[2], 0, info.primaryChannel, 3720, 67, DynamicValue.MF),
 
             // before beat
             new BendEvent(ticks[3], 0, info.primaryChannel, 8192),
-            new NoteEvent(ticks[3], 0, info.primaryChannel, 3720, 67, DynamicValue.F),
+            new NoteEvent(ticks[3], 0, info.primaryChannel, 3720, 67, DynamicValue.MF),
 
             new BendEvent(ticks[4], 0, info.primaryChannel, 8192),
-            new NoteEvent(ticks[4], 0, info.primaryChannel, 120, 67, DynamicValue.F),
+            new NoteEvent(ticks[4], 0, info.primaryChannel, 120, 67, DynamicValue.MF),
 
             new BendEvent(ticks[5], 0, info.primaryChannel, 8192),
-            new NoteEvent(ticks[5], 0, info.primaryChannel, 3840, 67, DynamicValue.F),
+            new NoteEvent(ticks[5], 0, info.primaryChannel, 3840, 67, DynamicValue.MF),
 
             // bend beat
             new BendEvent(ticks[6], 0, info.secondaryChannel, 8192),
@@ -253,7 +253,7 @@ describe('MidiFileGeneratorTest', () => {
             new NoteBendEvent(ticks[6] + 12 * 9, 0, info.secondaryChannel, 67, 8960),
             new NoteBendEvent(ticks[6] + 12 * 10, 0, info.secondaryChannel, 67, 9045),
             new NoteBendEvent(ticks[6] + 12 * 11, 0, info.secondaryChannel, 67, 9131),
-            new NoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, DynamicValue.F),
+            new NoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, DynamicValue.MF),
 
             // end of track
             new TrackEndEvent(19200, 0) // 3840 = end of bar

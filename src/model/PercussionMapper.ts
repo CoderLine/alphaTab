@@ -74,7 +74,7 @@ export class PercussionMapper {
      * }
      * copy(s)
      */
-    private static instrumentArticulations: Map<number, InstrumentArticulation> = new Map([
+    public static instrumentArticulations: Map<number, InstrumentArticulation> = new Map([
         [38, new InstrumentArticulation("snare", 3, 38, MusicFontSymbol.NoteheadBlack, MusicFontSymbol.NoteheadHalf, MusicFontSymbol.NoteheadWhole)],
         [37, new InstrumentArticulation("snare", 3, 37, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack, MusicFontSymbol.NoteheadXBlack)],
         [91, new InstrumentArticulation("snare", 3, 38, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite, MusicFontSymbol.NoteheadDiamondWhite)],

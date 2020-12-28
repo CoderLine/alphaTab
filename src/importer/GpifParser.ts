@@ -1897,6 +1897,10 @@ export class GpifParser {
                                 break;
                             case 'Octave':
                                 note.octave = parseInt(c.findChildElement('Number')!.innerText);
+                                // when exporting GP6 from GP7 the tone might be missing
+                                if(note.tone === -1) {
+                                    note.tone = 0;
+                                }
                                 break;
                             case 'Tone':
                                 note.tone = parseInt(c.findChildElement('Step')!.innerText);
@@ -2217,42 +2221,43 @@ export class GpifParser {
                     trackIndex++;
                 }
             }
+        }
 
-            // clear out percussion articulations where not needed 
-            // and add automations
-            for (let trackId of this._tracksMapping) {
-                if (!trackId) {
-                    continue;
-                }
-                let track: Track = this._tracksById.get(trackId)!;
+        // clear out percussion articulations where not needed 
+        // and add automations
+        for (let trackId of this._tracksMapping) {
+            if (!trackId) {
+                continue;
+            }
+            let track: Track = this._tracksById.get(trackId)!;
 
-                let hasPercussion = false;
-                for (const staff of track.staves) {
-                    if (staff.isPercussion) {
-                        hasPercussion = true;
-                        break;
-                    }
-                }
-                if (!hasPercussion) {
-                    track.percussionArticulations = [];
-                }
-
-                if (this._automationsPerTrackIdAndBarIndex.has(trackId)) {
-                    const trackAutomations = this._automationsPerTrackIdAndBarIndex.get(trackId)!;
-                    trackAutomations.forEach((automations, barNumber) => {
-                        if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
-                            const bar = track.staves[0].bars[barNumber];
-                            if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
-                                const beat = bar.voices[0].beats[0];
-                                for(const a of automations) {
-                                    beat.automations.push(a);
-                                }
-                            }
-                        }
-                    });
+            let hasPercussion = false;
+            for (const staff of track.staves) {
+                if (staff.isPercussion) {
+                    hasPercussion = true;
+                    break;
                 }
             }
+            if (!hasPercussion) {
+                track.percussionArticulations = [];
+            }
+
+            if (this._automationsPerTrackIdAndBarIndex.has(trackId)) {
+                const trackAutomations = this._automationsPerTrackIdAndBarIndex.get(trackId)!;
+                trackAutomations.forEach((automations, barNumber) => {
+                    if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
+                        const bar = track.staves[0].bars[barNumber];
+                        if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
+                            const beat = bar.voices[0].beats[0];
+                            for (const a of automations) {
+                                beat.automations.push(a);
+                            }
+                        }
+                    }
+                });
+            }
         }
+
         // build masterbar automations
         this._masterTrackAutomations.forEach((automations, barNumber) => {
             let masterBar: MasterBar = this.score.masterBars[barNumber];

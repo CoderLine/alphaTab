@@ -21,6 +21,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { Ottavia } from '@src/model/Ottavia';
+import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
 import { PlaybackInformation } from '@src/model/PlaybackInformation';
 import { Score } from '@src/model/Score';
@@ -30,6 +31,7 @@ import { SlideOutType } from '@src/model/SlideOutType';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
+import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 import { TextBaseline } from '@src/platform/ICanvas';
@@ -503,9 +505,6 @@ export class GpifWriter {
         }
     }
 
-    private static readonly defaultAccidentals: string[] = ['', '#', '', '#', '', '', '#', '', '#', '', '#', ''];
-    private static readonly defaultSteps: string[] = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
-
     private writePitchForValue(properties: XmlNode, propertyName: string, value: number, accidentalMode: NoteAccidentalMode) {
         let index = 0;
         let octave: number = 0;
@@ -517,20 +516,13 @@ export class GpifWriter {
             index = value % 12;
             octave = (value / 12) | 0;
 
-            step = GpifWriter.defaultSteps[index];
-            accidental = GpifWriter.defaultAccidentals[index];
+            step = Tuning.defaultSteps[index];
+            accidental = Tuning.defaultAccidentals[index];
         };
         updateParts();
 
         switch (accidentalMode) {
             case NoteAccidentalMode.Default:
-                break;
-            case NoteAccidentalMode.SwapAccidentals:
-                if(accidental === '#') {
-                    value += 1;
-                    updateParts();
-                    accidental = 'b';
-                }
                 break;
             case NoteAccidentalMode.ForceNone:
                 accidental = '';
@@ -542,21 +534,21 @@ export class GpifWriter {
                 accidental = '#';
                 break;
             case NoteAccidentalMode.ForceDoubleSharp:
-                if(accidental === '#') {
+                if (accidental === '#') {
                     value -= 2;
                     updateParts();
                 }
                 accidental = 'x';
                 break;
             case NoteAccidentalMode.ForceFlat:
-                if(accidental === '#') {
+                if (accidental === '#') {
                     value += 1;
                     updateParts();
                 }
                 accidental = 'b';
                 break;
             case NoteAccidentalMode.ForceDoubleFlat:
-                if(accidental === '#') {
+                if (accidental === '#') {
                     value += 2;
                     updateParts();
                 }
@@ -1059,8 +1051,8 @@ export class GpifWriter {
                     for (const voice of bar.voices) {
                         for (const beat of voice.beats) {
                             const soundAutomation = beat.getAutomation(AutomationType.Instrument);
+                            const isTrackSound = bar.index === 0 && beat.index === 0;
                             if (soundAutomation) {
-                                const isTrackSound = bar.index === 0 && beat.index === 0;
                                 const name = isTrackSound ? trackSoundName : `ProgramChange_${beat.id}`;
                                 const path = isTrackSound ? trackSoundPath : `Midi/${soundAutomation.value}`;
                                 const role = isTrackSound ? trackSoundRole : 'User';
@@ -1070,6 +1062,7 @@ export class GpifWriter {
                                         trackSoundName, trackSoundPath, trackSoundRole,
                                         track.staves[0].bars[0].index, track.playbackInfo.program
                                     );
+                                    trackSoundWritten = true;
                                 }
 
                                 this.writeSoundAndAutomation(soundsNode, automationsNode,
@@ -1121,58 +1114,60 @@ export class GpifWriter {
         this.writeSimplePropertyNode(properties, 'CapoFret', 'Fret', staff.capo.toString());
         this.writeSimplePropertyNode(properties, 'FretCount', 'Fret', "24");
 
-        const tuningProperty = properties.addElement('Property');
-        tuningProperty.attributes.set('name', 'Tuning');
-        tuningProperty.addElement('Pitches').innerText = staff.tuning.slice().reverse().join(' ');
-        tuningProperty.addElement('Label').setCData(staff.tuningName);
-        tuningProperty.addElement('LabelVisible').innerText = staff.tuningName ? "true" : "false";
-        tuningProperty.addElement('Flat');
+        if (staff.tuning.length > 0) {
+            const tuningProperty = properties.addElement('Property');
+            tuningProperty.attributes.set('name', 'Tuning');
+            tuningProperty.addElement('Pitches').innerText = staff.tuning.slice().reverse().join(' ');
+            tuningProperty.addElement('Label').setCData(staff.tuningName);
+            tuningProperty.addElement('LabelVisible').innerText = staff.tuningName ? "true" : "false";
+            tuningProperty.addElement('Flat');
 
-        switch (staff.tuning.length) {
-            case 3:
-                tuningProperty.addElement('Instrument').innerText = 'Shamisen';
-                break;
-            case 4:
-                if (staff.track.playbackInfo.program === 105) {
-                    tuningProperty.addElement('Instrument').innerText = 'Banjo';
-                } else if (staff.track.playbackInfo.program == 42) {
-                    tuningProperty.addElement('Instrument').innerText = 'Cello';
-                } else if (staff.track.playbackInfo.program == 43) {
-                    tuningProperty.addElement('Instrument').innerText = 'Contrabass';
-                } else if (staff.track.playbackInfo.program == 40) {
-                    tuningProperty.addElement('Instrument').innerText = 'Violin';
-                } else if (staff.track.playbackInfo.program == 41) {
-                    tuningProperty.addElement('Instrument').innerText = 'Viola';
-                } else {
-                    tuningProperty.addElement('Instrument').innerText = 'Bass';
-                }
-                break;
-            case 5:
-                if (staff.track.playbackInfo.program === 105) {
-                    tuningProperty.addElement('Instrument').innerText = 'Banjo';
-                } else {
-                    tuningProperty.addElement('Instrument').innerText = 'Bass';
-                }
-                break;
-            case 6:
-                if (staff.track.playbackInfo.program === 105) {
-                    tuningProperty.addElement('Instrument').innerText = 'Banjo';
-                } else if (staff.track.playbackInfo.program <= 39) {
-                    tuningProperty.addElement('Instrument').innerText = 'Bass';
-                } else {
+            switch (staff.tuning.length) {
+                case 3:
+                    tuningProperty.addElement('Instrument').innerText = 'Shamisen';
+                    break;
+                case 4:
+                    if (staff.track.playbackInfo.program === 105) {
+                        tuningProperty.addElement('Instrument').innerText = 'Banjo';
+                    } else if (staff.track.playbackInfo.program == 42) {
+                        tuningProperty.addElement('Instrument').innerText = 'Cello';
+                    } else if (staff.track.playbackInfo.program == 43) {
+                        tuningProperty.addElement('Instrument').innerText = 'Contrabass';
+                    } else if (staff.track.playbackInfo.program == 40) {
+                        tuningProperty.addElement('Instrument').innerText = 'Violin';
+                    } else if (staff.track.playbackInfo.program == 41) {
+                        tuningProperty.addElement('Instrument').innerText = 'Viola';
+                    } else {
+                        tuningProperty.addElement('Instrument').innerText = 'Bass';
+                    }
+                    break;
+                case 5:
+                    if (staff.track.playbackInfo.program === 105) {
+                        tuningProperty.addElement('Instrument').innerText = 'Banjo';
+                    } else {
+                        tuningProperty.addElement('Instrument').innerText = 'Bass';
+                    }
+                    break;
+                case 6:
+                    if (staff.track.playbackInfo.program === 105) {
+                        tuningProperty.addElement('Instrument').innerText = 'Banjo';
+                    } else if (staff.track.playbackInfo.program <= 39) {
+                        tuningProperty.addElement('Instrument').innerText = 'Bass';
+                    } else {
+                        tuningProperty.addElement('Instrument').innerText = 'Guitar';
+                    }
+                    break;
+                case 7:
+                    if (staff.track.playbackInfo.program <= 39) {
+                        tuningProperty.addElement('Instrument').innerText = 'Bass';
+                    } else {
+                        tuningProperty.addElement('Instrument').innerText = 'Guitar';
+                    }
+                    break;
+                default:
                     tuningProperty.addElement('Instrument').innerText = 'Guitar';
-                }
-                break;
-            case 7:
-                if (staff.track.playbackInfo.program <= 39) {
-                    tuningProperty.addElement('Instrument').innerText = 'Bass';
-                } else {
-                    tuningProperty.addElement('Instrument').innerText = 'Guitar';
-                }
-                break;
-            default:
-                tuningProperty.addElement('Instrument').innerText = 'Guitar';
-                break;
+                    break;
+            }
         }
 
         this.writeSimplePropertyNode(properties, 'PartialCapoFret', 'Fret', "0");
@@ -1368,10 +1363,16 @@ export class GpifWriter {
     private writeInstrumentSetNode(trackNode: XmlNode, track: Track) {
         const instrumentSet = trackNode.addElement('InstrumentSet');
 
-        instrumentSet.addElement('LineCount').innerText = track.staves[0].standardNotationLineCount.toString();
+        const firstStaff:Staff = track.staves[0];
+
+        instrumentSet.addElement('LineCount').innerText = firstStaff.standardNotationLineCount.toString();
 
 
-        if (track.percussionArticulations.length) {
+        if (track.percussionArticulations.length > 0 || firstStaff.isPercussion) {
+            const articulations = track.percussionArticulations.length > 0
+                ? track.percussionArticulations
+                : Array.from(PercussionMapper.instrumentArticulations.values());
+
             instrumentSet.addElement('Name').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetName;
             instrumentSet.addElement('Type').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetType;
             let currentElementType: string = "";
@@ -1379,7 +1380,7 @@ export class GpifWriter {
             let currentArticulations: XmlNode = null!;
             let counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
-            for (const articulation of track.percussionArticulations) {
+            for (const articulation of articulations) {
                 if (!currentElementType || currentElementType !== articulation.elementType) {
                     var currentElement = elements.addElement('Element');
 
@@ -1493,8 +1494,8 @@ export class GpifWriter {
         }
         if (masterBar.isSectionStart) {
             const section = masterBarNode.addElement('Section');
-            section.addElement('Letter').innerText = masterBar.section!.marker;
-            section.addElement('Text').innerText = masterBar.section!.text;
+            section.addElement('Letter').setCData(masterBar.section!.marker);
+            section.addElement('Text').setCData(masterBar.section!.text);
         }
 
         if (masterBar.isRepeatStart || masterBar.isRepeatEnd) {

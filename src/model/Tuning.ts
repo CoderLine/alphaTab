@@ -8,6 +8,9 @@ export class Tuning {
     private static _fourStrings: Tuning[] = [];
     private static _defaultTunings: Map<number, Tuning> = new Map();
 
+    public static readonly defaultAccidentals: string[] = ['', '#', '', '#', '', '', '#', '', '#', '', '#', ''];
+    public static readonly defaultSteps: string[] = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
+
     public static getTextForTuning(tuning: number, includeOctave: boolean): string {
         let parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];

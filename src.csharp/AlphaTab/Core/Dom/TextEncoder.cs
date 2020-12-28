@@ -3,7 +3,7 @@ using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab.Core.Dom
 {
-    public class TextEncoder
+    internal class TextEncoder
     {
         private readonly Encoding _encoding;
 

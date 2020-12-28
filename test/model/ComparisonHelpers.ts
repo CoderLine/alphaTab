@@ -1,6 +1,6 @@
 
 export class ComparisonHelpers {
-    public static expectJsonEqual(expected: unknown, actual: unknown, path: string) {
+    public static expectJsonEqual(expected: unknown, actual: unknown, path: string, ignoreKeys: string[] | null) {
         const expectedType = typeof expected;
         const actualType = typeof actual;
 
@@ -33,7 +33,7 @@ export class ComparisonHelpers {
                             fail(`Array Length mismatch on hierarchy: ${path}, ${actual.length} != ${expected.length}`);
                         } else {
                             for (let i = 0; i < actual.length; i++) {
-                                ComparisonHelpers.expectJsonEqual(expected[i], actual[i], `${path}[${i}]`);
+                                ComparisonHelpers.expectJsonEqual(expected[i], actual[i], `${path}[${i}]`, ignoreKeys);
                             }
                         }
                     } else if (expected instanceof Map) {
@@ -63,7 +63,9 @@ export class ComparisonHelpers {
                                         case 'tieDestinationNoteId':
                                             break;
                                         default:
-                                            ComparisonHelpers.expectJsonEqual(expectedMap.get(key), actualMap.get(key), `${path}.${key}`);
+                                            if(!ignoreKeys || ignoreKeys.indexOf(key) === -1) {
+                                                ComparisonHelpers.expectJsonEqual(expectedMap.get(key), actualMap.get(key), `${path}.${key}`, ignoreKeys);
+                                            }
                                             break;
                                     }
                                 }

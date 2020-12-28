@@ -40,6 +40,7 @@ import { Voice } from '@src/model/Voice';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { IWriteable } from '@src/io/IWriteable';
+import { Tuning } from '@src/model/Tuning';
 
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
@@ -876,13 +877,13 @@ export class Gp3To5Importer extends ScoreImporter {
             newNote.rightHandFinger = IOHelper.readSInt8(this.data) as Fingers;
             newNote.isFingering = true;
         }
+        let swapAccidentals = false;
         if (this._versionNumber >= 500) {
             if ((flags & 0x01) !== 0) {
                 newNote.durationPercent = GpBinaryHelpers.gpReadDouble(this.data);
             }
             let flags2: number = this.data.readByte();
-            newNote.accidentalMode =
-                (flags2 & 0x02) !== 0 ? NoteAccidentalMode.SwapAccidentals : NoteAccidentalMode.Default;
+            swapAccidentals = (flags2 & 0x02) !== 0;
         }
         beat.addNote(newNote);
         if ((flags & 0x08) !== 0) {
@@ -893,6 +894,15 @@ export class Gp3To5Importer extends ScoreImporter {
             newNote.percussionArticulation = newNote.fret;
             newNote.string = -1;
             newNote.fret = -1;
+        }
+        if(swapAccidentals) {
+            const accidental = Tuning.defaultAccidentals[newNote.realValueWithoutHarmonic % 12];
+            if(accidental === '#') {
+                newNote.accidentalMode = NoteAccidentalMode.ForceFlat;
+            } else if(accidental === 'b') {
+                newNote.accidentalMode = NoteAccidentalMode.ForceSharp;
+            }
+            // Note: forcing no sign to sharp not supported
         }
         return newNote;
     }
