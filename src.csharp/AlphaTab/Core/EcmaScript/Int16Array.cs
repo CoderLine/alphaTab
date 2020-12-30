@@ -9,6 +9,8 @@ namespace AlphaTab.Core.EcmaScript
     {
         private readonly short[] _data;
 
+        public double Length => _data.Length;
+
         public Int16Array(double size)
         {
             _data = new short[(int) size];

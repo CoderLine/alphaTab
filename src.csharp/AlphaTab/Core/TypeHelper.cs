@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Rendering.Glyphs;
+using String = System.String;
 
 namespace AlphaTab.Core
 {
@@ -14,19 +15,6 @@ namespace AlphaTab.Core
         public static IList<T> CreateList<T>(params T[] values)
         {
             return new List<T>(values);
-        }
-
-        public static IEnumerable<T> SetInitializer<T>(params T[] values)
-        {
-            return new List<T>(values);
-        }
-
-        public static IList<T> Splice<T>(this IList<T> data, double start)
-        {
-            var count = data.Count - (int) start;
-            var items = data.GetRange((int) start, count);
-            data.RemoveRange((int) start, count);
-            return new List<T>(items);
         }
 
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
@@ -246,6 +234,12 @@ namespace AlphaTab.Core
         public static string ToUpperCase(this string s)
         {
             return s.ToUpperInvariant();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int LocaleCompare(this string a, string b)
+        {
+            return string.Compare(a, b, StringComparison.Ordinal);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

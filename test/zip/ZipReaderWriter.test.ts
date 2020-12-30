@@ -10,10 +10,9 @@ describe('ZipReaderWriter', () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro7/score-info.gp');
         const reader = new ZipReader(ByteBuffer.fromBuffer(data));
         const entries = reader.read();
-        entries.sort((a, b) => a.fileName.localeCompare(b.fileName));
 
-        expect(entries.map(e => e.fileName).join(',')).toEqual('BinaryStylesheet,Content/,LayoutConfiguration,PartConfiguration,Preferences.json,score.gpif,VERSION');
-        expect(entries.map(e => e.data.length).join(',')).toEqual('19651,0,14,27,192,22998,3');
+        expect(entries.map(e => e.fileName).join(',')).toEqual('Content/,BinaryStylesheet,LayoutConfiguration,PartConfiguration,Preferences.json,score.gpif,VERSION');
+        expect(entries.map(e => e.data.length).join(',')).toEqual('0,19651,14,27,192,22998,3');
     });
 
     it('simple-roundtrip', () => {
