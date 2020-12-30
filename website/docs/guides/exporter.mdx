@@ -1,0 +1,59 @@
+---
+title: Export Data Model
+since: 1.2.0
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+After alphaTab has loaded a full [`Score`](/docs/reference/score) object from any input source, it can also be exported again to one of the supported export formats. 
+Supported export formats: 
+
+- Guitar Pro 7 (alphaTab.exporter.Gp7Exporter) <span class="badge badge--info badge--header">since 1.2.0-alpha.75</span>
+
+:::note
+More exporters are planned for the 1.5 release unless special feature requests of users are incoming. 
+:::
+
+To export a `Score` object the corresponding exporter needs to be created and called. Then the resulting binary array can be used further to 
+trigger a download, sent it to a server, save it to a file etc. 
+
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const exporter = new alphaTab.exporter.Gp7Exporter();
+const data = exporter.export(api.score, api.settings); // will return a Uint8Array
+
+// trigger download
+const a = document.createElement('a');
+a.download = api.score.title.length > 0 ? api.score.title + '.gp' : 'Untitled.gp';
+a.href = URL.createObjectURL(new Blob([data]));
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+var exporter = new AlphaTab.Exporter.Gp7Exporter();
+AlphaTab.Core.EcmaScript.Uint8Array data = exporter.export(api.Score, api.Settings);
+ArraySegment<byte> bytes = data.Data;
+string fileName = api.Score.Title.Length > 0 ? api.Score.Title + ".gp" : "Untitled.gp";
+using(var fs = new System.IO.FileStream(fileName, System.IO.FileMode.Create)) 
+{
+    fs.Write(bytes.Array, bytes.Offset, bytes.Count);
+}
+```
+
+</TabItem>
+</Tabs>

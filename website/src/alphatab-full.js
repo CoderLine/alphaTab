@@ -488,6 +488,19 @@ class PlayerControlsGroup extends React.Component {
     this.props.api?.print();
   }
 
+  download(e) {
+    e.preventDefault();
+    const exporter = new alphaTab.exporter.Gp7Exporter();
+    const score = this.props.api.score;
+    const data = exporter.export(score, this.props.api.settings);
+    const a = document.createElement('a');
+    a.download = score.title.length > 0 ? score.title + '.gp' : 'Untitled.gp';
+    a.href = URL.createObjectURL(new Blob([data]));
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
   toggleLoop(e) {
     e.preventDefault();
     if (this.props.api) {
@@ -649,6 +662,19 @@ class PlayerControlsGroup extends React.Component {
             >
               <i className="fas fa-print"></i>
             </a>
+            <a
+              href="#"
+              onClick={this.download.bind(this)}
+              className={
+                "at-download" +
+                (this.props.api?.isReadyForPlayback ? "" : " disabled")
+              }
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Export to Guitar Pro 7"
+            >
+              <i className="fas fa-download"></i>
+            </a>
             <ZoomLevelSelector api={this.props.api} />
             <LayoutSelector api={this.props.api} />
 
@@ -692,6 +718,8 @@ export default class AlphaTab extends React.Component {
     this.setState({
       api: new alphaTab.AlphaTabApi(this.refs.alphaTab, this.state.settings),
     });
+    debugger;
+    jQuery(this.refs.wrapper).find('[data-toggle="tooltip"]').tooltip();
   }
 
   componentWillUnmount() {
@@ -791,7 +819,7 @@ export default class AlphaTab extends React.Component {
 
   render() {
     return (
-      <div className="at-wrap">
+      <div className="at-wrap" ref="wrapper">
         {this.state.isLoading && (
           <div className="at-overlay">
             <div className="at-overlay-content">
