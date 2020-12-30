@@ -32,7 +32,7 @@ export class Adler32 {
     /**
      * largest prime smaller than 65536
      */
-    private static readonly BASE: number = 65521;
+    private static readonly Base: number = 65521;
 
 
     /**
@@ -77,8 +77,8 @@ export class Adler32 {
                 s1 = s1 + (data[offset++] & 0xff);
                 s2 = s2 + s1;
             }
-            s1 %= Adler32.BASE;
-            s2 %= Adler32.BASE;
+            s1 %= Adler32.Base;
+            s2 %= Adler32.Base;
         }
         this.value = (s2 << 16) | s1;
     }

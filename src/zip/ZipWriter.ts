@@ -28,7 +28,7 @@ class ZipCentralDirectoryHeader {
 export class ZipWriter {
     private _data: IWriteable;
     private _centralDirectoryHeaders: ZipCentralDirectoryHeader[] = [];
-    private _deflater: Deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+    private _deflater: Deflater = new Deflater();
 
     public constructor(data: IWriteable) {
         this._data = data;
@@ -87,7 +87,6 @@ export class ZipWriter {
 
             // init deflater
             this._deflater.reset();
-            this._deflater.setLevel(Deflater.DEFAULT_COMPRESSION);
 
             // write data
             this._deflater.setInput(data, 0, data.length);

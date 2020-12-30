@@ -1,13 +1,4 @@
 // This Inflate algorithm is based on the Inflate class of the Haxe Standard Library (MIT)
-import { FormatError } from '@src/FormatError';
-import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
-import {
-    Found as HuffmanFound,
-    Huffman,
-    NeedBit as HuffmanNeedBit,
-    NeedBits as HuffmanNeedBits
-} from '@src/zip/Huffman';
 /*
  * Copyright (C)2005-2019 Haxe Foundation
  *
@@ -29,6 +20,15 @@ import {
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+import { FormatError } from '@src/FormatError';
+import { IOHelper } from '@src/io/IOHelper';
+import { IReadable } from '@src/io/IReadable';
+import {
+    Found as HuffmanFound,
+    Huffman,
+    NeedBit as HuffmanNeedBit,
+    NeedBits as HuffmanNeedBits
+} from '@src/zip/Huffman';
 import { HuffTools } from '@src/zip/HuffTools';
 
 enum InflateState {

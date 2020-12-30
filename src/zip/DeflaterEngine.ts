@@ -19,12 +19,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-import { Adler32 } from "./Adler32";
 import { Crc32 } from "./Crc32";
 import { DeflaterConstants } from "./DeflaterConstants";
 import { DeflaterHuffman } from "./DeflaterHuffman";
-import { DeflaterPending } from "./DeflaterPending";
-import { DeflateStrategy } from "./DeflateStrategy";
+import { PendingBuffer } from "./PendingBuffer";
 
 /**
  * Low level compression engine for deflate algorithm which uses a 32K sliding window
@@ -34,20 +32,14 @@ export class DeflaterEngine {
     private static readonly TooFar: number = 4096;
 
     private blockStart: number;
-    private max_chain: number = 0;
-    private max_lazy: number = 0;
-    private niceLength: number = 0;
-    private goodLength: number = 0;
+    private maxChain: number = 128;
+    private niceLength: number = 128;
+    private goodLength: number = 8;
 
     /**
      * Hash index of string to be inserted
      */
-    private ins_h: number = 0;
-
-    /**
-     * The current compression function.
-     */
-    private compressionFunction: number = 0;
+    private insertHashIndex: number = 0;
 
     /**
      * Points to the current character in the window.
@@ -90,11 +82,6 @@ export class DeflaterEngine {
      */
     private inputBuf: Uint8Array | null = null;
 
-    // /**
-    //  * The total bytes of input read.
-    //  */
-    // private totalIn: number = 0;
-
     /**
      * The offset into inputBuf, where input data starts.
      */
@@ -118,34 +105,20 @@ export class DeflaterEngine {
      */
     private matchLen: number = 0;
 
-    private pending: DeflaterPending;
+    private pending: PendingBuffer;
     private huffman: DeflaterHuffman;
 
     public inputCrc: Crc32;
-    /**
-     * The adler checksum
-     */
-    public adler: Adler32 | null;
-
-    /**
-     * Get/set the deflate strategy
-     */
-    public strategy: DeflateStrategy = DeflateStrategy.Default;
 
     /**
      * Construct instance with pending buffer
      * @param pending Pending buffer to use
      * @param noAdlerCalculation Pending buffer to use
      */
-    public constructor(pending: DeflaterPending, noAdlerCalculation: boolean) {
+    public constructor(pending: PendingBuffer) {
         this.pending = pending;
         this.huffman = new DeflaterHuffman(pending);
         this.inputCrc = new Crc32();
-        if (!noAdlerCalculation) {
-            this.adler = new Adler32();
-        } else {
-            this.adler = null;
-        }
 
         this.window = new Uint8Array(2 * DeflaterConstants.WSIZE);
         this.head = new Int16Array(DeflaterConstants.HASH_SIZE);
@@ -158,23 +131,14 @@ export class DeflaterEngine {
     }
 
     /**
-     * Reset Adler checksum
-     */
-    public resetAdler() {
-        this.adler?.reset();
-    }
-
-    /**
      * Reset internal state
      */
     public reset() {
         this.huffman.reset();
-        this.adler?.reset();
         this.inputCrc.reset();
         this.blockStart = 1;
         this.strstart = 1;
         this.lookahead = 0;
-        // this.totalIn = 0;
         this.prevAvailable = false;
         this.matchLen = DeflaterConstants.MIN_MATCH - 1;
 
@@ -187,53 +151,9 @@ export class DeflaterEngine {
         }
     }
 
-    /**
-     * Set the deflate level (0-9)
-     * @param level The value to set the level to.
-     */
-    public setLevel(level: number) {
-        this.goodLength = DeflaterConstants.GOOD_LENGTH[level];
-        this.max_lazy = DeflaterConstants.MAX_LAZY[level];
-        this.niceLength = DeflaterConstants.NICE_LENGTH[level];
-        this.max_chain = DeflaterConstants.MAX_CHAIN[level];
-
-        if (DeflaterConstants.COMPR_FUNC[level] != this.compressionFunction) {
-            switch (this.compressionFunction) {
-                case DeflaterConstants.DEFLATE_STORED:
-                    if (this.strstart > this.blockStart) {
-                        this.huffman.flushStoredBlock(this.window, this.blockStart,
-                            this.strstart - this.blockStart, false);
-                        this.blockStart = this.strstart;
-                    }
-                    this.updateHash();
-                    break;
-
-                case DeflaterConstants.DEFLATE_FAST:
-                    if (this.strstart > this.blockStart) {
-                        this.huffman.flushBlock(this.window, this.blockStart, this.strstart - this.blockStart,
-                            false);
-                        this.blockStart = this.strstart;
-                    }
-                    break;
-
-                case DeflaterConstants.DEFLATE_SLOW:
-                    if (this.prevAvailable) {
-                        this.huffman.tallyLit(this.window[this.strstart - 1] & 0xff);
-                    }
-                    if (this.strstart > this.blockStart) {
-                        this.huffman.flushBlock(this.window, this.blockStart, this.strstart - this.blockStart, false);
-                        this.blockStart = this.strstart;
-                    }
-                    this.prevAvailable = false;
-                    this.matchLen = DeflaterConstants.MIN_MATCH - 1;
-                    break;
-            }
-            this.compressionFunction = DeflaterConstants.COMPR_FUNC[level];
-        }
-    }
 
     private updateHash() {
-        this.ins_h = (this.window[this.strstart] << DeflaterConstants.HASH_SHIFT) ^ this.window[this.strstart + 1];
+        this.insertHashIndex = (this.window[this.strstart] << DeflaterConstants.HASH_SHIFT) ^ this.window[this.strstart + 1];
     }
 
     /**
@@ -269,118 +189,9 @@ export class DeflaterEngine {
         do {
             this.fillWindow();
             let canFlush = flush && (this.inputOff == this.inputEnd);
-
-            switch (this.compressionFunction) {
-                case DeflaterConstants.DEFLATE_STORED:
-                    progress = this.deflateStored(canFlush, finish);
-                    break;
-
-                case DeflaterConstants.DEFLATE_FAST:
-                    progress = this.deflateFast(canFlush, finish);
-                    break;
-
-                case DeflaterConstants.DEFLATE_SLOW:
-                    progress = this.deflateSlow(canFlush, finish);
-                    break;
-
-                default:
-                    throw new Error("unknown compressionFunction");
-            }
+            progress = this.deflateSlow(canFlush, finish);
         } while (this.pending.isFlushed && progress); // repeat while we have no pending output and progress was made
         return progress;
-    }
-
-    private deflateStored(flush: boolean, finish: boolean): boolean {
-        if (!flush && (this.lookahead == 0)) {
-            return false;
-        }
-
-        this.strstart += this.lookahead;
-        this.lookahead = 0;
-
-        let storedLength = this.strstart - this.blockStart;
-
-        if ((storedLength >= DeflaterConstants.MAX_BLOCK_SIZE) || // Block is full
-            (this.blockStart < DeflaterConstants.WSIZE && storedLength >= DeflaterConstants.MAX_DIST) ||   // Block may move out of window
-            flush) {
-            let lastBlock = finish;
-            if (storedLength > DeflaterConstants.MAX_BLOCK_SIZE) {
-                storedLength = DeflaterConstants.MAX_BLOCK_SIZE;
-                lastBlock = false;
-            }
-
-            this.huffman.flushStoredBlock(this.window, this.blockStart, storedLength, lastBlock);
-            this.blockStart += storedLength;
-            return !(lastBlock || storedLength == 0);
-        }
-        return true;
-    }
-
-    private deflateFast(flush: boolean, finish: boolean): boolean {
-        if (this.lookahead < DeflaterConstants.MIN_LOOKAHEAD && !flush) {
-            return false;
-        }
-
-        while (this.lookahead >= DeflaterConstants.MIN_LOOKAHEAD || flush) {
-            if (this.lookahead == 0) {
-                // We are flushing everything
-                this.huffman.flushBlock(this.window, this.blockStart, this.strstart - this.blockStart, finish);
-                this.blockStart = this.strstart;
-                return false;
-            }
-
-            if (this.strstart > 2 * DeflaterConstants.WSIZE - DeflaterConstants.MIN_LOOKAHEAD) {
-                /* slide window, as FindLongestMatch needs this.
-                 * This should only happen when flushing and the window
-                 * is almost full.
-                 */
-                this.slideWindow();
-            }
-
-            let hashHead: number;
-            if (this.lookahead >= DeflaterConstants.MIN_MATCH &&
-                (hashHead = this.insertString()) != 0 &&
-                this.strategy != DeflateStrategy.HuffmanOnly &&
-                this.strstart - hashHead <= DeflaterConstants.MAX_DIST &&
-                this.findLongestMatch(hashHead)) {
-                // longestMatch sets matchStart and matchLen
-
-                let full = this.huffman.tallyDist(this.strstart - this.matchStart, this.matchLen);
-
-                this.lookahead -= this.matchLen;
-                if (this.matchLen <= this.max_lazy && this.lookahead >= DeflaterConstants.MIN_MATCH) {
-                    while (--this.matchLen > 0) {
-                        ++this.strstart;
-                        this.insertString();
-                    }
-                    ++this.strstart;
-                }
-                else {
-                    this.strstart += this.matchLen;
-                    if (this.lookahead >= DeflaterConstants.MIN_MATCH - 1) {
-                        this.updateHash();
-                    }
-                }
-                this.matchLen = DeflaterConstants.MIN_MATCH - 1;
-                if (!full) {
-                    continue;
-                }
-            }
-            else {
-                // No match found
-                this.huffman.tallyLit(this.window[this.strstart] & 0xff);
-                ++this.strstart;
-                --this.lookahead;
-            }
-
-            if (this.huffman.isFull()) {
-                let lastBlock = finish && (this.lookahead == 0);
-                this.huffman.flushBlock(this.window, this.blockStart, this.strstart - this.blockStart, lastBlock);
-                this.blockStart = this.strstart;
-                return !lastBlock;
-            }
-        }
-        return true;
     }
 
     private deflateSlow(flush: boolean, finish: boolean): boolean {
@@ -415,14 +226,13 @@ export class DeflaterEngine {
             if (this.lookahead >= DeflaterConstants.MIN_MATCH) {
                 let hashHead = this.insertString();
 
-                if (this.strategy != DeflateStrategy.HuffmanOnly &&
-                    hashHead != 0 &&
+                if (hashHead != 0 &&
                     this.strstart - hashHead <= DeflaterConstants.MAX_DIST &&
                     this.findLongestMatch(hashHead)) {
                     // longestMatch sets matchStart and matchLen
 
                     // Discard match if too small and too far away
-                    if (this.matchLen <= 5 && (this.strategy == DeflateStrategy.Filtered || (this.matchLen == DeflaterConstants.MIN_MATCH && this.strstart - this.matchStart > DeflaterEngine.TooFar))) {
+                    if (this.matchLen == DeflaterConstants.MIN_MATCH && this.strstart - this.matchStart > DeflaterEngine.TooFar) {
                         this.matchLen = DeflaterConstants.MIN_MATCH - 1;
                     }
                 }
@@ -485,7 +295,7 @@ export class DeflaterEngine {
 
         let window = this.window;
         let prev = this.prev;
-        let chainLength = this.max_chain;
+        let chainLength = this.maxChain;
         let niceLength = Math.min(this.niceLength, this.lookahead);
 
         this.matchLen = Math.max(this.matchLen, DeflaterConstants.MIN_MATCH - 1);
@@ -616,11 +426,11 @@ export class DeflaterEngine {
      */
     private insertString(): number {
         let match: number;
-        let hash = ((this.ins_h << DeflaterConstants.HASH_SHIFT) ^ this.window[this.strstart + (DeflaterConstants.MIN_MATCH - 1)]) & DeflaterConstants.HASH_MASK;
+        let hash = ((this.insertHashIndex << DeflaterConstants.HASH_SHIFT) ^ this.window[this.strstart + (DeflaterConstants.MIN_MATCH - 1)]) & DeflaterConstants.HASH_MASK;
 
         this.prev[this.strstart & DeflaterConstants.WMASK] = match = this.head[hash];
         this.head[hash] = this.strstart;
-        this.ins_h = hash;
+        this.insertHashIndex = hash;
         return match & 0xffff;
     }
 
@@ -647,7 +457,6 @@ export class DeflaterEngine {
 
             this.window.set(this.inputBuf!.subarray(this.inputOff, this.inputOff + more), this.strstart + this.lookahead);
             this.inputCrc.update(this.inputBuf!, this.inputOff, more);
-            this.adler?.update(this.inputBuf!, this.inputOff, more);
 
             this.inputOff += more;
             // this.totalIn += more;

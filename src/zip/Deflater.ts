@@ -21,8 +21,7 @@
 
 import { DeflaterConstants } from "./DeflaterConstants";
 import { DeflaterEngine } from "./DeflaterEngine";
-import { DeflaterPending } from "./DeflaterPending";
-import { DeflateStrategy } from "./DeflateStrategy";
+import { PendingBuffer } from "./PendingBuffer";
 
 /**
  * This is the Deflater class.  The deflater class compresses input
@@ -70,47 +69,16 @@ export class Deflater {
      *
      */
 
-    public static readonly DEFAULT_COMPRESSION: number = -1;
+    private static readonly IsFlushing: number = 0x04;
+    private static readonly IsFinishing: number = 0x08;
 
-    /**
-     * This level won't compress at all but output uncompressed blocks.
-     */
-    public static readonly NO_COMPRESSION: number = 0;
-
-    /**
-     * The best and slowest compression level.  This tries to find very
-     * long and distant string repetitions.
-     */
-    public static readonly BEST_COMPRESSION: number = 9;
-
-    /**
-     * The compression method.  This is the only method supported so far.
-     * There is no need to use this constant at all.
-     */
-    public static readonly DEFLATED: number = 8;
-
-
-    private static readonly IS_SETDICT: number = 0x01;
-    private static readonly IS_FLUSHING: number = 0x04;
-    private static readonly IS_FINISHING: number = 0x08;
-
-    private static readonly INIT_STATE: number = 0x00;
-    private static readonly BUSY_STATE: number = 0x10;
-
-    private static readonly FLUSHING_STATE: number = 0x14;
-    private static readonly FINISHING_STATE: number = 0x1c;
-    private static readonly FINISHED_STATE: number = 0x1e;
-
-
-    /**
-     * If true no Zlib/RFC1950 headers or footers are generated
-     */
-    private _noZlibHeaderOrFooter: boolean = false;
+    private static readonly BusyState: number = 0x10;
+    private static readonly FlushingState: number = 0x14;
+    private static readonly FinishingState: number = 0x1c;
+    private static readonly FinishedState: number = 0x1e;
 
     private _state: number = 0;
-    // private _totalOut: number = 0;
-    private _level: number = 0;
-    private _pending: DeflaterPending;
+    private _pending: PendingBuffer;
     private _engine: DeflaterEngine;
 
     public get inputCrc(): number {
@@ -120,49 +88,13 @@ export class Deflater {
     /**
      * Creates a new deflater with given compression level
      * @param level the compression level, a value between NO_COMPRESSION and BEST_COMPRESSION.
-     * @param noZlibHeaderOrFooter true, if we should suppress the Zlib/RFC1950 header at the
      * beginning and the adler checksum at the end of the output.  This is
      * useful for the GZIP/PKZIP formats.
      */
-    public constructor(level: number, noZlibHeaderOrFooter: boolean) {
-        this._pending = new DeflaterPending();
-        this._engine = new DeflaterEngine(this._pending, noZlibHeaderOrFooter);
-        this._noZlibHeaderOrFooter = noZlibHeaderOrFooter;
-        this.setStrategy(DeflateStrategy.Default);
-        this.setLevel(level);
+    public constructor() {
+        this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
+        this._engine = new DeflaterEngine(this._pending);
         this.reset();
-    }
-
-    /**
-     * Sets the compression strategy. Strategy is one of
-     * DEFAULT_STRATEGY, HUFFMAN_ONLY and FILTERED.  For the exact
-     * position where the strategy is changed, the same as for
-     * SetLevel() applies.
-     * @param strategy The new compression strategy.
-     */
-    public setStrategy(strategy: DeflateStrategy) {
-        this._engine.strategy = strategy;
-    }
-
-    /**
-     * Sets the compression level.  There is no guarantee of the exact
-     * position of the change, but if you call this when needsInput is
-     * true the change of compression level will occur somewhere near
-     * before the end of the so far given input.
-     * @param level the new compression level.
-     */
-    public setLevel(level: number) {
-        if (level == Deflater.DEFAULT_COMPRESSION) {
-            level = 6;
-        }
-        else if (level < Deflater.NO_COMPRESSION || level > Deflater.BEST_COMPRESSION) {
-            throw new Error("level out of range");
-        }
-
-        if (this._level != level) {
-            this._level = level;
-            this._engine.setLevel(level);
-        }
     }
 
     /**
@@ -180,7 +112,7 @@ export class Deflater {
      * are available.
      */
     public get isFinished() {
-        return (this._state == Deflater.FINISHED_STATE) && this._pending.isFlushed;
+        return (this._state == Deflater.FinishedState) && this._pending.isFlushed;
     }
 
     /**
@@ -189,8 +121,7 @@ export class Deflater {
      * had before.
      */
     public reset() {
-        this._state = (this._noZlibHeaderOrFooter ? Deflater.BUSY_STATE : Deflater.INIT_STATE);
-        // this._totalOut = 0;
+        this._state = Deflater.BusyState;
         this._pending.reset();
         this._engine.reset();
     }
@@ -219,76 +150,40 @@ export class Deflater {
     public deflate(output: Uint8Array, offset: number, length: number): number {
         let origLength = length;
 
-        if (this._state < Deflater.BUSY_STATE) {
-            // output header
-            let header = (Deflater.DEFLATED +
-                ((DeflaterConstants.MAX_WBITS - 8) << 4)) << 8;
-            let level_flags = (this._level - 1) >> 1;
-            if (level_flags < 0 || level_flags > 3) {
-                level_flags = 3;
-            }
-            header |= level_flags << 6;
-            if ((this._state & Deflater.IS_SETDICT) != 0) {
-                // Dictionary was set
-                header |= DeflaterConstants.PRESET_DICT;
-            }
-            header += 31 - (header % 31);
-
-            this._pending.writeShortMSB(header);
-            if ((this._state & Deflater.IS_SETDICT) != 0) {
-                let chksum = this._engine.adler?.value ?? 0;
-                this._engine.resetAdler();
-                this._pending.writeShortMSB(chksum >> 16);
-                this._pending.writeShortMSB(chksum & 0xffff);
-            }
-
-            this._state = Deflater.BUSY_STATE | (this._state & (Deflater.IS_FLUSHING | Deflater.IS_FINISHING));
-        }
-
         for (; ;) {
             let count = this._pending.flush(output, offset, length);
             offset += count;
-            // this._totalOut += count;
             length -= count;
 
-            if (length == 0 || this._state == Deflater.FINISHED_STATE) {
+            if (length == 0 || this._state == Deflater.FinishedState) {
                 break;
             }
 
-            if (!this._engine.deflate((this._state & Deflater.IS_FLUSHING) != 0, (this._state & Deflater.IS_FINISHING) != 0)) {
+            if (!this._engine.deflate((this._state & Deflater.IsFlushing) != 0, (this._state & Deflater.IsFinishing) != 0)) {
                 switch (this._state) {
-                    case Deflater.BUSY_STATE:
+                    case Deflater.BusyState:
                         // We need more input now
                         return origLength - length;
 
-                    case Deflater.FLUSHING_STATE:
-                        if (this._level != Deflater.NO_COMPRESSION) {
-                            /* We have to supply some lookahead.  8 bit lookahead
-                             * is needed by the zlib inflater, and we must fill
-                             * the next byte, so that all bits are flushed.
-                             */
-                            let neededbits = 8 + ((-this._pending.bitCount) & 7);
-                            while (neededbits > 0) {
-                                /* write a static tree block consisting solely of
-                                 * an EOF:
-                                 */
-                                this._pending.writeBits(2, 10);
-                                neededbits -= 10;
-                            }
+                    case Deflater.FlushingState:
+                        /* We have to supply some lookahead.  8 bit lookahead
+                            * is needed by the zlib inflater, and we must fill
+                            * the next byte, so that all bits are flushed.
+                            */
+                        let neededbits = 8 + ((-this._pending.bitCount) & 7);
+                        while (neededbits > 0) {
+                            /* write a static tree block consisting solely of
+                                * an EOF:
+                                */
+                            this._pending.writeBits(2, 10);
+                            neededbits -= 10;
                         }
-                        this._state = Deflater.BUSY_STATE;
+                        this._state = Deflater.BusyState;
                         break;
 
-                    case Deflater.FINISHING_STATE:
+                    case Deflater.FinishingState:
                         this._pending.alignToByte();
-
-                        // Compressed data is complete.  Write footer information if required.
-                        if (!this._noZlibHeaderOrFooter) {
-                            let adler = this._engine.adler?.value ?? 0;
-                            this._pending.writeShortMSB(adler >> 16);
-                            this._pending.writeShortMSB(adler & 0xffff);
-                        }
-                        this._state = Deflater.FINISHED_STATE;
+                        this._state = Deflater.FinishedState;
                         break;
                 }
             }
@@ -303,6 +198,6 @@ export class Deflater {
      * be called to force all bytes to be flushed.    
      */
     public finish() {
-        this._state |= (Deflater.IS_FLUSHING | Deflater.IS_FINISHING);
+        this._state |= (Deflater.IsFlushing | Deflater.IsFinishing);
     }
 }
