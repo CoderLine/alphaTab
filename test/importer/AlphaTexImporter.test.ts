@@ -1,5 +1,6 @@
 import { StaveProfile } from '@src/DisplaySettings';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { Beat } from '@src/model/Beat';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
@@ -849,5 +850,27 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isLeftHandTapped).toEqual(false);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isLeftHandTapped).toEqual(true);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLeftHandTapped).toEqual(false);
+    });
+
+    it('expect-invalid-format-xml', () => {
+        try {
+            parseTex('<xml>');
+            fail('Expected error');
+        } catch(e) {
+            if(!(e instanceof UnsupportedFormatError)) {
+                fail(`Expected UnsupportedFormatError got ${e}`);
+            }
+        }
+    });
+    
+    it('expect-invalid-format-other-text', () => {
+        try {
+            parseTex('This is not an alphaTex file');
+            fail('Expected error');
+        } catch(e) {
+            if(!(e instanceof UnsupportedFormatError)) {
+                fail(`Expected UnsupportedFormatError got ${e}`);
+            }
+        }
     });
 });
