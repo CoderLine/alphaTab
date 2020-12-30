@@ -231,7 +231,7 @@ export class GpifWriter {
 
         this.writeDom(xmlDocument, score);
 
-        return xmlDocument.toString('  ', true);
+        return xmlDocument.toString('', true);
     }
 
     private writeDom(parent: XmlNode, score: Score) {

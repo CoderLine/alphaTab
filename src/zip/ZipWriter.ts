@@ -78,7 +78,13 @@ export class ZipWriter {
     // TypeScript definition, for reference.
     // export default function crc32( data: Buffer | Uint8Array | number[] ) {
     private static crc32(input: Uint8Array) {
-        return ~input.reduce((crc, b) => ZipWriter.Crc32Lookup[(crc ^ b) & 0xff] ^ (crc >>> 8), 0xffffffff);
+        let crc = 0xffffffff;
+
+        for(let i = 0, j = input.length; i < j; i++) {
+            crc = ZipWriter.Crc32Lookup[(crc ^ input[i]) & 0xff] ^ (crc >>> 8);
+        }
+
+        return ~crc;
     }
 
     public end() {
