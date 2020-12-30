@@ -1,22 +1,34 @@
+import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
 import { IWriteable } from '@src/io/IWriteable';
+import { Crc32 } from './Crc32';
+import { Deflater } from './Deflater';
 import { ZipEntry } from './ZipEntry';
 
 class ZipCentralDirectoryHeader {
     public entry: ZipEntry;
     public localHeaderOffset: number;
+    public compressedSize: number;
     public crc32: number;
+    public compressionMode: number;
 
-    public constructor(entry: ZipEntry, crc32: number, localHeaderOffset: number) {
+    public constructor(entry: ZipEntry,
+        crc32: number,
+        localHeaderOffset: number,
+        compressionMode: number,
+        compressedSize: number) {
         this.entry = entry;
         this.crc32 = crc32;
         this.localHeaderOffset = localHeaderOffset;
+        this.compressionMode = compressionMode;
+        this.compressedSize = compressedSize;
     }
 }
 
 export class ZipWriter {
     private _data: IWriteable;
     private _centralDirectoryHeaders: ZipCentralDirectoryHeader[] = [];
+    private _deflater: Deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
 
     public constructor(data: IWriteable) {
         this._data = data;
@@ -24,18 +36,22 @@ export class ZipWriter {
 
     public writeEntry(entry: ZipEntry) {
         // 4.3.7 local file header
+        const compressionMode = ZipEntry.CompressionMethodDeflate;
 
-        const crc32 = ZipWriter.crc32(entry.data);
-        this._centralDirectoryHeaders.push(new ZipCentralDirectoryHeader(entry, crc32, this._data.bytesWritten));
+        const compressedData = ByteBuffer.empty();
+        const crc32 = this.compress(compressedData, entry.data, compressionMode);
+        const compressedDataArray = compressedData.toArray();
+        const directoryHeader = new ZipCentralDirectoryHeader(entry, crc32, this._data.bytesWritten, compressionMode, compressedData.length);
+        this._centralDirectoryHeaders.push(directoryHeader);
 
         // Signature
         IOHelper.writeInt32LE(this._data, ZipEntry.LocalFileHeaderSignature);
         // Version
         IOHelper.writeUInt16LE(this._data, 10);
         // Flags
-        IOHelper.writeUInt16LE(this._data, 0);
+        IOHelper.writeUInt16LE(this._data, 0x0800);
         // Compression
-        IOHelper.writeUInt16LE(this._data, 0);
+        IOHelper.writeUInt16LE(this._data, compressionMode);
         // last mod file time
         IOHelper.writeInt16LE(this._data, 0);
         // last mod file date
@@ -43,7 +59,7 @@ export class ZipWriter {
         // crc-32
         IOHelper.writeInt32LE(this._data, crc32);
         // compressed size
-        IOHelper.writeInt32LE(this._data, entry.data.length);
+        IOHelper.writeInt32LE(this._data, compressedDataArray.length);
         // uncompressed size
         IOHelper.writeInt32LE(this._data, entry.data.length);
         // file name length
@@ -57,34 +73,46 @@ export class ZipWriter {
         // <empty>
 
         // 4.3.8 File Data
-        this._data.write(entry.data, 0, entry.data.length);
+        this._data.write(compressedDataArray, 0, compressedDataArray.length);
     }
 
-    private static readonly Crc32Lookup: Uint32Array = ZipWriter.buildCrc32Lookup();
-    private static buildCrc32Lookup(): Uint32Array {
-        const poly = 0xedb88320;
-        const lookup = new Uint32Array(256);
-        for(let i = 0; i < lookup.length; i++) {
-            let crc = i;
-            for (let bit = 0; bit < 8; bit++) {
-                crc = (crc & 1) === 1 ? (crc >>> 1) ^ poly : crc >>> 1;
+    private compress(output: IWriteable, data: Uint8Array, compressionMode: number): number {
+        if (compressionMode != ZipEntry.CompressionMethodDeflate) {
+            const crc = new Crc32();
+            crc.update(data, 0, data.length);
+            output.write(data, 0, data.length);
+            return crc.value;
+        } else {
+            let buffer: Uint8Array = new Uint8Array(512);
+
+            // init deflater
+            this._deflater.reset();
+            this._deflater.setLevel(Deflater.DEFAULT_COMPRESSION);
+
+            // write data
+            this._deflater.setInput(data, 0, data.length);
+            while (!this._deflater.isNeedingInput) {
+                const len = this._deflater.deflate(buffer, 0, buffer.length);
+                if (len <= 0) {
+                    break;
+                }
+
+                output.write(buffer, 0, len);
             }
-            lookup[i] = crc;
+
+            // let deflater finish up
+            this._deflater.finish();
+            while (!this._deflater.isFinished) {
+                const len = this._deflater.deflate(buffer, 0, buffer.length);
+                if (len <= 0) {
+                    break;
+                }
+
+                output.write(buffer, 0, len);
+            }
+
+            return this._deflater.inputCrc;
         }
-
-        return lookup;
-    }
-
-    // TypeScript definition, for reference.
-    // export default function crc32( data: Buffer | Uint8Array | number[] ) {
-    private static crc32(input: Uint8Array) {
-        let crc = 0xffffffff;
-
-        for(let i = 0, j = input.length; i < j; i++) {
-            crc = ZipWriter.Crc32Lookup[(crc ^ input[i]) & 0xff] ^ (crc >>> 8);
-        }
-
-        return ~crc;
     }
 
     public end() {
@@ -138,9 +166,9 @@ export class ZipWriter {
         // version needed to extract
         IOHelper.writeUInt16LE(this._data, 10);
         // Flags
-        IOHelper.writeUInt16LE(this._data, 0);
+        IOHelper.writeUInt16LE(this._data, 0x0800);
         // Compression
-        IOHelper.writeUInt16LE(this._data, 0);
+        IOHelper.writeUInt16LE(this._data, header.compressionMode);
         // last mod file time
         IOHelper.writeInt16LE(this._data, 0);
         // last mod file date
@@ -148,7 +176,7 @@ export class ZipWriter {
         // crc-32
         IOHelper.writeInt32LE(this._data, header.crc32);
         // compressed size
-        IOHelper.writeInt32LE(this._data, header.entry.data.length);
+        IOHelper.writeInt32LE(this._data, header.compressedSize);
         // uncompressed size
         IOHelper.writeInt32LE(this._data, header.entry.data.length);
         // file name length
