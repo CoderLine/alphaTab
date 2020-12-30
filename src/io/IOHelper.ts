@@ -1,6 +1,7 @@
 import { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
 import { Environment } from '@src/Environment';
+import { IWriteable } from './IWriteable';
 
 export class IOHelper {
     public static readInt32BE(input: IReadable): number {
@@ -154,7 +155,7 @@ export class IOHelper {
             return s;
         }
     }
-    
+
     private static detectEncoding(data: Uint8Array): string | null {
         if (data.length > 2 && data[0] === 0xfe && data[1] === 0xff) {
             return 'utf-16be';
@@ -169,5 +170,84 @@ export class IOHelper {
             return 'utf-32le';
         }
         return null;
-    }    
+    }
+
+    public static stringToBytes(str: string): Uint8Array {
+        if (Environment.supportsTextDecoder) {
+            let decoder: TextEncoder = new TextEncoder();
+            return decoder.encode(str);
+        } else {
+            // manual UTF8 decoding for older browsers
+            // https://developer.mozilla.org/de/docs/Web/API/TextEncoder
+            const Len = str.length;
+            let resPos = -1;
+            const resArr = new Uint8Array(Len * 3);
+
+            for (let point = 0, nextcode = 0, i = 0; i !== Len; ) {
+                point = str.charCodeAt(i);
+                i += 1;
+                if (point >= 0xd800 && point <= 0xdbff) {
+                    if (i === Len) {
+                        resArr[(resPos += 1)] = 0xef /*0b11101111*/;
+                        resArr[(resPos += 1)] = 0xbf /*0b10111111*/;
+                        resArr[(resPos += 1)] = 0xbd /*0b10111101*/;
+                        break;
+                    }
+                    // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+                    nextcode = str.charCodeAt(i);
+                    if (nextcode >= 0xdc00 && nextcode <= 0xdfff) {
+                        point = (point - 0xd800) * 0x400 + nextcode - 0xdc00 + 0x10000;
+                        i += 1;
+                        if (point > 0xffff) {
+                            resArr[(resPos += 1)] = (0x1e /*0b11110*/ << 3) | (point >>> 18);
+                            resArr[(resPos += 1)] = (0x2 /*0b10*/ << 6) | ((point >>> 12) & 0x3f) /*0b00111111*/;
+                            resArr[(resPos += 1)] = (0x2 /*0b10*/ << 6) | ((point >>> 6) & 0x3f) /*0b00111111*/;
+                            resArr[(resPos += 1)] = (0x2 /*0b10*/ << 6) | (point & 0x3f) /*0b00111111*/;
+                            continue;
+                        }
+                    } else {
+                        resArr[(resPos += 1)] = 0xef /*0b11101111*/;
+                        resArr[(resPos += 1)] = 0xbf /*0b10111111*/;
+                        resArr[(resPos += 1)] = 0xbd /*0b10111101*/;
+                        continue;
+                    }
+                }
+                if (point <= 0x007f) {
+                    resArr[(resPos += 1)] = (0x0 /*0b0*/ << 7) | point;
+                } else if (point <= 0x07ff) {
+                    resArr[(resPos += 1)] = (0x6 /*0b110*/ << 5) | (point >>> 6);
+                    resArr[(resPos += 1)] = (0x2 /*0b10*/ << 6) | (point & 0x3f) /*0b00111111*/;
+                } else {
+                    resArr[(resPos += 1)] = (0xe /*0b1110*/ << 4) | (point >>> 12);
+                    resArr[(resPos += 1)] = (0x2 /*0b10*/ << 6) | ((point >>> 6) & 0x3f) /*0b00111111*/;
+                    resArr[(resPos += 1)] = (0x2 /*0b10*/ << 6) | (point & 0x3f) /*0b00111111*/;
+                }
+            }
+            return resArr.subarray(0, resPos + 1);
+        }
+    }
+
+    public static writeInt32BE(o: IWriteable, v: number) {
+        o.writeByte((v >> 24) & 0xFF);
+        o.writeByte((v >> 16) & 0xFF);
+        o.writeByte((v >> 8) & 0xFF);
+        o.writeByte((v >> 0) & 0xFF);
+    }
+
+    public static writeInt32LE(o: IWriteable, v: number) {
+        o.writeByte((v >> 0) & 0xFF);    
+        o.writeByte((v >> 8) & 0xFF);
+        o.writeByte((v >> 16) & 0xFF);
+        o.writeByte((v >> 24) & 0xFF);
+    }
+
+    public static writeUInt16LE(o: IWriteable, v: number) {
+        o.writeByte((v >> 0) & 0xFF);    
+        o.writeByte((v >> 8) & 0xFF);
+    }
+
+    public static writeInt16LE(o: IWriteable, v: number) {
+        o.writeByte((v >> 0) & 0xFF);
+        o.writeByte((v >> 8) & 0xFF);
+    }
 }

@@ -10,6 +10,6 @@ describe('SpecialTracksTests', () => {
     });
 
     it('grand-staff', async () => {
-        await VisualTestHelper.runVisualTest('special-tracks/grand-staff.gpx');
+        await VisualTestHelper.runVisualTest('special-tracks/grand-staff.gp');
     });
 });

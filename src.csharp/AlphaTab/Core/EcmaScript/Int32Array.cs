@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Core.EcmaScript
 {
-    public class Int32Array
+    public class Int32Array : IEnumerable<int>
     {
         private readonly int[] _data;
 
@@ -35,6 +37,16 @@ namespace AlphaTab.Core.EcmaScript
                     _data[j] = i;
                 }
             }
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            return ((IEnumerable<int>)_data).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

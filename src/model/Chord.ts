@@ -1,5 +1,8 @@
 import { Staff } from '@src/model/Staff';
 
+// TODO: rework model to specify for each finger 
+// on which frets they are placed. 
+
 /**
  * A chord definition.
  * @json

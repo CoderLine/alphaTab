@@ -613,7 +613,7 @@ export default class CSharpEmitterContext {
         }
 
         // object -> object
-        if(tsType.flags === ts.TypeFlags.NonPrimitive && 'objectFlags' in tsType && 'intrinsicName' in tsType) {
+        if (tsType.flags === ts.TypeFlags.NonPrimitive && 'objectFlags' in tsType && 'intrinsicName' in tsType) {
             const unknown = handleNullablePrimitive(cs.PrimitiveType.Object);
             unknown.isNullable = true;
             return unknown;
@@ -930,6 +930,12 @@ export default class CSharpEmitterContext {
     public getSmartCastType(expression: ts.Expression): ts.Type | null {
         // if the parent is already casting, we have no "smart" cast.
         if (expression.parent.kind === ts.SyntaxKind.AsExpression) {
+            return null;
+        }
+
+        // For Enum[value] we do not smart cast value to a number
+        if (ts.isElementAccessExpression(expression.parent) &&
+            expression.parent.argumentExpression === expression) {
             return null;
         }
 

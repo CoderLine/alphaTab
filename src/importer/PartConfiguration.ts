@@ -6,7 +6,6 @@ import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 
 export class TrackConfiguration {
-    public isVisible: boolean = false;
     public showSlash: boolean = false;
     public showStandardNotation: boolean = false;
     public showTablature: boolean = false;
@@ -78,5 +77,51 @@ export class PartConfiguration {
                 part.tracks.push(trackConfiguration);
             }
         }
+    }
+
+    public static writeForScore(score: Score): Uint8Array {
+        const writer = ByteBuffer.withCapacity(128);
+
+        const parts: Part[] = [
+            new Part() // default part always exists
+        ];
+
+        for (const track of score.tracks) {
+            for (const staff of track.staves) {
+
+                const trackConfiguration = new TrackConfiguration();
+                trackConfiguration.showStandardNotation = staff.showStandardNotation;
+                trackConfiguration.showTablature = staff.showTablature;
+
+                if (staff.index === 0) {
+                    parts[0].tracks.push(trackConfiguration);
+                } else {
+                    let part = new Part();
+                    part.tracks.push(trackConfiguration);
+                    parts.push(part);
+                }
+            }
+        }
+
+        IOHelper.writeInt32BE(writer, parts.length);
+        for (const part of parts) {
+            writer.writeByte(part.isMultiRest ? 1 : 0);
+            IOHelper.writeInt32BE(writer, part.tracks.length);
+            for(const track of part.tracks) {
+                let flags = 0;
+                if(track.showStandardNotation) {
+                    flags |= 0x01;
+                }
+                if(track.showTablature) {
+                    flags |= 0x02;
+                }
+                if(track.showSlash) {
+                    flags |= 0x04;
+                }
+                writer.writeByte(flags);
+            }
+        }
+
+        return writer.toArray();
     }
 }

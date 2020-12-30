@@ -13,6 +13,13 @@ import { Settings } from '@src/Settings';
 export class Voice {
     private _beatLookup!: Map<number, Beat>;
 
+    private static _globalBarId: number = 0;
+
+    /**
+     * Gets or sets the unique id of this bar.
+     */
+    public id: number = Voice._globalBarId++;
+
     /**
      * Gets or sets the zero-based index of this voice within the bar.
      * @json_ignore

@@ -8,6 +8,10 @@ import { MusicFontSymbol } from "./MusicFontSymbol";
  */
 export class InstrumentArticulation {
     /**
+     * Gets or sets the type of the element for which this articulation is for.
+     */
+    public elementType: string;
+    /**
      * Gets or sets the line the note head should be shown for standard notation
      */
     public staffLine: number;
@@ -36,13 +40,16 @@ export class InstrumentArticulation {
      */
     public outputMidiNumber: number;
 
-    public constructor(staffLine: number = 0,
+    public constructor(
+        elementType: string = "",
+        staffLine: number = 0,
         outputMidiNumber: number = 0,
         noteHeadDefault: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbolPlacement: TextBaseline = TextBaseline.Middle) {
+        this.elementType = elementType;
         this.outputMidiNumber = outputMidiNumber;
         this.staffLine = staffLine;
         this.noteHeadDefault = noteHeadDefault;

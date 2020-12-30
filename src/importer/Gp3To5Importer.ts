@@ -39,6 +39,8 @@ import { Voice } from '@src/model/Voice';
 
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { IWriteable } from '@src/io/IWriteable';
+import { Tuning } from '@src/model/Tuning';
 
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
@@ -129,6 +131,14 @@ export class Gp3To5Importer extends ScoreImporter {
         this.readMasterBars();
         this.readTracks();
         this.readBars();
+
+        // To be more in line with the GP7 structure we create an
+        // initial tempo automation on the first masterbar
+        if (this._score.masterBars.length > 0) {
+            this._score.masterBars[0].tempoAutomation = Automation.buildTempoAutomation(false, 0, this._score.tempo, 2);
+            this._score.masterBars[0].tempoAutomation.text = this._score.tempoLabel;
+        }
+
         this._score.finish(this.settings);
         if (this._lyrics && this._lyricsTrack >= 0) {
             this._score.tracks[this._lyricsTrack].applyLyrics(this._lyrics);
@@ -321,6 +331,7 @@ export class Gp3To5Importer extends ScoreImporter {
             newMasterBar.tripletFeel = this._globalTripletFeel;
         }
         newMasterBar.isDoubleBar = (flags & 0x80) !== 0;
+
         this._score.addMasterBar(newMasterBar);
     }
 
@@ -499,7 +510,6 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((flags & 0x04) !== 0) {
             newBeat.text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
         }
-        
 
         let allNoteHarmonicType = HarmonicType.None;
         if ((flags & 0x08) !== 0) {
@@ -512,9 +522,9 @@ export class Gp3To5Importer extends ScoreImporter {
         for (let i: number = 6; i >= 0; i--) {
             if ((stringFlags & (1 << i)) !== 0 && 6 - i < bar.staff.tuning.length) {
                 const note = this.readNote(track, bar, voice, newBeat, 6 - i);
-                if(allNoteHarmonicType !== HarmonicType.None) {
+                if (allNoteHarmonicType !== HarmonicType.None) {
                     note.harmonicType = allNoteHarmonicType;
-                    if(note.harmonicType === HarmonicType.Natural) {
+                    if (note.harmonicType === HarmonicType.Natural) {
                         note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
                     }
                 }
@@ -867,23 +877,32 @@ export class Gp3To5Importer extends ScoreImporter {
             newNote.rightHandFinger = IOHelper.readSInt8(this.data) as Fingers;
             newNote.isFingering = true;
         }
+        let swapAccidentals = false;
         if (this._versionNumber >= 500) {
             if ((flags & 0x01) !== 0) {
                 newNote.durationPercent = GpBinaryHelpers.gpReadDouble(this.data);
             }
             let flags2: number = this.data.readByte();
-            newNote.accidentalMode =
-                (flags2 & 0x02) !== 0 ? NoteAccidentalMode.SwapAccidentals : NoteAccidentalMode.Default;
+            swapAccidentals = (flags2 & 0x02) !== 0;
         }
         beat.addNote(newNote);
         if ((flags & 0x08) !== 0) {
             this.readNoteEffects(track, voice, beat, newNote);
         }
 
-        if(bar.staff.isPercussion) {
+        if (bar.staff.isPercussion) {
             newNote.percussionArticulation = newNote.fret;
             newNote.string = -1;
             newNote.fret = -1;
+        }
+        if(swapAccidentals) {
+            const accidental = Tuning.defaultAccidentals[newNote.realValueWithoutHarmonic % 12];
+            if(accidental === '#') {
+                newNote.accidentalMode = NoteAccidentalMode.ForceFlat;
+            } else if(accidental === 'b') {
+                newNote.accidentalMode = NoteAccidentalMode.ForceSharp;
+            }
+            // Note: forcing no sign to sharp not supported
         }
         return newNote;
     }
@@ -1178,7 +1197,7 @@ export class GpBinaryHelpers {
         bytes[2] = data.readByte();
         bytes[2] = data.readByte();
         bytes[1] = data.readByte();
-        
+
         let array: Float32Array = new Float32Array(bytes.buffer);
         return array[0];
     }
@@ -1231,6 +1250,12 @@ export class GpBinaryHelpers {
         return IOHelper.toString(b, encoding);
     }
 
+    public static gpWriteString(data: IWriteable, s: string): void {
+        const encoded = IOHelper.stringToBytes(s);
+        data.writeByte(s.length);
+        data.write(encoded, 0, encoded.length);
+    }
+
     /**
      * Reads a byte as size and the string itself.
      * Additionally it is ensured the specified amount of bytes is read.
@@ -1256,7 +1281,7 @@ class MixTableChange {
     public volume: number = -1;
     public balance: number = -1;
     public instrument: number = -1;
-    public tempoName: string = "";
+    public tempoName: string = '';
     public tempo: number = -1;
     public duration: number = -1;
 }

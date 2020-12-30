@@ -19,6 +19,7 @@ export class InstrumentArticulationSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
+        o.set("elementType", obj.elementType); 
         o.set("staffLine", obj.staffLine); 
         o.set("noteHeadDefault", (obj.noteHeadDefault as number)); 
         o.set("noteHeadHalf", (obj.noteHeadHalf as number)); 
@@ -30,6 +31,9 @@ export class InstrumentArticulationSerializer {
     }
     public static setProperty(obj: InstrumentArticulation, property: string, v: unknown): boolean {
         switch (property) {
+            case "elementtype":
+                obj.elementType = (v as string);
+                return true;
             case "staffline":
                 obj.staffLine = (v as number);
                 return true;

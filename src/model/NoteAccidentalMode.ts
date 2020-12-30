@@ -7,10 +7,6 @@ export enum NoteAccidentalMode {
      */
     Default,
     /**
-     * If the default behavior calculates a Sharp, use flat instead (and vice versa).
-     */
-    SwapAccidentals,
-    /**
      * This will try to ensure that no accidental is shown.
      */
     ForceNone,

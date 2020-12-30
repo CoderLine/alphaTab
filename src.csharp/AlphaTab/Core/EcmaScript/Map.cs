@@ -152,5 +152,10 @@ namespace AlphaTab.Core.EcmaScript
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => _data.Keys;
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => _data.Values;
+
+        public IEnumerable<TValue> Values()
+        {
+            return _data.Values;
+        }
     }
 }

@@ -175,7 +175,7 @@ export class GpxFileSystem {
                 let sectorCount: number = 0;
                 // we're keeping count so we can calculate the offset of the array item
                 // as long we have data blocks we need to iterate them,
-                let fileData: ByteBuffer | null = storeFile ? ByteBuffer.withCapactiy(file.fileSize) : null;
+                let fileData: ByteBuffer | null = storeFile ? ByteBuffer.withCapacity(file.fileSize) : null;
                 // tslint:disable-next-line: no-conditional-assignment
                 while ((sector = this.getInteger(data, dataPointerOffset + 4 * sectorCount++)) !== 0) {
                     // the next file entry starts after the last data sector so we

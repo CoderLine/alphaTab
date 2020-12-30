@@ -68,4 +68,18 @@ export class Automation {
         automation.value = value * references[reference];
         return automation;
     }
+
+
+    public static buildInstrumentAutomation(
+        isLinear: boolean,
+        ratioPosition: number,
+        value: number
+    ): Automation {
+        let automation: Automation = new Automation();
+        automation.type = AutomationType.Instrument;
+        automation.isLinear = isLinear;
+        automation.ratioPosition = ratioPosition;
+        automation.value = value;
+        return automation;
+    }
 }

@@ -8,15 +8,19 @@ export class ByteBuffer implements IWriteable, IReadable {
     public length: number = 0;
     public position: number = 0;
 
+    public get bytesWritten(): number {
+        return this.position;
+    }
+
     public getBuffer(): Uint8Array {
         return this._buffer;
     }
 
     public static empty(): ByteBuffer {
-        return ByteBuffer.withCapactiy(0);
+        return ByteBuffer.withCapacity(0);
     }
 
-    public static withCapactiy(capacity: number): ByteBuffer {
+    public static withCapacity(capacity: number): ByteBuffer {
         let buffer: ByteBuffer = new ByteBuffer();
         buffer._buffer = new Uint8Array(capacity);
         buffer._capacity = capacity;

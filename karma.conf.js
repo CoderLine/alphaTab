@@ -75,7 +75,41 @@ module.exports = function (config) {
                     }
                 );
                 app.post(
+                    '/save-file',
+                    upload.fields([
+                        {
+                            name: 'file',
+                            maxCount: 1
+                        }
+                    ]),
+                    function (req, res) {
+                        log.info(`save file ${req.file}`);
+                        res.send(JSON.stringify('OK'));
+                    }
+                );
+                app.post(
                     '/save-visual-error',
+                    upload.fields([
+                        {
+                            name: 'expected',
+                            maxCount: 1
+                        },
+                        {
+                            name: 'actual',
+                            maxCount: 1
+                        },
+                        {
+                            name: 'diff',
+                            maxCount: 1
+                        }
+                    ]),
+                    function (req, res) {
+                        log.info(`save visual error ${req.file}`);
+                        res.send(JSON.stringify('OK'));
+                    }
+                );
+                app.post(
+                    '/list-files',
                     upload.fields([
                         {
                             name: 'expected',

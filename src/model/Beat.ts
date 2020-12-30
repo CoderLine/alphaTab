@@ -413,7 +413,7 @@ export class Beat {
     /**
      * Gets or sets how the beaming should be done for this beat.
      */
-    public beamingMode:BeatBeamingMode = BeatBeamingMode.Auto;    
+    public beamingMode: BeatBeamingMode = BeatBeamingMode.Auto;
 
     public addWhammyBarPoint(point: BendPoint): void {
         this.whammyBarPoints.push(point);
@@ -447,7 +447,7 @@ export class Beat {
                 }
             }
         }
-        
+
         if (point === this.minWhammyPoint) {
             this.minWhammyPoint = null;
             for (let currentPoint of this.whammyBarPoints) {
@@ -554,6 +554,14 @@ export class Beat {
     }
 
     public finish(settings: Settings): void {
+        if (this.getAutomation(AutomationType.Instrument) === null &&
+            this.index === 0 &&
+            this.voice.index === 0 &&
+            this.voice.bar.index === 0 &&
+            this.voice.bar.staff.index === 0) {
+            this.automations.push(Automation.buildInstrumentAutomation(false, 0, this.voice.bar.staff.track.playbackInfo.program));
+        }
+
         let displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
         let isGradual: boolean = this.text === 'grad' || this.text === 'grad.';
         if (isGradual && displayMode === NotationMode.SongBook) {
@@ -568,6 +576,7 @@ export class Beat {
         let isEffectSlurBeat: boolean = false;
         for (let i: number = 0, j: number = this.notes.length; i < j; i++) {
             let note: Note = this.notes[i];
+            note.dynamics = this.dynamics;
             note.finish(settings);
             if (note.isLetRing) {
                 this.isLetRing = true;
@@ -726,11 +735,11 @@ export class Beat {
                 cloneNote.id = Note.GlobalNoteId++;
 
                 // fix ties
-                if(note.isTieOrigin) {
+                if (note.isTieOrigin) {
                     cloneNote.tieDestinationNoteId = note.tieDestination!.id;
                     note.tieDestination!.tieOriginNoteId = cloneNote.id;
                 }
-                if(note.isTieDestination) {
+                if (note.isTieDestination) {
                     cloneNote.tieOriginNoteId = note.tieOrigin ? note.tieOrigin.id : -1;
                     note.tieOrigin!.tieDestinationNoteId = cloneNote.id;
                 }
@@ -790,8 +799,8 @@ export class Beat {
         return null;
     }
 
-    public chain() {    
-        for(const n of this.notes) {
+    public chain() {
+        for (const n of this.notes) {
             this.noteValueLookup.set(n.realValue, n);
             n.chain();
         }

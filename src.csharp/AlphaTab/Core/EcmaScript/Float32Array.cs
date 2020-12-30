@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Core.EcmaScript
 {
-    public class Float32Array
+    public class Float32Array : IEnumerable<float>
     {
         public readonly float[] Data;
         public double Length => Data.Length;
@@ -60,6 +60,16 @@ namespace AlphaTab.Core.EcmaScript
                 Data,
                 (int) offset * sizeof(float),
                 subarray.Data.Length * sizeof(float));
+        }
+
+        public IEnumerator<float> GetEnumerator()
+        {
+            return ((IEnumerable<float>)Data).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

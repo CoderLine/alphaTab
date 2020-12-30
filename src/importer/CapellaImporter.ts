@@ -5,7 +5,8 @@ import { Score } from '@src/model/Score';
 
 import { Logger } from '@src/Logger';
 
-import { ZipEntry, ZipReader } from '@src/zip/ZipReader';
+import { ZipReader } from '@src/zip/ZipReader';
+import { ZipEntry } from "@src/zip/ZipEntry";
 import { IOHelper } from '@src/io/IOHelper';
 import { CapellaParser } from './CapellaParser';
 

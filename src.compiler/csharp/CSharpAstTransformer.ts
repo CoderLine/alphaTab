@@ -309,7 +309,7 @@ export default class CSharpAstTransformer {
             const text = node.getSourceFile().text;
             // check for /*@target web*/ marker
             const commentText = text.substr(node.getStart() - node.getLeadingTriviaWidth(), node.getLeadingTriviaWidth());
-            if(commentText.indexOf('/*@target web*/') >= 0) {
+            if (commentText.indexOf('/*@target web*/') >= 0) {
                 return true;
             }
         }
@@ -1228,6 +1228,15 @@ export default class CSharpAstTransformer {
             csMethod.body = this.visitBlock(csMethod, classElement.body);
         }
 
+        switch (csMethod.name) {
+            case 'ToString':
+                if (csMethod.parameters.length === 0) {
+                    csMethod.isVirtual = false;
+                    csMethod.isOverride = true;
+                }
+                break;
+        }
+
         parent.members.push(csMethod);
 
         this._context.registerSymbol(csMethod);
@@ -1982,6 +1991,10 @@ export default class CSharpAstTransformer {
             return null;
         }
 
+        if (csExpr.operator === "~") {
+            csExpr.operand = this.makeInt(csExpr.operand);
+        }
+
         return csExpr;
     }
 
@@ -2285,8 +2298,10 @@ export default class CSharpAstTransformer {
                 switch (expression.operatorToken.kind) {
                     case ts.SyntaxKind.AmpersandToken:
                     case ts.SyntaxKind.GreaterThanGreaterThanToken:
+                    case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
                     case ts.SyntaxKind.LessThanLessThanToken:
                     case ts.SyntaxKind.BarToken:
+                    case ts.SyntaxKind.CaretToken:
                         binaryExpression.left = this.makeInt(binaryExpression.left);
                         binaryExpression.right = this.makeInt(binaryExpression.right);
                         break;
@@ -2632,6 +2647,25 @@ export default class CSharpAstTransformer {
             });
 
             return csExpr;
+        } else if (this.isSetInitializer(expression)) {
+            const csExpr = {
+                parent: parent,
+                tsNode: expression,
+                nodeType: cs.SyntaxKind.InvocationExpression,
+                arguments: [],
+                expression: {} as cs.Expression
+            } as cs.InvocationExpression;
+
+            csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'SetInitializer');
+
+            expression.elements.forEach(e => {
+                const ex = this.visitExpression(csExpr, e);
+                if (ex) {
+                    csExpr.arguments.push(ex);
+                }
+            });
+
+            return csExpr;
         } else {
             const csExpr = {
                 parent: parent,
@@ -2672,6 +2706,15 @@ export default class CSharpAstTransformer {
         return false;
     }
 
+    private isSetInitializer(expression: ts.ArrayLiteralExpression) {
+        const isCandidate = expression.parent.kind === ts.SyntaxKind.NewExpression;
+        if (!isCandidate) {
+            return false;
+        }
+
+        return this._context.typeChecker.getTypeAtLocation(expression.parent).symbol.name === 'Set';
+    }
+
     private visitPropertyAccessExpression(parent: cs.Node, expression: ts.PropertyAccessExpression) {
         const memberAccess = {
             expression: {} as cs.Expression,
@@ -2699,8 +2742,21 @@ export default class CSharpAstTransformer {
                             case 'length':
                                 memberAccess.member = 'Count';
                                 break;
+                            case 'reverse':
+                                memberAccess.member = 'Reversed';
+                                break;
                             case 'push':
                                 memberAccess.member = 'Add';
+                                break;
+                        }
+                        break;
+                    case 'String':
+                        switch (memberAccess.tsSymbol!.name) {
+                            case 'trimRight':
+                                memberAccess.member = 'TrimEnd';
+                                break;
+                            case 'trimLeft':
+                                memberAccess.member = 'TrimStart';
                                 break;
                         }
                         break;
@@ -2799,8 +2855,8 @@ export default class CSharpAstTransformer {
 
     private visitElementAccessExpression(parent: cs.Node, expression: ts.ElementAccessExpression) {
         // Enum[value] => value.ToString()
-        const symbol = this._context.typeChecker.getSymbolAtLocation(expression.expression);
-        if (symbol && symbol.flags & ts.SymbolFlags.Enum) {
+        const enumType = this._context.typeChecker.getTypeAtLocation(expression.expression);
+        if (enumType?.symbol && enumType.symbol.flags & ts.SymbolFlags.RegularEnum) {
             const callExpr = {
                 parent: parent,
                 arguments: [],
@@ -2843,6 +2899,7 @@ export default class CSharpAstTransformer {
             return null;
         }
 
+        const symbol = this._context.typeChecker.getSymbolAtLocation(expression.expression);
         let type = symbol ? this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, expression.expression) : null;
         if (type) {
             type = this._context.typeChecker.getNonNullableType(type);
@@ -2904,6 +2961,31 @@ export default class CSharpAstTransformer {
                 callExpression.arguments.push(e);
             }
         });
+
+        // number.ToString
+        const isNumberToString = ts.isPropertyAccessExpression(expression.expression)
+            && this._context.typeChecker.getTypeAtLocation(expression.expression.expression).flags & ts.TypeFlags.Number
+            && (expression.expression.name as ts.Identifier).text === 'toString'
+            && expression.arguments.length === 0;
+
+        if (isNumberToString) {
+            const invariantCultureInfo = {
+                parent: parent,
+                nodeType: cs.SyntaxKind.MemberAccessExpression,
+                tsNode: expression,
+                expression: null!,
+                member: 'InvariantCulture'
+            } as cs.MemberAccessExpression;
+
+            invariantCultureInfo.expression = {
+                parent: invariantCultureInfo,
+                tsNode: expression.expression,
+                nodeType: cs.SyntaxKind.Identifier,
+                text: 'System.Globalization.CultureInfo'
+            } as cs.Identifier;
+
+            callExpression.arguments.push(invariantCultureInfo);
+        }
 
         if (expression.typeArguments) {
             callExpression.typeArguments = [];
@@ -3216,9 +3298,8 @@ export default class CSharpAstTransformer {
             case ts.SyntaxKind.LessThanLessThanToken:
                 return '<<';
             case ts.SyntaxKind.GreaterThanGreaterThanToken:
-                return '>>';
             case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
-                return '>>>';
+                return '>>';
 
             case ts.SyntaxKind.LessThanToken:
                 return '<';

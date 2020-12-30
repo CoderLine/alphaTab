@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Rendering.Glyphs;
+using String = System.String;
 
 namespace AlphaTab.Core
 {
@@ -14,14 +15,6 @@ namespace AlphaTab.Core
         public static IList<T> CreateList<T>(params T[] values)
         {
             return new List<T>(values);
-        }
-
-        public static IList<T> Splice<T>(this IList<T> data, double start)
-        {
-            var count = data.Count - (int) start;
-            var items = data.GetRange((int) start, count);
-            data.RemoveRange((int) start, count);
-            return new List<T>(items);
         }
 
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
@@ -183,6 +176,29 @@ namespace AlphaTab.Core
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TResult Reduce<TInput, TResult>(this IEnumerable<TInput> source, Func<TResult, TInput, TResult> func, TResult seed)
+        {
+            return source.Aggregate(seed, func);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<TResult> Map<TInput, TResult>(this IEnumerable<TInput> source, Func<TInput, TResult> func)
+        {
+            return source.Select(func).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<TInput> Reversed<TInput>(this IEnumerable<TInput> source)
+        {
+            return source.Reverse();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Join<TInput>(this IEnumerable<TInput> source, string separator)
+        {
+            return string.Join(separator, source);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Substr(this string s, double start, double length)
@@ -218,6 +234,12 @@ namespace AlphaTab.Core
         public static string ToUpperCase(this string s)
         {
             return s.ToUpperInvariant();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int LocaleCompare(this string a, string b)
+        {
+            return string.Compare(a, b, StringComparison.Ordinal);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
