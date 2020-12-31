@@ -9,6 +9,8 @@ import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWo
 import { BrowserUiFacade } from '@src/platform/javascript/BrowserUiFacade';
 import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { Settings } from '@src/Settings';
+import { JsonConverter } from '@src/model/JsonConverter';
+import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
  * @target web
@@ -23,7 +25,7 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         super.tex(tex, browser.parseTracks(tracks));
     }
 
-    public print(width: string): void {
+    public print(width: string, additionalSettings:unknown = null): void {
         // prepare a popup window for printing (a4 width, window height, centered)
         let preview: Window = window.open('', '', 'width=0,height=0')!;
         let a4: HTMLElement = preview.document.createElement('div');
@@ -64,14 +66,12 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         preview.moveTo(left, top);
         preview.focus();
         // render alphaTab
-        let settings: Settings = new Settings();
-        settings.core.scriptFile = this.settings.core.scriptFile;
-        settings.core.fontDirectory = this.settings.core.fontDirectory;
+        let settings: Settings = JsonConverter.jsObjectToSettings(JsonConverter.settingsToJsObject(this.settings));
         settings.core.enableLazyLoading = false;
         settings.core.useWorkers = false;
         settings.display.scale = 0.8;
         settings.display.stretchForce = 0.8;
-        settings.display.resources = this.settings.display.resources;
+        SettingsSerializer.fromJson(settings, additionalSettings);
         let alphaTab: AlphaTabApi = new AlphaTabApi(a4, settings);
         alphaTab.renderer.postRenderFinished.on(() => {
             alphaTab.canvasElement.height = -1;
