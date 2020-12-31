@@ -51,7 +51,7 @@ export class TabBarRenderer extends BarRendererBase {
 
     protected updateSizes(): void {
         let res: RenderingResources = this.resources;
-        let numberOverflow: number = res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2;
+        let numberOverflow: number = (res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2) * this.scale;
         this.topPadding = numberOverflow;
         this.bottomPadding = numberOverflow;
         this.height = this.lineOffset * (this.bar.staff.tuning.length - 1) + numberOverflow * 2;

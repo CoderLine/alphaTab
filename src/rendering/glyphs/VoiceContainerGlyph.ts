@@ -30,13 +30,14 @@ export class VoiceContainerGlyph extends GlyphGroup {
     }
 
     private scaleToForce(force: number): void {
-        this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force);
+        const scale = this.renderer.scale;
+        this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force) * scale;
         let positions: Map<number, number> = this.renderer.layoutingInfo.buildOnTimePositions(force);
         let beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
         for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
             let currentBeatGlyph: BeatContainerGlyph = beatGlyphs[i];
             let time: number = currentBeatGlyph.beat.absoluteDisplayStart;
-            currentBeatGlyph.x = positions.get(time)! - currentBeatGlyph.onTimeX;
+            currentBeatGlyph.x = positions.get(time)! * scale - currentBeatGlyph.onTimeX;
             // size always previousl glyph after we know the position
             // of the next glyph
             if (i > 0) {
