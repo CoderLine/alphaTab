@@ -55,7 +55,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set masterVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._synthesizer.masterVolume = value;
     }
 
@@ -64,7 +64,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set metronomeVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._metronomeVolume = value;
         this._synthesizer.metronomeVolume = value;
     }
@@ -74,7 +74,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set countInVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._countInVolume = value;
     }
 
@@ -333,7 +333,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public setChannelVolume(channel: number, volume: number): void {
-        volume = SynthHelper.clamp(volume, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        volume = Math.max(volume, SynthConstants.MinVolume);
         this._synthesizer.channelSetMixVolume(channel, volume);
     }
 

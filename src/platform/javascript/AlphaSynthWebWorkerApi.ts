@@ -63,7 +63,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public set masterVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._masterVolume = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setMasterVolume',
@@ -76,7 +76,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public set metronomeVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._metronomeVolume = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setMetronomeVolume',
@@ -88,7 +88,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public set countInVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._countInVolume = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setCountInVolume',
@@ -318,7 +318,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public setChannelVolume(channel: number, volume: number): void {
-        volume = SynthHelper.clamp(volume, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        volume = Math.max(volume, SynthConstants.MinVolume);
         this._synth.postMessage({
             cmd: 'alphaSynth.setChannelVolume',
             channel: channel,
