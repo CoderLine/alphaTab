@@ -7,7 +7,6 @@ export class SynthConstants {
     public static readonly MetronomeChannel: number = SynthConstants.DefaultChannelCount - 1;
     public static readonly AudioChannels: number = 2;
     public static readonly MinVolume: number = 0;
-    public static readonly MaxVolume: number = 1;
     public static readonly MinProgram: number = 0;
     public static readonly MaxProgram: number = 127;
     public static readonly MinPlaybackSpeed: number = 0.125;
