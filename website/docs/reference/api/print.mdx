@@ -25,8 +25,9 @@ This function opens a popup window which is filled with a by-default A4 optimize
 <TypeTable>
     <TypeRow type="js" name="function print()" />
     <TypeRow type="js" name="function print(width)" />
+    <TypeRow type="js" name="function print(width, additionalSettings)" />
     <TypeRow type="jquery" name="alphaTab('print')" />
-    <TypeRow type="jquery" name="alphaTab('print', width)" />
+    <TypeRow type="jquery" name="alphaTab('print', width, additionalSettings)" />
 </TypeTable>
 
 ### Parameters
@@ -34,6 +35,10 @@ This function opens a popup window which is filled with a by-default A4 optimize
 <ParameterTable>
     <ParameterRow platform="js-jquery" name="width" type="string">
         An optional custom width as CSS width that should be used. Best is to use a CSS width that is suitable for your preferred page size.
+    </ParameterRow>
+    <ParameterRow platform="js-jquery" name="additionalSettings" type="object">
+        An optional parameter to specify additional setting values which should be respected during printing. 
+        <span class="badge badge--info">since 1.2.0-alpha.79</span>
     </ParameterRow>
 </ParameterTable>
 
@@ -54,6 +59,7 @@ Nothing
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.print();
+api.print(undefined, { display: { barsPerRow: 5 } });
 ```
 
 </TabItem>
@@ -65,8 +71,3 @@ $('#alphaTab').alphaTab('print');
 
 </TabItem>
 </Tabs>
-
-## Example - JavaScript
-
-
-## Example - jQuery
