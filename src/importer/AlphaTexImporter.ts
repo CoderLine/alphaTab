@@ -118,6 +118,9 @@ export class AlphaTexImporter extends ScoreImporter {
     private _currentTuplet: number = 0;
     private _lyrics!: Map<number, Lyrics[]>;
 
+    private _staffHasExplicitTuning: boolean = false;
+    private _staffTuningApplied: boolean = false;
+
     public constructor() {
         super();
     }
@@ -689,12 +692,15 @@ export class AlphaTexImporter extends ScoreImporter {
             case 'tuning':
                 this._sy = this.newSy();
                 let strings: number = this._currentStaff.tuning.length;
+                this._staffHasExplicitTuning = true;
+                this._staffTuningApplied = false;
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
                         let text: string = (this._syData as string).toLowerCase();
                         if (text === 'piano' || text === 'none' || text === 'voice') {
                             // clear tuning
                             this._currentStaff.tuning = [];
+                            this._currentStaff.displayTranspositionPitch = 0;
                         } else {
                             this.error('tuning', AlphaTexSymbols.Tuning, true);
                         }
@@ -719,6 +725,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 return true;
             case 'instrument':
                 this._sy = this.newSy();
+                this._staffTuningApplied = false;
                 if (this._sy === AlphaTexSymbols.Number) {
                     let instrument: number = this._syData as number;
                     if (instrument >= 0 && instrument <= 128) {
@@ -732,11 +739,6 @@ export class AlphaTexImporter extends ScoreImporter {
                 } else {
                     this.error('instrument', AlphaTexSymbols.Number, true);
                 }
-                this._currentStaff.displayTranspositionPitch = GeneralMidi.isGuitar(
-                    this._currentTrack.playbackInfo.program
-                )
-                    ? -12
-                    : 0;
                 this._sy = this.newSy();
                 return true;
             case 'lyrics':
@@ -885,6 +887,9 @@ export class AlphaTexImporter extends ScoreImporter {
             anyMeta = true;
             let syData: string = (this._syData as string).toLowerCase();
             if (syData === 'track') {
+                this._staffHasExplicitTuning = false;
+                this._staffTuningApplied = false;        
+
                 this._sy = this.newSy();
                 // new track starting? - if no masterbars it's the \track of the initial track.
                 if (this._score.masterBars.length > 0) {
@@ -904,6 +909,9 @@ export class AlphaTexImporter extends ScoreImporter {
             if (this._sy === AlphaTexSymbols.MetaCommand) {
                 syData = (this._syData as string).toLowerCase();
                 if (syData === 'staff') {
+                    this._staffHasExplicitTuning = false;
+                    this._staffTuningApplied = false;
+    
                     this._sy = this.newSy();
                     if (this._currentTrack.staves[0].bars.length > 0) {
                         this._currentTrack.ensureStaveCount(this._currentTrack.staves.length + 1);
@@ -964,6 +972,58 @@ export class AlphaTexImporter extends ScoreImporter {
             }
         }
         const anyBarMeta = this.barMeta(bar);
+
+        // detect tuning for staff
+        if (!this._staffTuningApplied && !this._staffHasExplicitTuning) {
+            const program = this._currentTrack.playbackInfo.program;
+
+            // reset to defaults
+            this._currentStaff.displayTranspositionPitch = 0;
+            this._currentStaff.tuning = [];
+
+
+            if (program == 15 || program >= 24 && program <= 31) {
+                // dulcimer+guitar E4 B3 G3 D3 A2 E2
+                this._currentStaff.displayTranspositionPitch = -12;
+                this._currentStaff.tuning = Tuning.getDefaultTuningFor(6)!.tunings;
+            } else if (program >= 32 && program <= 39) {
+                // bass G2 D2 A1 E1
+                this._currentStaff.displayTranspositionPitch = -12;
+                this._currentStaff.tuning = [43, 38, 33, 28];
+            } else if (program == 40 || program == 44 || program == 45 || program == 48 || program == 49 || program == 50 || program == 51) {
+                // violin E3 A3 D3 G2
+                this._currentStaff.tuning = [52, 57, 50, 43];
+            } else if (program == 41) {
+                // viola A3 D3 G2 C2
+                this._currentStaff.tuning = [57, 50, 43, 36];
+            } else if (program == 42) {
+                // cello A2 D2 G1 C1
+                this._currentStaff.tuning = [45, 38, 31, 24];
+            } else if (program == 43) {
+                // contrabass
+                // G2 D2 A1 E1
+                this._currentStaff.displayTranspositionPitch = -12;
+                this._currentStaff.tuning = [43, 38, 33, 28];
+            } else if (program == 105) {
+                // banjo
+                // D3 B2 G2 D2 G3
+                this._currentStaff.tuning = [50, 47, 43, 38, 55];
+            } else if (program == 106) {
+                // shamisen
+                // A3 E3 A2
+                this._currentStaff.tuning = [57, 52, 45];
+            } else if (program == 107) {
+                // koto
+                // E3 A2 D2 G1
+                this._currentStaff.tuning = [52, 45, 38, 31];
+            } else if (program == 110) {
+                // Fiddle
+                // E4 A3 D3 G2
+                this._currentStaff.tuning = [64, 57, 50, 43];
+            }
+            this._staffTuningApplied = true;
+        }
+
 
         let anyBeatData = false;
         let voice: Voice = bar.voices[0];
