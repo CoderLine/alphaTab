@@ -441,7 +441,7 @@ export class MidiFileGenerator {
         }
 
         if (initialBend >= 0) {
-            this._handler.addBend(track.index, noteStart, channel, initialBend);
+            this._handler.addNoteBend(track.index, noteStart, channel, noteKey, initialBend);
         }
 
         //
@@ -832,7 +832,7 @@ export class MidiFileGenerator {
             duration = noteDuration.noteOnly;
         }
         // ensure prebends are slightly before the actual note.
-        if (bendPoints[0].value > 0 && !note.isContinuedBend) {
+        if (bendPoints[0].value > 0 && !note.isContinuedBend && noteStart > 0) {
             noteStart--;
         }
         const bendDuration: number = Math.min(
@@ -922,7 +922,7 @@ export class MidiFileGenerator {
                         break;
                     case BendStyle.Fast:
                         const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
-                        this._handler.addBend(track.index, noteStart, channel, preBendValue | 0);
+                        addBend(noteStart, preBendValue | 0);
                         if (!finalBendValue || finalBendValue < note.bendPoints[1].value) {
                             finalBendValue = note.bendPoints[1].value;
                         }
@@ -948,7 +948,7 @@ export class MidiFileGenerator {
                         break;
                     case BendStyle.Fast:
                         const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
-                        this._handler.addBend(track.index, noteStart, channel, preBendValue | 0);
+                        addBend(noteStart, preBendValue | 0);
                         this.generateSongBookWhammyOrBend(
                             noteStart,
                             duration,
