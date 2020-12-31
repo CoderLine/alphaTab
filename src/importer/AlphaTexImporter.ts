@@ -119,7 +119,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _lyrics!: Map<number, Lyrics[]>;
 
     private _staffHasExplicitTuning: boolean = false;
-    private _staffTuningApplied: boolean = true;
+    private _staffTuningApplied: boolean = false;
 
     public constructor() {
         super();
@@ -700,6 +700,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         if (text === 'piano' || text === 'none' || text === 'voice') {
                             // clear tuning
                             this._currentStaff.tuning = [];
+                            this._currentStaff.displayTranspositionPitch = 0;
                         } else {
                             this.error('tuning', AlphaTexSymbols.Tuning, true);
                         }
@@ -883,11 +884,12 @@ export class AlphaTexImporter extends ScoreImporter {
     private trackStaffMeta(): boolean {
         let anyMeta = false;
         if (this._sy === AlphaTexSymbols.MetaCommand) {
-            this._staffHasExplicitTuning = false;
-            this._staffTuningApplied = true;
             anyMeta = true;
             let syData: string = (this._syData as string).toLowerCase();
             if (syData === 'track') {
+                this._staffHasExplicitTuning = false;
+                this._staffTuningApplied = false;        
+
                 this._sy = this.newSy();
                 // new track starting? - if no masterbars it's the \track of the initial track.
                 if (this._score.masterBars.length > 0) {
@@ -907,6 +909,9 @@ export class AlphaTexImporter extends ScoreImporter {
             if (this._sy === AlphaTexSymbols.MetaCommand) {
                 syData = (this._syData as string).toLowerCase();
                 if (syData === 'staff') {
+                    this._staffHasExplicitTuning = false;
+                    this._staffTuningApplied = false;
+    
                     this._sy = this.newSy();
                     if (this._currentTrack.staves[0].bars.length > 0) {
                         this._currentTrack.ensureStaveCount(this._currentTrack.staves.length + 1);
@@ -971,6 +976,12 @@ export class AlphaTexImporter extends ScoreImporter {
         // detect tuning for staff
         if (!this._staffTuningApplied && !this._staffHasExplicitTuning) {
             const program = this._currentTrack.playbackInfo.program;
+
+            // reset to defaults
+            this._currentStaff.displayTranspositionPitch = 0;
+            this._currentStaff.tuning = [];
+
+
             if (program == 15 || program >= 24 && program <= 31) {
                 // dulcimer+guitar E4 B3 G3 D3 A2 E2
                 this._currentStaff.displayTranspositionPitch = -12;
@@ -1009,9 +1020,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 // Fiddle
                 // E4 A3 D3 G2
                 this._currentStaff.tuning = [64, 57, 50, 43];
-            } else {
-                this._currentStaff.displayTranspositionPitch = 0;
             }
+            this._staffTuningApplied = true;
         }
 
 
