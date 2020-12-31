@@ -35,3 +35,176 @@ Some of the metadata tags can also be specified when starting a new staff or tra
 // end of metadata
 .        
 `}</AlphaTexSample>
+
+## Instrument
+As indicated above the instrument can be changed via the `\instrument` metadata. 
+Refer to the table below for all possible values and names. The list represents the general midi instrument list.
+You can either leave out the spaces or put the names into quotes e.g. `AcousticBass` vs `"Acoustic Bass"`
+
+export function GeneralMidiList() {
+    const items = [
+        'Acoustic Grand Piano',
+        'Bright Grand Piano',
+        'Electric Grand Piano',
+        'Honky tonk Piano',
+        'Electric Piano 1',
+        'Electric Piano 2',
+        'Harpsichord',
+        'Clavinet',
+        'Celesta',
+        'Glockenspiel',
+        'Musicbox',
+        'Vibraphone',
+        'Marimba',
+        'Xylophone',
+        'Tubularbells',
+        'Dulcimer',
+        'Drawbar Organ',
+        'Percussive Organ',
+        'Rock Organ',
+        'Church Organ',
+        'Reed Organ',
+        'Accordion',
+        'Harmonica',
+        'Tango Accordion',
+        'Acoustic Guitar Nylon',
+        'Acoustic Guitar Steel',
+        'Electric Guitar Jazz',
+        'Electric Guitar Clean',
+        'Electric Guitar Muted',
+        'Overdriven Guitar',
+        'Distortion Guitar',
+        'Guitar Harmonics',
+        'Acoustic Bass',
+        'Electric Bass Finger',
+        'Electric Bass Pick',
+        'Fretless Bass',
+        'Slap Bass 1',
+        'Slap Bass 2',
+        'Synth Bass 1',
+        'Synth Bass 2',
+        'Violin',
+        'Viola',
+        'Cello',
+        'Contrabass',
+        'Tremolo Strings',
+        'Pizzicato Strings',
+        'Orchestral Harp',
+        'Timpani',
+        'String Ensemble 1',
+        'String Ensemble 2',
+        'Synth Strings 1',
+        'Synth Strings 2',
+        'Choir Aahs',
+        'Voice Oohs',
+        'Synth Voice',
+        'Orchestra Hit',
+        'Trumpet',
+        'Trombone',
+        'Tuba',
+        'Muted Trumpet',
+        'French Horn',
+        'Brass Section',
+        'Synth Brass 1',
+        'Synth Brass 2',
+        'Soprano Sax',
+        'Alto Sax',
+        'Tenor Sax',
+        'Baritone Sax',
+        'Oboe',
+        'English Horn',
+        'Bassoon',
+        'Clarinet',
+        'Piccolo',
+        'Flute',
+        'Recorder',
+        'Pan Flute',
+        'Blown bottle',
+        'Shakuhachi',
+        'Whistle',
+        'Ocarina',
+        'Lead 1 Square',
+        'Lead 2 Sawtooth',
+        'Lead 3 Calliope',
+        'Lead 4 Chiff',
+        'Lead 5 Charang',
+        'Lead 6 Voice',
+        'Lead 7 Fifths',
+        'Lead 8 Bass and Lead',
+        'Pad 1 newage',
+        'Pad 2 warm',
+        'Pad 3 polysynth',
+        'Pad 4 choir',
+        'Pad 5 bowed',
+        'Pad 6 metallic',
+        'Pad 7 halo',
+        'Pad 8 sweep',
+        'Fx 1 rain',
+        'Fx 2 soundtrack',
+        'Fx 3 crystal',
+        'Fx 4 atmosphere',
+        'Fx 5 brightness',
+        'Fx 6 goblins',
+        'Fx 7 echoes',
+        'Fx 8 scifi',
+        'Sitar',
+        'Banjo',
+        'Shamisen',
+        'Koto',
+        'Kalimba',
+        'Bag pipe',
+        'Fiddle',
+        'Shanai',
+        'Tinkle Bell',
+        'Agogo',
+        'Steel Drums',
+        'Woodblock',
+        'Taiko Drum',
+        'Melodic Tom',
+        'Synth Drum',
+        'Reverse Cymbal',
+        'Guitar Fret Noise',
+        'Breath Noise',
+        'Seashore',
+        'Bird Tweet',
+        'Telephone Ring',
+        'Helicopter',
+        'Applause',
+        'Gunshot'
+    ];
+    return (
+        <tbody>
+            {items.map((x,i) => {
+                return (<tr>
+                    <td>{i}</td>
+                    <td>{x}</td>
+                </tr>);
+            })}
+        </tbody>
+    )
+}
+
+<div style={{overflow: 'auto', height: "300px"}}> 
+    <table class="table table-striped table-condensed type-table">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Name</th>
+            </tr>
+        </thead>   
+        <GeneralMidiList />
+    </table>
+</div>
+
+## Tuning
+
+The tuning of the instrument is defined by `\tuning` tag. For stringed instruments like the Guitar
+each tuning value defines one string. The format of the tuning value is `{note}{octave}` 
+`{note}` is one value of the following values in the given order C, C# or Db, D, D# or Eb, E, F, F# or Gb, G, G# or Ab, A, A# or Bb, B. 
+`{octave}` is just a number defining the octvate. 
+
+A standard guitar tuning would be `\tuning e5 b4 g4 d4 a3 e3`
+
+For non-stringed instruments one of the following values can be used: `piano`, `none` or `voice` depending on preference.
+
+If `\instrument` is specified without `\tuning` alphaTab will try to make a guess and apply the right default tuning. 
