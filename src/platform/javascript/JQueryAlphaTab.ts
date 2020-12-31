@@ -72,8 +72,8 @@ export class JQueryAlphaTab {
         context.destroy();
     }
 
-    public print(element: jQuery, context: AlphaTabApi, width: string): void {
-        context.print(width);
+    public print(element: jQuery, context: AlphaTabApi, width: string, additionalSettings?: unknown): void {
+        context.print(width, additionalSettings);
     }
 
     public load(element: jQuery, context: AlphaTabApi, data: unknown, tracks?: number[]): boolean {
