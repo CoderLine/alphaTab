@@ -51,7 +51,7 @@ export class ScoreBarRenderer extends BarRendererBase {
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
         this._startSpacing = false;
-        this.accidentalHelper = new AccidentalHelper(bar);
+        this.accidentalHelper = new AccidentalHelper(this);
     }
 
     public getBeatDirection(beat: Beat): BeamDirection {
