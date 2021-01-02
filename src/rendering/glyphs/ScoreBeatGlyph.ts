@@ -82,8 +82,8 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                             0,
                             0,
                             4 *
-                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                                this.scale
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
+                            this.scale
                         )
                     );
                     this.addGlyph(ghost);
@@ -129,6 +129,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 this.restGlyph.beat = this.container.beat;
                 this.restGlyph.beamingHelper = this.beamingHelper;
                 this.addGlyph(this.restGlyph);
+                if (this.beamingHelper) {
+                    this.beamingHelper.applyRest(this.container.beat, line);
+                }
+
                 //
                 // Note dots
                 //
