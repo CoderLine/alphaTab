@@ -776,7 +776,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     }
                     this._sy = this.newSy();
                 }
-                this._currentStaff.addChord(chord.name.toLowerCase(), chord);
+                this._currentStaff.addChord(this.getChordId(this._currentStaff, chord.name), chord);
                 return true;
             default:
                 return false;
@@ -1296,7 +1296,7 @@ export class AlphaTexImporter extends ScoreImporter {
         if (syData === 'ch') {
             this._sy = this.newSy();
             let chordName: string = (this._syData as string);
-            let chordId: string = chordName.toLowerCase();
+            let chordId: string = this.getChordId(this._currentStaff, chordName);
             if (!this._currentStaff.chords.has(chordId)) {
                 let chord: Chord = new Chord();
                 chord.showDiagram = false;
@@ -1386,6 +1386,10 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         }
         return false;
+    }
+
+    private getChordId(currentStaff: Staff, chordName: string): string {
+        return chordName.toLowerCase() + currentStaff.index + currentStaff.track.index
     }
 
     private applyTuplet(beat: Beat, tuplet: number): void {

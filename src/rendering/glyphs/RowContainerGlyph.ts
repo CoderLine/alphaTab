@@ -1,7 +1,6 @@
 import { ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { RowGlyphContainer } from '@src/rendering/glyphs/RowGlyphContainer';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { EffectGlyph } from './EffectGlyph';
 
 export class RowContainerGlyph extends GlyphGroup {
     private static readonly Padding: number = 3;
@@ -24,7 +23,7 @@ export class RowContainerGlyph extends GlyphGroup {
         row.width = this.width;
         for (let g of this.glyphs!) {
             if (x + g.width < this.width) {
-                row.addGlyphToRow(g as EffectGlyph);
+                row.addGlyphToRow(g);
                 x += g.width;
             } else {
                 if (!row.isEmpty) {
@@ -35,7 +34,7 @@ export class RowContainerGlyph extends GlyphGroup {
                 x = 0;
                 row = new RowGlyphContainer(x, y, this._align);
                 row.width = this.width;
-                row.addGlyphToRow(g as EffectGlyph);
+                row.addGlyphToRow(g);
                 x += g.width;
             }
         }

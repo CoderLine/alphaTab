@@ -1,6 +1,6 @@
 import { TextAlign } from '@src/platform/ICanvas';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { EffectGlyph } from './EffectGlyph';
+import { Glyph } from './Glyph';
 
 export class RowGlyphContainer extends GlyphGroup {
     private _glyphWidth: number = 0;
@@ -31,7 +31,7 @@ export class RowGlyphContainer extends GlyphGroup {
         }
     }
 
-    public addGlyphToRow(glyph: EffectGlyph): void {
+    public addGlyphToRow(glyph: Glyph): void {
         this.glyphs!.push(glyph);
         this._glyphWidth += glyph.width;
         if (glyph.height > this.height) {

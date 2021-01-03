@@ -277,6 +277,8 @@ export class Html5Canvas implements ICanvas {
         this._context.textBaseline = 'middle';
         if (centerAtPosition) {
             this._context.textAlign = 'center';
+        } else {
+            this._context.textAlign = 'left';
         }
         this._context.fillText(symbols, x, y);
         this._context.textBaseline = baseLine;

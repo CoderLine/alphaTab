@@ -1,66 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>AlphaTab alphaTex Editor Demo</title>
 
-        <link
-            rel="stylesheet"
-            href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-            crossorigin="anonymous"
-        />
-        <script
-            src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-            crossorigin="anonymous"
-        ></script>
-        <script
-            src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-            crossorigin="anonymous"
-        ></script>
-        <script
-            src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-            crossorigin="anonymous"
-        ></script>
+<head>
+    <meta charset="utf-8" />
+    <title>AlphaTab alphaTex Editor Demo</title>
 
-        <link
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500,700&display=swap"
-            rel="stylesheet"
-        />
-        <script src="https://kit.fontawesome.com/b43f0e512e.js" crossorigin="anonymous"></script>
-        <script
-            src="https://cdn.jsdelivr.net/npm/handlebars@4.5.3/dist/handlebars.min.js"
-            integrity="sha256-GwjGuGudzIwyNtTEBZuBYYPDvNlSMSKEDwECr6x6H9c="
-            crossorigin="anonymous"
-        ></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
 
-        <script src="/dist/alphaTab.js"></script>
-        <link rel="stylesheet" href="control.css" />
-        <link rel="stylesheet" href="alphatex-editor.css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500,700&display=swap" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/b43f0e512e.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@4.5.3/dist/handlebars.min.js"
+        integrity="sha256-GwjGuGudzIwyNtTEBZuBYYPDvNlSMSKEDwECr6x6H9c=" crossorigin="anonymous"></script>
 
-        <script
-            src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.11/src-min/ace.js"
-            integrity="sha256-Kr5Mbwq/xwJYw6XU4NR519/iosGvECYMyMU8IZ/rQok="
-            crossorigin="anonymous"
-        ></script>
-        <script
-            src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.11/src-min/ext-language_tools.js"
-            integrity="sha256-2/wG0EywLUH85JnoH5zJ7epl4erMdkumdq6e9l0Ngew="
-            crossorigin="anonymous"
-        ></script>
-        <script
-            src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.11/src-min/mode-tex.js"
-            integrity="sha256-i3DUcEBSJGQPDBtUKIziMPLYK/t7eBNgQXd25FgGdgo="
-            crossorigin="anonymous"
-        ></script>
-    </head>
-    <body>
-        <div id="placeholder"></div>
-        <div class="editor-wrap">
-            <div id="editor">
+    <script src="/dist/alphaTab.js"></script>
+    <link rel="stylesheet" href="control.css" />
+    <link rel="stylesheet" href="alphatex-editor.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.11/src-min/ace.js"
+        integrity="sha256-Kr5Mbwq/xwJYw6XU4NR519/iosGvECYMyMU8IZ/rQok=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.11/src-min/ext-language_tools.js"
+        integrity="sha256-2/wG0EywLUH85JnoH5zJ7epl4erMdkumdq6e9l0Ngew=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.11/src-min/mode-tex.js"
+        integrity="sha256-i3DUcEBSJGQPDBtUKIziMPLYK/t7eBNgQXd25FgGdgo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div id="placeholder"></div>
+    <div class="editor-wrap">
+        <div id="editor">
             \title "Canon Rock"
             \subtitle "JerryC"
             \tempo 90
@@ -71,28 +47,31 @@
             12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
             14.1.2 :8 17.2 15.1 14.1{h} 17.2 |
             15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b(0 4 4 0)}.4 |
-            15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 |
-            12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}                
-            </div>
+            15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2
+            14.2 |
+            12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h}
+            15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}
         </div>
-        <script type="text/javascript" src="control.js"></script>
-        <script type="text/javascript" src="alphatex-editor.js"></script>
-        <script type="text/javascript">
-            const req = new XMLHttpRequest();
-            req.onload = data => {
-                document.getElementById('placeholder').outerHTML = req.responseText;
-                
-                const element = document.getElementById('alphaTab');
-                delete element.dataset.file;
-                delete element.dataset.tracks;
-                element.dataset.tex = true;
-                element.innerHTML = document.getElementById('editor').innerHTML;             
+    </div>
+    <script type="text/javascript" src="control.js"></script>
+    <script type="text/javascript" src="alphatex-editor.js"></script>
+    <script type="text/javascript">
+        const req = new XMLHttpRequest();
+        req.onload = data => {
+            document.getElementById('placeholder').outerHTML = req.responseText;
 
-                window.at = setupControl('#alphaTab');
-                setupEditor(window.at, '#editor');
-            };
-            req.open('GET', 'control-template.html');
-            req.send();
-        </script>
-    </body>
+            const element = document.getElementById('alphaTab');
+            delete element.dataset.file;
+            delete element.dataset.tracks;
+            element.dataset.tex = true;
+            element.innerHTML = document.getElementById('editor').innerHTML;
+
+            window.at = setupControl('#alphaTab');
+            setupEditor(window.at, '#editor');
+        };
+        req.open('GET', 'control-template.html');
+        req.send();
+    </script>
+</body>
+
 </html>
