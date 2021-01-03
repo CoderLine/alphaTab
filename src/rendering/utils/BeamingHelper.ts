@@ -49,6 +49,7 @@ export class BeamingHelper {
     private _staff: Staff;
     private _beatLineXPositions: Map<number, BeatLinePositions> = new Map();
     private _renderer: BarRendererBase;
+    private _lastNonRestBeat: Beat | null = null;
 
     public voice: Voice | null = null;
     public beats: Beat[] = [];
@@ -79,11 +80,11 @@ export class BeamingHelper {
     public preferredBeamDirection: BeamDirection | null = null;
     public isGrace: boolean = false;
 
-    public minRestLineStack: number[] = [];
-    public beatOfMinRestLineStack: Beat[] = [];
+    public minRestLine: number | null = null;
+    public beatOfMinRestLine: Beat | null = null;
 
-    public maxRestLineStack: number[] = [];
-    public beatOfMaxRestLineStack: Beat[] = [];
+    public maxRestLine: number | null = null;
+    public beatOfMaxRestLine: Beat | null = null;
 
     public get hasLine(): boolean {
         return this.beats.length === 1 && this.beats[0].duration > Duration.Whole;
@@ -132,21 +133,6 @@ export class BeamingHelper {
 
     public direction: BeamDirection = BeamDirection.Up;
     public finish(): void {
-        // remove trailing rests
-        // TODO: handle this properly with adding/removing overall rest bounds, this logic
-        // does not handle cases where a rest might be the minline but not the maxline
-        let i = this.beats.length - 1;
-        while(i > 0 && this.beats[i].isRest) {
-            if(this.beatOfMinRestLineStack[this.beatOfMinRestLineStack.length - 1] === this.beats[i]){
-                this.beatOfMinRestLineStack.pop();
-                this.minRestLineStack.pop();
-            }
-            
-            if(this.beatOfMaxRestLineStack[this.beatOfMaxRestLineStack.length - 1] === this.beats[i]){
-                this.beatOfMaxRestLineStack.pop();
-                this.maxRestLineStack.pop();
-            }
-        }
         this.direction = this.calculateDirection();
     }
 
@@ -192,6 +178,11 @@ export class BeamingHelper {
      * @param line The line on which the rest symbol is placed
      */
     public applyRest(beat: Beat, line: number): void {
+        // do not accept rests after the last beat which has notes
+        if (this._lastNonRestBeat && beat.index >= this._lastNonRestBeat.index) {
+            return;
+        }
+
         // correct the line of the glyph to a note which would
         // be placed at the upper / lower end of the glyph.
         let aboveRest = line;
@@ -242,13 +233,13 @@ export class BeamingHelper {
                 belowRest += 8;
                 break;
         }
-        if (this.minRestLineStack.length === 0 || this.minRestLineStack[this.minRestLineStack.length - 1] > aboveRest) {
-            this.minRestLineStack.push(aboveRest);
-            this.beatOfMinRestLineStack.push(beat);
+        if (this.minRestLine === null || this.minRestLine > aboveRest) {
+            this.minRestLine = aboveRest;
+            this.beatOfMinRestLine = beat;
         }
-        if (this.maxRestLineStack.length === 0 || this.maxRestLineStack[this.maxRestLineStack.length - 1] < belowRest) {
-            this.maxRestLineStack.push(belowRest);
-            this.beatOfMaxRestLineStack.push(beat);
+        if (this.maxRestLine === null || this.maxRestLine < belowRest) {
+            this.maxRestLine = belowRest;
+            this.beatOfMaxRestLine = beat;
         }
     }
 
@@ -319,8 +310,8 @@ export class BeamingHelper {
             if (beat.hasTuplet) {
                 this.hasTuplet = true;
             }
-            if (beat.isRest) {
-
+            if (!beat.isRest) {
+                this._lastNonRestBeat = beat;
             }
         }
         return add;

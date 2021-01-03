@@ -421,25 +421,25 @@ export class ScoreBarRenderer extends BarRendererBase {
                 }
 
                 // check if rest shifts bar up or down
-                if (h.minRestLineStack.length >= 0 || h.maxRestLineStack.length > 0) {
+                if (h.minRestLine !== null || h.maxRestLine !== null) {
                     const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
                     let scaleMod: number = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
                     let barSpacing: number = barCount *
                         (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * this.scale * scaleMod;
                     barSpacing += BarRendererBase.BeamSpacing;
 
-                    if (direction === BeamDirection.Up && h.minRestLineStack.length > 0) {
-                        let yNeededForRest = this.getScoreY(h.minRestLineStack[h.minRestLineStack.length - 1]) - barSpacing;
-                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMinRestLineStack[h.beatOfMinRestLineStack.length - 1]));
+                    if (direction === BeamDirection.Up && h.minRestLine !== null) {
+                        let yNeededForRest = this.getScoreY(h.minRestLine) - barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMinRestLine!));
 
                         const diff = yGivenByCurrentValues - yNeededForRest;
                         if (diff > 0) {
                             drawingInfo.startY -= diff;
                             drawingInfo.endY -= diff;
                         }
-                    } else if (direction === BeamDirection.Down && h.maxRestLineStack.length > 0) {
-                        let yNeededForRest = this.getScoreY(h.maxRestLineStack[h.maxRestLineStack.length - 1]) + barSpacing;
-                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMaxRestLineStack[h.beatOfMaxRestLineStack.length - 1]));
+                    } else if (direction === BeamDirection.Down && h.maxRestLine !== null) {
+                        let yNeededForRest = this.getScoreY(h.maxRestLine) + barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMaxRestLine!));
 
                         const diff = yNeededForRest - yGivenByCurrentValues;
                         if (diff > 0) {
