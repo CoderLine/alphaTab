@@ -2526,12 +2526,20 @@ export default class CSharpAstTransformer {
             expression: {} as cs.Expression
         } as cs.InvocationExpression;
 
+        const parts = expression.text.split('/');
         csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'CreateRegex');
         csExpr.arguments.push({
             parent: csExpr,
             nodeType: cs.SyntaxKind.StringLiteral,
             tsNode: expression,
-            text: expression.text
+            text: parts[1]
+        } as cs.StringLiteral);
+
+        csExpr.arguments.push({
+            parent: csExpr,
+            nodeType: cs.SyntaxKind.StringLiteral,
+            tsNode: expression,
+            text: parts[2]
         } as cs.StringLiteral);
 
         return csExpr;

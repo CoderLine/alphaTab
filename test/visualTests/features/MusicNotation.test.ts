@@ -48,4 +48,10 @@ describe('MusicNotationTests', () => {
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/forced-accidentals.gp', settings, [0, 1]);
     });
+
+    it('beams-advanced', async () => {
+        let settings: Settings = new Settings();
+        settings.display.barsPerRow = 4;
+        await VisualTestHelper.runVisualTest('music-notation/beams-advanced.gp', settings);
+    });
 });

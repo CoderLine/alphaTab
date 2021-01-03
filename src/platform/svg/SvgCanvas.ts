@@ -22,9 +22,8 @@ export abstract class SvgCanvas implements ICanvas {
     public settings!: Settings;
 
     public beginRender(width: number, height: number): void {
-        this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${
-            height | 0
-        }px" class="at-surface-svg">\n`;
+        this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${height | 0
+            }px" class="at-surface-svg">\n`;
         this._currentPath = '';
         this._currentPathIsEmpty = true;
     }
@@ -137,8 +136,17 @@ export abstract class SvgCanvas implements ICanvas {
         if (this.textAlign !== TextAlign.Left) {
             s += ` text-anchor="${this.getSvgTextAlignment(this.textAlign)}"`;
         }
-        s += `>${text}</text>`;
+        s += `>${SvgCanvas.escapeText(text)}</text>`;
         this.buffer += s;
+    }
+
+    private static escapeText(text: string) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
 
     protected getSvgTextAlignment(textAlign: TextAlign): string {

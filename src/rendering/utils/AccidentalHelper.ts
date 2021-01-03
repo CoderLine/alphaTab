@@ -265,7 +265,7 @@ export class AccidentalHelper {
                     const previousRenderer = this._barRenderer.previousRenderer as ScoreBarRenderer;
                     if (previousRenderer) {
                         const tieOriginLine = previousRenderer.accidentalHelper.getNoteLine(note.tieOrigin!);
-                        if(tieOriginLine === line) {
+                        if (tieOriginLine === line) {
                             skipAccidental = true;
                         }
                     }
@@ -328,24 +328,27 @@ export class AccidentalHelper {
         }
 
         if (!isHelperNote) {
-            let lines: BeatLines;
-            if (this._beatLines.has(relatedBeat.id)) {
-                lines = this._beatLines.get(relatedBeat.id)!;
-            }
-            else {
-                lines = new BeatLines();
-                this._beatLines.set(relatedBeat.id, lines);
-            }
-
-            if (lines.minLine === -1000 || line < lines.minLine) {
-                lines.minLine = line;
-            }
-            if (lines.minLine === -1000 || line > lines.maxLine) {
-                lines.maxLine = line;
-            }
+            this.registerLine(relatedBeat, line);
         }
 
         return accidentalToSet;
+    }
+
+    private registerLine(relatedBeat: Beat, line: number) {
+        let lines: BeatLines;
+        if (this._beatLines.has(relatedBeat.id)) {
+            lines = this._beatLines.get(relatedBeat.id)!;
+        }
+        else {
+            lines = new BeatLines();
+            this._beatLines.set(relatedBeat.id, lines);
+        }
+        if (lines.minLine === -1000 || line < lines.minLine) {
+            lines.minLine = line;
+        }
+        if (lines.minLine === -1000 || line > lines.maxLine) {
+            lines.maxLine = line;
+        }
     }
 
     public getMaxLine(b: Beat): number {

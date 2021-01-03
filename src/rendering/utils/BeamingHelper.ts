@@ -19,6 +19,29 @@ class BeatLinePositions {
     public down: number = 0;
 }
 
+export class BeamingHelperDrawInfo {
+    public startX: number = 0;
+    public startY: number = 0;
+
+    public endX: number = 0;
+    public endY: number = 0;
+
+    // 
+    /**
+     * calculates the Y-position given a X-pos using the current start end point 
+     * @param x 
+     */
+    public calcY(x: number): number {
+        // get the y position of the given beat on this curve
+        if (this.startX === this.endX) {
+            return this.startY;
+        }
+
+        // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
+        return ((this.endY - this.startY) / (this.endX - this.startX)) * (x - this.startX) + this.startY;
+    }
+}
+
 /**
  * This public class helps drawing beams and bars for notes.
  */
@@ -26,6 +49,7 @@ export class BeamingHelper {
     private _staff: Staff;
     private _beatLineXPositions: Map<number, BeatLinePositions> = new Map();
     private _renderer: BarRendererBase;
+    private _lastNonRestBeat: Beat | null = null;
 
     public voice: Voice | null = null;
     public beats: Beat[] = [];
@@ -41,16 +65,9 @@ export class BeamingHelper {
      */
     public hasTuplet: boolean = false;
 
-    private _firstBeatLowestNote: Note | null = null;
     private _firstBeatLowestNoteCompareValue: number = -1;
-
-    private _firstBeatHighestNote: Note | null = null;
     private _firstBeatHighestNoteCompareValue: number = -1;
-
-    private _lastBeatLowestNote: Note | null = null;
     private _lastBeatLowestNoteCompareValue: number = -1;
-
-    private _lastBeatHighestNote: Note | null = null;
     private _lastBeatHighestNoteCompareValue: number = -1;
 
     private _lowestNoteInHelper: Note | null = null;
@@ -62,6 +79,12 @@ export class BeamingHelper {
     public invertBeamDirection: boolean = false;
     public preferredBeamDirection: BeamDirection | null = null;
     public isGrace: boolean = false;
+
+    public minRestLine: number | null = null;
+    public beatOfMinRestLine: Beat | null = null;
+
+    public maxRestLine: number | null = null;
+    public beatOfMaxRestLine: Beat | null = null;
 
     public get hasLine(): boolean {
         return this.beats.length === 1 && this.beats[0].duration > Duration.Whole;
@@ -148,6 +171,78 @@ export class BeamingHelper {
         return this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
     }
 
+    /**
+     * Registers a rest beat within the accidental helper so the rest
+     * symbol is considered properly during beaming. 
+     * @param beat The rest beat. 
+     * @param line The line on which the rest symbol is placed
+     */
+    public applyRest(beat: Beat, line: number): void {
+        // do not accept rests after the last beat which has notes
+        if (this._lastNonRestBeat && beat.index >= this._lastNonRestBeat.index) {
+            return;
+        }
+
+        // correct the line of the glyph to a note which would
+        // be placed at the upper / lower end of the glyph.
+        let aboveRest = line;
+        let belowRest = line;
+        switch (beat.duration) {
+            case Duration.QuadrupleWhole:
+                aboveRest -= 2;
+                belowRest += 2;
+                break;
+            case Duration.DoubleWhole:
+                aboveRest -= 2;
+                belowRest -= 2;
+                break;
+            case Duration.Whole:
+                aboveRest += 2;
+                belowRest += 2;
+                break;
+            case Duration.Half:
+                aboveRest -= 2;
+                belowRest -= 2;
+                break;
+            case Duration.Quarter:
+                aboveRest -= 4;
+                belowRest += 2;
+                break;
+            case Duration.Eighth:
+                aboveRest -= 2;
+                belowRest += 2;
+                break;
+            case Duration.Sixteenth:
+                aboveRest -= 2;
+                belowRest += 4;
+                break;
+            case Duration.ThirtySecond:
+                aboveRest -= 4;
+                belowRest += 4;
+                break;
+            case Duration.SixtyFourth:
+                aboveRest -= 4;
+                belowRest += 6;
+                break;
+            case Duration.OneHundredTwentyEighth:
+                aboveRest -= 6;
+                belowRest += 6;
+                break;
+            case Duration.TwoHundredFiftySixth:
+                aboveRest -= 6;
+                belowRest += 8;
+                break;
+        }
+        if (this.minRestLine === null || this.minRestLine > aboveRest) {
+            this.minRestLine = aboveRest;
+            this.beatOfMinRestLine = beat;
+        }
+        if (this.maxRestLine === null || this.maxRestLine < belowRest) {
+            this.maxRestLine = belowRest;
+            this.beatOfMaxRestLine = beat;
+        }
+    }
+
     private invert(direction: BeamDirection): BeamDirection {
         if (!this.invertBeamDirection) {
             return direction;
@@ -207,8 +302,6 @@ export class BeamingHelper {
             if (fingeringCount > this.fingeringCount) {
                 this.fingeringCount = fingeringCount;
             }
-            this._lastBeatLowestNote = null;
-            this._lastBeatHighestNote = null;
             this.checkNote(beat.minNote);
             this.checkNote(beat.maxNote);
             if (this.shortestDuration < beat.duration) {
@@ -216,6 +309,9 @@ export class BeamingHelper {
             }
             if (beat.hasTuplet) {
                 this.hasTuplet = true;
+            }
+            if (!beat.isRest) {
+                this._lastNonRestBeat = beat;
             }
         }
         return add;
@@ -247,23 +343,19 @@ export class BeamingHelper {
         }
 
         if (this.beats.length === 1 && this.beats[0] === note.beat) {
-            if (!this._firstBeatLowestNote || lowestValueForNote < this._firstBeatLowestNoteCompareValue) {
-                this._firstBeatLowestNote = note;
+            if (this._firstBeatLowestNoteCompareValue === -1 || lowestValueForNote < this._firstBeatLowestNoteCompareValue) {
                 this._firstBeatLowestNoteCompareValue = lowestValueForNote;
             }
-            if (!this._firstBeatHighestNote || highestValueForNote > this._firstBeatHighestNoteCompareValue) {
-                this._firstBeatHighestNote = note;
+            if (this._firstBeatHighestNoteCompareValue === -1 || highestValueForNote > this._firstBeatHighestNoteCompareValue) {
                 this._firstBeatHighestNoteCompareValue = highestValueForNote;
             }
         }
 
-        if (!this._lastBeatLowestNote || lowestValueForNote < this._lastBeatLowestNoteCompareValue) {
-            this._lastBeatLowestNote = note;
+        if (this._lastBeatLowestNoteCompareValue === -1 || lowestValueForNote < this._lastBeatLowestNoteCompareValue) {
             this._lastBeatLowestNoteCompareValue = lowestValueForNote;
         }
 
-        if (!this._lastBeatHighestNote || highestValueForNote > this._lastBeatHighestNoteCompareValue) {
-            this._lastBeatHighestNote = note;
+        if (this._lastBeatHighestNoteCompareValue === -1 || highestValueForNote > this._lastBeatHighestNoteCompareValue) {
             this._lastBeatHighestNoteCompareValue = highestValueForNote;
         }
 
@@ -277,7 +369,7 @@ export class BeamingHelper {
         }
     }
 
-    
+
     // TODO: Check if this beaming is really correct, I'm not sure if we are connecting beats correctly
     private static canJoin(b1: Beat, b2: Beat): boolean {
         // is this a voice we can join with?
@@ -373,4 +465,6 @@ export class BeamingHelper {
             !this._beatLineXPositions.get(beat.index)!.staffId
         );
     }
+
+    public drawingInfos: Map<BeamDirection, BeamingHelperDrawInfo> = new Map<BeamDirection, BeamingHelperDrawInfo>();
 }

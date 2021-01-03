@@ -29,7 +29,7 @@ import { ScoreBeatContainerGlyph } from '@src/rendering/ScoreBeatContainerGlyph'
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { BeamingHelper, BeamingHelperDrawInfo } from '@src/rendering/utils/BeamingHelper';
 import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
@@ -354,71 +354,104 @@ export class ScoreBarRenderer extends BarRendererBase {
     private calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         let stemSize: number = this.getStemSize(h);
 
-        const firstBeat = h.beats[0];
+        if (!h.drawingInfos.has(direction)) {
+            let drawingInfo = new BeamingHelperDrawInfo();
+            h.drawingInfos.set(direction, drawingInfo);
 
-        // create a line between the min and max note of the group
-        if (h.beats.length === 1) {
-            if (direction === BeamDirection.Up) {
-                return this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize;
+            // the beaming logic works like this: 
+            // 1. we take the first and last note, add the stem, and put a diagnal line between them. 
+            // 2. the height of the diagonal line must not exceed a max height, 
+            //    - if this is the case, the line on the more distant note just gets longer
+            // 3. any middle elements (notes or rests) shift this diagonal line up/down to avoid overlaps
+
+            const firstBeat = h.beats[0];
+            const lastBeat = h.beats[h.beats.length - 1];
+
+            // 1. put direct diagonal line. 
+            drawingInfo.startX = h.getBeatLineX(firstBeat);
+            drawingInfo.startY =
+                direction === BeamDirection.Up
+                    ? this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize
+                    : this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
+
+            drawingInfo.endX = h.getBeatLineX(lastBeat);
+            drawingInfo.endY =
+                direction === BeamDirection.Up
+                    ? this.getScoreY(this.accidentalHelper.getMinLine(lastBeat)) - stemSize
+                    : this.getScoreY(this.accidentalHelper.getMaxLine(lastBeat)) + stemSize;
+
+            // 2. ensure max height
+            // we use the min/max notes to place the beam along their real position
+            // we only want a maximum of 10 offset for their gradient
+            let maxDistance: number = 10 * this.scale;
+            if (direction === BeamDirection.Down && drawingInfo.startY > drawingInfo.endY && drawingInfo.startY - drawingInfo.endY > maxDistance) {
+                drawingInfo.endY = drawingInfo.startY - maxDistance;
             }
-            return this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
+            if (direction === BeamDirection.Down && drawingInfo.endY > drawingInfo.startY && drawingInfo.endY - drawingInfo.startY > maxDistance) {
+                drawingInfo.startY = drawingInfo.endY - maxDistance;
+            }
+            if (direction === BeamDirection.Up && drawingInfo.startY < drawingInfo.endY && drawingInfo.endY - drawingInfo.startY > maxDistance) {
+                drawingInfo.endY = drawingInfo.startY + maxDistance;
+            }
+            if (direction === BeamDirection.Up && drawingInfo.endY < drawingInfo.startY && drawingInfo.startY - drawingInfo.endY > maxDistance) {
+                drawingInfo.startY = drawingInfo.endY + maxDistance;
+            }
+
+            // 3. let middle elements shift up/down
+            if (h.beats.length > 1) {
+                // check if highest note shifts bar up or down
+                if (direction === BeamDirection.Up) {
+                    let yNeededForHighestNote = this.getScoreY(this.accidentalHelper.getMinLine(h.beatOfHighestNote)) - stemSize;
+                    const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfHighestNote));
+
+                    const diff = yGivenByCurrentValues - yNeededForHighestNote;
+                    if (diff > 0) {
+                        drawingInfo.startY -= diff;
+                        drawingInfo.endY -= diff;
+                    }
+                } else {
+                    let yNeededForLowestNote = this.getScoreY(this.accidentalHelper.getMaxLine(h.beatOfLowestNote)) + stemSize;
+                    const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfLowestNote));
+
+                    const diff = yNeededForLowestNote - yGivenByCurrentValues;
+                    if (diff > 0) {
+                        drawingInfo.startY += diff;
+                        drawingInfo.endY += diff;
+                    }
+                }
+
+                // check if rest shifts bar up or down
+                if (h.minRestLine !== null || h.maxRestLine !== null) {
+                    const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
+                    let scaleMod: number = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
+                    let barSpacing: number = barCount *
+                        (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * this.scale * scaleMod;
+                    barSpacing += BarRendererBase.BeamSpacing;
+
+                    if (direction === BeamDirection.Up && h.minRestLine !== null) {
+                        let yNeededForRest = this.getScoreY(h.minRestLine!) - barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMinRestLine!));
+
+                        const diff = yGivenByCurrentValues - yNeededForRest;
+                        if (diff > 0) {
+                            drawingInfo.startY -= diff;
+                            drawingInfo.endY -= diff;
+                        }
+                    } else if (direction === BeamDirection.Down && h.maxRestLine !== null) {
+                        let yNeededForRest = this.getScoreY(h.maxRestLine!) + barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMaxRestLine!));
+
+                        const diff = yNeededForRest - yGivenByCurrentValues;
+                        if (diff > 0) {
+                            drawingInfo.startY += diff;
+                            drawingInfo.endY += diff;
+                        }
+                    }
+                }
+            }
         }
 
-        const lastBeat = h.beats[h.beats.length - 1];
-
-        // we use the min/max notes to place the beam along their real position
-        // we only want a maximum of 10 offset for their gradient
-        let maxDistance: number = 10 * this.scale;
-        // if the min note is not first or last, we can align notes directly to the position
-        // of the min note
-        const beatOfLowestNote = h.beatOfLowestNote;
-        const beatOfHighestNote = h.beatOfHighestNote;
-        if (
-            direction === BeamDirection.Down &&
-            beatOfLowestNote !== firstBeat &&
-            beatOfLowestNote !== lastBeat
-        ) {
-            return this.getScoreY(this.accidentalHelper.getMaxLine(beatOfLowestNote)) + stemSize;
-        }
-        if (
-            direction === BeamDirection.Up &&
-            beatOfHighestNote !== firstBeat &&
-            beatOfHighestNote !== lastBeat
-        ) {
-            return this.getScoreY(this.accidentalHelper.getMinLine(beatOfHighestNote)) - stemSize;
-        }
-
-        let startX: number = h.getBeatLineX(firstBeat);
-        let startY: number =
-            direction === BeamDirection.Up
-                ? this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize
-                : this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
-
-        let endX: number = h.getBeatLineX(lastBeat);
-        let endY: number =
-            direction === BeamDirection.Up
-                ? this.getScoreY(this.accidentalHelper.getMinLine(lastBeat)) - stemSize
-                : this.getScoreY(this.accidentalHelper.getMaxLine(lastBeat)) + stemSize;
-
-        // ensure the maxDistance
-        if (direction === BeamDirection.Down && startY > endY && startY - endY > maxDistance) {
-            endY = startY - maxDistance;
-        }
-        if (direction === BeamDirection.Down && endY > startY && endY - startY > maxDistance) {
-            startY = endY - maxDistance;
-        }
-        if (direction === BeamDirection.Up && startY < endY && endY - startY > maxDistance) {
-            endY = startY + maxDistance;
-        }
-        if (direction === BeamDirection.Up && endY < startY && startY - endY > maxDistance) {
-            startY = endY + maxDistance;
-        }
-        // get the y position of the given beat on this curve
-        if (startX === endX) {
-            return startY;
-        }
-        // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
-        return ((endY - startY) / (endX - startX)) * (x - startX) + startY;
+        return h.drawingInfos.get(direction)!.calcY(x);
     }
 
 

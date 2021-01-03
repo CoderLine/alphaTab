@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using AlphaTab.Core.EcmaScript;
-using AlphaTab.Rendering.Glyphs;
-using String = System.String;
 
 namespace AlphaTab.Core
 {
@@ -271,6 +268,18 @@ namespace AlphaTab.Core
             }
 
             return num.ToString(CultureInfo.InvariantCulture);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegExp CreateRegex(string pattern, string flags)
+        {
+            return new RegExp(pattern, flags);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Replace(this string input, RegExp pattern, string replacement)
+        {
+            return pattern.Replace(input, replacement);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
