@@ -122,6 +122,17 @@ export enum MusicFontSymbol {
 
     PictEdgeOfCymbal = 0xe729,
 
+    GuitarString0 = 0xe833,
+    GuitarString1 = 0xe834,
+    GuitarString2 = 0xe835,
+    GuitarString3 = 0xe836,
+    GuitarString4 = 0xe837,
+    GuitarString5 = 0xe838,
+    GuitarString6 = 0xe839,
+    GuitarString7 = 0xe83A,
+    GuitarString8 = 0xe83B,
+    GuitarString9 = 0xe83C,
+
     GuitarGolpe = 0xe842,
 
     FretboardX = 0xe859,

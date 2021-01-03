@@ -7,6 +7,7 @@ import { Staff } from "@src/model/Staff";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BarSerializer } from "@src/generated/model/BarSerializer";
 import { ChordSerializer } from "@src/generated/model/ChordSerializer";
+import { TuningSerializer } from "@src/generated/model/TuningSerializer";
 import { Bar } from "@src/model/Bar";
 import { Chord } from "@src/model/Chord";
 export class StaffSerializer {
@@ -30,8 +31,7 @@ export class StaffSerializer {
         o.set("capo", obj.capo); 
         o.set("transpositionPitch", obj.transpositionPitch); 
         o.set("displayTranspositionPitch", obj.displayTranspositionPitch); 
-        o.set("tuning", obj.tuning); 
-        o.set("tuningName", obj.tuningName); 
+        o.set("stringTuning", TuningSerializer.toJson(obj.stringTuning)); 
         o.set("showTablature", obj.showTablature); 
         o.set("showStandardNotation", obj.showStandardNotation); 
         o.set("isPercussion", obj.isPercussion); 
@@ -65,12 +65,6 @@ export class StaffSerializer {
             case "displaytranspositionpitch":
                 obj.displayTranspositionPitch = (v as number);
                 return true;
-            case "tuning":
-                obj.tuning = (v as number[]);
-                return true;
-            case "tuningname":
-                obj.tuningName = (v as string);
-                return true;
             case "showtablature":
                 obj.showTablature = (v as boolean);
                 return true;
@@ -83,6 +77,10 @@ export class StaffSerializer {
             case "standardnotationlinecount":
                 obj.standardNotationLineCount = (v as number);
                 return true;
+        } 
+        if (["stringtuning"].indexOf(property) >= 0) {
+            TuningSerializer.fromJson(obj.stringTuning, (v as Map<string, unknown>));
+            return true;
         } 
         return false; 
     }

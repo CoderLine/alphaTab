@@ -366,7 +366,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 switch (c.localName) {
                     case 'staff-lines':
                         for (let staff of track.staves) {
-                            staff.tuning = new Array<number>(parseInt(c.innerText)).fill(0);
+                            staff.stringTuning.tunings = new Array<number>(parseInt(c.innerText)).fill(0);
                         }
                         break;
                     case 'staff-tuning':
@@ -377,7 +377,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         for (let staff of track.staves) {
             if (this.isEmptyTuning(staff.tuning)) {
-                staff.tuning = [];
+                staff.stringTuning.tunings = [];
             }
         }
     }
@@ -1370,7 +1370,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
         if (this.isEmptyTuning(track.staves[0].tuning)) {
-            track.staves[0].tuning = [];
+            track.staves[0].stringTuning.tunings = [];
         }
     }
 

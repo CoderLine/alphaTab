@@ -17,7 +17,6 @@ export class NoteNumberGlyph extends Glyph {
     private _trillNoteStringWidth: number = 0;
 
     public isEmpty: boolean = false;
-    public height: number = 0;
     public noteStringWidth: number = 0;
 
     public constructor(x: number, y: number, note: Note) {

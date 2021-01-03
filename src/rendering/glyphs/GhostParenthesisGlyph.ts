@@ -11,8 +11,6 @@ export class GhostParenthesisGlyph extends Glyph {
         this._isOpen = isOpen;
     }
 
-    public height: number = 0;
-
     public doLayout(): void {
         super.doLayout();
         this.width = GhostParenthesisGlyph.Size * this.scale;
