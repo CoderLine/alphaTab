@@ -70,7 +70,7 @@ namespace AlphaTab.WinForms
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public AlphaTabApiBase<AlphaTabControl> Api { get; private set; }
+        public AlphaTabApiBase<AlphaTabControl> Api { get; private set; } = null!;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AlphaTabControl"/> class.

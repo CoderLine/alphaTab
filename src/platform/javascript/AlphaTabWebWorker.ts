@@ -29,7 +29,7 @@ export class AlphaTabWebWorker {
         let cmd: any = data ? data.cmd : '';
         switch (cmd) {
             case 'alphaTab.initialize':
-                let settings: Settings = JsonConverter.jsObjectToSettings(data.settings); new Settings();
+                let settings: Settings = JsonConverter.jsObjectToSettings(data.settings);
                 Logger.logLevel = settings.core.logLevel;
                 this._renderer = new ScoreRenderer(settings);
                 this._renderer.partialRenderFinished.on(result => {

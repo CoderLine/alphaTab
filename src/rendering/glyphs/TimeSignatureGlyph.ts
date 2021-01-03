@@ -41,7 +41,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
             this.addGlyph(common);
             super.doLayout();
         } else {
-            const numberHeight = NumberGlyph.height * this.scale;
+            const numberHeight = NumberGlyph.numberHeight * this.scale;
             let numerator: NumberGlyph = new NumberGlyph(0, -numberHeight / 2, this._numerator, this.numberScale);
             let denominator: NumberGlyph = new NumberGlyph(0, numberHeight / 2, this._denominator, this.numberScale);
             this.addGlyph(numerator);

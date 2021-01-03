@@ -110,24 +110,24 @@ describe('LyricsTests', () => {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].lyrics![1]).toBeFalsy();
     });
 
-    it('spaces', async () => {
+    it('spaces', () => {
         testLyrics('AAA BBB CCC DDD EEE', ['AAA', 'BBB', 'CCC', 'DDD', 'EEE']);
         testLyrics('AAA  BBB   CCC', ['AAA', '', 'BBB', '', '', 'CCC']);
     });
 
-    it('new-lines', async () => {
+    it('new-lines', () => {
         testLyrics('AAA\r\nBBB\rCCC\nDDD\r\nEEE', ['AAA', 'BBB', 'CCC', 'DDD', 'EEE']);
     });
 
-    it('dash', async () => {
+    it('dash', () => {
         testLyrics('AAA-BBB CCC- DDD EEE--FFF', ['AAA-', 'BBB', 'CCC-', 'DDD', 'EEE--', 'FFF']);
     });
 
-    it('plus', async () => {
+    it('plus', () => {
         testLyrics('AAA+BBB CCC++DDD EEE+ FFF', ['AAA BBB', 'CCC  DDD', 'EEE ', 'FFF']);
     });
 
-    it('comments', async () => {
+    it('comments', () => {
         testLyrics('[ABCD]AAA BBB', ['AAA', 'BBB']);
         testLyrics('[ABCD] AAA BBB', ['', 'AAA', 'BBB']);
         testLyrics('[AAA BBB\r\nCCC DDD]AAA BBB', ['AAA', 'BBB']);

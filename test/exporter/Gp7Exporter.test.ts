@@ -113,7 +113,7 @@ describe('Gp7ExporterTest', () => {
         ]);
     });
 
-    it('alphatex-to-gp7', async () => {
+    it('alphatex-to-gp7', () => {
         const tex = `\\title "Canon Rock"
         \\subtitle "JerryC"
         \\tempo 90

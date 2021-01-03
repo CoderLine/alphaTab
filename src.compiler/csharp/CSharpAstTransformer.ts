@@ -1235,6 +1235,12 @@ export default class CSharpAstTransformer {
                     csMethod.isOverride = true;
                 }
                 break;
+            case 'Equals':
+                if (csMethod.parameters.length === 1) {
+                    csMethod.isVirtual = false;
+                    csMethod.isOverride = true;
+                }
+                break;
         }
 
         parent.members.push(csMethod);
