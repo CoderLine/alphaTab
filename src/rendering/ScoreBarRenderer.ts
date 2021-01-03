@@ -429,7 +429,7 @@ export class ScoreBarRenderer extends BarRendererBase {
                     barSpacing += BarRendererBase.BeamSpacing;
 
                     if (direction === BeamDirection.Up && h.minRestLine !== null) {
-                        let yNeededForRest = this.getScoreY(h.minRestLine) - barSpacing;
+                        let yNeededForRest = this.getScoreY(h.minRestLine!) - barSpacing;
                         const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMinRestLine!));
 
                         const diff = yGivenByCurrentValues - yNeededForRest;
@@ -438,7 +438,7 @@ export class ScoreBarRenderer extends BarRendererBase {
                             drawingInfo.endY -= diff;
                         }
                     } else if (direction === BeamDirection.Down && h.maxRestLine !== null) {
-                        let yNeededForRest = this.getScoreY(h.maxRestLine) + barSpacing;
+                        let yNeededForRest = this.getScoreY(h.maxRestLine!) + barSpacing;
                         const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMaxRestLine!));
 
                         const diff = yNeededForRest - yGivenByCurrentValues;
