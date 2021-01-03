@@ -13,6 +13,6 @@ function setupEditor(api, selector) {
         mode: 'ace/mode/tex'
     });
     editor.session.on('change', () => {
-        api.tex(editor.getSession().getDocument().getAllLines().join('\n'));
+        api.tex(editor.getSession().getDocument().getAllLines().join('\n'), 'all');
     });
 }

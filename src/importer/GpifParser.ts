@@ -748,10 +748,10 @@ export class GpifParser {
                                 for (let i: number = 0; i < tuning.length; i++) {
                                     tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
                                 }
-                                staff.tuning = tuning;
+                                staff.stringTuning.tunings = tuning;
                                 break;
                             case 'Label':
-                                staff.tuningName = c.innerText;
+                                staff.stringTuning.name = c.innerText;
                                 break;
                         }
                     }
@@ -941,7 +941,7 @@ export class GpifParser {
                     tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
                 }
                 for (let staff of track.staves) {
-                    staff.tuning = tuning;
+                    staff.stringTuning.tunings = tuning;
                     staff.showStandardNotation = true;
                     staff.showTablature = true;
                 }

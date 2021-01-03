@@ -77,7 +77,7 @@ namespace AlphaTab.VisualTests
             settings.Core.Engine = "skia";
             settings.Core.EnableLazyLoading = false;
             settings.Core.UseWorkers = false;
-			
+
 			if(!referenceFileName.StartsWith("test-data/")) {
 				referenceFileName = $"test-data/visual-tests/{referenceFileName}";
 			}
@@ -89,7 +89,7 @@ namespace AlphaTab.VisualTests
             var totalWidth = 0.0;
             var totalHeight = 0.0;
 
-            var task = new TaskCompletionSource<object>();
+            var task = new TaskCompletionSource<object?>();
             var renderer = new ScoreRenderer(settings);
             renderer.Width = 1300;
 
@@ -112,7 +112,7 @@ namespace AlphaTab.VisualTests
 
             if (await Task.WhenAny(task.Task, Task.Delay(2000)) == task.Task)
             {
-                await CompareVisualResult(
+                CompareVisualResult(
                     totalWidth,
                     totalHeight,
                     result,
@@ -127,7 +127,7 @@ namespace AlphaTab.VisualTests
             }
         }
 
-        private static async Task CompareVisualResult(double totalWidth, double totalHeight,
+        private static void CompareVisualResult(double totalWidth, double totalHeight,
             List<RenderFinishedEventArgs> result, string referenceFileName,
             Uint8Array referenceFileData, string? message)
         {
@@ -135,6 +135,8 @@ namespace AlphaTab.VisualTests
             // https://github.com/mono/SkiaSharp/issues/1253
             return;
 
+            // ReSharper disable once HeuristicUnreachableCode
+#pragma warning disable 162
             SKBitmap finalBitmap;
 
             using (var finalImageSurface = SKSurface.Create(new SKImageInfo((int) totalWidth,
@@ -219,6 +221,7 @@ namespace AlphaTab.VisualTests
             }
 
             File.Delete(finalImageFileName);
+#pragma warning restore 162
         }
     }
 }

@@ -212,7 +212,7 @@ export class AlphaTexImporter extends ScoreImporter {
         this._currentTrack.playbackInfo.secondaryChannel = this._trackChannel++;
         this._currentStaff = this._currentTrack.staves[0];
         this._currentStaff.displayTranspositionPitch = -12;
-        this._currentStaff.tuning = Tuning.getDefaultTuningFor(6)!.tunings;
+        this._currentStaff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
         this._score.addTrack(this._currentTrack);
         this._lyrics.set(this._currentTrack.index, []);
         this._currentDynamics = DynamicValue.F;
@@ -699,7 +699,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         let text: string = (this._syData as string).toLowerCase();
                         if (text === 'piano' || text === 'none' || text === 'voice') {
                             // clear tuning
-                            this._currentStaff.tuning = [];
+                            this._currentStaff.stringTuning.tunings = [];
                             this._currentStaff.displayTranspositionPitch = 0;
                         } else {
                             this.error('tuning', AlphaTexSymbols.Tuning, true);
@@ -713,7 +713,7 @@ export class AlphaTexImporter extends ScoreImporter {
                             tuning.push(t.realValue);
                             this._sy = this.newSy();
                         } while (this._sy === AlphaTexSymbols.Tuning);
-                        this._currentStaff.tuning = tuning;
+                        this._currentStaff.stringTuning.tunings = tuning;
                         break;
                     default:
                         this.error('tuning', AlphaTexSymbols.Tuning, true);
@@ -776,7 +776,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     }
                     this._sy = this.newSy();
                 }
-                this._currentStaff.addChord(chord.name.toLowerCase(), chord);
+                this._currentStaff.addChord(this.getChordId(this._currentStaff, chord.name), chord);
                 return true;
             default:
                 return false;
@@ -979,51 +979,51 @@ export class AlphaTexImporter extends ScoreImporter {
 
             // reset to defaults
             this._currentStaff.displayTranspositionPitch = 0;
-            this._currentStaff.tuning = [];
+            this._currentStaff.stringTuning.tunings = [];
 
 
             if (program == 15 || program >= 24 && program <= 31) {
                 // dulcimer+guitar E4 B3 G3 D3 A2 E2
                 this._currentStaff.displayTranspositionPitch = -12;
-                this._currentStaff.tuning = Tuning.getDefaultTuningFor(6)!.tunings;
+                this._currentStaff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
             } else if (program >= 32 && program <= 39) {
                 // bass G2 D2 A1 E1
                 this._currentStaff.displayTranspositionPitch = -12;
-                this._currentStaff.tuning = [43, 38, 33, 28];
+                this._currentStaff.stringTuning.tunings = [43, 38, 33, 28];
             } else if (program == 40 || program == 44 || program == 45 || program == 48 || program == 49 || program == 50 || program == 51) {
                 // violin E3 A3 D3 G2
-                this._currentStaff.tuning = [52, 57, 50, 43];
+                this._currentStaff.stringTuning.tunings = [52, 57, 50, 43];
             } else if (program == 41) {
                 // viola A3 D3 G2 C2
-                this._currentStaff.tuning = [57, 50, 43, 36];
+                this._currentStaff.stringTuning.tunings = [57, 50, 43, 36];
             } else if (program == 42) {
                 // cello A2 D2 G1 C1
-                this._currentStaff.tuning = [45, 38, 31, 24];
+                this._currentStaff.stringTuning.tunings = [45, 38, 31, 24];
             } else if (program == 43) {
                 // contrabass
                 // G2 D2 A1 E1
                 this._currentStaff.displayTranspositionPitch = -12;
-                this._currentStaff.tuning = [43, 38, 33, 28];
+                this._currentStaff.stringTuning.tunings = [43, 38, 33, 28];
             } else if (program == 105) {
                 // banjo
                 // D3 B2 G2 D2 G3
-                this._currentStaff.tuning = [50, 47, 43, 38, 55];
+                this._currentStaff.stringTuning.tunings = [50, 47, 43, 38, 55];
             } else if (program == 106) {
                 // shamisen
                 // A3 E3 A2
-                this._currentStaff.tuning = [57, 52, 45];
+                this._currentStaff.stringTuning.tunings = [57, 52, 45];
             } else if (program == 107) {
                 // koto
                 // E3 A2 D2 G1
-                this._currentStaff.tuning = [52, 45, 38, 31];
+                this._currentStaff.stringTuning.tunings = [52, 45, 38, 31];
             } else if (program == 110) {
                 // Fiddle
                 // E4 A3 D3 G2
-                this._currentStaff.tuning = [64, 57, 50, 43];
+                this._currentStaff.stringTuning.tunings = [64, 57, 50, 43];
             }
+
             this._staffTuningApplied = true;
         }
-
 
         let anyBeatData = false;
         let voice: Voice = bar.voices[0];
@@ -1296,7 +1296,7 @@ export class AlphaTexImporter extends ScoreImporter {
         if (syData === 'ch') {
             this._sy = this.newSy();
             let chordName: string = (this._syData as string);
-            let chordId: string = chordName.toLowerCase();
+            let chordId: string = this.getChordId(this._currentStaff, chordName);
             if (!this._currentStaff.chords.has(chordId)) {
                 let chord: Chord = new Chord();
                 chord.showDiagram = false;
@@ -1386,6 +1386,10 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         }
         return false;
+    }
+
+    private getChordId(currentStaff: Staff, chordName: string): string {
+        return chordName.toLowerCase() + currentStaff.index + currentStaff.track.index
     }
 
     private applyTuplet(beat: Beat, tuplet: number): void {

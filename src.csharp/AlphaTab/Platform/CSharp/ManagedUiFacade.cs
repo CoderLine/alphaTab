@@ -39,7 +39,7 @@ namespace AlphaTab.Platform.CSharp
             return new ManagedThreadScoreRenderer(Api.Settings, BeginInvoke);
         }
 
-        protected abstract Stream OpenDefaultSoundFont();
+        protected abstract Stream? OpenDefaultSoundFont();
 
         public IAlphaSynth CreateWorkerPlayer()
         {

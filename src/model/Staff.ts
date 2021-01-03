@@ -2,6 +2,7 @@ import { Bar } from '@src/model/Bar';
 import { Chord } from '@src/model/Chord';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
+import { Tuning } from './Tuning';
 
 /**
  * This class describes a single staff within a track. There are instruments like pianos
@@ -55,15 +56,24 @@ export class Staff {
      * guitar tablature. Unlike the {@link Note.string} property this array directly represents
      * the order of the tracks shown in the tablature. The first item is the most top tablature line.
      */
-    public tuning: number[] = [];
+    public stringTuning: Tuning = new Tuning("", [], false);
+
+    /**
+     * Get or set the values of the related guitar tuning.
+     */
+    public get tuning(): number[] {
+        return this.stringTuning.tunings;
+    }
 
     /**
      * Gets or sets the name of the tuning.
      */
-    public tuningName: string = "";
+    public get tuningName(): string {
+        return this.stringTuning.name;
+    }
 
     public get isStringed(): boolean {
-        return this.tuning.length > 0;
+        return this.stringTuning.tunings.length > 0;
     }
 
     /**
@@ -88,6 +98,7 @@ export class Staff {
     public standardNotationLineCount: number = 5;
 
     public finish(settings: Settings): void {
+        this.stringTuning.finish();
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
             this.bars[i].finish(settings);
         }

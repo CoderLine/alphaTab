@@ -1,5 +1,6 @@
 /**
  * This public class represents a predefined string tuning.
+ * @json
  */
 export class Tuning {
     private static _sevenStrings: Tuning[] = [];
@@ -176,10 +177,23 @@ export class Tuning {
      * @param tuning The tuning.
      * @param isStandard if set to`true`[is standard].
      */
-    public constructor(name: string, tuning: number[], isStandard: boolean) {
+    public constructor(name: string = '', tuning: number[] | null = null, isStandard: boolean = false) {
         this.isStandard = isStandard;
         this.name = name;
-        this.tunings = tuning;
+        this.tunings = tuning ?? [];
+    }
+
+    /**
+     * Tries to detect the name and standard flag of the tuning from a known tuning list based
+     * on the string values. 
+     */
+    public finish() {
+        const knownTuning = Tuning.findTuning(this.tunings);
+        if (knownTuning) {
+            this.name = knownTuning.name;
+            this.isStandard = knownTuning.isStandard;
+        }
+        this.name = this.name.trim();
     }
 }
 

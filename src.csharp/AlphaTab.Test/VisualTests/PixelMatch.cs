@@ -317,7 +317,7 @@ namespace AlphaTab.VisualTests
 
     internal class PixelMatchResult
     {
-        public SKBitmap Output { get; set; }
+        public SKBitmap? Output { get; set; }
         public int DifferentPixels { get; set; }
         public int TotalPixels { get; set; }
         public double Mismatch => DifferentPixels / (double) TotalPixels;

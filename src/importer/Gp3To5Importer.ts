@@ -359,7 +359,8 @@ export class Gp3To5Importer extends ScoreImporter {
                 tuning.push(stringTuning);
             }
         }
-        mainStaff.tuning = tuning;
+        mainStaff.stringTuning.tunings = tuning;
+
         let port: number = IOHelper.readInt32LE(this.data);
         let index: number = IOHelper.readInt32LE(this.data) - 1;
         let effectChannel: number = IOHelper.readInt32LE(this.data) - 1;

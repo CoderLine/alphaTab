@@ -69,7 +69,7 @@ namespace AlphaTab.Wpf
             );
         }
 
-        protected override Stream OpenDefaultSoundFont()
+        protected override Stream? OpenDefaultSoundFont()
         {
             return typeof(NAudioSynthOutput).Assembly.GetManifestResourceStream(
                 typeof(NAudioSynthOutput), "default.sf2");
