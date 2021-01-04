@@ -1,5 +1,6 @@
 import { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
+import { GraceType } from '@src/model/GraceType';
 import { Note } from '@src/model/Note';
 import { ICanvas } from '@src/platform/ICanvas';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
@@ -43,6 +44,11 @@ export class BeatContainerGlyph extends Glyph {
             postBeatStretch += tie.width;
         }
 
+        // Add some further spacing to grace notes
+        if(this.beat.graceType !== GraceType.None) {
+            postBeatStretch += 10 * this.renderer.scale;
+        }
+
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
         // store sizes for special renderers like the EffectBarRenderer
         layoutings.setPreBeatSize(this.beat, this.preNotes.width);
@@ -51,11 +57,11 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public applyLayoutingInfo(info: BarLayoutingInfo): void {
-        let offset: number = info.getBeatCenterX(this.beat) - this.onNotes.centerX;
-        this.preNotes.x = offset;
+        this.preNotes.x = 0;
         this.preNotes.width = info.getPreBeatSize(this.beat);
         this.onNotes.width = info.getOnBeatSize(this.beat);
         this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        this.onNotes.centerX = info.getBeatCenterX(this.beat);
         this.onNotes.updateBeamingHelper();
     }
 

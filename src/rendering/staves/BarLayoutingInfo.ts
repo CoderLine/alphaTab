@@ -149,6 +149,7 @@ export class BarLayoutingInfo {
     }
 
     public addBeatSpring(beat: Beat, preBeatSize: number, postBeatSize: number): void {
+        let start: number = beat.absolutePlaybackStart;
         if (beat.graceType !== GraceType.None) {
             // For grace beats we just remember the the sizes required for them
             // these sizes are then considered when the target beat is added. 
@@ -159,17 +160,18 @@ export class BarLayoutingInfo {
 
             let existingSpring = this.graceSprings.get(beat.graceTarget!.id)![beat.graceIndex];
             if (existingSpring) {
-                existingSpring.postSpringWidth = postBeatSize;
-                existingSpring.preBeatWidth = preBeatSize;
+                if (existingSpring.postSpringWidth < postBeatSize) {
+                    existingSpring.postSpringWidth = postBeatSize;
+                }
+                if (existingSpring.preBeatWidth < preBeatSize) {
+                    existingSpring.preBeatWidth = preBeatSize;
+                }
             } else {
                 const graceSpring = new Spring();
+                graceSpring.timePosition = start;
                 graceSpring.postSpringWidth = postBeatSize;
                 graceSpring.preBeatWidth = preBeatSize;
                 this.graceSprings.get(beat.graceTarget!.id)![beat.graceIndex] = graceSpring;
-            }
-            // reset grace beat to ensure it is applied on the next round
-            if (this.springs.has(beat.graceTarget!.absolutePlaybackStart)) {
-                this.springs.get(beat.graceTarget!.absolutePlaybackStart)!.graceBeatWidth = 0;
             }
         } else {
             // TODO: adding this size causes the notation to be wider than needed
@@ -180,7 +182,6 @@ export class BarLayoutingInfo {
                 }
             }
 
-            let start: number = beat.absolutePlaybackStart;
             this.addSpring(start, beat.playbackDuration, graceBeatSize, preBeatSize, postBeatSize);
         }
     }
@@ -190,10 +191,10 @@ export class BarLayoutingInfo {
             let offset = 0;
             for (let i = s.length - 1; i >= 0; i--) {
                 // for grace beats we store the offset 
-                // in the 'time position' for later use during applying
+                // in the 'graceBeatWidth' for later use during applying
                 // beat positions
-                offset -= s[i].springWidth;
-                s[i].timePosition = offset;
+                s[i].graceBeatWidth = offset;
+                offset -= (s[i].preBeatWidth + s[i].postSpringWidth);
             }
         });
 

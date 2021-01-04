@@ -47,11 +47,11 @@ export class VoiceContainerGlyph extends GlyphGroup {
             currentBeatGlyph.x = positions.get(time)! * scale - currentBeatGlyph.onTimeX;
             if (currentBeatGlyph.beat.graceType !== GraceType.None) {
                 let graceSprings = this.renderer.layoutingInfo.graceSprings.get(currentBeatGlyph.beat.graceTarget!.id)!;
-                let graceTargetPreBeat = this.renderer.layoutingInfo.springs.get(time)!.preSpringWidth;
-                // move to start of grace beat range
-                currentBeatGlyph.x -= graceTargetPreBeat - FlagGlyph.FlagWidth * scale;
+                let graceTargetPreBeat = this.renderer.layoutingInfo.springs.get(time)!.preBeatWidth;
+                // move to end of grace beat range
+                currentBeatGlyph.x -= (graceTargetPreBeat + FlagGlyph.FlagWidth * scale);
                 // shift to right position of individual beat
-                currentBeatGlyph.x += graceSprings[currentBeatGlyph.beat.graceIndex].timePosition;
+                currentBeatGlyph.x += graceSprings[currentBeatGlyph.beat.graceIndex].graceBeatWidth;
             }
 
             // size always previous glyph after we know the position
