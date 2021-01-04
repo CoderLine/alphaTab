@@ -132,7 +132,7 @@ export class BeatContainerGlyph extends Glyph {
         // var ta = canvas.textAlign;
         // canvas.color = new Color(255, 0, 0);
         // canvas.textAlign = TextAlign.Left;
-        // canvas.fillText(this.beat.displayStart.toString(), cx + this.x, cy + this.y - 10);
+        // canvas.fillText(this.beat.playbackStart.toString(), cx + this.x, cy + this.y - 10);
         // canvas.color = c;
         // canvas.textAlign = ta;
         // canvas.color = Color.random();

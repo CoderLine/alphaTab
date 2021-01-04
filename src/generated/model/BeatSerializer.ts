@@ -64,10 +64,7 @@ export class BeatSerializer {
         o.set("pickStroke", (obj.pickStroke as number)); 
         o.set("tremoloSpeed", (obj.tremoloSpeed as number | null)); 
         o.set("crescendo", (obj.crescendo as number)); 
-        o.set("displayStart", obj.displayStart); 
         o.set("playbackStart", obj.playbackStart); 
-        o.set("displayDuration", obj.displayDuration); 
-        o.set("playbackDuration", obj.playbackDuration); 
         o.set("dynamics", (obj.dynamics as number)); 
         o.set("invertBeamDirection", obj.invertBeamDirection); 
         o.set("preferredBeamDirection", (obj.preferredBeamDirection as number | null)); 
@@ -178,14 +175,8 @@ export class BeatSerializer {
             case "crescendo":
                 obj.crescendo = (JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!);
                 return true;
-            case "displaystart":
-                obj.displayStart = (v as number);
-                return true;
             case "playbackstart":
                 obj.playbackStart = (v as number);
-                return true;
-            case "displayduration":
-                obj.displayDuration = (v as number);
                 return true;
             case "playbackduration":
                 obj.playbackDuration = (v as number);

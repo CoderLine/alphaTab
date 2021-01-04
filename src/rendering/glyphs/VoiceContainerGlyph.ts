@@ -1,3 +1,4 @@
+import { GraceType } from '@src/model/GraceType';
 import { TupletGroup } from '@src/model/TupletGroup';
 import { Voice } from '@src/model/Voice';
 import { ICanvas } from '@src/platform/ICanvas';
@@ -5,6 +6,7 @@ import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import { FlagGlyph } from './FlagGlyph';
 
 /**
  * This glyph acts as container for handling
@@ -34,11 +36,25 @@ export class VoiceContainerGlyph extends GlyphGroup {
         this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force) * scale;
         let positions: Map<number, number> = this.renderer.layoutingInfo.buildOnTimePositions(force);
         let beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
+
         for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
             let currentBeatGlyph: BeatContainerGlyph = beatGlyphs[i];
-            let time: number = currentBeatGlyph.beat.absoluteDisplayStart;
+            let time: number = (currentBeatGlyph.beat.graceType === GraceType.None)
+                ? currentBeatGlyph.beat.absolutePlaybackStart
+                : currentBeatGlyph.beat.graceTarget!.absolutePlaybackStart
+            ;
+
             currentBeatGlyph.x = positions.get(time)! * scale - currentBeatGlyph.onTimeX;
-            // size always previousl glyph after we know the position
+            if (currentBeatGlyph.beat.graceType !== GraceType.None) {
+                let graceSprings = this.renderer.layoutingInfo.graceSprings.get(currentBeatGlyph.beat.graceTarget!.id)!;
+                let graceTargetPreBeat = this.renderer.layoutingInfo.springs.get(time)!.preSpringWidth;
+                // move to start of grace beat range
+                currentBeatGlyph.x -= graceTargetPreBeat - FlagGlyph.FlagWidth * scale;
+                // shift to right position of individual beat
+                currentBeatGlyph.x += graceSprings[currentBeatGlyph.beat.graceIndex].timePosition;
+            }
+
+            // size always previous glyph after we know the position
             // of the next glyph
             if (i > 0) {
                 let beatWidth: number = currentBeatGlyph.x - beatGlyphs[i - 1].x;

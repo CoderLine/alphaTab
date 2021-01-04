@@ -1,7 +1,5 @@
-import { MidiUtils } from '@src/midi/MidiUtils';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
 import { Settings } from '@src/Settings';
 
@@ -98,9 +96,9 @@ export class Voice {
         this.isEmpty = false;
     }
 
-    public getBeatAtDisplayStart(displayStart: number): Beat | null {
-        if (this._beatLookup.has(displayStart)) {
-            return this._beatLookup.get(displayStart)!;
+    public getBeatAtStart(start: number): Beat | null {
+        if (this._beatLookup.has(start)) {
+            return this._beatLookup.get(start)!;
         }
         return null;
     }
@@ -112,76 +110,35 @@ export class Voice {
             beat.index = index;
             this.chain(beat);
         }
-        let currentDisplayTick: number = 0;
         let currentPlaybackTick: number = 0;
+        let currentGraceBeats: Beat[] = [];
         for (let i: number = 0; i < this.beats.length; i++) {
             let beat: Beat = this.beats[i];
             beat.index = i;
             beat.finish(settings);
-            if (beat.graceType === GraceType.None || beat.graceType === GraceType.BendGrace) {
-                beat.displayStart = currentDisplayTick;
-                beat.playbackStart = currentPlaybackTick;
-                currentDisplayTick += beat.displayDuration;
-                currentPlaybackTick += beat.playbackDuration;
-            } else {
-                if (!beat.previousBeat || beat.previousBeat.graceType === GraceType.None) {
-                    // find note which is not a grace note
-                    let nonGrace: Beat | null = beat;
-                    let numberOfGraceBeats: number = 0;
-                    while (nonGrace && nonGrace.graceType !== GraceType.None) {
-                        nonGrace = nonGrace.nextBeat;
-                        numberOfGraceBeats++;
-                    }
-                    let graceDuration: Duration = Duration.Eighth;
-                    let stolenDuration: number = 0;
-                    if (numberOfGraceBeats === 1) {
-                        graceDuration = Duration.Eighth;
-                    } else if (numberOfGraceBeats === 2) {
-                        graceDuration = Duration.Sixteenth;
-                    } else {
-                        graceDuration = Duration.ThirtySecond;
-                    }
-                    if (nonGrace) {
-                        nonGrace.updateDurations();
-                    }
-                    // grace beats have 1/4 size of the non grace beat preceeding them
-                    let perGraceDisplayDuration: number = !beat.previousBeat
-                        ? MidiUtils.toTicks(Duration.ThirtySecond)
-                        : (((beat.previousBeat.displayDuration / 4) | 0) / numberOfGraceBeats) | 0;
-                    // move all grace beats
-                    let graceBeat: Beat | null = this.beats[i];
-                    for (let j: number = 0; j < numberOfGraceBeats && graceBeat; j++) {
-                        graceBeat.duration = graceDuration;
-                        graceBeat.updateDurations();
-                        graceBeat.displayStart =
-                            currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDisplayDuration;
-                        graceBeat.displayDuration = perGraceDisplayDuration;
-                        stolenDuration += graceBeat.playbackDuration;
-                        graceBeat = graceBeat.nextBeat;
-                    }
-                    // steal needed duration from beat duration
-                    if (beat.graceType === GraceType.BeforeBeat) {
-                        if (beat.previousBeat) {
-                            beat.previousBeat.playbackDuration -= stolenDuration;
-                        }
-                        currentPlaybackTick -= stolenDuration;
-                    } else if (nonGrace && beat.graceType === GraceType.OnBeat) {
-                        nonGrace.playbackDuration -= stolenDuration;
-                    }
-                }
-                beat.playbackStart = currentPlaybackTick;
-                currentPlaybackTick = beat.playbackStart + beat.playbackDuration;
-            }
 
-
-            if(beat.fermata) {
-                this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
-            } else {
-                beat.fermata = this.bar.masterBar.getFermata(beat);
-            }
-
+            beat.playbackStart = currentPlaybackTick;
+            currentPlaybackTick += beat.playbackDuration;
             beat.finishTuplet();
-            this._beatLookup.set(beat.displayStart, beat);
+
+            if (beat.graceType === GraceType.None) {
+                beat.graceBeats = currentGraceBeats;
+                for (const gb of currentGraceBeats) {
+                    gb.graceTarget = beat;
+                }
+                currentGraceBeats = [];
+
+                if (beat.fermata) {
+                    this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
+                } else {
+                    beat.fermata = this.bar.masterBar.getFermata(beat);
+                }
+
+                this._beatLookup.set(beat.playbackStart, beat);
+            } else {
+                beat.graceIndex = currentGraceBeats.length;
+                currentGraceBeats.push(beat);
+            }
         }
     }
 

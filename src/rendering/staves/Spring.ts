@@ -9,7 +9,13 @@ export class Spring {
         return this.preSpringWidth + this.postSpringWidth;
     }
 
-    public preSpringWidth: number = 0;
+    public preBeatWidth: number = 0;
+    public graceBeatWidth: number = 0;
+
     public postSpringWidth: number = 0;
-    public allDurations: number[] = [];
+    public get preSpringWidth() {
+        return this.preBeatWidth + this.graceBeatWidth;
+    }
+
+    public allDurations: Set<number> = new Set<number>();
 }

@@ -4,6 +4,7 @@ import { Duration } from '@src/model/Duration';
 import { Spring } from '@src/rendering/staves/Spring';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { ICanvas } from '@src/platform/ICanvas';
+import { GraceType } from '@src/model/GraceType';
 
 /**
  * This public class stores size information about a stave.
@@ -89,30 +90,32 @@ export class BarLayoutingInfo {
         }
     }
 
+    public graceSprings: Map<number/*beat id*/, Spring[]> = new Map();
     public springs: Map<number, Spring> = new Map();
 
-    public addSpring(start: number, duration: number, preSpringSize: number, postSpringSize: number): Spring {
+    public addSpring(start: number, duration: number, graceBeatWidth: number, preBeatWidth: number, postSpringSize: number): Spring {
         this.version++;
         let spring: Spring;
         if (!this.springs.has(start)) {
             spring = new Spring();
             spring.timePosition = start;
-            spring.allDurations.push(duration);
+            spring.allDurations.add(duration);
             // check in the previous spring for the shortest duration that overlaps with this spring
             // Gourlay defines that we need the smallest note duration that either starts **or continues** on the current spring.
             if (this._timeSortedSprings.length > 0) {
                 let smallestDuration: number = duration;
                 let previousSpring: Spring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
-                for (let prevDuration of previousSpring.allDurations) {
+                previousSpring.allDurations.forEach(prevDuration => {
                     let end: number = previousSpring.timePosition + prevDuration;
                     if (end >= start && prevDuration < smallestDuration) {
                         smallestDuration = prevDuration;
                     }
-                }
+                });
             }
             spring.longestDuration = duration;
             spring.postSpringWidth = postSpringSize;
-            spring.preSpringWidth = preSpringSize;
+            spring.graceBeatWidth = graceBeatWidth;
+            spring.preBeatWidth = preBeatWidth;
             this.springs.set(start, spring);
             let timeSorted: Spring[] = this._timeSortedSprings;
             let insertPos: number = timeSorted.length - 1;
@@ -125,8 +128,11 @@ export class BarLayoutingInfo {
             if (spring.postSpringWidth < postSpringSize) {
                 spring.postSpringWidth = postSpringSize;
             }
-            if (spring.preSpringWidth < preSpringSize) {
-                spring.preSpringWidth = preSpringSize;
+            if (spring.graceBeatWidth < graceBeatWidth) {
+                spring.graceBeatWidth = graceBeatWidth;
+            }
+            if (spring.preBeatWidth < preBeatWidth) {
+                spring.preBeatWidth = preBeatWidth;
             }
             if (duration < spring.smallestDuration) {
                 spring.smallestDuration = duration;
@@ -134,7 +140,7 @@ export class BarLayoutingInfo {
             if (duration > spring.longestDuration) {
                 spring.longestDuration = duration;
             }
-            spring.allDurations.push(duration);
+            spring.allDurations.add(duration);
         }
         if (this._minTime === -1 || this._minTime > start) {
             this._minTime = start;
@@ -142,12 +148,55 @@ export class BarLayoutingInfo {
         return spring;
     }
 
-    public addBeatSpring(beat: Beat, preBeatSize: number, postBeatSize: number): Spring {
-        let start: number = beat.absoluteDisplayStart;
-        return this.addSpring(start, beat.displayDuration, preBeatSize, postBeatSize);
+    public addBeatSpring(beat: Beat, preBeatSize: number, postBeatSize: number): void {
+        if (beat.graceType !== GraceType.None) {
+            // For grace beats we just remember the the sizes required for them
+            // these sizes are then considered when the target beat is added. 
+
+            if (!this.graceSprings.has(beat.graceTarget!.id)) {
+                this.graceSprings.set(beat.graceTarget!.id, new Array<Spring>(beat.graceTarget!.graceBeats.length));
+            }
+
+            let existingSpring = this.graceSprings.get(beat.graceTarget!.id)![beat.graceIndex];
+            if (existingSpring) {
+                existingSpring.postSpringWidth = postBeatSize;
+                existingSpring.preBeatWidth = preBeatSize;
+            } else {
+                const graceSpring = new Spring();
+                graceSpring.postSpringWidth = postBeatSize;
+                graceSpring.preBeatWidth = preBeatSize;
+                this.graceSprings.get(beat.graceTarget!.id)![beat.graceIndex] = graceSpring;
+            }
+            // reset grace beat to ensure it is applied on the next round
+            if (this.springs.has(beat.graceTarget!.absolutePlaybackStart)) {
+                this.springs.get(beat.graceTarget!.absolutePlaybackStart)!.graceBeatWidth = 0;
+            }
+        } else {
+            // TODO: adding this size causes the notation to be wider than needed
+            let graceBeatSize = 0;
+            if (this.graceSprings.has(beat.id)) {
+                for (const graceBeat of this.graceSprings.get(beat.id)!) {
+                    graceBeatSize += graceBeat.springWidth;
+                }
+            }
+
+            let start: number = beat.absolutePlaybackStart;
+            this.addSpring(start, beat.playbackDuration, graceBeatSize, preBeatSize, postBeatSize);
+        }
     }
 
     public finish(): void {
+        this.graceSprings.forEach(s => {
+            let offset = 0;
+            for (let i = s.length - 1; i >= 0; i--) {
+                // for grace beats we store the offset 
+                // in the 'time position' for later use during applying
+                // beat positions
+                offset -= s[i].springWidth;
+                s[i].timePosition = offset;
+            }
+        });
+
         this.calculateSpringConstants();
         this.version++;
     }
@@ -205,7 +254,7 @@ export class BarLayoutingInfo {
     }
 
     public height: number = 0;
-    public paint(_cx: number, _cy: number, _canvas: ICanvas) {}
+    public paint(_cx: number, _cy: number, _canvas: ICanvas) { }
 
     // public height: number = 30;
     // public paint(cx: number, cy: number, canvas: ICanvas) {
@@ -260,7 +309,7 @@ export class BarLayoutingInfo {
     }
 
     public spaceToForce(space: number): number {
-        if(this._timeSortedSprings.length > 0) {
+        if (this._timeSortedSprings.length > 0) {
             space -= this._timeSortedSprings[0].preSpringWidth
         }
         return space * this.totalSpringConstant;
@@ -268,7 +317,7 @@ export class BarLayoutingInfo {
 
     public calculateVoiceWidth(force: number): number {
         let width = this.calculateWidth(force, this.totalSpringConstant);
-        if(this._timeSortedSprings.length > 0) {
+        if (this._timeSortedSprings.length > 0) {
             width += this._timeSortedSprings[0].preSpringWidth
         }
         return width;
