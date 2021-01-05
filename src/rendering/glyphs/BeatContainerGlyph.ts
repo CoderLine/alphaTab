@@ -36,6 +36,10 @@ export class BeatContainerGlyph extends Glyph {
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
         let preBeatStretch: number = this.onTimeX;
+        if(this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
+            preBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
+        }
+
         let postBeatStretch: number = this.onNotes.width - this.onNotes.centerX;
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
@@ -60,12 +64,14 @@ export class BeatContainerGlyph extends Glyph {
 
     public applyLayoutingInfo(info: BarLayoutingInfo): void {
         let offset: number = info.getBeatCenterX(this.beat) - this.onNotes.centerX;
+        if(this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
+            offset += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
+        }
+
         this.preNotes.x = offset;
         this.preNotes.width = info.getPreBeatSize(this.beat);
         this.onNotes.width = info.getOnBeatSize(this.beat);
         this.onNotes.x = this.preNotes.x + this.preNotes.width;
-        // TODO: without setting this correctly, we will cause a resize on effect containers
-        // this.onNotes.centerX = info.getBeatCenterX(this.beat);
         this.onNotes.updateBeamingHelper();
     }
 

@@ -835,7 +835,6 @@ export class ScoreBarRenderer extends BarRendererBase {
         }
     }
 
-    // TODO[performance]: Maybe we should cache this (check profiler)
     public getNoteLine(n: Note): number {
         return this.accidentalHelper.getNoteLine(n);
     }

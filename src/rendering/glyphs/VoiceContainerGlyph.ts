@@ -46,6 +46,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
                 default:
                     const graceDisplayStart = currentBeatGlyph.beat.graceGroup!.beats[0].absoluteDisplayStart;
                     const graceGroupId = currentBeatGlyph.beat.graceGroup!.id;
+                    // placement for proper grace notes which have a following note
                     if (currentBeatGlyph.beat.graceGroup!.isComplete && positions.has(graceDisplayStart)) {
                         currentBeatGlyph.x = positions.get(graceDisplayStart)! * scale - currentBeatGlyph.onTimeX;
                         let graceSprings = this.renderer.layoutingInfo.allGraceRods.get(graceGroupId)!;
@@ -57,15 +58,27 @@ export class VoiceContainerGlyph extends GlyphGroup {
                         // shift to right position of the particular grace note
                         currentBeatGlyph.x += graceSprings[currentBeatGlyph.beat.graceIndex].graceBeatWidth;
                     } else {
-                        // align after last beat or at start
+                        // placement for improper grace beats where no beat in the same bar follows
                         let graceSpring = this.renderer.layoutingInfo.incompleteGraceRods.get(graceGroupId)!;
-                        currentBeatGlyph.x =  i > 0
-                            ? beatGlyphs[i - 1].x + beatGlyphs[i - 1].width
-                            : 0;
-                        // respect the post beat width of the grace note
-                        currentBeatGlyph.x -= graceSpring[currentBeatGlyph.beat.graceIndex].postSpringWidth;
-                        // shift to right position of the particular grace note
-                        currentBeatGlyph.x += graceSpring[currentBeatGlyph.beat.graceIndex].preSpringWidth;
+                        const relativeOffset = graceSpring[currentBeatGlyph.beat.graceIndex].postSpringWidth
+                            - graceSpring[currentBeatGlyph.beat.graceIndex].preSpringWidth
+
+                        if (i > 0) {
+                            if (currentBeatGlyph.beat.graceIndex === 0) {
+                                // we place the grace beat directly after the previous one
+                                // otherwise this causes flickers on resizing 
+                                currentBeatGlyph.x = beatGlyphs[i - 1].x + beatGlyphs[i - 1].width;
+                            } else {
+                                // for the multiple grace glyphs we take the width of the grace rod
+                                // this width setting is aligned with the positioning logic below
+                                currentBeatGlyph.x = beatGlyphs[i - 1].x
+                                    + graceSpring[currentBeatGlyph.beat.graceIndex - 1].postSpringWidth
+                                    - graceSpring[currentBeatGlyph.beat.graceIndex - 1].preSpringWidth
+                                    - relativeOffset;
+                            }
+                        } else {
+                            currentBeatGlyph.x = -relativeOffset;
+                        }
                     }
                     break;
             }

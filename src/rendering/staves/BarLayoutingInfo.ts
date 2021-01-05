@@ -236,6 +236,11 @@ export class BarLayoutingInfo {
         });
         let totalSpringConstant: number = 0;
         let sortedSprings: Spring[] = this._timeSortedSprings;
+        if (sortedSprings.length === 0) {
+            this.totalSpringConstant = -1;
+            this.minStretchForce = -1;
+            return;
+        }
         for (let i: number = 0; i < sortedSprings.length; i++) {
             let currentSpring: Spring = sortedSprings[i];
             let duration: number = 0;
@@ -334,15 +339,22 @@ export class BarLayoutingInfo {
     }
 
     public spaceToForce(space: number): number {
-        if (this._timeSortedSprings.length > 0) {
-            space -= this._timeSortedSprings[0].preSpringWidth
+        if (this.totalSpringConstant !== -1) {
+            if (this._timeSortedSprings.length > 0) {
+                space -= this._timeSortedSprings[0].preSpringWidth
+            }
+            space -= this._incompleteGraceRodsWidth;
+            return Math.max(space, 0) * this.totalSpringConstant;
         }
-        space -= this._incompleteGraceRodsWidth;
-        return space * this.totalSpringConstant;
+        return -1;
     }
 
     public calculateVoiceWidth(force: number): number {
-        let width = this.calculateWidth(force, this.totalSpringConstant);
+        let width = 0;
+        if (this.totalSpringConstant !== -1) {
+            width = this.calculateWidth(force, this.totalSpringConstant);
+        }
+
         if (this._timeSortedSprings.length > 0) {
             width += this._timeSortedSprings[0].preSpringWidth;
         }
@@ -350,11 +362,14 @@ export class BarLayoutingInfo {
         return width;
     }
 
-    public calculateWidth(force: number, springConstant: number): number {
+    private calculateWidth(force: number, springConstant: number): number {
         return force / springConstant;
     }
 
     public buildOnTimePositions(force: number): Map<number, number> {
+        if(this.totalSpringConstant === -1) {
+            return new Map<number, number>();
+        }
         if (ModelUtils.isAlmostEqualTo(this._onTimePositionsForce, force) && this._onTimePositions) {
             return this._onTimePositions;
         }
