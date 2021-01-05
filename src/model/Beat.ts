@@ -364,9 +364,9 @@ export class Beat {
     public crescendo: CrescendoType = CrescendoType.None;
 
     /**
- * The timeline position of the voice within the current bar as it is displayed. (unit: midi ticks)
- * This might differ from the actual playback time due to special grace types.
- */
+     * The timeline position of the voice within the current bar as it is displayed. (unit: midi ticks)
+     * This might differ from the actual playback time due to special grace types.
+     */
     public displayStart: number = 0;
 
     /**
@@ -553,12 +553,6 @@ export class Beat {
                 let previous: Beat | null = this.previousBeat;
                 if (previous && previous.graceType === GraceType.BendGrace) {
                     this.playbackDuration = previous.playbackDuration;
-                } else {
-                    while (previous && previous.graceType === GraceType.OnBeat) {
-                        // if the previous beat is a on-beat grace it steals the duration from this beat
-                        this.playbackDuration -= previous.playbackDuration;
-                        previous = previous.previousBeat;
-                    }
                 }
                 break;
         }

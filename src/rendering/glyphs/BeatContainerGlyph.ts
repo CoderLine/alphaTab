@@ -57,11 +57,13 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public applyLayoutingInfo(info: BarLayoutingInfo): void {
-        this.preNotes.x = 0;
+        let offset: number = info.getBeatCenterX(this.beat) - this.onNotes.centerX;
+        this.preNotes.x = offset;
         this.preNotes.width = info.getPreBeatSize(this.beat);
         this.onNotes.width = info.getOnBeatSize(this.beat);
         this.onNotes.x = this.preNotes.x + this.preNotes.width;
-        this.onNotes.centerX = info.getBeatCenterX(this.beat);
+        // TODO: without setting this correctly, we will cause a resize on effect containers
+        // this.onNotes.centerX = info.getBeatCenterX(this.beat);
         this.onNotes.updateBeamingHelper();
     }
 

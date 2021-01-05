@@ -121,8 +121,6 @@ export class Voice {
 
             beat.displayStart = currentDisplayTick;
             beat.playbackStart = currentPlaybackTick;
-            currentDisplayTick += beat.displayDuration;
-            currentPlaybackTick += beat.playbackDuration;
             beat.finishTuplet();
 
             if (beat.graceType === GraceType.None) {
@@ -140,11 +138,49 @@ export class Voice {
                             graceDuration = Duration.ThirtySecond;
                         }
 
-                        // move all grace beats
+                        // update durations of grace beats for further updates
+                        let stolenDuration: number = 0;
                         for (const graceBeat of currentGraceBeats) {
+                            // update duration of grace note
                             graceBeat.graceTarget = beat;
                             graceBeat.duration = graceDuration;
                             graceBeat.updateDurations();
+                            stolenDuration += graceBeat.playbackDuration;
+                        }
+
+                        switch (currentGraceBeats[0].graceType) {
+                            case GraceType.BeforeBeat:
+                                // steal duration from previous beat and then place grace beats newly
+                                if (currentGraceBeats[0].previousBeat) {
+                                    currentGraceBeats[0].previousBeat.playbackDuration -= stolenDuration;
+                                    // place beats starting after new beat end
+                                    if(currentGraceBeats[0].previousBeat.voice == this) {
+                                        currentPlaybackTick = currentGraceBeats[0].previousBeat.playbackStart +
+                                        currentGraceBeats[0].previousBeat.playbackDuration;
+                                    } else {
+                                        // stealing into the previous bar
+                                        currentPlaybackTick = -stolenDuration;
+                                    }                                    
+                                } else {
+                                    // before-beat on start is somehow not possible as it causes negative ticks
+                                    currentPlaybackTick = -stolenDuration;
+                                }
+
+                                for (const graceBeat of currentGraceBeats) {
+                                    this._beatLookup.delete(graceBeat.playbackStart);
+                                    graceBeat.playbackStart = currentPlaybackTick;
+                                    this._beatLookup.set(graceBeat.playbackStart, beat);
+
+                                    // advance to next grace beat
+                                    currentPlaybackTick += graceBeat.playbackDuration;
+                                }
+
+                                break;
+                            case GraceType.OnBeat:
+                                // steal duration from current beat and advance it to the end of the last grace
+                                beat.playbackStart += stolenDuration;
+                                beat.playbackDuration -= stolenDuration;
+                                break;
                         }
                     } else {
                         for (const gb of currentGraceBeats) {
@@ -166,6 +202,9 @@ export class Voice {
                 beat.graceIndex = currentGraceBeats.length;
                 currentGraceBeats.push(beat);
             }
+
+            currentDisplayTick += beat.displayDuration;
+            currentPlaybackTick += beat.playbackDuration;
         }
     }
 
