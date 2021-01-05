@@ -336,6 +336,8 @@ export class Beat {
     /**
      * Gets or sets the index of this beat within the grace group if
      * this is a grace beat. 
+     * @json_ignore
+     * @clone_ignore
      */
     public graceIndex: number = -1;
 
@@ -745,7 +747,6 @@ export class Beat {
             }
         }
         this.updateDurations();
-        // TODO: handle for new grace positioning
         if (needCopyBeatForBend) {
             // if this beat is a simple bend convert it to a grace beat
             // and generate a placeholder beat with tied notes

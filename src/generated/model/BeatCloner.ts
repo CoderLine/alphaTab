@@ -47,7 +47,6 @@ export class BeatCloner {
         clone.vibrato = original.vibrato; 
         clone.chordId = original.chordId; 
         clone.graceType = original.graceType; 
-        clone.graceIndex = original.graceIndex; 
         clone.pickStroke = original.pickStroke; 
         clone.tremoloSpeed = original.tremoloSpeed; 
         clone.crescendo = original.crescendo; 

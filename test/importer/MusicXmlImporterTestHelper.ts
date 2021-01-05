@@ -172,7 +172,7 @@ export class MusicXmlImporterTestHelper {
         expect(actual.crescendo).toEqual(expected.crescendo, 'Mismatch on Crescendo');
         expect(actual.playbackStart).toEqual(expected.playbackStart, 'Mismatch on Start');
         expect(actual.displayStart).toEqual(expected.displayStart, 'Mismatch on Start');
-         // Assert.AreEqual(expected.Dynamic, actual.Dynamic, "Mismatch on Dynamic");
+        // Assert.AreEqual(expected.Dynamic, actual.Dynamic, "Mismatch on Dynamic");
         expect(actual.invertBeamDirection).toEqual(expected.invertBeamDirection, 'Mismatch on InvertBeamDirection');
         expect(actual.notes.length).toEqual(expected.notes.length, 'Mismatch on Notes.Count');
         for (let i: number = 0; i < expected.notes.length; i++) {

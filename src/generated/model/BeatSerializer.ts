@@ -61,7 +61,6 @@ export class BeatSerializer {
         o.set("vibrato", (obj.vibrato as number)); 
         o.set("chordId", obj.chordId); 
         o.set("graceType", (obj.graceType as number)); 
-        o.set("graceIndex", obj.graceIndex); 
         o.set("pickStroke", (obj.pickStroke as number)); 
         o.set("tremoloSpeed", (obj.tremoloSpeed as number | null)); 
         o.set("crescendo", (obj.crescendo as number)); 
@@ -169,9 +168,6 @@ export class BeatSerializer {
                 return true;
             case "gracetype":
                 obj.graceType = (JsonHelper.parseEnum<GraceType>(v, GraceType)!);
-                return true;
-            case "graceindex":
-                obj.graceIndex = (v as number);
                 return true;
             case "pickstroke":
                 obj.pickStroke = (JsonHelper.parseEnum<PickStroke>(v, PickStroke)!);
