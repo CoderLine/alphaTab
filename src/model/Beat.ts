@@ -788,6 +788,9 @@ export class Beat {
                 cloneNote.isTieDestination = true;
             }
             this.graceType = GraceType.BendGrace;
+            this.graceGroup = new GraceGroup();
+            this.graceGroup.addBeat(this);
+            this.graceGroup.isComplete = true;
             this.updateDurations();
             this.voice.insertBeat(this, cloneBeat);
         }

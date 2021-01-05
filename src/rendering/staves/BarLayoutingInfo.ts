@@ -185,7 +185,6 @@ export class BarLayoutingInfo {
                 this.allGraceRods.get(groupId)![beat.graceIndex] = graceSpring;
             }
         } else {
-            // TODO: adding this size causes the notation to be wider than needed
             let graceBeatSize = 0;
             if (beat.graceGroup && this.allGraceRods.has(beat.graceGroup.id)) {
                 for (const graceBeat of this.allGraceRods.get(beat.graceGroup.id)!) {
