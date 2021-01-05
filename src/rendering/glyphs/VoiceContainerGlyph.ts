@@ -40,8 +40,8 @@ export class VoiceContainerGlyph extends GlyphGroup {
         for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
             let currentBeatGlyph: BeatContainerGlyph = beatGlyphs[i];
             let time: number = (currentBeatGlyph.beat.graceType === GraceType.None)
-                ? currentBeatGlyph.beat.absolutePlaybackStart
-                : currentBeatGlyph.beat.graceTarget!.absolutePlaybackStart
+                ? currentBeatGlyph.beat.absoluteDisplayStart
+                : currentBeatGlyph.beat.graceTarget!.absoluteDisplayStart
             ;
 
             currentBeatGlyph.x = positions.get(time)! * scale - currentBeatGlyph.onTimeX;

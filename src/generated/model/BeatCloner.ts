@@ -47,10 +47,13 @@ export class BeatCloner {
         clone.vibrato = original.vibrato; 
         clone.chordId = original.chordId; 
         clone.graceType = original.graceType; 
+        clone.graceIndex = original.graceIndex; 
         clone.pickStroke = original.pickStroke; 
         clone.tremoloSpeed = original.tremoloSpeed; 
         clone.crescendo = original.crescendo; 
+        clone.displayStart = original.displayStart; 
         clone.playbackStart = original.playbackStart; 
+        clone.displayDuration = original.displayDuration; 
         clone.playbackDuration = original.playbackDuration; 
         clone.dynamics = original.dynamics; 
         clone.invertBeamDirection = original.invertBeamDirection; 

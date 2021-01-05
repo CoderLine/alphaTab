@@ -342,7 +342,7 @@ export class Beat {
      * Gets or sets the index of this beat within the grace group if
      * this is a grace beat. 
      */
-    public graceIndex:number = -1;
+    public graceIndex: number = -1;
 
     /**
      * Gets or sets the pickstroke applied on this beat.
@@ -364,14 +364,31 @@ export class Beat {
     public crescendo: CrescendoType = CrescendoType.None;
 
     /**
+ * The timeline position of the voice within the current bar as it is displayed. (unit: midi ticks)
+ * This might differ from the actual playback time due to special grace types.
+ */
+    public displayStart: number = 0;
+
+    /**
      * The timeline position of the voice within the current bar as it is played. (unit: midi ticks)
+     * This might differ from the actual playback time due to special grace types.
      */
     public playbackStart: number = 0;
+
+    /**
+     * Gets or sets the duration that is used for the display of this beat. It defines the size/width of the beat in
+     * the music sheet. (unit: midi ticks).
+     */
+    public displayDuration: number = 0;
 
     /**
      * Gets or sets the duration that the note is played during the audio generation.
      */
     public playbackDuration: number = 0;
+
+    public get absoluteDisplayStart(): number {
+        return this.voice.bar.masterBar.start + this.displayStart;
+    }
 
     public get absolutePlaybackStart(): number {
         return this.voice.bar.masterBar.start + this.playbackStart;
@@ -509,10 +526,41 @@ export class Beat {
 
     public updateDurations(): void {
         let ticks: number = this.calculateDuration();
-        if (this.graceType !== GraceType.None) {
-            this.playbackDuration = 0;
-        } else {
-            this.playbackDuration = ticks;
+        this.playbackDuration = ticks;
+
+        switch (this.graceType) {
+            case GraceType.BeforeBeat:
+            case GraceType.OnBeat:
+                switch (this.duration) {
+                    case Duration.Sixteenth:
+                        this.playbackDuration = MidiUtils.toTicks(Duration.SixtyFourth);
+                        break;
+                    case Duration.ThirtySecond:
+                        this.playbackDuration = MidiUtils.toTicks(Duration.OneHundredTwentyEighth);
+                        break;
+                    default:
+                        this.playbackDuration = MidiUtils.toTicks(Duration.ThirtySecond);
+                        break;
+                }
+                this.displayDuration = 0;
+                break;
+            case GraceType.BendGrace:
+                this.playbackDuration /= 2;
+                this.displayDuration = 0;
+                break;
+            default:
+                this.displayDuration = ticks;
+                let previous: Beat | null = this.previousBeat;
+                if (previous && previous.graceType === GraceType.BendGrace) {
+                    this.playbackDuration = previous.playbackDuration;
+                } else {
+                    while (previous && previous.graceType === GraceType.OnBeat) {
+                        // if the previous beat is a on-beat grace it steals the duration from this beat
+                        this.playbackDuration -= previous.playbackDuration;
+                        previous = previous.previousBeat;
+                    }
+                }
+                break;
         }
     }
 

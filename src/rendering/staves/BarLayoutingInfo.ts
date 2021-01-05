@@ -149,7 +149,7 @@ export class BarLayoutingInfo {
     }
 
     public addBeatSpring(beat: Beat, preBeatSize: number, postBeatSize: number): void {
-        let start: number = beat.absolutePlaybackStart;
+        let start: number = beat.absoluteDisplayStart;
         if (beat.graceType !== GraceType.None) {
             // For grace beats we just remember the the sizes required for them
             // these sizes are then considered when the target beat is added. 
@@ -182,7 +182,7 @@ export class BarLayoutingInfo {
                 }
             }
 
-            this.addSpring(start, beat.playbackDuration, graceBeatSize, preBeatSize, postBeatSize);
+            this.addSpring(start, beat.displayDuration, graceBeatSize, preBeatSize, postBeatSize);
         }
     }
 

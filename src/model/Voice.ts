@@ -2,6 +2,7 @@ import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
 import { Settings } from '@src/Settings';
+import { Duration } from './Duration';
 
 /**
  * A voice represents a group of beats
@@ -96,9 +97,9 @@ export class Voice {
         this.isEmpty = false;
     }
 
-    public getBeatAtStart(start: number): Beat | null {
-        if (this._beatLookup.has(start)) {
-            return this._beatLookup.get(start)!;
+    public getBeatAtPlaybackStart(playbackStart: number): Beat | null {
+        if (this._beatLookup.has(playbackStart)) {
+            return this._beatLookup.get(playbackStart)!;
         }
         return null;
     }
@@ -110,6 +111,7 @@ export class Voice {
             beat.index = index;
             this.chain(beat);
         }
+        let currentDisplayTick: number = 0;
         let currentPlaybackTick: number = 0;
         let currentGraceBeats: Beat[] = [];
         for (let i: number = 0; i < this.beats.length; i++) {
@@ -117,15 +119,40 @@ export class Voice {
             beat.index = i;
             beat.finish(settings);
 
+            beat.displayStart = currentDisplayTick;
             beat.playbackStart = currentPlaybackTick;
+            currentDisplayTick += beat.displayDuration;
             currentPlaybackTick += beat.playbackDuration;
             beat.finishTuplet();
 
             if (beat.graceType === GraceType.None) {
                 beat.graceBeats = currentGraceBeats;
-                for (const gb of currentGraceBeats) {
-                    gb.graceTarget = beat;
+
+                if (currentGraceBeats.length > 0) {
+                    if (currentGraceBeats[0].graceType !== GraceType.BendGrace) {
+                        let numberOfGraceBeats: number = currentGraceBeats.length;
+                        let graceDuration: Duration = Duration.Eighth;
+                        if (numberOfGraceBeats === 1) {
+                            graceDuration = Duration.Eighth;
+                        } else if (numberOfGraceBeats === 2) {
+                            graceDuration = Duration.Sixteenth;
+                        } else {
+                            graceDuration = Duration.ThirtySecond;
+                        }
+
+                        // move all grace beats
+                        for (const graceBeat of currentGraceBeats) {
+                            graceBeat.graceTarget = beat;
+                            graceBeat.duration = graceDuration;
+                            graceBeat.updateDurations();
+                        }
+                    } else {
+                        for (const gb of currentGraceBeats) {
+                            gb.graceTarget = beat;
+                        }
+                    }
                 }
+
                 currentGraceBeats = [];
 
                 if (beat.fermata) {
