@@ -20,6 +20,7 @@ export class BarLayoutingInfo {
     private _minTime: number = -1;
     private _onTimePositionsForce: number = 0;
     private _onTimePositions: Map<number, number> = new Map();
+    private _incompleteGraceRodsWidth: number = 0;
 
     /**
      * an internal version number that increments whenever a change was made.
@@ -90,7 +91,8 @@ export class BarLayoutingInfo {
         }
     }
 
-    public graceSprings: Map<number/*beat id*/, Spring[]> = new Map();
+    public incompleteGraceRods: Map<string, Spring[]> = new Map();
+    public allGraceRods: Map<string, Spring[]> = new Map();
     public springs: Map<number, Spring> = new Map();
 
     public addSpring(start: number, duration: number, graceBeatWidth: number, preBeatWidth: number, postSpringSize: number): Spring {
@@ -154,11 +156,17 @@ export class BarLayoutingInfo {
             // For grace beats we just remember the the sizes required for them
             // these sizes are then considered when the target beat is added. 
 
-            if (!this.graceSprings.has(beat.graceTarget!.id)) {
-                this.graceSprings.set(beat.graceTarget!.id, new Array<Spring>(beat.graceTarget!.graceBeats.length));
+            const groupId = beat.graceGroup!.id;
+
+            if (!this.allGraceRods.has(groupId)) {
+                this.allGraceRods.set(groupId, new Array<Spring>(beat.graceGroup!.beats.length));
             }
 
-            let existingSpring = this.graceSprings.get(beat.graceTarget!.id)![beat.graceIndex];
+            if (!beat.graceGroup!.isComplete && !this.incompleteGraceRods.has(groupId)) {
+                this.incompleteGraceRods.set(groupId, new Array<Spring>(beat.graceGroup!.beats.length));
+            }
+
+            let existingSpring = this.allGraceRods.get(groupId)![beat.graceIndex];
             if (existingSpring) {
                 if (existingSpring.postSpringWidth < postBeatSize) {
                     existingSpring.postSpringWidth = postBeatSize;
@@ -171,13 +179,16 @@ export class BarLayoutingInfo {
                 graceSpring.timePosition = start;
                 graceSpring.postSpringWidth = postBeatSize;
                 graceSpring.preBeatWidth = preBeatSize;
-                this.graceSprings.get(beat.graceTarget!.id)![beat.graceIndex] = graceSpring;
+                if (!beat.graceGroup!.isComplete) {
+                    this.incompleteGraceRods.get(groupId)![beat.graceIndex] = graceSpring;
+                }
+                this.allGraceRods.get(groupId)![beat.graceIndex] = graceSpring;
             }
         } else {
             // TODO: adding this size causes the notation to be wider than needed
             let graceBeatSize = 0;
-            if (this.graceSprings.has(beat.id)) {
-                for (const graceBeat of this.graceSprings.get(beat.id)!) {
+            if (beat.graceGroup && this.allGraceRods.has(beat.graceGroup.id)) {
+                for (const graceBeat of this.allGraceRods.get(beat.graceGroup.id)!) {
                     graceBeatSize += graceBeat.springWidth;
                 }
             }
@@ -187,14 +198,28 @@ export class BarLayoutingInfo {
     }
 
     public finish(): void {
-        this.graceSprings.forEach(s => {
+        this.allGraceRods.forEach((s, k) => {
             let offset = 0;
-            for (let i = s.length - 1; i >= 0; i--) {
-                // for grace beats we store the offset 
-                // in the 'graceBeatWidth' for later use during applying
-                // beat positions
-                s[i].graceBeatWidth = offset;
-                offset -= (s[i].preBeatWidth + s[i].postSpringWidth);
+            if (this.incompleteGraceRods.has(k)) {
+                for (const sp of s) {
+                    offset += sp.preBeatWidth;
+                    sp.graceBeatWidth = offset;
+                    offset += sp.postSpringWidth;
+                }
+            } else {
+                for (let i = s.length - 1; i >= 0; i--) {
+                    // for grace beats we store the offset 
+                    // in the 'graceBeatWidth' for later use during applying
+                    // beat positions
+                    s[i].graceBeatWidth = offset;
+                    offset -= (s[i].preBeatWidth + s[i].postSpringWidth);
+                }
+            }
+        });
+        this._incompleteGraceRodsWidth = 0;
+        this.incompleteGraceRods.forEach(s => {
+            for (const sp of s) {
+                this._incompleteGraceRodsWidth += sp.preBeatWidth + sp.postSpringWidth;
             }
         });
 
@@ -313,14 +338,16 @@ export class BarLayoutingInfo {
         if (this._timeSortedSprings.length > 0) {
             space -= this._timeSortedSprings[0].preSpringWidth
         }
+        space -= this._incompleteGraceRodsWidth;
         return space * this.totalSpringConstant;
     }
 
     public calculateVoiceWidth(force: number): number {
         let width = this.calculateWidth(force, this.totalSpringConstant);
         if (this._timeSortedSprings.length > 0) {
-            width += this._timeSortedSprings[0].preSpringWidth
+            width += this._timeSortedSprings[0].preSpringWidth;
         }
+        width += this._incompleteGraceRodsWidth;
         return width;
     }
 

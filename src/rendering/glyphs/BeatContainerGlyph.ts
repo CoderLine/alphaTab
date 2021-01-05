@@ -12,8 +12,10 @@ import { BarBounds } from '../utils/BarBounds';
 import { BeatBounds } from '../utils/BeatBounds';
 import { Bounds } from '../utils/Bounds';
 import { FlagGlyph } from './FlagGlyph';
+import { NoteHeadGlyph } from './NoteHeadGlyph';
 
 export class BeatContainerGlyph extends Glyph {
+    public static readonly GraceBeatPadding:number = 3;
     public voiceContainer: VoiceContainerGlyph;
     public beat: Beat;
     public preNotes!: BeatGlyphBase;
@@ -37,8 +39,8 @@ export class BeatContainerGlyph extends Glyph {
         let postBeatStretch: number = this.onNotes.width - this.onNotes.centerX;
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
-        if(helper && helper.hasFlag) {
-            postBeatStretch += FlagGlyph.FlagWidth * this.scale;
+        if(helper && helper.hasFlag || this.beat.graceType !== GraceType.None) {
+            postBeatStretch += (FlagGlyph.FlagWidth * this.scale * (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1));
         }
         for(const tie of this.ties) {
             postBeatStretch += tie.width;
@@ -46,7 +48,7 @@ export class BeatContainerGlyph extends Glyph {
 
         // Add some further spacing to grace notes
         if(this.beat.graceType !== GraceType.None) {
-            postBeatStretch += 10 * this.renderer.scale;
+            postBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
         }
 
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);

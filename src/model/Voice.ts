@@ -2,7 +2,7 @@ import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
 import { Settings } from '@src/Settings';
-import { Duration } from './Duration';
+import { GraceGroup } from './GraceGroup';
 
 /**
  * A voice represents a group of beats
@@ -106,90 +106,83 @@ export class Voice {
 
     public finish(settings: Settings): void {
         this._beatLookup = new Map<number, Beat>();
+        let currentGraceGroup: GraceGroup | null = null;
         for (let index: number = 0; index < this.beats.length; index++) {
             let beat: Beat = this.beats[index];
             beat.index = index;
             this.chain(beat);
+            if (beat.graceType === GraceType.None) {
+                beat.graceGroup = currentGraceGroup;
+                if (currentGraceGroup) {
+                    currentGraceGroup.isComplete = true;
+                }
+                currentGraceGroup = null;
+            } else {
+                if (!currentGraceGroup) {
+                    currentGraceGroup = new GraceGroup();
+                }
+                currentGraceGroup.addBeat(beat);
+            }
         }
+
         let currentDisplayTick: number = 0;
         let currentPlaybackTick: number = 0;
-        let currentGraceBeats: Beat[] = [];
         for (let i: number = 0; i < this.beats.length; i++) {
             let beat: Beat = this.beats[i];
             beat.index = i;
             beat.finish(settings);
 
-            beat.displayStart = currentDisplayTick;
-            beat.playbackStart = currentPlaybackTick;
-            beat.finishTuplet();
-
+            // if this beat is a non-grace but has grace notes
+            // we need to first steal the duration from the right beat
+            // and place the grace beats correctly
             if (beat.graceType === GraceType.None) {
-                beat.graceBeats = currentGraceBeats;
+                if (beat.graceGroup) {
+                    const firstGraceBeat = beat.graceGroup!.beats[0];
+                    const lastGraceBeat = beat.graceGroup!.beats[beat.graceGroup!.beats.length - 1];
+                    if (firstGraceBeat.graceType !== GraceType.BendGrace) {
+                        // find out the stolen duration first
+                        let stolenDuration: number = (lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration) - firstGraceBeat.playbackStart;
 
-                if (currentGraceBeats.length > 0) {
-                    if (currentGraceBeats[0].graceType !== GraceType.BendGrace) {
-                        let numberOfGraceBeats: number = currentGraceBeats.length;
-                        let graceDuration: Duration = Duration.Eighth;
-                        if (numberOfGraceBeats === 1) {
-                            graceDuration = Duration.Eighth;
-                        } else if (numberOfGraceBeats === 2) {
-                            graceDuration = Duration.Sixteenth;
-                        } else {
-                            graceDuration = Duration.ThirtySecond;
-                        }
-
-                        // update durations of grace beats for further updates
-                        let stolenDuration: number = 0;
-                        for (const graceBeat of currentGraceBeats) {
-                            // update duration of grace note
-                            graceBeat.graceTarget = beat;
-                            graceBeat.duration = graceDuration;
-                            graceBeat.updateDurations();
-                            stolenDuration += graceBeat.playbackDuration;
-                        }
-
-                        switch (currentGraceBeats[0].graceType) {
+                        switch (firstGraceBeat.graceType) {
                             case GraceType.BeforeBeat:
                                 // steal duration from previous beat and then place grace beats newly
-                                if (currentGraceBeats[0].previousBeat) {
-                                    currentGraceBeats[0].previousBeat.playbackDuration -= stolenDuration;
+                                if (firstGraceBeat.previousBeat) {
+                                    firstGraceBeat.previousBeat.playbackDuration -= stolenDuration;
                                     // place beats starting after new beat end
-                                    if(currentGraceBeats[0].previousBeat.voice == this) {
-                                        currentPlaybackTick = currentGraceBeats[0].previousBeat.playbackStart +
-                                        currentGraceBeats[0].previousBeat.playbackDuration;
+                                    if (firstGraceBeat.previousBeat.voice == this) {
+                                        currentPlaybackTick = firstGraceBeat.previousBeat.playbackStart +
+                                            firstGraceBeat.previousBeat.playbackDuration;
                                     } else {
                                         // stealing into the previous bar
                                         currentPlaybackTick = -stolenDuration;
-                                    }                                    
+                                    }
                                 } else {
                                     // before-beat on start is somehow not possible as it causes negative ticks
                                     currentPlaybackTick = -stolenDuration;
                                 }
 
-                                for (const graceBeat of currentGraceBeats) {
+                                for (const graceBeat of beat.graceGroup!.beats) {
                                     this._beatLookup.delete(graceBeat.playbackStart);
                                     graceBeat.playbackStart = currentPlaybackTick;
                                     this._beatLookup.set(graceBeat.playbackStart, beat);
-
-                                    // advance to next grace beat
                                     currentPlaybackTick += graceBeat.playbackDuration;
                                 }
 
                                 break;
                             case GraceType.OnBeat:
-                                // steal duration from current beat and advance it to the end of the last grace
-                                beat.playbackStart += stolenDuration;
+                                // steal duration from current beat 
                                 beat.playbackDuration -= stolenDuration;
+                                if (lastGraceBeat.voice === this) {
+                                    // with changed durations, update current position to be after the last grace beat
+                                    currentPlaybackTick = lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration;
+                                } else {
+                                    // if last grace beat is on the previous bar, we shift the time back to have the note played earlier
+                                    currentPlaybackTick = -stolenDuration;
+                                }
                                 break;
-                        }
-                    } else {
-                        for (const gb of currentGraceBeats) {
-                            gb.graceTarget = beat;
                         }
                     }
                 }
-
-                currentGraceBeats = [];
 
                 if (beat.fermata) {
                     this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
@@ -198,11 +191,11 @@ export class Voice {
                 }
 
                 this._beatLookup.set(beat.playbackStart, beat);
-            } else {
-                beat.graceIndex = currentGraceBeats.length;
-                currentGraceBeats.push(beat);
             }
 
+            beat.displayStart = currentDisplayTick;
+            beat.playbackStart = currentPlaybackTick;
+            beat.finishTuplet();
             currentDisplayTick += beat.displayDuration;
             currentPlaybackTick += beat.playbackDuration;
         }

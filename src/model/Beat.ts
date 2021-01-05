@@ -22,6 +22,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
+import { GraceGroup } from './GraceGroup';
 
 /**
  * Lists the different modes on how beaming for a beat should be done. 
@@ -325,18 +326,12 @@ export class Beat {
     public graceType: GraceType = GraceType.None;
 
     /**
-     * Gets or sets the list of grace note beats which belong to this beat. 
+     * Gets or sets the grace group this beat belongs to.
+     * If this beat is not a grace note, it holds the group which belongs to this beat.  
      * @json_ignore
      * @clone_ignore
      */
-    public graceBeats: Beat[] = [];
-
-    /**
-     * Gets the next non-grace beat in case this beat is a grace beat. 
-     * @json_ignore
-     * @clone_ignore
-     */
-    public graceTarget: Beat | null = null;
+    public graceGroup: GraceGroup | null = null;
 
     /**
      * Gets or sets the index of this beat within the grace group if
@@ -579,6 +574,22 @@ export class Beat {
             this.automations.push(Automation.buildInstrumentAutomation(false, 0, this.voice.bar.staff.track.playbackInfo.program));
         }
 
+        switch (this.graceType) {
+            case GraceType.OnBeat:
+            case GraceType.BeforeBeat:
+                let numberOfGraceBeats: number = this.graceGroup!.beats.length;
+                // set right duration for beaming/display
+                if (numberOfGraceBeats === 1) {
+                    this.duration = Duration.Eighth;
+                } else if (numberOfGraceBeats === 2) {
+                    this.duration = Duration.Sixteenth;
+                } else {
+                    this.duration = Duration.ThirtySecond;
+                }
+                break;
+        }
+
+
         let displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
         let isGradual: boolean = this.text === 'grad' || this.text === 'grad.';
         if (isGradual && displayMode === NotationMode.SongBook) {
@@ -734,6 +745,7 @@ export class Beat {
             }
         }
         this.updateDurations();
+        // TODO: handle for new grace positioning
         if (needCopyBeatForBend) {
             // if this beat is a simple bend convert it to a grace beat
             // and generate a placeholder beat with tied notes

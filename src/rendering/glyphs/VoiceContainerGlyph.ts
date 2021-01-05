@@ -6,7 +6,6 @@ import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { FlagGlyph } from './FlagGlyph';
 
 /**
  * This glyph acts as container for handling
@@ -39,19 +38,36 @@ export class VoiceContainerGlyph extends GlyphGroup {
 
         for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
             let currentBeatGlyph: BeatContainerGlyph = beatGlyphs[i];
-            let time: number = (currentBeatGlyph.beat.graceType === GraceType.None)
-                ? currentBeatGlyph.beat.absoluteDisplayStart
-                : currentBeatGlyph.beat.graceTarget!.absoluteDisplayStart
-            ;
 
-            currentBeatGlyph.x = positions.get(time)! * scale - currentBeatGlyph.onTimeX;
-            if (currentBeatGlyph.beat.graceType !== GraceType.None) {
-                let graceSprings = this.renderer.layoutingInfo.graceSprings.get(currentBeatGlyph.beat.graceTarget!.id)!;
-                let graceTargetPreBeat = this.renderer.layoutingInfo.springs.get(time)!.preBeatWidth;
-                // move to end of grace beat range
-                currentBeatGlyph.x -= (graceTargetPreBeat + FlagGlyph.FlagWidth * scale);
-                // shift to right position of individual beat
-                currentBeatGlyph.x += graceSprings[currentBeatGlyph.beat.graceIndex].graceBeatWidth;
+            switch (currentBeatGlyph.beat.graceType) {
+                case GraceType.None:
+                    currentBeatGlyph.x = positions.get(currentBeatGlyph.beat.absoluteDisplayStart)! * scale - currentBeatGlyph.onTimeX;
+                    break;
+                default:
+                    const graceDisplayStart = currentBeatGlyph.beat.graceGroup!.beats[0].absoluteDisplayStart;
+                    const graceGroupId = currentBeatGlyph.beat.graceGroup!.id;
+                    if (currentBeatGlyph.beat.graceGroup!.isComplete && positions.has(graceDisplayStart)) {
+                        currentBeatGlyph.x = positions.get(graceDisplayStart)! * scale - currentBeatGlyph.onTimeX;
+                        let graceSprings = this.renderer.layoutingInfo.allGraceRods.get(graceGroupId)!;
+                        let graceTargetPreBeat = this.renderer.layoutingInfo.springs.get(graceDisplayStart)!.preBeatWidth;
+                        // move right in front to the note
+                        currentBeatGlyph.x -= graceTargetPreBeat;
+                        // respect the post beat width of the grace note
+                        currentBeatGlyph.x -= graceSprings[currentBeatGlyph.beat.graceIndex].postSpringWidth;
+                        // shift to right position of the particular grace note
+                        currentBeatGlyph.x += graceSprings[currentBeatGlyph.beat.graceIndex].graceBeatWidth;
+                    } else {
+                        // align after last beat or at start
+                        let graceSpring = this.renderer.layoutingInfo.incompleteGraceRods.get(graceGroupId)!;
+                        currentBeatGlyph.x =  i > 0
+                            ? beatGlyphs[i - 1].x + beatGlyphs[i - 1].width
+                            : 0;
+                        // respect the post beat width of the grace note
+                        currentBeatGlyph.x -= graceSpring[currentBeatGlyph.beat.graceIndex].postSpringWidth;
+                        // shift to right position of the particular grace note
+                        currentBeatGlyph.x += graceSpring[currentBeatGlyph.beat.graceIndex].preSpringWidth;
+                    }
+                    break;
             }
 
             // size always previous glyph after we know the position
