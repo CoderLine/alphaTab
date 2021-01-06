@@ -22,6 +22,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
+import { GraceGroup } from './GraceGroup';
 
 /**
  * Lists the different modes on how beaming for a beat should be done. 
@@ -325,6 +326,22 @@ export class Beat {
     public graceType: GraceType = GraceType.None;
 
     /**
+     * Gets or sets the grace group this beat belongs to.
+     * If this beat is not a grace note, it holds the group which belongs to this beat.  
+     * @json_ignore
+     * @clone_ignore
+     */
+    public graceGroup: GraceGroup | null = null;
+
+    /**
+     * Gets or sets the index of this beat within the grace group if
+     * this is a grace beat. 
+     * @json_ignore
+     * @clone_ignore
+     */
+    public graceIndex: number = -1;
+
+    /**
      * Gets or sets the pickstroke applied on this beat.
      */
     public pickStroke: PickStroke = PickStroke.None;
@@ -507,7 +524,7 @@ export class Beat {
     public updateDurations(): void {
         let ticks: number = this.calculateDuration();
         this.playbackDuration = ticks;
-        this.displayDuration = ticks;
+
         switch (this.graceType) {
             case GraceType.BeforeBeat:
             case GraceType.OnBeat:
@@ -522,20 +539,17 @@ export class Beat {
                         this.playbackDuration = MidiUtils.toTicks(Duration.ThirtySecond);
                         break;
                 }
+                this.displayDuration = 0;
                 break;
             case GraceType.BendGrace:
                 this.playbackDuration /= 2;
+                this.displayDuration = 0;
                 break;
             default:
+                this.displayDuration = ticks;
                 let previous: Beat | null = this.previousBeat;
                 if (previous && previous.graceType === GraceType.BendGrace) {
                     this.playbackDuration = previous.playbackDuration;
-                } else {
-                    while (previous && previous.graceType === GraceType.OnBeat) {
-                        // if the previous beat is a on-beat grace it steals the duration from this beat
-                        this.playbackDuration -= previous.playbackDuration;
-                        previous = previous.previousBeat;
-                    }
                 }
                 break;
         }
@@ -561,6 +575,22 @@ export class Beat {
             this.voice.bar.staff.index === 0) {
             this.automations.push(Automation.buildInstrumentAutomation(false, 0, this.voice.bar.staff.track.playbackInfo.program));
         }
+
+        switch (this.graceType) {
+            case GraceType.OnBeat:
+            case GraceType.BeforeBeat:
+                let numberOfGraceBeats: number = this.graceGroup!.beats.length;
+                // set right duration for beaming/display
+                if (numberOfGraceBeats === 1) {
+                    this.duration = Duration.Eighth;
+                } else if (numberOfGraceBeats === 2) {
+                    this.duration = Duration.Sixteenth;
+                } else {
+                    this.duration = Duration.ThirtySecond;
+                }
+                break;
+        }
+
 
         let displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
         let isGradual: boolean = this.text === 'grad' || this.text === 'grad.';
@@ -759,6 +789,9 @@ export class Beat {
                 cloneNote.isTieDestination = true;
             }
             this.graceType = GraceType.BendGrace;
+            this.graceGroup = new GraceGroup();
+            this.graceGroup.addBeat(this);
+            this.graceGroup.isComplete = true;
             this.updateDurations();
             this.voice.insertBeat(this, cloneBeat);
         }

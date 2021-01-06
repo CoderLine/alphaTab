@@ -43,7 +43,7 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
         if (show && beat.voice.index > 0) {
             for (let voice of beat.voice.bar.voices) {
                 if (voice.index < beat.voice.index) {
-                    let beatAtSamePos = voice.getBeatAtDisplayStart(beat.displayStart);
+                    let beatAtSamePos = voice.getBeatAtPlaybackStart(beat.playbackStart);
                     if (
                         beatAtSamePos &&
                         beat.dynamics === beatAtSamePos.dynamics &&

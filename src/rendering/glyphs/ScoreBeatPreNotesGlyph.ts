@@ -28,6 +28,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             let ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
             ghost.renderer = this.renderer;
+
             this._prebends = new BendNoteHeadGroupGlyph(this.container.beat, true);
             this._prebends.renderer = this.renderer;
             for (let note of this.container.beat.notes) {

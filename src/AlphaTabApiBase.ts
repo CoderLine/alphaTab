@@ -969,8 +969,8 @@ export class AlphaTabApiBase<TSettings> {
         if (this.settings.player.enableUserInteraction) {
             // for the selection ensure start < end
             if (this._selectionEnd) {
-                let startTick: number = this._selectionStart!.beat.absoluteDisplayStart;
-                let endTick: number = this._selectionStart!.beat.absoluteDisplayStart;
+                let startTick: number = this._selectionStart!.beat.absolutePlaybackStart;
+                let endTick: number = this._selectionStart!.beat.absolutePlaybackStart;
                 if (endTick < startTick) {
                     let t: SelectionInfo = this._selectionStart!;
                     this._selectionStart = this._selectionEnd;
