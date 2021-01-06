@@ -73,6 +73,7 @@ export class BeatContainerGlyph extends Glyph {
         this.onNotes.width = info.getOnBeatSize(this.beat);
         this.onNotes.x = this.preNotes.x + this.preNotes.width;
         this.onNotes.updateBeamingHelper();
+        this.updateWidth();
     }
 
     public doLayout(): void {
