@@ -72,6 +72,7 @@ export class VisualTestHelper {
 
             settings.core.fontDirectory = CoreSettings.ensureFullUrl('/base/font/bravura/');
             settings.core.engine = 'html5';
+            Environment.HighDpiFactor = 1; // test data is in scale 1
             settings.core.enableLazyLoading = false;
 
             let referenceFileData: Uint8Array;

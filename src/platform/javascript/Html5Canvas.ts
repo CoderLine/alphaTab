@@ -1,3 +1,4 @@
+import { Environment } from '@src/Environment';
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
@@ -45,12 +46,13 @@ export class Html5Canvas implements ICanvas {
 
     public beginRender(width: number, height: number): void {
         this._canvas = document.createElement('canvas');
-        this._canvas.width = width | 0;
-        this._canvas.height = height | 0;
+        this._canvas.width = (width * Environment.HighDpiFactor) | 0;
+        this._canvas.height = (height  * Environment.HighDpiFactor) | 0;
         this._canvas.style.width = width + 'px';
         this._canvas.style.height = height + 'px';
         this._context = this._canvas.getContext('2d')!;
         this._context.textBaseline = 'hanging';
+        this._context.scale(Environment.HighDpiFactor, Environment.HighDpiFactor);
         this._context.lineWidth = this._lineWidth;
     }
 
