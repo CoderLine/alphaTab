@@ -89,6 +89,12 @@ export class Environment {
      * The font size of the music font in pixel. 
      */
     public static readonly MusicFontSize = 34;
+
+    /**
+     * The scaling factor to use when rending raster graphics for sharper rendering on high-dpi displays. 
+     */
+    public static HighDpiFactor = 1;
+
     /**
      * @target web
      */
@@ -530,6 +536,8 @@ export class Environment {
               };
 
         if (!Environment.isRunningInWorker) {
+            Environment.HighDpiFactor = window.devicePixelRatio;
+
             let vbAjaxLoader: string = '';
             vbAjaxLoader += 'Function VbAjaxLoader(method, fileName)' + '\r\n';
             vbAjaxLoader += '    Dim xhr' + '\r\n';
