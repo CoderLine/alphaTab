@@ -25,7 +25,6 @@ import { Logger } from '@src/alphatab';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { Ottavia } from '@src/model/Ottavia';
-import { MidiUtils } from '@src/midi/MidiUtils';
 import { KeySignature } from '@src/model/KeySignature';
 
 class DrawObject {
@@ -54,9 +53,9 @@ class GuitarDrawObject extends DrawObject {
     public chord: Chord = new Chord();
 }
 
-class SlurDrawObject extends DrawObject {}
+class SlurDrawObject extends DrawObject { }
 
-class WavyLineDrawObject extends DrawObject {}
+class WavyLineDrawObject extends DrawObject { }
 
 class TupletBracketDrawObject extends DrawObject {
     public number: number = 0;
@@ -76,7 +75,7 @@ class OctaveClefDrawObject extends DrawObject {
     public octave: number = 1;
 }
 
-class TrillDrawObject extends DrawObject {}
+class TrillDrawObject extends DrawObject { }
 
 class StaffLayout {
     public defaultClef: Clef = Clef.G2;
@@ -670,7 +669,7 @@ export class CapellaParser {
                                     break;
                                 case 'repEnd':
                                     this._currentVoiceState.repeatEnd = this._currentBar.masterBar;
-                                    if(this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
+                                    if (this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
                                         this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
                                     }
                                     this.parseBarDrawObject(c);
@@ -687,7 +686,7 @@ export class CapellaParser {
                                     break;
                                 case 'repEndBegin':
                                     this._currentVoiceState.repeatEnd = this._currentBar.masterBar;
-                                    if(this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
+                                    if (this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
                                         this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
                                     }
                                     this.parseBarDrawObject(c);
@@ -728,11 +727,11 @@ export class CapellaParser {
                             }
                             break;
                         case 'rest':
-                            const restBeats = this.parseRestDurations(
+                            const restBeat = this.parseRestDurations(
                                 this._currentBar,
                                 c.findChildElement('duration')!
                             );
-                            for (const restBeat of restBeats) {
+                            if (restBeat) {
                                 this.initFromPreviousBeat(restBeat, this._currentVoice);
                                 restBeat.updateDurations();
                                 this._currentVoiceState.currentPosition += restBeat.playbackDuration;
@@ -980,7 +979,7 @@ export class CapellaParser {
     private applyVolta(obj: VoltaDrawObject) {
         if (obj.lastNumber > 0) {
             this._currentVoiceState.repeatCount = obj.lastNumber;
-            if (this._currentVoiceState.repeatEnd && 
+            if (this._currentVoiceState.repeatEnd &&
                 this._currentVoiceState.repeatEnd.repeatCount < this._currentVoiceState.repeatCount) {
                 this._currentVoiceState.repeatEnd.repeatCount = this._currentVoiceState.repeatCount;
             }
@@ -1000,7 +999,7 @@ export class CapellaParser {
             this._currentBar.masterBar.alternateEndings = alternateEndings;
         } else if (obj.lastNumber > 0) {
             this._currentBar.masterBar.alternateEndings = 0x01 << (obj.lastNumber - 1);
-        } else if(obj.firstNumber > 0) {
+        } else if (obj.firstNumber > 0) {
             this._currentBar.masterBar.alternateEndings = 0x01 << (obj.firstNumber - 1);
         }
     }
@@ -1024,50 +1023,26 @@ export class CapellaParser {
         }
     }
 
-    private parseRestDurations(bar: Bar, element: XmlNode): Beat[] {
+    private parseRestDurations(bar: Bar, element: XmlNode): Beat | null {
         const durationBase = element.getAttribute('base');
         if (durationBase.indexOf('/') !== -1) {
             let restBeat = new Beat();
             restBeat.beamingMode = this._beamingMode;
             this.parseDuration(bar, restBeat, element);
-            return [restBeat];
+            return restBeat;
         }
 
         // for
         const fullBars = parseInt(durationBase);
         if (fullBars === 1) {
-            let restBeats: Beat[] = [];
-            let remainingTicks = bar.masterBar.calculateDuration(false) * fullBars;
-            let currentRestDuration = Duration.Whole;
-            let currentRestDurationTicks = MidiUtils.toTicks(currentRestDuration);
-            while (remainingTicks > 0) {
-                // reduce to the duration that fits into the remaining time
-                while (
-                    currentRestDurationTicks > remainingTicks &&
-                    currentRestDuration < Duration.TwoHundredFiftySixth
-                ) {
-                    currentRestDuration = ((currentRestDuration as number) * 2) as Duration;
-                    currentRestDurationTicks = MidiUtils.toTicks(currentRestDuration);
-                }
-
-                // no duration will fit anymore
-                if (currentRestDurationTicks > remainingTicks) {
-                    break;
-                }
-
-                let restBeat = new Beat();
-                restBeat.beamingMode = this._beamingMode;
-                restBeat.duration = currentRestDuration;
-                restBeats.push(restBeat);
-
-                remainingTicks -= currentRestDurationTicks;
-            }
-
-            return restBeats;
+            let restBeat = new Beat();
+            restBeat.beamingMode = this._beamingMode;
+            restBeat.duration = Duration.Whole;
+            return restBeat;
         } else {
             // TODO: multibar rests
             Logger.warning('Importer', `Multi-Bar rests are not supported`);
-            return [];
+            return null;
         }
     }
 
