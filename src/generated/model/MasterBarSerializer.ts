@@ -81,7 +81,7 @@ export class MasterBarSerializer {
                 return true;
             case "fermata":
                 obj.fermata = new Map<number, Fermata>();
-                (v as Map<string, unknown>).forEach((v, k) => {
+                JsonHelper.forEach(v, (v, k) => {
                     const i = new Fermata(); 
                     FermataSerializer.fromJson(i, (v as Map<string, unknown>)); 
                     obj.fermata.set(parseInt(k), i); 

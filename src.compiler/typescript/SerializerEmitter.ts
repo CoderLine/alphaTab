@@ -801,14 +801,12 @@ function generateSetPropertyBody(program: ts.Program,
                 ts.factory.createExpressionStatement(
                     ts.factory.createCallExpression(
                         ts.factory.createPropertyAccessExpression(
-                            ts.factory.createAsExpression(
-                                ts.factory.createIdentifier('v'),
-                                createStringUnknownMapNode()
-                            ),
+                            ts.factory.createIdentifier('JsonHelper'),
                             'forEach'
                         ),
                         undefined,
                         [
+                            ts.factory.createIdentifier('v'),
                             ts.factory.createArrowFunction(
                                 undefined,
                                 undefined,

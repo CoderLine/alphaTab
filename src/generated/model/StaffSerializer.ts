@@ -50,7 +50,7 @@ export class StaffSerializer {
                 return true;
             case "chords":
                 obj.chords = new Map<string, Chord>();
-                (v as Map<string, unknown>).forEach((v, k) => {
+                JsonHelper.forEach(v, (v, k) => {
                     const i = new Chord(); 
                     ChordSerializer.fromJson(i, (v as Map<string, unknown>)); 
                     obj.addChord(k, i); 
