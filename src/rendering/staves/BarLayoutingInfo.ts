@@ -7,6 +7,40 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { GraceType } from '@src/model/GraceType';
 import { BeamingHelper } from '../utils/BeamingHelper';
 
+class ReservedLayoutAreaSlot {
+    public topY: number = 0;
+    public bottomY: number = 0;
+    public constructor(topY: number, bottomY: number) {
+        this.topY = topY;
+        this.bottomY = bottomY;
+    }
+}
+class ReservedLayoutArea {
+    public topY: number = -1000;
+    public bottomY: number = -1000;
+    public slots: ReservedLayoutAreaSlot[] = [];
+
+    public addSlot(topY: number, bottomY: number) {
+        if(topY == bottomY) {
+            return;
+        }
+        this.slots.push(new ReservedLayoutAreaSlot(topY, bottomY));
+        if (this.topY === -1000) {
+            this.topY = topY;
+            this.bottomY = bottomY;
+        } else {
+            const min = Math.min(topY, bottomY);
+            const max = Math.max(topY, bottomY);
+            if (min < this.topY) {
+                this.topY = min;
+            }
+            if (max > this.bottomY) {
+                this.bottomY = max;
+            }
+        }
+    }
+}
+
 /**
  * This public class stores size information about a stave.
  * It is used by the layout engine to collect the sizes of score parts
@@ -28,8 +62,7 @@ export class BarLayoutingInfo {
      */
     public version: number = 0;
 
-    public minYByDisplayTime: Map<number, number> = new Map();
-    public maxYByDisplayTime: Map<number, number> = new Map();
+    private _reservedLayoutAreasByDisplayTime: Map<number, ReservedLayoutArea> = new Map();
     public preBeatSizes: Map<number, number> = new Map();
     public onBeatSizes: Map<number, number> = new Map();
     public onBeatCenterX: Map<number, number> = new Map();
@@ -47,20 +80,10 @@ export class BarLayoutingInfo {
     }
 
     public setBeatYPositions(beat: Beat, topY: number, bottomY: number): void {
-        if (!this.minYByDisplayTime.has(beat.displayStart)) {
-            this.minYByDisplayTime.set(beat.displayStart, topY);
-            this.maxYByDisplayTime.set(beat.displayStart, bottomY);
-        } else {
-            const minY = Math.min(topY, bottomY);
-            const maxY = Math.max(topY, bottomY);
-
-            if (this.minYByDisplayTime.get(beat.displayStart)! > minY) {
-                this.minYByDisplayTime.set(beat.displayStart, minY);
-            }
-            if (this.maxYByDisplayTime.get(beat.displayStart)! < maxY) {
-                this.maxYByDisplayTime.set(beat.displayStart, maxY);
-            }
+        if (!this._reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
+            this._reservedLayoutAreasByDisplayTime.set(beat.displayStart, new ReservedLayoutArea());
         }
+        this._reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.addSlot(topY, bottomY);
     }
 
     public applyRestCollisionOffset(beat: Beat, currentY: number, linesToPixel: number): number {
@@ -72,7 +95,7 @@ export class BarLayoutingInfo {
             // on the horizontal axis. So we only need to check for collisions
             // of elements at the current time position
             // if there are none, we can just use the line
-            if (this.minYByDisplayTime.has(beat.playbackStart)) {
+            if (this._reservedLayoutAreasByDisplayTime.has(beat.playbackStart)) {
                 // do check for collisions we need to obtain the range on which the 
                 // restglyph is placed
                 // rest glyphs have their ancor 
@@ -81,24 +104,26 @@ export class BarLayoutingInfo {
                 let oldRestBottomY = currentY + restSizes[1];
                 let newRestTopY = oldRestTopY;
 
-                const reservedTopY = this.minYByDisplayTime.get(beat.playbackStart)!;
-                const reservedBottomY = this.maxYByDisplayTime.get(beat.playbackStart)!;
-                // if there are other elements at the current time we need to shift the 
-                // rest up or down in case the line is in use
-                let hasCollision =
-                    (oldRestTopY >= reservedTopY && oldRestTopY <= reservedBottomY) ||
-                    (oldRestBottomY >= reservedTopY && oldRestBottomY <= reservedBottomY);
+                const reservedSlots = this._reservedLayoutAreasByDisplayTime.get(beat.playbackStart)!;
+                let hasCollision = false;
+                for (const slot of reservedSlots.slots) {
+                    if ((oldRestTopY >= slot.topY && oldRestTopY <= slot.bottomY) ||
+                        (oldRestBottomY >= slot.topY && oldRestBottomY <= slot.bottomY)) {
+                        hasCollision = true;
+                        break;
+                    }
+                }
 
                 if (hasCollision) {
                     // second voice above, the others below
                     if (beat.voice.index == 1) {
                         // move rest above top position
                         // TODO: rest must align with note lines
-                        newRestTopY = this.minYByDisplayTime.get(beat.playbackStart)! - restSizes[1] - restSizes[0];
+                        newRestTopY = reservedSlots.topY - restSizes[1] - restSizes[0];
                     } else {
                         // move rest above top position
                         // TODO: rest must align with note lines
-                        newRestTopY = this.maxYByDisplayTime.get(beat.playbackStart)!;
+                        newRestTopY = reservedSlots.bottomY;
                     }
 
                     let newRestBottomY = newRestTopY + restSizes[0] + restSizes[1];
@@ -108,12 +133,7 @@ export class BarLayoutingInfo {
                     let distanceInLines = Math.ceil(Math.abs(newRestTopY - oldRestTopY) / staveSpace);
 
                     // register new min/max offsets
-                    if(reservedTopY > newRestTopY) {
-                        this.minYByDisplayTime.set(beat.playbackStart, newRestTopY);
-                    }
-                    if(reservedBottomY < newRestBottomY) {
-                        this.maxYByDisplayTime.set(beat.playbackStart, newRestBottomY);
-                    }
+                    reservedSlots.addSlot(newRestTopY, newRestBottomY);
 
                     if (newRestTopY < oldRestTopY) {
                         return distanceInLines * -staveSpace;
