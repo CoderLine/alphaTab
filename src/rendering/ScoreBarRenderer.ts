@@ -353,7 +353,7 @@ export class ScoreBarRenderer extends BarRendererBase {
 
     public applyLayoutingInfo(): boolean {
         const result = super.applyLayoutingInfo();
-        if(result) {
+        if(result && this.bar.isMultiVoice) {
             // consider rest overflows
             let top: number = this.getScoreY(-2, 0);
             let bottom: number = this.getScoreY(6, 0);

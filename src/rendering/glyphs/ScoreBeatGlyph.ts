@@ -150,14 +150,17 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 this.restGlyph.beamingHelper = this.beamingHelper;
                 this.addGlyph(this.restGlyph);
 
-                if (this.container.beat.voice.index === 0) {
-                    const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
-                    let restTop = this.restGlyph.y - sr.getScoreHeight(restSizes[0]);
-                    let restBottom = this.restGlyph.y + sr.getScoreHeight(restSizes[1]);
-                    this.renderer.layoutingInfo.setBeatYPositions(this.container.beat, restTop, restBottom);
-                } else {
-                    this.renderer.layoutingInfo.registerRest(this.container.beat);
+                if (this.renderer.bar.isMultiVoice) {
+                    if (this.container.beat.voice.index === 0) {
+                        const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
+                        let restTop = this.restGlyph.y - sr.getScoreHeight(restSizes[0]);
+                        let restBottom = this.restGlyph.y + sr.getScoreHeight(restSizes[1]);
+                        this.renderer.layoutingInfo.setBeatYPositions(this.container.beat, restTop, restBottom);
+                    } else {
+                        this.renderer.layoutingInfo.registerRest(this.container.beat);
+                    }
                 }
+
 
                 if (this.beamingHelper) {
                     this.beamingHelper.applyRest(this.container.beat, line);
