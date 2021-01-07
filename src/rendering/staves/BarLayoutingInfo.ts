@@ -5,6 +5,7 @@ import { Spring } from '@src/rendering/staves/Spring';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { ICanvas } from '@src/platform/ICanvas';
 import { GraceType } from '@src/model/GraceType';
+import { BeamingHelper } from '../utils/BeamingHelper';
 
 /**
  * This public class stores size information about a stave.
@@ -27,6 +28,8 @@ export class BarLayoutingInfo {
      */
     public version: number = 0;
 
+    public minYByDisplayTime: Map<number, number> = new Map();
+    public maxYByDisplayTime: Map<number, number> = new Map();
     public preBeatSizes: Map<number, number> = new Map();
     public onBeatSizes: Map<number, number> = new Map();
     public onBeatCenterX: Map<number, number> = new Map();
@@ -41,6 +44,76 @@ export class BarLayoutingInfo {
             this.voiceSize = size;
             this.version++;
         }
+    }
+
+    public setBeatYPositions(beat: Beat, topY: number, bottomY: number): void {
+        if (!this.minYByDisplayTime.has(beat.displayStart)) {
+            this.minYByDisplayTime.set(beat.displayStart, topY);
+            this.maxYByDisplayTime.set(beat.displayStart, bottomY);
+        } else {
+            const minY = Math.min(topY, bottomY);
+            const maxY = Math.max(topY, bottomY);
+
+            if (this.minYByDisplayTime.get(beat.displayStart)! > minY) {
+                this.minYByDisplayTime.set(beat.displayStart, minY);
+            }
+            if (this.maxYByDisplayTime.get(beat.displayStart)! < maxY) {
+                this.maxYByDisplayTime.set(beat.displayStart, maxY);
+            }
+        }
+    }
+
+    public calculateRestCollisionOffset(beat: Beat, currentY: number, linesToPixel: number): number {
+        // for the first voice we do not need collision detection on rests
+        // we just place it normally
+        if (beat.voice.index > 0) {
+            // From the Spring-Rod poisitioning we have the guarantee
+            // that 2 timewise subsequent elements can never collide 
+            // on the horizontal axis. So we only need to check for collisions
+            // of elements at the current time position
+            // if there are none, we can just use the line
+            if (this.minYByDisplayTime.has(beat.playbackStart)) {
+                // do check for collisions we need to obtain the range on which the 
+                // restglyph is placed
+                // rest glyphs have their ancor 
+                const restSizes = BeamingHelper.computeLineHeightsForRest(beat.duration).map(i => i * linesToPixel);
+                let oldRestTopY = currentY - restSizes[0];
+                let oldRestBottomY = currentY + restSizes[1];
+                let newRestTopY = oldRestTopY;
+
+                const reservedTopY = this.minYByDisplayTime.get(beat.playbackStart)!;
+                const reservedBottomY = this.maxYByDisplayTime.get(beat.playbackStart)!;
+                // if there are other elements at the current time we need to shift the 
+                // rest up or down in case the line is in use
+                let hasCollision =
+                    (oldRestTopY >= reservedTopY && oldRestTopY <= reservedBottomY) ||
+                    (oldRestBottomY >= reservedTopY! && oldRestBottomY <= reservedBottomY);
+
+                if (hasCollision) {
+                    // second voice above, the others below
+                    if (beat.voice.index == 1) {
+                        // move rest above top position
+                        // TODO: rest must align with note lines
+                        newRestTopY = this.minYByDisplayTime.get(beat.playbackStart)! - restSizes[1] - restSizes[0];
+                    } else {
+                        // move rest above top position
+                        // TODO: rest must align with note lines
+                        newRestTopY = this.maxYByDisplayTime.get(beat.playbackStart)! + restSizes[1] + restSizes[0];
+                    }
+
+                    // moving always happens in full stave spaces
+                    const staveSpace = linesToPixel * 2;
+                    let distanceInLines = Math.ceil(Math.abs(newRestTopY - oldRestTopY) / staveSpace);
+                    if (newRestTopY < oldRestTopY) {
+                        return distanceInLines * -staveSpace;
+                    } else {
+                        return distanceInLines * staveSpace;
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 
     public setPreBeatSize(beat: Beat, size: number): void {
@@ -367,7 +440,7 @@ export class BarLayoutingInfo {
     }
 
     public buildOnTimePositions(force: number): Map<number, number> {
-        if(this.totalSpringConstant === -1) {
+        if (this.totalSpringConstant === -1) {
             return new Map<number, number>();
         }
         if (ModelUtils.isAlmostEqualTo(this._onTimePositionsForce, force) && this._onTimePositions) {

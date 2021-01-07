@@ -29,8 +29,11 @@ import { PictEdgeOfCymbalGlyph } from './PictEdgeOfCymbalGlyph';
 import { PickStrokeGlyph } from './PickStrokeGlyph';
 import { PickStroke } from '@src/model/PickStroke';
 import { GuitarGolpeGlyph } from './GuitarGolpeGlyph';
+import { BeamingHelper } from '../utils/BeamingHelper';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
+    private _collisionOffset: number = -1000;
+ 
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
 
@@ -53,6 +56,11 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.noteHeads.updateBeamingHelper(this.container.x + this.x);
         } else if (this.restGlyph) {
             this.restGlyph.updateBeamingHelper(this.container.x + this.x);
+            if (this._collisionOffset === -1000) {
+                this._collisionOffset = this.renderer.layoutingInfo.calculateRestCollisionOffset(this.container.beat, this.restGlyph.y, 
+                    (this.renderer as ScoreBarRenderer).getScoreHeight(1));
+                this.y += this._collisionOffset;
+            }
         }
     }
 
@@ -110,7 +118,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
             } else {
-                let offset: number = 0;
                 let line = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
 
                 // this positioning is quite strange, for most staff line counts
@@ -124,11 +131,16 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     line -= 2;
                 }
 
-                let y: number = sr.getScoreY(line, offset);
-                this.restGlyph = new ScoreRestGlyph(0, y, this.container.beat.duration);
+                this.restGlyph = new ScoreRestGlyph(0, sr.getScoreY(line), this.container.beat.duration);
                 this.restGlyph.beat = this.container.beat;
                 this.restGlyph.beamingHelper = this.beamingHelper;
                 this.addGlyph(this.restGlyph);
+
+                const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
+                let restTop = this.restGlyph.y - sr.getScoreHeight(restSizes[0]);
+                let restBottom = this.restGlyph.y + sr.getScoreHeight(restSizes[1]);
+                this.renderer.layoutingInfo.setBeatYPositions(this.container.beat, restTop, restBottom);
+
                 if (this.beamingHelper) {
                     this.beamingHelper.applyRest(this.container.beat, line);
                 }

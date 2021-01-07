@@ -137,38 +137,83 @@ export class BeamingHelper {
     }
 
     private calculateDirection(): BeamDirection {
-        let preferredBeamDirection = this.preferredBeamDirection;
-        if (preferredBeamDirection !== null) {
-            return preferredBeamDirection;
-        }
-
+        let direction: BeamDirection | null = null;
         if (!this.voice) {
-            return BeamDirection.Up;
-        }
-
-        // multivoice handling
-        if (this.voice.index > 0) {
-            return this.invert(BeamDirection.Down);
-        }
-        if (this.voice.bar.voices.length > 1) {
-            for (let v: number = 1; v < this.voice.bar.voices.length; v++) {
-                if (!this.voice.bar.voices[v].isEmpty) {
-                    return this.invert(BeamDirection.Up);
-                }
-            }
-        }
-        if (this.beats[0].graceType !== GraceType.None) {
-            return this.invert(BeamDirection.Up);
+            // no proper voice (should not happen usually)
+            direction = BeamDirection.Up;
+        } else if (this.preferredBeamDirection !== null) {
+            // we have a preferred direction
+            direction = this.preferredBeamDirection;
+        } else if (this.voice.index > 0) {
+            // on multi-voice setups secondary voices are always down
+            direction = this.invert(BeamDirection.Down);
+        } else if (this.voice.bar.isMultiVoice) {
+            // on multi-voice setups primary voices are always up
+            direction = this.invert(BeamDirection.Up);
+        } else if (this.beats[0].graceType !== GraceType.None) {
+            // grace notes are always up
+            direction = this.invert(BeamDirection.Up);
         }
 
         // the average line is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
-        const highestNotePosition = this._renderer.getNoteY(this._highestNoteInHelper!, NoteYPosition.Center);
-        const lowestNotePosition = this._renderer.getNoteY(this._lowestNoteInHelper!, NoteYPosition.Center);
-        const avg = (highestNotePosition + lowestNotePosition) / 2;
+        let highestNotePosition = this._renderer.getNoteY(this._highestNoteInHelper!, NoteYPosition.Center);
+        let lowestNotePosition = this._renderer.getNoteY(this._lowestNoteInHelper!, NoteYPosition.Center);
 
-        return this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
+        if (direction === null) {
+            const avg = (highestNotePosition + lowestNotePosition) / 2;
+            direction = this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
+        }
+
+        // for multi-voice bars we need to register the positions 
+        // for multi-voice rest displacement to avoid collisions
+        if (this.voice && this.voice.bar.isMultiVoice && !isNaN(highestNotePosition) && !isNaN(lowestNotePosition)) {
+            let offset = this._renderer.getStemSize(this);
+            if(this.hasTuplet) {
+                offset += this._renderer.resources.effectFont.size * 2;
+            }
+
+            if (direction == BeamDirection.Up) {
+                highestNotePosition -= offset;
+            } else {
+                lowestNotePosition += offset;
+            }
+
+            for (const beat of this.beats) {
+                this._renderer.layoutingInfo.setBeatYPositions(beat, highestNotePosition, lowestNotePosition);
+            }
+        }
+
+        return direction;
+    }
+
+    public static computeLineHeightsForRest(duration: Duration): number[] {
+        switch (duration) {
+            case Duration.QuadrupleWhole:
+                return [2, 2];
+            case Duration.DoubleWhole:
+                return [2, 2];
+            case Duration.Whole:
+                return [2, 2];
+            case Duration.Half:
+                return [2, 2];
+            case Duration.Quarter:
+                return [4, 3];
+            case Duration.Eighth:
+                return [2, 2];
+            case Duration.Sixteenth:
+                return [2, 4];
+            case Duration.ThirtySecond:
+                return [4, 4];
+            case Duration.SixtyFourth:
+                return [4, 6];
+            case Duration.OneHundredTwentyEighth:
+                return [6, 6];
+            case Duration.TwoHundredFiftySixth:
+                return [6, 8];
+        }
+        return [0, 0];
     }
 
     /**
@@ -187,52 +232,9 @@ export class BeamingHelper {
         // be placed at the upper / lower end of the glyph.
         let aboveRest = line;
         let belowRest = line;
-        switch (beat.duration) {
-            case Duration.QuadrupleWhole:
-                aboveRest -= 2;
-                belowRest += 2;
-                break;
-            case Duration.DoubleWhole:
-                aboveRest -= 2;
-                belowRest -= 2;
-                break;
-            case Duration.Whole:
-                aboveRest += 2;
-                belowRest += 2;
-                break;
-            case Duration.Half:
-                aboveRest -= 2;
-                belowRest -= 2;
-                break;
-            case Duration.Quarter:
-                aboveRest -= 4;
-                belowRest += 2;
-                break;
-            case Duration.Eighth:
-                aboveRest -= 2;
-                belowRest += 2;
-                break;
-            case Duration.Sixteenth:
-                aboveRest -= 2;
-                belowRest += 4;
-                break;
-            case Duration.ThirtySecond:
-                aboveRest -= 4;
-                belowRest += 4;
-                break;
-            case Duration.SixtyFourth:
-                aboveRest -= 4;
-                belowRest += 6;
-                break;
-            case Duration.OneHundredTwentyEighth:
-                aboveRest -= 6;
-                belowRest += 6;
-                break;
-            case Duration.TwoHundredFiftySixth:
-                aboveRest -= 6;
-                belowRest += 8;
-                break;
-        }
+        const offsets = BeamingHelper.computeLineHeightsForRest(beat.duration);
+        aboveRest -= offsets[0];
+        belowRest += offsets[1];
         if (this.minRestLine === null || this.minRestLine > aboveRest) {
             this.minRestLine = aboveRest;
             this.beatOfMinRestLine = beat;

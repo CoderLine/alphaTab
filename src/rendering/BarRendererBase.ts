@@ -21,6 +21,7 @@ import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
+import { BeamingHelper } from './utils/BeamingHelper';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -323,6 +324,10 @@ export class BarRendererBase {
 
     public getOnNotesGlyphForBeat(beat: Beat): BeatOnNoteGlyphBase | undefined {
         return this.getBeatContainer(beat)?.onNotes;
+    }
+
+    public getStemSize(helper: BeamingHelper): number {
+        return 0;
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
