@@ -24,7 +24,8 @@ import {
     ProgramChangeEvent,
     TempoEvent,
     TimeSignatureEvent,
-    TrackEndEvent
+    TrackEndEvent,
+    RestEvent
 } from '@test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from '@test/TestPlatform';
 
@@ -796,6 +797,43 @@ describe('MidiFileGeneratorTest', () => {
             }
         }
         expect(handler.midiEvents.length).toEqual(expectedEvents.length);
+    });
+
+    it('full-bar-rest', () => {
+        let tex: string = '\\ts 3 4 3.3.4 3.3.4 3.3.4 | r.1 | 3.3.4 3.3.4 3.3.4';
+        let score: Score = parseTex(tex);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].isFullBarRest).toBeTrue();
+
+        let expectedNoteOnTimes:number[] = [
+            0 * MidiUtils.QuarterTime, // note 1
+            1 * MidiUtils.QuarterTime, // note 2
+            2 * MidiUtils.QuarterTime, // note 3
+            3 * MidiUtils.QuarterTime, // 3/4 rest 
+            6 * MidiUtils.QuarterTime, // note 4
+            7 * MidiUtils.QuarterTime, // note 5
+            8 * MidiUtils.QuarterTime, // note 6
+        ];
+        let noteOnTimes:number[] = [];
+        let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        while (beat != null) {
+            noteOnTimes.push(beat.absolutePlaybackStart);
+            beat = beat.nextBeat;
+        }
+
+        expect(noteOnTimes.join(',')).toEqual(expectedNoteOnTimes.join(','));
+
+        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+        noteOnTimes = [];
+        for(const evt of handler.midiEvents) {
+            if(evt instanceof NoteEvent) {
+                noteOnTimes.push(evt.tick);
+            } else if(evt instanceof RestEvent) {
+                noteOnTimes.push(evt.tick);
+            }
+        }
+        expect(noteOnTimes.join(',')).toEqual(expectedNoteOnTimes.join(','));
     });
 
 });

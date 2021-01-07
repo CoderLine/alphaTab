@@ -178,6 +178,13 @@ export class Beat {
     }
 
     /**
+     * Gets a value indicating whether this beat is a full bar rest.
+     */
+    public get isFullBarRest(): boolean {
+        return this.isRest && this.voice.beats.length === 1 && this.duration === Duration.Whole;
+    }
+
+    /**
      * Gets or sets whether any note in this beat has a let-ring applied.
      * @json_ignore
      */
@@ -509,6 +516,9 @@ export class Beat {
     }
 
     private calculateDuration(): number {
+        if(this.isFullBarRest) {
+            return this.voice.bar.masterBar.calculateDuration();
+        }
         let ticks: number = MidiUtils.toTicks(this.duration);
         if (this.dots === 2) {
             ticks = MidiUtils.applyDot(ticks, true);

@@ -614,6 +614,7 @@ export class MusicXmlImporter extends ScoreImporter {
         beat.isEmpty = false;
         beat.addNote(note);
         beat.dots = 0;
+        let isFullBarRest = false;
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -626,7 +627,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         beat.duration = Duration.ThirtySecond;
                         break;
                     case 'duration':
-                        if (beat.isRest) {
+                        if (beat.isRest && !isFullBarRest) {
                             // unit: divisions per quarter note
                             let duration: number = parseInt(c.innerText);
                             switch (duration) {
@@ -708,8 +709,10 @@ export class MusicXmlImporter extends ScoreImporter {
                         this.parseUnpitched(c, note);
                         break;
                     case 'rest':
+                        isFullBarRest = c.getAttribute('measure') === 'yes';
                         beat.isEmpty = false;
                         beat.notes = [];
+                        beat.duration = Duration.Whole;
                         break;
                 }
             }
