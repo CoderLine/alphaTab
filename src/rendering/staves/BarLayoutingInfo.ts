@@ -87,7 +87,7 @@ export class BarLayoutingInfo {
                 // rest up or down in case the line is in use
                 let hasCollision =
                     (oldRestTopY >= reservedTopY && oldRestTopY <= reservedBottomY) ||
-                    (oldRestBottomY >= reservedTopY! && oldRestBottomY <= reservedBottomY);
+                    (oldRestBottomY >= reservedTopY && oldRestBottomY <= reservedBottomY);
 
                 if (hasCollision) {
                     // second voice above, the others below
