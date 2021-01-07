@@ -367,13 +367,15 @@ export class ScoreBarRenderer extends BarRendererBase {
             const firstBeat = h.beats[0];
             const lastBeat = h.beats[h.beats.length - 1];
 
-            // 1. put direct diagonal line. 
+            // 1. put direct diagonal line.
+            drawingInfo.startBeat = firstBeat; 
             drawingInfo.startX = h.getBeatLineX(firstBeat);
             drawingInfo.startY =
                 direction === BeamDirection.Up
                     ? this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize
                     : this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
 
+            drawingInfo.endBeat = lastBeat;
             drawingInfo.endX = h.getBeatLineX(lastBeat);
             drawingInfo.endY =
                 direction === BeamDirection.Up

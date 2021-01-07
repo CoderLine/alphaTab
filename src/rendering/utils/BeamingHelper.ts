@@ -20,9 +20,11 @@ class BeatLinePositions {
 }
 
 export class BeamingHelperDrawInfo {
+    public startBeat: Beat | null = null;
     public startX: number = 0;
     public startY: number = 0;
 
+    public endBeat: Beat | null = null;
     public endX: number = 0;
     public endY: number = 0;
 
@@ -122,6 +124,13 @@ export class BeamingHelper {
         positions.staffId = staffId;
         positions.up = up;
         positions.down = down;
+        this.drawingInfos.forEach((v, _) => {
+            if (v.startBeat == beat) {
+                v.startX = this.getBeatLineX(beat);
+            } else if (v.endBeat == beat) {
+                v.endX = this.getBeatLineX(beat);
+            }
+        });
     }
 
     private getOrCreateBeatPositions(beat: Beat): BeatLinePositions {
@@ -170,7 +179,7 @@ export class BeamingHelper {
         // for multi-voice rest displacement to avoid collisions
         if (this.voice && this.voice.bar.isMultiVoice && !isNaN(highestNotePosition) && !isNaN(lowestNotePosition)) {
             let offset = this._renderer.getStemSize(this);
-            if(this.hasTuplet) {
+            if (this.hasTuplet) {
                 offset += this._renderer.resources.effectFont.size * 2;
             }
 
