@@ -351,6 +351,23 @@ export class ScoreBarRenderer extends BarRendererBase {
         return this.calculateBeamYWithDirection(h, x, h.direction);
     }
 
+    public applyLayoutingInfo(): boolean {
+        const result = super.applyLayoutingInfo();
+        if(result) {
+            // consider rest overflows
+            let top: number = this.getScoreY(-2, 0);
+            let bottom: number = this.getScoreY(6, 0);
+            let minMax = this.layoutingInfo.getBeatMinMaxY();
+            if(minMax[0] < top) {
+                this.registerOverflowTop(Math.abs(minMax[0]));
+            } 
+            if(minMax[1] > bottom) {
+                this.registerOverflowBottom(Math.abs(minMax[1]) - bottom);
+            }
+        }
+        return result;
+    }
+
     private calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         let stemSize: number = this.getStemSize(h);
 

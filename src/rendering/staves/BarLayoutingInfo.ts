@@ -21,7 +21,7 @@ class ReservedLayoutArea {
     public slots: ReservedLayoutAreaSlot[] = [];
 
     public addSlot(topY: number, bottomY: number) {
-        if(topY == bottomY) {
+        if (topY == bottomY) {
             return;
         }
         this.slots.push(new ReservedLayoutAreaSlot(topY, bottomY));
@@ -77,6 +77,29 @@ export class BarLayoutingInfo {
             this.voiceSize = size;
             this.version++;
         }
+    }
+
+    public getBeatMinMaxY(): number[] {
+        let minY = -1000;
+        let maxY = -1000;
+        this._reservedLayoutAreasByDisplayTime.forEach((v, k) => {
+            if (minY === -1000) {
+                minY = v.topY;
+                maxY = v.bottomY;
+            } else {
+                if (minY > v.topY) {
+                    minY = v.topY;
+                }
+                if (maxY < v.bottomY) {
+                    maxY = v.bottomY;
+                }
+            }
+        });
+
+        if (minY === -1000) {
+            return [0, 0];
+        }
+        return [minY, maxY];
     }
 
     public setBeatYPositions(beat: Beat, topY: number, bottomY: number): void {
