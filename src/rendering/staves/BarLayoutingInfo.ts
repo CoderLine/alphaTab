@@ -63,7 +63,7 @@ export class BarLayoutingInfo {
         }
     }
 
-    public calculateRestCollisionOffset(beat: Beat, currentY: number, linesToPixel: number): number {
+    public applyRestCollisionOffset(beat: Beat, currentY: number, linesToPixel: number): number {
         // for the first voice we do not need collision detection on rests
         // we just place it normally
         if (beat.voice.index > 0) {
@@ -98,12 +98,23 @@ export class BarLayoutingInfo {
                     } else {
                         // move rest above top position
                         // TODO: rest must align with note lines
-                        newRestTopY = this.maxYByDisplayTime.get(beat.playbackStart)! + restSizes[1] + restSizes[0];
+                        newRestTopY = this.maxYByDisplayTime.get(beat.playbackStart)!;
                     }
+
+                    let newRestBottomY = newRestTopY + restSizes[0] + restSizes[1];
 
                     // moving always happens in full stave spaces
                     const staveSpace = linesToPixel * 2;
                     let distanceInLines = Math.ceil(Math.abs(newRestTopY - oldRestTopY) / staveSpace);
+
+                    // register new min/max offsets
+                    if(reservedTopY > newRestTopY) {
+                        this.minYByDisplayTime.set(beat.playbackStart, newRestTopY);
+                    }
+                    if(reservedBottomY < newRestBottomY) {
+                        this.maxYByDisplayTime.set(beat.playbackStart, newRestBottomY);
+                    }
+
                     if (newRestTopY < oldRestTopY) {
                         return distanceInLines * -staveSpace;
                     } else {

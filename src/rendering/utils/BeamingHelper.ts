@@ -208,7 +208,7 @@ export class BeamingHelper {
             case Duration.Half:
                 return [2, 2];
             case Duration.Quarter:
-                return [4, 3];
+                return [3, 3];
             case Duration.Eighth:
                 return [2, 2];
             case Duration.Sixteenth:
