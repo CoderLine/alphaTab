@@ -48,7 +48,7 @@ export class NotationSettingsSerializer {
                 return true;
             case "elements":
                 obj.elements = new Map<NotationElement, boolean>();
-                (v as Map<string, unknown>).forEach((v, k) => {
+                JsonHelper.forEach(v, (v, k) => {
                     obj.elements.set((JsonHelper.parseEnum<NotationElement>(k, NotationElement)!), (v as boolean)); 
                 });
                 return true;
