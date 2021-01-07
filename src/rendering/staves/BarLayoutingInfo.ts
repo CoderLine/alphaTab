@@ -71,6 +71,7 @@ export class BarLayoutingInfo {
     public voiceSize: number = 0;
     public minStretchForce: number = 0;
     public totalSpringConstant: number = 0;
+    public restDurationsByDisplayTime: Map<number/*start*/, Map<number/*duration*/, number/*beat id*/>> = new Map();
 
     public updateVoiceSize(size: number): void {
         if (size > this.voiceSize) {
@@ -107,6 +108,19 @@ export class BarLayoutingInfo {
             this._reservedLayoutAreasByDisplayTime.set(beat.displayStart, new ReservedLayoutArea());
         }
         this._reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.addSlot(topY, bottomY);
+        if (beat.isRest) {
+            this.registerRest(beat);
+
+        }
+    }
+    
+    public registerRest(beat: Beat) {
+        if (!this.restDurationsByDisplayTime.has(beat.displayStart)) {
+            this.restDurationsByDisplayTime.set(beat.displayStart, new Map<number, number>());
+        }
+        if (!this.restDurationsByDisplayTime.get(beat.displayStart)!.has(beat.playbackDuration)) {
+            this.restDurationsByDisplayTime.get(beat.displayStart)!.set(beat.playbackDuration, beat.id);
+        }
     }
 
     public applyRestCollisionOffset(beat: Beat, currentY: number, linesToPixel: number): number {

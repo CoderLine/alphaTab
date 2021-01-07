@@ -24,7 +24,7 @@ import { PercussionNoteHeadGlyph } from './PercussionNoteHeadGlyph';
 import { Logger } from '@src/alphatab';
 import { ArticStaccatoAboveGlyph } from './ArticStaccatoAboveGlyph';
 import { MusicFontSymbol } from '../../model/MusicFontSymbol';
-import { TextBaseline } from '@src/platform/ICanvas';
+import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { PictEdgeOfCymbalGlyph } from './PictEdgeOfCymbalGlyph';
 import { PickStrokeGlyph } from './PickStrokeGlyph';
 import { PickStroke } from '@src/model/PickStroke';
@@ -33,7 +33,8 @@ import { BeamingHelper } from '../utils/BeamingHelper';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
- 
+    private _skipPaint: boolean = false;
+
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
 
@@ -57,10 +58,23 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         } else if (this.restGlyph) {
             this.restGlyph.updateBeamingHelper(this.container.x + this.x);
             if (this._collisionOffset === -1000) {
-                this._collisionOffset = this.renderer.layoutingInfo.applyRestCollisionOffset(this.container.beat, this.restGlyph.y, 
+                this._collisionOffset = this.renderer.layoutingInfo.applyRestCollisionOffset(this.container.beat, this.restGlyph.y,
                     (this.renderer as ScoreBarRenderer).getScoreHeight(1));
                 this.y += this._collisionOffset;
+                const existingRests = this.renderer.layoutingInfo.restDurationsByDisplayTime;
+                if (existingRests.has(this.container.beat.playbackStart) &&
+                    existingRests.get(this.container.beat.playbackStart)!.has(this.container.beat.playbackDuration) &&
+                    existingRests.get(this.container.beat.playbackStart)!.get(this.container.beat.playbackDuration) !== this.container.beat.id
+                ) {
+                    this._skipPaint = true;
+                }
             }
+        }
+    }
+
+    public paint(cx: number, cy: number, canvas: ICanvas): void {
+        if (!this._skipPaint) {
+            super.paint(cx, cy, canvas);
         }
     }
 
@@ -136,13 +150,15 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 this.restGlyph.beamingHelper = this.beamingHelper;
                 this.addGlyph(this.restGlyph);
 
-                if(this.container.beat.voice.index === 0) {
+                if (this.container.beat.voice.index === 0) {
                     const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
                     let restTop = this.restGlyph.y - sr.getScoreHeight(restSizes[0]);
                     let restBottom = this.restGlyph.y + sr.getScoreHeight(restSizes[1]);
                     this.renderer.layoutingInfo.setBeatYPositions(this.container.beat, restTop, restBottom);
+                } else {
+                    this.renderer.layoutingInfo.registerRest(this.container.beat);
                 }
-               
+
                 if (this.beamingHelper) {
                     this.beamingHelper.applyRest(this.container.beat, line);
                 }
