@@ -8,6 +8,13 @@ alphaTab is a cross platform music notation and guitar tablature rendering libra
 
 ![alphaTab](img/banner.png?raw=true "alphaTab")
 
+# Getting Started
+
+To get started follow our guides and tutorials at: 
+
+* https://www.alphatab.net/docs/introduction
+* https://www.alphatab.net/docs/tutorials
+
 ## Build Status
 
 > Until the official 1.0 release we recommend to use pre release versions based on the `develop` branch.
@@ -20,9 +27,7 @@ alphaTab is a cross platform music notation and guitar tablature rendering libra
 # Downloads
 
 The latest binaries based  are available for download at either npmjs.org or NuGet.org.
-Use the links below to grab the binaries from the latest builds. Please do not use the GitHub releases yet, they are not maintained. We recommend using package managers to pull the files to your projects. 
-
-> Until the official 1.0 release we recommend to use `develop` branch which are available as "pre-release" versions on the package registries.
+Use the links below to grab the binaries from the latest builds. We recommend using package managers to pull the files to your projects. 
 
 &nbsp; | &nbsp;
 --- | --- |
