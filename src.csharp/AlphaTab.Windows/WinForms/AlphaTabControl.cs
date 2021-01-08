@@ -48,6 +48,26 @@ namespace AlphaTab.WinForms
             }
         }
 
+        /// <summary>
+        /// Gets or sets the color which the music notation has as background.
+        /// </summary>
+        /// <remarks>
+        /// The control has an overall background on which the notation
+        /// itself is placed in a page-style fashion depending on the chosen layout.
+        /// The <see cref="AlphaTabControl.BackColor"/> property controls the background
+        /// of the overall area background while this property controls the background of
+        /// the part showing the notation.
+        /// </remarks>
+        [Browsable(true)]
+        [Description("The color which the music notation has as background")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [Category("Appearance")]
+        public System.Drawing.Color NotationBackColor
+        {
+            get => _layoutPanel.BackColor;
+            set => _layoutPanel.BackColor = value;
+        }
+
         /// <see cref="AlphaTabApiBase{TSettings}.Settings"/>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public Settings Settings
@@ -78,13 +98,21 @@ namespace AlphaTab.WinForms
         public AlphaTabControl()
         {
             _settings = null!;
-            _layoutPanel = new AlphaTabLayoutPanel();
+            _layoutPanel = new AlphaTabLayoutPanel
+            {
+                BackColor = System.Drawing.Color.LightGray
+            };
             AutoScroll = true;
             Controls.Add(_layoutPanel);
 
-            Settings = new Settings();
-            Settings.Player.EnablePlayer = true;
-            Settings.Player.EnableCursor = true;
+            Settings = new Settings
+            {
+                Player =
+                {
+                    EnablePlayer = true,
+                    EnableCursor = true
+                }
+            };
         }
 
         /// <inheritdoc />
@@ -112,16 +140,6 @@ namespace AlphaTab.WinForms
             if (e.Control != _layoutPanel)
             {
                 Controls.Remove(e.Control);
-            }
-        }
-
-        /// <inheritdoc />
-        protected override void OnForeColorChanged(EventArgs e)
-        {
-            base.OnForeColorChanged(e);
-            if (_layoutPanel != null)
-            {
-                _layoutPanel.BackColor = ForeColor;
             }
         }
 
