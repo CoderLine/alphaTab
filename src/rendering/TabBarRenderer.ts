@@ -117,7 +117,7 @@ export class TabBarRenderer extends BarRendererBase {
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
         }
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getTabY(-1), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getTabHeight(-0.5), this.bar.index + 1));
     }
 
     private _startSpacing: boolean = false;
@@ -169,14 +169,16 @@ export class TabBarRenderer extends BarRendererBase {
 
     /**
      * Gets the relative y position of the given steps relative to first line.
-     * @param line the amount of steps while 2 steps are one line
+     * @param line the line of the particular string where 0 is the most top line
      * @param correction
      * @returns
      */
     public getTabY(line: number): number {
-        return this._firstLineY +
-            this.lineOffset * line
-        ;
+        return this._firstLineY + this.getTabHeight(line);
+    }
+
+    public getTabHeight(line: number): number {
+        return this.lineOffset * line;
     }
 
     public get middleYPosition(): number {
@@ -190,7 +192,6 @@ export class TabBarRenderer extends BarRendererBase {
         // draw string lines
         //
         canvas.color = res.staffLineColor;
-        let lineY: number = cy + this.y + this.topPadding;
         let padding: number = this.scale;
         // collect tab note position for spaces
         let tabNotes: Float32Array[][] = [];
@@ -225,17 +226,14 @@ export class TabBarRenderer extends BarRendererBase {
                 return a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0;
             });
         }
-        let lineOffset: number = this.lineOffset;
         for (let i: number = 0, j: number = this.bar.staff.tuning.length; i < j; i++) {
-            if (i > 0) {
-                lineY += lineOffset;
-            }
+            const lineY = this.getTabY(i);
             let lineX: number = 0;
             for (let line of tabNotes[i]) {
-                canvas.fillRect(cx + this.x + lineX, lineY | 0, line[0] - lineX, this.scale * BarRendererBase.StaffLineThickness);
+                canvas.fillRect(cx + this.x + lineX, cy + this.y + lineY | 0, line[0] - lineX, this.scale * BarRendererBase.StaffLineThickness);
                 lineX = line[0] + line[1];
             }
-            canvas.fillRect(cx + this.x + lineX, lineY | 0, this.width - lineX, this.scale * BarRendererBase.StaffLineThickness);
+            canvas.fillRect(cx + this.x + lineX, cy + this.y + lineY | 0, this.width - lineX, this.scale * BarRendererBase.StaffLineThickness);
         }
 
         // this.helpers.collisionHelper.loopBeatSlots((beat, topLine, _) => {

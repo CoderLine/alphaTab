@@ -22,7 +22,6 @@ import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
 import { BeamingHelper } from './utils/BeamingHelper';
-import { Color } from '@src/model/Color';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -349,8 +348,8 @@ export class BarRendererBase {
             cy + this.y + this.height,
             canvas
         );
-        canvas.color = Color.random();
-        canvas.fillRect(cx + this.x + this._preBeatGlyphs.x, cy + this.y, this._preBeatGlyphs.width, this.height);
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x + this._preBeatGlyphs.x, cy + this.y, this._preBeatGlyphs.width, this.height);
     }
 
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {

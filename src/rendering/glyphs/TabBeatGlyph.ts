@@ -95,7 +95,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 }
             }
         } else {
-            let line = (this.renderer.bar.staff.tuning.length - 1) / 2;
+            let line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2) ;
             let y: number = tabRenderer.getTabY(line);
             this.restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
             this.restGlyph.beat = this.container.beat;

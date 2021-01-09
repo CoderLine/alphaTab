@@ -709,7 +709,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             this.createStartSpacing();
 
             this.addPreBeatGlyph(
-                new ClefGlyph(0, this.getScoreY(offset), this.bar.clef, this.bar.clefOttava)
+                new ClefGlyph(0, this.getScoreY(offset) + 0.5 * BarRendererBase.StaffLineThickness, this.bar.clef, this.bar.clefOttava)
             );
         }
         // Key signature

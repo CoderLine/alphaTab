@@ -1,5 +1,4 @@
 import { Beat } from '@src/model/Beat';
-import { Color } from '@src/model/Color';
 import { Note } from '@src/model/Note';
 import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
