@@ -65,8 +65,8 @@ export class BarCollisionHelper {
         return [minY, maxY];
     }
 
-    public reserveBeatSlot(beat: Beat, topY: number, bottomY: number, force: boolean = false): void {
-        if (!force && topY == bottomY) {
+    public reserveBeatSlot(beat: Beat, topY: number, bottomY: number): void {
+        if (topY == bottomY) {
             return;
         }
         if (!this.reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {

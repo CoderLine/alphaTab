@@ -36,22 +36,20 @@ export class BarHelpers {
                     currentGraceBeamHelper = null;
                 }
                 // if a new beaming helper was started, we close our tuplet grouping as well
-                if (!b.isRest) {
-                    // try to fit beam to current beamhelper
-                    if (!helperForBeat || !helperForBeat.checkBeat(b)) {
-                        if (helperForBeat) {
-                            helperForBeat.finish();
-                        }
-                        // if not possible, create the next beaming helper
-                        helperForBeat = new BeamingHelper(bar.staff, barRenderer);
-                        helperForBeat.checkBeat(b);
-                        if (b.graceType !== GraceType.None) {
-                            currentGraceBeamHelper = helperForBeat;
-                        } else {
-                            currentBeamHelper = helperForBeat;
-                        }
-                        this.beamHelpers[v.index].push(helperForBeat);
+                // try to fit beam to current beamhelper
+                if (!helperForBeat || !helperForBeat.checkBeat(b)) {
+                    if (helperForBeat) {
+                        helperForBeat.finish();
                     }
+                    // if not possible, create the next beaming helper
+                    helperForBeat = new BeamingHelper(bar.staff, barRenderer);
+                    helperForBeat.checkBeat(b);
+                    if (b.graceType !== GraceType.None) {
+                        currentGraceBeamHelper = helperForBeat;
+                    } else {
+                        currentBeamHelper = helperForBeat;
+                    }
+                    this.beamHelpers[v.index].push(helperForBeat);
                 }
                 this.beamHelperLookup[v.index].set(b.index, helperForBeat!);
             }

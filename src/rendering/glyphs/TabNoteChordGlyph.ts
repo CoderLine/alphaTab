@@ -24,8 +24,8 @@ export class TabNoteChordGlyph extends Glyph {
         this._isGrace = isGrace;
     }
 
-    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
-        for(const note of this._notes) {
+    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+        for (const note of this._notes) {
             note.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
         }
     }
@@ -133,7 +133,10 @@ export class TabNoteChordGlyph extends Glyph {
 
     public updateBeamingHelper(cx: number): void {
         if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat)) {
-            this.beamingHelper.registerBeatLineX('tab', this.beat, cx + this.x + this.width, cx + this.x);
+            this.beamingHelper.registerBeatLineX('tab', this.beat,
+                cx + this.x + this.width / 2,
+                cx + this.x + this.width / 2
+            );
         }
     }
 }

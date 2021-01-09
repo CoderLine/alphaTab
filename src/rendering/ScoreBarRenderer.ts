@@ -9,7 +9,7 @@ import { Note } from '@src/model/Note';
 import { TupletGroup } from '@src/model/TupletGroup';
 import { Voice } from '@src/model/Voice';
 import { FingeringMode, NotationMode } from '@src/NotationSettings';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
@@ -146,18 +146,22 @@ export class ScoreBarRenderer extends BarRendererBase {
         canvas.color = h.voice!.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         // TODO: draw stem at least at the center of the score staff.
         // check if we need to paint simple footer
-        if (h.beats.length === 1) {
-            this.paintFlag(cx, cy, canvas, h);
-        } else {
-            this.paintBar(cx, cy, canvas, h);
+        if (!h.isRestBeamHelper) {
+            if (h.beats.length === 1) {
+                this.paintFlag(cx, cy, canvas, h);
+            } else {
+                this.paintBar(cx, cy, canvas, h);
+            }
         }
     }
 
     private paintTupletHelper(cx: number, cy: number, canvas: ICanvas, h: TupletGroup): void {
         let res: RenderingResources = this.resources;
         let oldAlign: TextAlign = canvas.textAlign;
+        let oldBaseLine = canvas.textBaseline;
         canvas.color = h.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         canvas.textAlign = TextAlign.Center;
+        canvas.textBaseline = TextBaseline.Middle;
         let s: string;
         let num: number = h.beats[0].tupletNumerator;
         let den: number = h.beats[0].tupletDenominator;
@@ -188,6 +192,9 @@ export class ScoreBarRenderer extends BarRendererBase {
             s = num + ':' + den;
         }
         // check if we need to paint simple footer
+        let offset: number = 10 * this.scale;
+        let size: number = 5 * this.scale;
+
         if (h.beats.length === 1 || !h.isFull) {
             for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
                 let beat: Beat = h.beats[i];
@@ -197,77 +204,115 @@ export class ScoreBarRenderer extends BarRendererBase {
                 }
                 let direction: BeamDirection = beamingHelper.direction;
                 let tupletX: number = beamingHelper.getBeatLineX(beat);
-                let tupletY: number = cy + this.y + this.calculateBeamY(beamingHelper, tupletX);
-                let offset: number = direction === BeamDirection.Up ? res.effectFont.size * 1.5 : -3 * this.scale;
-                canvas.font = res.effectFont;
-                canvas.fillText(s, cx + this.x + tupletX, tupletY - offset);
-            }
-        } else {
-            let firstBeat: Beat = h.beats[0];
-            let lastBeat: Beat = h.beats[h.beats.length - 1];
-            let firstBeamingHelper: BeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstBeat.index)!;
-            let lastBeamingHelper: BeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastBeat.index)!;
-            if (firstBeamingHelper && lastBeamingHelper) {
-                let direction: BeamDirection = firstBeamingHelper.direction;
-                //
-                // Calculate the overall area of the tuplet bracket
-                let startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
-                let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
-                //
-                // Calculate how many space the text will need
-                canvas.font = res.effectFont;
-                let sw: number = canvas.measureText(s);
-                let sp: number = 3 * this.scale;
-                //
-                // Calculate the offsets where to break the bracket
-                let middleX: number = (startX + endX) / 2;
-                let offset1X: number = middleX - sw / 2 - sp;
-                let offset2X: number = middleX + sw / 2 + sp;
-                //
-                // calculate the y positions for our bracket
-                let startY: number = this.calculateBeamYWithDirection(
-                    firstBeamingHelper,
-                    startX,
-                    firstBeamingHelper.direction
+                let tupletY: number = this.calculateBeamYWithDirection(
+                    beamingHelper,
+                    tupletX,
+                    direction
                 );
-                let endY: number = this.calculateBeamYWithDirection(
-                    lastBeamingHelper,
-                    endX,
-                    firstBeamingHelper.direction
-                );
-                let k: number = (endY - startY) / (endX - startX);
-                let d: number = startY - k * startX;
-                let offset1Y: number = k * offset1X + d;
-                let middleY: number = k * middleX + d;
-                let offset2Y: number = k * offset2X + d;
-                let offset: number = 10 * this.scale;
-                let size: number = 5 * this.scale;
                 if (direction === BeamDirection.Down) {
                     offset *= -1;
                     size *= -1;
                 }
-                //
-                // draw the bracket
-                canvas.beginPath();
-                canvas.moveTo(cx + this.x + startX, (cy + this.y + startY - offset) | 0);
-                canvas.lineTo(cx + this.x + startX, (cy + this.y + startY - offset - size) | 0);
-                canvas.lineTo(cx + this.x + offset1X, (cy + this.y + offset1Y - offset - size) | 0);
-                canvas.stroke();
-                canvas.beginPath();
-                canvas.moveTo(cx + this.x + offset2X, (cy + this.y + offset2Y - offset - size) | 0);
-                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset - size) | 0);
-                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset) | 0);
-                canvas.stroke();
-                //
-                // Draw the string
-                canvas.fillText(
-                    s,
-                    cx + this.x + middleX,
-                    cy + this.y + middleY - offset - size - res.effectFont.size / 2
-                );
+                canvas.font = res.effectFont;
+                canvas.fillText(s, cx + this.x + tupletX, cy + this.y + tupletY - offset - size);
             }
+        } else {
+            let firstBeat: Beat = h.beats[0];
+            let lastBeat: Beat = h.beats[h.beats.length - 1];
+            let firstNonRestBeat: Beat | null = null;
+            let lastNonRestBeat: Beat | null = null;
+            for (let i = 0; i < h.beats.length; i++) {
+                if (!h.beats[i].isRest) {
+                    firstNonRestBeat = h.beats[i];
+                    break;
+                }
+            }
+            for (let i = h.beats.length - 1; i >= 0; i--) {
+                if (!h.beats[i].isRest) {
+                    lastNonRestBeat = h.beats[i];
+                    break;
+                }
+            }
+
+            let isRestOnly = false;
+            if (!firstNonRestBeat) {
+                firstNonRestBeat = firstBeat;
+                isRestOnly = true;
+            }
+
+            if (!lastNonRestBeat) {
+                lastNonRestBeat = lastBeat;
+            }
+
+            //
+            // Calculate the overall area of the tuplet bracket
+            let firstBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstBeat.index)!;
+            let lastBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastBeat.index)!;
+            let startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
+            let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
+
+            //
+            // calculate the y positions for our bracket
+            let firstNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstNonRestBeat.index)!;
+            let lastNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastNonRestBeat.index)!;
+            let direction = firstBeamingHelper.direction;
+            let startY: number = this.calculateBeamYWithDirection(
+                firstNonRestBeamingHelper,
+                startX,
+                direction
+            );
+            let endY: number = this.calculateBeamYWithDirection(
+                lastNonRestBeamingHelper,
+                endX,
+                direction
+            );
+            if(isRestOnly) {
+                startY = Math.max(startY, endY);
+                endY = startY;
+            }
+
+            //
+            // Calculate how many space the text will need
+            canvas.font = res.effectFont;
+            let sw: number = canvas.measureText(s);
+            let sp: number = 3 * this.scale;
+            //
+            // Calculate the offsets where to break the bracket
+            let middleX: number = (startX + endX) / 2;
+            let offset1X: number = middleX - sw / 2 - sp;
+            let offset2X: number = middleX + sw / 2 + sp;
+
+            let k: number = (endY - startY) / (endX - startX);
+            let d: number = startY - k * startX;
+            let offset1Y: number = k * offset1X + d;
+            let middleY: number = k * middleX + d;
+            let offset2Y: number = k * offset2X + d;
+            if (direction === BeamDirection.Down) {
+                offset *= -1;
+                size *= -1;
+            }
+            //
+            // draw the bracket
+            canvas.beginPath();
+            canvas.moveTo(cx + this.x + startX, (cy + this.y + startY - offset) | 0);
+            canvas.lineTo(cx + this.x + startX, (cy + this.y + startY - offset - size) | 0);
+            canvas.lineTo(cx + this.x + offset1X, (cy + this.y + offset1Y - offset - size) | 0);
+            canvas.stroke();
+            canvas.beginPath();
+            canvas.moveTo(cx + this.x + offset2X, (cy + this.y + offset2Y - offset - size) | 0);
+            canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset - size) | 0);
+            canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset) | 0);
+            canvas.stroke();
+            //
+            // Draw the string
+            canvas.fillText(
+                s,
+                cx + this.x + middleX,
+                cy + this.y + middleY - offset - size
+            );
         }
         canvas.textAlign = oldAlign;
+        canvas.textBaseline = oldBaseLine;
     }
 
     public getStemSize(helper: BeamingHelper): number {
@@ -384,21 +429,34 @@ export class ScoreBarRenderer extends BarRendererBase {
             const firstBeat = h.beats[0];
             const lastBeat = h.beats[h.beats.length - 1];
 
+            let isRest = h.isRestBeamHelper;
+
             // 1. put direct diagonal line.
             drawingInfo.startBeat = firstBeat;
             drawingInfo.startX = h.getBeatLineX(firstBeat);
-            drawingInfo.startY =
-                direction === BeamDirection.Up
+            if (isRest) {
+                drawingInfo.startY = direction === BeamDirection.Up
+                    ? this.getScoreY(h.minRestLine!)
+                    : this.getScoreY(h.maxRestLine!);
+            } else {
+                drawingInfo.startY = direction === BeamDirection.Up
                     ? this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize
                     : this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
+            }
+
 
             drawingInfo.endBeat = lastBeat;
             drawingInfo.endX = h.getBeatLineX(lastBeat);
-            drawingInfo.endY =
-                direction === BeamDirection.Up
-                    ? this.getScoreY(this.accidentalHelper.getMinLine(lastBeat)) - stemSize
-                    : this.getScoreY(this.accidentalHelper.getMaxLine(lastBeat)) + stemSize;
-
+            if (isRest) {
+                drawingInfo.endY = direction === BeamDirection.Up
+                    ? this.getScoreY(h.minRestLine!)
+                    : this.getScoreY(h.maxRestLine!);
+            } else {
+                drawingInfo.endY =
+                    direction === BeamDirection.Up
+                        ? this.getScoreY(this.accidentalHelper.getMinLine(lastBeat)) - stemSize
+                        : this.getScoreY(this.accidentalHelper.getMaxLine(lastBeat)) + stemSize;
+            }
             // 2. ensure max height
             // we use the min/max notes to place the beam along their real position
             // we only want a maximum of 10 offset for their gradient
@@ -903,10 +961,10 @@ export class ScoreBarRenderer extends BarRendererBase {
     public completeBeamingHelper(helper: BeamingHelper) {
         // for multi-voice bars we need to register the positions 
         // for multi-voice rest displacement to avoid collisions
-        if (this.bar.isMultiVoice) {
-            let highestNotePosition = this.getNoteY(helper.highestNoteInHelper!, NoteYPosition.Center);
-            let lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper!, NoteYPosition.Center);
-    
+        if (this.bar.isMultiVoice && helper.highestNoteInHelper && helper.lowestNoteInHelper) {
+            let highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.Center);
+            let lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.Center);
+
             let offset = this.getStemSize(helper);
             if (helper.hasTuplet) {
                 offset += this.resources.effectFont.size * 2;

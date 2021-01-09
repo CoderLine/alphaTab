@@ -149,6 +149,8 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         noteNumberGlyph.renderer = this.renderer;
         noteNumberGlyph.doLayout();
         this.noteNumbers!.addNoteGlyph(noteNumberGlyph, n);
-        this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, l, l, true);
+        let topY = noteNumberGlyph.y - noteNumberGlyph.height / 2;
+        let bottomY = topY + noteNumberGlyph.height;
+        this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
     }
 }

@@ -5,12 +5,11 @@ import { GraceType } from '@src/model/GraceType';
 import { TupletGroup } from '@src/model/TupletGroup';
 import { Voice } from '@src/model/Voice';
 import { TabRhythmMode } from '@src/NotationSettings';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
 import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { RepeatCloseGlyph } from '@src/rendering/glyphs/RepeatCloseGlyph';
 import { RepeatCountGlyph } from '@src/rendering/glyphs/RepeatCountGlyph';
 import { RepeatOpenGlyph } from '@src/rendering/glyphs/RepeatOpenGlyph';
@@ -27,6 +26,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { RenderingResources } from '@src/RenderingResources';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { ReservedLayoutAreaSlot } from './utils/BarCollisionHelper';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -198,6 +198,7 @@ export class TabBarRenderer extends BarRendererBase {
         for (let i: number = 0, j: number = this.bar.staff.tuning.length; i < j; i++) {
             tabNotes.push([]);
         }
+
         for (let voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 let vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
@@ -263,7 +264,9 @@ export class TabBarRenderer extends BarRendererBase {
             let v: BeamingHelper[] = this.helpers.beamHelpers[i];
             for (let k: number = 0, l: number = v.length; k < l; k++) {
                 let h: BeamingHelper = v[k];
-                this.paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h);
+                if (h.voice!.index === 0) {
+                    this.paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h);
+                }
             }
         }
     }
@@ -282,10 +285,12 @@ export class TabBarRenderer extends BarRendererBase {
     private paintBeamHelper(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         canvas.color = h.voice!.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         // check if we need to paint simple footer
-        if (h.beats.length === 1 || this.settings.notation.rhythmMode === TabRhythmMode.ShowWithBeams) {
-            this.paintFooter(cx, cy, canvas, h);
-        } else {
-            this.paintBar(cx, cy, canvas, h);
+        if (!h.isRestBeamHelper) {
+            if (h.beats.length === 1 || this.settings.notation.rhythmMode === TabRhythmMode.ShowWithBeams) {
+                this.paintFooter(cx, cy, canvas, h);
+            } else {
+                this.paintBar(cx, cy, canvas, h);
+            }
         }
     }
 
@@ -310,15 +315,8 @@ export class TabBarRenderer extends BarRendererBase {
                         startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
                         this.lineOffset / 2;
                 }
-                if (h.direction === BeamDirection.Up) {
-                    beatLineX -= startGlyph.width / 2;
-                } else {
-                    beatLineX += startGlyph.width / 2;
-                }
-                canvas.beginPath();
-                canvas.moveTo(cx + this.x + beatLineX, y1);
-                canvas.lineTo(cx + this.x + beatLineX, y2);
-                canvas.stroke();
+
+                this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, y1, y2, canvas);
                 let brokenBarOffset: number = 6 * this.scale;
                 let barSpacing: number = -6 * this.scale;
                 let barSize: number = 3 * this.scale;
@@ -351,12 +349,6 @@ export class TabBarRenderer extends BarRendererBase {
                         if (BeamingHelper.isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
                             barStartX = beatLineX;
                             barEndX = h.getBeatLineX(h.beats[i + 1]);
-                            let endGlyph: BeatGlyphBase = this.getOnNotesGlyphForBeat(h.beats[i + 1])!;
-                            if (h.direction === BeamDirection.Up) {
-                                barEndX -= endGlyph.width / 2;
-                            } else {
-                                barEndX += endGlyph.width / 2;
-                            }
                         } else if (i === 0 || !BeamingHelper.isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
                             barStartX = beatLineX;
                             barEndX = barStartX + brokenBarOffset;
@@ -395,8 +387,10 @@ export class TabBarRenderer extends BarRendererBase {
     private paintTupletHelper(cx: number, cy: number, canvas: ICanvas, h: TupletGroup): void {
         let res: RenderingResources = this.resources;
         let oldAlign: TextAlign = canvas.textAlign;
+        let oldBaseLine = canvas.textBaseline;
         canvas.color = h.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         canvas.textAlign = TextAlign.Center;
+        canvas.textBaseline = TextBaseline.Middle;
         let s: string;
         let num: number = h.beats[0].tupletNumerator;
         let den: number = h.beats[0].tupletDenominator;
@@ -435,12 +429,6 @@ export class TabBarRenderer extends BarRendererBase {
                     continue;
                 }
                 let tupletX: number = beamingHelper.getBeatLineX(beat);
-                let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
-                if (beamingHelper.direction === BeamDirection.Up) {
-                    tupletX -= startGlyph.width / 2;
-                } else {
-                    tupletX += startGlyph.width / 2;
-                }
                 let tupletY: number = cy + this.y + this.height - this._tupletSize + res.effectFont.size * 0.5;
                 canvas.font = res.effectFont;
                 canvas.fillText(s, cx + this.x + tupletX, tupletY);
@@ -455,15 +443,6 @@ export class TabBarRenderer extends BarRendererBase {
                 // Calculate the overall area of the tuplet bracket
                 let startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
                 let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
-                let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(firstBeat) as TabBeatGlyph;
-                let endGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(firstBeat) as TabBeatGlyph;
-                if (firstBeamingHelper.direction === BeamDirection.Up) {
-                    startX -= startGlyph.width / 2;
-                    endX -= endGlyph.width / 2;
-                } else {
-                    startX += startGlyph.width / 2;
-                    endX += endGlyph.width / 2;
-                }
                 //
                 // Calculate how many space the text will need
                 canvas.font = res.effectFont;
@@ -493,10 +472,11 @@ export class TabBarRenderer extends BarRendererBase {
                 canvas.stroke();
                 //
                 // Draw the string
-                canvas.fillText(s, cx + this.x + middleX, startY);
+                canvas.fillText(s, cx + this.x + middleX, startY - offset - size);
             }
         }
         canvas.textAlign = oldAlign;
+        canvas.textBaseline = oldBaseLine;
     }
 
     private static paintSingleBar(canvas: ICanvas, x1: number, y1: number, x2: number, y2: number, size: number): void {
@@ -507,6 +487,34 @@ export class TabBarRenderer extends BarRendererBase {
         canvas.lineTo(x1, y1 - size);
         canvas.closePath();
         canvas.fill();
+    }
+
+    private paintBeamingStem(beat: Beat, cy: number, x: number, topY: number, bottomY: number, canvas: ICanvas) {
+        canvas.beginPath();
+
+        let holes: ReservedLayoutAreaSlot[] = [];
+        if (this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
+            holes = this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.slots.slice();
+            holes.sort((a, b) => a.topY - b.topY);
+        }
+
+        let y = bottomY;
+        while (y > topY) {
+            canvas.moveTo(x, y);
+
+            let lineY = topY;
+            // draw until next hole
+            if (holes.length > 0) {
+                const bottomHole = holes.pop()!;
+                lineY = cy + bottomHole.bottomY;
+                canvas.lineTo(x, lineY);
+                y = cy + bottomHole.topY;
+            } else {
+                canvas.lineTo(x, topY);
+                break;
+            }
+        }
+        canvas.stroke();
     }
 
     private paintFooter(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
@@ -533,15 +541,9 @@ export class TabBarRenderer extends BarRendererBase {
                 y1 +=
                     startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
             }
-            if (h.direction === BeamDirection.Up) {
-                beatLineX -= startGlyph.width / 2;
-            } else {
-                beatLineX += startGlyph.width / 2;
-            }
-            canvas.beginPath();
-            canvas.moveTo(cx + this.x + beatLineX, y1);
-            canvas.lineTo(cx + this.x + beatLineX, y2);
-            canvas.stroke();
+
+            this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, y1, y2, canvas);
+
             //
             // Draw Flag
             //
