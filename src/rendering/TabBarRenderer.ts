@@ -237,16 +237,6 @@ export class TabBarRenderer extends BarRendererBase {
             canvas.fillRect(cx + this.x + lineX, cy + this.y + lineY | 0, this.width - lineX, this.scale * BarRendererBase.StaffLineThickness);
         }
 
-        // this.helpers.collisionHelper.loopBeatSlots((beat, topLine, _) => {
-        //     canvas.color = Color.random();
-        //     const x1 = this.getBeatX(beat, BeatXPosition.OnNotes);
-        //     const x2 = this.getBeatX(beat, BeatXPosition.PostNotes);
-        //     const height = this.resources.tablatureFont.size * this.scale;
-        //     const topY = this.getTabY(topLine) - height / 2;
-        //     const bottomY = topY + height;
-        //     canvas.fillRect(cx + this.x + x1, cy + this.y + topY, x2 - x1, bottomY - topY);
-        // });
-
         canvas.color = res.mainGlyphColor;
         this.paintSimileMark(cx, cy, canvas);
     }
@@ -264,9 +254,7 @@ export class TabBarRenderer extends BarRendererBase {
             let v: BeamingHelper[] = this.helpers.beamHelpers[i];
             for (let k: number = 0, l: number = v.length; k < l; k++) {
                 let h: BeamingHelper = v[k];
-                if (h.voice!.index === 0) {
-                    this.paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h);
-                }
+                this.paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h);
             }
         }
     }

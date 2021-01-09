@@ -326,10 +326,6 @@ export class BarRendererBase {
         return this.getBeatContainer(beat)?.onNotes;
     }
 
-    public getStemSize(helper: BeamingHelper): number {
-        return 0;
-    }
-
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         this.paintBackground(cx, cy, canvas);
         canvas.color = this.resources.mainGlyphColor;
@@ -491,7 +487,6 @@ export class BarRendererBase {
                 break;
         }
     }
-
     
     public completeBeamingHelper(helper: BeamingHelper) {
         // nothing by default

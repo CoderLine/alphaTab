@@ -57,7 +57,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.noteHeads.updateBeamingHelper(this.container.x + this.x);
         } else if (this.restGlyph) {
             this.restGlyph.updateBeamingHelper(this.container.x + this.x);
-            if (this._collisionOffset === -1000) {
+            if (this.renderer.bar.isMultiVoice && this._collisionOffset === -1000) {
                 this._collisionOffset = this.renderer.helpers.collisionHelper.applyRestCollisionOffset(this.container.beat, this.restGlyph.y,
                     (this.renderer as ScoreBarRenderer).getScoreHeight(1));
                 this.y += this._collisionOffset;
