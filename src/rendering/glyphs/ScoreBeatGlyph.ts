@@ -190,7 +190,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
     private createBeatDot(line: number, group: GlyphGroup): void {
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        group.addGlyph(new CircleGlyph(0, sr.getScoreY(line, 0), 1.5 * this.scale));
+        group.addGlyph(new CircleGlyph(0, sr.getScoreY(line), 1.5 * this.scale));
     }
 
     private createNoteHeadGlyph(n: Note): EffectGlyph {
@@ -226,7 +226,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         let noteHeadGlyph: EffectGlyph = this.createNoteHeadGlyph(n);
         // calculate y position
         let line: number = sr.getNoteLine(n);
-        noteHeadGlyph.y = sr.getScoreY(line, 0);
+        noteHeadGlyph.y = sr.getScoreY(line);
         this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             // create harmonic note head.
@@ -238,7 +238,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 this.container.beat.graceType !== GraceType.None
             );
             line = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
-            noteHeadGlyph.y = sr.getScoreY(line, 0);
+            noteHeadGlyph.y = sr.getScoreY(line);
             this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         }
         if (n.isStaccato && !this.noteHeads!.aboveBeatEffects.has('Staccato')) {

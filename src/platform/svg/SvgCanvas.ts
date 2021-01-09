@@ -164,10 +164,11 @@ export abstract class SvgCanvas implements ICanvas {
     protected getSvgBaseLine(): string {
         switch (this.textBaseline) {
             case TextBaseline.Top:
-                return `dy="1.25ex"`;
+                return `dominant-baseline="bottom"`;
             case TextBaseline.Middle:
-                return `dy="0.5ex"`;
+                return `dominant-baseline="central"`;
             case TextBaseline.Bottom:
+                return `dominant-baseline="hanging"`;
             default:
                 return '';
         }

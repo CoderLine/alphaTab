@@ -325,8 +325,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             startNoteRenderer.accidentalHelper.getNoteLineForValue(
                                 note.displayValue - ((note.beat.whammyBarPoints[0].value / 2) | 0),
                                 false
-                            ),
-                            0
+                            )
                         ) +
                         heightOffset;
                     this.drawBendSlur(

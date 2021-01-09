@@ -62,7 +62,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             true
         );
         let line: number = sr.accidentalHelper.getNoteLineForValue(noteValue, false);
-        noteHeadGlyph.y = sr.getScoreY(line, 0);
+        noteHeadGlyph.y = sr.getScoreY(line);
         if (this._showParenthesis) {
             this._preNoteParenthesis!.renderer = this.renderer;
             this._postNoteParenthesis!.renderer = this.renderer;

@@ -84,11 +84,11 @@ export class ScoreBarRenderer extends BarRendererBase {
         this.updateFirstLineY();
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
-            let top: number = this.getScoreY(-2, 0);
-            let bottom: number = this.getScoreY(6, 0);
+            let top: number = this.getScoreY(-2);
+            let bottom: number = this.getScoreY(6);
             let whammyOffset: number = this.simpleWhammyOverflow;
             this.registerOverflowTop(whammyOffset);
-            let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine, 0);
+            let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine);
             let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
             if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
@@ -103,7 +103,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             if (maxNoteY < top) {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
             }
-            let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine, 0);
+            let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine);
             let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
@@ -355,8 +355,8 @@ export class ScoreBarRenderer extends BarRendererBase {
         const result = super.applyLayoutingInfo();
         if (result && this.bar.isMultiVoice) {
             // consider rest overflows
-            let top: number = this.getScoreY(-2, 0);
-            let bottom: number = this.getScoreY(6, 0);
+            let top: number = this.getScoreY(-2);
+            let bottom: number = this.getScoreY(6);
             let minMax = this.helpers.collisionHelper.getBeatMinMaxY();
             if (minMax[0] < top) {
                 this.registerOverflowTop(Math.abs(minMax[0]));
@@ -689,7 +689,6 @@ export class ScoreBarRenderer extends BarRendererBase {
             this.bar.clefOttava !== this.bar.previousBar!.clefOttava
         ) {
             let offset: number = 0;
-            let correction: number = 0.5;
             switch (this.bar.clef) {
                 case Clef.Neutral:
                     offset = this.bar.staff.standardNotationLineCount - 1;
@@ -710,7 +709,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             this.createStartSpacing();
 
             this.addPreBeatGlyph(
-                new ClefGlyph(0, this.getScoreY(offset, correction), this.bar.clef, this.bar.clefOttava)
+                new ClefGlyph(0, this.getScoreY(offset), this.bar.clef, this.bar.clefOttava)
             );
         }
         // Key signature
@@ -749,7 +748,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
             if (this.bar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreY(-4), this.bar.masterBar.repeatCount));
+                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreHeight(-0.5), this.bar.masterBar.repeatCount));
             }
         } else {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
@@ -796,13 +795,13 @@ export class ScoreBarRenderer extends BarRendererBase {
         if (ModelUtils.keySignatureIsSharp(currentKey)) {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
                 let step: number = ScoreBarRenderer.SharpKsSteps[i] + offsetClef;
-                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step, 0), AccidentalType.Sharp, false));
+                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Sharp, false));
                 newLines.set(step, true);
             }
         } else {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
                 let step: number = ScoreBarRenderer.FlatKsSteps[i] + offsetClef;
-                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step, 0), AccidentalType.Flat, false));
+                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Flat, false));
                 newLines.set(step, true);
             }
         }
@@ -817,7 +816,7 @@ export class ScoreBarRenderer extends BarRendererBase {
                 this.addPreBeatGlyph(
                     new AccidentalGlyph(
                         0,
-                        this.getScoreY(previousKeyPositions[i] + offsetClef, 0),
+                        this.getScoreY(previousKeyPositions[i] + offsetClef),
                         AccidentalType.Natural,
                         false
                     )
@@ -836,7 +835,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
                 0,
-                this.getScoreY(lines, 0),
+                this.getScoreY(lines),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon
@@ -861,15 +860,13 @@ export class ScoreBarRenderer extends BarRendererBase {
     /**
      * Gets the relative y position of the given steps relative to first line.
      * @param steps the amount of steps while 2 steps are one line
-     * @param correction
      * @returns
      */
-    public getScoreY(steps: number, correction: number = 0): number {
+    public getScoreY(steps: number): number {
         return (
             this._firstLineY +
             this.lineOffset +
-            this.getScoreHeight(steps) +
-            correction * this.scale * BarRendererBase.StaffLineThickness
+            this.getScoreHeight(steps)
         );
     }
 

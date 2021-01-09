@@ -32,7 +32,7 @@ export class ScoreLegatoGlyph extends TieGlyph {
     protected getStartY(): number {
         if (this.startBeat!.isRest) {
             // below all lines
-            return (this.startNoteRenderer as ScoreBarRenderer).getScoreY(9, 0);
+            return (this.startNoteRenderer as ScoreBarRenderer).getScoreY(9);
         }
         switch (this.tieDirection) {
             case BeamDirection.Up:
@@ -48,9 +48,9 @@ export class ScoreLegatoGlyph extends TieGlyph {
         if (this.endBeat!.isRest) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
-                    return endNoteScoreRenderer.getScoreY(9, 0);
+                    return endNoteScoreRenderer.getScoreY(9);
                 default:
-                    return endNoteScoreRenderer.getScoreY(0, 0);
+                    return endNoteScoreRenderer.getScoreY(0);
             }
         }
 

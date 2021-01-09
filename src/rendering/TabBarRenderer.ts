@@ -35,6 +35,8 @@ export class TabBarRenderer extends BarRendererBase {
     public static readonly StaffId: string = 'tab';
     public static readonly TabLineSpacing: number = 10;
 
+    private _firstLineY: number = 0;
+
     private _tupletSize: number = 0;
 
     public showTimeSignature: boolean = false;
@@ -59,10 +61,19 @@ export class TabBarRenderer extends BarRendererBase {
             this.height += this.settings.notation.rhythmHeight * this.settings.display.scale;
             this.bottomPadding += this.settings.notation.rhythmHeight * this.settings.display.scale;
         }
+
+        this.updateFirstLineY();
+
         super.updateSizes();
     }
 
+    private updateFirstLineY() {
+        let res: RenderingResources = this.resources;
+        this._firstLineY = (res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2) * this.scale;
+    }
+
     public doLayout(): void {
+        this.updateFirstLineY();
         super.doLayout();
         if (this.settings.notation.rhythmMode !== TabRhythmMode.Hidden) {
             let hasTuplets: boolean = false;
@@ -89,8 +100,8 @@ export class TabBarRenderer extends BarRendererBase {
         }
         // Clef
         if (this.isFirstOfLine) {
-            let center: number = (this.bar.staff.tuning.length + 1) / 2;
-            this.addPreBeatGlyph(new TabClefGlyph(5 * this.scale, this.getTabY(center, 0)));
+            let center: number = (this.bar.staff.tuning.length - 1) / 2;
+            this.addPreBeatGlyph(new TabClefGlyph(5 * this.scale, this.getTabY(center)));
         }
         // Time Signature
         if (
@@ -98,15 +109,15 @@ export class TabBarRenderer extends BarRendererBase {
             (!this.bar.previousBar ||
                 (this.bar.previousBar &&
                     this.bar.masterBar.timeSignatureNumerator !==
-                        this.bar.previousBar.masterBar.timeSignatureNumerator) ||
+                    this.bar.previousBar.masterBar.timeSignatureNumerator) ||
                 (this.bar.previousBar &&
                     this.bar.masterBar.timeSignatureDenominator !==
-                        this.bar.previousBar.masterBar.timeSignatureDenominator))
+                    this.bar.previousBar.masterBar.timeSignatureDenominator))
         ) {
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
         }
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getTabY(-0.5, 0), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getTabY(-1), this.bar.index + 1));
     }
 
     private _startSpacing: boolean = false;
@@ -122,11 +133,11 @@ export class TabBarRenderer extends BarRendererBase {
     private createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
 
-        const lines = (this.bar.staff.tuning.length + 1) / 2;
+        const lines = ((this.bar.staff.tuning.length + 1) / 2) - 1;
         this.addPreBeatGlyph(
             new TabTimeSignatureGlyph(
                 0,
-                this.getTabY(lines, 0),
+                this.getTabY(lines),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon
@@ -149,7 +160,7 @@ export class TabBarRenderer extends BarRendererBase {
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
             if (this.bar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getTabY(-0.5, -3), this.bar.masterBar.repeatCount));
+                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getTabY(-1), this.bar.masterBar.repeatCount));
             }
         } else {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
@@ -162,8 +173,10 @@ export class TabBarRenderer extends BarRendererBase {
      * @param correction
      * @returns
      */
-    public getTabY(line: number, correction: number = 0): number {
-        return this.lineOffset * line + correction * this.scale;
+    public getTabY(line: number): number {
+        return this._firstLineY +
+            this.lineOffset * line
+        ;
     }
 
     public get middleYPosition(): number {
@@ -224,6 +237,17 @@ export class TabBarRenderer extends BarRendererBase {
             }
             canvas.fillRect(cx + this.x + lineX, lineY | 0, this.width - lineX, this.scale * BarRendererBase.StaffLineThickness);
         }
+
+        // this.helpers.collisionHelper.loopBeatSlots((beat, topLine, _) => {
+        //     canvas.color = Color.random();
+        //     const x1 = this.getBeatX(beat, BeatXPosition.OnNotes);
+        //     const x2 = this.getBeatX(beat, BeatXPosition.PostNotes);
+        //     const height = this.resources.tablatureFont.size * this.scale;
+        //     const topY = this.getTabY(topLine) - height / 2;
+        //     const bottomY = topY + height;
+        //     canvas.fillRect(cx + this.x + x1, cy + this.y + topY, x2 - x1, bottomY - topY);
+        // });
+
         canvas.color = res.mainGlyphColor;
         this.paintSimileMark(cx, cy, canvas);
     }

@@ -9,6 +9,7 @@ import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NotationElement, NotationMode } from '@src/NotationSettings';
 import { BeatBounds } from '../utils/BeatBounds';
+import { Color } from '@src/model/Color';
 
 export class NoteNumberGlyph extends Glyph {
     private _note: Note;

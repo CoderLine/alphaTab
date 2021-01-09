@@ -1,4 +1,5 @@
 import { Beat } from '@src/model/Beat';
+import { Color } from '@src/model/Color';
 import { Note } from '@src/model/Note';
 import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
@@ -117,6 +118,7 @@ export class TabNoteChordGlyph extends Glyph {
         let oldBaseLine: TextBaseline = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Middle;
         canvas.font = this._isGrace ? res.graceFont : res.tablatureFont;
+
         let notes: NoteNumberGlyph[] = this._notes;
         let w: number = this.width;
         for (let g of notes) {

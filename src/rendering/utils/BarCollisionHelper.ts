@@ -1,7 +1,7 @@
 import { Beat } from "@src/model/Beat";
 import { BeamingHelper } from "./BeamingHelper";
 
-class ReservedLayoutAreaSlot {
+export class ReservedLayoutAreaSlot {
     public topY: number = 0;
     public bottomY: number = 0;
     public constructor(topY: number, bottomY: number) {
@@ -9,15 +9,18 @@ class ReservedLayoutAreaSlot {
         this.bottomY = bottomY;
     }
 }
-class ReservedLayoutArea {
+
+export class ReservedLayoutArea {
+    public beat: Beat;
     public topY: number = -1000;
     public bottomY: number = -1000;
     public slots: ReservedLayoutAreaSlot[] = [];
 
+    public constructor(beat: Beat) {
+        this.beat = beat;
+    }
+
     public addSlot(topY: number, bottomY: number) {
-        if (topY == bottomY) {
-            return;
-        }
         this.slots.push(new ReservedLayoutAreaSlot(topY, bottomY));
         if (this.topY === -1000) {
             this.topY = topY;
@@ -36,13 +39,13 @@ class ReservedLayoutArea {
 }
 
 export class BarCollisionHelper {
-    private _reservedLayoutAreasByDisplayTime: Map<number, ReservedLayoutArea> = new Map();
+    public reservedLayoutAreasByDisplayTime: Map<number, ReservedLayoutArea> = new Map();
     public restDurationsByDisplayTime: Map<number/*start*/, Map<number/*duration*/, number/*beat id*/>> = new Map();
 
     public getBeatMinMaxY(): number[] {
         let minY = -1000;
         let maxY = -1000;
-        this._reservedLayoutAreasByDisplayTime.forEach((v, k) => {
+        this.reservedLayoutAreasByDisplayTime.forEach((v, k) => {
             if (minY === -1000) {
                 minY = v.topY;
                 maxY = v.bottomY;
@@ -62,11 +65,14 @@ export class BarCollisionHelper {
         return [minY, maxY];
     }
 
-    public reserveBeatSlot(beat: Beat, topY: number, bottomY: number): void {
-        if (!this._reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
-            this._reservedLayoutAreasByDisplayTime.set(beat.displayStart, new ReservedLayoutArea());
+    public reserveBeatSlot(beat: Beat, topY: number, bottomY: number, force: boolean = false): void {
+        if (!force && topY == bottomY) {
+            return;
         }
-        this._reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.addSlot(topY, bottomY);
+        if (!this.reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
+            this.reservedLayoutAreasByDisplayTime.set(beat.displayStart, new ReservedLayoutArea(beat));
+        }
+        this.reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.addSlot(topY, bottomY);
         if (beat.isRest) {
             this.registerRest(beat);
         }
@@ -90,7 +96,7 @@ export class BarCollisionHelper {
             // on the horizontal axis. So we only need to check for collisions
             // of elements at the current time position
             // if there are none, we can just use the line
-            if (this._reservedLayoutAreasByDisplayTime.has(beat.playbackStart)) {
+            if (this.reservedLayoutAreasByDisplayTime.has(beat.playbackStart)) {
                 // do check for collisions we need to obtain the range on which the 
                 // restglyph is placed
                 // rest glyphs have their ancor 
@@ -99,7 +105,7 @@ export class BarCollisionHelper {
                 let oldRestBottomY = currentY + restSizes[1];
                 let newRestTopY = oldRestTopY;
 
-                const reservedSlots = this._reservedLayoutAreasByDisplayTime.get(beat.playbackStart)!;
+                const reservedSlots = this.reservedLayoutAreasByDisplayTime.get(beat.playbackStart)!;
                 let hasCollision = false;
                 for (const slot of reservedSlots.slots) {
                     if ((oldRestTopY >= slot.topY && oldRestTopY <= slot.bottomY) ||

@@ -115,7 +115,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             let l: number = -2;
             while (l >= this.minNote!.line) {
                 // + 1 Because we want to place the line in the center of the note, not at the top
-                let lY: number = cy + scoreRenderer.getScoreY(l, 0);
+                let lY: number = cy + scoreRenderer.getScoreY(l);
                 canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, this.scale);
                 l -= 2;
             }
@@ -126,7 +126,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             canvas.color = scoreRenderer.resources.staffLineColor;
             let l: number = 10;
             while (l <= this.maxNote!.line) {
-                let lY: number = cy + scoreRenderer.getScoreY(l, 0);
+                let lY: number = cy + scoreRenderer.getScoreY(l);
                 canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, this.scale);
                 l += 2;
             }
