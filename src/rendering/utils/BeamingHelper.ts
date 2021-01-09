@@ -100,6 +100,7 @@ export class BeamingHelper {
     public get hasFlag(): boolean {
         return (
             this.beats.length === 1 &&
+            !this.beats[0].isRest && 
             (this.beats[0].duration > Duration.Quarter || this.beats[0].graceType !== GraceType.None)
         );
     }
