@@ -66,13 +66,13 @@ export class GhostNoteContainerGlyph extends Glyph {
             } else if (!previousGlyph) {
                 g = new GhostParenthesisGlyph(this._isOpen);
                 g.renderer = this.renderer;
-                g.y = sr.getScoreY(this._infos[i].line, 0) - sizePerLine;
+                g.y = sr.getScoreY(this._infos[i].line) - sizePerLine;
                 g.height = sizePerLine * 2;
                 g.doLayout();
                 this._glyphs.push(g);
                 previousGlyph = g;
             } else {
-                let y: number = sr.getScoreY(this._infos[i].line, 0) + sizePerLine;
+                let y: number = sr.getScoreY(this._infos[i].line) + sizePerLine;
                 previousGlyph.height = y - previousGlyph.y;
             }
         }

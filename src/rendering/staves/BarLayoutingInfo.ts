@@ -367,7 +367,7 @@ export class BarLayoutingInfo {
     }
 
     public buildOnTimePositions(force: number): Map<number, number> {
-        if(this.totalSpringConstant === -1) {
+        if (this.totalSpringConstant === -1) {
             return new Map<number, number>();
         }
         if (ModelUtils.isAlmostEqualTo(this._onTimePositionsForce, force) && this._onTimePositions) {

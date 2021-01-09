@@ -535,11 +535,14 @@ export default class CSharpEmitterContext {
             } else if (actualType == null) {
                 actualType = t;
             } else if (actualType != null && actualType.flags !== t.flags) {
-                this.addCsNodeDiagnostics(
-                    parent,
-                    'Union type covering multiple types detected, fallback to dynamic',
-                    ts.DiagnosticCategory.Warning
-                );
+                let isEmitted = this.isNodeEmitted(parent);
+                if (isEmitted) {
+                    this.addCsNodeDiagnostics(
+                        parent,
+                        'Union type covering multiple types detected, fallback to dynamic',
+                        ts.DiagnosticCategory.Warning
+                    );
+                }
                 fallbackToObject = true;
             } else {
                 actualType = t;
@@ -567,6 +570,15 @@ export default class CSharpEmitterContext {
             isNullable: isNullable,
             isOptional: isOptional
         } as cs.TypeReference;
+    }
+    
+    private isNodeEmitted(node: cs.Node): boolean {
+        if ('skipEmit' in node && node.skipEmit as boolean) {
+            return false;
+        } else if (node.parent) {
+            return this.isNodeEmitted(node.parent);
+        }
+        return true;
     }
 
     public isDefaultValueNull(tsType: ts.Type): boolean {

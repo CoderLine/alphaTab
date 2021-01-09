@@ -26,6 +26,7 @@ export abstract class SvgCanvas implements ICanvas {
             }px" class="at-surface-svg">\n`;
         this._currentPath = '';
         this._currentPathIsEmpty = true;
+        this.textBaseline = TextBaseline.Top;
     }
 
     public beginGroup(identifier: string): void {
@@ -164,10 +165,11 @@ export abstract class SvgCanvas implements ICanvas {
     protected getSvgBaseLine(): string {
         switch (this.textBaseline) {
             case TextBaseline.Top:
-                return `dy="1.25ex"`;
+                return `dominant-baseline="hanging"`;
             case TextBaseline.Middle:
-                return `dy="0.5ex"`;
+                return `dominant-baseline="central"`;
             case TextBaseline.Bottom:
+                return `dominant-baseline="bottom"`;
             default:
                 return '';
         }

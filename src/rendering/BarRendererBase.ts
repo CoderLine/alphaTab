@@ -21,6 +21,7 @@ import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
+import { BeamingHelper } from './utils/BeamingHelper';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -485,5 +486,9 @@ export class BarRendererBase {
                 );
                 break;
         }
+    }
+    
+    public completeBeamingHelper(helper: BeamingHelper) {
+        // nothing by default
     }
 }

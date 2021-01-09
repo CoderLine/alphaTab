@@ -20,9 +20,11 @@ class BeatLinePositions {
 }
 
 export class BeamingHelperDrawInfo {
+    public startBeat: Beat | null = null;
     public startX: number = 0;
     public startY: number = 0;
 
+    public endBeat: Beat | null = null;
     public endX: number = 0;
     public endY: number = 0;
 
@@ -49,6 +51,7 @@ export class BeamingHelper {
     private _staff: Staff;
     private _beatLineXPositions: Map<number, BeatLinePositions> = new Map();
     private _renderer: BarRendererBase;
+    private _firstNonRestBeat: Beat | null = null;
     private _lastNonRestBeat: Beat | null = null;
 
     public voice: Voice | null = null;
@@ -70,10 +73,10 @@ export class BeamingHelper {
     private _lastBeatLowestNoteCompareValue: number = -1;
     private _lastBeatHighestNoteCompareValue: number = -1;
 
-    private _lowestNoteInHelper: Note | null = null;
+    public lowestNoteInHelper: Note | null = null;
     private _lowestNoteCompareValueInHelper: number = -1;
 
-    private _highestNoteInHelper: Note | null = null;
+    public highestNoteInHelper: Note | null = null;
     private _highestNoteCompareValueInHelper: number = -1;
 
     public invertBeamDirection: boolean = false;
@@ -86,6 +89,10 @@ export class BeamingHelper {
     public maxRestLine: number | null = null;
     public beatOfMaxRestLine: Beat | null = null;
 
+    public get isRestBeamHelper(): boolean {
+        return this.beats.length === 1 && this.beats[0].isRest;
+    }
+
     public get hasLine(): boolean {
         return this.beats.length === 1 && this.beats[0].duration > Duration.Whole;
     }
@@ -93,6 +100,7 @@ export class BeamingHelper {
     public get hasFlag(): boolean {
         return (
             this.beats.length === 1 &&
+            !this.beats[0].isRest && 
             (this.beats[0].duration > Duration.Quarter || this.beats[0].graceType !== GraceType.None)
         );
     }
@@ -122,6 +130,13 @@ export class BeamingHelper {
         positions.staffId = staffId;
         positions.up = up;
         positions.down = down;
+        this.drawingInfos.forEach((v, _) => {
+            if (v.startBeat == beat) {
+                v.startX = this.getBeatLineX(beat);
+            } else if (v.endBeat == beat) {
+                v.endX = this.getBeatLineX(beat);
+            }
+        });
     }
 
     private getOrCreateBeatPositions(beat: Beat): BeatLinePositions {
@@ -137,38 +152,71 @@ export class BeamingHelper {
     }
 
     private calculateDirection(): BeamDirection {
-        let preferredBeamDirection = this.preferredBeamDirection;
-        if (preferredBeamDirection !== null) {
-            return preferredBeamDirection;
-        }
-
+        let direction: BeamDirection | null = null;
         if (!this.voice) {
-            return BeamDirection.Up;
-        }
-
-        // multivoice handling
-        if (this.voice.index > 0) {
-            return this.invert(BeamDirection.Down);
-        }
-        if (this.voice.bar.voices.length > 1) {
-            for (let v: number = 1; v < this.voice.bar.voices.length; v++) {
-                if (!this.voice.bar.voices[v].isEmpty) {
-                    return this.invert(BeamDirection.Up);
-                }
-            }
-        }
-        if (this.beats[0].graceType !== GraceType.None) {
-            return this.invert(BeamDirection.Up);
+            // no proper voice (should not happen usually)
+            direction = BeamDirection.Up;
+        } else if (this.preferredBeamDirection !== null) {
+            // we have a preferred direction
+            direction = this.preferredBeamDirection;
+        } else if (this.voice.index > 0) {
+            // on multi-voice setups secondary voices are always down
+            direction = this.invert(BeamDirection.Down);
+        } else if (this.voice.bar.isMultiVoice) {
+            // on multi-voice setups primary voices are always up
+            direction = this.invert(BeamDirection.Up);
+        } else if (this.beats[0].graceType !== GraceType.None) {
+            // grace notes are always up
+            direction = this.invert(BeamDirection.Up);
         }
 
         // the average line is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
-        const highestNotePosition = this._renderer.getNoteY(this._highestNoteInHelper!, NoteYPosition.Center);
-        const lowestNotePosition = this._renderer.getNoteY(this._lowestNoteInHelper!, NoteYPosition.Center);
-        const avg = (highestNotePosition + lowestNotePosition) / 2;
+        if (this.highestNoteInHelper && this.lowestNoteInHelper) {
+            let highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper, NoteYPosition.Center);
+            let lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper, NoteYPosition.Center);
 
-        return this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
+            if (direction === null) {
+                const avg = (highestNotePosition + lowestNotePosition) / 2;
+                direction = this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
+            }
+
+            this._renderer.completeBeamingHelper(this);
+        } else {
+            direction = this.invert(BeamDirection.Up);
+            this._renderer.completeBeamingHelper(this);
+        }
+
+        return direction;
+    }
+
+    public static computeLineHeightsForRest(duration: Duration): number[] {
+        switch (duration) {
+            case Duration.QuadrupleWhole:
+                return [2, 2];
+            case Duration.DoubleWhole:
+                return [2, 2];
+            case Duration.Whole:
+                return [0, 1];
+            case Duration.Half:
+                return [1, 0];
+            case Duration.Quarter:
+                return [3, 3];
+            case Duration.Eighth:
+                return [2, 2];
+            case Duration.Sixteenth:
+                return [2, 4];
+            case Duration.ThirtySecond:
+                return [4, 4];
+            case Duration.SixtyFourth:
+                return [4, 6];
+            case Duration.OneHundredTwentyEighth:
+                return [6, 6];
+            case Duration.TwoHundredFiftySixth:
+                return [6, 8];
+        }
+        return [0, 0];
     }
 
     /**
@@ -179,7 +227,8 @@ export class BeamingHelper {
      */
     public applyRest(beat: Beat, line: number): void {
         // do not accept rests after the last beat which has notes
-        if (this._lastNonRestBeat && beat.index >= this._lastNonRestBeat.index) {
+        if (this._lastNonRestBeat && beat.index >= this._lastNonRestBeat.index ||
+            this._firstNonRestBeat && beat.index <= this._firstNonRestBeat.index) {
             return;
         }
 
@@ -187,52 +236,9 @@ export class BeamingHelper {
         // be placed at the upper / lower end of the glyph.
         let aboveRest = line;
         let belowRest = line;
-        switch (beat.duration) {
-            case Duration.QuadrupleWhole:
-                aboveRest -= 2;
-                belowRest += 2;
-                break;
-            case Duration.DoubleWhole:
-                aboveRest -= 2;
-                belowRest -= 2;
-                break;
-            case Duration.Whole:
-                aboveRest += 2;
-                belowRest += 2;
-                break;
-            case Duration.Half:
-                aboveRest -= 2;
-                belowRest -= 2;
-                break;
-            case Duration.Quarter:
-                aboveRest -= 4;
-                belowRest += 2;
-                break;
-            case Duration.Eighth:
-                aboveRest -= 2;
-                belowRest += 2;
-                break;
-            case Duration.Sixteenth:
-                aboveRest -= 2;
-                belowRest += 4;
-                break;
-            case Duration.ThirtySecond:
-                aboveRest -= 4;
-                belowRest += 4;
-                break;
-            case Duration.SixtyFourth:
-                aboveRest -= 4;
-                belowRest += 6;
-                break;
-            case Duration.OneHundredTwentyEighth:
-                aboveRest -= 6;
-                belowRest += 6;
-                break;
-            case Duration.TwoHundredFiftySixth:
-                aboveRest -= 6;
-                belowRest += 8;
-                break;
-        }
+        const offsets = BeamingHelper.computeLineHeightsForRest(beat.duration);
+        aboveRest -= offsets[0];
+        belowRest += offsets[1];
         if (this.minRestLine === null || this.minRestLine > aboveRest) {
             this.minRestLine = aboveRest;
             this.beatOfMinRestLine = beat;
@@ -280,38 +286,48 @@ export class BeamingHelper {
                     break;
             }
         }
+
         if (add) {
             if (beat.preferredBeamDirection !== null) {
                 this.preferredBeamDirection = beat.preferredBeamDirection;
             }
 
-            this.beats.push(beat);
-            if (beat.graceType !== GraceType.None) {
-                this.isGrace = true;
-            }
-            if (beat.hasTuplet) {
-                this.hasTuplet = true;
-            }
-            let fingeringCount: number = 0;
-            for (let n: number = 0; n < beat.notes.length; n++) {
-                let note: Note = beat.notes[n];
-                if (note.leftHandFinger !== Fingers.Unknown || note.rightHandFinger !== Fingers.Unknown) {
-                    fingeringCount++;
-                }
-            }
-            if (fingeringCount > this.fingeringCount) {
-                this.fingeringCount = fingeringCount;
-            }
-            this.checkNote(beat.minNote);
-            this.checkNote(beat.maxNote);
-            if (this.shortestDuration < beat.duration) {
-                this.shortestDuration = beat.duration;
-            }
-            if (beat.hasTuplet) {
-                this.hasTuplet = true;
-            }
             if (!beat.isRest) {
+                if (this.isRestBeamHelper) {
+                    this.beats = [];
+                }
+                this.beats.push(beat);
+
+                if (beat.graceType !== GraceType.None) {
+                    this.isGrace = true;
+                }
+                if (beat.hasTuplet) {
+                    this.hasTuplet = true;
+                }
+                let fingeringCount: number = 0;
+                for (let n: number = 0; n < beat.notes.length; n++) {
+                    let note: Note = beat.notes[n];
+                    if (note.leftHandFinger !== Fingers.Unknown || note.rightHandFinger !== Fingers.Unknown) {
+                        fingeringCount++;
+                    }
+                }
+                if (fingeringCount > this.fingeringCount) {
+                    this.fingeringCount = fingeringCount;
+                }
+                this.checkNote(beat.minNote);
+                this.checkNote(beat.maxNote);
+                if (this.shortestDuration < beat.duration) {
+                    this.shortestDuration = beat.duration;
+                }
+                if(!this._firstNonRestBeat) {
+                    this._firstNonRestBeat = beat;
+                }
                 this._lastNonRestBeat = beat;
+            } else if (this.beats.length === 0) {
+                this.beats.push(beat);
+            }
+            if (beat.hasTuplet) {
+                this.hasTuplet = true;
             }
         }
         return add;
@@ -359,12 +375,12 @@ export class BeamingHelper {
             this._lastBeatHighestNoteCompareValue = highestValueForNote;
         }
 
-        if (!this._lowestNoteInHelper || lowestValueForNote < this._lowestNoteCompareValueInHelper) {
-            this._lowestNoteInHelper = note;
+        if (!this.lowestNoteInHelper || lowestValueForNote < this._lowestNoteCompareValueInHelper) {
+            this.lowestNoteInHelper = note;
             this._lowestNoteCompareValueInHelper = lowestValueForNote;
         }
-        if (!this._highestNoteInHelper || highestValueForNote > this._highestNoteCompareValueInHelper) {
-            this._highestNoteInHelper = note;
+        if (!this.highestNoteInHelper || highestValueForNote > this._highestNoteCompareValueInHelper) {
+            this.highestNoteInHelper = note;
             this._highestNoteCompareValueInHelper = highestValueForNote;
         }
     }
@@ -376,8 +392,6 @@ export class BeamingHelper {
         if (
             !b1 ||
             !b2 ||
-            b1.isRest ||
-            b2.isRest ||
             b1.graceType !== b2.graceType ||
             b1.graceType === GraceType.BendGrace ||
             b2.graceType === GraceType.BendGrace
@@ -443,11 +457,11 @@ export class BeamingHelper {
     }
 
     public get beatOfLowestNote(): Beat {
-        return this._lowestNoteInHelper!.beat;
+        return this.lowestNoteInHelper!.beat;
     }
 
     public get beatOfHighestNote(): Beat {
-        return this._highestNoteInHelper!.beat;
+        return this.highestNoteInHelper!.beat;
     }
 
     /**

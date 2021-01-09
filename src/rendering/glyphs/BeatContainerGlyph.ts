@@ -96,7 +96,7 @@ export class BeatContainerGlyph extends Glyph {
         this.minWidth = this.preNotes.width + this.onNotes.width;
         if (!this.beat.isRest) {
             if (this.onNotes.beamingHelper.beats.length === 1) {
-                // make space for footer
+                // make space for flag
                 if (this.beat.duration >= Duration.Eighth) {
                     this.minWidth += 20 * this.scale;
                 }
