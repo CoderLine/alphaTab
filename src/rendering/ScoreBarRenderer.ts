@@ -353,15 +353,15 @@ export class ScoreBarRenderer extends BarRendererBase {
 
     public applyLayoutingInfo(): boolean {
         const result = super.applyLayoutingInfo();
-        if(result && this.bar.isMultiVoice) {
+        if (result && this.bar.isMultiVoice) {
             // consider rest overflows
             let top: number = this.getScoreY(-2, 0);
             let bottom: number = this.getScoreY(6, 0);
-            let minMax = this.layoutingInfo.getBeatMinMaxY();
-            if(minMax[0] < top) {
+            let minMax = this.helpers.collisionHelper.getBeatMinMaxY();
+            if (minMax[0] < top) {
                 this.registerOverflowTop(Math.abs(minMax[0]));
-            } 
-            if(minMax[1] > bottom) {
+            }
+            if (minMax[1] > bottom) {
                 this.registerOverflowBottom(Math.abs(minMax[1]) - bottom);
             }
         }
@@ -385,7 +385,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             const lastBeat = h.beats[h.beats.length - 1];
 
             // 1. put direct diagonal line.
-            drawingInfo.startBeat = firstBeat; 
+            drawingInfo.startBeat = firstBeat;
             drawingInfo.startX = h.getBeatLineX(firstBeat);
             drawingInfo.startY =
                 direction === BeamDirection.Up
@@ -901,5 +901,29 @@ export class ScoreBarRenderer extends BarRendererBase {
         canvas.color = res.mainGlyphColor;
 
         this.paintSimileMark(cx, cy, canvas);
+    }
+
+    public completeBeamingHelper(helper: BeamingHelper) {
+        // for multi-voice bars we need to register the positions 
+        // for multi-voice rest displacement to avoid collisions
+        if (this.bar.isMultiVoice) {
+            let highestNotePosition = this.getNoteY(helper.highestNoteInHelper!, NoteYPosition.Center);
+            let lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper!, NoteYPosition.Center);
+    
+            let offset = this.getStemSize(helper);
+            if (helper.hasTuplet) {
+                offset += this.resources.effectFont.size * 2;
+            }
+
+            if (helper.direction == BeamDirection.Up) {
+                highestNotePosition -= offset;
+            } else {
+                lowestNotePosition += offset;
+            }
+
+            for (const beat of helper.beats) {
+                this.helpers.collisionHelper.reserveBeatSlot(beat, highestNotePosition, lowestNotePosition);
+            }
+        }
     }
 }

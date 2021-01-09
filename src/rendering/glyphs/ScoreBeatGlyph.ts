@@ -58,10 +58,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         } else if (this.restGlyph) {
             this.restGlyph.updateBeamingHelper(this.container.x + this.x);
             if (this._collisionOffset === -1000) {
-                this._collisionOffset = this.renderer.layoutingInfo.applyRestCollisionOffset(this.container.beat, this.restGlyph.y,
+                this._collisionOffset = this.renderer.helpers.collisionHelper.applyRestCollisionOffset(this.container.beat, this.restGlyph.y,
                     (this.renderer as ScoreBarRenderer).getScoreHeight(1));
                 this.y += this._collisionOffset;
-                const existingRests = this.renderer.layoutingInfo.restDurationsByDisplayTime;
+                const existingRests = this.renderer.helpers.collisionHelper.restDurationsByDisplayTime;
                 if (existingRests.has(this.container.beat.playbackStart) &&
                     existingRests.get(this.container.beat.playbackStart)!.has(this.container.beat.playbackDuration) &&
                     existingRests.get(this.container.beat.playbackStart)!.get(this.container.beat.playbackDuration) !== this.container.beat.id
@@ -155,12 +155,11 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
                         let restTop = this.restGlyph.y - sr.getScoreHeight(restSizes[0]);
                         let restBottom = this.restGlyph.y + sr.getScoreHeight(restSizes[1]);
-                        this.renderer.layoutingInfo.setBeatYPositions(this.container.beat, restTop, restBottom);
+                        this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
                     } else {
-                        this.renderer.layoutingInfo.registerRest(this.container.beat);
+                        this.renderer.helpers.collisionHelper.registerRest(this.container.beat);
                     }
                 }
-
 
                 if (this.beamingHelper) {
                     this.beamingHelper.applyRest(this.container.beat, line);

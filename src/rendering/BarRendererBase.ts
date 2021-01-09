@@ -491,4 +491,9 @@ export class BarRendererBase {
                 break;
         }
     }
+
+    
+    public completeBeamingHelper(helper: BeamingHelper) {
+        // nothing by default
+    }
 }

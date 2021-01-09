@@ -54,4 +54,8 @@ describe('MusicNotationTests', () => {
         settings.display.barsPerRow = 4;
         await VisualTestHelper.runVisualTest('music-notation/beams-advanced.gp', settings);
     });
+    
+    it('rest-collisions', async () => {
+        await VisualTestHelper.runVisualTest('music-notation/rest-collisions.gp');
+    });
 });

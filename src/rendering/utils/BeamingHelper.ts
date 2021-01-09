@@ -72,10 +72,10 @@ export class BeamingHelper {
     private _lastBeatLowestNoteCompareValue: number = -1;
     private _lastBeatHighestNoteCompareValue: number = -1;
 
-    private _lowestNoteInHelper: Note | null = null;
+    public  lowestNoteInHelper: Note | null = null;
     private _lowestNoteCompareValueInHelper: number = -1;
 
-    private _highestNoteInHelper: Note | null = null;
+    public highestNoteInHelper: Note | null = null;
     private _highestNoteCompareValueInHelper: number = -1;
 
     public invertBeamDirection: boolean = false;
@@ -167,33 +167,15 @@ export class BeamingHelper {
         // the average line is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
-        let highestNotePosition = this._renderer.getNoteY(this._highestNoteInHelper!, NoteYPosition.Center);
-        let lowestNotePosition = this._renderer.getNoteY(this._lowestNoteInHelper!, NoteYPosition.Center);
+        let highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper!, NoteYPosition.Center);
+        let lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper!, NoteYPosition.Center);
 
         if (direction === null) {
             const avg = (highestNotePosition + lowestNotePosition) / 2;
             direction = this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
         }
 
-        // for multi-voice bars we need to register the positions 
-        // for multi-voice rest displacement to avoid collisions
-        if (this.voice && this.voice.bar.isMultiVoice && !isNaN(highestNotePosition) && !isNaN(lowestNotePosition)) {
-            let offset = this._renderer.getStemSize(this);
-            if (this.hasTuplet) {
-                offset += this._renderer.resources.effectFont.size * 2;
-            }
-
-            if (direction == BeamDirection.Up) {
-                highestNotePosition -= offset;
-            } else {
-                lowestNotePosition += offset;
-            }
-
-            for (const beat of this.beats) {
-                this._renderer.layoutingInfo.setBeatYPositions(beat, highestNotePosition, lowestNotePosition);
-            }
-        }
-
+        this._renderer.completeBeamingHelper(this);
         return direction;
     }
 
@@ -370,12 +352,12 @@ export class BeamingHelper {
             this._lastBeatHighestNoteCompareValue = highestValueForNote;
         }
 
-        if (!this._lowestNoteInHelper || lowestValueForNote < this._lowestNoteCompareValueInHelper) {
-            this._lowestNoteInHelper = note;
+        if (!this.lowestNoteInHelper || lowestValueForNote < this._lowestNoteCompareValueInHelper) {
+            this.lowestNoteInHelper = note;
             this._lowestNoteCompareValueInHelper = lowestValueForNote;
         }
-        if (!this._highestNoteInHelper || highestValueForNote > this._highestNoteCompareValueInHelper) {
-            this._highestNoteInHelper = note;
+        if (!this.highestNoteInHelper || highestValueForNote > this._highestNoteCompareValueInHelper) {
+            this.highestNoteInHelper = note;
             this._highestNoteCompareValueInHelper = highestValueForNote;
         }
     }
@@ -454,11 +436,11 @@ export class BeamingHelper {
     }
 
     public get beatOfLowestNote(): Beat {
-        return this._lowestNoteInHelper!.beat;
+        return this.lowestNoteInHelper!.beat;
     }
 
     public get beatOfHighestNote(): Beat {
-        return this._highestNoteInHelper!.beat;
+        return this.highestNoteInHelper!.beat;
     }
 
     /**

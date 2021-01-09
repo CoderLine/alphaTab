@@ -3,14 +3,17 @@ import { GraceType } from '@src/model/GraceType';
 import { Voice } from '@src/model/Voice';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { BarRendererBase } from '../BarRendererBase';
+import { BarCollisionHelper } from './BarCollisionHelper';
 
 export class BarHelpers {
-    private _renderer:BarRendererBase;
+    private _renderer: BarRendererBase;
     public beamHelpers: BeamingHelper[][] = [];
     public beamHelperLookup: Map<number, BeamingHelper>[] = [];
+    public collisionHelper: BarCollisionHelper;
 
-    public constructor(renderer:BarRendererBase) {
+    public constructor(renderer: BarRendererBase) {
         this._renderer = renderer;
+        this.collisionHelper = new BarCollisionHelper();
     }
 
     public initialize() {
