@@ -64,11 +64,6 @@ export interface IContainer {
     clear(): void;
 
     /**
-     * This event occurs when a scroll on the control happened.
-     */
-    scroll: IEventEmitter;
-
-    /**
      * This event occurs when the control was resized.
      */
     resize: IEventEmitter;

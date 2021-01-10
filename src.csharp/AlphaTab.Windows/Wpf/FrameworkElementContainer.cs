@@ -14,17 +14,6 @@ namespace AlphaTab.Wpf
         {
             Control = control;
 
-            Scroll = new DelegatedEventEmitter(
-                value =>
-                {
-                    if (Control is ScrollViewer scroll)
-                    {
-                        scroll.ScrollChanged += (sender, args) => value();
-                    }
-                },
-                value => { }
-            );
-
             Resize = new DelegatedEventEmitter(
                 value => { Control.SizeChanged += (sender, args) => value(); },
                 value => { }
@@ -153,7 +142,6 @@ namespace AlphaTab.Wpf
             }
         }
 
-        public IEventEmitter Scroll { get; set; }
         public IEventEmitter Resize { get; set; }
         public IEventEmitterOfT<IMouseEventArgs> MouseDown { get; set; }
         public IEventEmitterOfT<IMouseEventArgs> MouseMove { get; set; }

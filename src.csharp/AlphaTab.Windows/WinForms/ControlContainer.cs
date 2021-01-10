@@ -12,17 +12,6 @@ namespace AlphaTab.WinForms
         {
             Control = control;
 
-            Scroll = new DelegatedEventEmitter(
-                value =>
-                {
-                    if (Control is ScrollableControl scroll)
-                    {
-                        scroll.Scroll += (sender, args) => value();
-                    }
-                },
-                value => { }
-            );
-
             Resize = new DelegatedEventEmitter(
                 value => { Control.Resize += (sender, args) => value(); },
                 value => { }
@@ -127,7 +116,6 @@ namespace AlphaTab.WinForms
             Control.Controls.Clear();
         }
 
-        public IEventEmitter Scroll { get; set; }
         public IEventEmitter Resize { get; set; }
         public IEventEmitterOfT<IMouseEventArgs> MouseDown { get; set; }
         public IEventEmitterOfT<IMouseEventArgs> MouseMove { get; set; }
