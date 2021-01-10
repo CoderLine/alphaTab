@@ -42,6 +42,7 @@ export enum SyntaxKind {
 
     VariableDeclarationList,
     VariableDeclaration,
+    DeconstructDeclaration,
     CaseClause,
     DefaultClause,
     CatchClause,
@@ -264,7 +265,8 @@ export enum PrimitiveType {
     Int,
     Void,
     Object,
-    Dynamic
+    Dynamic,
+    Var
 }
 
 export interface PrimitiveTypeNode extends TypeNode {
@@ -436,7 +438,12 @@ export interface VariableDeclarationList extends Node {
 export interface VariableDeclaration extends Node {
     type: TypeNode;
     name: string;
+    deconstructNames?: string[];
     initializer?: Expression;
+}
+
+export interface DeconstructDeclaration extends Node {
+    names: string[];
 }
 
 export interface ForStatement extends Statement {

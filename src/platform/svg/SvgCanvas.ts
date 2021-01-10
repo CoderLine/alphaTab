@@ -169,6 +169,7 @@ export abstract class SvgCanvas implements ICanvas {
             case TextBaseline.Bottom:
                 return `dominant-baseline="bottom"`;
             case TextBaseline.Middle:
+            default:
                 // middle is set as default on the SVG tag via css
                 return '';
         }

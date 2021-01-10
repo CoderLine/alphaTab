@@ -460,6 +460,19 @@ export default class CSharpAstTransformer {
         return unresolved;
     }
 
+    private createVarTypeNode(
+        parent: cs.Node | null,
+        tsNode: ts.Node,
+    ): cs.PrimitiveTypeNode {
+        const varNode = {
+            nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+            tsNode: tsNode,
+            parent: parent,
+            type: cs.PrimitiveType.Var
+        } as cs.PrimitiveTypeNode;
+        return varNode;
+    }
+
     public visitTestClass(d: ts.CallExpression): void {
         const csClass: cs.ClassDeclaration = {
             visibility: cs.Visibility.Public,
@@ -1366,34 +1379,47 @@ export default class CSharpAstTransformer {
         return variableStatement;
     }
     private visitVariableDeclaration(parent: cs.Node, s: ts.VariableDeclaration): cs.VariableDeclaration {
-        const symbol = this._context.typeChecker.getSymbolAtLocation(s.name);
-        const type = this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, s);
-
         const variableStatement = {
             nodeType: cs.SyntaxKind.VariableDeclaration,
             parent: parent,
             tsNode: s,
-            name: (s.name as ts.Identifier).text,
+            name: '',
             type: {} as cs.TypeNode
         } as cs.VariableDeclaration;
 
-        if (parent.nodeType === cs.SyntaxKind.CatchClause) {
-            variableStatement.type = {
-                nodeType: cs.SyntaxKind.TypeReference,
-                parent: variableStatement,
-                tsNode: s,
-                reference: 'AlphaTab.Core.EcmaScript.Error'
-            } as cs.TypeReference;
-        } else {
-            variableStatement.type = this.createUnresolvedTypeNode(variableStatement, s.type ?? s, type);
-        }
+        if (ts.isIdentifier(s.name)) {
+            const symbol = this._context.typeChecker.getSymbolAtLocation(s.name);
+            const type = this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, s);
 
-        variableStatement.type.parent = variableStatement;
+            variableStatement.name = s.name.text;
+            if (parent.nodeType === cs.SyntaxKind.CatchClause) {
+                variableStatement.type = {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: variableStatement,
+                    tsNode: s,
+                    reference: 'AlphaTab.Core.EcmaScript.Error'
+                } as cs.TypeReference;
+            } else {
+                variableStatement.type = this.createUnresolvedTypeNode(variableStatement, s.type ?? s, type);
+            }
 
-        if (s.initializer) {
-            this._declarationOrAssignmentTypeStack.push(type);
-            variableStatement.initializer = this.visitExpression(variableStatement, s.initializer) ?? undefined;
-            this._declarationOrAssignmentTypeStack.pop();
+            variableStatement.type.parent = variableStatement;
+
+            if (s.initializer) {
+                this._declarationOrAssignmentTypeStack.push(type);
+                variableStatement.initializer = this.visitExpression(variableStatement, s.initializer) ?? undefined;
+                this._declarationOrAssignmentTypeStack.pop();
+            }
+        } else if (ts.isArrayBindingPattern(s.name)) {
+            variableStatement.type = this.createVarTypeNode(variableStatement, s.type ?? s);
+            variableStatement.deconstructNames = [];
+            for (const el of s.name.elements) {
+                if (ts.isOmittedExpression(el)) {
+                    variableStatement.deconstructNames.push('_');
+                } else if (ts.isBindingElement(el)) {
+                    variableStatement.deconstructNames.push((el.name as ts.Identifier).text);
+                }
+            }
         }
 
         return variableStatement;
