@@ -11,16 +11,6 @@ As of today alphaTab is **not** a drop-in component that provides all functional
 an **SDK** or **Library** to build components in the way you need it in your website. The needs to music sheets vary from application to application 
 and website to website. You will need a certain development skillset to integrate alphaTab into solution.
 
-:::note
-The JavaScript and .net version of alphaTab are sharing the same source code. 
-We take our TypeScript code and compile it to C# using a special toolchain.
-This way all platforms benefit from the same new features we add.
-:::
-
-:::note
-For the future we plan to extend alphaTab to new platforms like Native Android and iOS.
-:::
-
 On high level alphaTab can be structured into the following submodules: 
 
 1. The data model
@@ -29,6 +19,74 @@ On high level alphaTab can be structured into the following submodules:
 4. The audio engine
 
 All these 4 modules together make up alphaTab and allows you to provide modern and interactive music notation into your website or application. 
+
+## Compatibility
+
+The different flavours version of alphaTab are sharing the same source code. 
+We take our TypeScript code and compile it to C# and other languages using a special toolchain.
+This way all platforms benefit from the same new features we add. For the future we plan to extend alphaTab to more platforms like Native Android and iOS.
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'Vanilla JavaScript', value: 'js', },
+    { label: '.net', value: 'net', }
+  ]
+}>
+<TabItem value="js">
+
+alphaTab follows a "web first" approach and the related package is provided as [NPM package](https://www.npmjs.com/package/@coderline/alphatab). Most development and testing happens on this web version.
+alphaTab runs on all major and modern browsers supporting ES6. We do not maintain a full list
+of browsers as most of modern browsers are auto-updating anyhow. 
+
+**ES6 compatible browsers**
+
+* Google Chrome 58+
+* Microsoft Edge 79+
+* Mozilla Firefox 54+
+* Safari 10
+* Opera 55
+
+Source: https://www.w3schools.com/js/js_es6.asp
+
+**Main Web Technologies we use**
+
+* Typed Arrays (https://caniuse.com/typedarrays)
+* Map/Set
+* HTML5 Canvas (https://caniuse.com/canvas)
+* SVG (https://caniuse.com/svg)
+* Web Workers (https://caniuse.com/webworkers)
+* Web Audio API (https://caniuse.com/audio-api)
+* Intersection Observer API (https://caniuse.com/mdn-api_intersectionobserver)
+* Resize Observer API (https://caniuse.com/resizeobserver)
+* TextEncoder/TextDecoder (https://caniuse.com/textencoder)
+
+alphaTab brings everything you need to get it running in modern browsers, no 3rd party dependencies are needed.
+
+:::note
+Internet Explorer support was dropped in version 1.2. If you still need to 
+support the Internet Explorer on your website (I hope you don't 😅) I recommend
+to use version 1.1 where we still had basic IE support. We also do not officially support test against the
+old Microsoft Edge before it was based on Chromium.
+:::
+
+</TabItem>
+<TabItem value="net">
+
+The .net version of alphaTab comes as NuGet packages. 
+
+- The [base package](https://www.nuget.org/packages/AlphaTab) targets the .net standard 2.0 and can be used in almost all environments using the low level APIs.
+- The [windows package](https://www.nuget.org/packages/AlphaTab.Window) targets .net core 3.1+ and provides WinForms and WPF UI controls.
+
+The .net version of alphaTab has some 3rd party dependencies for drawing and audio APIs but we try to keep them at a minimum. 
+
+</TabItem>
+</Tabs>
+
+
 
 ## The data model 
 The data model which holds all information about a piece of music. This includes general information like
@@ -42,7 +100,8 @@ the information about music sheets. alphaTab has importers for:
 * Guitar Pro 3-5 files `.gp3`, `.gp4`, `.gp5` which are a proprietary binary format from [Arobas Music](https://www.guitar-pro.com/en/index.php?pg=about)
 * Guitar Pro 6 files `.gpx` which are a proprietary archive format storing the music information as XML 
 * Guitar Pro 7 files `.gp` which are a zip archive storing the music information as XML
-* MusicXML files `.xml` which is an open XML based [standard](https://www.musicxml.com/). 
+* MusicXML files `.xml` which is an open XML based [standard](https://www.musicxml.com/) by an open consortium. 
+* Capella `.cap` which is an open XML based [standard](https://www.capella.de/CapXML/3.0/) by Capella Software. 
 * [alphaTex](/docs/alphaTex/introduction) which is a text based format optimized writing music notation in a textual format
 
 :::note
