@@ -10,8 +10,6 @@ import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
 
-declare var VbAjaxLoader: any;
-
 /**
  * The ScoreLoader enables you easy loading of Scores using all
  * available importers
@@ -25,7 +23,6 @@ export class ScoreLoader {
      * @param settings settings for the score import
      * @target web
      */
-    // TODO: use promises
     public static loadScoreAsync(
         path: string,
         success: (score: Score) => void,
@@ -62,31 +59,7 @@ export class ScoreLoader {
                 }
             }
         };
-        // IE fallback
-        if (xhr.responseType !== 'arraybuffer') {
-            // use VB Loader to load binary array
-            let vbArr: any = VbAjaxLoader('GET', path);
-            let fileContents: any = vbArr.toArray();
-            // decode byte array to string
-            let data: string = '';
-            let i: number = 0;
-            while (i < fileContents.length - 1) {
-                data += (fileContents[i] as number).toString();
-                i++;
-            }
-            let reader: Uint8Array = ScoreLoader.getBytesFromString(data);
-            let score: Score = ScoreLoader.loadScoreFromBytes(reader, settings);
-            success(score);
-        }
         xhr.send();
-    }
-
-    private static getBytesFromString(s: string): Uint8Array {
-        let b: Uint8Array = new Uint8Array(s.length);
-        for (let i: number = 0; i < s.length; i++) {
-            b[i] = s.charCodeAt(i);
-        }
-        return b;
     }
 
     /**

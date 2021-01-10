@@ -111,13 +111,13 @@ export class BinaryStylesheet {
     }
 
     public apply(score: Score): void {
-        this.raw.forEach((value, key) => {
+        for(const [key, value] of this.raw) {
             switch (key) {
                 case 'StandardNotation/hideDynamics':
                     score.stylesheet.hideDynamics = value as boolean;
                     break;
             }
-        });
+        }
     }
 
     public addValue(key: string, value: unknown): void {

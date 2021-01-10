@@ -186,7 +186,7 @@ export class CapellaParser {
         effects: Map<Beat, T>,
         applyEffect: (effect: T, beat: Beat) => void
     ) {
-        effects.forEach((effect, startBeat) => {
+        for(const [startBeat, effect] of effects) {
             const noteRange = effect.noteRange;
             let endBeat = startBeat;
             for (let i = 0; i < noteRange; i++) {
@@ -201,7 +201,7 @@ export class CapellaParser {
                     break;
                 }
             }
-        });
+        }
     }
 
     private parseDom(dom: XmlDocument): void {

@@ -23,7 +23,7 @@ export abstract class SvgCanvas implements ICanvas {
 
     public beginRender(width: number, height: number): void {
         this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${height | 0
-            }px" class="at-surface-svg">\n`;
+            }px" class="at-surface-svg" style="dominant-baseline: central;">\n`;
         this._currentPath = '';
         this._currentPathIsEmpty = true;
         this.textBaseline = TextBaseline.Top;
@@ -166,11 +166,11 @@ export abstract class SvgCanvas implements ICanvas {
         switch (this.textBaseline) {
             case TextBaseline.Top:
                 return `dominant-baseline="hanging"`;
-            case TextBaseline.Middle:
-                return `dominant-baseline="central"`;
             case TextBaseline.Bottom:
                 return `dominant-baseline="bottom"`;
+            case TextBaseline.Middle:
             default:
+                // middle is set as default on the SVG tag via css
                 return '';
         }
     }

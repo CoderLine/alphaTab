@@ -120,12 +120,12 @@ export class ChordDiagramGlyph extends EffectGlyph {
             }
         }
 
-        barreLookup.forEach((strings, fret) => {
+        for(const [fret, strings] of barreLookup) {
             let y: number = cy + fret * fretSpacing + fretSpacing / 2 + this.scale;
             let xLeft: number = cx + (this._chord.strings.length - strings[1] - 1) * stringSpacing;
             let xRight: number = cx + (this._chord.strings.length - strings[0] - 1) * stringSpacing;
             canvas.fillRect(xLeft, y - circleRadius, xRight - xLeft, circleRadius * 2);
-        });
+        }
 
         canvas.textAlign = align;
         canvas.textBaseline = baseline;

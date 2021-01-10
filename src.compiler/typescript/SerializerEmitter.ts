@@ -290,12 +290,12 @@ function generateToJsonBody(
                     ts.factory.createStringLiteral(jsonName),
                     ts.factory.createAsExpression(
                         ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
-                        type.isNullable 
-                        ? ts.factory.createUnionTypeNode([
-                            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
-                            ts.factory.createLiteralTypeNode(ts.factory.createNull())
-                        ])
-                        : ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
+                        type.isNullable
+                            ? ts.factory.createUnionTypeNode([
+                                ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+                                ts.factory.createLiteralTypeNode(ts.factory.createNull())
+                            ])
+                            : ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
                     )
                 ]
             )));
@@ -344,7 +344,7 @@ function generateToJsonBody(
             let writeValue: ts.Expression;
             if (isPrimitiveToJson(mapType.typeArguments![1], typeChecker)) {
                 writeValue = ts.factory.createIdentifier('v');
-            } else if(isEnumType(mapType.typeArguments![1])) {
+            } else if (isEnumType(mapType.typeArguments![1])) {
                 writeValue = ts.factory.createAsExpression(
                     ts.factory.createIdentifier('v'),
                     ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
@@ -358,7 +358,7 @@ function generateToJsonBody(
                     ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier(itemSerializer), 'toJson'),
                     undefined,
                     [
-                        ts.factory.createIdentifier('v')
+                        ts.factory.createIdentifier('v'),
                     ]
                 );
             }
@@ -387,42 +387,46 @@ function generateToJsonBody(
                     ]
                 )),
 
-                ts.factory.createExpressionStatement(
-                    ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(
-                            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
-                            'forEach'
-                        ),
-                        undefined,
-                        [
-                            ts.factory.createArrowFunction(
-                                undefined,
+                ts.factory.createForOfStatement(
+                    undefined,
+                    ts.factory.createVariableDeclarationList([
+                        ts.factory.createVariableDeclaration(
+                            ts.factory.createArrayBindingPattern([
+                                ts.factory.createBindingElement(
+                                    undefined,
+                                    undefined,
+                                    'k'
+                                ),
+                                ts.factory.createBindingElement(
+                                    undefined,
+                                    undefined,
+                                    'v'
+                                ),
+                            ])
+                        )],
+                        ts.NodeFlags.Const
+                    ),
+                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
+                    ts.factory.createBlock([
+                        ts.factory.createExpressionStatement(
+                            ts.factory.createCallExpression(
+                                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('m'), 'set'),
                                 undefined,
                                 [
-                                    ts.factory.createParameterDeclaration(undefined, undefined, undefined, 'v'),
-                                    ts.factory.createParameterDeclaration(undefined, undefined, undefined, 'k')
-                                ],
-                                undefined,
-                                ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-                                ts.factory.createCallExpression(
-                                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('m'), 'set'),
-                                    undefined,
-                                    [
-                                        // todo: key to string
-                                        ts.factory.createCallExpression(
-                                            ts.factory.createPropertyAccessExpression(
-                                                ts.factory.createIdentifier('k'),
-                                                'toString'
-                                            ),
-                                            undefined,
-                                            []
+                                    // todo: key to string
+                                    ts.factory.createCallExpression(
+                                        ts.factory.createPropertyAccessExpression(
+                                            ts.factory.createIdentifier('k'),
+                                            'toString'
                                         ),
-                                        writeValue
-                                    ]
-                                )
+                                        undefined,
+                                        []
+                                    ),
+                                    writeValue
+                                ]
                             )
-                        ]
-                    )
+                        )
+                    ])
                 )
             ]));
         } else if (isImmutable(type.type)) {

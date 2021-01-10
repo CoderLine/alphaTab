@@ -94,9 +94,9 @@ export default class CSharpAstPrinter {
             if (!this._isStartOfLine) {
                 this.writeLine();
             }
-            lines.forEach(line => {
+            for (const line of lines) {
                 this.writeLine(`/// ${this.escapeXmlDoc(line)}`);
-            });
+            }
         } else if (lines.length === 1) {
             if (this._isStartOfLine) {
                 this.writeLine(`/// ${this.escapeXmlDoc(lines[0])}`);
@@ -597,6 +597,9 @@ export default class CSharpAstPrinter {
                             break;
                         case cs.PrimitiveType.Void:
                             this.write('void');
+                            break;
+                        case cs.PrimitiveType.Var:
+                            this.write('var');
                             break;
                     }
                 }
@@ -1257,7 +1260,19 @@ export default class CSharpAstPrinter {
                 this.write(', ');
             }
 
-            this.write(d.name);
+            if (d.deconstructNames) {
+                this.write('(');
+                d.deconstructNames.forEach((v, i) => {
+                    if (i > 0) {
+                        this.write(', ');
+                    }
+                    this.write(v);
+                })
+                this.write(')');
+            } else {
+                this.write(d.name);
+            }
+
             if (d.initializer) {
                 this.write(' = ');
                 this.writeExpression(d.initializer);

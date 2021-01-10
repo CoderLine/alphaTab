@@ -26,7 +26,9 @@ export class NotationSettingsSerializer {
         {
             const m = new Map<string, unknown>();
             o.set("elements", m);
-            obj.elements.forEach((v, k) => m.set(k.toString(), v));
+            for (const [k, v] of obj.elements) {
+                m.set(k.toString(), v);
+            }
         } 
         o.set("rhythmMode", (obj.rhythmMode as number)); 
         o.set("rhythmHeight", obj.rhythmHeight); 

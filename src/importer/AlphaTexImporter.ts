@@ -148,9 +148,9 @@ export class AlphaTexImporter extends ScoreImporter {
             this.consolidate();
             this._score.finish(this.settings);
             this._score.rebuildRepeatGroups();
-            this._lyrics.forEach((lyrics, track) => {
+            for(const [track, lyrics] of this._lyrics) {
                 this._score.tracks[track].applyLyrics(lyrics);
-            });
+            }
             return this._score;
         } catch (e) {
             if (e instanceof AlphaTexError) {

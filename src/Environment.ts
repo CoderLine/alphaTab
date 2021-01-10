@@ -40,7 +40,6 @@ import { TripletFeelEffectInfo } from '@src/rendering/effects/TripletFeelEffectI
 import { WhammyBarEffectInfo } from '@src/rendering/effects/WhammyBarEffectInfo';
 import { WideBeatVibratoEffectInfo } from '@src/rendering/effects/WideBeatVibratoEffectInfo';
 import { WideNoteVibratoEffectInfo } from '@src/rendering/effects/WideNoteVibratoEffectInfo';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { HorizontalScreenLayout } from '@src/rendering/layout/HorizontalScreenLayout';
@@ -184,8 +183,7 @@ export class Environment {
      * @target web
      */
     public static bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(
-        'alphaTab',
-        `&#${MusicFontSymbol.GClef};`
+        'alphaTab'
     );
 
     /**
@@ -193,20 +191,6 @@ export class Environment {
      */
     public static get isRunningInWorker(): boolean {
         return 'WorkerGlobalScope' in Environment.globalThis;
-    }
-
-    /**
-     * @target web
-     */
-    public static get supportsFontsApi(): boolean {
-        return 'fonts' in document && 'load' in (document as any).fonts;
-    }
-
-    /**
-     * @target web
-     */
-    public static get supportsTextDecoder(): boolean {
-        return 'TextDecoder' in Environment.globalThis;
     }
 
     /**
@@ -227,47 +211,7 @@ export class Environment {
         if (Environment.isRunningInWorker) {
             return null;
         }
-        // try to build the find the alphaTab script url in case we are not in the webworker already
-        let scriptElement: HTMLScriptElement = document.currentScript as HTMLScriptElement;
-        let scriptFile: string | null = null;
-
-        if (!scriptElement) {
-            // try to get javascript from exception stack
-            try {
-                let error: Error = new Error();
-                let stack = error.stack;
-                if (!stack) {
-                    throw error;
-                }
-                scriptFile = Environment.scriptFileFromStack(stack);
-            } catch (e) {
-                if (e instanceof Error) {
-                    let stack = e.stack;
-                    if (!stack) {
-                        scriptElement = document.querySelector('script[data-alphatab]') as HTMLScriptElement;
-                    } else {
-                        scriptFile = Environment.scriptFileFromStack(stack);
-                    }
-                } else {
-                    throw e;
-                }
-            }
-        }
-
-        // failed to automatically resolve
-        if (!scriptFile) {
-            if (!scriptElement) {
-                Logger.warning(
-                    'Environment',
-                    'Could not automatically find alphaTab script file for worker, please add the data-alphatab attribute to the script tag that includes alphaTab or provide it when initializing alphaTab',
-                    null
-                );
-            } else {
-                scriptFile = scriptElement.src;
-            }
-        }
-
-        return scriptFile;
+        return (document.currentScript as HTMLScriptElement).src;
     }
 
     /**
@@ -293,30 +237,6 @@ export class Environment {
             };
             jquery.fn.alphaTab.fn = api;
         }
-    }
-
-    /**
-     * based on https://github.com/JamesMGreene/currentExecutingScript
-     * @target web
-     */
-    private static scriptFileFromStack(stack: string): string | null {
-        let matches = stack.match(
-            '(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?'
-        );
-        if (!matches) {
-            matches = stack.match(
-                '^(?:|[^:@]*@|.+\\)@(?=data:text\\/javascript|blob|http[s]?|file)|.+?\\s+(?: at |@)(?:[^:\\(]+ )*[\\(]?)(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?'
-            );
-            if (!matches) {
-                matches = stack.match(
-                    '\\)@(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?'
-                );
-                if (!matches) {
-                    return null;
-                }
-            }
-        }
-        return matches[1];
     }
 
     public static renderEngines: Map<string, RenderEngineFactory> = Environment.createDefaultRenderEngines();
@@ -528,46 +448,8 @@ export class Environment {
      */
     public static platformInit(): void {
         Environment.registerJQueryPlugin();
-        // polyfills
-        Math.log2 = Math.log2
-            ? Math.log2
-            : function (x) {
-                  return Math.log(x) * Math.LOG2E;
-              };
-
         if (!Environment.isRunningInWorker) {
             Environment.HighDpiFactor = window.devicePixelRatio;
-
-            let vbAjaxLoader: string = '';
-            vbAjaxLoader += 'Function VbAjaxLoader(method, fileName)' + '\r\n';
-            vbAjaxLoader += '    Dim xhr' + '\r\n';
-            vbAjaxLoader += '    Set xhr = CreateObject("Microsoft.XMLHTTP")' + '\r\n';
-            vbAjaxLoader += '    xhr.Open method, fileName, False' + '\r\n';
-            vbAjaxLoader += '    xhr.setRequestHeader "Accept-Charset", "x-user-defined"' + '\r\n';
-            vbAjaxLoader += '    xhr.send' + '\r\n';
-            vbAjaxLoader += '    Dim byteArray()' + '\r\n';
-            vbAjaxLoader += '    if xhr.Status = 200 Then' + '\r\n';
-            vbAjaxLoader += '        Dim byteString' + '\r\n';
-            vbAjaxLoader += '        Dim i' + '\r\n';
-            vbAjaxLoader += '        byteString=xhr.responseBody' + '\r\n';
-            vbAjaxLoader += '        ReDim byteArray(LenB(byteString))' + '\r\n';
-            vbAjaxLoader += '        For i = 1 To LenB(byteString)' + '\r\n';
-            vbAjaxLoader += '            byteArray(i-1) = AscB(MidB(byteString, i, 1))' + '\r\n';
-            vbAjaxLoader += '        Next' + '\r\n';
-            vbAjaxLoader += '    End If' + '\r\n';
-            vbAjaxLoader += '    VbAjaxLoader=byteArray' + '\r\n';
-            vbAjaxLoader += 'End Function' + '\r\n';
-            let vbAjaxLoaderScript: HTMLScriptElement = document.createElement('script') as HTMLScriptElement;
-            vbAjaxLoaderScript.setAttribute('type', 'text/vbscript');
-            let inlineScript: Node = document.createTextNode(vbAjaxLoader);
-            vbAjaxLoaderScript.appendChild(inlineScript);
-            document.addEventListener(
-                'DOMContentLoaded',
-                () => {
-                    document.body.appendChild(vbAjaxLoaderScript);
-                },
-                false
-            );
         } else {
             AlphaTabWebWorker.init();
             AlphaSynthWebWorker.init();

@@ -32,11 +32,11 @@ export class XmlWriter {
                     this.writeLine();
                 }
                 this.write(`<${xml.localName}`);
-                xml.attributes.forEach((value, name) => {
+                for (const [name, value] of xml.attributes) {
                     this.write(` ${name}="`);
                     this.writeAttributeValue(value);
                     this.write('"');
-                });
+                }
 
                 if (xml.childNodes.length === 0) {
                     this.write('/>');
@@ -97,16 +97,16 @@ export class XmlWriter {
             const c = value.charAt(i);
             switch (c) {
                 case '<':
-                    this._result.push( '&lt;');
+                    this._result.push('&lt;');
                     break;
                 case '>':
-                    this._result.push( '&gt;');
+                    this._result.push('&gt;');
                     break;
                 case '&':
-                    this._result.push( '&amp;');
+                    this._result.push('&amp;');
                     break;
                 case "'":
-                    this._result.push( '&apos;');
+                    this._result.push('&apos;');
                     break;
                 case '"':
                     this._result.push('&quot;');

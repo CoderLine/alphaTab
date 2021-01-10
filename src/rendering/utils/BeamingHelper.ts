@@ -130,13 +130,13 @@ export class BeamingHelper {
         positions.staffId = staffId;
         positions.up = up;
         positions.down = down;
-        this.drawingInfos.forEach((v, _) => {
+        for(const v of this.drawingInfos.values()) {
             if (v.startBeat == beat) {
                 v.startX = this.getBeatLineX(beat);
             } else if (v.endBeat == beat) {
                 v.endX = this.getBeatLineX(beat);
             }
-        });
+        }
     }
 
     private getOrCreateBeatPositions(beat: Beat): BeatLinePositions {

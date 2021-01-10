@@ -206,7 +206,7 @@ export class TabBarRenderer extends BarRendererBase {
                     let notes: TabBeatGlyph = bg.onNotes as TabBeatGlyph;
                     let noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                     if (noteNumbers) {
-                        noteNumbers.notesPerString.forEach((noteNumber, str) => {
+                        for(const [str, noteNumber] of noteNumbers.notesPerString) {
                             if (!noteNumber.isEmpty) {
                                 tabNotes[this.bar.staff.tuning.length - str].push(
                                     new Float32Array([
@@ -215,7 +215,7 @@ export class TabBarRenderer extends BarRendererBase {
                                     ])
                                 );
                             }
-                        });
+                        }
                     }
                 }
             }

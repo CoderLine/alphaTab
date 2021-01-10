@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Core.EcmaScript
 {
-    public class Set<T>
+    public class Set<T> : IEnumerable<T>
     {
         private readonly HashSet<T> _data = new HashSet<T>();
 
@@ -27,6 +28,16 @@ namespace AlphaTab.Core.EcmaScript
             {
                 action(i);
             }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _data.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
