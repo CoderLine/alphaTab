@@ -1,0 +1,49 @@
+---
+title: importer.beatTextAsLyrics
+category: Importer
+description: Enables detecting lyrics from beat texts
+sidebarPath: /docs/reference/settings
+since: 1.2.0-alpha.92
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+On various old Guitar Pro 3-5 files tab authors often used the "beat text" feature to add lyrics to the individual tracks. 
+This was easier and quicker than using the lyrics feature. 
+
+These texts were optimized to align correctly when viewed in Guitar Pro with the default layout but can lead to 
+disturbed display in alphaTab. When `beatTextAsLyrics` is set to true, alphaTab will try to rather parse beat text 
+values as lyrics using typical text patterns like dashes, underscores and spaces. 
+
+The lyrics are only detected if not already proper lyrics are applied to the track.
+
+Enable this option for input files which suffer from this practice.
+
+:::note
+
+alphaTab tries a guess on how the texts and chunks could relate to the beats but this 
+of course is not perfect. You have to expect some errors with such kind of files.
+
+:::
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="bool" />
+</TypeTable>
+
+## Default Value
+`false`
+
+## Example
+
+**Enabled**
+![Enabled](/img/reference/property/beattextaslyrics-enabled.png)
+
+**Disabled**
+ ![Disabled](/img/reference/property/beattextaslyrics-disabled.png)
