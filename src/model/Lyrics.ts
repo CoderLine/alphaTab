@@ -34,12 +34,12 @@ export class Lyrics {
      */
     public chunks!: string[];
 
-    public finish(): void {
+    public finish(skipEmptyEntries: boolean = false): void {
         this.chunks = [];
-        this.parse(this.text, 0, this.chunks);
+        this.parse(this.text, 0, this.chunks, skipEmptyEntries);
     }
 
-    private parse(str: string, p: number, chunks: string[]): void {
+    private parse(str: string, p: number, chunks: string[], skipEmptyEntries: boolean): void {
         if (!str) {
             return;
         }
@@ -97,7 +97,7 @@ export class Lyrics {
                         case Lyrics.CharCodeLF:
                         case Lyrics.CharCodeSpace:
                             let txt: string = str.substr(start, p - start);
-                            chunks.push(this.prepareChunk(txt));
+                            this.addChunk(txt, skipEmptyEntries);
                             state = LyricsState.IgnoreSpaces;
                             next = LyricsState.Begin;
                             break;
@@ -109,7 +109,7 @@ export class Lyrics {
                             break;
                         default:
                             let txt: string = str.substr(start, p - start);
-                            chunks.push(this.prepareChunk(txt));
+                            this.addChunk(txt, skipEmptyEntries);
                             skipSpace = true;
                             state = LyricsState.IgnoreSpaces;
                             next = LyricsState.Begin;
@@ -122,12 +122,26 @@ export class Lyrics {
 
         if (state === LyricsState.Text) {
             if (p !== start) {
-                chunks.push(str.substr(start, p - start));
+                this.addChunk(str.substr(start, p - start), skipEmptyEntries);
             }
+        }
+    }
+    private addChunk(txt: string, skipEmptyEntries: boolean) {
+        txt = this.prepareChunk(txt);
+        if (!skipEmptyEntries || (txt.length > 0 && txt !== '-')) {
+            this.chunks.push(txt);
         }
     }
 
     private prepareChunk(txt: string): string {
-        return txt.split('+').join(' ');
+        let chunk = txt.split('+').join(' ');
+
+        // trim off trailing _ like "You____" becomes "You"
+        let endLength = chunk.length;
+        while (endLength > 0 && chunk.charAt(endLength - 1) === '_') {
+            endLength--;
+        }
+
+        return endLength !== chunk.length ? chunk.substr(0, endLength) : chunk;
     }
 }

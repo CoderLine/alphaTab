@@ -53,6 +53,8 @@ export class Gp3To5Importer extends ScoreImporter {
     private _trackCount: number = 0;
     private _playbackInfos: PlaybackInformation[] = [];
 
+    private _beatTextChunksByTrack: Map<number, string[]> = new Map<number, string[]>();
+
     public get name(): string {
         return 'Guitar Pro 3-5';
     }
@@ -508,9 +510,31 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((flags & 0x02) !== 0) {
             this.readChord(newBeat);
         }
+
+        let beatTextAsLyrics = this.settings.importer.beatTextAsLyrics
+            && track.index !== this._lyricsTrack; // detect if not lyrics track
+
         if ((flags & 0x04) !== 0) {
-            newBeat.text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+            const text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
+            if (beatTextAsLyrics) {
+
+                const lyrics = new Lyrics();
+                lyrics.text = text.trim();
+                lyrics.finish(true);
+
+                // push them in reverse order to the store for applying them 
+                // to the next beats being read 
+                const beatLyrics:string[] = [];
+                for (let i = lyrics.chunks.length - 1; i >= 0; i--) {
+                    beatLyrics.push(lyrics.chunks[i]);
+                }
+                this._beatTextChunksByTrack.set(track.index, beatLyrics);
+
+            } else {
+                newBeat.text = text;
+            }
         }
+
 
         let allNoteHarmonicType = HarmonicType.None;
         if ((flags & 0x08) !== 0) {
@@ -537,6 +561,12 @@ export class Gp3To5Importer extends ScoreImporter {
             if ((flag & 0x08) !== 0) {
                 this.data.readByte();
             }
+        }
+
+        if (beatTextAsLyrics && !newBeat.isRest && 
+            this._beatTextChunksByTrack.has(track.index) &&
+            this._beatTextChunksByTrack.get(track.index)!.length > 0) {
+            newBeat.lyrics = [this._beatTextChunksByTrack.get(track.index)!.pop()!];
         }
     }
 
@@ -896,11 +926,11 @@ export class Gp3To5Importer extends ScoreImporter {
             newNote.string = -1;
             newNote.fret = -1;
         }
-        if(swapAccidentals) {
+        if (swapAccidentals) {
             const accidental = Tuning.defaultAccidentals[newNote.realValueWithoutHarmonic % 12];
-            if(accidental === '#') {
+            if (accidental === '#') {
                 newNote.accidentalMode = NoteAccidentalMode.ForceFlat;
-            } else if(accidental === 'b') {
+            } else if (accidental === 'b') {
                 newNote.accidentalMode = NoteAccidentalMode.ForceSharp;
             }
             // Note: forcing no sign to sharp not supported
