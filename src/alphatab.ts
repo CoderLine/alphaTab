@@ -117,6 +117,9 @@ export {
     Logger
 };
 
+import { VersionInfo } from '@src/generated/VersionInfo';
+export const meta = VersionInfo;
+
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';

@@ -1,9 +1,9 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "es6",
     "outDir": "dist/lib.csharp",
     "module": "commonjs",
+    "resolveJsonModule": true,
     "declaration": false,
     "declarationDir": null,
     "sourceMap": false,
@@ -20,13 +20,7 @@
       "@test*": [
         "test*"
       ]
-    },
-    "plugins": [
-      {
-        "transform": "./src.compiler/csharp/CSharpTranspilerPlugin.ts",
-        "after": true
-      },
-    ]
+    }
   },
   "include": [
     "src",

@@ -182,7 +182,7 @@ export default class CSharpAstTransformer {
                                     this._context.addTsNodeDiagnostics(
                                         p,
                                         'Unsupported export',
-                                        ts.DiagnosticCategory.Error
+                                        ts.DiagnosticCategory.Message
                                     );
                                 }
                             });
@@ -191,7 +191,7 @@ export default class CSharpAstTransformer {
                             this._context.addTsNodeDiagnostics(
                                 d,
                                 'Unsupported export',
-                                ts.DiagnosticCategory.Error
+                                ts.DiagnosticCategory.Message
                             );
                         }
                     })
