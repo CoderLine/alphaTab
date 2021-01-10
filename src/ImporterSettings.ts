@@ -12,4 +12,11 @@ export class ImporterSettings {
      * If part-groups should be merged into a single track.
      */
     public mergePartGroupsInMusicXml: boolean = false;
+
+    /**
+     * If set to true, text annotations on beats are attempted to be parsed as
+     * lyrics considering spaces as separators and removing underscores.
+     * If a track/staff has explicit lyrics the beat texts will not be detected as lyrics. 
+     */
+    public beatTextAsLyrics: boolean = false;
 }

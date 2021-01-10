@@ -19,6 +19,7 @@ export class ImporterSettingsSerializer {
         const o = new Map<string, unknown>(); 
         o.set("encoding", obj.encoding); 
         o.set("mergePartGroupsInMusicXml", obj.mergePartGroupsInMusicXml); 
+        o.set("beatTextAsLyrics", obj.beatTextAsLyrics); 
         return o; 
     }
     public static setProperty(obj: ImporterSettings, property: string, v: unknown): boolean {
@@ -28,6 +29,9 @@ export class ImporterSettingsSerializer {
                 return true;
             case "mergepartgroupsinmusicxml":
                 obj.mergePartGroupsInMusicXml = (v as boolean);
+                return true;
+            case "beattextaslyrics":
+                obj.beatTextAsLyrics = (v as boolean);
                 return true;
         } 
         return false; 
