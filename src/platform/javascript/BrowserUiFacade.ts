@@ -34,13 +34,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _api!: AlphaTabApiBase<unknown>;
     private _contents: string | null = null;
     private _file: string | null = null;
-    private _visibilityCheckIntervalId: number = 0;
-    private _visibilityCheckInterval: number = 0;
     private _totalResultCount: number = 0;
     private _initialTrackIndexes: number[] | null = null;
+    private _intersectionObserver: IntersectionObserver;
 
-    private _rootContainerBecameVisible: IEventEmitter = new EventEmitter();
-    public rootContainerBecameVisible: IEventEmitter;
+    public rootContainerBecameVisible: IEventEmitter = new EventEmitter();
     public canRenderChanged: IEventEmitter = new EventEmitter();
 
     public get resizeThrottle(): number {
@@ -61,7 +59,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
 
         let isAnyNotLoaded = false;
-        for(const checker of this._fontCheckers.values()) {
+        for (const checker of this._fontCheckers.values()) {
             if (!checker.isFontLoaded) {
                 isAnyNotLoaded = true;
             }
@@ -88,29 +86,25 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this.areWorkersSupported = 'Worker' in window;
         Environment.bravuraFontChecker.fontLoaded.on(this.onFontLoaded.bind(this));
 
-        this.rootContainerBecameVisible = {
-            on: (value: any) => {
-                if (this.rootContainer.isVisible) {
-                    value();
-                } else {
-                    this._rootContainerBecameVisible.on(value);
+        this._intersectionObserver = new IntersectionObserver(this.onElementVisibilityChanged.bind(this), {
+            threshold: [0, 0.01, 1]
+        });
+        this._intersectionObserver.observe(rootElement);
+    }
 
-                    if (this._visibilityCheckIntervalId === 0) {
-                        this._visibilityCheckIntervalId = window.setInterval(() => {
-                            if (this._api.container.isVisible) {
-                                window.clearInterval(this._visibilityCheckIntervalId);
-                                this._visibilityCheckIntervalId = 0;
-                                (this._rootContainerBecameVisible as EventEmitter).trigger();
-                            }
-                        }, this._visibilityCheckInterval);
-                    }
+    private onElementVisibilityChanged(entries: IntersectionObserverEntry[]) {
+        for (const e of entries) {
+            if (e.isIntersecting) {
+                const htmlElement = e.target as HTMLElement;
+                if (htmlElement === (this.rootContainer as HtmlElementContainer).element) {
+                    (this.rootContainerBecameVisible as EventEmitter).trigger();
+                    this._intersectionObserver.unobserve((this.rootContainer as HtmlElementContainer).element);
+                } else if ('svg' in htmlElement.dataset) {
+                    this.replacePlaceholder(htmlElement, htmlElement.dataset['svg'] as string);
+                    this._intersectionObserver.unobserve(htmlElement);
                 }
-            },
-
-            off: (value: any) => {
-                this._rootContainerBecameVisible.off(value);
             }
-        };
+        }
     }
 
     public createWorkerRenderer(): IScoreRenderer {
@@ -132,10 +126,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             settings.setSongBookModeSettings();
         }
         api.settings = settings;
-        if (settings.core.engine === 'default' || settings.core.engine === 'svg') {
-            api.container.scroll.on(this.showSvgsInViewPort.bind(this));
-            api.container.resize.on(this.showSvgsInViewPort.bind(this));
-        }
         this.setupFontCheckers(settings);
 
         this._initialTrackIndexes = this.parseTracks(settings.core.tracks);
@@ -147,8 +137,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
         this.createStyleElement(settings);
         this._file = settings.core.file;
-
-        this._visibilityCheckInterval = settings.core.visibilityCheckInterval;
     }
 
     private setupFontCheckers(settings: Settings): void {
@@ -284,28 +272,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         });
     }
 
-    private showSvgsInViewPort(): void {
-        let placeholders: NodeList = (this._api.canvasElement as HtmlElementContainer).element.querySelectorAll(
-            '[data-lazy=true]'
-        );
-        for (let i: number = 0; i < placeholders.length; i++) {
-            let placeholder: HTMLElement = placeholders.item(i) as HTMLElement;
-            if (this.isElementInViewPort(placeholder)) {
-                this.replacePlaceholder(placeholder, (placeholder as any)['svg']);
-            }
-        }
-    }
-
-    public isElementInViewPort(element: HTMLElement): boolean {
-        let rect: DOMRect = element.getBoundingClientRect();
-        return (
-            rect.top + rect.height >= 0 &&
-            rect.top <= window.innerHeight &&
-            rect.left + rect.width >= 0 &&
-            rect.left <= window.innerWidth
-        );
-    }
-
     private createStyleElement(settings: Settings): void {
         let elementDocument: HTMLDocument = (this._api.container as HtmlElementContainer).element.ownerDocument!;
         Environment.createStyleElement(elementDocument, settings.core.fontDirectory);
@@ -402,10 +368,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             while (canvasElement.childElementCount > this._totalResultCount) {
                 canvasElement.removeChild(canvasElement.lastChild!);
             }
-            // directly show the elements in the viewport once we're done.
-            if (this._api.settings.core.enableLazyLoading) {
-                this.showSvgsInViewPort();
-            }
         } else {
             let body: unknown = renderResult.renderResult;
             if (typeof body === 'string') {
@@ -419,11 +381,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 placeholder.style.width = renderResult.width + 'px';
                 placeholder.style.height = renderResult.height + 'px';
                 placeholder.style.display = 'inline-block';
-                if (!this._api.settings.core.enableLazyLoading || this.isElementInViewPort(placeholder)) {
+                if (!this._api.settings.core.enableLazyLoading) {
                     this.replacePlaceholder(placeholder, body);
                 } else {
-                    (placeholder as any)['svg'] = body;
-                    placeholder.setAttribute('data-lazy', 'true');
+                    placeholder.dataset['svg'] = body;
+                    this._intersectionObserver.observe(placeholder);
                 }
             } else {
                 if (this._totalResultCount < canvasElement.childElementCount) {

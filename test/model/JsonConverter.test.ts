@@ -94,8 +94,6 @@ describe('JsonConverterTest', () => {
         expected.core.tex = true;
         /**@target web*/
         expected.core.tracks = [1, 2, 3];
-        /**@target web*/
-        expected.core.visibilityCheckInterval = 4711;
 
         expected.core.enableLazyLoading = false;
         expected.core.engine = "engine";
