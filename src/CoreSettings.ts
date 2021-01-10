@@ -37,13 +37,6 @@ export class CoreSettings {
     public tracks: unknown = null;
 
     /**
-     * Gets or sets the interval in which alphaTab should check whether the 
-     * target element for rendering is already visible. 
-     * @target web
-     */
-    public visibilityCheckInterval: number = 500;
-
-    /**
      * Gets or sets whether lazy loading for displayed elements is enabled.
      */
     public enableLazyLoading: boolean = true;

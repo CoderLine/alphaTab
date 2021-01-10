@@ -28,8 +28,6 @@ export class CoreSettingsSerializer {
         o.set("tex", obj.tex); 
         /*@target web*/
         o.set("tracks", obj.tracks); 
-        /*@target web*/
-        o.set("visibilityCheckInterval", obj.visibilityCheckInterval); 
         o.set("enableLazyLoading", obj.enableLazyLoading); 
         o.set("engine", obj.engine); 
         o.set("logLevel", (obj.logLevel as number)); 
@@ -58,10 +56,6 @@ export class CoreSettingsSerializer {
             /*@target web*/
             case "tracks":
                 obj.tracks = (v as unknown);
-                return true;
-            /*@target web*/
-            case "visibilitycheckinterval":
-                obj.visibilityCheckInterval = (v as number);
                 return true;
             case "enablelazyloading":
                 obj.enableLazyLoading = (v as boolean);
