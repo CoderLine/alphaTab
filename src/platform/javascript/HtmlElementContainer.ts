@@ -2,11 +2,23 @@ import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
+import { Lazy } from '@src/util/Lazy';
 
 /**
  * @target web
  */
 export class HtmlElementContainer implements IContainer {
+    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(() => new ResizeObserver((entries) => {
+        for (const e of entries) {
+            let evt = new CustomEvent('resize', {
+                detail: e
+            });
+            e.target.dispatchEvent(evt);
+        }
+    }));
+
+    private _resizeListeners: number = 0;
+
     public get top(): number {
         return parseFloat(this.element.style.top);
     }
@@ -113,21 +125,29 @@ export class HtmlElementContainer implements IContainer {
             }
         };
 
-        this.scroll = {
-            on: (value: any) => {
-                window.addEventListener('scroll', value, true);
-            },
-            off: (value: any) => {
-                window.removeEventListener('scroll', value, true);
-            }
-        };
-
         this.resize = {
             on: (value: any) => {
-                window.addEventListener('resize', value, true);
+                if (this._resizeListeners === 0) {
+                    HtmlElementContainer.resizeObserver.value.observe(this.element);
+                }
+                this.element.addEventListener(
+                    'resize',
+                    value,
+                    true
+                );
+                this._resizeListeners++;
             },
             off: (value: any) => {
-                window.removeEventListener('resize', value, true);
+                this.element.removeEventListener(
+                    'resize',
+                    value,
+                    true
+                );
+                this._resizeListeners--;
+                if (this._resizeListeners <= 0) {
+                    this._resizeListeners = 0;
+                    HtmlElementContainer.resizeObserver.value.unobserve(this.element);
+                }
             }
         };
     }
@@ -141,11 +161,6 @@ export class HtmlElementContainer implements IContainer {
         this.element.style.transitionDuration = duration + 'ms';
         this.element.style.left = x + 'px';
     }
-
-    /**
-     * This event occurs when a scroll on the control happened.
-     */
-    public scroll: IEventEmitter;
 
     /**
      * This event occurs when the control was resized.

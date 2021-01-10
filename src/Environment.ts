@@ -53,6 +53,7 @@ import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
 import { LeftHandTapEffectInfo } from './rendering/effects/LeftHandTapEffectInfo';
 import { CapellaImporter } from './importer/CapellaImporter';
+import { ResizeObserverPolyfill } from './platform/javascript/ResizeObserverPolyfill';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -450,6 +451,11 @@ export class Environment {
         Environment.registerJQueryPlugin();
         if (!Environment.isRunningInWorker) {
             Environment.HighDpiFactor = window.devicePixelRatio;
+            // ResizeObserver API does not yet exist so long on Safari (only start 2020 with iOS Safari 13.7 and Desktop 13.1)
+            // so we better add a polyfill for it 
+            if(!('ResizeObserver' in globalThis)) {
+                (globalThis as any).ResizeObserver = ResizeObserverPolyfill;
+            }
         } else {
             AlphaTabWebWorker.init();
             AlphaSynthWebWorker.init();
