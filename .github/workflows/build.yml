@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-      - run: npm install
+      - uses: bahmutov/npm-install@v1
       - run: npm run build-ci
       - run: npm run test-ci
 
@@ -30,6 +30,6 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.100'
-      - run: npm install
+      - uses: bahmutov/npm-install@v1
       - run: npm run build-csharp-ci
       - run: npm run test-csharp-ci      

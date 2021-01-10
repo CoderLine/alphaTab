@@ -11,12 +11,12 @@ jobs:
     steps:
       # Checkout the repo
       - uses: actions/checkout@v2
-        
+      - uses: bahmutov/npm-install@v1
+
       # Build Project
       - uses: actions/setup-node@master
       - name: Build Project
         run: |
-            npm install
             node ./scripts/update-version.js alpha ${{github.run_number}}
             npm run build-ci
 
@@ -43,7 +43,7 @@ jobs:
           dotnet-version: '3.1.100'
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
-      - run: npm install
+      - uses: bahmutov/npm-install@v1
       - run: node ./scripts/update-csharp-version.js alpha ${{github.run_number}}
       - run: npm run build-csharp-ci
       - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
