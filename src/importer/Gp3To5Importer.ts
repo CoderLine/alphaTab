@@ -524,7 +524,7 @@ export class Gp3To5Importer extends ScoreImporter {
 
                 // push them in reverse order to the store for applying them 
                 // to the next beats being read 
-                const beatLyrics = [];
+                const beatLyrics:string[] = [];
                 for (let i = lyrics.chunks.length - 1; i >= 0; i--) {
                     beatLyrics.push(lyrics.chunks[i]);
                 }
