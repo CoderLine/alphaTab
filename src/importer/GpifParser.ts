@@ -143,10 +143,10 @@ export class GpifParser {
         this.buildModel();
         this.score.finish(settings);
         if (!this._skipApplyLyrics && this._lyricsByTrack.size > 0) {
-            this._lyricsByTrack.forEach((lyrics, t) => {
+            for (const [t, lyrics] of this._lyricsByTrack) {
                 let track: Track = this._tracksById.get(t)!;
                 track.applyLyrics(lyrics);
-            });
+            }
         }
     }
 
@@ -1898,7 +1898,7 @@ export class GpifParser {
                             case 'Octave':
                                 note.octave = parseInt(c.findChildElement('Number')!.innerText);
                                 // when exporting GP6 from GP7 the tone might be missing
-                                if(note.tone === -1) {
+                                if (note.tone === -1) {
                                     note.tone = 0;
                                 }
                                 break;
@@ -2244,7 +2244,7 @@ export class GpifParser {
 
             if (this._automationsPerTrackIdAndBarIndex.has(trackId)) {
                 const trackAutomations = this._automationsPerTrackIdAndBarIndex.get(trackId)!;
-                trackAutomations.forEach((automations, barNumber) => {
+                for (const [barNumber, automations] of trackAutomations) {
                     if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
                         const bar = track.staves[0].bars[barNumber];
                         if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
@@ -2254,12 +2254,12 @@ export class GpifParser {
                             }
                         }
                     }
-                });
+                }
             }
         }
 
         // build masterbar automations
-        this._masterTrackAutomations.forEach((automations, barNumber) => {
+        for (const [barNumber, automations] of this._masterTrackAutomations) {
             let masterBar: MasterBar = this.score.masterBars[barNumber];
             for (let i: number = 0, j: number = automations.length; i < j; i++) {
                 let automation: Automation = automations[i];
@@ -2273,6 +2273,6 @@ export class GpifParser {
                     masterBar.tempoAutomation = automation;
                 }
             }
-        });
+        }
     }
 }

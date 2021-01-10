@@ -107,12 +107,12 @@ export class BarLayoutingInfo {
             if (this._timeSortedSprings.length > 0) {
                 let smallestDuration: number = duration;
                 let previousSpring: Spring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
-                previousSpring.allDurations.forEach(prevDuration => {
+                for(const prevDuration of previousSpring.allDurations) {
                     let end: number = previousSpring.timePosition + prevDuration;
                     if (end >= start && prevDuration < smallestDuration) {
                         smallestDuration = prevDuration;
                     }
-                });
+                }
             }
             spring.longestDuration = duration;
             spring.postSpringWidth = postSpringSize;
@@ -197,7 +197,7 @@ export class BarLayoutingInfo {
     }
 
     public finish(): void {
-        this.allGraceRods.forEach((s, k) => {
+        for(const [k,s] of this.allGraceRods) {
             let offset = 0;
             if (this.incompleteGraceRods.has(k)) {
                 for (const sp of s) {
@@ -214,13 +214,13 @@ export class BarLayoutingInfo {
                     offset -= (s[i].preBeatWidth + s[i].postSpringWidth);
                 }
             }
-        });
+        }
         this._incompleteGraceRodsWidth = 0;
-        this.incompleteGraceRods.forEach(s => {
+        for(const s of this.incompleteGraceRods.values()) {
             for (const sp of s) {
                 this._incompleteGraceRodsWidth += sp.preBeatWidth + sp.postSpringWidth;
             }
-        });
+        }
 
         this.calculateSpringConstants();
         this.version++;
@@ -229,11 +229,11 @@ export class BarLayoutingInfo {
     private calculateSpringConstants(): void {
         this._xMin = 0;
         let springs: Map<number, Spring> = this.springs;
-        springs.forEach(spring => {
+        for(const spring of springs.values()){
             if (spring.springWidth < this._xMin) {
                 this._xMin = spring.springWidth;
             }
-        });
+        }
         let totalSpringConstant: number = 0;
         let sortedSprings: Spring[] = this._timeSortedSprings;
         if (sortedSprings.length === 0) {

@@ -1184,8 +1184,7 @@ export class GpifWriter {
         diagramCollectionProperty.attributes.set('name', name);
         const diagramCollectionItems = diagramCollectionProperty.addElement('Items');
 
-        staff.chords.forEach((chord, id) => {
-
+        for (const [id, chord] of staff.chords) {
             const diagramCollectionItem = diagramCollectionItems.addElement('Item');
             diagramCollectionItem.attributes.set('id', id);
             diagramCollectionItem.attributes.set('name', chord.name);
@@ -1289,7 +1288,7 @@ export class GpifWriter {
             degree2Node.attributes.set('interval', 'Fifth');
             degree2Node.attributes.set('alteration', 'Perfect');
             degree2Node.attributes.set('omitted', 'false');
-        });
+        }
     }
 
     private writeSimplePropertyNode(parent: XmlNode, propertyName: string, propertyValueTagName: string, propertyValue: string | null) {
@@ -1363,7 +1362,7 @@ export class GpifWriter {
     private writeInstrumentSetNode(trackNode: XmlNode, track: Track) {
         const instrumentSet = trackNode.addElement('InstrumentSet');
 
-        const firstStaff:Staff = track.staves[0];
+        const firstStaff: Staff = track.staves[0];
 
         instrumentSet.addElement('LineCount').innerText = firstStaff.standardNotationLineCount.toString();
 
@@ -1538,9 +1537,9 @@ export class GpifWriter {
 
         if (masterBar.fermata.size > 0) {
             const fermatas = parent.addElement('Fermatas');
-            masterBar.fermata.forEach((fermata, offset) => {
+            for (const [offset, fermata] of masterBar.fermata) {
                 this.writeFermata(fermatas, offset, fermata);
-            });
+            }
         }
 
     }

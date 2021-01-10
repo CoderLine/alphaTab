@@ -41,7 +41,9 @@ export class MasterBarSerializer {
         {
             const m = new Map<string, unknown>();
             o.set("fermata", m);
-            obj.fermata.forEach((v, k) => m.set(k.toString(), FermataSerializer.toJson(v)));
+            for (const [k, v] of obj.fermata) {
+                m.set(k.toString(), FermataSerializer.toJson(v));
+            }
         } 
         o.set("start", obj.start); 
         o.set("isAnacrusis", obj.isAnacrusis); 

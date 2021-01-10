@@ -61,11 +61,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
 
         let isAnyNotLoaded = false;
-        this._fontCheckers.forEach(checker => {
+        for(const checker of this._fontCheckers.values()) {
             if (!checker.isFontLoaded) {
                 isAnyNotLoaded = true;
             }
-        });
+        }
 
         if (isAnyNotLoaded) {
             return false;

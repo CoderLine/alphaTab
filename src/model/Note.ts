@@ -131,7 +131,7 @@ export class Note {
 
     /**
      * Gets or sets the variation of this note.
-     * * @deprecated
+     * @deprecated
      */
     public get variation(): number {
         return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[1] : -1;

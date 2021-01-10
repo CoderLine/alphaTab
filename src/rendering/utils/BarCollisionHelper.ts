@@ -45,7 +45,7 @@ export class BarCollisionHelper {
     public getBeatMinMaxY(): number[] {
         let minY = -1000;
         let maxY = -1000;
-        this.reservedLayoutAreasByDisplayTime.forEach((v, k) => {
+        for(const v of this.reservedLayoutAreasByDisplayTime.values()) {
             if (minY === -1000) {
                 minY = v.topY;
                 maxY = v.bottomY;
@@ -57,7 +57,7 @@ export class BarCollisionHelper {
                     maxY = v.bottomY;
                 }
             }
-        });
+        }
 
         if (minY === -1000) {
             return [0, 0];

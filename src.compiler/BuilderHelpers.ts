@@ -1,4 +1,3 @@
-import { indexOf } from 'lodash';
 import * as ts from 'typescript';
 
 export function addNewLines(stmts: ts.Statement[]) {

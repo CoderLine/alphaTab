@@ -26,7 +26,9 @@ export class StaffSerializer {
         {
             const m = new Map<string, unknown>();
             o.set("chords", m);
-            obj.chords.forEach((v, k) => m.set(k.toString(), ChordSerializer.toJson(v)));
+            for (const [k, v] of obj.chords) {
+                m.set(k.toString(), ChordSerializer.toJson(v));
+            }
         } 
         o.set("capo", obj.capo); 
         o.set("transpositionPitch", obj.transpositionPitch); 

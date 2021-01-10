@@ -198,9 +198,9 @@ export class PageViewLayout extends ScoreLayout {
         canvas.beginRender(this.width, y);
         canvas.color = res.scoreInfoColor;
         canvas.textAlign = TextAlign.Center;
-        this.scoreInfoGlyphs.forEach(g => {
+        for(const g of this.scoreInfoGlyphs.values()) {
             g.paint(0, 0, canvas);
-        });
+        }
         let result: unknown = canvas.endRender();
 
         let e = new RenderFinishedEventArgs();

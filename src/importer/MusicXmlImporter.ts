@@ -76,12 +76,12 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private mergePartGroups(): void {
         let anyMerged: boolean = false;
-        this._partGroups.forEach((tracks) =>{
+        for(const tracks of this._partGroups.values()) {
             if (tracks.length > 1) {
                 this.mergeGroup(tracks);
                 anyMerged = true;
             }
-        });
+        }
         // if any groups were merged, we need to rebuild the indexes
         if (anyMerged) {
             for (let i: number = 0; i < this._score.tracks.length; i++) {
@@ -161,11 +161,11 @@ export class MusicXmlImporter extends ScoreImporter {
         let id: string = element.getAttribute('id');
         if (!this._trackById.has(id)) {
             if (this._trackById.size === 1) {
-                this._trackById.forEach((t, x)=> {
+                for(const [x,t] of this._trackById) {
                     if (t.staves.length === 0 || t.staves[0].bars.length === 0) {
                         id = x;
                     }
-                });
+                }
                 if (!this._trackById.has(id)) {
                     return;
                 }

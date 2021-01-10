@@ -94,9 +94,9 @@ export default class CSharpAstPrinter {
             if (!this._isStartOfLine) {
                 this.writeLine();
             }
-            lines.forEach(line => {
+            for(const line of lines) {
                 this.writeLine(`/// ${this.escapeXmlDoc(line)}`);
-            });
+            }
         } else if (lines.length === 1) {
             if (this._isStartOfLine) {
                 this.writeLine(`/// ${this.escapeXmlDoc(lines[0])}`);

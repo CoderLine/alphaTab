@@ -100,14 +100,14 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public doLayout(): void {
         super.doLayout();
         let direction: BeamDirection = this.direction;
-        this.aboveBeatEffects.forEach(effect => {
+        for (const effect of this.aboveBeatEffects.values()) {
             effect.renderer = this.renderer;
             effect.doLayout();
-        });
-        this.belowBeatEffects.forEach(effect => {
+        }
+        for (const effect of this.belowBeatEffects.values()) {
             effect.renderer = this.renderer;
             effect.doLayout();
-        });
+        }
         if (this.beat.isTremolo) {
             let offset: number = 0;
             let baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
@@ -171,15 +171,15 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             belowEffectSpacing *= -1;
         }
 
-        this.aboveBeatEffects.forEach(g => {
+        for (const g of this.aboveBeatEffects.values()) {
             aboveBeatEffectsY += aboveEffectSpacing * g.height;
             g.paint(cx + this.x + 2 * this.scale, cy + this.y + aboveBeatEffectsY, canvas);
-        });
+        }
 
-        this.belowBeatEffects.forEach(g => {
+        for (const g of this.belowBeatEffects.values()) {
             belowBeatEffectsY += belowEffectSpacing * g.height;
             g.paint(cx + this.x + 2 * this.scale, cy + this.y + belowBeatEffectsY, canvas);
-        });
+        }
         super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {
             this._tremoloPicking.paint(cx, cy, canvas);

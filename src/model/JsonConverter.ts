@@ -23,7 +23,7 @@ export class JsonConverter {
                 return (Object as any).fromEntries(v);
             } else {
                 const o: any = {};
-                v.forEach((v, k) => o[k] = v);
+                for (const [k, mv] of v) { o[k] = mv; }
                 return o;
             }
         }

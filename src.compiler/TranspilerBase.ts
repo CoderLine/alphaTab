@@ -72,13 +72,13 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
         let diagnostics = ts.sortAndDeduplicateDiagnostics(allDiagnostics);
         let errorCount = 0;
         let warningCount = 0;
-        diagnostics.forEach(d => {
+        for(const d of diagnostics) {
             switch (d.category) {
                 case ts.DiagnosticCategory.Error: errorCount++; break;
                 case ts.DiagnosticCategory.Warning: warningCount++; break;
             }
             reportDiagnostic(d);
-        });
+        }
 
         if (pretty) {
             reportDiagnostic({
