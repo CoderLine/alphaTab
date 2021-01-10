@@ -236,7 +236,7 @@ export abstract class ScoreLayout {
 
     public renderAnnotation(): void {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
-        let msg: string = 'rendered by alphaTab (https://alphaTab.net)';
+        let msg: string = 'rendered by alphaTab';
         let canvas: ICanvas = this.renderer.canvas!;
         let resources: RenderingResources = this.renderer.settings.display.resources;
         let size: number = 12 * this.renderer.settings.display.scale;
