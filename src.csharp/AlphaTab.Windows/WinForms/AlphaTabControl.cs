@@ -54,7 +54,7 @@ namespace AlphaTab.WinForms
         /// <remarks>
         /// The control has an overall background on which the notation
         /// itself is placed in a page-style fashion depending on the chosen layout.
-        /// The <see cref="AlphaTabControl.BackColor"/> property controls the background
+        /// The <see cref="Control.BackColor"/> property controls the background
         /// of the overall area background while this property controls the background of
         /// the part showing the notation.
         /// </remarks>
