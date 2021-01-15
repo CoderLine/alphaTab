@@ -89,6 +89,14 @@ export class AlphaSynth implements IAlphaSynth {
         this.updateTimePosition(this._timePosition * (oldSpeed / value));
     }
 
+    public get playbackEndTime(): number {
+        return this._sequencer.endTime;
+    }
+
+    public get playbackEndTick(): number {
+        return this._sequencer.endTick;
+    }
+
     public get tickPosition(): number {
         return this._tickPosition;
     }
@@ -192,7 +200,7 @@ export class AlphaSynth implements IAlphaSynth {
             return false;
         }
         this.output.activate();
-                
+
         this.playInternal();
 
         if (this._countInVolume > 0) {
