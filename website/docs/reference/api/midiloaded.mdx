@@ -20,12 +20,23 @@ This event is fired when the Midi file needed for playback was loaded.
 ## Types
 
 <TypeTable>
-    <TypeRow type="js" name="function()" />    
-    <TypeRow type="net" name="Action" />    
+    <TypeRow type="js" name="function(args)" />    
+    <TypeRow type="net" name="Action<PositionChangedEventArgs>" />    
 </TypeTable>
 
 ## Parameters
-none
+<ParameterTable>
+    <ParameterRow platform="js" name="args" type="alphaTab.synth.PositionChangedEventArgs">
+        The information about the song duration. <span class="badge badge--info">since 1.2.0-alpha.97</span>
+    </ParameterRow>
+    <ParameterRow platform="net" name="args" type="AlphaTab.Synth.PositionChangedEventArgs">
+        The information about the song duration. <span class="badge badge--info">since 1.2.0-alpha.97</span>
+    </ParameterRow>
+</ParameterTable>
+
+## PositionChangedEventArgs Properties
+
+See [`playerPositionChanged`](/docs/reference/api/playerpositionchanged)
 
 ## Examples
 
@@ -42,8 +53,9 @@ none
 
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-api.midiLoaded.on(() => {
+api.midiLoaded.on(e => {
     hideGeneratingAudioIndicator();
+    updateSongDuration(e.endTime);
 });
 ```
 
@@ -52,7 +64,9 @@ api.midiLoaded.on(() => {
 
 ```js
 $('#alphaTab').on('alphaTab.midiFileLoaded', (e) => {
+    var args = e.detail;
     hideGeneratingAudioIndicator();
+    updateSongDuration(args.endTime);
 });
 ```
 
@@ -60,8 +74,9 @@ $('#alphaTab').on('alphaTab.midiFileLoaded', (e) => {
 <TabItem value="html">
 
 ```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.midiFileLoaded', () => {
+document.querySelector('#alphaTab').addEventListener('alphaTab.midiFileLoaded', e => {
     hideGeneratingAudioIndicator();
+    updateSongDuration(e.endTime);
 }, false);
 ```
 
@@ -70,9 +85,10 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.midiFileLoaded', 
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.MidiLoaded.On(() => 
+api.MidiLoaded.On(e => 
 {
     HideGeneratingAudioIndicator();
+    UpdateSongDuration(e.EndTime);
 });
 ```
 

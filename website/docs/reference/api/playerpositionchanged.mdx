@@ -20,7 +20,7 @@ This event is fired when the current playback position of the song changed.
 ## Types
 
 <TypeTable>
-    <TypeRow type="js" name="function(e)" />    
+    <TypeRow type="js" name="function(args)" />    
     <TypeRow type="net" name="Action<PositionChangedEventArgs>" />    
 </TypeTable>
 
@@ -61,6 +61,12 @@ This event is fired when the current playback position of the song changed.
     </ParameterRow>
     <ParameterRow platform="net" name="EndTick" type="double">
         The current time position within the song in midi ticks.
+    </ParameterRow>
+    <ParameterRow platform="js" name="isSeek" type="boolean">
+        Whether the position changed because of time seeking and not due to playback. <span class="badge badge--info">since 1.2.0-alpha.97</span>
+    </ParameterRow>
+    <ParameterRow platform="net" name="IsSeek" type="bool">
+        Whether the position changed because of time seeking and not due to playback. <span class="badge badge--info">since 1.2.0-alpha.97</span>
     </ParameterRow>
 </ParameterTable>
 
