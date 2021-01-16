@@ -33,6 +33,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
             denominatorIndex++;
         }
         const message: MetaDataEvent = new MetaDataEvent(
+            0,
             tick,
             0xff,
             MetaEventType.TimeSignature,
@@ -43,6 +44,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
 
     public addRest(track: number, tick: number, channel: number): void {
         const message: SystemExclusiveEvent = new SystemExclusiveEvent(
+            track,
             tick,
             SystemCommonType.SystemExclusive,
             SystemExclusiveEvent.AlphaTabManufacturerId,
@@ -61,6 +63,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     ): void {
         const velocity: number = MidiUtils.dynamicToVelocity(dynamicValue);
         const noteOn: MidiEvent = new MidiEvent(
+            track,
             start,
             this.makeCommand(MidiEventType.NoteOn, channel),
             AlphaSynthMidiFileHandler.fixValue(key),
@@ -68,6 +71,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         );
         this._midiFile.addEvent(noteOn);
         const noteOff: MidiEvent = new MidiEvent(
+            track,
             start + length,
             this.makeCommand(MidiEventType.NoteOff, channel),
             AlphaSynthMidiFileHandler.fixValue(key),
@@ -92,6 +96,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
 
     public addControlChange(track: number, tick: number, channel: number, controller: number, value: number): void {
         const message: MidiEvent = new MidiEvent(
+            track,
             tick,
             this.makeCommand(MidiEventType.Controller, channel),
             AlphaSynthMidiFileHandler.fixValue(controller),
@@ -102,6 +107,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
 
     public addProgramChange(track: number, tick: number, channel: number, program: number): void {
         const message: MidiEvent = new MidiEvent(
+            track,
             tick,
             this.makeCommand(MidiEventType.ProgramChange, channel),
             AlphaSynthMidiFileHandler.fixValue(program),
@@ -113,7 +119,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     public addTempo(tick: number, tempo: number): void {
         // bpm -> microsecond per quarter note
         const tempoInUsq: number = (60000000 / tempo) | 0;
-        const message: MetaNumberEvent = new MetaNumberEvent(tick, 0xff, MetaEventType.Tempo, tempoInUsq);
+        const message: MetaNumberEvent = new MetaNumberEvent(0, tick, 0xff, MetaEventType.Tempo, tempoInUsq);
         this._midiFile.addEvent(message);
     }
 
@@ -125,9 +131,10 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         }
 
         const message: MidiEvent = new MidiEvent(
+            track,
             tick,
             this.makeCommand(MidiEventType.PitchBend, channel),
-            value & 0x7F, 
+            value & 0x7F,
             (value >> 7) & 0x7F
         );
         this._midiFile.addEvent(message);
@@ -145,6 +152,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         value = value * SynthConstants.MaxPitchWheel20 / SynthConstants.MaxPitchWheel
 
         const message = new Midi20PerNotePitchBendEvent(
+            track,
             tick,
             this.makeCommand(MidiEventType.PerNotePitchBend, channel),
             key,
@@ -154,7 +162,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public finishTrack(track: number, tick: number): void {
-        const message: MetaDataEvent = new MetaDataEvent(tick, 0xff, MetaEventType.EndOfTrack, new Uint8Array(0));
+        const message: MetaDataEvent = new MetaDataEvent(track, tick, 0xff, MetaEventType.EndOfTrack, new Uint8Array(0));
         this._midiFile.addEvent(message);
     }
 }

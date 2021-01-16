@@ -170,6 +170,7 @@ export class MidiFileSequencer {
         let absTick: number = 0;
         let absTime: number = 0.0;
 
+        let metronomeCount: number = 0;
         let metronomeLength: number = 0;
         let metronomeTick: number = 0;
         let metronomeTime: number = 0.0;
@@ -187,7 +188,7 @@ export class MidiFileSequencer {
 
             if (metronomeLength > 0) {
                 while (metronomeTick < absTick) {
-                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length, metronomeTick % metronomeLength);
+                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length, Math.floor(metronomeTick / metronomeLength) % metronomeCount);
                     state.synthData.push(metronome);
                     metronome.time = metronomeTime;
                     metronomeTick += metronomeLength;
@@ -202,6 +203,7 @@ export class MidiFileSequencer {
             } else if (mEvent.command === MidiEventType.Meta && mEvent.data1 === MetaEventType.TimeSignature) {
                 let meta: MetaDataEvent = mEvent as MetaDataEvent;
                 let timeSignatureDenominator: number = Math.pow(2, meta.data[1]);
+                metronomeCount = meta.data[0];
                 metronomeLength = (state.division * (4.0 / timeSignatureDenominator)) | 0;
                 if (state.firstTimeSignatureDenominator === 0) {
                     state.firstTimeSignatureNumerator = meta.data[0];

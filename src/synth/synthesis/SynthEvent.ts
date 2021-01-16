@@ -20,7 +20,7 @@ export class SynthEvent {
 
     private static readonly MetronomeTickData: Uint8Array = new Uint8Array([AlphaTabSystemExclusiveEvents.MetronomeTick]);
     public static newMetronomeEvent(eventIndex: number, counter:number): SynthEvent {
-        const evt = new SystemExclusiveEvent(counter, MidiEventType.SystemExclusive2, SystemExclusiveEvent.AlphaTabManufacturerId, SynthEvent.MetronomeTickData);
+        const evt = new SystemExclusiveEvent(0, counter, MidiEventType.SystemExclusive2, SystemExclusiveEvent.AlphaTabManufacturerId, SynthEvent.MetronomeTickData);
         const x: SynthEvent = new SynthEvent(eventIndex, evt);
         return x;
     }

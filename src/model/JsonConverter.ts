@@ -137,28 +137,29 @@ export class JsonConverter {
      * @target web
      */
     public static jsObjectToMidiEvent(midiEvent: any): MidiEvent {
+        let track: number = midiEvent.track;
         let tick: number = midiEvent.tick;
         let message: number = midiEvent.message;
         let midiEvent2: MidiEvent;
         switch (midiEvent.type) {
             case 'SystemExclusiveEvent':
-                midiEvent2 = new SystemExclusiveEvent(tick, 0, 0, midiEvent.data);
+                midiEvent2 = new SystemExclusiveEvent(track, tick, 0, 0, midiEvent.data);
                 midiEvent2.message = message;
                 break;
             case 'MetaDataEvent':
-                midiEvent2 = new MetaDataEvent(tick, 0, 0, midiEvent.data);
+                midiEvent2 = new MetaDataEvent(track, tick, 0, 0, midiEvent.data);
                 midiEvent2.message = message;
                 break;
             case 'MetaNumberEvent':
-                midiEvent2 = new MetaNumberEvent(tick, 0, 0, midiEvent.value);
+                midiEvent2 = new MetaNumberEvent(track, tick, 0, 0, midiEvent.value);
                 midiEvent2.message = message;
                 break;
             case 'Midi20PerNotePitchBendEvent':
-                midiEvent2 = new Midi20PerNotePitchBendEvent(tick, 0, midiEvent.noteKey, midiEvent.pitch);
+                midiEvent2 = new Midi20PerNotePitchBendEvent(track, tick, 0, midiEvent.noteKey, midiEvent.pitch);
                 midiEvent2.message = message;
                 break;
             default:
-                midiEvent2 = new MidiEvent(tick, 0, 0, 0);
+                midiEvent2 = new MidiEvent(track, tick, 0, 0, 0);
                 midiEvent2.message = message;
                 break;
         }
@@ -184,6 +185,7 @@ export class JsonConverter {
      */
     public static midiEventToJsObject(midiEvent: MidiEvent): unknown {
         let midiEvent2: any = {} as any;
+        midiEvent2.track = midiEvent.track;
         midiEvent2.tick = midiEvent.tick;
         midiEvent2.message = midiEvent.message;
         if (midiEvent instanceof SystemExclusiveEvent) {

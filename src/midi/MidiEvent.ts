@@ -66,6 +66,11 @@ export enum MidiEventType {
  */
 export class MidiEvent {
     /**
+     * Gets or sets the track to which the midi event belongs. 
+     */
+    public track:number;
+
+    /**
      * Gets or sets the raw midi message.
      */
     public message: number;
@@ -103,12 +108,14 @@ export class MidiEvent {
 
     /**
      * Initializes a new instance of the {@link MidiEvent} class.
-     * @param tick The absolute midi ticks of this event..
+     * @param track The track this event belongs to.
+     * @param tick The absolute midi ticks of this event.
      * @param status The status information of this event.
      * @param data1 The first data component of this midi event.
      * @param data2 The second data component of this midi event.
      */
-    public constructor(tick: number, status: number, data1: number, data2: number) {
+    public constructor(track:number, tick: number, status: number, data1: number, data2: number) {
+        this.track = track;
         this.tick = tick;
         this.message = status | (data1 << 8) | (data2 << 16);
     }

@@ -25,8 +25,8 @@ export class SystemExclusiveEvent extends SystemCommonEvent {
         return this.message >> 8;
     }
 
-    public constructor(delta: number, status: number, id: number, data: Uint8Array) {
-        super(delta, status, id & 0x00ff, (id >> 8) & 0xff);
+    public constructor(track:number, delta: number, status: number, id: number, data: Uint8Array) {
+        super(track, delta, status, id & 0x00ff, (id >> 8) & 0xff);
         this.data = data;
     }
 

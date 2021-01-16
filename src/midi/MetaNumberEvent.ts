@@ -5,8 +5,8 @@ import { IWriteable } from '@src/io/IWriteable';
 export class MetaNumberEvent extends MetaEvent {
     public value: number;
 
-    public constructor(delta: number, status: number, metaId: number, value: number) {
-        super(delta, status, metaId, 0);
+    public constructor(track:number, delta: number, status: number, metaId: number, value: number) {
+        super(track, delta, status, metaId, 0);
         this.value = value;
     }
 
