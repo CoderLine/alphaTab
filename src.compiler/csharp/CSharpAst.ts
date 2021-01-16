@@ -140,13 +140,13 @@ export interface TypeParameterDeclaration extends NamedElement, Node {
 export interface NamedTypeDeclaration extends NamedElement, DocumentedElement, Node, AttributedElement {
     typeParameters?: TypeParameterDeclaration[];
     visibility: Visibility;
+    partial: boolean;
 }
 
 export interface ClassDeclaration extends NamedTypeDeclaration {
     baseClass?: TypeNode;
     interfaces?: TypeNode[];
     isAbstract: boolean;
-    partial: boolean;
     members: ClassMember[];
 }
 
