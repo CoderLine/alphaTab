@@ -1221,10 +1221,10 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'soundFontLoaded', null);
     }
 
-    public midiLoaded: IEventEmitter = new EventEmitter();
-    private onMidiLoaded(): void {
-        (this.midiLoaded as EventEmitter).trigger();
-        this.uiFacade.triggerEvent(this.container, 'midiFileLoaded', null);
+    public midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
+    private onMidiLoaded(e:PositionChangedEventArgs): void {
+        (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
+        this.uiFacade.triggerEvent(this.container, 'midiFileLoaded', e);
     }
 
     public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
