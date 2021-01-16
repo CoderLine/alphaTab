@@ -100,7 +100,7 @@ export class AlphaSynth implements IAlphaSynth {
         value = SynthHelper.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
         let oldSpeed: number = this._sequencer.playbackSpeed;
         this._sequencer.playbackSpeed = value;
-        this.updateTimePosition(this._timePosition * (oldSpeed / value));
+        this.updateTimePosition(this._timePosition * (oldSpeed / value), true);
     }
 
     public get tickPosition(): number {
@@ -122,7 +122,7 @@ export class AlphaSynth implements IAlphaSynth {
         this._sequencer.seek(value);
 
         // update the internal position
-        this.updateTimePosition(value);
+        this.updateTimePosition(value, true);
 
         // tell the output to reset the already synthesized buffers and request data again
         this.output.resetSamples();
@@ -329,8 +329,9 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'Loading midi from model');
             this._sequencer.loadMidi(midiFile);
             this._isMidiLoaded = true;
-            (this.midiLoaded as EventEmitter).trigger();
-
+            (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
+                new PositionChangedEventArgs(0, this._sequencer.endTime, 0, this._sequencer.endTick, false)
+            );
             Logger.debug('AlphaSynth', 'Midi successfully loaded');
             this.checkReadyForPlayback();
             this.tickPosition = 0;
@@ -359,7 +360,7 @@ export class AlphaSynth implements IAlphaSynth {
 
     private onSamplesPlayed(sampleCount: number): void {
         let playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
-        this.updateTimePosition(this._timePosition + playedMillis);
+        this.updateTimePosition(this._timePosition + playedMillis, false);
         this.checkForFinish();
     }
 
@@ -396,7 +397,7 @@ export class AlphaSynth implements IAlphaSynth {
         }
     }
 
-    private updateTimePosition(timePosition: number): void {
+    private updateTimePosition(timePosition: number, isSeek: boolean): void {
         // update the real positions
         const currentTime: number = (this._timePosition = timePosition);
         const currentTick: number = (this._tickPosition = this._sequencer.timePositionToTickPosition(currentTime));
@@ -409,7 +410,7 @@ export class AlphaSynth implements IAlphaSynth {
                 `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount}`
             );
             (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick)
+                new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick, isSeek)
             );
         }
 
@@ -429,7 +430,7 @@ export class AlphaSynth implements IAlphaSynth {
     readonly finished: IEventEmitter = new EventEmitter();
     readonly soundFontLoaded: IEventEmitter = new EventEmitter();
     readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly midiLoaded: IEventEmitter = new EventEmitter();
+    readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
     readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
     readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
         PlayerStateChangedEventArgs

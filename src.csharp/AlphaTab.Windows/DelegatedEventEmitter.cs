@@ -35,6 +35,16 @@ namespace AlphaTab
             _off = off;
         }
 
+        public void On(Action value)
+        {
+			// not used internally
+        }
+
+        public void Off(Action value)
+        {
+            // not used internally
+        }
+		
         public void On(Action<T> value)
         {
             _on(value);

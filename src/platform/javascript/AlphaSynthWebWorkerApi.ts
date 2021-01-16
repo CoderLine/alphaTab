@@ -357,7 +357,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 this._timePosition = data.currentTime;
                 this._tickPosition = data.currentTick;
                 (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                    new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick)
+                    new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick, data.isSeek)
                 break;
             case 'alphaSynth.midiEventsPlayed':
                 (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(
@@ -381,7 +381,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 break;
             case 'alphaSynth.midiLoaded':
                 this.checkReadyForPlayback();
-                (this.midiLoaded as EventEmitter).trigger();
+                (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
+                    new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick, data.isSeek)
+                );
                 break;
             case 'alphaSynth.midiLoadFailed':
                 this.checkReadyForPlayback();
@@ -419,7 +421,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     readonly finished: IEventEmitter = new EventEmitter();
     readonly soundFontLoaded: IEventEmitter = new EventEmitter();
     readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly midiLoaded: IEventEmitter = new EventEmitter();
+    readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
+        PositionChangedEventArgs
+    >();
     readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
     readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
         PlayerStateChangedEventArgs

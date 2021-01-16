@@ -143,6 +143,11 @@ export default class CSharpAstPrinter {
     private writeInterfaceDeclaration(d: cs.InterfaceDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
+
+        if (d.partial) {
+            this.write('partial ');
+        }
+
         this.write(`interface ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
 
