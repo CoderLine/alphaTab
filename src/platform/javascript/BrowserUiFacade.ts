@@ -248,7 +248,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this._api.renderer.preRender.on((_: boolean) => {
             this._totalResultCount = 0;
         });
-        this.rootContainerBecameVisible.on(() => {
+
+        const initialRender = () => {
             // rendering was possibly delayed due to invisible element
             // in this case we need the correct width for autosize
             this._api.renderer.width = this.rootContainer.width | 0;
@@ -269,7 +270,13 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                     this._api.settings
                 );
             }
-        });
+        };
+
+        if (!this.rootContainer!.isVisible) {
+            this.rootContainerBecameVisible.on(initialRender);
+        } else {
+            initialRender();
+        }
     }
 
     private createStyleElement(settings: Settings): void {
