@@ -5,6 +5,8 @@ import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventA
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { LogLevel } from '@src/LogLevel';
+import { MidiEventsPlayedEventArgs } from './MidiEventsPlayedEventArgs';
+import { MidiEventType } from '@src/midi/MidiEvent';
 
 /**
  * The public API interface for interacting with the synthesizer.
@@ -70,6 +72,15 @@ export interface IAlphaSynth {
      * Gets or sets volume of the metronome during count-in. (range: 0.0-3.0, default 0.0 - no count in)
      */
     countInVolume: number;
+
+    /**
+     * Gets or sets the type fo midi events which will trigger the `midiEventsPlayed` event for
+     * midi events which have been played. 
+     * 
+     * Metronome events are signaled as `SystemExclusiveEvent`
+     * 
+     */
+    midiEventPlayedFilter: MidiEventType[];
 
     /**
      * Destroys the synthesizer and all related components
@@ -191,4 +202,9 @@ export interface IAlphaSynth {
      * This event is fired when the current playback position of/ the song changed.
      */
     readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs>;
+
+    /**
+     * The event is fired when certain midi events were sent to the audio output device for playback.
+     */
+    readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs>;
 }

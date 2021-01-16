@@ -187,7 +187,7 @@ export class MidiFileSequencer {
 
             if (metronomeLength > 0) {
                 while (metronomeTick < absTick) {
-                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length);
+                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length, metronomeTick % metronomeLength);
                     state.synthData.push(metronome);
                     metronome.time = metronomeTime;
                     metronomeTick += metronomeLength;
@@ -356,10 +356,10 @@ export class MidiFileSequencer {
         const state = new MidiSequencerState();
         state.division = this._mainState.division;
 
-        let bpm :number = 120;
+        let bpm: number = 120;
         let timeSignatureNumerator = 4;
         let timeSignatureDenominator = 4;
-        if(this._mainState.eventIndex === 0) {
+        if (this._mainState.eventIndex === 0) {
             bpm = this._mainState.tempoChanges[0].bpm;
             timeSignatureNumerator = this._mainState.firstTimeSignatureNumerator;
             timeSignatureDenominator = this._mainState.firstTimeSignatureDenominator;
@@ -376,7 +376,7 @@ export class MidiFileSequencer {
         let metronomeTime: number = 0.0;
 
         for (let i = 0; i < timeSignatureNumerator; i++) {
-            let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length);
+            let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length, i);
             state.synthData.push(metronome);
             metronome.time = metronomeTime;
             metronomeTick += metronomeLength;

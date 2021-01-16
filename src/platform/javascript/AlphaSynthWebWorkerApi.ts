@@ -13,6 +13,8 @@ import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { ProgressEventArgs } from '@src/alphatab';
 import { FileLoadError } from '@src/FileLoadError';
+import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import { MidiEventType } from '@src/midi/MidiEvent';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -33,6 +35,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private _timePosition: number = 0;
     private _isLooping: boolean = false;
     private _playbackRange: PlaybackRange | null = null;
+    private _midiEventPlayedFilter: MidiEventType[] = [];
 
     public get isReady(): boolean {
         return this._workerIsReady && this._outputIsReady;
@@ -94,6 +97,18 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
             cmd: 'alphaSynth.setCountInVolume',
             value: value
         });
+    }
+
+    public get midiEventPlayedFilter(): MidiEventType[] {
+        return this._midiEventPlayedFilter;
+    }
+
+    public set midiEventPlayedFilter(value: MidiEventType[]) {
+        this._midiEventPlayedFilter = value;
+        this._synth.postMessage({
+            cmd: 'alphaSynth.setMidiEventPlayedFilter',
+            value: value
+        })
     }
 
     public get playbackSpeed(): number {
@@ -343,6 +358,10 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 this._tickPosition = data.currentTick;
                 (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
                     new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick)
+                break;
+            case 'alphaSynth.midiEventsPlayed':
+                (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(
+                    new MidiEventsPlayedEventArgs((data.events as unknown[]).map(JsonConverter.jsObjectToMidiEvent))
                 );
                 break;
             case 'alphaSynth.playerStateChanged':
@@ -407,6 +426,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     >();
     readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
         PositionChangedEventArgs
+    >(); 
+    readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<
+        MidiEventsPlayedEventArgs
     >();
 
     //

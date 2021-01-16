@@ -1,8 +1,25 @@
 import { SystemCommonEvent } from '@src/midi/SystemCommonEvent';
 import { IWriteable } from '@src/io/IWriteable';
 
+export enum AlphaTabSystemExclusiveEvents {
+    MetronomeTick = 0,
+    Rest = 1
+}
+
 export class SystemExclusiveEvent extends SystemCommonEvent {
+    public static readonly AlphaTabManufacturerId = 0x7D;
+    
     public data: Uint8Array;
+
+    public get isMetronome():boolean {
+        return this.manufacturerId == SystemExclusiveEvent.AlphaTabManufacturerId &&
+                this.data[0] == AlphaTabSystemExclusiveEvents.MetronomeTick;
+    }
+
+    public get isRest():boolean {
+        return this.manufacturerId == SystemExclusiveEvent.AlphaTabManufacturerId &&
+                this.data[0] == AlphaTabSystemExclusiveEvents.Rest;
+    }
 
     public get manufacturerId(): number {
         return this.message >> 8;

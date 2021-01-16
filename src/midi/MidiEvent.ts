@@ -46,7 +46,17 @@ export enum MidiEventType {
     PitchBend = 0xE0,
 
     /**
-     * A meta event. See <see cref="MetaEventTypeEnum"/> for details.
+     * A System Exclusive event.
+     */
+    SystemExclusive = 0xF0,
+
+    /**
+     * A System Exclusive event.
+     */
+    SystemExclusive2 = 0xF7,
+
+    /**
+     * A meta event. See `MetaEventType` for details.
      */
     Meta = 0xFF
 }

@@ -127,34 +127,42 @@ export class JsonConverter {
         midi2.division = midi.division;
         let midiEvents: any[] = midi.events;
         for (let midiEvent of midiEvents) {
-            let tick: number = midiEvent.tick;
-            let message: number = midiEvent.message;
-            let midiEvent2: MidiEvent;
-            switch (midiEvent.type) {
-                case 'SystemExclusiveEvent':
-                    midiEvent2 = new SystemExclusiveEvent(tick, 0, 0, midiEvent.data);
-                    midiEvent2.message = message;
-                    break;
-                case 'MetaDataEvent':
-                    midiEvent2 = new MetaDataEvent(tick, 0, 0, midiEvent.data);
-                    midiEvent2.message = message;
-                    break;
-                case 'MetaNumberEvent':
-                    midiEvent2 = new MetaNumberEvent(tick, 0, 0, midiEvent.value);
-                    midiEvent2.message = message;
-                    break;
-                case 'Midi20PerNotePitchBendEvent':
-                    midiEvent2 = new Midi20PerNotePitchBendEvent(tick, 0, midiEvent.noteKey, midiEvent.pitch);
-                    midiEvent2.message = message;
-                    break;
-                default:
-                    midiEvent2 = new MidiEvent(tick, 0, 0, 0);
-                    midiEvent2.message = message;
-                    break;
-            }
+            let midiEvent2: MidiEvent = JsonConverter.jsObjectToMidiEvent(midiEvent);
             midi2.events.push(midiEvent2);
         }
         return midi2;
+    }
+
+    /**
+     * @target web
+     */
+    public static jsObjectToMidiEvent(midiEvent: any): MidiEvent {
+        let tick: number = midiEvent.tick;
+        let message: number = midiEvent.message;
+        let midiEvent2: MidiEvent;
+        switch (midiEvent.type) {
+            case 'SystemExclusiveEvent':
+                midiEvent2 = new SystemExclusiveEvent(tick, 0, 0, midiEvent.data);
+                midiEvent2.message = message;
+                break;
+            case 'MetaDataEvent':
+                midiEvent2 = new MetaDataEvent(tick, 0, 0, midiEvent.data);
+                midiEvent2.message = message;
+                break;
+            case 'MetaNumberEvent':
+                midiEvent2 = new MetaNumberEvent(tick, 0, 0, midiEvent.value);
+                midiEvent2.message = message;
+                break;
+            case 'Midi20PerNotePitchBendEvent':
+                midiEvent2 = new Midi20PerNotePitchBendEvent(tick, 0, midiEvent.noteKey, midiEvent.pitch);
+                midiEvent2.message = message;
+                break;
+            default:
+                midiEvent2 = new MidiEvent(tick, 0, 0, 0);
+                midiEvent2.message = message;
+                break;
+        }
+        return midiEvent2;
     }
 
     /**
@@ -166,25 +174,32 @@ export class JsonConverter {
         let midiEvents: unknown[] = [];
         midi2.events = midiEvents;
         for (let midiEvent of midi.events) {
-            let midiEvent2: any = {} as any;
-            midiEvents.push(midiEvent2);
-            midiEvent2.tick = midiEvent.tick;
-            midiEvent2.message = midiEvent.message;
-            if (midiEvent instanceof SystemExclusiveEvent) {
-                midiEvent2.type = 'SystemExclusiveEvent';
-                midiEvent2.data = midiEvent.data;
-            } else if (midiEvent instanceof MetaDataEvent) {
-                midiEvent2.type = 'MetaDataEvent';
-                midiEvent2.data = midiEvent.data;
-            } else if (midiEvent instanceof MetaNumberEvent) {
-                midiEvent2.type = 'MetaNumberEvent';
-                midiEvent2.value = midiEvent.value;
-            } else if (midiEvent instanceof Midi20PerNotePitchBendEvent) {
-                midiEvent2.type = 'Midi20PerNotePitchBendEvent';
-                midiEvent2.noteKey = midiEvent.noteKey;
-                midiEvent2.pitch = midiEvent.pitch;
-            }
+            midiEvents.push(JsonConverter.midiEventToJsObject(midiEvent));
         }
         return midi2;
+    }
+
+    /**
+     * @target web
+     */
+    public static midiEventToJsObject(midiEvent: MidiEvent): unknown {
+        let midiEvent2: any = {} as any;
+        midiEvent2.tick = midiEvent.tick;
+        midiEvent2.message = midiEvent.message;
+        if (midiEvent instanceof SystemExclusiveEvent) {
+            midiEvent2.type = 'SystemExclusiveEvent';
+            midiEvent2.data = midiEvent.data;
+        } else if (midiEvent instanceof MetaDataEvent) {
+            midiEvent2.type = 'MetaDataEvent';
+            midiEvent2.data = midiEvent.data;
+        } else if (midiEvent instanceof MetaNumberEvent) {
+            midiEvent2.type = 'MetaNumberEvent';
+            midiEvent2.value = midiEvent.value;
+        } else if (midiEvent instanceof Midi20PerNotePitchBendEvent) {
+            midiEvent2.type = 'Midi20PerNotePitchBendEvent';
+            midiEvent2.noteKey = midiEvent.noteKey;
+            midiEvent2.pitch = midiEvent.pitch;
+        }
+        return midiEvent2;
     }
 }

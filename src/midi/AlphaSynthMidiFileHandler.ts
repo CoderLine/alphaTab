@@ -3,7 +3,7 @@ import { MetaEventType } from '@src/midi/MetaEvent';
 import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 import { SystemCommonType } from '@src/midi/SystemCommonEvent';
-import { SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
+import { AlphaTabSystemExclusiveEvents, SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
 import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
@@ -45,8 +45,8 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         const message: SystemExclusiveEvent = new SystemExclusiveEvent(
             tick,
             SystemCommonType.SystemExclusive,
-            0,
-            new Uint8Array([0xff])
+            SystemExclusiveEvent.AlphaTabManufacturerId,
+            new Uint8Array([AlphaTabSystemExclusiveEvents.Rest])
         );
         this._midiFile.addEvent(message);
     }
