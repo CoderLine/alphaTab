@@ -175,7 +175,7 @@ export interface IAlphaSynth {
     /**
      * This event is fired when the Midi file needed for playback was loaded.
      */
-    readonly midiLoaded: IEventEmitter;
+    readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs>;
 
     /**
      * This event is fired when the loading of the Midi file failed.

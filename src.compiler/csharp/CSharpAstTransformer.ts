@@ -329,6 +329,7 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             members: [],
             tsNode: node,
+            partial: false,
             skipEmit: this.shouldSkip(node, false),
             tsSymbol: this._context.getSymbolForDeclaration(node)
         };
@@ -385,6 +386,7 @@ export default class CSharpAstTransformer {
             members: [],
             tsNode: node,
             skipEmit: this.shouldSkip(node, false),
+            partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
             tsSymbol: this._context.getSymbolForDeclaration(node)
         };
 

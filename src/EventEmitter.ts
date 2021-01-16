@@ -2,6 +2,10 @@ export interface IEventEmitter {
     on(value: () => void): void;
     off(value: () => void): void;
 }
+
+/**
+ * @partial
+ */
 export interface IEventEmitterOfT<T> {
     on(value: (arg: T) => void): void;
     off(value: (arg: T) => void): void;
@@ -25,6 +29,9 @@ export class EventEmitter implements IEventEmitter {
     }
 }
 
+/**
+ * @partial
+ */
 export class EventEmitterOfT<T> implements IEventEmitterOfT<T> {
     private _listeners: ((arg: T) => void)[] = [];
 

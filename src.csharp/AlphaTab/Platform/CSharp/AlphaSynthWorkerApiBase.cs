@@ -172,7 +172,7 @@ namespace AlphaTab.Platform.CSharp
         public IEventEmitter Finished { get; } = new EventEmitter();
         public IEventEmitter SoundFontLoaded { get; } = new EventEmitter();
         public IEventEmitterOfT<Error> SoundFontLoadFailed { get; } =new EventEmitterOfT<Error>();
-        public IEventEmitter MidiLoaded { get; } = new EventEmitter();
+        public IEventEmitterOfT<PositionChangedEventArgs> MidiLoaded { get; } = new EventEmitterOfT<PositionChangedEventArgs>();
         public IEventEmitterOfT<Error> MidiLoadFailed { get; } = new EventEmitterOfT<Error>();
         public IEventEmitterOfT<PlayerStateChangedEventArgs> StateChanged { get; } = new EventEmitterOfT<PlayerStateChangedEventArgs>();
         public IEventEmitterOfT<PositionChangedEventArgs> PositionChanged { get; } = new EventEmitterOfT<PositionChangedEventArgs>();
@@ -202,9 +202,9 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnUiThread(() => ((EventEmitterOfT<Error>)SoundFontLoadFailed).Trigger(e));
         }
 
-        protected virtual void OnMidiLoaded()
+        protected virtual void OnMidiLoaded(PositionChangedEventArgs args)
         {
-            DispatchOnUiThread(() => ((EventEmitter)MidiLoaded).Trigger());
+            DispatchOnUiThread(() => ((EventEmitterOfT<PositionChangedEventArgs>)MidiLoaded).Trigger(args));
         }
 
         protected virtual void OnMidiLoadFailed(Error e)
