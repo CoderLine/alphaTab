@@ -172,9 +172,14 @@ export class AlphaSynthWebWorker {
         return error;
     }
 
-    public onMidiLoaded(): void {
+    public onMidiLoaded(e: PositionChangedEventArgs): void {
         this._main.postMessage({
-            cmd: 'alphaSynth.midiLoaded'
+            cmd: 'alphaSynth.midiLoaded',
+            currentTime: e.currentTime,
+            endTime: e.endTime,
+            currentTick: e.currentTick,
+            endTick: e.endTick,
+            isSeek: e.isSeek
         });
     }
 
