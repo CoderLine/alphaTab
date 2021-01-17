@@ -3,7 +3,7 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
-import { AlphaTabSystemExclusiveEvents, SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
+import { SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
 
 export class SynthEvent {
     public eventIndex: number;
@@ -18,9 +18,12 @@ export class SynthEvent {
     }
 
 
-    private static readonly MetronomeTickData: Uint8Array = new Uint8Array([AlphaTabSystemExclusiveEvents.MetronomeTick]);
-    public static newMetronomeEvent(eventIndex: number, counter:number): SynthEvent {
-        const evt = new SystemExclusiveEvent(0, counter, MidiEventType.SystemExclusive2, SystemExclusiveEvent.AlphaTabManufacturerId, SynthEvent.MetronomeTickData);
+    public static newMetronomeEvent(eventIndex: number, tick: number, counter: number, durationInTicks: number, durationInMillis: number): SynthEvent {
+        const evt = new SystemExclusiveEvent(0, tick,
+            MidiEventType.SystemExclusive2,
+            SystemExclusiveEvent.AlphaTabManufacturerId,
+            SystemExclusiveEvent.encodeMetronome(counter, durationInTicks, durationInMillis)
+        );
         const x: SynthEvent = new SynthEvent(eventIndex, evt);
         return x;
     }

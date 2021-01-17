@@ -415,14 +415,19 @@ export class AlphaSynth implements IAlphaSynth {
         }
 
         // build events which were actually played
-        const playedEvents = new Queue<MidiEvent>();
-        while (!this._playedEventsQueue.isEmpty && this._playedEventsQueue.peek().time < currentTime) {
-            const synthEvent = this._playedEventsQueue.dequeue();
-            playedEvents.enqueue(synthEvent.event);
+        if (isSeek) {
+            this._playedEventsQueue.clear();
+        } else {
+            const playedEvents = new Queue<MidiEvent>();
+            while (!this._playedEventsQueue.isEmpty && this._playedEventsQueue.peek().time < currentTime) {
+                const synthEvent = this._playedEventsQueue.dequeue();
+                playedEvents.enqueue(synthEvent.event);
+            }
+            if (!playedEvents.isEmpty) {
+                (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(new MidiEventsPlayedEventArgs(playedEvents.toArray()))
+            }
         }
-        if (!playedEvents.isEmpty) {
-            (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(new MidiEventsPlayedEventArgs(playedEvents.toArray()))
-        }
+
     }
 
     readonly ready: IEventEmitter = new EventEmitter();

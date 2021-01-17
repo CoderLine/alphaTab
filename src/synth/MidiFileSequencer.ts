@@ -171,7 +171,8 @@ export class MidiFileSequencer {
         let absTime: number = 0.0;
 
         let metronomeCount: number = 0;
-        let metronomeLength: number = 0;
+        let metronomeLengthInTicks: number = 0;
+        let metronomeLengthInMillis: number = 0;
         let metronomeTick: number = 0;
         let metronomeTime: number = 0.0;
 
@@ -186,13 +187,18 @@ export class MidiFileSequencer {
             synthData.time = absTime;
             previousTick = mEvent.tick;
 
-            if (metronomeLength > 0) {
+            if (metronomeLengthInTicks > 0) {
                 while (metronomeTick < absTick) {
-                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length, Math.floor(metronomeTick / metronomeLength) % metronomeCount);
+                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length,
+                        metronomeTick,
+                        Math.floor(metronomeTick / metronomeLengthInTicks) % metronomeCount,
+                        metronomeLengthInTicks,
+                        metronomeLengthInMillis
+                    );
                     state.synthData.push(metronome);
                     metronome.time = metronomeTime;
-                    metronomeTick += metronomeLength;
-                    metronomeTime += metronomeLength * (60000.0 / (bpm * midiFile.division));
+                    metronomeTick += metronomeLengthInTicks;
+                    metronomeTime += metronomeLengthInMillis;
                 }
             }
 
@@ -200,11 +206,13 @@ export class MidiFileSequencer {
                 let meta: MetaNumberEvent = mEvent as MetaNumberEvent;
                 bpm = 60000000 / meta.value;
                 state.tempoChanges.push(new MidiFileSequencerTempoChange(bpm, absTick, absTime));
+                metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division))
             } else if (mEvent.command === MidiEventType.Meta && mEvent.data1 === MetaEventType.TimeSignature) {
                 let meta: MetaDataEvent = mEvent as MetaDataEvent;
                 let timeSignatureDenominator: number = Math.pow(2, meta.data[1]);
                 metronomeCount = meta.data[0];
-                metronomeLength = (state.division * (4.0 / timeSignatureDenominator)) | 0;
+                metronomeLengthInTicks = (state.division * (4.0 / timeSignatureDenominator)) | 0;
+                metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division))
                 if (state.firstTimeSignatureDenominator === 0) {
                     state.firstTimeSignatureNumerator = meta.data[0];
                     state.firstTimeSignatureDenominator = timeSignatureDenominator;
@@ -373,16 +381,23 @@ export class MidiFileSequencer {
 
         state.tempoChanges.push(new MidiFileSequencerTempoChange(bpm, 0, 0));
 
-        let metronomeLength: number = (state.division * (4.0 / timeSignatureDenominator)) | 0;
+        let metronomeLengthInTicks: number = (state.division * (4.0 / timeSignatureDenominator)) | 0;
+        let metronomeLengthInMillis: number = metronomeLengthInTicks * (60000.0 / (bpm * this._mainState.division));
         let metronomeTick: number = 0;
         let metronomeTime: number = 0.0;
 
         for (let i = 0; i < timeSignatureNumerator; i++) {
-            let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length, i);
+            let metronome: SynthEvent = SynthEvent.newMetronomeEvent(
+                state.synthData.length,
+                metronomeTick,
+                i,
+                metronomeLengthInTicks,
+                metronomeLengthInMillis
+            );
             state.synthData.push(metronome);
             metronome.time = metronomeTime;
-            metronomeTick += metronomeLength;
-            metronomeTime += metronomeLength * (60000.0 / (bpm * this._mainState.division));
+            metronomeTick += metronomeLengthInTicks;
+            metronomeTime += metronomeLengthInMillis;
         }
 
         state.synthData.sort((a, b) => {

@@ -4,6 +4,12 @@ export class Queue<T> {
 
     public isEmpty: boolean = true;
 
+    public clear() {
+        this._items = [];
+        this._position = 0;
+        this.isEmpty = true;
+    }
+
     public enqueue(item: T) {
         this.isEmpty = false;
         this._items.push(item);
