@@ -3,6 +3,11 @@
  */
 export class PositionChangedEventArgs {
     /**
+     * Gets a value indicating whether the position changed because of time seeking.
+     */
+    public isSeek: boolean;
+
+    /**
      * Gets the current time in milliseconds.
      */
     public readonly currentTime: number;
@@ -28,11 +33,13 @@ export class PositionChangedEventArgs {
      * @param endTime The end time.
      * @param currentTick The current tick.
      * @param endTick The end tick.
+     * @param isSeek Whether the time was seeked.
      */
-    public constructor(currentTime: number, endTime: number, currentTick: number, endTick: number) {
+    public constructor(currentTime: number, endTime: number, currentTick: number, endTick: number, isSeek:boolean) {
         this.currentTime = currentTime;
         this.endTime = endTime;
         this.currentTick = currentTick;
         this.endTick = endTick;
+        this.isSeek = isSeek;
     }
 }

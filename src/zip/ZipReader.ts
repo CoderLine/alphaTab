@@ -2,24 +2,9 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
 import { IReadable } from '@src/io/IReadable';
 import { Inflate } from '@src/zip/Inflate';
-
-export class ZipEntry {
-    public readonly fullName: string;
-    public readonly fileName: string;
-    public readonly data: Uint8Array;
-
-    public constructor(fullName: string, data: Uint8Array) {
-        this.fullName = fullName;
-        let i: number = fullName.lastIndexOf('/');
-        this.fileName = i === -1 || i === fullName.length - 1 ? this.fullName : fullName.substr(i + 1);
-        this.data = data;
-    }
-}
+import { ZipEntry } from './ZipEntry';
 
 export class ZipReader {
-    private static readonly OptionalDataDescriptorSignature: number = 0x08074b50;
-    private static readonly CompressionMethodDeflate: number = 8;
-    private static readonly LocalFileHeaderSignature: number = 0x04034b50;
 
     private _readable: IReadable;
 
@@ -42,7 +27,7 @@ export class ZipReader {
     private readEntry(): ZipEntry | null {
         let readable: IReadable = this._readable;
         let h: number = IOHelper.readInt32LE(readable);
-        if (h !== ZipReader.LocalFileHeaderSignature) {
+        if (h !== ZipEntry.LocalFileHeaderSignature) {
             return null;
         }
         // 4.3.7 local file header
@@ -51,13 +36,13 @@ export class ZipReader {
         let flags: number = IOHelper.readUInt16LE(readable);
         let compressionMethod: number = IOHelper.readUInt16LE(readable);
         let compressed: boolean = compressionMethod !== 0;
-        if (compressed && compressionMethod !== ZipReader.CompressionMethodDeflate) {
+        if (compressed && compressionMethod !== ZipEntry.CompressionMethodDeflate) {
             return null;
         }
 
-        IOHelper.readInt16LE(this._readable); // lastModFileTime
-        IOHelper.readInt16LE(this._readable); // lastModFileDate
-        IOHelper.readInt32LE(readable); // crc32
+        IOHelper.readInt16LE(this._readable); // last mod file time
+        IOHelper.readInt16LE(this._readable); // last mod file date
+        IOHelper.readInt32LE(readable); // crc-32
         IOHelper.readInt32LE(readable); // compressed size
 
         let uncompressedSize: number = IOHelper.readInt32LE(readable);
@@ -89,7 +74,7 @@ export class ZipReader {
         if ((flags & 8) !== 0) {
             let crc32: number = IOHelper.readInt32LE(this._readable);
             // 4.3.9.3
-            if (crc32 === ZipReader.OptionalDataDescriptorSignature) {
+            if (crc32 === ZipEntry.OptionalDataDescriptorSignature) {
                 IOHelper.readInt32LE(this._readable); // real crc
             }
             IOHelper.readInt32LE(this._readable); // compressed size

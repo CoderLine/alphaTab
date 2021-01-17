@@ -95,46 +95,8 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 }
             }
         } else {
-            let line: number = 0;
-            let offset: number = 0;
-            switch (this.container.beat.duration) {
-                case Duration.QuadrupleWhole:
-                    line = 3;
-                    break;
-                case Duration.DoubleWhole:
-                    line = 3;
-                    break;
-                case Duration.Whole:
-                    line = 2;
-                    break;
-                case Duration.Half:
-                    line = 3;
-                    break;
-                case Duration.Quarter:
-                    line = 3;
-                    break;
-                case Duration.Eighth:
-                    line = 2;
-                    offset = 5;
-                    break;
-                case Duration.Sixteenth:
-                    line = 2;
-                    offset = 5;
-                    break;
-                case Duration.ThirtySecond:
-                    line = 3;
-                    break;
-                case Duration.SixtyFourth:
-                    line = 3;
-                    break;
-                case Duration.OneHundredTwentyEighth:
-                    line = 3;
-                    break;
-                case Duration.TwoHundredFiftySixth:
-                    line = 3;
-                    break;
-            }
-            let y: number = tabRenderer.getTabY(line, offset);
+            let line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2) ;
+            let y: number = tabRenderer.getTabY(line);
             this.restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
             this.restGlyph.beat = this.container.beat;
             this.restGlyph.beamingHelper = this.beamingHelper;
@@ -182,10 +144,13 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     private createNoteGlyph(n: Note): void {
         let tr: TabBarRenderer = this.renderer as TabBarRenderer;
         let noteNumberGlyph: NoteNumberGlyph = new NoteNumberGlyph(0, 0, n);
-        let l: number = n.beat.voice.bar.staff.tuning.length - n.string + 1;
-        noteNumberGlyph.y = tr.getTabY(l, -2);
+        let l: number = n.beat.voice.bar.staff.tuning.length - n.string;
+        noteNumberGlyph.y = tr.getTabY(l);
         noteNumberGlyph.renderer = this.renderer;
         noteNumberGlyph.doLayout();
         this.noteNumbers!.addNoteGlyph(noteNumberGlyph, n);
+        let topY = noteNumberGlyph.y - noteNumberGlyph.height / 2;
+        let bottomY = topY + noteNumberGlyph.height;
+        this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
     }
 }

@@ -88,11 +88,12 @@ export class DisplaySettings {
 
     /**
      * Gets or sets the resources used during rendering. This defines all fonts and colors used.
+     * @json_partial_names
      */
     public resources: RenderingResources = new RenderingResources();
 
     /**
      * Gets or sets the padding between the music notation and the border.
      */
-    public padding: Float32Array | null = null;
+    public padding: number[] | null = null;
 }

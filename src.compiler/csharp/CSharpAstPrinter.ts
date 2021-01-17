@@ -94,9 +94,9 @@ export default class CSharpAstPrinter {
             if (!this._isStartOfLine) {
                 this.writeLine();
             }
-            lines.forEach(line => {
+            for (const line of lines) {
                 this.writeLine(`/// ${this.escapeXmlDoc(line)}`);
-            });
+            }
         } else if (lines.length === 1) {
             if (this._isStartOfLine) {
                 this.writeLine(`/// ${this.escapeXmlDoc(lines[0])}`);
@@ -143,6 +143,11 @@ export default class CSharpAstPrinter {
     private writeInterfaceDeclaration(d: cs.InterfaceDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
+
+        if (d.partial) {
+            this.write('partial ');
+        }
+
         this.write(`interface ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
 
@@ -273,12 +278,12 @@ export default class CSharpAstPrinter {
                 defaultConstructor.parameters = constructorDeclaration.parameters;
                 defaultConstructor.baseConstructorArguments = constructorDeclaration.parameters.map(
                     p =>
-                        ({
-                            parent: defaultConstructor,
-                            nodeType: cs.SyntaxKind.Identifier,
-                            text: p.name,
-                            tsNode: defaultConstructor.tsNode
-                        } as cs.Identifier)
+                    ({
+                        parent: defaultConstructor,
+                        nodeType: cs.SyntaxKind.Identifier,
+                        text: p.name,
+                        tsNode: defaultConstructor.tsNode
+                    } as cs.Identifier)
                 );
                 this.writeMember(defaultConstructor);
             }
@@ -413,7 +418,7 @@ export default class CSharpAstPrinter {
                     this.write('where ');
                     this.write(p.name);
                     this.write(' : ');
-                    this.writeType(p.constraint);
+                    this.writeType(p.constraint, false, false, true);
                 }
             });
             this._indent--;
@@ -555,35 +560,52 @@ export default class CSharpAstPrinter {
         this.writeLine(';');
     }
 
-    private writeType(type: cs.TypeNode, forNew: boolean = false, asNativeArray: boolean = false) {
-        if (!type) {
-            console.log('ERR');
-        }
+    private writeType(type: cs.TypeNode, forNew: boolean = false, asNativeArray: boolean = false, forTypeConstraint: boolean = false) {
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
-                switch ((type as cs.PrimitiveTypeNode).type) {
-                    case cs.PrimitiveType.Bool:
-                        this.write('bool');
-                        break;
-                    case cs.PrimitiveType.Dynamic:
-                        this.write('dynamic');
-                        break;
-                    case cs.PrimitiveType.Double:
-                        this.write('double');
-                        break;
-                    case cs.PrimitiveType.Int:
-                        this.write('int');
-                        break;
-                    case cs.PrimitiveType.Object:
-                        this.write('object');
-                        break;
-                    case cs.PrimitiveType.String:
-                        this.write('string');
-                        break;
-                    case cs.PrimitiveType.Void:
-                        this.write('void');
-                        break;
+                if (forTypeConstraint) {
+                    switch ((type as cs.PrimitiveTypeNode).type) {
+                        case cs.PrimitiveType.Bool:
+                        case cs.PrimitiveType.Int:
+                        case cs.PrimitiveType.Double:
+                            this.write('struct');
+                            break;
+                        case cs.PrimitiveType.Object:
+                        case cs.PrimitiveType.Dynamic:
+                        case cs.PrimitiveType.String:
+                        case cs.PrimitiveType.Void:
+                            this.write('class');
+                            break;
+                    }
+                } else {
+                    switch ((type as cs.PrimitiveTypeNode).type) {
+                        case cs.PrimitiveType.Bool:
+                            this.write('bool');
+                            break;
+                        case cs.PrimitiveType.Dynamic:
+                            this.write('dynamic');
+                            break;
+                        case cs.PrimitiveType.Double:
+                            this.write('double');
+                            break;
+                        case cs.PrimitiveType.Int:
+                            this.write('int');
+                            break;
+                        case cs.PrimitiveType.Object:
+                            this.write('object');
+                            break;
+                        case cs.PrimitiveType.String:
+                            this.write('string');
+                            break;
+                        case cs.PrimitiveType.Void:
+                            this.write('void');
+                            break;
+                        case cs.PrimitiveType.Var:
+                            this.write('var');
+                            break;
+                    }
                 }
+
                 break;
             case cs.SyntaxKind.ArrayTypeNode:
                 const arrayType = type as cs.ArrayTypeNode;
@@ -591,13 +613,20 @@ export default class CSharpAstPrinter {
                     this.writeType(arrayType.elementType);
                     this.write('[]');
                 } else {
-                    if (forNew) {
-                        this.write('System.Collections.Generic.List<');
+                    const isDynamicArray = arrayType.elementType.nodeType == cs.SyntaxKind.PrimitiveTypeNode
+                        && (arrayType.elementType as cs.PrimitiveTypeNode).type == cs.PrimitiveType.Dynamic;
+                    if (isDynamicArray && !forNew) {
+                        this.write('System.Collections.IList');
                     } else {
-                        this.write('System.Collections.Generic.IList<');
+                        if (forNew) {
+                            this.write('System.Collections.Generic.List<');
+                        } else {
+                            this.write('System.Collections.Generic.IList<');
+                        }
+                        this.writeType(arrayType.elementType);
+                        this.write('>');
                     }
-                    this.writeType(arrayType.elementType);
-                    this.write('>');
+
                 }
 
                 break;
@@ -632,7 +661,7 @@ export default class CSharpAstPrinter {
                 this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
                 break;
         }
-        if (type.isNullable && !forNew) {
+        if (type.isNullable && !forNew && !forTypeConstraint) {
             this.write('?');
         }
     }
@@ -741,6 +770,9 @@ export default class CSharpAstPrinter {
             case cs.SyntaxKind.DefaultExpression:
                 this.writeDefaultExpression(expr as cs.DefaultExpression);
                 break;
+            case cs.SyntaxKind.TypeOfExpression:
+                this.writeTypeOfExpression(expr as cs.TypeOfExpression);
+                break;
             default:
                 throw new Error(`Unhandled expression type: ${cs.SyntaxKind[expr.nodeType]}`);
         }
@@ -750,6 +782,15 @@ export default class CSharpAstPrinter {
         if (expr.type) {
             this.write('(');
             this.writeType(expr.type);
+            this.write(')');
+        }
+    }
+
+    private writeTypeOfExpression(expr: cs.TypeOfExpression) {
+        this.write('typeof');
+        if (expr.expression) {
+            this.write('(');
+            this.writeExpression(expr.expression);
             this.write(')');
         }
     }
@@ -821,24 +862,29 @@ export default class CSharpAstPrinter {
     }
 
     private writeStringTemplateExpression(expr: cs.StringTemplateExpression) {
-        this.write('$@"');
+        this.write('string.Format(System.Globalization.CultureInfo.InvariantCulture, @"');
+        let exprs: cs.Expression[] = [];
         expr.chunks.forEach(c => {
             if (c.nodeType === cs.SyntaxKind.StringLiteral) {
                 const escapedText = (c as cs.StringLiteral).text
                     .split('"')
                     .join('""')
-                    .split('{')
-                    .join('{{')
-                    .split('}')
-                    .join('}}');
+                    .split('\n')
+                    .join('\\n')
+                    .split('\r')
+                    .join('\\r');
                 this.write(escapedText);
             } else {
-                this.write('{');
-                this.writeExpression(c as cs.Expression);
-                this.write('}');
+                this.write(`{${exprs.length}}`);
+                exprs.push(c as cs.Expression);
             }
         });
         this.write('"');
+        exprs.forEach(expr => {
+            this.write(', ');
+            this.writeExpression(expr);
+        })
+        this.write(')');
     }
 
     private writeIsExpression(expr: cs.IsExpression) {
@@ -1216,7 +1262,19 @@ export default class CSharpAstPrinter {
                 this.write(', ');
             }
 
-            this.write(d.name);
+            if (d.deconstructNames) {
+                this.write('(');
+                d.deconstructNames.forEach((v, i) => {
+                    if (i > 0) {
+                        this.write(', ');
+                    }
+                    this.write(v);
+                })
+                this.write(')');
+            } else {
+                this.write(d.name);
+            }
+
             if (d.initializer) {
                 this.write(' = ');
                 this.writeExpression(d.initializer);

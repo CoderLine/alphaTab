@@ -4,8 +4,13 @@ import { MusicFontSymbol } from "./MusicFontSymbol";
 
 /**
  * Describes an instrument articulation which is used for percussions. 
+ * @json
  */
 export class InstrumentArticulation {
+    /**
+     * Gets or sets the type of the element for which this articulation is for.
+     */
+    public elementType: string;
     /**
      * Gets or sets the line the note head should be shown for standard notation
      */
@@ -35,13 +40,16 @@ export class InstrumentArticulation {
      */
     public outputMidiNumber: number;
 
-    public constructor(staffLine: number = 0,
+    public constructor(
+        elementType: string = "",
+        staffLine: number = 0,
         outputMidiNumber: number = 0,
         noteHeadDefault: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbolPlacement: TextBaseline = TextBaseline.Middle) {
+        this.elementType = elementType;
         this.outputMidiNumber = outputMidiNumber;
         this.staffLine = staffLine;
         this.noteHeadDefault = noteHeadDefault;
@@ -49,16 +57,6 @@ export class InstrumentArticulation {
         this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
         this.techniqueSymbol = techniqueSymbol;
         this.techniqueSymbolPlacement = techniqueSymbolPlacement;
-    }
-
-    public static copyTo(src: any, dst: InstrumentArticulation) {
-        dst.outputMidiNumber = src.outputMidiNumber;
-        dst.staffLine = src.staffLine;
-        dst.noteHeadDefault = src.noteHeadDefault;
-        dst.noteHeadHalf = src.noteHeadHalf;
-        dst.noteHeadWhole = src.noteHeadWhole;
-        dst.techniqueSymbol = src.techniqueSymbol;
-        dst.techniqueSymbolPlacement = src.techniqueSymbolPlacement;
     }
 
     public getSymbol(duration: Duration): MusicFontSymbol {

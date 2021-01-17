@@ -21,15 +21,15 @@ import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 
 export class GpImporterTestHelper {
-    public static async prepareImporterWithFile(name: string): Promise<Gp3To5Importer> {
+    public static async prepareImporterWithFile(name: string, settings: Settings | null = null): Promise<Gp3To5Importer> {
         let path: string = 'test-data/';
         const buffer = await TestPlatform.loadFile(path + name);
-        return GpImporterTestHelper.prepareImporterWithBytes(buffer);
+        return GpImporterTestHelper.prepareImporterWithBytes(buffer, settings);
     }
 
-    public static prepareImporterWithBytes(buffer: Uint8Array): Gp3To5Importer {
+    public static prepareImporterWithBytes(buffer: Uint8Array, settings: Settings | null = null): Gp3To5Importer {
         let readerBase: Gp3To5Importer = new Gp3To5Importer();
-        readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
+        readerBase.init(ByteBuffer.fromBuffer(buffer), settings ?? new Settings());
         return readerBase;
     }
 

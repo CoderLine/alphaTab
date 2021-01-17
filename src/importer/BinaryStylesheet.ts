@@ -111,16 +111,31 @@ export class BinaryStylesheet {
     }
 
     public apply(score: Score): void {
-        this.raw.forEach((value, key) => {
+        for(const [key, value] of this.raw) {
             switch (key) {
                 case 'StandardNotation/hideDynamics':
                     score.stylesheet.hideDynamics = value as boolean;
                     break;
             }
-        });
+        }
     }
 
     public addValue(key: string, value: unknown): void {
         this.raw.set(key, value);
+    }
+
+    public static writeForScore(score: Score): Uint8Array {
+        const writer = ByteBuffer.withCapacity(128);
+        IOHelper.writeInt32BE(writer, 1); // entry count
+
+        BinaryStylesheet.writeBooleanEntry(writer, 'StandardNotation/hideDynamics', score.stylesheet.hideDynamics);
+
+        return writer.toArray();
+    }
+
+    private static writeBooleanEntry(writer: ByteBuffer, key: string, value: boolean) {
+        GpBinaryHelpers.gpWriteString(writer, key);
+        writer.writeByte(DataType.Boolean as number);
+        writer.writeByte(value ? 1 : 0);
     }
 }

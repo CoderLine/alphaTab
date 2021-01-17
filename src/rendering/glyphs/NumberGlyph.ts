@@ -3,7 +3,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 
 export class NumberGlyph extends GlyphGroup {
-    public static readonly height:number = 18;
+    public static readonly numberHeight:number = 18;
     
     private _number: number = 0;
     private _scale: number = 0;

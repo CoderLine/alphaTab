@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Feature Request
+    url: https://github.com/CoderLine/alphaTab/discussions?discussions_q=category%3AIdeas
+    about: Propose your desired feature with a new discussion.
+  - name: General Question
+    url: https://github.com/CoderLine/alphaTab/discussions?discussions_q=category%3AQ%26A
+    about: Ask any question about alphaTab.

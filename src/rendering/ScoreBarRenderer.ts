@@ -9,7 +9,7 @@ import { Note } from '@src/model/Note';
 import { TupletGroup } from '@src/model/TupletGroup';
 import { Voice } from '@src/model/Voice';
 import { FingeringMode, NotationMode } from '@src/NotationSettings';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
@@ -29,7 +29,7 @@ import { ScoreBeatContainerGlyph } from '@src/rendering/ScoreBeatContainerGlyph'
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { BeamingHelper, BeamingHelperDrawInfo } from '@src/rendering/utils/BeamingHelper';
 import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
@@ -51,7 +51,7 @@ export class ScoreBarRenderer extends BarRendererBase {
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
         this._startSpacing = false;
-        this.accidentalHelper = new AccidentalHelper(bar);
+        this.accidentalHelper = new AccidentalHelper(this);
     }
 
     public getBeatDirection(beat: Beat): BeamDirection {
@@ -84,11 +84,11 @@ export class ScoreBarRenderer extends BarRendererBase {
         this.updateFirstLineY();
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
-            let top: number = this.getScoreY(-2, 0);
-            let bottom: number = this.getScoreY(6, 0);
+            let top: number = this.getScoreY(-2);
+            let bottom: number = this.getScoreY(6);
             let whammyOffset: number = this.simpleWhammyOverflow;
             this.registerOverflowTop(whammyOffset);
-            let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine, 0);
+            let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine);
             let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
             if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
@@ -103,7 +103,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             if (maxNoteY < top) {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
             }
-            let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine, 0);
+            let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine);
             let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
@@ -146,18 +146,22 @@ export class ScoreBarRenderer extends BarRendererBase {
         canvas.color = h.voice!.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         // TODO: draw stem at least at the center of the score staff.
         // check if we need to paint simple footer
-        if (h.beats.length === 1) {
-            this.paintFlag(cx, cy, canvas, h);
-        } else {
-            this.paintBar(cx, cy, canvas, h);
+        if (!h.isRestBeamHelper) {
+            if (h.beats.length === 1) {
+                this.paintFlag(cx, cy, canvas, h);
+            } else {
+                this.paintBar(cx, cy, canvas, h);
+            }
         }
     }
 
     private paintTupletHelper(cx: number, cy: number, canvas: ICanvas, h: TupletGroup): void {
         let res: RenderingResources = this.resources;
         let oldAlign: TextAlign = canvas.textAlign;
+        let oldBaseLine = canvas.textBaseline;
         canvas.color = h.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         canvas.textAlign = TextAlign.Center;
+        canvas.textBaseline = TextBaseline.Middle;
         let s: string;
         let num: number = h.beats[0].tupletNumerator;
         let den: number = h.beats[0].tupletDenominator;
@@ -188,6 +192,9 @@ export class ScoreBarRenderer extends BarRendererBase {
             s = num + ':' + den;
         }
         // check if we need to paint simple footer
+        let offset: number = 10 * this.scale;
+        let size: number = 5 * this.scale;
+
         if (h.beats.length === 1 || !h.isFull) {
             for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
                 let beat: Beat = h.beats[i];
@@ -197,77 +204,115 @@ export class ScoreBarRenderer extends BarRendererBase {
                 }
                 let direction: BeamDirection = beamingHelper.direction;
                 let tupletX: number = beamingHelper.getBeatLineX(beat);
-                let tupletY: number = cy + this.y + this.calculateBeamY(beamingHelper, tupletX);
-                let offset: number = direction === BeamDirection.Up ? res.effectFont.size * 1.5 : -3 * this.scale;
-                canvas.font = res.effectFont;
-                canvas.fillText(s, cx + this.x + tupletX, tupletY - offset);
-            }
-        } else {
-            let firstBeat: Beat = h.beats[0];
-            let lastBeat: Beat = h.beats[h.beats.length - 1];
-            let firstBeamingHelper: BeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstBeat.index)!;
-            let lastBeamingHelper: BeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastBeat.index)!;
-            if (firstBeamingHelper && lastBeamingHelper) {
-                let direction: BeamDirection = firstBeamingHelper.direction;
-                //
-                // Calculate the overall area of the tuplet bracket
-                let startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
-                let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
-                //
-                // Calculate how many space the text will need
-                canvas.font = res.effectFont;
-                let sw: number = canvas.measureText(s);
-                let sp: number = 3 * this.scale;
-                //
-                // Calculate the offsets where to break the bracket
-                let middleX: number = (startX + endX) / 2;
-                let offset1X: number = middleX - sw / 2 - sp;
-                let offset2X: number = middleX + sw / 2 + sp;
-                //
-                // calculate the y positions for our bracket
-                let startY: number = this.calculateBeamYWithDirection(
-                    firstBeamingHelper,
-                    startX,
-                    firstBeamingHelper.direction
+                let tupletY: number = this.calculateBeamYWithDirection(
+                    beamingHelper,
+                    tupletX,
+                    direction
                 );
-                let endY: number = this.calculateBeamYWithDirection(
-                    lastBeamingHelper,
-                    endX,
-                    firstBeamingHelper.direction
-                );
-                let k: number = (endY - startY) / (endX - startX);
-                let d: number = startY - k * startX;
-                let offset1Y: number = k * offset1X + d;
-                let middleY: number = k * middleX + d;
-                let offset2Y: number = k * offset2X + d;
-                let offset: number = 10 * this.scale;
-                let size: number = 5 * this.scale;
                 if (direction === BeamDirection.Down) {
                     offset *= -1;
                     size *= -1;
                 }
-                //
-                // draw the bracket
-                canvas.beginPath();
-                canvas.moveTo(cx + this.x + startX, (cy + this.y + startY - offset) | 0);
-                canvas.lineTo(cx + this.x + startX, (cy + this.y + startY - offset - size) | 0);
-                canvas.lineTo(cx + this.x + offset1X, (cy + this.y + offset1Y - offset - size) | 0);
-                canvas.stroke();
-                canvas.beginPath();
-                canvas.moveTo(cx + this.x + offset2X, (cy + this.y + offset2Y - offset - size) | 0);
-                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset - size) | 0);
-                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset) | 0);
-                canvas.stroke();
-                //
-                // Draw the string
-                canvas.fillText(
-                    s,
-                    cx + this.x + middleX,
-                    cy + this.y + middleY - offset - size - res.effectFont.size / 2
-                );
+                canvas.font = res.effectFont;
+                canvas.fillText(s, cx + this.x + tupletX, cy + this.y + tupletY - offset - size);
             }
+        } else {
+            let firstBeat: Beat = h.beats[0];
+            let lastBeat: Beat = h.beats[h.beats.length - 1];
+            let firstNonRestBeat: Beat | null = null;
+            let lastNonRestBeat: Beat | null = null;
+            for (let i = 0; i < h.beats.length; i++) {
+                if (!h.beats[i].isRest) {
+                    firstNonRestBeat = h.beats[i];
+                    break;
+                }
+            }
+            for (let i = h.beats.length - 1; i >= 0; i--) {
+                if (!h.beats[i].isRest) {
+                    lastNonRestBeat = h.beats[i];
+                    break;
+                }
+            }
+
+            let isRestOnly = false;
+            if (!firstNonRestBeat) {
+                firstNonRestBeat = firstBeat;
+                isRestOnly = true;
+            }
+
+            if (!lastNonRestBeat) {
+                lastNonRestBeat = lastBeat;
+            }
+
+            //
+            // Calculate the overall area of the tuplet bracket
+            let firstBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstBeat.index)!;
+            let lastBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastBeat.index)!;
+            let startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
+            let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
+
+            //
+            // calculate the y positions for our bracket
+            let firstNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstNonRestBeat.index)!;
+            let lastNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastNonRestBeat.index)!;
+            let direction = firstBeamingHelper.direction;
+            let startY: number = this.calculateBeamYWithDirection(
+                firstNonRestBeamingHelper,
+                startX,
+                direction
+            );
+            let endY: number = this.calculateBeamYWithDirection(
+                lastNonRestBeamingHelper,
+                endX,
+                direction
+            );
+            if(isRestOnly) {
+                startY = Math.max(startY, endY);
+                endY = startY;
+            }
+
+            //
+            // Calculate how many space the text will need
+            canvas.font = res.effectFont;
+            let sw: number = canvas.measureText(s);
+            let sp: number = 3 * this.scale;
+            //
+            // Calculate the offsets where to break the bracket
+            let middleX: number = (startX + endX) / 2;
+            let offset1X: number = middleX - sw / 2 - sp;
+            let offset2X: number = middleX + sw / 2 + sp;
+
+            let k: number = (endY - startY) / (endX - startX);
+            let d: number = startY - k * startX;
+            let offset1Y: number = k * offset1X + d;
+            let middleY: number = k * middleX + d;
+            let offset2Y: number = k * offset2X + d;
+            if (direction === BeamDirection.Down) {
+                offset *= -1;
+                size *= -1;
+            }
+            //
+            // draw the bracket
+            canvas.beginPath();
+            canvas.moveTo(cx + this.x + startX, (cy + this.y + startY - offset) | 0);
+            canvas.lineTo(cx + this.x + startX, (cy + this.y + startY - offset - size) | 0);
+            canvas.lineTo(cx + this.x + offset1X, (cy + this.y + offset1Y - offset - size) | 0);
+            canvas.stroke();
+            canvas.beginPath();
+            canvas.moveTo(cx + this.x + offset2X, (cy + this.y + offset2Y - offset - size) | 0);
+            canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset - size) | 0);
+            canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset) | 0);
+            canvas.stroke();
+            //
+            // Draw the string
+            canvas.fillText(
+                s,
+                cx + this.x + middleX,
+                cy + this.y + middleY - offset - size
+            );
         }
         canvas.textAlign = oldAlign;
+        canvas.textBaseline = oldBaseLine;
     }
 
     public getStemSize(helper: BeamingHelper): number {
@@ -351,74 +396,139 @@ export class ScoreBarRenderer extends BarRendererBase {
         return this.calculateBeamYWithDirection(h, x, h.direction);
     }
 
+    public applyLayoutingInfo(): boolean {
+        const result = super.applyLayoutingInfo();
+        if (result && this.bar.isMultiVoice) {
+            // consider rest overflows
+            let top: number = this.getScoreY(-2);
+            let bottom: number = this.getScoreY(6);
+            let minMax = this.helpers.collisionHelper.getBeatMinMaxY();
+            if (minMax[0] < top) {
+                this.registerOverflowTop(Math.abs(minMax[0]));
+            }
+            if (minMax[1] > bottom) {
+                this.registerOverflowBottom(Math.abs(minMax[1]) - bottom);
+            }
+        }
+        return result;
+    }
+
     private calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         let stemSize: number = this.getStemSize(h);
 
-        const firstBeat = h.beats[0];
+        if (!h.drawingInfos.has(direction)) {
+            let drawingInfo = new BeamingHelperDrawInfo();
+            h.drawingInfos.set(direction, drawingInfo);
 
-        // create a line between the min and max note of the group
-        if (h.beats.length === 1) {
-            if (direction === BeamDirection.Up) {
-                return this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize;
+            // the beaming logic works like this: 
+            // 1. we take the first and last note, add the stem, and put a diagnal line between them. 
+            // 2. the height of the diagonal line must not exceed a max height, 
+            //    - if this is the case, the line on the more distant note just gets longer
+            // 3. any middle elements (notes or rests) shift this diagonal line up/down to avoid overlaps
+
+            const firstBeat = h.beats[0];
+            const lastBeat = h.beats[h.beats.length - 1];
+
+            let isRest = h.isRestBeamHelper;
+
+            // 1. put direct diagonal line.
+            drawingInfo.startBeat = firstBeat;
+            drawingInfo.startX = h.getBeatLineX(firstBeat);
+            if (isRest) {
+                drawingInfo.startY = direction === BeamDirection.Up
+                    ? this.getScoreY(h.minRestLine!)
+                    : this.getScoreY(h.maxRestLine!);
+            } else {
+                drawingInfo.startY = direction === BeamDirection.Up
+                    ? this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize
+                    : this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
             }
-            return this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
+
+
+            drawingInfo.endBeat = lastBeat;
+            drawingInfo.endX = h.getBeatLineX(lastBeat);
+            if (isRest) {
+                drawingInfo.endY = direction === BeamDirection.Up
+                    ? this.getScoreY(h.minRestLine!)
+                    : this.getScoreY(h.maxRestLine!);
+            } else {
+                drawingInfo.endY =
+                    direction === BeamDirection.Up
+                        ? this.getScoreY(this.accidentalHelper.getMinLine(lastBeat)) - stemSize
+                        : this.getScoreY(this.accidentalHelper.getMaxLine(lastBeat)) + stemSize;
+            }
+            // 2. ensure max height
+            // we use the min/max notes to place the beam along their real position
+            // we only want a maximum of 10 offset for their gradient
+            let maxDistance: number = 10 * this.scale;
+            if (direction === BeamDirection.Down && drawingInfo.startY > drawingInfo.endY && drawingInfo.startY - drawingInfo.endY > maxDistance) {
+                drawingInfo.endY = drawingInfo.startY - maxDistance;
+            }
+            if (direction === BeamDirection.Down && drawingInfo.endY > drawingInfo.startY && drawingInfo.endY - drawingInfo.startY > maxDistance) {
+                drawingInfo.startY = drawingInfo.endY - maxDistance;
+            }
+            if (direction === BeamDirection.Up && drawingInfo.startY < drawingInfo.endY && drawingInfo.endY - drawingInfo.startY > maxDistance) {
+                drawingInfo.endY = drawingInfo.startY + maxDistance;
+            }
+            if (direction === BeamDirection.Up && drawingInfo.endY < drawingInfo.startY && drawingInfo.startY - drawingInfo.endY > maxDistance) {
+                drawingInfo.startY = drawingInfo.endY + maxDistance;
+            }
+
+            // 3. let middle elements shift up/down
+            if (h.beats.length > 1) {
+                // check if highest note shifts bar up or down
+                if (direction === BeamDirection.Up) {
+                    let yNeededForHighestNote = this.getScoreY(this.accidentalHelper.getMinLine(h.beatOfHighestNote)) - stemSize;
+                    const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfHighestNote));
+
+                    const diff = yGivenByCurrentValues - yNeededForHighestNote;
+                    if (diff > 0) {
+                        drawingInfo.startY -= diff;
+                        drawingInfo.endY -= diff;
+                    }
+                } else {
+                    let yNeededForLowestNote = this.getScoreY(this.accidentalHelper.getMaxLine(h.beatOfLowestNote)) + stemSize;
+                    const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfLowestNote));
+
+                    const diff = yNeededForLowestNote - yGivenByCurrentValues;
+                    if (diff > 0) {
+                        drawingInfo.startY += diff;
+                        drawingInfo.endY += diff;
+                    }
+                }
+
+                // check if rest shifts bar up or down
+                if (h.minRestLine !== null || h.maxRestLine !== null) {
+                    const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
+                    let scaleMod: number = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
+                    let barSpacing: number = barCount *
+                        (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * this.scale * scaleMod;
+                    barSpacing += BarRendererBase.BeamSpacing;
+
+                    if (direction === BeamDirection.Up && h.minRestLine !== null) {
+                        let yNeededForRest = this.getScoreY(h.minRestLine!) - barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMinRestLine!));
+
+                        const diff = yGivenByCurrentValues - yNeededForRest;
+                        if (diff > 0) {
+                            drawingInfo.startY -= diff;
+                            drawingInfo.endY -= diff;
+                        }
+                    } else if (direction === BeamDirection.Down && h.maxRestLine !== null) {
+                        let yNeededForRest = this.getScoreY(h.maxRestLine!) + barSpacing;
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMaxRestLine!));
+
+                        const diff = yNeededForRest - yGivenByCurrentValues;
+                        if (diff > 0) {
+                            drawingInfo.startY += diff;
+                            drawingInfo.endY += diff;
+                        }
+                    }
+                }
+            }
         }
 
-        const lastBeat = h.beats[h.beats.length - 1];
-
-        // we use the min/max notes to place the beam along their real position
-        // we only want a maximum of 10 offset for their gradient
-        let maxDistance: number = 10 * this.scale;
-        // if the min note is not first or last, we can align notes directly to the position
-        // of the min note
-        const beatOfLowestNote = h.beatOfLowestNote;
-        const beatOfHighestNote = h.beatOfHighestNote;
-        if (
-            direction === BeamDirection.Down &&
-            beatOfLowestNote !== firstBeat &&
-            beatOfLowestNote !== lastBeat
-        ) {
-            return this.getScoreY(this.accidentalHelper.getMaxLine(beatOfLowestNote)) + stemSize;
-        }
-        if (
-            direction === BeamDirection.Up &&
-            beatOfHighestNote !== firstBeat &&
-            beatOfHighestNote !== lastBeat
-        ) {
-            return this.getScoreY(this.accidentalHelper.getMinLine(beatOfHighestNote)) - stemSize;
-        }
-
-        let startX: number = h.getBeatLineX(firstBeat);
-        let startY: number =
-            direction === BeamDirection.Up
-                ? this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize
-                : this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
-
-        let endX: number = h.getBeatLineX(lastBeat);
-        let endY: number =
-            direction === BeamDirection.Up
-                ? this.getScoreY(this.accidentalHelper.getMinLine(lastBeat)) - stemSize
-                : this.getScoreY(this.accidentalHelper.getMaxLine(lastBeat)) + stemSize;
-
-        // ensure the maxDistance
-        if (direction === BeamDirection.Down && startY > endY && startY - endY > maxDistance) {
-            endY = startY - maxDistance;
-        }
-        if (direction === BeamDirection.Down && endY > startY && endY - startY > maxDistance) {
-            startY = endY - maxDistance;
-        }
-        if (direction === BeamDirection.Up && startY < endY && endY - startY > maxDistance) {
-            endY = startY + maxDistance;
-        }
-        if (direction === BeamDirection.Up && endY < startY && startY - endY > maxDistance) {
-            startY = endY + maxDistance;
-        }
-        // get the y position of the given beat on this curve
-        if (startX === endX) {
-            return startY;
-        }
-        // y(x)  = ( (y2 - y1) / (x2 - x1) )  * (x - x1) + y1;
-        return ((endY - startY) / (endX - startX)) * (x - startX) + startY;
+        return h.drawingInfos.get(direction)!.calcY(x);
     }
 
 
@@ -637,7 +747,6 @@ export class ScoreBarRenderer extends BarRendererBase {
             this.bar.clefOttava !== this.bar.previousBar!.clefOttava
         ) {
             let offset: number = 0;
-            let correction: number = 0.5;
             switch (this.bar.clef) {
                 case Clef.Neutral:
                     offset = this.bar.staff.standardNotationLineCount - 1;
@@ -658,7 +767,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             this.createStartSpacing();
 
             this.addPreBeatGlyph(
-                new ClefGlyph(0, this.getScoreY(offset, correction), this.bar.clef, this.bar.clefOttava)
+                new ClefGlyph(0, this.getScoreY(offset) + 0.5 * BarRendererBase.StaffLineThickness, this.bar.clef, this.bar.clefOttava)
             );
         }
         // Key signature
@@ -697,7 +806,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
             if (this.bar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreY(-4), this.bar.masterBar.repeatCount));
+                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreHeight(-0.5), this.bar.masterBar.repeatCount));
             }
         } else {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
@@ -744,13 +853,13 @@ export class ScoreBarRenderer extends BarRendererBase {
         if (ModelUtils.keySignatureIsSharp(currentKey)) {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
                 let step: number = ScoreBarRenderer.SharpKsSteps[i] + offsetClef;
-                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step, 0), AccidentalType.Sharp, false));
+                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Sharp, false));
                 newLines.set(step, true);
             }
         } else {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
                 let step: number = ScoreBarRenderer.FlatKsSteps[i] + offsetClef;
-                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step, 0), AccidentalType.Flat, false));
+                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Flat, false));
                 newLines.set(step, true);
             }
         }
@@ -765,7 +874,7 @@ export class ScoreBarRenderer extends BarRendererBase {
                 this.addPreBeatGlyph(
                     new AccidentalGlyph(
                         0,
-                        this.getScoreY(previousKeyPositions[i] + offsetClef, 0),
+                        this.getScoreY(previousKeyPositions[i] + offsetClef),
                         AccidentalType.Natural,
                         false
                     )
@@ -784,7 +893,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
                 0,
-                this.getScoreY(lines, 0),
+                this.getScoreY(lines),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon
@@ -802,7 +911,6 @@ export class ScoreBarRenderer extends BarRendererBase {
         }
     }
 
-    // TODO[performance]: Maybe we should cache this (check profiler)
     public getNoteLine(n: Note): number {
         return this.accidentalHelper.getNoteLine(n);
     }
@@ -810,15 +918,13 @@ export class ScoreBarRenderer extends BarRendererBase {
     /**
      * Gets the relative y position of the given steps relative to first line.
      * @param steps the amount of steps while 2 steps are one line
-     * @param correction
      * @returns
      */
-    public getScoreY(steps: number, correction: number = 0): number {
+    public getScoreY(steps: number): number {
         return (
             this._firstLineY +
             this.lineOffset +
-            this.getScoreHeight(steps) +
-            correction * this.scale * BarRendererBase.StaffLineThickness
+            this.getScoreHeight(steps)
         );
     }
 
@@ -850,5 +956,29 @@ export class ScoreBarRenderer extends BarRendererBase {
         canvas.color = res.mainGlyphColor;
 
         this.paintSimileMark(cx, cy, canvas);
+    }
+
+    public completeBeamingHelper(helper: BeamingHelper) {
+        // for multi-voice bars we need to register the positions 
+        // for multi-voice rest displacement to avoid collisions
+        if (this.bar.isMultiVoice && helper.highestNoteInHelper && helper.lowestNoteInHelper) {
+            let highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.Center);
+            let lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.Center);
+
+            let offset = this.getStemSize(helper);
+            if (helper.hasTuplet) {
+                offset += this.resources.effectFont.size * 2;
+            }
+
+            if (helper.direction == BeamDirection.Up) {
+                highestNotePosition -= offset;
+            } else {
+                lowestNotePosition += offset;
+            }
+
+            for (const beat of helper.beats) {
+                this.helpers.collisionHelper.reserveBeatSlot(beat, highestNotePosition, lowestNotePosition);
+            }
+        }
     }
 }

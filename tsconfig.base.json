@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es6",
     "module": "es6",
     "lib": [
       "es2015",
@@ -32,15 +32,10 @@
     "typeRoots": [
       "types",
       "node_modules/@types"
-    ],
-    "plugins": [
-      {
-        "transform": "./src.compiler/JsonSerializationBuilder.ts"
-      },
     ]
   },
   "include": [
-    "src"
+    "src",
   ],
   "exclude": [
     "**/node_modules",

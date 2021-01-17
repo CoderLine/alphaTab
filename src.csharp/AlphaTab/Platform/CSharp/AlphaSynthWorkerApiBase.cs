@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Midi;
 using AlphaTab.Synth;
@@ -34,6 +35,7 @@ namespace AlphaTab.Platform.CSharp
             Player.MidiLoaded.On(OnMidiLoaded);
             Player.MidiLoadFailed.On(OnMidiLoadFailed);
             Player.ReadyForPlayback.On(OnReadyForPlayback);
+            Player.MidiEventsPlayed.On(OnMidiEventsPlayed);
 
             DispatchOnUiThread(OnReady);
         }
@@ -63,6 +65,12 @@ namespace AlphaTab.Platform.CSharp
         {
             get => Player.CountInVolume;
             set => DispatchOnWorkerThread(() => { Player.CountInVolume = value; });
+        }
+
+        public IList<MidiEventType> MidiEventsPlayedFilter
+        {
+            get => Player.MidiEventsPlayedFilter;
+            set => DispatchOnWorkerThread(() => { Player.MidiEventsPlayedFilter = value; });
         }
 
         public double MetronomeVolume
@@ -172,10 +180,12 @@ namespace AlphaTab.Platform.CSharp
         public IEventEmitter Finished { get; } = new EventEmitter();
         public IEventEmitter SoundFontLoaded { get; } = new EventEmitter();
         public IEventEmitterOfT<Error> SoundFontLoadFailed { get; } =new EventEmitterOfT<Error>();
-        public IEventEmitter MidiLoaded { get; } = new EventEmitter();
+        public IEventEmitterOfT<MidiFile> MidiLoad { get; } = new EventEmitterOfT<MidiFile>();
+        public IEventEmitterOfT<PositionChangedEventArgs> MidiLoaded { get; } = new EventEmitterOfT<PositionChangedEventArgs>();
         public IEventEmitterOfT<Error> MidiLoadFailed { get; } = new EventEmitterOfT<Error>();
         public IEventEmitterOfT<PlayerStateChangedEventArgs> StateChanged { get; } = new EventEmitterOfT<PlayerStateChangedEventArgs>();
         public IEventEmitterOfT<PositionChangedEventArgs> PositionChanged { get; } = new EventEmitterOfT<PositionChangedEventArgs>();
+        public IEventEmitterOfT<MidiEventsPlayedEventArgs> MidiEventsPlayed { get; } = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
 
         protected virtual void OnReady()
         {
@@ -202,14 +212,19 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnUiThread(() => ((EventEmitterOfT<Error>)SoundFontLoadFailed).Trigger(e));
         }
 
-        protected virtual void OnMidiLoaded()
+        protected virtual void OnMidiLoaded(PositionChangedEventArgs args)
         {
-            DispatchOnUiThread(() => ((EventEmitter)MidiLoaded).Trigger());
+            DispatchOnUiThread(() => ((EventEmitterOfT<PositionChangedEventArgs>)MidiLoaded).Trigger(args));
         }
 
         protected virtual void OnMidiLoadFailed(Error e)
         {
             DispatchOnUiThread(() => ((EventEmitterOfT<Error>)MidiLoadFailed).Trigger(e));
+        }
+
+        protected virtual void OnMidiEventsPlayed(MidiEventsPlayedEventArgs e)
+        {
+            DispatchOnUiThread(() => ((EventEmitterOfT<MidiEventsPlayedEventArgs>)MidiEventsPlayed).Trigger(e));
         }
 
         protected virtual void OnStateChanged(PlayerStateChangedEventArgs obj)

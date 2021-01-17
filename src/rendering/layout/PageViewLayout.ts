@@ -14,12 +14,12 @@ import { NotationElement } from '@src/NotationSettings';
  * This layout arranges the bars into a fixed width and dynamic height region.
  */
 export class PageViewLayout extends ScoreLayout {
-    public static PagePadding: Float32Array = new Float32Array([40, 40, 40, 40]);
+    public static PagePadding: number[] = [40, 40, 40, 40];
     public static readonly GroupSpacing: number = 20;
     private _groups: StaveGroup[] = [];
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
     private _barsFromPreviousGroup: MasterBarsRenderers[] = [];
-    private _pagePadding: Float32Array | null = null;
+    private _pagePadding: number[] | null = null;
 
     public get name(): string {
         return 'PageView';
@@ -35,19 +35,19 @@ export class PageViewLayout extends ScoreLayout {
             this._pagePadding = PageViewLayout.PagePadding;
         }
         if (this._pagePadding.length === 1) {
-            this._pagePadding = new Float32Array([
+            this._pagePadding = [
                 this._pagePadding[0],
                 this._pagePadding[0],
                 this._pagePadding[0],
                 this._pagePadding[0]
-            ]);
+            ];
         } else if (this._pagePadding.length === 2) {
-            this._pagePadding = new Float32Array([
+            this._pagePadding = [
                 this._pagePadding[0],
                 this._pagePadding[1],
                 this._pagePadding[0],
                 this._pagePadding[1]
-            ]);
+            ];
         }
         let x: number = this._pagePadding[0];
         let y: number = this._pagePadding[1];
@@ -57,10 +57,13 @@ export class PageViewLayout extends ScoreLayout {
         // 1. Score Info
         y = this.layoutAndRenderScoreInfo(x, y, -1);
         //
-        // 2. Chord Diagrms
+        // 2. Tunings
+        y = this.layoutAndRenderTunings(y, -1);
+        //
+        // 3. Chord Diagrms
         y = this.layoutAndRenderChordDiagrams(y, -1);
         //
-        // 3. One result per StaveGroup
+        // 4. One result per StaveGroup
         y = this.layoutAndRenderScore(x, y);
         this.height = y + this._pagePadding[3];
     }
@@ -78,12 +81,46 @@ export class PageViewLayout extends ScoreLayout {
         // 1. Score Info
         y = this.layoutAndRenderScoreInfo(x, y, oldHeight);
         //
-        // 2. Chord Digrams
+        // 2. Tunings
+        y = this.layoutAndRenderTunings(y, oldHeight);
+        //
+        // 3. Chord Digrams
         y = this.layoutAndRenderChordDiagrams(y, oldHeight);
         //
-        // 2. One result per StaveGroup
+        // 4. One result per StaveGroup
         y = this.resizeAndRenderScore(x, y, oldHeight);
         this.height = y + this._pagePadding![3];
+    }
+
+    private layoutAndRenderTunings(y: number, totalHeight: number = -1): number {
+        if (!this.tuningGlyph) {
+            return y;
+        }
+
+        let res: RenderingResources = this.renderer.settings.display.resources;
+        this.tuningGlyph.width = this.width;
+        this.tuningGlyph.doLayout();
+
+        let tuningHeight = this.tuningGlyph.height + 11 * this.scale;;
+        y += tuningHeight;
+
+        let canvas: ICanvas = this.renderer.canvas!;
+        canvas.beginRender(this.width, tuningHeight);
+        canvas.color = res.scoreInfoColor;
+        canvas.textAlign = TextAlign.Center;
+        this.tuningGlyph.paint(this._pagePadding![0], 0, canvas);
+        let result: unknown = canvas.endRender();
+
+        let e = new RenderFinishedEventArgs();
+        e.width = this.width;
+        e.height = tuningHeight;
+        e.renderResult = result;
+        e.totalWidth = this.width;
+        e.totalHeight = totalHeight < 0 ? y : totalHeight;
+        e.firstMasterBarIndex = -1;
+        e.lastMasterBarIndex = -1;
+        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
+        return y;
     }
 
     private layoutAndRenderChordDiagrams(y: number, totalHeight: number = -1): number {
@@ -154,22 +191,15 @@ export class PageViewLayout extends ScoreLayout {
         if (musicOrWords) {
             y += musicOrWordsHeight;
         }
-        if (this.tuningGlyph) {
-            y += 20 * scale;
-            this.tuningGlyph.x = x;
-            this.tuningGlyph.y = y;
-            y += this.tuningGlyph.height;
-        }
-        y += 20 * scale;
+        
+        y += 17 * this.scale;
+
         let canvas: ICanvas = this.renderer.canvas!;
         canvas.beginRender(this.width, y);
         canvas.color = res.scoreInfoColor;
         canvas.textAlign = TextAlign.Center;
-        this.scoreInfoGlyphs.forEach(g => {
+        for(const g of this.scoreInfoGlyphs.values()) {
             g.paint(0, 0, canvas);
-        });
-        if (this.tuningGlyph) {
-            this.tuningGlyph.paint(0, 0, canvas);
         }
         let result: unknown = canvas.endRender();
 

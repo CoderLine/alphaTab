@@ -14,6 +14,10 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { SynthEvent } from './synthesis/SynthEvent';
+import { Queue } from './ds/Queue';
+import { MidiEventsPlayedEventArgs } from './MidiEventsPlayedEventArgs';
+import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 
 /**
  * This is the main synthesizer component which can be used to
@@ -28,6 +32,8 @@ export class AlphaSynth implements IAlphaSynth {
     private _timePosition: number = 0;
     private _metronomeVolume: number = 0;
     private _countInVolume: number = 0;
+    private _playedEventsQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
+    private _midiEventsPlayedFilter: Set<MidiEventType> = new Set<MidiEventType>();
 
     /**
      * Gets the {@link ISynthOutput} used for playing the generated samples.
@@ -55,7 +61,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set masterVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._synthesizer.masterVolume = value;
     }
 
@@ -64,7 +70,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set metronomeVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._metronomeVolume = value;
         this._synthesizer.metronomeVolume = value;
     }
@@ -74,8 +80,16 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set countInVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._countInVolume = value;
+    }
+
+    public get midiEventsPlayedFilter(): MidiEventType[] {
+        return Array.from(this._midiEventsPlayedFilter);
+    }
+
+    public set midiEventsPlayedFilter(value: MidiEventType[]) {
+        this._midiEventsPlayedFilter = new Set<MidiEventType>(value);
     }
 
     public get playbackSpeed(): number {
@@ -86,7 +100,7 @@ export class AlphaSynth implements IAlphaSynth {
         value = SynthHelper.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
         let oldSpeed: number = this._sequencer.playbackSpeed;
         this._sequencer.playbackSpeed = value;
-        this.updateTimePosition(this._timePosition * (oldSpeed / value));
+        this.updateTimePosition(this._timePosition * (oldSpeed / value), true);
     }
 
     public get tickPosition(): number {
@@ -108,7 +122,7 @@ export class AlphaSynth implements IAlphaSynth {
         this._sequencer.seek(value);
 
         // update the internal position
-        this.updateTimePosition(value);
+        this.updateTimePosition(value, true);
 
         // tell the output to reset the already synthesized buffers and request data again
         this.output.resetSamples();
@@ -162,9 +176,15 @@ export class AlphaSynth implements IAlphaSynth {
             for (let i = 0; i < SynthConstants.MicroBufferCount; i++) {
                 // synthesize buffer
                 this._sequencer.fillMidiEventQueue();
-                this._synthesizer.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
+                const synthesizedEvents = this._synthesizer.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
                 bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
-
+                // push all processed events into the queue
+                // for informing users about played events
+                for (const e of synthesizedEvents) {
+                    if (this._midiEventsPlayedFilter.has(e.event.command)) {
+                        this._playedEventsQueue.enqueue(e);
+                    }
+                }
                 // tell sequencer to check whether its work is done
                 if (this._sequencer.isFinished) {
                     break;
@@ -192,7 +212,7 @@ export class AlphaSynth implements IAlphaSynth {
             return false;
         }
         this.output.activate();
-                
+
         this.playInternal();
 
         if (this._countInVolume > 0) {
@@ -309,8 +329,9 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'Loading midi from model');
             this._sequencer.loadMidi(midiFile);
             this._isMidiLoaded = true;
-            (this.midiLoaded as EventEmitter).trigger();
-
+            (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
+                new PositionChangedEventArgs(0, this._sequencer.endTime, 0, this._sequencer.endTick, false)
+            );
             Logger.debug('AlphaSynth', 'Midi successfully loaded');
             this.checkReadyForPlayback();
             this.tickPosition = 0;
@@ -333,13 +354,13 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public setChannelVolume(channel: number, volume: number): void {
-        volume = SynthHelper.clamp(volume, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        volume = Math.max(volume, SynthConstants.MinVolume);
         this._synthesizer.channelSetMixVolume(channel, volume);
     }
 
     private onSamplesPlayed(sampleCount: number): void {
         let playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
-        this.updateTimePosition(this._timePosition + playedMillis);
+        this.updateTimePosition(this._timePosition + playedMillis, false);
         this.checkForFinish();
     }
 
@@ -376,7 +397,7 @@ export class AlphaSynth implements IAlphaSynth {
         }
     }
 
-    private updateTimePosition(timePosition: number): void {
+    private updateTimePosition(timePosition: number, isSeek: boolean): void {
         // update the real positions
         const currentTime: number = (this._timePosition = timePosition);
         const currentTick: number = (this._tickPosition = this._sequencer.timePositionToTickPosition(currentTime));
@@ -389,9 +410,24 @@ export class AlphaSynth implements IAlphaSynth {
                 `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount}`
             );
             (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick)
+                new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick, isSeek)
             );
         }
+
+        // build events which were actually played
+        if (isSeek) {
+            this._playedEventsQueue.clear();
+        } else {
+            const playedEvents = new Queue<MidiEvent>();
+            while (!this._playedEventsQueue.isEmpty && this._playedEventsQueue.peek().time < currentTime) {
+                const synthEvent = this._playedEventsQueue.dequeue();
+                playedEvents.enqueue(synthEvent.event);
+            }
+            if (!playedEvents.isEmpty) {
+                (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(new MidiEventsPlayedEventArgs(playedEvents.toArray()))
+            }
+        }
+
     }
 
     readonly ready: IEventEmitter = new EventEmitter();
@@ -399,7 +435,7 @@ export class AlphaSynth implements IAlphaSynth {
     readonly finished: IEventEmitter = new EventEmitter();
     readonly soundFontLoaded: IEventEmitter = new EventEmitter();
     readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly midiLoaded: IEventEmitter = new EventEmitter();
+    readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
     readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
     readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
         PlayerStateChangedEventArgs
@@ -407,4 +443,5 @@ export class AlphaSynth implements IAlphaSynth {
     readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
         PositionChangedEventArgs
     >();
+    readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
 }

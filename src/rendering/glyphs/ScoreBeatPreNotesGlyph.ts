@@ -28,6 +28,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             let ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
             ghost.renderer = this.renderer;
+
             this._prebends = new BendNoteHeadGroupGlyph(this.container.beat, true);
             this._prebends.renderer = this.renderer;
             for (let note of this.container.beat.notes) {
@@ -110,7 +111,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         let noteLine: number = sr.getNoteLine(n);
         let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
         if (accidental !== AccidentalType.None) {
-            let g = new AccidentalGlyph(0, sr.getScoreY(noteLine, 0), accidental, isGrace);
+            let g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, isGrace);
             g.renderer = this.renderer;
             accidentals.addGlyph(g);
         }
@@ -118,7 +119,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             let harmonicFret: number = n.displayValue + n.harmonicPitch;
             accidental = sr.accidentalHelper.applyAccidentalForValue(n.beat, harmonicFret, isGrace, false);
             noteLine = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
-            let g = new AccidentalGlyph(0, sr.getScoreY(noteLine, 0), accidental, isGrace);
+            let g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, isGrace);
             g.renderer = this.renderer;
             accidentals.addGlyph(g);
         }

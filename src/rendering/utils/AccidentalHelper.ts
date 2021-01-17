@@ -6,6 +6,7 @@ import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PercussionMapper } from '../../model/PercussionMapper';
+import { ScoreBarRenderer } from '../ScoreBarRenderer';
 
 
 class BeatLines {
@@ -20,6 +21,7 @@ class BeatLines {
  */
 export class AccidentalHelper {
     private _bar: Bar;
+    private _barRenderer: ScoreBarRenderer;
 
     /**
      * a lookup list containing an info whether the notes within an octave
@@ -103,8 +105,9 @@ export class AccidentalHelper {
      */
     public minLine: number = -1000;
 
-    public constructor(bar: Bar) {
-        this._bar = bar;
+    public constructor(barRenderer: ScoreBarRenderer) {
+        this._barRenderer = barRenderer;
+        this._bar = barRenderer.bar;
     }
 
     public static getPercussionLine(bar: Bar, noteValue: number): number {
@@ -231,19 +234,15 @@ export class AccidentalHelper {
                 switch (accidentalMode) {
                     case NoteAccidentalMode.ForceSharp:
                         accidentalToSet = AccidentalType.Sharp;
-                        hasNoteAccidentalWithinOctave = true;
                         break;
                     case NoteAccidentalMode.ForceDoubleSharp:
                         accidentalToSet = AccidentalType.DoubleSharp;
-                        hasNoteAccidentalWithinOctave = true;
                         break;
                     case NoteAccidentalMode.ForceFlat:
                         accidentalToSet = AccidentalType.Flat;
-                        hasNoteAccidentalWithinOctave = true;
                         break;
                     case NoteAccidentalMode.ForceDoubleFlat:
                         accidentalToSet = AccidentalType.DoubleFlat;
-                        hasNoteAccidentalWithinOctave = true;
                         break;
                     default:
                         // if note has an accidental in the octave, we place a symbol
@@ -257,36 +256,56 @@ export class AccidentalHelper {
                         break;
                 }
 
-                // do we need an accidental on the note?
-                if (accidentalToSet !== AccidentalType.None) {
-                    // if we already have an accidental on this line we will reset it if it's the same
-                    if (this._registeredAccidentals.has(line)) {
-                        if (this._registeredAccidentals.get(line) === accidentalToSet) {
-                            accidentalToSet = AccidentalType.None;
+                // Issue #472: Tied notes across bars do not show the accidentals but also 
+                // do not register them. 
+                // https://ultimatemusictheory.com/tied-notes-with-accidentals/
+                let skipAccidental = false;
+                if (note && note.isTieDestination && note.beat.index === 0) {
+                    // candidate for skip, check further if start note is on the same line
+                    const previousRenderer = this._barRenderer.previousRenderer as ScoreBarRenderer;
+                    if (previousRenderer) {
+                        const tieOriginLine = previousRenderer.accidentalHelper.getNoteLine(note.tieOrigin!);
+                        if (tieOriginLine === line) {
+                            skipAccidental = true;
                         }
                     }
-                    // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
-                    else if (hasKeySignatureAccidentalSetForNote && accidentalToSet === accidentalForKeySignature) {
-                        accidentalToSet = AccidentalType.None;
-                    }
+                }
 
-                    // register the new accidental on the line if any.
-                    if (accidentalToSet != AccidentalType.None) {
-                        this._registeredAccidentals.set(line, accidentalToSet);
-                    }
+
+                if (skipAccidental) {
+                    accidentalToSet = AccidentalType.None;
                 } else {
-                    // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
-                    // and clear the registration
-                    if (this._registeredAccidentals.has(line)) {
-                        // if there is already a naturalize symbol on the line, we don't care.
-                        if (this._registeredAccidentals.get(line) === AccidentalType.Natural) {
+                    // do we need an accidental on the note?
+                    if (accidentalToSet !== AccidentalType.None) {
+                        // if we already have an accidental on this line we will reset it if it's the same
+                        if (this._registeredAccidentals.has(line)) {
+                            if (this._registeredAccidentals.get(line) === accidentalToSet) {
+                                accidentalToSet = AccidentalType.None;
+                            }
+                        }
+                        // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
+                        else if (hasKeySignatureAccidentalSetForNote && accidentalToSet === accidentalForKeySignature) {
                             accidentalToSet = AccidentalType.None;
-                        } else {
-                            accidentalToSet = AccidentalType.Natural;
+                        }
+
+                        // register the new accidental on the line if any.
+                        if (accidentalToSet != AccidentalType.None) {
                             this._registeredAccidentals.set(line, accidentalToSet);
                         }
                     } else {
-                        this._registeredAccidentals.delete(line);
+                        // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
+                        // and clear the registration
+                        if (this._registeredAccidentals.has(line)) {
+                            // if there is already a naturalize symbol on the line, we don't care.
+                            if (this._registeredAccidentals.get(line) === AccidentalType.Natural) {
+                                accidentalToSet = AccidentalType.None;
+                            } else {
+                                accidentalToSet = AccidentalType.Natural;
+                                this._registeredAccidentals.set(line, accidentalToSet);
+                            }
+                        } else {
+                            this._registeredAccidentals.delete(line);
+                        }
                     }
                 }
             }
@@ -309,24 +328,27 @@ export class AccidentalHelper {
         }
 
         if (!isHelperNote) {
-            let lines: BeatLines;
-            if (this._beatLines.has(relatedBeat.id)) {
-                lines = this._beatLines.get(relatedBeat.id)!;
-            }
-            else {
-                lines = new BeatLines();
-                this._beatLines.set(relatedBeat.id, lines);
-            }
-
-            if (lines.minLine === -1000 || line < lines.minLine) {
-                lines.minLine = line;
-            }
-            if (lines.minLine === -1000 || line > lines.maxLine) {
-                lines.maxLine = line;
-            }
+            this.registerLine(relatedBeat, line);
         }
 
         return accidentalToSet;
+    }
+
+    private registerLine(relatedBeat: Beat, line: number) {
+        let lines: BeatLines;
+        if (this._beatLines.has(relatedBeat.id)) {
+            lines = this._beatLines.get(relatedBeat.id)!;
+        }
+        else {
+            lines = new BeatLines();
+            this._beatLines.set(relatedBeat.id, lines);
+        }
+        if (lines.minLine === -1000 || line < lines.minLine) {
+            lines.minLine = line;
+        }
+        if (lines.minLine === -1000 || line > lines.maxLine) {
+            lines.maxLine = line;
+        }
     }
 
     public getMaxLine(b: Beat): number {

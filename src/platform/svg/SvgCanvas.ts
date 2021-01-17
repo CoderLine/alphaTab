@@ -22,11 +22,11 @@ export abstract class SvgCanvas implements ICanvas {
     public settings!: Settings;
 
     public beginRender(width: number, height: number): void {
-        this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${
-            height | 0
-        }px" class="at-surface-svg">\n`;
+        this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${height | 0
+            }px" class="at-surface-svg" style="dominant-baseline: central;">\n`;
         this._currentPath = '';
         this._currentPathIsEmpty = true;
+        this.textBaseline = TextBaseline.Top;
     }
 
     public beginGroup(identifier: string): void {
@@ -137,8 +137,17 @@ export abstract class SvgCanvas implements ICanvas {
         if (this.textAlign !== TextAlign.Left) {
             s += ` text-anchor="${this.getSvgTextAlignment(this.textAlign)}"`;
         }
-        s += `>${text}</text>`;
+        s += `>${SvgCanvas.escapeText(text)}</text>`;
         this.buffer += s;
+    }
+
+    private static escapeText(text: string) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
 
     protected getSvgTextAlignment(textAlign: TextAlign): string {
@@ -156,11 +165,12 @@ export abstract class SvgCanvas implements ICanvas {
     protected getSvgBaseLine(): string {
         switch (this.textBaseline) {
             case TextBaseline.Top:
-                return `dy="1.25ex"`;
-            case TextBaseline.Middle:
-                return `dy="0.5ex"`;
+                return `dominant-baseline="hanging"`;
             case TextBaseline.Bottom:
+                return `dominant-baseline="bottom"`;
+            case TextBaseline.Middle:
             default:
+                // middle is set as default on the SVG tag via css
                 return '';
         }
     }

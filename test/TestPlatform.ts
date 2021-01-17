@@ -13,6 +13,25 @@ export class TestPlatform {
     /**
      * @target web
      */
+    public static saveFile(name: string, data: Uint8Array): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            let x: XMLHttpRequest = new XMLHttpRequest();
+            x.open('POST', 'http://localhost:8090/save-file/', true);
+            x.onload = () => {
+                resolve();
+            };
+            x.onerror = () => {
+                reject();
+            };
+            const form = new FormData();
+            form.append('file', new Blob([data]), name);
+            x.send(form);
+        });
+    }
+
+    /**
+     * @target web
+     */
     public static loadFile(path: string): Promise<Uint8Array> {
         return new Promise<Uint8Array>((resolve, reject) => {
             let x: XMLHttpRequest = new XMLHttpRequest();
@@ -27,6 +46,27 @@ export class TestPlatform {
                     } else {
                         let response: string = x.response;
                         reject('Could not find file: ' + path + ', received:' + response);
+                    }
+                }
+            };
+            x.send();
+        });
+    }
+
+    /**
+     * @target web
+     */
+    public static listDirectory(path: string): Promise<string[]> {
+        return new Promise<string[]>((resolve, reject) => {
+            let x: XMLHttpRequest = new XMLHttpRequest();
+            x.open('GET', 'http://localhost:8090/list-files?dir=' + path, true, null, null);
+            x.responseType = 'text';
+            x.onreadystatechange = () => {
+                if (x.readyState === XMLHttpRequest.DONE) {
+                    if (x.status === 200) {
+                        resolve(JSON.parse(x.responseText));
+                    } else {
+                        reject('Could not find path: ' + path + ', received:' + x.responseText);
                     }
                 }
             };

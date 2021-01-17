@@ -1,17 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test
 {
-    public class Globals
+    public static class Globals
     {
         public static Expector<T> Expect<T>(T actual)
         {
             return new Expector<T>(actual);
         }
 
-        public static void Fail(string message)
+        public static void Fail(object? message)
         {
-            Assert.Fail(message);
+            Assert.Fail(Convert.ToString(message));
         }
     }
 
@@ -32,13 +33,25 @@ namespace AlphaTab.Test
             return this;
         }
 
-        public void ToEqual(object expected, string message = null)
+        public void ToEqual(object expected, string? message = null)
         {
             if (expected is int i && _actual is double)
             {
                 expected = (double)i;
             }
             Assert.AreEqual(expected, _actual, _message + message);
+        }
+
+        public void ToBeCloseTo(double expected, string? message = null)
+        {
+            if (_actual is IConvertible c)
+            {
+                Assert.AreEqual(expected, c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), 0.001, _message + message);
+            }
+            else
+            {
+                Assert.Fail("ToBeCloseTo can only be used with numeric operands");
+            }
         }
 
         public void ToBe(object expected)
@@ -52,7 +65,7 @@ namespace AlphaTab.Test
 
         public void ToBeTruthy()
         {
-            Assert.AreNotEqual(default, _actual, _message);
+            Assert.AreNotEqual(default!, _actual, _message);
         }
 
         public void ToBeTrue()
@@ -69,7 +82,7 @@ namespace AlphaTab.Test
 
         public void ToBeFalsy()
         {
-            Assert.AreEqual(default, _actual, _message);
+            Assert.AreEqual(default!, _actual, _message);
         }
     }
 }

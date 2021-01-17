@@ -96,7 +96,7 @@ export class SlidePlaybackSettings {
  */
 export class PlayerSettings {
     /**
-     * Gets or sets the URl of the sound font to be loaded.
+     * Gets or sets the URL of the sound font to be loaded.
      */
     public soundFont: string | null = null;
 
@@ -153,11 +153,13 @@ export class PlayerSettings {
 
     /**
      * Gets or sets the settings on how the vibrato audio is generated.
+     * @json_partial_names
      */
     public readonly vibrato: VibratoPlaybackSettings = new VibratoPlaybackSettings();
 
     /**
      * Gets or sets the setitngs on how the slide audio is generated.
+     * @json_partial_names
      */
     public readonly slide: SlidePlaybackSettings = new SlidePlaybackSettings();
 

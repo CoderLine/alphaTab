@@ -1,5 +1,6 @@
 /**
  * This public class represents a predefined string tuning.
+ * @json
  */
 export class Tuning {
     private static _sevenStrings: Tuning[] = [];
@@ -8,15 +9,19 @@ export class Tuning {
     private static _fourStrings: Tuning[] = [];
     private static _defaultTunings: Map<number, Tuning> = new Map();
 
+    public static readonly defaultAccidentals: string[] = ['', '#', '', '#', '', '', '#', '', '#', '', '#', ''];
+    public static readonly defaultSteps: string[] = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
+
     public static getTextForTuning(tuning: number, includeOctave: boolean): string {
+        let parts = Tuning.getTextPartsForTuning(tuning);
+        return includeOctave ? parts.join('') : parts[0];
+    }
+
+    public static getTextPartsForTuning(tuning: number, octaveShift: number = -1): string[] {
         let octave: number = (tuning / 12) | 0;
         let note: number = tuning % 12;
         let notes: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-        let result: string = notes[note];
-        if (includeOctave) {
-            result += octave - 1;
-        }
-        return result;
+        return [notes[note], (octave + octaveShift).toString()];
     }
 
     /**
@@ -172,10 +177,23 @@ export class Tuning {
      * @param tuning The tuning.
      * @param isStandard if set to`true`[is standard].
      */
-    public constructor(name: string, tuning: number[], isStandard: boolean) {
+    public constructor(name: string = '', tuning: number[] | null = null, isStandard: boolean = false) {
         this.isStandard = isStandard;
         this.name = name;
-        this.tunings = tuning;
+        this.tunings = tuning ?? [];
+    }
+
+    /**
+     * Tries to detect the name and standard flag of the tuning from a known tuning list based
+     * on the string values. 
+     */
+    public finish() {
+        const knownTuning = Tuning.findTuning(this.tunings);
+        if (knownTuning) {
+            this.name = knownTuning.name;
+            this.isStandard = knownTuning.isStandard;
+        }
+        this.name = this.name.trim();
     }
 }
 

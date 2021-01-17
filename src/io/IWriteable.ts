@@ -2,6 +2,12 @@
  * Represents a writer where binary data can be written to.
  */
 export interface IWriteable {
+
+    /**
+     * Gets the current number of written bytes. 
+     */
+    readonly bytesWritten:number;
+    
     /**
      * Write a single byte to the stream.
      * @param value The value to write.

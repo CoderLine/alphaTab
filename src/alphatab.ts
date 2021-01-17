@@ -1,79 +1,3 @@
-if (!('WorkerGlobalScope' in self)) {
-    if (!Element.prototype.matches) {
-        Element.prototype.matches =
-            (Element.prototype as any).msMatchesSelector || Element.prototype.webkitMatchesSelector;
-    }
-
-    if (!Element.prototype.closest) {
-        Element.prototype.closest = function (s: string) {
-            let el: any = this;
-            do {
-                if (Element.prototype.matches.call(el, s)) return el;
-                el = el.parentElement || el.parentNode;
-            } while (el !== null && el.nodeType === 1);
-            return null;
-        };
-    }
-
-    if (window.NodeList && !NodeList.prototype.forEach) {
-        (NodeList.prototype as any).forEach = Array.prototype.forEach;
-    }
-}
-
-if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function (searchString, position) {
-        position = position || 0;
-        return this.indexOf(searchString, position) === position;
-    };
-}
-
-// https://tc39.github.io/ecma262/#sec-array.prototype.find
-if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, 'find', {
-        value: function (predicate: any) {
-            // 1. Let O be ? ToObject(this value).
-            if (this == null) {
-                throw new TypeError('"this" is null or not defined');
-            }
-
-            let o = Object(this);
-
-            // 2. Let len be ? ToLength(? Get(O, "length")).
-            let len = o.length >>> 0;
-
-            // 3. If IsCallable(predicate) is false, throw a TypeError exception.
-            if (typeof predicate !== 'function') {
-                throw new TypeError('predicate must be a function');
-            }
-
-            // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
-            let thisArg = arguments[1];
-
-            // 5. Let k be 0.
-            let k = 0;
-
-            // 6. Repeat, while k < len
-            while (k < len) {
-                // a. Let Pk be ! ToString(k).
-                // b. Let kValue be ? Get(O, Pk).
-                // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
-                // d. If testResult is true, return kValue.
-                let kValue = o[k];
-                if (predicate.call(thisArg, kValue, k, o)) {
-                    return kValue;
-                }
-                // e. Increase k by 1.
-                k++;
-            }
-
-            // 7. Return undefined.
-            return undefined;
-        },
-        configurable: true,
-        writable: true
-    });
-}
-
 import { CoreSettings } from '@src/CoreSettings';
 import { DisplaySettings, LayoutMode, StaveProfile } from '@src/DisplaySettings';
 import { ImporterSettings } from '@src/ImporterSettings';
@@ -117,6 +41,9 @@ export {
     Logger
 };
 
+import { VersionInfo } from '@src/generated/VersionInfo';
+export const meta = VersionInfo;
+
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
@@ -125,6 +52,14 @@ export const importer = {
     ScoreImporter,
     ScoreLoader,
     UnsupportedFormatError
+};
+
+import { ScoreExporter } from '@src/exporter/ScoreExporter';
+import { Gp7Exporter } from '@src/exporter/Gp7Exporter';
+
+export const exporter = {
+    ScoreExporter,
+    Gp7Exporter
 };
 
 import { BeatTickLookup } from '@src/midi/BeatTickLookup';
@@ -136,6 +71,7 @@ import { MetaDataEvent } from '@src/midi/MetaDataEvent';
 import { MetaEvent, MetaEventType } from '@src/midi/MetaEvent';
 import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
+import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 import { SystemCommonEvent, SystemCommonType } from '@src/midi/SystemCommonEvent';
 import { SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
@@ -154,6 +90,7 @@ export const midi = {
     MetaNumberEvent,
     MidiEvent,
     MidiEventType,
+    Midi20PerNotePitchBendEvent,
     SystemCommonEvent,
     SystemCommonType,
     SystemExclusiveEvent,

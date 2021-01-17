@@ -1,3 +1,5 @@
+import { Settings } from '@src/alphatab';
+import { Beat } from '@src/model/Beat';
 import { Score } from '@src/model/Score';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 
@@ -183,5 +185,37 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[6].name).toEqual('The clean guitar');
         expect(score.tracks[7].name).toEqual('Track 8');
         expect(score.tracks[8].name).toEqual('Percussion');
+    });
+    it('beat-text-lyrics', async () => {
+        const settings = new Settings();
+        settings.importer.beatTextAsLyrics = true;
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/beat-text-lyrics.gp5', settings);
+        let score: Score = reader.readScore();
+
+        const expectedChunks: string[] = [
+            "",
+            "So", "close,",
+            "no", "mat", "ter", "how", "", "far.", 
+            "", "", 
+            "Could-", "n't", "be", "much", "more", "from", "the", "", "heart.", 
+            "", "", "", "", 
+            "For-", "ev-", "er", "trust-", "ing", "who", "we", "are.", 
+            "", "", "", "", "", "", 
+            "And", "noth-", "ing", "else", "", 
+            "mat-", "ters.", "", ""
+        ];
+
+        let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        const actualChunks: string[] = [];
+        while (beat != null) {
+            if (beat.lyrics) {
+                actualChunks.push(beat.lyrics[0]);
+            } else {
+                actualChunks.push('');
+            }
+            beat = beat.nextBeat;
+        }
+
+        expect(actualChunks.join(';')).toEqual(expectedChunks.join(';'));
     });
 });

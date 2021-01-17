@@ -29,10 +29,12 @@ export enum TextBaseline {
     Top,
     /**
      * Text is aligned middle
-     */ Middle,
+     */
+    Middle,
     /**
      * Text is aligend on the bottom.
-     */ Bottom
+     */
+    Bottom
 }
 
 /**

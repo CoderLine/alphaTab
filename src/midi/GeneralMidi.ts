@@ -50,6 +50,6 @@ export class GeneralMidi {
     }
 
     public static isGuitar(program: number): boolean {
-        return program >= 24 && program <= 39 || program===105 || program===43;
+        return program >= 24 && program <= 39 || program === 105 || program === 43;
     }
 }

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using AlphaTab.Core.EcmaScript;
-using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Core
 {
@@ -14,14 +12,6 @@ namespace AlphaTab.Core
         public static IList<T> CreateList<T>(params T[] values)
         {
             return new List<T>(values);
-        }
-
-        public static IList<T> Splice<T>(this IList<T> data, double start)
-        {
-            var count = data.Count - (int) start;
-            var items = data.GetRange((int) start, count);
-            data.RemoveRange((int) start, count);
-            return new List<T>(items);
         }
 
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
@@ -54,11 +44,12 @@ namespace AlphaTab.Core
             }
             else if (data is T[] array)
             {
-                Array.Reverse(array);
+                System.Array.Reverse(array);
             }
             else
             {
-                throw new NotSupportedException("Cannot reverse list of type " + data.GetType().FullName);
+                throw new NotSupportedException("Cannot reverse list of type " +
+                                                data.GetType().FullName);
             }
         }
 
@@ -153,20 +144,58 @@ namespace AlphaTab.Core
 
         public static void Sort<T>(this IList<T> data, Func<T, T, double> func)
         {
-            if (data is System.Collections.Generic.List<T> l)
+            switch (data)
             {
-                l.Sort((a, b) => (int) func(a, b));
+                case System.Collections.Generic.List<T> l:
+                    l.Sort((a, b) => (int) func(a, b));
+                    break;
+                case T[] array:
+                    System.Array.Sort(array, (a, b) => (int) func(a, b));
+                    break;
+                default:
+                    throw new NotSupportedException("Cannot sort list of type " +
+                                                    data.GetType().FullName);
             }
-            else if(data is T[] array)
+        }
+        public static void Sort<T>(this IList<T> data)
+        {
+            switch (data)
             {
-                Array.Sort(array, (a, b) => (int) func(a, b));
-            }
-            else
-            {
-                throw new NotSupportedException("Cannot sort list of type " + data.GetType().FullName);
+                case List<T> l:
+                    l.Sort();
+                    break;
+                case T[] array:
+                    System.Array.Sort(array);
+                    break;
+                default:
+                    throw new NotSupportedException("Cannot sort list of type " +
+                                                    data.GetType().FullName);
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TResult Reduce<TInput, TResult>(this IEnumerable<TInput> source, Func<TResult, TInput, TResult> func, TResult seed)
+        {
+            return source.Aggregate(seed, func);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<TResult> Map<TInput, TResult>(this IEnumerable<TInput> source, Func<TInput, TResult> func)
+        {
+            return source.Select(func).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<TInput> Reversed<TInput>(this IEnumerable<TInput> source)
+        {
+            return source.Reverse();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Join<TInput>(this IEnumerable<TInput> source, string separator)
+        {
+            return string.Join(separator, source);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Substr(this string s, double start, double length)
@@ -185,7 +214,7 @@ namespace AlphaTab.Core
         {
             return s[(int) index];
         }
-		
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string CharAt(this string s, double index)
         {
@@ -202,6 +231,12 @@ namespace AlphaTab.Core
         public static string ToUpperCase(this string s)
         {
             return s.ToUpperInvariant();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int LocaleCompare(this string a, string b)
+        {
+            return string.Compare(a, b, StringComparison.Ordinal);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -236,6 +271,18 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegExp CreateRegex(string pattern, string flags)
+        {
+            return new RegExp(pattern, flags);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Replace(this string input, RegExp pattern, string replacement)
+        {
+            return pattern.Replace(input, replacement);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsTruthy(string? s)
         {
             return !string.IsNullOrEmpty(s);
@@ -251,6 +298,46 @@ namespace AlphaTab.Core
         public static bool IsTruthy(double s)
         {
             return !double.IsNaN(s) && s != 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<TResult> Map<TSource, TResult>(this IList<TSource> source,
+            Func<TSource, TResult> func)
+        {
+            return source.Select(func).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Substring(this string s, double startIndex, double endIndex)
+        {
+            return s.Substring((int) startIndex, (int) (endIndex - startIndex));
+        }
+
+        public static string TypeOf(object? actual)
+        {
+            switch (actual)
+            {
+                case string _:
+                    return "string";
+                case bool _:
+                    return "boolean";
+                case byte _:
+                case short _:
+                case int _:
+                case long _:
+                case sbyte _:
+                case ushort _:
+                case uint _:
+                case ulong _:
+                case float _:
+                case double _:
+                case Enum _:
+                    return "number";
+                case null:
+                    return "undefined";
+                default:
+                    return "object";
+            }
         }
     }
 }

@@ -9,3 +9,5 @@ bin/
 *.user
 *.tgz
 test-results/
+debug.log
+src/generated/VersionInfo.ts

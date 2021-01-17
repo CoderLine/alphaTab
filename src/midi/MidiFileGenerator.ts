@@ -63,6 +63,7 @@ export class MidiFileGenerator {
     private _handler: IMidiFileHandler;
     private _currentTempo: number = 0;
     private _currentBarRepeatLookup: BeatTickLookup | null = null;
+    private _programsPerChannel: Map<number, number> = new Map<number, number>();
 
     /**
      * Gets a lookup object which can be used to quickly find beats and bars
@@ -134,6 +135,13 @@ export class MidiFileGenerator {
         }
     }
 
+    private addProgramChange(track:Track, tick:number, channel:number, program: number) {
+        if(!this._programsPerChannel.has(channel) || this._programsPerChannel.get(channel) !== program) {
+            this._handler.addProgramChange(track.index, tick, channel, program);
+            this._programsPerChannel.set(channel, program);
+        }
+    }
+
     private generateChannel(track: Track, channel: number, playbackInfo: PlaybackInformation): void {
         let volume: number = MidiFileGenerator.toChannelShort(playbackInfo.volume);
         let balance: number = MidiFileGenerator.toChannelShort(playbackInfo.balance);
@@ -154,7 +162,7 @@ export class MidiFileGenerator {
             ControllerType.DataEntryCoarse,
             MidiFileGenerator.PitchBendRangeInSemitones
         );
-        this._handler.addProgramChange(track.index, 0, channel, playbackInfo.program);
+        this.addProgramChange(track, 0, channel, playbackInfo.program);
     }
 
     private static toChannelShort(data: number): number {
@@ -433,7 +441,7 @@ export class MidiFileGenerator {
         }
 
         if (initialBend >= 0) {
-            this._handler.addBend(track.index, noteStart, channel, initialBend);
+            this._handler.addNoteBend(track.index, noteStart, channel, noteKey, initialBend);
         }
 
         //
@@ -824,7 +832,7 @@ export class MidiFileGenerator {
             duration = noteDuration.noteOnly;
         }
         // ensure prebends are slightly before the actual note.
-        if (bendPoints[0].value > 0 && !note.isContinuedBend) {
+        if (bendPoints[0].value > 0 && !note.isContinuedBend && noteStart > 0) {
             noteStart--;
         }
         const bendDuration: number = Math.min(
@@ -914,7 +922,7 @@ export class MidiFileGenerator {
                         break;
                     case BendStyle.Fast:
                         const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
-                        this._handler.addBend(track.index, noteStart, channel, preBendValue | 0);
+                        addBend(noteStart, preBendValue | 0);
                         if (!finalBendValue || finalBendValue < note.bendPoints[1].value) {
                             finalBendValue = note.bendPoints[1].value;
                         }
@@ -940,7 +948,7 @@ export class MidiFileGenerator {
                         break;
                     case BendStyle.Fast:
                         const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
-                        this._handler.addBend(track.index, noteStart, channel, preBendValue | 0);
+                        addBend(noteStart, preBendValue | 0);
                         this.generateSongBookWhammyOrBend(
                             noteStart,
                             duration,
@@ -1216,14 +1224,14 @@ export class MidiFileGenerator {
     private generateAutomation(beat: Beat, automation: Automation, startMove: number): void {
         switch (automation.type) {
             case AutomationType.Instrument:
-                this._handler.addProgramChange(
-                    beat.voice.bar.staff.track.index,
+                this.addProgramChange(
+                    beat.voice.bar.staff.track,
                     beat.playbackStart + startMove,
                     beat.voice.bar.staff.track.playbackInfo.primaryChannel,
                     (automation.value | 0) & 0xff
                 );
-                this._handler.addProgramChange(
-                    beat.voice.bar.staff.track.index,
+                this.addProgramChange(
+                    beat.voice.bar.staff.track,
                     beat.playbackStart + startMove,
                     beat.voice.bar.staff.track.playbackInfo.secondaryChannel,
                     (automation.value | 0) & 0xff

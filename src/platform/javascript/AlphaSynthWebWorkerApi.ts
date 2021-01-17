@@ -13,6 +13,8 @@ import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { ProgressEventArgs } from '@src/alphatab';
 import { FileLoadError } from '@src/FileLoadError';
+import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import { MidiEventType } from '@src/midi/MidiEvent';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -33,6 +35,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private _timePosition: number = 0;
     private _isLooping: boolean = false;
     private _playbackRange: PlaybackRange | null = null;
+    private _midiEventsPlayedFilter: MidiEventType[] = [];
 
     public get isReady(): boolean {
         return this._workerIsReady && this._outputIsReady;
@@ -63,7 +66,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public set masterVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._masterVolume = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setMasterVolume',
@@ -76,7 +79,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public set metronomeVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._metronomeVolume = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setMetronomeVolume',
@@ -88,12 +91,24 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public set countInVolume(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        value = Math.max(value, SynthConstants.MinVolume);
         this._countInVolume = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setCountInVolume',
             value: value
         });
+    }
+
+    public get midiEventsPlayedFilter(): MidiEventType[] {
+        return this._midiEventsPlayedFilter;
+    }
+
+    public set midiEventsPlayedFilter(value: MidiEventType[]) {
+        this._midiEventsPlayedFilter = value;
+        this._synth.postMessage({
+            cmd: 'alphaSynth.setMidiEventsPlayedFilter',
+            value: value
+        })
     }
 
     public get playbackSpeed(): number {
@@ -318,7 +333,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public setChannelVolume(channel: number, volume: number): void {
-        volume = SynthHelper.clamp(volume, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+        volume = Math.max(volume, SynthConstants.MinVolume);
         this._synth.postMessage({
             cmd: 'alphaSynth.setChannelVolume',
             channel: channel,
@@ -342,7 +357,12 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 this._timePosition = data.currentTime;
                 this._tickPosition = data.currentTick;
                 (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                    new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick)
+                    new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick, data.isSeek)
+                );
+                break;
+            case 'alphaSynth.midiEventsPlayed':
+                (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(
+                    new MidiEventsPlayedEventArgs((data.events as unknown[]).map(JsonConverter.jsObjectToMidiEvent))
                 );
                 break;
             case 'alphaSynth.playerStateChanged':
@@ -362,7 +382,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 break;
             case 'alphaSynth.midiLoaded':
                 this.checkReadyForPlayback();
-                (this.midiLoaded as EventEmitter).trigger();
+                (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
+                    new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick, data.isSeek)
+                );
                 break;
             case 'alphaSynth.midiLoadFailed':
                 this.checkReadyForPlayback();
@@ -400,13 +422,18 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     readonly finished: IEventEmitter = new EventEmitter();
     readonly soundFontLoaded: IEventEmitter = new EventEmitter();
     readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly midiLoaded: IEventEmitter = new EventEmitter();
+    readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
+        PositionChangedEventArgs
+    >();
     readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
     readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
         PlayerStateChangedEventArgs
     >();
     readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
         PositionChangedEventArgs
+    >(); 
+    readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<
+        MidiEventsPlayedEventArgs
     >();
 
     //

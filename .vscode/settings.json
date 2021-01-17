@@ -1,6 +1,7 @@
 {
     "files.exclude": {
         "dist/lib.csharp/**": true,
-        "src.csharp/**": true
+        "src.csharp/**": true,
+        "node_modules/**": true
     }
 }

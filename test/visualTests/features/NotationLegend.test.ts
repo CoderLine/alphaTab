@@ -96,7 +96,10 @@ describe('NotationLegend', () => {
     it('mixed-default', async () => { await runNotationLegendTest(`mixed-default.png`, 121, 7, false); });
     it('mixed-songbook', async () => { await runNotationLegendTest(`mixed-songbook.png`, 121, 7, true); });
 
-    async function runNotationLegendTest(referenceFileName: string, startBar: number, barCount: number, songBook: boolean): Promise<void> {
+    it('tied-note-accidentals-default', async () => { await runNotationLegendTest(`tied-note-accidentals-default.png`, 1, -1, false, 'tied-note-accidentals.gp'); });
+    it('tied-note-accidentals-songbook', async () => { await runNotationLegendTest(`tied-note-accidentals-songbook.png`, 1, -1, true, 'tied-note-accidentals.gp'); });
+
+    async function runNotationLegendTest(referenceFileName: string, startBar: number, barCount: number, songBook: boolean, fileName: string = 'notation-legend.gp'): Promise<void> {
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         settings.display.startBar = startBar;
@@ -104,7 +107,7 @@ describe('NotationLegend', () => {
         if (songBook) {
             settings.setSongBookModeSettings();
         }
-        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/notation-legend/notation-legend.gp`);
+        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/notation-legend/${fileName}`);
         let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
         await VisualTestHelper.runVisualTestScore(score, `notation-legend/${referenceFileName}`, settings, [0]);
     }

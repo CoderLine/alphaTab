@@ -24,13 +24,17 @@ import { PercussionNoteHeadGlyph } from './PercussionNoteHeadGlyph';
 import { Logger } from '@src/alphatab';
 import { ArticStaccatoAboveGlyph } from './ArticStaccatoAboveGlyph';
 import { MusicFontSymbol } from '../../model/MusicFontSymbol';
-import { TextBaseline } from '@src/platform/ICanvas';
+import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { PictEdgeOfCymbalGlyph } from './PictEdgeOfCymbalGlyph';
 import { PickStrokeGlyph } from './PickStrokeGlyph';
 import { PickStroke } from '@src/model/PickStroke';
 import { GuitarGolpeGlyph } from './GuitarGolpeGlyph';
+import { BeamingHelper } from '../utils/BeamingHelper';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
+    private _collisionOffset: number = -1000;
+    private _skipPaint: boolean = false;
+
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
 
@@ -53,6 +57,24 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.noteHeads.updateBeamingHelper(this.container.x + this.x);
         } else if (this.restGlyph) {
             this.restGlyph.updateBeamingHelper(this.container.x + this.x);
+            if (this.renderer.bar.isMultiVoice && this._collisionOffset === -1000) {
+                this._collisionOffset = this.renderer.helpers.collisionHelper.applyRestCollisionOffset(this.container.beat, this.restGlyph.y,
+                    (this.renderer as ScoreBarRenderer).getScoreHeight(1));
+                this.y += this._collisionOffset;
+                const existingRests = this.renderer.helpers.collisionHelper.restDurationsByDisplayTime;
+                if (existingRests.has(this.container.beat.playbackStart) &&
+                    existingRests.get(this.container.beat.playbackStart)!.has(this.container.beat.playbackDuration) &&
+                    existingRests.get(this.container.beat.playbackStart)!.get(this.container.beat.playbackDuration) !== this.container.beat.id
+                ) {
+                    this._skipPaint = true;
+                }
+            }
+        }
+    }
+
+    public paint(cx: number, cy: number, canvas: ICanvas): void {
+        if (!this._skipPaint) {
+            super.paint(cx, cy, canvas);
         }
     }
 
@@ -82,8 +104,8 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                             0,
                             0,
                             4 *
-                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                                this.scale
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
+                            this.scale
                         )
                     );
                     this.addGlyph(ghost);
@@ -110,7 +132,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
             } else {
-                let offset: number = 0;
                 let line = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
 
                 // this positioning is quite strange, for most staff line counts
@@ -124,11 +145,26 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     line -= 2;
                 }
 
-                let y: number = sr.getScoreY(line, offset);
-                this.restGlyph = new ScoreRestGlyph(0, y, this.container.beat.duration);
+                this.restGlyph = new ScoreRestGlyph(0, sr.getScoreY(line), this.container.beat.duration);
                 this.restGlyph.beat = this.container.beat;
                 this.restGlyph.beamingHelper = this.beamingHelper;
                 this.addGlyph(this.restGlyph);
+
+                if (this.renderer.bar.isMultiVoice) {
+                    if (this.container.beat.voice.index === 0) {
+                        const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
+                        let restTop = this.restGlyph.y - sr.getScoreHeight(restSizes[0]);
+                        let restBottom = this.restGlyph.y + sr.getScoreHeight(restSizes[1]);
+                        this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
+                    } else {
+                        this.renderer.helpers.collisionHelper.registerRest(this.container.beat);
+                    }
+                }
+
+                if (this.beamingHelper) {
+                    this.beamingHelper.applyRest(this.container.beat, line);
+                }
+
                 //
                 // Note dots
                 //
@@ -154,7 +190,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
     private createBeatDot(line: number, group: GlyphGroup): void {
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        group.addGlyph(new CircleGlyph(0, sr.getScoreY(line, 0), 1.5 * this.scale));
+        group.addGlyph(new CircleGlyph(0, sr.getScoreY(line), 1.5 * this.scale));
     }
 
     private createNoteHeadGlyph(n: Note): EffectGlyph {
@@ -190,7 +226,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         let noteHeadGlyph: EffectGlyph = this.createNoteHeadGlyph(n);
         // calculate y position
         let line: number = sr.getNoteLine(n);
-        noteHeadGlyph.y = sr.getScoreY(line, 0);
+        noteHeadGlyph.y = sr.getScoreY(line);
         this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             // create harmonic note head.
@@ -202,7 +238,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 this.container.beat.graceType !== GraceType.None
             );
             line = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
-            noteHeadGlyph.y = sr.getScoreY(line, 0);
+            noteHeadGlyph.y = sr.getScoreY(line);
             this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         }
         if (n.isStaccato && !this.noteHeads!.aboveBeatEffects.has('Staccato')) {

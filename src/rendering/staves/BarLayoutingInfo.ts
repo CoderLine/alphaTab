@@ -4,6 +4,7 @@ import { Duration } from '@src/model/Duration';
 import { Spring } from '@src/rendering/staves/Spring';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { ICanvas } from '@src/platform/ICanvas';
+import { GraceType } from '@src/model/GraceType';
 
 /**
  * This public class stores size information about a stave.
@@ -19,6 +20,7 @@ export class BarLayoutingInfo {
     private _minTime: number = -1;
     private _onTimePositionsForce: number = 0;
     private _onTimePositions: Map<number, number> = new Map();
+    private _incompleteGraceRodsWidth: number = 0;
 
     /**
      * an internal version number that increments whenever a change was made.
@@ -89,21 +91,23 @@ export class BarLayoutingInfo {
         }
     }
 
+    public incompleteGraceRods: Map<string, Spring[]> = new Map();
+    public allGraceRods: Map<string, Spring[]> = new Map();
     public springs: Map<number, Spring> = new Map();
 
-    public addSpring(start: number, duration: number, preSpringSize: number, postSpringSize: number): Spring {
+    public addSpring(start: number, duration: number, graceBeatWidth: number, preBeatWidth: number, postSpringSize: number): Spring {
         this.version++;
         let spring: Spring;
         if (!this.springs.has(start)) {
             spring = new Spring();
             spring.timePosition = start;
-            spring.allDurations.push(duration);
+            spring.allDurations.add(duration);
             // check in the previous spring for the shortest duration that overlaps with this spring
             // Gourlay defines that we need the smallest note duration that either starts **or continues** on the current spring.
             if (this._timeSortedSprings.length > 0) {
                 let smallestDuration: number = duration;
                 let previousSpring: Spring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
-                for (let prevDuration of previousSpring.allDurations) {
+                for(const prevDuration of previousSpring.allDurations) {
                     let end: number = previousSpring.timePosition + prevDuration;
                     if (end >= start && prevDuration < smallestDuration) {
                         smallestDuration = prevDuration;
@@ -112,7 +116,8 @@ export class BarLayoutingInfo {
             }
             spring.longestDuration = duration;
             spring.postSpringWidth = postSpringSize;
-            spring.preSpringWidth = preSpringSize;
+            spring.graceBeatWidth = graceBeatWidth;
+            spring.preBeatWidth = preBeatWidth;
             this.springs.set(start, spring);
             let timeSorted: Spring[] = this._timeSortedSprings;
             let insertPos: number = timeSorted.length - 1;
@@ -125,8 +130,11 @@ export class BarLayoutingInfo {
             if (spring.postSpringWidth < postSpringSize) {
                 spring.postSpringWidth = postSpringSize;
             }
-            if (spring.preSpringWidth < preSpringSize) {
-                spring.preSpringWidth = preSpringSize;
+            if (spring.graceBeatWidth < graceBeatWidth) {
+                spring.graceBeatWidth = graceBeatWidth;
+            }
+            if (spring.preBeatWidth < preBeatWidth) {
+                spring.preBeatWidth = preBeatWidth;
             }
             if (duration < spring.smallestDuration) {
                 spring.smallestDuration = duration;
@@ -134,7 +142,7 @@ export class BarLayoutingInfo {
             if (duration > spring.longestDuration) {
                 spring.longestDuration = duration;
             }
-            spring.allDurations.push(duration);
+            spring.allDurations.add(duration);
         }
         if (this._minTime === -1 || this._minTime > start) {
             this._minTime = start;
@@ -142,12 +150,78 @@ export class BarLayoutingInfo {
         return spring;
     }
 
-    public addBeatSpring(beat: Beat, preBeatSize: number, postBeatSize: number): Spring {
+    public addBeatSpring(beat: Beat, preBeatSize: number, postBeatSize: number): void {
         let start: number = beat.absoluteDisplayStart;
-        return this.addSpring(start, beat.displayDuration, preBeatSize, postBeatSize);
+        if (beat.graceType !== GraceType.None) {
+            // For grace beats we just remember the the sizes required for them
+            // these sizes are then considered when the target beat is added. 
+
+            const groupId = beat.graceGroup!.id;
+
+            if (!this.allGraceRods.has(groupId)) {
+                this.allGraceRods.set(groupId, new Array<Spring>(beat.graceGroup!.beats.length));
+            }
+
+            if (!beat.graceGroup!.isComplete && !this.incompleteGraceRods.has(groupId)) {
+                this.incompleteGraceRods.set(groupId, new Array<Spring>(beat.graceGroup!.beats.length));
+            }
+
+            let existingSpring = this.allGraceRods.get(groupId)![beat.graceIndex];
+            if (existingSpring) {
+                if (existingSpring.postSpringWidth < postBeatSize) {
+                    existingSpring.postSpringWidth = postBeatSize;
+                }
+                if (existingSpring.preBeatWidth < preBeatSize) {
+                    existingSpring.preBeatWidth = preBeatSize;
+                }
+            } else {
+                const graceSpring = new Spring();
+                graceSpring.timePosition = start;
+                graceSpring.postSpringWidth = postBeatSize;
+                graceSpring.preBeatWidth = preBeatSize;
+                if (!beat.graceGroup!.isComplete) {
+                    this.incompleteGraceRods.get(groupId)![beat.graceIndex] = graceSpring;
+                }
+                this.allGraceRods.get(groupId)![beat.graceIndex] = graceSpring;
+            }
+        } else {
+            let graceBeatSize = 0;
+            if (beat.graceGroup && this.allGraceRods.has(beat.graceGroup.id)) {
+                for (const graceBeat of this.allGraceRods.get(beat.graceGroup.id)!) {
+                    graceBeatSize += graceBeat.springWidth;
+                }
+            }
+
+            this.addSpring(start, beat.displayDuration, graceBeatSize, preBeatSize, postBeatSize);
+        }
     }
 
     public finish(): void {
+        for(const [k,s] of this.allGraceRods) {
+            let offset = 0;
+            if (this.incompleteGraceRods.has(k)) {
+                for (const sp of s) {
+                    offset += sp.preBeatWidth;
+                    sp.graceBeatWidth = offset;
+                    offset += sp.postSpringWidth;
+                }
+            } else {
+                for (let i = s.length - 1; i >= 0; i--) {
+                    // for grace beats we store the offset 
+                    // in the 'graceBeatWidth' for later use during applying
+                    // beat positions
+                    s[i].graceBeatWidth = offset;
+                    offset -= (s[i].preBeatWidth + s[i].postSpringWidth);
+                }
+            }
+        }
+        this._incompleteGraceRodsWidth = 0;
+        for(const s of this.incompleteGraceRods.values()) {
+            for (const sp of s) {
+                this._incompleteGraceRodsWidth += sp.preBeatWidth + sp.postSpringWidth;
+            }
+        }
+
         this.calculateSpringConstants();
         this.version++;
     }
@@ -155,13 +229,18 @@ export class BarLayoutingInfo {
     private calculateSpringConstants(): void {
         this._xMin = 0;
         let springs: Map<number, Spring> = this.springs;
-        springs.forEach(spring => {
+        for(const spring of springs.values()){
             if (spring.springWidth < this._xMin) {
                 this._xMin = spring.springWidth;
             }
-        });
+        }
         let totalSpringConstant: number = 0;
         let sortedSprings: Spring[] = this._timeSortedSprings;
+        if (sortedSprings.length === 0) {
+            this.totalSpringConstant = -1;
+            this.minStretchForce = -1;
+            return;
+        }
         for (let i: number = 0; i < sortedSprings.length; i++) {
             let currentSpring: Spring = sortedSprings[i];
             let duration: number = 0;
@@ -205,7 +284,7 @@ export class BarLayoutingInfo {
     }
 
     public height: number = 0;
-    public paint(_cx: number, _cy: number, _canvas: ICanvas) {}
+    public paint(_cx: number, _cy: number, _canvas: ICanvas) { }
 
     // public height: number = 30;
     // public paint(cx: number, cy: number, canvas: ICanvas) {
@@ -260,25 +339,37 @@ export class BarLayoutingInfo {
     }
 
     public spaceToForce(space: number): number {
-        if(this._timeSortedSprings.length > 0) {
-            space -= this._timeSortedSprings[0].preSpringWidth
+        if (this.totalSpringConstant !== -1) {
+            if (this._timeSortedSprings.length > 0) {
+                space -= this._timeSortedSprings[0].preSpringWidth
+            }
+            space -= this._incompleteGraceRodsWidth;
+            return Math.max(space, 0) * this.totalSpringConstant;
         }
-        return space * this.totalSpringConstant;
+        return -1;
     }
 
     public calculateVoiceWidth(force: number): number {
-        let width = this.calculateWidth(force, this.totalSpringConstant);
-        if(this._timeSortedSprings.length > 0) {
-            width += this._timeSortedSprings[0].preSpringWidth
+        let width = 0;
+        if (this.totalSpringConstant !== -1) {
+            width = this.calculateWidth(force, this.totalSpringConstant);
         }
+
+        if (this._timeSortedSprings.length > 0) {
+            width += this._timeSortedSprings[0].preSpringWidth;
+        }
+        width += this._incompleteGraceRodsWidth;
         return width;
     }
 
-    public calculateWidth(force: number, springConstant: number): number {
+    private calculateWidth(force: number, springConstant: number): number {
         return force / springConstant;
     }
 
     public buildOnTimePositions(force: number): Map<number, number> {
+        if (this.totalSpringConstant === -1) {
+            return new Map<number, number>();
+        }
         if (ModelUtils.isAlmostEqualTo(this._onTimePositionsForce, force) && this._onTimePositions) {
             return this._onTimePositions;
         }

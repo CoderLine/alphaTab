@@ -1,5 +1,6 @@
 import { StaveProfile } from '@src/DisplaySettings';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { Beat } from '@src/model/Beat';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
@@ -781,8 +782,8 @@ describe('AlphaTexImporterTest', () => {
                 c4 d4 e4 f4 |
                 \\staff{score} \\tuning piano \\clef F4
                 c2 c2 c2 c2 |
-            \\track Guitar"
-                \\staff{tabs} \\capo 5
+            \\track Guitar
+                \\staff{tabs} \\instrument acousticguitarsteel \\capo 5
                 1.2 3.2 0.1 1.1
         `;
         let score: Score = parseTex(tex);
@@ -849,5 +850,45 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isLeftHandTapped).toEqual(false);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isLeftHandTapped).toEqual(true);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLeftHandTapped).toEqual(false);
+    });
+
+    it('expect-invalid-format-xml', () => {
+        try {
+            parseTex('<xml>');
+            fail('Expected error');
+        } catch(e) {
+            if(!(e instanceof UnsupportedFormatError)) {
+                fail(`Expected UnsupportedFormatError got ${e}`);
+            }
+        }
+    });
+    
+    it('expect-invalid-format-other-text', () => {
+        try {
+            parseTex('This is not an alphaTex file');
+            fail('Expected error');
+        } catch(e) {
+            if(!(e instanceof UnsupportedFormatError)) {
+                fail(`Expected UnsupportedFormatError got ${e}`);
+            }
+        }
+    });
+
+    it('auto-detect-tuning-from-instrument', () => {
+        let score = parseTex('\\instrument acousticguitarsteel . 3.3');
+        expect(score.tracks[0].staves[0].tuning.length).toEqual(6);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toEqual(-12);
+
+        score = parseTex('\\instrument acousticbass . 3.3');
+        expect(score.tracks[0].staves[0].tuning.length).toEqual(4);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toEqual(-12);
+
+        score = parseTex('\\instrument violin . 3.3');
+        expect(score.tracks[0].staves[0].tuning.length).toEqual(4);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toEqual(0);
+
+        score = parseTex('\\instrument acousticpiano . 3.3');
+        expect(score.tracks[0].staves[0].tuning.length).toEqual(0);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).toEqual(0);
     });
 });

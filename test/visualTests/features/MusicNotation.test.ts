@@ -16,7 +16,7 @@ describe('MusicNotationTests', () => {
         settings.notation.elements.set(NotationElement.ScoreTitle, false);
         settings.notation.elements.set(NotationElement.ScoreWords, false);
         settings.notation.elements.set(NotationElement.ScoreWordsAndMusic, false);
-        await VisualTestHelper.runVisualTest('music-notation/clefs.gpx', settings);
+        await VisualTestHelper.runVisualTest('music-notation/clefs.gp', settings);
     });
 
     it('key-signatures', async () => {
@@ -28,24 +28,34 @@ describe('MusicNotationTests', () => {
     it('time-signatures', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
-        await VisualTestHelper.runVisualTest('music-notation/time-signatures.gp5', settings);
+        await VisualTestHelper.runVisualTest('music-notation/time-signatures.gp', settings);
     });
 
     it('notes-rests-beams', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
-        await VisualTestHelper.runVisualTest('music-notation/notes-rests-beams.gp5', settings);
+        await VisualTestHelper.runVisualTest('music-notation/notes-rests-beams.gp', settings);
     });
 
     it('accidentals', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
-        await VisualTestHelper.runVisualTest('music-notation/accidentals.gp5', settings);
+        await VisualTestHelper.runVisualTest('music-notation/accidentals.gp', settings);
     });
 
     it('forced-accidentals', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/forced-accidentals.gp', settings, [0, 1]);
+    });
+
+    it('beams-advanced', async () => {
+        let settings: Settings = new Settings();
+        settings.display.barsPerRow = 4;
+        await VisualTestHelper.runVisualTest('music-notation/beams-advanced.gp', settings);
+    });
+    
+    it('rest-collisions', async () => {
+        await VisualTestHelper.runVisualTest('music-notation/rest-collisions.gp');
     });
 });

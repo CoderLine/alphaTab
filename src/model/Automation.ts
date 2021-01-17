@@ -22,6 +22,8 @@ export enum AutomationType {
 
 /**
  * Automations are used to change the behaviour of a song.
+ * @cloneable
+ * @json
  */
 export class Automation {
     /**
@@ -67,17 +69,17 @@ export class Automation {
         return automation;
     }
 
-    public static copyTo(src: Automation, dst: Automation): void {
-        dst.isLinear = src.isLinear;
-        dst.ratioPosition = src.ratioPosition;
-        dst.text = src.text;
-        dst.type = src.type;
-        dst.value = src.value;
-    }
 
-    public clone(): Automation {
-        let a: Automation = new Automation();
-        Automation.copyTo(this, a);
-        return a;
+    public static buildInstrumentAutomation(
+        isLinear: boolean,
+        ratioPosition: number,
+        value: number
+    ): Automation {
+        let automation: Automation = new Automation();
+        automation.type = AutomationType.Instrument;
+        automation.isLinear = isLinear;
+        automation.ratioPosition = ratioPosition;
+        automation.value = value;
+        return automation;
     }
 }

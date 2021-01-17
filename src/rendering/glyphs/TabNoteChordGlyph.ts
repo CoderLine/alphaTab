@@ -24,8 +24,8 @@ export class TabNoteChordGlyph extends Glyph {
         this._isGrace = isGrace;
     }
 
-    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
-        for(const note of this._notes) {
+    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+        for (const note of this._notes) {
             note.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
         }
     }
@@ -92,13 +92,13 @@ export class TabNoteChordGlyph extends Glyph {
         let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
         // TODO: take care of actual glyph height
         let effectSpacing: number = 7 * this.scale;
-        this.beatEffects.forEach(g => {
+        for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;
             g.renderer = this.renderer;
             effectY += effectSpacing;
             g.doLayout();
-        });
+        }
         this.width = w;
     }
 
@@ -117,6 +117,7 @@ export class TabNoteChordGlyph extends Glyph {
         let oldBaseLine: TextBaseline = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Middle;
         canvas.font = this._isGrace ? res.graceFont : res.tablatureFont;
+
         let notes: NoteNumberGlyph[] = this._notes;
         let w: number = this.width;
         for (let g of notes) {
@@ -125,14 +126,17 @@ export class TabNoteChordGlyph extends Glyph {
             g.paint(cx, cy, canvas);
         }
         canvas.textBaseline = oldBaseLine;
-        this.beatEffects.forEach(g => {
+        for(const g of this.beatEffects.values()) {
             g.paint(cx, cy, canvas);
-        });
+        }
     }
 
     public updateBeamingHelper(cx: number): void {
         if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat)) {
-            this.beamingHelper.registerBeatLineX('tab', this.beat, cx + this.x + this.width, cx + this.x);
+            this.beamingHelper.registerBeatLineX('tab', this.beat,
+                cx + this.x + this.width / 2,
+                cx + this.x + this.width / 2
+            );
         }
     }
 }

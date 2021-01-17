@@ -9,6 +9,7 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PixelMatch } from './PixelMatch';
+import { JsonConverter } from '@src/model/JsonConverter';
 
 /**
  * @partial
@@ -71,6 +72,7 @@ export class VisualTestHelper {
 
             settings.core.fontDirectory = CoreSettings.ensureFullUrl('/base/font/bravura/');
             settings.core.engine = 'html5';
+            Environment.HighDpiFactor = 1; // test data is in scale 1
             settings.core.enableLazyLoading = false;
 
             let referenceFileData: Uint8Array;
@@ -127,7 +129,11 @@ export class VisualTestHelper {
                 api.error.on(e => {
                     reject(`Failed to render image: ${e}`);
                 });
-                api.renderScore(score, tracks);
+
+                // NOTE: on some platforms we serialize/deserialize the score objects
+                // this logic does the same just to ensure we get the right result
+                const renderScore = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
+                api.renderScore(renderScore, tracks);
             });
 
             await Promise.race([
@@ -325,7 +331,7 @@ export class VisualTestHelper {
                     let totalPixels = match.totalPixels - match.transparentPixels;
                     let percentDifference = (match.differentPixels / totalPixels) * 100;
                     result.pass = percentDifference < 1;
-                    // result.pass = match.differentPixels < 30;
+                    // result.pass = match.differentPixels < 5;
 
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
@@ -342,9 +348,10 @@ export class VisualTestHelper {
 
                 const jasmineRequire = Environment.globalThis.jasmineRequire;
                 if (!result.pass && jasmineRequire.html) {
+                    const errorMessage = `${result.message} (${message})`;
                     const dom = document.createElement('div');
                     dom.innerHTML = `
-                        <strong>Error:</strong> ${result.message} (${message})<br/>
+                        <strong>Error:</strong> ${errorMessage}<br/>
                         <div class="comparer" style="border: 1px solid #000">
                             <div class="expected"></div>
                             <div class="actual"></div>
@@ -362,11 +369,14 @@ export class VisualTestHelper {
                     dom.querySelector('.expected')!.appendChild(expected);
                     dom.querySelector('.actual')!.appendChild(actual);
                     dom.querySelector('.diff')!.appendChild(diff);
-                    (dom as any).toString = function () {
-                        return result.message;
-                    };
-
                     VisualTestHelper.initComparer(dom.querySelector('.comparer'));
+
+                    (dom as any).toString = function () {
+                        return errorMessage;
+                    };
+                    (dom as any)[Symbol.toPrimitive] = function() { 
+                        return errorMessage;
+                    };
 
                     (result as any).message = dom;
                 }

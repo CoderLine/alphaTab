@@ -10,5 +10,11 @@
             Key = key;
             Value = value;
         }
+
+        public void Deconstruct(out TKey key, out TValue value)
+        {
+            key = Key;
+            value = Value;
+        }
     }
 }

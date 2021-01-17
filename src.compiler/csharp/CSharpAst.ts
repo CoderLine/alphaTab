@@ -42,6 +42,7 @@ export enum SyntaxKind {
 
     VariableDeclarationList,
     VariableDeclaration,
+    DeconstructDeclaration,
     CaseClause,
     DefaultClause,
     CatchClause,
@@ -75,6 +76,7 @@ export enum SyntaxKind {
     Identifier,
     DefaultExpression,
     ToDoExpression,
+    TypeOfExpression,
     
     Attribute
 }
@@ -138,13 +140,13 @@ export interface TypeParameterDeclaration extends NamedElement, Node {
 export interface NamedTypeDeclaration extends NamedElement, DocumentedElement, Node, AttributedElement {
     typeParameters?: TypeParameterDeclaration[];
     visibility: Visibility;
+    partial: boolean;
 }
 
 export interface ClassDeclaration extends NamedTypeDeclaration {
     baseClass?: TypeNode;
     interfaces?: TypeNode[];
     isAbstract: boolean;
-    partial: boolean;
     members: ClassMember[];
 }
 
@@ -263,7 +265,8 @@ export enum PrimitiveType {
     Int,
     Void,
     Object,
-    Dynamic
+    Dynamic,
+    Var
 }
 
 export interface PrimitiveTypeNode extends TypeNode {
@@ -380,6 +383,10 @@ export interface NonNullExpression extends Node {
     expression: Expression;
 }
 
+export interface TypeOfExpression extends Node {
+    expression: Expression;
+}
+
 export interface NullSafeExpression extends Node {
     expression: Expression;
 }
@@ -431,7 +438,12 @@ export interface VariableDeclarationList extends Node {
 export interface VariableDeclaration extends Node {
     type: TypeNode;
     name: string;
+    deconstructNames?: string[];
     initializer?: Expression;
+}
+
+export interface DeconstructDeclaration extends Node {
+    names: string[];
 }
 
 export interface ForStatement extends Statement {

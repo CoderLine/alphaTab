@@ -41,6 +41,8 @@ import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { Note } from './model/Note';
+import { MidiEventType } from './midi/MidiEvent';
+import { MidiEventsPlayedEventArgs } from './synth/MidiEventsPlayedEventArgs';
 
 class SelectionInfo {
     public beat: Beat;
@@ -435,6 +437,19 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
+    public get midiEventsPlayedFilter(): MidiEventType[] {
+        if (!this.player) {
+            return [];
+        }
+        return this.player.midiEventsPlayedFilter;
+    }
+
+    public set midiEventsPlayedFilter(value: MidiEventType[]) {
+        if (this.player) {
+            this.player.midiEventsPlayedFilter = value;
+        }
+    }
+
     public get tickPosition(): number {
         if (!this.player) {
             return 0;
@@ -543,6 +558,7 @@ export class AlphaTabApiBase<TSettings> {
         });
         this.player.stateChanged.on(this.onPlayerStateChanged.bind(this));
         this.player.positionChanged.on(this.onPlayerPositionChanged.bind(this));
+        this.player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
         this.player.finished.on(this.onPlayerFinished.bind(this));
         if (this.settings.player.enableCursor) {
             this.setupCursors();
@@ -561,6 +577,7 @@ export class AlphaTabApiBase<TSettings> {
         let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
         generator.generate();
         this._tickCache = generator.tickLookup;
+        this.onMidiLoad(midiFile);
         this.player.loadMidiFile(midiFile);
     }
 
@@ -969,8 +986,8 @@ export class AlphaTabApiBase<TSettings> {
         if (this.settings.player.enableUserInteraction) {
             // for the selection ensure start < end
             if (this._selectionEnd) {
-                let startTick: number = this._selectionStart!.beat.absoluteDisplayStart;
-                let endTick: number = this._selectionStart!.beat.absoluteDisplayStart;
+                let startTick: number = this._selectionStart!.beat.absolutePlaybackStart;
+                let endTick: number = this._selectionStart!.beat.absolutePlaybackStart;
                 if (endTick < startTick) {
                     let t: SelectionInfo = this._selectionStart!;
                     this._selectionStart = this._selectionEnd;
@@ -1221,10 +1238,16 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'soundFontLoaded', null);
     }
 
-    public midiLoaded: IEventEmitter = new EventEmitter();
-    private onMidiLoaded(): void {
-        (this.midiLoaded as EventEmitter).trigger();
-        this.uiFacade.triggerEvent(this.container, 'midiFileLoaded', null);
+    public midiLoad: IEventEmitterOfT<MidiFile> = new EventEmitterOfT<MidiFile>();
+    private onMidiLoad(e:MidiFile): void {
+        (this.midiLoad as EventEmitterOfT<MidiFile>).trigger(e);
+        this.uiFacade.triggerEvent(this.container, 'midiLoad', e);
+    }
+
+    public midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
+    private onMidiLoaded(e:PositionChangedEventArgs): void {
+        (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
+        this.uiFacade.triggerEvent(this.container, 'midiFileLoaded', e);
     }
 
     public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
@@ -1241,5 +1264,13 @@ export class AlphaTabApiBase<TSettings> {
     private onPlayerPositionChanged(e: PositionChangedEventArgs): void {
         (this.playerPositionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'playerPositionChanged', e);
+    }
+
+    public midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<
+        MidiEventsPlayedEventArgs
+    >();
+    private onMidiEventsPlayed(e: MidiEventsPlayedEventArgs): void {
+        (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(e);
+        this.uiFacade.triggerEvent(this.container, 'midiEventsPlayed', e);
     }
 }

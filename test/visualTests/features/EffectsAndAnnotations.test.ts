@@ -2,43 +2,43 @@ import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 
 describe('EffectsAndAnnotationsTests', () => {
     it('markers', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/markers.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/markers.gp');
     });
 
     it('tempo', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/tempo.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/tempo.gp');
     });
 
     it('text', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/text.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/text.gp');
     });
 
     it('chords', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/chords.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/chords.gp');
     });
 
     it('vibrato', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/vibrato.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/vibrato.gp');
     });
 
     it('dynamics', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/dynamics.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/dynamics.gp');
     });
 
     it('tap', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/tap.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/tap.gp');
     });
 
     it('fade-in', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/fade-in.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/fade-in.gp');
     });
 
     it('let-ring', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/let-ring.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/let-ring.gp');
     });
 
     it('palm-mute', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/palm-mute.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/palm-mute.gp');
     });
 
     it('bends', async () => {
@@ -50,27 +50,27 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('tremolo-picking', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/tremolo-picking.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/tremolo-picking.gp');
     });
 
     it('brush', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/brush.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/brush.gp');
     });
 
     it('slides', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/slides.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/slides.gp');
     });
 
     it('trill', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/trill.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/trill.gp');
     });
 
     it('pickStroke', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/pick-stroke.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/pick-stroke.gp');
     });
 
     it('tuplets', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets.gp5');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets.gp');
     });
 
     it('tuplets-advanced', async () => {
@@ -78,10 +78,10 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('fingering', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/fingering.gpx');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/fingering.gp');
     });
 
     it('triplet-feel', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/triplet-feel.gpx');
+        await VisualTestHelper.runVisualTest('effects-and-annotations/triplet-feel.gp');
     });
 });

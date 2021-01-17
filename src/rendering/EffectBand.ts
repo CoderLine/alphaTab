@@ -155,9 +155,9 @@ export class EffectBand extends Glyph {
 
     public alignGlyphs(): void {
         for (let v: number = 0; v < this._effectGlyphs.length; v++) {
-            this._effectGlyphs[v].forEach((g, beatIndex)=> {
+            for (const beatIndex of this._effectGlyphs[v].keys()) {
                 this.alignGlyph(this.info.sizingMode, this.renderer.bar.voices[v].beats[beatIndex]);
-            });
+            }
         }
     }
 

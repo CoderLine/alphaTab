@@ -6,13 +6,11 @@ import { Font, FontStyle } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
-import { Tuning } from '@src/model/Tuning';
 import { ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@src/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
-import { TuningGlyph } from '@src/rendering/glyphs/TuningGlyph';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { RenderStaff } from '@src/rendering/staves/RenderStaff';
@@ -21,6 +19,7 @@ import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
 import { EventEmitterOfT } from '@src/EventEmitter';
 import { NotationSettings, NotationElement } from '@src/NotationSettings';
+import { TuningContainerGlyph } from '../glyphs/TuningContainerGlyph';
 
 /**
  * This is the base public class for creating new layouting engines for the score renderer.
@@ -36,7 +35,7 @@ export abstract class ScoreLayout {
 
     protected scoreInfoGlyphs: Map<NotationElement, TextGlyph> = new Map();
     protected chordDiagrams: ChordDiagramContainerGlyph | null = null;
-    protected tuningGlyph: TuningGlyph | null = null;
+    protected tuningGlyph: TuningContainerGlyph | null = null;
 
     protected constructor(renderer: ScoreRenderer) {
         this.renderer = renderer;
@@ -120,46 +119,46 @@ export abstract class ScoreLayout {
                 );
             }
         }
+
+        const fakeBarRenderer = new BarRendererBase(
+            this.renderer,
+            this.renderer.tracks![0].staves[0].bars[0]
+        );
+
         if (notation.isNotationElementVisible(NotationElement.GuitarTuning)) {
-            let staffWithTuning: Staff | null = null;
+            let tunings: Staff[] = [];
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
-                    if (!staff.isPercussion && staff.isStringed && staff.tuning.length > 0) {
-                        staffWithTuning = staff;
+                    if (!staff.isPercussion && staff.isStringed && staff.tuning.length > 0 && staff.showTablature) {
+                        tunings.push(staff);
                         break;
                     }
                 }
-                if (staffWithTuning) {
-                    break;
-                }
             }
             // tuning info
-            if (staffWithTuning) {
-                let tuning: Tuning | null = Tuning.findTuning(staffWithTuning.tuning);
-                if (!tuning) {
-                    tuning = new Tuning('', staffWithTuning.tuning, false);
+            if (tunings.length > 0) {
+                this.tuningGlyph = new TuningContainerGlyph(0, 0);
+                this.tuningGlyph.renderer = fakeBarRenderer;
+                for (const t of tunings) {
+                    this.tuningGlyph.addTuning(t.stringTuning, tunings.length > 1 ? t.track.name : '');
                 }
-                this.tuningGlyph = new TuningGlyph(0, 0, this.scale, res, tuning);
             }
         }
         // chord diagram glyphs
         if (notation.isNotationElementVisible(NotationElement.ChordDiagrams)) {
             this.chordDiagrams = new ChordDiagramContainerGlyph(0, 0);
-            this.chordDiagrams.renderer = new BarRendererBase(
-                this.renderer,
-                this.renderer.tracks![0].staves[0].bars[0]
-            );
+            this.chordDiagrams.renderer = fakeBarRenderer;
             let chords: Map<string, Chord> = new Map<string, Chord>();
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
-                    staff.chords.forEach((chord, chordId) => {
+                    for (const [chordId, chord] of staff.chords) {
                         if (!chords.has(chordId)) {
                             if (chord.showDiagram) {
                                 chords.set(chordId, chord);
                                 this.chordDiagrams!.addChord(chord);
                             }
                         }
-                    });
+                    }
                 }
             }
         }
@@ -237,7 +236,7 @@ export abstract class ScoreLayout {
 
     public renderAnnotation(): void {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
-        let msg: string = 'rendered by alphaTab (https://alphaTab.net)';
+        let msg: string = 'rendered by alphaTab';
         let canvas: ICanvas = this.renderer.canvas!;
         let resources: RenderingResources = this.renderer.settings.display.resources;
         let size: number = 12 * this.renderer.settings.display.scale;

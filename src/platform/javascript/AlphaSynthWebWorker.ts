@@ -6,6 +6,7 @@ import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynth
 import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
+import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 
 /**
  * This class implements a HTML5 WebWorker based version of alphaSynth
@@ -30,6 +31,7 @@ export class AlphaSynthWebWorker {
         this._player.midiLoaded.on(this.onMidiLoaded.bind(this));
         this._player.midiLoadFailed.on(this.onMidiLoadFailed.bind(this));
         this._player.readyForPlayback.on(this.onReadyForPlayback.bind(this));
+        this._player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
         this._main.postMessage({
             cmd: 'alphaSynth.ready'
         });
@@ -80,6 +82,9 @@ export class AlphaSynthWebWorker {
                 break;
             case 'alphaSynth.setCountInVolume':
                 this._player.countInVolume = data.value;
+                break;           
+            case 'alphaSynth.setMidiEventsPlayedFilter':
+                this._player.midiEventsPlayedFilter = data.value;
                 break;
             case 'alphaSynth.play':
                 this._player.play();
@@ -126,7 +131,8 @@ export class AlphaSynthWebWorker {
             currentTime: e.currentTime,
             endTime: e.endTime,
             currentTick: e.currentTick,
-            endTick: e.endTick
+            endTick: e.endTick,
+            isSeek: e.isSeek
         });
     }
 
@@ -171,9 +177,14 @@ export class AlphaSynthWebWorker {
         return error;
     }
 
-    public onMidiLoaded(): void {
+    public onMidiLoaded(e: PositionChangedEventArgs): void {
         this._main.postMessage({
-            cmd: 'alphaSynth.midiLoaded'
+            cmd: 'alphaSynth.midiLoaded',
+            currentTime: e.currentTime,
+            endTime: e.endTime,
+            currentTick: e.currentTick,
+            endTick: e.endTick,
+            isSeek: e.isSeek
         });
     }
 
@@ -187,6 +198,13 @@ export class AlphaSynthWebWorker {
     public onReadyForPlayback(): void {
         this._main.postMessage({
             cmd: 'alphaSynth.readyForPlayback'
+        });
+    }
+
+    public onMidiEventsPlayed(args: MidiEventsPlayedEventArgs): void {
+        this._main.postMessage({
+            cmd: 'alphaSynth.midiEventsPlayed',
+            events: args.events.map(JsonConverter.midiEventToJsObject)
         });
     }
 }

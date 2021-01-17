@@ -24,22 +24,10 @@
 export enum XmlNodeType {
     None,
     Element,
-    Attribute,
     Text,
     CDATA,
-    EntityReference,
-    Entity,
-    ProcessingInstruction,
-    Comment,
     Document,
     DocumentType,
-    DocumentFragment,
-    Notation,
-    Whitespace,
-    SignificantWhitespace,
-    EndElement,
-    EndEntity,
-    XmlDeclaration
 }
 
 export class XmlNode {
@@ -54,7 +42,7 @@ export class XmlNode {
     public addChild(node: XmlNode): void {
         this.childNodes.push(node);
         this.firstChild = node;
-        if (node.nodeType === XmlNodeType.Element) {
+        if (node.nodeType === XmlNodeType.Element || node.nodeType === XmlNodeType.CDATA) {
             this.firstElement = node;
         }
     }
@@ -92,8 +80,19 @@ export class XmlNode {
         return null;
     }
 
+    public addElement(name: string): XmlNode {
+        const newNode = new XmlNode();
+        newNode.nodeType = XmlNodeType.Element;
+        newNode.localName = name;
+        this.addChild(newNode);
+        return newNode;
+    }
+
     public get innerText(): string {
         if (this.nodeType === XmlNodeType.Element || this.nodeType === XmlNodeType.Document) {
+            if(this.firstElement && this.firstElement.nodeType === XmlNodeType.CDATA) {
+                return this.firstElement.innerText;
+            }
             let txt: string = '';
             for (let c of this.childNodes) {
                 txt += c.innerText?.toString();
@@ -102,5 +101,20 @@ export class XmlNode {
             return s.trim();
         }
         return this.value ?? '';
+    }
+
+
+    public set innerText(value: string) {
+        const textNode = new XmlNode();
+        textNode.nodeType = XmlNodeType.Text;
+        textNode.value = value;
+        this.childNodes = [textNode];
+    }
+
+    public setCData(s:string) {
+        const textNode = new XmlNode();
+        textNode.nodeType = XmlNodeType.CDATA;
+        textNode.value = s ?? "";
+        this.childNodes = [textNode];
     }
 }

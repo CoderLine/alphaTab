@@ -23,7 +23,6 @@ export class EffectGlyph extends Glyph {
      */
     public previousGlyph: EffectGlyph | null = null;
 
-    public height: number = 0;
 
     public constructor(x: number = 0, y: number = 0) {
         super(x, y);

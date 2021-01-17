@@ -21,6 +21,7 @@ import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
+import { BeamingHelper } from './utils/BeamingHelper';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -149,9 +150,9 @@ export class BarRendererBase {
     public scaleToWidth(width: number): void {
         // preBeat and postBeat glyphs do not get resized
         let containerWidth: number = width - this._preBeatGlyphs.width - this._postBeatGlyphs.width;
-        this._voiceContainers.forEach(container => {
+        for (const container of this._voiceContainers.values()) {
             container.scaleToWidth(containerWidth);
-        });
+        }
         this._postBeatGlyphs.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width + containerWidth;
         this.width = width;
     }
@@ -184,9 +185,9 @@ export class BarRendererBase {
         if (info.preBeatSize < preSize) {
             info.preBeatSize = preSize;
         }
-        this._voiceContainers.forEach(container => {
+        for (const container of this._voiceContainers.values()) {
             container.registerLayoutingInfo(info);
-        });
+        }
         let postSize: number = this._postBeatGlyphs.width;
         if (info.postBeatSize < postSize) {
             info.postBeatSize = postSize;
@@ -205,14 +206,14 @@ export class BarRendererBase {
         this._preBeatGlyphs.width = this.layoutingInfo.preBeatSize;
         // on beat glyphs we apply the glyph spacing
         let voiceEnd: number = this._preBeatGlyphs.x + this._preBeatGlyphs.width;
-        this._voiceContainers.forEach(c => {
+        for (const c of this._voiceContainers.values()) {
             c.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width;
             c.applyLayoutingInfo(this.layoutingInfo);
             let newEnd: number = c.x + c.width;
             if (voiceEnd < newEnd) {
                 voiceEnd = newEnd;
             }
-        });
+        }
         // on the post glyphs we add the spacing before all other glyphs
         this._postBeatGlyphs.x = Math.floor(voiceEnd);
         this._postBeatGlyphs.width = this.layoutingInfo.postBeatSize;
@@ -283,14 +284,14 @@ export class BarRendererBase {
         let voiceContainers: Map<number, VoiceContainerGlyph> = this._voiceContainers;
         let beatGlyphsStart: number = this.beatGlyphsStart;
         let postBeatStart: number = beatGlyphsStart;
-        voiceContainers.forEach(c => {
+        for (const c of voiceContainers.values()) {
             c.x = beatGlyphsStart;
             c.doLayout();
             let x: number = c.x + c.width;
             if (postBeatStart < x) {
                 postBeatStart = x;
             }
-        });
+        }
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
         this.height += this.layoutingInfo.height * this.scale;
@@ -329,10 +330,10 @@ export class BarRendererBase {
         this.paintBackground(cx, cy, canvas);
         canvas.color = this.resources.mainGlyphColor;
         this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
-        this._voiceContainers.forEach(c => {
+        for (const c of this._voiceContainers.values()) {
             canvas.color = c.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
             c.paint(cx + this.x, cy + this.y, canvas);
-        });
+        }
         canvas.color = this.resources.mainGlyphColor;
         this._postBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
     }
@@ -363,7 +364,7 @@ export class BarRendererBase {
         barBounds.realBounds.h = this.height;
 
         masterBarBounds.addBar(barBounds);
-        this._voiceContainers.forEach((c, index) => {
+        for (const [index, c] of this._voiceContainers) {
             let isEmptyBar: boolean = this.bar.isEmpty && index === 0;
             if (!c.voice.isEmpty || isEmptyBar) {
                 for (let i: number = 0, j: number = c.beatGlyphs.length; i < j; i++) {
@@ -371,7 +372,7 @@ export class BarRendererBase {
                     bc.buildBoundingsLookup(barBounds, cx + this.x + c.x, cy + this.y + c.y, isEmptyBar);
                 }
             }
-        });
+        }
     }
 
     protected addPostBeatGlyph(g: Glyph): void {
@@ -485,5 +486,9 @@ export class BarRendererBase {
                 );
                 break;
         }
+    }
+
+    public completeBeamingHelper(helper: BeamingHelper) {
+        // nothing by default
     }
 }

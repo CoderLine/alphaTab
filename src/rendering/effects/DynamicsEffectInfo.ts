@@ -6,6 +6,7 @@ import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
+import { GraceType } from '@src/model/GraceType';
 
 export class DynamicsEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
@@ -29,17 +30,20 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
     }
 
     private internalShouldCreateGlyph(beat: Beat): boolean {
-        if (beat.voice.bar.staff.track.score.stylesheet.hideDynamics || beat.isEmpty || beat.voice.isEmpty) {
+        if (beat.voice.bar.staff.track.score.stylesheet.hideDynamics || beat.isEmpty || beat.voice.isEmpty || beat.isRest || beat.graceType !== GraceType.None) {
             return false;
         }
+
+        let previousBeat = this.getPreviousDynamicsBeat(beat);
+
         let show: boolean =
-            (beat.voice.index === 0 && beat.index === 0 && beat.voice.bar.index === 0) ||
-            (!!beat.previousBeat && beat.dynamics !== beat.previousBeat.dynamics);
+            (beat.voice.index === 0 && !previousBeat) ||
+            (beat.dynamics !== previousBeat?.dynamics);
         // ensure we do not show duplicate dynamics
         if (show && beat.voice.index > 0) {
             for (let voice of beat.voice.bar.voices) {
                 if (voice.index < beat.voice.index) {
-                    let beatAtSamePos = voice.getBeatAtDisplayStart(beat.displayStart);
+                    let beatAtSamePos = voice.getBeatAtPlaybackStart(beat.playbackStart);
                     if (
                         beatAtSamePos &&
                         beat.dynamics === beatAtSamePos.dynamics &&
@@ -51,6 +55,16 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
             }
         }
         return show;
+    }
+    private getPreviousDynamicsBeat(beat: Beat) {
+        let previousBeat = beat.previousBeat;
+        while (previousBeat != null) {
+            if (!previousBeat.isRest && previousBeat.graceType === GraceType.None) {
+                return previousBeat;
+            }
+            previousBeat = previousBeat.previousBeat;
+        }
+        return null;
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {

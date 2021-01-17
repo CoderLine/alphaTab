@@ -55,9 +55,9 @@ export class MusicXmlImporter extends ScoreImporter {
         this._tieStartIds = new Map<number, boolean>();
         this._slurStarts = new Map<string, Note>();
         let xml: string = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
-        let dom: XmlDocument;
+        let dom: XmlDocument = new XmlDocument();
         try {
-            dom = new XmlDocument(xml);
+            dom.parse(xml);
         } catch (e) {
             throw new UnsupportedFormatError('Unsupported format');
         }
@@ -76,12 +76,12 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private mergePartGroups(): void {
         let anyMerged: boolean = false;
-        this._partGroups.forEach((tracks) =>{
+        for(const tracks of this._partGroups.values()) {
             if (tracks.length > 1) {
                 this.mergeGroup(tracks);
                 anyMerged = true;
             }
-        });
+        }
         // if any groups were merged, we need to rebuild the indexes
         if (anyMerged) {
             for (let i: number = 0; i < this._score.tracks.length; i++) {
@@ -105,7 +105,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseDom(dom: XmlDocument): void {
-        let root: XmlNode | null = dom.documentElement;
+        let root: XmlNode | null = dom.firstElement;
         if (!root) {
             throw new UnsupportedFormatError('Unsupported format');
         }
@@ -161,11 +161,11 @@ export class MusicXmlImporter extends ScoreImporter {
         let id: string = element.getAttribute('id');
         if (!this._trackById.has(id)) {
             if (this._trackById.size === 1) {
-                this._trackById.forEach((t, x)=> {
+                for(const [x,t] of this._trackById) {
                     if (t.staves.length === 0 || t.staves[0].bars.length === 0) {
                         id = x;
                     }
-                });
+                }
                 if (!this._trackById.has(id)) {
                     return;
                 }
@@ -366,7 +366,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 switch (c.localName) {
                     case 'staff-lines':
                         for (let staff of track.staves) {
-                            staff.tuning = new Array<number>(parseInt(c.innerText)).fill(0);
+                            staff.stringTuning.tunings = new Array<number>(parseInt(c.innerText)).fill(0);
                         }
                         break;
                     case 'staff-tuning':
@@ -377,7 +377,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         for (let staff of track.staves) {
             if (this.isEmptyTuning(staff.tuning)) {
-                staff.tuning = [];
+                staff.stringTuning.tunings = [];
             }
         }
     }
@@ -614,6 +614,7 @@ export class MusicXmlImporter extends ScoreImporter {
         beat.isEmpty = false;
         beat.addNote(note);
         beat.dots = 0;
+        let isFullBarRest = false;
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -626,7 +627,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         beat.duration = Duration.ThirtySecond;
                         break;
                     case 'duration':
-                        if (beat.isRest) {
+                        if (beat.isRest && !isFullBarRest) {
                             // unit: divisions per quarter note
                             let duration: number = parseInt(c.innerText);
                             switch (duration) {
@@ -708,8 +709,10 @@ export class MusicXmlImporter extends ScoreImporter {
                         this.parseUnpitched(c, note);
                         break;
                     case 'rest':
+                        isFullBarRest = c.getAttribute('measure') === 'yes';
                         beat.isEmpty = false;
                         beat.notes = [];
+                        beat.duration = Duration.Whole;
                         break;
                 }
             }
@@ -805,7 +808,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         } else if (element.getAttribute('type') === 'stop' && this._tieStarts.length > 0 && !note.isTieDestination) {
             note.isTieDestination = true;
-            note.tieOrigin = this._tieStarts[0];
+            note.tieOriginNoteId = this._tieStarts[0].id;
             this._tieStarts.splice(0, 1);
             this._tieStartIds.delete(note.id);
         }
@@ -849,8 +852,8 @@ export class MusicXmlImporter extends ScoreImporter {
                                 if (this._slurStarts.has(slurNumber)) {
                                     note.isSlurDestination = true;
                                     let slurStart: Note = this._slurStarts.get(slurNumber)!;
-                                    slurStart.slurDestination = note;
-                                    note.slurOrigin = note;
+                                    slurStart.slurDestinationNoteId = note.id;
+                                    note.slurOriginNoteId = note.id;
                                 }
                                 break;
                         }
@@ -1370,7 +1373,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
         if (this.isEmptyTuning(track.staves[0].tuning)) {
-            track.staves[0].tuning = [];
+            track.staves[0].stringTuning.tunings = [];
         }
     }
 
@@ -1396,8 +1399,11 @@ export class MusicXmlImporter extends ScoreImporter {
                     case 'midi-program':
                         track.playbackInfo.program = parseInt(c.innerText);
                         break;
-                    case 'midi-volume':
-                        track.playbackInfo.volume = parseInt(c.innerText);
+                    case 'volume':
+                        track.playbackInfo.volume = Math.floor((parseInt(c.innerText) / 100) * 16);
+                        break;
+                    case 'pan':
+                        track.playbackInfo.balance = Math.max(0, Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16)));
                         break;
                 }
             }

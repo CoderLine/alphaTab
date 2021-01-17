@@ -43,19 +43,34 @@ import { PercussionMapper } from '@src/model/PercussionMapper';
 import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { TextBaseline } from '@src/platform/ICanvas';
+import { BeatCloner } from '@src/generated/model/BeatCloner';
+import { NoteCloner } from '@src/generated/model/NoteCloner';
+import { Logger } from '@src/alphatab';
 
 /**
  * This structure represents a duration within a gpif
  */
-class GpifRhythm {
+export class GpifRhythm {
+    public id: string = '';
     public dots: number = 0;
     public tupletDenominator: number = -1;
     public tupletNumerator: number = -1;
     public value: Duration = Duration.Quarter;
 }
 
+class GpifSound {
+    public name: string = '';
+    public path: string = '';
+    public role: string = '';
+    public get uniqueId(): string {
+        return this.path + ';' + this.name + ';' + this.role;
+    }
+
+    public program: number = 0;
+}
+
 /**
- * This public class can parse a score.gpif xml file into the model structure
+ * This class can parse a score.gpif xml file into the model structure
  */
 export class GpifParser {
     private static readonly InvalidId: string = '-1';
@@ -74,7 +89,8 @@ export class GpifParser {
 
     public score!: Score;
 
-    private _masterTrackAutomations!: Map<string, Automation[]>;
+    private _masterTrackAutomations!: Map<number, Automation[]>;
+    private _automationsPerTrackIdAndBarIndex!: Map<string, Map<number, Automation[]>>;
     private _tracksMapping!: string[];
     private _tracksById!: Map<string, Track>;
     private _masterBars!: MasterBar[];
@@ -90,12 +106,14 @@ export class GpifParser {
     private _notesOfBeat!: Map<string, string[]>;
     private _tappedNotes!: Map<string, boolean>;
     private _lyricsByTrack!: Map<string, Lyrics[]>;
+    private _soundsByTrack!: Map<string, Map<string, GpifSound>>;
     private _hasAnacrusis: boolean = false;
     private _articulationByName!: Map<string, InstrumentArticulation>;
     private _skipApplyLyrics: boolean = false;
 
     public parseXml(xml: string, settings: Settings): void {
-        this._masterTrackAutomations = new Map<string, Automation[]>();
+        this._masterTrackAutomations = new Map<number, Automation[]>();
+        this._automationsPerTrackIdAndBarIndex = new Map<string, Map<number, Automation[]>>();
         this._tracksMapping = [];
         this._tracksById = new Map<string, Track>();
         this._masterBars = [];
@@ -111,11 +129,12 @@ export class GpifParser {
         this._noteById = new Map<string, Note>();
         this._tappedNotes = new Map<string, boolean>();
         this._lyricsByTrack = new Map<string, Lyrics[]>();
+        this._soundsByTrack = new Map<string, Map<string, GpifSound>>();
         this._skipApplyLyrics = false;
 
-        let dom: XmlDocument;
+        let dom: XmlDocument = new XmlDocument();
         try {
-            dom = new XmlDocument(xml);
+            dom.parse(xml);
         } catch (e) {
             throw new UnsupportedFormatError('Could not parse XML', e);
         }
@@ -124,15 +143,15 @@ export class GpifParser {
         this.buildModel();
         this.score.finish(settings);
         if (!this._skipApplyLyrics && this._lyricsByTrack.size > 0) {
-            this._lyricsByTrack.forEach((lyrics, t) => {
+            for (const [t, lyrics] of this._lyricsByTrack) {
                 let track: Track = this._tracksById.get(t)!;
                 track.applyLyrics(lyrics);
-            });
+            }
         }
     }
 
     private parseDom(dom: XmlDocument): void {
-        let root: XmlNode | null = dom.documentElement;
+        let root: XmlNode | null = dom.firstElement;
         if (!root) {
             return;
         }
@@ -242,7 +261,7 @@ export class GpifParser {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Automations':
-                        this.parseAutomations(c, this._masterTrackAutomations);
+                        this.parseAutomations(c, this._masterTrackAutomations, null);
                         break;
                     case 'Tracks':
                         this._tracksMapping = c.innerText.split(' ');
@@ -255,24 +274,25 @@ export class GpifParser {
         }
     }
 
-    private parseAutomations(node: XmlNode, automations: Map<string, Automation[]>): void {
+    private parseAutomations(node: XmlNode, automations: Map<number, Automation[]>, sounds: Map<string, GpifSound> | null): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Automation':
-                        this.parseAutomation(c, automations);
+                        this.parseAutomation(c, automations, sounds);
                         break;
                 }
             }
         }
     }
 
-    private parseAutomation(node: XmlNode, automations: Map<string, Automation[]>): void {
+    private parseAutomation(node: XmlNode, automations: Map<number, Automation[]>, sounds: Map<string, GpifSound> | null): void {
         let type: string | null = null;
         let isLinear: boolean = false;
-        let barId: string | null = null;
+        let barIndex: number = -1;
         let ratioPosition: number = 0;
-        let value: number = 0;
+        let numberValue: number = 0;
+        let textValue: string | null = null;
         let reference: number = 0;
         let text: string | null = null;
         for (let c of node.childNodes) {
@@ -285,21 +305,25 @@ export class GpifParser {
                         isLinear = c.innerText.toLowerCase() === 'true';
                         break;
                     case 'Bar':
-                        barId = c.innerText;
+                        barIndex = parseInt(c.innerText);
                         break;
                     case 'Position':
                         ratioPosition = parseFloat(c.innerText);
                         break;
                     case 'Value':
-                        let parts: string[] = c.innerText.split(' ');
-                        // Issue 391: Some GPX files might have 
-                        // single floating point value. 
-                        if (parts.length === 1) {
-                            value = parseFloat(parts[0]);
-                            reference = 1;
+                        if (c.firstElement && c.firstElement.nodeType === XmlNodeType.CDATA) {
+                            textValue = c.innerText;
                         } else {
-                            value = parseFloat(parts[0]);
-                            reference = parseInt(parts[1]);
+                            let parts: string[] = c.innerText.split(' ');
+                            // Issue 391: Some GPX files might have
+                            // single floating point value.
+                            if (parts.length === 1) {
+                                numberValue = parseFloat(parts[0]);
+                                reference = 1;
+                            } else {
+                                numberValue = parseFloat(parts[0]);
+                                reference = parseInt(parts[1]);
+                            }
                         }
                         break;
                     case 'Text':
@@ -314,7 +338,12 @@ export class GpifParser {
         let automation: Automation | null = null;
         switch (type) {
             case 'Tempo':
-                automation = Automation.buildTempoAutomation(isLinear, ratioPosition, value, reference);
+                automation = Automation.buildTempoAutomation(isLinear, ratioPosition, numberValue, reference);
+                break;
+            case 'Sound':
+                if (textValue && sounds && sounds.has(textValue)) {
+                    automation = Automation.buildInstrumentAutomation(isLinear, ratioPosition, sounds.get(textValue)!.program);
+                }
                 break;
         }
         if (automation) {
@@ -322,11 +351,11 @@ export class GpifParser {
                 automation.text = text;
             }
 
-            if (barId) {
-                if (!automations.has(barId)) {
-                    automations.set(barId, []);
+            if (barIndex >= 0) {
+                if (!automations.has(barIndex)) {
+                    automations.set(barIndex, []);
                 }
-                automations.get(barId)!.push(automation);
+                automations.get(barIndex)!.push(automation);
             }
         }
     }
@@ -398,7 +427,7 @@ export class GpifParser {
                         this.parseGeneralMidi(track, c);
                         break;
                     case 'Sounds':
-                        this.parseSounds(track, c);
+                        this.parseSounds(trackId, track, c);
                         break;
                     case 'PlaybackState':
                         let state: string = c.innerText;
@@ -414,10 +443,22 @@ export class GpifParser {
                     case 'Transpose':
                         this.parseTranspose(track, c);
                         break;
+                    case 'RSE':
+                        this.parseRSE(track, c);
+                        break;
+                    case 'Automations':
+                        this.parseTrackAutomations(trackId, c);
+                        break;
                 }
             }
         }
         this._tracksById.set(trackId, track);
+    }
+
+    private parseTrackAutomations(trackId: string, c: XmlNode) {
+        const trackAutomations = new Map<number, Automation[]>()
+        this._automationsPerTrackIdAndBarIndex.set(trackId, trackAutomations)
+        this.parseAutomations(c, trackAutomations, this._soundsByTrack.get(trackId)!);
     }
 
     private parseNotationPatch(track: Track, node: XmlNode) {
@@ -482,32 +523,36 @@ export class GpifParser {
     }
 
     private parseElement(track: Track, node: XmlNode) {
+        const typeElement = node.findChildElement('Type');
+        const type = typeElement ? typeElement.innerText : "";
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
+                    case 'Name':
                     case 'Articulations':
-                        this.parseArticulations(track, c);
+                        this.parseArticulations(track, c, type);
                         break;
                 }
             }
         }
     }
-    private parseArticulations(track: Track, node: XmlNode) {
+    private parseArticulations(track: Track, node: XmlNode, elementType: string) {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Articulation':
-                        this.parseArticulation(track, c);
+                        this.parseArticulation(track, c, elementType);
                         break;
                 }
             }
         }
     }
 
-    private parseArticulation(track: Track, node: XmlNode) {
+    private parseArticulation(track: Track, node: XmlNode, elementType: string) {
         const articulation = new InstrumentArticulation();
         articulation.outputMidiNumber = -1;
-        let name = "";
+        articulation.elementType = elementType;
+        let name = '';
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 const txt = c.innerText;
@@ -551,20 +596,12 @@ export class GpifParser {
                             articulation.noteHeadWhole = this.parseNoteHead(noteHeadsTxt[2]);
                         }
 
-
                         if (articulation.noteHeadHalf == MusicFontSymbol.None) {
                             articulation.noteHeadHalf = articulation.noteHeadDefault;
                         }
 
                         if (articulation.noteHeadWhole == MusicFontSymbol.None) {
                             articulation.noteHeadWhole = articulation.noteHeadDefault;
-                        }
-
-                        switch (noteHeadsTxt.length) {
-                            case 1:
-                            case 2:
-                            case 3:
-                                break;
                         }
 
                         break;
@@ -582,50 +619,79 @@ export class GpifParser {
             if (name.length > 0) {
                 this._articulationByName.set(name, articulation);
             }
-        }
-        else if (name.length > 0 && this._articulationByName.has(name)) {
+        } else if (name.length > 0 && this._articulationByName.has(name)) {
             this._articulationByName.get(name)!.staffLine = articulation.staffLine;
         }
-
     }
 
     private parseTechniqueSymbol(txt: string): MusicFontSymbol {
         switch (txt) {
-            case 'pictEdgeOfCymbal': return MusicFontSymbol.PictEdgeOfCymbal;
-            case 'articStaccatoAbove': return MusicFontSymbol.ArticStaccatoAbove;
-            case 'noteheadParenthesis': return MusicFontSymbol.NoteheadParenthesis;
-            case 'stringsUpBow': return MusicFontSymbol.StringsUpBow;
-            case 'stringsDownBow': return MusicFontSymbol.StringsDownBow;
-            case 'guitarGolpe': return MusicFontSymbol.GuitarGolpe;
-            default: return MusicFontSymbol.None;
+            case 'pictEdgeOfCymbal':
+                return MusicFontSymbol.PictEdgeOfCymbal;
+            case 'articStaccatoAbove':
+                return MusicFontSymbol.ArticStaccatoAbove;
+            case 'noteheadParenthesis':
+                return MusicFontSymbol.NoteheadParenthesis;
+            case 'stringsUpBow':
+                return MusicFontSymbol.StringsUpBow;
+            case 'stringsDownBow':
+                return MusicFontSymbol.StringsDownBow;
+            case 'guitarGolpe':
+                return MusicFontSymbol.GuitarGolpe;
+            default:
+                return MusicFontSymbol.None;
         }
     }
 
     private parseNoteHead(txt: string): MusicFontSymbol {
         switch (txt) {
-            case 'noteheadDoubleWholeSquare': return MusicFontSymbol.NoteheadDoubleWholeSquare;
-            case 'noteheadDoubleWhole': return MusicFontSymbol.NoteheadDoubleWhole;
-            case 'noteheadWhole': return MusicFontSymbol.NoteheadWhole;
-            case 'noteheadHalf': return MusicFontSymbol.NoteheadHalf;
-            case 'noteheadBlack': return MusicFontSymbol.NoteheadBlack;
-            case 'noteheadNull': return MusicFontSymbol.NoteheadNull;
-            case 'noteheadXOrnate': return MusicFontSymbol.NoteheadXOrnate;
-            case 'noteheadTriangleUpWhole': return MusicFontSymbol.NoteheadTriangleUpWhole;
-            case 'noteheadTriangleUpHalf': return MusicFontSymbol.NoteheadTriangleUpHalf;
-            case 'noteheadTriangleUpBlack': return MusicFontSymbol.NoteheadTriangleUpBlack;
-            case 'noteheadDiamondBlackWide': return MusicFontSymbol.NoteheadDiamondBlackWide;
-            case 'noteheadDiamondWhite': return MusicFontSymbol.NoteheadDiamondWhite;
-            case 'noteheadDiamondWhiteWide': return MusicFontSymbol.NoteheadDiamondWhiteWide;
-            case 'noteheadCircleX': return MusicFontSymbol.NoteheadCircleX;
-            case 'noteheadXWhole': return MusicFontSymbol.NoteheadXWhole;
-            case 'noteheadXHalf': return MusicFontSymbol.NoteheadXHalf;
-            case 'noteheadXBlack': return MusicFontSymbol.NoteheadXBlack;
-            case 'noteheadParenthesis': return MusicFontSymbol.NoteheadParenthesis;
-            case 'noteheadSlashedBlack2': return MusicFontSymbol.NoteheadSlashedBlack2;
-            case 'noteheadCircleSlash': return MusicFontSymbol.NoteheadCircleSlash;
-            case 'noteheadHeavyX': return MusicFontSymbol.NoteheadHeavyX;
-            case 'noteheadHeavyXHat': return MusicFontSymbol.NoteheadHeavyXHat;
-            default: return MusicFontSymbol.None;
+            case 'noteheadDoubleWholeSquare':
+                return MusicFontSymbol.NoteheadDoubleWholeSquare;
+            case 'noteheadDoubleWhole':
+                return MusicFontSymbol.NoteheadDoubleWhole;
+            case 'noteheadWhole':
+                return MusicFontSymbol.NoteheadWhole;
+            case 'noteheadHalf':
+                return MusicFontSymbol.NoteheadHalf;
+            case 'noteheadBlack':
+                return MusicFontSymbol.NoteheadBlack;
+            case 'noteheadNull':
+                return MusicFontSymbol.NoteheadNull;
+            case 'noteheadXOrnate':
+                return MusicFontSymbol.NoteheadXOrnate;
+            case 'noteheadTriangleUpWhole':
+                return MusicFontSymbol.NoteheadTriangleUpWhole;
+            case 'noteheadTriangleUpHalf':
+                return MusicFontSymbol.NoteheadTriangleUpHalf;
+            case 'noteheadTriangleUpBlack':
+                return MusicFontSymbol.NoteheadTriangleUpBlack;
+            case 'noteheadDiamondBlackWide':
+                return MusicFontSymbol.NoteheadDiamondBlackWide;
+            case 'noteheadDiamondWhite':
+                return MusicFontSymbol.NoteheadDiamondWhite;
+            case 'noteheadDiamondWhiteWide':
+                return MusicFontSymbol.NoteheadDiamondWhiteWide;
+            case 'noteheadCircleX':
+                return MusicFontSymbol.NoteheadCircleX;
+            case 'noteheadXWhole':
+                return MusicFontSymbol.NoteheadXWhole;
+            case 'noteheadXHalf':
+                return MusicFontSymbol.NoteheadXHalf;
+            case 'noteheadXBlack':
+                return MusicFontSymbol.NoteheadXBlack;
+            case 'noteheadParenthesis':
+                return MusicFontSymbol.NoteheadParenthesis;
+            case 'noteheadSlashedBlack2':
+                return MusicFontSymbol.NoteheadSlashedBlack2;
+            case 'noteheadCircleSlash':
+                return MusicFontSymbol.NoteheadCircleSlash;
+            case 'noteheadHeavyX':
+                return MusicFontSymbol.NoteheadHeavyX;
+            case 'noteheadHeavyXHat':
+                return MusicFontSymbol.NoteheadHeavyXHat;
+            default:
+                Logger.warning('GPIF', 'Unknown notehead symbol', txt);
+                return MusicFontSymbol.None;
         }
     }
 
@@ -673,19 +739,32 @@ export class GpifParser {
         let propertyName: string = node.getAttribute('name');
         switch (propertyName) {
             case 'Tuning':
-                let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
-                let tuning = new Array<number>(tuningParts.length);
-                for (let i: number = 0; i < tuning.length; i++) {
-                    tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
+                for (let c of node.childNodes) {
+                    if (c.nodeType === XmlNodeType.Element) {
+                        switch (c.localName) {
+                            case 'Pitches':
+                                let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
+                                let tuning = new Array<number>(tuningParts.length);
+                                for (let i: number = 0; i < tuning.length; i++) {
+                                    tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
+                                }
+                                staff.stringTuning.tunings = tuning;
+                                break;
+                            case 'Label':
+                                staff.stringTuning.name = c.innerText;
+                                break;
+                        }
+                    }
                 }
-                staff.tuning = tuning;
+
                 if (!staff.isPercussion) {
                     staff.showTablature = true;
                 }
+
                 break;
             case 'DiagramCollection':
             case 'ChordCollection':
-                this.parseDiagramCollection_Staff_XmlNode(staff, node);
+                this.parseDiagramCollectionForStaff(staff, node);
                 break;
             case 'CapoFret':
                 let capo: number = parseInt(node.findChildElement('Fret')!.innerText);
@@ -725,49 +804,49 @@ export class GpifParser {
         return lyrics;
     }
 
-    private parseDiagramCollection_Track_XmlNode(track: Track, node: XmlNode): void {
+    private parseDiagramCollectionForTrack(track: Track, node: XmlNode): void {
         let items: XmlNode = node.findChildElement('Items')!;
         for (let c of items.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Item':
-                        this.parseDiagramItem_Track_XmlNode(track, c);
+                        this.parseDiagramItemForTrack(track, c);
                         break;
                 }
             }
         }
     }
 
-    private parseDiagramCollection_Staff_XmlNode(staff: Staff, node: XmlNode): void {
+    private parseDiagramCollectionForStaff(staff: Staff, node: XmlNode): void {
         let items: XmlNode = node.findChildElement('Items')!;
         for (let c of items.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Item':
-                        this.parseDiagramItem_Staff_XmlNode(staff, c);
+                        this.parseDiagramItemForStaff(staff, c);
                         break;
                 }
             }
         }
     }
 
-    private parseDiagramItem_Track_XmlNode(track: Track, node: XmlNode): void {
+    private parseDiagramItemForTrack(track: Track, node: XmlNode): void {
         let chord: Chord = new Chord();
         let chordId: string = node.getAttribute('id');
         for (let staff of track.staves) {
             staff.addChord(chordId, chord);
         }
-        this.parseDiagramItem_Chord_XmlNode(chord, node);
+        this.parseDiagramItemForChord(chord, node);
     }
 
-    private parseDiagramItem_Staff_XmlNode(staff: Staff, node: XmlNode): void {
+    private parseDiagramItemForStaff(staff: Staff, node: XmlNode): void {
         let chord: Chord = new Chord();
         let chordId: string = node.getAttribute('id');
         staff.addChord(chordId, chord);
-        this.parseDiagramItem_Chord_XmlNode(chord, node);
+        this.parseDiagramItemForChord(chord, node);
     }
 
-    private parseDiagramItem_Chord_XmlNode(chord: Chord, node: XmlNode): void {
+    private parseDiagramItemForChord(chord: Chord, node: XmlNode): void {
         chord.name = node.getAttribute('name');
         let diagram: XmlNode = node.findChildElement('Diagram')!;
         let stringCount: number = parseInt(diagram.getAttribute('stringCount'));
@@ -862,14 +941,14 @@ export class GpifParser {
                     tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
                 }
                 for (let staff of track.staves) {
-                    staff.tuning = tuning;
+                    staff.stringTuning.tunings = tuning;
                     staff.showStandardNotation = true;
                     staff.showTablature = true;
                 }
                 break;
             case 'DiagramCollection':
             case 'ChordCollection':
-                this.parseDiagramCollection_Track_XmlNode(track, node);
+                this.parseDiagramCollectionForTrack(track, node);
                 break;
             case 'CapoFret':
                 let capo: number = parseInt(node.findChildElement('Fret')!.innerText);
@@ -907,36 +986,56 @@ export class GpifParser {
         }
     }
 
-    private parseSounds(track: Track, node: XmlNode): void {
+    private parseSounds(trackId: string, track: Track, node: XmlNode): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Sound':
-                        this.parseSound(track, c);
+                        this.parseSound(trackId, track, c);
                         break;
                 }
             }
         }
     }
 
-    private parseSound(track: Track, node: XmlNode): void {
+    private parseSound(trackId: string, track: Track, node: XmlNode): void {
+        const sound = new GpifSound();
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
+                    case 'Name':
+                        sound.name = c.innerText;
+                        break;
+                    case 'Path':
+                        sound.path = c.innerText;
+                        break;
+                    case 'Role':
+                        sound.role = c.innerText;
+                        break;
                     case 'MIDI':
-                        this.parseSoundMidi(track, c);
+                        this.parseSoundMidi(sound, c);
                         break;
                 }
             }
         }
+
+        if (sound.role === 'Factory' || track.playbackInfo.program === 0) {
+            track.playbackInfo.program = sound.program;
+        }
+
+        if (!this._soundsByTrack.has(trackId)) {
+            this._soundsByTrack.set(trackId, new Map<string, GpifSound>());
+        }
+
+        this._soundsByTrack.get(trackId)!.set(sound.uniqueId, sound);
     }
 
-    private parseSoundMidi(track: Track, node: XmlNode): void {
+    private parseSoundMidi(sound: GpifSound, node: XmlNode): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Program':
-                        track.playbackInfo.program = parseInt(c.innerText);
+                        sound.program = parseInt(c.innerText);
                         break;
                 }
             }
@@ -974,6 +1073,40 @@ export class GpifParser {
         }
         for (let staff of track.staves) {
             staff.displayTranspositionPitch = octave * 12 + chromatic;
+        }
+    }
+
+    private parseRSE(track: Track, node: XmlNode): void {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'ChannelStrip':
+                        this.parseChannelStrip(track, c);
+                        break;
+                }
+            }
+        }
+    }
+
+    private parseChannelStrip(track: Track, node: XmlNode): void {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'Parameters':
+                        this.parseChannelStripParameters(track, c);
+                        break;
+                }
+            }
+        }
+    }
+
+    private parseChannelStripParameters(track: Track, node: XmlNode): void {
+        if (node.firstChild && node.firstChild.value) {
+            let parameters = node.firstChild.value.split(' ');
+            if (parameters.length >= 12) {
+                track.playbackInfo.balance = Math.floor(parseFloat(parameters[11]) * 16);
+                track.playbackInfo.volume = Math.floor(parseFloat(parameters[12]) * 16);
+            }
         }
     }
 
@@ -1764,6 +1897,10 @@ export class GpifParser {
                                 break;
                             case 'Octave':
                                 note.octave = parseInt(c.findChildElement('Number')!.innerText);
+                                // when exporting GP6 from GP7 the tone might be missing
+                                if (note.tone === -1) {
+                                    note.tone = 0;
+                                }
                                 break;
                             case 'Tone':
                                 note.tone = parseInt(c.findChildElement('Step')!.innerText);
@@ -1917,7 +2054,7 @@ export class GpifParser {
     }
 
     private toBendOffset(gpxOffset: number): number {
-        return (gpxOffset * GpifParser.BendPointPositionFactor) | 0;
+        return (gpxOffset * GpifParser.BendPointPositionFactor);
     }
 
     private parseRhythms(node: XmlNode): void {
@@ -1935,6 +2072,7 @@ export class GpifParser {
     private parseRhythm(node: XmlNode): void {
         let rhythm: GpifRhythm = new GpifRhythm();
         let rhythmId: string = node.getAttribute('id');
+        rhythm.id = rhythmId;
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -2029,7 +2167,7 @@ export class GpifParser {
                                         if (beatId !== GpifParser.InvalidId) {
                                             // important! we clone the beat because beats get reused
                                             // in gp6, our model needs to have unique beats.
-                                            let beat: Beat = this._beatById.get(beatId)!.clone();
+                                            let beat: Beat = BeatCloner.clone(this._beatById.get(beatId)!);
                                             voice.addBeat(beat);
                                             let rhythmId: string = this._rhythmOfBeat.get(beatId)!;
                                             let rhythm: GpifRhythm = this._rhythmById.get(rhythmId)!;
@@ -2042,7 +2180,7 @@ export class GpifParser {
                                             if (this._notesOfBeat.has(beatId)) {
                                                 for (let noteId of this._notesOfBeat.get(beatId)!) {
                                                     if (noteId !== GpifParser.InvalidId) {
-                                                        const note = this._noteById.get(noteId)!.clone();
+                                                        const note = NoteCloner.clone(this._noteById.get(noteId)!);
                                                         // reset midi value for non-percussion staves
                                                         if (staff.isPercussion) {
                                                             note.fret = -1;
@@ -2084,13 +2222,49 @@ export class GpifParser {
                 }
             }
         }
+
+        // clear out percussion articulations where not needed 
+        // and add automations
+        for (let trackId of this._tracksMapping) {
+            if (!trackId) {
+                continue;
+            }
+            let track: Track = this._tracksById.get(trackId)!;
+
+            let hasPercussion = false;
+            for (const staff of track.staves) {
+                if (staff.isPercussion) {
+                    hasPercussion = true;
+                    break;
+                }
+            }
+            if (!hasPercussion) {
+                track.percussionArticulations = [];
+            }
+
+            if (this._automationsPerTrackIdAndBarIndex.has(trackId)) {
+                const trackAutomations = this._automationsPerTrackIdAndBarIndex.get(trackId)!;
+                for (const [barNumber, automations] of trackAutomations) {
+                    if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
+                        const bar = track.staves[0].bars[barNumber];
+                        if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
+                            const beat = bar.voices[0].beats[0];
+                            for (const a of automations) {
+                                beat.automations.push(a);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // build masterbar automations
-        this._masterTrackAutomations.forEach((automations, barIndex) => {
-            let masterBar: MasterBar = this.score.masterBars[parseInt(barIndex)];
+        for (const [barNumber, automations] of this._masterTrackAutomations) {
+            let masterBar: MasterBar = this.score.masterBars[barNumber];
             for (let i: number = 0, j: number = automations.length; i < j; i++) {
                 let automation: Automation = automations[i];
                 if (automation.type === AutomationType.Tempo) {
-                    if (barIndex === '0') {
+                    if (barNumber === 0) {
                         this.score.tempo = automation.value | 0;
                         if (automation.text) {
                             this.score.tempoLabel = automation.text;
@@ -2099,6 +2273,6 @@ export class GpifParser {
                     masterBar.tempoAutomation = automation;
                 }
             }
-        });
+        }
     }
 }

@@ -1,6 +1,6 @@
 import { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
-import { Environment } from '@src/Environment';
+import { IWriteable } from './IWriteable';
 
 export class IOHelper {
     public static readInt32BE(input: IReadable): number {
@@ -24,6 +24,14 @@ export class IOHelper {
         let ch2: number = input.readByte();
         let ch3: number = input.readByte();
         let ch4: number = input.readByte();
+        return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
+    }
+
+    public static decodeUInt32LE(data: Uint8Array, index: number): number {
+        let ch1: number = data[index];
+        let ch2: number = data[index + 1];
+        let ch3: number = data[index + 2];
+        let ch4: number = data[index + 3];
         return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
     }
 
@@ -116,45 +124,17 @@ export class IOHelper {
     }
 
     public static toString(data: Uint8Array, encoding: string): string {
-        if (Environment.supportsTextDecoder) {
-            let detectedEncoding: string | null = IOHelper.detectEncoding(data);
-            if (detectedEncoding) {
-                encoding = detectedEncoding;
-            }
-            if (!encoding) {
-                encoding = 'utf-8';
-            }
-            let decoder: TextDecoder = new TextDecoder(encoding);
-            return decoder.decode(data.buffer);
-        } else {
-            // manual UTF8 decoding for older browsers
-            let s: string = '';
-            let i: number = 0;
-            while (i < data.length) {
-                let c: number = data[i++];
-                if (c < 0x80) {
-                    if (c === 0) {
-                        break;
-                    }
-                    s += String.fromCharCode(c);
-                } else if (c < 0xe0) {
-                    s += String.fromCharCode(((c & 0x3f) << 6) | (data[i++] & 0x7f));
-                } else if (c < 0xf0) {
-                    s += String.fromCharCode(((c & 0x1f) << 12) | ((data[i++] & 0x7f) << 6) | (data[i++] & 0x7f));
-                } else {
-                    let u: number =
-                        ((c & 0x0f) << 18) |
-                        ((data[i++] & 0x7f) << 12) |
-                        ((data[i++] & 0x7f) << 6) |
-                        (data[i++] & 0x7f);
-                    s += String.fromCharCode((u >> 18) + 0xd7c0);
-                    s += String.fromCharCode((u & 0x3ff) | 0xdc00);
-                }
-            }
-            return s;
+        let detectedEncoding: string | null = IOHelper.detectEncoding(data);
+        if (detectedEncoding) {
+            encoding = detectedEncoding;
         }
+        if (!encoding) {
+            encoding = 'utf-8';
+        }
+        let decoder: TextDecoder = new TextDecoder(encoding);
+        return decoder.decode(data.buffer);
     }
-    
+
     private static detectEncoding(data: Uint8Array): string | null {
         if (data.length > 2 && data[0] === 0xfe && data[1] === 0xff) {
             return 'utf-16be';
@@ -169,5 +149,34 @@ export class IOHelper {
             return 'utf-32le';
         }
         return null;
-    }    
+    }
+
+    public static stringToBytes(str: string): Uint8Array {
+        let decoder: TextEncoder = new TextEncoder();
+        return decoder.encode(str);
+    }
+
+    public static writeInt32BE(o: IWriteable, v: number) {
+        o.writeByte((v >> 24) & 0xFF);
+        o.writeByte((v >> 16) & 0xFF);
+        o.writeByte((v >> 8) & 0xFF);
+        o.writeByte((v >> 0) & 0xFF);
+    }
+
+    public static writeInt32LE(o: IWriteable, v: number) {
+        o.writeByte((v >> 0) & 0xFF);
+        o.writeByte((v >> 8) & 0xFF);
+        o.writeByte((v >> 16) & 0xFF);
+        o.writeByte((v >> 24) & 0xFF);
+    }
+
+    public static writeUInt16LE(o: IWriteable, v: number) {
+        o.writeByte((v >> 0) & 0xFF);
+        o.writeByte((v >> 8) & 0xFF);
+    }
+
+    public static writeInt16LE(o: IWriteable, v: number) {
+        o.writeByte((v >> 0) & 0xFF);
+        o.writeByte((v >> 8) & 0xFF);
+    }
 }

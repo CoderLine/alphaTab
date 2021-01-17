@@ -1,29 +1,39 @@
-import { MidiUtils } from '@src/midi/MidiUtils';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
 import { Settings } from '@src/Settings';
+import { GraceGroup } from './GraceGroup';
 
 /**
  * A voice represents a group of beats
  * that can be played during a bar.
+ * @json
  */
 export class Voice {
     private _beatLookup!: Map<number, Beat>;
 
+    private static _globalBarId: number = 0;
+
+    /**
+     * Gets or sets the unique id of this bar.
+     */
+    public id: number = Voice._globalBarId++;
+
     /**
      * Gets or sets the zero-based index of this voice within the bar.
+     * @json_ignore
      */
     public index: number = 0;
 
     /**
      * Gets or sets the reference to the bar this voice belongs to.
+     * @json_ignore
      */
     public bar!: Bar;
 
     /**
      * Gets or sets the list of beats contained in this voice.
+     * @json_add addBeat
      */
     public beats: Beat[] = [];
 
@@ -31,11 +41,6 @@ export class Voice {
      * Gets or sets a value indicating whether this voice is empty.
      */
     public isEmpty: boolean = true;
-
-    public static copyTo(src: Voice, dst: Voice): void {
-        dst.index = src.index;
-        dst.isEmpty = src.isEmpty;
-    }
 
     public insertBeat(after: Beat, newBeat: Beat): void {
         newBeat.nextBeat = after.nextBeat;
@@ -92,90 +97,107 @@ export class Voice {
         this.isEmpty = false;
     }
 
-    public getBeatAtDisplayStart(displayStart: number): Beat | null {
-        if (this._beatLookup.has(displayStart)) {
-            return this._beatLookup.get(displayStart)!;
+    public getBeatAtPlaybackStart(playbackStart: number): Beat | null {
+        if (this._beatLookup.has(playbackStart)) {
+            return this._beatLookup.get(playbackStart)!;
         }
         return null;
     }
 
     public finish(settings: Settings): void {
         this._beatLookup = new Map<number, Beat>();
+        let currentGraceGroup: GraceGroup | null = null;
         for (let index: number = 0; index < this.beats.length; index++) {
             let beat: Beat = this.beats[index];
             beat.index = index;
             this.chain(beat);
+            if (beat.graceType === GraceType.None) {
+                beat.graceGroup = currentGraceGroup;
+                if (currentGraceGroup) {
+                    currentGraceGroup.isComplete = true;
+                }
+                currentGraceGroup = null;
+            } else {
+                if (!currentGraceGroup) {
+                    currentGraceGroup = new GraceGroup();
+                }
+                currentGraceGroup.addBeat(beat);
+            }
         }
+
         let currentDisplayTick: number = 0;
         let currentPlaybackTick: number = 0;
         for (let i: number = 0; i < this.beats.length; i++) {
             let beat: Beat = this.beats[i];
             beat.index = i;
             beat.finish(settings);
-            if (beat.graceType === GraceType.None || beat.graceType === GraceType.BendGrace) {
-                beat.displayStart = currentDisplayTick;
-                beat.playbackStart = currentPlaybackTick;
-                currentDisplayTick += beat.displayDuration;
-                currentPlaybackTick += beat.playbackDuration;
-            } else {
-                if (!beat.previousBeat || beat.previousBeat.graceType === GraceType.None) {
-                    // find note which is not a grace note
-                    let nonGrace: Beat | null = beat;
-                    let numberOfGraceBeats: number = 0;
-                    while (nonGrace && nonGrace.graceType !== GraceType.None) {
-                        nonGrace = nonGrace.nextBeat;
-                        numberOfGraceBeats++;
-                    }
-                    let graceDuration: Duration = Duration.Eighth;
-                    let stolenDuration: number = 0;
-                    if (numberOfGraceBeats === 1) {
-                        graceDuration = Duration.Eighth;
-                    } else if (numberOfGraceBeats === 2) {
-                        graceDuration = Duration.Sixteenth;
-                    } else {
-                        graceDuration = Duration.ThirtySecond;
-                    }
-                    if (nonGrace) {
-                        nonGrace.updateDurations();
-                    }
-                    // grace beats have 1/4 size of the non grace beat preceeding them
-                    let perGraceDisplayDuration: number = !beat.previousBeat
-                        ? MidiUtils.toTicks(Duration.ThirtySecond)
-                        : (((beat.previousBeat.displayDuration / 4) | 0) / numberOfGraceBeats) | 0;
-                    // move all grace beats
-                    let graceBeat: Beat | null = this.beats[i];
-                    for (let j: number = 0; j < numberOfGraceBeats && graceBeat; j++) {
-                        graceBeat.duration = graceDuration;
-                        graceBeat.updateDurations();
-                        graceBeat.displayStart =
-                            currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDisplayDuration;
-                        graceBeat.displayDuration = perGraceDisplayDuration;
-                        stolenDuration += graceBeat.playbackDuration;
-                        graceBeat = graceBeat.nextBeat;
-                    }
-                    // steal needed duration from beat duration
-                    if (beat.graceType === GraceType.BeforeBeat) {
-                        if (beat.previousBeat) {
-                            beat.previousBeat.playbackDuration -= stolenDuration;
+
+            // if this beat is a non-grace but has grace notes
+            // we need to first steal the duration from the right beat
+            // and place the grace beats correctly
+            if (beat.graceType === GraceType.None) {
+                if (beat.graceGroup) {
+                    const firstGraceBeat = beat.graceGroup!.beats[0];
+                    const lastGraceBeat = beat.graceGroup!.beats[beat.graceGroup!.beats.length - 1];
+                    if (firstGraceBeat.graceType !== GraceType.BendGrace) {
+                        // find out the stolen duration first
+                        let stolenDuration: number = (lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration) - firstGraceBeat.playbackStart;
+
+                        switch (firstGraceBeat.graceType) {
+                            case GraceType.BeforeBeat:
+                                // steal duration from previous beat and then place grace beats newly
+                                if (firstGraceBeat.previousBeat) {
+                                    firstGraceBeat.previousBeat.playbackDuration -= stolenDuration;
+                                    // place beats starting after new beat end
+                                    if (firstGraceBeat.previousBeat.voice == this) {
+                                        currentPlaybackTick = firstGraceBeat.previousBeat.playbackStart +
+                                            firstGraceBeat.previousBeat.playbackDuration;
+                                    } else {
+                                        // stealing into the previous bar
+                                        currentPlaybackTick = -stolenDuration;
+                                    }
+                                } else {
+                                    // before-beat on start is somehow not possible as it causes negative ticks
+                                    currentPlaybackTick = -stolenDuration;
+                                }
+
+                                for (const graceBeat of beat.graceGroup!.beats) {
+                                    this._beatLookup.delete(graceBeat.playbackStart);
+                                    graceBeat.playbackStart = currentPlaybackTick;
+                                    this._beatLookup.set(graceBeat.playbackStart, beat);
+                                    currentPlaybackTick += graceBeat.playbackDuration;
+                                }
+
+                                break;
+                            case GraceType.OnBeat:
+                                // steal duration from current beat 
+                                beat.playbackDuration -= stolenDuration;
+                                if (lastGraceBeat.voice === this) {
+                                    // with changed durations, update current position to be after the last grace beat
+                                    currentPlaybackTick = lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration;
+                                } else {
+                                    // if last grace beat is on the previous bar, we shift the time back to have the note played earlier
+                                    currentPlaybackTick = -stolenDuration;
+                                }
+                                break;
                         }
-                        currentPlaybackTick -= stolenDuration;
-                    } else if (nonGrace && beat.graceType === GraceType.OnBeat) {
-                        nonGrace.playbackDuration -= stolenDuration;
                     }
                 }
-                beat.playbackStart = currentPlaybackTick;
-                currentPlaybackTick = beat.playbackStart + beat.playbackDuration;
+
+                if (beat.fermata) {
+                    this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
+                } else {
+                    beat.fermata = this.bar.masterBar.getFermata(beat);
+                }
+
+                this._beatLookup.set(beat.playbackStart, beat);
             }
 
-
-            if(beat.fermata) {
-                this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
-            } else {
-                beat.fermata = this.bar.masterBar.getFermata(beat);
-            }
-
+            beat.displayStart = currentDisplayTick;
+            beat.playbackStart = currentPlaybackTick;
             beat.finishTuplet();
-            this._beatLookup.set(beat.displayStart, beat);
+            currentDisplayTick += beat.displayDuration;
+            currentPlaybackTick += beat.playbackDuration;
         }
     }
 
