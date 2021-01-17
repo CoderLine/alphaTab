@@ -57,6 +57,11 @@ export class VoiceContainerGlyph extends GlyphGroup {
                         currentBeatGlyph.x -= graceSprings[currentBeatGlyph.beat.graceIndex].postSpringWidth;
                         // shift to right position of the particular grace note
                         currentBeatGlyph.x += graceSprings[currentBeatGlyph.beat.graceIndex].graceBeatWidth;
+                        // move the whole group again forward for cases where another track has e.g. 3 beats and here we have only 2. 
+                        // so we shift the whole group of this voice to stick to the end of the group.
+                        const lastGraceSpring = graceSprings[currentBeatGlyph.beat.graceGroup!.beats.length - 1];
+                        currentBeatGlyph.x -= lastGraceSpring.graceBeatWidth;
+
                     } else {
                         // placement for improper grace beats where no beat in the same bar follows
                         let graceSpring = this.renderer.layoutingInfo.incompleteGraceRods.get(graceGroupId)!;
