@@ -561,9 +561,6 @@ export default class CSharpAstPrinter {
     }
 
     private writeType(type: cs.TypeNode, forNew: boolean = false, asNativeArray: boolean = false, forTypeConstraint: boolean = false) {
-        if (!type) {
-            console.log('ERR');
-        }
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
                 if (forTypeConstraint) {

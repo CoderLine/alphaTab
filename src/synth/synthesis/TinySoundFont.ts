@@ -26,10 +26,11 @@ import { SynthHelper } from '@src/synth/SynthHelper';
 import { TypeConversions } from '@src/io/TypeConversions';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
+import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 import { MetaEventType } from '@src/midi/MetaEvent';
 import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
 import { MetaDataEvent } from '@src/midi/MetaDataEvent';
+import { Queue } from '../ds/Queue';
 
 /**
  * This is a tiny soundfont based synthesizer.
@@ -39,22 +40,21 @@ import { MetaDataEvent } from '@src/midi/MetaDataEvent';
  *   - Support for modulators
  */
 export class TinySoundFont {
-    private _midiEventQueue: SynthEvent[] = [];
-    private _midiEventCount: number = 0;
+    private _midiEventQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
     private _isAnySolo: boolean = false;
 
-    public currentTempo:number = 0;
-    public timeSignatureNumerator:number = 0;
-    public timeSignatureDenominator:number = 0;
+    public currentTempo: number = 0;
+    public timeSignatureNumerator: number = 0;
+    public timeSignatureDenominator: number = 0;
 
     public constructor(sampleRate: number) {
         this.outSampleRate = sampleRate;
     }
 
-    public synthesize(buffer: Float32Array, bufferPos: number, sampleCount: number) {
-        this.fillWorkingBuffer(buffer, bufferPos, sampleCount);
+    public synthesize(buffer: Float32Array, bufferPos: number, sampleCount: number): SynthEvent[] {
+        return this.fillWorkingBuffer(buffer, bufferPos, sampleCount);
     }
 
     public synthesizeSilent(sampleCount: number): void {
@@ -101,29 +101,27 @@ export class TinySoundFont {
     }
 
     public dispatchEvent(synthEvent: SynthEvent): void {
-        this._midiEventQueue.unshift(synthEvent);
-        this._midiEventCount++;
+        this._midiEventQueue.enqueue(synthEvent);
     }
 
-    private fillWorkingBuffer(buffer: Float32Array | null, bufferPos: number, sampleCount: number) {
+    private fillWorkingBuffer(buffer: Float32Array | null, bufferPos: number, sampleCount: number): SynthEvent[] {
         // Break the process loop into sections representing the smallest timeframe before the midi controls need to be updated
         // the bigger the timeframe the more efficent the process is, but playback quality will be reduced.
         const anySolo: boolean = this._isAnySolo;
 
+        const processedEvents: SynthEvent[] = [];
+
         // process in micro-buffers
         // process events for first microbuffer
-        if (this._midiEventQueue.length > 0) {
-            for (let i: number = 0; i < this._midiEventCount; i++) {
-                let m: SynthEvent | undefined = this._midiEventQueue.pop();
-                if (m) {
-                    if (m.isMetronome && this.metronomeVolume > 0) {
-                        this.channelNoteOff(SynthConstants.MetronomeChannel, 33);
-                        this.channelNoteOn(SynthConstants.MetronomeChannel, 33, 95 / 127);
-                    } else if (m.event) {
-                        this.processMidiMessage(m.event);
-                    }
-                }
+        while (!this._midiEventQueue.isEmpty) {
+            let m: SynthEvent = this._midiEventQueue.dequeue();
+            if (m.isMetronome && this.metronomeVolume > 0) {
+                this.channelNoteOff(SynthConstants.MetronomeChannel, 33);
+                this.channelNoteOn(SynthConstants.MetronomeChannel, 33, 95 / 127);
+            } else if (m.event) {
+                this.processMidiMessage(m.event);
             }
+            processedEvents.push(m);
         }
 
         // voice processing loop
@@ -143,7 +141,7 @@ export class TinySoundFont {
             }
         }
 
-        this._midiEventCount = 0;
+        return processedEvents;
     }
 
     private processMidiMessage(e: MidiEvent): void {
@@ -185,8 +183,8 @@ export class TinySoundFont {
                         this.currentTempo = 60000000 / (e as MetaNumberEvent).value;
                         break;
                     case MetaEventType.TimeSignature:
-                        this.timeSignatureNumerator =  (e as MetaDataEvent).data[0];
-                        this.timeSignatureDenominator =  Math.pow(2, (e as MetaDataEvent).data[1]);
+                        this.timeSignatureNumerator = (e as MetaDataEvent).data[0];
+                        this.timeSignatureDenominator = Math.pow(2, (e as MetaDataEvent).data[1]);
                         break;
                 }
                 break;

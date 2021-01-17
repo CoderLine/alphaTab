@@ -18,7 +18,7 @@ export class SystemCommonEvent extends MidiEvent {
         return (this.message & 0x00000ff) as MidiEventType;
     }
 
-    protected constructor(delta: number, status: number, data1: number, data2: number) {
-        super(delta, status, data1, data2);
+    protected constructor(track:number, delta: number, status: number, data1: number, data2: number) {
+        super(track, delta, status, data1, data2);
     }
 }

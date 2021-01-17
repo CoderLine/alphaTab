@@ -9,8 +9,8 @@ export class Midi20PerNotePitchBendEvent extends MidiEvent {
     public noteKey: number;
     public pitch: number;
 
-    public constructor(tick: number, status: number, noteKey: number, pitch: number) {
-        super(tick, status, 0, 0);
+    public constructor(track:number, tick: number, status: number, noteKey: number, pitch: number) {
+        super(track, tick, status, 0, 0);
         this.noteKey = noteKey;
         this.pitch = pitch;
     }

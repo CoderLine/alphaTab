@@ -47,11 +47,11 @@ describe('MidiFileGeneratorTest', () => {
 
     it('midi-order', () => {
         let midiFile: MidiFile = new MidiFile();
-        midiFile.addEvent(new MidiEvent(0, 0, 0, 0));
-        midiFile.addEvent(new MidiEvent(0, 0, 1, 0));
-        midiFile.addEvent(new MidiEvent(100, 0, 2, 0));
-        midiFile.addEvent(new MidiEvent(50, 0, 3, 0));
-        midiFile.addEvent(new MidiEvent(50, 0, 4, 0));
+        midiFile.addEvent(new MidiEvent(0, 0, 0, 0, 0));
+        midiFile.addEvent(new MidiEvent(0, 0, 0, 1, 0));
+        midiFile.addEvent(new MidiEvent(0, 100, 0, 2, 0));
+        midiFile.addEvent(new MidiEvent(0, 50, 0, 3, 0));
+        midiFile.addEvent(new MidiEvent(0, 50, 0, 4, 0));
         expect(midiFile.events[0].data1).toEqual(0);
         expect(midiFile.events[1].data1).toEqual(1);
         expect(midiFile.events[2].data1).toEqual(3);

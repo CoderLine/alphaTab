@@ -453,7 +453,11 @@ export default class CSharpAstTransformer {
             parent: parent
         } as cs.UnresolvedTypeNode;
 
-        const typeArguments = (tsType as ts.TypeReference)?.typeArguments;
+        let typeArguments = (tsType as ts.TypeReference)?.typeArguments;
+        if(tsType && !typeArguments) {
+            const nonNullable = this._context.typeChecker.getNonNullableType(tsType);
+            typeArguments = (nonNullable as ts.TypeReference)?.typeArguments;
+        }
         if (typeArguments) {
             unresolved.typeArguments = typeArguments.map(a => this.createUnresolvedTypeNode(parent, tsNode, a));
         }

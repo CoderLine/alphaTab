@@ -14,6 +14,10 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { SynthEvent } from './synthesis/SynthEvent';
+import { Queue } from './ds/Queue';
+import { MidiEventsPlayedEventArgs } from './MidiEventsPlayedEventArgs';
+import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 
 /**
  * This is the main synthesizer component which can be used to
@@ -28,6 +32,8 @@ export class AlphaSynth implements IAlphaSynth {
     private _timePosition: number = 0;
     private _metronomeVolume: number = 0;
     private _countInVolume: number = 0;
+    private _playedEventsQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
+    private _midiEventsPlayedFilter: Set<MidiEventType> = new Set<MidiEventType>();
 
     /**
      * Gets the {@link ISynthOutput} used for playing the generated samples.
@@ -76,6 +82,14 @@ export class AlphaSynth implements IAlphaSynth {
     public set countInVolume(value: number) {
         value = Math.max(value, SynthConstants.MinVolume);
         this._countInVolume = value;
+    }
+
+    public get midiEventsPlayedFilter(): MidiEventType[] {
+        return Array.from(this._midiEventsPlayedFilter);
+    }
+
+    public set midiEventsPlayedFilter(value: MidiEventType[]) {
+        this._midiEventsPlayedFilter = new Set<MidiEventType>(value);
     }
 
     public get playbackSpeed(): number {
@@ -162,9 +176,15 @@ export class AlphaSynth implements IAlphaSynth {
             for (let i = 0; i < SynthConstants.MicroBufferCount; i++) {
                 // synthesize buffer
                 this._sequencer.fillMidiEventQueue();
-                this._synthesizer.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
+                const synthesizedEvents = this._synthesizer.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
                 bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
-
+                // push all processed events into the queue
+                // for informing users about played events
+                for (const e of synthesizedEvents) {
+                    if (this._midiEventsPlayedFilter.has(e.event.command)) {
+                        this._playedEventsQueue.enqueue(e);
+                    }
+                }
                 // tell sequencer to check whether its work is done
                 if (this._sequencer.isFinished) {
                     break;
@@ -192,7 +212,7 @@ export class AlphaSynth implements IAlphaSynth {
             return false;
         }
         this.output.activate();
-                
+
         this.playInternal();
 
         if (this._countInVolume > 0) {
@@ -393,6 +413,21 @@ export class AlphaSynth implements IAlphaSynth {
                 new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick, isSeek)
             );
         }
+
+        // build events which were actually played
+        if (isSeek) {
+            this._playedEventsQueue.clear();
+        } else {
+            const playedEvents = new Queue<MidiEvent>();
+            while (!this._playedEventsQueue.isEmpty && this._playedEventsQueue.peek().time < currentTime) {
+                const synthEvent = this._playedEventsQueue.dequeue();
+                playedEvents.enqueue(synthEvent.event);
+            }
+            if (!playedEvents.isEmpty) {
+                (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(new MidiEventsPlayedEventArgs(playedEvents.toArray()))
+            }
+        }
+
     }
 
     readonly ready: IEventEmitter = new EventEmitter();
@@ -408,4 +443,5 @@ export class AlphaSynth implements IAlphaSynth {
     readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
         PositionChangedEventArgs
     >();
+    readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
 }

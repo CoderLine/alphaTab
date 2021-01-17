@@ -27,6 +27,14 @@ export class IOHelper {
         return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
     }
 
+    public static decodeUInt32LE(data: Uint8Array, index: number): number {
+        let ch1: number = data[index];
+        let ch2: number = data[index + 1];
+        let ch3: number = data[index + 2];
+        let ch4: number = data[index + 3];
+        return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
+    }
+
     public static readUInt16LE(input: IReadable): number {
         let ch1: number = input.readByte();
         let ch2: number = input.readByte();
