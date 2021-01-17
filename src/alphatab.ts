@@ -71,6 +71,7 @@ import { MetaDataEvent } from '@src/midi/MetaDataEvent';
 import { MetaEvent, MetaEventType } from '@src/midi/MetaEvent';
 import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
+import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 import { SystemCommonEvent, SystemCommonType } from '@src/midi/SystemCommonEvent';
 import { SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
@@ -89,6 +90,7 @@ export const midi = {
     MetaNumberEvent,
     MidiEvent,
     MidiEventType,
+    Midi20PerNotePitchBendEvent,
     SystemCommonEvent,
     SystemCommonType,
     SystemExclusiveEvent,

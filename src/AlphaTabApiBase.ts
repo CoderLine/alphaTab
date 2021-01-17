@@ -577,6 +577,7 @@ export class AlphaTabApiBase<TSettings> {
         let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
         generator.generate();
         this._tickCache = generator.tickLookup;
+        this.onMidiLoad(midiFile);
         this.player.loadMidiFile(midiFile);
     }
 
@@ -1235,6 +1236,12 @@ export class AlphaTabApiBase<TSettings> {
     private onSoundFontLoaded(): void {
         (this.soundFontLoaded as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'soundFontLoaded', null);
+    }
+
+    public midiLoad: IEventEmitterOfT<MidiFile> = new EventEmitterOfT<MidiFile>();
+    private onMidiLoad(e:MidiFile): void {
+        (this.midiLoad as EventEmitterOfT<MidiFile>).trigger(e);
+        this.uiFacade.triggerEvent(this.container, 'midiFileLoad', e);
     }
 
     public midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
