@@ -1,0 +1,353 @@
+---
+title: Handling Midi Events
+---
+
+## Introduction
+
+When alphaTab is playing the audio, it internally uses a Midi and SoundFont2 based synthesizer. 
+The midi it plays is generated from the data model and includes the messages on when notes have to start/stop playing,
+when tempo changes are etc. These timed "Midi Messages" are named "Midi Events". Additionally there are midi events for
+events like the metronome or the count-in sounds which will trigger a special note being played. 
+
+You can learn more about midi all across the internet, here some links for further reading: 
+
+* https://www.midi.org/images/easyblog_articles/47/audio_midi.pdf
+* https://www.midi.org/midi-articles/about-midi-part-3-midi-messages
+* https://www.midi.org/midi-articles/about-midi-part-4-midi-files
+* Official Specs: https://www.midi.org/specifications
+
+When building applications or websites with alphaTab you might need to know during playback that certain midi events 
+were processed and played. The most obvious example is handling the metronome. You might want to 
+show some visual feedback of the metronome, like a number that counts visually. But also other events like 
+notes that start/stop playing might be important. 
+
+alphaTab exposes an event where you can register for the midi events that have been played. Internally alphaTab
+buffers the audio, so it will process first a bunch of midi events and generate the related audio for it. 
+Once these events were detected to be actually played on the audio device, the event in alphaTab will be triggered
+and you can handle the played events within your codebase. 
+
+:::note
+Due to audio latency and architecture of alphaTab you have to take into account that there can be a latency between
+the actual playback and the event being fired. This latency might depend on the machine performance. 
+:::
+
+:::note
+Secondly you have to notice that midi events are only timed single events with no direct duration. When a note is played, 
+it does not have an event "play note at time X with duration Y". It has one event "at time X start note with the key 90 on channel 1" and later 
+when the note should stop there is an event "at time Y stop stop note with key 90 on channel 1". You can see this like on a keyboard,
+when pressing the key, the sound starts playing until you release it. The duration is not known at this point.
+
+You can use the [`midiLoad`](/docs/reference/api/midiload) event to inspect all midi events which will be loaded by the synthesizer.
+From additional values like durations can be derived by tracking the related events. 
+:::
+
+## Hands on 
+
+The hands-on will be focusing on how to develop this solution using the Web version but it should be easy to adopt it to any other platform. 
+
+In the following hands-on we will use the main alphaTab events related to played midi events (events everywhere!) to 
+build a visual metronome which will count in a double fashion like "1 and 2 and 3 and 4".
+
+To achieve this we will follow this strategy: 
+
+1. We will listen to played metronome ticks to update the metronome counter to 1,2,3 and so on. 
+2. We will listen to time signature events to be able to derive the right counting and durations of the metronome. 
+3. We will listen to tempo changes to be able to translate the midi ticks to actual milliseconds. 
+4. Using the time information from 2. and 3. we will show the "and" label with a simple timeout. 
+
+### Base Structure
+
+The starting point is a simple page with alphaTab and some UI elements for the metronome counter and a play button. 
+From this starting point we will be adding the logic.  
+
+<img src="/img/guides/handling-midi-events/base-structure.png" />
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <!-- Using the alpha builds for testing here -->
+    <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/alphaTab.min.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #controls {
+            position: sticky;
+            top: 0;
+            z-index: 10000;
+            width: 100%;
+            height: 30px;
+            background: #E4E5E6;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        #controls>* {
+            margin-right: 5px;
+        }
+
+        /* Styles for player */
+        .at-cursor-bar {
+            /* Defines the color of the bar background when a bar is played */
+            background: rgba(255, 242, 0, 0.25);
+        }
+
+        .at-selection div {
+            /* Defines the color of the selection background */
+            background: rgba(64, 64, 255, 0.1)
+        }
+
+        .at-cursor-beat {
+            /* Defines the beat cursor */
+            background: rgba(64, 64, 255, 0.75);
+            width: 3px;
+        }
+
+        .at-highlight * {
+            /* Defines the color of the music symbols when they are being played (svg) */
+            fill: #0078ff;
+            stroke: #0078ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <button id="playPause">Play/Pause</button>
+        <span id="counter">1</span>
+        <span id="and">and</span>
+    </div>
+    <div id="alphaTab" data-player-scrolloffsety="-30" data-tex="true"
+        data-player-enableplayer="true"
+        data-player-soundfont="https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/soundfont/sonivox.sf2">
+        \ts 3 4 
+        1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8 | 
+        1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8 | 
+        1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8
+    </div>
+
+    <script type="text/javascript">
+        const el = document.getElementById('alphaTab');
+        let api = new alphaTab.AlphaTabApi(el);
+        api.metronomeVolume = 1;
+        api.playbackSpeed = 0.5;
+
+        document.getElementById('playPause').onclick = () => {
+            api.playPause();
+        };
+    </script>
+</body>
+```
+
+### Simple counter
+
+First we will add the code to add the counter. For this we will listen to the `SystemExclusive2` event by adding it to the filter and subscribing 
+to the event. Without the filter, the event will not fire. For performance reasons alphaTab signales only events which have been registered, not all events
+which are played. 
+
+```js
+const el = document.getElementById('alphaTab');
+let api = new alphaTab.AlphaTabApi(el);
+api.metronomeVolume = 1;
+api.playbackSpeed = 0.5;
+
+document.getElementById('playPause').onclick = () => {
+    api.playPause();
+};
+
+const counterSpan = document.getElementById('counter');
+api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.SystemExclusive2];
+api.playerStateChanged.on(e => {
+    // reset to 1 when stopped
+    if(e.stopped) {
+        counterSpan.innerText = 1;
+    }
+});
+api.midiEventsPlayed.on(e => {
+    for (const midi of e.events) { // loop through all played events
+        if (midi.isMetronome) { // if a metronome was played, update the UI
+            counterSpan.innerText = midi.metronomeNumerator + 1;
+        }
+    }
+});
+```
+
+And we already got our counter: 
+<img src="/img/guides/handling-midi-events/simple-counter.gif" />
+
+### Adding 'and' counting
+
+Here it gets a bit more tricky. alphaTab does not do an "and" counting. There is no event for it. So we have to find out the time
+at which the "and" starts which should be in the middle between two number counts. This means we need to know how many milliseconds
+after the normal metronome event we need to show the "and". Luckily for the metronome events alphaTab provides these details. 
+
+```js
+const el = document.getElementById('alphaTab');
+let api = new alphaTab.AlphaTabApi(el);
+api.metronomeVolume = 1;
+api.playbackSpeed = 0.5;
+
+document.getElementById('playPause').onclick = () => {
+    api.playPause();
+};
+
+const counterSpan = document.getElementById('counter');
+const andSpan = document.getElementById('and');
+
+api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.SystemExclusive2];
+
+andSpan.style.display = 'none'; // hide 'and' at start
+api.playerStateChanged.on(e => {
+    // reset to 1 when stopped
+    if(e.stopped) {
+        counterSpan.innerText = 1;
+        andSpan.style.display = 'none';
+    }
+});
+api.midiEventsPlayed.on(e => {
+    for (const midi of e.events) { // loop through all played events
+        if (midi.isMetronome) { // if a metronome was played, update the UI
+            console.log('metronome');
+            counterSpan.innerText = midi.metronomeNumerator + 1;
+            andSpan.style.display = 'none'; // hide 'and' on tick.
+            // show "and" after half the metronome duration
+            const andTime = (midi.metronomeDurationInMilliseconds / 2) / api.playbackSpeed;
+            setTimeout(() => {
+                andSpan.style.display = 'inline';
+            }, andTime);
+        }
+    }
+});
+```
+
+Nothing special right? Just hiding and showing some span at some given times.
+
+<img src="/img/guides/handling-midi-events/and-counting.gif" />
+
+Now it is up to you to use this feature in any way you can make use of it. You can subscribe to midi events
+and forward them to any further component you prefer. Keep in mind that subscribing to too many events might
+also cause some performance degredation and as there is a bit audio latency involved, there might be some delays.
+
+
+## Final File
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <!-- Using the alpha builds for testing here -->
+    <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/alphaTab.min.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #controls {
+            position: sticky;
+            top: 0;
+            z-index: 10000;
+            width: 100%;
+            height: 30px;
+            background: #E4E5E6;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        #controls>* {
+            margin-right: 5px;
+        }
+
+        /* Styles for player */
+        .at-cursor-bar {
+            /* Defines the color of the bar background when a bar is played */
+            background: rgba(255, 242, 0, 0.25);
+        }
+
+        .at-selection div {
+            /* Defines the color of the selection background */
+            background: rgba(64, 64, 255, 0.1)
+        }
+
+        .at-cursor-beat {
+            /* Defines the beat cursor */
+            background: rgba(64, 64, 255, 0.75);
+            width: 3px;
+        }
+
+        .at-highlight * {
+            /* Defines the color of the music symbols when they are being played (svg) */
+            fill: #0078ff;
+            stroke: #0078ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <button id="playPause">Play/Pause</button>
+        <span id="counter">1</span>
+        <span id="and">and</span>
+    </div>
+    <div id="alphaTab" data-player-scrolloffsety="-30" data-tex="true"
+        data-player-enableplayer="true"
+        data-player-soundfont="https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/soundfont/sonivox.sf2">
+        \ts 3 4 
+        1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8 | 
+        1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8 | 
+        1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8
+    </div>
+
+    <script type="text/javascript">
+        const el = document.getElementById('alphaTab');
+        let api = new alphaTab.AlphaTabApi(el);
+        api.metronomeVolume = 1;
+        api.playbackSpeed = 0.5;
+
+        document.getElementById('playPause').onclick = () => {
+            api.playPause();
+        };
+
+        const counterSpan = document.getElementById('counter');
+        const andSpan = document.getElementById('and');
+
+        api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.SystemExclusive2];
+
+        andSpan.style.display = 'none'; // hide 'and' at start
+        api.playerStateChanged.on(e => {
+            // reset to 1 when stopped
+            if(e.stopped) {
+                counterSpan.innerText = 1;
+                andSpan.style.display = 'none';
+            }
+        });
+        api.midiEventsPlayed.on(e => {
+            for (const midi of e.events) { // loop through all played events
+                if (midi.isMetronome) { // if a metronome was played, update the UI
+                    console.log('metronome');
+                    counterSpan.innerText = midi.metronomeNumerator + 1;
+                    andSpan.style.display = 'none'; // hide 'and' on tick.
+                    // show "and" after half the metronome duration
+                    const andTime = (midi.metronomeDurationInMilliseconds / 2) / api.playbackSpeed;
+                    setTimeout(() => {
+                        andSpan.style.display = 'inline';
+                    }, andTime);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
+```

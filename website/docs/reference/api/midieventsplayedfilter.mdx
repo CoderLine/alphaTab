@@ -1,0 +1,91 @@
+---
+title: midiEventsPlayedFilter
+category: Properties - Player
+description: The midi events which will trigger the `midiEventsPlayed` event
+sidebarPath: /docs/reference/api
+since: 1.2.0-alpha.100
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Description
+Gets or sets the midi events which will trigger the `midiEventsPlayed` event. With this filter set you can enable 
+that alphaTab will signal any midi events as they are played by the synthesizer. This allows reacing on various low level
+audio playback elements like notes/rests played or metronome ticks. 
+
+Refer to the [related guide](/docs/guides/handling-midi-events) to learn more about this feature. 
+
+## Types
+
+<TypeTable>
+    <TypeRow type="js" name="alphaTab.midi.MidiEventType[]" />
+    <TypeRow type="net" name="IList<AlphaTab.Midi.MidiEventType>" />
+</TypeTable>
+
+## Default Value
+
+`[]`
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.SystemExclusive2];
+api.midiEventsPlayed.on(function(e) {
+  for(const midi of e.events) {
+    if(midi.isMetronome) {
+      console.log('Metronome tick ' + midi.metronomeNumerator); 
+    }
+  }
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab')
+  .alphaTab('midiEventsPlayedFilter', [alphaTab.midi.MidiEventType.SystemExclusive2])
+  .on('alphaTab.midiEventsPlayed', (e, args) => {
+    for(const midi of args.events) {
+      if(midi.isMetronome) {
+        console.log('Metronome tick ' + midi.metronomeNumerator); 
+      }
+    }
+  });
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.MidiEventsPlayedFilter = new MidiEventType[] { AlphaTab.Midi.MidiEventType.SystemExclusive2 };
+api.MidiEventsPlayed.On(e => 
+{
+  foreach(var midi of e.events) 
+  {
+    if(midi is AlphaTab.Midi.SystemExclusiveEvent sysex && sysex.IsMetronome) 
+    {
+      Console.WriteLine("Metronome tick " + midi.MetronomeNumerator); 
+    }
+  }
+});
+```
+
+</TabItem>
+</Tabs>

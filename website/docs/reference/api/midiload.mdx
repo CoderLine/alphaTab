@@ -1,0 +1,98 @@
+---
+title: midiLoad
+category: Events - Player
+description: This event is fired when a Midi file is being loaded.
+sidebarPath: /docs/reference/api
+since: 1.2.0-alpha.100
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Description
+This event is fired when a Midi file for the song was generated and is being loaded
+by the synthesizer. This event can be used to inspect or modify the midi events 
+which will be played for the song. This can be used to generate other visual representations
+of the song.
+
+:::note
+The generated midi file will NOT contain any metronome and count-in related events. The metronome and
+count-in ticks are handled within the synthesizer. 
+:::
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="js" name="function(midiFile)" />    
+    <TypeRow type="net" name="Action<MidiFile>" />    
+</TypeTable>
+
+## Parameters
+<ParameterTable>
+    <ParameterRow platform="all" name="midiFile" type="alphaTab.midi.MidiFile">
+        The midi file containing all events which will be synthesized. 
+    </ParameterRow>
+</ParameterTable>
+
+## MidiFile Properties
+
+
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.midiLoad.on(file => {
+    initializePianoPractice(file);
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.midiLoad', (e) => {
+    const file = e.detail;
+    initializePianoPractice(file);
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.midiLoad', e => {
+    const file = e.detail;
+    initializePianoPractice(file);
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.MidiLoad.On(file => 
+{
+    InitializePianoPractice(file);
+});
+```
+
+</TabItem>
+</Tabs>

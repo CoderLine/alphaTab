@@ -18,6 +18,7 @@ const sidebars = {
 		"guides/multiple-soundfonts",
 		"guides/song-details",
 		"guides/exporter",
+		"guides/handling-midi-events",
 		"guides/breaking-changes-095-096",
 		"guides/breaking-changes-097-098"
 	],

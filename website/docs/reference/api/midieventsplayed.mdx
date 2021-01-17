@@ -1,0 +1,211 @@
+---
+title: midiEventsPlayed
+category: Events - Player
+description: The midi events which will trigger the `midiEventsPlayed` event
+sidebarPath: /docs/reference/api
+since: 1.2.0-alpha.100
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Description
+This event is fired when the synthesizer played certain midi events. This allows reacing on various low level
+audio playback elements like notes/rests played or metronome ticks. 
+
+Refer to the [related guide](/docs/guides/handling-midi-events) to learn more about this feature. 
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="js" name="function(args)" />    
+    <TypeRow type="net" name="Action<MidiEventsPlayedEventArgs>" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="js" name="args" type="alphaTab.synth.MidiEventsPlayedEventArgs">
+        The information about the played events. 
+    </ParameterRow>
+    <ParameterRow platform="net" name="args" type="AlphaTab.Synth.MidiEventsPlayedEventArgs">
+        The information about the played events. 
+    </ParameterRow>
+</ParameterTable>
+
+## MidiEventsPlayedEventArgs Properties
+
+<ParameterTable>
+    <ParameterRow platform="js" name="events" type="alphaTab.midi.MidiEvent[]">
+        The played midi events.
+    </ParameterRow>
+    <ParameterRow platform="net" name="Events" type="IList<AlphaTab.Midi.MidiEvent>">
+        The current time position within the song in milliseconds.
+    </ParameterRow>
+</ParameterTable>
+
+Following midi event classes exist which represent the usual 
+events of a midi file. 
+
+### alphaTab.midi.MidiEvent
+General midi events which can be represented by 32bit (e.g. note on, note off, control changes, pitch bends).  
+
+<ParameterTable>
+    <ParameterRow platform="all" name="track" type="number">
+        The track to which this event belongs. 
+    </ParameterRow>
+    <ParameterRow platform="all" name="message" type="number">
+        The 32-bit encoded raw midi message. 
+    </ParameterRow>
+    <ParameterRow platform="all" name="tick" type="number">
+        The absolute midi tick of when this event is played. 
+    </ParameterRow>
+    <ParameterRow platform="all" name="channel" type="number">
+        The midi channel to which this event belongs (not valid for all events).
+    </ParameterRow>    
+    <ParameterRow platform="all" name="command" type="alphaTab.midi.MidiEventType">
+        The type of this event. 
+    </ParameterRow>    
+    <ParameterRow platform="all" name="data1" type="number">
+        The first data byte (meaning depends on midi event type)
+    </ParameterRow>    
+    <ParameterRow platform="all" name="data2" type="number">
+        The second data byte (meaning depends on midi event type)
+    </ParameterRow>    
+</ParameterTable>
+
+### alphaTab.midi.MetaEvent
+Any Meta Events. 
+
+<ParameterTable>
+    <ParameterRow platform="all" name="metaStatus" type="alphaTab.midi.MetaEventType">
+        The type of meta event. 
+    </ParameterRow>  
+</ParameterTable>
+
+### alphaTab.midi.MetaDataEvent
+Meta Events with a related data array (e.g. time signature changes).
+
+<ParameterTable>
+    <ParameterRow platform="all" name="data" type="Uint8Array">
+        The raw binary data attached to this meta event. 
+    </ParameterRow>  
+</ParameterTable>
+
+### alphaTab.midi.MetaNumberEvent
+Meta Events with a number value (e.g. tempo changes). 
+
+<ParameterTable>
+    <ParameterRow platform="all" name="value" type="number">
+        The number value of this meta event. 
+    </ParameterRow>  
+</ParameterTable>
+
+
+### alphaTab.midi.Midi20PerNotePitchBendEvent
+A Midi 2.0 comparable per-note pitch bend. 
+
+<ParameterTable>
+    <ParameterRow platform="all" name="noteKey" type="number">
+        The key of the note on the related channel which should be bent.  
+    </ParameterRow>  
+    <ParameterRow platform="all" name="pitch" type="number">
+        The 32 bit pitch wheel value according to the Midi 2.0 standard. 
+    </ParameterRow>  
+</ParameterTable>
+
+### alphaTab.midi.SystemCommonEvent
+Not used in alphaTab by default.
+
+### alphaTab.midi.SystemExclusiveEvent
+For special alphaTab specific events (e.g. rest played, metronome tick).
+
+<ParameterTable>
+    <ParameterRow platform="all" name="data" type="Uint8Array">
+        The raw binary data attached to this event. 
+    </ParameterRow>  
+    <ParameterRow platform="all" name="isMetronome" type="boolean">
+        Whether this event is a metronome tick event. 
+    </ParameterRow>  
+    <ParameterRow platform="all" name="metronomeNumerator" type="boolean">
+        If the event is a metronome event it contains the zero based metronome numerator according to the time signature (e.g. 0, 1, 2 on a 3/4 signature).
+    </ParameterRow>  
+    <ParameterRow platform="all" name="metronomeDurationInTicks" type="boolean">
+        If the event is a metronome event it contains the current duration of the metronome event in ticks. 
+    </ParameterRow>  
+    <ParameterRow platform="all" name="metronomeDurationInMilliseconds" type="boolean">
+        If the event is a metronome event it contains the current duration of the metronome event in milliseconds.
+        This duration is assuming playback speed=1. 
+    </ParameterRow>  
+    <ParameterRow platform="all" name="isRest" type="boolean">
+        Whether this event is a rest play event. 
+    </ParameterRow>  
+    <ParameterRow platform="all" name="manufacturerId" type="number">
+        The manufacturer ID of this specific event (0x7D for alphaTab).
+    </ParameterRow>  
+</ParameterTable>
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.SystemExclusive2];
+api.midiEventsPlayed.on(function(e) {
+  for(const midi of e.events) {
+    if(midi.isMetronome) {
+      console.log('Metronome tick ' + midi.tick); 
+    }
+  }
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab')
+  .alphaTab('midiEventsPlayedFilter', [alphaTab.midi.MidiEventType.SystemExclusive2])
+  .on('alphaTab.midiEventsPlayed', (e, args) => {
+    for(const midi of args.events) {
+      if(midi.isMetronome) {
+        console.log('Metronome tick ' + midi.tick); 
+      }
+    }
+  });
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.MidiEventsPlayedFilter = new MidiEventType[] { AlphaTab.Midi.MidiEventType.SystemExclusive2 };
+api.MidiEventsPlayed.On(e => 
+{
+  foreach(var midi of e.events) 
+  {
+    if(midi is AlphaTab.Midi.SystemExclusiveEvent sysex && sysex.IsMetronome) 
+    {
+      Console.WriteLine("Metronome tick " + midi.Tick); 
+    }
+  }
+});
+```
+
+</TabItem>
+</Tabs>
