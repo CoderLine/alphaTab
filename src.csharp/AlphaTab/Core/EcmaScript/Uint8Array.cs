@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +15,11 @@ namespace AlphaTab.Core.EcmaScript
         public ArrayBuffer Buffer => new ArrayBuffer(_data);
 
         public ArraySegment<byte> Data => _data;
+
+        public Uint8Array(IList<double> data)
+        {
+            _data = new ArraySegment<byte>(data.Cast<byte>().ToArray());
+        }
 
         public Uint8Array(byte[] data)
         {

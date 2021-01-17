@@ -1241,7 +1241,7 @@ export class AlphaTabApiBase<TSettings> {
     public midiLoad: IEventEmitterOfT<MidiFile> = new EventEmitterOfT<MidiFile>();
     private onMidiLoad(e:MidiFile): void {
         (this.midiLoad as EventEmitterOfT<MidiFile>).trigger(e);
-        this.uiFacade.triggerEvent(this.container, 'midiFileLoad', e);
+        this.uiFacade.triggerEvent(this.container, 'midiLoad', e);
     }
 
     public midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();

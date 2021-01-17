@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -7,7 +7,17 @@ namespace AlphaTab.Core.EcmaScript
 {
     public class Set<T> : IEnumerable<T>
     {
-        private readonly HashSet<T> _data = new HashSet<T>();
+        private readonly HashSet<T> _data;
+
+        public Set()
+        {
+            _data = new HashSet<T>();
+        }
+
+        public Set(IEnumerable<T> values)
+        {
+            _data = new HashSet<T>(values);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(T item)

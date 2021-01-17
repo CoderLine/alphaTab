@@ -262,7 +262,7 @@ export default class CSharpEmitterContext {
             return csType;
         }
 
-        csType = this.resolveUnionType(node, tsType);
+        csType = this.resolveUnionType(node, tsType, typeArguments);
         if (csType) {
             return csType;
         }
@@ -493,7 +493,7 @@ export default class CSharpEmitterContext {
         }
     }
 
-    private resolveUnionType(parent: cs.Node, tsType: ts.Type): cs.TypeNode | null {
+    private resolveUnionType(parent: cs.Node, tsType: ts.Type, typeArguments?: cs.UnresolvedTypeNode[]): cs.TypeNode | null {
         if (!tsType.isUnion()) {
             return null;
         }
@@ -562,7 +562,7 @@ export default class CSharpEmitterContext {
         if (!actualType) {
             return null;
         }
-        const type = this.getTypeFromTsType(parent, actualType);
+        const type = this.getTypeFromTsType(parent, actualType, undefined, typeArguments);
         return {
             nodeType: cs.SyntaxKind.TypeReference,
             parent: parent,

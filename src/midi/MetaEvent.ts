@@ -31,7 +31,7 @@ export class MetaEvent extends MidiEvent {
     }
 
     public get metaStatus(): MetaEventType {
-        return this.data1;
+        return this.data1 as MetaEventType;
     }
 
     protected constructor(track: number, delta: number, status: number, data1: number, data2: number) {
