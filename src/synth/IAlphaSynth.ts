@@ -74,13 +74,10 @@ export interface IAlphaSynth {
     countInVolume: number;
 
     /**
-     * Gets or sets the type fo midi events which will trigger the `midiEventsPlayed` event for
-     * midi events which have been played. 
-     * 
-     * Metronome events are signaled as `SystemExclusiveEvent`
-     * 
+     * Gets or sets the midi events which will trigger the `midiEventsPlayed` event.
+     * To subscribe to Metronome events use the `SystemExclusiveEvent2` event type and check against `event.isMetronome` 
      */
-    midiEventPlayedFilter: MidiEventType[];
+    midiEventsPlayedFilter: MidiEventType[];
 
     /**
      * Destroys the synthesizer and all related components

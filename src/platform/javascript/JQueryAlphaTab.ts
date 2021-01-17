@@ -6,6 +6,7 @@ import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
+import { MidiEventType } from '@src/midi/MidiEvent';
 
 /**
  * @target web
@@ -171,6 +172,13 @@ export class JQueryAlphaTab {
             context.countInVolume = countInVolume;
         }
         return context.countInVolume;
+    }
+
+    public midiEventsPlayedFilter(element: jQuery, context: AlphaTabApi, midiEventsPlayedFilter?: MidiEventType[]): MidiEventType[] {
+        if (Array.isArray(midiEventsPlayedFilter)) {
+            context.midiEventsPlayedFilter = midiEventsPlayedFilter;
+        }
+        return context.midiEventsPlayedFilter;
     }
 
     public playbackSpeed(element: jQuery, context: AlphaTabApi, playbackSpeed?: number): number {

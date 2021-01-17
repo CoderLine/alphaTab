@@ -35,7 +35,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private _timePosition: number = 0;
     private _isLooping: boolean = false;
     private _playbackRange: PlaybackRange | null = null;
-    private _midiEventPlayedFilter: MidiEventType[] = [];
+    private _midiEventsPlayedFilter: MidiEventType[] = [];
 
     public get isReady(): boolean {
         return this._workerIsReady && this._outputIsReady;
@@ -99,14 +99,14 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public get midiEventPlayedFilter(): MidiEventType[] {
-        return this._midiEventPlayedFilter;
+    public get midiEventsPlayedFilter(): MidiEventType[] {
+        return this._midiEventsPlayedFilter;
     }
 
-    public set midiEventPlayedFilter(value: MidiEventType[]) {
-        this._midiEventPlayedFilter = value;
+    public set midiEventsPlayedFilter(value: MidiEventType[]) {
+        this._midiEventsPlayedFilter = value;
         this._synth.postMessage({
-            cmd: 'alphaSynth.setMidiEventPlayedFilter',
+            cmd: 'alphaSynth.setMidiEventsPlayedFilter',
             value: value
         })
     }
@@ -358,6 +358,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 this._tickPosition = data.currentTick;
                 (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
                     new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick, data.isSeek)
+                );
                 break;
             case 'alphaSynth.midiEventsPlayed':
                 (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(

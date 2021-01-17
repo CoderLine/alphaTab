@@ -12,7 +12,7 @@ export class MetaDataEvent extends MetaEvent {
 
     public writeTo(s: IWriteable): void {
         s.writeByte(0xff);
-        s.writeByte(this.metaStatus);
+        s.writeByte(this.metaStatus as number);
         let l: number = this.data.length;
         MidiFile.writeVariableInt(s, l);
         s.write(this.data, 0, this.data.length);

@@ -30,7 +30,7 @@ export class MetaEvent extends MidiEvent {
         return (this.message & 0x00000ff) as MidiEventType;
     }
 
-    public get metaStatus(): number {
+    public get metaStatus(): MetaEventType {
         return this.data1;
     }
 

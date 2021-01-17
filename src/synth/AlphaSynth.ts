@@ -33,7 +33,7 @@ export class AlphaSynth implements IAlphaSynth {
     private _metronomeVolume: number = 0;
     private _countInVolume: number = 0;
     private _playedEventsQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
-    private _midiEventPlayedFilter: Set<MidiEventType> = new Set<MidiEventType>();
+    private _midiEventsPlayedFilter: Set<MidiEventType> = new Set<MidiEventType>();
 
     /**
      * Gets the {@link ISynthOutput} used for playing the generated samples.
@@ -84,12 +84,12 @@ export class AlphaSynth implements IAlphaSynth {
         this._countInVolume = value;
     }
 
-    public get midiEventPlayedFilter(): MidiEventType[] {
-        return Array.from(this._midiEventPlayedFilter);
+    public get midiEventsPlayedFilter(): MidiEventType[] {
+        return Array.from(this._midiEventsPlayedFilter);
     }
 
-    public set midiEventPlayedFilter(value: MidiEventType[]) {
-        this._midiEventPlayedFilter = new Set<MidiEventType>(value);
+    public set midiEventsPlayedFilter(value: MidiEventType[]) {
+        this._midiEventsPlayedFilter = new Set<MidiEventType>(value);
     }
 
     public get playbackSpeed(): number {
@@ -181,7 +181,7 @@ export class AlphaSynth implements IAlphaSynth {
                 // push all processed events into the queue
                 // for informing users about played events
                 for (const e of synthesizedEvents) {
-                    if (this._midiEventPlayedFilter.has(e.event.command)) {
+                    if (this._midiEventsPlayedFilter.has(e.event.command)) {
                         this._playedEventsQueue.enqueue(e);
                     }
                 }

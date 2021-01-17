@@ -5,7 +5,7 @@ import { SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
 import { MidiFile } from '@src/midi/MidiFile';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
-import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20ChannelVoiceEvent';
+import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 

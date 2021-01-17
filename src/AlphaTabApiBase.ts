@@ -41,6 +41,8 @@ import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { Note } from './model/Note';
+import { MidiEventType } from './midi/MidiEvent';
+import { MidiEventsPlayedEventArgs } from './synth/MidiEventsPlayedEventArgs';
 
 class SelectionInfo {
     public beat: Beat;
@@ -435,6 +437,19 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
+    public get midiEventsPlayedFilter(): MidiEventType[] {
+        if (!this.player) {
+            return [];
+        }
+        return this.player.midiEventsPlayedFilter;
+    }
+
+    public set midiEventsPlayedFilter(value: MidiEventType[]) {
+        if (this.player) {
+            this.player.midiEventsPlayedFilter = value;
+        }
+    }
+
     public get tickPosition(): number {
         if (!this.player) {
             return 0;
@@ -543,6 +558,7 @@ export class AlphaTabApiBase<TSettings> {
         });
         this.player.stateChanged.on(this.onPlayerStateChanged.bind(this));
         this.player.positionChanged.on(this.onPlayerPositionChanged.bind(this));
+        this.player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
         this.player.finished.on(this.onPlayerFinished.bind(this));
         if (this.settings.player.enableCursor) {
             this.setupCursors();
@@ -1241,5 +1257,13 @@ export class AlphaTabApiBase<TSettings> {
     private onPlayerPositionChanged(e: PositionChangedEventArgs): void {
         (this.playerPositionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'playerPositionChanged', e);
+    }
+
+    public midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<
+        MidiEventsPlayedEventArgs
+    >();
+    private onMidiEventsPlayed(e: MidiEventsPlayedEventArgs): void {
+        (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(e);
+        this.uiFacade.triggerEvent(this.container, 'midiEventsPlayed', e);
     }
 }

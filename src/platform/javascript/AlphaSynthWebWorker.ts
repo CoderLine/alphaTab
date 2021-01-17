@@ -83,8 +83,8 @@ export class AlphaSynthWebWorker {
             case 'alphaSynth.setCountInVolume':
                 this._player.countInVolume = data.value;
                 break;           
-            case 'alphaSynth.setMidiEventPlayedFilter':
-                this._player.midiEventPlayedFilter = data.value;
+            case 'alphaSynth.setMidiEventsPlayedFilter':
+                this._player.midiEventsPlayedFilter = data.value;
                 break;
             case 'alphaSynth.play':
                 this._player.play();
