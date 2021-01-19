@@ -24,7 +24,7 @@ kotlin {
     android()
     sourceSets {
         val commonMain by getting
-        commonMain.kotlin.srcDirs("src/generatedMain/kotlin")
+        commonMain.kotlin.srcDirs("src/generated/src")
 
         val commonTest by getting {
             dependencies {
@@ -32,7 +32,7 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
-        commonTest.kotlin.srcDirs("src/generatedTest/kotlin")
+        commonTest.kotlin.srcDirs("src/generated/test")
 
         val jvmMain by getting
         val jvmTest by getting {

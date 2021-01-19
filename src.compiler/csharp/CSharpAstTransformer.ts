@@ -26,18 +26,18 @@ export default class CSharpAstTransformer {
             fileName: fileName,
             usings: [
                 {
-                    namespaceOrTypeName: 'System',
+                    namespaceOrTypeName: this._context.toPascalCase('system'),
                     nodeType: cs.SyntaxKind.UsingDeclaration
                 } as cs.UsingDeclaration,
                 {
-                    namespaceOrTypeName: 'AlphaTab.Core',
+                    namespaceOrTypeName: this._context.toPascalCase('alphaTab') + '.' + this._context.toPascalCase('core'),
                     nodeType: cs.SyntaxKind.UsingDeclaration
                 } as cs.UsingDeclaration
             ],
             namespace: {
                 parent: null,
                 nodeType: cs.SyntaxKind.NamespaceDeclaration,
-                namespace: 'AlphaTab',
+                namespace: this._context.toPascalCase('alphaTab'),
                 declarations: []
             }
         };
@@ -241,7 +241,7 @@ export default class CSharpAstTransformer {
                 folders.shift();
             }
             this._csharpFile.namespace.namespace =
-                'AlphaTab' + folders.map(f => '.' + f.substr(0, 1).toUpperCase() + f.substr(1)).join('');
+                this._context.toPascalCase('alphaTab') + folders.map(f => '.' + f.substr(0, 1).toUpperCase() + f.substr(1)).join('');
 
             if (defaultExport) {
                 this.visit(
@@ -454,7 +454,7 @@ export default class CSharpAstTransformer {
         } as cs.UnresolvedTypeNode;
 
         let typeArguments = (tsType as ts.TypeReference)?.typeArguments;
-        if(tsType && !typeArguments) {
+        if (tsType && !typeArguments) {
             const nonNullable = this._context.typeChecker.getNonNullableType(tsType);
             typeArguments = (nonNullable as ts.TypeReference)?.typeArguments;
         }
@@ -1403,7 +1403,7 @@ export default class CSharpAstTransformer {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: variableStatement,
                     tsNode: s,
-                    reference: 'AlphaTab.Core.EcmaScript.Error'
+                    reference: this.makeTypeName('alphaTab.core.ecmascript.Error')
                 } as cs.TypeReference;
             } else {
                 variableStatement.type = this.createUnresolvedTypeNode(variableStatement, s.type ?? s, type);
@@ -1429,6 +1429,22 @@ export default class CSharpAstTransformer {
         }
 
         return variableStatement;
+    }
+
+    private makeTypeName(tsName: string): string {
+        const parts = tsName.split('.');
+        let result = '';
+        for (let i = 0; i < parts.length; i++) {
+            if (i > 0) {
+                result += '.';
+            }
+            if (i === parts.length - 1) {
+                result += parts[i];
+            } else {
+                result += this._context.toPascalCase(parts[i]);
+            }
+        }
+        return result;
     }
 
     private visitExpressionStatement(parent: cs.Node, s: ts.ExpressionStatement) {
@@ -2118,7 +2134,8 @@ export default class CSharpAstTransformer {
             expression: {} as cs.Expression
         } as cs.InvocationExpression;
 
-        csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'TypeOf');
+        csExpr.expression = this.makeMemberAccess(csExpr, this.makeTypeName('alphaTab.core.TypeHelper'),
+            this._context.toPascalCase('typeOf'));
         const e = this.visitExpression(csExpr, expression.expression);
         if (e) {
             csExpr.arguments.push(e);
@@ -2171,7 +2188,9 @@ export default class CSharpAstTransformer {
                 expression: {} as cs.Expression
             } as cs.InvocationExpression;
 
-            csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'In');
+            csExpr.expression = this.makeMemberAccess(csExpr, 
+                this.makeTypeName('alphaTab.core.TypeHelper'),
+                this._context.toPascalCase('in'));
 
             let e = this.visitExpression(csExpr, expression.left)!;
             if (e) {
@@ -2470,14 +2489,14 @@ export default class CSharpAstTransformer {
             tsNode: expression.tsNode,
             nodeType: cs.SyntaxKind.MemberAccessExpression,
             expression: {} as cs.Expression,
-            member: 'IsTruthy'
+            member: this._context.toPascalCase('isTruthy')
         } as cs.MemberAccessExpression;
 
         access.expression = {
             parent: access,
             tsNode: expression.tsNode,
             nodeType: cs.SyntaxKind.Identifier,
-            text: 'AlphaTab.Core.TypeHelper'
+            text: this.makeTypeName('alphaTab.core.TypeHelper')
         } as cs.Identifier;
 
         expression.parent = call;
@@ -2565,7 +2584,10 @@ export default class CSharpAstTransformer {
         } as cs.InvocationExpression;
 
         const parts = expression.text.split('/');
-        csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'CreateRegex');
+        csExpr.expression = this.makeMemberAccess(csExpr,
+            this.makeTypeName('alphaTab.core.TypeHelper'),
+            this._context.toPascalCase('createRegex')
+        );
         csExpr.arguments.push({
             parent: csExpr,
             nodeType: cs.SyntaxKind.StringLiteral,
@@ -2683,7 +2705,7 @@ export default class CSharpAstTransformer {
                 expression: {} as cs.Expression
             } as cs.InvocationExpression;
 
-            csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'CreateMapEntry');
+            csExpr.expression = this.makeMemberAccess(csExpr, this.makeTypeName('alphaTab.core.TypeHelper'), this._context.toPascalCase('createMapEntry'));
 
             expression.elements.forEach(e => {
                 const ex = this.visitExpression(csExpr, e);
@@ -2702,7 +2724,7 @@ export default class CSharpAstTransformer {
                 expression: {} as cs.Expression
             } as cs.InvocationExpression;
 
-            csExpr.expression = this.makeMemberAccess(csExpr, 'AlphaTab.Core.TypeHelper', 'SetInitializer');
+            csExpr.expression = this.makeMemberAccess(csExpr, this.makeTypeName('alphaTab.core.TypeHelper'), this._context.toPascalCase('setInitializer'));
 
             expression.elements.forEach(e => {
                 const ex = this.visitExpression(csExpr, e);

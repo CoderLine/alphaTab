@@ -13,7 +13,6 @@ export enum SyntaxKind {
     ConstructorDeclaration,
     FieldDeclaration,
     PropertyDeclaration,
-    EventDeclaration,
     PropertyAccessorDeclaration,
     ParameterDeclaration,
     UnresolvedTypeNode,
@@ -95,7 +94,6 @@ export interface SourceFile extends Node {
 }
 
 export interface UsingDeclaration extends Node {
-    typeAlias?: string;
     namespaceOrTypeName: string;
 }
 
@@ -154,7 +152,6 @@ export type ClassMember =
     | MethodDeclaration
     | FieldDeclaration
     | PropertyDeclaration
-    | EventDeclaration
     | NamedTypeDeclaration;
 
 export interface EnumDeclaration extends NamedTypeDeclaration {
@@ -170,7 +167,7 @@ export interface InterfaceDeclaration extends NamedTypeDeclaration {
     members: InterfaceMember[];
 }
 
-export type InterfaceMember = MethodDeclaration | PropertyDeclaration | EventDeclaration;
+export type InterfaceMember = MethodDeclaration | PropertyDeclaration;
 
 export interface MemberDeclaration extends NamedElement, DocumentedElement, Node {
     visibility: Visibility;
@@ -217,10 +214,6 @@ export interface PropertyDeclaration extends MemberDeclaration {
 export interface PropertyAccessorDeclaration extends Node {
     keyword: string;
     body?: Block | Expression;
-}
-
-export interface EventDeclaration extends MemberDeclaration {
-    eventType: TypeNode;
 }
 
 export interface ParameterDeclaration extends NamedElement, Node, DocumentedElement {

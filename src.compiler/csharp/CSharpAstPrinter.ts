@@ -314,9 +314,6 @@ export default class CSharpAstPrinter {
             case cs.SyntaxKind.MethodDeclaration:
                 this.writeMethodDeclaration(member as cs.MethodDeclaration);
                 break;
-            case cs.SyntaxKind.EventDeclaration:
-                this.writeEventDeclaration(member as cs.EventDeclaration);
-                break;
             case cs.SyntaxKind.ClassDeclaration:
                 this.writeClassDeclaration(member as cs.ClassDeclaration);
                 break;
@@ -328,10 +325,6 @@ export default class CSharpAstPrinter {
                 break;
         }
         this.writeLine();
-    }
-
-    private writeEventDeclaration(d: cs.EventDeclaration) {
-        throw new Error('Method not implemented.');
     }
 
     private writeMethodDeclaration(d: cs.MethodDeclaration) {
@@ -1293,11 +1286,7 @@ export default class CSharpAstPrinter {
     }
 
     private writeUsing(using: cs.UsingDeclaration) {
-        if (using.typeAlias) {
-            this.writeLine(`using ${using.typeAlias} = ${using.namespaceOrTypeName};`);
-        } else {
-            this.writeLine(`using ${using.namespaceOrTypeName};`);
-        }
+        this.writeLine(`using ${using.namespaceOrTypeName};`);
     }
 
     private writeLine(txt?: string) {

@@ -1,7 +1,6 @@
 import * as cs from './CSharpAst';
 import * as ts from 'typescript';
 import * as path from 'path';
-import { indexOf } from 'lodash';
 
 type SymbolKey = string;
 
@@ -15,6 +14,7 @@ export default class CSharpEmitterContext {
     private _unresolvedTypeNodes: cs.UnresolvedTypeNode[] = [];
     private _program: ts.Program;
     public typeChecker: ts.TypeChecker;
+    public noPascalCase:boolean = false;
 
     public csharpFiles: cs.SourceFile[] = [];
     public get compilerOptions(): ts.CompilerOptions {
@@ -755,6 +755,10 @@ export default class CSharpEmitterContext {
     }
 
     public toPascalCase(text: string): string {
+        if(this.noPascalCase) {
+            return text;
+        }
+
         if (text.indexOf('-') >= 0) {
             return this.kebabCaseToPascalCase(text);
         }

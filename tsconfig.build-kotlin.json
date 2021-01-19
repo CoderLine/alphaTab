@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "src.kotlin/alphaTab/src/generatedMain",
+    "outDir": "src.kotlin/alphaTab/src/generated",
     "module": "commonjs",
     "resolveJsonModule": true,
     "declaration": false,

@@ -5,6 +5,8 @@ import KotlinAstPrinter from './KotlinAstPrinter';
 
 export default function emit(program: ts.Program, diagnostics: ts.Diagnostic[]) {
     const context = new CSharpEmitterContext(program);
+    context.noPascalCase = true;
+    
     console.log('[Kotlin] Transforming to Kotlin AST');
     program.getRootFileNames().forEach(file => {
         const sourceFile = program.getSourceFile(file)!;
