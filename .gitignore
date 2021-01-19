@@ -11,6 +11,8 @@ bin/
 test-results/
 debug.log
 src/generated/VersionInfo.ts
+src.kotlin/alphaTab/src/generatedMain/
+src.kotlin/alphaTab/src/generatedTest/
 
 .gradle
 build/

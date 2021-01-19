@@ -52,7 +52,6 @@ export default class CSharpEmitterContext {
                     case cs.SyntaxKind.ClassDeclaration:
                     case cs.SyntaxKind.InterfaceDeclaration:
                     case cs.SyntaxKind.EnumDeclaration:
-                    case cs.SyntaxKind.DelegateDeclaration:
                         return this.getFullName(csSymbol as cs.NamedTypeDeclaration);
                 }
                 return csSymbol.name;
@@ -112,7 +111,6 @@ export default class CSharpEmitterContext {
             case cs.SyntaxKind.ClassDeclaration:
             case cs.SyntaxKind.InterfaceDeclaration:
             case cs.SyntaxKind.EnumDeclaration:
-            case cs.SyntaxKind.DelegateDeclaration:
                 return this.getFullName(type.parent as cs.NamedTypeDeclaration) + '.' + type.name;
             case cs.SyntaxKind.NamespaceDeclaration:
                 return (type.parent as cs.NamespaceDeclaration).namespace + '.' + type.name;
@@ -1142,7 +1140,6 @@ export default class CSharpEmitterContext {
             const symbolKey = this.getSymbolKey(kvp[1].tsSymbol!);
             switch (kvp[1].nodeType) {
                 case cs.SyntaxKind.ClassDeclaration:
-                case cs.SyntaxKind.DelegateDeclaration:
                 case cs.SyntaxKind.EnumDeclaration:
                 case cs.SyntaxKind.InterfaceDeclaration:
                     if (!visited.has(symbolKey)) {

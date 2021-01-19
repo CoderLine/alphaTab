@@ -8,7 +8,6 @@ export enum SyntaxKind {
     ClassDeclaration,
     EnumDeclaration,
     InterfaceDeclaration,
-    DelegateDeclaration,
     TypeParameterDeclaration,
     MethodDeclaration,
     ConstructorDeclaration,
@@ -105,7 +104,7 @@ export interface NamespaceDeclaration extends Node {
     declarations: NamespaceMember[];
 }
 
-type NamespaceMember = ClassDeclaration | EnumDeclaration | InterfaceDeclaration | DelegateDeclaration;
+type NamespaceMember = ClassDeclaration | EnumDeclaration | InterfaceDeclaration;
 
 export enum Visibility {
     None,
@@ -222,11 +221,6 @@ export interface PropertyAccessorDeclaration extends Node {
 
 export interface EventDeclaration extends MemberDeclaration {
     eventType: TypeNode;
-}
-
-export interface DelegateDeclaration extends NamedTypeDeclaration {
-    returnType: TypeNode;
-    parameters: ParameterDeclaration[];
 }
 
 export interface ParameterDeclaration extends NamedElement, Node, DocumentedElement {

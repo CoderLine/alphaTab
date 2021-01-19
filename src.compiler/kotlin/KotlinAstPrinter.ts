@@ -1,10 +1,10 @@
-import * as cs from './CSharpAst';
+import * as cs from '../csharp/CSharpAst';
 import * as ts from 'typescript';
 import * as path from 'path';
 import * as fs from 'fs';
-import CSharpEmitterContext from './CSharpEmitterContext';
+import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 
-export default class CSharpAstPrinter {
+export default class KotlinAstPrinter {
     private _sourceFile: cs.SourceFile;
     private _fileHandle!: number;
     private _isStartOfLine: boolean = true;
@@ -15,6 +15,9 @@ export default class CSharpAstPrinter {
 
     public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
         this._sourceFile = sourceFile;
+        if(sourceFile.fileName.endsWith(".cs")) {
+            sourceFile.fileName = sourceFile.fileName.substr(0, sourceFile.fileName.length - 3) + ".kt"
+        }
         this._context = context;
     }
 
@@ -34,7 +37,6 @@ export default class CSharpAstPrinter {
         this.writeLine('// Changes to this file may cause incorrect behavior and will be lost if');
         this.writeLine('// the code is regenerated.');
         this.writeLine('// </auto-generated>');
-        this.writeLine('#nullable enable annotations');
         this.writeLine();
         for (const using of sourceFile.usings) {
             this.writeUsing(using);
@@ -46,15 +48,14 @@ export default class CSharpAstPrinter {
     }
 
     private writeNamespace(namespace: cs.NamespaceDeclaration) {
-        this.writeLine(`namespace ${namespace.namespace}`);
-        this.beginBlock();
+        this.writeLine(`package ${namespace.namespace}`);
 
         for (const declaration of namespace.declarations) {
             if (!declaration.skipEmit) {
                 switch (declaration.nodeType) {
                     case cs.SyntaxKind.ClassDeclaration:
-                        this.writeClassDeclaration(declaration as cs.ClassDeclaration);
-                        break;
+                         this.writeClassDeclaration(declaration as cs.ClassDeclaration);
+                         break;
                     case cs.SyntaxKind.EnumDeclaration:
                         this.writeEnumDeclaration(declaration as cs.EnumDeclaration);
                         break;
@@ -64,8 +65,6 @@ export default class CSharpAstPrinter {
                 }
             }
         }
-
-        this.endBlock();
     }
 
     private writeDocumentation(d: cs.DocumentedElement) {

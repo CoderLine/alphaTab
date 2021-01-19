@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "src.kotlin/alphaTab/src/generatedMain",
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "declaration": false,
+    "declarationDir": null,
+    "sourceMap": false,
+    "incremental": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
+
+    "paths": {
+      "@src*": [
+        "src*"
+      ],
+      "@test*": [
+        "test*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "test"
+  ]
+}
