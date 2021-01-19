@@ -11,3 +11,11 @@ bin/
 test-results/
 debug.log
 src/generated/VersionInfo.ts
+
+.gradle
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+**/build/
+local.properties
