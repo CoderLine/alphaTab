@@ -84,18 +84,16 @@ class TrackItem extends React.Component {
           <button
             type="button"
             onClick={this.toggleMute.bind(this)}
-            className={`btn btn-sm btn-outline-danger at-track-mute ${
-              isMute ? "active" : ""
-            }`}
+            className={`btn btn-sm btn-outline-danger at-track-mute ${isMute ? "active" : ""
+              }`}
           >
             Mute
           </button>
           <button
             type="button"
             onClick={this.toggleSolo.bind(this)}
-            className={`btn btn-sm btn-outline-success at-track-solo ${
-              isSolo ? "active" : ""
-            }`}
+            className={`btn btn-sm btn-outline-success at-track-solo ${isSolo ? "active" : ""
+              }`}
           >
             Solo
           </button>
@@ -501,6 +499,29 @@ class PlayerControlsGroup extends React.Component {
     document.body.removeChild(a);
   }
 
+  open(e) {
+    e.preventDefault();
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = ".gp3,.gp4,.gp5,.gpx,.musicxml,.mxml,.xml,.capx";
+    input.onchange = () => {
+      if (input.files.length === 1) {
+        this.openFile(input.files[0]);
+      }
+    };
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+  }
+
+  openFile(file) {
+    const reader = new FileReader();
+    reader.onload = (data) => {
+      this.props.api.load(data.target.result, [0]);
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
   toggleLoop(e) {
     e.preventDefault();
     if (this.props.api) {
@@ -559,6 +580,18 @@ class PlayerControlsGroup extends React.Component {
         </div>
         <div className="at-player">
           <div className="at-player-left">
+            <a
+              href="#"
+              onClick={this.open.bind(this)}
+              className={
+                "at-open"
+              }
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Open File"
+            >
+              <i className="fas fa-folder-open"></i>
+            </a>
             <a
               href="#"
               onClick={this.stop.bind(this)}
@@ -716,10 +749,22 @@ export default class AlphaTab extends React.Component {
     console.log(this.state.settings);
 
     this.setState({
-      api: new alphaTab.AlphaTabApi(this.refs.alphaTab, this.state.settings),
+      api: new alphaTab.AlphaTabApi(this.refs.alphaTab, this.state.settings)
     });
-    debugger;
     jQuery(this.refs.wrapper).find('[data-toggle="tooltip"]').tooltip();
+    this.refs.wrapper.ondragover = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'link';
+    };
+    this.refs.wrapper.ondrop = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files.length === 1) {
+          this.refs.playerControls.openFile(files[0]);
+        }
+    };
   }
 
   componentWillUnmount() {
@@ -765,13 +810,13 @@ export default class AlphaTab extends React.Component {
     });
 
     at.addEventListener("alphaTab.resize", (e) => {
-        if(e.detail.newWidth > 750) {
-            e.detail.settings.display.scale = 1;
-            e.detail.settings.display.layoutMode = alphaTab.LayoutMode.Page;         
-        } else {
-            e.detail.settings.display.scale = 0.8;
-            e.detail.settings.display.layoutMode = alphaTab.LayoutMode.Horizontal;
-        }
+      if (e.detail.newWidth > 750) {
+        e.detail.settings.display.scale = 1;
+        e.detail.settings.display.layoutMode = alphaTab.LayoutMode.Page;
+      } else {
+        e.detail.settings.display.scale = 0.8;
+        e.detail.settings.display.layoutMode = alphaTab.LayoutMode.Horizontal;
+      }
     });
 
     at.addEventListener("alphaTab.renderStarted", (e) => {
