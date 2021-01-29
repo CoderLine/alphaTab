@@ -45,10 +45,10 @@ export class TrackSerializer {
                 obj.color = (Color.fromJson(v)!);
                 return true;
             case "name":
-                obj.name = (v as string);
+                obj.name = (v! as string);
                 return true;
             case "shortname":
-                obj.shortName = (v as string);
+                obj.shortName = (v! as string);
                 return true;
             case "percussionarticulations":
                 obj.percussionArticulations = [];

@@ -52,7 +52,7 @@ export default class CSharpEmitterContext {
                     case cs.SyntaxKind.ClassDeclaration:
                     case cs.SyntaxKind.InterfaceDeclaration:
                     case cs.SyntaxKind.EnumDeclaration:
-                        return this.getFullName(csSymbol as cs.NamedTypeDeclaration);
+                        return this.getFullName(csSymbol as cs.NamedTypeDeclaration, expr);
                 }
                 return csSymbol.name;
             } else if (
@@ -103,7 +103,7 @@ export default class CSharpEmitterContext {
         return false;
     }
 
-    public getFullName(type: cs.NamedTypeDeclaration): string {
+    public getFullName(type: cs.NamedTypeDeclaration, expr?: cs.Node): string {
         if (!type.parent) {
             return '';
         }
@@ -111,11 +111,15 @@ export default class CSharpEmitterContext {
             case cs.SyntaxKind.ClassDeclaration:
             case cs.SyntaxKind.InterfaceDeclaration:
             case cs.SyntaxKind.EnumDeclaration:
-                return this.getFullName(type.parent as cs.NamedTypeDeclaration) + '.' + type.name;
+                return this.getFullName(type.parent as cs.NamedTypeDeclaration) + '.' + this.getClassName(type, expr);
             case cs.SyntaxKind.NamespaceDeclaration:
-                return (type.parent as cs.NamespaceDeclaration).namespace + '.' + type.name;
+                return (type.parent as cs.NamespaceDeclaration).namespace + '.' + this.getClassName(type, expr);
         }
         return '';
+    }
+
+    protected getClassName(type: cs.NamedTypeDeclaration, expr?: cs.Node) {
+        return type.name;
     }
 
     public resolveAllUnresolvedTypeNodes() {
@@ -491,7 +495,11 @@ export default class CSharpEmitterContext {
         }
     }
 
-    private resolveUnionType(parent: cs.Node, tsType: ts.Type, typeArguments?: cs.UnresolvedTypeNode[]): cs.TypeNode | null {
+    private resolveUnionType(
+        parent: cs.Node,
+        tsType: ts.Type,
+        typeArguments?: cs.UnresolvedTypeNode[]
+    ): cs.TypeNode | null {
         if (!tsType.isUnion()) {
             return null;
         }
@@ -571,7 +579,7 @@ export default class CSharpEmitterContext {
     }
 
     private isNodeEmitted(node: cs.Node): boolean {
-        if ('skipEmit' in node && node.skipEmit as boolean) {
+        if ('skipEmit' in node && (node.skipEmit as boolean)) {
             return false;
         } else if (node.parent) {
             return this.isNodeEmitted(node.parent);
@@ -748,7 +756,6 @@ export default class CSharpEmitterContext {
         return result;
     }
 
-
     private buildCoreNamespace(aliasSymbol: ts.Symbol) {
         let suffix = '';
         for (const decl of aliasSymbol.declarations) {
@@ -768,7 +775,7 @@ export default class CSharpEmitterContext {
                 }
             }
         }
-        return this.makeTypeName('alphaTab.core') + suffix + ".";
+        return this.makeTypeName('alphaTab.core') + suffix + '.';
     }
 
     public toPascalCase(text: string): string {
@@ -827,8 +834,8 @@ export default class CSharpEmitterContext {
         const declaration = symbol.valueDeclaration
             ? symbol.valueDeclaration
             : symbol.declarations && symbol.declarations.length > 0
-                ? symbol.declarations[0]
-                : undefined;
+            ? symbol.declarations[0]
+            : undefined;
 
         if (declaration) {
             return symbol.name + '_' + declaration.getSourceFile().fileName + '_' + declaration.pos;
@@ -960,8 +967,11 @@ export default class CSharpEmitterContext {
 
     public isNonNullSmartCast(expression: ts.Expression): boolean {
         // if the parent is already casting, we have no "smart" cast.
-        if (expression.parent.kind === ts.SyntaxKind.AsExpression ||
-            (ts.isBinaryExpression(expression.parent) && expression.parent.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken)) {
+        if (
+            expression.parent.kind === ts.SyntaxKind.AsExpression ||
+            (ts.isBinaryExpression(expression.parent) &&
+                expression.parent.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken)
+        ) {
             return false;
         }
 
@@ -1000,8 +1010,7 @@ export default class CSharpEmitterContext {
         }
 
         // For Enum[value] we do not smart cast value to a number
-        if (ts.isElementAccessExpression(expression.parent) &&
-            expression.parent.argumentExpression === expression) {
+        if (ts.isElementAccessExpression(expression.parent) && expression.parent.argumentExpression === expression) {
             return null;
         }
 
@@ -1075,8 +1084,10 @@ export default class CSharpEmitterContext {
         }
 
         // enum literal to same enum type
-        if (contextualType.flags & ts.TypeFlags.EnumLiteral &&
-            (declaredType.symbol as any)?.parent == contextualType.symbol) {
+        if (
+            contextualType.flags & ts.TypeFlags.EnumLiteral &&
+            (declaredType.symbol as any)?.parent == contextualType.symbol
+        ) {
             return null;
         }
 
@@ -1152,14 +1163,21 @@ export default class CSharpEmitterContext {
         return this.hasAnyBaseTypeClassMember(classType, classElement.name!.getText());
     }
 
-    protected hasAnyBaseTypeClassMember(classType: ts.InterfaceType, memberName: string, allowInterfaces: boolean = false) {
+    protected hasAnyBaseTypeClassMember(
+        classType: ts.InterfaceType,
+        memberName: string,
+        allowInterfaces: boolean = false
+    ) {
         const baseTypes = classType.getBaseTypes();
         if (!baseTypes) {
             return false;
         }
 
         for (const baseType of baseTypes) {
-            if ((allowInterfaces && baseType.isClassOrInterface() || baseType.isClass()) && this.hasClassMember(baseType, memberName)) {
+            if (
+                ((allowInterfaces && baseType.isClassOrInterface()) || baseType.isClass()) &&
+                this.hasClassMember(baseType, memberName)
+            ) {
                 return true;
             }
         }
@@ -1211,7 +1229,9 @@ export default class CSharpEmitterContext {
                 case cs.SyntaxKind.InterfaceDeclaration:
                     if (!visited.has(symbolKey)) {
                         const csType = kvp[1] as cs.NamedTypeDeclaration;
-                        const shouldBePublic = !!ts.getJSDocTags(csType.tsNode!).find(t => t.tagName.text === 'csharp_public');
+                        const shouldBePublic = !!ts
+                            .getJSDocTags(csType.tsNode!)
+                            .find(t => t.tagName.text === 'csharp_public');
                         if (csType.visibility === cs.Visibility.Public || shouldBePublic) {
                             if (this._exportedSymbols.has(symbolKey) || shouldBePublic) {
                                 this.makePublic(csType, visited);
@@ -1249,7 +1269,7 @@ export default class CSharpEmitterContext {
 
                 csClass.members.forEach(m => {
                     if (m.visibility == cs.Visibility.Public || m.visibility == cs.Visibility.Protected) {
-                        this.makePublic(m, visited)
+                        this.makePublic(m, visited);
                     }
                 });
                 break;
@@ -1266,7 +1286,7 @@ export default class CSharpEmitterContext {
                 }
 
                 csInterface.members.forEach(m => {
-                    this.makePublic(m, visited)
+                    this.makePublic(m, visited);
                 });
 
                 break;
@@ -1310,16 +1330,18 @@ export default class CSharpEmitterContext {
     }
 
     public isStaticSymbol(tsSymbol: ts.Symbol) {
-        return (tsSymbol.flags & ts.SymbolFlags.EnumMember) !== 0 ||
-            !!tsSymbol.declarations.find(d => d.modifiers &&
-                !!d.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)
-            );
+        return (
+            (tsSymbol.flags & ts.SymbolFlags.EnumMember) !== 0 ||
+            !!tsSymbol.declarations.find(
+                d => d.modifiers && !!d.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)
+            )
+        );
     }
 
     public isNullableString(type: ts.Type) {
         if (type.isUnion()) {
             type = this.typeChecker.getNonNullableType(type);
         }
-        return ((type.flags & ts.TypeFlags.String) || (type.flags & ts.TypeFlags.StringLiteral));
+        return type.flags & ts.TypeFlags.String || type.flags & ts.TypeFlags.StringLiteral;
     }
 }

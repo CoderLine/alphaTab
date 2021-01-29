@@ -35,10 +35,10 @@ export class DisplaySettingsSerializer {
     public static setProperty(obj: DisplaySettings, property: string, v: unknown): boolean {
         switch (property) {
             case "scale":
-                obj.scale = (v as number);
+                obj.scale = (v! as number);
                 return true;
             case "stretchforce":
-                obj.stretchForce = (v as number);
+                obj.stretchForce = (v! as number);
                 return true;
             case "layoutmode":
                 obj.layoutMode = (JsonHelper.parseEnum<LayoutMode>(v, LayoutMode)!);
@@ -47,19 +47,19 @@ export class DisplaySettingsSerializer {
                 obj.staveProfile = (JsonHelper.parseEnum<StaveProfile>(v, StaveProfile)!);
                 return true;
             case "barsperrow":
-                obj.barsPerRow = (v as number);
+                obj.barsPerRow = (v! as number);
                 return true;
             case "startbar":
-                obj.startBar = (v as number);
+                obj.startBar = (v! as number);
                 return true;
             case "barcount":
-                obj.barCount = (v as number);
+                obj.barCount = (v! as number);
                 return true;
             case "barcountperpartial":
-                obj.barCountPerPartial = (v as number);
+                obj.barCountPerPartial = (v! as number);
                 return true;
             case "padding":
-                obj.padding = (v as number[] | null);
+                obj.padding = (v! as number[] | null);
                 return true;
         } 
         if (["resources"].indexOf(property) >= 0) {

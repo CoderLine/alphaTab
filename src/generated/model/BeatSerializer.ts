@@ -77,7 +77,7 @@ export class BeatSerializer {
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (v as number);
+                obj.id = (v! as number);
                 return true;
             case "notes":
                 obj.notes = [];
@@ -88,7 +88,7 @@ export class BeatSerializer {
                 }
                 return true;
             case "isempty":
-                obj.isEmpty = (v as boolean);
+                obj.isEmpty = (v! as boolean);
                 return true;
             case "whammystyle":
                 obj.whammyStyle = (JsonHelper.parseEnum<BendStyle>(v, BendStyle)!);
@@ -97,7 +97,7 @@ export class BeatSerializer {
                 obj.ottava = (JsonHelper.parseEnum<Ottavia>(v, Ottavia)!);
                 return true;
             case "islegatoorigin":
-                obj.isLegatoOrigin = (v as boolean);
+                obj.isLegatoOrigin = (v! as boolean);
                 return true;
             case "duration":
                 obj.duration = (JsonHelper.parseEnum<Duration>(v, Duration)!);
@@ -111,43 +111,43 @@ export class BeatSerializer {
                 }
                 return true;
             case "dots":
-                obj.dots = (v as number);
+                obj.dots = (v! as number);
                 return true;
             case "fadein":
-                obj.fadeIn = (v as boolean);
+                obj.fadeIn = (v! as boolean);
                 return true;
             case "lyrics":
-                obj.lyrics = (v as string[] | null);
+                obj.lyrics = (v! as string[] | null);
                 return true;
             case "hasrasgueado":
-                obj.hasRasgueado = (v as boolean);
+                obj.hasRasgueado = (v! as boolean);
                 return true;
             case "pop":
-                obj.pop = (v as boolean);
+                obj.pop = (v! as boolean);
                 return true;
             case "slap":
-                obj.slap = (v as boolean);
+                obj.slap = (v! as boolean);
                 return true;
             case "tap":
-                obj.tap = (v as boolean);
+                obj.tap = (v! as boolean);
                 return true;
             case "text":
-                obj.text = (v as string | null);
+                obj.text = (v! as string | null);
                 return true;
             case "brushtype":
                 obj.brushType = (JsonHelper.parseEnum<BrushType>(v, BrushType)!);
                 return true;
             case "brushduration":
-                obj.brushDuration = (v as number);
+                obj.brushDuration = (v! as number);
                 return true;
             case "tupletdenominator":
-                obj.tupletDenominator = (v as number);
+                obj.tupletDenominator = (v! as number);
                 return true;
             case "tupletnumerator":
-                obj.tupletNumerator = (v as number);
+                obj.tupletNumerator = (v! as number);
                 return true;
             case "iscontinuedwhammy":
-                obj.isContinuedWhammy = (v as boolean);
+                obj.isContinuedWhammy = (v! as boolean);
                 return true;
             case "whammybartype":
                 obj.whammyBarType = (JsonHelper.parseEnum<WhammyType>(v, WhammyType)!);
@@ -164,7 +164,7 @@ export class BeatSerializer {
                 obj.vibrato = (JsonHelper.parseEnum<VibratoType>(v, VibratoType)!);
                 return true;
             case "chordid":
-                obj.chordId = (v as string | null);
+                obj.chordId = (v! as string | null);
                 return true;
             case "gracetype":
                 obj.graceType = (JsonHelper.parseEnum<GraceType>(v, GraceType)!);
@@ -179,22 +179,22 @@ export class BeatSerializer {
                 obj.crescendo = (JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!);
                 return true;
             case "displaystart":
-                obj.displayStart = (v as number);
+                obj.displayStart = (v! as number);
                 return true;
             case "playbackstart":
-                obj.playbackStart = (v as number);
+                obj.playbackStart = (v! as number);
                 return true;
             case "displayduration":
-                obj.displayDuration = (v as number);
+                obj.displayDuration = (v! as number);
                 return true;
             case "playbackduration":
-                obj.playbackDuration = (v as number);
+                obj.playbackDuration = (v! as number);
                 return true;
             case "dynamics":
                 obj.dynamics = (JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!);
                 return true;
             case "invertbeamdirection":
-                obj.invertBeamDirection = (v as boolean);
+                obj.invertBeamDirection = (v! as boolean);
                 return true;
             case "preferredbeamdirection":
                 obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(v, BeamDirection);

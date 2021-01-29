@@ -188,7 +188,7 @@ export default class KotlinAstPrinter {
     private writeEnumDeclaration(d: cs.EnumDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
-        this.write(`enum class ${d.name}(val value: Int)`);
+        this.write(`enum class ${d.name}(override val value: Int): alphaTab.core.IAlphaTabEnum`);
         this.writeLine();
         this.beginBlock();
 
@@ -207,9 +207,13 @@ export default class KotlinAstPrinter {
                 this.write('(');
                 this.write(currentEnumValue.toString());
                 this.write(')');
-
             }
-            this.writeLine(',');
+
+            if(i < d.members.length - 1) {
+                this.writeLine(',');
+            } else {
+                this.writeLine(','); 
+            }
 
             currentEnumValue++;
         }

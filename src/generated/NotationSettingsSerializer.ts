@@ -58,25 +58,25 @@ export class NotationSettingsSerializer {
                 obj.rhythmMode = (JsonHelper.parseEnum<TabRhythmMode>(v, TabRhythmMode)!);
                 return true;
             case "rhythmheight":
-                obj.rhythmHeight = (v as number);
+                obj.rhythmHeight = (v! as number);
                 return true;
             case "transpositionpitches":
-                obj.transpositionPitches = (v as number[]);
+                obj.transpositionPitches = (v! as number[]);
                 return true;
             case "displaytranspositionpitches":
-                obj.displayTranspositionPitches = (v as number[]);
+                obj.displayTranspositionPitches = (v! as number[]);
                 return true;
             case "smallgracetabnotes":
-                obj.smallGraceTabNotes = (v as boolean);
+                obj.smallGraceTabNotes = (v! as boolean);
                 return true;
             case "extendbendarrowsontiednotes":
-                obj.extendBendArrowsOnTiedNotes = (v as boolean);
+                obj.extendBendArrowsOnTiedNotes = (v! as boolean);
                 return true;
             case "extendlineeffectstobeatend":
-                obj.extendLineEffectsToBeatEnd = (v as boolean);
+                obj.extendLineEffectsToBeatEnd = (v! as boolean);
                 return true;
             case "slurheight":
-                obj.slurHeight = (v as number);
+                obj.slurHeight = (v! as number);
                 return true;
         } 
         return false; 

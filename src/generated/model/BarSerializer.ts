@@ -32,7 +32,7 @@ export class BarSerializer {
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (v as number);
+                obj.id = (v! as number);
                 return true;
             case "clef":
                 obj.clef = (JsonHelper.parseEnum<Clef>(v, Clef)!);

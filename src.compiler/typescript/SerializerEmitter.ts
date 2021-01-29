@@ -634,7 +634,9 @@ function generateSetPropertyBody(program: ts.Program,
 
         if (isPrimitiveFromJson(type.type!, typeChecker)) {
             caseStatements.push(assignField(ts.factory.createAsExpression(
-                ts.factory.createIdentifier('v'),
+                ts.factory.createNonNullExpression(
+                    ts.factory.createIdentifier('v'),
+                ),
                 getDeepMutableClone(prop.property.type!)
             )));
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));

@@ -75,7 +75,7 @@ export enum SyntaxKind {
     DefaultExpression,
     ToDoExpression,
     TypeOfExpression,
-    
+
     Attribute
 }
 
@@ -120,8 +120,8 @@ export interface AttributedElement {
 }
 
 export interface Attribute extends Node {
-    type: TypeNode,
-    arguments?: Expression[]
+    type: TypeNode;
+    arguments?: Expression[];
 }
 
 export interface NamedElement {
@@ -184,6 +184,7 @@ export interface MethodDeclaration extends MethodDeclarationBase, AttributedElem
     isVirtual: boolean;
     isOverride: boolean;
     isAbstract: boolean;
+    partial: boolean;
     returnType: TypeNode;
     parameters: ParameterDeclaration[];
     body?: Block | Expression;

@@ -39,40 +39,40 @@ export class PlayerSettingsSerializer {
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "soundfont":
-                obj.soundFont = (v as string | null);
+                obj.soundFont = (v! as string | null);
                 return true;
             case "scrollelement":
-                obj.scrollElement = (v as string);
+                obj.scrollElement = (v! as string);
                 return true;
             case "enableplayer":
-                obj.enablePlayer = (v as boolean);
+                obj.enablePlayer = (v! as boolean);
                 return true;
             case "enablecursor":
-                obj.enableCursor = (v as boolean);
+                obj.enableCursor = (v! as boolean);
                 return true;
             case "enableuserinteraction":
-                obj.enableUserInteraction = (v as boolean);
+                obj.enableUserInteraction = (v! as boolean);
                 return true;
             case "scrolloffsetx":
-                obj.scrollOffsetX = (v as number);
+                obj.scrollOffsetX = (v! as number);
                 return true;
             case "scrolloffsety":
-                obj.scrollOffsetY = (v as number);
+                obj.scrollOffsetY = (v! as number);
                 return true;
             case "scrollmode":
                 obj.scrollMode = (JsonHelper.parseEnum<ScrollMode>(v, ScrollMode)!);
                 return true;
             case "scrollspeed":
-                obj.scrollSpeed = (v as number);
+                obj.scrollSpeed = (v! as number);
                 return true;
             case "songbookbendduration":
-                obj.songBookBendDuration = (v as number);
+                obj.songBookBendDuration = (v! as number);
                 return true;
             case "songbookdipduration":
-                obj.songBookDipDuration = (v as number);
+                obj.songBookDipDuration = (v! as number);
                 return true;
             case "playtripletfeel":
-                obj.playTripletFeel = (v as boolean);
+                obj.playTripletFeel = (v! as boolean);
                 return true;
         } 
         if (["vibrato"].indexOf(property) >= 0) {
