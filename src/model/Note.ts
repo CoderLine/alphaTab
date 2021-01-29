@@ -632,15 +632,15 @@ export class Note {
 
     public get initialBendValue(): number {
         if (this.hasBend) {
-            return (this.bendPoints[0].value / 2) | 0;
+            return Math.floor(this.bendPoints[0].value / 2);
         } else if (this.bendOrigin) {
-            return (this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2) | 0;
+            return Math.floor(this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2);
         } else if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
-            return (this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2) | 0;
+            return Math.floor(this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2) ;
         } else if (this.beat.hasWhammyBar) {
-            return (this.beat.whammyBarPoints[0].value / 2) | 0;
+            return Math.floor(this.beat.whammyBarPoints[0].value / 2);
         } else if (this.beat.isContinuedWhammy) {
-            return (this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value / 2) | 0;
+            return Math.floor(this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value / 2);
         }
         return 0;
     }
@@ -793,7 +793,8 @@ export class Note {
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all bends
         if (this.bendPoints.length > 0 && this.bendType === BendType.Custom) {
-            let isContinuedBend: boolean = (this.isContinuedBend = this.isTieDestination && this.tieOrigin!.hasBend);
+            let isContinuedBend: boolean = this.isTieDestination && this.tieOrigin!.hasBend;
+            this.isContinuedBend = isContinuedBend;
             if (this.bendPoints.length === 4) {
                 let origin: BendPoint = this.bendPoints[0];
                 let middle1: BendPoint = this.bendPoints[1];

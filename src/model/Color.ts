@@ -15,7 +15,6 @@ export class Color {
      * @param a The alpha component.
      */
     public constructor(r: number, g: number, b: number, a: number = 0xff) {
-        this.raw = 0;
         this.raw = ((a & 0xff) << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
         this.updateRgba();
     }

@@ -10,7 +10,7 @@ export default class KotlinAstPrinter {
     private _isStartOfLine: boolean = true;
     private _indent: number = 0;
     private _context: CSharpEmitterContext;
-
+    private _forceInteger: boolean = false;
     public diagnostics: ts.Diagnostic[] = [];
 
     public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
@@ -38,6 +38,21 @@ export default class KotlinAstPrinter {
         this.writeLine('// the code is regenerated.');
         this.writeLine('// </auto-generated>');
         this.writeLine();
+        this.writeLine('@file:Suppress(');
+        this.writeLine('    "RedundantVisibilityModifier",');
+        this.writeLine('    "RedundantExplicitType",');
+        this.writeLine('    "RedundantUnitReturnType",');
+        this.writeLine('    "RemoveRedundantQualifierName",');
+        this.writeLine('    "RemoveExplicitTypeArguments",');
+        this.writeLine('    "MemberVisibilityCanBePrivate",');
+        this.writeLine('    "MoveLambdaOutsideParentheses",');
+        this.writeLine('    "MayBeConstant",');
+        this.writeLine('    "UnusedImport",');
+        this.writeLine('    "CanBeVal",');
+        this.writeLine('    "CascadeIf",');
+        this.writeLine('    "NON_EXHAUSTIVE_WHEN",');
+        this.writeLine('    "UNNECESSARY_NOT_NULL_ASSERTION"');
+        this.writeLine(')');
         this.writeLine(`package ${sourceFile.namespace.namespace}`);
 
         for (const using of sourceFile.usings) {
@@ -108,19 +123,40 @@ export default class KotlinAstPrinter {
 
     private writeParameter(p: cs.ParameterDeclaration) {
         if (p.params) {
-            this.write('params ');
+            this.write('vararg ');
         }
-        
-        this.write(` ${p.name}`);
+
+        this.write(`${p.name}`);
         if (p.type) {
             this.write(': ');
-            this.writeType(p.type, false, p.params);
+            if (p.params) {
+                this.writeType((p.type as cs.ArrayTypeNode).elementType, false, false);
+            } else {
+                this.writeType(p.type, false);
+            }
         }
         if (p.initializer) {
             this.write(' = ');
             this.writeExpression(p.initializer);
         } else if (p.type && p.type.isOptional) {
-            this.write(' = default');
+            if (p.type.nodeType === cs.SyntaxKind.PrimitiveTypeNode) {
+                switch ((p.type as cs.PrimitiveTypeNode).type) {
+                    case cs.PrimitiveType.Bool:
+                        this.write(' = false');
+                        break;
+                    case cs.PrimitiveType.Double:
+                        this.write(' = 0.0');
+                        break;
+                    case cs.PrimitiveType.Int:
+                        this.write(' = 0');
+                        break;
+                    default:
+                        this.write(' = null');
+                        break;
+                }
+            } else {
+                this.write(' = null');
+            }
         }
     }
 
@@ -152,22 +188,39 @@ export default class KotlinAstPrinter {
     private writeEnumDeclaration(d: cs.EnumDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
-        this.write(`enum class ${d.name}`);
+        this.write(`enum class ${d.name}(val value: Int)`);
         this.writeLine();
         this.beginBlock();
 
-        d.members.forEach(m => this.writeEnumMember(m));
+        let currentEnumValue = 0;
+
+        this._forceInteger = true;
+        for (let i = 0; i < d.members.length; i++) {
+            let m = d.members[i];
+            this.writeDocumentation(m);
+            this.write(m.name);
+            if (m.initializer) {
+                this.write('(');
+                this.writeExpression(m.initializer);
+                this.write(')');
+            } else {
+                this.write('(');
+                this.write(currentEnumValue.toString());
+                this.write(')');
+
+            }
+            this.writeLine(',');
+
+            currentEnumValue++;
+        }
+        this._forceInteger = false;
+
 
         this.endBlock();
     }
+
     private writeEnumMember(m: cs.EnumMember): void {
-        this.writeDocumentation(m);
-        this.write(m.name);
-        if (m.initializer) {
-            this.write(' = ');
-            this.writeExpression(m.initializer);
-        }
-        this.writeLine(',');
+
     }
 
     private writeClassDeclaration(d: cs.ClassDeclaration) {
@@ -175,15 +228,11 @@ export default class KotlinAstPrinter {
         this.writeAttributes(d);
         this.writeVisibility(d.visibility);
 
-        if (d.partial) {
-            this.write('partial ');
-        }
-
         if (d.isAbstract) {
             this.write('abstract ');
         }
 
-        this.write(`class ${d.name}`);
+        this.write(`open class ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
 
         if (d.baseClass) {
@@ -219,15 +268,16 @@ export default class KotlinAstPrinter {
             }
         });
 
-        this.write('companion object');
-        this.beginBlock();
+        if (statics.length > 0) {
+            this.write('companion object');
+            this.beginBlock();
 
-        statics.forEach(s => {
-            this.writeMember(s);
-        })
+            statics.forEach(s => {
+                this.writeMember(s);
+            })
 
-        this.endBlock();
-
+            this.endBlock();
+        }
 
         if (d.baseClass && !hasConstuctor) {
             let baseClass: cs.TypeReferenceType | undefined = d;
@@ -363,13 +413,15 @@ export default class KotlinAstPrinter {
             this.write('abstract ');
         }
 
+        if (d.isVirtual) {
+            this.write('open ');
+        }
+
         if (d.isOverride) {
             this.write('override ');
         }
 
-        this.write('fun ');
-
-        this.write(` ${d.name}`);
+        this.write(`fun ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
         this.writeParameters(d.parameters);
         this.writeTypeParameterConstraints(d.typeParameters);
@@ -389,7 +441,7 @@ export default class KotlinAstPrinter {
         } else {
             this.writeType(d.returnType);
         }
-        
+
         this.writeBody(d.body);
     }
 
@@ -415,11 +467,12 @@ export default class KotlinAstPrinter {
                 this.writeLine();
                 this.writeBlock(body as cs.Block);
             } else {
-                this.write(' => ');
+                this.write(' = ');
                 this.writeExpression(body as cs.Expression);
+                this.writeLine();
             }
         } else {
-            this.writeLine(';');
+            this.writeLine();
         }
     }
 
@@ -429,13 +482,13 @@ export default class KotlinAstPrinter {
         if (d.isStatic) {
             this.write('static ')
         }
-        this.write(`${(d.parent as cs.ClassDeclaration).name}`);
+        this.write(`constructor`);
         this.writeParameters(d.parameters);
 
         if (d.baseConstructorArguments) {
             this.writeLine();
             this._indent++;
-            this.write(': base (');
+            this.write(': super(');
             this.writeCommaSeparated(d.baseConstructorArguments, e => this.writeExpression(e));
             this.write(')');
             this._indent--;
@@ -447,6 +500,9 @@ export default class KotlinAstPrinter {
     private writePropertyDeclaration(d: cs.PropertyDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
+
+        const isAutoProperty = this.isAutoProperty(d);
+        const isLateInit = this.isLateInit(d);
 
         const writeAsField = this.writePropertyAsField(d);
 
@@ -461,21 +517,56 @@ export default class KotlinAstPrinter {
                 this.write('override ');
             }
 
-            this.write('var ');
+            if (isLateInit) {
+                this.write('lateinit ');
+            }
+
+            if (!isAutoProperty && !d.setAccessor) {
+                this.write('val ');
+            } else {
+                this.write('var ');
+            }
         }
 
-        this.write(` ${d.name}: `);
+        this.write(`${d.name}: `);
         this.writeType(d.type);
 
-
-        if (d.initializer) {
+        if (d.initializer && !isLateInit) {
             this.write(' = ');
             this.writeExpression(d.initializer);
             this.writeLine();
         } else if (writeAsField) {
             this.writeLine();
         }
+
+        if (!writeAsField && !isAutoProperty) {
+            this.writeLine();
+
+            if (d.getAccessor) {
+                this.writePropertyAccessor(d.getAccessor);
+            }
+
+            if (d.setAccessor) {
+                this.writePropertyAccessor(d.setAccessor);
+            }
+        }
     }
+    private isLateInit(d: cs.PropertyDeclaration) {
+        return d.initializer &&
+            d.initializer.nodeType === cs.SyntaxKind.NonNullExpression &&
+            (d.initializer as cs.NonNullExpression).expression.nodeType === cs.SyntaxKind.NullLiteral;
+    }
+
+    private isAutoProperty(d: cs.PropertyDeclaration) {
+        if (d.getAccessor && d.getAccessor.body) {
+            return false;
+        }
+        if (d.setAccessor && d.setAccessor.body) {
+            return false;
+        }
+        return true;
+    }
+
     private canBeConstant(d: cs.PropertyDeclaration): boolean {
         return (
             d.isStatic &&
@@ -496,6 +587,11 @@ export default class KotlinAstPrinter {
 
     private writePropertyAccessor(accessor: cs.PropertyAccessorDeclaration) {
         this.write(accessor.keyword);
+        if (accessor.keyword === 'set') {
+            this.write('(value)');
+        } else {
+            this.write("()")
+        }
         this.writeBody(accessor.body);
     }
 
@@ -543,7 +639,7 @@ export default class KotlinAstPrinter {
                             this.write('Boolean');
                             break;
                         case cs.PrimitiveType.Dynamic:
-                            this.write('Object');
+                            this.write('Any');
                             break;
                         case cs.PrimitiveType.Double:
                             this.write('Double');
@@ -552,13 +648,13 @@ export default class KotlinAstPrinter {
                             this.write('Int');
                             break;
                         case cs.PrimitiveType.Object:
-                            this.write('Object');
+                            this.write('Any');
                             break;
                         case cs.PrimitiveType.String:
                             this.write('String');
                             break;
                         case cs.PrimitiveType.Void:
-                            this.write('Void');
+                            this.write('Unit');
                             break;
                         case cs.PrimitiveType.Var:
                             this.write('var');
@@ -570,18 +666,19 @@ export default class KotlinAstPrinter {
             case cs.SyntaxKind.ArrayTypeNode:
                 const arrayType = type as cs.ArrayTypeNode;
                 if (asNativeArray) {
+                    this.write('Array<')
                     this.writeType(arrayType.elementType);
-                    this.write('[]');
+                    this.write('>');
                 } else {
                     const isDynamicArray = arrayType.elementType.nodeType == cs.SyntaxKind.PrimitiveTypeNode
                         && (arrayType.elementType as cs.PrimitiveTypeNode).type == cs.PrimitiveType.Dynamic;
                     if (isDynamicArray && !forNew) {
-                        this.write('System.Collections.IList');
+                        this.write('kotlin.collections.MutableList');
                     } else {
                         if (forNew) {
-                            this.write('System.Collections.Generic.List<');
+                            this.write('kotlin.collections.ArrayList<');
                         } else {
-                            this.write('System.Collections.Generic.IList<');
+                            this.write('kotlin.collections.MutableList<');
                         }
                         this.writeType(arrayType.elementType);
                         this.write('>');
@@ -746,11 +843,9 @@ export default class KotlinAstPrinter {
     }
 
     private writeTypeOfExpression(expr: cs.TypeOfExpression) {
-        this.write('typeof');
         if (expr.expression) {
-            this.write('(');
             this.writeExpression(expr.expression);
-            this.write(')');
+            this.write('::class');
         }
     }
 
@@ -792,32 +887,95 @@ export default class KotlinAstPrinter {
     private writeBinaryExpression(expr: cs.BinaryExpression) {
         this.writeExpression(expr.left);
         this.write(' ');
-        this.write(expr.operator);
+        switch (expr.operator) {
+            case '??':
+                this.write('?:');
+                break;
+            case '&':
+                this.write('and');
+                break;
+            case '|':
+                this.write('or');
+                break;
+            case '^':
+                this.write('xor');
+                break;
+            case '<<':
+                this.write('shl');
+                break;
+            case '>>':
+                this.write('shr');
+                break;
+            default:
+                this.write(expr.operator);
+                break;
+        }
         this.write(' ');
         this.writeExpression(expr.right);
     }
 
     private writeConditionalExpression(expr: cs.ConditionalExpression) {
+        this.write('if(')
         this.writeExpression(expr.condition);
-        this.write(' ? ');
+        this.write(')  ');
         this.writeExpression(expr.whenTrue);
-        this.write(' : ');
+        this.write(' else ');
         this.writeExpression(expr.whenFalse);
     }
 
     private writeLambdaExpression(expr: cs.LambdaExpression) {
-        this.write('(');
+        this.write('{');
         this.writeCommaSeparated(expr.parameters, p => this.writeParameter(p));
-        this.write(') => ');
+        if (expr.parameters.length > 0) {
+            this.write(' -> ');
+        }
         if (expr.body.nodeType === cs.SyntaxKind.Block) {
             this.writeBlock(expr.body as cs.Block);
         } else {
             this.writeExpression(expr.body);
         }
+        this.write("}")
     }
 
     private writeNumericLiteral(expr: cs.NumericLiteral) {
         this.write(expr.value);
+        let shouldWriteSuffix = false;
+        if (!this._forceInteger && expr.parent) {
+            shouldWriteSuffix = expr.value.indexOf('.') === -1;
+            switch (expr.parent.nodeType) {
+                case cs.SyntaxKind.PropertyDeclaration:
+                case cs.SyntaxKind.FieldDeclaration:
+                case cs.SyntaxKind.VariableDeclaration:
+                case cs.SyntaxKind.ConditionalExpression:
+                    break;
+                case cs.SyntaxKind.PrefixUnaryExpression:
+                    switch ((expr.parent as cs.PrefixUnaryExpression).operator) {
+                        case '~':
+                            shouldWriteSuffix = false;
+                            break;
+                    }
+                    break;
+                case cs.SyntaxKind.BinaryExpression:
+                    switch ((expr.parent as cs.BinaryExpression).operator) {
+                        case '<<':
+                        case '>>':
+                        case '<':
+                        case '>':
+                        case '<=':
+                        case '>=':
+                        case '|':
+                        case '^':
+                        case '&':
+                            shouldWriteSuffix = false;
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        if (shouldWriteSuffix) {
+            this.write('.0');
+        }
     }
 
     private writeStringTemplateExpression(expr: cs.StringTemplateExpression) {
@@ -860,7 +1018,6 @@ export default class KotlinAstPrinter {
 
     private writeArrayCreationExpression(expr: cs.ArrayCreationExpression) {
         if (expr.type) {
-            this.write('new ');
             this.writeType(expr.type, true);
             if (expr.values) {
                 if (expr.values.length > 0) {
@@ -884,7 +1041,7 @@ export default class KotlinAstPrinter {
             }
         }
         else if (expr.values && expr.values.length > 0) {
-            this.write('AlphaTab.Core.TypeHelper.CreateList(');
+            this.write('listOf(');
             this.writeCommaSeparated(expr.values, v => {
                 if (expr.values!.length > 10) {
                     this.writeLine();
@@ -899,7 +1056,17 @@ export default class KotlinAstPrinter {
 
     private writeMemberAccessExpression(expr: cs.MemberAccessExpression) {
         this.writeExpression(expr.expression);
-        this.write(expr.nullSafe ? '?.' : '.');
+        if (expr.nullSafe) {
+            this.write('?.');
+        } else if (expr.tsSymbol && this._context.isStaticSymbol(expr.tsSymbol)) {
+            this.write('.');
+        } else if (expr.expression.nodeType == cs.SyntaxKind.NonNullExpression ||
+            expr.expression.nodeType === cs.SyntaxKind.Identifier ||
+            expr.expression.nodeType === cs.SyntaxKind.ThisLiteral) {
+            this.write('.');
+        } else {
+            this.write('!!.');
+        }
         const name = this._context.getSymbolName(expr) ?? expr.member;
         this.write(name);
     }
@@ -922,6 +1089,9 @@ export default class KotlinAstPrinter {
 
     private writeElementAccessExpression(expr: cs.ElementAccessExpression) {
         this.writeExpression(expr.expression);
+        if (expr.expression.nodeType !== cs.SyntaxKind.NonNullExpression) {
+            this.write('!!')
+        }
         this.write('[');
         this.writeExpression(expr.argumentExpression);
         this.write(']');
@@ -940,7 +1110,6 @@ export default class KotlinAstPrinter {
     }
 
     private writeNewExpression(expr: cs.NewExpression) {
-        this.write('new ');
         this.writeType(expr.type, true);
         this.write('(');
         this.writeCommaSeparated(expr.arguments, a => this.writeExpression(a));
@@ -948,17 +1117,33 @@ export default class KotlinAstPrinter {
     }
 
     private writeCastExpression(expr: cs.CastExpression) {
+        if (expr.type.nodeType === cs.SyntaxKind.PrimitiveTypeNode) {
+            switch ((expr.type as cs.PrimitiveTypeNode).type) {
+                case cs.PrimitiveType.String:
+                    this.writeExpression(expr.expression);
+                    this.write('.toString()')
+                    return;
+                case cs.PrimitiveType.Double:
+                    this.writeExpression(expr.expression);
+                    this.write('.toDouble()')
+                    return;
+                case cs.PrimitiveType.Int:
+                    this.writeExpression(expr.expression);
+                    this.write('.toInt()')
+                    return;
+            }
+        }
+
         this.write('(');
         this.writeExpression(expr.expression);
         this.write(' as ');
         this.writeType(expr.type);
         this.write(')');
-
     }
 
     private writeNonNullExpression(expr: cs.NonNullExpression) {
         this.writeExpression(expr.expression);
-        this.write('!');
+        this.write('!!');
     }
 
     private writeNullSafeExpression(expr: cs.NullSafeExpression) {
@@ -1039,9 +1224,9 @@ export default class KotlinAstPrinter {
 
     private writeCatchClause(c: cs.CatchClause): void {
         this.write('catch (');
-        this.writeType(c.variableDeclaration.type);
-        this.write(' ');
         this.write(c.variableDeclaration.name);
+        this.write(': ');
+        this.writeType(c.variableDeclaration.type);
         this.writeLine(')');
         this.writeBlock(c.block);
     }
@@ -1056,7 +1241,7 @@ export default class KotlinAstPrinter {
     }
 
     private writeSwitchStatement(s: cs.SwitchStatement) {
-        this.write('switch (');
+        this.write('when (');
         this.writeExpression(s.expression);
         this.writeLine(')');
         this.beginBlock();
@@ -1072,20 +1257,36 @@ export default class KotlinAstPrinter {
         this.endBlock();
     }
 
+    private getCaseClauseStatements(stmt: cs.Statement[]): cs.Statement[] {
+        if (stmt.length === 1 && stmt[0].nodeType === cs.SyntaxKind.Block) {
+            stmt = (stmt[0] as cs.Block).statements;
+        }
+        stmt = stmt.slice();
+        if (stmt[stmt.length - 1].nodeType === cs.SyntaxKind.BreakStatement) {
+            stmt.pop();
+        }
+        return stmt;
+    }
+
     private writeCaseClause(c: cs.CaseClause) {
-        this.write('case ');
         this.writeExpression(c.expression);
-        this.writeLine(':');
-        this._indent++;
-        c.statements.forEach(s => this.writeStatement(s));
-        this._indent--;
+        if (c.statements.length === 0) {
+            this.write(', ');
+            return;
+        }
+
+        this.writeLine(' -> ');
+        this.beginBlock();
+
+        this.getCaseClauseStatements(c.statements).forEach(s => this.writeStatement(s));
+        this.endBlock();
     }
 
     private writeDefaultClause(c: cs.DefaultClause) {
-        this.writeLine('default:');
-        this._indent++;
-        c.statements.forEach(s => this.writeStatement(s));
-        this._indent--;
+        this.writeLine('else -> ');
+        this.beginBlock();
+        this.getCaseClauseStatements(c.statements).forEach(s => this.writeStatement(s));
+        this.endBlock();
     }
 
     private writeReturnStatement(r: cs.ReturnStatement) {
@@ -1094,21 +1295,21 @@ export default class KotlinAstPrinter {
             this.write(' ');
             this.writeExpression(r.expression);
         }
-        this.writeLine(';');
+        this.writeLine();
     }
 
     private writeContinueStatement(_: cs.ContinueStatement) {
-        this.writeLine('continue;');
+        this.writeLine('continue');
     }
 
     private writeBreakStatement(_: cs.BreakStatement) {
-        this.writeLine('break;');
+        this.writeLine('break');
     }
 
     private writeForEachStatement(s: cs.ForEachStatement) {
-        this.write('foreach (');
+        this.write('for (');
         if (s.initializer.nodeType === cs.SyntaxKind.VariableDeclarationList) {
-            this.writeVariableDeclarationList(s.initializer as cs.VariableDeclarationList);
+            this.write((s.initializer as cs.VariableDeclarationList).declarations[0].name);
         } else {
             this.writeExpression(s.initializer as cs.Expression);
         }
@@ -1126,7 +1327,10 @@ export default class KotlinAstPrinter {
     }
 
     private writeForStatement(s: cs.ForStatement) {
-        this.write('for (');
+        // TODO: detect simple range loops
+        this.write('run ');
+        this.beginBlock()
+
         if (s.initializer) {
             if (s.initializer.nodeType === cs.SyntaxKind.VariableDeclarationList) {
                 this.writeVariableDeclarationList(s.initializer as cs.VariableDeclarationList);
@@ -1134,25 +1338,37 @@ export default class KotlinAstPrinter {
                 this.writeExpression(s.initializer as cs.Expression);
             }
         }
-        this.write(';');
+        this.writeLine();
 
+        this.write('while(')
         if (s.condition) {
             this.writeExpression(s.condition);
         }
-        this.write(';');
+        this.write(')')
+        this.beginBlock();
 
-        if (s.incrementor) {
-            this.writeExpression(s.incrementor);
-        }
-        this.writeLine(')');
+        this.write('try')
+        this.beginBlock();
 
         if (s.statement.nodeType === cs.SyntaxKind.Block) {
-            this.writeStatement(s.statement);
+            for (const stmt of (s.statement as cs.Block).statements) {
+                this.writeStatement(stmt);
+            }
         } else {
             this._indent++;
             this.writeStatement(s.statement);
             this._indent--;
         }
+        this.endBlock();
+        this.write('finally');
+        this.beginBlock();
+        if (s.incrementor) {
+            this.writeExpression(s.incrementor);
+            this.writeLine();
+        }
+        this.endBlock();
+        this.endBlock();
+        this.endBlock();
     }
 
     private writeWhileStatement(s: cs.WhileStatement) {
@@ -1205,24 +1421,17 @@ export default class KotlinAstPrinter {
     }
     private writeExpressionStatement(s: cs.ExpressionStatement) {
         this.writeExpression(s.expression);
-        this.writeLine(';');
+        this.writeLine();
     }
 
     private writeVariableStatement(v: cs.VariableStatement) {
         this.writeVariableDeclarationList(v.declarationList);
-        this.writeLine(';');
+        this.writeLine();
     }
 
     private writeVariableDeclarationList(declarationList: cs.VariableDeclarationList) {
-        this.writeType(declarationList.declarations[0].type);
-
         declarationList.declarations.forEach((d, i) => {
-            if (i === 0) {
-                this.write(' ');
-            } else {
-                this.write(', ');
-            }
-
+            this.write("var ");
             if (d.deconstructNames) {
                 this.write('(');
                 d.deconstructNames.forEach((v, i) => {
@@ -1236,10 +1445,18 @@ export default class KotlinAstPrinter {
                 this.write(d.name);
             }
 
+            if (d.type.nodeType !== cs.SyntaxKind.PrimitiveTypeNode ||
+                (d.type as cs.PrimitiveTypeNode).type !== cs.PrimitiveType.Var) {
+                this.write(': ')
+                this.writeType(d.type);
+            }
+
             if (d.initializer) {
                 this.write(' = ');
                 this.writeExpression(d.initializer);
             }
+
+            this.writeLine();
         });
     }
 
@@ -1271,9 +1488,7 @@ export default class KotlinAstPrinter {
     }
 
     private writeImport(using: cs.UsingDeclaration) {
-        if (using.namespaceOrTypeName != 'system') {
-            this.writeLine(`import ${using.namespaceOrTypeName}.*`);
-        }
+        this.writeLine(`import ${using.namespaceOrTypeName}.*`);
     }
 
     private writeLine(txt?: string) {

@@ -1,16 +1,16 @@
 import * as ts from 'typescript';
-import CSharpAstTransformer from '../csharp/CSharpAstTransformer';
 import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 import KotlinAstPrinter from './KotlinAstPrinter';
+import KotlinAstTransformer from './KotlinAstTransformer';
+import KotlinEmitterContext from './KotlinEmitterContext';
 
 export default function emit(program: ts.Program, diagnostics: ts.Diagnostic[]) {
-    const context = new CSharpEmitterContext(program);
-    context.noPascalCase = true;
+    const context = new KotlinEmitterContext(program);
     
     console.log('[Kotlin] Transforming to Kotlin AST');
     program.getRootFileNames().forEach(file => {
         const sourceFile = program.getSourceFile(file)!;
-        const transformer = new CSharpAstTransformer(sourceFile, context);
+        const transformer = new KotlinAstTransformer(sourceFile, context);
         transformer.transform();
     });
 

@@ -184,11 +184,12 @@ class FontParser {
         let ambiguous: string[] = [];
 
         while (true) {
-            switch (this._currentToken?.text) {
+            let text:string|undefined= this._currentToken?.text;
+            switch (text) {
                 // ambiguous
                 case 'normal':
                 case 'inherit':
-                    ambiguous.push(this._currentToken?.text);
+                    ambiguous.push(text);
                     valuesNeeded--;
                     this.nextToken();
                     break;
@@ -196,14 +197,14 @@ class FontParser {
                 // style
                 case 'italic':
                 case 'oblique':
-                    this.style = this._currentToken?.text;
+                    this.style = text;
                     hasStyle = true;
                     valuesNeeded--;
                     this.nextToken();
                     break;
                 // variant
                 case 'small-caps':
-                    this.variant = this._currentToken?.text;
+                    this.variant = text;
                     hasVariant = true;
                     valuesNeeded--;
                     this.nextToken();
@@ -222,7 +223,7 @@ class FontParser {
                 case '700':
                 case '800':
                 case '900':
-                    this.weight = this._currentToken?.text;
+                    this.weight = text;
                     hasWeight = true;
                     valuesNeeded--;
                     this.nextToken();
@@ -298,11 +299,11 @@ export class Font {
     public style: FontStyle;
 
     public get isBold(): boolean {
-        return (this.style & FontStyle.Bold) !== 0;
+        return (this.style & FontStyle.Bold) === FontStyle.Bold;
     }
 
     public get isItalic(): boolean {
-        return (this.style & FontStyle.Italic) !== 0;
+        return (this.style & FontStyle.Italic) === FontStyle.Italic;
     }
 
     /**

@@ -14,7 +14,7 @@ export default class CSharpEmitterContext {
     private _unresolvedTypeNodes: cs.UnresolvedTypeNode[] = [];
     private _program: ts.Program;
     public typeChecker: ts.TypeChecker;
-    public noPascalCase:boolean = false;
+    public noPascalCase: boolean = false;
 
     public csharpFiles: cs.SourceFile[] = [];
     public get compilerOptions(): ts.CompilerOptions {
@@ -64,14 +64,14 @@ export default class CSharpEmitterContext {
                 return this.buildCoreNamespace(expr.tsSymbol) + expr.tsSymbol.name;
             } else if (expr.tsSymbol.flags & ts.SymbolFlags.Function) {
                 if (this.isTestFunction(expr.tsSymbol)) {
-                    return 'AlphaTab.Test.Globals.' + this.toPascalCase(expr.tsSymbol.name);
+                    return this.toPascalCase('alphaTab.test') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
                 }
-                return 'AlphaTab.Core.Globals.' + this.toPascalCase(expr.tsSymbol.name);
+                return this.toPascalCase('alphaTab.core') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
             } else if (
                 (expr.tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable && this.isGlobalVariable(expr.tsSymbol)) ||
                 (expr.tsSymbol.flags & ts.SymbolFlags.NamespaceModule && this.isKnownModule(expr.tsSymbol))
             ) {
-                return 'AlphaTab.Core.Globals.' + this.toPascalCase(expr.tsSymbol.name);
+                return this.toPascalCase('alphaTab.core') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
             }
         }
         return undefined;
@@ -476,7 +476,7 @@ export default class CSharpEmitterContext {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: node.parent,
                 tsNode: node.tsNode,
-                reference: 'System.Action',
+                reference: this.toPascalCase('system') + '.Action',
                 typeArguments: parameterTypes
             } as cs.TypeReference;
         } else {
@@ -485,7 +485,7 @@ export default class CSharpEmitterContext {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: node.parent,
                 tsNode: node.tsNode,
-                reference: 'System.Func',
+                reference: this.toPascalCase('system') + '.Func',
                 typeArguments: parameterTypes
             } as cs.TypeReference;
         }
@@ -569,7 +569,7 @@ export default class CSharpEmitterContext {
             isOptional: isOptional
         } as cs.TypeReference;
     }
-    
+
     private isNodeEmitted(node: cs.Node): boolean {
         if ('skipEmit' in node && node.skipEmit as boolean) {
             return false;
@@ -732,6 +732,23 @@ export default class CSharpEmitterContext {
         return null;
     }
 
+    public makeTypeName(tsName: string): string {
+        const parts = tsName.split('.');
+        let result = '';
+        for (let i = 0; i < parts.length; i++) {
+            if (i > 0) {
+                result += '.';
+            }
+            if (i === parts.length - 1) {
+                result += parts[i];
+            } else {
+                result += this.toPascalCase(parts[i]);
+            }
+        }
+        return result;
+    }
+
+
     private buildCoreNamespace(aliasSymbol: ts.Symbol) {
         let suffix = '';
         for (const decl of aliasSymbol.declarations) {
@@ -741,21 +758,21 @@ export default class CSharpEmitterContext {
                 if (fileName.length) {
                     suffix = fileName.split('.').map(s => {
                         if (s.match(/es[0-9]{4}/)) {
-                            return '.EcmaScript';
+                            return '.' + this.toPascalCase('ecmaScript');
                         }
                         if (s.match(/es[0-9]{1}/)) {
-                            return '.EcmaScript';
+                            return '.' + this.toPascalCase('ecmaScript');
                         }
                         return '.' + this.toPascalCase(s);
                     })[0];
                 }
             }
         }
-        return `AlphaTab.Core${suffix}.`;
+        return this.makeTypeName('alphaTab.core') + suffix + ".";
     }
 
     public toPascalCase(text: string): string {
-        if(this.noPascalCase) {
+        if (this.noPascalCase) {
             return text;
         }
 
@@ -941,6 +958,41 @@ export default class CSharpEmitterContext {
         );
     }
 
+    public isNonNullSmartCast(expression: ts.Expression): boolean {
+        // if the parent is already casting, we have no "smart" cast.
+        if (expression.parent.kind === ts.SyntaxKind.AsExpression ||
+            (ts.isBinaryExpression(expression.parent) && expression.parent.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken)) {
+            return false;
+        }
+
+        let contextualType = this.typeChecker.getContextualType(expression);
+        if (!contextualType) {
+            return false;
+        }
+
+        // we consider the expression as smart casted if the declared symbol has a different
+        // contextual type than the declared type.
+        let symbol = this.typeChecker.getSymbolAtLocation(expression);
+        if (!symbol || !symbol.declarations || symbol.declarations.length === 0) {
+            return false;
+        }
+
+        if (symbol.flags & ts.SymbolFlags.Alias) {
+            symbol = this.typeChecker.getAliasedSymbol(symbol);
+        }
+
+        if (symbol.flags & ts.SymbolFlags.Interface || symbol.flags & ts.SymbolFlags.Class) {
+            return false;
+        }
+
+        let declaredType = this.typeChecker.getTypeAtLocation(symbol.declarations[0]);
+        if (!this.isNullableType(declaredType)) {
+            return false;
+        }
+
+        return contextualType == this.typeChecker.getNonNullableType(declaredType);
+    }
+
     public getSmartCastType(expression: ts.Expression): ts.Type | null {
         // if the parent is already casting, we have no "smart" cast.
         if (expression.parent.kind === ts.SyntaxKind.AsExpression) {
@@ -1022,6 +1074,12 @@ export default class CSharpEmitterContext {
             }
         }
 
+        // enum literal to same enum type
+        if (contextualType.flags & ts.TypeFlags.EnumLiteral &&
+            (declaredType.symbol as any)?.parent == contextualType.symbol) {
+            return null;
+        }
+
         return contextualType !== declaredType && !this.isTypeAssignable(contextualType, declaredType)
             ? contextualTypeNullable
             : null;
@@ -1083,20 +1141,25 @@ export default class CSharpEmitterContext {
             return false;
         }
 
-        if (this.hasAnyBaseTypeClassMember(classType, classElement.name!.getText())) {
+        if (this.isClassElementOverride(classType, classElement)) {
             return true;
         }
 
         return false;
     }
-    private hasAnyBaseTypeClassMember(classType: ts.InterfaceType, memberName: string) {
+
+    protected isClassElementOverride(classType: ts.InterfaceType, classElement: ts.ClassElement) {
+        return this.hasAnyBaseTypeClassMember(classType, classElement.name!.getText());
+    }
+
+    protected hasAnyBaseTypeClassMember(classType: ts.InterfaceType, memberName: string, allowInterfaces: boolean = false) {
         const baseTypes = classType.getBaseTypes();
         if (!baseTypes) {
             return false;
         }
 
         for (const baseType of baseTypes) {
-            if (baseType.isClass() && this.hasClassMember(baseType, memberName)) {
+            if ((allowInterfaces && baseType.isClassOrInterface() || baseType.isClass()) && this.hasClassMember(baseType, memberName)) {
                 return true;
             }
         }
@@ -1104,7 +1167,7 @@ export default class CSharpEmitterContext {
         return false;
     }
 
-    private hasClassMember(baseType: ts.InterfaceType, name: string): boolean {
+    protected hasClassMember(baseType: ts.InterfaceType, name: string): boolean {
         if (
             baseType.symbol &&
             baseType.symbol.members &&
@@ -1247,9 +1310,10 @@ export default class CSharpEmitterContext {
     }
 
     public isStaticSymbol(tsSymbol: ts.Symbol) {
-        return !!tsSymbol.declarations.find(d => d.modifiers &&
-            !!d.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)
-        );
+        return (tsSymbol.flags & ts.SymbolFlags.EnumMember) !== 0 ||
+            !!tsSymbol.declarations.find(d => d.modifiers &&
+                !!d.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)
+            );
     }
 
     public isNullableString(type: ts.Type) {

@@ -4,10 +4,10 @@ import * as path from 'path';
 import CSharpEmitterContext from './CSharpEmitterContext';
 
 export default class CSharpAstTransformer {
-    private _typeScriptFile: ts.SourceFile;
-    private _csharpFile: cs.SourceFile;
-    private _context: CSharpEmitterContext;
-    private _declarationOrAssignmentTypeStack: ts.Type[] = [];
+    protected _typeScriptFile: ts.SourceFile;
+    protected _csharpFile: cs.SourceFile;
+    protected _context: CSharpEmitterContext;
+    protected _declarationOrAssignmentTypeStack: ts.Type[] = [];
 
     public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
         this._typeScriptFile = typeScript;
@@ -241,7 +241,7 @@ export default class CSharpAstTransformer {
                 folders.shift();
             }
             this._csharpFile.namespace.namespace =
-                this._context.toPascalCase('alphaTab') + folders.map(f => '.' + f.substr(0, 1).toUpperCase() + f.substr(1)).join('');
+                this._context.toPascalCase('alphaTab') + folders.map(f => '.' + this._context.toPascalCase(f)).join('');
 
             if (defaultExport) {
                 this.visit(
@@ -261,7 +261,7 @@ export default class CSharpAstTransformer {
         }
     }
 
-    private isDefaultExport(s: ts.NamedDeclaration): boolean {
+    protected isDefaultExport(s: ts.NamedDeclaration): boolean {
         const isDefaultExport = s.modifiers && !!s.modifiers.find(m => m.kind === ts.SyntaxKind.DefaultKeyword);
         if (isDefaultExport) {
             return true;
@@ -276,7 +276,7 @@ export default class CSharpAstTransformer {
         return false;
     }
 
-    private visit(
+    protected visit(
         node: ts.Node,
         additionalNestedExportDeclarations?: ts.Declaration[],
         additionalNestedNonExportsDeclarations?: ts.Declaration[],
@@ -304,7 +304,7 @@ export default class CSharpAstTransformer {
         return node;
     }
 
-    private shouldSkip(node: ts.Node, checkComments: boolean) {
+    protected shouldSkip(node: ts.Node, checkComments: boolean) {
         if (checkComments) {
             const text = node.getSourceFile().text;
             // check for /*@target web*/ marker
@@ -321,7 +321,7 @@ export default class CSharpAstTransformer {
         return false;
     }
 
-    private visitEnumDeclaration(node: ts.EnumDeclaration) {
+    protected visitEnumDeclaration(node: ts.EnumDeclaration) {
         const csEnum: cs.EnumDeclaration = {
             visibility: cs.Visibility.Public,
             name: node.name.text,
@@ -344,7 +344,7 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csEnum);
     }
 
-    private visitEnumMember(parent: cs.EnumDeclaration, enumMember: ts.EnumMember) {
+    protected visitEnumMember(parent: cs.EnumDeclaration, enumMember: ts.EnumMember) {
         const csEnumMember: cs.EnumMember = {
             parent: parent,
             tsNode: enumMember,
@@ -365,11 +365,11 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csEnumMember);
     }
 
-    private visitTypeAliasDeclaration(node: ts.TypeAliasDeclaration) {
+    protected visitTypeAliasDeclaration(node: ts.TypeAliasDeclaration) {
         //throw new Error("Method not implemented.");
     }
 
-    private visitInterfaceDeclaration(node: ts.InterfaceDeclaration) {
+    protected visitInterfaceDeclaration(node: ts.InterfaceDeclaration) {
         let extendsClauses: ts.ExpressionWithTypeArguments[] = [];
 
         node.heritageClauses?.forEach(c => {
@@ -419,7 +419,7 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csInterface);
     }
 
-    private visitTypeParameterDeclaration(parent: cs.Node, p: ts.TypeParameterDeclaration): cs.TypeParameterDeclaration {
+    protected visitTypeParameterDeclaration(parent: cs.Node, p: ts.TypeParameterDeclaration): cs.TypeParameterDeclaration {
         const csTypeParameter: cs.TypeParameterDeclaration = {
             nodeType: cs.SyntaxKind.TypeParameterDeclaration,
             name: p.name.text,
@@ -435,7 +435,7 @@ export default class CSharpAstTransformer {
         return csTypeParameter;
     }
 
-    private createUnresolvedTypeNode(
+    protected createUnresolvedTypeNode(
         parent: cs.Node | null,
         tsNode: ts.Node,
         tsType?: ts.Type,
@@ -466,7 +466,7 @@ export default class CSharpAstTransformer {
         return unresolved;
     }
 
-    private createVarTypeNode(
+    protected createVarTypeNode(
         parent: cs.Node | null,
         tsNode: ts.Node,
     ): cs.PrimitiveTypeNode {
@@ -538,7 +538,7 @@ export default class CSharpAstTransformer {
         this._csharpFile.namespace.declarations.push(csClass);
     }
 
-    private visitTestClassMethod(parent: cs.ClassDeclaration, d: ts.FunctionDeclaration) {
+    protected visitTestClassMethod(parent: cs.ClassDeclaration, d: ts.FunctionDeclaration) {
         const signature = this._context.typeChecker.getSignatureFromDeclaration(d);
         const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
 
@@ -572,7 +572,7 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csMethod);
     }
 
-    private visitTestMethod(parent: cs.ClassDeclaration, d: ts.CallExpression) {
+    protected visitTestMethod(parent: cs.ClassDeclaration, d: ts.CallExpression) {
         const csMethod: cs.MethodDeclaration = {
             parent: parent,
             nodeType: cs.SyntaxKind.MethodDeclaration,
@@ -618,7 +618,7 @@ export default class CSharpAstTransformer {
         parent.members.push(csMethod);
     }
 
-    private visitTestClassProperty(parent: cs.ClassDeclaration, s: ts.VariableStatement) {
+    protected visitTestClassProperty(parent: cs.ClassDeclaration, s: ts.VariableStatement) {
         s.declarationList.declarations.forEach(d => {
             const type = this._context.typeChecker.getTypeAtLocation(d.name);
             if (this._context.isFunctionType(type) && d.initializer && ts.isArrowFunction(d.initializer)) {
@@ -696,7 +696,7 @@ export default class CSharpAstTransformer {
         });
     }
 
-    private visitClassDeclaration(
+    protected visitClassDeclaration(
         node: ts.ClassDeclaration,
         additionalNestedExportDeclarations?: ts.Declaration[],
         additionalNestedNonExportsDeclarations?: ts.Declaration[],
@@ -791,7 +791,7 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csClass);
     }
 
-    private visitDocumentation(node: ts.Node): string | undefined {
+    protected visitDocumentation(node: ts.Node): string | undefined {
         let symbol = this._context.typeChecker.getSymbolAtLocation(node);
         if (!symbol) {
             return undefined;
@@ -842,7 +842,7 @@ export default class CSharpAstTransformer {
         return s;
     }
 
-    private visitClassElement(parent: cs.ClassDeclaration, classElement: ts.ClassElement) {
+    protected visitClassElement(parent: cs.ClassDeclaration, classElement: ts.ClassElement) {
         if (ts.isConstructorDeclaration(classElement)) {
             this.visitConstructorDeclaration(parent, classElement);
         } else if (ts.isMethodSignature(classElement)) {
@@ -866,7 +866,7 @@ export default class CSharpAstTransformer {
         }
     }
 
-    private visitInterfaceElement(parent: cs.InterfaceDeclaration, classElement: ts.TypeElement) {
+    protected visitInterfaceElement(parent: cs.InterfaceDeclaration, classElement: ts.TypeElement) {
         if (ts.isMethodSignature(classElement)) {
             this.visitMethodSignature(parent, classElement);
         } else if (ts.isPropertySignature(classElement)) {
@@ -880,7 +880,7 @@ export default class CSharpAstTransformer {
         }
     }
 
-    private visitPropertySignature(
+    protected visitPropertySignature(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.PropertySignature
     ) {
@@ -932,7 +932,7 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csProperty);
     }
 
-    private visitGetAccessor(parent: cs.ClassDeclaration, classElement: ts.GetAccessorDeclaration) {
+    protected visitGetAccessor(parent: cs.ClassDeclaration, classElement: ts.GetAccessorDeclaration) {
         const propertyName = this._context.toPascalCase(classElement.name.getText());
         const member = parent.members.find(m => m.name === propertyName);
         if (member && member.nodeType === cs.SyntaxKind.PropertyDeclaration) {
@@ -1003,7 +1003,7 @@ export default class CSharpAstTransformer {
         }
     }
 
-    private visitSetAccessor(parent: cs.ClassDeclaration, classElement: ts.SetAccessorDeclaration) {
+    protected visitSetAccessor(parent: cs.ClassDeclaration, classElement: ts.SetAccessorDeclaration) {
         const propertyName = this._context.toPascalCase(classElement.name.getText());
         const member = parent.members.find(m => m.name === propertyName);
         if (member && member.nodeType === cs.SyntaxKind.PropertyDeclaration) {
@@ -1074,7 +1074,7 @@ export default class CSharpAstTransformer {
         }
     }
 
-    private visitPropertyDeclaration(
+    protected visitPropertyDeclaration(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.PropertyDeclaration
     ) {
@@ -1170,7 +1170,7 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csProperty);
     }
 
-    private visitMethodDeclaration(
+    protected visitMethodDeclaration(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.MethodDeclaration
     ) {
@@ -1265,9 +1265,11 @@ export default class CSharpAstTransformer {
         parent.members.push(csMethod);
 
         this._context.registerSymbol(csMethod);
+
+        return csMethod;
     }
 
-    private visitStatement(parent: cs.Node, s: ts.Statement): cs.Statement | null {
+    protected visitStatement(parent: cs.Node, s: ts.Statement): cs.Statement | null {
         if (this.shouldSkip(s, true)) {
             return null;
         }
@@ -1321,14 +1323,14 @@ export default class CSharpAstTransformer {
         return {} as cs.ThrowStatement;
     }
 
-    private visitEmptyStatement(parent: cs.Node, s: ts.EmptyStatement) {
+    protected visitEmptyStatement(parent: cs.Node, s: ts.EmptyStatement) {
         return {
             nodeType: cs.SyntaxKind.EmptyStatement,
             parent: parent,
             tsNode: s
         } as cs.EmptyStatement;
     }
-    private visitDebuggerStatement(parent: cs.Node, s: ts.DebuggerStatement) {
+    protected visitDebuggerStatement(parent: cs.Node, s: ts.DebuggerStatement) {
         return {} as cs.ThrowStatement;
 
         // {
@@ -1339,7 +1341,7 @@ export default class CSharpAstTransformer {
         // } as cs.ExpressionStatement;
     }
 
-    private visitBlock(parent: cs.Node, block: ts.Block): cs.Block {
+    protected visitBlock(parent: cs.Node, block: ts.Block): cs.Block {
         const csBlock: cs.Block = {
             nodeType: cs.SyntaxKind.Block,
             parent: parent,
@@ -1357,7 +1359,7 @@ export default class CSharpAstTransformer {
         return csBlock;
     }
 
-    private visitVariableStatement(parent: cs.Node, s: ts.VariableStatement) {
+    protected visitVariableStatement(parent: cs.Node, s: ts.VariableStatement) {
         const variableStatement = {
             nodeType: cs.SyntaxKind.VariableStatement,
             parent: parent,
@@ -1370,7 +1372,7 @@ export default class CSharpAstTransformer {
         return variableStatement;
     }
 
-    private visitVariableDeclarationList(parent: cs.Node, s: ts.VariableDeclarationList): cs.VariableDeclarationList {
+    protected visitVariableDeclarationList(parent: cs.Node, s: ts.VariableDeclarationList): cs.VariableDeclarationList {
         const variableStatement = {
             nodeType: cs.SyntaxKind.VariableDeclarationList,
             parent: parent,
@@ -1384,7 +1386,7 @@ export default class CSharpAstTransformer {
 
         return variableStatement;
     }
-    private visitVariableDeclaration(parent: cs.Node, s: ts.VariableDeclaration): cs.VariableDeclaration {
+    protected visitVariableDeclaration(parent: cs.Node, s: ts.VariableDeclaration): cs.VariableDeclaration {
         const variableStatement = {
             nodeType: cs.SyntaxKind.VariableDeclaration,
             parent: parent,
@@ -1403,7 +1405,7 @@ export default class CSharpAstTransformer {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: variableStatement,
                     tsNode: s,
-                    reference: this.makeTypeName('alphaTab.core.ecmascript.Error')
+                    reference: this._context.makeTypeName('alphaTab.core.ecmascript.Error')
                 } as cs.TypeReference;
             } else {
                 variableStatement.type = this.createUnresolvedTypeNode(variableStatement, s.type ?? s, type);
@@ -1431,23 +1433,8 @@ export default class CSharpAstTransformer {
         return variableStatement;
     }
 
-    private makeTypeName(tsName: string): string {
-        const parts = tsName.split('.');
-        let result = '';
-        for (let i = 0; i < parts.length; i++) {
-            if (i > 0) {
-                result += '.';
-            }
-            if (i === parts.length - 1) {
-                result += parts[i];
-            } else {
-                result += this._context.toPascalCase(parts[i]);
-            }
-        }
-        return result;
-    }
 
-    private visitExpressionStatement(parent: cs.Node, s: ts.ExpressionStatement) {
+    protected visitExpressionStatement(parent: cs.Node, s: ts.ExpressionStatement) {
         const expressionStatement = {
             nodeType: cs.SyntaxKind.ExpressionStatement,
             parent: parent,
@@ -1463,7 +1450,7 @@ export default class CSharpAstTransformer {
         return expressionStatement;
     }
 
-    private visitIfStatement(parent: cs.Node, s: ts.IfStatement) {
+    protected visitIfStatement(parent: cs.Node, s: ts.IfStatement) {
         const ifStatement = {
             nodeType: cs.SyntaxKind.IfStatement,
             parent: parent,
@@ -1491,7 +1478,7 @@ export default class CSharpAstTransformer {
         return ifStatement;
     }
 
-    private visitDoStatement(parent: cs.Node, s: ts.DoStatement) {
+    protected visitDoStatement(parent: cs.Node, s: ts.DoStatement) {
         const doStatement = {
             nodeType: cs.SyntaxKind.DoStatement,
             parent: parent,
@@ -1513,7 +1500,7 @@ export default class CSharpAstTransformer {
         return doStatement;
     }
 
-    private visitWhileStatement(parent: cs.Node, s: ts.WhileStatement) {
+    protected visitWhileStatement(parent: cs.Node, s: ts.WhileStatement) {
         const whileStatement = {
             nodeType: cs.SyntaxKind.WhileStatement,
             parent: parent,
@@ -1535,7 +1522,7 @@ export default class CSharpAstTransformer {
         return whileStatement;
     }
 
-    private visitForStatement(parent: cs.Node, s: ts.ForStatement) {
+    protected visitForStatement(parent: cs.Node, s: ts.ForStatement) {
         const forStatement = {
             nodeType: cs.SyntaxKind.ForStatement,
             parent: parent,
@@ -1575,7 +1562,7 @@ export default class CSharpAstTransformer {
         return forStatement;
     }
 
-    private visitForOfStatement(parent: cs.Node, s: ts.ForOfStatement) {
+    protected visitForOfStatement(parent: cs.Node, s: ts.ForOfStatement) {
         const forEachStatement = {
             nodeType: cs.SyntaxKind.ForEachStatement,
             parent: parent,
@@ -1605,7 +1592,7 @@ export default class CSharpAstTransformer {
 
         return forEachStatement;
     }
-    private visitForInStatement(parent: cs.Node, s: ts.ForInStatement) {
+    protected visitForInStatement(parent: cs.Node, s: ts.ForInStatement) {
         // TODO: Detect raw object iteration and map it
         const forEachStatement = {
             nodeType: cs.SyntaxKind.ForEachStatement,
@@ -1637,7 +1624,7 @@ export default class CSharpAstTransformer {
         return forEachStatement;
     }
 
-    private visitBreakStatement(parent: cs.Node, s: ts.BreakStatement) {
+    protected visitBreakStatement(parent: cs.Node, s: ts.BreakStatement) {
         const breakStatement = {
             nodeType: cs.SyntaxKind.BreakStatement,
             parent: parent,
@@ -1647,7 +1634,7 @@ export default class CSharpAstTransformer {
         return breakStatement;
     }
 
-    private visitContinueStatement(parent: cs.Node, s: ts.ContinueStatement) {
+    protected visitContinueStatement(parent: cs.Node, s: ts.ContinueStatement) {
         const continueStatement = {
             nodeType: cs.SyntaxKind.ContinueStatement,
             parent: parent,
@@ -1657,7 +1644,7 @@ export default class CSharpAstTransformer {
         return continueStatement;
     }
 
-    private visitReturnStatement(parent: cs.Node, s: ts.ReturnStatement) {
+    protected visitReturnStatement(parent: cs.Node, s: ts.ReturnStatement) {
         const returnStatement = {
             nodeType: cs.SyntaxKind.ReturnStatement,
             parent: parent,
@@ -1674,7 +1661,7 @@ export default class CSharpAstTransformer {
         return returnStatement;
     }
 
-    private visitSwitchStatement(parent: cs.Node, s: ts.SwitchStatement) {
+    protected visitSwitchStatement(parent: cs.Node, s: ts.SwitchStatement) {
         const switchStatement = {
             nodeType: cs.SyntaxKind.SwitchStatement,
             parent: parent,
@@ -1702,7 +1689,7 @@ export default class CSharpAstTransformer {
         return switchStatement;
     }
 
-    private visitDefaultClause(parent: cs.SwitchStatement, s: ts.DefaultClause): cs.DefaultClause {
+    protected visitDefaultClause(parent: cs.SwitchStatement, s: ts.DefaultClause): cs.DefaultClause {
         const defaultClause = {
             nodeType: cs.SyntaxKind.DefaultClause,
             parent: parent,
@@ -1720,7 +1707,7 @@ export default class CSharpAstTransformer {
         return defaultClause;
     }
 
-    private visitCaseClause(parent: cs.SwitchStatement, s: ts.CaseClause) {
+    protected visitCaseClause(parent: cs.SwitchStatement, s: ts.CaseClause) {
         if (this.shouldSkip(s, true)) {
             return null;
         }
@@ -1747,7 +1734,7 @@ export default class CSharpAstTransformer {
         return caseClause;
     }
 
-    private visitThrowStatement(parent: cs.Node, s: ts.ThrowStatement) {
+    protected visitThrowStatement(parent: cs.Node, s: ts.ThrowStatement) {
         const throwStatement = {
             nodeType: cs.SyntaxKind.ThrowStatement,
             parent: parent,
@@ -1763,7 +1750,7 @@ export default class CSharpAstTransformer {
 
         return throwStatement;
     }
-    private visitTryStatement(parent: cs.Node, s: ts.TryStatement) {
+    protected visitTryStatement(parent: cs.Node, s: ts.TryStatement) {
         const tryStatement = {
             nodeType: cs.SyntaxKind.TryStatement,
             parent: parent,
@@ -1782,7 +1769,7 @@ export default class CSharpAstTransformer {
         return tryStatement;
     }
 
-    private visitCatchClause(parent: cs.TryStatement, s: ts.CatchClause): cs.CatchClause {
+    protected visitCatchClause(parent: cs.TryStatement, s: ts.CatchClause): cs.CatchClause {
         const catchClause = {
             nodeType: cs.SyntaxKind.CatchClause,
             parent: parent,
@@ -1797,7 +1784,7 @@ export default class CSharpAstTransformer {
         return catchClause;
     }
 
-    private visitMethodSignature(
+    protected visitMethodSignature(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.MethodSignature
     ) {
@@ -1848,7 +1835,7 @@ export default class CSharpAstTransformer {
 
         this._context.registerSymbol(csMethod);
     }
-    private mapVisibility(modifiers: ts.ModifiersArray | undefined): cs.Visibility {
+    protected mapVisibility(modifiers: ts.ModifiersArray | undefined): cs.Visibility {
         if (modifiers) {
             for (const m of modifiers) {
                 switch (m.kind) {
@@ -1863,11 +1850,11 @@ export default class CSharpAstTransformer {
         }
         return cs.Visibility.Public;
     }
-    private visitMethodParameter(parent: cs.MethodDeclarationBase, p: ts.ParameterDeclaration): void {
+    protected visitMethodParameter(parent: cs.MethodDeclarationBase, p: ts.ParameterDeclaration): void {
         parent.parameters.push(this.makeParameter(parent, p));
     }
 
-    private makeParameter(csMethod: cs.Node, p: ts.ParameterDeclaration): cs.ParameterDeclaration {
+    protected makeParameter(csMethod: cs.Node, p: ts.ParameterDeclaration): cs.ParameterDeclaration {
         const symbol = this._context.typeChecker.getSymbolAtLocation(p.name);
         const type = this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, p);
 
@@ -1902,7 +1889,7 @@ export default class CSharpAstTransformer {
         return csParameter;
     }
 
-    private visitConstructorDeclaration(parent: cs.ClassDeclaration, classElement: ts.ConstructorDeclaration) {
+    protected visitConstructorDeclaration(parent: cs.ClassDeclaration, classElement: ts.ConstructorDeclaration) {
         const csConstructor: cs.ConstructorDeclaration = {
             parent: parent,
             nodeType: cs.SyntaxKind.ConstructorDeclaration,
@@ -1934,9 +1921,10 @@ export default class CSharpAstTransformer {
         }
 
         parent.members.push(csConstructor);
+        return csConstructor;
     }
 
-    private visitExpression(parent: cs.Node, expression: ts.Expression): cs.Expression | null {
+    protected visitExpression(parent: cs.Node, expression: ts.Expression): cs.Expression | null {
         switch (expression.kind) {
             case ts.SyntaxKind.PrefixUnaryExpression:
                 return this.visitPrefixUnaryExpression(parent, expression as ts.PrefixUnaryExpression);
@@ -2027,11 +2015,11 @@ export default class CSharpAstTransformer {
             tsNode: expression
         } as cs.Expression;
     }
-    private visitSpreadElement(parent: cs.Node, expression: ts.SpreadElement) {
+    protected visitSpreadElement(parent: cs.Node, expression: ts.SpreadElement) {
         return this.visitExpression(parent, expression.expression);
     }
 
-    private visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {
+    protected visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {
         const csExpr = {
             parent: parent,
             tsNode: expression,
@@ -2052,7 +2040,7 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    private visitPostfixUnaryExpression(parent: cs.Node, expression: ts.PostfixUnaryExpression) {
+    protected visitPostfixUnaryExpression(parent: cs.Node, expression: ts.PostfixUnaryExpression) {
         const csExpr = {
             parent: parent,
             tsNode: expression,
@@ -2069,7 +2057,7 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    private visitNullLiteral(parent: cs.Node, expression: ts.NullLiteral) {
+    protected visitNullLiteral(parent: cs.Node, expression: ts.NullLiteral) {
         const csExpr = {
             parent: parent,
             tsNode: expression,
@@ -2079,7 +2067,7 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    private visitBooleanLiteral(parent: cs.Node, expression: ts.BooleanLiteral) {
+    protected visitBooleanLiteral(parent: cs.Node, expression: ts.BooleanLiteral) {
         const csExpr = {
             parent: parent,
             tsNode: expression,
@@ -2090,7 +2078,7 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    private visitThisExpression(parent: cs.Node, expression: ts.ThisExpression) {
+    protected visitThisExpression(parent: cs.Node, expression: ts.ThisExpression) {
         if (parent.nodeType === cs.SyntaxKind.MemberAccessExpression &&
             parent.tsSymbol &&
             this._context.isStaticSymbol(parent.tsSymbol)) {
@@ -2114,7 +2102,7 @@ export default class CSharpAstTransformer {
         }
     }
 
-    private visitSuperLiteralExpression(parent: cs.Node, expression: ts.SuperExpression) {
+    protected visitSuperLiteralExpression(parent: cs.Node, expression: ts.SuperExpression) {
         const csExpr = {
             parent: parent,
             tsNode: expression,
@@ -2124,7 +2112,7 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    private visitTypeOfExpression(parent: cs.Node, expression: ts.TypeOfExpression) {
+    protected visitTypeOfExpression(parent: cs.Node, expression: ts.TypeOfExpression) {
         // AlphaTab.Core.TypeHelper.TypeOf(expr)
         const csExpr = {
             parent: parent,
@@ -2134,7 +2122,7 @@ export default class CSharpAstTransformer {
             expression: {} as cs.Expression
         } as cs.InvocationExpression;
 
-        csExpr.expression = this.makeMemberAccess(csExpr, this.makeTypeName('alphaTab.core.TypeHelper'),
+        csExpr.expression = this.makeMemberAccess(csExpr, this._context.makeTypeName('alphaTab.core.TypeHelper'),
             this._context.toPascalCase('typeOf'));
         const e = this.visitExpression(csExpr, expression.expression);
         if (e) {
@@ -2144,7 +2132,7 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    private makeMemberAccess(parent: cs.Node, identifier: string, member: string): cs.Node {
+    protected makeMemberAccess(parent: cs.Node, identifier: string, member: string): cs.Node {
         const memberAccess = {
             expression: {
                 nodeType: cs.SyntaxKind.Identifier,
@@ -2161,7 +2149,7 @@ export default class CSharpAstTransformer {
         return memberAccess;
     }
 
-    private visitAwaitExpression(parent: cs.Node, expression: ts.AwaitExpression) {
+    protected visitAwaitExpression(parent: cs.Node, expression: ts.AwaitExpression) {
         const awaitExpression = {
             parent: parent,
             nodeType: cs.SyntaxKind.AwaitExpression,
@@ -2177,7 +2165,7 @@ export default class CSharpAstTransformer {
         return awaitExpression;
     }
 
-    private visitBinaryExpression(parent: cs.Node, expression: ts.BinaryExpression) {
+    protected visitBinaryExpression(parent: cs.Node, expression: ts.BinaryExpression) {
         if (expression.operatorToken.kind === ts.SyntaxKind.InKeyword) {
             // AlphaTab.Core.TypeHelper.In('Text', expr)
             const csExpr = {
@@ -2188,8 +2176,8 @@ export default class CSharpAstTransformer {
                 expression: {} as cs.Expression
             } as cs.InvocationExpression;
 
-            csExpr.expression = this.makeMemberAccess(csExpr, 
-                this.makeTypeName('alphaTab.core.TypeHelper'),
+            csExpr.expression = this.makeMemberAccess(csExpr,
+                this._context.makeTypeName('alphaTab.core.TypeHelper'),
                 this._context.toPascalCase('in'));
 
             let e = this.visitExpression(csExpr, expression.left)!;
@@ -2359,8 +2347,22 @@ export default class CSharpAstTransformer {
                     case ts.SyntaxKind.LessThanLessThanToken:
                     case ts.SyntaxKind.BarToken:
                     case ts.SyntaxKind.CaretToken:
-                        binaryExpression.left = this.makeInt(binaryExpression.left);
-                        binaryExpression.right = this.makeInt(binaryExpression.right);
+                        if(!this.hasBinaryOperationMakeInt(binaryExpression.left)) {
+                            binaryExpression.left = this.makeInt(binaryExpression.left);
+                        } 
+                        if(!this.hasBinaryOperationMakeInt(binaryExpression.right)) {
+                            binaryExpression.right = this.makeInt(binaryExpression.right);
+                        }
+
+                        let nextParent = parent;
+                        while(nextParent.nodeType === cs.SyntaxKind.ParenthesizedExpression) {
+                            nextParent = nextParent.parent!;
+                        }
+
+                        if(nextParent.nodeType !== cs.SyntaxKind.BinaryExpression ||
+                           (nextParent as cs.BinaryExpression).operator === '=') {
+                            return this.makeDouble(binaryExpression);
+                        }                        
                         break;
                     case ts.SyntaxKind.SlashToken:
                         if (expression.left.kind === ts.SyntaxKind.NumericLiteral && expression.right.kind === ts.SyntaxKind.NumericLiteral) {
@@ -2374,7 +2376,28 @@ export default class CSharpAstTransformer {
         }
     }
 
-    private makeDouble(expression: cs.Expression): cs.Expression {
+    private hasBinaryOperationMakeInt(left: cs.Expression): boolean {
+        if(left.nodeType === cs.SyntaxKind.ParenthesizedExpression) {
+            return this.hasBinaryOperationMakeInt((left as cs.ParenthesizedExpression).expression);
+        }
+
+        if(left.nodeType !== cs.SyntaxKind.BinaryExpression) {
+            return false;
+        }
+
+        switch((left as cs.BinaryExpression).operator) {
+            case '&':
+            case '>>':
+            case '<<':
+            case '^':
+            case '|':
+                return true;
+        }
+
+        return false;
+    }
+
+    protected makeDouble(expression: cs.Expression): cs.Expression {
         // (double)(expr)
 
         const cast = {
@@ -2401,7 +2424,7 @@ export default class CSharpAstTransformer {
         return cast;
     }
 
-    private makeInt(expression: cs.Expression): cs.Expression {
+    protected makeInt(expression: cs.Expression): cs.Expression {
         switch (expression.nodeType) {
             case cs.SyntaxKind.NumericLiteral:
                 if ((expression as cs.NumericLiteral).value.indexOf('.') === -1) {
@@ -2435,7 +2458,7 @@ export default class CSharpAstTransformer {
         return cast;
     }
 
-    private visitConditionalExpression(parent: cs.Node, expression: ts.ConditionalExpression) {
+    protected visitConditionalExpression(parent: cs.Node, expression: ts.ConditionalExpression) {
         const conditionalExpression = {
             parent: parent,
             nodeType: cs.SyntaxKind.ConditionalExpression,
@@ -2463,7 +2486,7 @@ export default class CSharpAstTransformer {
         return conditionalExpression;
     }
 
-    private makeTruthy(expression: cs.Node, force: boolean = false): cs.Expression {
+    protected makeTruthy(expression: cs.Node, force: boolean = false): cs.Expression {
         if (!force) {
             if (!this._context.isBooleanSmartCast(expression.tsNode!)) {
                 return expression;
@@ -2496,7 +2519,7 @@ export default class CSharpAstTransformer {
             parent: access,
             tsNode: expression.tsNode,
             nodeType: cs.SyntaxKind.Identifier,
-            text: this.makeTypeName('alphaTab.core.TypeHelper')
+            text: this._context.makeTypeName('alphaTab.core.TypeHelper')
         } as cs.Identifier;
 
         expression.parent = call;
@@ -2505,7 +2528,7 @@ export default class CSharpAstTransformer {
         return call;
     }
 
-    private visitFunctionExpression(parent: cs.Node, expression: ts.FunctionExpression) {
+    protected visitFunctionExpression(parent: cs.Node, expression: ts.FunctionExpression) {
         if (parent.nodeType === cs.SyntaxKind.ExpressionStatement) {
             this._context.addTsNodeDiagnostics(
                 expression,
@@ -2544,7 +2567,7 @@ export default class CSharpAstTransformer {
         }
     }
 
-    private visitArrowExpression(parent: cs.Node, expression: ts.ArrowFunction) {
+    protected visitArrowExpression(parent: cs.Node, expression: ts.ArrowFunction) {
         const lambdaExpression = {
             nodeType: cs.SyntaxKind.LambdaExpression,
             parent: parent,
@@ -2573,7 +2596,7 @@ export default class CSharpAstTransformer {
         return lambdaExpression;
     }
 
-    private visitRegularExpressionLiteral(parent: cs.Node, expression: ts.RegularExpressionLiteral) {
+    protected visitRegularExpressionLiteral(parent: cs.Node, expression: ts.RegularExpressionLiteral) {
         // AlphaTab.Core.TypeHelper.CreateRegex(expr)
         const csExpr = {
             parent: parent,
@@ -2585,7 +2608,7 @@ export default class CSharpAstTransformer {
 
         const parts = expression.text.split('/');
         csExpr.expression = this.makeMemberAccess(csExpr,
-            this.makeTypeName('alphaTab.core.TypeHelper'),
+            this._context.makeTypeName('alphaTab.core.TypeHelper'),
             this._context.toPascalCase('createRegex')
         );
         csExpr.arguments.push({
@@ -2605,7 +2628,7 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    private visitNumericLiteral(parent: cs.Node, expression: ts.NumericLiteral) {
+    protected visitNumericLiteral(parent: cs.Node, expression: ts.NumericLiteral) {
         return {
             parent: parent,
             nodeType: cs.SyntaxKind.NumericLiteral,
@@ -2614,7 +2637,7 @@ export default class CSharpAstTransformer {
         } as cs.NumericLiteral;
     }
 
-    private visitNoSubstitutionTemplateLiteral(
+    protected visitNoSubstitutionTemplateLiteral(
         parent: cs.Node,
         expression: ts.NoSubstitutionTemplateLiteral
     ): cs.Expression {
@@ -2628,7 +2651,7 @@ export default class CSharpAstTransformer {
         return stringLiteral;
     }
 
-    private visitTemplateExpression(parent: cs.Node, expression: ts.TemplateExpression) {
+    protected visitTemplateExpression(parent: cs.Node, expression: ts.TemplateExpression): cs.Expression {
         const templateString = {
             parent: parent,
             nodeType: cs.SyntaxKind.StringTemplateExpression,
@@ -2661,7 +2684,7 @@ export default class CSharpAstTransformer {
         return templateString;
     }
 
-    private visitTypeAssertionExpression(parent: cs.Node, expression: ts.TypeAssertion) {
+    protected visitTypeAssertionExpression(parent: cs.Node, expression: ts.TypeAssertion) {
         const csExpr = {
             parent: parent,
             tsNode: expression,
@@ -2679,7 +2702,7 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    private visitParenthesizedExpression(parent: cs.Node, expression: ts.ParenthesizedExpression) {
+    protected visitParenthesizedExpression(parent: cs.Node, expression: ts.ParenthesizedExpression) {
         const csExpr = {
             parent: parent,
             tsNode: expression,
@@ -2695,7 +2718,7 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    private visitArrayLiteralExpression(parent: cs.Node, expression: ts.ArrayLiteralExpression) {
+    protected visitArrayLiteralExpression(parent: cs.Node, expression: ts.ArrayLiteralExpression) {
         if (this.isMapInitializer(expression)) {
             const csExpr = {
                 parent: parent,
@@ -2705,7 +2728,7 @@ export default class CSharpAstTransformer {
                 expression: {} as cs.Expression
             } as cs.InvocationExpression;
 
-            csExpr.expression = this.makeMemberAccess(csExpr, this.makeTypeName('alphaTab.core.TypeHelper'), this._context.toPascalCase('createMapEntry'));
+            csExpr.expression = this.makeMemberAccess(csExpr, this._context.makeTypeName('alphaTab.core.TypeHelper'), this._context.toPascalCase('createMapEntry'));
 
             expression.elements.forEach(e => {
                 const ex = this.visitExpression(csExpr, e);
@@ -2724,7 +2747,7 @@ export default class CSharpAstTransformer {
                 expression: {} as cs.Expression
             } as cs.InvocationExpression;
 
-            csExpr.expression = this.makeMemberAccess(csExpr, this.makeTypeName('alphaTab.core.TypeHelper'), this._context.toPascalCase('setInitializer'));
+            csExpr.expression = this.makeMemberAccess(csExpr, this._context.makeTypeName('alphaTab.core.TypeHelper'), this._context.toPascalCase('setInitializer'));
 
             expression.elements.forEach(e => {
                 const ex = this.visitExpression(csExpr, e);
@@ -2757,7 +2780,7 @@ export default class CSharpAstTransformer {
             return csExpr;
         }
     }
-    private isMapInitializer(expression: ts.ArrayLiteralExpression) {
+    protected isMapInitializer(expression: ts.ArrayLiteralExpression) {
         const isCandidate =
             expression.elements.length === 2 &&
             expression.parent.kind === ts.SyntaxKind.ArrayLiteralExpression &&
@@ -2774,7 +2797,7 @@ export default class CSharpAstTransformer {
         return false;
     }
 
-    private isSetInitializer(expression: ts.ArrayLiteralExpression) {
+    protected isSetInitializer(expression: ts.ArrayLiteralExpression) {
         const isCandidate = expression.parent.kind === ts.SyntaxKind.NewExpression;
         if (!isCandidate) {
             return false;
@@ -2783,7 +2806,7 @@ export default class CSharpAstTransformer {
         return this._context.typeChecker.getTypeAtLocation(expression.parent).symbol.name === 'Set';
     }
 
-    private visitPropertyAccessExpression(parent: cs.Node, expression: ts.PropertyAccessExpression) {
+    protected visitPropertyAccessExpression(parent: cs.Node, expression: ts.PropertyAccessExpression) {
         const memberAccess = {
             expression: {} as cs.Expression,
             member: this._context.toPascalCase(expression.name.text),
@@ -2804,30 +2827,9 @@ export default class CSharpAstTransformer {
         if (memberAccess.tsSymbol) {
             const parentSymbol = (memberAccess.tsSymbol as any).parent as ts.Symbol;
             if (parentSymbol) {
-                switch (parentSymbol.name) {
-                    case 'Array':
-                        switch (memberAccess.tsSymbol!.name) {
-                            case 'length':
-                                memberAccess.member = 'Count';
-                                break;
-                            case 'reverse':
-                                memberAccess.member = 'Reversed';
-                                break;
-                            case 'push':
-                                memberAccess.member = 'Add';
-                                break;
-                        }
-                        break;
-                    case 'String':
-                        switch (memberAccess.tsSymbol!.name) {
-                            case 'trimRight':
-                                memberAccess.member = 'TrimEnd';
-                                break;
-                            case 'trimLeft':
-                                memberAccess.member = 'TrimStart';
-                                break;
-                        }
-                        break;
+                const renamed = this.getSymbolName(parentSymbol!, memberAccess.tsSymbol!, memberAccess);
+                if (renamed) {
+                    memberAccess.member = renamed;
                 }
             }
         }
@@ -2844,7 +2846,31 @@ export default class CSharpAstTransformer {
         return this.wrapToSmartCast(parent, memberAccess, expression);
     }
 
-    private visitObjectLiteralExpression(parent: cs.Node, expression: ts.ObjectLiteralExpression) {
+    protected getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol, expression:cs.Expression): string | null {
+        switch (parentSymbol.name) {
+            case 'Array':
+                switch (symbol.name) {
+                    case 'length':
+                        return 'Count';
+                    case 'reverse':
+                        return 'Reversed';
+                    case 'push':
+                        return 'Add';
+                }
+                break;
+            case 'String':
+                switch (symbol.name) {
+                    case 'trimRight':
+                        return 'TrimEnd';
+                    case 'trimLeft':
+                        return 'TrimStart';
+                }
+                break;
+        }
+        return null;
+    }
+
+    protected visitObjectLiteralExpression(parent: cs.Node, expression: ts.ObjectLiteralExpression) {
         const objectLiteral = {
             parent: parent,
             tsNode: expression,
@@ -2921,7 +2947,7 @@ export default class CSharpAstTransformer {
         return objectLiteral;
     }
 
-    private visitElementAccessExpression(parent: cs.Node, expression: ts.ElementAccessExpression) {
+    protected visitElementAccessExpression(parent: cs.Node, expression: ts.ElementAccessExpression) {
         // Enum[value] => value.ToString()
         const enumType = this._context.typeChecker.getTypeAtLocation(expression.expression);
         if (enumType?.symbol && enumType.symbol.flags & ts.SymbolFlags.RegularEnum) {
@@ -3001,7 +3027,7 @@ export default class CSharpAstTransformer {
         return this.wrapToSmartCast(parent, elementAccess, expression);
     }
 
-    private visitCallExpression(parent: cs.Node, expression: ts.CallExpression) {
+    protected visitCallExpression(parent: cs.Node, expression: ts.CallExpression) {
         if (this.isBind(expression)) {
             return this.visitExpression(parent, (expression.expression as ts.PropertyAccessExpression).expression);
         }
@@ -3064,14 +3090,14 @@ export default class CSharpAstTransformer {
 
         return this.makeTruthy(callExpression);
     }
-    private isBind(expression: ts.CallExpression) {
+    protected isBind(expression: ts.CallExpression) {
         if (ts.isPropertyAccessExpression(expression.expression)) {
             return expression.expression.name.text === 'bind' && expression.arguments.length === 1;
         }
         return false;
     }
 
-    private visitNewExpression(parent: cs.Node, expression: ts.NewExpression) {
+    protected visitNewExpression(parent: cs.Node, expression: ts.NewExpression) {
         const symbol = this._context.typeChecker.getSymbolAtLocation(expression.expression);
         let type: ts.Type | undefined = undefined;
         if (symbol) {
@@ -3125,42 +3151,42 @@ export default class CSharpAstTransformer {
             }
         }
 
-        if (type && type.symbol && type.symbol.name == 'ArrayConstructor' && newExpression.arguments.length === 1) {
-            const toInt = {
-                parent: newExpression,
-                nodeType: cs.SyntaxKind.CastExpression,
-                expression: {} as cs.Expression,
-                type: {
-                    parent: null,
-                    nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                    type: cs.PrimitiveType.Int,
-                    tsNode: expression
-                } as cs.PrimitiveTypeNode,
-                tsNode: expression
-            } as cs.CastExpression;
-            toInt.expression = newExpression.arguments[0];
-            toInt.expression.parent = toInt;
+        // if (type && type.symbol && type.symbol.name == 'ArrayConstructor' && newExpression.arguments.length === 1) {
+        //     const toInt = {
+        //         parent: newExpression,
+        //         nodeType: cs.SyntaxKind.CastExpression,
+        //         expression: {} as cs.Expression,
+        //         type: {
+        //             parent: null,
+        //             nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+        //             type: cs.PrimitiveType.Int,
+        //             tsNode: expression
+        //         } as cs.PrimitiveTypeNode,
+        //         tsNode: expression
+        //     } as cs.CastExpression;
+        //     toInt.expression = newExpression.arguments[0];
+        //     toInt.expression.parent = toInt;
 
-            const newArray = {
-                parent: newExpression,
-                nodeType: cs.SyntaxKind.ArrayCreationExpression,
-                sizeExpression: toInt,
-                type: csType.typeArguments![0],
-            } as cs.ArrayCreationExpression;
-            toInt.parent = newExpression;
+        //     const newArray = {
+        //         parent: newExpression,
+        //         nodeType: cs.SyntaxKind.ArrayCreationExpression,
+        //         sizeExpression: toInt,
+        //         type: csType.typeArguments![0],
+        //     } as cs.ArrayCreationExpression;
+        //     toInt.parent = newExpression;
 
-            newExpression.arguments = [newArray];
-        }
+        //     newExpression.arguments = [newArray];
+        // }
 
         return newExpression;
     }
-    private getDeclarationOrAssignmentType(): ts.Type | undefined {
+    protected getDeclarationOrAssignmentType(): ts.Type | undefined {
         return this._declarationOrAssignmentTypeStack.length === 0
             ? undefined
             : this._declarationOrAssignmentTypeStack[this._declarationOrAssignmentTypeStack.length - 1];
     }
 
-    private visitAsExpression(parent: cs.Node, expression: ts.AsExpression) {
+    protected visitAsExpression(parent: cs.Node, expression: ts.AsExpression) {
         const castExpression = {
             type: this.createUnresolvedTypeNode(null, expression.type),
             expression: {} as cs.Expression,
@@ -3178,7 +3204,7 @@ export default class CSharpAstTransformer {
         return castExpression;
     }
 
-    private visitNonNullExpression(parent: cs.Node, expression: ts.NonNullExpression) {
+    protected visitNonNullExpression(parent: cs.Node, expression: ts.NonNullExpression) {
         if (this._context.isValueTypeExpression(expression)) {
             const valueAccessExpression = {
                 expression: {} as cs.Expression,
@@ -3211,7 +3237,7 @@ export default class CSharpAstTransformer {
         }
     }
 
-    private visitIdentifier(parent: cs.Node, expression: ts.Identifier) {
+    protected visitIdentifier(parent: cs.Node, expression: ts.Identifier) {
         if (expression.text === 'undefined') {
             return {
                 parent: parent,
@@ -3225,8 +3251,11 @@ export default class CSharpAstTransformer {
             tsNode: expression,
             tsSymbol: this._context.typeChecker.getSymbolAtLocation(expression),
             nodeType: cs.SyntaxKind.Identifier,
-            text: expression.text
+            text: ''
         } as cs.Identifier;
+
+        identifier.text = this.getIdentifierName(identifier, expression);
+
 
         if (identifier.tsSymbol) {
             switch (expression.parent.kind) {
@@ -3252,7 +3281,11 @@ export default class CSharpAstTransformer {
         return this.wrapToSmartCast(parent, identifier, expression);
     }
 
-    private wrapToSmartCast(parent: cs.Node, node: cs.Node, expression: ts.Expression): cs.Expression {
+    protected getIdentifierName(identifier: cs.Identifier, expression: ts.Identifier): string {
+        return expression.text;
+    }
+
+    protected wrapToSmartCast(parent: cs.Node, node: cs.Node, expression: ts.Expression): cs.Expression {
         if (node.tsSymbol) {
             if (
                 (node.tsSymbol.flags & ts.SymbolFlags.Property) === ts.SymbolFlags.Property ||
@@ -3313,13 +3346,23 @@ export default class CSharpAstTransformer {
                         } as cs.NonNullExpression;
                     }
                 }
+
+                if (this._context.isNonNullSmartCast(expression)) {
+                    return {
+                        parent: parent,
+                        nodeType: cs.SyntaxKind.NonNullExpression,
+                        tsNode: expression,
+                        expression: node
+                    } as cs.NonNullExpression;
+                }
             }
         }
+
 
         return this.makeTruthy(node);
     }
 
-    private visitStringLiteral(parent: cs.Node, expression: ts.Identifier) {
+    protected visitStringLiteral(parent: cs.Node, expression: ts.Identifier) {
         const stringLiteral = {
             parent: parent,
             tsNode: expression,
@@ -3330,11 +3373,11 @@ export default class CSharpAstTransformer {
         return stringLiteral;
     }
 
-    private removeExtension(fileName: string) {
+    protected removeExtension(fileName: string) {
         return fileName.substring(0, fileName.lastIndexOf('.'));
     }
 
-    private mapOperator(operator: ts.SyntaxKind): string {
+    protected mapOperator(operator: ts.SyntaxKind): string {
         switch (operator) {
             case ts.SyntaxKind.PlusPlusToken:
                 return '++';
