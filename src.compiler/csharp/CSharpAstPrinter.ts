@@ -235,7 +235,7 @@ export default class CSharpAstPrinter {
 
                     baseClass =
                         baseClassDeclaration.baseClass &&
-                            baseClassDeclaration.baseClass.nodeType === cs.SyntaxKind.TypeReference
+                        baseClassDeclaration.baseClass.nodeType === cs.SyntaxKind.TypeReference
                             ? (baseClassDeclaration.baseClass as cs.TypeReference).reference
                             : undefined;
                 } else {
@@ -265,12 +265,12 @@ export default class CSharpAstPrinter {
                 defaultConstructor.parameters = constructorDeclaration.parameters;
                 defaultConstructor.baseConstructorArguments = constructorDeclaration.parameters.map(
                     p =>
-                    ({
-                        parent: defaultConstructor,
-                        nodeType: cs.SyntaxKind.Identifier,
-                        text: p.name,
-                        tsNode: defaultConstructor.tsNode
-                    } as cs.Identifier)
+                        ({
+                            parent: defaultConstructor,
+                            nodeType: cs.SyntaxKind.Identifier,
+                            text: p.name,
+                            tsNode: defaultConstructor.tsNode
+                        } as cs.Identifier)
                 );
                 this.writeMember(defaultConstructor);
             }
@@ -420,7 +420,7 @@ export default class CSharpAstPrinter {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
         if (d.isStatic) {
-            this.write('static ')
+            this.write('static ');
         }
         this.write(`${(d.parent as cs.ClassDeclaration).name}`);
         this.writeParameters(d.parameters);
@@ -500,8 +500,11 @@ export default class CSharpAstPrinter {
     }
 
     private writePropertyAsField(d: cs.PropertyDeclaration) {
-        if (d.parent!.nodeType === cs.SyntaxKind.ClassDeclaration && d.visibility === cs.Visibility.Private &&
-            (!d.getAccessor || !d.getAccessor.body)) {
+        if (
+            d.parent!.nodeType === cs.SyntaxKind.ClassDeclaration &&
+            d.visibility === cs.Visibility.Private &&
+            (!d.getAccessor || !d.getAccessor.body)
+        ) {
             return true;
         }
         return this.canBeConstant(d);
@@ -537,7 +540,12 @@ export default class CSharpAstPrinter {
         this.writeLine(';');
     }
 
-    private writeType(type: cs.TypeNode, forNew: boolean = false, asNativeArray: boolean = false, forTypeConstraint: boolean = false) {
+    private writeType(
+        type: cs.TypeNode,
+        forNew: boolean = false,
+        asNativeArray: boolean = false,
+        forTypeConstraint: boolean = false
+    ) {
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
                 if (forTypeConstraint) {
@@ -590,8 +598,9 @@ export default class CSharpAstPrinter {
                     this.writeType(arrayType.elementType);
                     this.write('[]');
                 } else {
-                    const isDynamicArray = arrayType.elementType.nodeType == cs.SyntaxKind.PrimitiveTypeNode
-                        && (arrayType.elementType as cs.PrimitiveTypeNode).type == cs.PrimitiveType.Dynamic;
+                    const isDynamicArray =
+                        arrayType.elementType.nodeType == cs.SyntaxKind.PrimitiveTypeNode &&
+                        (arrayType.elementType as cs.PrimitiveTypeNode).type == cs.PrimitiveType.Dynamic;
                     if (isDynamicArray && !forNew) {
                         this.write('System.Collections.IList');
                     } else {
@@ -603,9 +612,33 @@ export default class CSharpAstPrinter {
                         this.writeType(arrayType.elementType);
                         this.write('>');
                     }
-
                 }
 
+                break;
+            case cs.SyntaxKind.FunctionTypeNode:
+                const functionType = type as cs.FunctionTypeNode;
+                if (
+                    functionType.returnType.nodeType === cs.SyntaxKind.PrimitiveTypeNode &&
+                    (functionType.returnType as cs.PrimitiveTypeNode).type === cs.PrimitiveType.Void
+                ) {
+                    this.write('System.Action')
+                    if (functionType.parameterTypes.length > 0) {
+                        this.write('<');
+                        this.writeCommaSeparated(functionType.parameterTypes, p => this.writeType(p));
+                        this.write('>');
+                    }
+                } else {
+                    this.write('System.Func')
+                    this.write('<');
+                    if (functionType.parameterTypes.length > 0) {
+                        this.writeCommaSeparated(functionType.parameterTypes, p => this.writeType(p));
+                        this.write(', ');
+                        this.writeType(functionType.returnType);
+                    } else {
+                        this.writeType(functionType.returnType);
+                    }
+                    this.write('>');
+                }
                 break;
             case cs.SyntaxKind.TypeReference:
                 const typeReference = type as cs.TypeReference;
@@ -859,7 +892,7 @@ export default class CSharpAstPrinter {
         exprs.forEach(expr => {
             this.write(', ');
             this.writeExpression(expr);
-        })
+        });
         this.write(')');
     }
 
@@ -899,8 +932,7 @@ export default class CSharpAstPrinter {
                 this.writeExpression(expr.sizeExpression!);
                 this.write(']');
             }
-        }
-        else if (expr.values && expr.values.length > 0) {
+        } else if (expr.values && expr.values.length > 0) {
             this.write('AlphaTab.Core.TypeHelper.CreateList(');
             this.writeCommaSeparated(expr.values, v => {
                 if (expr.values!.length > 10) {
@@ -1245,7 +1277,7 @@ export default class CSharpAstPrinter {
                         this.write(', ');
                     }
                     this.write(v);
-                })
+                });
                 this.write(')');
             } else {
                 this.write(d.name);

@@ -1,5 +1,5 @@
 import { Color } from '@src/model/Color';
-import { Font, FontStyle } from '@src/model/Font';
+import { Font, FontStyle, FontWeight } from '@src/model/Font';
 
 /**
  * This public class contains central definitions for controlling the visual appearance.
@@ -12,7 +12,7 @@ export class RenderingResources {
     /**
      * Gets or sets the font to use for displaying the songs copyright information in the header of the music sheet.
      */
-    public copyrightFont: Font = new Font(RenderingResources.sansFont, 12, FontStyle.Bold);
+    public copyrightFont: Font = new Font(RenderingResources.sansFont, 12, FontStyle.Plain, FontWeight.Bold);
 
     /**
      * Gets or sets the font to use for displaying the songs title in the header of the music sheet.
@@ -77,7 +77,7 @@ export class RenderingResources {
     /**
      * Gets or sets the font to use for section marker labels shown above the music sheet.
      */
-    public markerFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Bold);
+    public markerFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain, FontWeight.Bold);
 
     /**
      * Gets or sets the color to use for music notation elements of the primary voice.

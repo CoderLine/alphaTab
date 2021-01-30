@@ -1,7 +1,7 @@
 import { JsonHelper } from '@src/io/JsonHelper';
 
 /**
- * A very basic font parser which parses the fields according to 
+ * A very basic font parser which parses the fields according to
  * https://www.w3.org/TR/CSS21/fonts.html#propdef-font
  */
 class FontParserToken {
@@ -31,7 +31,7 @@ class FontParser {
 
     public constructor(input: string) {
         this._input = input;
-        this._tokens = this.splitToTokens(input);;
+        this._tokens = this.splitToTokens(input);
     }
 
     private splitToTokens(input: string): FontParserToken[] {
@@ -48,7 +48,7 @@ class FontParser {
                 tokens.push(new FontParserToken(input.substring(startPos, endPos), startPos, endPos));
             }
 
-            startPos = endPos + 1;;
+            startPos = endPos + 1;
         }
 
         return tokens;
@@ -88,9 +88,14 @@ class FontParser {
                 // skip whitespace and quotes
                 pos++;
             } else if (c === '"' || c === "'") {
-                // quoted 
+                // quoted
                 const endOfString = this.findEndOfQuote(familyListInput, pos + 1, c);
-                this.families.push(familyListInput.substring(pos + 1, endOfString).split("\\" + c).join(c));
+                this.families.push(
+                    familyListInput
+                        .substring(pos + 1, endOfString)
+                        .split('\\' + c)
+                        .join(c)
+                );
                 pos = endOfString + 1;
             } else {
                 // until comma
@@ -115,7 +120,7 @@ class FontParser {
             } else {
                 escaped = false;
             }
-            pos++;
+            pos += 1;
         }
 
         return s.length;
@@ -184,7 +189,10 @@ class FontParser {
         let ambiguous: string[] = [];
 
         while (true) {
-            let text:string|undefined= this._currentToken?.text;
+            if (!this._currentToken) {
+                return;
+            }
+            let text: string = this._currentToken.text;
             switch (text) {
                 // ambiguous
                 case 'normal':
@@ -242,11 +250,9 @@ class FontParser {
             const v = ambiguous.pop()!;
             if (!hasWeight) {
                 this.weight = v;
-            }
-            else if (!hasVariant) {
+            } else if (!hasVariant) {
                 this.variant = v;
-            }
-            else if (!hasStyle) {
+            } else if (!hasStyle) {
                 this.style = v;
             }
         }
@@ -267,13 +273,23 @@ export enum FontStyle {
      */
     Plain = 0,
     /**
-     * Font is bold
-     */
-    Bold = 1,
-    /**
      * Font is italic.
      */
-    Italic = 2
+    Italic = 1
+}
+
+/**
+ * Lists all font weight values.
+ */
+export enum FontWeight {
+    /**
+     * Not bold
+     */
+    Regular = 0,
+    /**
+     * Font is bold
+     */
+    Bold = 1
 }
 
 /**
@@ -298,12 +314,17 @@ export class Font {
      */
     public style: FontStyle;
 
+    /**
+     * Gets or sets the font weight.
+     */
+    public weight: FontWeight;
+
     public get isBold(): boolean {
-        return (this.style & FontStyle.Bold) === FontStyle.Bold;
+        return this.weight === FontWeight.Bold;
     }
 
     public get isItalic(): boolean {
-        return (this.style & FontStyle.Italic) === FontStyle.Italic;
+        return this.style === FontStyle.Italic;
     }
 
     /**
@@ -311,11 +332,18 @@ export class Font {
      * @param family The family.
      * @param size The size.
      * @param style The style.
+     * @param weight The weight.
      */
-    public constructor(family: string, size: number, style: FontStyle = FontStyle.Plain) {
+    public constructor(
+        family: string,
+        size: number,
+        style: FontStyle = FontStyle.Plain,
+        weight: FontWeight = FontWeight.Regular
+    ) {
         this.family = family;
         this.size = size;
         this.style = style;
+        this.weight = weight;
         this._css = this.toCssString(1);
     }
 
@@ -339,88 +367,93 @@ export class Font {
         return this._css;
     }
 
-    public static fromJson(v:unknown): Font | null {
+    public static fromJson(v: unknown): Font | null {
         switch (typeof v) {
             case 'undefined':
                 return null;
-            case 'object':
-                {
-                    const m = v as Map<string, unknown>;
-                    let family = m.get('family') as string;
-                    let size = m.get('size') as number;
-                    let style = JsonHelper.parseEnum<FontStyle>(m.get('style'), FontStyle)!;
-                    return new Font(family, size, style);
+            case 'object': {
+                const m = v as Map<string, unknown>;
+                let family = m.get('family') as string;
+                let size = m.get('size') as number;
+                let style = JsonHelper.parseEnum<FontStyle>(m.get('style'), FontStyle)!;
+                let weight = JsonHelper.parseEnum<FontWeight>(m.get('weight'), FontWeight)!;
+                return new Font(family, size, style, weight);
+            }
+            case 'string': {
+                const parser = new FontParser(v as string);
+                parser.parse();
+
+                let family: string = parser.families[0];
+                if (
+                    (family.startsWith("'") && family.endsWith("'")) ||
+                    (family.startsWith('"') && family.endsWith('"'))
+                ) {
+                    family = family.substr(1, family.length - 2);
                 }
-            case 'string':
-                {
-                    const parser = new FontParser(v as string);
-                    parser.parse();
 
-                    let family: string = parser.families[0];
-                    if ((family.startsWith("'") && family.endsWith("'")) || (family.startsWith('"') && family.endsWith('"'))) {
-                        family = family.substr(1, family.length - 2);
-                    }
-
-                    let fontSizeString: string = parser.size.toLowerCase();
-                    let fontSize: number = 0;
-                    // as per https://websemantics.uk/articles/font-size-conversion/
-                    switch (fontSizeString) {
-                        case 'xx-small':
-                            fontSize = 7;
-                            break;
-                        case 'x-small':
-                            fontSize = 10;
-                            break;
-                        case 'small':
-                        case 'smaller':
-                            fontSize = 13;
-                            break;
-                        case 'medium':
-                            fontSize = 16;
-                            break;
-                        case 'large':
-                        case 'larger':
-                            fontSize = 18;
-                            break;
-                        case 'x-large':
-                            fontSize = 24;
-                            break;
-                        case 'xx-large':
-                            fontSize = 32;
-                            break;
-                        default:
-                            try {
-                                if (fontSizeString.endsWith('em')) {
-                                    fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16;
-                                } else if (fontSizeString.endsWith('pt')) {
-                                    fontSize = (parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16.0) / 12.0;
-                                } else if (fontSizeString.endsWith('px')) {
-                                    fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2));
-                                } else {
-                                    fontSize = 12;
-                                }
-                            } catch (e) {
+                let fontSizeString: string = parser.size.toLowerCase();
+                let fontSize: number = 0;
+                // as per https://websemantics.uk/articles/font-size-conversion/
+                switch (fontSizeString) {
+                    case 'xx-small':
+                        fontSize = 7;
+                        break;
+                    case 'x-small':
+                        fontSize = 10;
+                        break;
+                    case 'small':
+                    case 'smaller':
+                        fontSize = 13;
+                        break;
+                    case 'medium':
+                        fontSize = 16;
+                        break;
+                    case 'large':
+                    case 'larger':
+                        fontSize = 18;
+                        break;
+                    case 'x-large':
+                        fontSize = 24;
+                        break;
+                    case 'xx-large':
+                        fontSize = 32;
+                        break;
+                    default:
+                        try {
+                            if (fontSizeString.endsWith('em')) {
+                                fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16;
+                            } else if (fontSizeString.endsWith('pt')) {
+                                fontSize =
+                                    (parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16.0) / 12.0;
+                            } else if (fontSizeString.endsWith('px')) {
+                                fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2));
+                            } else {
                                 fontSize = 12;
                             }
-                            break;
-                    }
-
-                    let fontStyle: FontStyle = FontStyle.Plain;
-                    if (parser.style === 'italic') {
-                        fontStyle |= FontStyle.Italic;
-                    }
-                    let fontWeightString: string = parser.weight.toLowerCase();
-                    switch (fontWeightString) {
-                        case 'normal':
-                        case 'lighter':
-                            break;
-                        default:
-                            fontStyle |= FontStyle.Bold;
-                            break;
-                    }
-
-                    return new Font(family, fontSize, fontStyle);
+                        } catch (e) {
+                            fontSize = 12;
+                        }
+                        break;
                 }
+
+                let fontStyle: FontStyle = FontStyle.Plain;
+                if (parser.style === 'italic') {
+                    fontStyle = FontStyle.Italic;
+                }
+
+                let fontWeight: FontWeight = FontWeight.Regular;
+                let fontWeightString: string = parser.weight.toLowerCase();
+                switch (fontWeightString) {
+                    case 'normal':
+                    case 'lighter':
+                        break;
+                    default:
+                        fontWeight = FontWeight.Bold;
+                        break;
+                }
+
+                return new Font(family, fontSize, fontStyle, fontWeight);
+            }
             default:
                 return null;
         }
@@ -431,6 +464,7 @@ export class Font {
         o.set('family', font.family);
         o.set('size', font.size);
         o.set('style', font.style as number);
+        o.set('weight', font.weight as number);
         return o;
     }
 }

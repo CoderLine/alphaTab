@@ -22,6 +22,13 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return className;
     }
 
+    protected toCoreTypeName(s: string) {
+        if(s === 'String') {
+            return 'CoreString';
+        }
+        return s;
+    }
+
     private isSymbolPartial(tsSymbol: ts.Symbol): boolean {
         if (!tsSymbol.valueDeclaration) {
             return false;
@@ -56,5 +63,9 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         }
 
         return false;
+    }
+
+    public isValueTypeNotNullSmartCast(expression: ts.Expression): boolean | undefined {
+        return undefined;
     }
 }

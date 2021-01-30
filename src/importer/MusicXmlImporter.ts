@@ -230,7 +230,8 @@ export class MusicXmlImporter extends ScoreImporter {
         let masterBar: MasterBar | null = null;
         for (let b: number = track.staves[0].bars.length; b <= barIndex; b++) {
             for (let s: number = 0; s < track.staves.length; s++) {
-                let bar: Bar = (bars[s] = new Bar());
+                let bar: Bar =new Bar();
+                bars[s] = bar;
                 if (track.staves[s].bars.length > 0) {
                     let previousBar: Bar = track.staves[s].bars[track.staves[s].bars.length - 1];
                     bar.clef = previousBar.clef;
@@ -576,7 +577,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let num: number = parseInt(element.getAttribute('number'));
         if (num > 0) {
             --num;
-            masterBar.alternateEndings |= (0x01 << num) & 0xff;
+            masterBar.alternateEndings = masterBar.alternateEndings | ((0x01 << num) & 0xff);
         }
     }
 
@@ -1088,9 +1089,10 @@ export class MusicXmlImporter extends ScoreImporter {
                 }
             }
         }
-        let tempoAutomation: Automation = (masterBar.tempoAutomation = new Automation());
+        let tempoAutomation: Automation = new Automation();
         tempoAutomation.type = AutomationType.Tempo;
         tempoAutomation.value = perMinute * ((unit / 4) | 0);
+        masterBar.tempoAutomation = tempoAutomation;
     }
 
     private parseAttributes(element: XmlNode, bars: Bar[], masterBar: MasterBar, track: Track): void {

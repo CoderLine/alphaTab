@@ -1,14 +1,33 @@
 package alphaTab.core
 
-fun String.substr(startIndex:Double, length:Double): String {
+import system.globalization.CultureInfo
+
+expect fun UByteArray.decodeToFloatArray(): FloatArray
+expect fun UByteArray.decodeToDoubleArray(): DoubleArray
+
+fun kotlin.String.substr(startIndex: Double, length: Double): kotlin.String {
     return this.substring(startIndex.toInt(), (startIndex + length).toInt());
 }
-fun String.substr(startIndex:Double): String {
+
+fun kotlin.String.substr(startIndex: Double): kotlin.String {
     return this.substring(startIndex.toInt());
 }
 
-fun <T> MutableList<T>.splice(start: Double, deleteCount: Double, vararg newItems:T) {
-    if(deleteCount > 0) {
+fun <T> MutableList<T>.sort(comparer: ((a: T, b: T) -> Double)) {
+    this.sortWith { a, b -> comparer(a, b).toInt() }
+}
+
+fun <T> MutableList<T>.filterBy(predicate: (T) -> Boolean): MutableList<T> {
+    return this.filter(predicate).toMutableList()
+}
+
+fun <T> MutableList<T>.fillWith(value: T): MutableList<T> {
+    this.fill(value)
+    return this
+}
+
+fun <T> MutableList<T>.splice(start: Double, deleteCount: Double, vararg newItems: T) {
+    if (deleteCount > 0) {
         this.removeAll(this.subList(start.toInt(), (start + deleteCount).toInt()))
     }
     this.addAll(start.toInt(), newItems.asList());
@@ -18,54 +37,82 @@ fun <T> MutableList<T>.pop(): T {
     return this.removeLast();
 }
 
-fun <T> List<T>.indexOfInDouble(item:T): Double {
+fun kotlin.String.indexOfInDouble(item: kotlin.String): Double {
     return this.indexOf(item).toDouble();
 }
-fun <T> Iterable<T>.join(separator:String): String {
+
+fun Double.toString(base: Double): kotlin.String {
+    return this.toInt().toString(base.toInt());
+}
+
+fun Double.toString(cultureInfo: CultureInfo): kotlin.String {
+// TODO
+    return this.toString()
+}
+
+
+fun kotlin.String.lastIndexOfInDouble(item: kotlin.String): Double {
+    return this.lastIndexOf(item).toDouble();
+}
+
+fun <T> List<T>.indexOfInDouble(item: T): Double {
+    return this.indexOf(item).toDouble();
+}
+
+fun <T> Iterable<T>.join(separator: kotlin.String): kotlin.String {
     return this.joinToString(separator);
 }
-operator fun Double.plus(str:String): String {
+
+operator fun Double.plus(str: kotlin.String): kotlin.String {
     return this.toString() + str;
 }
-fun String.charAt(index:Double): String {
+
+fun kotlin.String.charAt(index: Double): kotlin.String {
     return this.substring(index.toInt(), 1);
 }
-fun String.split(delimiter:String): MutableList<String> {
+
+fun kotlin.String.charAt(index: Int): kotlin.String {
+    return this.substring(index, 1);
+}
+
+fun kotlin.String.charCodeAt(index: Double): Double {
+    return this[index.toInt()].toDouble()
+}
+
+fun kotlin.String.split(delimiter: kotlin.String): MutableList<kotlin.String> {
     return this.split(delimiters = arrayOf(delimiter), false, 0).toMutableList();
 }
-fun String.substring(startIndex:Double, endIndex:Double): String {
+
+fun kotlin.String.substring(startIndex: Double, endIndex: Double): kotlin.String {
     return this.substring(startIndex.toInt(), endIndex.toInt());
 }
-fun Any.toDouble(): Double {
-    if(this is Double) {
+
+fun kotlin.String.substring(startIndex: Double): kotlin.String {
+    return this.substring(startIndex.toInt());
+}
+
+operator fun Int.rangeTo(d:Double): IntRange {
+    return this.rangeTo(d.toInt())
+}
+
+fun Any?.toDouble(): Double {
+    if (this is Double) {
         return this;
     }
     return this.toString().toDouble();
 }
 
 class Console {
-    public open fun debug( format:String, vararg details:Any?)
-    {
-        var message = details != null ? string.Format(format, details) : format;
-        println(message, "AlphaTab Debug");
+    public open fun debug(format: kotlin.String, vararg details: Any?) {
     }
 
-    public open fun warn(string format, object?[]? details)
-    {
-        var message = details != null ? string.Format(format, details) : format;
-        Trace.Write(message, "AlphaTab Warn");
+    public open fun warn(format: kotlin.String, vararg details: Any?) {
     }
 
-    public open fun info(string format, object?[]? details)
-    {
-        var message = details != null ? string.Format(format, details) : format;
-        Trace.Write(message, "AlphaTab Info");
+    public open fun info(format: kotlin.String, vararg details: Any?) {
     }
 
-    public open fun error(string format, object?[]? details)
-    {
-        var message = details != null ? string.Format(format, details) : format;
-        Trace.Write(message, "AlphaTab Error");
+    public open fun error(format: kotlin.String, vararg details: Any?) {
     }
 }
 
@@ -73,7 +120,18 @@ class Globals {
     companion object {
         val console = Console();
 
-        fun parseFloat(s:String): Double {
+        fun isNaN(s: Double): Boolean {
+            return s.isNaN()
+        }
+        fun parseFloat(s: String): Double {
+            return 0.0
+        }
+
+        fun parseInt(s: String): Double {
+            return 0.0
+        }
+
+        fun parseInt(s: String, radix: Double): Double {
             return 0.0
         }
     }

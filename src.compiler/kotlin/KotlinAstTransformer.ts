@@ -24,24 +24,28 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             ts.isParameter(identifier.tsSymbol.valueDeclaration) &&
             !this.isSuperCall(expression.parent)
         ) {
-            // TODO: proper scope handling here, first register all parameters when 
-            // a new scope is started, 
-            // and here register all identifier usages. 
+            // TODO: proper scope handling here, first register all parameters when
+            // a new scope is started,
+            // and here register all identifier usages.
             const currentParamRefs = this._paramReferences[this._paramReferences.length - 1];
-            if(currentParamRefs) {
+            if (currentParamRefs) {
                 if (!currentParamRefs.has(paramName)) {
                     currentParamRefs.set(paramName, []);
                 }
                 currentParamRefs.get(paramName)!.push(identifier);
             }
         }
+
         return paramName;
     }
 
     protected visitBinaryExpression(parent: cs.Node, expression: ts.BinaryExpression) {
         const bin = super.visitBinaryExpression(parent, expression);
         // detect parameter assignment
-        if (expression.operatorToken.kind == ts.SyntaxKind.EqualsToken) {
+        if (
+            expression.operatorToken.kind == ts.SyntaxKind.EqualsToken ||
+            expression.operatorToken.kind == ts.SyntaxKind.PlusEqualsToken
+        ) {
             const left = this._context.typeChecker.getSymbolAtLocation(expression.left);
             if (left?.valueDeclaration && left.valueDeclaration.kind == ts.SyntaxKind.Parameter) {
                 this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(left.name);
@@ -49,6 +53,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         }
         return bin;
     }
+
     private isSuperCall(parent: ts.Node): boolean {
         return ts.isCallExpression(parent) && parent.expression.kind === ts.SyntaxKind.SuperKeyword;
     }
@@ -61,7 +66,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         for (const p of currentAssignments) {
             const renamedP = this.getMethodLocalParameterName(p);
 
-            for(const ident of currentScope.get(p)!) {
+            for (const ident of currentScope.get(p)!) {
                 ident.text = renamedP;
             }
 
@@ -192,16 +197,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return base;
     }
 
-    protected visitTemplateExpression(parent: cs.Node, expression: ts.TemplateExpression): cs.Expression {
-        const text = expression.getText();
-        return {
-            parent: parent,
-            nodeType: cs.SyntaxKind.StringLiteral,
-            tsNode: expression,
-            text: text.substring(1, text.length - 1)
-        } as cs.StringLiteral;
-    }
-
     protected getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol, expression: cs.Expression): string | null {
         switch (parentSymbol.name) {
             case 'Array':
@@ -222,16 +217,29 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                         return 'add';
                     case 'indexOf':
                         return 'indexOfInDouble';
+                    case 'filter':
+                        return 'filterBy';
+                    case 'fill':
+                        return 'fillWith';
                 }
                 break;
             case 'String':
                 switch (symbol.name) {
                     case 'length':
-                        if (expression.parent?.nodeType === cs.SyntaxKind.ReturnStatement) {
+                        if (
+                            expression.parent?.nodeType === cs.SyntaxKind.ReturnStatement ||
+                            expression.parent?.nodeType === cs.SyntaxKind.VariableDeclaration ||
+                            (expression.parent?.nodeType === cs.SyntaxKind.BinaryExpression &&
+                                (expression.parent as cs.BinaryExpression).operator === '=')
+                        ) {
                             return 'length.toDouble()';
                         }
 
-                        return 'length';
+                        return 'length.toDouble()';
+                    case 'indexOf':
+                        return 'indexOfInDouble';
+                    case 'lastIndexOf':
+                        return 'lastIndexOfInDouble';
                 }
                 break;
         }

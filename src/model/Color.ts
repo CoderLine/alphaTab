@@ -66,7 +66,7 @@ export class Color {
             case 'number':
                 {
                     const c = new Color(0, 0, 0, 0);
-                    c.raw = v as number;
+                    c.raw = v! as number;
                     c.updateRgba();
                     return c;
                 }

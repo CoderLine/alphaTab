@@ -61,7 +61,7 @@ export default class CSharpEmitterContext {
                 expr.tsSymbol.flags & ts.SymbolFlags.ConstEnum ||
                 expr.tsSymbol.flags & ts.SymbolFlags.RegularEnum
             ) {
-                return this.buildCoreNamespace(expr.tsSymbol) + expr.tsSymbol.name;
+                return this.buildCoreNamespace(expr.tsSymbol) + this.toCoreTypeName(expr.tsSymbol.name);
             } else if (expr.tsSymbol.flags & ts.SymbolFlags.Function) {
                 if (this.isTestFunction(expr.tsSymbol)) {
                     return this.toPascalCase('alphaTab.test') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
@@ -472,29 +472,19 @@ export default class CSharpEmitterContext {
             }
         }
 
-        if (
-            returnType.nodeType === cs.SyntaxKind.PrimitiveTypeNode &&
-            (returnType as cs.PrimitiveTypeNode).type === cs.PrimitiveType.Void
-        ) {
-            return {
-                nodeType: cs.SyntaxKind.TypeReference,
-                parent: node.parent,
-                tsNode: node.tsNode,
-                reference: this.toPascalCase('system') + '.Action',
-                typeArguments: parameterTypes
-            } as cs.TypeReference;
-        } else {
-            parameterTypes.push(returnType);
-            return {
-                nodeType: cs.SyntaxKind.TypeReference,
-                parent: node.parent,
-                tsNode: node.tsNode,
-                reference: this.toPascalCase('system') + '.Func',
-                typeArguments: parameterTypes
-            } as cs.TypeReference;
-        }
+        return this.createBasicFunctionType(node, returnType, parameterTypes);
     }
 
+    protected createBasicFunctionType(node:cs.Node, returnType: cs.TypeNode, parameterTypes: cs.TypeNode[]): cs.TypeNode {
+        return {
+            nodeType: cs.SyntaxKind.FunctionTypeNode,
+            parent: node.parent,
+            tsNode: node.tsNode,
+            parameterTypes: parameterTypes,
+            returnType: returnType
+        } as cs.FunctionTypeNode;
+    }
+    
     private resolveUnionType(
         parent: cs.Node,
         tsType: ts.Type,
@@ -777,6 +767,9 @@ export default class CSharpEmitterContext {
         }
         return this.makeTypeName('alphaTab.core') + suffix + '.';
     }
+    protected toCoreTypeName(s: string) {
+        return s;
+    }
 
     public toPascalCase(text: string): string {
         if (this.noPascalCase) {
@@ -1006,6 +999,13 @@ export default class CSharpEmitterContext {
     public getSmartCastType(expression: ts.Expression): ts.Type | null {
         // if the parent is already casting, we have no "smart" cast.
         if (expression.parent.kind === ts.SyntaxKind.AsExpression) {
+            return null;
+        }
+
+        if (
+            expression.parent.kind === ts.SyntaxKind.NonNullExpression &&
+            expression.parent.parent.kind === ts.SyntaxKind.AsExpression
+        ) {
             return null;
         }
 

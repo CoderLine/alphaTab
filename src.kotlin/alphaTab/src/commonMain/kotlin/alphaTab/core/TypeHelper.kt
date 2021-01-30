@@ -5,18 +5,22 @@ import kotlin.contracts.contract
 
 class TypeHelper {
     companion object {
-        public fun isTruthy(s:String?): Boolean {
+        public fun isTruthy(s: String?): Boolean {
             return s != null && s.isNotEmpty();
         }
-        public fun isTruthy(s:Any?): Boolean {
+
+        @ExperimentalContracts
+        public inline fun isTruthy(s: Any?): Boolean {
+            contract { returns(true) implies (s != null) }
             return s != null;
         }
-        @ExperimentalContracts
-        public fun typeOf(s:Any?): String {
-            contract {
-                returnsNotNull() implies (s != null)
-            }
+
+        public fun typeOf(s: Any?): String {
             return ""
+        }
+
+        public fun <K, V> createMapEntry(k: K, v: V): Pair<K, V> {
+            return Pair(k, v);
         }
     }
 }

@@ -17,6 +17,7 @@ export enum SyntaxKind {
     ParameterDeclaration,
     UnresolvedTypeNode,
     TypeReference,
+    FunctionTypeNode,
     PrimitiveTypeNode,
     EnumMember,
     ArrayTypeNode,
@@ -246,6 +247,11 @@ export interface ArrayTypeNode extends TypeNode {
     elementType: TypeNode;
 }
 
+export interface FunctionTypeNode extends TypeNode {
+    parameterTypes: TypeNode[];
+    returnType: TypeNode;
+}
+
 export enum PrimitiveType {
     Bool,
     String,
@@ -306,6 +312,7 @@ export interface ConditionalExpression extends Node {
 export interface LambdaExpression extends Node {
     parameters: ParameterDeclaration[];
     body: Block | Expression;
+    returnType: TypeNode;
 }
 
 export interface NumericLiteral extends Node {

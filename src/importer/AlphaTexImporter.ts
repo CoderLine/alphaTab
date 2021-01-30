@@ -61,7 +61,7 @@ export class AlphaTexError extends AlphaTabError {
     public nonTerm: string = '';
     public expected: AlphaTexSymbols = AlphaTexSymbols.No;
     public symbol: AlphaTexSymbols = AlphaTexSymbols.No;
-    public symbolData: unknown;
+    public symbolData: unknown = null;
 
     public constructor(message: string) {
         super(AlphaTabErrorType.AlphaTex, message);
@@ -110,7 +110,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _ch: number = 0;
     private _curChPos: number = 0;
     private _sy: AlphaTexSymbols = AlphaTexSymbols.No;
-    private _syData: unknown;
+    private _syData: unknown = null;
     private _allowNegatives: boolean = false;
     private _allowTuning: boolean = false;
     private _currentDuration: Duration = Duration.QuadrupleWhole;
@@ -183,13 +183,13 @@ export class AlphaTexImporter extends ScoreImporter {
         } else {
             e = AlphaTexError.symbolError(this._curChPos, nonterm, expected, expected, this._syData);
         }
-        Logger.error(this.name, e.message);
+        Logger.error(this.name, e.message!);
         throw e;
     }
 
     private errorMessage(message: string): void {
         let e: AlphaTexError = AlphaTexError.errorMessage(this._curChPos, message);
-        Logger.error(this.name, e.message);
+        Logger.error(this.name, e.message!);
         throw e;
     }
 

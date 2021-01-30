@@ -1,10 +1,13 @@
 package alphaTab.core.ecmaScript
 
-class Error: Throwable {
-    public constructor() : super() {
+open class Error: Throwable {
+    public override val message: String
 
+    public constructor() : super() {
+        this.message = ""
     }
 
     public constructor(msg:String) : super(msg) {
+        this.message = msg;
     }
 }

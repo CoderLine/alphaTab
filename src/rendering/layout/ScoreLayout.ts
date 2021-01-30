@@ -2,7 +2,7 @@ import { StaveProfile } from '@src/DisplaySettings';
 import { Environment } from '@src/Environment';
 import { Bar } from '@src/model/Bar';
 import { Chord } from '@src/model/Chord';
-import { Font, FontStyle } from '@src/model/Font';
+import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
@@ -245,7 +245,7 @@ export abstract class ScoreLayout {
         let x: number = this.width / 2;
         canvas.beginRender(this.width, height);
         canvas.color = resources.mainGlyphColor;
-        canvas.font = new Font(resources.copyrightFont.family, size, FontStyle.Bold);
+        canvas.font = new Font(resources.copyrightFont.family, size, FontStyle.Plain, FontWeight.Bold);
         canvas.textAlign = TextAlign.Center;
         canvas.fillText(msg, x, size);
         let result: unknown = canvas.endRender();

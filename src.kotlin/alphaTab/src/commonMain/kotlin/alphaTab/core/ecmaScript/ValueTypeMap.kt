@@ -2,7 +2,7 @@ package alphaTab.core.ecmaScript
 
 import kotlin.collections.Map
 
-class Map<TKey, TValue> : Iterable<Map.Entry<TKey, TValue>> {
+class ValueTypeMap<TKey, TValue> : Iterable<Map.Entry<TKey, TValue>> {
     private val _map: HashMap<TKey, TValue>
 
 
@@ -13,11 +13,6 @@ class Map<TKey, TValue> : Iterable<Map.Entry<TKey, TValue>> {
 
     public constructor() {
         _map = HashMap()
-    }
-
-    public fun values(): MutableList<TValue>
-    {
-        return _map.values.toMutableList()
     }
 
     public constructor(entries: Iterable<Pair<TKey, TValue>>) {
