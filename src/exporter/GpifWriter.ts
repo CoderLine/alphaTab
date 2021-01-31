@@ -507,7 +507,7 @@ export class GpifWriter {
 
     private writePitchForValue(properties: XmlNode, propertyName: string, value: number, accidentalMode: NoteAccidentalMode) {
         let index = 0;
-        let octave: number = 0;
+        let octave = 0;
 
         let step = '';
         let accidental = '';
@@ -593,7 +593,7 @@ export class GpifWriter {
                 bendMiddle1 = bendPoints[1];
                 bendMiddle2 = bendPoints[1];
                 break;
-            case 2:
+            // case 2:
             default:
                 bendMiddle1 = new BendPoint(
                     (bendOrigin.offset + bendDestination.offset) / 2,
@@ -852,7 +852,7 @@ export class GpifWriter {
                 whammyMiddle1 = whammyBarPoints[1];
                 whammyMiddle2 = whammyBarPoints[1];
                 break;
-            case 2:
+            // case 2:
             default:
                 whammyMiddle1 = new BendPoint(
                     (whammyOrigin.offset + whammyDestination.offset) / 2,

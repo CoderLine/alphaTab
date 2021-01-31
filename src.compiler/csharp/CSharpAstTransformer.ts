@@ -2314,6 +2314,7 @@ export default class CSharpAstTransformer {
                 }
             }
 
+            assignment.right = this.makeDouble(assignment.right);
             return assignment;
         } else {
             const binaryExpression = {

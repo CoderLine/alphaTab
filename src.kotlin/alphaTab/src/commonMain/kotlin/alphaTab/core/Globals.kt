@@ -4,6 +4,8 @@ import system.globalization.CultureInfo
 
 expect fun UByteArray.decodeToFloatArray(): FloatArray
 expect fun UByteArray.decodeToDoubleArray(): DoubleArray
+expect fun UByteArray.decodeToString(encoding:String): String
+
 
 fun kotlin.String.substr(startIndex: Double, length: Double): kotlin.String {
     return this.substring(startIndex.toInt(), (startIndex + length).toInt());
@@ -19,6 +21,14 @@ fun <T> MutableList<T>.sort(comparer: ((a: T, b: T) -> Double)) {
 
 fun <T> MutableList<T>.filterBy(predicate: (T) -> Boolean): MutableList<T> {
     return this.filter(predicate).toMutableList()
+}
+
+fun <T> MutableList<T>.slice(): MutableList<T> {
+    return this.toMutableList()
+}
+fun <T> MutableList<T>.rev(): MutableList<T> {
+    this.reverse()
+    return this;
 }
 
 fun <T> MutableList<T>.fillWith(value: T): MutableList<T> {
@@ -75,6 +85,9 @@ fun kotlin.String.charAt(index: Int): kotlin.String {
     return this.substring(index, 1);
 }
 
+fun kotlin.String.charCodeAt(index: Int): Double {
+    return this[index].toDouble()
+}
 fun kotlin.String.charCodeAt(index: Double): Double {
     return this[index.toInt()].toDouble()
 }

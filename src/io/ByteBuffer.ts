@@ -30,7 +30,8 @@ export class ByteBuffer implements IWriteable, IReadable {
     public static fromBuffer(data: Uint8Array): ByteBuffer {
         let buffer: ByteBuffer = new ByteBuffer();
         buffer._buffer = data;
-        buffer._capacity = buffer.length = data.length;
+        buffer.length = data.length
+        buffer._capacity = buffer.length;
         return buffer;
     }
 

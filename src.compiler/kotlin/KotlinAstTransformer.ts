@@ -212,6 +212,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                             return 'size';
                         }
 
+                        if (this.isWithinForInitializer(expression.tsNode!)) {
+                            return 'size';
+                        }
+
                         return 'size.toDouble()';
                     case 'push':
                         return 'add';
@@ -219,6 +223,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                         return 'indexOfInDouble';
                     case 'filter':
                         return 'filterBy';
+                    case 'reverse':
+                        return 'rev';
                     case 'fill':
                         return 'fillWith';
                 }
@@ -244,6 +250,19 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 break;
         }
         return null;
+    }
+
+    private isWithinForInitializer(expression: ts.Node): Boolean {
+        if(!expression.parent) {
+            return false;
+        }
+
+        if(ts.isForStatement(expression.parent) &&
+        expression.parent.initializer === expression) {
+               return true;
+        }
+        
+        return this.isWithinForInitializer(expression.parent!);
     }
 
     protected visitNonNullExpression(parent: cs.Node, expression: ts.NonNullExpression) {

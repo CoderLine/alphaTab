@@ -54,6 +54,7 @@ export default class KotlinAstPrinter {
         this.writeLine('    "CascadeIf",');
         this.writeLine('    "unused",');
         this.writeLine('    "NON_EXHAUSTIVE_WHEN",');
+        this.writeLine('    "UNCHECKED_CAST",');
         this.writeLine('    "UNNECESSARY_NOT_NULL_ASSERTION"');
         this.writeLine(')');
         this.writeLine(`package ${sourceFile.namespace.namespace}`);
@@ -510,6 +511,7 @@ export default class KotlinAstPrinter {
 
     private writePropertyDeclaration(d: cs.PropertyDeclaration) {
         this.writeDocumentation(d);
+
         this.writeVisibility(d.visibility);
 
         const isAutoProperty = this.isAutoProperty(d);
@@ -536,7 +538,11 @@ export default class KotlinAstPrinter {
                 this.write('lateinit ');
             }
 
-            if ((!isAutoProperty && !d.setAccessor) || (d.isAbstract && !d.setAccessor)) {
+            if (
+                (!isAutoProperty && !d.setAccessor) ||
+                (d.isAbstract && !d.setAccessor) ||
+                (d.parent!.nodeType === cs.SyntaxKind.InterfaceDeclaration && !d.setAccessor)
+            ) {
                 this.write('val ');
             } else {
                 this.write('var ');
@@ -667,7 +673,7 @@ export default class KotlinAstPrinter {
                             this.write('Any');
                             break;
                         case cs.PrimitiveType.Double:
-                            this.write('Double');
+                            this.write(this._forceInteger ? 'Int' : 'Double');
                             break;
                         case cs.PrimitiveType.Int:
                             this.write('Int');
@@ -888,8 +894,17 @@ export default class KotlinAstPrinter {
     }
 
     private writePrefixUnaryExpression(expr: cs.PrefixUnaryExpression) {
-        this.write(expr.operator);
-        this.writeExpression(expr.operand);
+        switch (expr.operator) {
+            case '~':
+                this.write('(');
+                this.writeExpression(expr.operand);
+                this.write(').toInt().inv()');
+                break;
+            default:
+                this.write(expr.operator);
+                this.writeExpression(expr.operand);
+                break;
+        }
     }
 
     private writePostfixUnaryExpression(expr: cs.PostfixUnaryExpression) {
@@ -977,11 +992,14 @@ export default class KotlinAstPrinter {
         }
     }
 
-    private writeNumericLiteral(expr: cs.NumericLiteral) {
-        this.write(expr.value);
+    private shouldWriteDoubleSuffix(expr: cs.Expression) {
         let shouldWriteSuffix = false;
         if (!this._forceInteger && expr.parent) {
-            shouldWriteSuffix = expr.value.indexOf('.') === -1;
+            shouldWriteSuffix =
+                expr.nodeType === cs.SyntaxKind.NumericLiteral
+                    ? (expr as cs.NumericLiteral).value.indexOf('.') === -1
+                    : false;
+
             switch (expr.parent.nodeType) {
                 case cs.SyntaxKind.VariableDeclaration:
                     if (
@@ -991,6 +1009,9 @@ export default class KotlinAstPrinter {
                     ) {
                         shouldWriteSuffix = false;
                     }
+                    break;
+                case cs.SyntaxKind.ParenthesizedExpression:
+                    shouldWriteSuffix = this.shouldWriteDoubleSuffix(expr.parent!.parent!);
                     break;
                 case cs.SyntaxKind.PropertyDeclaration:
                 case cs.SyntaxKind.FieldDeclaration:
@@ -1016,6 +1037,9 @@ export default class KotlinAstPrinter {
                         case '|':
                         case '^':
                         case '&':
+                        case '|=':
+                        case '^=':
+                        case '&=':
                             shouldWriteSuffix = false;
                             break;
                         case '==':
@@ -1028,7 +1052,13 @@ export default class KotlinAstPrinter {
             }
         }
 
-        if (shouldWriteSuffix) {
+        return shouldWriteSuffix;
+    }
+
+    private writeNumericLiteral(expr: cs.NumericLiteral) {
+        this.write(expr.value);
+
+        if (this.shouldWriteDoubleSuffix(expr)) {
             this.write('.0');
         }
     }
@@ -1083,7 +1113,7 @@ export default class KotlinAstPrinter {
                     .join('\\r');
                 this.write(escapedText);
             } else {
-                this.write('${')
+                this.write('${');
                 this.writeExpression(c as cs.Expression);
                 this.write('}');
             }
@@ -1151,6 +1181,8 @@ export default class KotlinAstPrinter {
         } else if (
             expr.expression.nodeType == cs.SyntaxKind.NonNullExpression ||
             expr.expression.nodeType === cs.SyntaxKind.Identifier ||
+            expr.expression.nodeType === cs.SyntaxKind.ArrayCreationExpression ||
+            expr.expression.nodeType === cs.SyntaxKind.NewExpression ||
             expr.expression.nodeType === cs.SyntaxKind.ThisLiteral
         ) {
             this.write('.');
@@ -1212,7 +1244,7 @@ export default class KotlinAstPrinter {
             this.write(')');
         }
     }
-    
+
     private writeCastExpression(expr: cs.CastExpression) {
         if (expr.type.nodeType === cs.SyntaxKind.PrimitiveTypeNode) {
             switch ((expr.type as cs.PrimitiveTypeNode).type) {
@@ -1436,18 +1468,23 @@ export default class KotlinAstPrinter {
     }
 
     private writeForStatement(s: cs.ForStatement) {
-        let [name, lower, upper] = this.detectForRange(s);
-        if (lower && upper) {
-            this.write(`for(${name} in `);
+        let [name, lower, upper, rangeOperator] = this.detectForRange(s);
+        if (lower && upper && rangeOperator) {
+            this.write(`for(${name} in (`);
+            this._forceInteger = true;
             this.writeExpression(lower);
-            this.write('..');
+            this.write(').toInt() ');
+            this.write(rangeOperator);
+            this.write(' (');
             this.writeExpression(upper);
-            this.write(')');
+            this.write(').toInt())');
+            this._forceInteger = false;
             this.writeStatement(s.statement);
         } else {
             this.write('run ');
             this.beginBlock();
 
+            this._forceInteger = true;
             if (s.initializer) {
                 if (s.initializer.nodeType === cs.SyntaxKind.VariableDeclarationList) {
                     this.writeVariableDeclarationList(s.initializer as cs.VariableDeclarationList);
@@ -1455,6 +1492,7 @@ export default class KotlinAstPrinter {
                     this.writeExpression(s.initializer as cs.Expression);
                 }
             }
+            this._forceInteger = false;
             this.writeLine();
 
             this.write('while(');
@@ -1489,81 +1527,88 @@ export default class KotlinAstPrinter {
         }
     }
 
-    private detectForRange(s: cs.ForStatement): [string | null, cs.Expression | null, cs.Expression | null] {
+    private detectForRange(
+        s: cs.ForStatement
+    ): [string | null, cs.Expression | null, cs.Expression | null, string | null] {
         if (!s.initializer || !s.condition || !s.incrementor) {
-            return [null, null, null];
+            return [null, null, null, null];
         }
 
         // let i=0 or let i=0, j=10
         if (s.initializer.nodeType !== cs.SyntaxKind.VariableDeclarationList) {
-            return [null, null, null];
+            return [null, null, null, null];
         }
 
-        // i < 10 or i < j
+        // i < 10 or i < j or i >= 0
         if (
             s.condition.nodeType !== cs.SyntaxKind.BinaryExpression ||
-            (s.condition as cs.BinaryExpression).operator !== '<'
+            ((s.condition as cs.BinaryExpression).operator !== '<' &&
+                (s.condition as cs.BinaryExpression).operator !== '>=')
         ) {
-            return [null, null, null];
+            return [null, null, null, null];
         }
 
-        // i++
+        // i++ or i--
         if (
             s.incrementor.nodeType !== cs.SyntaxKind.PostfixUnaryExpression ||
-            (s.incrementor as cs.PostfixUnaryExpression).operator !== '++'
+            ((s.incrementor as cs.PostfixUnaryExpression).operator !== '++' &&
+                (s.incrementor as cs.PostfixUnaryExpression).operator !== '--')
         ) {
-            return [null, null, null];
+            return [null, null, null, null];
         }
 
         const decl = s.initializer as cs.VariableDeclarationList;
+        const operator = (s.condition as cs.BinaryExpression).operator === '<' ? 'until' : 'downTo';
+
         if (decl.declarations.length === 1) {
             const name = decl.declarations[0].name;
             const lower = decl.declarations[0].initializer;
             if (!lower) {
-                return [null, null, null];
+                return [null, null, null, null];
             }
 
             const left = (s.condition as cs.BinaryExpression).left;
             if (left.nodeType === cs.SyntaxKind.Identifier) {
                 if ((left as cs.Identifier).text !== name) {
-                    return [null, null, null];
+                    return [null, null, null, null];
                 }
             } else {
-                return [null, null, null];
+                return [null, null, null, null];
             }
 
             const upper = (s.condition as cs.BinaryExpression).right;
-            return [name, lower, upper];
+
+            return [name, lower, upper, operator];
         } else if (decl.declarations.length === 2) {
             const lowerName = decl.declarations[0].name;
             const lower = decl.declarations[0].initializer;
             const upperName = decl.declarations[1].name;
             const upper = decl.declarations[1].initializer;
             if (!lower || !upper) {
-                return [null, null, null];
+                return [null, null, null, null];
             }
 
             const left = (s.condition as cs.BinaryExpression).left;
             if (left.nodeType === cs.SyntaxKind.Identifier) {
                 if ((left as cs.Identifier).text !== lowerName) {
-                    return [null, null, null];
+                    return [null, null, null, null];
                 }
             } else {
-                return [null, null, null];
+                return [null, null, null, null];
             }
 
             const right = (s.condition as cs.BinaryExpression).left;
             if (right.nodeType === cs.SyntaxKind.Identifier) {
                 if ((right as cs.Identifier).text !== upperName) {
-                    return [null, null, null];
+                    return [null, null, null, null];
                 }
             } else {
-                return [null, null, null];
+                return [null, null, null, null];
             }
 
-            return [lowerName, lower, upper];
+            return [lowerName, lower, upper, operator];
         } else {
-            return [null, null, null];
+            return [null, null, null, null];
         }
     }
 
@@ -1663,6 +1708,9 @@ export default class KotlinAstPrinter {
     }
 
     private writeBlock(b: cs.Block) {
+        if (b.parent?.nodeType === cs.SyntaxKind.Block) {
+            this.write('run ');
+        }
         this.beginBlock();
         b.statements.forEach(s => this.writeStatement(s));
         this.endBlock();

@@ -95,7 +95,7 @@ export class IOHelper {
         for (let i: number = 0; i < length; i++) {
             let c: number = input.readByte();
             if (c === 0 && z === -1) {
-                z = i;
+                z = i as number;
             }
             s += String.fromCharCode(c);
         }

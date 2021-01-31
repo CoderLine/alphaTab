@@ -85,7 +85,7 @@ export class MusicXmlImporter extends ScoreImporter {
         // if any groups were merged, we need to rebuild the indexes
         if (anyMerged) {
             for (let i: number = 0; i < this._score.tracks.length; i++) {
-                this._score.tracks[i].index = i;
+                this._score.tracks[i].index = i as number;
             }
         }
     }
