@@ -39,7 +39,8 @@ Link to jsFiddle, CodePen, Project etc.:
 **Version**
 - [ ] 1.0 
 - [ ] 1.1
-- [ ] 1.2-alpha.## <!-- Add your exact version here -->
+- [ ] 1.2
+- [ ] 1.3-alpha.## <!-- Add your exact version here -->
 
 **Flavor**
 - [ ] JavaScript 
