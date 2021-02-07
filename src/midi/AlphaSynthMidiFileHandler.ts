@@ -28,9 +28,13 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
 
     public addTimeSignature(tick: number, timeSignatureNumerator: number, timeSignatureDenominator: number): void {
         let denominatorIndex: number = 0;
-        // tslint:disable-next-line: no-conditional-assignment
-        while ((timeSignatureDenominator = timeSignatureDenominator >> 1) > 0) {
-            denominatorIndex++;
+        while(true) {
+            timeSignatureDenominator = timeSignatureDenominator >> 1;
+            if(timeSignatureDenominator > 0) {
+                denominatorIndex++;
+            } else {
+                break;
+            }
         }
         const message: MetaDataEvent = new MetaDataEvent(
             0,

@@ -1,19 +1,17 @@
 package alphaTab.core
 
-class Lazy<T : Any?> {
-    private val _factory: () -> T
-    private var _created:Boolean = false;
-    private var _value:T;
+internal object UninitializedValue
 
-    public constructor(factory:() -> T) {
-        this._factory = factory;
-    }
+class Lazy<T : Any?>(factory: () -> T) {
+    private val _factory: () -> T = factory
+    private var _value:Any? = UninitializedValue
 
     public val value:T
         get() {
-            if(!_created) {
+            if(_value == UninitializedValue) {
                 _value = _factory()
             }
-            return _value;
+            @Suppress("UNCHECKED_CAST")
+            return _value as T;
         }
 }

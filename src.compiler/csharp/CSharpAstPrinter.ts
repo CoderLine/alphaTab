@@ -68,14 +68,15 @@ export default class CSharpAstPrinter {
         this.endBlock();
     }
 
-    private writeDocumentation(d: cs.DocumentedElement) {
+    protected writeDocumentation(d: cs.DocumentedElement) {
         if (d.documentation) {
             this.writeLine('/// <summary>');
             this.writeDocumentationLines(d.documentation, true);
             this.writeLine('/// </summary>');
         }
     }
-    private writeDocumentationLines(documentation: string, multiLine: boolean) {
+
+    protected writeDocumentationLines(documentation: string, multiLine: boolean) {
         const lines = documentation.split('\n');
         if (lines.length > 1 || multiLine) {
             if (!this._isStartOfLine) {
@@ -329,16 +330,8 @@ export default class CSharpAstPrinter {
 
     private writeMethodDeclaration(d: cs.MethodDeclaration) {
         this.writeDocumentation(d);
-        for (const p of d.parameters) {
-            if (p.documentation) {
-                this.write(`/// <param name="${p.name}">`);
-                this.writeDocumentationLines(p.documentation, false);
-                if (this._isStartOfLine) {
-                    this.write('/// ');
-                }
-                this.writeLine('</param>');
-            }
-        }
+        this.writeParameterDocumentation(d);
+        
 
         this.writeAttributes(d);
         this.writeVisibility(d.visibility);
@@ -384,6 +377,19 @@ export default class CSharpAstPrinter {
         this.writeTypeParameterConstraints(d.typeParameters);
 
         this.writeBody(d.body);
+    }
+
+    protected writeParameterDocumentation(d: cs.MethodDeclaration) {
+        for (const p of d.parameters) {
+            if (p.documentation) {
+                this.write(`/// <param name="${p.name}">`);
+                this.writeDocumentationLines(p.documentation, false);
+                if (this._isStartOfLine) {
+                    this.write('/// ');
+                }
+                this.writeLine('</param>');
+            }
+        }
     }
 
     private writeTypeParameterConstraints(typeParameters: cs.TypeParameterDeclaration[] | undefined) {

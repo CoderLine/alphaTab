@@ -162,6 +162,12 @@ export class AlphaSynth implements IAlphaSynth {
 
         Logger.debug('AlphaSynth', 'Creating output');
         this.output = output;
+
+        Logger.debug('AlphaSynth', 'Creating synthesizer');
+        this._synthesizer = new TinySoundFont(this.output.sampleRate);
+        this._sequencer = new MidiFileSequencer(this._synthesizer);
+
+        Logger.debug('AlphaSynth', 'Opening output');
         this.output.ready.on(() => {
             this.isReady = true;
             (this.ready as EventEmitter).trigger();
@@ -176,7 +182,11 @@ export class AlphaSynth implements IAlphaSynth {
             for (let i = 0; i < SynthConstants.MicroBufferCount; i++) {
                 // synthesize buffer
                 this._sequencer.fillMidiEventQueue();
-                const synthesizedEvents = this._synthesizer.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
+                const synthesizedEvents = this._synthesizer.synthesize(
+                    samples,
+                    bufferPos,
+                    SynthConstants.MicroBufferSize
+                );
                 bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
                 // push all processed events into the queue
                 // for informing users about played events
@@ -198,12 +208,6 @@ export class AlphaSynth implements IAlphaSynth {
             this.output.addSamples(samples);
         });
         this.output.samplesPlayed.on(this.onSamplesPlayed.bind(this));
-
-        Logger.debug('AlphaSynth', 'Creating synthesizer');
-        this._synthesizer = new TinySoundFont(this.output.sampleRate);
-        this._sequencer = new MidiFileSequencer(this._synthesizer);
-
-        Logger.debug('AlphaSynth', 'Opening output');
         this.output.open();
     }
 
@@ -379,7 +383,7 @@ export class AlphaSynth implements IAlphaSynth {
             if (this._sequencer.isPlayingCountIn) {
                 this._sequencer.resetCountIn();
                 this.timePosition = this._sequencer.currentTime;
-                this.playInternal()
+                this.playInternal();
             } else if (this._sequencer.isPlayingOneTimeMidi) {
                 this._sequencer.resetOneTimeMidi();
                 this.state = PlayerState.Paused;
@@ -399,8 +403,10 @@ export class AlphaSynth implements IAlphaSynth {
 
     private updateTimePosition(timePosition: number, isSeek: boolean): void {
         // update the real positions
-        const currentTime: number = (this._timePosition = timePosition);
-        const currentTick: number = (this._tickPosition = this._sequencer.timePositionToTickPosition(currentTime));
+        const currentTime: number = timePosition;
+        this._timePosition = currentTime;
+        const currentTick: number = this._sequencer.timePositionToTickPosition(currentTime);
+        this._tickPosition = currentTick;
         const endTime: number = this._sequencer.endTime;
         const endTick: number = this._sequencer.endTick;
 
@@ -424,10 +430,11 @@ export class AlphaSynth implements IAlphaSynth {
                 playedEvents.enqueue(synthEvent.event);
             }
             if (!playedEvents.isEmpty) {
-                (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(new MidiEventsPlayedEventArgs(playedEvents.toArray()))
+                (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(
+                    new MidiEventsPlayedEventArgs(playedEvents.toArray())
+                );
             }
         }
-
     }
 
     readonly ready: IEventEmitter = new EventEmitter();
@@ -437,11 +444,7 @@ export class AlphaSynth implements IAlphaSynth {
     readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
     readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
     readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
-        PlayerStateChangedEventArgs
-    >();
-    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
-        PositionChangedEventArgs
-    >();
+    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<PlayerStateChangedEventArgs>();
+    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
     readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
 }

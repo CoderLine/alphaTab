@@ -37,7 +37,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return !!ts.getJSDocTags(tsSymbol.valueDeclaration).find(t => t.tagName.text === 'partial');
     }
 
-    protected isClassElementOverride(classType: ts.InterfaceType, classElement: ts.ClassElement) {
+    protected isClassElementOverride(classType: ts.Type, classElement: ts.ClassElement) {
         if (this.hasAnyBaseTypeClassMember(classType, classElement.name!.getText(), true)) {
             return true;
         }
@@ -53,10 +53,8 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
             if (implementsClause) {
                 for (const typeSyntax of implementsClause.types) {
                     const type = this.typeChecker.getTypeFromTypeNode(typeSyntax);
-                    if (type.isClassOrInterface()) {
-                        if (this.hasClassMember(type, classElement.name!.getText())) {
-                            return true;
-                        }
+                    if (this.hasClassMember(type, classElement.name!.getText())) {
+                        return true;
                     }
                 }
             }

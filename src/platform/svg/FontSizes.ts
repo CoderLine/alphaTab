@@ -43,6 +43,7 @@ export class FontSizes {
 
     /**
      * @target web
+     * @partial
      */
     public static generateFontLookup(family: string): void {
         if (FontSizes.FontSizeLookupTables.has(family)) {

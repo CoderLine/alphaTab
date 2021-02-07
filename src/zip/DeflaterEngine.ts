@@ -413,7 +413,8 @@ export class DeflaterEngine {
                 scan_end1 = window[scan - 1];
                 scan_end = window[scan];
             }
-        } while ((curMatch = (prev[curMatch & DeflaterConstants.WMASK] & 0xffff)) > limit && 0 != --chainLength);
+            curMatch = (prev[curMatch & DeflaterConstants.WMASK] & 0xffff);
+        } while (curMatch > limit && 0 != --chainLength);
 
         return this.matchLen >= DeflaterConstants.MIN_MATCH;
     }
@@ -428,7 +429,8 @@ export class DeflaterEngine {
         let match: number;
         let hash = ((this.insertHashIndex << DeflaterConstants.HASH_SHIFT) ^ this.window[this.strstart + (DeflaterConstants.MIN_MATCH - 1)]) & DeflaterConstants.HASH_MASK;
 
-        this.prev[this.strstart & DeflaterConstants.WMASK] = match = this.head[hash];
+        match = this.head[hash];
+        this.prev[this.strstart & DeflaterConstants.WMASK] = match;
         this.head[hash] = this.strstart;
         this.insertHashIndex = hash;
         return match & 0xffff;

@@ -111,13 +111,6 @@ export class AlphaTabApiBase<TSettings> {
 
         this.canvasElement = uiFacade.createCanvasElement();
         this.container.appendChild(this.canvasElement);
-        this.container.resize.on(
-            Environment.throttle(() => {
-                if (this.container.width !== this.renderer.width) {
-                    this.triggerResize();
-                }
-            }, uiFacade.resizeThrottle)
-        );
         if (
             this.settings.core.useWorkers &&
             this.uiFacade.areWorkersSupported &&
@@ -128,6 +121,13 @@ export class AlphaTabApiBase<TSettings> {
             this.renderer = new ScoreRenderer(this.settings);
         }
 
+        this.container.resize.on(
+            Environment.throttle(() => {
+                if (this.container.width !== this.renderer.width) {
+                    this.triggerResize();
+                }
+            }, uiFacade.resizeThrottle)
+        );
         let initialResizeEventInfo: ResizeEventArgs = new ResizeEventArgs();
         initialResizeEventInfo.oldWidth = this.renderer.width;
         initialResizeEventInfo.newWidth = this.container.width | 0;
@@ -372,7 +372,7 @@ export class AlphaTabApiBase<TSettings> {
         if (this.uiFacade.canRender) {
             // when font is finally loaded, start rendering
             this.renderer.width = this.container.width;
-            this.renderer.renderScore(this.score!, this._trackIndexes as any);
+            this.renderer.renderScore(this.score!, this._trackIndexes!);
         } else {
             this.uiFacade.canRenderChanged.on(() => this.render());
         }

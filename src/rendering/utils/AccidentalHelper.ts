@@ -366,7 +366,7 @@ export class AccidentalHelper {
     private static calculateNoteLine(bar: Bar, noteValue: number, mode: NoteAccidentalMode): number {
         let value: number = noteValue;
         let ks: number = bar.masterBar.keySignature;
-        let clef: Clef = bar.clef;
+        let clef: number = bar.clef as number;
         let index: number = value % 12;
         let octave: number = ((value / 12) | 0) - 1;
 

@@ -244,10 +244,13 @@ export class TinySoundFont {
 
         if (this._channels) {
             for (const c of this._channels.channelList) {
-                c.presetIndex = c.bank = 0;
-                c.pitchWheel = c.midiPan = 8192;
+                c.presetIndex = 0;
+                c.bank = 0;
+                c.pitchWheel = 8192;
+                c.midiPan = 8192;
                 c.perNotePitchWheel.clear();
-                c.midiVolume = c.midiExpression = 16383;
+                c.midiVolume = 16383;
+                c.midiExpression = 16383;
                 c.midiRpn = 0xffff;
                 c.midiData = 0;
                 c.panOffset = 0.0;
@@ -397,7 +400,8 @@ export class TinySoundFont {
             // Setup lowpass filter.
             const filterQDB: number = region.initialFilterQ / 10.0;
             voice.lowPass.qInv = 1.0 / Math.pow(10.0, filterQDB / 20.0);
-            voice.lowPass.z1 = voice.lowPass.z2 = 0;
+            voice.lowPass.z1 = 0;
+            voice.lowPass.z2 = 0;
             voice.lowPass.active = region.initialFilterFc <= 13500;
             if (voice.lowPass.active) {
                 voice.lowPass.setup(SynthHelper.cents2Hertz(region.initialFilterFc) / this.outSampleRate);
@@ -518,9 +522,12 @@ export class TinySoundFont {
 
         for (let i: number = this._channels.channelList.length; i <= channel; i++) {
             let c: Channel = new Channel();
-            c.presetIndex = c.bank = 0;
-            c.pitchWheel = c.midiPan = 8192;
-            c.midiVolume = c.midiExpression = 16383;
+            c.presetIndex = 0;
+            c.bank = 0;
+            c.pitchWheel = 8192;
+            c.midiPan = 8192;
+            c.midiVolume = 16383;
+            c.midiExpression = 16383;
             c.midiRpn = 0xffff;
             c.midiData = 0;
             c.panOffset = 0.0;
@@ -606,7 +613,8 @@ export class TinySoundFont {
             }
 
             if (!matchFirst || v.playIndex < matchFirst.playIndex) {
-                matchFirst = matchLast = v;
+                matchFirst = v;
+                matchLast = v;
                 matches.push(v);
             } else if (v.playIndex === matchFirst.playIndex) {
                 matchLast = v;
@@ -955,7 +963,8 @@ export class TinySoundFont {
                 this.channelNoteOffAll(channel);
                 return;
             case 121 /*ALL_CTRL_OFF*/:
-                c.midiVolume = c.midiExpression = 16383;
+                c.midiVolume = 16383;
+                c.midiExpression = 16383;
                 c.midiPan = 8192;
                 c.bank = 0;
                 this.channelSetVolume(channel, 1);
@@ -1053,7 +1062,8 @@ export class TinySoundFont {
             const phdr: HydraPhdr = hydra.phdrs[phdrIndex];
             let regionIndex: number = 0;
 
-            const preset: Preset = (newPresets[phdrIndex] = new Preset());
+            const preset: Preset = new Preset();
+            newPresets[phdrIndex] = preset;
             preset.name = phdr.presetName;
             preset.bank = phdr.bank;
             preset.presetNumber = phdr.preset;

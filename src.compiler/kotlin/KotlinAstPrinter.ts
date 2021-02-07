@@ -83,14 +83,36 @@ export default class KotlinAstPrinter {
         }
     }
 
-    private writeDocumentation(d: cs.DocumentedElement) {
+    protected writeDocumentation(d: cs.DocumentedElement) {
         if (d.documentation) {
             this.writeLine('/**');
             this.writeDocumentationLines(d.documentation, true);
+            if (d.nodeType !== cs.SyntaxKind.MethodDeclaration) {
+                this.writeLine(' */');
+            }
+        }
+    }
+
+    protected writeParameterDocumentation(d: cs.MethodDeclaration) {
+        if (d.parameters.length > 0) {
+            if (!d.documentation) {
+                this.writeLine('/**');
+            }
+
+            for (const p of d.parameters) {
+                if (p.documentation) {
+                    this.write(` * @param ${p.name} `);
+                    this.writeDocumentationLines(p.documentation, false);
+                    this.writeLine();
+                }
+            }
+            this.writeLine(' */');
+        } else if (d.documentation) {
             this.writeLine(' */');
         }
     }
-    private writeDocumentationLines(documentation: string, multiLine: boolean) {
+
+    protected writeDocumentationLines(documentation: string, multiLine: boolean) {
         const lines = documentation.split('\n');
         if (lines.length > 1 || multiLine) {
             if (!this._isStartOfLine) {
@@ -139,39 +161,50 @@ export default class KotlinAstPrinter {
                 this.writeType(p.type, false);
             }
         }
-        if (p.initializer) {
-            this.write(' = ');
-            this.writeExpression(p.initializer);
-        } else if (p.type && p.type.isOptional) {
-            if (p.type.nodeType === cs.SyntaxKind.PrimitiveTypeNode) {
-                switch ((p.type as cs.PrimitiveTypeNode).type) {
-                    case cs.PrimitiveType.Bool:
-                        this.write(' = false');
-                        break;
-                    case cs.PrimitiveType.Double:
-                        this.write(' = 0.0');
-                        break;
-                    case cs.PrimitiveType.Int:
-                        this.write(' = 0');
-                        break;
-                    default:
-                        this.write(' = null');
-                        break;
+        if(!this.isOverrideMethod(p.parent!)) {
+            if (p.initializer) {
+                this.write(' = ');
+                this.writeExpression(p.initializer);
+            } else if (p.type && p.type.isOptional) {
+                var type: cs.TypeNode = p.type;
+                if (p.type.nodeType === cs.SyntaxKind.TypeReference) {
+                    type = (p.type as cs.TypeReference).reference as cs.TypeNode;
                 }
-            } else {
-                this.write(' = null');
+                if (type.nodeType === cs.SyntaxKind.PrimitiveTypeNode) {
+                    switch ((type as cs.PrimitiveTypeNode).type) {
+                        case cs.PrimitiveType.Bool:
+                            this.write(' = false');
+                            break;
+                        case cs.PrimitiveType.Double:
+                            this.write(' = 0.0');
+                            break;
+                        case cs.PrimitiveType.Int:
+                            this.write(' = 0');
+                            break;
+                        default:
+                            this.write(' = null');
+                            break;
+                    }
+                } else {
+                    this.write(' = null');
+                }
             }
         }
+    }
+    private isOverrideMethod(parent: cs.Node) {
+        if (parent.nodeType !== cs.SyntaxKind.MethodDeclaration) {
+            return false;
+        }
+
+        var method = parent as cs.MethodDeclaration;
+        return method.isOverride;
     }
 
     private writeInterfaceDeclaration(d: cs.InterfaceDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
 
-        if (d.partial) {
-            this.write('partial ');
-        }
-
+        this.writeLine('@kotlin.contracts.ExperimentalContracts');
         this.write(`interface ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
 
@@ -243,9 +276,9 @@ export default class KotlinAstPrinter {
         if (d.baseClass) {
             this.write(': ');
             this.writeType(d.baseClass);
-            if (!d.members.find(m => m.nodeType === cs.SyntaxKind.ConstructorDeclaration)) {
-                this.write('()');
-            }
+            // if (!d.members.find(m => m.nodeType === cs.SyntaxKind.ConstructorDeclaration)) {
+            //     this.write('()');
+            // }
         }
 
         if (d.interfaces && d.interfaces.length > 0) {
@@ -343,7 +376,11 @@ export default class KotlinAstPrinter {
                         } as cs.Identifier)
                 );
                 this.writeMember(defaultConstructor);
+            } else {
+                this.writeLine('public constructor()');
             }
+        } else if (!hasConstuctor) {
+            this.writeLine('public constructor()');
         }
 
         this.endBlock();
@@ -399,18 +436,12 @@ export default class KotlinAstPrinter {
 
     private writeMethodDeclaration(d: cs.MethodDeclaration) {
         this.writeDocumentation(d);
-        for (const p of d.parameters) {
-            if (p.documentation) {
-                this.write(`/// <param name="${p.name}">`);
-                this.writeDocumentationLines(p.documentation, false);
-                if (this._isStartOfLine) {
-                    this.write('/// ');
-                }
-                this.writeLine('</param>');
-            }
-        }
+        this.writeParameterDocumentation(d);
 
         this.writeAttributes(d);
+        if(d.isStatic) {
+            this.writeLine('@kotlin.jvm.JvmStatic');
+        }
         this.writeVisibility(d.visibility);
 
         if (d.isAsync) {
@@ -512,6 +543,10 @@ export default class KotlinAstPrinter {
     private writePropertyDeclaration(d: cs.PropertyDeclaration) {
         this.writeDocumentation(d);
 
+        if(d.isStatic) {
+            this.writeLine('@kotlin.jvm.JvmStatic');
+        }
+        
         this.writeVisibility(d.visibility);
 
         const isAutoProperty = this.isAutoProperty(d);
@@ -761,7 +796,7 @@ export default class KotlinAstPrinter {
                 this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
                 break;
         }
-        if (type.isNullable && !forNew && !forTypeConstraint) {
+        if ((type.isNullable||type.isOptional) && !forNew && !forTypeConstraint) {
             this.write('?');
         }
     }
@@ -899,6 +934,15 @@ export default class KotlinAstPrinter {
                 this.write('(');
                 this.writeExpression(expr.operand);
                 this.write(').toInt().inv()');
+
+                let parent = expr.parent!;
+                while(parent.nodeType === cs.SyntaxKind.ParenthesizedExpression) {
+                    parent = parent.parent!;
+                }
+
+                if (!this.isIntResultExpression(parent)) {
+                    this.write('.toDouble()');
+                }
                 break;
             default:
                 this.write(expr.operator);
@@ -925,7 +969,7 @@ export default class KotlinAstPrinter {
     }
 
     private writeBaseLiteralExpression(expr: cs.BaseLiteralExpression) {
-        this.write('base');
+        this.write('super');
     }
 
     private writeStringLiteral(expr: cs.StringLiteral) {
@@ -1001,15 +1045,6 @@ export default class KotlinAstPrinter {
                     : false;
 
             switch (expr.parent.nodeType) {
-                case cs.SyntaxKind.VariableDeclaration:
-                    if (
-                        expr.parent.parent?.nodeType === cs.SyntaxKind.VariableDeclarationList &&
-                        expr.parent.parent.parent?.nodeType === cs.SyntaxKind.ForStatement &&
-                        expr.parent.parent === (expr.parent.parent.parent as cs.ForStatement).initializer
-                    ) {
-                        shouldWriteSuffix = false;
-                    }
-                    break;
                 case cs.SyntaxKind.ParenthesizedExpression:
                     shouldWriteSuffix = this.shouldWriteDoubleSuffix(expr.parent!.parent!);
                     break;
@@ -1055,32 +1090,8 @@ export default class KotlinAstPrinter {
         return shouldWriteSuffix;
     }
 
-    private writeNumericLiteral(expr: cs.NumericLiteral) {
-        this.write(expr.value);
-
-        if (this.shouldWriteDoubleSuffix(expr)) {
-            this.write('.0');
-        }
-    }
     private isIntResultExpression(expr: cs.Expression): boolean {
-        if (expr.nodeType === cs.SyntaxKind.MemberAccessExpression) {
-            const parentSymbol = (expr.tsSymbol as any).parent as ts.Symbol;
-            switch (parentSymbol.name) {
-                case 'Array':
-                    switch (expr.tsSymbol!.name) {
-                        case 'indexOf':
-                            return true;
-                    }
-                    return false;
-                case 'String':
-                    switch (expr.tsSymbol!.name) {
-                        case 'length':
-                            return true;
-                    }
-                    return false;
-            }
-            return false;
-        } else if (expr.nodeType === cs.SyntaxKind.InvocationExpression) {
+        if (expr.nodeType === cs.SyntaxKind.InvocationExpression) {
             return this.isIntResultExpression((expr as cs.InvocationExpression).expression);
         } else if (expr.nodeType === cs.SyntaxKind.BinaryExpression) {
             switch ((expr as cs.BinaryExpression).operator) {
@@ -1099,6 +1110,14 @@ export default class KotlinAstPrinter {
         }
     }
 
+    private writeNumericLiteral(expr: cs.NumericLiteral) {
+        this.write(expr.value);
+
+        if (this.shouldWriteDoubleSuffix(expr)) {
+            this.write('.0');
+        }
+    }
+
     private writeStringTemplateExpression(expr: cs.StringTemplateExpression) {
         this.write('"');
         let exprs: cs.Expression[] = [];
@@ -1106,7 +1125,7 @@ export default class KotlinAstPrinter {
             if (c.nodeType === cs.SyntaxKind.StringLiteral) {
                 const escapedText = (c as cs.StringLiteral).text
                     .split('"')
-                    .join('""')
+                    .join('\\"')
                     .split('\n')
                     .join('\\n')
                     .split('\r')
@@ -1176,6 +1195,8 @@ export default class KotlinAstPrinter {
         this.writeExpression(expr.expression);
         if (expr.nullSafe) {
             this.write('?.');
+        } else if (this.isMethodAsDelegate(expr)) {
+            this.write('::');
         } else if (expr.tsSymbol && this._context.isStaticSymbol(expr.tsSymbol)) {
             this.write('.');
         } else if (
@@ -1183,7 +1204,8 @@ export default class KotlinAstPrinter {
             expr.expression.nodeType === cs.SyntaxKind.Identifier ||
             expr.expression.nodeType === cs.SyntaxKind.ArrayCreationExpression ||
             expr.expression.nodeType === cs.SyntaxKind.NewExpression ||
-            expr.expression.nodeType === cs.SyntaxKind.ThisLiteral
+            expr.expression.nodeType === cs.SyntaxKind.ThisLiteral ||
+            expr.expression.nodeType === cs.SyntaxKind.BaseLiteralExpression
         ) {
             this.write('.');
         } else {
@@ -1191,6 +1213,45 @@ export default class KotlinAstPrinter {
         }
         const name = this._context.getSymbolName(expr) ?? expr.member;
         this.write(name);
+
+        // TODO: consider nullablility
+        if (this.isMemberValueAccess(expr)) {
+            this.write('!!');
+        }
+    }
+
+    private isMemberValueAccess(expr: cs.MemberAccessExpression): boolean {
+        switch (expr.parent!.nodeType) {
+            case cs.SyntaxKind.BinaryExpression:
+                const bin = expr.parent as cs.BinaryExpression;
+                if(bin.operator.endsWith('=')) {
+                    return bin.left !== expr;
+                } else {
+                    return true;
+                }
+            case cs.SyntaxKind.InvocationExpression:
+                return (expr.parent as cs.InvocationExpression).expression !== expr;
+            case cs.SyntaxKind.MemberAccessExpression:
+            case cs.SyntaxKind.NonNullExpression:
+            case cs.SyntaxKind.NullSafeExpression:
+            case cs.SyntaxKind.PrefixUnaryExpression:
+            case cs.SyntaxKind.PostfixUnaryExpression:
+            case cs.SyntaxKind.ElementAccessExpression:
+                return false;
+        }
+
+        return true;
+    }
+
+    private isMethodAsDelegate(expr: cs.MemberAccessExpression) {
+        if (
+            expr.tsSymbol &&
+            ts.isMethodDeclaration(expr.tsSymbol.valueDeclaration) &&
+            !ts.isCallExpression(expr.tsNode!.parent)
+        ) {
+            return true;
+        }
+        return false;
     }
 
     private writeAnonymousObjectCreationExpression(expr: cs.AnonymousObjectCreationExpression) {
@@ -1387,13 +1448,22 @@ export default class KotlinAstPrinter {
     }
 
     private getCaseClauseStatements(stmt: cs.Statement[]): cs.Statement[] {
+        if (stmt.length === 0) {
+            return stmt;
+        }
+        if (stmt[stmt.length - 1].nodeType === cs.SyntaxKind.BreakStatement) {
+            stmt.pop();
+        }
+
         if (stmt.length === 1 && stmt[0].nodeType === cs.SyntaxKind.Block) {
             stmt = (stmt[0] as cs.Block).statements;
         }
         stmt = stmt.slice();
-        if (stmt[stmt.length - 1].nodeType === cs.SyntaxKind.BreakStatement) {
+
+        if (stmt.length > 0 && stmt[stmt.length - 1].nodeType === cs.SyntaxKind.BreakStatement) {
             stmt.pop();
         }
+
         return stmt;
     }
 
@@ -1470,21 +1540,18 @@ export default class KotlinAstPrinter {
     private writeForStatement(s: cs.ForStatement) {
         let [name, lower, upper, rangeOperator] = this.detectForRange(s);
         if (lower && upper && rangeOperator) {
-            this.write(`for(${name} in (`);
-            this._forceInteger = true;
+            this.write(`for(${name} in `);
             this.writeExpression(lower);
-            this.write(').toInt() ');
+            this.write(' ');
             this.write(rangeOperator);
-            this.write(' (');
+            this.write(' ');
             this.writeExpression(upper);
-            this.write(').toInt())');
-            this._forceInteger = false;
+            this.write(')');
             this.writeStatement(s.statement);
         } else {
-            this.write('run ');
+            this.write('if(true) ');
             this.beginBlock();
 
-            this._forceInteger = true;
             if (s.initializer) {
                 if (s.initializer.nodeType === cs.SyntaxKind.VariableDeclarationList) {
                     this.writeVariableDeclarationList(s.initializer as cs.VariableDeclarationList);
@@ -1492,7 +1559,6 @@ export default class KotlinAstPrinter {
                     this.writeExpression(s.initializer as cs.Expression);
                 }
             }
-            this._forceInteger = false;
             this.writeLine();
 
             this.write('while(');
@@ -1709,7 +1775,7 @@ export default class KotlinAstPrinter {
 
     private writeBlock(b: cs.Block) {
         if (b.parent?.nodeType === cs.SyntaxKind.Block) {
-            this.write('run ');
+            this.write('if(true) ');
         }
         this.beginBlock();
         b.statements.forEach(s => this.writeStatement(s));

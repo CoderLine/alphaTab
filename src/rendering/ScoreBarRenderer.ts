@@ -34,6 +34,7 @@ import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { KeySignature } from '@src/model/KeySignature';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
@@ -550,7 +551,7 @@ export class ScoreBarRenderer extends BarRendererBase {
                     : this.getScoreY(this.accidentalHelper.getMinLine(beat));
             let y2: number = cy + this.y;
             y2 += this.calculateBeamY(h, beatLineX);
-            canvas.lineWidth = ScoreBarRenderer.StemWidth * this.scale;
+            canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
             canvas.beginPath();
             canvas.moveTo(cx + this.x + beatLineX, y1);
             canvas.lineTo(cx + this.x + beatLineX, y2);
@@ -772,7 +773,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         }
         // Key signature
         if (
-            (this.index === 0 && this.bar.masterBar.keySignature !== 0) ||
+            (this.index === 0 && this.bar.masterBar.keySignature !== KeySignature.C) ||
             (this.bar.previousBar && this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature)
         ) {
             this.createStartSpacing();

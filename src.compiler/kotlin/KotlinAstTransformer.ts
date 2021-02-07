@@ -39,12 +39,49 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return paramName;
     }
 
+    protected visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {
+        const pre = super.visitPrefixUnaryExpression(parent, expression);
+        if (pre) {
+            switch (pre.operator) {
+                case '++':
+                case '--':
+                    const op = this._context.typeChecker.getSymbolAtLocation(expression.operand);
+                    if (op?.valueDeclaration && op.valueDeclaration.kind == ts.SyntaxKind.Parameter) {
+                        this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(op.name);
+                    }
+                    break;
+            }
+        }
+        return pre;
+    }
+
+    protected visitPostfixUnaryExpression(parent: cs.Node, expression: ts.PostfixUnaryExpression) {
+        const post = super.visitPostfixUnaryExpression(parent, expression);
+        if (post) {
+            switch (post.operator) {
+                case '++':
+                case '--':
+                    const op = this._context.typeChecker.getSymbolAtLocation(expression.operand);
+                    if (op?.valueDeclaration && op.valueDeclaration.kind == ts.SyntaxKind.Parameter) {
+                        this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(op.name);
+                    }
+                    break;
+            }
+        }
+        return post;
+    }
+
     protected visitBinaryExpression(parent: cs.Node, expression: ts.BinaryExpression) {
         const bin = super.visitBinaryExpression(parent, expression);
         // detect parameter assignment
         if (
             expression.operatorToken.kind == ts.SyntaxKind.EqualsToken ||
-            expression.operatorToken.kind == ts.SyntaxKind.PlusEqualsToken
+            expression.operatorToken.kind == ts.SyntaxKind.PlusEqualsToken ||
+            expression.operatorToken.kind == ts.SyntaxKind.MinusEqualsToken ||
+            expression.operatorToken.kind == ts.SyntaxKind.AsteriskEqualsToken ||
+            expression.operatorToken.kind == ts.SyntaxKind.GreaterThanGreaterThanEqualsToken ||
+            expression.operatorToken.kind == ts.SyntaxKind.LessThanLessThanEqualsToken ||
+            expression.operatorToken.kind == ts.SyntaxKind.SlashEqualsToken
         ) {
             const left = this._context.typeChecker.getSymbolAtLocation(expression.left);
             if (left?.valueDeclaration && left.valueDeclaration.kind == ts.SyntaxKind.Parameter) {
@@ -58,7 +95,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return ts.isCallExpression(parent) && parent.expression.kind === ts.SyntaxKind.SuperKeyword;
     }
 
-    private injectParametersAsLocal(parameters: cs.ParameterDeclaration[], block: cs.Block) {
+    private injectParametersAsLocal(block: cs.Block) {
         let localParams: cs.VariableStatement[] = [];
 
         let currentAssignments = this._paramsWithAssignment[this._paramsWithAssignment.length - 1];
@@ -125,6 +162,9 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         this._paramsWithAssignment.push(new Set<string>());
 
         const el = super.visitSetAccessor(parent, classElement);
+        if (el.body?.nodeType === cs.SyntaxKind.Block) {
+            this.injectParametersAsLocal(el.body as cs.Block);
+        }
 
         this._paramReferences.pop();
         this._paramsWithAssignment.pop();
@@ -139,7 +179,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         const constr = super.visitConstructorDeclaration(parent, classElement);
 
         if (constr.body?.nodeType === cs.SyntaxKind.Block) {
-            this.injectParametersAsLocal(constr.parameters, constr.body as cs.Block);
+            this.injectParametersAsLocal(constr.body as cs.Block);
         }
 
         this._paramReferences.pop();
@@ -182,7 +222,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         const method = super.visitMethodDeclaration(parent, classElement);
 
         if (method.body?.nodeType === cs.SyntaxKind.Block) {
-            this.injectParametersAsLocal(method.parameters, method.body as cs.Block);
+            this.injectParametersAsLocal(method.body as cs.Block);
         }
 
         this._paramReferences.pop();
@@ -212,10 +252,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                             return 'size';
                         }
 
-                        if (this.isWithinForInitializer(expression.tsNode!)) {
-                            return 'size';
-                        }
-
                         return 'size.toDouble()';
                     case 'push':
                         return 'add';
@@ -227,6 +263,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                         return 'rev';
                     case 'fill':
                         return 'fillWith';
+                    case 'map':
+                        return 'mapTo';
                 }
                 break;
             case 'String':
@@ -246,6 +284,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                         return 'indexOfInDouble';
                     case 'lastIndexOf':
                         return 'lastIndexOfInDouble';
+                    case 'trimRight':
+                        return 'trimEnd';
                 }
                 break;
         }
@@ -253,15 +293,14 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     }
 
     private isWithinForInitializer(expression: ts.Node): Boolean {
-        if(!expression.parent) {
+        if (!expression.parent) {
             return false;
         }
 
-        if(ts.isForStatement(expression.parent) &&
-        expression.parent.initializer === expression) {
-               return true;
+        if (ts.isForStatement(expression.parent) && expression.parent.initializer === expression) {
+            return true;
         }
-        
+
         return this.isWithinForInitializer(expression.parent!);
     }
 

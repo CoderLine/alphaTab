@@ -1,10 +1,63 @@
 package alphaTab.core
 
+import alphaTab.core.ecmaScript.RegExp
 import system.globalization.CultureInfo
 
 expect fun UByteArray.decodeToFloatArray(): FloatArray
 expect fun UByteArray.decodeToDoubleArray(): DoubleArray
-expect fun UByteArray.decodeToString(encoding:String): String
+expect fun UByteArray.decodeToString(encoding: String): String
+
+public class DoubleRange(start: Double, endInclusive: Double) : Iterable<Double> {
+    private val _start = start;
+    private val _endInclusive = endInclusive;
+
+    override fun iterator(): Iterator<Double> =
+        generateSequence(_start, { _start + 1 })
+            .takeWhile { it <= _endInclusive }
+            .iterator()
+
+    companion object {
+        public val EMPTY: DoubleRange = DoubleRange(1.0, 0.0)
+    }
+}
+
+public class ReverseDoubleRange(start: Double, endInclusive: Double) : Iterable<Double> {
+    private val _start = start;
+    private val _endInclusive = endInclusive;
+
+    override fun iterator(): Iterator<Double> =
+        generateSequence(_start, { _start - 1 })
+            .takeWhile { it >= _endInclusive }
+            .iterator()
+
+    companion object {
+        public val EMPTY: ReverseDoubleRange = ReverseDoubleRange(0.0, 1.0)
+    }
+}
+
+public infix fun Int.until(to: Double): DoubleRange {
+    return DoubleRange(this.toDouble(), (to - 1.0))
+}
+
+public infix fun Double.until(to: Double): DoubleRange {
+    return DoubleRange(this, (to - 1.0))
+}
+
+public infix fun Double.until(to: Int): DoubleRange {
+    return DoubleRange(this, (to - 1.0))
+}
+
+public infix fun Double.downTo(to: Double): ReverseDoubleRange {
+    return ReverseDoubleRange(this.toDouble(), to)
+}
+
+public infix fun Double.downTo(to: Int): ReverseDoubleRange {
+    return ReverseDoubleRange(this.toDouble(), to.toDouble())
+}
+
+public infix fun Int.downTo(to: Double): ReverseDoubleRange {
+    return ReverseDoubleRange(this.toDouble(), to)
+}
 
 
 fun kotlin.String.substr(startIndex: Double, length: Double): kotlin.String {
@@ -15,8 +68,16 @@ fun kotlin.String.substr(startIndex: Double): kotlin.String {
     return this.substring(startIndex.toInt());
 }
 
+fun kotlin.String.replace(pattern:RegExp, replacement:String): kotlin.String {
+    return pattern.replace(this, replacement)
+}
+
 fun <T> MutableList<T>.sort(comparer: ((a: T, b: T) -> Double)) {
     this.sortWith { a, b -> comparer(a, b).toInt() }
+}
+
+fun <TIn, TOut> MutableList<TIn>.mapTo(transform: (v: TIn) -> TOut): MutableList<TOut> {
+    return this.map(transform).toMutableList()
 }
 
 fun <T> MutableList<T>.filterBy(predicate: (T) -> Boolean): MutableList<T> {
@@ -26,6 +87,11 @@ fun <T> MutableList<T>.filterBy(predicate: (T) -> Boolean): MutableList<T> {
 fun <T> MutableList<T>.slice(): MutableList<T> {
     return this.toMutableList()
 }
+
+fun <T> MutableList<T>.slice(start: Double): MutableList<T> {
+    return this.subList(start.toInt(), this.size - 1)
+}
+
 fun <T> MutableList<T>.rev(): MutableList<T> {
     this.reverse()
     return this;
@@ -88,6 +154,7 @@ fun kotlin.String.charAt(index: Int): kotlin.String {
 fun kotlin.String.charCodeAt(index: Int): Double {
     return this[index].toDouble()
 }
+
 fun kotlin.String.charCodeAt(index: Double): Double {
     return this[index.toInt()].toDouble()
 }
@@ -104,7 +171,7 @@ fun kotlin.String.substring(startIndex: Double): kotlin.String {
     return this.substring(startIndex.toInt());
 }
 
-operator fun Int.rangeTo(d:Double): IntRange {
+operator fun Int.rangeTo(d: Double): IntRange {
     return this.rangeTo(d.toInt())
 }
 
@@ -131,11 +198,13 @@ class Console {
 
 class Globals {
     companion object {
+        const val NaN: Double = Double.NaN;
         val console = Console();
 
         fun isNaN(s: Double): Boolean {
             return s.isNaN()
         }
+
         fun parseFloat(s: String): Double {
             return 0.0
         }

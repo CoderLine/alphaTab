@@ -374,7 +374,8 @@ export class BarLayoutingInfo {
             return this._onTimePositions;
         }
         this._onTimePositionsForce = force;
-        let positions: Map<number, number> = (this._onTimePositions = new Map<number, number>());
+        let positions: Map<number, number> = new Map<number, number>();
+        this._onTimePositions = positions;
         let sortedSprings: Spring[] = this._timeSortedSprings;
         if (sortedSprings.length === 0) {
             return positions;

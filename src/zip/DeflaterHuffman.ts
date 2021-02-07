@@ -7,10 +7,10 @@
  * without restriction, including without limitation the rights to use, copy, modify, merge,
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
  * to whom the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
  * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
@@ -19,9 +19,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-import { DeflaterConstants } from "./DeflaterConstants";
-import { PendingBuffer } from "./PendingBuffer";
-
+import { DeflaterConstants } from './DeflaterConstants';
+import { PendingBuffer } from './PendingBuffer';
 
 class Tree {
     // repeat previous bit length 3-6 times (2 bits of repeat count)
@@ -65,18 +64,17 @@ class Tree {
         this.length = null;
     }
 
-
     public buildTree() {
         let numSymbols = this.freqs.length;
 
         /* heap is a priority queue, sorted by frequency, least frequent
-        * nodes first.  The heap is a binary tree, with the property, that
-        * the parent node is smaller than both child nodes.  This assures
-        * that the smallest node is the first parent.
-        *
-        * The binary tree is encoded in an array:  0 is root node and
-        * the nodes 2*n+1, 2*n+2 are the child nodes of node n.
-        */
+         * nodes first.  The heap is a binary tree, with the property, that
+         * the parent node is smaller than both child nodes.  This assures
+         * that the smallest node is the first parent.
+         *
+         * The binary tree is encoded in an array:  0 is root node and
+         * the nodes 2*n+1, 2*n+2 are the child nodes of node n.
+         */
         let heap = new Int32Array(numSymbols);
         let heapLen = 0;
         let maxCode = 0;
@@ -85,10 +83,14 @@ class Tree {
             if (freq != 0) {
                 // Insert n into heap
                 let pos = heapLen++;
-                let ppos;
-                while (pos > 0 && this.freqs[heap[ppos = Math.floor((pos - 1) / 2)]] > freq) {
-                    heap[pos] = heap[ppos];
-                    pos = ppos;
+                while (true) {
+                    var ppos = Math.floor((pos - 1) / 2);
+                    if (pos > 0 && this.freqs[heap[ppos]] > freq) {
+                        heap[pos] = heap[ppos];
+                        pos = ppos;
+                    } else {
+                        break;
+                    }
                 }
                 heap[pos] = n;
 
@@ -97,10 +99,10 @@ class Tree {
         }
 
         /* We could encode a single literal with 0 bits but then we
-        * don't see the literals.  Therefore we force at least two
-        * literals to avoid this case.  We don't care about order in
-        * this case, both literals get a 1 bit code.
-        */
+         * don't see the literals.  Therefore we force at least two
+         * literals to avoid this case.  We don't care about order in
+         * this case, both literals get a 1 bit code.
+         */
         while (heapLen < 2) {
             let node = maxCode < 2 ? ++maxCode : 0;
             heap[heapLen++] = node;
@@ -121,8 +123,8 @@ class Tree {
         }
 
         /* Construct the Huffman tree by repeatedly combining the least two
-        * frequent nodes.
-        */
+         * frequent nodes.
+         */
         do {
             let first = heap[0];
             let last = heap[--heapLen];
@@ -142,12 +144,24 @@ class Tree {
             }
 
             /* Now propagate the last element down along path.  Normally
-            * it shouldn't go too deep.
-            */
+             * it shouldn't go too deep.
+             */
             let lastVal = values[last];
-            while ((path = ppos) > 0 && values[heap[ppos = Math.floor((path - 1) / 2)]] > lastVal) {
-                heap[path] = heap[ppos];
+            while (true) {
+                path = ppos;
+                if (ppos > 0) {
+                    ppos = Math.floor((path - 1) / 2);
+                    path = ppos;
+                    if (path > 0 && values[heap[ppos]] > lastVal) {
+                        heap[path] = heap[ppos];
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
             }
+
             heap[path] = last;
 
             let second = heap[0];
@@ -157,7 +171,8 @@ class Tree {
             childs[2 * last] = first;
             childs[2 * last + 1] = second;
             let mindepth = Math.min(values[first] & 0xff, values[second] & 0xff);
-            values[last] = lastVal = values[first] + values[second] - mindepth + 1;
+            lastVal = values[first] + values[second] - mindepth + 1;
+            values[last] = lastVal;
 
             // Again, propagate the hole to the leafs
             ppos = 0;
@@ -174,15 +189,24 @@ class Tree {
             }
 
             // Now propagate the new element down along path
-            while ((path = ppos) > 0 && values[heap[ppos = Math.floor((path - 1) / 2)]] > lastVal) {
-                heap[path] = heap[ppos];
+            while (true) {
+                path = ppos;
+                if (path > 0) {
+                    ppos = Math.floor((path - 1) / 2);
+                    if (values[heap[ppos]] > lastVal) {
+                        heap[path] = heap[ppos];
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
             }
             heap[path] = last;
         } while (heapLen > 1);
 
         this.buildLength(childs);
     }
-
 
     private buildLength(childs: Int32Array) {
         this.length = new Uint8Array(this.freqs.length);
@@ -205,9 +229,9 @@ class Tree {
                     bitLength = this.maxLength;
                     overflow++;
                 }
-                lengths[childs[2 * i]] = lengths[childs[2 * i + 1]] = bitLength;
-            }
-            else {
+                lengths[childs[2 * i]] =  bitLength;
+                lengths[childs[2 * i + 1]] = bitLength;
+            } else {
                 // A leaf node
                 let bitLength = lengths[i];
                 this.bitLengthCounts[bitLength - 1]++;
@@ -222,8 +246,7 @@ class Tree {
         let incrBitLen = this.maxLength - 1;
         do {
             // Find the first bit length which could increase:
-            while (this.bitLengthCounts[--incrBitLen] == 0) {
-            }
+            while (this.bitLengthCounts[--incrBitLen] == 0) {}
 
             // Move this node one down and remove a corresponding
             // number of overflow nodes.
@@ -235,19 +258,19 @@ class Tree {
         } while (overflow > 0);
 
         /* We may have overshot above.  Move some nodes from maxLength to
-        * maxLength-1 in that case.
-        */
+         * maxLength-1 in that case.
+         */
         this.bitLengthCounts[this.maxLength - 1] += overflow;
         this.bitLengthCounts[this.maxLength - 2] -= overflow;
 
         /* Now recompute all bit lengths, scanning in increasing
-        * frequency.  It is simpler to reconstruct all lengths instead of
-        * fixing only the wrong ones. This idea is taken from 'ar'
-        * written by Haruhiko Okumura.
-        *
-        * The nodes were inserted with decreasing frequency into the childs
-        * array.
-        */
+         * frequency.  It is simpler to reconstruct all lengths instead of
+         * fixing only the wrong ones. This idea is taken from 'ar'
+         * written by Haruhiko Okumura.
+         *
+         * The nodes were inserted with decreasing frequency into the childs
+         * array.
+         */
         let nodePtr = 2 * numLeafs;
         for (let bits = this.maxLength; bits != 0; bits--) {
             let n = this.bitLengthCounts[bits - 1];
@@ -277,13 +300,13 @@ class Tree {
     /**
      * Scan a literal or distance tree to determine the frequencies of the codes
      * in the bit length tree.
-     * @param blTree 
+     * @param blTree
      */
     public calcBLFreq(blTree: Tree) {
-        let max_count: number;               /* max repeat count */
-        let min_count: number;               /* min repeat count */
-        let count: number;                   /* repeat count of the current code */
-        let curlen = -1;             /* length of current code */
+        let max_count: number; /* max repeat count */
+        let min_count: number; /* min repeat count */
+        let count: number; /* repeat count of the current code */
+        let curlen = -1; /* length of current code */
 
         let i = 0;
         while (i < this.numCodes) {
@@ -292,8 +315,7 @@ class Tree {
             if (nextlen == 0) {
                 max_count = 138;
                 min_count = 3;
-            }
-            else {
+            } else {
                 max_count = 6;
                 min_count = 3;
                 if (curlen != nextlen) {
@@ -313,14 +335,11 @@ class Tree {
 
             if (count < min_count) {
                 blTree.freqs[curlen] += count;
-            }
-            else if (curlen != 0) {
+            } else if (curlen != 0) {
                 blTree.freqs[Tree.Repeat3To6]++;
-            }
-            else if (count <= 10) {
+            } else if (count <= 10) {
                 blTree.freqs[Tree.Repeat3To10]++;
-            }
-            else {
+            } else {
                 blTree.freqs[Tree.Repeat11To138]++;
             }
         }
@@ -336,7 +355,6 @@ class Tree {
         this.length = staticLengths;
     }
 
-
     /**
      * Build dynamic codes and lengths
      */
@@ -349,7 +367,6 @@ class Tree {
         for (let bits = 0; bits < this.maxLength; bits++) {
             nextCode[bits] = code;
             code += this.bitLengthCounts[bits] << (15 - bits);
-
         }
 
         for (let i = 0; i < this.numCodes; i++) {
@@ -366,10 +383,10 @@ class Tree {
      * @param blTree Tree to write
      */
     public writeTree(blTree: Tree) {
-        let maxCount: number;               // max repeat count
-        let minCount: number;               // min repeat count
-        let count: number;                   // repeat count of the current code
-        let curlen = -1;             // length of current code
+        let maxCount: number; // max repeat count
+        let minCount: number; // min repeat count
+        let count: number; // repeat count of the current code
+        let curlen = -1; // length of current code
 
         let i = 0;
         while (i < this.numCodes) {
@@ -378,8 +395,7 @@ class Tree {
             if (nextlen == 0) {
                 maxCount = 138;
                 minCount = 3;
-            }
-            else {
+            } else {
                 maxCount = 6;
                 minCount = 3;
                 if (curlen != nextlen) {
@@ -401,16 +417,13 @@ class Tree {
                 while (count-- > 0) {
                     blTree.writeSymbol(curlen);
                 }
-            }
-            else if (curlen != 0) {
+            } else if (curlen != 0) {
                 blTree.writeSymbol(Tree.Repeat3To6);
                 this.huffman.pending.writeBits(count - 3, 2);
-            }
-            else if (count <= 10) {
+            } else if (count <= 10) {
                 blTree.writeSymbol(Tree.Repeat3To10);
                 this.huffman.pending.writeBits(count - 3, 3);
-            }
-            else {
+            } else {
                 blTree.writeSymbol(Tree.Repeat11To138);
                 this.huffman.pending.writeBits(count - 11, 7);
             }
@@ -444,17 +457,14 @@ export class DeflaterHuffman {
     // Number of distance codes
     private static readonly DIST_NUM = 30;
 
-
-    private static staticLCodes: Int16Array;
-    private static staticLLength: Uint8Array;
-    private static staticDCodes: Int16Array;
-    private static staticDLength: Uint8Array;
+    private static staticLCodes: Int16Array = new Int16Array(DeflaterHuffman.LITERAL_NUM);
+    private static staticLLength: Uint8Array = new Uint8Array(DeflaterHuffman.LITERAL_NUM);
+    private static staticDCodes: Int16Array = new Int16Array(DeflaterHuffman.DIST_NUM);
+    private static staticDLength: Uint8Array = new Uint8Array(DeflaterHuffman.DIST_NUM);
 
     public static staticInit() {
         // See RFC 1951 3.2.6
         // Literal codes
-        DeflaterHuffman.staticLCodes = new Int16Array(DeflaterHuffman.LITERAL_NUM);
-        DeflaterHuffman.staticLLength = new Uint8Array(DeflaterHuffman.LITERAL_NUM);
 
         let i = 0;
         while (i < 144) {
@@ -478,8 +488,6 @@ export class DeflaterHuffman {
         }
 
         // Distance codes
-        DeflaterHuffman.staticDCodes = new Int16Array(DeflaterHuffman.DIST_NUM);
-        DeflaterHuffman.staticDLength = new Uint8Array(DeflaterHuffman.DIST_NUM);
         for (i = 0; i < DeflaterHuffman.DIST_NUM; i++) {
             DeflaterHuffman.staticDCodes[i] = DeflaterHuffman.bitReverse(i << 11);
             DeflaterHuffman.staticDLength[i] = 5;
@@ -515,19 +523,18 @@ export class DeflaterHuffman {
      * @returns Value with bits reversed
      */
     public static bitReverse(toReverse: number): number {
-        return (DeflaterHuffman.bit4Reverse[toReverse & 0xF] << 12 |
-            DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xF] << 8 |
-            DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xF] << 4 |
-            DeflaterHuffman.bit4Reverse[toReverse >> 12]);
+        return (
+            (DeflaterHuffman.bit4Reverse[toReverse & 0xf] << 12) |
+            (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
+            (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
+            DeflaterHuffman.bit4Reverse[toReverse >> 12]
+        );
     }
 
     // Number of codes used to transfer bit lengths
     private static readonly BITLEN_NUM = 19;
 
-
-
     private static readonly EOF_SYMBOL = 256;
-
 
     /**
      * Pending buffer to use
@@ -597,8 +604,12 @@ export class DeflaterHuffman {
                 blTreeCodes = i + 1;
             }
         }
-        let opt_len = 14 + blTreeCodes * 3 + this.blTree.getEncodedLength() +
-            this.literalTree.getEncodedLength() + this.distTree.getEncodedLength() +
+        let opt_len =
+            14 +
+            blTreeCodes * 3 +
+            this.blTree.getEncodedLength() +
+            this.literalTree.getEncodedLength() +
+            this.distTree.getEncodedLength() +
             this.extra_bits;
 
         let static_len = this.extra_bits;
@@ -616,16 +627,14 @@ export class DeflaterHuffman {
         if (storedOffset >= 0 && storedLength + 4 < opt_len >> 3) {
             // Store Block
             this.flushStoredBlock(stored, storedOffset, storedLength, lastBlock);
-        }
-        else if (opt_len == static_len) {
+        } else if (opt_len == static_len) {
             // Encode with static tree
             this.pending.writeBits((DeflaterHuffman.STATIC_TREES << 1) + (lastBlock ? 1 : 0), 3);
             this.literalTree.setStaticCodes(DeflaterHuffman.staticLCodes, DeflaterHuffman.staticLLength);
             this.distTree.setStaticCodes(DeflaterHuffman.staticDCodes, DeflaterHuffman.staticDLength);
             this.compressBlock();
             this.reset();
-        }
-        else {
+        } else {
             // Encode with dynamic tree
             this.pending.writeBits((DeflaterHuffman.DYN_TREES << 1) + (lastBlock ? 1 : 0), 3);
             this.sendAllTrees(blTreeCodes);
@@ -675,8 +684,7 @@ export class DeflaterHuffman {
                 if (bits > 0) {
                     this.pending.writeBits(dist & ((1 << bits) - 1), bits);
                 }
-            }
-            else {
+            } else {
                 this.literalTree.writeSymbol(litlen);
             }
         }
@@ -692,7 +700,7 @@ export class DeflaterHuffman {
      */
     public tallyDist(distance: number, length: number): boolean {
         this.d_buf[this.last_lit] = distance;
-        this.l_buf[this.last_lit++] = (length - 3);
+        this.l_buf[this.last_lit++] = length - 3;
 
         let lc = DeflaterHuffman.Lcode(length - 3);
         this.literalTree.freqs[lc]++;
@@ -728,7 +736,7 @@ export class DeflaterHuffman {
         let code = 257;
         while (length >= 8) {
             code += 4;
-            length >>= 1;
+            length = length >> 1;
         }
         return code + length;
     }
@@ -737,7 +745,7 @@ export class DeflaterHuffman {
         let code = 0;
         while (distance >= 4) {
             code += 2;
-            distance >>= 1;
+            distance = distance >> 1;
         }
         return code + distance;
     }

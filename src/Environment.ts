@@ -196,6 +196,7 @@ export class Environment {
 
     /**
      * @target web
+     * @partial
      */
     public static throttle(action: () => void, delay: number): () => void {
         let timeoutId: number = 0;
@@ -292,6 +293,7 @@ export class Environment {
 
     /**
      * @target web
+     * @partial
      */
     private static createPlatformSpecificRenderEngines(renderEngines: Map<string, RenderEngineFactory>) {
         renderEngines.set(
@@ -446,6 +448,7 @@ export class Environment {
 
     /**
      * @target web
+     * @partial
      */
     public static platformInit(): void {
         Environment.registerJQueryPlugin();

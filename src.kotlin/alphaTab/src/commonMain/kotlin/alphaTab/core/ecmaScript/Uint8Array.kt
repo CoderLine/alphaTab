@@ -32,7 +32,7 @@ class Uint8Array : Iterable<UByte> {
     public operator fun set(idx: Int, value:Double) {
         _data[idx] = value.toInt().toUByte();
     }
-    public operator fun set(subarray:Uint8Array, pos:Double) {
+    public fun set(subarray:Uint8Array, pos:Double) {
         subarray._data.copyInto(_data, pos.toInt(), 0, _data.size);
     }
 

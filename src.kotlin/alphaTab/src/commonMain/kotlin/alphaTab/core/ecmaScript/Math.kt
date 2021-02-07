@@ -4,6 +4,34 @@ import kotlin.math.pow
 
 class Math {
     companion object {
+        public const val PI:Double = kotlin.math.PI;
+        public fun log10(x:Double) : Double {
+            return kotlin.math.log10(x);
+        }
+        public fun round(x:Double) : Double {
+            return kotlin.math.round(x);
+        }
+        public fun exp(x:Double) : Double {
+            return kotlin.math.exp(x);
+        }
+        public fun tan(x:Double) : Double {
+            return kotlin.math.tan(x);
+        }
+        public fun ceil(x:Double) : Double {
+            return kotlin.math.ceil(x);
+        }
+        public fun asin(x:Double) : Double {
+            return kotlin.math.asin(x);
+        }
+        public fun sqrt(x:Double) : Double {
+            return kotlin.math.sqrt(x);
+        }
+        public fun log(x:Double) : Double {
+            return kotlin.math.ln(x);
+        }
+        public fun sin(x:Double) : Double {
+            return kotlin.math.sin(x);
+        }
         public fun pow(b:Double, e:Double) : Double {
             return b.pow(e);
         }

@@ -238,8 +238,8 @@ export class PageViewLayout extends ScoreLayout {
                 // if the current renderer still has space in the current group add it
                 // also force adding in case the group is empty
                 let renderers: MasterBarsRenderers | null = this._allMasterBarRenderers[currentIndex];
-                if (group.width + renderers.width <= maxWidth || group.masterBarsRenderers.length === 0) {
-                    group.addMasterBarRenderers(this.renderer.tracks!, renderers);
+                if (group.width + renderers!.width <= maxWidth || group.masterBarsRenderers.length === 0) {
+                    group.addMasterBarRenderers(this.renderer.tracks!, renderers!);
                     // move to next group
                     currentIndex++;
                 } else {
@@ -338,14 +338,16 @@ export class PageViewLayout extends ScoreLayout {
         let barsPerRow: number = this.renderer.settings.display.barsPerRow;
         let maxWidth: number = this.maxWidth;
         let end: number = endIndex + 1;
-        for (let i: number = currentBarIndex; i < end; i++) {
+
+        let barIndex = 0;
+        while(barIndex < end) {
             if (this._barsFromPreviousGroup.length > 0) {
                 for (let renderer of this._barsFromPreviousGroup) {
                     group.addMasterBarRenderers(this.renderer.tracks!, renderer);
-                    i = renderer.masterBar.index;
+                    barIndex = renderer.masterBar.index;
                 }
             } else {
-                let renderers: MasterBarsRenderers | null = group.addBars(this.renderer.tracks!, i);
+                let renderers: MasterBarsRenderers | null = group.addBars(this.renderer.tracks!, barIndex);
                 if (renderers) {
                     this._allMasterBarRenderers.push(renderers);
                 }
@@ -375,6 +377,7 @@ export class PageViewLayout extends ScoreLayout {
                 return group;
             }
             group.x = 0;
+            barIndex++;
         }
         group.isLast = endIndex === group.lastBarIndex;
         return group;

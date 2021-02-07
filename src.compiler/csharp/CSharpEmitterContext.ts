@@ -1164,7 +1164,7 @@ export default class CSharpEmitterContext {
     }
 
     protected hasAnyBaseTypeClassMember(
-        classType: ts.InterfaceType,
+        classType: ts.Type,
         memberName: string,
         allowInterfaces: boolean = false
     ) {
@@ -1185,7 +1185,7 @@ export default class CSharpEmitterContext {
         return false;
     }
 
-    protected hasClassMember(baseType: ts.InterfaceType, name: string): boolean {
+    protected hasClassMember(baseType: ts.Type, name: string): boolean {
         if (
             baseType.symbol &&
             baseType.symbol.members &&

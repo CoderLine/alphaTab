@@ -1009,6 +1009,7 @@ export default class CSharpAstTransformer {
                 tsNode: classElement,
                 body: classElement.body ? this.visitBlock(existingProperty, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
+            return existingProperty.setAccessor;
         } else {
             const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
             const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
@@ -1065,7 +1066,10 @@ export default class CSharpAstTransformer {
             } as cs.PropertyAccessorDeclaration;
 
             parent.members.push(newProperty);
+
+            return newProperty.setAccessor;
         }
+
     }
 
     protected visitPropertyDeclaration(
@@ -1212,7 +1216,6 @@ export default class CSharpAstTransformer {
                             (parent as cs.ClassDeclaration).isAbstract = true;
                         }
                         csMethod.isVirtual = false;
-                        csMethod.isOverride = false;
                         break;
                     case ts.SyntaxKind.StaticKeyword:
                         csMethod.isStatic = true;

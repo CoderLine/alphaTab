@@ -113,7 +113,7 @@ export enum Visibility {
     Internal
 }
 
-export interface DocumentedElement {
+export interface DocumentedElement extends Node {
     documentation?: string;
 }
 export interface AttributedElement {

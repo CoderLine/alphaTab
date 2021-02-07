@@ -590,7 +590,7 @@ export class MidiFileGenerator {
     }
 
     private static getDynamicValue(note: Note): DynamicValue {
-        let dynamicValue: DynamicValue = note.dynamics;
+        let dynamicValue: number = note.dynamics as number;
         // more silent on hammer destination
         if (!note.beat.voice.bar.staff.isPercussion && note.hammerPullOrigin) {
             dynamicValue--;
@@ -608,7 +608,7 @@ export class MidiFileGenerator {
                 dynamicValue += 2;
                 break;
         }
-        return dynamicValue;
+        return dynamicValue as DynamicValue;
     }
 
     private generateFadeIn(note: Note, noteStart: number, noteDuration: MidiNoteDuration): void {

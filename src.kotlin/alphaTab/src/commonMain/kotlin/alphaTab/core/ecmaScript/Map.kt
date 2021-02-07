@@ -15,6 +15,10 @@ class Map<TKey, TValue> : Iterable<Map.Entry<TKey, TValue>> {
         _map = HashMap()
     }
 
+    public fun keys(): MutableList<TKey> {
+        return _map.keys.toMutableList()
+    }
+
     public fun values(): MutableList<TValue>
     {
         return _map.values.toMutableList()

@@ -256,7 +256,7 @@ export class BeamingHelper {
         switch (direction) {
             case BeamDirection.Down:
                 return BeamDirection.Up;
-            case BeamDirection.Up:
+            // case BeamDirection.Up:
             default:
                 return BeamDirection.Down;
         }
