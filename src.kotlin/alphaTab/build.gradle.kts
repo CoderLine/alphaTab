@@ -1,7 +1,7 @@
 plugins {
     kotlin("multiplatform") version "1.4.10"
-    id("com.android.library")
-    id("kotlin-android-extensions")
+//    id("com.android.library")
+//    id("kotlin-android-extensions")
 }
 
 group = "net.alphatab"
@@ -22,7 +22,7 @@ kotlin {
             useJUnit()
         }
     }
-    android()
+//    android()
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -66,27 +66,27 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
-        val androidMain by getting {
-            dependencies {
-                implementation("com.google.android.material:material:1.3.0")
-            }
-        }
-        androidMain.kotlin.srcDirs("src/jvmCommon/kotlin")
-
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-                implementation("junit:junit:4.13")
-            }
-        }
+//        val androidMain by getting {
+//            dependencies {
+//                implementation("com.google.android.material:material:1.3.0")
+//            }
+//        }
+//        androidMain.kotlin.srcDirs("src/jvmCommon/kotlin")
+//
+//        val androidTest by getting {
+//            dependencies {
+//                implementation(kotlin("test-junit"))
+//                implementation("junit:junit:4.13")
+//            }
+//        }
     }
 }
 
-android {
-    compileSdkVersion(29)
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdkVersion(24)
-        targetSdkVersion(29)
-    }
-}
+//android {
+//    compileSdkVersion(29)
+//    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+//    defaultConfig {
+//        minSdkVersion(24)
+//        targetSdkVersion(29)
+//    }
+//}
