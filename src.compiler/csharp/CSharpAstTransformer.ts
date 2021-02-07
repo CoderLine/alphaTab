@@ -9,6 +9,9 @@ export default class CSharpAstTransformer {
     protected _context: CSharpEmitterContext;
     protected _declarationOrAssignmentTypeStack: ts.Type[] = [];
 
+    protected _testClassAttribute: string = 'microsoft.visualStudio.testTools.unitTesting.TestClass';
+    protected _testMethodAttribute: string = 'microsoft.visualStudio.testTools.unitTesting.TestMethod';
+
     public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
         this._typeScriptFile = typeScript;
         this._context = context;
@@ -484,18 +487,20 @@ export default class CSharpAstTransformer {
             members: []
         };
 
-        csClass.attributes = [
-            {
-                parent: csClass,
-                nodeType: cs.SyntaxKind.Attribute,
-                type: {
-                    parent: null,
-                    nodeType: cs.SyntaxKind.TypeReference,
-                    reference: 'Microsoft.VisualStudio.TestTools.UnitTesting.TestClass'
-                } as cs.TypeReference
-            }
-        ];
-
+        if(this._testClassAttribute.length > 0) {
+            csClass.attributes = [
+                {
+                    parent: csClass,
+                    nodeType: cs.SyntaxKind.Attribute,
+                    type: {
+                        parent: null,
+                        nodeType: cs.SyntaxKind.TypeReference,
+                        reference: this._context.makeTypeName(this._testClassAttribute)
+                    } as cs.TypeReference
+                }
+            ];
+        }
+     
         ((d.arguments![1] as ts.ArrowFunction).body as ts.Block).statements.forEach(s => {
             if (ts.isExpressionStatement(s)) {
                 if (ts.isCallExpression(s.expression)) {
@@ -597,7 +602,7 @@ export default class CSharpAstTransformer {
                 type: {
                     parent: null,
                     nodeType: cs.SyntaxKind.TypeReference,
-                    reference: 'Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod'
+                    reference: this._context.makeTypeName(this._testMethodAttribute)
                 } as cs.TypeReference
             }
         ];
@@ -1069,7 +1074,6 @@ export default class CSharpAstTransformer {
 
             return newProperty.setAccessor;
         }
-
     }
 
     protected visitPropertyDeclaration(
@@ -2996,11 +3000,7 @@ export default class CSharpAstTransformer {
                     } as cs.PrimitiveTypeNode;
                 } else {
                     const returnType = signature.getReturnType();
-                    lambda.returnType = this.createUnresolvedTypeNode(
-                        lambda,
-                        p.type ?? p,
-                        returnType
-                    );
+                    lambda.returnType = this.createUnresolvedTypeNode(lambda, p.type ?? p, returnType);
                 }
 
                 p.parameters.forEach(param => lambda.parameters.push(this.makeParameter(lambda, param)));
@@ -3107,7 +3107,7 @@ export default class CSharpAstTransformer {
         return this.wrapToSmartCast(parent, elementAccess, expression);
     }
 
-    protected isEnumToString(expression: ts.ElementAccessExpression):boolean {
+    protected isEnumToString(expression: ts.ElementAccessExpression): boolean {
         const enumType = this._context.typeChecker.getTypeAtLocation(expression.expression);
         return !!(enumType?.symbol && enumType.symbol.flags & ts.SymbolFlags.RegularEnum);
     }
@@ -3275,7 +3275,7 @@ export default class CSharpAstTransformer {
             : this._declarationOrAssignmentTypeStack[this._declarationOrAssignmentTypeStack.length - 1];
     }
 
-    protected visitAsExpression(parent: cs.Node, expression: ts.AsExpression):cs.Expression|null {
+    protected visitAsExpression(parent: cs.Node, expression: ts.AsExpression): cs.Expression | null {
         const castExpression = {
             type: this.createUnresolvedTypeNode(null, expression.type),
             expression: {} as cs.Expression,

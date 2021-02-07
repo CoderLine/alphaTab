@@ -772,14 +772,13 @@ export default class CSharpEmitterContext {
     }
 
     public toPascalCase(text: string): string {
-        if (this.noPascalCase) {
-            return text;
-        }
-
         if (text.indexOf('-') >= 0) {
             return this.kebabCaseToPascalCase(text);
         }
 
+        if (this.noPascalCase) {
+            return text;
+        }
         return text ? text.substr(0, 1).toUpperCase() + text.substr(1) : '';
     }
 

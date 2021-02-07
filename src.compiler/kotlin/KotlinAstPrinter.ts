@@ -426,7 +426,7 @@ export default class KotlinAstPrinter {
             this.writeCommaSeparated(a.arguments!, x => this.writeExpression(x));
             this.write(')');
         }
-        this.writeLine(']');
+        this.writeLine()
     }
 
     private writeMember(member: cs.Node) {
@@ -470,10 +470,6 @@ export default class KotlinAstPrinter {
         }
         this.writeVisibility(d.visibility);
 
-        if (d.isAsync) {
-            this.write('async ');
-        }
-
         if (d.isAbstract) {
             this.write('abstract ');
         }
@@ -492,20 +488,7 @@ export default class KotlinAstPrinter {
         this.writeParameters(d.parameters);
 
         this.write(': ');
-        if (d.isAsync) {
-            if (
-                d.returnType.nodeType === cs.SyntaxKind.PrimitiveTypeNode &&
-                (d.returnType as cs.PrimitiveTypeNode).type === cs.PrimitiveType.Void
-            ) {
-                this.write('Deferred');
-            } else {
-                this.write('Deferred<');
-                this.writeType(d.returnType);
-                this.write('>');
-            }
-        } else {
-            this.writeType(d.returnType);
-        }
+        this.writeType(d.returnType);
 
         this.writeTypeParameterConstraints(d.typeParameters);
 
@@ -1007,7 +990,6 @@ export default class KotlinAstPrinter {
     }
 
     private writeAwaitExpression(expr: cs.AwaitExpression) {
-        this.write('await ');
         this.writeExpression(expr.expression);
     }
 

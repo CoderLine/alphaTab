@@ -7,7 +7,7 @@ class RegExp {
     private var _regex: Regex
     private var _global: Boolean
 
-    public constructor(regex: String, flags: String) {
+    public constructor(regex: String, flags: String = "") {
         val cache = RegexpCache.getOrPut(RegExpCacheEntry(regex, flags), {
             val options = HashSet<RegexOption>()
             for (c in flags) {

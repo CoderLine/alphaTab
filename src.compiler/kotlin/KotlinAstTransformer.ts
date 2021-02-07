@@ -6,6 +6,8 @@ import CSharpAstTransformer from '../csharp/CSharpAstTransformer';
 export default class KotlinAstTransformer extends CSharpAstTransformer {
     public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
         super(typeScript, context);
+        this._testClassAttribute = '';
+        this._testMethodAttribute = 'org.junit.Test';
     }
 
     private _paramReferences: Map<string, cs.Identifier[]>[] = [];
@@ -319,7 +321,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return nonNullExpression;
     }
 
-    protected visitAsExpression(parent: cs.Node, expression: ts.AsExpression): cs.Expression|null {
+    protected visitAsExpression(parent: cs.Node, expression: ts.AsExpression): cs.Expression | null {
         if (this.isCastToEnum(expression)) {
             const methodAccess = {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
@@ -327,7 +329,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 expression: this.createUnresolvedTypeNode(null, expression.type),
                 member: 'fromValue',
                 tsNode: expression
-            } as cs.MemberAccessExpression
+            } as cs.MemberAccessExpression;
 
             const call = {
                 nodeType: cs.SyntaxKind.InvocationExpression,
@@ -335,15 +337,15 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 expression: methodAccess,
                 tsNode: expression,
                 arguments: []
-            } as cs.InvocationExpression
-            
+            } as cs.InvocationExpression;
+
             let expr = this.visitExpression(call, expression.expression);
-            if(!expr) {
+            if (!expr) {
                 return null;
             }
             call.arguments.push(expr);
 
-            return call
+            return call;
         } else if (this.isCastFromEnumToNumber(expression)) {
             return {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
@@ -351,7 +353,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 expression: this.createUnresolvedTypeNode(null, expression.type),
                 member: 'value',
                 tsNode: expression
-            } as cs.MemberAccessExpression
+            } as cs.MemberAccessExpression;
         } else {
             return super.visitAsExpression(parent, expression);
         }
