@@ -3,10 +3,12 @@ package alphaTab.io
 import alphaTab.AlphaTabError
 import alphaTab.AlphaTabErrorType
 import kotlin.contracts.ExperimentalContracts
+import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
 
 internal open class JsonHelperPartials {
     companion object {
+        @JvmName("forEachBool")
         public fun forEach(o: Any?, func: (v: Any?, k: String) -> Boolean) {
             if (o is Map<*, *>) {
                 for (kvp in o) {
@@ -14,6 +16,7 @@ internal open class JsonHelperPartials {
                 }
             }
         }
+
         public fun forEach(o: Any?, func: (v: Any?, k: String) -> Unit) {
             if (o is Map<*, *>) {
                 for (kvp in o) {
@@ -22,34 +25,41 @@ internal open class JsonHelperPartials {
             }
         }
 
+
+        public fun <T : Enum<T>> parseEnum(value: String, values: Array<T>): T? {
+            for (e in values) {
+                if (e.name.toLowerCase() == value) {
+                    return e
+                }
+            }
+            return null
+        }
+
+        public fun <T : Enum<T>> parseEnum(value: Int, values: Array<T>): T? {
+            for (e in values) {
+                if (e is alphaTab.core.IAlphaTabEnum && e.value == value) {
+                    return e
+                }
+            }
+            return null
+        }
+
+        @ExperimentalUnsignedTypes
         @ExperimentalContracts
-        public inline fun <reified T : Enum<T>> parseEnum(value: Any?, @Suppress("UNUSED_PARAMETER") type: KClass<T>): T? {
-            if (value == null) {
-                return null
+        public inline fun <reified T : Enum<T>> parseEnum(
+            value: Any?,
+            @Suppress("UNUSED_PARAMETER") type: KClass<T>
+        ): T? {
+            return when (value) {
+                null -> null
+                is T -> value
+                is String -> parseEnum(value, enumValues<T>())
+                is Int -> parseEnum(value, enumValues<T>())
+                else -> throw AlphaTabError(
+                    AlphaTabErrorType.Format,
+                    "Could not parse enum value '$value' [(${value::class.simpleName}"
+                )
             }
-            if (value is String) {
-                for (e in enumValues<T>()) {
-                    if (e.name.toLowerCase() == value) {
-                        return e
-                    }
-                }
-                return null
-            }
-            if (value is Int) {
-                for (e in enumValues<T>()) {
-                    if (e is alphaTab.core.IAlphaTabEnum && e.value == value) {
-                        return e
-                    }
-                }
-                return null
-            }
-            if (value is T) {
-                return value
-            }
-            throw AlphaTabError(
-                AlphaTabErrorType.Format,
-                "Could not parse enum value '$value' [(${value::class.simpleName}"
-            )
         }
     }
 }

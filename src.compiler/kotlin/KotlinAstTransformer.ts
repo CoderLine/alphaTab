@@ -318,4 +318,55 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
         return nonNullExpression;
     }
+
+    protected visitAsExpression(parent: cs.Node, expression: ts.AsExpression): cs.Expression|null {
+        if (this.isCastToEnum(expression)) {
+            const methodAccess = {
+                nodeType: cs.SyntaxKind.MemberAccessExpression,
+                parent: parent,
+                expression: this.createUnresolvedTypeNode(null, expression.type),
+                member: 'fromValue',
+                tsNode: expression
+            } as cs.MemberAccessExpression
+
+            const call = {
+                nodeType: cs.SyntaxKind.InvocationExpression,
+                parent: parent,
+                expression: methodAccess,
+                tsNode: expression,
+                arguments: []
+            } as cs.InvocationExpression
+            
+            let expr = this.visitExpression(call, expression.expression);
+            if(!expr) {
+                return null;
+            }
+            call.arguments.push(expr);
+
+            return call
+        } else if (this.isCastFromEnumToNumber(expression)) {
+            return {
+                nodeType: cs.SyntaxKind.MemberAccessExpression,
+                parent: parent,
+                expression: this.createUnresolvedTypeNode(null, expression.type),
+                member: 'value',
+                tsNode: expression
+            } as cs.MemberAccessExpression
+        } else {
+            return super.visitAsExpression(parent, expression);
+        }
+    }
+
+    private isCastFromEnumToNumber(expression: ts.AsExpression) {
+        let targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
+        if (targetType.flags === ts.TypeFlags.Number) {
+            let sourceType = this._context.getType(expression.type);
+            return sourceType.flags & ts.TypeFlags.Enum || sourceType.flags & ts.TypeFlags.EnumLiteral;
+        }
+        return false;
+    }
+    private isCastToEnum(expression: ts.AsExpression) {
+        let targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
+        return targetType.flags & ts.TypeFlags.Enum || targetType.flags & ts.TypeFlags.EnumLiteral;
+    }
 }

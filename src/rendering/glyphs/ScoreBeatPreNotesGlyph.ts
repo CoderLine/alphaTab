@@ -29,8 +29,9 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             let ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
             ghost.renderer = this.renderer;
 
-            this._prebends = new BendNoteHeadGroupGlyph(this.container.beat, true);
-            this._prebends.renderer = this.renderer;
+            const preBends = new BendNoteHeadGroupGlyph(this.container.beat, true);
+            this._prebends = preBends;
+            preBends.renderer = this.renderer;
             for (let note of this.container.beat.notes) {
                 if (note.isVisible) {
                     if (note.hasBend) {
@@ -38,7 +39,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                             case BendType.PrebendBend:
                             case BendType.Prebend:
                             case BendType.PrebendRelease:
-                                this._prebends.addGlyph(
+                                preBends.addGlyph(
                                     note.displayValue - ((note.bendPoints[0].value / 2) | 0),
                                     false
                                 );
@@ -59,8 +60,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                     ghost.addParenthesis(note);
                 }
             }
-            if (!this._prebends.isEmpty) {
-                this.addGlyph(this._prebends);
+            if (!preBends.isEmpty) {
+                this.addGlyph(preBends);
                 this.addGlyph(
                     new SpacingGlyph(
                         0,

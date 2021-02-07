@@ -380,12 +380,12 @@ export class AccidentalHelper {
                 ? AccidentalHelper.SharpNoteSteps
                 : AccidentalHelper.FlatNoteSteps;
         // Add offset for note itself
-        switch (mode) {
-            default:
-                // normal behavior: simply use the position where
-                // the keysignature defines the position
-                break;
-        }
+        // switch (mode) {
+        //     default:
+        //         // normal behavior: simply use the position where
+        //         // the keysignature defines the position
+        //         break;
+        // }
         steps -= stepList[index];
 
         return steps;

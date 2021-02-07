@@ -324,14 +324,14 @@ export class AlphaSynth implements IAlphaSynth {
 
     /**
      * Loads the given midi file for playback.
-     * @param midiFile The midi file to load
+     * @param midi The midi file to load
      */
-    public loadMidiFile(midiFile: MidiFile): void {
+    public loadMidiFile(midi: MidiFile): void {
         this.stop();
 
         try {
             Logger.debug('AlphaSynth', 'Loading midi from model');
-            this._sequencer.loadMidi(midiFile);
+            this._sequencer.loadMidi(midi);
             this._isMidiLoaded = true;
             (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
                 new PositionChangedEventArgs(0, this._sequencer.endTime, 0, this._sequencer.endTick, false)

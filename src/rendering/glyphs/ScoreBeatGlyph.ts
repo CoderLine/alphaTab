@@ -86,9 +86,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 //
                 // Note heads
                 //
-                this.noteHeads = new ScoreNoteChordGlyph();
-                this.noteHeads.beat = this.container.beat;
-                this.noteHeads.beamingHelper = this.beamingHelper;
+                const noteHeads = new ScoreNoteChordGlyph();
+                this.noteHeads = noteHeads;
+                noteHeads.beat = this.container.beat;
+                noteHeads.beamingHelper = this.beamingHelper;
                 let ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(false);
                 ghost.renderer = this.renderer;
                 for (let note of this.container.beat.notes) {
@@ -97,7 +98,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         ghost.addParenthesis(note);
                     }
                 }
-                this.addGlyph(this.noteHeads);
+                this.addGlyph(noteHeads);
                 if (!ghost.isEmpty) {
                     this.addGlyph(
                         new SpacingGlyph(
@@ -145,16 +146,17 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     line -= 2;
                 }
 
-                this.restGlyph = new ScoreRestGlyph(0, sr.getScoreY(line), this.container.beat.duration);
-                this.restGlyph.beat = this.container.beat;
-                this.restGlyph.beamingHelper = this.beamingHelper;
-                this.addGlyph(this.restGlyph);
+                const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(line), this.container.beat.duration);
+                this.restGlyph = restGlyph;
+                restGlyph.beat = this.container.beat;
+                restGlyph.beamingHelper = this.beamingHelper;
+                this.addGlyph(restGlyph);
 
                 if (this.renderer.bar.isMultiVoice) {
                     if (this.container.beat.voice.index === 0) {
                         const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
-                        let restTop = this.restGlyph.y - sr.getScoreHeight(restSizes[0]);
-                        let restBottom = this.restGlyph.y + sr.getScoreHeight(restSizes[1]);
+                        let restTop = restGlyph.y - sr.getScoreHeight(restSizes[0]);
+                        let restBottom = restGlyph.y + sr.getScoreHeight(restSizes[1]);
                         this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
                     } else {
                         this.renderer.helpers.collisionHelper.registerRest(this.container.beat);

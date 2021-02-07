@@ -55,7 +55,15 @@ export default class KotlinAstPrinter {
         this.writeLine('    "unused",');
         this.writeLine('    "NON_EXHAUSTIVE_WHEN",');
         this.writeLine('    "UNCHECKED_CAST",');
-        this.writeLine('    "UNNECESSARY_NOT_NULL_ASSERTION"');
+        this.writeLine('    "USELESS_CAST",');
+        this.writeLine('    "UNNECESSARY_NOT_NULL_ASSERTION",');
+        this.writeLine('    "UNNECESSARY_SAFE_CALL",');
+        this.writeLine('    "UNUSED_ANONYMOUS_PARAMETER",');
+        this.writeLine('    "UNUSED_PARAMETER",');
+        this.writeLine('    "UNUSED_VALUE",');
+        this.writeLine('    "UNREACHABLE_CODE",');
+        this.writeLine('    "REDUNDANT_ELSE_IN_WHEN",');
+        this.writeLine('    "VARIABLE_WITH_REDUNDANT_INITIALIZER"');
         this.writeLine(')');
         this.writeLine(`package ${sourceFile.namespace.namespace}`);
 
@@ -119,18 +127,15 @@ export default class KotlinAstPrinter {
                 this.writeLine();
             }
             for (const line of lines) {
-                this.writeLine(` * ${this.escapeXmlDoc(line)}`);
+                this.writeLine(` * ${line}`);
             }
         } else if (lines.length === 1) {
             if (this._isStartOfLine) {
-                this.writeLine(` * ${this.escapeXmlDoc(lines[0])}`);
+                this.writeLine(` * ${lines[0]}`);
             } else {
-                this.write(this.escapeXmlDoc(lines[0]));
+                this.write(lines[0]);
             }
         }
-    }
-    private escapeXmlDoc(s: string): string {
-        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     private writeParameters(parameters: cs.ParameterDeclaration[]) {
@@ -138,6 +143,7 @@ export default class KotlinAstPrinter {
         this.writeCommaSeparated(parameters, p => this.writeParameter(p));
         this.write(')');
     }
+
     private writeCommaSeparated<T>(values: T[], write: (p: T) => void) {
         values.forEach((v, i) => {
             if (i > 0) {
@@ -166,7 +172,7 @@ export default class KotlinAstPrinter {
                 this.write(' = ');
                 this.writeExpression(p.initializer);
             } else if (p.type && p.type.isOptional) {
-                var type: cs.TypeNode = p.type;
+                let type: cs.TypeNode = p.type;
                 if (p.type.nodeType === cs.SyntaxKind.TypeReference) {
                     type = (p.type as cs.TypeReference).reference as cs.TypeNode;
                 }
@@ -196,7 +202,7 @@ export default class KotlinAstPrinter {
             return false;
         }
 
-        var method = parent as cs.MethodDeclaration;
+        let method = parent as cs.MethodDeclaration;
         return method.isOverride;
     }
 
@@ -224,6 +230,7 @@ export default class KotlinAstPrinter {
     }
 
     private writeEnumDeclaration(d: cs.EnumDeclaration) {
+        this._forceInteger = true;
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
         this.write(`enum class ${d.name}(override val value: Int): alphaTab.core.IAlphaTabEnum`);
@@ -232,7 +239,6 @@ export default class KotlinAstPrinter {
 
         let currentEnumValue = 0;
 
-        this._forceInteger = true;
         for (let i = 0; i < d.members.length; i++) {
             let m = d.members[i];
             this.writeDocumentation(m);
@@ -255,8 +261,29 @@ export default class KotlinAstPrinter {
 
             currentEnumValue++;
         }
-        this._forceInteger = false;
+
+        this.write('companion object');
+        this.beginBlock();
+
+        this.write(`public fun fromValue(v:Double): ${d.name}`);
+        this.beginBlock();
+        this.write('return when(v.toInt())');
+        this.beginBlock();
+
+        for (const m of d.members) {
+            this.write(m.name);
+            this.write('.value -> ');
+            this.writeLine(m.name);
+        }
+        this.write('else -> throw ClassCastException("No enum with value $v found")');
         this.endBlock();
+
+        this.endBlock();
+
+        this.endBlock();
+
+        this.endBlock();
+        this._forceInteger = false;
     }
 
     private writeClassDeclaration(d: cs.ClassDeclaration) {
@@ -278,9 +305,6 @@ export default class KotlinAstPrinter {
         if (d.baseClass) {
             this.write(': ');
             this.writeType(d.baseClass);
-            // if (!d.members.find(m => m.nodeType === cs.SyntaxKind.ConstructorDeclaration)) {
-            //     this.write('()');
-            // }
         }
 
         if (d.interfaces && d.interfaces.length > 0) {
@@ -609,6 +633,7 @@ export default class KotlinAstPrinter {
             }
         }
     }
+    
     private isLateInit(d: cs.PropertyDeclaration) {
         return (
             d.initializer &&
@@ -910,6 +935,9 @@ export default class KotlinAstPrinter {
             case cs.SyntaxKind.TypeOfExpression:
                 this.writeTypeOfExpression(expr as cs.TypeOfExpression);
                 break;
+            case cs.SyntaxKind.TypeReference:
+                this.writeType(expr as cs.TypeReference);
+                break;
             default:
                 throw new Error(`Unhandled expression type: ${cs.SyntaxKind[expr.nodeType]}`);
         }
@@ -988,6 +1016,9 @@ export default class KotlinAstPrinter {
         this.write(' ');
         switch (expr.operator) {
             case '??':
+                if (expr.right.nodeType === cs.SyntaxKind.NullLiteral) {
+                    return;
+                }
                 this.write('?:');
                 break;
             case '&':
@@ -1201,8 +1232,10 @@ export default class KotlinAstPrinter {
             this.write('::');
         } else if (expr.tsSymbol && this._context.isStaticSymbol(expr.tsSymbol)) {
             this.write('.');
+        } else if (expr.expression.nodeType === cs.SyntaxKind.TypeReference) {
+            this.write('.');
         } else if (
-            expr.expression.nodeType == cs.SyntaxKind.NonNullExpression ||
+            expr.expression.nodeType === cs.SyntaxKind.NonNullExpression ||
             expr.expression.nodeType === cs.SyntaxKind.Identifier ||
             expr.expression.nodeType === cs.SyntaxKind.ArrayCreationExpression ||
             expr.expression.nodeType === cs.SyntaxKind.NewExpression ||
@@ -1215,34 +1248,6 @@ export default class KotlinAstPrinter {
         }
         const name = this._context.getSymbolName(expr) ?? expr.member;
         this.write(name);
-
-        // TODO: consider nullablility
-        if (this.isMemberValueAccess(expr)) {
-            this.write('!!');
-        }
-    }
-
-    private isMemberValueAccess(expr: cs.MemberAccessExpression): boolean {
-        switch (expr.parent!.nodeType) {
-            case cs.SyntaxKind.BinaryExpression:
-                const bin = expr.parent as cs.BinaryExpression;
-                if (bin.operator.endsWith('=')) {
-                    return bin.left !== expr;
-                } else {
-                    return true;
-                }
-            case cs.SyntaxKind.InvocationExpression:
-                return (expr.parent as cs.InvocationExpression).expression !== expr;
-            case cs.SyntaxKind.MemberAccessExpression:
-            case cs.SyntaxKind.NonNullExpression:
-            case cs.SyntaxKind.NullSafeExpression:
-            case cs.SyntaxKind.PrefixUnaryExpression:
-            case cs.SyntaxKind.PostfixUnaryExpression:
-            case cs.SyntaxKind.ElementAccessExpression:
-                return false;
-        }
-
-        return true;
     }
 
     private isMethodAsDelegate(expr: cs.MemberAccessExpression) {

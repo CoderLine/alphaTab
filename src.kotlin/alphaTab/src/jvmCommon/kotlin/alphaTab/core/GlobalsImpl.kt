@@ -24,7 +24,6 @@ actual fun Double.toInvariantString(): String {
     return NumberFormat.getInstance(Locale.ROOT).format(this)
 }
 
-
 actual fun String.toDoubleOrNaN(): Double {
     try {
         val number = NumberFormat.getInstance(Locale.ROOT).parse(this)

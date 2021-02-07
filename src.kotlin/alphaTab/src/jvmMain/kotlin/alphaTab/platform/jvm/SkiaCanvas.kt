@@ -15,6 +15,7 @@ import kotlin.contracts.ExperimentalContracts
 val MusicFont: Typeface = Typeface.makeDefault()
 const val MusicFontSize = 34
 
+@ExperimentalUnsignedTypes
 @ExperimentalContracts
 class SkiaCanvas : ICanvas {
     private lateinit var _surface: Surface

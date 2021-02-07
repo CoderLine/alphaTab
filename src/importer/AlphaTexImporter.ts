@@ -110,7 +110,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _ch: number = 0;
     private _curChPos: number = 0;
     private _sy: AlphaTexSymbols = AlphaTexSymbols.No;
-    private _syData: unknown = null;
+    private _syData: any = "";
     private _allowNegatives: boolean = false;
     private _allowTuning: boolean = false;
     private _currentDuration: Duration = Duration.QuadrupleWhole;

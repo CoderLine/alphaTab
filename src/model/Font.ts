@@ -374,7 +374,8 @@ export class Font {
             case 'object': {
                 const m = v as Map<string, unknown>;
                 let family = m.get('family') as string;
-                let size = m.get('size') as number;
+                // tslint:disable-next-line: no-unnecessary-type-assertion
+                let size = m.get('size')! as number;
                 let style = JsonHelper.parseEnum<FontStyle>(m.get('style'), FontStyle)!;
                 let weight = JsonHelper.parseEnum<FontWeight>(m.get('weight'), FontWeight)!;
                 return new Font(family, size, style, weight);

@@ -31,13 +31,13 @@ kotlin {
         }
         commonMain.kotlin.srcDirs("src/generated/src")
 
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-            }
-        }
-        commonTest.kotlin.srcDirs("src/generated/test")
+//        val commonTest by getting {
+//            dependencies {
+//                implementation(kotlin("test-common"))
+//                implementation(kotlin("test-annotations-common"))
+//            }
+//        }
+//        commonTest.kotlin.srcDirs("src/generated/test")
 
         val os = System.getProperty("os.name")
         val target = when {
@@ -61,11 +61,11 @@ kotlin {
         }
         jvmMain.kotlin.srcDirs("src/jvmCommon/kotlin")
 
-        val jvmTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-            }
-        }
+//        val jvmTest by getting {
+//            dependencies {
+//                implementation(kotlin("test-junit"))
+//            }
+//        }
 //        val androidMain by getting {
 //            dependencies {
 //                implementation("com.google.android.material:material:1.3.0")

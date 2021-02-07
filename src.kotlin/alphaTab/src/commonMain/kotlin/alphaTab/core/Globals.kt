@@ -165,11 +165,23 @@ operator fun Int.rangeTo(d: Double): IntRange {
     return this.rangeTo(d.toInt())
 }
 
-fun Any?.toDouble(): Double {
-    if (this is Double) {
+//fun Any?.toDouble(): Double {
+//    if (this is Double) {
+//        return this
+//    }
+//    return this.toString().toDouble()
+//}
+fun IAlphaTabEnum.toDouble(): Double {
+    return this.value.toDouble()
+}
+fun Any.toDouble(): Double {
+    if(this is Double) {
         return this
     }
-    return this.toString().toDouble()
+    throw ClassCastException("Cannot cast ${this::class.simpleName} to double")
+}
+fun Int?.toDouble(): Double? {
+    return this?.toDouble()
 }
 
 expect fun String.toDoubleOrNaN(): Double;
@@ -180,7 +192,7 @@ class Globals {
         const val NaN: Double = Double.NaN
         val console = Console()
 
-        public inline fun isNaN(s: Double): Boolean {
+        public fun isNaN(s: Double): Boolean {
             return s.isNaN()
         }
 

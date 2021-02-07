@@ -3275,7 +3275,7 @@ export default class CSharpAstTransformer {
             : this._declarationOrAssignmentTypeStack[this._declarationOrAssignmentTypeStack.length - 1];
     }
 
-    protected visitAsExpression(parent: cs.Node, expression: ts.AsExpression) {
+    protected visitAsExpression(parent: cs.Node, expression: ts.AsExpression):cs.Expression|null {
         const castExpression = {
             type: this.createUnresolvedTypeNode(null, expression.type),
             expression: {} as cs.Expression,

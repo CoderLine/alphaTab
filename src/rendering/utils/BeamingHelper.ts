@@ -239,11 +239,13 @@ export class BeamingHelper {
         const offsets = BeamingHelper.computeLineHeightsForRest(beat.duration);
         aboveRest -= offsets[0];
         belowRest += offsets[1];
-        if (this.minRestLine === null || this.minRestLine > aboveRest) {
+        const minRestLine = this.minRestLine;
+        const maxRestLine = this.maxRestLine;
+        if (minRestLine === null || minRestLine > aboveRest) {
             this.minRestLine = aboveRest;
             this.beatOfMinRestLine = beat;
         }
-        if (this.maxRestLine === null || this.maxRestLine < belowRest) {
+        if (maxRestLine === null || maxRestLine < belowRest) {
             this.maxRestLine = belowRest;
             this.beatOfMaxRestLine = beat;
         }

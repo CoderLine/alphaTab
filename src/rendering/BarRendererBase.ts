@@ -99,7 +99,7 @@ export class BarRendererBase {
     public scoreRenderer: ScoreRenderer;
     public staff!: RenderStaff;
     public layoutingInfo!: BarLayoutingInfo;
-    public bar!: Bar;
+    public bar: Bar;
 
     public x: number = 0;
     public y: number = 0;

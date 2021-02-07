@@ -6,10 +6,12 @@ import kotlinx.coroutines.launch
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
+@ExperimentalUnsignedTypes
 internal expect fun createPlatformSpecificRenderEngines(engines: alphaTab.core.ecmaScript.Map<String, RenderEngineFactory>)
 
 @Suppress("UNUSED_PARAMETER")
 @kotlin.contracts.ExperimentalContracts
+@ExperimentalUnsignedTypes
 class EnvironmentPartials {
     companion object {
         internal fun createPlatformSpecificRenderEngines(engines: alphaTab.core.ecmaScript.Map<String, RenderEngineFactory>) {

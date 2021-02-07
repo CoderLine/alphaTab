@@ -52,13 +52,14 @@ export class BeatBounds {
      * @returns The note at the given position or null if no note was found, or the note lookup was not enabled before rendering.
      */
     public findNoteAtPos(x: number, y: number): Note | null {
-        if (!this.notes) {
+        const notes = this.notes;
+        if (!notes) {
             return null;
         }
         // TODO: can be likely optimized
         // a beat is mostly vertically aligned, we could sort the note bounds by Y
         // and then do a binary search on the Y-axis.
-        for (let note of this.notes) {
+        for (let note of notes) {
             let bottom: number = note.noteHeadBounds.y + note.noteHeadBounds.h;
             let right: number = note.noteHeadBounds.x + note.noteHeadBounds.w;
             if (note.noteHeadBounds.x >= x && note.noteHeadBounds.y >= y && x <= right && y <= bottom) {

@@ -40,15 +40,16 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             // Note numbers
             let isGrace: boolean =
                 this.renderer.settings.notation.smallGraceTabNotes && this.container.beat.graceType !== GraceType.None;
-            this.noteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
-            this.noteNumbers.beat = this.container.beat;
-            this.noteNumbers.beamingHelper = this.beamingHelper;
+            const noteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
+            this.noteNumbers = noteNumbers;
+            noteNumbers.beat = this.container.beat;
+            noteNumbers.beamingHelper = this.beamingHelper;
             for (let note of this.container.beat.notes) {
                 if (note.isVisible) {
                     this.createNoteGlyph(note);
                 }
             }
-            this.addGlyph(this.noteNumbers);
+            this.addGlyph(noteNumbers);
             //
             // Whammy Bar
             if (this.container.beat.hasWhammyBar) {
@@ -97,10 +98,11 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         } else {
             let line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2) ;
             let y: number = tabRenderer.getTabY(line);
-            this.restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
-            this.restGlyph.beat = this.container.beat;
-            this.restGlyph.beamingHelper = this.beamingHelper;
-            this.addGlyph(this.restGlyph);
+            const restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
+            this.restGlyph = restGlyph;
+            restGlyph.beat = this.container.beat;
+            restGlyph.beamingHelper = this.beamingHelper;
+            this.addGlyph(restGlyph);
             //
             // Note dots
             //

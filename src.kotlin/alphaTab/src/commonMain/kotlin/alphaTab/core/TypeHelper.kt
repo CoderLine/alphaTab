@@ -6,7 +6,7 @@ import kotlin.contracts.contract
 
 class TypeHelper {
     companion object {
-        public inline fun createRegex(pattern: String, flags: String): RegExp {
+        public fun createRegex(pattern: String, flags: String): RegExp {
             return RegExp(pattern, flags)
         }
 
@@ -19,7 +19,7 @@ class TypeHelper {
         }
 
         @ExperimentalContracts
-        public inline fun isTruthy(s: Any?): Boolean {
+        public fun isTruthy(s: Any?): Boolean {
             contract { returns(true) implies (s != null) }
             return s != null
         }
@@ -45,7 +45,7 @@ class TypeHelper {
             }
         }
 
-        public inline fun <K, V> createMapEntry(k: K, v: V): Pair<K, V> {
+        public fun <K, V> createMapEntry(k: K, v: V): Pair<K, V> {
             return Pair(k, v)
         }
     }
