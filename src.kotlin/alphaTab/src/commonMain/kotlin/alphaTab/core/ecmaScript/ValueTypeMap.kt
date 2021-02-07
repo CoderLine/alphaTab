@@ -5,7 +5,6 @@ import kotlin.collections.Map
 class ValueTypeMap<TKey, TValue> : Iterable<Map.Entry<TKey, TValue>> {
     private val _map: HashMap<TKey, TValue>
 
-
     public val size: Double
         get() {
             return _map.size.toDouble()
@@ -17,7 +16,7 @@ class ValueTypeMap<TKey, TValue> : Iterable<Map.Entry<TKey, TValue>> {
 
     public constructor(entries: Iterable<Pair<TKey, TValue>>) {
         _map = HashMap()
-        _map.putAll(entries);
+        _map.putAll(entries)
     }
 
     public fun get(key: TKey): TValue? {
@@ -41,6 +40,6 @@ class ValueTypeMap<TKey, TValue> : Iterable<Map.Entry<TKey, TValue>> {
     }
 
     override fun iterator(): Iterator<Map.Entry<TKey, TValue>> {
-        return _map.iterator();
+        return _map.iterator()
     }
 }

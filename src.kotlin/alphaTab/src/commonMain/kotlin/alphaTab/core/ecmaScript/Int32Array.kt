@@ -1,7 +1,7 @@
 package alphaTab.core.ecmaScript
 
 class Int32Array : Iterable<Int> {
-    private val _data: IntArray;
+    private val _data: IntArray
 
     public val length: Double
         get() {
@@ -9,15 +9,15 @@ class Int32Array : Iterable<Int> {
         }
 
     public constructor(size: Double) {
-        _data = IntArray(size.toInt());
+        _data = IntArray(size.toInt())
     }
 
     public operator fun get(index: Double): Double {
-        return _data[index.toInt()].toDouble();
+        return _data[index.toInt()].toDouble()
     }
 
     public operator fun get(index: Int): Double {
-        return _data[index].toDouble();
+        return _data[index].toDouble()
     }
 
     public operator fun set(index: Double, value: Double) {
@@ -27,6 +27,7 @@ class Int32Array : Iterable<Int> {
     public operator fun set(index: Int, value: Double) {
         _data[index] = value.toInt()
     }
+
     public operator fun set(index: Int, value: Int) {
         _data[index] = value
     }

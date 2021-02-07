@@ -6,28 +6,47 @@ import kotlin.contracts.contract
 
 class TypeHelper {
     companion object {
-        public inline fun createRegex(pattern:String, flags:String):RegExp {
+        public inline fun createRegex(pattern: String, flags: String): RegExp {
             return RegExp(pattern, flags)
         }
+
         public fun isTruthy(s: String?): Boolean {
-            return s != null && s.isNotEmpty();
+            return s != null && s.isNotEmpty()
         }
+
         public fun isTruthy(b: Boolean?): Boolean {
-            return b != null && b;
+            return b != null && b
         }
 
         @ExperimentalContracts
         public inline fun isTruthy(s: Any?): Boolean {
             contract { returns(true) implies (s != null) }
-            return s != null;
+            return s != null
         }
 
+        @ExperimentalUnsignedTypes
         public fun typeOf(s: Any?): String {
-            return ""
+            return when (s) {
+                is String -> "string"
+                is Boolean -> "boolean"
+                is Byte,
+                is Short,
+                is Int,
+                is Long,
+                is UByte,
+                is UShort,
+                is UInt,
+                is ULong,
+                is Float,
+                is Double,
+                is IAlphaTabEnum -> "number"
+                null -> "undefined"
+                else -> "object"
+            }
         }
 
-        public fun <K, V> createMapEntry(k: K, v: V): Pair<K, V> {
-            return Pair(k, v);
+        public inline fun <K, V> createMapEntry(k: K, v: V): Pair<K, V> {
+            return Pair(k, v)
         }
     }
 }

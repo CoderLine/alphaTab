@@ -3,15 +3,11 @@ package alphaTab.core.dom
 import alphaTab.core.decodeToString
 import alphaTab.core.ecmaScript.ArrayBuffer
 
-class TextDecoder {
+class TextDecoder(encoding:String) {
+    private val _encoding:String = encoding
 
-
-    private val _encoding:String
-    public constructor(encoding:String) {
-        _encoding = encoding
-    }
-
+    @ExperimentalUnsignedTypes
     public fun decode(buffer: ArrayBuffer): String {
-        return buffer.raw.decodeToString(_encoding);
+        return buffer.raw.decodeToString(_encoding)
     }
 }

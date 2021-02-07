@@ -2,7 +2,6 @@ package alphaTab.io
 
 import alphaTab.AlphaTabError
 import alphaTab.AlphaTabErrorType
-import alphaTab.core.IAlphaTabEnum
 import kotlin.contracts.ExperimentalContracts
 import kotlin.reflect.KClass
 
@@ -11,22 +10,22 @@ internal open class JsonHelperPartials {
         public fun forEach(o: Any?, func: (v: Any?, k: String) -> Boolean) {
             if (o is Map<*, *>) {
                 for (kvp in o) {
-                    func(kvp.value, (kvp.key!!) as String);
+                    func(kvp.value, (kvp.key!!) as String)
                 }
             }
         }
         public fun forEach(o: Any?, func: (v: Any?, k: String) -> Unit) {
             if (o is Map<*, *>) {
                 for (kvp in o) {
-                    func(kvp.value, (kvp.key!!) as String);
+                    func(kvp.value, (kvp.key!!) as String)
                 }
             }
         }
 
         @ExperimentalContracts
-        public inline fun <reified T : kotlin.Enum<T>> parseEnum(value: Any?, type: KClass<T>): T? {
+        public inline fun <reified T : Enum<T>> parseEnum(value: Any?, @Suppress("UNUSED_PARAMETER") type: KClass<T>): T? {
             if (value == null) {
-                return null;
+                return null
             }
             if (value is String) {
                 for (e in enumValues<T>()) {
@@ -34,7 +33,7 @@ internal open class JsonHelperPartials {
                         return e
                     }
                 }
-                return null;
+                return null
             }
             if (value is Int) {
                 for (e in enumValues<T>()) {
@@ -42,10 +41,10 @@ internal open class JsonHelperPartials {
                         return e
                     }
                 }
-                return null;
+                return null
             }
             if (value is T) {
-                return value;
+                return value
             }
             throw AlphaTabError(
                 AlphaTabErrorType.Format,

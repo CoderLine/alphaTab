@@ -1,6 +1,5 @@
 import * as ts from 'typescript';
 import * as cs from '../csharp/CSharpAst';
-import * as path from 'path';
 import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 import CSharpAstTransformer from '../csharp/CSharpAstTransformer';
 

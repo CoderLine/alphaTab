@@ -1,9 +1,7 @@
 package alphaTab.core.ecmaScript
 
-class Date {
+expect class Date {
     companion object {
-        public fun now(): Double {
-            return 0.0
-        }
+        public fun now(): Double
     }
 }

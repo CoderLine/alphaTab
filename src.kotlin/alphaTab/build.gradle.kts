@@ -10,6 +10,7 @@ version = "1.3-SNAPSHOT"
 repositories {
     google()
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 kotlin {
@@ -23,7 +24,11 @@ kotlin {
     }
     android()
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+            }
+        }
         commonMain.kotlin.srcDirs("src/generated/src")
 
         val commonTest by getting {
@@ -34,7 +39,28 @@ kotlin {
         }
         commonTest.kotlin.srcDirs("src/generated/test")
 
-        val jvmMain by getting
+        val os = System.getProperty("os.name")
+        val target = when {
+            os == "Mac OS X" -> {
+                "macos"
+            }
+            os.startsWith("Win") -> {
+                "windows"
+            }
+            os.startsWith("Linux") -> {
+                "linux"
+            }
+            else -> {
+                throw Error("Unsupported OS: $os")
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                implementation("org.jetbrains.skiko:skiko-jvm-runtime-$target-x64:0.2.6")
+            }
+        }
+        jvmMain.kotlin.srcDirs("src/jvmCommon/kotlin")
+
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
@@ -42,9 +68,11 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation("com.google.android.material:material:1.2.1")
+                implementation("com.google.android.material:material:1.3.0")
             }
         }
+        androidMain.kotlin.srcDirs("src/jvmCommon/kotlin")
+
         val androidTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))

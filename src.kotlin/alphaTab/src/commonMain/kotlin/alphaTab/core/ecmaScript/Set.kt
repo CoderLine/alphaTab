@@ -7,7 +7,7 @@ class Set<T> : Iterable<T> {
         _set = HashSet()
     }
 
-    public constructor(values: alphaTab.core.ecmaScript.Iterable<T>?) {
+    public constructor(values: Iterable<T>?) {
         _set = values?.toHashSet() ?: HashSet()
     }
 

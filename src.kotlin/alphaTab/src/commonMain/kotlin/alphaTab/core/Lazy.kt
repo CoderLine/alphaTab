@@ -12,6 +12,6 @@ class Lazy<T : Any?>(factory: () -> T) {
                 _value = _factory()
             }
             @Suppress("UNCHECKED_CAST")
-            return _value as T;
+            return _value as T
         }
 }

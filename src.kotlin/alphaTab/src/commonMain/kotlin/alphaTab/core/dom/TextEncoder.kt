@@ -1,10 +1,8 @@
 package alphaTab.core.dom
 
-import alphaTab.core.decodeToString
-import alphaTab.core.ecmaScript.ArrayBuffer
-
 class TextEncoder {
+    @ExperimentalUnsignedTypes
     public fun encode(str: String): alphaTab.core.ecmaScript.Uint8Array {
-        return alphaTab.core.ecmaScript.Uint8Array(str.encodeToByteArray().toUByteArray());
+        return alphaTab.core.ecmaScript.Uint8Array(str.encodeToByteArray().toUByteArray())
     }
 }

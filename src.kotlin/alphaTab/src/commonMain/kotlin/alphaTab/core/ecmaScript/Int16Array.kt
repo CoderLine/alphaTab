@@ -1,9 +1,9 @@
 package alphaTab.core.ecmaScript
 
 class Int16Array : Iterable<Short> {
-    private val _data: ShortArray;
+    private val _data: ShortArray
 
-    public val length:Double
+    public val length: Double
         get() {
             return _data.size.toDouble()
         }
@@ -17,14 +17,15 @@ class Int16Array : Iterable<Short> {
     }
 
     public operator fun set(index: Double, value: Double) {
-        _data[index.toInt()] = value.toInt().toShort();
+        _data[index.toInt()] = value.toInt().toShort()
     }
+
     public operator fun get(index: Int): Double {
         return _data[index].toDouble()
     }
 
     public operator fun set(index: Int, value: Double) {
-        _data[index] = value.toInt().toShort();
+        _data[index] = value.toInt().toShort()
     }
 
     override fun iterator(): Iterator<Short> {

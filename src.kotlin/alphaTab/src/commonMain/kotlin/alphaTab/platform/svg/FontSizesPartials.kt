@@ -5,14 +5,15 @@ import kotlin.contracts.ExperimentalContracts
 
 class FontSizesPartials {
     companion object {
+        @ExperimentalUnsignedTypes
         @ExperimentalContracts
         public fun generateFontLookup(family: String) {
             if (FontSizes.FontSizeLookupTables.has(family)) {
-                return;
+                return
             }
 
             // TODO: maybe allow fallback to GDI/Skia based on availability?
-            FontSizes.FontSizeLookupTables.set(family, Uint8Array(ubyteArrayOf((8).toUByte())));
+            FontSizes.FontSizeLookupTables.set(family, Uint8Array(ubyteArrayOf((8).toUByte())))
         }
     }
 }

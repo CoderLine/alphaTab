@@ -2,7 +2,7 @@ package alphaTab.core.ecmaScript
 
 @ExperimentalUnsignedTypes
 class Uint32Array : Iterable<UInt> {
-    private val _data: UIntArray;
+    private val _data: UIntArray
 
     public val length: Double
         get() {
@@ -10,11 +10,11 @@ class Uint32Array : Iterable<UInt> {
         }
 
     public constructor(size: Double) {
-        _data = UIntArray(size.toInt());
+        _data = UIntArray(size.toInt())
     }
 
     public operator fun get(index: Double): Double {
-        return _data[index.toInt()].toDouble();
+        return _data[index.toInt()].toDouble()
     }
 
     public operator fun set(index: Double, value: Double) {
@@ -22,7 +22,7 @@ class Uint32Array : Iterable<UInt> {
     }
 
     public operator fun get(index: Int): Double {
-        return _data[index].toDouble();
+        return _data[index].toDouble()
     }
 
     public operator fun set(index: Int, value: Double) {

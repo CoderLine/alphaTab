@@ -1,5 +1,4 @@
 import * as ts from 'typescript';
-import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 import KotlinAstPrinter from './KotlinAstPrinter';
 import KotlinAstTransformer from './KotlinAstTransformer';
 import KotlinEmitterContext from './KotlinEmitterContext';
@@ -13,7 +12,6 @@ export default function emit(program: ts.Program, diagnostics: ts.Diagnostic[]) 
         const transformer = new KotlinAstTransformer(sourceFile, context);
         transformer.transform();
     });
-
 
     console.log('[Kotlin] Resolving types');
     context.resolveAllUnresolvedTypeNodes();

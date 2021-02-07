@@ -161,7 +161,7 @@ export default class KotlinAstPrinter {
                 this.writeType(p.type, false);
             }
         }
-        if(!this.isOverrideMethod(p.parent!)) {
+        if (!this.isOverrideMethod(p.parent!)) {
             if (p.initializer) {
                 this.write(' = ');
                 this.writeExpression(p.initializer);
@@ -205,6 +205,7 @@ export default class KotlinAstPrinter {
         this.writeVisibility(d.visibility);
 
         this.writeLine('@kotlin.contracts.ExperimentalContracts');
+        this.writeLine('@kotlin.ExperimentalUnsignedTypes');
         this.write(`interface ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
 
@@ -262,6 +263,7 @@ export default class KotlinAstPrinter {
         this.writeDocumentation(d);
         this.writeAttributes(d);
         this.writeLine('@kotlin.contracts.ExperimentalContracts');
+        this.writeLine('@kotlin.ExperimentalUnsignedTypes');
         this.writeVisibility(d.visibility);
 
         if (d.isAbstract) {
@@ -439,7 +441,7 @@ export default class KotlinAstPrinter {
         this.writeParameterDocumentation(d);
 
         this.writeAttributes(d);
-        if(d.isStatic) {
+        if (d.isStatic) {
             this.writeLine('@kotlin.jvm.JvmStatic');
         }
         this.writeVisibility(d.visibility);
@@ -543,10 +545,10 @@ export default class KotlinAstPrinter {
     private writePropertyDeclaration(d: cs.PropertyDeclaration) {
         this.writeDocumentation(d);
 
-        if(d.isStatic) {
+        if (d.isStatic) {
             this.writeLine('@kotlin.jvm.JvmStatic');
         }
-        
+
         this.writeVisibility(d.visibility);
 
         const isAutoProperty = this.isAutoProperty(d);
@@ -796,7 +798,7 @@ export default class KotlinAstPrinter {
                 this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
                 break;
         }
-        if ((type.isNullable||type.isOptional) && !forNew && !forTypeConstraint) {
+        if ((type.isNullable || type.isOptional) && !forNew && !forTypeConstraint) {
             this.write('?');
         }
     }
@@ -936,7 +938,7 @@ export default class KotlinAstPrinter {
                 this.write(').toInt().inv()');
 
                 let parent = expr.parent!;
-                while(parent.nodeType === cs.SyntaxKind.ParenthesizedExpression) {
+                while (parent.nodeType === cs.SyntaxKind.ParenthesizedExpression) {
                     parent = parent.parent!;
                 }
 
@@ -1224,7 +1226,7 @@ export default class KotlinAstPrinter {
         switch (expr.parent!.nodeType) {
             case cs.SyntaxKind.BinaryExpression:
                 const bin = expr.parent as cs.BinaryExpression;
-                if(bin.operator.endsWith('=')) {
+                if (bin.operator.endsWith('=')) {
                     return bin.left !== expr;
                 } else {
                     return true;
