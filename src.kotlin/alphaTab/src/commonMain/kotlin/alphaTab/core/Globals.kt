@@ -3,6 +3,10 @@ package alphaTab.core
 import alphaTab.core.ecmaScript.RegExp
 import system.globalization.CultureInfo
 
+expect class LateInitList<T> : MutableList<T> {
+    public constructor(size:Int)
+}
+
 @kotlin.ExperimentalUnsignedTypes
 expect fun UByteArray.decodeToFloatArray(): FloatArray
 
@@ -127,6 +131,11 @@ fun <T> List<T>.indexOfInDouble(item: T): Double {
     return this.indexOf(item).toDouble()
 }
 
+@JvmName("joinDouble")
+fun Iterable<Double>.join(separator: String): String {
+    return this.joinToString(separator) { it.toString(CultureInfo.invariantCulture) }
+}
+
 fun <T> Iterable<T>.join(separator: String): String {
     return this.joinToString(separator)
 }
@@ -136,7 +145,7 @@ operator fun Double.plus(str: String): String {
 }
 
 fun String.charAt(index: Double): String {
-    return this.substring(index.toInt(), 1)
+    return this.substring(index.toInt(), index.toInt() + 1)
 }
 
 fun String.charCodeAt(index: Int): Double {

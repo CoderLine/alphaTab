@@ -1057,13 +1057,13 @@ export class TinySoundFont {
     }
 
     public loadPresets(hydra: Hydra, append: boolean): void {
-        const newPresets = new Array<Preset>(hydra.phdrs.length - 1);
+        const newPresets:Preset[] = [];
         for (let phdrIndex: number = 0; phdrIndex < hydra.phdrs.length - 1; phdrIndex++) {
             const phdr: HydraPhdr = hydra.phdrs[phdrIndex];
             let regionIndex: number = 0;
 
             const preset: Preset = new Preset();
-            newPresets[phdrIndex] = preset;
+            newPresets.push(preset);
             preset.name = phdr.presetName;
             preset.bank = phdr.bank;
             preset.presetNumber = phdr.preset;

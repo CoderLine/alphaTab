@@ -35,7 +35,11 @@ export class XmlDocument extends XmlNode {
         XmlParser.parse(xml, 0, this);
     }
 
-    public toString(indention: string = '', xmlHeader:boolean = false): string {
+    public toString() {
+        return this.toFormattedString();
+    }
+
+    public toFormattedString(indention: string = '', xmlHeader: boolean = false): string {
         return XmlWriter.write(this, indention, xmlHeader);
     }
 }

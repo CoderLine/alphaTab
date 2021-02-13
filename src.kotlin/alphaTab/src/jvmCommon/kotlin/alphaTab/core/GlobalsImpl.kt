@@ -5,14 +5,28 @@ import java.nio.charset.Charset
 import java.text.NumberFormat
 import java.util.*
 
+actual class LateInitList<T> : java.util.ArrayList<T>, MutableList<T> {
+    @Suppress("UNCHECKED_CAST")
+    public actual constructor(size: Int) : super(arrayOfNulls<Any>(size).toList() as List<T>) {
+
+    }
+}
+
+
 @ExperimentalUnsignedTypes
 actual fun UByteArray.decodeToFloatArray(): FloatArray {
-    return ByteBuffer.wrap(this.toByteArray()).asFloatBuffer().array()
+    val fb = ByteBuffer.wrap(this.toByteArray()).asFloatBuffer();
+    val fa = FloatArray(fb.limit())
+    fb.get(fa)
+    return fa
 }
 
 @ExperimentalUnsignedTypes
 actual fun UByteArray.decodeToDoubleArray(): DoubleArray {
-    return ByteBuffer.wrap(this.toByteArray()).asDoubleBuffer().array()
+    val db = ByteBuffer.wrap(this.toByteArray()).asDoubleBuffer();
+    val da = DoubleArray(db.limit())
+    db.get(da)
+    return da
 }
 
 @ExperimentalUnsignedTypes
@@ -27,7 +41,7 @@ actual fun Double.toInvariantString(): String {
 actual fun String.toDoubleOrNaN(): Double {
     try {
         val number = NumberFormat.getInstance(Locale.ROOT).parse(this)
-        if(number != null) {
+        if (number != null) {
             return number.toDouble()
         }
     } catch (e: Throwable) {
@@ -38,7 +52,7 @@ actual fun String.toDoubleOrNaN(): Double {
 actual fun String.toIntOrNaN(): Double {
     try {
         val number = NumberFormat.getInstance(Locale.ROOT).parse(this)
-        if(number != null) {
+        if (number != null) {
             return number.toInt().toDouble()
         }
     } catch (e: Throwable) {

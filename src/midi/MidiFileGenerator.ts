@@ -135,8 +135,8 @@ export class MidiFileGenerator {
         }
     }
 
-    private addProgramChange(track:Track, tick:number, channel:number, program: number) {
-        if(!this._programsPerChannel.has(channel) || this._programsPerChannel.get(channel) !== program) {
+    private addProgramChange(track: Track, tick: number, channel: number, program: number) {
+        if (!this._programsPerChannel.has(channel) || this._programsPerChannel.get(channel) !== program) {
             this._handler.addProgramChange(track.index, tick, channel, program);
             this._programsPerChannel.set(channel, program);
         }
@@ -322,7 +322,12 @@ export class MidiFileGenerator {
                 phaseLength,
                 bendAmplitude,
                 (tick, value) => {
-                    this._handler.addBend(beat.voice.bar.staff.track.index, tick, track.playbackInfo.secondaryChannel, value);
+                    this._handler.addBend(
+                        beat.voice.bar.staff.track.index,
+                        tick,
+                        track.playbackInfo.secondaryChannel,
+                        value
+                    );
                 }
             );
         }
@@ -408,9 +413,9 @@ export class MidiFileGenerator {
         const track: Track = note.beat.voice.bar.staff.track;
         const staff: Staff = note.beat.voice.bar.staff;
         let noteKey: number = note.realValue;
-        if(note.isPercussion) {
+        if (note.isPercussion) {
             const articulation = PercussionMapper.getArticulation(note);
-            if(articulation) {
+            if (articulation) {
                 noteKey = articulation.outputMidiNumber;
             }
         }
@@ -608,6 +613,11 @@ export class MidiFileGenerator {
                 dynamicValue += 2;
                 break;
         }
+
+        if (dynamicValue < 0) {
+            dynamicValue = 0;
+        }
+
         return dynamicValue as DynamicValue;
     }
 
@@ -654,7 +664,13 @@ export class MidiFileGenerator {
         }
     }
 
-    private generateVibrato(note: Note, noteStart: number, noteDuration: MidiNoteDuration, noteKey: number, channel: number): void {
+    private generateVibrato(
+        note: Note,
+        noteStart: number,
+        noteDuration: MidiNoteDuration,
+        noteKey: number,
+        channel: number
+    ): void {
         let phaseLength: number = 0;
         let bendAmplitude: number = 0;
         switch (note.vibrato) {
@@ -693,10 +709,7 @@ export class MidiFileGenerator {
             const phaseDuration: number = noteStart + phaseLength < noteEnd ? phaseLength : noteEnd - noteStart;
             while (phase < phaseDuration) {
                 let bend: number = bendAmplitude * Math.sin((phase * Math.PI) / phaseHalf);
-                addBend(
-                    (noteStart + phase) | 0,
-                    MidiFileGenerator.getPitchWheel(bend)
-                );
+                addBend((noteStart + phase) | 0, MidiFileGenerator.getPitchWheel(bend));
                 phase += resolution;
             }
             noteStart += phaseLength;
@@ -746,8 +759,12 @@ export class MidiFileGenerator {
         let track: Track = note.beat.voice.bar.staff.track;
 
         const simpleSlidePitchOffset = this._settings.player.slide.simpleSlidePitchOffset;
-        const simpleSlideDurationOffset = Math.floor(BendPoint.MaxPosition * this._settings.player.slide.simpleSlideDurationRatio);
-        const shiftSlideDurationOffset = Math.floor(BendPoint.MaxPosition * this._settings.player.slide.shiftSlideDurationRatio);
+        const simpleSlideDurationOffset = Math.floor(
+            BendPoint.MaxPosition * this._settings.player.slide.simpleSlideDurationRatio
+        );
+        const shiftSlideDurationOffset = Math.floor(
+            BendPoint.MaxPosition * this._settings.player.slide.shiftSlideDurationRatio
+        );
 
         // Shift Slide: Play note, move up to target note, play end note
         // Legato Slide: Play note, move up to target note, no pick on end note, just keep it ringing
@@ -791,7 +808,13 @@ export class MidiFileGenerator {
         });
     }
 
-    private generateBend(note: Note, noteStart: number, noteDuration: MidiNoteDuration, noteKey: number, channel: number): void {
+    private generateBend(
+        note: Note,
+        noteStart: number,
+        noteDuration: MidiNoteDuration,
+        noteKey: number,
+        channel: number
+    ): void {
         let bendPoints: BendPoint[] = note.bendPoints;
         let track: Track = note.beat.voice.bar.staff.track;
 
@@ -1275,69 +1298,73 @@ export class MidiFileGenerator {
     }
 
     public prepareSingleBeat(beat: Beat) {
-         // collect tempo and program at given beat
-         let tempo = -1;
-         let program = -1;
- 
-         // traverse to previous beats until we maybe hit the automations needed
-         let currentBeat: Beat | null = beat;
-         while (currentBeat && (tempo === -1 || program === -1)) {
-             for (const automation of beat.automations) {
-                 switch (automation.type) {
-                     case AutomationType.Instrument:
-                         program = automation.value;
-                         break;
-                     case AutomationType.Tempo:
-                         tempo = automation.value;
-                         break;
-                 }
-             }
-             currentBeat = currentBeat.previousBeat;
-         }
- 
-         const track = beat.voice.bar.staff.track;
-         const masterBar = beat.voice.bar.masterBar;
-         if (tempo === -1) {
-             tempo = masterBar.score.tempo;
-         }
- 
-         if (program === -1) {
-             program = track.playbackInfo.program;
-         }
- 
-         const volume = track.playbackInfo.volume;
- 
-         // setup channel
-         this.generateTrack(track);
-         this._handler.addTimeSignature(0, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
-         this._handler.addTempo(0, tempo);
- 
-      
-         let volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
-         this._handler.addControlChange(
-             0,
-             0,
-             track.playbackInfo.primaryChannel,
-             ControllerType.VolumeCoarse,
-             volumeCoarse
-         );
-         this._handler.addControlChange(
-             0,
-             0,
-             track.playbackInfo.secondaryChannel,
-             ControllerType.VolumeCoarse,
-             volumeCoarse
-         );
+        // collect tempo and program at given beat
+        let tempo = -1;
+        let program = -1;
+
+        // traverse to previous beats until we maybe hit the automations needed
+        let currentBeat: Beat | null = beat;
+        while (currentBeat && (tempo === -1 || program === -1)) {
+            for (const automation of beat.automations) {
+                switch (automation.type) {
+                    case AutomationType.Instrument:
+                        program = automation.value;
+                        break;
+                    case AutomationType.Tempo:
+                        tempo = automation.value;
+                        break;
+                }
+            }
+            currentBeat = currentBeat.previousBeat;
+        }
+
+        const track = beat.voice.bar.staff.track;
+        const masterBar = beat.voice.bar.masterBar;
+        if (tempo === -1) {
+            tempo = masterBar.score.tempo;
+        }
+
+        if (program === -1) {
+            program = track.playbackInfo.program;
+        }
+
+        const volume = track.playbackInfo.volume;
+
+        // setup channel
+        this.generateTrack(track);
+        this._handler.addTimeSignature(0, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
+        this._handler.addTempo(0, tempo);
+
+        let volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
+        this._handler.addControlChange(
+            0,
+            0,
+            track.playbackInfo.primaryChannel,
+            ControllerType.VolumeCoarse,
+            volumeCoarse
+        );
+        this._handler.addControlChange(
+            0,
+            0,
+            track.playbackInfo.secondaryChannel,
+            ControllerType.VolumeCoarse,
+            volumeCoarse
+        );
     }
 
     public generateSingleBeat(beat: Beat) {
         this.prepareSingleBeat(beat);
-       
+
         this.generateBeat(beat, -beat.playbackStart /* to bring it to 0*/, beat.voice.bar);
     }
 
     public generateSingleNote(note: Note) {
         this.prepareSingleBeat(note.beat);
-        this.generateNote(note, -note.beat.playbackStart, note.beat.playbackDuration, new Int32Array(note.beat.voice.bar.staff.tuning.length));
+        this.generateNote(
+            note,
+            -note.beat.playbackStart,
+            note.beat.playbackDuration,
+            new Int32Array(note.beat.voice.bar.staff.tuning.length)
+        );
     }
 }

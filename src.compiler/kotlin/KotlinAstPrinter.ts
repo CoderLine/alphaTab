@@ -753,7 +753,7 @@ export default class KotlinAstPrinter {
                         this.write('kotlin.collections.MutableList<*>');
                     } else {
                         if (forNew) {
-                            this.write('kotlin.collections.ArrayList<');
+                            this.write('alphaTab.core.LateInitList<');
                         } else {
                             this.write('kotlin.collections.MutableList<');
                         }

@@ -1376,7 +1376,7 @@ export class GpifWriter {
             instrumentSet.addElement('Type').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetType;
             let currentElementType: string = "";
             let currentElementName: string = "";
-            let currentArticulations: XmlNode = null!;
+            let currentArticulations: XmlNode = new XmlNode();
             let counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
             for (const articulation of articulations) {

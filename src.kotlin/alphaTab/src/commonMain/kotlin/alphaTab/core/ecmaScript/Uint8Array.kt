@@ -39,7 +39,7 @@ class Uint8Array : Iterable<UByte> {
     }
 
     public fun set(subarray: Uint8Array, pos: Double) {
-        subarray._data.copyInto(_data, pos.toInt(), 0, _data.size)
+        subarray._data.copyInto(_data, pos.toInt(), 0, subarray._data.size)
     }
 
     override fun iterator(): Iterator<UByte> {

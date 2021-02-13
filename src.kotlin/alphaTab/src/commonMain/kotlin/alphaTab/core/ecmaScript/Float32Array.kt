@@ -40,7 +40,7 @@ public class Float32Array : Iterable<Float> {
     }
 
     public fun set(subarray: Float32Array, pos: Double) {
-        subarray.data.copyInto(data, pos.toInt(), 0, data.size)
+        subarray.data.copyInto(data, pos.toInt(), 0, subarray.data.size)
     }
 
     public fun subarray(begin: Double, end: Double): Float32Array {
