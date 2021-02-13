@@ -25,6 +25,9 @@ import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEven
 import { Cursors } from '@src/platform/Cursors';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
+import { WebPlatform } from './WebPlatform';
+import { AlphaTabError } from '@src/AlphaTabError';
+import { AlphaTabErrorType } from '@src/alphatab';
 
 /**
  * @target web
@@ -81,6 +84,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public constructor(rootElement: HTMLElement) {
+        if(Environment.webPlatform !== WebPlatform.Browser) {
+           throw new AlphaTabError(AlphaTabErrorType.General,
+            'Usage of AlphaTabApi is only possible in browser environments. For usage in node use the Low Level APIs'
+           );    
+        }
         rootElement.classList.add('alphaTab');
         this.rootContainer = new HtmlElementContainer(rootElement);
         this.areWorkersSupported = 'Worker' in window;

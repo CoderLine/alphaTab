@@ -37,7 +37,7 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         if (ctx.state === 'suspended') {
             let resume = () => {
                 ctx.resume();
-                window.setTimeout(() => {
+                Environment.globalThis.setTimeout(() => {
                     if (ctx.state === 'running') {
                         document.body.removeEventListener('touchend', resume, false);
                         document.body.removeEventListener('click', resume, false);
