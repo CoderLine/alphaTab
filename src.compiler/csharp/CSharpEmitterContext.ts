@@ -769,7 +769,7 @@ export default class CSharpEmitterContext {
                 }
             }
         }
-        return this.makeTypeName('alphaTab.core') + suffix + '.';
+        return this.toPascalCase('alphaTab.core') + suffix + '.';
     }
     protected toCoreTypeName(s: string) {
         return s;
@@ -783,7 +783,14 @@ export default class CSharpEmitterContext {
         if (this.noPascalCase) {
             return text;
         }
-        return text ? text.substr(0, 1).toUpperCase() + text.substr(1) : '';
+
+        if(!text) {
+            return '';
+        }
+
+        return text.split('.')
+            .map(p=> p.substr(0, 1).toUpperCase() + p.substr(1))
+            .join('.');
     }
 
     private kebabCaseToPascalCase(text: string): string {
@@ -1201,7 +1208,18 @@ export default class CSharpEmitterContext {
     }
 
     public isValueTypeExpression(expression: ts.NonNullExpression) {
-        const tsType = this.typeChecker.getTypeAtLocation(expression);
+        let tsType:ts.Type;
+        if(ts.isIdentifier(expression.expression)) {
+            const symbol = this.typeChecker.getSymbolAtLocation(expression.expression);
+            if(symbol?.valueDeclaration) {
+                tsType = this.typeChecker.getTypeAtLocation(symbol.valueDeclaration);
+            } else {
+                tsType = this.typeChecker.getTypeAtLocation(expression);
+            }
+        } else {
+            tsType = this.typeChecker.getTypeAtLocation(expression);
+        }
+
         return this.isValueType(tsType);
     }
 

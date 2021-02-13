@@ -1542,7 +1542,7 @@ export class GpifParser {
         this._beatById.set(beatId, beat);
     }
 
-    private parseBeatLyrics(node: XmlNode): string[] | null {
+    private parseBeatLyrics(node: XmlNode): string[] {
         const lines: string[] = [];
 
         for (let c of node.childNodes) {

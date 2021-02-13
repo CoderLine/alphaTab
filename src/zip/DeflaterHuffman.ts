@@ -80,14 +80,18 @@ class Tree {
         let maxCode = 0;
         for (let n = 0; n < numSymbols; n++) {
             let freq = this.freqs[n];
-            if (freq != 0) {
+            if (freq !== 0) {
                 // Insert n into heap
                 let pos = heapLen++;
                 while (true) {
-                    var ppos = Math.floor((pos - 1) / 2);
-                    if (pos > 0 && this.freqs[heap[ppos]] > freq) {
-                        heap[pos] = heap[ppos];
-                        pos = ppos;
+                    if (pos > 0) {
+                        let ppos = Math.floor((pos - 1) / 2);
+                        if (this.freqs[heap[ppos]] > freq) {
+                            heap[pos] = heap[ppos];
+                            pos = ppos;
+                        } else {
+                            break;
+                        }
                     } else {
                         break;
                     }
@@ -151,8 +155,7 @@ class Tree {
                 path = ppos;
                 if (ppos > 0) {
                     ppos = Math.floor((path - 1) / 2);
-                    path = ppos;
-                    if (path > 0 && values[heap[ppos]] > lastVal) {
+                    if (values[heap[ppos]] > lastVal) {
                         heap[path] = heap[ppos];
                     } else {
                         break;
@@ -229,7 +232,7 @@ class Tree {
                     bitLength = this.maxLength;
                     overflow++;
                 }
-                lengths[childs[2 * i]] =  bitLength;
+                lengths[childs[2 * i]] = bitLength;
                 lengths[childs[2 * i + 1]] = bitLength;
             } else {
                 // A leaf node

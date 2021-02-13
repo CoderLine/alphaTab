@@ -222,8 +222,8 @@ export class Gp3To5Importer extends ScoreImporter {
         this._playbackInfos = [];
         for (let i: number = 0; i < 64; i++) {
             let info: PlaybackInformation = new PlaybackInformation();
-            info.primaryChannel = i as number;
-            info.secondaryChannel = i as number;
+            info.primaryChannel = i;
+            info.secondaryChannel = i;
             info.program = IOHelper.readInt32LE(this.data);
             info.volume = this.data.readByte();
             info.balance = this.data.readByte();
@@ -544,7 +544,7 @@ export class Gp3To5Importer extends ScoreImporter {
             this.readMixTableChange(newBeat);
         }
         let stringFlags: number = this.data.readByte();
-        for (let i: number = 6.0; i >= 0; i--) {
+        for (let i: number = 6; i >= 0; i--) {
             if ((stringFlags & (1 << i)) !== 0 && 6 - i < bar.staff.tuning.length) {
                 const note = this.readNote(track, bar, voice, newBeat, 6 - i);
                 if (allNoteHarmonicType !== HarmonicType.None) {

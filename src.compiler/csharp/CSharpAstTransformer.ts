@@ -3251,32 +3251,9 @@ export default class CSharpAstTransformer {
             }
         }
 
-        // if (type && type.symbol && type.symbol.name == 'ArrayConstructor' && newExpression.arguments.length === 1) {
-        //     const toInt = {
-        //         parent: newExpression,
-        //         nodeType: cs.SyntaxKind.CastExpression,
-        //         expression: {} as cs.Expression,
-        //         type: {
-        //             parent: null,
-        //             nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-        //             type: cs.PrimitiveType.Int,
-        //             tsNode: expression
-        //         } as cs.PrimitiveTypeNode,
-        //         tsNode: expression
-        //     } as cs.CastExpression;
-        //     toInt.expression = newExpression.arguments[0];
-        //     toInt.expression.parent = toInt;
-
-        //     const newArray = {
-        //         parent: newExpression,
-        //         nodeType: cs.SyntaxKind.ArrayCreationExpression,
-        //         sizeExpression: toInt,
-        //         type: csType.typeArguments![0],
-        //     } as cs.ArrayCreationExpression;
-        //     toInt.parent = newExpression;
-
-        //     newExpression.arguments = [newArray];
-        // }
+        if (type && type.symbol && type.symbol.name == 'ArrayConstructor' && newExpression.arguments.length === 1) {
+            newExpression.arguments[0] = this.makeInt(newExpression.arguments[0]);
+        }
 
         return newExpression;
     }

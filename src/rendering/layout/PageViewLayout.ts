@@ -339,7 +339,7 @@ export class PageViewLayout extends ScoreLayout {
         let maxWidth: number = this.maxWidth;
         let end: number = endIndex + 1;
 
-        let barIndex = 0;
+        let barIndex = currentBarIndex;
         while(barIndex < end) {
             if (this._barsFromPreviousGroup.length > 0) {
                 for (let renderer of this._barsFromPreviousGroup) {

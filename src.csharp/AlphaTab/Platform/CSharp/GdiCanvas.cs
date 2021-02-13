@@ -134,19 +134,11 @@ namespace AlphaTab.Platform.CSharp
         {
             get
             {
-                var fs = Model.FontStyle.Plain;
-                if (_font.Bold)
-                {
-                    fs = Model.FontStyle.Bold;
-                }
-
-                if (_font.Italic)
-                {
-                    fs = Model.FontStyle.Italic;
-                }
-
+                var fw = _font.Bold ? Model.FontWeight.Bold : Model.FontWeight.Regular;
+                var fs = _font.Italic ? Model.FontStyle.Italic : Model.FontStyle.Plain;
+                
                 return new Model.Font(_font.FontFamily.Name, _font.Size * Settings.Display.Scale,
-                    fs);
+                    fs, fw);
             }
             set
             {

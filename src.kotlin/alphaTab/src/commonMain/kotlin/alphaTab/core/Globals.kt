@@ -17,7 +17,7 @@ public class DoubleRange(start: Double, endInclusive: Double) : Iterable<Double>
     private val _endInclusive = endInclusive
 
     override fun iterator(): Iterator<Double> =
-        generateSequence(_start, { _start + 1 })
+        generateSequence(_start, { it + 1 })
             .takeWhile { it <= _endInclusive }
             .iterator()
 }
@@ -27,7 +27,7 @@ public class ReverseDoubleRange(start: Double, endInclusive: Double) : Iterable<
     private val _endInclusive = endInclusive
 
     override fun iterator(): Iterator<Double> =
-        generateSequence(_start, { _start - 1 })
+        generateSequence(_start, { it - 1 })
             .takeWhile { it >= _endInclusive }
             .iterator()
 }

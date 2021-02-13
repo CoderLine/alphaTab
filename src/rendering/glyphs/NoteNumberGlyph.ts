@@ -79,7 +79,7 @@ export class NoteNumberGlyph extends Glyph {
         if (!this.isEmpty) {
             this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.tablatureFont;
             this.noteStringWidth = this.renderer.scoreRenderer.canvas!.measureText(this._noteString) * this.scale;
-            this.width = this.renderer.scoreRenderer.canvas!.measureText(this._noteString) * this.scale;
+            this.width = this.noteStringWidth;
             this.height = this.renderer.scoreRenderer.canvas!.font.size;
             let hasTrill: boolean = !!this._trillNoteString;
             if (hasTrill) {

@@ -176,19 +176,20 @@ export class GpxFileSystem {
                 // we're keeping count so we can calculate the offset of the array item
                 // as long we have data blocks we need to iterate them,
                 let fileData: ByteBuffer | null = storeFile ? ByteBuffer.withCapacity(file.fileSize) : null;
-                do {
+                while (true) {
                     sector = this.getInteger(data, dataPointerOffset + 4 * sectorCount++);
                     if (sector !== 0) {
+                        // the next file entry starts after the last data sector so we
+                        // move the offset along
+                        offset = sector * sectorSize;
+                        // write data only if needed
+                        if (storeFile) {
+                            fileData!.write(data, offset, sectorSize);
+                        }
+                    } else {
                         break;
                     }
-                    // the next file entry starts after the last data sector so we
-                    // move the offset along
-                    offset = sector * sectorSize;
-                    // write data only if needed
-                    if (storeFile) {
-                        fileData!.write(data, offset, sectorSize);
-                    }
-                } while (true);
+                }
 
                 if (storeFile) {
                     // trim data to filesize if needed

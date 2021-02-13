@@ -414,7 +414,7 @@ export class DeflaterEngine {
                 scan_end = window[scan];
             }
             curMatch = (prev[curMatch & DeflaterConstants.WMASK] & 0xffff);
-        } while (curMatch > limit && 0 != --chainLength);
+        } while (curMatch > limit && 0 !== --chainLength);
 
         return this.matchLen >= DeflaterConstants.MIN_MATCH;
     }

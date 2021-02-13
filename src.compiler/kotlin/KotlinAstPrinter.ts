@@ -693,9 +693,6 @@ export default class KotlinAstPrinter {
         asNativeArray: boolean = false,
         forTypeConstraint: boolean = false
     ) {
-        if(!type) {
-            console.log('xx');
-        }
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
                 if (forTypeConstraint) {
@@ -1285,17 +1282,10 @@ export default class KotlinAstPrinter {
     }
 
     private writeNewExpression(expr: cs.NewExpression) {
-        if (expr.type.nodeType == cs.SyntaxKind.ArrayTypeNode && expr.arguments.length === 1) {
-            this.writeType(expr.type, true);
-            this.write('( (');
-            this.writeExpression(expr.arguments[0]);
-            this.write(').toInt() )');
-        } else {
-            this.writeType(expr.type, true);
-            this.write('(');
-            this.writeCommaSeparated(expr.arguments, a => this.writeExpression(a));
-            this.write(')');
-        }
+        this.writeType(expr.type, true);
+        this.write('(');
+        this.writeCommaSeparated(expr.arguments, a => this.writeExpression(a));
+        this.write(')');
     }
 
     private writeCastExpression(expr: cs.CastExpression) {

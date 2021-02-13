@@ -33,7 +33,7 @@ namespace AlphaTab.Core
 
         public static IList<T> Slice<T>(this IList<T> data)
         {
-            return new List<T>(new System.Collections.Generic.List<T>(data));
+            return new AlphaTab.Core.List<T>(data);
         }
 
         public static void Reverse<T>(this IList<T> data)
@@ -161,7 +161,7 @@ namespace AlphaTab.Core
         {
             switch (data)
             {
-                case List<T> l:
+                case System.Collections.Generic.List<T> l:
                     l.Sort();
                     break;
                 case T[] array:

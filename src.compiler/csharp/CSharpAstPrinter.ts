@@ -611,7 +611,7 @@ export default class CSharpAstPrinter {
                         this.write('System.Collections.IList');
                     } else {
                         if (forNew) {
-                            this.write('System.Collections.Generic.List<');
+                            this.write('AlphaTab.Core.List<');
                         } else {
                             this.write('System.Collections.Generic.IList<');
                         }

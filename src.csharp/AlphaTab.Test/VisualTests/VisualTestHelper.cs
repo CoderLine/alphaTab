@@ -14,7 +14,7 @@ using SkiaSharp;
 
 namespace AlphaTab.VisualTests
 {
-    public class VisualTestHelper
+    partial class VisualTestHelper
     {
         public static async Task RunVisualTest(string inputFile, Settings? settings = null,
             IList<double>? tracks = null, string? message = null)
@@ -71,7 +71,7 @@ namespace AlphaTab.VisualTests
 
             if (tracks == null)
             {
-                tracks = new List<double> {0};
+                tracks = new AlphaTab.Core.List<double> {0};
             }
 
             settings.Core.Engine = "skia";
@@ -85,7 +85,7 @@ namespace AlphaTab.VisualTests
             var referenceFileData =
                 await TestPlatform.LoadFile(referenceFileName);
 
-            var result = new List<RenderFinishedEventArgs>();
+            var result = new AlphaTab.Core.List<RenderFinishedEventArgs>();
             var totalWidth = 0.0;
             var totalHeight = 0.0;
 
@@ -128,7 +128,7 @@ namespace AlphaTab.VisualTests
         }
 
         private static void CompareVisualResult(double totalWidth, double totalHeight,
-            List<RenderFinishedEventArgs> result, string referenceFileName,
+            AlphaTab.Core.List<RenderFinishedEventArgs> result, string referenceFileName,
             Uint8Array referenceFileData, string? message)
         {
             // TODO: get Skia to render like Chrome
