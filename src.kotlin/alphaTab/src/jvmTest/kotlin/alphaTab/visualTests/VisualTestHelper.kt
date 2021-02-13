@@ -27,7 +27,7 @@ class VisualTestHelper {
             // TODO
         }
 
-        public fun runVisualTestSCore(
+        public fun runVisualTestScore(
             score: Score,
             referenceFileName: String,
             settings: Settings? = null,
