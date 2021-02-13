@@ -19,6 +19,7 @@ const sidebars = {
 		"guides/song-details",
 		"guides/exporter",
 		"guides/handling-midi-events",
+		"guides/nodejs",
 		"guides/breaking-changes-095-096",
 		"guides/breaking-changes-097-098"
 	],
