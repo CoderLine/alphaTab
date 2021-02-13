@@ -131,11 +131,6 @@ fun <T> List<T>.indexOfInDouble(item: T): Double {
     return this.indexOf(item).toDouble()
 }
 
-@JvmName("joinDouble")
-fun Iterable<Double>.join(separator: String): String {
-    return this.joinToString(separator) { it.toString(CultureInfo.invariantCulture) }
-}
-
 fun <T> Iterable<T>.join(separator: String): String {
     return this.joinToString(separator)
 }
