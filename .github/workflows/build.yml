@@ -32,4 +32,19 @@ jobs:
           dotnet-version: '3.1.100'
       - run: npm install
       - run: npm run build-csharp-ci
-      - run: npm run test-csharp-ci      
+      - run: npm run test-csharp-ci
+
+  build_kotlin:
+    name: Build and Test Kotlin
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.100'
+      - run: npm install
+      - run: npm run build-kotlin-ci
+      - run: npm run test-kotlin-ci      
