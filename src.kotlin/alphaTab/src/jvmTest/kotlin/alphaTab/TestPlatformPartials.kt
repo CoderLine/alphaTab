@@ -28,11 +28,11 @@ class TestPlatformPartials {
             println("Loading file from $filePath ($projectRoot)")
 
             val fs = FileInputStream(filePath.toString())
-            fs.use {
-                val ms = ByteArrayOutputStream()
+			val ms = ByteArrayOutputStream()
+			fs.use {
                 fs.copyTo(ms)
-                return Uint8Array(ms.toByteArray().asUByteArray())
             }
+			return Uint8Array(ms.toByteArray().asUByteArray())
         }
 
         public fun saveFile(name:String, data:Uint8Array) {
