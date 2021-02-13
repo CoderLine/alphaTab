@@ -469,6 +469,9 @@ export class Environment {
         }
     }
 
+    /**
+     * @target web
+     */
     private static detectWebPlatform(): WebPlatform {
         try {
             // Credit of the node.js detection goes to
