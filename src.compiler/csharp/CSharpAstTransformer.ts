@@ -842,6 +842,10 @@ export default class CSharpAstTransformer {
     }
 
     protected visitClassElement(parent: cs.ClassDeclaration, classElement: ts.ClassElement) {
+        let isSkipped = this.shouldSkip(classElement, false);
+        if(isSkipped) {
+            this._context.processingSkippedElement = true;
+        }
         if (ts.isConstructorDeclaration(classElement)) {
             this.visitConstructorDeclaration(parent, classElement);
         } else if (ts.isMethodSignature(classElement)) {
@@ -862,6 +866,9 @@ export default class CSharpAstTransformer {
                 'Unsupported class element: ' + ts.SyntaxKind[classElement.kind],
                 ts.DiagnosticCategory.Error
             );
+        }
+        if(isSkipped) {
+            this._context.processingSkippedElement = false;
         }
     }
 
@@ -1245,7 +1252,7 @@ export default class CSharpAstTransformer {
 
         classElement.parameters.forEach(p => this.visitMethodParameter(csMethod, p));
 
-        if (classElement.body) {
+        if (classElement.body && !csMethod.skipEmit) {
             csMethod.body = this.visitBlock(csMethod, classElement.body);
         }
 
@@ -1264,7 +1271,9 @@ export default class CSharpAstTransformer {
                 break;
         }
 
-        parent.members.push(csMethod);
+        if(!csMethod.skipEmit) {
+            parent.members.push(csMethod);
+        }
 
         this._context.registerSymbol(csMethod);
 
@@ -1833,7 +1842,9 @@ export default class CSharpAstTransformer {
 
         classElement.parameters.forEach(p => this.visitMethodParameter(csMethod, p));
 
-        parent.members.push(csMethod);
+        if(!csMethod.skipEmit) {
+            parent.members.push(csMethod);
+        }
 
         this._context.registerSymbol(csMethod);
     }

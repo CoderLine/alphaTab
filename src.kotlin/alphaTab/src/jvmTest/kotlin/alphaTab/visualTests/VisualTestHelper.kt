@@ -6,7 +6,7 @@ import alphaTab.model.Score
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
-class VisualTestHelper {
+class VisualTestHelperPartials {
     companion object {
         public fun runVisualTest(
             inputFile: String,

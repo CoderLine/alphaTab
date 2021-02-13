@@ -426,7 +426,7 @@ export default class KotlinAstPrinter {
             this.writeCommaSeparated(a.arguments!, x => this.writeExpression(x));
             this.write(')');
         }
-        this.writeLine()
+        this.writeLine();
     }
 
     private writeMember(member: cs.Node) {
@@ -616,7 +616,7 @@ export default class KotlinAstPrinter {
             }
         }
     }
-    
+
     private isLateInit(d: cs.PropertyDeclaration) {
         return (
             d.initializer &&
@@ -693,6 +693,9 @@ export default class KotlinAstPrinter {
         asNativeArray: boolean = false,
         forTypeConstraint: boolean = false
     ) {
+        if(!type) {
+            console.log('xx');
+        }
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
                 if (forTypeConstraint) {
@@ -750,7 +753,7 @@ export default class KotlinAstPrinter {
                         arrayType.elementType.nodeType == cs.SyntaxKind.PrimitiveTypeNode &&
                         (arrayType.elementType as cs.PrimitiveTypeNode).type == cs.PrimitiveType.Dynamic;
                     if (isDynamicArray && !forNew) {
-                        this.write('kotlin.collections.MutableList');
+                        this.write('kotlin.collections.MutableList<*>');
                     } else {
                         if (forNew) {
                             this.write('kotlin.collections.ArrayList<');
@@ -1304,10 +1307,16 @@ export default class KotlinAstPrinter {
                     return;
                 case cs.PrimitiveType.Double:
                     this.writeExpression(expr.expression);
+                    if (expr.expression.nodeType !== cs.SyntaxKind.NonNullExpression) {
+                        this.write('!!');
+                    }
                     this.write('.toDouble()');
                     return;
                 case cs.PrimitiveType.Int:
                     this.writeExpression(expr.expression);
+                    if (expr.expression.nodeType !== cs.SyntaxKind.NonNullExpression) {
+                        this.write('!!');
+                    }
                     this.write('.toInt()');
                     return;
             }

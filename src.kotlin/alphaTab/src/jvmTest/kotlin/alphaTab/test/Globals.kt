@@ -27,7 +27,7 @@ class Expector<T> {
         return this
     }
 
-    public fun toEqual(expected: Any, message: String? = null) {
+    public fun toEqual(expected: Any?, message: String? = null) {
         var exp = expected
         if (exp is Int && _actual is Double) {
             exp = exp.toDouble()
@@ -43,7 +43,7 @@ class Expector<T> {
         }
     }
 
-    public fun toBe(expected:Any) {
+    public fun toBe(expected:Any?) {
         var exp = expected
         if(exp is Int && _actual is Double) {
             exp = exp.toDouble()

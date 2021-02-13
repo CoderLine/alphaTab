@@ -26,6 +26,9 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         if(s === 'String') {
             return 'CoreString';
         }
+        if(s === 'Map') {
+            return 'Map<*, *>'
+        }
         return s;
     }
 

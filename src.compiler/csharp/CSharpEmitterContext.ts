@@ -17,6 +17,7 @@ export default class CSharpEmitterContext {
     public noPascalCase: boolean = false;
 
     public csharpFiles: cs.SourceFile[] = [];
+    public processingSkippedElement: boolean = false;
     public get compilerOptions(): ts.CompilerOptions {
         return this._program.getCompilerOptions();
     }
@@ -40,6 +41,9 @@ export default class CSharpEmitterContext {
     }
 
     public registerUnresolvedTypeNode(unresolved: cs.UnresolvedTypeNode) {
+        if(this.processingSkippedElement) {
+            return;
+        }
         this._unresolvedTypeNodes.push(unresolved);
     }
 
