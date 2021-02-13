@@ -1,7 +1,6 @@
 import { AccidentalType } from '@src/model/AccidentalType';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
-import { Clef } from '@src/model/Clef';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { ModelUtils } from '@src/model/ModelUtils';
@@ -289,7 +288,7 @@ export class AccidentalHelper {
                         }
 
                         // register the new accidental on the line if any.
-                        if (accidentalToSet != AccidentalType.None) {
+                        if (accidentalToSet !== AccidentalType.None) {
                             this._registeredAccidentals.set(line, accidentalToSet);
                         }
                     } else {

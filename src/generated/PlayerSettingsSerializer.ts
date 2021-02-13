@@ -39,7 +39,7 @@ export class PlayerSettingsSerializer {
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "soundfont":
-                obj.soundFont = (v! as string | null);
+                obj.soundFont = (v as string | null);
                 return true;
             case "scrollelement":
                 obj.scrollElement = (v! as string);

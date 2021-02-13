@@ -39,15 +39,15 @@ export class CoreSettingsSerializer {
         switch (property) {
             /*@target web*/
             case "scriptfile":
-                obj.scriptFile = (v! as string | null);
+                obj.scriptFile = (v as string | null);
                 return true;
             /*@target web*/
             case "fontdirectory":
-                obj.fontDirectory = (v! as string | null);
+                obj.fontDirectory = (v as string | null);
                 return true;
             /*@target web*/
             case "file":
-                obj.file = (v! as string | null);
+                obj.file = (v as string | null);
                 return true;
             /*@target web*/
             case "tex":

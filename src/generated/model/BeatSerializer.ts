@@ -117,7 +117,7 @@ export class BeatSerializer {
                 obj.fadeIn = (v! as boolean);
                 return true;
             case "lyrics":
-                obj.lyrics = (v! as string[] | null);
+                obj.lyrics = (v as string[] | null);
                 return true;
             case "hasrasgueado":
                 obj.hasRasgueado = (v! as boolean);
@@ -132,7 +132,7 @@ export class BeatSerializer {
                 obj.tap = (v! as boolean);
                 return true;
             case "text":
-                obj.text = (v! as string | null);
+                obj.text = (v as string | null);
                 return true;
             case "brushtype":
                 obj.brushType = (JsonHelper.parseEnum<BrushType>(v, BrushType)!);
@@ -164,7 +164,7 @@ export class BeatSerializer {
                 obj.vibrato = (JsonHelper.parseEnum<VibratoType>(v, VibratoType)!);
                 return true;
             case "chordid":
-                obj.chordId = (v! as string | null);
+                obj.chordId = (v as string | null);
                 return true;
             case "gracetype":
                 obj.graceType = (JsonHelper.parseEnum<GraceType>(v, GraceType)!);

@@ -59,7 +59,7 @@ export class DisplaySettingsSerializer {
                 obj.barCountPerPartial = (v! as number);
                 return true;
             case "padding":
-                obj.padding = (v! as number[] | null);
+                obj.padding = (v as number[] | null);
                 return true;
         } 
         if (["resources"].indexOf(property) >= 0) {
