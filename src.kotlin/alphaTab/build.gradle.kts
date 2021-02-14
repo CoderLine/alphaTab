@@ -53,6 +53,11 @@ kotlin {
             }
         }
         jvmMain.kotlin.srcDirs("src/jvmCommon/kotlin")
+        // TODO: check if we can control this folder
+        jvmMain.resources.srcDirs("../../font/").apply {
+            this.filter.include("**/*.ttf")
+            this.filter.include("**/*.sf2")
+        }
 
         val jvmTest by getting {
             dependencies {

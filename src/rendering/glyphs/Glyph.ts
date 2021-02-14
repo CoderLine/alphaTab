@@ -10,7 +10,6 @@ export class Glyph {
     public y: number;
     public width: number = 0;
     public height: number = 0;
-    // TODO: Kotlin - make this maybe rather nullable
     public renderer!: BarRendererBase;
 
     public constructor(x: number, y: number) {

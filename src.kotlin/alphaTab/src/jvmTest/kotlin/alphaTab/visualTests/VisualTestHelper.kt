@@ -12,9 +12,15 @@ import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.ScoreRenderer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.skija.*
+import org.junit.Assert
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.contracts.ExperimentalContracts
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
+
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
@@ -92,12 +98,12 @@ class VisualTestHelperPartials {
 
             renderer.partialRenderFinished.on { e ->
                 result.add(e)
-                waitHandle.release()
             }
             renderer.renderFinished.on { e ->
                 totalWidth = e.totalWidth
                 totalHeight = e.totalHeight
                 result.add(e)
+                waitHandle.release()
             }
             renderer.error.on { e ->
                 error = e
@@ -107,8 +113,7 @@ class VisualTestHelperPartials {
             val job = GlobalScope.launch {
                 try {
                     renderer.renderScore(score, actualTracks)
-                }
-                catch(e:Throwable) {
+                } catch (e: Throwable) {
                     error = e
                     waitHandle.release()
                 }
@@ -141,6 +146,51 @@ class VisualTestHelperPartials {
             referenceFileData: Uint8Array,
             message: String?
         ) {
+            Assert.assertNotEquals(0.0, totalWidth)
+            Assert.assertNotEquals(0.0, totalHeight)
+
+            val finalImageSurface = Surface.makeRaster(
+                ImageInfo(
+                    totalWidth.toInt(),
+                    totalHeight.toInt(),
+                    ColorType.BGRA_8888 /* TODO check for right default */,
+                    ColorAlphaType.PREMUL
+                )
+            )
+            finalImageSurface.use {
+                var x = 0f
+                var y = 0f
+                var rowHeight = 0
+                for (partialResult in result) {
+                    val partialCanvas = partialResult.renderResult;
+                    if (partialCanvas is Image) {
+                        finalImageSurface.canvas.drawImage(partialCanvas, x, y);
+                        if (partialResult.height > rowHeight) {
+                            rowHeight = partialCanvas.height;
+                        }
+
+                        x += partialCanvas.width;
+
+                        if (x >= totalWidth) {
+                            x = 0f
+                            y += rowHeight;
+                            rowHeight = 0;
+                        }
+                    }
+                }
+
+                val finalImage = finalImageSurface.makeImageSnapshot()
+                finalImage.use {
+                    val finalImageFileName =
+                        TestPlatform.changeExtension(referenceFileName, ".new.png");
+                    val png = finalImage.encodeToData(EncodedImageFormat.PNG)
+                    val path = Path.of(finalImageFileName)
+                    path.parent.toFile().mkdirs()
+                    println("Wrote $path")
+                    Files.write(path, png!!.bytes)
+                }
+            }
+
             // TODO: get Skia to render like Chrome
             // https://github.com/mono/SkiaSharp/issues/1253
         }

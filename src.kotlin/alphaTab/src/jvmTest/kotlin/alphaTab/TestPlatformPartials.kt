@@ -25,8 +25,6 @@ class TestPlatformPartials {
 
         public fun loadFile(path: String): Uint8Array {
             val filePath = Path.of(projectRoot, path)
-            println("Loading file from $filePath ($projectRoot)")
-
             val fs = FileInputStream(filePath.toString())
 			val ms = ByteArrayOutputStream()
 			fs.use {
@@ -45,7 +43,8 @@ class TestPlatformPartials {
         }
 
         public fun listDirectory(path:String): MutableList<String> {
-            return Paths.get(path).toFile().listFiles()?.map { it.name }?.toMutableList() ?: mutableListOf()
+            val dirPath = Path.of(projectRoot, path)
+            return dirPath.toFile().listFiles()?.map { it.name }?.toMutableList() ?: mutableListOf()
         }
     }
 }

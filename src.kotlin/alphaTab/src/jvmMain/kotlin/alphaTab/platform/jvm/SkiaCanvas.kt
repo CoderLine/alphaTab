@@ -12,7 +12,11 @@ import org.jetbrains.skija.shaper.Shaper
 import kotlin.contracts.ExperimentalContracts
 
 // TODO
-val MusicFont: Typeface = Typeface.makeDefault()
+@ExperimentalContracts
+val bravuraTtf = SkiaCanvas::class.java.getResource("/bravura/Bravura.ttf").readBytes()
+
+@ExperimentalContracts
+val MusicFont: Typeface = Typeface.makeFromData(Data.makeFromBytes(bravuraTtf))
 const val MusicFontSize = 34
 
 @ExperimentalUnsignedTypes
@@ -79,7 +83,14 @@ class SkiaCanvas : ICanvas {
         createPaint().use {
             it.blendMode = BlendMode.SRC_OVER
             it.mode = PaintMode.FILL
-            _surface.canvas.drawRect(Rect(x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat()), it)
+            _surface.canvas.drawRect(
+                Rect(
+                    x.toFloat(),
+                    y.toFloat(),
+                    (x + w).toFloat(),
+                    (y + h).toFloat()
+                ), it
+            )
         }
     }
 
@@ -87,9 +98,7 @@ class SkiaCanvas : ICanvas {
         val paint = Paint()
         paint.isAntiAlias = true
         paint.isDither = false
-//        paint.subpixelText = true
-//        paint.deviceKerningEnabled = true
-        paint.color = color.raw.toInt()
+        paint.setARGB(color.a.toInt(), color.r.toInt(), color.g.toInt(), color.b.toInt())
         return paint
     }
 
@@ -97,7 +106,14 @@ class SkiaCanvas : ICanvas {
         createPaint().use {
             it.blendMode = BlendMode.SRC_OVER
             it.mode = PaintMode.STROKE
-            _surface.canvas.drawRect(Rect(x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat()), it)
+            _surface.canvas.drawRect(
+                Rect(
+                    x.toFloat(),
+                    y.toFloat(),
+                    (x + w).toFloat(),
+                    (y + h).toFloat()
+                ), it
+            )
         }
     }
 
@@ -179,10 +195,19 @@ class SkiaCanvas : ICanvas {
 
     override fun fillText(text: String, x: Double, y: Double) {
         textRun(text, fun(blob, font, paint) {
+            val xOffset = getFontOffset(
+                textAlign,
+                blob
+            )
+            val yOffset = getFontBaseLine(
+                textBaseline,
+                blob,
+                font
+            )
             _surface.canvas.drawTextBlob(
                 blob,
-                x.toFloat(),
-                y.toFloat() + getFontBaseLine(textBaseline, font),
+                x.toFloat() + xOffset,
+                y.toFloat() + yOffset,
                 paint
             )
         })
@@ -210,7 +235,7 @@ class SkiaCanvas : ICanvas {
         }
     }
 
-    private fun getFontBaseLine(textBaseline: TextBaseline, font: org.jetbrains.skija.Font): Float {
+    private fun getFontBaseLine(textBaseline: TextBaseline, blob:TextBlob, font: org.jetbrains.skija.Font): Float {
         return when (textBaseline) {
             TextBaseline.Top -> // TopTextBaseline
                 // https://chromium.googlesource.com/chromium/blink/+/master/Source/modules/canvas2d/CanvasRenderingContext2D.cpp#2056
@@ -218,7 +243,7 @@ class SkiaCanvas : ICanvas {
                 // "FOP (Formatting Objects Processor) puts the hanging baseline at 80% of the ascender height"
                 return (-font.metrics.ascent * 4) / 5
             TextBaseline.Middle -> // MiddleTextBaseline
-                return -font.metrics.descent + font.size / 2
+                return -font.metrics.descent + font.metrics.height / 2
             TextBaseline.Bottom -> // BottomTextBaseline
                 return -font.metrics.descent
             else -> 0.0f
@@ -229,10 +254,9 @@ class SkiaCanvas : ICanvas {
         if (text.isEmpty()) {
             return 0.0
         }
-
         var size = 0.0
-        textRun(text, fun(_, font, paint) {
-            size = font.measureText(text, paint).width.toDouble()
+        textRun(text, fun(blob, font, paint) {
+            size = blob.tightBounds.width.toDouble()
         })
         return size
     }
@@ -271,10 +295,22 @@ class SkiaCanvas : ICanvas {
                 font.use {
                     val blob = shaper.shape(s, font)
                     blob?.use {
-                        _surface.canvas.drawTextBlob(blob, x.toFloat(), y.toFloat(), paint)
+                        val xOffset = getFontOffset(
+                            if(centerAtPosition == true) TextAlign.Center else TextAlign.Left,
+                            it
+                        )
+                        _surface.canvas.drawTextBlob(blob, x.toFloat() + xOffset, y.toFloat() - font.metrics.descent, paint)
                     }
                 }
             }
+        }
+    }
+
+    private fun getFontOffset(textAlign: TextAlign, blob: TextBlob): Float {
+        return when(textAlign) {
+            TextAlign.Left -> 0f
+            TextAlign.Center -> -blob.bounds.width / 2f
+            TextAlign.Right -> -blob.bounds.width
         }
     }
 

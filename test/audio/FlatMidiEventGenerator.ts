@@ -82,7 +82,6 @@ export class MidiEvent {
             return false;
         }
 
-        // TODO kotlin: we need reference equals here (===)
         if (obj === this) {
             return true;
         }
