@@ -24,12 +24,13 @@ kotlin {
     }
 //    android()
     sourceSets {
+
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
             }
         }
-        commonMain.kotlin.srcDirs("src/generated/src")
+        commonMain.kotlin.srcDirs("../../dist/lib.kotlin/src")
 
         val os = System.getProperty("os.name")
         val target = when {
@@ -58,7 +59,7 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
-        jvmTest.kotlin.srcDirs("src/generated/test")
+        jvmTest.kotlin.srcDirs("../../dist/lib.kotlin/test")
 
 //        val androidMain by getting {
 //            dependencies {
