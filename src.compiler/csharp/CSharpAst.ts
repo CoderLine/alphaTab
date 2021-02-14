@@ -356,6 +356,7 @@ export interface AnonymousObjectProperty extends Node {
 export interface ElementAccessExpression extends Node {
     expression: Expression;
     argumentExpression: Expression;
+    nullSafe: boolean;
 }
 
 export interface InvocationExpression extends Node {

@@ -19,7 +19,7 @@ class TypeHelper {
         }
 
         @ExperimentalContracts
-        public fun isTruthy(s: Any?): Boolean {
+        public inline fun isTruthy(s: Any?): Boolean {
             contract { returns(true) implies (s != null) }
             return s != null
         }

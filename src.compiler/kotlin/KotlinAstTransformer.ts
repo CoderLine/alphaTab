@@ -76,19 +76,35 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         const bin = super.visitBinaryExpression(parent, expression);
         // detect parameter assignment
         if (
-            expression.operatorToken.kind == ts.SyntaxKind.EqualsToken ||
-            expression.operatorToken.kind == ts.SyntaxKind.PlusEqualsToken ||
-            expression.operatorToken.kind == ts.SyntaxKind.MinusEqualsToken ||
-            expression.operatorToken.kind == ts.SyntaxKind.AsteriskEqualsToken ||
-            expression.operatorToken.kind == ts.SyntaxKind.GreaterThanGreaterThanEqualsToken ||
-            expression.operatorToken.kind == ts.SyntaxKind.LessThanLessThanEqualsToken ||
-            expression.operatorToken.kind == ts.SyntaxKind.SlashEqualsToken
+            expression.operatorToken.kind === ts.SyntaxKind.EqualsToken ||
+            expression.operatorToken.kind === ts.SyntaxKind.PlusEqualsToken ||
+            expression.operatorToken.kind === ts.SyntaxKind.MinusEqualsToken ||
+            expression.operatorToken.kind === ts.SyntaxKind.AsteriskEqualsToken ||
+            expression.operatorToken.kind === ts.SyntaxKind.GreaterThanGreaterThanEqualsToken ||
+            expression.operatorToken.kind === ts.SyntaxKind.LessThanLessThanEqualsToken ||
+            expression.operatorToken.kind === ts.SyntaxKind.SlashEqualsToken
         ) {
             const left = this._context.typeChecker.getSymbolAtLocation(expression.left);
             if (left?.valueDeclaration && left.valueDeclaration.kind == ts.SyntaxKind.Parameter) {
                 this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(left.name);
             }
         }
+
+        // a == this or this == a 
+        // within an equals method needs to have the operator ===
+
+        if (
+            bin?.nodeType === cs.SyntaxKind.BinaryExpression && 
+            (expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken ||
+            expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsToken) &&
+            this._currentClassElement?.name && 
+            ts.isIdentifier(this._currentClassElement.name) &&
+            this._currentClassElement.name.text === 'equals' &&
+            (expression.left.kind === ts.SyntaxKind.ThisKeyword || expression.right.kind === ts.SyntaxKind.ThisKeyword)
+        ) {
+            (bin as cs.BinaryExpression).operator = '==='
+        }
+
         return bin;
     }
 

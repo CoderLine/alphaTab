@@ -16,42 +16,6 @@ expect fun UByteArray.decodeToDoubleArray(): DoubleArray
 @kotlin.ExperimentalUnsignedTypes
 expect fun UByteArray.decodeToString(encoding: String): String
 
-public class DoubleRange(start: Double, endInclusive: Double) : Iterable<Double> {
-    private val _start = start
-    private val _endInclusive = endInclusive
-
-    override fun iterator(): Iterator<Double> =
-        generateSequence(_start, { it + 1 })
-            .takeWhile { it <= _endInclusive }
-            .iterator()
-}
-
-public class ReverseDoubleRange(start: Double, endInclusive: Double) : Iterable<Double> {
-    private val _start = start
-    private val _endInclusive = endInclusive
-
-    override fun iterator(): Iterator<Double> =
-        generateSequence(_start, { it - 1 })
-            .takeWhile { it >= _endInclusive }
-            .iterator()
-}
-
-public infix fun Int.until(to: Double): DoubleRange {
-    return DoubleRange(this.toDouble(), (to - 1.0))
-}
-
-public infix fun Double.until(to: Double): DoubleRange {
-    return DoubleRange(this, (to - 1.0))
-}
-
-public infix fun Double.until(to: Int): DoubleRange {
-    return DoubleRange(this, (to - 1.0))
-}
-
-public infix fun Double.downTo(to: Int): ReverseDoubleRange {
-    return ReverseDoubleRange(this, to.toDouble())
-}
-
 fun String.substr(startIndex: Double, length: Double): String {
     return this.substring(startIndex.toInt(), (startIndex + length).toInt())
 }
@@ -81,7 +45,7 @@ fun <T> MutableList<T>.slice(): MutableList<T> {
 }
 
 fun <T> MutableList<T>.slice(start: Double): MutableList<T> {
-    return this.subList(start.toInt(), this.size - 1)
+    return this.subList(start.toInt(), this.size)
 }
 
 fun <T> MutableList<T>.rev(): MutableList<T> {
@@ -129,6 +93,11 @@ fun String.lastIndexOfInDouble(item: String): Double {
 
 fun <T> List<T>.indexOfInDouble(item: T): Double {
     return this.indexOf(item).toDouble()
+}
+
+@kotlin.jvm.JvmName("joinDouble")
+fun Iterable<Double>.join(separator: String): String {
+    return this.map { it.toInvariantString() }.join(separator)
 }
 
 fun <T> Iterable<T>.join(separator: String): String {

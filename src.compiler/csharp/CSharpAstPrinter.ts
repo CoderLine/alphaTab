@@ -331,7 +331,6 @@ export default class CSharpAstPrinter {
     private writeMethodDeclaration(d: cs.MethodDeclaration) {
         this.writeDocumentation(d);
         this.writeParameterDocumentation(d);
-        
 
         this.writeAttributes(d);
         this.writeVisibility(d.visibility);
@@ -627,14 +626,14 @@ export default class CSharpAstPrinter {
                     functionType.returnType.nodeType === cs.SyntaxKind.PrimitiveTypeNode &&
                     (functionType.returnType as cs.PrimitiveTypeNode).type === cs.PrimitiveType.Void
                 ) {
-                    this.write('System.Action')
+                    this.write('System.Action');
                     if (functionType.parameterTypes.length > 0) {
                         this.write('<');
                         this.writeCommaSeparated(functionType.parameterTypes, p => this.writeType(p));
                         this.write('>');
                     }
                 } else {
-                    this.write('System.Func')
+                    this.write('System.Func');
                     this.write('<');
                     if (functionType.parameterTypes.length > 0) {
                         this.writeCommaSeparated(functionType.parameterTypes, p => this.writeType(p));
@@ -977,6 +976,9 @@ export default class CSharpAstPrinter {
 
     private writeElementAccessExpression(expr: cs.ElementAccessExpression) {
         this.writeExpression(expr.expression);
+        if (expr.nullSafe) {
+            this.write('?');
+        }
         this.write('[');
         this.writeExpression(expr.argumentExpression);
         this.write(']');

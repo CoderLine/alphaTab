@@ -1145,18 +1145,18 @@ export class AlphaTabApiBase<TSettings> {
             // from the startbeat to the end of the staff,
             // then fill all staffs until the end-beat staff
             // then from staff-start to the end beat (or to end of bar if it's the last beat)
-            let staffStartX: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds.visualBounds.x;
+            let staffStartX: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.x;
             let staffEndX: number =
-                startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds.visualBounds.x +
-                startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds.visualBounds.w;
+                startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.x +
+                startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.w;
             let startSelection: IContainer = this.uiFacade.createSelectionElement()!;
             startSelection.top = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
             startSelection.left = startX;
             startSelection.width = staffEndX - startX;
             startSelection.height = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h;
             selectionWrapper.appendChild(startSelection);
-            let staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds.index + 1;
-            let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds.index;
+            let staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index + 1;
+            let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index;
             for (let staffIndex: number = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
                 let staffBounds: StaveGroupBounds = cache.staveGroups[staffIndex];
                 let middleSelection: IContainer = this.uiFacade.createSelectionElement()!;

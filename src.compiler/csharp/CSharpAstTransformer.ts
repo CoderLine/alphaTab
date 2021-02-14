@@ -7,6 +7,7 @@ export default class CSharpAstTransformer {
     protected _typeScriptFile: ts.SourceFile;
     protected _csharpFile: cs.SourceFile;
     protected _context: CSharpEmitterContext;
+    protected _currentClassElement: ts.ClassElement|null=null;
     protected _declarationOrAssignmentTypeStack: ts.Type[] = [];
 
     protected _testClassAttribute: string = 'microsoft.visualStudio.testTools.unitTesting.TestClass';
@@ -846,6 +847,9 @@ export default class CSharpAstTransformer {
         if(isSkipped) {
             this._context.processingSkippedElement = true;
         }
+
+        this._currentClassElement = classElement;
+
         if (ts.isConstructorDeclaration(classElement)) {
             this.visitConstructorDeclaration(parent, classElement);
         } else if (ts.isMethodSignature(classElement)) {
@@ -867,6 +871,10 @@ export default class CSharpAstTransformer {
                 ts.DiagnosticCategory.Error
             );
         }
+
+        this._currentClassElement = null;
+
+
         if(isSkipped) {
             this._context.processingSkippedElement = false;
         }
@@ -3070,7 +3078,8 @@ export default class CSharpAstTransformer {
             argumentExpression: {} as cs.Expression,
             parent: parent,
             tsNode: expression,
-            nodeType: cs.SyntaxKind.ElementAccessExpression
+            nodeType: cs.SyntaxKind.ElementAccessExpression,
+            nullSafe: !!expression.questionDotToken
         } as cs.ElementAccessExpression;
 
         elementAccess.expression = this.visitExpression(elementAccess, expression.expression)!;

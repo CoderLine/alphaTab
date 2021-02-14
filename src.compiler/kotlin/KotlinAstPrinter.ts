@@ -208,10 +208,10 @@ export default class KotlinAstPrinter {
 
     private writeInterfaceDeclaration(d: cs.InterfaceDeclaration) {
         this.writeDocumentation(d);
-        this.writeVisibility(d.visibility);
 
         this.writeLine('@kotlin.contracts.ExperimentalContracts');
         this.writeLine('@kotlin.ExperimentalUnsignedTypes');
+        this.writeVisibility(d.visibility);
         this.write(`interface ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
 
@@ -1261,7 +1261,12 @@ export default class KotlinAstPrinter {
 
     private writeElementAccessExpression(expr: cs.ElementAccessExpression) {
         this.writeExpression(expr.expression);
-        if (expr.expression.nodeType !== cs.SyntaxKind.NonNullExpression) {
+        if (expr.nullSafe) {
+            this.write('?.get(');
+            this.writeExpression(expr.argumentExpression);
+            this.write(')');
+            return;
+        } else if (expr.expression.nodeType !== cs.SyntaxKind.NonNullExpression) {
             this.write('!!');
         }
         this.write('[');
@@ -1526,17 +1531,7 @@ export default class KotlinAstPrinter {
     }
 
     private writeForStatement(s: cs.ForStatement) {
-        let [name, lower, upper, rangeOperator] = this.detectForRange(s);
-        if (lower && upper && rangeOperator) {
-            this.write(`for(${name} in `);
-            this.writeExpression(lower);
-            this.write(' ');
-            this.write(rangeOperator);
-            this.write(' ');
-            this.writeExpression(upper);
-            this.write(')');
-            this.writeStatement(s.statement);
-        } else {
+        if (!this.tryWriteForRange(s)) {
             this.write('if(true) ');
             this.beginBlock();
 
@@ -1581,89 +1576,189 @@ export default class KotlinAstPrinter {
         }
     }
 
-    private detectForRange(
-        s: cs.ForStatement
-    ): [string | null, cs.Expression | null, cs.Expression | null, string | null] {
+    private tryWriteForRange(s: cs.ForStatement): boolean {
         if (!s.initializer || !s.condition || !s.incrementor) {
-            return [null, null, null, null];
+            return false;
         }
 
-        // let i=0 or let i=0, j=10
         if (s.initializer.nodeType !== cs.SyntaxKind.VariableDeclarationList) {
-            return [null, null, null, null];
+            return false;
         }
 
-        // i < 10 or i < j or i >= 0
-        if (
-            s.condition.nodeType !== cs.SyntaxKind.BinaryExpression ||
-            ((s.condition as cs.BinaryExpression).operator !== '<' &&
-                (s.condition as cs.BinaryExpression).operator !== '>=')
-        ) {
-            return [null, null, null, null];
+        if (s.condition?.nodeType !== cs.SyntaxKind.BinaryExpression) {
+            return false;
         }
 
-        // i++ or i--
-        if (
-            s.incrementor.nodeType !== cs.SyntaxKind.PostfixUnaryExpression ||
-            ((s.incrementor as cs.PostfixUnaryExpression).operator !== '++' &&
-                (s.incrementor as cs.PostfixUnaryExpression).operator !== '--')
-        ) {
-            return [null, null, null, null];
-        }
+        const writeIncrementor = () => {
+            if(!s.incrementor) {
+                return;
+            }
+            switch (s.incrementor.nodeType) {
+                case cs.SyntaxKind.PrefixUnaryExpression:
+                    const preOp = (s.incrementor as cs.PrefixUnaryExpression).operand;
+                    if (preOp.nodeType !== cs.SyntaxKind.Identifier) {
+                        this._context.addCsNodeDiagnostics(
+                            s.incrementor,
+                            'Unknown for incrementor',
+                            ts.DiagnosticCategory.Error
+                        );
+                    } else {
+                        switch ((s.incrementor as cs.PrefixUnaryExpression).operator) {
+                            case '++':
+                                this.write('it + 1');
+                                break;
+                            case '--':
+                                this.write('it - 1');
+                                break;
+                            default:
+                                this._context.addCsNodeDiagnostics(
+                                    s.incrementor,
+                                    'Unknown for incrementor',
+                                    ts.DiagnosticCategory.Error
+                                );
+                                break;
+                        }
+                    }
+                    break;
+                case cs.SyntaxKind.PostfixUnaryExpression:
+                    const postOp = (s.incrementor as cs.PostfixUnaryExpression).operand;
+                    switch ((s.incrementor as cs.PostfixUnaryExpression).operator) {
+                        case '++':
+                            this.write('it + 1');
+                            break;
+                        case '--':
+                            this.write('it - 1');
+                            break;
+                        default:
+                            this._context.addCsNodeDiagnostics(
+                                s.incrementor,
+                                'Unknown incrementor',
+                                ts.DiagnosticCategory.Error
+                            );
+                            break;
+                    }
+                    break;
+                case cs.SyntaxKind.BinaryExpression:
+                    switch ((s.incrementor as cs.BinaryExpression).operator) {
+                        case '+=':
+                            this.write('it + ');
+                            this.writeExpression((s.incrementor as cs.BinaryExpression).right);
+                            break;
+                        case '-=':
+                            this.write('it - ');
+                            this.writeExpression((s.incrementor as cs.BinaryExpression).right);
+                            break;
+                        default:
+                            this._context.addCsNodeDiagnostics(
+                                s.incrementor,
+                                'Unknown incrementor',
+                                ts.DiagnosticCategory.Error
+                            );
+                            break;
+                    }
+                    break;
+            }
+        };
 
         const decl = s.initializer as cs.VariableDeclarationList;
-        const operator = (s.condition as cs.BinaryExpression).operator === '<' ? 'until' : 'downTo';
-
         if (decl.declarations.length === 1) {
             const name = decl.declarations[0].name;
             const lower = decl.declarations[0].initializer;
             if (!lower) {
-                return [null, null, null, null];
+                return false;
             }
 
             const left = (s.condition as cs.BinaryExpression).left;
+            const right = (s.condition as cs.BinaryExpression).right;
             if (left.nodeType === cs.SyntaxKind.Identifier) {
                 if ((left as cs.Identifier).text !== name) {
-                    return [null, null, null, null];
+                    return false;
+                }
+            } else if(right.nodeType === cs.SyntaxKind.Identifier) {
+                if ((right as cs.Identifier).text !== name) {
+                    return false;
                 }
             } else {
-                return [null, null, null, null];
+                return false;
             }
 
-            const upper = (s.condition as cs.BinaryExpression).right;
+            this.write(`for ( ${name} in generateSequence(`);
+            this.writeExpression(lower);
+            this.write(') { ');
+            writeIncrementor();
+            this.write(' }.takeWhile { ');
 
-            return [name, lower, upper, operator];
+            if(left.nodeType === cs.SyntaxKind.Identifier) {
+                this.write(' it ')
+                this.write((s.condition as cs.BinaryExpression).operator);
+                this.writeExpression((s.condition as cs.BinaryExpression).right);
+            } else {
+                this.writeExpression((s.condition as cs.BinaryExpression).left);
+                this.write(' ' + (s.condition as cs.BinaryExpression).operator);
+                this.write(' it')
+            }
+
+            this.write(' }) ');
         } else if (decl.declarations.length === 2) {
             const lowerName = decl.declarations[0].name;
             const lower = decl.declarations[0].initializer;
             const upperName = decl.declarations[1].name;
             const upper = decl.declarations[1].initializer;
             if (!lower || !upper) {
-                return [null, null, null, null];
+                return false;
             }
 
             const left = (s.condition as cs.BinaryExpression).left;
             if (left.nodeType === cs.SyntaxKind.Identifier) {
                 if ((left as cs.Identifier).text !== lowerName) {
-                    return [null, null, null, null];
+                    return false;
                 }
             } else {
-                return [null, null, null, null];
+                return false;
             }
 
             const right = (s.condition as cs.BinaryExpression).left;
             if (right.nodeType === cs.SyntaxKind.Identifier) {
                 if ((right as cs.Identifier).text !== upperName) {
-                    return [null, null, null, null];
+                    return false;
                 }
             } else {
-                return [null, null, null, null];
+                return false;
             }
 
-            return [lowerName, lower, upper, operator];
+            this.write(`for( ${lowerName} in generateSequence( `);
+            this.writeExpression(lower);
+            this.write(') { ');
+            writeIncrementor();
+            this.write(' }.takeWhile { ');
+
+            if((left as cs.Identifier).text === lowerName) {
+                this.write('it ')
+                this.write((s.condition as cs.BinaryExpression).operator);
+                this.writeExpression((s.condition as cs.BinaryExpression).right);
+            } else {
+                this.writeExpression((s.condition as cs.BinaryExpression).left);
+                this.write((s.condition as cs.BinaryExpression).operator);
+                this.write(' it')
+            }
+
+            this.write(' }) ');
         } else {
-            return [null, null, null, null];
+            return false;
         }
+
+        this.beginBlock();
+
+        if (s.statement.nodeType === cs.SyntaxKind.Block) {
+            for (const stmt of (s.statement as cs.Block).statements) {
+                this.writeStatement(stmt);
+            }
+        } else {
+            this.writeStatement(s.statement);
+        }
+
+        this.endBlock();
+        return true;
     }
 
     private writeWhileStatement(s: cs.WhileStatement) {

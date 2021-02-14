@@ -1,7 +1,9 @@
 package alphaTab.core
 
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.nio.charset.Charset
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
 
@@ -15,7 +17,7 @@ actual class LateInitList<T> : java.util.ArrayList<T>, MutableList<T> {
 
 @ExperimentalUnsignedTypes
 actual fun UByteArray.decodeToFloatArray(): FloatArray {
-    val fb = ByteBuffer.wrap(this.toByteArray()).asFloatBuffer();
+    val fb = ByteBuffer.wrap(this.toByteArray()).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
     val fa = FloatArray(fb.limit())
     fb.get(fa)
     return fa
@@ -23,7 +25,7 @@ actual fun UByteArray.decodeToFloatArray(): FloatArray {
 
 @ExperimentalUnsignedTypes
 actual fun UByteArray.decodeToDoubleArray(): DoubleArray {
-    val db = ByteBuffer.wrap(this.toByteArray()).asDoubleBuffer();
+    val db = ByteBuffer.wrap(this.toByteArray()).order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer();
     val da = DoubleArray(db.limit())
     db.get(da)
     return da
@@ -34,8 +36,15 @@ actual fun UByteArray.decodeToString(encoding: String): String {
     return String(this.toByteArray(), 0, this.size, Charset.forName(encoding))
 }
 
+var invariantDoubleFormat = DecimalFormat().apply {
+    this.minimumFractionDigits = 0
+    this.maximumFractionDigits = Int.MAX_VALUE
+    this.decimalFormatSymbols.decimalSeparator = '.'
+    this.isGroupingUsed = false
+}
+
 actual fun Double.toInvariantString(): String {
-    return NumberFormat.getInstance(Locale.ROOT).format(this)
+    return invariantDoubleFormat.format(this)
 }
 
 actual fun String.toDoubleOrNaN(): Double {

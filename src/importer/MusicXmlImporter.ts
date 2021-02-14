@@ -76,7 +76,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private mergePartGroups(): void {
         let anyMerged: boolean = false;
-        for(const tracks of this._partGroups.values()) {
+        for (const tracks of this._partGroups.values()) {
             if (tracks.length > 1) {
                 this.mergeGroup(tracks);
                 anyMerged = true;
@@ -161,7 +161,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let id: string = element.getAttribute('id');
         if (!this._trackById.has(id)) {
             if (this._trackById.size === 1) {
-                for(const [x,t] of this._trackById) {
+                for (const [x, t] of this._trackById) {
                     if (t.staves.length === 0 || t.staves[0].bars.length === 0) {
                         id = x;
                     }
@@ -203,7 +203,7 @@ export class MusicXmlImporter extends ScoreImporter {
         if (isFirstMeasure) {
             this._divisionsPerQuarterNote = 0;
             this._trackFirstMeasureNumber = parseInt(element.getAttribute('number'));
-            if(!this._trackFirstMeasureNumber) {
+            if (!this._trackFirstMeasureNumber) {
                 this._trackFirstMeasureNumber = 0;
             }
             barIndex = 0;
@@ -230,7 +230,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let masterBar: MasterBar | null = null;
         for (let b: number = track.staves[0].bars.length; b <= barIndex; b++) {
             for (let s: number = 0; s < track.staves.length; s++) {
-                let bar: Bar =new Bar();
+                let bar: Bar = new Bar();
                 bars[s] = bar;
                 if (track.staves[s].bars.length > 0) {
                     let previousBar: Bar = track.staves[s].bars[track.staves[s].bars.length - 1];
@@ -241,34 +241,37 @@ export class MusicXmlImporter extends ScoreImporter {
                 this.ensureVoices(bar);
             }
         }
-        let attributesParsed: boolean = false;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'note':
-                        this.parseNoteBeat(c, bars);
-                        break;
-                    case 'forward':
-                        this.parseForward(c, bars);
-                        break;
-                    case 'direction':
-                        this.parseDirection(c, masterBar!);
-                        break;
-                    case 'attributes':
-                        if (!attributesParsed) {
-                            this.parseAttributes(c, bars, masterBar!, track);
-                            attributesParsed = true;
-                        }
-                        break;
-                    case 'harmony':
-                        this.parseHarmony(c, track);
-                        break;
-                    case 'sound':
-                        // TODO
-                        break;
-                    case 'barline':
-                        this.parseBarline(c, masterBar!);
-                        break;
+
+        if (masterBar) {
+            let attributesParsed: boolean = false;
+            for (let c of element.childNodes) {
+                if (c.nodeType === XmlNodeType.Element) {
+                    switch (c.localName) {
+                        case 'note':
+                            this.parseNoteBeat(c, bars);
+                            break;
+                        case 'forward':
+                            this.parseForward(c, bars);
+                            break;
+                        case 'direction':
+                            this.parseDirection(c, masterBar);
+                            break;
+                        case 'attributes':
+                            if (!attributesParsed) {
+                                this.parseAttributes(c, bars, masterBar, track);
+                                attributesParsed = true;
+                            }
+                            break;
+                        case 'harmony':
+                            this.parseHarmony(c, track);
+                            break;
+                        case 'sound':
+                            // TODO
+                            break;
+                        case 'barline':
+                            this.parseBarline(c, masterBar);
+                            break;
+                    }
                 }
             }
         }
@@ -1405,7 +1408,10 @@ export class MusicXmlImporter extends ScoreImporter {
                         track.playbackInfo.volume = Math.floor((parseInt(c.innerText) / 100) * 16);
                         break;
                     case 'pan':
-                        track.playbackInfo.balance = Math.max(0, Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16)));
+                        track.playbackInfo.balance = Math.max(
+                            0,
+                            Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16))
+                        );
                         break;
                 }
             }
