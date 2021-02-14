@@ -19,9 +19,9 @@ const val MusicFontSize = 34
 @ExperimentalContracts
 class SkiaCanvas : ICanvas {
     private lateinit var _surface: Surface
-    private lateinit var _path: Path
+    private var _path: Path? = null
     private var _typeFaceCache: String = ""
-    private lateinit var _typeFace: Typeface
+    private var _typeFace: Typeface? = null
 
     public override var color: Color = Color(255.0, 255.0, 255.0)
     public override var lineWidth: Double = 1.0
@@ -29,7 +29,7 @@ class SkiaCanvas : ICanvas {
     private val typeFace: Typeface
         get() {
             if (_typeFaceCache != font.toCssString(settings.display.scale)) {
-                _typeFace.close()
+                _typeFace?.close()
                 _typeFaceCache = font.toCssString(settings.display.scale)
                 _typeFace = Typeface.makeFromName(
                     font.family,
@@ -40,7 +40,7 @@ class SkiaCanvas : ICanvas {
                     )
                 )
             }
-            return _typeFace
+            return _typeFace!!
         }
 
 
@@ -58,10 +58,11 @@ class SkiaCanvas : ICanvas {
             )
         )
         _surface = newImage
-        _path.close()
+        _path?.close()
 
-        _path = Path()
-        _path.fillMode = PathFillMode.WINDING
+        val path = Path()
+        path.fillMode = PathFillMode.WINDING
+        _path = path
     }
 
     override fun endRender(): Any? {
@@ -101,23 +102,23 @@ class SkiaCanvas : ICanvas {
     }
 
     override fun beginPath() {
-        _path.reset()
+        _path!!.reset()
     }
 
     override fun closePath() {
-        _path.closePath()
+        _path!!.closePath()
     }
 
     override fun moveTo(x: Double, y: Double) {
-        _path.moveTo(x.toFloat(), y.toFloat())
+        _path!!.moveTo(x.toFloat(), y.toFloat())
     }
 
     override fun lineTo(x: Double, y: Double) {
-        _path.lineTo(x.toFloat(), y.toFloat())
+        _path!!.lineTo(x.toFloat(), y.toFloat())
     }
 
     override fun quadraticCurveTo(cpx: Double, cpy: Double, x: Double, y: Double) {
-        _path.quadTo(cpx.toFloat(), cpy.toFloat(), x.toFloat(), y.toFloat())
+        _path!!.quadTo(cpx.toFloat(), cpy.toFloat(), x.toFloat(), y.toFloat())
     }
 
     override fun bezierCurveTo(
@@ -128,7 +129,7 @@ class SkiaCanvas : ICanvas {
         x: Double,
         y: Double
     ) {
-        _path.cubicTo(
+        _path!!.cubicTo(
             cp1X.toFloat(),
             cp1Y.toFloat(),
             cp2X.toFloat(),
@@ -140,7 +141,7 @@ class SkiaCanvas : ICanvas {
 
     override fun fillCircle(x: Double, y: Double, radius: Double) {
         beginPath()
-        _path.addCircle(x.toFloat(), y.toFloat(), radius.toFloat())
+        _path!!.addCircle(x.toFloat(), y.toFloat(), radius.toFloat())
         closePath()
         fill()
     }
@@ -148,7 +149,7 @@ class SkiaCanvas : ICanvas {
 
     override fun strokeCircle(x: Double, y: Double, radius: Double) {
         beginPath()
-        _path.addCircle(x.toFloat(), y.toFloat(), radius.toFloat())
+        _path!!.addCircle(x.toFloat(), y.toFloat(), radius.toFloat())
         closePath()
         stroke()
     }
@@ -157,7 +158,7 @@ class SkiaCanvas : ICanvas {
         createPaint().use {
             it.strokeWidth = lineWidth.toFloat()
             it.mode = PaintMode.FILL
-            _surface.canvas.drawPath(_path, it)
+            _surface.canvas.drawPath(_path!!, it)
         }
     }
 
@@ -166,7 +167,7 @@ class SkiaCanvas : ICanvas {
         createPaint().use {
             it.strokeWidth = lineWidth.toFloat()
             it.mode = PaintMode.STROKE
-            _surface.canvas.drawPath(_path, it)
+            _surface.canvas.drawPath(_path!!, it)
         }
     }
 

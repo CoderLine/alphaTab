@@ -70,7 +70,7 @@ export class ScoreRestGlyph extends MusicFontGlyph {
         if (this.beamingHelper) {
             this.beamingHelper.registerBeatLineX(
                 'score',
-                this.beat,
+                this.beat!,
                 cx + this.x + this.width / 2,
                 cx + this.x + this.width / 2
             );

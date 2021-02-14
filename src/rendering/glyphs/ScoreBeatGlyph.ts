@@ -126,6 +126,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         let group: GlyphGroup = new GlyphGroup(0, 0);
+                        group.renderer = this.renderer;
                         for (let note of this.container.beat.notes) {
                             this.createBeatDot(sr.getNoteLine(note), group);
                         }
@@ -174,6 +175,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         let group: GlyphGroup = new GlyphGroup(0, 0);
+                        group.renderer = this.renderer;
                         this.createBeatDot(line, group);
                         this.addGlyph(group);
                     }

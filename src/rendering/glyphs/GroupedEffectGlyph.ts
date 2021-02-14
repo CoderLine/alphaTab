@@ -48,7 +48,7 @@ export abstract class GroupedEffectGlyph extends EffectGlyph {
         }
         // use start position of next beat when possible
         let endBeatRenderer: BarRendererBase = lastLinkedGlyph.renderer;
-        let endBeat: Beat = lastLinkedGlyph.beat;
+        let endBeat: Beat = lastLinkedGlyph.beat!;
         let position: BeatXPosition = this.endPosition;
         // calculate end X-position
         let cxRenderer: number = cx - this.renderer.x;
@@ -58,7 +58,7 @@ export abstract class GroupedEffectGlyph extends EffectGlyph {
 
     protected calculateEndX(
         endBeatRenderer: BarRendererBase,
-        endBeat: Beat,
+        endBeat: Beat|null,
         cx: number,
         endPosition: BeatXPosition
     ): number {

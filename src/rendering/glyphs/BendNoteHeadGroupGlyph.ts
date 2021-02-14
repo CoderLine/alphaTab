@@ -44,10 +44,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
 
     public getNoteValueY(noteValue: number): number {
         if (this._noteValueLookup.has(noteValue)) {
-            return (
-                this.y +
-                this._noteValueLookup.get(noteValue)!.y
-            );
+            return this.y + this._noteValueLookup.get(noteValue)!.y;
         }
         return 0;
     }
@@ -72,6 +69,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         if (accidental !== AccidentalType.None) {
             let g = new AccidentalGlyph(0, noteHeadGlyph.y, accidental, true);
             g.renderer = this.renderer;
+            this._accidentals.renderer = this.renderer;
             this._accidentals.addGlyph(g);
         }
         this._noteValueLookup.set(noteValue, noteHeadGlyph);
