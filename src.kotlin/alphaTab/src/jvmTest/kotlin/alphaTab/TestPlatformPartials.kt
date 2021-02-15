@@ -34,7 +34,7 @@ class TestPlatformPartials {
         }
 
         public fun saveFile(name:String, data:Uint8Array) {
-            val path = Paths.get("text-results", name)
+            val path = Path.of(projectRoot, "test-results", name)
             path.parent.toFile().mkdirs()
             val fs = path.toFile().outputStream()
             fs.use {

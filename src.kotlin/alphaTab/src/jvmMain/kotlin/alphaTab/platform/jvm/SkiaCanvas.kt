@@ -10,14 +10,20 @@ import alphaTab.platform.TextBaseline
 import org.jetbrains.skija.*
 import org.jetbrains.skija.shaper.Shaper
 import kotlin.contracts.ExperimentalContracts
+import kotlin.math.floor
 
-// TODO
+@ExperimentalUnsignedTypes
 @ExperimentalContracts
 val bravuraTtf = SkiaCanvas::class.java.getResource("/bravura/Bravura.ttf").readBytes()
 
+@ExperimentalUnsignedTypes
 @ExperimentalContracts
 val MusicFont: Typeface = Typeface.makeFromData(Data.makeFromBytes(bravuraTtf))
 const val MusicFontSize = 34
+
+const val HangingAsPercentOfAscent = 80
+
+// https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/modules/canvas/offscreencanvas2d/offscreen_canvas_rendering_context_2d.cc
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
@@ -57,7 +63,7 @@ class SkiaCanvas : ICanvas {
             ImageInfo(
                 width.toInt(),
                 height.toInt(),
-                ColorType.BGRA_8888 /* TODO check for right default */,
+                ColorType.BGRA_8888,
                 ColorAlphaType.PREMUL
             )
         )
@@ -85,10 +91,10 @@ class SkiaCanvas : ICanvas {
             it.mode = PaintMode.FILL
             _surface.canvas.drawRect(
                 Rect(
-                    x.toFloat(),
-                    y.toFloat(),
-                    (x + w).toFloat(),
-                    (y + h).toFloat()
+                    x.toInt().toFloat(),
+                    y.toInt().toFloat(),
+                    (x.toInt() + w).toFloat(),
+                    (y.toInt() + h).toFloat()
                 ), it
             )
         }
@@ -108,10 +114,10 @@ class SkiaCanvas : ICanvas {
             it.mode = PaintMode.STROKE
             _surface.canvas.drawRect(
                 Rect(
-                    x.toFloat(),
-                    y.toFloat(),
-                    (x + w).toFloat(),
-                    (y + h).toFloat()
+                    x.toInt().toFloat(),
+                    y.toInt().toFloat(),
+                    (x.toInt() + w).toFloat(),
+                    (y.toInt() + h).toFloat()
                 ), it
             )
         }
@@ -199,15 +205,20 @@ class SkiaCanvas : ICanvas {
                 textAlign,
                 blob
             )
+
             val yOffset = getFontBaseLine(
                 textBaseline,
-                blob,
                 font
             )
+
+            // In Chrome some of the values are rounded with a +0.5f floor rounding
+            // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/platform/fonts/font_metrics.cc#L112
+            // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/modules/canvas/offscreencanvas2d/offscreen_canvas_rendering_context_2d.cc#L694
+            val ascent = floor(-font.metrics.ascent + 0.5f)
             _surface.canvas.drawTextBlob(
                 blob,
                 x.toFloat() + xOffset,
-                y.toFloat() + yOffset,
+                y.toFloat() + yOffset - ascent - font.metrics.leading,
                 paint
             )
         })
@@ -235,19 +246,36 @@ class SkiaCanvas : ICanvas {
         }
     }
 
-    private fun getFontBaseLine(textBaseline: TextBaseline, blob:TextBlob, font: org.jetbrains.skija.Font): Float {
+    private fun getFontBaseLine(
+        textBaseline: TextBaseline,
+        font: org.jetbrains.skija.Font
+    ): Float {
+        // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/core/html/canvas/text_metrics.cc#L14
         return when (textBaseline) {
-            TextBaseline.Top -> // TopTextBaseline
-                // https://chromium.googlesource.com/chromium/blink/+/master/Source/modules/canvas2d/CanvasRenderingContext2D.cpp#2056
-                // According to http://wiki.apache.org/xmlgraphics-fop/LineLayout/AlignmentHandling
-                // "FOP (Formatting Objects Processor) puts the hanging baseline at 80% of the ascender height"
-                return (-font.metrics.ascent * 4) / 5
-            TextBaseline.Middle -> // MiddleTextBaseline
-                return -font.metrics.descent + font.metrics.height / 2
-            TextBaseline.Bottom -> // BottomTextBaseline
-                return -font.metrics.descent
+            TextBaseline.Top -> // kHangingTextBaseline
+                return -font.metrics.ascent * HangingAsPercentOfAscent / 100.0f
+            TextBaseline.Middle -> {// kMiddleTextBaseline
+                val normalized = computeNormalizedTypoAscentAndDescent(font)
+                return (normalized[0] - normalized[1]) / 2.0f
+            }
+            TextBaseline.Bottom -> {// kBottomTextBaseline
+                val normalized = computeNormalizedTypoAscentAndDescent(font)
+                return -normalized[1]
+            }
             else -> 0.0f
         }
+    }
+
+    private fun computeNormalizedTypoAscentAndDescent(font: org.jetbrains.skija.Font): Array<Float> {
+        // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/platform/fonts/simple_font_data.cc#L330
+        val ascent: Float = -font.metrics.ascent
+        val descent: Float = font.metrics.descent
+        val emHeight: Float = font.size
+        val height = ascent + descent
+
+        val normalizedAscent = ascent * emHeight / height
+        val normalizedDescent = emHeight - normalizedAscent
+        return arrayOf(normalizedAscent, normalizedDescent)
     }
 
     override fun measureText(text: String): Double {
@@ -255,8 +283,8 @@ class SkiaCanvas : ICanvas {
             return 0.0
         }
         var size = 0.0
-        textRun(text, fun(blob, font, paint) {
-            size = blob.tightBounds.width.toDouble()
+        textRun(text, fun(blob, _, _) {
+            size = blob.blockBounds.width.toDouble()
         })
         return size
     }
@@ -296,10 +324,15 @@ class SkiaCanvas : ICanvas {
                     val blob = shaper.shape(s, font)
                     blob?.use {
                         val xOffset = getFontOffset(
-                            if(centerAtPosition == true) TextAlign.Center else TextAlign.Left,
+                            if (centerAtPosition == true) TextAlign.Center else TextAlign.Left,
                             it
                         )
-                        _surface.canvas.drawTextBlob(blob, x.toFloat() + xOffset, y.toFloat() - font.metrics.descent, paint)
+                        _surface.canvas.drawTextBlob(
+                            blob,
+                            x.toFloat() + xOffset,
+                            y.toFloat() - font.metrics.descent,
+                            paint
+                        )
                     }
                 }
             }
@@ -307,10 +340,10 @@ class SkiaCanvas : ICanvas {
     }
 
     private fun getFontOffset(textAlign: TextAlign, blob: TextBlob): Float {
-        return when(textAlign) {
+        return when (textAlign) {
             TextAlign.Left -> 0f
-            TextAlign.Center -> -blob.bounds.width / 2f
-            TextAlign.Right -> -blob.bounds.width
+            TextAlign.Center -> -blob.tightBounds.width / 2f
+            TextAlign.Right -> -blob.tightBounds.width
         }
     }
 

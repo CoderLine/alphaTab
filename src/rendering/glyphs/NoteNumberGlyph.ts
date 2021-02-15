@@ -47,12 +47,12 @@ export class NoteNumberGlyph extends Glyph {
             ((n.bendType === BendType.Bend || n.bendType === BendType.BendRelease) &&
                 this.renderer.settings.notation.isNotationElementVisible(NotationElement.TabNotesOnTiedBends))
         ) {
-            this._noteString = '(' + (n.tieOrigin!.fret - n.beat.voice.bar.staff.transpositionPitch) + ')';
+            this._noteString = '(' + (n.tieOrigin!.fret - n.beat.voice.bar.staff.transpositionPitch).toString() + ')';
         } else {
             this._noteString = '';
         }
         if (n.isTrill) {
-            this._trillNoteString = '(' + (n.trillFret - n.beat.voice.bar.staff.transpositionPitch) + ')';
+            this._trillNoteString = '(' + (n.trillFret - n.beat.voice.bar.staff.transpositionPitch).toString() + ')';
         } else if (!ModelUtils.isAlmostEqualTo(n.harmonicValue, 0)) {
             switch (n.harmonicType) {
                 case HarmonicType.Artificial:
