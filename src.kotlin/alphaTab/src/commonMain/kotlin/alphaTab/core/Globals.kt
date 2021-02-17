@@ -147,6 +147,9 @@ operator fun Int.rangeTo(d: Double): IntRange {
 fun IAlphaTabEnum.toDouble(): Double {
     return this.value.toDouble()
 }
+fun IAlphaTabEnum?.toDouble(): Double? {
+    return this?.value.toDouble()
+}
 fun Any.toDouble(): Double {
     if(this is Double) {
         return this

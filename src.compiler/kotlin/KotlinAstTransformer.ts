@@ -90,19 +90,19 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             }
         }
 
-        // a == this or this == a 
+        // a == this or this == a
         // within an equals method needs to have the operator ===
 
         if (
-            bin?.nodeType === cs.SyntaxKind.BinaryExpression && 
+            bin?.nodeType === cs.SyntaxKind.BinaryExpression &&
             (expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken ||
-            expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsToken) &&
-            this._currentClassElement?.name && 
+                expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsToken) &&
+            this._currentClassElement?.name &&
             ts.isIdentifier(this._currentClassElement.name) &&
             this._currentClassElement.name.text === 'equals' &&
             (expression.left.kind === ts.SyntaxKind.ThisKeyword || expression.right.kind === ts.SyntaxKind.ThisKeyword)
         ) {
-            (bin as cs.BinaryExpression).operator = '==='
+            (bin as cs.BinaryExpression).operator = '===';
         }
 
         return bin;
@@ -363,13 +363,28 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
             return call;
         } else if (this.isCastFromEnumToNumber(expression)) {
-            return {
+            const methodAccess = {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
                 parent: parent,
-                expression: this.createUnresolvedTypeNode(null, expression.type),
-                member: 'value',
+                expression: null!,
+                member: 'toDouble',
                 tsNode: expression
             } as cs.MemberAccessExpression;
+
+            let expr = this.visitExpression(methodAccess, expression.expression);
+            if(!expr) {
+                return null;
+            }
+            methodAccess.expression = expr;
+            const call = {
+                nodeType: cs.SyntaxKind.InvocationExpression,
+                parent: parent,
+                expression: methodAccess,
+                tsNode: expression,
+                arguments: []
+            } as cs.InvocationExpression;
+
+            return call;
         } else {
             return super.visitAsExpression(parent, expression);
         }
@@ -377,8 +392,9 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
     private isCastFromEnumToNumber(expression: ts.AsExpression) {
         let targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
-        if (targetType.flags === ts.TypeFlags.Number) {
-            let sourceType = this._context.getType(expression.type);
+        let nonNullable = this._context.typeChecker.getNonNullableType(targetType);
+        if (nonNullable.flags === ts.TypeFlags.Number) {
+            let sourceType = this._context.typeChecker.getNonNullableType(this._context.getType(expression.expression));
             return sourceType.flags & ts.TypeFlags.Enum || sourceType.flags & ts.TypeFlags.EnumLiteral;
         }
         return false;

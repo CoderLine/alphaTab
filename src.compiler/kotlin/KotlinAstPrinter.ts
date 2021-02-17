@@ -1222,7 +1222,8 @@ export default class KotlinAstPrinter {
             expr.expression.nodeType === cs.SyntaxKind.ArrayCreationExpression ||
             expr.expression.nodeType === cs.SyntaxKind.NewExpression ||
             expr.expression.nodeType === cs.SyntaxKind.ThisLiteral ||
-            expr.expression.nodeType === cs.SyntaxKind.BaseLiteralExpression
+            expr.expression.nodeType === cs.SyntaxKind.BaseLiteralExpression ||
+            expr.tsNode!.kind === ts.SyntaxKind.AsExpression
         ) {
             this.write('.');
         } else {

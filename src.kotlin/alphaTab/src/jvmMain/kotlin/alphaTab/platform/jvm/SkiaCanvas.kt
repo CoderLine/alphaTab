@@ -70,6 +70,8 @@ class SkiaCanvas : ICanvas {
         _surface = newImage
         _path?.close()
 
+        textBaseline = TextBaseline.Top
+
         val path = Path()
         path.fillMode = PathFillMode.WINDING
         _path = path
@@ -342,8 +344,8 @@ class SkiaCanvas : ICanvas {
     private fun getFontOffset(textAlign: TextAlign, blob: TextBlob): Float {
         return when (textAlign) {
             TextAlign.Left -> 0f
-            TextAlign.Center -> -blob.tightBounds.width / 2f
-            TextAlign.Right -> -blob.tightBounds.width
+            TextAlign.Center -> -blob.blockBounds.width / 2f
+            TextAlign.Right -> -blob.blockBounds.width
         }
     }
 

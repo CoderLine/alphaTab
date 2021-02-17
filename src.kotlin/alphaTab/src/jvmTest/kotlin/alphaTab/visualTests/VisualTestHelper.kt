@@ -184,10 +184,7 @@ class VisualTestHelperPartials {
                     val finalImageFileName =
                         TestPlatform.changeExtension(referenceFileName, ".new.png");
                     val png = finalImage.encodeToData(EncodedImageFormat.PNG)
-                    val path = Path.of(finalImageFileName)
-                    path.parent.toFile().mkdirs()
-                    println("Wrote $path")
-                    Files.write(path, png!!.bytes)
+                    TestPlatformPartials.saveFile(finalImageFileName, Uint8Array(png!!.bytes.asUByteArray()))
                 }
             }
 
