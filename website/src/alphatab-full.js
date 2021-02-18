@@ -492,8 +492,8 @@ class PlayerControlsGroup extends React.Component {
     const score = this.props.api.score;
     const data = exporter.export(score, this.props.api.settings);
     const a = document.createElement('a');
-    a.download = score.title.length > 0 ? score.title + '.gp' : 'Untitled.gp';
-    a.href = URL.createObjectURL(new Blob([data]));
+    a.download = score.title.length > 0 ? score.title.trim() + '.gp' : 'Untitled.gp';
+    a.href = URL.createObjectURL(new Blob([data], { type: 'application/gp' }));
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -758,12 +758,12 @@ export default class AlphaTab extends React.Component {
       e.dataTransfer.dropEffect = 'link';
     };
     this.refs.wrapper.ondrop = (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        const files = e.dataTransfer.files;
-        if (files.length === 1) {
-          this.refs.playerControls.openFile(files[0]);
-        }
+      e.stopPropagation();
+      e.preventDefault();
+      const files = e.dataTransfer.files;
+      if (files.length === 1) {
+        this.refs.playerControls.openFile(files[0]);
+      }
     };
   }
 
