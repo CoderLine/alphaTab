@@ -8,7 +8,7 @@ import { Environment } from '@src/Environment';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { PixelMatch } from './PixelMatch';
+import { PixelMatch, PixelMatchOptions } from './PixelMatch';
 import { JsonConverter } from '@src/model/JsonConverter';
 
 /**
@@ -322,7 +322,7 @@ export class VisualTestHelper {
                             includeAA: false,
                             diffMask: true,
                             alpha: 1
-                        }
+                        } as PixelMatchOptions
                     );
 
                     diffContext.putImageData(diffImageData, 0, 0);

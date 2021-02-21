@@ -186,9 +186,15 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<TInput> Reversed<TInput>(this IEnumerable<TInput> source)
+        public static IList<TInput> Reversed<TInput>(this IList<TInput> source)
         {
-            return source.Reverse();
+            if (source is List<TInput> list)
+            {
+                list.Reverse();
+                return list;
+            }
+
+            throw new ArgumentException("Unsupported type for in-place reversing");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

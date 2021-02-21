@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Security.Permissions;
 using System.Threading.Tasks;
 using AlphaTab.Core;
 using AlphaTab.Core.EcmaScript;
@@ -78,9 +80,10 @@ namespace AlphaTab.VisualTests
             settings.Core.EnableLazyLoading = false;
             settings.Core.UseWorkers = false;
 
-			if(!referenceFileName.StartsWith("test-data/")) {
-				referenceFileName = $"test-data/visual-tests/{referenceFileName}";
-			}
+            if (!referenceFileName.StartsWith("test-data/"))
+            {
+                referenceFileName = $"test-data/visual-tests/{referenceFileName}";
+            }
 
             var referenceFileData =
                 await TestPlatform.LoadFile(referenceFileName);
@@ -131,12 +134,6 @@ namespace AlphaTab.VisualTests
             List<RenderFinishedEventArgs> result, string referenceFileName,
             Uint8Array referenceFileData, string? message)
         {
-            // TODO: get Skia to render like Chrome
-            // https://github.com/mono/SkiaSharp/issues/1253
-            return;
-
-            // ReSharper disable once HeuristicUnreachableCode
-#pragma warning disable 162
             SKBitmap finalBitmap;
 
             using (var finalImageSurface = SKSurface.Create(new SKImageInfo((int) totalWidth,
@@ -179,7 +176,7 @@ namespace AlphaTab.VisualTests
 
                 using (var fileStream = new SKFileWStream(finalImageFileName))
                 {
-                    SKPixmap.Encode(fileStream, finalBitmap, SKEncodedImageFormat.Png, 100);
+                    finalBitmap.Encode(fileStream, SKEncodedImageFormat.Png, 100);
                 }
 
                 SKBitmap referenceBitmap;
@@ -190,32 +187,59 @@ namespace AlphaTab.VisualTests
 
                 using (referenceBitmap)
                 {
-                    var compareResult = PixelMatch.Run(finalBitmap, referenceBitmap,
-                        new PixelMatchOptions
-                        {
-                            Threshold = 0.8,
-                            IncludeAntiAlias = false,
-                            IgnoreTransparent = true,
-                            CreateOutputImage = true
-                        });
-
-
-                    using (compareResult.Output)
+                    try
                     {
-                        Assert.IsTrue(compareResult.SizesMatch, "Dimensions differ");
-                        if (compareResult.Mismatch > 0.01)
+                        var diffData = new Uint8Array(finalBitmap.Bytes.Length);
+                        var match = PixelMatch.Match(
+                            new Uint8Array(referenceBitmap.Bytes),
+                            new Uint8Array(finalBitmap.Bytes),
+                            diffData,
+                            referenceBitmap.Width,
+                            referenceBitmap.Height,
+                            new PixelMatchOptions
+                            {
+                                Threshold = 0.3,
+                                IncludeAA = false,
+                                DiffMask = true,
+                                Alpha = 1
+                            });
+
+
+                        var totalPixels = match.TotalPixels - match.TransparentPixels;
+                        var percentDifference = (match.DifferentPixels / totalPixels) * 100;
+                        var pass = percentDifference < 1;
+                        if (!pass)
                         {
+                            var percentDifferenceText = percentDifference.ToString("0.00");
+                            var msg =
+                                $"Difference between original and new image is too big: {match.DifferentPixels}/${totalPixels} ({percentDifferenceText}%)";
+
                             var diffImageName =
                                 Path.ChangeExtension(referenceFileName, ".diff.png");
                             using (var fileStream = new SKFileWStream(diffImageName))
                             {
-                                SKPixmap.Encode(fileStream, compareResult.Output,
+                                var diff = SKBitmap.FromImage(
+                                    SKImage.FromPixels(referenceBitmap.Info,
+                                        SKData.Create(new MemoryStream(diffData.Data.Array)))
+                                );
+                                diff?.Encode(fileStream,
                                     SKEncodedImageFormat.Png, 100);
                             }
 
-                            Assert.Fail(
-                                $"Difference between original and new image is too big: {compareResult.Mismatch:P}, {compareResult.DifferentPixels}/{compareResult.TotalPixels}");
+                            var newImageName =
+                                Path.ChangeExtension(referenceFileName, ".new.png");
+                            using (var fileStream = new SKFileWStream(newImageName))
+                            {
+                                finalBitmap?.Encode(fileStream,
+                                    SKEncodedImageFormat.Png, 100);
+                            }
+
+                            Assert.Fail(msg);
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        Assert.Fail($"Error comparing images: {e}");
                     }
                 }
             }

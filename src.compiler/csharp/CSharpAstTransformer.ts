@@ -2344,9 +2344,12 @@ export default class CSharpAstTransformer {
                         binaryExpression.right = this.makeInt(binaryExpression.right);
                         break;
                     case ts.SyntaxKind.SlashToken:
-                        if (expression.left.kind === ts.SyntaxKind.NumericLiteral && expression.right.kind === ts.SyntaxKind.NumericLiteral) {
-                            binaryExpression.right = this.makeDouble(binaryExpression.right);
+                        if (expression.left.kind === ts.SyntaxKind.NumericLiteral) {
+                            binaryExpression.left = this.makeDouble(binaryExpression.left);
                         }
+                        if (expression.right.kind === ts.SyntaxKind.NumericLiteral) {
+                            binaryExpression.right = this.makeDouble(binaryExpression.right);
+                        }                        
                         break;
                 }
             }
