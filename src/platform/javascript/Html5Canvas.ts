@@ -45,8 +45,6 @@ export class Html5Canvas implements ICanvas {
     }
 
     public beginRender(width: number, height: number): void {
-        console.log(`new canvas w=${width}, h=${height}`);
-
         this._canvas = document.createElement('canvas');
         this._canvas.width = (width * Environment.HighDpiFactor) | 0;
         this._canvas.height = (height  * Environment.HighDpiFactor) | 0;
@@ -233,10 +231,7 @@ export class Html5Canvas implements ICanvas {
     }
 
     public fillText(text: string, x: number, y: number): void {
-        if(!isNaN(parseInt(text))) {
-            console.log(`text=${text}, x=${x}, y=${y}`);
-            this._context.fillText(text, x, y);
-        }
+        this._context.fillText(text, x, y);
     }
 
     public measureText(text: string): number {
