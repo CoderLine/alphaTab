@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using AlphaTab.Model;
 using HarfBuzzSharp;
@@ -12,7 +13,7 @@ using String = AlphaTab.Core.EcmaScript.String;
 
 namespace AlphaTab.Platform.CSharp
 {
-    internal class SkiaCanvas : ICanvas
+    internal sealed class SkiaCanvas : ICanvas
     {
         private static readonly SKTypeface MusicFont;
         private const int MusicFontSize = 34;
@@ -34,16 +35,9 @@ namespace AlphaTab.Platform.CSharp
                 default:
                     var libSkiaSharpPath =
                         Path.GetDirectoryName(typeof(SkiaCanvas).Assembly.Location);
-                    if (IntPtr.Size == 4)
-                    {
-                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", "win-x86",
-                            "native", "libSkiaSharp.dll");
-                    }
-                    else
-                    {
-                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", "win-x64",
-                            "native", "libSkiaSharp.dll");
-                    }
+                    var platformName = IntPtr.Size == 4 ? "win-x86" : "win-x64";
+                    libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", platformName,
+                        "native", "libSkiaSharp.dll");
 
                     Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "'");
                     var lib = LoadLibrary(libSkiaSharpPath);
@@ -131,7 +125,7 @@ namespace AlphaTab.Platform.CSharp
             return image;
         }
 
-        public virtual object OnRenderFinished()
+        public object OnRenderFinished()
         {
             // nothing to do
             return null;
@@ -147,29 +141,28 @@ namespace AlphaTab.Platform.CSharp
 
         private SKPaint CreatePaint()
         {
-            var paint = new SKPaint();
-            paint.Color = new SKColor((byte) Color.R, (byte) Color.G, (byte) Color.B,
-                (byte) Color.A);
-            paint.StrokeWidth = (float) LineWidth;
-            paint.StrokeMiter = 4;
-            paint.BlendMode = SKBlendMode.SrcOver;
-            paint.IsAntialias = true;
-            paint.IsDither = true;
-            paint.StrokeCap = SKStrokeCap.Butt;
-            paint.StrokeJoin = SKStrokeJoin.Miter;
-            paint.FilterQuality = SKFilterQuality.None;
-            return paint;
+            return new SKPaint
+            {
+                Color = new SKColor((byte) Color.R, (byte) Color.G, (byte) Color.B,
+                    (byte) Color.A),
+                StrokeWidth = (float) LineWidth,
+                StrokeMiter = 4,
+                BlendMode = SKBlendMode.SrcOver,
+                IsAntialias = true,
+                IsDither = true,
+                StrokeCap = SKStrokeCap.Butt,
+                StrokeJoin = SKStrokeJoin.Miter,
+                FilterQuality = SKFilterQuality.None
+            };
         }
 
         public void StrokeRect(double x, double y, double w, double h)
         {
-            using (var paint = CreatePaint())
-            {
-                paint.Style = SKPaintStyle.Stroke;
-                paint.StrokeWidth = (float) LineWidth;
-                _surface.Canvas.DrawRect(SKRect.Create((int) x, (int) y, (float) w, (float) h),
-                    paint);
-            }
+            using var paint = CreatePaint();
+            paint.Style = SKPaintStyle.Stroke;
+            paint.StrokeWidth = (float) LineWidth;
+            _surface.Canvas.DrawRect(SKRect.Create((int) x, (int) y, (float) w, (float) h),
+                paint);
         }
 
         public void BeginPath()
@@ -375,25 +368,24 @@ namespace AlphaTab.Platform.CSharp
             {
                 case TextBaseline.Top: // Hanging
                 {
-                    var (ascDesc, _) = AscentDescent(font.Metrics);
-                    return ascDesc * HangingAsPercentOfAscent / 100.0f;
+                    return FloatAscent(font.Metrics) * HangingAsPercentOfAscent / 100.0f;
                 }
                 case TextBaseline.Middle:
                 {
                     var (emHeightAscent, emHeightDescent) = EmHeightAcentDescent(font);
-                    return (emHeightAscent.ToFloat() - emHeightDescent.ToFloat()) / 2.0f;
+                    return (emHeightAscent - emHeightDescent) / 2.0f;
                 }
                 case TextBaseline.Bottom:
                 {
                     var (_, emHeightDescent) = EmHeightAcentDescent(font);
-                    return -emHeightDescent.ToFloat();
+                    return -emHeightDescent;
                 }
                 default:
                     return 0;
             }
         }
 
-        private (LayoutUnit ascent, LayoutUnit descent) EmHeightAcentDescent(SKFont font)
+        private (float ascent, float descent) EmHeightAcentDescent(SKFont font)
         {
             var typeface = font.Typeface;
             var (typoAscent, typeDecent) = TypoAscenderDescender(typeface);
@@ -401,32 +393,33 @@ namespace AlphaTab.Platform.CSharp
                 NormalizeEmHeightMetrics(font, typoAscent, typoAscent + typeDecent,
                     out var normTypoAsc, out var normTypoDesc))
             {
-                return (normTypoAsc!, normTypoDesc!);
+                return (normTypoAsc, normTypoDesc);
             }
 
-            var (metricAscent, metricDescent) = AscentDescent(font.Metrics);
+            var metricAscent = FloatAscent(font.Metrics);
+            var metricDescent = FloatDescent(font.Metrics);
             if (NormalizeEmHeightMetrics(font, metricAscent, metricAscent + metricDescent,
                 out var normAsc, out var normDesc))
             {
-                return (normAsc!, normDesc!);
+                return (normAsc, normDesc);
             }
 
             throw new InvalidOperationException("Cannot compute ascent and descent");
         }
 
         private bool NormalizeEmHeightMetrics(SKFont font, float ascent, float height,
-            out LayoutUnit? emHeightAscent, out LayoutUnit? emHeightDescent)
+            out float emHeightAscent, out float emHeightDescent)
         {
             if (height <= 0 || ascent < 0 || ascent > height)
             {
-                emHeightAscent = null;
-                emHeightDescent = null;
+                emHeightAscent = float.NaN;
+                emHeightDescent = float.NaN;
                 return false;
             }
 
             var emHeight = font.Size;
-            emHeightAscent = LayoutUnit.FromFloatRound(ascent * emHeight / height);
-            emHeightDescent = LayoutUnit.FromFloatRound(emHeight) - emHeightAscent;
+            emHeightAscent = ascent * emHeight / height;
+            emHeightDescent = emHeight - emHeightAscent;
             return true;
         }
 
@@ -452,57 +445,25 @@ namespace AlphaTab.Platform.CSharp
             return (0, 0);
         }
 
-        private class LayoutUnit
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private float FloatAscent(SKFontMetrics metrics)
         {
-            private int _value;
-            private const int LayoutUnitFractionalBits = 6;
-            private const int FixedPointDenominator = 1 << LayoutUnitFractionalBits;
-
-            public float ToFloat()
-            {
-                return (float) _value / FixedPointDenominator;
-            }
-
-            public static LayoutUnit FromFloatRound(float value)
-            {
-                return new LayoutUnit
-                {
-                    _value = (int) (float) Math.Round(value * FixedPointDenominator)
-                };
-            }
-
-            public static LayoutUnit operator -(LayoutUnit a, LayoutUnit b)
-            {
-                return new LayoutUnit {_value = a._value - b._value};
-            }
+            return SkScalarRoundToScalar(-metrics.Ascent);
         }
 
-        private (float ascent, float descent) AscentDescent(SKFontMetrics metrics)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private float FloatDescent(SKFontMetrics metrics)
         {
-            float ascent;
-            float descent;
-            if (-metrics.Ascent < 3 || -metrics.Ascent + metrics.Descent < 2)
-            {
-                // For tiny fonts, the rounding of fAscent and fDescent results in equal
-                // baseline for different types of text baselines (crbug.com/338908).
-                // Please see CanvasRenderingContext2D::getFontBaseline for the heuristic.
-                ascent = -metrics.Ascent;
-                descent = metrics.Descent;
-            }
-            else
-            {
-                ascent = SkScalarRoundToScalar(-metrics.Ascent);
-                descent = SkScalarRoundToScalar(metrics.Descent);
-            }
-
-            return (ascent, descent);
+            return SkScalarRoundToScalar(metrics.Descent);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private float SkScalarRoundToScalar(float x)
         {
             return (float) Math.Floor(x + 0.5f);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint GetIntTag(string v)
         {
             return
