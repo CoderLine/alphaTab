@@ -6,10 +6,11 @@ import CSharpEmitterContext from './CSharpEmitterContext';
 
 export default class CSharpAstPrinter {
     private _sourceFile: cs.SourceFile;
-    private _fileHandle!: number;
     private _isStartOfLine: boolean = true;
     private _indent: number = 0;
     private _context: CSharpEmitterContext;
+
+    private _source = '';
 
     public diagnostics: ts.Diagnostic[] = [];
 
@@ -20,11 +21,11 @@ export default class CSharpAstPrinter {
 
     public print() {
         fs.mkdirSync(path.dirname(this._sourceFile.fileName), { recursive: true });
-        this._fileHandle = fs.openSync(this._sourceFile.fileName, 'w');
         try {
+            this._source = '';
             this.writeSourceFile(this._sourceFile);
         } finally {
-            fs.closeSync(this._fileHandle);
+            fs.writeFileSync(this._sourceFile.fileName, this._source);
         }
     }
 
@@ -248,7 +249,7 @@ export default class CSharpAstPrinter {
 
                     baseClass =
                         baseClassDeclaration.baseClass &&
-                            baseClassDeclaration.baseClass.nodeType === cs.SyntaxKind.TypeReference
+                        baseClassDeclaration.baseClass.nodeType === cs.SyntaxKind.TypeReference
                             ? (baseClassDeclaration.baseClass as cs.TypeReference).reference
                             : undefined;
                 } else {
@@ -278,12 +279,12 @@ export default class CSharpAstPrinter {
                 defaultConstructor.parameters = constructorDeclaration.parameters;
                 defaultConstructor.baseConstructorArguments = constructorDeclaration.parameters.map(
                     p =>
-                    ({
-                        parent: defaultConstructor,
-                        nodeType: cs.SyntaxKind.Identifier,
-                        text: p.name,
-                        tsNode: defaultConstructor.tsNode
-                    } as cs.Identifier)
+                        ({
+                            parent: defaultConstructor,
+                            nodeType: cs.SyntaxKind.Identifier,
+                            text: p.name,
+                            tsNode: defaultConstructor.tsNode
+                        } as cs.Identifier)
                 );
                 this.writeMember(defaultConstructor);
             }
@@ -443,7 +444,7 @@ export default class CSharpAstPrinter {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
         if (d.isStatic) {
-            this.write('static ')
+            this.write('static ');
         }
         this.write(`${(d.parent as cs.ClassDeclaration).name}`);
         this.writeParameters(d.parameters);
@@ -523,8 +524,11 @@ export default class CSharpAstPrinter {
     }
 
     private writePropertyAsField(d: cs.PropertyDeclaration) {
-        if (d.parent!.nodeType === cs.SyntaxKind.ClassDeclaration && d.visibility === cs.Visibility.Private &&
-            (!d.getAccessor || !d.getAccessor.body)) {
+        if (
+            d.parent!.nodeType === cs.SyntaxKind.ClassDeclaration &&
+            d.visibility === cs.Visibility.Private &&
+            (!d.getAccessor || !d.getAccessor.body)
+        ) {
             return true;
         }
         return this.canBeConstant(d);
@@ -560,7 +564,12 @@ export default class CSharpAstPrinter {
         this.writeLine(';');
     }
 
-    private writeType(type: cs.TypeNode, forNew: boolean = false, asNativeArray: boolean = false, forTypeConstraint: boolean = false) {
+    private writeType(
+        type: cs.TypeNode,
+        forNew: boolean = false,
+        asNativeArray: boolean = false,
+        forTypeConstraint: boolean = false
+    ) {
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
                 if (forTypeConstraint) {
@@ -613,8 +622,9 @@ export default class CSharpAstPrinter {
                     this.writeType(arrayType.elementType);
                     this.write('[]');
                 } else {
-                    const isDynamicArray = arrayType.elementType.nodeType == cs.SyntaxKind.PrimitiveTypeNode
-                        && (arrayType.elementType as cs.PrimitiveTypeNode).type == cs.PrimitiveType.Dynamic;
+                    const isDynamicArray =
+                        arrayType.elementType.nodeType == cs.SyntaxKind.PrimitiveTypeNode &&
+                        (arrayType.elementType as cs.PrimitiveTypeNode).type == cs.PrimitiveType.Dynamic;
                     if (isDynamicArray && !forNew) {
                         this.write('System.Collections.IList');
                     } else {
@@ -626,7 +636,6 @@ export default class CSharpAstPrinter {
                         this.writeType(arrayType.elementType);
                         this.write('>');
                     }
-
                 }
 
                 break;
@@ -883,7 +892,7 @@ export default class CSharpAstPrinter {
         exprs.forEach(expr => {
             this.write(', ');
             this.writeExpression(expr);
-        })
+        });
         this.write(')');
     }
 
@@ -923,8 +932,7 @@ export default class CSharpAstPrinter {
                 this.writeExpression(expr.sizeExpression!);
                 this.write(']');
             }
-        }
-        else if (expr.values && expr.values.length > 0) {
+        } else if (expr.values && expr.values.length > 0) {
             this.write('AlphaTab.Core.TypeHelper.CreateList(');
             this.writeCommaSeparated(expr.values, v => {
                 if (expr.values!.length > 10) {
@@ -1269,7 +1277,7 @@ export default class CSharpAstPrinter {
                         this.write(', ');
                     }
                     this.write(v);
-                })
+                });
                 this.write(')');
             } else {
                 this.write(d.name);
@@ -1328,13 +1336,13 @@ export default class CSharpAstPrinter {
 
     private write(txt: string) {
         this.writeIndent();
-        fs.writeSync(this._fileHandle, txt);
+        this._source += txt;
         this._isStartOfLine = false;
     }
 
     private writeIndent() {
         if (this._isStartOfLine && this._indent > 0) {
-            fs.writeSync(this._fileHandle, this._indent === 1 ? '    ' : '    '.repeat(this._indent));
+            this._source += (this._indent === 1 ? '    ' : '    '.repeat(this._indent));
             this._isStartOfLine = false;
         }
     }

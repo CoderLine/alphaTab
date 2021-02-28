@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using AlphaTab.Core;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Importer;
 using AlphaTab.Io;
@@ -14,10 +12,10 @@ using SkiaSharp;
 
 namespace AlphaTab.VisualTests
 {
-    public class VisualTestHelper
+    public static class VisualTestHelper
     {
         public static async Task RunVisualTest(string inputFile, Settings? settings = null,
-            IList<double>? tracks = null, string? message = null)
+            IList<double>? tracks = null, string? message = null, int tolerancePercent = 1)
         {
             try
             {
@@ -27,8 +25,8 @@ namespace AlphaTab.VisualTests
                 var referenceFileName = TestPlatform.ChangeExtension(inputFile, ".png");
                 var score = ScoreLoader.LoadScoreFromBytes(inputFileData, settings);
 
-                await VisualTestHelper.RunVisualTestScore(score, referenceFileName, settings,
-                    tracks, message);
+                await RunVisualTestScore(score, referenceFileName, settings,
+                    tracks, message, tolerancePercent);
             }
             catch (Exception e)
             {
@@ -42,16 +40,13 @@ namespace AlphaTab.VisualTests
         {
             try
             {
-                if (settings == null)
-                {
-                    settings = new Settings();
-                }
+                settings ??= new Settings();
 
                 var importer = new AlphaTexImporter();
                 importer.Init(ByteBuffer.FromString(tex), settings);
                 var score = importer.ReadScore();
 
-                await VisualTestHelper.RunVisualTestScore(score, referenceFileName, settings,
+                await RunVisualTestScore(score, referenceFileName, settings,
                     tracks, message);
             }
             catch (Exception e)
@@ -62,25 +57,19 @@ namespace AlphaTab.VisualTests
 
         public static async Task RunVisualTestScore(Score score, string referenceFileName,
             Settings? settings = null,
-            IList<double>? tracks = null, string? message = null)
+            IList<double>? tracks = null, string? message = null, int tolerancePercent = 1)
         {
-            if (settings == null)
-            {
-                settings = new Settings();
-            }
-
-            if (tracks == null)
-            {
-                tracks = new List<double> {0};
-            }
+            settings ??= new Settings();
+            tracks ??= new List<double> {0};
 
             settings.Core.Engine = "skia";
             settings.Core.EnableLazyLoading = false;
             settings.Core.UseWorkers = false;
 
-			if(!referenceFileName.StartsWith("test-data/")) {
-				referenceFileName = $"test-data/visual-tests/{referenceFileName}";
-			}
+            if (!referenceFileName.StartsWith("test-data/"))
+            {
+                referenceFileName = $"test-data/visual-tests/{referenceFileName}";
+            }
 
             var referenceFileData =
                 await TestPlatform.LoadFile(referenceFileName);
@@ -90,8 +79,10 @@ namespace AlphaTab.VisualTests
             var totalHeight = 0.0;
 
             var task = new TaskCompletionSource<object?>();
-            var renderer = new ScoreRenderer(settings);
-            renderer.Width = 1300;
+            var renderer = new ScoreRenderer(settings)
+            {
+                Width = 1300
+            };
 
             renderer.PartialRenderFinished.On(e =>
             {
@@ -108,7 +99,10 @@ namespace AlphaTab.VisualTests
                 task.SetResult(null);
             });
             renderer.Error.On((e) => { task.SetException(e); });
-            renderer.RenderScore(score, tracks);
+
+            var renderScore =
+                JsonConverter.JsObjectToScore(JsonConverter.ScoreToJsObject(score), settings);
+            renderer.RenderScore(renderScore, tracks);
 
             if (await Task.WhenAny(task.Task, Task.Delay(2000)) == task.Task)
             {
@@ -118,7 +112,8 @@ namespace AlphaTab.VisualTests
                     result,
                     referenceFileName,
                     referenceFileData,
-                    message
+                    message,
+                    tolerancePercent
                 );
             }
             else
@@ -129,14 +124,8 @@ namespace AlphaTab.VisualTests
 
         private static void CompareVisualResult(double totalWidth, double totalHeight,
             List<RenderFinishedEventArgs> result, string referenceFileName,
-            Uint8Array referenceFileData, string? message)
+            Uint8Array referenceFileData, string? message, int tolerancePercent = 1)
         {
-            // TODO: get Skia to render like Chrome
-            // https://github.com/mono/SkiaSharp/issues/1253
-            return;
-
-            // ReSharper disable once HeuristicUnreachableCode
-#pragma warning disable 162
             SKBitmap finalBitmap;
 
             using (var finalImageSurface = SKSurface.Create(new SKImageInfo((int) totalWidth,
@@ -179,7 +168,7 @@ namespace AlphaTab.VisualTests
 
                 using (var fileStream = new SKFileWStream(finalImageFileName))
                 {
-                    SKPixmap.Encode(fileStream, finalBitmap, SKEncodedImageFormat.Png, 100);
+                    finalBitmap.Encode(fileStream, SKEncodedImageFormat.Png, 100);
                 }
 
                 SKBitmap referenceBitmap;
@@ -190,38 +179,63 @@ namespace AlphaTab.VisualTests
 
                 using (referenceBitmap)
                 {
-                    var compareResult = PixelMatch.Run(finalBitmap, referenceBitmap,
-                        new PixelMatchOptions
-                        {
-                            Threshold = 0.8,
-                            IncludeAntiAlias = false,
-                            IgnoreTransparent = true,
-                            CreateOutputImage = true
-                        });
-
-
-                    using (compareResult.Output)
+                    try
                     {
-                        Assert.IsTrue(compareResult.SizesMatch, "Dimensions differ");
-                        if (compareResult.Mismatch > 0.01)
+                        var diffData = new Uint8Array(finalBitmap.Bytes.Length);
+                        var match = PixelMatch.Match(
+                            new Uint8Array(referenceBitmap.Bytes),
+                            new Uint8Array(finalBitmap.Bytes),
+                            diffData,
+                            referenceBitmap.Width,
+                            referenceBitmap.Height,
+                            new PixelMatchOptions
+                            {
+                                Threshold = 0.3,
+                                IncludeAA = false,
+                                DiffMask = true,
+                                Alpha = 1
+                            });
+
+                        var totalPixels = match.TotalPixels - match.TransparentPixels;
+                        var percentDifference = (match.DifferentPixels / totalPixels) * 100;
+                        var pass = percentDifference < tolerancePercent;
+                        if (!pass)
                         {
+                            var percentDifferenceText = percentDifference.ToString("0.00");
+                            var msg =
+                                $"Difference between original and new image is too big: {match.DifferentPixels}/${totalPixels} ({percentDifferenceText}%) ${message}";
+
                             var diffImageName =
                                 Path.ChangeExtension(referenceFileName, ".diff.png");
                             using (var fileStream = new SKFileWStream(diffImageName))
                             {
-                                SKPixmap.Encode(fileStream, compareResult.Output,
+                                var diff = SKBitmap.FromImage(
+                                    SKImage.FromPixels(referenceBitmap.Info,
+                                        SKData.Create(new MemoryStream(diffData.Data.Array!)))
+                                );
+                                diff?.Encode(fileStream,
                                     SKEncodedImageFormat.Png, 100);
                             }
 
-                            Assert.Fail(
-                                $"Difference between original and new image is too big: {compareResult.Mismatch:P}, {compareResult.DifferentPixels}/{compareResult.TotalPixels}");
+                            var newImageName =
+                                Path.ChangeExtension(referenceFileName, ".new.png");
+                            using (var fileStream = new SKFileWStream(newImageName))
+                            {
+                                finalBitmap.Encode(fileStream,
+                                    SKEncodedImageFormat.Png, 100);
+                            }
+
+                            Assert.Fail(msg);
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        Assert.Fail($"Error comparing images: {e}, ${message}");
                     }
                 }
             }
 
             File.Delete(finalImageFileName);
-#pragma warning restore 162
         }
     }
 }

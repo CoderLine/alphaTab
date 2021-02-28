@@ -11,6 +11,8 @@
         <TargetFramework>netstandard20</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>8</LangVersion>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,7 +27,8 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-      <PackageReference Include="SkiaSharp" Version="1.68.1.1" />
-      <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+      <PackageReference Include="SkiaSharp" Version="2.80.2" />
+      <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.80.2" />
+      <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
     </ItemGroup>
 </Project>

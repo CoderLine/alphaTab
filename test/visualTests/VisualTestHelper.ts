@@ -8,7 +8,7 @@ import { Environment } from '@src/Environment';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { PixelMatch } from './PixelMatch';
+import { PixelMatch, PixelMatchOptions } from './PixelMatch';
 import { JsonConverter } from '@src/model/JsonConverter';
 
 /**
@@ -20,14 +20,15 @@ export class VisualTestHelper {
         inputFile: string,
         settings?: Settings,
         tracks?: number[],
-        message?: string
+        message?: string,
+        tolerancePercent: number = 1
     ): Promise<void> {
         try {
             const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
             const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
             let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
-            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message);
+            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message, tolerancePercent);
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
         }
@@ -38,7 +39,8 @@ export class VisualTestHelper {
         referenceFileName: string,
         settings?: Settings,
         tracks?: number[],
-        message?: string
+        message?: string,
+        tolerancePercent: number = 1
     ): Promise<void> {
         try {
             if (!settings) {
@@ -60,7 +62,8 @@ export class VisualTestHelper {
         referenceFileName: string,
         settings?: Settings,
         tracks?: number[],
-        message?: string
+        message?: string,
+        tolerancePercent: number = 1
     ): Promise<void> {
         try {
             if (!settings) {
@@ -151,7 +154,8 @@ export class VisualTestHelper {
                 result,
                 referenceFileName,
                 referenceFileData,
-                message
+                message,
+                tolerancePercent
             );
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
@@ -211,7 +215,8 @@ export class VisualTestHelper {
         result: RenderFinishedEventArgs[],
         referenceFileName: string,
         referenceFileData: Uint8Array,
-        message?: string
+        message?: string,
+        tolerancePercent: number = 1
     ): Promise<void> {
         // create final full image
         const actual = document.createElement('canvas');
@@ -263,7 +268,7 @@ export class VisualTestHelper {
             toEqualVisually: VisualTestHelper.toEqualVisually
         });
 
-        await (expectAsync(actual) as any).toEqualVisually(expected, referenceFileName, message);
+        await (expectAsync(actual) as any).toEqualVisually(expected, referenceFileName, message, tolerancePercent);
     }
 
     private static toEqualVisually(
@@ -275,7 +280,8 @@ export class VisualTestHelper {
                 actual: HTMLCanvasElement,
                 expected: HTMLCanvasElement,
                 expectedFileName: string,
-                message?: string
+                message?: string,
+                tolerancePercent: number = 1
             ): Promise<jasmine.CustomMatcherResult> {
                 const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
                 const oldActual = actual;
@@ -322,7 +328,7 @@ export class VisualTestHelper {
                             includeAA: false,
                             diffMask: true,
                             alpha: 1
-                        }
+                        } as PixelMatchOptions
                     );
 
                     diffContext.putImageData(diffImageData, 0, 0);
@@ -330,7 +336,7 @@ export class VisualTestHelper {
                     // only pixels that are not transparent are relevant for the diff-ratio
                     let totalPixels = match.totalPixels - match.transparentPixels;
                     let percentDifference = (match.differentPixels / totalPixels) * 100;
-                    result.pass = percentDifference < 1;
+                    result.pass = percentDifference < tolerancePercent;
                     // result.pass = match.differentPixels < 5;
 
                     if (!result.pass) {
