@@ -99,7 +99,10 @@ namespace AlphaTab.VisualTests
                 task.SetResult(null);
             });
             renderer.Error.On((e) => { task.SetException(e); });
-            renderer.RenderScore(score, tracks);
+
+            var renderScore =
+                JsonConverter.JsObjectToScore(JsonConverter.ScoreToJsObject(score), settings);
+            renderer.RenderScore(renderScore, tracks);
 
             if (await Task.WhenAny(task.Task, Task.Delay(2000)) == task.Task)
             {
@@ -109,7 +112,8 @@ namespace AlphaTab.VisualTests
                     result,
                     referenceFileName,
                     referenceFileData,
-                    message
+                    message,
+                    tolerancePercent
                 );
             }
             else
