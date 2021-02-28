@@ -7,7 +7,7 @@ export default class CSharpAstTransformer {
     protected _typeScriptFile: ts.SourceFile;
     protected _csharpFile: cs.SourceFile;
     protected _context: CSharpEmitterContext;
-    protected _currentClassElement: ts.ClassElement|null=null;
+    protected _currentClassElement: ts.ClassElement | null = null;
     protected _declarationOrAssignmentTypeStack: ts.Type[] = [];
 
     protected _testClassAttribute: string = 'microsoft.visualStudio.testTools.unitTesting.TestClass';
@@ -488,7 +488,7 @@ export default class CSharpAstTransformer {
             members: []
         };
 
-        if(this._testClassAttribute.length > 0) {
+        if (this._testClassAttribute.length > 0) {
             csClass.attributes = [
                 {
                     parent: csClass,
@@ -501,7 +501,7 @@ export default class CSharpAstTransformer {
                 }
             ];
         }
-     
+
         ((d.arguments![1] as ts.ArrowFunction).body as ts.Block).statements.forEach(s => {
             if (ts.isExpressionStatement(s)) {
                 if (ts.isCallExpression(s.expression)) {
@@ -844,7 +844,7 @@ export default class CSharpAstTransformer {
 
     protected visitClassElement(parent: cs.ClassDeclaration, classElement: ts.ClassElement) {
         let isSkipped = this.shouldSkip(classElement, false);
-        if(isSkipped) {
+        if (isSkipped) {
             this._context.processingSkippedElement = true;
         }
 
@@ -874,8 +874,7 @@ export default class CSharpAstTransformer {
 
         this._currentClassElement = null;
 
-
-        if(isSkipped) {
+        if (isSkipped) {
             this._context.processingSkippedElement = false;
         }
     }
@@ -1279,7 +1278,7 @@ export default class CSharpAstTransformer {
                 break;
         }
 
-        if(!csMethod.skipEmit) {
+        if (!csMethod.skipEmit) {
             parent.members.push(csMethod);
         }
 
@@ -1850,7 +1849,7 @@ export default class CSharpAstTransformer {
 
         classElement.parameters.forEach(p => this.visitMethodParameter(csMethod, p));
 
-        if(!csMethod.skipEmit) {
+        if (!csMethod.skipEmit) {
             parent.members.push(csMethod);
         }
 
@@ -2370,6 +2369,21 @@ export default class CSharpAstTransformer {
 
             if (!isLeftEnum || !isRightEnum) {
                 switch (expression.operatorToken.kind) {
+                    case ts.SyntaxKind.PlusToken:
+                    case ts.SyntaxKind.PlusEqualsToken:
+                        // string and number concatenation
+                        if (
+                            leftType.flags & ts.TypeFlags.Number &&
+                            rightType.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLiteral)
+                        ) {
+                            binaryExpression.left = this.toInvariantString(binaryExpression.left);
+                        } else if (
+                            rightType.flags & ts.TypeFlags.Number &&
+                            leftType.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLiteral)
+                        ) {
+                            binaryExpression.right = this.toInvariantString(binaryExpression.right);
+                        }
+                        break;
                     case ts.SyntaxKind.AmpersandToken:
                     case ts.SyntaxKind.GreaterThanGreaterThanToken:
                     case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
@@ -2401,7 +2415,7 @@ export default class CSharpAstTransformer {
                         }
                         if (expression.right.kind === ts.SyntaxKind.NumericLiteral) {
                             binaryExpression.right = this.makeDouble(binaryExpression.right);
-                        }                        
+                        }
                         break;
                 }
             }
@@ -3044,6 +3058,51 @@ export default class CSharpAstTransformer {
         });
 
         return objectLiteral;
+    }
+
+    protected toInvariantString(expr: cs.Expression): cs.Expression {
+        const callExpr = {
+            parent: expr.parent,
+            arguments: [],
+            expression: {} as cs.Expression,
+            nodeType: cs.SyntaxKind.InvocationExpression,
+            tsNode: expr.tsNode
+        } as cs.InvocationExpression;
+        const memberAccess = (callExpr.expression = {
+            expression: null!,
+            member: this._context.toPascalCase('toString'),
+            parent: callExpr,
+            tsNode: expr.tsNode,
+            nodeType: cs.SyntaxKind.MemberAccessExpression
+        } as cs.MemberAccessExpression);
+
+        const par = {
+            parent: memberAccess,
+            nodeType: cs.SyntaxKind.ParenthesizedExpression,
+            tsNode: expr.tsNode,
+            tsSymbol: expr.tsSymbol,
+            expression: expr
+        } as cs.ParenthesizedExpression;
+        expr.parent = par;
+        memberAccess.expression = par;
+
+        const invariantCultureInfo = {
+            parent: callExpr,
+            nodeType: cs.SyntaxKind.MemberAccessExpression,
+            tsNode: expr.tsNode,
+            expression: null!,
+            member: this._context.toPascalCase('invariantCulture')
+        } as cs.MemberAccessExpression;
+
+        invariantCultureInfo.expression = {
+            parent: invariantCultureInfo,
+            tsNode: expr.tsNode,
+            nodeType: cs.SyntaxKind.Identifier,
+            text: this._context.makeTypeName('system.globalization.CultureInfo')
+        } as cs.Identifier;
+        callExpr.arguments.push(invariantCultureInfo);
+
+        return callExpr;
     }
 
     protected visitElementAccessExpression(parent: cs.Node, expression: ts.ElementAccessExpression) {

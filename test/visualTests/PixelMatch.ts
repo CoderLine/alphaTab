@@ -107,17 +107,22 @@ export class PixelMatch {
 
         // check if images are identical
         const len = width * height;
-        const a32 = new Uint32Array(img1.buffer, img1.byteOffset, len);
-        const b32 = new Uint32Array(img2.buffer, img2.byteOffset, len);
+        const a32 = new DataView(img1.buffer);
+        const b32 = new DataView(img2.buffer);
         let identical = true;
         let transparentPixels = 0;
 
         for (let i = 0; i < len; i++) {
-            if (a32[i] !== b32[i]) {
+            if (a32.getInt32(i, true) !== b32.getInt32(i, true)) {
                 identical = false;
                 break;
             }
-            if ((a32[i] & 0xff000000) === 0xff000000) {
+            if (
+                a32.getUint8(i) === 0xff &&
+                a32.getUint8(i + 1) === 0 &&
+                a32.getUint8(i + 2) === 0 &&
+                a32.getUint8(i + 3) === 0
+            ) {
                 transparentPixels++;
             }
         }
@@ -339,7 +344,7 @@ export class PixelMatch {
         const r = img[i + 0];
         const g = img[i + 1];
         const b = img[i + 2];
-        const val = PixelMatch.blend(PixelMatch.rgb2y(r, g, b), (alpha * img[i + 3]) / 255);
-        PixelMatch.drawPixel(output, i, val, val, val);
+        const value = PixelMatch.blend(PixelMatch.rgb2y(r, g, b), (alpha * img[i + 3]) / 255);
+        PixelMatch.drawPixel(output, i, value, value, value);
     }
 }

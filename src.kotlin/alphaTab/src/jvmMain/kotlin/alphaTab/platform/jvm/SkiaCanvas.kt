@@ -1,6 +1,7 @@
 package alphaTab.platform.jvm
 
 import alphaTab.Settings
+import alphaTab.core.BitConverter
 import alphaTab.model.Color
 import alphaTab.model.Font
 import alphaTab.model.MusicFontSymbol
@@ -9,6 +10,7 @@ import alphaTab.platform.TextAlign
 import alphaTab.platform.TextBaseline
 import org.jetbrains.skija.*
 import org.jetbrains.skija.shaper.Shaper
+import java.lang.IllegalStateException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.math.floor
 
@@ -180,10 +182,11 @@ class SkiaCanvas : ICanvas {
 
     override fun fill() {
         createPaint().use {
-            it.strokeWidth = lineWidth.toFloat()
+            it.strokeWidth = 0f
             it.mode = PaintMode.FILL
             _surface.canvas.drawPath(_path!!, it)
         }
+        _path!!.reset()
     }
 
 
@@ -193,6 +196,7 @@ class SkiaCanvas : ICanvas {
             it.mode = PaintMode.STROKE
             _surface.canvas.drawPath(_path!!, it)
         }
+        _path!!.reset()
     }
 
     override fun beginGroup(identifier: String) {
@@ -208,19 +212,16 @@ class SkiaCanvas : ICanvas {
                 blob
             )
 
-            val yOffset = getFontBaseLine(
+            val fontBaseLine = getFontBaseLine(
                 textBaseline,
                 font
             )
 
-            // In Chrome some of the values are rounded with a +0.5f floor rounding
-            // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/platform/fonts/font_metrics.cc#L112
-            // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/modules/canvas/offscreencanvas2d/offscreen_canvas_rendering_context_2d.cc#L694
-            val ascent = floor(-font.metrics.ascent + 0.5f)
+            val ascent = floatAscent(font.metrics)
             _surface.canvas.drawTextBlob(
                 blob,
                 x.toFloat() + xOffset,
-                y.toFloat() + yOffset - ascent - font.metrics.leading,
+                y.toFloat() + fontBaseLine - ascent - skScalarRoundToScalar(font.metrics.leading),
                 paint
             )
         })
@@ -255,29 +256,80 @@ class SkiaCanvas : ICanvas {
         // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/core/html/canvas/text_metrics.cc#L14
         return when (textBaseline) {
             TextBaseline.Top -> // kHangingTextBaseline
-                return -font.metrics.ascent * HangingAsPercentOfAscent / 100.0f
+                return floatAscent(font.metrics) * HangingAsPercentOfAscent / 100.0f
             TextBaseline.Middle -> {// kMiddleTextBaseline
-                val normalized = computeNormalizedTypoAscentAndDescent(font)
-                return (normalized[0] - normalized[1]) / 2.0f
+                val (emHeightAscent, emHeightDescent) = emHeightAscentDescent(font)
+                return (emHeightAscent - emHeightDescent) / 2.0f
             }
             TextBaseline.Bottom -> {// kBottomTextBaseline
-                val normalized = computeNormalizedTypoAscentAndDescent(font)
-                return -normalized[1]
+                val (_, emHeightDescent) = emHeightAscentDescent(font)
+                return -emHeightDescent
             }
             else -> 0.0f
         }
     }
 
-    private fun computeNormalizedTypoAscentAndDescent(font: org.jetbrains.skija.Font): Array<Float> {
-        // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/platform/fonts/simple_font_data.cc#L330
-        val ascent: Float = -font.metrics.ascent
-        val descent: Float = font.metrics.descent
-        val emHeight: Float = font.size
-        val height = ascent + descent
+    private fun emHeightAscentDescent(font: org.jetbrains.skija.Font): Pair<Float, Float> {
+        val typeface = font.typeface!!
+        val (typoAscent, typeDecent) = typoAscenderDescender(typeface)
+        if (typoAscent > 0) {
+            val normalized = normalizeEmHeightMetrics(
+                font,
+                typoAscent.toFloat(),
+                (typoAscent + typeDecent).toFloat()
+            )
+            if (normalized != null) {
+                return normalized
+            }
+        }
 
-        val normalizedAscent = ascent * emHeight / height
-        val normalizedDescent = emHeight - normalizedAscent
-        return arrayOf(normalizedAscent, normalizedDescent)
+        val metrics = font.metrics
+        val metricAscent = floatAscent(metrics)
+        val metricDescent = floatDescent(metrics)
+        val normalized = normalizeEmHeightMetrics(font, metricAscent, metricAscent + metricDescent)
+        if (normalized != null) {
+            return normalized
+        }
+
+        throw IllegalStateException("Cannot compute ascent and descent")
+    }
+
+    private fun normalizeEmHeightMetrics(
+        font: org.jetbrains.skija.Font,
+        ascent: Float,
+        height: Float
+    ): Pair<Float, Float>? {
+        if (height <= 0 || ascent < 0 || ascent > height) {
+            return null
+        }
+
+        val emHeight = font.size
+        val emHeightAscent = ascent * emHeight / height
+        val emHeightDescent = emHeight - emHeightAscent
+        return Pair(emHeightAscent, emHeightDescent)
+    }
+
+    private fun typoAscenderDescender(typeface: Typeface): Pair<Short, Short> {
+        val buffer = typeface.getTableData("OS/2")
+        if (buffer != null && buffer.size >= 72) {
+            val ascender = BitConverter.getInt16 (buffer.bytes, 68, false)
+            val descender = -BitConverter.getInt16 (buffer.bytes, 70, false)
+            return Pair(ascender, descender.toShort())
+        }
+
+        return Pair(0.toShort(), 0.toShort())
+    }
+
+    private fun floatAscent(metrics: FontMetrics): Float {
+        return skScalarRoundToScalar(-metrics.ascent)
+    }
+
+    private fun floatDescent(metrics: FontMetrics): Float {
+        return skScalarRoundToScalar(metrics.descent)
+    }
+
+    private fun skScalarRoundToScalar(x: Float): Float {
+        return floor(x + 0.5f)
     }
 
     override fun measureText(text: String): Double {

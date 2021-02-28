@@ -20,5 +20,8 @@ expect class BitConverter {
 
         @kotlin.jvm.JvmStatic
         fun getUint32(src: ByteArray, pos: Int, littleEndian: Boolean): UInt
+
+        @kotlin.jvm.JvmStatic
+        fun getInt32(src: ByteArray, pos: Int, littleEndian: Boolean): Int
     }
 }

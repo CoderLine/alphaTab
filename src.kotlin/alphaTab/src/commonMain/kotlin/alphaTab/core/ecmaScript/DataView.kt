@@ -10,6 +10,10 @@ class DataView {
         this._buffer = buffer
     }
 
+    public fun getUint8(offset:Double): Double {
+        return _buffer.raw[offset.toInt()].toDouble()
+    }
+
     public fun setUint16(offset: Double, value: Double, littleEndian: Boolean) {
         BitConverter.put(
             _buffer.raw.asByteArray(),
@@ -35,6 +39,11 @@ class DataView {
 
     public fun getUint32(offset: Double, littleEndian: Boolean): Double {
         return BitConverter.getUint32(_buffer.raw.asByteArray(), offset.toInt(), littleEndian)
+            .toDouble()
+    }
+
+    public fun getInt32(offset: Double, littleEndian: Boolean): Double {
+        return BitConverter.getInt32(_buffer.raw.asByteArray(), offset.toInt(), littleEndian)
             .toDouble()
     }
 

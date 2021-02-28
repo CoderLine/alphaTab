@@ -12,7 +12,7 @@ using SkiaSharp;
 
 namespace AlphaTab.VisualTests
 {
-    public static class VisualTestHelper
+    partial class VisualTestHelper
     {
         public static async Task RunVisualTest(string inputFile, Settings? settings = null,
             IList<double>? tracks = null, string? message = null, int tolerancePercent = 1)

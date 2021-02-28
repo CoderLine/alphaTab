@@ -55,5 +55,13 @@ actual class BitConverter {
                 .getInt(pos)
                 .toUInt()
         }
+
+        @kotlin.jvm.JvmStatic
+        public actual fun getInt32(src: ByteArray, pos: Int, littleEndian: Boolean): Int {
+            return ByteBuffer
+                .wrap(src)
+                .order(if (littleEndian) ByteOrder.LITTLE_ENDIAN else ByteOrder.BIG_ENDIAN)
+                .getInt(pos)
+        }
     }
 }

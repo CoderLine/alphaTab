@@ -372,12 +372,12 @@ namespace AlphaTab.Platform.CSharp
                 }
                 case TextBaseline.Middle:
                 {
-                    var (emHeightAscent, emHeightDescent) = EmHeightAcentDescent(font);
+                    var (emHeightAscent, emHeightDescent) = EmHeightAscentDescent(font);
                     return (emHeightAscent - emHeightDescent) / 2.0f;
                 }
                 case TextBaseline.Bottom:
                 {
-                    var (_, emHeightDescent) = EmHeightAcentDescent(font);
+                    var (_, emHeightDescent) = EmHeightAscentDescent(font);
                     return -emHeightDescent;
                 }
                 default:
@@ -385,7 +385,7 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
-        private (float ascent, float descent) EmHeightAcentDescent(SKFont font)
+        private (float ascent, float descent) EmHeightAscentDescent(SKFont font)
         {
             var typeface = font.Typeface;
             var (typoAscent, typeDecent) = TypoAscenderDescender(typeface);
