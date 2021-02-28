@@ -6,10 +6,11 @@ import CSharpEmitterContext from './CSharpEmitterContext';
 
 export default class CSharpAstPrinter {
     private _sourceFile: cs.SourceFile;
-    private _fileHandle!: number;
     private _isStartOfLine: boolean = true;
     private _indent: number = 0;
     private _context: CSharpEmitterContext;
+
+    private _source = '';
 
     public diagnostics: ts.Diagnostic[] = [];
 
@@ -20,11 +21,11 @@ export default class CSharpAstPrinter {
 
     public print() {
         fs.mkdirSync(path.dirname(this._sourceFile.fileName), { recursive: true });
-        this._fileHandle = fs.openSync(this._sourceFile.fileName, 'w');
         try {
+            this._source = '';
             this.writeSourceFile(this._sourceFile);
         } finally {
-            fs.closeSync(this._fileHandle);
+            fs.writeFileSync(this._sourceFile.fileName, this._source);
         }
     }
 
@@ -1335,13 +1336,13 @@ export default class CSharpAstPrinter {
 
     private write(txt: string) {
         this.writeIndent();
-        fs.writeSync(this._fileHandle, txt);
+        this._source += txt;
         this._isStartOfLine = false;
     }
 
     private writeIndent() {
         if (this._isStartOfLine && this._indent > 0) {
-            fs.writeSync(this._fileHandle, this._indent === 1 ? '    ' : '    '.repeat(this._indent));
+            this._source += (this._indent === 1 ? '    ' : '    '.repeat(this._indent));
             this._isStartOfLine = false;
         }
     }
