@@ -21,7 +21,7 @@ export class AlphaTabWebWorker {
     }
 
     public static init(): void {
-        Environment.globalThis.alphaTabWebWorker = new AlphaTabWebWorker(Environment.globalThis as IWorkerScope);
+        (Environment.globalThis as any).alphaTabWebWorker = new AlphaTabWebWorker(Environment.globalThis as IWorkerScope);
     }
 
     private handleMessage(e: MessageEvent): void {

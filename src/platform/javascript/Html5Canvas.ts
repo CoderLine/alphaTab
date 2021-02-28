@@ -148,10 +148,12 @@ export class Html5Canvas implements ICanvas {
 
     public fill(): void {
         this._context.fill();
+        this._context.beginPath();
     }
 
     public stroke(): void {
         this._context.stroke();
+        this._context.beginPath();
     }
 
     public get font(): Font {

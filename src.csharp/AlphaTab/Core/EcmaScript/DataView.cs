@@ -4,11 +4,11 @@ namespace AlphaTab.Core.EcmaScript
 {
     public class DataView
     {
-        private readonly ArrayBuffer _buffer;
+        public ArrayBuffer Buffer { get; }
 
         public DataView(ArrayBuffer buffer)
         {
-            _buffer = buffer;
+            Buffer = buffer;
         }
 
         public void SetUint16(double offset, double value, bool littleEndian)
@@ -19,14 +19,14 @@ namespace AlphaTab.Core.EcmaScript
                 System.Array.Reverse(bytes);
             }
 
-            Buffer.BlockCopy(bytes, 0, _buffer.Raw.Array, _buffer.Raw.Offset + (int) offset,
+            System.Buffer.BlockCopy(bytes, 0, Buffer.Raw.Array, Buffer.Raw.Offset + (int) offset,
                 bytes.Length);
         }
 
         public double GetInt16(double offset, bool littleEndian)
         {
             var bytes = new byte[sizeof(short)];
-            Buffer.BlockCopy(_buffer.Raw.Array, _buffer.Raw.Offset + (int) offset, bytes, 0,
+            System.Buffer.BlockCopy(Buffer.Raw.Array, Buffer.Raw.Offset + (int) offset, bytes, 0,
                 bytes.Length);
             if (littleEndian != BitConverter.IsLittleEndian)
             {
@@ -44,14 +44,14 @@ namespace AlphaTab.Core.EcmaScript
                 System.Array.Reverse(bytes);
             }
 
-            Buffer.BlockCopy(bytes, 0, _buffer.Raw.Array, _buffer.Raw.Offset + (int) offset,
+            System.Buffer.BlockCopy(bytes, 0, Buffer.Raw.Array, Buffer.Raw.Offset + (int) offset,
                 bytes.Length);
         }
 
         public double GetUint32(double offset, bool littleEndian)
         {
             var bytes = new byte[sizeof(uint)];
-            Buffer.BlockCopy(_buffer.Raw.Array, _buffer.Raw.Offset + (int) offset, bytes, 0,
+            System.Buffer.BlockCopy(Buffer.Raw.Array, Buffer.Raw.Offset + (int) offset, bytes, 0,
                 bytes.Length);
             if (littleEndian != BitConverter.IsLittleEndian)
             {
@@ -69,14 +69,14 @@ namespace AlphaTab.Core.EcmaScript
                 System.Array.Reverse(bytes);
             }
 
-            Buffer.BlockCopy(bytes, 0, _buffer.Raw.Array, _buffer.Raw.Offset + (int) offset, bytes
+            System.Buffer.BlockCopy(bytes, 0, Buffer.Raw.Array, Buffer.Raw.Offset + (int) offset, bytes
                 .Length);
         }
 
         public double GetUint16(double offset, bool littleEndian)
         {
             var bytes = new byte[sizeof(ushort)];
-            Buffer.BlockCopy(_buffer.Raw.Array, _buffer.Raw.Offset + (int) offset, bytes, 0,
+            System.Buffer.BlockCopy(Buffer.Raw.Array, Buffer.Raw.Offset + (int) offset, bytes, 0,
                 bytes.Length);
             if (littleEndian != BitConverter.IsLittleEndian)
             {
@@ -88,12 +88,25 @@ namespace AlphaTab.Core.EcmaScript
 
         public void SetUint8(double offset, double value)
         {
-            _buffer.Raw.Array[_buffer.Raw.Offset + (int) offset] = (byte) value;
+            Buffer.Raw.Array[Buffer.Raw.Offset + (int) offset] = (byte) value;
         }
 
         public double GetInt8(double offset)
         {
-            return (sbyte) _buffer.Raw.Array[_buffer.Raw.Offset + (int) offset];
+            return (sbyte) Buffer.Raw.Array[Buffer.Raw.Offset + (int) offset];
+        }
+
+        public double SetUint32(double offset, double value, bool littleEndian)
+        {
+            var bytes = BitConverter.GetBytes((uint)value);
+            if (littleEndian != BitConverter.IsLittleEndian)
+            {
+                System.Array.Reverse(bytes);
+            }
+
+            System.Buffer.BlockCopy(bytes, 0, Buffer.Raw.Array, Buffer.Raw.Offset + (int) offset, bytes
+                .Length);
+            return value;
         }
     }
 }

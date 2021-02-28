@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using AlphaTab.Model;
-using AlphaTab.Rendering.Glyphs;
+using HarfBuzzSharp;
 using SkiaSharp;
+using Font = AlphaTab.Model.Font;
+using Math = System.Math;
 using String = AlphaTab.Core.EcmaScript.String;
 
 namespace AlphaTab.Platform.CSharp
 {
-    internal class SkiaCanvas : ICanvas
+    internal sealed class SkiaCanvas : ICanvas
     {
         private static readonly SKTypeface MusicFont;
-        private static readonly int MusicFontSize = 34;
+        private const int MusicFontSize = 34;
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr LoadLibrary(string libname);
@@ -30,25 +33,23 @@ namespace AlphaTab.Platform.CSharp
                     // I think unix platforms should be fine, to be tested
                     break;
                 default:
-                    var libSkiaSharpPath = Path.GetDirectoryName(typeof(SkiaCanvas).Assembly.Location);
-                    if (IntPtr.Size == 4)
-                    {
-                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", "win-x86", "native", "libSkiaSharp.dll");
-                    }
-                    else
-                    {
-                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", "win-x64", "native", "libSkiaSharp.dll");
-                    }
+                    var libSkiaSharpPath =
+                        Path.GetDirectoryName(typeof(SkiaCanvas).Assembly.Location);
+                    var platformName = IntPtr.Size == 4 ? "win-x86" : "win-x64";
+                    libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", platformName,
+                        "native", "libSkiaSharp.dll");
 
                     Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "'");
                     var lib = LoadLibrary(libSkiaSharpPath);
                     if (lib == IntPtr.Zero)
                     {
-                        Logger.Warning("Skia", "Loading native lib from '" + libSkiaSharpPath + "' failed");
+                        Logger.Warning("Skia",
+                            "Loading native lib from '" + libSkiaSharpPath + "' failed");
                     }
                     else
                     {
-                        Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "' successful");
+                        Logger.Debug("Skia",
+                            "Loading native lib from '" + libSkiaSharpPath + "' successful");
                     }
 
                     break;
@@ -56,29 +57,27 @@ namespace AlphaTab.Platform.CSharp
 
             // attempt to load correct skia native lib
             var type = typeof(SkiaCanvas).GetTypeInfo();
-            using var bravura = type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf");
+            using var bravura =
+                type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf");
             MusicFont = SKTypeface.FromStream(bravura);
         }
 
-        private SKSurface _surface = null!;
-        private SKPath _path = null!;
+        private SKSurface? _surface;
+        private SKPath? _path;
         private string _typeFaceCache = "";
-        private SKTypeface _typeFace = null!;
+        private SKTypeface? _typeFace;
 
         public Color Color { get; set; }
         public double LineWidth { get; set; }
         public Font Font { get; set; }
 
-        public SKTypeface TypeFace
+        private SKTypeface TypeFace
         {
             get
             {
                 if (_typeFaceCache != Font.ToCssString(Settings.Display.Scale))
                 {
-                    if (_typeFace != null)
-                    {
-                        _typeFace.Dispose();
-                    }
+                    _typeFace?.Dispose();
 
                     _typeFaceCache = Font.ToCssString(Settings.Display.Scale);
                     _typeFace = SKTypeface.FromFamilyName(Font.Family,
@@ -109,19 +108,14 @@ namespace AlphaTab.Platform.CSharp
 
         public void BeginRender(double width, double height)
         {
-            var newImage = SKSurface.Create(new SKImageInfo((int)width,
-                (int)height,
+            var newImage = SKSurface.Create(new SKImageInfo((int) width,
+                (int) height,
                 SKImageInfo.PlatformColorType,
                 SKAlphaType.Premul));
             _surface = newImage;
 
-            if (_path != null)
-            {
-                _path.Dispose();
-            }
-
-            _path = new SKPath();
-            _path.FillType = SKPathFillType.Winding;
+            _path?.Dispose();
+            _path = new SKPath {FillType = SKPathFillType.Winding};
         }
 
         public object EndRender()
@@ -131,7 +125,7 @@ namespace AlphaTab.Platform.CSharp
             return image;
         }
 
-        public virtual object OnRenderFinished()
+        public object OnRenderFinished()
         {
             // nothing to do
             return null;
@@ -139,33 +133,36 @@ namespace AlphaTab.Platform.CSharp
 
         public void FillRect(double x, double y, double w, double h)
         {
-            using (var paint = CreatePaint())
-            {
-                paint.BlendMode = SKBlendMode.SrcOver;
-                _surface.Canvas.DrawRect(SKRect.Create((float)x, (float)y, (float)w, (float)h), paint);
-            }
+            using var paint = CreatePaint();
+            paint.Style = SKPaintStyle.Fill;
+            _surface.Canvas.DrawRect(SKRect.Create((int) x, (int) y, (float) w, (float) h),
+                paint);
         }
 
         private SKPaint CreatePaint()
         {
-            var paint = new SKPaint();
-            paint.IsAntialias = true;
-            paint.SubpixelText = true;
-            paint.DeviceKerningEnabled = true;
-            paint.Color = new SKColor((byte) Color.R, (byte) Color.G, (byte) Color.B,
-                (byte) Color.A);
-            return paint;
+            return new SKPaint
+            {
+                Color = new SKColor((byte) Color.R, (byte) Color.G, (byte) Color.B,
+                    (byte) Color.A),
+                StrokeWidth = (float) LineWidth,
+                StrokeMiter = 4,
+                BlendMode = SKBlendMode.SrcOver,
+                IsAntialias = true,
+                IsDither = true,
+                StrokeCap = SKStrokeCap.Butt,
+                StrokeJoin = SKStrokeJoin.Miter,
+                FilterQuality = SKFilterQuality.None
+            };
         }
 
         public void StrokeRect(double x, double y, double w, double h)
         {
-            using (var paint = CreatePaint())
-            {
-                paint.BlendMode = SKBlendMode.SrcOver;
-                paint.StrokeWidth = (float)LineWidth;
-                paint.IsStroke = true;
-                _surface.Canvas.DrawRect(SKRect.Create((float)x, (float)y, (float)w, (float)h), paint);
-            }
+            using var paint = CreatePaint();
+            paint.Style = SKPaintStyle.Stroke;
+            paint.StrokeWidth = (float) LineWidth;
+            _surface.Canvas.DrawRect(SKRect.Create((int) x, (int) y, (float) w, (float) h),
+                paint);
         }
 
         public void BeginPath()
@@ -180,28 +177,30 @@ namespace AlphaTab.Platform.CSharp
 
         public void MoveTo(double x, double y)
         {
-            _path.MoveTo((float)x, (float)y);
+            _path.MoveTo((float) x, (float) y);
         }
 
         public void LineTo(double x, double y)
         {
-            _path.LineTo((float)x, (float)y);
+            _path.LineTo((float) x, (float) y);
         }
 
         public void QuadraticCurveTo(double cpx, double cpy, double x, double y)
         {
-            _path.QuadTo((float)cpx, (float)cpy, (float)x, (float)y);
+            _path.QuadTo((float) cpx, (float) cpy, (float) x, (float) y);
         }
 
-        public void BezierCurveTo(double cp1X, double cp1Y, double cp2X, double cp2Y, double x, double y)
+        public void BezierCurveTo(double cp1X, double cp1Y, double cp2X, double cp2Y, double x,
+            double y)
         {
-            _path.CubicTo((float)cp1X, (float)cp1Y, (float)cp2X, (float)cp2Y, (float)x, (float)y);
+            _path.CubicTo((float) cp1X, (float) cp1Y, (float) cp2X, (float) cp2Y, (float) x,
+                (float) y);
         }
 
         public void FillCircle(double x, double y, double radius)
         {
             BeginPath();
-            _path.AddCircle((float)x, (float)y, (float)radius);
+            _path.AddCircle((float) x, (float) y, (float) radius);
             ClosePath();
             Fill();
         }
@@ -209,7 +208,7 @@ namespace AlphaTab.Platform.CSharp
         public void StrokeCircle(double x, double y, double radius)
         {
             BeginPath();
-            _path.AddCircle((float)x, (float)y, (float)radius);
+            _path.AddCircle((float) x, (float) y, (float) radius);
             ClosePath();
             Stroke();
         }
@@ -218,6 +217,7 @@ namespace AlphaTab.Platform.CSharp
         {
             using (var paint = CreatePaint())
             {
+                paint.Style = SKPaintStyle.Fill;
                 _surface.Canvas.DrawPath(_path, paint);
             }
 
@@ -228,8 +228,8 @@ namespace AlphaTab.Platform.CSharp
         {
             using (var paint = CreatePaint())
             {
-                paint.StrokeWidth = (float)LineWidth;
-                paint.IsStroke = true;
+                paint.Style = SKPaintStyle.Stroke;
+                paint.StrokeWidth = (float) LineWidth;
                 _surface.Canvas.DrawPath(_path, paint);
             }
 
@@ -244,47 +244,233 @@ namespace AlphaTab.Platform.CSharp
         {
         }
 
+        private const int SkiaToHarfBuzzFontSize = 1 << 16;
+        private const float HarfBuzzToSkiaFontSize = 1f / SkiaToHarfBuzzFontSize;
+
+        private static HarfBuzzSharp.Font MakeHarfBuzzFont(SKTypeface typeface, int size)
+        {
+            using var stream = typeface.OpenStream(out var ttcIndex);
+            var data = Marshal.AllocCoTaskMem(stream.Length);
+            stream.Read(data, stream.Length);
+            using var blob = new Blob(data, stream.Length, MemoryMode.ReadOnly,
+                () => { Marshal.FreeCoTaskMem(data); });
+            blob.MakeImmutable();
+
+            using var face = new Face(blob, ttcIndex)
+            {
+                Index = ttcIndex,
+                UnitsPerEm = typeface.UnitsPerEm
+            };
+
+            var font = new HarfBuzzSharp.Font(face);
+            var scale = size * SkiaToHarfBuzzFontSize;
+            font.SetScale(scale, scale);
+            font.SetFunctionsOpenType();
+            return font;
+        }
+
+
         public void FillText(string text, double x, double y)
         {
-            using (var paint = CreatePaint())
+            if (text.Length == 0)
             {
-                paint.Typeface = TypeFace;
-                paint.TextSize = (float)(Font.Size * Settings.Display.Scale);
-                switch (TextAlign)
-                {
-                    case TextAlign.Left:
-                        paint.TextAlign = SKTextAlign.Left;
-                        break;
-                    case TextAlign.Center:
-                        paint.TextAlign = SKTextAlign.Center;
-                        break;
-                    case TextAlign.Right:
-                        paint.TextAlign = SKTextAlign.Right;
-                        break;
-                }
+                return;
+            }
 
-                _surface.Canvas.DrawText(text, (int)x, (int)y + GetFontBaseline(TextBaseline, paint), paint);
+            TextRun(text, TypeFace, Font.Size, (blob, font, paint, width) =>
+            {
+                var xOffset = GetFontOffset(
+                    TextAlign,
+                    width
+                );
+
+                var fontBaseLine = GetFontBaseLine(
+                    TextBaseline,
+                    font
+                );
+
+                _surface.Canvas.DrawText(
+                    blob,
+                    (float) x + xOffset,
+                    (float) y + fontBaseLine,
+                    paint
+                );
+            });
+        }
+
+        private float GetFontOffset(TextAlign textAlign, float width)
+        {
+            return textAlign switch
+            {
+                TextAlign.Left => 0,
+                TextAlign.Center => -width / 2,
+                TextAlign.Right => -width,
+                _ => 0
+            };
+        }
+
+        private void TextRun(string text, SKTypeface typeFace, double size,
+            Action<SKTextBlob, SKFont, SKPaint, float> action)
+        {
+            using var paint = CreatePaint();
+            paint.Style = SKPaintStyle.Fill;
+            paint.Typeface = typeFace;
+            paint.TextSize = (float) (size * Settings.Display.Scale);
+
+            using var harfBuzzFont = MakeHarfBuzzFont(typeFace, (int) size);
+            using var buffer = new HarfBuzzSharp.Buffer
+            {
+                Direction = Direction.LeftToRight,
+                Language = Language.Default
+            };
+            buffer.AddUtf8(text);
+            harfBuzzFont.Shape(buffer);
+
+            var infos = buffer.GlyphInfos;
+            var positions = buffer.GlyphPositions;
+
+            using var skFont = paint.ToFont();
+            skFont.Edging = SKFontEdging.Antialias;
+            skFont.Subpixel = true;
+            skFont.Hinting = SKFontHinting.Normal;
+            skFont.Typeface = typeFace;
+            skFont.Size = (float) size;
+
+            using var blobBuilder = new SKTextBlobBuilder();
+            var runBuffer = blobBuilder.AllocatePositionedRun(skFont, infos.Length);
+
+            var glyphSpan = runBuffer.GetGlyphSpan();
+            var positionSpan = runBuffer.GetPositionSpan();
+
+            var width = 0.0f;
+            for (var i = 0; i < infos.Length; i++)
+            {
+                glyphSpan[i] = (ushort) infos[i].Codepoint;
+
+                var xOffset = width + HarfBuzzToSkiaFontSize * positions[i].XOffset;
+                var yOffset = HarfBuzzToSkiaFontSize * -positions[i].YOffset;
+                positionSpan[i] = new SKPoint(xOffset, yOffset);
+
+                width += HarfBuzzToSkiaFontSize * positions[i].XAdvance;
+            }
+
+            using var blob = blobBuilder.Build();
+            action(blob, skFont, paint, width);
+        }
+
+        private const int HangingAsPercentOfAscent = 80;
+
+        private float GetFontBaseLine(TextBaseline baseline, SKFont font)
+        {
+            // TextMetrics::GetFontBaseline
+            // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/core/html/canvas/text_metrics.cc#L14
+            switch (baseline)
+            {
+                case TextBaseline.Top: // Hanging
+                {
+                    return FloatAscent(font.Metrics) * HangingAsPercentOfAscent / 100.0f;
+                }
+                case TextBaseline.Middle:
+                {
+                    var (emHeightAscent, emHeightDescent) = EmHeightAcentDescent(font);
+                    return (emHeightAscent - emHeightDescent) / 2.0f;
+                }
+                case TextBaseline.Bottom:
+                {
+                    var (_, emHeightDescent) = EmHeightAcentDescent(font);
+                    return -emHeightDescent;
+                }
+                default:
+                    return 0;
             }
         }
 
-        private float GetFontBaseline(TextBaseline baseline, SKPaint paint)
+        private (float ascent, float descent) EmHeightAcentDescent(SKFont font)
         {
-            switch (baseline)
+            var typeface = font.Typeface;
+            var (typoAscent, typeDecent) = TypoAscenderDescender(typeface);
+            if (typoAscent > 0 &&
+                NormalizeEmHeightMetrics(font, typoAscent, typoAscent + typeDecent,
+                    out var normTypoAsc, out var normTypoDesc))
             {
-                case TextBaseline.Top: // TopTextBaseline
-                    // https://chromium.googlesource.com/chromium/blink/+/master/Source/modules/canvas2d/CanvasRenderingContext2D.cpp#2056
-                    // According to http://wiki.apache.org/xmlgraphics-fop/LineLayout/AlignmentHandling
-                    // "FOP (Formatting Objects Processor) puts the hanging baseline at 80% of the ascender height"
-                    return (-paint.FontMetrics.Ascent * 4) / 5;
-                case TextBaseline.Middle: // MiddleTextBaseline
-                    return -paint.FontMetrics.Descent + paint.TextSize / 2;
-                case TextBaseline.Bottom: // BottomTextBaseline
-                    return -paint.FontMetrics.Descent;
-                default:
-                    break;
+                return (normTypoAsc, normTypoDesc);
             }
 
-            return 0;
+            var metricAscent = FloatAscent(font.Metrics);
+            var metricDescent = FloatDescent(font.Metrics);
+            if (NormalizeEmHeightMetrics(font, metricAscent, metricAscent + metricDescent,
+                out var normAsc, out var normDesc))
+            {
+                return (normAsc, normDesc);
+            }
+
+            throw new InvalidOperationException("Cannot compute ascent and descent");
+        }
+
+        private bool NormalizeEmHeightMetrics(SKFont font, float ascent, float height,
+            out float emHeightAscent, out float emHeightDescent)
+        {
+            if (height <= 0 || ascent < 0 || ascent > height)
+            {
+                emHeightAscent = float.NaN;
+                emHeightDescent = float.NaN;
+                return false;
+            }
+
+            var emHeight = font.Size;
+            emHeightAscent = ascent * emHeight / height;
+            emHeightDescent = emHeight - emHeightAscent;
+            return true;
+        }
+
+        private (short typoAscender, short typooDescender) TypoAscenderDescender(
+            SKTypeface typeface)
+        {
+            try
+            {
+                var buffer = typeface.GetTableData(GetIntTag("OS/2"));
+                if (buffer.Length >= 72)
+                {
+                    return (
+                        (short) (buffer[68] << 8 | buffer[69]),
+                        (short) -(buffer[70] << 8 | buffer[71])
+                    );
+                }
+            }
+            catch
+            {
+                // no data
+            }
+
+            return (0, 0);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private float FloatAscent(SKFontMetrics metrics)
+        {
+            return SkScalarRoundToScalar(-metrics.Ascent);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private float FloatDescent(SKFontMetrics metrics)
+        {
+            return SkScalarRoundToScalar(metrics.Descent);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private float SkScalarRoundToScalar(float x)
+        {
+            return (float) Math.Floor(x + 0.5f);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static uint GetIntTag(string v)
+        {
+            return
+                (uint) v[0] << 24 |
+                (uint) v[1] << 16 |
+                (uint) v[2] << 08 |
+                (uint) v[3] << 00;
         }
 
         public double MeasureText(string text)
@@ -294,25 +480,11 @@ namespace AlphaTab.Platform.CSharp
                 return 0;
             }
 
-            using (var paint = CreatePaint())
-            {
-                paint.Typeface = TypeFace;
-                paint.TextSize = (float)Font.Size;
-                switch (TextAlign)
-                {
-                    case TextAlign.Left:
-                        paint.TextAlign = SKTextAlign.Left;
-                        break;
-                    case TextAlign.Center:
-                        paint.TextAlign = SKTextAlign.Center;
-                        break;
-                    case TextAlign.Right:
-                        paint.TextAlign = SKTextAlign.Right;
-                        break;
-                }
+            var size = 0.0;
+            TextRun(text, TypeFace, Font.Size,
+                (blob, font, paint, width) => { size = width; });
 
-                return paint.MeasureText(text);
-            }
+            return size;
         }
 
         public void FillMusicFontSymbol(
@@ -327,17 +499,7 @@ namespace AlphaTab.Platform.CSharp
                 return;
             }
 
-            using (var paint = CreatePaint())
-            {
-                paint.Typeface = MusicFont;
-                paint.TextSize = (float)(MusicFontSize * scale);
-                if (centerAtPosition)
-                {
-                    paint.TextAlign = SKTextAlign.Center;
-                }
-
-                _surface.Canvas.DrawText(String.FromCharCode((double)symbol), (float)x, (float)y, paint);
-            }
+            FillMusicFontSymbols(x, y, scale, new[] {symbol}, centerAtPosition);
         }
 
         public void FillMusicFontSymbols(
@@ -352,29 +514,30 @@ namespace AlphaTab.Platform.CSharp
             {
                 if (symbol != MusicFontSymbol.None)
                 {
-                    s += String.FromCharCode((double)symbol);
+                    s += String.FromCharCode((double) symbol);
                 }
             }
 
-            using (var paint = CreatePaint())
+            TextRun(s, MusicFont, MusicFontSize * scale, (blob, font, paint, width) =>
             {
-                paint.Typeface = MusicFont;
-                paint.TextSize = (float)(MusicFontSize * scale);
-                if (centerAtPosition)
-                {
-                    paint.TextAlign = SKTextAlign.Center;
-                }
+                var xOffset = GetFontOffset(
+                    centerAtPosition ? TextAlign.Center : TextAlign.Left,
+                    width);
 
-
-                _surface.Canvas.DrawText(s, (float)x, (float)y, paint);
-            }
+                _surface.Canvas.DrawText(
+                    blob,
+                    (float) x + xOffset,
+                    (float) y,
+                    paint
+                );
+            });
         }
 
         public void BeginRotate(double centerX, double centerY, double angle)
         {
             _surface.Canvas.Save();
-            _surface.Canvas.Translate((float)centerX, (float)centerY);
-            _surface.Canvas.RotateDegrees((float)angle);
+            _surface.Canvas.Translate((float) centerX, (float) centerY);
+            _surface.Canvas.RotateDegrees((float) angle);
         }
 
         public void EndRotate()

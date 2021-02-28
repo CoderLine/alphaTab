@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using AlphaTab.Core;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
@@ -15,9 +14,9 @@ namespace AlphaTab.Platform.CSharp
         private readonly Action<Action> _uiInvoke;
 
         private readonly Thread _workerThread;
-        private BlockingCollection<Action> _workerQueue;
-        private ManualResetEventSlim? _threadStartedEvent;
-        private CancellationTokenSource _workerCancellationToken;
+        private readonly BlockingCollection<Action> _workerQueue;
+        private readonly ManualResetEventSlim? _threadStartedEvent;
+        private readonly CancellationTokenSource _workerCancellationToken;
         private ScoreRenderer _renderer;
         private double _width;
 
@@ -148,7 +147,10 @@ namespace AlphaTab.Platform.CSharp
             }
             else
             {
-                _workerQueue.Add(() => RenderScore(score, trackIndexes));
+                var serialized = JsonConverter.ScoreToJsObject(score);
+                _workerQueue.Add(() =>
+                    RenderScore(JsonConverter.JsObjectToScore(serialized, _renderer.Settings),
+                        trackIndexes));
             }
         }
 

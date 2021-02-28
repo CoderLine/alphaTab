@@ -118,7 +118,8 @@ export class Color {
                             throw new FormatError('No values specified for rgb/rgba function');
                         }
 
-                        const numbers = json.substring(start + 1, end - start - 1).split(',');
+                        const numbers = json.substring(start + 1, end).split(',');
+
                         if (numbers.length === 3) {
                             return new Color(parseInt(numbers[0]), parseInt(numbers[1]), parseInt(numbers[2]));
                         }

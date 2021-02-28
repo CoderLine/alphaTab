@@ -207,7 +207,7 @@ export class CapellaParser {
     private parseDom(dom: XmlDocument): void {
         let root: XmlNode | null = dom.firstElement;
         if (!root) {
-            return;
+            throw new UnsupportedFormatError('No valid XML');
         }
         if (root.localName === 'score') {
             this.score = new Score();
@@ -236,7 +236,7 @@ export class CapellaParser {
                 }
             }
         } else {
-            throw new UnsupportedFormatError('Root node of XML was not GPIF');
+            throw new UnsupportedFormatError('Root node of XML was not "score"');
         }
     }
 

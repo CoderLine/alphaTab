@@ -54,6 +54,7 @@ import { Logger } from '@src/Logger';
 import { LeftHandTapEffectInfo } from './rendering/effects/LeftHandTapEffectInfo';
 import { CapellaImporter } from './importer/CapellaImporter';
 import { ResizeObserverPolyfill } from './platform/javascript/ResizeObserverPolyfill';
+import { WebPlatform } from './platform/javascript/WebPlatform';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -86,12 +87,12 @@ export class RenderEngineFactory {
  */
 export class Environment {
     /**
-     * The font size of the music font in pixel. 
+     * The font size of the music font in pixel.
      */
     public static readonly MusicFontSize = 34;
 
     /**
-     * The scaling factor to use when rending raster graphics for sharper rendering on high-dpi displays. 
+     * The scaling factor to use when rending raster graphics for sharper rendering on high-dpi displays.
      */
     public static HighDpiFactor = 1;
 
@@ -158,11 +159,14 @@ export class Environment {
             try {
                 Environment._globalThis = globalThis;
             } catch (e) {
-                // global this not available
+                // globalThis not available
             }
 
             if (typeof Environment._globalThis === 'undefined') {
                 Environment._globalThis = self;
+            }
+            if (typeof Environment._globalThis === 'undefined') {
+                Environment._globalThis = global;
             }
             if (typeof Environment._globalThis === 'undefined') {
                 Environment._globalThis = window;
@@ -178,14 +182,17 @@ export class Environment {
     /**
      * @target web
      */
+    public static webPlatform: WebPlatform = Environment.detectWebPlatform();
+
+    /**
+     * @target web
+     */
     public static scriptFile: string | null = Environment.detectScriptFile();
 
     /**
      * @target web
      */
-    public static bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(
-        'alphaTab'
-    );
+    public static bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker('alphaTab');
 
     /**
      * @target web
@@ -201,8 +208,8 @@ export class Environment {
     public static throttle(action: () => void, delay: number): () => void {
         let timeoutId: number = 0;
         return () => {
-            window.clearTimeout(timeoutId);
-            timeoutId = window.setTimeout(action, delay);
+            Environment.globalThis.clearTimeout(timeoutId);
+            timeoutId = Environment.globalThis.setTimeout(action, delay);
         };
     }
 
@@ -210,7 +217,7 @@ export class Environment {
      * @target web
      */
     private static detectScriptFile(): string | null {
-        if (Environment.isRunningInWorker) {
+        if (Environment.isRunningInWorker || Environment.webPlatform !== WebPlatform.Browser) {
             return null;
         }
         return (document.currentScript as HTMLScriptElement).src;
@@ -451,18 +458,38 @@ export class Environment {
      * @partial
      */
     public static platformInit(): void {
-        Environment.registerJQueryPlugin();
-        if (!Environment.isRunningInWorker) {
-            Environment.HighDpiFactor = window.devicePixelRatio;
-            // ResizeObserver API does not yet exist so long on Safari (only start 2020 with iOS Safari 13.7 and Desktop 13.1)
-            // so we better add a polyfill for it 
-            if(!('ResizeObserver' in globalThis)) {
-                (globalThis as any).ResizeObserver = ResizeObserverPolyfill;
-            }
-        } else {
+        if (Environment.isRunningInWorker) {
             AlphaTabWebWorker.init();
             AlphaSynthWebWorker.init();
+        } else if (Environment.webPlatform === WebPlatform.Browser) {
+            Environment.registerJQueryPlugin();
+            Environment.HighDpiFactor = window.devicePixelRatio;
+            // ResizeObserver API does not yet exist so long on Safari (only start 2020 with iOS Safari 13.7 and Desktop 13.1)
+            // so we better add a polyfill for it
+            if (!('ResizeObserver' in globalThis)) {
+                (globalThis as any).ResizeObserver = ResizeObserverPolyfill;
+            }
         }
+    }
+
+    /**
+     * @target web
+     */
+    private static detectWebPlatform(): WebPlatform {
+        try {
+            // Credit of the node.js detection goes to
+            // https://github.com/iliakan/detect-node
+            // MIT License
+            // Copyright (c) 2017 Ilya Kantor
+            // tslint:disable-next-line: strict-type-predicates
+            if (Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]') {
+                return WebPlatform.NodeJs;
+            }
+        } catch (e) {
+            // no node.js
+        }
+
+        return WebPlatform.Browser;
     }
 }
 
