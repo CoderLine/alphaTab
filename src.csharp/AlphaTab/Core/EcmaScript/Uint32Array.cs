@@ -8,8 +8,8 @@ namespace AlphaTab.Core.EcmaScript
 {
     public class Uint32Array : IEnumerable<uint>
     {
-        private readonly uint[]? _data = null;
-        private readonly DataView _raw;
+        private readonly uint[]? _data;
+        private readonly DataView? _raw;
 
         public double Length => _data?.Length ?? _raw.Buffer.Raw.Count / sizeof(uint);
 
@@ -20,7 +20,7 @@ namespace AlphaTab.Core.EcmaScript
 
         public Uint32Array(ArrayBuffer buffer, double bufferOffset, double length)
         {
-            _raw = new DataView(new ArrayBuffer(new ArraySegment<byte>(buffer.Raw.Array,
+            _raw = new DataView(new ArrayBuffer(new ArraySegment<byte>(buffer.Raw.Array!,
                 buffer.Raw.Offset + (int) bufferOffset,
                 (int) length)));
         }
