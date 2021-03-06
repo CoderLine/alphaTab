@@ -294,9 +294,9 @@ export class XmlParser {
                         default:
                             if (c === attrValQuote) {
                                 buf += str.substr(start, p - start);
-                                let val: string = buf;
+                                let value: string = buf;
                                 buf = '';
-                                xml!.attributes.set(aname!, val);
+                                xml!.attributes.set(aname!, value);
                                 state = XmlState.IgnoreSpaces;
                                 next = XmlState.Body;
                             }

@@ -99,7 +99,7 @@ export class BarRendererBase {
     public scoreRenderer: ScoreRenderer;
     public staff!: RenderStaff;
     public layoutingInfo!: BarLayoutingInfo;
-    public bar!: Bar;
+    public bar: Bar;
 
     public x: number = 0;
     public y: number = 0;
@@ -315,7 +315,7 @@ export class BarRendererBase {
     }
 
     public getBeatContainer(beat: Beat): BeatContainerGlyph | undefined {
-        return this.getVoiceContainer(beat.voice)?.beatGlyphs[beat.index];
+        return this.getVoiceContainer(beat.voice)?.beatGlyphs?.[beat.index];
     }
 
     public getPreNotesGlyphForBeat(beat: Beat): BeatGlyphBase | undefined {

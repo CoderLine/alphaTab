@@ -699,7 +699,7 @@ export class CapellaParser {
                                     }
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
-                                case 'single':
+                                // case 'single':
                                 default:
                                     if (!this._currentVoiceState.currentBarComplete) {
                                         this._currentBar.masterBar.isAnacrusis = true;
@@ -994,7 +994,7 @@ export class CapellaParser {
         if (obj.lastNumber > 0 && obj.firstNumber > 0) {
             let alternateEndings = 0;
             for (let i = obj.firstNumber; i <= obj.lastNumber; i++) {
-                alternateEndings |= 0x01 << (i - 1);
+                alternateEndings = alternateEndings |  (0x01 << (i - 1));
             }
             this._currentBar.masterBar.alternateEndings = alternateEndings;
         } else if (obj.lastNumber > 0) {
@@ -1191,7 +1191,7 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseTrill(_: XmlNode): DrawObject | null {
+    private parseTrill(_unused: XmlNode): DrawObject | null {
         const obj = new TrillDrawObject();
         return obj;
     }
@@ -1238,12 +1238,12 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseWavyLine(_: XmlNode): WavyLineDrawObject {
+    private parseWavyLine(_unused: XmlNode): WavyLineDrawObject {
         const obj = new WavyLineDrawObject();
         return obj;
     }
 
-    private parseSlur(_: XmlNode): SlurDrawObject {
+    private parseSlur(_unused: XmlNode): SlurDrawObject {
         const obj = new SlurDrawObject();
         return obj;
     }

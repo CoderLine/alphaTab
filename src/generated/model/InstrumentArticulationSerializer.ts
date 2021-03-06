@@ -32,10 +32,10 @@ export class InstrumentArticulationSerializer {
     public static setProperty(obj: InstrumentArticulation, property: string, v: unknown): boolean {
         switch (property) {
             case "elementtype":
-                obj.elementType = (v as string);
+                obj.elementType = (v! as string);
                 return true;
             case "staffline":
-                obj.staffLine = (v as number);
+                obj.staffLine = (v! as number);
                 return true;
             case "noteheaddefault":
                 obj.noteHeadDefault = (JsonHelper.parseEnum<MusicFontSymbol>(v, MusicFontSymbol)!);
@@ -53,7 +53,7 @@ export class InstrumentArticulationSerializer {
                 obj.techniqueSymbolPlacement = (JsonHelper.parseEnum<TextBaseline>(v, TextBaseline)!);
                 return true;
             case "outputmidinumber":
-                obj.outputMidiNumber = (v as number);
+                obj.outputMidiNumber = (v! as number);
                 return true;
         } 
         return false; 

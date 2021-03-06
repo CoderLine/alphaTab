@@ -38,8 +38,9 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 {
                     let endGlyphs = this._endNoteGlyph;
                     if (!endGlyphs) {
-                        endGlyphs = this._endNoteGlyph = new BendNoteHeadGroupGlyph(note.beat, false);
+                        endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
                         endGlyphs.renderer = this.renderer;
+                        this._endNoteGlyph = endGlyphs;
                         this.BendNoteHeads.push(endGlyphs);
                     }
                     let lastBendPoint: BendPoint = note.bendPoints[note.bendPoints.length - 1];
@@ -51,8 +52,9 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     if (!note.isTieOrigin) {
                         let endGlyphs = this._endNoteGlyph;
                         if (!endGlyphs) {
-                            endGlyphs = this._endNoteGlyph = new BendNoteHeadGroupGlyph(note.beat, false);
+                            endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
                             endGlyphs.renderer = this.renderer;
+                            this._endNoteGlyph  = endGlyphs;
                             this.BendNoteHeads.push(endGlyphs);
                         }
                         let lastBendPoint: BendPoint = note.bendPoints[note.bendPoints.length - 1];
@@ -64,7 +66,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 {
                     let middleGlyphs = this._middleNoteGlyph;
                     if (!middleGlyphs) {
-                        middleGlyphs = this._middleNoteGlyph = new BendNoteHeadGroupGlyph(note.beat, false);
+                        middleGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
+                        this._middleNoteGlyph = middleGlyphs;
                         middleGlyphs.renderer = this.renderer;
                         this.BendNoteHeads.push(middleGlyphs);
                     }
@@ -75,8 +78,9 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     );
                     let endGlyphs = this._endNoteGlyph;
                     if (!endGlyphs) {
-                        endGlyphs = this._endNoteGlyph = new BendNoteHeadGroupGlyph(note.beat, false);
+                        endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
                         endGlyphs.renderer = this.renderer;
+                        this._endNoteGlyph = endGlyphs;
                         this.BendNoteHeads.push(endGlyphs);
                     }
                     let lastBendPoint: BendPoint = note.bendPoints[note.bendPoints.length - 1];

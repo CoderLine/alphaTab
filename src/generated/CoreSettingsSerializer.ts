@@ -51,26 +51,26 @@ export class CoreSettingsSerializer {
                 return true;
             /*@target web*/
             case "tex":
-                obj.tex = (v as boolean);
+                obj.tex = (v! as boolean);
                 return true;
             /*@target web*/
             case "tracks":
-                obj.tracks = (v as unknown);
+                obj.tracks = (v! as unknown);
                 return true;
             case "enablelazyloading":
-                obj.enableLazyLoading = (v as boolean);
+                obj.enableLazyLoading = (v! as boolean);
                 return true;
             case "engine":
-                obj.engine = (v as string);
+                obj.engine = (v! as string);
                 return true;
             case "loglevel":
                 obj.logLevel = (JsonHelper.parseEnum<LogLevel>(v, LogLevel)!);
                 return true;
             case "useworkers":
-                obj.useWorkers = (v as boolean);
+                obj.useWorkers = (v! as boolean);
                 return true;
             case "includenotebounds":
-                obj.includeNoteBounds = (v as boolean);
+                obj.includeNoteBounds = (v! as boolean);
                 return true;
         } 
         return false; 

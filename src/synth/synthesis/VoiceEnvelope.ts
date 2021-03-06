@@ -143,11 +143,12 @@ export class VoiceEnvelope {
                     }
 
                     return;
-                case VoiceEnvelopeSegment.Release:
+                // case VoiceEnvelopeSegment.Release:
                 default:
                     this.segment = VoiceEnvelopeSegment.Done;
                     this.segmentIsExponential = false;
-                    this.level = this.slope = 0.0;
+                    this.level = 0.0;
+                    this.slope = 0.0;
                     this.samplesUntilNextSegment = 0x7ffffff;
                     return;
             }
@@ -188,8 +189,8 @@ export class VoiceEnvelope {
             }
         }
         
-        // tslint:disable-next-line: no-conditional-assignment
-        if ((this.samplesUntilNextSegment -= numSamples) <= 0) {
+        this.samplesUntilNextSegment -= numSamples;
+        if (this.samplesUntilNextSegment <= 0) {
             this.nextSegment(this.segment, outSampleRate);
         }
     }

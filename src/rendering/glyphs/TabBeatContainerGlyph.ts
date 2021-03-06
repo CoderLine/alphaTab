@@ -81,9 +81,10 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
         if (n.hasBend) {
             if (!this._bend) {
-                this._bend = new TabBendGlyph();
-                this._bend.renderer = this.renderer;
-                this.ties.push(this._bend);
+                const bend = new TabBendGlyph();
+                this._bend = bend;
+                bend.renderer = this.renderer;
+                this.ties.push(bend);
             }
             this._bend.addBends(n);
         }

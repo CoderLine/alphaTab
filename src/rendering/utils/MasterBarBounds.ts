@@ -41,7 +41,7 @@ export class MasterBarBounds {
     /**
      * Gets or sets a reference to the parent {@link staveGroupBounds}.
      */
-    public staveGroupBounds!: StaveGroupBounds;
+    public staveGroupBounds: StaveGroupBounds | null = null;
 
     /**
      * Adds a new bar to this lookup.
@@ -95,6 +95,6 @@ export class MasterBarBounds {
      * @param bounds The beat bounds to add.
      */
     public addBeat(bounds: BeatBounds): void {
-        this.staveGroupBounds.boundsLookup.addBeat(bounds);
+        this.staveGroupBounds!.boundsLookup.addBeat(bounds);
     }
 }

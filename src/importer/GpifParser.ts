@@ -1542,7 +1542,7 @@ export class GpifParser {
         this._beatById.set(beatId, beat);
     }
 
-    private parseBeatLyrics(node: XmlNode): string[] | null {
+    private parseBeatLyrics(node: XmlNode): string[] {
         const lines: string[] = [];
 
         for (let c of node.childNodes) {
@@ -1564,15 +1564,15 @@ export class GpifParser {
                 switch (c.localName) {
                     case 'XProperty':
                         let id: string = c.getAttribute('id');
-                        let val: number = 0;
+                        let value: number = 0;
                         switch (id) {
                             case '1124204545':
-                                val = parseInt(c.findChildElement('Int')!.innerText);
-                                beat.invertBeamDirection = val === 1;
+                                value = parseInt(c.findChildElement('Int')!.innerText);
+                                beat.invertBeamDirection = value === 1;
                                 break;
                             case '687935489':
-                                val = parseInt(c.findChildElement('Int')!.innerText);
-                                beat.brushDuration = val;
+                                value = parseInt(c.findChildElement('Int')!.innerText);
+                                beat.brushDuration = value;
                                 break;
                         }
                         break;

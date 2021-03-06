@@ -244,14 +244,14 @@ export class Voice {
 
                         // TODO: check for interpolation mode on voice
                         let alpha: number = tmpSourceSamplePosition - pos;
-                        let val: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
+                        let value: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
 
                         // Low-pass filter.
-                        if (tmpLowpass.active) val = tmpLowpass.process(val);
+                        if (tmpLowpass.active) value = tmpLowpass.process(value);
 
-                        outputBuffer[offset + outL] += val * gainLeft;
+                        outputBuffer[offset + outL] += value * gainLeft;
                         outL++;
-                        outputBuffer[offset + outL] += val * gainRight;
+                        outputBuffer[offset + outL] += value * gainRight;
                         outL++;
 
                         // Next sample.
@@ -270,14 +270,14 @@ export class Voice {
 
                         // Simple linear interpolation.
                         let alpha: number = tmpSourceSamplePosition - pos;
-                        let val: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
+                        let value: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
 
                         // Low-pass filter.
-                        if (tmpLowpass.active) val = tmpLowpass.process(val);
+                        if (tmpLowpass.active) value = tmpLowpass.process(value);
 
-                        outputBuffer[offset + outL] += val * gainLeft;
+                        outputBuffer[offset + outL] += value * gainLeft;
                         outL++;
-                        outputBuffer[offset + outR] += val * gainRight;
+                        outputBuffer[offset + outR] += value * gainRight;
                         outR++;
 
                         // Next sample.
@@ -294,12 +294,12 @@ export class Voice {
 
                         // Simple linear interpolation.
                         let alpha: number = tmpSourceSamplePosition - pos;
-                        let val: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
+                        let value: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
 
                         // Low-pass filter.
-                        if (tmpLowpass.active) val = tmpLowpass.process(val);
+                        if (tmpLowpass.active) value = tmpLowpass.process(value);
 
-                        outputBuffer[offset + outL] = val * gainMono;
+                        outputBuffer[offset + outL] = value * gainMono;
                         outL++;
 
                         // Next sample.

@@ -150,7 +150,7 @@ export class Deflater {
     public deflate(output: Uint8Array, offset: number, length: number): number {
         let origLength = length;
 
-        for (; ;) {
+        while(true) {
             let count = this._pending.flush(output, offset, length);
             offset += count;
             length -= count;

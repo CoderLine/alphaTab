@@ -12,7 +12,7 @@ using SkiaSharp;
 
 namespace AlphaTab.VisualTests
 {
-    public static class VisualTestHelper
+    partial class VisualTestHelper
     {
         public static async Task RunVisualTest(string inputFile, Settings? settings = null,
             IList<double>? tracks = null, string? message = null, int tolerancePercent = 1)
@@ -60,7 +60,7 @@ namespace AlphaTab.VisualTests
             IList<double>? tracks = null, string? message = null, int tolerancePercent = 1)
         {
             settings ??= new Settings();
-            tracks ??= new List<double> {0};
+            tracks ??= new Core.List<double> {0};
 
             settings.Core.Engine = "skia";
             settings.Core.EnableLazyLoading = false;
@@ -74,7 +74,7 @@ namespace AlphaTab.VisualTests
             var referenceFileData =
                 await TestPlatform.LoadFile(referenceFileName);
 
-            var result = new List<RenderFinishedEventArgs>();
+            var result = new AlphaTab.Core.List<RenderFinishedEventArgs>();
             var totalWidth = 0.0;
             var totalHeight = 0.0;
 
@@ -123,7 +123,7 @@ namespace AlphaTab.VisualTests
         }
 
         private static void CompareVisualResult(double totalWidth, double totalHeight,
-            List<RenderFinishedEventArgs> result, string referenceFileName,
+            AlphaTab.Core.List<RenderFinishedEventArgs> result, string referenceFileName,
             Uint8Array referenceFileData, string? message, int tolerancePercent = 1)
         {
             SKBitmap finalBitmap;

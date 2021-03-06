@@ -28,7 +28,7 @@ export class FermataSerializer {
                 obj.type = (JsonHelper.parseEnum<FermataType>(v, FermataType)!);
                 return true;
             case "length":
-                obj.length = (v as number);
+                obj.length = (v! as number);
                 return true;
         } 
         return false; 

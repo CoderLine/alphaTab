@@ -24,9 +24,9 @@ export class TabRestGlyph extends MusicFontGlyph {
     }
 
     public updateBeamingHelper(cx: number): void {
-        if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat)) {
+        if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat!)) {
             this.beamingHelper.registerBeatLineX('tab',
-                this.beat,
+                this.beat!,
                 cx + this.x + this.width / 2,
                 cx + this.x + this.width / 2
             );

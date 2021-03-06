@@ -67,7 +67,8 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             n.tieDestination &&
             n.tieDestination.isVisible
         ) {
-            let tie: ScoreTieGlyph = new ScoreTieGlyph(n, n.tieDestination, false);
+            // tslint:disable-next-line: no-unnecessary-type-assertion
+            let tie: ScoreTieGlyph = new ScoreTieGlyph(n, n.tieDestination!, false);
             this.ties.push(tie);
         }
         if (n.isTieDestination && !n.tieOrigin!.hasBend && !n.beat.hasWhammyBar) {
@@ -81,7 +82,8 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             this.ties.push(l);
         }
         if (n.isSlurOrigin && n.slurDestination && n.slurDestination.isVisible) {
-            let tie: ScoreSlurGlyph = new ScoreSlurGlyph(n, n.slurDestination, false);
+            // tslint:disable-next-line: no-unnecessary-type-assertion
+            let tie: ScoreSlurGlyph = new ScoreSlurGlyph(n, n.slurDestination!, false);
             this.ties.push(tie);
         }
         if (n.isSlurDestination) {
@@ -90,8 +92,9 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
         // start effect slur on first beat
         if (!this._effectSlur && n.isEffectSlurOrigin && n.effectSlurDestination) {
-            this._effectSlur = new ScoreSlurGlyph(n, n.effectSlurDestination, false);
-            this.ties.push(this._effectSlur);
+            const effectSlur = new ScoreSlurGlyph(n, n.effectSlurDestination, false);
+            this._effectSlur = effectSlur;
+            this.ties.push(effectSlur);
         }
         // end effect slur on last beat
         if (!this._effectEndSlur && n.beat.isEffectSlurDestination && n.beat.effectSlurOrigin) {
@@ -99,16 +102,19 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             let startNote: Note =
                 direction === BeamDirection.Up ? n.beat.effectSlurOrigin.minNote! : n.beat.effectSlurOrigin.maxNote!;
             let endNote: Note = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
-            this._effectEndSlur = new ScoreSlurGlyph(startNote, endNote, true);
-            this.ties.push(this._effectEndSlur);
+            const effectEndSlur = new ScoreSlurGlyph(startNote, endNote, true);
+            this._effectEndSlur = effectEndSlur;
+            this.ties.push(effectEndSlur);
         }
         if (n.hasBend) {
             if (!this._bend) {
-                this._bend = new ScoreBendGlyph(n.beat);
-                this._bend.renderer = this.renderer;
-                this.ties.push(this._bend);
+                const bend = new ScoreBendGlyph(n.beat);
+                this._bend = bend;
+                bend.renderer = this.renderer;
+                this.ties.push(bend);
             }
-            this._bend.addBends(n);
+            // tslint:disable-next-line: no-unnecessary-type-assertion
+            this._bend!.addBends(n);
         }
     }
 }

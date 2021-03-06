@@ -1,4 +1,4 @@
-import { FontStyle } from '@src/model/Font';
+import { FontStyle, FontWeight } from '@src/model/Font';
 import { Environment } from '@src/Environment';
 
 /**
@@ -43,6 +43,7 @@ export class FontSizes {
 
     /**
      * @target web
+     * @partial
      */
     public static generateFontLookup(family: string): void {
         if (FontSizes.FontSizeLookupTables.has(family)) {
@@ -66,7 +67,7 @@ export class FontSizes {
         }
     }
 
-    public static measureString(s: string, family: string, size: number, style: FontStyle): number {
+    public static measureString(s: string, family: string, size: number, style: FontStyle, weight:FontWeight): number {
         let data: Uint8Array;
         let dataSize: number = 11;
         if (!FontSizes.FontSizeLookupTables.has(family)) {
@@ -74,10 +75,10 @@ export class FontSizes {
         }
         data = FontSizes.FontSizeLookupTables.get(family)!;
         let factor: number = 1;
-        if ((style & FontStyle.Italic) !== 0) {
+        if (style === FontStyle.Italic) {
             factor *= 1.2;
         }
-        if ((style & FontStyle.Bold) !== 0) {
+        if (weight === FontWeight.Bold) {
             factor *= 1.2;
         }
         let stringSize: number = 0;

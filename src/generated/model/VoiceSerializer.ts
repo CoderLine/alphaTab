@@ -27,7 +27,7 @@ export class VoiceSerializer {
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (v as number);
+                obj.id = (v! as number);
                 return true;
             case "beats":
                 obj.beats = [];
@@ -38,7 +38,7 @@ export class VoiceSerializer {
                 }
                 return true;
             case "isempty":
-                obj.isEmpty = (v as boolean);
+                obj.isEmpty = (v! as boolean);
                 return true;
         } 
         return false; 

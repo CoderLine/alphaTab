@@ -59,25 +59,25 @@ export class StaffSerializer {
                 });
                 return true;
             case "capo":
-                obj.capo = (v as number);
+                obj.capo = (v! as number);
                 return true;
             case "transpositionpitch":
-                obj.transpositionPitch = (v as number);
+                obj.transpositionPitch = (v! as number);
                 return true;
             case "displaytranspositionpitch":
-                obj.displayTranspositionPitch = (v as number);
+                obj.displayTranspositionPitch = (v! as number);
                 return true;
             case "showtablature":
-                obj.showTablature = (v as boolean);
+                obj.showTablature = (v! as boolean);
                 return true;
             case "showstandardnotation":
-                obj.showStandardNotation = (v as boolean);
+                obj.showStandardNotation = (v! as boolean);
                 return true;
             case "ispercussion":
-                obj.isPercussion = (v as boolean);
+                obj.isPercussion = (v! as boolean);
                 return true;
             case "standardnotationlinecount":
-                obj.standardNotationLineCount = (v as number);
+                obj.standardNotationLineCount = (v! as number);
                 return true;
         } 
         if (["stringtuning"].indexOf(property) >= 0) {

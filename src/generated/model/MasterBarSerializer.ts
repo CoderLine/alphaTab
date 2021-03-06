@@ -52,7 +52,7 @@ export class MasterBarSerializer {
     public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
         switch (property) {
             case "alternateendings":
-                obj.alternateEndings = (v as number);
+                obj.alternateEndings = (v! as number);
                 return true;
             case "keysignature":
                 obj.keySignature = (JsonHelper.parseEnum<KeySignature>(v, KeySignature)!);
@@ -61,22 +61,22 @@ export class MasterBarSerializer {
                 obj.keySignatureType = (JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!);
                 return true;
             case "isdoublebar":
-                obj.isDoubleBar = (v as boolean);
+                obj.isDoubleBar = (v! as boolean);
                 return true;
             case "isrepeatstart":
-                obj.isRepeatStart = (v as boolean);
+                obj.isRepeatStart = (v! as boolean);
                 return true;
             case "repeatcount":
-                obj.repeatCount = (v as number);
+                obj.repeatCount = (v! as number);
                 return true;
             case "timesignaturenumerator":
-                obj.timeSignatureNumerator = (v as number);
+                obj.timeSignatureNumerator = (v! as number);
                 return true;
             case "timesignaturedenominator":
-                obj.timeSignatureDenominator = (v as number);
+                obj.timeSignatureDenominator = (v! as number);
                 return true;
             case "timesignaturecommon":
-                obj.timeSignatureCommon = (v as boolean);
+                obj.timeSignatureCommon = (v! as boolean);
                 return true;
             case "tripletfeel":
                 obj.tripletFeel = (JsonHelper.parseEnum<TripletFeel>(v, TripletFeel)!);
@@ -90,10 +90,10 @@ export class MasterBarSerializer {
                 });
                 return true;
             case "start":
-                obj.start = (v as number);
+                obj.start = (v! as number);
                 return true;
             case "isanacrusis":
-                obj.isAnacrusis = (v as boolean);
+                obj.isAnacrusis = (v! as boolean);
                 return true;
         } 
         if (["section"].indexOf(property) >= 0) {

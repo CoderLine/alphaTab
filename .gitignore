@@ -11,3 +11,12 @@ bin/
 test-results/
 debug.log
 src/generated/VersionInfo.ts
+src.kotlin/alphaTab/src/generated/
+
+.gradle
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+**/build/
+local.properties

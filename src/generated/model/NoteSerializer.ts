@@ -75,7 +75,7 @@ export class NoteSerializer {
     public static setProperty(obj: Note, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (v as number);
+                obj.id = (v! as number);
                 return true;
             case "accentuated":
                 obj.accentuated = (JsonHelper.parseEnum<AccentuationType>(v, AccentuationType)!);
@@ -87,7 +87,7 @@ export class NoteSerializer {
                 obj.bendStyle = (JsonHelper.parseEnum<BendStyle>(v, BendStyle)!);
                 return true;
             case "iscontinuedbend":
-                obj.isContinuedBend = (v as boolean);
+                obj.isContinuedBend = (v! as boolean);
                 return true;
             case "bendpoints":
                 obj.bendPoints = [];
@@ -98,64 +98,64 @@ export class NoteSerializer {
                 }
                 return true;
             case "fret":
-                obj.fret = (v as number);
+                obj.fret = (v! as number);
                 return true;
             case "string":
-                obj.string = (v as number);
+                obj.string = (v! as number);
                 return true;
             case "octave":
-                obj.octave = (v as number);
+                obj.octave = (v! as number);
                 return true;
             case "tone":
-                obj.tone = (v as number);
+                obj.tone = (v! as number);
                 return true;
             case "percussionarticulation":
-                obj.percussionArticulation = (v as number);
+                obj.percussionArticulation = (v! as number);
                 return true;
             case "isvisible":
-                obj.isVisible = (v as boolean);
+                obj.isVisible = (v! as boolean);
                 return true;
             case "islefthandtapped":
-                obj.isLeftHandTapped = (v as boolean);
+                obj.isLeftHandTapped = (v! as boolean);
                 return true;
             case "ishammerpullorigin":
-                obj.isHammerPullOrigin = (v as boolean);
+                obj.isHammerPullOrigin = (v! as boolean);
                 return true;
             case "hammerpulloriginnoteid":
-                obj.hammerPullOriginNoteId = (v as number);
+                obj.hammerPullOriginNoteId = (v! as number);
                 return true;
             case "hammerpulldestinationnoteid":
-                obj.hammerPullDestinationNoteId = (v as number);
+                obj.hammerPullDestinationNoteId = (v! as number);
                 return true;
             case "isslurdestination":
-                obj.isSlurDestination = (v as boolean);
+                obj.isSlurDestination = (v! as boolean);
                 return true;
             case "sluroriginnoteid":
-                obj.slurOriginNoteId = (v as number);
+                obj.slurOriginNoteId = (v! as number);
                 return true;
             case "slurdestinationnoteid":
-                obj.slurDestinationNoteId = (v as number);
+                obj.slurDestinationNoteId = (v! as number);
                 return true;
             case "harmonictype":
                 obj.harmonicType = (JsonHelper.parseEnum<HarmonicType>(v, HarmonicType)!);
                 return true;
             case "harmonicvalue":
-                obj.harmonicValue = (v as number);
+                obj.harmonicValue = (v! as number);
                 return true;
             case "isghost":
-                obj.isGhost = (v as boolean);
+                obj.isGhost = (v! as boolean);
                 return true;
             case "isletring":
-                obj.isLetRing = (v as boolean);
+                obj.isLetRing = (v! as boolean);
                 return true;
             case "ispalmmute":
-                obj.isPalmMute = (v as boolean);
+                obj.isPalmMute = (v! as boolean);
                 return true;
             case "isdead":
-                obj.isDead = (v as boolean);
+                obj.isDead = (v! as boolean);
                 return true;
             case "isstaccato":
-                obj.isStaccato = (v as boolean);
+                obj.isStaccato = (v! as boolean);
                 return true;
             case "slideintype":
                 obj.slideInType = (JsonHelper.parseEnum<SlideInType>(v, SlideInType)!);
@@ -167,13 +167,13 @@ export class NoteSerializer {
                 obj.vibrato = (JsonHelper.parseEnum<VibratoType>(v, VibratoType)!);
                 return true;
             case "tieoriginnoteid":
-                obj.tieOriginNoteId = (v as number);
+                obj.tieOriginNoteId = (v! as number);
                 return true;
             case "tiedestinationnoteid":
-                obj.tieDestinationNoteId = (v as number);
+                obj.tieDestinationNoteId = (v! as number);
                 return true;
             case "istiedestination":
-                obj.isTieDestination = (v as boolean);
+                obj.isTieDestination = (v! as boolean);
                 return true;
             case "lefthandfinger":
                 obj.leftHandFinger = (JsonHelper.parseEnum<Fingers>(v, Fingers)!);
@@ -182,16 +182,16 @@ export class NoteSerializer {
                 obj.rightHandFinger = (JsonHelper.parseEnum<Fingers>(v, Fingers)!);
                 return true;
             case "isfingering":
-                obj.isFingering = (v as boolean);
+                obj.isFingering = (v! as boolean);
                 return true;
             case "trillvalue":
-                obj.trillValue = (v as number);
+                obj.trillValue = (v! as number);
                 return true;
             case "trillspeed":
                 obj.trillSpeed = (JsonHelper.parseEnum<Duration>(v, Duration)!);
                 return true;
             case "durationpercent":
-                obj.durationPercent = (v as number);
+                obj.durationPercent = (v! as number);
                 return true;
             case "accidentalmode":
                 obj.accidentalMode = (JsonHelper.parseEnum<NoteAccidentalMode>(v, NoteAccidentalMode)!);
