@@ -8,6 +8,7 @@ import alphaTab.core.toInvariantString
 import alphaTab.importer.AlphaTexImporter
 import alphaTab.importer.ScoreLoader
 import alphaTab.io.ByteBuffer
+import alphaTab.model.JsonConverter
 import alphaTab.model.Score
 import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.ScoreRenderer
@@ -128,7 +129,9 @@ class VisualTestHelperPartials {
 
             val job = GlobalScope.launch {
                 try {
-                    renderer.renderScore(score, actualTracks)
+                    val renderScore =
+                        JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
+                    renderer.renderScore(renderScore, actualTracks)
                 } catch (e: Throwable) {
                     error = e
                     waitHandle.release()
