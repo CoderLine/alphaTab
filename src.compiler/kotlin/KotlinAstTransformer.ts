@@ -10,6 +10,11 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         this._testMethodAttribute = 'org.junit.Test';
     }
 
+    public get extension(): string {
+        return '.kt'
+    }
+
+
     private _paramReferences: Map<string, cs.Identifier[]>[] = [];
     private _paramsWithAssignment: Set<string>[] = [];
 
@@ -47,7 +52,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 case '++':
                 case '--':
                     const op = this._context.typeChecker.getSymbolAtLocation(expression.operand);
-                    if (op?.valueDeclaration && op.valueDeclaration.kind == ts.SyntaxKind.Parameter) {
+                    if (op?.valueDeclaration && op.valueDeclaration.kind === ts.SyntaxKind.Parameter) {
                         this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(op.name);
                     }
                     break;
@@ -63,7 +68,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 case '++':
                 case '--':
                     const op = this._context.typeChecker.getSymbolAtLocation(expression.operand);
-                    if (op?.valueDeclaration && op.valueDeclaration.kind == ts.SyntaxKind.Parameter) {
+                    if (op?.valueDeclaration && op.valueDeclaration.kind === ts.SyntaxKind.Parameter) {
                         this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(op.name);
                     }
                     break;
@@ -85,7 +90,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             expression.operatorToken.kind === ts.SyntaxKind.SlashEqualsToken
         ) {
             const left = this._context.typeChecker.getSymbolAtLocation(expression.left);
-            if (left?.valueDeclaration && left.valueDeclaration.kind == ts.SyntaxKind.Parameter) {
+            if (left?.valueDeclaration && left.valueDeclaration.kind === ts.SyntaxKind.Parameter) {
                 this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(left.name);
             }
         }
@@ -93,8 +98,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         // a == this or this == a
         // within an equals method needs to have the operator ===
 
-        if (
-            bin?.nodeType === cs.SyntaxKind.BinaryExpression &&
+        if (bin && 
+            cs.isBinaryExpression(bin) &&
             (expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken ||
                 expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsToken) &&
             this._currentClassElement?.name &&
@@ -179,8 +184,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         this._paramsWithAssignment.push(new Set<string>());
 
         const el = super.visitSetAccessor(parent, classElement);
-        if (el.body?.nodeType === cs.SyntaxKind.Block) {
-            this.injectParametersAsLocal(el.body as cs.Block);
+        if (el.body && cs.isBlock(el.body)) {
+            this.injectParametersAsLocal(el.body);
         }
 
         this._paramReferences.pop();
@@ -195,8 +200,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
         const constr = super.visitConstructorDeclaration(parent, classElement);
 
-        if (constr.body?.nodeType === cs.SyntaxKind.Block) {
-            this.injectParametersAsLocal(constr.body as cs.Block);
+        if (constr.body && cs.isBlock(constr.body)) {
+            this.injectParametersAsLocal(constr.body);
         }
 
         this._paramReferences.pop();
@@ -238,8 +243,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
         const method = super.visitMethodDeclaration(parent, classElement);
 
-        if (method.body?.nodeType === cs.SyntaxKind.Block) {
-            this.injectParametersAsLocal(method.body as cs.Block);
+        if (method.body && cs.isBlock(method.body)) {
+            this.injectParametersAsLocal(method.body);
         }
 
         this._paramReferences.pop();
@@ -260,10 +265,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 switch (symbol.name) {
                     case 'length':
                         // new Array<string>(other.length)
-                        if (
-                            expression.parent?.nodeType === cs.SyntaxKind.NewExpression &&
+                        if (expression.parent &&
+                            cs.isNewExpression(expression.parent) &&
                             (expression.parent.tsNode as ts.NewExpression).arguments?.length === 1 &&
-                            ((expression.parent as cs.NewExpression).type as cs.UnresolvedTypeNode).tsType?.symbol
+                            (expression.parent.type as cs.UnresolvedTypeNode).tsType?.symbol
                                 ?.name === 'ArrayConstructor'
                         ) {
                             return 'size';
@@ -288,10 +293,12 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 switch (symbol.name) {
                     case 'length':
                         if (
-                            expression.parent?.nodeType === cs.SyntaxKind.ReturnStatement ||
-                            expression.parent?.nodeType === cs.SyntaxKind.VariableDeclaration ||
-                            (expression.parent?.nodeType === cs.SyntaxKind.BinaryExpression &&
-                                (expression.parent as cs.BinaryExpression).operator === '=')
+                            expression.parent && (
+                            cs.isReturnStatement(expression.parent) ||
+                            cs.isVariableDeclaration(expression.parent) ||
+                            (cs.isBinaryExpression(expression.parent) &&
+                                expression.parent.operator === '=')
+                            )
                         ) {
                             return 'length.toDouble()';
                         }

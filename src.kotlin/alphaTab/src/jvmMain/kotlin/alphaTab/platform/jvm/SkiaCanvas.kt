@@ -291,7 +291,6 @@ class SkiaCanvas : ICanvas {
                 val (_, emHeightDescent) = normalizedTypoAscentDescent(font)
                 return -emHeightDescent
             }
-            else -> 0.0f
         }
     }
 
@@ -393,7 +392,7 @@ class SkiaCanvas : ICanvas {
             .toCharArray()
         )
 
-        textRun(s, MusicFont, MusicFontSize * scale, fun(blob, font, paint) {
+        textRun(s, MusicFont, MusicFontSize * scale, fun(blob, _, paint) {
             val xOffset = getFontOffset(
                 if (centerAtPosition == true) TextAlign.Center else TextAlign.Left,
                 blob

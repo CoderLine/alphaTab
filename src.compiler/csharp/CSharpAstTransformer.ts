@@ -13,6 +13,11 @@ export default class CSharpAstTransformer {
     protected _testClassAttribute: string = 'microsoft.visualStudio.testTools.unitTesting.TestClass';
     protected _testMethodAttribute: string = 'microsoft.visualStudio.testTools.unitTesting.TestMethod';
 
+    public get extension(): string {
+        return '.cs'
+    }
+
+
     public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
         this._typeScriptFile = typeScript;
         this._context = context;
@@ -21,7 +26,7 @@ export default class CSharpAstTransformer {
             path.resolve(this._context.compilerOptions.baseUrl!),
             path.resolve(this._typeScriptFile.fileName)
         );
-        fileName = path.join(context.compilerOptions.outDir!, this.removeExtension(fileName) + '.cs');
+        fileName = path.join(context.compilerOptions.outDir!, this.removeExtension(fileName) + this.extension);
 
         this._csharpFile = {
             parent: null,
@@ -291,8 +296,6 @@ export default class CSharpAstTransformer {
             this.visitEnumDeclaration(node);
         } else if (ts.isInterfaceDeclaration(node)) {
             this.visitInterfaceDeclaration(node);
-        } else if (ts.isTypeAliasDeclaration(node) && ts.isFunctionTypeNode(node.type)) {
-            this.visitTypeAliasDeclaration(node);
         }
 
         return node;
@@ -360,10 +363,6 @@ export default class CSharpAstTransformer {
 
         parent.members.push(csEnumMember);
         this._context.registerSymbol(csEnumMember);
-    }
-
-    protected visitTypeAliasDeclaration(node: ts.TypeAliasDeclaration) {
-        //throw new Error("Method not implemented.");
     }
 
     protected visitInterfaceDeclaration(node: ts.InterfaceDeclaration) {
@@ -948,14 +947,13 @@ export default class CSharpAstTransformer {
     protected visitGetAccessor(parent: cs.ClassDeclaration, classElement: ts.GetAccessorDeclaration) {
         const propertyName = this._context.toPascalCase(classElement.name.getText());
         const member = parent.members.find(m => m.name === propertyName);
-        if (member && member.nodeType === cs.SyntaxKind.PropertyDeclaration) {
-            let existingProperty = member as cs.PropertyDeclaration;
-            existingProperty.getAccessor = {
+        if (member && cs.isPropertyDeclaration(member)) {
+            member.getAccessor = {
                 keyword: 'get',
-                parent: existingProperty,
+                parent: member,
                 nodeType: cs.SyntaxKind.PropertyAccessorDeclaration,
                 tsNode: classElement,
-                body: classElement.body ? this.visitBlock(existingProperty, classElement.body) : null
+                body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
         } else {
             const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
@@ -1019,16 +1017,15 @@ export default class CSharpAstTransformer {
     protected visitSetAccessor(parent: cs.ClassDeclaration, classElement: ts.SetAccessorDeclaration) {
         const propertyName = this._context.toPascalCase(classElement.name.getText());
         const member = parent.members.find(m => m.name === propertyName);
-        if (member && member.nodeType === cs.SyntaxKind.PropertyDeclaration) {
-            let existingProperty = member as cs.PropertyDeclaration;
-            existingProperty.setAccessor = {
+        if (member && cs.isPropertyDeclaration(member)) {
+            member.setAccessor = {
                 keyword: 'set',
-                parent: existingProperty,
+                parent: member,
                 nodeType: cs.SyntaxKind.PropertyAccessorDeclaration,
                 tsNode: classElement,
-                body: classElement.body ? this.visitBlock(existingProperty, classElement.body) : null
+                body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
-            return existingProperty.setAccessor;
+            return member.setAccessor;
         } else {
             const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
             const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
@@ -1130,8 +1127,8 @@ export default class CSharpAstTransformer {
                 switch (m.kind) {
                     case ts.SyntaxKind.AbstractKeyword:
                         csProperty.isAbstract = true;
-                        if (parent.nodeType === cs.SyntaxKind.ClassDeclaration) {
-                            (parent as cs.ClassDeclaration).isAbstract = true;
+                        if (cs.isClassDeclaration(parent)) {
+                            parent.isAbstract = true;
                         }
                         csProperty.isVirtual = false;
                         csProperty.isOverride = false;
@@ -1230,8 +1227,8 @@ export default class CSharpAstTransformer {
                 switch (m.kind) {
                     case ts.SyntaxKind.AbstractKeyword:
                         csMethod.isAbstract = true;
-                        if (parent.nodeType === cs.SyntaxKind.ClassDeclaration) {
-                            (parent as cs.ClassDeclaration).isAbstract = true;
+                        if (cs.isClassDeclaration(parent)) {
+                            parent.isAbstract = true;
                         }
                         csMethod.isVirtual = false;
                         break;
@@ -1418,7 +1415,7 @@ export default class CSharpAstTransformer {
             const type = this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, s);
 
             variableStatement.name = s.name.text;
-            if (parent.nodeType === cs.SyntaxKind.CatchClause) {
+            if (cs.isCatchClause(parent)) {
                 variableStatement.type = {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: variableStatement,
@@ -1894,7 +1891,7 @@ export default class CSharpAstTransformer {
 
         if (p.initializer) {
             csParameter.initializer = this.visitExpression(csParameter, p.initializer) ?? undefined;
-            if (csParameter.initializer && csParameter.initializer.nodeType === cs.SyntaxKind.NullLiteral) {
+            if (csParameter.initializer && cs.isNullLiteral(csParameter.initializer)) {
                 csParameter.type!.isNullable = true;
             }
         } else if (csParameter.type!.isOptional) {
@@ -1928,11 +1925,9 @@ export default class CSharpAstTransformer {
             const block = csConstructor.body as cs.Block;
             if (
                 block.statements.length > 0 &&
-                block.statements[0].nodeType === cs.SyntaxKind.ExpressionStatement &&
-                (block.statements[0] as cs.ExpressionStatement).expression.nodeType ===
-                    cs.SyntaxKind.InvocationExpression &&
-                ((block.statements[0] as cs.ExpressionStatement).expression as cs.InvocationExpression).expression
-                    .nodeType === cs.SyntaxKind.BaseLiteralExpression
+                cs.isExpressionStatement(block.statements[0]) &&
+                cs.isInvocationExpression((block.statements[0] as cs.ExpressionStatement).expression) &&
+                cs.isBaseLiteralExpression(((block.statements[0] as cs.ExpressionStatement).expression as cs.InvocationExpression).expression)
             ) {
                 csConstructor.baseConstructorArguments = ((block.statements[0] as cs.ExpressionStatement)
                     .expression as cs.InvocationExpression).arguments;
@@ -2100,7 +2095,7 @@ export default class CSharpAstTransformer {
 
     protected visitThisExpression(parent: cs.Node, expression: ts.ThisExpression) {
         if (
-            parent.nodeType === cs.SyntaxKind.MemberAccessExpression &&
+            cs.isMemberAccessExpression(parent) &&
             parent.tsSymbol &&
             this._context.isStaticSymbol(parent.tsSymbol)
         ) {
@@ -2398,7 +2393,7 @@ export default class CSharpAstTransformer {
                         }
 
                         let nextParent = parent;
-                        while (nextParent.nodeType === cs.SyntaxKind.ParenthesizedExpression) {
+                        while (cs.isParenthesizedExpression(nextParent)) {
                             nextParent = nextParent.parent!;
                         }
 
@@ -2425,8 +2420,8 @@ export default class CSharpAstTransformer {
     }
 
     private hasBinaryOperationMakeInt(left: cs.Expression): boolean {
-        if (left.nodeType === cs.SyntaxKind.ParenthesizedExpression) {
-            return this.hasBinaryOperationMakeInt((left as cs.ParenthesizedExpression).expression);
+        if (cs.isParenthesizedExpression(left)) {
+            return this.hasBinaryOperationMakeInt(left.expression);
         }
 
         if (left.nodeType !== cs.SyntaxKind.BinaryExpression) {
@@ -2577,7 +2572,7 @@ export default class CSharpAstTransformer {
     }
 
     protected visitFunctionExpression(parent: cs.Node, expression: ts.FunctionExpression) {
-        if (parent.nodeType === cs.SyntaxKind.ExpressionStatement) {
+        if (cs.isExpressionStatement(parent)) {
             this._context.addTsNodeDiagnostics(
                 expression,
                 'Local function declarations are not yet supported',
@@ -3319,7 +3314,7 @@ export default class CSharpAstTransformer {
             }
         }
 
-        if (type && type.symbol && type.symbol.name == 'ArrayConstructor' && newExpression.arguments.length === 1) {
+        if (type && type.symbol && type.symbol.name === 'ArrayConstructor' && newExpression.arguments.length === 1) {
             newExpression.arguments[0] = this.makeInt(newExpression.arguments[0]);
         }
 

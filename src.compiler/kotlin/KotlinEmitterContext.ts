@@ -13,7 +13,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         // partial member access
         if (
             expr?.parent &&
-            expr.parent.nodeType === cs.SyntaxKind.MemberAccessExpression &&
+            cs.isMemberAccessExpression(expr.parent) &&
             expr.parent.tsSymbol &&
             this.isSymbolPartial(expr.parent.tsSymbol)
         ) {
