@@ -10,7 +10,7 @@ version = "1.3-SNAPSHOT"
 repositories {
     google()
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://packages.jetbrains.team/maven/p/skija/maven")
 }
 
 kotlin {
@@ -35,7 +35,7 @@ kotlin {
         val os = System.getProperty("os.name")
         val target = when {
             os == "Mac OS X" -> {
-                "macos"
+                "macos-x64"
             }
             os.startsWith("Win") -> {
                 "windows"
@@ -49,7 +49,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("org.jetbrains.skiko:skiko-jvm-runtime-$target-x64:0.2.6")
+                api("org.jetbrains.skija:skija-$target:0.89.32")
             }
         }
         jvmMain.kotlin.srcDirs("src/jvmCommon/kotlin")

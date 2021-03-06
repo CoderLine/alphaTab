@@ -208,9 +208,11 @@ class VisualTestHelperPartials {
                 val referenceBitmap =
                     Image.makeFromEncoded(referenceFileData.buffer.raw.asByteArray())
 
+                var pass:Boolean
+                var msg:String
                 try {
-                    val finalBitmapRaw = toRawBytes(imageInfo, finalBitmap)
-                    val referenceBitmapRaw = toRawBytes(imageInfo, referenceBitmap)
+                    val finalBitmapRaw = toRawBytes(finalBitmap)
+                    val referenceBitmapRaw = toRawBytes(referenceBitmap)
 
                     val diffData = Uint8Array(finalBitmapRaw.size.toDouble())
                     val match = PixelMatch.match(
@@ -228,30 +230,21 @@ class VisualTestHelperPartials {
 
                     val totalPixels = match.totalPixels - match.transparentPixels
                     val percentDifference = (match.differentPixels / totalPixels) * 100
-                    val pass = percentDifference < tolerancePercent
-                    if (!pass) {
-                        TestPlatformPartials.saveFile(
-                            referenceFileName,
-                            referenceFileData
-                        )
+                    pass = percentDifference < tolerancePercent
 
-                        val png = finalBitmap.encodeToData(EncodedImageFormat.PNG)
-                        TestPlatformPartials.saveFile(
-                            finalImageFileName,
-                            Uint8Array(png!!.bytes.asUByteArray())
-                        )
+                    val percentDifferenceText = percentDifference.toInvariantString()
+                    msg =
+                        "Difference between original and new image is too big: ${match.differentPixels}/$totalPixels (${percentDifferenceText}%) $message"
 
-
-                        val percentDifferenceText = percentDifference.toInvariantString()
-                        val msg =
-                            "Difference between original and new image is too big: ${match.differentPixels}/$totalPixels (${percentDifferenceText}%) $message"
-
+                    if(!pass) {
                         val diffImageName =
                             TestPlatform.changeExtension(referenceFileName, ".diff.png")
 
-                        println(diffImageName)
-
-                        val diff = toImage(imageInfo, diffData.buffer.raw)
+                        val diff = Image.makeRaster(
+                            imageInfo,
+                            diffData.buffer.raw.asByteArray(),
+                            imageInfo.minRowBytes
+                        )
                         diff.use {
                             val diffPngData = diff.encodeToData(EncodedImageFormat.PNG)
                             TestPlatformPartials.saveFile(
@@ -259,53 +252,42 @@ class VisualTestHelperPartials {
                                 Uint8Array(diffPngData!!.bytes.asUByteArray())
                             )
                         }
-
-                        val newImageName =
-                            TestPlatform.changeExtension(referenceFileName, ".new.png")
-                        val finalBitmapData = finalBitmap.encodeToData(EncodedImageFormat.PNG)
-                        TestPlatformPartials.saveFile(
-                            newImageName,
-                            Uint8Array(finalBitmapData!!.bytes.asUByteArray())
-                        )
-                        Assert.fail(msg)
                     }
+
                 } catch (e: Throwable) {
-                    Assert.fail("Error comparing images:  ${e.message} ${e.stackTraceToString()}, $message")
+                    pass = false
+                    msg = "Error comparing images:  ${e.message} ${e.stackTraceToString()}, $message"
+                }
+
+                if (!pass) {
+                    TestPlatformPartials.saveFile(
+                        referenceFileName,
+                        referenceFileData
+                    )
+
+                    val png = finalBitmap.encodeToData(EncodedImageFormat.PNG)
+                    TestPlatformPartials.saveFile(
+                        finalImageFileName,
+                        Uint8Array(png!!.bytes.asUByteArray())
+                    )
+
+                    val newImageName =
+                        TestPlatform.changeExtension(referenceFileName, ".new.png")
+                    val finalBitmapData = finalBitmap.encodeToData(EncodedImageFormat.PNG)
+                    TestPlatformPartials.saveFile(
+                        newImageName,
+                        Uint8Array(finalBitmapData!!.bytes.asUByteArray())
+                    )
+                    Assert.fail(msg)
                 }
             }
         }
 
-        // Workaround for missing Skija methods
-        // https://github.com/JetBrains/skija/issues/95
-
-        private fun toImage(imageInfo: ImageInfo, raw: UByteArray): Image {
-            val bitmap = Bitmap()
+        private fun toRawBytes(image: Image): UByteArray {
+            val bitmap = Bitmap.makeFromImage(image)
             bitmap.use {
-                bitmap.imageInfo = imageInfo
-                bitmap.allocPixels()
-                bitmap.installPixels(bitmap.imageInfo, raw.asByteArray(), bitmap.rowBytes)
-
-
-                val surface = Surface.makeRaster(bitmap.imageInfo)
-                surface.use {
-                    surface.writePixels(bitmap, 0, 0)
-                    return surface.makeImageSnapshot()
-                }
+                return bitmap.readPixels()!!.asUByteArray()
             }
-        }
-
-        private fun toRawBytes(imageInfo: ImageInfo, image: Image): UByteArray {
-            val bitmap = Bitmap()
-            bitmap.imageInfo = imageInfo
-            bitmap.allocPixels()
-
-            val canvas = Canvas(bitmap)
-            canvas.use {
-                canvas.drawImage(image, 0f, 0f)
-            }
-
-            val raw = bitmap.readPixels(bitmap.imageInfo, bitmap.rowBytes, 0, 0)
-            return raw!!.asUByteArray()
         }
     }
 }

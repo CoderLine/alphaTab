@@ -9,7 +9,10 @@ import alphaTab.platform.ICanvas
 import alphaTab.platform.TextAlign
 import alphaTab.platform.TextBaseline
 import org.jetbrains.skija.*
+import org.jetbrains.skija.shaper.RunHandler
+import org.jetbrains.skija.shaper.RunInfo
 import org.jetbrains.skija.shaper.Shaper
+import org.jetbrains.skija.shaper.TextBlobBuilderRunHandler
 import java.lang.IllegalStateException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.math.floor
@@ -206,7 +209,7 @@ class SkiaCanvas : ICanvas {
     }
 
     override fun fillText(text: String, x: Double, y: Double) {
-        textRun(text, fun(blob, font, paint) {
+        textRun(text, typeFace, font.size, fun(blob, font, paint) {
             val xOffset = getFontOffset(
                 textAlign,
                 blob
@@ -217,11 +220,10 @@ class SkiaCanvas : ICanvas {
                 font
             )
 
-            val ascent = floatAscent(font.metrics)
             _surface.canvas.drawTextBlob(
                 blob,
                 x.toFloat() + xOffset,
-                y.toFloat() + fontBaseLine - ascent - skScalarRoundToScalar(font.metrics.leading),
+                y.toFloat() + fontBaseLine,
                 paint
             )
         })
@@ -229,20 +231,44 @@ class SkiaCanvas : ICanvas {
 
     private fun textRun(
         text: String,
+        typeFace: Typeface,
+        size:Double,
         action: (blob: TextBlob, font: org.jetbrains.skija.Font, paint: Paint) -> Unit
     ) {
         val paint = createPaint()
+        paint.mode = PaintMode.FILL
+
         paint.use {
             val shaper = Shaper.make()
             shaper.use {
-                val font = Font(typeFace, this.font.size.toFloat())
+                val font = Font(typeFace, (size * settings.display.scale).toFloat())
                 font.edging = FontEdging.ANTI_ALIAS
                 font.isSubpixel = true
                 font.hinting = FontHinting.NORMAL
+                val metrics = font.metrics
+                // SkShaper seems to add a negative ascent to the Y-position, we have to correct this
+                // https://source.chromium.org/chromium/chromium/src/+/master:third_party/skia/modules/skshaper/src/SkShaper.cpp;l=206;drc=c21c001893e2dd8229ab321465e4408798ff7289;bpv=1;bpt=1
+                val yMetricsOffset = - metrics.ascent
                 font.use {
-                    val blob = shaper.shape(text, font)
+                    val blob = shaper.shape(
+                        text, font
+                    )
                     blob?.use {
-                        action(blob, font, paint)
+                        val blobBuilder = TextBlobBuilder()
+                        val pos = arrayListOf<Point>()
+
+                        for(i in blob.glyphs.indices) {
+                            val xOffset = blob.positions[i * 2]
+                            val yOffset = blob.positions[(i * 2) + 1] - yMetricsOffset
+                            pos.add(Point(xOffset, yOffset))
+                        }
+
+                        blobBuilder.appendRunPos(font, blob.glyphs, pos.toTypedArray())
+
+                        val skiaBlob = blobBuilder.build()
+                        skiaBlob?.use {
+                            action(skiaBlob, font, paint)
+                        }
                     }
                 }
             }
@@ -258,25 +284,25 @@ class SkiaCanvas : ICanvas {
             TextBaseline.Top -> // kHangingTextBaseline
                 return floatAscent(font.metrics) * HangingAsPercentOfAscent / 100.0f
             TextBaseline.Middle -> {// kMiddleTextBaseline
-                val (emHeightAscent, emHeightDescent) = emHeightAscentDescent(font)
+                val (emHeightAscent, emHeightDescent) = normalizedTypoAscentDescent(font)
                 return (emHeightAscent - emHeightDescent) / 2.0f
             }
             TextBaseline.Bottom -> {// kBottomTextBaseline
-                val (_, emHeightDescent) = emHeightAscentDescent(font)
+                val (_, emHeightDescent) = normalizedTypoAscentDescent(font)
                 return -emHeightDescent
             }
             else -> 0.0f
         }
     }
 
-    private fun emHeightAscentDescent(font: org.jetbrains.skija.Font): Pair<Float, Float> {
+    private fun normalizedTypoAscentDescent(font: org.jetbrains.skija.Font): Pair<Float, Float> {
         val typeface = font.typeface!!
         val (typoAscent, typeDecent) = typoAscenderDescender(typeface)
         if (typoAscent > 0) {
             val normalized = normalizeEmHeightMetrics(
                 font,
                 typoAscent.toFloat(),
-                (typoAscent + typeDecent).toFloat()
+                typeDecent.toFloat()
             )
             if (normalized != null) {
                 return normalized
@@ -286,7 +312,7 @@ class SkiaCanvas : ICanvas {
         val metrics = font.metrics
         val metricAscent = floatAscent(metrics)
         val metricDescent = floatDescent(metrics)
-        val normalized = normalizeEmHeightMetrics(font, metricAscent, metricAscent + metricDescent)
+        val normalized = normalizeEmHeightMetrics(font, metricAscent, metricDescent)
         if (normalized != null) {
             return normalized
         }
@@ -297,8 +323,9 @@ class SkiaCanvas : ICanvas {
     private fun normalizeEmHeightMetrics(
         font: org.jetbrains.skija.Font,
         ascent: Float,
-        height: Float
+        descent: Float
     ): Pair<Float, Float>? {
+        val height = ascent + descent
         if (height <= 0 || ascent < 0 || ascent > height) {
             return null
         }
@@ -312,8 +339,8 @@ class SkiaCanvas : ICanvas {
     private fun typoAscenderDescender(typeface: Typeface): Pair<Short, Short> {
         val buffer = typeface.getTableData("OS/2")
         if (buffer != null && buffer.size >= 72) {
-            val ascender = BitConverter.getInt16 (buffer.bytes, 68, false)
-            val descender = -BitConverter.getInt16 (buffer.bytes, 70, false)
+            val ascender = BitConverter.getInt16(buffer.bytes, 68, false)
+            val descender = -BitConverter.getInt16(buffer.bytes, 70, false)
             return Pair(ascender, descender.toShort())
         }
 
@@ -337,7 +364,7 @@ class SkiaCanvas : ICanvas {
             return 0.0
         }
         var size = 0.0
-        textRun(text, fun(blob, _, _) {
+        textRun(text, typeFace, font.size, fun(blob, _, _) {
             size = blob.blockBounds.width.toDouble()
         })
         return size
@@ -366,31 +393,18 @@ class SkiaCanvas : ICanvas {
             .toCharArray()
         )
 
-        val paint = createPaint()
-        paint.use {
-            val shaper = Shaper.make()
-            shaper.use {
-                val font = Font(MusicFont, (MusicFontSize * scale).toFloat())
-                font.edging = FontEdging.ANTI_ALIAS
-                font.isSubpixel = true
-                font.hinting = FontHinting.NORMAL
-                font.use {
-                    val blob = shaper.shape(s, font)
-                    blob?.use {
-                        val xOffset = getFontOffset(
-                            if (centerAtPosition == true) TextAlign.Center else TextAlign.Left,
-                            it
-                        )
-                        _surface.canvas.drawTextBlob(
-                            blob,
-                            x.toFloat() + xOffset,
-                            y.toFloat() - font.metrics.descent,
-                            paint
-                        )
-                    }
-                }
-            }
-        }
+        textRun(s, MusicFont, MusicFontSize * scale, fun(blob, font, paint) {
+            val xOffset = getFontOffset(
+                if (centerAtPosition == true) TextAlign.Center else TextAlign.Left,
+                blob
+            )
+            _surface.canvas.drawTextBlob(
+                blob,
+                x.toFloat() + xOffset,
+                y.toFloat(),
+                paint
+            )
+        })
     }
 
     private fun getFontOffset(textAlign: TextAlign, blob: TextBlob): Float {
@@ -411,3 +425,93 @@ class SkiaCanvas : ICanvas {
         _surface.canvas.restore()
     }
 }
+
+
+//@ExperimentalUnsignedTypes
+//class TextBlobBuilderRunHandler : RunHandler, AutoCloseable {
+//    private val _blobBuilder: TextBlobBuilder = TextBlobBuilder()
+//
+//    private var _offset = Point(0f, 0f)
+//    private var _currentPosition = Point(0f, 0f)
+//    private var _maxRunAscent = 0f
+//    private var _maxRunDescent = 0f
+//    private var _maxRunLeading = 0f
+//    private var _clusterOffset = 0.toUInt()
+//    private var _glyphCount = 0.toUInt()
+//    private var _clusters = arrayListOf<UInt>()
+//
+////    val points = mutableListOf<Point>()
+////    for(glyphIndex in shaped.glyphs.indices) {
+////        val xOffset = shaped.positions[glyphIndex * 2]
+////        val yOffset = -shaped.positions[(glyphIndex * 2) + 1]
+////        points.add(Point(xOffset, yOffset))
+////    }
+////    val skiaBlob = TextBlob.makeFromPos(
+////        shaped.glyphs,
+////        points.toTypedArray(),
+////        font
+////    )
+////
+//
+//    public fun makeTextBlob(): TextBlob {
+//        return _blobBuilder.build()!!
+//    }
+//
+//    override fun beginLine() {
+//        _currentPosition = _offset
+//        _maxRunAscent = 0f
+//        _maxRunDescent = 0f
+//        _maxRunLeading = 0f
+//    }
+//
+//    override fun runInfo(info: RunInfo?) {
+//        if (info != null) {
+//            val metrics = info.font.metrics
+//            _maxRunAscent = maxOf(_maxRunAscent, metrics.ascent)
+//            _maxRunDescent = maxOf(_maxRunDescent, metrics.descent)
+//            _maxRunLeading = maxOf(_maxRunLeading, metrics.leading)
+//        }
+//    }
+//
+//    override fun commitRunInfo() {
+//        _currentPosition = Point(_currentPosition.x, _currentPosition.y - _maxRunAscent)
+//    }
+//
+//    override fun runOffset(info: RunInfo?): Point {
+//        if(info != null){
+//            val glyphs = ShortArray(info.glyphCount.toInt())
+//
+//
+//            info.
+//            _glyphCount = info.glyphCount.toUInt()
+//            val pos = info.points;
+//            _blobBuilder.appendRunPos(info.font,glyphs )
+//
+//        }
+//
+//        return _currentPosition
+//    }
+//
+//    override fun commitRun(
+//        info: RunInfo?,
+//        glyphs: ShortArray?,
+//        positions: Array<out Point>?,
+//        clusters: IntArray?
+//    ) {
+//        if (info != null) {
+//            for (i in 0 until _glyphCount) {
+//                _clusters[i] -= _clusterOffset
+//            }
+//            _currentPosition =
+//                Point(_currentPosition.x + info.advance.x, _currentPosition.x + info.advance.y)
+//        }
+//    }
+//
+//    override fun commitLine() {
+//        _offset = Point(_offset.x, _offset.x + (_maxRunDescent + _maxRunLeading - _maxRunAscent))
+//    }
+//
+//    override fun close() {
+//        _blobBuilder.close()
+//    }
+//}
