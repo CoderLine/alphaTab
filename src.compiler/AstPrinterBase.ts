@@ -15,9 +15,6 @@ export default abstract class AstPrinterBase {
 
     public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
         this._sourceFile = sourceFile;
-        if (sourceFile.fileName.endsWith('.cs')) {
-            sourceFile.fileName = sourceFile.fileName.substr(0, sourceFile.fileName.length - 3) + '.kt';
-        }
         this._context = context;
     }
 
