@@ -62,6 +62,25 @@ namespace AlphaTab.Platform.CSharp
             MusicFont = SKTypeface.FromStream(bravura);
         }
 
+        private static readonly IDictionary<string, SKTypeface> CustomTypeFaces =
+            new Dictionary<string, SKTypeface>(StringComparer.OrdinalIgnoreCase);
+        public static void RegisterCustomFont(byte[] data)
+        {
+            var face = SKTypeface.FromStream(new MemoryStream(data));
+            CustomTypeFaces[CustomTypeFaceKey(face)] = face;
+        }
+
+        private static string CustomTypeFaceKey(SKTypeface typeface)
+        {
+            return CustomTypeFaceKey(typeface.FamilyName, typeface.FontWeight > 400,
+                typeface.FontSlant == SKFontStyleSlant.Italic);
+        }
+
+        private static string CustomTypeFaceKey(string fontFamily, bool isBold, bool isItalic)
+        {
+            return fontFamily.ToLowerInvariant() + "_" + isBold + "_" + isItalic;
+        }
+
         private SKSurface? _surface;
         private SKPath? _path;
         private string _typeFaceCache = "";
@@ -80,11 +99,16 @@ namespace AlphaTab.Platform.CSharp
                     _typeFace?.Dispose();
 
                     _typeFaceCache = Font.ToCssString(Settings.Display.Scale);
-                    _typeFace = SKTypeface.FromFamilyName(Font.Family,
-                        Font.IsBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal,
-                        SKFontStyleWidth.Normal,
-                        Font.IsItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright
-                    );
+
+                    var key = CustomTypeFaceKey(Font.Family, Font.IsBold, Font.IsItalic);
+                    if (!CustomTypeFaces.TryGetValue(key, out _typeFace))
+                    {
+                        _typeFace = SKTypeface.FromFamilyName(Font.Family,
+                            Font.IsBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal,
+                            SKFontStyleWidth.Normal,
+                            Font.IsItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright
+                        );
+                    }
                 }
 
                 return _typeFace;

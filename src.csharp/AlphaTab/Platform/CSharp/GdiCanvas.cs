@@ -19,8 +19,31 @@ namespace AlphaTab.Platform.CSharp
     {
         private static readonly Graphics MeasurementGraphics;
         private static readonly PrivateFontCollection MusicFontCollection;
+        private static readonly PrivateFontCollection CustomFontCollection = new PrivateFontCollection();
+        private static readonly IDictionary<string, FontFamily> CustomFontFamilies =
+            new Dictionary<string, FontFamily>(StringComparer.OrdinalIgnoreCase);
         private static readonly StringFormat MusicFontFormat;
         private static readonly StringFormat MusicFontFormatCenter;
+
+        public static void RegisterCustomFont(byte[] data)
+        {
+            var dataPtr = Marshal.AllocCoTaskMem(data.Length);
+            try
+            {
+                Marshal.Copy(data, 0, dataPtr, data.Length);
+                CustomFontCollection.AddMemoryFont(dataPtr, data.Length);
+
+                CustomFontFamilies.Clear();
+                foreach (var family in CustomFontCollection.Families)
+                {
+                    CustomFontFamilies[family.Name] = family;
+                }
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem(dataPtr);
+            }
+        }
 
         static GdiCanvas()
         {
@@ -136,7 +159,7 @@ namespace AlphaTab.Platform.CSharp
             {
                 var fw = _font.Bold ? Model.FontWeight.Bold : Model.FontWeight.Regular;
                 var fs = _font.Italic ? Model.FontStyle.Italic : Model.FontStyle.Plain;
-                
+
                 return new Model.Font(_font.FontFamily.Name, _font.Size * Settings.Display.Scale,
                     fs, fw);
             }
@@ -153,9 +176,19 @@ namespace AlphaTab.Platform.CSharp
                     fontStyle = GdiFontStyle.Italic;
                 }
 
-                _font = new GdiFont(value.Family, (float) (value.Size * Settings.Display.Scale),
-                    fontStyle,
-                    GraphicsUnit.Pixel);
+                if (CustomFontFamilies.TryGetValue(value.Family, out var gdiFamily))
+                {
+                    _font = new GdiFont(gdiFamily, (float) (value.Size * Settings.Display.Scale),
+                        fontStyle,
+                        GraphicsUnit.Pixel);
+
+                }
+                else
+                {
+                    _font = new GdiFont(value.Family, (float) (value.Size * Settings.Display.Scale),
+                        fontStyle,
+                        GraphicsUnit.Pixel);
+                }
             }
         }
 
@@ -348,7 +381,7 @@ namespace AlphaTab.Platform.CSharp
             _currentY = y;
             Fill();
         }
-        
+
         public void StrokeCircle(double x, double y, double radius)
         {
             _currentPath.StartFigure();

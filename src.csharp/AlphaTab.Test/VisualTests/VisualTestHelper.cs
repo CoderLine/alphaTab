@@ -6,6 +6,7 @@ using AlphaTab.Core.EcmaScript;
 using AlphaTab.Importer;
 using AlphaTab.Io;
 using AlphaTab.Model;
+using AlphaTab.Platform.CSharp;
 using AlphaTab.Rendering;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkiaSharp;
@@ -66,6 +67,20 @@ namespace AlphaTab.VisualTests
             settings.Core.EnableLazyLoading = false;
             settings.Core.UseWorkers = false;
 
+            settings.Display.Resources.CopyrightFont.Family = "Roboto";
+            settings.Display.Resources.TitleFont.Family = "PTSerif";
+            settings.Display.Resources.SubTitleFont.Family = "PTSerif";
+            settings.Display.Resources.WordsFont.Family = "PTSerif";
+            settings.Display.Resources.EffectFont.Family = "PTSerif";
+            settings.Display.Resources.FretboardNumberFont.Family = "Roboto";
+            settings.Display.Resources.TablatureFont.Family = "Roboto";
+            settings.Display.Resources.GraceFont.Family = "Roboto";
+            settings.Display.Resources.BarNumberFont.Family = "Roboto";
+            settings.Display.Resources.FingeringFont.Family = "PTSerif";
+            settings.Display.Resources.MarkerFont.Family = "PTSerif";
+
+            LoadFonts();
+
             if (!referenceFileName.StartsWith("test-data/"))
             {
                 referenceFileName = $"test-data/visual-tests/{referenceFileName}";
@@ -119,6 +134,26 @@ namespace AlphaTab.VisualTests
             else
             {
                 Assert.Fail("Rendering did not complete within timeout");
+            }
+        }
+
+        private static void LoadFonts()
+        {
+            var fonts = new[]
+            {
+                "font/roboto/Roboto-Regular.ttf",
+                "font/roboto/Roboto-Italic.ttf",
+                "font/roboto/Roboto-Bold.ttf",
+                "font/roboto/Roboto-BoldItalic.ttf",
+                "font/ptserif/PTSerif-Regular.ttf",
+                "font/ptserif/PTSerif-Italic.ttf",
+                "font/ptserif/PTSerif-Bold.ttf",
+                "font/ptserif/PTSerif-BoldItalic.ttf"
+            };
+            foreach (var font in fonts)
+            {
+                var data = File.ReadAllBytes(font);
+                SkiaCanvas.RegisterCustomFont(data);
             }
         }
 
