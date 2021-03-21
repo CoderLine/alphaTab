@@ -75,7 +75,17 @@ export class VisualTestHelper {
      * @target web
      * @partial
      */
+    private static _fontsLoaded = false;
+
+    /**
+     * @target web
+     * @partial
+     */
     private static async loadFonts(): Promise<void> {
+        if(VisualTestHelper._fontsLoaded) {
+            return;
+        }
+        VisualTestHelper._fontsLoaded = true;
         const allFonts: FontFace[] = [];
 
         const robotoRegular = new FontFace('Roboto', 'url(/base/font/roboto/Roboto-Regular.ttf)', {
@@ -102,25 +112,25 @@ export class VisualTestHelper {
         });
         allFonts.push(robotoBoldItalic);
 
-        const ptserifRegular = new FontFace('PTSerif', 'url(/base/font/ptserif/PTSerif-Regular.ttf)', {
+        const ptserifRegular = new FontFace('PT Serif', 'url(/base/font/ptserif/PTSerif-Regular.ttf)', {
             weight: '400',
             style: 'normal'
         });
         allFonts.push(ptserifRegular);
 
-        const ptserifItalic = new FontFace('PTSerif', 'url(/base/font/ptserif/PTSerif-Italic.ttf)', {
+        const ptserifItalic = new FontFace('PT Serif', 'url(/base/font/ptserif/PTSerif-Italic.ttf)', {
             weight: '400',
             style: 'italic'
         });
         allFonts.push(ptserifItalic);
 
-        const ptserifBold = new FontFace('PTSerif', 'url(/base/font/ptserif/PTSerif-Bold.ttf)', {
+        const ptserifBold = new FontFace('PT Serif', 'url(/base/font/ptserif/PTSerif-Bold.ttf)', {
             weight: '700',
             style: 'normal'
         });
         allFonts.push(ptserifBold);
 
-        const ptserifBoldItalic = new FontFace('PTSerif', 'url(/base/font/ptserif/PTSerif-BoldItalic.ttf)', {
+        const ptserifBoldItalic = new FontFace('PT Serif', 'url(/base/font/ptserif/PTSerif-BoldItalic.ttf)', {
             weight: '700',
             style: 'italic'
         });
@@ -161,16 +171,16 @@ export class VisualTestHelper {
             settings.core.enableLazyLoading = false;
 
             settings.display.resources.copyrightFont.family = 'Roboto';
-            settings.display.resources.titleFont.family = 'PTSerif';
-            settings.display.resources.subTitleFont.family = 'PTSerif';
-            settings.display.resources.wordsFont.family = 'PTSerif';
-            settings.display.resources.effectFont.family = 'PTSerif';
+            settings.display.resources.titleFont.family = 'PT Serif';
+            settings.display.resources.subTitleFont.family = 'PT Serif';
+            settings.display.resources.wordsFont.family = 'PT Serif';
+            settings.display.resources.effectFont.family = 'PT Serif';
             settings.display.resources.fretboardNumberFont.family = 'Roboto';
             settings.display.resources.tablatureFont.family = 'Roboto';
             settings.display.resources.graceFont.family = 'Roboto';
             settings.display.resources.barNumberFont.family = 'Roboto';
-            settings.display.resources.fingeringFont.family = 'PTSerif';
-            settings.display.resources.markerFont.family = 'PTSerif';
+            settings.display.resources.fingeringFont.family = 'PT Serif';
+            settings.display.resources.markerFont.family = 'PT Serif';
 
             await VisualTestHelper.loadFonts();
 

@@ -84,8 +84,8 @@ describe('NotationLegend', () => {
     it('sweep-default', async () => { await runNotationLegendTest(`sweep-default.png`, 93, 1, false); });
     it('sweep-songbook', async () => { await runNotationLegendTest(`sweep-songbook.png`, 92, 1, true); });
 
-    it('fingering-default', async () => { await runNotationLegendTest(`fingering-default.png`, 94, 2, false); });
-    it('fingering-songbook', async () => { await runNotationLegendTest(`fingering-songbook.png`, 94, 2, true); });
+    it('fingering-default', async () => { await runNotationLegendTest(`fingering-default.png`, 94, 2, false, 'notation-legend.gp', 1.5); });
+    it('fingering-songbook', async () => { await runNotationLegendTest(`fingering-songbook.png`, 94, 2, true, 'notation-legend.gp', 1.5); });
 
     it('whammy-default', async () => { await runNotationLegendTest(`whammy-default.png`, 96, 15, false); });
     it('whammy-songbook', async () => { await runNotationLegendTest(`whammy-songbook.png`, 96, 15, true); });
@@ -99,7 +99,7 @@ describe('NotationLegend', () => {
     it('tied-note-accidentals-default', async () => { await runNotationLegendTest(`tied-note-accidentals-default.png`, 1, -1, false, 'tied-note-accidentals.gp'); });
     it('tied-note-accidentals-songbook', async () => { await runNotationLegendTest(`tied-note-accidentals-songbook.png`, 1, -1, true, 'tied-note-accidentals.gp'); });
 
-    async function runNotationLegendTest(referenceFileName: string, startBar: number, barCount: number, songBook: boolean, fileName: string = 'notation-legend.gp'): Promise<void> {
+    async function runNotationLegendTest(referenceFileName: string, startBar: number, barCount: number, songBook: boolean, fileName: string = 'notation-legend.gp', tolerance:number=1): Promise<void> {
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         settings.display.startBar = startBar;
@@ -109,6 +109,6 @@ describe('NotationLegend', () => {
         }
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/notation-legend/${fileName}`);
         let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
-        await VisualTestHelper.runVisualTestScore(score, `notation-legend/${referenceFileName}`, settings, [0]);
+        await VisualTestHelper.runVisualTestScore(score, `notation-legend/${referenceFileName}`, settings, [0], undefined, tolerance);
     }
 });

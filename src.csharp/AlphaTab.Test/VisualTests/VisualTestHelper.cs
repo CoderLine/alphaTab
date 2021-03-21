@@ -16,7 +16,7 @@ namespace AlphaTab.VisualTests
     partial class VisualTestHelper
     {
         public static async Task RunVisualTest(string inputFile, Settings? settings = null,
-            IList<double>? tracks = null, string? message = null, int tolerancePercent = 1)
+            IList<double>? tracks = null, string? message = null, double tolerancePercent = 1)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace AlphaTab.VisualTests
 
         public static async Task RunVisualTestScore(Score score, string referenceFileName,
             Settings? settings = null,
-            IList<double>? tracks = null, string? message = null, int tolerancePercent = 1)
+            IList<double>? tracks = null, string? message = null, double tolerancePercent = 1)
         {
             settings ??= new Settings();
             tracks ??= new Core.List<double> {0};
@@ -68,16 +68,16 @@ namespace AlphaTab.VisualTests
             settings.Core.UseWorkers = false;
 
             settings.Display.Resources.CopyrightFont.Family = "Roboto";
-            settings.Display.Resources.TitleFont.Family = "PTSerif";
-            settings.Display.Resources.SubTitleFont.Family = "PTSerif";
-            settings.Display.Resources.WordsFont.Family = "PTSerif";
-            settings.Display.Resources.EffectFont.Family = "PTSerif";
+            settings.Display.Resources.TitleFont.Family = "PT Serif";
+            settings.Display.Resources.SubTitleFont.Family = "PT Serif";
+            settings.Display.Resources.WordsFont.Family = "PT Serif";
+            settings.Display.Resources.EffectFont.Family = "PT Serif";
             settings.Display.Resources.FretboardNumberFont.Family = "Roboto";
             settings.Display.Resources.TablatureFont.Family = "Roboto";
             settings.Display.Resources.GraceFont.Family = "Roboto";
             settings.Display.Resources.BarNumberFont.Family = "Roboto";
-            settings.Display.Resources.FingeringFont.Family = "PTSerif";
-            settings.Display.Resources.MarkerFont.Family = "PTSerif";
+            settings.Display.Resources.FingeringFont.Family = "PT Serif";
+            settings.Display.Resources.MarkerFont.Family = "PT Serif";
 
             LoadFonts();
 
@@ -137,8 +137,15 @@ namespace AlphaTab.VisualTests
             }
         }
 
+        private static bool _fontsLoaded;
         private static void LoadFonts()
         {
+            if (_fontsLoaded)
+            {
+                return;
+            }
+
+            _fontsLoaded = true;
             var fonts = new[]
             {
                 "font/roboto/Roboto-Regular.ttf",
@@ -159,7 +166,7 @@ namespace AlphaTab.VisualTests
 
         private static void CompareVisualResult(double totalWidth, double totalHeight,
             AlphaTab.Core.List<RenderFinishedEventArgs> result, string referenceFileName,
-            Uint8Array referenceFileData, string? message, int tolerancePercent = 1)
+            Uint8Array referenceFileData, string? message, double tolerancePercent = 1)
         {
             SKBitmap finalBitmap;
 
