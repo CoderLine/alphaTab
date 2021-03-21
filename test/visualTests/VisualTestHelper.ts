@@ -31,7 +31,14 @@ export class VisualTestHelper {
             const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
             let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
-            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message, tolerancePercent);
+            await VisualTestHelper.runVisualTestScore(
+                score,
+                referenceFileName,
+                settings,
+                tracks,
+                message,
+                tolerancePercent
+            );
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
         }
@@ -68,6 +75,70 @@ export class VisualTestHelper {
      * @target web
      * @partial
      */
+    private static async loadFonts(): Promise<void> {
+        const allFonts: FontFace[] = [];
+
+        const robotoRegular = new FontFace('Roboto', 'url(/base/font/roboto/Roboto-Regular.ttf)', {
+            weight: '400',
+            style: 'normal'
+        });
+        allFonts.push(robotoRegular);
+
+        const robotoItalic = new FontFace('Roboto', 'url(/base/font/roboto/Roboto-Italic.ttf)', {
+            weight: '400',
+            style: 'italic'
+        });
+        allFonts.push(robotoItalic);
+
+        const robotoBold = new FontFace('Roboto', 'url(/base/font/roboto/Roboto-Bold.ttf)', {
+            weight: '700',
+            style: 'normal'
+        });
+        allFonts.push(robotoBold);
+
+        const robotoBoldItalic = new FontFace('Roboto', 'url(/base/font/roboto/Roboto-BoldItalic.ttf)', {
+            weight: '700',
+            style: 'italic'
+        });
+        allFonts.push(robotoBoldItalic);
+
+        const ptserifRegular = new FontFace('PTSerif', 'url(/base/font/ptserif/PTSerif-Regular.ttf)', {
+            weight: '400',
+            style: 'normal'
+        });
+        allFonts.push(ptserifRegular);
+
+        const ptserifItalic = new FontFace('PTSerif', 'url(/base/font/ptserif/PTSerif-Italic.ttf)', {
+            weight: '400',
+            style: 'italic'
+        });
+        allFonts.push(ptserifItalic);
+
+        const ptserifBold = new FontFace('PTSerif', 'url(/base/font/ptserif/PTSerif-Bold.ttf)', {
+            weight: '700',
+            style: 'normal'
+        });
+        allFonts.push(ptserifBold);
+
+        const ptserifBoldItalic = new FontFace('PTSerif', 'url(/base/font/ptserif/PTSerif-BoldItalic.ttf)', {
+            weight: '700',
+            style: 'italic'
+        });
+        allFonts.push(ptserifBoldItalic);
+
+        const promises = allFonts.map(f => f.load());
+
+        await Promise.all(promises);
+
+        for(const font of allFonts) {
+            document.fonts.add(font);
+        }
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
     public static async runVisualTestScore(
         score: Score,
         referenceFileName: string,
@@ -88,6 +159,20 @@ export class VisualTestHelper {
             settings.core.engine = 'html5';
             Environment.HighDpiFactor = 1; // test data is in scale 1
             settings.core.enableLazyLoading = false;
+
+            settings.display.resources.copyrightFont.family = 'Roboto';
+            settings.display.resources.titleFont.family = 'PTSerif';
+            settings.display.resources.subTitleFont.family = 'PTSerif';
+            settings.display.resources.wordsFont.family = 'PTSerif';
+            settings.display.resources.effectFont.family = 'PTSerif';
+            settings.display.resources.fretboardNumberFont.family = 'Roboto';
+            settings.display.resources.tablatureFont.family = 'Roboto';
+            settings.display.resources.graceFont.family = 'Roboto';
+            settings.display.resources.barNumberFont.family = 'Roboto';
+            settings.display.resources.fingeringFont.family = 'PTSerif';
+            settings.display.resources.markerFont.family = 'PTSerif';
+
+            await VisualTestHelper.loadFonts();
 
             let referenceFileData: Uint8Array;
             try {
@@ -407,7 +492,7 @@ export class VisualTestHelper {
                     (dom as any).toString = function () {
                         return errorMessage;
                     };
-                    (dom as any)[Symbol.toPrimitive] = function() { 
+                    (dom as any)[Symbol.toPrimitive] = function () {
                         return errorMessage;
                     };
 
