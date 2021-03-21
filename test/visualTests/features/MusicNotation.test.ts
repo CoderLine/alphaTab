@@ -40,7 +40,7 @@ describe('MusicNotationTests', () => {
     it('accidentals', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
-        await VisualTestHelper.runVisualTest('music-notation/accidentals.gp', settings);
+        await VisualTestHelper.runVisualTest('music-notation/accidentals.gp', settings, undefined, undefined, 2.5);
     });
 
     it('forced-accidentals', async () => {

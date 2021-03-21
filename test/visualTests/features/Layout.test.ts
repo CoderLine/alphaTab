@@ -27,7 +27,7 @@ describe('LayoutTests', () => {
         settings.display.layoutMode = LayoutMode.Page;
         settings.display.startBar = 5;
         settings.display.barCount = 4;
-        await VisualTestHelper.runVisualTest('layout/page-layout-5to8.gp', settings);
+        await VisualTestHelper.runVisualTest('layout/page-layout-5to8.gp', settings, undefined, undefined, 1.5);
     });
 
     it('horizontal-layout', async () => {

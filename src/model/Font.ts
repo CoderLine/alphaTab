@@ -298,26 +298,74 @@ export enum FontWeight {
 export class Font {
     private _css: string;
     private _cssScale: number = 0.0;
+    private _family: string;
+    private _style: FontStyle;
+    private _weight: FontWeight;
+    private _size: number;
+
+    private reset() {
+        this._cssScale = 0;
+        this._css = this.toCssString();
+    }
 
     /**
-     * Gets or sets the font family name.
+     * Gets the font family name.
      */
-    public family: string;
+    public get family(): string {
+        return this._family;
+    }
 
     /**
-     * Gets or sets the font size in pixels.
+     * Sets the font family name.
      */
-    public size: number;
+    public set family(value: string) {
+        this._family = value;
+        this.reset();
+    }
 
     /**
-     * Gets or sets the font style.
+     * Gets the font size in pixels.
      */
-    public style: FontStyle;
+    public get size(): number {
+        return this._size;
+    }
+
+    /**
+     * Sets the font size in pixels.
+     */
+    public set size(value: number) {
+        this._size = value;
+        this.reset();
+    }
+
+    /**
+     * Gets the font style.
+     */
+    public get style(): FontStyle {
+        return this._style;
+    }
+    /**
+     * Sets the font style.
+     */
+    public set style(value: FontStyle) {
+        this._style = value;
+        this.reset();
+    }
+
+    /**
+     * Gets the font weight.
+     */
+    public get weight(): FontWeight {
+        return this._weight;
+    }
 
     /**
      * Gets or sets the font weight.
      */
-    public weight: FontWeight;
+    public set weight(value: FontWeight) {
+        this._weight = value;
+        this.reset();
+    }
 
     public get isBold(): boolean {
         return this.weight === FontWeight.Bold;
@@ -340,14 +388,14 @@ export class Font {
         style: FontStyle = FontStyle.Plain,
         weight: FontWeight = FontWeight.Regular
     ) {
-        this.family = family;
-        this.size = size;
-        this.style = style;
-        this.weight = weight;
-        this._css = this.toCssString(1);
+        this._family = family;
+        this._size = size;
+        this._style = style;
+        this._weight = weight;
+        this._css = this.toCssString();
     }
 
-    public toCssString(scale: number): string {
+    public toCssString(scale: number = 1): string {
         if (!this._css || !(Math.abs(scale - this._cssScale) < 0.01)) {
             let buf: string = '';
             if (this.isBold) {

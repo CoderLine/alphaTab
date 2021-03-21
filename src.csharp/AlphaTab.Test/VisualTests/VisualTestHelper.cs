@@ -6,6 +6,7 @@ using AlphaTab.Core.EcmaScript;
 using AlphaTab.Importer;
 using AlphaTab.Io;
 using AlphaTab.Model;
+using AlphaTab.Platform.CSharp;
 using AlphaTab.Rendering;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkiaSharp;
@@ -15,7 +16,7 @@ namespace AlphaTab.VisualTests
     partial class VisualTestHelper
     {
         public static async Task RunVisualTest(string inputFile, Settings? settings = null,
-            IList<double>? tracks = null, string? message = null, int tolerancePercent = 1)
+            IList<double>? tracks = null, string? message = null, double tolerancePercent = 1)
         {
             try
             {
@@ -57,7 +58,7 @@ namespace AlphaTab.VisualTests
 
         public static async Task RunVisualTestScore(Score score, string referenceFileName,
             Settings? settings = null,
-            IList<double>? tracks = null, string? message = null, int tolerancePercent = 1)
+            IList<double>? tracks = null, string? message = null, double tolerancePercent = 1)
         {
             settings ??= new Settings();
             tracks ??= new Core.List<double> {0};
@@ -65,6 +66,20 @@ namespace AlphaTab.VisualTests
             settings.Core.Engine = "skia";
             settings.Core.EnableLazyLoading = false;
             settings.Core.UseWorkers = false;
+
+            settings.Display.Resources.CopyrightFont.Family = "Roboto";
+            settings.Display.Resources.TitleFont.Family = "PT Serif";
+            settings.Display.Resources.SubTitleFont.Family = "PT Serif";
+            settings.Display.Resources.WordsFont.Family = "PT Serif";
+            settings.Display.Resources.EffectFont.Family = "PT Serif";
+            settings.Display.Resources.FretboardNumberFont.Family = "Roboto";
+            settings.Display.Resources.TablatureFont.Family = "Roboto";
+            settings.Display.Resources.GraceFont.Family = "Roboto";
+            settings.Display.Resources.BarNumberFont.Family = "Roboto";
+            settings.Display.Resources.FingeringFont.Family = "PT Serif";
+            settings.Display.Resources.MarkerFont.Family = "PT Serif";
+
+            LoadFonts();
 
             if (!referenceFileName.StartsWith("test-data/"))
             {
@@ -122,9 +137,36 @@ namespace AlphaTab.VisualTests
             }
         }
 
+        private static bool _fontsLoaded;
+        private static void LoadFonts()
+        {
+            if (_fontsLoaded)
+            {
+                return;
+            }
+
+            _fontsLoaded = true;
+            var fonts = new[]
+            {
+                "font/roboto/Roboto-Regular.ttf",
+                "font/roboto/Roboto-Italic.ttf",
+                "font/roboto/Roboto-Bold.ttf",
+                "font/roboto/Roboto-BoldItalic.ttf",
+                "font/ptserif/PTSerif-Regular.ttf",
+                "font/ptserif/PTSerif-Italic.ttf",
+                "font/ptserif/PTSerif-Bold.ttf",
+                "font/ptserif/PTSerif-BoldItalic.ttf"
+            };
+            foreach (var font in fonts)
+            {
+                var data = File.ReadAllBytes(font);
+                SkiaCanvas.RegisterCustomFont(data);
+            }
+        }
+
         private static void CompareVisualResult(double totalWidth, double totalHeight,
             AlphaTab.Core.List<RenderFinishedEventArgs> result, string referenceFileName,
-            Uint8Array referenceFileData, string? message, int tolerancePercent = 1)
+            Uint8Array referenceFileData, string? message, double tolerancePercent = 1)
         {
             SKBitmap finalBitmap;
 

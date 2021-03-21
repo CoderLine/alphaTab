@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using AlphaTab.Model;
 using HarfBuzzSharp;
@@ -62,9 +63,30 @@ namespace AlphaTab.Platform.CSharp
             MusicFont = SKTypeface.FromStream(bravura);
         }
 
+        private static readonly IDictionary<string, SKTypeface> CustomTypeFaces =
+            new Dictionary<string, SKTypeface>(StringComparer.OrdinalIgnoreCase);
+        public static void RegisterCustomFont(byte[] data)
+        {
+            using var skData = SKData.CreateCopy(data);
+            var face = SKTypeface.FromData(skData);
+            CustomTypeFaces[CustomTypeFaceKey(face)] = face;
+        }
+
+        private static string CustomTypeFaceKey(SKTypeface typeface)
+        {
+            return CustomTypeFaceKey(typeface.FamilyName, typeface.FontWeight > 400,
+                typeface.FontSlant == SKFontStyleSlant.Italic);
+        }
+
+        private static string CustomTypeFaceKey(string fontFamily, bool isBold, bool isItalic)
+        {
+            return fontFamily.ToLowerInvariant() + "_" + isBold + "_" + isItalic;
+        }
+
         private SKSurface? _surface;
         private SKPath? _path;
         private string _typeFaceCache = "";
+        private bool _typeFaceIsSystem = false;
         private SKTypeface? _typeFace;
 
         public Color Color { get; set; }
@@ -77,14 +99,26 @@ namespace AlphaTab.Platform.CSharp
             {
                 if (_typeFaceCache != Font.ToCssString(Settings.Display.Scale))
                 {
-                    _typeFace?.Dispose();
-
+                    if (_typeFaceIsSystem)
+                    {
+                        _typeFace?.Dispose();
+                    }
                     _typeFaceCache = Font.ToCssString(Settings.Display.Scale);
-                    _typeFace = SKTypeface.FromFamilyName(Font.Family,
-                        Font.IsBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal,
-                        SKFontStyleWidth.Normal,
-                        Font.IsItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright
-                    );
+
+                    var key = CustomTypeFaceKey(Font.Family, Font.IsBold, Font.IsItalic);
+                    if (!CustomTypeFaces.TryGetValue(key, out _typeFace))
+                    {
+                        _typeFaceIsSystem = true;
+                        _typeFace = SKTypeface.FromFamilyName(Font.Family,
+                            Font.IsBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal,
+                            SKFontStyleWidth.Normal,
+                            Font.IsItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright
+                        );
+                    }
+                    else
+                    {
+                        _typeFaceIsSystem = false;
+                    }
                 }
 
                 return _typeFace;
@@ -247,26 +281,34 @@ namespace AlphaTab.Platform.CSharp
         private const int SkiaToHarfBuzzFontSize = 1 << 16;
         private const float HarfBuzzToSkiaFontSize = 1f / SkiaToHarfBuzzFontSize;
 
+        [HandleProcessCorruptedStateExceptions]
         private static HarfBuzzSharp.Font MakeHarfBuzzFont(SKTypeface typeface, int size)
         {
-            using var stream = typeface.OpenStream(out var ttcIndex);
-            var data = Marshal.AllocCoTaskMem(stream.Length);
-            stream.Read(data, stream.Length);
-            using var blob = new Blob(data, stream.Length, MemoryMode.ReadOnly,
-                () => { Marshal.FreeCoTaskMem(data); });
-            blob.MakeImmutable();
-
-            using var face = new Face(blob, ttcIndex)
+            try
             {
-                Index = ttcIndex,
-                UnitsPerEm = typeface.UnitsPerEm
-            };
+                using var stream = typeface.OpenStream(out var ttcIndex);
+                var data = Marshal.AllocCoTaskMem(stream.Length);
+                stream.Read(data, stream.Length);
+                using var blob = new Blob(data, stream.Length, MemoryMode.ReadOnly,
+                    () => { Marshal.FreeCoTaskMem(data); });
+                blob.MakeImmutable();
 
-            var font = new HarfBuzzSharp.Font(face);
-            var scale = size * SkiaToHarfBuzzFontSize;
-            font.SetScale(scale, scale);
-            font.SetFunctionsOpenType();
-            return font;
+                using var face = new Face(blob, ttcIndex)
+                {
+                    Index = ttcIndex,
+                    UnitsPerEm = typeface.UnitsPerEm
+                };
+
+                var font = new HarfBuzzSharp.Font(face);
+                var scale = size * SkiaToHarfBuzzFontSize;
+                font.SetScale(scale, scale);
+                font.SetFunctionsOpenType();
+                return font;
+            }
+            catch (AccessViolationException e)
+            {
+                throw;
+            }
         }
 
 

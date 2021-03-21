@@ -9,13 +9,11 @@ import alphaTab.platform.ICanvas
 import alphaTab.platform.TextAlign
 import alphaTab.platform.TextBaseline
 import org.jetbrains.skija.*
-import org.jetbrains.skija.shaper.RunHandler
-import org.jetbrains.skija.shaper.RunInfo
 import org.jetbrains.skija.shaper.Shaper
-import org.jetbrains.skija.shaper.TextBlobBuilderRunHandler
 import java.lang.IllegalStateException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.math.floor
+
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
@@ -28,14 +26,40 @@ const val MusicFontSize = 34
 
 const val HangingAsPercentOfAscent = 80
 
+val CustomTypeFaces = HashMap<String, Typeface>();
+
 // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/modules/canvas/offscreencanvas2d/offscreen_canvas_rendering_context_2d.cc
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
-class SkiaCanvas : ICanvas {
+public class SkiaCanvas : ICanvas {
+    companion object {
+        public fun registerCustomFont(data: UByteArray) {
+            val skData = Data.makeFromBytes(data.asByteArray())
+            skData.use {
+                val face = Typeface.makeFromData(skData)
+                CustomTypeFaces[customTypeFaceKey(face)] = face;
+            }
+        }
+
+        private fun customTypeFaceKey(typeface: Typeface): String {
+            return customTypeFaceKey(typeface.familyName, typeface.isBold, typeface.isItalic)
+        }
+
+        private fun customTypeFaceKey(
+            fontFamily: String,
+            isBold: Boolean,
+            isItalic: Boolean
+        ): String {
+            return fontFamily.toLowerCase() + "_" + isBold + "_" + isItalic;
+        }
+
+    }
+
     private lateinit var _surface: Surface
     private var _path: Path? = null
     private var _typeFaceCache: String = ""
+    private var _typeFaceIsSystem: Boolean = false
     private var _typeFace: Typeface? = null
 
     public override var color: Color = Color(255.0, 255.0, 255.0)
@@ -44,16 +68,28 @@ class SkiaCanvas : ICanvas {
     private val typeFace: Typeface
         get() {
             if (_typeFaceCache != font.toCssString(settings.display.scale)) {
-                _typeFace?.close()
+                if (_typeFaceIsSystem) {
+                    _typeFace?.close()
+                }
                 _typeFaceCache = font.toCssString(settings.display.scale)
-                _typeFace = Typeface.makeFromName(
-                    font.family,
-                    FontStyle(
-                        if (font.isBold) FontStyle.BOLD.weight else FontStyle.NORMAL.weight,
-                        FontStyle.NORMAL.width,
-                        if (font.isItalic) FontStyle.ITALIC.slant else FontStyle.NORMAL.slant
+
+                val key = customTypeFaceKey(font.family, font.isBold, font.isItalic)
+                if(!CustomTypeFaces.containsKey(key)) {
+                    _typeFaceIsSystem = true
+                    _typeFace = Typeface.makeFromName(
+                        font.family,
+                        FontStyle(
+                            if (font.isBold) FontStyle.BOLD.weight else FontStyle.NORMAL.weight,
+                            FontStyle.NORMAL.width,
+                            if (font.isItalic) FontStyle.ITALIC.slant else FontStyle.NORMAL.slant
+                        )
                     )
-                )
+                }
+                else {
+                    _typeFaceIsSystem = false
+                    _typeFace = CustomTypeFaces[key]!!
+                }
+
             }
             return _typeFace!!
         }
@@ -232,7 +268,7 @@ class SkiaCanvas : ICanvas {
     private fun textRun(
         text: String,
         typeFace: Typeface,
-        size:Double,
+        size: Double,
         action: (blob: TextBlob, font: org.jetbrains.skija.Font, paint: Paint) -> Unit
     ) {
         val paint = createPaint()
@@ -248,7 +284,7 @@ class SkiaCanvas : ICanvas {
                 val metrics = font.metrics
                 // SkShaper seems to add a negative ascent to the Y-position, we have to correct this
                 // https://source.chromium.org/chromium/chromium/src/+/master:third_party/skia/modules/skshaper/src/SkShaper.cpp;l=206;drc=c21c001893e2dd8229ab321465e4408798ff7289;bpv=1;bpt=1
-                val yMetricsOffset = - metrics.ascent
+                val yMetricsOffset = -metrics.ascent
                 font.use {
                     val blob = shaper.shape(
                         text, font
@@ -257,7 +293,7 @@ class SkiaCanvas : ICanvas {
                         val blobBuilder = TextBlobBuilder()
                         val pos = arrayListOf<Point>()
 
-                        for(i in blob.glyphs.indices) {
+                        for (i in blob.glyphs.indices) {
                             val xOffset = blob.positions[i * 2]
                             val yOffset = blob.positions[(i * 2) + 1] - yMetricsOffset
                             pos.add(Point(xOffset, yOffset))

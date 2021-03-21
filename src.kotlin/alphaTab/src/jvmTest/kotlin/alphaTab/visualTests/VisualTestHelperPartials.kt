@@ -10,6 +10,7 @@ import alphaTab.importer.ScoreLoader
 import alphaTab.io.ByteBuffer
 import alphaTab.model.JsonConverter
 import alphaTab.model.Score
+import alphaTab.platform.jvm.SkiaCanvas
 import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.ScoreRenderer
 import kotlinx.coroutines.GlobalScope
@@ -94,6 +95,20 @@ class VisualTestHelperPartials {
             actualSettings.core.enableLazyLoading = false
             actualSettings.core.useWorkers = false
 
+            actualSettings.display.resources.copyrightFont.family = "Roboto"
+            actualSettings.display.resources.titleFont.family = "PT Serif"
+            actualSettings.display.resources.subTitleFont.family = "PT Serif"
+            actualSettings.display.resources.wordsFont.family = "PT Serif"
+            actualSettings.display.resources.effectFont.family = "PT Serif"
+            actualSettings.display.resources.fretboardNumberFont.family = "Roboto"
+            actualSettings.display.resources.tablatureFont.family = "Roboto"
+            actualSettings.display.resources.graceFont.family = "Roboto"
+            actualSettings.display.resources.barNumberFont.family = "Roboto"
+            actualSettings.display.resources.fingeringFont.family = "PT Serif"
+            actualSettings.display.resources.markerFont.family = "PT Serif"
+
+            loadFonts()
+
             var actualReferenceFileName = referenceFileName
             if (!actualReferenceFileName.startsWith("test-data/")) {
                 actualReferenceFileName = "test-data/visual-tests/$actualReferenceFileName"
@@ -157,6 +172,34 @@ class VisualTestHelperPartials {
                 Assert.fail("Rendering did not complete within timeout")
             }
         }
+
+        private var _fontsLoaded = false
+        private fun loadFonts()
+        {
+            if (_fontsLoaded)
+            {
+                return;
+            }
+
+            _fontsLoaded = true;
+            val fonts = arrayOf(
+                "font/roboto/Roboto-Regular.ttf",
+                "font/roboto/Roboto-Italic.ttf",
+                "font/roboto/Roboto-Bold.ttf",
+                "font/roboto/Roboto-BoldItalic.ttf",
+                "font/ptserif/PTSerif-Regular.ttf",
+                "font/ptserif/PTSerif-Italic.ttf",
+                "font/ptserif/PTSerif-Bold.ttf",
+                "font/ptserif/PTSerif-BoldItalic.ttf"
+            )
+
+            for (font in fonts)
+            {
+                val data = TestPlatformPartials.loadFile(font)
+                SkiaCanvas.registerCustomFont(data.buffer.raw)
+            }
+        }
+
 
         private fun compareVisualResult(
             totalWidth: Double,
