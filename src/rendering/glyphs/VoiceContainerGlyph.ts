@@ -26,7 +26,8 @@ export class VoiceContainerGlyph extends GlyphGroup {
     }
 
     public scaleToWidth(width: number): void {
-        let force: number = this.renderer.layoutingInfo.spaceToForce(width);
+        const scale = this.renderer.scale;
+        let force: number = this.renderer.layoutingInfo.spaceToForce(width / scale);
         this.scaleToForce(force);
     }
 
