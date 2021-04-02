@@ -23,7 +23,7 @@ export abstract class SvgCanvas implements ICanvas {
 
     public beginRender(width: number, height: number): void {
         this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${height | 0
-            }px" class="at-surface-svg" style="dominant-baseline: central;">\n`;
+            }px" class="at-surface-svg">\n`;
         this._currentPath = '';
         this._currentPathIsEmpty = true;
         this.textBaseline = TextBaseline.Top;
