@@ -30,7 +30,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         let denominatorIndex: number = 0;
         while(true) {
             timeSignatureDenominator = timeSignatureDenominator >> 1;
-            if(timeSignatureDenominator <= 0) {
+            if(timeSignatureDenominator > 0) {
                 denominatorIndex++;
             } else {
                 break;

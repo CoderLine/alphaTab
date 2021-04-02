@@ -1,5 +1,5 @@
 import { ControllerType } from '@src/midi/ControllerType';
-import { MidiEvent } from '@src/midi/MidiEvent';
+import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
@@ -28,6 +28,9 @@ import {
     RestEvent
 } from '@test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from '@test/TestPlatform';
+import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
+import { MetaEventType } from '@src/midi/MetaEvent';
+import { MetaDataEvent } from '@src/midi/MetaDataEvent';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
@@ -804,7 +807,7 @@ describe('MidiFileGeneratorTest', () => {
         let score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].isFullBarRest).toBeTrue();
 
-        let expectedNoteOnTimes:number[] = [
+        let expectedNoteOnTimes: number[] = [
             0 * MidiUtils.QuarterTime, // note 1
             1 * MidiUtils.QuarterTime, // note 2
             2 * MidiUtils.QuarterTime, // note 3
@@ -813,7 +816,7 @@ describe('MidiFileGeneratorTest', () => {
             7 * MidiUtils.QuarterTime, // note 5
             8 * MidiUtils.QuarterTime, // note 6
         ];
-        let noteOnTimes:number[] = [];
+        let noteOnTimes: number[] = [];
         let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
         while (beat != null) {
             noteOnTimes.push(beat.absolutePlaybackStart);
@@ -826,14 +829,40 @@ describe('MidiFileGeneratorTest', () => {
         let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
         noteOnTimes = [];
-        for(const evt of handler.midiEvents) {
-            if(evt instanceof NoteEvent) {
+        for (const evt of handler.midiEvents) {
+            if (evt instanceof NoteEvent) {
                 noteOnTimes.push(evt.tick);
-            } else if(evt instanceof RestEvent) {
+            } else if (evt instanceof RestEvent) {
                 noteOnTimes.push(evt.tick);
             }
         }
         expect(noteOnTimes.join(',')).toEqual(expectedNoteOnTimes.join(','));
+    });
+
+
+    it('time-signature', () => {
+        let tex: string = '\\ts 3 4 3.3.4 3.3.4 3.3.4';
+        let score: Score = parseTex(tex);
+
+        let file = new MidiFile();
+        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(file);
+        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        let timeSignature: MidiEvent | null = null;
+        for(const evt of file.events) {
+            if(evt.command === MidiEventType.Meta && evt.data1 === MetaEventType.TimeSignature) {
+                timeSignature = evt;
+                break;
+            }
+        }
+
+        expect(timeSignature).toBeTruthy();
+        const meta: MetaDataEvent = timeSignature as MetaDataEvent;
+        const timeSignatureNumerator: number = meta.data[0];
+        const timeSignatureDenominator: number = Math.pow(2, meta.data[1]);
+        expect(timeSignatureNumerator).toEqual(3);
+        expect(timeSignatureDenominator).toEqual(4);
     });
 
 });
