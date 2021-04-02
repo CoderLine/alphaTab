@@ -54,6 +54,7 @@ import { Logger } from '@src/Logger';
 import { LeftHandTapEffectInfo } from './rendering/effects/LeftHandTapEffectInfo';
 import { CapellaImporter } from './importer/CapellaImporter';
 import { ResizeObserverPolyfill } from './platform/javascript/ResizeObserverPolyfill';
+import { IntersectionObserverPolyfill } from './platform/javascript/IntersectionObserverPolyfill';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -124,6 +125,9 @@ export class Environment {
                 vertical-align: top;
                 overflow: visible;
             }
+            .at-surface-svg text {
+                dominant-baseline: central;
+            }             
             .at {
                  font-family: 'alphaTab';
                  speak: none;
@@ -456,6 +460,11 @@ export class Environment {
             if(!('ResizeObserver' in globalThis)) {
                 (globalThis as any).ResizeObserver = ResizeObserverPolyfill;
             }
+            // IntersectionObserver API does not on older iOS versions
+            // so we better add a polyfill for it
+            if (!('IntersectionObserver' in Environment.globalThis)) {
+                (Environment.globalThis as any).IntersectionObserver = IntersectionObserverPolyfill;
+            }            
         } else {
             AlphaTabWebWorker.init();
             AlphaSynthWebWorker.init();
