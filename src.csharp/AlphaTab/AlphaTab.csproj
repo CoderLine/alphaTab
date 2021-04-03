@@ -11,8 +11,6 @@
         <TargetFramework>netstandard20</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>8</LangVersion>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
