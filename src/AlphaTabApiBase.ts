@@ -13,7 +13,6 @@ import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '
 
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 
-import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Beat } from '@src/model/Beat';
 import { Score } from '@src/model/Score';
 import { Track } from '@src/model/Track';
@@ -330,8 +329,7 @@ export class AlphaTabApiBase<TSettings> {
     public tex(tex: string, tracks?: number[]): void {
         try {
             let parser: AlphaTexImporter = new AlphaTexImporter();
-            let data: ByteBuffer = ByteBuffer.fromString(tex);
-            parser.init(data, this.settings);
+            parser.initFromString(tex, this.settings);
             let score: Score = parser.readScore();
             this.renderScore(score, tracks);
         } catch (e) {

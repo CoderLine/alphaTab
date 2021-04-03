@@ -2,15 +2,15 @@
   <PropertyGroup>
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <Version>1.1.0</Version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <Version>1.3.0</Version>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <Authors>Danielku15</Authors>
     <Company>CoderLine</Company>
     <Product>AlphaTab</Product>
     <NeutralLanguage>en</NeutralLanguage>
     <Description>alphaTab is a cross platform music notation and guitar tablature rendering library.</Description>
-    <Copyright>Copyright © 2020, Daniel Kuschny and Contributors</Copyright>
+    <Copyright>Copyright © 2021, Daniel Kuschny and Contributors</Copyright>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://www.alphatab.net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/CoderLine/alphaTab</RepositoryUrl>

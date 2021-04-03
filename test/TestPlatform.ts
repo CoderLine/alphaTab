@@ -1,15 +1,9 @@
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IReadable } from '@src/io/IReadable';
 import { IOHelper } from '@src/io/IOHelper';
   
 /**
  * @partial
  */
 export class TestPlatform {
-    public static createStringReader(tex: string): IReadable {
-        return ByteBuffer.fromString(tex);
-    }
-
     /**
      * @target web
      * @partial

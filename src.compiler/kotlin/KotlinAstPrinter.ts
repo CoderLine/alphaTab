@@ -858,10 +858,10 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     }
 
     protected writeStringTemplateExpression(expr: cs.StringTemplateExpression) {
-        this.write('"');
+        this.write('"""');
         expr.chunks.forEach(c => {
             if (cs.isStringLiteral(c)) {
-                const escapedText = c.text.split('"').join('\\"').split('\n').join('\\n').split('\r').join('\\r');
+                const escapedText = c.text;
                 this.write(escapedText);
             } else {
                 this.write('${');
@@ -869,7 +869,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 this.write('}');
             }
         });
-        this.write('"');
+        this.write('"""');
     }
 
     protected writeArrayCreationExpression(expr: cs.ArrayCreationExpression) {

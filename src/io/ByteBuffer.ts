@@ -1,5 +1,6 @@
 import { IReadable } from '@src/io/IReadable';
 import { IWriteable } from '@src/io/IWriteable';
+import { IOHelper } from './IOHelper';
 
 export class ByteBuffer implements IWriteable, IReadable {
     private _buffer!: Uint8Array;
@@ -36,10 +37,7 @@ export class ByteBuffer implements IWriteable, IReadable {
     }
 
     public static fromString(contents: string): ByteBuffer {
-        let byteArray: Uint8Array = new Uint8Array(contents.length);
-        for (let i: number = 0; i < contents.length; i++) {
-            byteArray[i] = contents.charCodeAt(i);
-        }
+        let byteArray: Uint8Array = IOHelper.stringToBytes(contents);
         return ByteBuffer.fromBuffer(byteArray);
     }
 
