@@ -33,6 +33,9 @@ import { Logger } from '@src/Logger';
 import { ModelUtils, TuningParseResult } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
+import { IOHelper } from '@src/io/IOHelper';
+import { Settings } from '@src/Settings';
+import { ByteBuffer } from '@src/io/ByteBuffer';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -107,6 +110,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _score!: Score;
     private _currentTrack!: Track;
     private _currentStaff!: Staff;
+    private _input: string = "";
     private _ch: number = 0;
     private _curChPos: number = 0;
     private _sy: AlphaTexSymbols = AlphaTexSymbols.No;
@@ -129,8 +133,18 @@ export class AlphaTexImporter extends ScoreImporter {
         return 'AlphaTex';
     }
 
+    public initFromString(tex: string, settings: Settings) {
+        this.data = ByteBuffer.empty();
+        this._input = tex;
+        this.settings = settings;
+    }
+    
+
     public readScore(): Score {
         try {
+            if(this.data.length > 0) {
+                this._input = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
+            }
             this._allowTuning = true;
             this._lyrics = new Map<number, Lyrics[]>();
             this.createDefaultScore();
@@ -148,7 +162,7 @@ export class AlphaTexImporter extends ScoreImporter {
             this.consolidate();
             this._score.finish(this.settings);
             this._score.rebuildRepeatGroups();
-            for(const [track, lyrics] of this._lyrics) {
+            for (const [track, lyrics] of this._lyrics) {
                 this._score.tracks[track].applyLyrics(lyrics);
             }
             return this._score;
@@ -362,12 +376,10 @@ export class AlphaTexImporter extends ScoreImporter {
      * Reads the next character of the source stream.
      */
     private nextChar(): number {
-        let b: number = this.data.readByte();
-        if (b === -1) {
-            this._ch = 0;
+        if (this._curChPos < this._input.length) {
+            this._ch = this._input.charCodeAt(this._curChPos++)
         } else {
-            this._ch = b;
-            this._curChPos++;
+            this._ch = 0;
         }
         return this._ch;
     }
@@ -888,7 +900,7 @@ export class AlphaTexImporter extends ScoreImporter {
             let syData: string = (this._syData as string).toLowerCase();
             if (syData === 'track') {
                 this._staffHasExplicitTuning = false;
-                this._staffTuningApplied = false;        
+                this._staffTuningApplied = false;
 
                 this._sy = this.newSy();
                 // new track starting? - if no masterbars it's the \track of the initial track.
@@ -911,7 +923,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (syData === 'staff') {
                     this._staffHasExplicitTuning = false;
                     this._staffTuningApplied = false;
-    
+
                     this._sy = this.newSy();
                     if (this._currentTrack.staves[0].bars.length > 0) {
                         this._currentTrack.ensureStaveCount(this._currentTrack.staves.length + 1);

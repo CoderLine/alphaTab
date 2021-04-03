@@ -4,7 +4,6 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
-import { TestPlatform } from '@test/TestPlatform';
 
 describe('MidiPlaybackControllerTest', () => {
     const testRepeat: ((score: Score, expectedIndexes: number[]) => void) = (score: Score, expectedIndexes: number[]): void => {
@@ -60,7 +59,7 @@ describe('MidiPlaybackControllerTest', () => {
         let tex: string =
             '\\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \\rc 2 1.3 2.3 3.3 4.3 | \\ro \\rc 3 1.3 2.3 3.3 4.3';
         let importer: AlphaTexImporter = new AlphaTexImporter();
-        importer.init(TestPlatform.createStringReader(tex), new Settings());
+        importer.initFromString(tex, new Settings());
         let score: Score = importer.readScore();
         let playedBars: number[] = [];
         let controller: MidiPlaybackController = new MidiPlaybackController(score);

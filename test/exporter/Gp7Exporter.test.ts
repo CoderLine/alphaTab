@@ -129,7 +129,7 @@ describe('Gp7ExporterTest', () => {
         `;
 
         const importer = new AlphaTexImporter();
-        importer.init(TestPlatform.createStringReader(tex), new Settings());
+        importer.initFromString(tex, new Settings());
         const expected = importer.readScore();
         const exported = exportGp7(expected);
 

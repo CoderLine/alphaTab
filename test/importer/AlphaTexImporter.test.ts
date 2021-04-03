@@ -19,12 +19,11 @@ import { Tuning } from '@src/model/Tuning';
 import { HarmonicsEffectInfo } from '@src/rendering/effects/HarmonicsEffectInfo';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
-import { TestPlatform } from '@test/TestPlatform';
 
 describe('AlphaTexImporterTest', () => {
-    const parseTex: (tex:string) => Score = (tex: string): Score => {
+    const parseTex: (tex: string) => Score = (tex: string): Score => {
         let importer: AlphaTexImporter = new AlphaTexImporter();
-        importer.init(TestPlatform.createStringReader(tex), new Settings());
+        importer.initFromString(tex, new Settings());
         return importer.readScore();
     };
 
@@ -856,19 +855,19 @@ describe('AlphaTexImporterTest', () => {
         try {
             parseTex('<xml>');
             fail('Expected error');
-        } catch(e) {
-            if(!(e instanceof UnsupportedFormatError)) {
+        } catch (e) {
+            if (!(e instanceof UnsupportedFormatError)) {
                 fail(`Expected UnsupportedFormatError got ${e}`);
             }
         }
     });
-    
+
     it('expect-invalid-format-other-text', () => {
         try {
             parseTex('This is not an alphaTex file');
             fail('Expected error');
-        } catch(e) {
-            if(!(e instanceof UnsupportedFormatError)) {
+        } catch (e) {
+            if (!(e instanceof UnsupportedFormatError)) {
                 fail(`Expected UnsupportedFormatError got ${e}`);
             }
         }
@@ -890,5 +889,18 @@ describe('AlphaTexImporterTest', () => {
         score = parseTex('\\instrument acousticpiano . 3.3');
         expect(score.tracks[0].staves[0].tuning.length).toEqual(0);
         expect(score.tracks[0].staves[0].displayTranspositionPitch).toEqual(0);
+    });
+
+    it('multibyte-encoding', () => {
+        const multiByteChars = '爱你ÖÄÜ🎸🎵🎶';
+        const score = parseTex(`\\title "${multiByteChars}"
+        .
+        \\track "🎸"
+        \\lyrics "Test Lyrics 🤘"
+        (1.2 1.1).4 x.2.8 0.1 1.1 | 1.2 3.2 0.1 1.1`);
+
+        expect(score.title).toEqual(multiByteChars);
+        expect(score.tracks[0].name).toEqual("🎸");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics!![0]).toEqual("🤘");
     });
 });

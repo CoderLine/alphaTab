@@ -35,7 +35,7 @@ import { MetaDataEvent } from '@src/midi/MetaDataEvent';
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
         let importer: AlphaTexImporter = new AlphaTexImporter();
-        importer.init(TestPlatform.createStringReader(tex), new Settings());
+        importer.initFromString(tex, new Settings());
         return importer.readScore();
     };
 
