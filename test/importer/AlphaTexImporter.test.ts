@@ -901,6 +901,6 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.title).toEqual(multiByteChars);
         expect(score.tracks[0].name).toEqual("🎸");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics!![0]).toEqual("🤘");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).toEqual("🤘");
     });
 });
