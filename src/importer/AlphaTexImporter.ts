@@ -1846,7 +1846,11 @@ export class AlphaTexImporter extends ScoreImporter {
                 master.isAnacrusis = true;
                 this._sy = this.newSy();
             } else {
-                if (bar.index === 0 && !this.handleStaffMeta()) {
+                if (bar.index === 0) {
+                    if(!this.handleStaffMeta()) {
+                        this.error('measure-effects', AlphaTexSymbols.String, false);
+                    }
+                } else {
                     this.error('measure-effects', AlphaTexSymbols.String, false);
                 }
             }
