@@ -22,12 +22,14 @@ module.exports = [
         output: [
             {
                 file: 'dist/alphaTab.js',
-                name: 'alphaTab'
+                name: 'alphaTab',
+                sourcemap: true
             },
             {
                 file: 'dist/alphaTab.min.js',
                 name: 'alphaTab',
-                plugins: [terser()]
+                plugins: [terser()],
+                sourcemap: true,
             }
         ].map(o => ({ ...o, ...commonOutput })),
         external: [],
