@@ -903,4 +903,13 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].name).toEqual("🎸");
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).toEqual("🤘");
     });
+    
+    it('does-not-hang-on-backslash', () => {
+        try {
+            parseTex('\\title Test . 3.3 \\')
+            fail('Parsing should fail');
+        } catch (e) {
+            // success
+        }
+    })
 });
