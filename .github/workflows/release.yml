@@ -40,7 +40,7 @@ jobs:
           node-version: '12.x'
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '3.1.100'
+          dotnet-version: '5.0.x'
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
       - run: npm install
