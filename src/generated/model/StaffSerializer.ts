@@ -44,7 +44,7 @@ export class StaffSerializer {
         switch (property) {
             case "bars":
                 obj.bars = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
+                for (const o of v as (Map<string, unknown> | null)[]) {
                     const i = new Bar();
                     BarSerializer.fromJson(i, o)
                     obj.addBar(i);
@@ -54,34 +54,34 @@ export class StaffSerializer {
                 obj.chords = new Map<string, Chord>();
                 JsonHelper.forEach(v, (v, k) => {
                     const i = new Chord(); 
-                    ChordSerializer.fromJson(i, (v as Map<string, unknown>)); 
+                    ChordSerializer.fromJson(i, v as Map<string, unknown>); 
                     obj.addChord(k, i); 
                 });
                 return true;
             case "capo":
-                obj.capo = (v! as number);
+                obj.capo = v! as number;
                 return true;
             case "transpositionpitch":
-                obj.transpositionPitch = (v! as number);
+                obj.transpositionPitch = v! as number;
                 return true;
             case "displaytranspositionpitch":
-                obj.displayTranspositionPitch = (v! as number);
+                obj.displayTranspositionPitch = v! as number;
                 return true;
             case "showtablature":
-                obj.showTablature = (v! as boolean);
+                obj.showTablature = v! as boolean;
                 return true;
             case "showstandardnotation":
-                obj.showStandardNotation = (v! as boolean);
+                obj.showStandardNotation = v! as boolean;
                 return true;
             case "ispercussion":
-                obj.isPercussion = (v! as boolean);
+                obj.isPercussion = v! as boolean;
                 return true;
             case "standardnotationlinecount":
-                obj.standardNotationLineCount = (v! as number);
+                obj.standardNotationLineCount = v! as number;
                 return true;
         } 
         if (["stringtuning"].indexOf(property) >= 0) {
-            TuningSerializer.fromJson(obj.stringTuning, (v as Map<string, unknown>));
+            TuningSerializer.fromJson(obj.stringTuning, v as Map<string, unknown>);
             return true;
         } 
         return false; 

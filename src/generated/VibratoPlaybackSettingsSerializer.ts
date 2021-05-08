@@ -30,28 +30,28 @@ export class VibratoPlaybackSettingsSerializer {
     public static setProperty(obj: VibratoPlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "notewidelength":
-                obj.noteWideLength = (v! as number);
+                obj.noteWideLength = v! as number;
                 return true;
             case "notewideamplitude":
-                obj.noteWideAmplitude = (v! as number);
+                obj.noteWideAmplitude = v! as number;
                 return true;
             case "noteslightlength":
-                obj.noteSlightLength = (v! as number);
+                obj.noteSlightLength = v! as number;
                 return true;
             case "noteslightamplitude":
-                obj.noteSlightAmplitude = (v! as number);
+                obj.noteSlightAmplitude = v! as number;
                 return true;
             case "beatwidelength":
-                obj.beatWideLength = (v! as number);
+                obj.beatWideLength = v! as number;
                 return true;
             case "beatwideamplitude":
-                obj.beatWideAmplitude = (v! as number);
+                obj.beatWideAmplitude = v! as number;
                 return true;
             case "beatslightlength":
-                obj.beatSlightLength = (v! as number);
+                obj.beatSlightLength = v! as number;
                 return true;
             case "beatslightamplitude":
-                obj.beatSlightAmplitude = (v! as number);
+                obj.beatSlightAmplitude = v! as number;
                 return true;
         } 
         return false; 

@@ -25,13 +25,13 @@ export class ImporterSettingsSerializer {
     public static setProperty(obj: ImporterSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "encoding":
-                obj.encoding = (v! as string);
+                obj.encoding = v! as string;
                 return true;
             case "mergepartgroupsinmusicxml":
-                obj.mergePartGroupsInMusicXml = (v! as boolean);
+                obj.mergePartGroupsInMusicXml = v! as boolean;
                 return true;
             case "beattextaslyrics":
-                obj.beatTextAsLyrics = (v! as boolean);
+                obj.beatTextAsLyrics = v! as boolean;
                 return true;
         } 
         return false; 

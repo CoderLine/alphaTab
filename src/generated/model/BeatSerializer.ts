@@ -38,10 +38,10 @@ export class BeatSerializer {
         o.set("id", obj.id); 
         o.set("notes", obj.notes.map(i => NoteSerializer.toJson(i))); 
         o.set("isEmpty", obj.isEmpty); 
-        o.set("whammyStyle", (obj.whammyStyle as number)); 
-        o.set("ottava", (obj.ottava as number)); 
+        o.set("whammyStyle", obj.whammyStyle as number); 
+        o.set("ottava", obj.ottava as number); 
         o.set("isLegatoOrigin", obj.isLegatoOrigin); 
-        o.set("duration", (obj.duration as number)); 
+        o.set("duration", obj.duration as number); 
         o.set("automations", obj.automations.map(i => AutomationSerializer.toJson(i))); 
         o.set("dots", obj.dots); 
         o.set("fadeIn", obj.fadeIn); 
@@ -51,156 +51,156 @@ export class BeatSerializer {
         o.set("slap", obj.slap); 
         o.set("tap", obj.tap); 
         o.set("text", obj.text); 
-        o.set("brushType", (obj.brushType as number)); 
+        o.set("brushType", obj.brushType as number); 
         o.set("brushDuration", obj.brushDuration); 
         o.set("tupletDenominator", obj.tupletDenominator); 
         o.set("tupletNumerator", obj.tupletNumerator); 
         o.set("isContinuedWhammy", obj.isContinuedWhammy); 
-        o.set("whammyBarType", (obj.whammyBarType as number)); 
+        o.set("whammyBarType", obj.whammyBarType as number); 
         o.set("whammyBarPoints", obj.whammyBarPoints.map(i => BendPointSerializer.toJson(i))); 
-        o.set("vibrato", (obj.vibrato as number)); 
+        o.set("vibrato", obj.vibrato as number); 
         o.set("chordId", obj.chordId); 
-        o.set("graceType", (obj.graceType as number)); 
-        o.set("pickStroke", (obj.pickStroke as number)); 
-        o.set("tremoloSpeed", (obj.tremoloSpeed as number | null)); 
-        o.set("crescendo", (obj.crescendo as number)); 
+        o.set("graceType", obj.graceType as number); 
+        o.set("pickStroke", obj.pickStroke as number); 
+        o.set("tremoloSpeed", obj.tremoloSpeed as number | null); 
+        o.set("crescendo", obj.crescendo as number); 
         o.set("displayStart", obj.displayStart); 
         o.set("playbackStart", obj.playbackStart); 
         o.set("displayDuration", obj.displayDuration); 
         o.set("playbackDuration", obj.playbackDuration); 
-        o.set("dynamics", (obj.dynamics as number)); 
+        o.set("dynamics", obj.dynamics as number); 
         o.set("invertBeamDirection", obj.invertBeamDirection); 
-        o.set("preferredBeamDirection", (obj.preferredBeamDirection as number | null)); 
-        o.set("beamingMode", (obj.beamingMode as number)); 
+        o.set("preferredBeamDirection", obj.preferredBeamDirection as number | null); 
+        o.set("beamingMode", obj.beamingMode as number); 
         return o; 
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (v! as number);
+                obj.id = v! as number;
                 return true;
             case "notes":
                 obj.notes = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
+                for (const o of v as (Map<string, unknown> | null)[]) {
                     const i = new Note();
                     NoteSerializer.fromJson(i, o)
                     obj.addNote(i);
                 }
                 return true;
             case "isempty":
-                obj.isEmpty = (v! as boolean);
+                obj.isEmpty = v! as boolean;
                 return true;
             case "whammystyle":
-                obj.whammyStyle = (JsonHelper.parseEnum<BendStyle>(v, BendStyle)!);
+                obj.whammyStyle = JsonHelper.parseEnum<BendStyle>(v, BendStyle)!;
                 return true;
             case "ottava":
-                obj.ottava = (JsonHelper.parseEnum<Ottavia>(v, Ottavia)!);
+                obj.ottava = JsonHelper.parseEnum<Ottavia>(v, Ottavia)!;
                 return true;
             case "islegatoorigin":
-                obj.isLegatoOrigin = (v! as boolean);
+                obj.isLegatoOrigin = v! as boolean;
                 return true;
             case "duration":
-                obj.duration = (JsonHelper.parseEnum<Duration>(v, Duration)!);
+                obj.duration = JsonHelper.parseEnum<Duration>(v, Duration)!;
                 return true;
             case "automations":
                 obj.automations = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
+                for (const o of v as (Map<string, unknown> | null)[]) {
                     const i = new Automation();
                     AutomationSerializer.fromJson(i, o)
                     obj.automations.push(i);
                 }
                 return true;
             case "dots":
-                obj.dots = (v! as number);
+                obj.dots = v! as number;
                 return true;
             case "fadein":
-                obj.fadeIn = (v! as boolean);
+                obj.fadeIn = v! as boolean;
                 return true;
             case "lyrics":
-                obj.lyrics = (v as string[] | null);
+                obj.lyrics = v as string[] | null;
                 return true;
             case "hasrasgueado":
-                obj.hasRasgueado = (v! as boolean);
+                obj.hasRasgueado = v! as boolean;
                 return true;
             case "pop":
-                obj.pop = (v! as boolean);
+                obj.pop = v! as boolean;
                 return true;
             case "slap":
-                obj.slap = (v! as boolean);
+                obj.slap = v! as boolean;
                 return true;
             case "tap":
-                obj.tap = (v! as boolean);
+                obj.tap = v! as boolean;
                 return true;
             case "text":
-                obj.text = (v as string | null);
+                obj.text = v as string | null;
                 return true;
             case "brushtype":
-                obj.brushType = (JsonHelper.parseEnum<BrushType>(v, BrushType)!);
+                obj.brushType = JsonHelper.parseEnum<BrushType>(v, BrushType)!;
                 return true;
             case "brushduration":
-                obj.brushDuration = (v! as number);
+                obj.brushDuration = v! as number;
                 return true;
             case "tupletdenominator":
-                obj.tupletDenominator = (v! as number);
+                obj.tupletDenominator = v! as number;
                 return true;
             case "tupletnumerator":
-                obj.tupletNumerator = (v! as number);
+                obj.tupletNumerator = v! as number;
                 return true;
             case "iscontinuedwhammy":
-                obj.isContinuedWhammy = (v! as boolean);
+                obj.isContinuedWhammy = v! as boolean;
                 return true;
             case "whammybartype":
-                obj.whammyBarType = (JsonHelper.parseEnum<WhammyType>(v, WhammyType)!);
+                obj.whammyBarType = JsonHelper.parseEnum<WhammyType>(v, WhammyType)!;
                 return true;
             case "whammybarpoints":
                 obj.whammyBarPoints = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
+                for (const o of v as (Map<string, unknown> | null)[]) {
                     const i = new BendPoint();
                     BendPointSerializer.fromJson(i, o)
                     obj.addWhammyBarPoint(i);
                 }
                 return true;
             case "vibrato":
-                obj.vibrato = (JsonHelper.parseEnum<VibratoType>(v, VibratoType)!);
+                obj.vibrato = JsonHelper.parseEnum<VibratoType>(v, VibratoType)!;
                 return true;
             case "chordid":
-                obj.chordId = (v as string | null);
+                obj.chordId = v as string | null;
                 return true;
             case "gracetype":
-                obj.graceType = (JsonHelper.parseEnum<GraceType>(v, GraceType)!);
+                obj.graceType = JsonHelper.parseEnum<GraceType>(v, GraceType)!;
                 return true;
             case "pickstroke":
-                obj.pickStroke = (JsonHelper.parseEnum<PickStroke>(v, PickStroke)!);
+                obj.pickStroke = JsonHelper.parseEnum<PickStroke>(v, PickStroke)!;
                 return true;
             case "tremolospeed":
                 obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(v, Duration);
                 return true;
             case "crescendo":
-                obj.crescendo = (JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!);
+                obj.crescendo = JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!;
                 return true;
             case "displaystart":
-                obj.displayStart = (v! as number);
+                obj.displayStart = v! as number;
                 return true;
             case "playbackstart":
-                obj.playbackStart = (v! as number);
+                obj.playbackStart = v! as number;
                 return true;
             case "displayduration":
-                obj.displayDuration = (v! as number);
+                obj.displayDuration = v! as number;
                 return true;
             case "playbackduration":
-                obj.playbackDuration = (v! as number);
+                obj.playbackDuration = v! as number;
                 return true;
             case "dynamics":
-                obj.dynamics = (JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!);
+                obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
                 return true;
             case "invertbeamdirection":
-                obj.invertBeamDirection = (v! as boolean);
+                obj.invertBeamDirection = v! as boolean;
                 return true;
             case "preferredbeamdirection":
                 obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(v, BeamDirection);
                 return true;
             case "beamingmode":
-                obj.beamingMode = (JsonHelper.parseEnum<BeatBeamingMode>(v, BeatBeamingMode)!);
+                obj.beamingMode = JsonHelper.parseEnum<BeatBeamingMode>(v, BeatBeamingMode)!;
                 return true;
         } 
         return false; 

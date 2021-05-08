@@ -25,13 +25,13 @@ export class TuningSerializer {
     public static setProperty(obj: Tuning, property: string, v: unknown): boolean {
         switch (property) {
             case "isstandard":
-                obj.isStandard = (v! as boolean);
+                obj.isStandard = v! as boolean;
                 return true;
             case "name":
-                obj.name = (v! as string);
+                obj.name = v! as string;
                 return true;
             case "tunings":
-                obj.tunings = (v! as number[]);
+                obj.tunings = v! as number[];
                 return true;
         } 
         return false; 

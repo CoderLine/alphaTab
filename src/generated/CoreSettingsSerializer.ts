@@ -30,7 +30,7 @@ export class CoreSettingsSerializer {
         o.set("tracks", obj.tracks); 
         o.set("enableLazyLoading", obj.enableLazyLoading); 
         o.set("engine", obj.engine); 
-        o.set("logLevel", (obj.logLevel as number)); 
+        o.set("logLevel", obj.logLevel as number); 
         o.set("useWorkers", obj.useWorkers); 
         o.set("includeNoteBounds", obj.includeNoteBounds); 
         return o; 
@@ -39,38 +39,38 @@ export class CoreSettingsSerializer {
         switch (property) {
             /*@target web*/
             case "scriptfile":
-                obj.scriptFile = (v as string | null);
+                obj.scriptFile = v as string | null;
                 return true;
             /*@target web*/
             case "fontdirectory":
-                obj.fontDirectory = (v as string | null);
+                obj.fontDirectory = v as string | null;
                 return true;
             /*@target web*/
             case "file":
-                obj.file = (v as string | null);
+                obj.file = v as string | null;
                 return true;
             /*@target web*/
             case "tex":
-                obj.tex = (v! as boolean);
+                obj.tex = v! as boolean;
                 return true;
             /*@target web*/
             case "tracks":
-                obj.tracks = (v! as unknown);
+                obj.tracks = v! as unknown;
                 return true;
             case "enablelazyloading":
-                obj.enableLazyLoading = (v! as boolean);
+                obj.enableLazyLoading = v! as boolean;
                 return true;
             case "engine":
-                obj.engine = (v! as string);
+                obj.engine = v! as string;
                 return true;
             case "loglevel":
-                obj.logLevel = (JsonHelper.parseEnum<LogLevel>(v, LogLevel)!);
+                obj.logLevel = JsonHelper.parseEnum<LogLevel>(v, LogLevel)!;
                 return true;
             case "useworkers":
-                obj.useWorkers = (v! as boolean);
+                obj.useWorkers = v! as boolean;
                 return true;
             case "includenotebounds":
-                obj.includeNoteBounds = (v! as boolean);
+                obj.includeNoteBounds = v! as boolean;
                 return true;
         } 
         return false; 

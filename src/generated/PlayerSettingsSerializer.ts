@@ -27,7 +27,7 @@ export class PlayerSettingsSerializer {
         o.set("enableUserInteraction", obj.enableUserInteraction); 
         o.set("scrollOffsetX", obj.scrollOffsetX); 
         o.set("scrollOffsetY", obj.scrollOffsetY); 
-        o.set("scrollMode", (obj.scrollMode as number)); 
+        o.set("scrollMode", obj.scrollMode as number); 
         o.set("scrollSpeed", obj.scrollSpeed); 
         o.set("songBookBendDuration", obj.songBookBendDuration); 
         o.set("songBookDipDuration", obj.songBookDipDuration); 
@@ -39,44 +39,44 @@ export class PlayerSettingsSerializer {
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "soundfont":
-                obj.soundFont = (v as string | null);
+                obj.soundFont = v as string | null;
                 return true;
             case "scrollelement":
-                obj.scrollElement = (v! as string);
+                obj.scrollElement = v! as string;
                 return true;
             case "enableplayer":
-                obj.enablePlayer = (v! as boolean);
+                obj.enablePlayer = v! as boolean;
                 return true;
             case "enablecursor":
-                obj.enableCursor = (v! as boolean);
+                obj.enableCursor = v! as boolean;
                 return true;
             case "enableuserinteraction":
-                obj.enableUserInteraction = (v! as boolean);
+                obj.enableUserInteraction = v! as boolean;
                 return true;
             case "scrolloffsetx":
-                obj.scrollOffsetX = (v! as number);
+                obj.scrollOffsetX = v! as number;
                 return true;
             case "scrolloffsety":
-                obj.scrollOffsetY = (v! as number);
+                obj.scrollOffsetY = v! as number;
                 return true;
             case "scrollmode":
-                obj.scrollMode = (JsonHelper.parseEnum<ScrollMode>(v, ScrollMode)!);
+                obj.scrollMode = JsonHelper.parseEnum<ScrollMode>(v, ScrollMode)!;
                 return true;
             case "scrollspeed":
-                obj.scrollSpeed = (v! as number);
+                obj.scrollSpeed = v! as number;
                 return true;
             case "songbookbendduration":
-                obj.songBookBendDuration = (v! as number);
+                obj.songBookBendDuration = v! as number;
                 return true;
             case "songbookdipduration":
-                obj.songBookDipDuration = (v! as number);
+                obj.songBookDipDuration = v! as number;
                 return true;
             case "playtripletfeel":
-                obj.playTripletFeel = (v! as boolean);
+                obj.playTripletFeel = v! as boolean;
                 return true;
         } 
         if (["vibrato"].indexOf(property) >= 0) {
-            VibratoPlaybackSettingsSerializer.fromJson(obj.vibrato, (v as Map<string, unknown>));
+            VibratoPlaybackSettingsSerializer.fromJson(obj.vibrato, v as Map<string, unknown>);
             return true;
         }
         else {
@@ -89,7 +89,7 @@ export class PlayerSettingsSerializer {
             }
         } 
         if (["slide"].indexOf(property) >= 0) {
-            SlidePlaybackSettingsSerializer.fromJson(obj.slide, (v as Map<string, unknown>));
+            SlidePlaybackSettingsSerializer.fromJson(obj.slide, v as Map<string, unknown>);
             return true;
         }
         else {

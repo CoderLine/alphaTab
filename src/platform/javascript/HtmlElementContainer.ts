@@ -8,7 +8,7 @@ import { Lazy } from '@src/util/Lazy';
  * @target web
  */
 export class HtmlElementContainer implements IContainer {
-    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(() => new ResizeObserver((entries) => {
+    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(() => new ResizeObserver((entries:ResizeObserverEntry[]) => {
         for (const e of entries) {
             let evt = new CustomEvent('resize', {
                 detail: e
