@@ -205,7 +205,7 @@ namespace AlphaTab.VisualTests
             var finalImageFileName = Path.ChangeExtension(referenceFileName, ".new.png");
             using (finalBitmap)
             {
-                var dir = Path.GetDirectoryName(finalImageFileName);
+                var dir = Path.GetDirectoryName(finalImageFileName)!;
                 Directory.CreateDirectory(dir);
 
                 using (var fileStream = new SKFileWStream(finalImageFileName))

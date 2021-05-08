@@ -6,7 +6,7 @@
         <PackageId>AlphaTab.Windows</PackageId>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFrameworks>netcoreapp3.1;net5.0-windows</TargetFrameworks>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
         <NoWarn>$(NoWarn);NU5105</NoWarn>
@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="NAudio" Version="1.10.0" />
+      <PackageReference Include="NAudio.Core" Version="2.0.0" />
     </ItemGroup>
 
 </Project>

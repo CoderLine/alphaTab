@@ -19,7 +19,7 @@ namespace AlphaTab
         public static async Task SaveFile(string name, Uint8Array data)
         {
             var path = Path.Combine("test-results", name);
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             await using var fs = new FileStream(Path.Combine("test-results", name), FileMode.Create);
             await fs.WriteAsync(data.Data.Array!, data.Data.Offset, data.Data.Count);
         }
