@@ -39,6 +39,11 @@ The `Score` class contains some high-level information like the song title, arti
 It also contains a `stylesheet` property which is the only place in the data model where potentially some visual information is stored. 
 Some file formats like Guitar Pro give some additional hints on how to render the music sheet. 
 
+**Example**
+
+A score is one whole file loaded (e.g. Guitar Pro or MusicXML) where all the individual instruments are inside. 
+![Score](/img/reference/score/score.png)
+
 ### MasterBar (Score.masterBars)
 
 The `MasterBar` items stored in `score.masterBars` contain information which is valid across all tracks for a particular bar or measure.
@@ -48,6 +53,12 @@ playback sequence. Pieces where maybe the first instrument is repeating the firs
 
 This is needed to consistently align the music notation elements when rendering multiple tracks at the same time, or when handling the audio playback.
 
+**Example**
+
+When you have a music piece which has e.g. 5 bars (aka. measures) and 3 instruments, the master bar 1 describes the details about the first bar of all 3 instruments. 
+![MasterBar](/img/reference/score/masterbar.png)
+
+
 ### Track (Score.tracks)
 
 A [`Track`](https://en.wikipedia.org/wiki/Part_(music)) (aka. Part) represents a single instrument of the overall music piece. Like the lead guitar or the drums. 
@@ -56,6 +67,11 @@ The track has a name and defines some playback information via the `playbackInfo
 The `playbackInfo` of the track contains info like the midi channels and program used for playback. 
 
 The track contains on the next level the individual staves which contribute to the instrument. 
+
+**Example**
+
+When you have a song with vocals and guitar, the vocals are one track and the guitar is one track.
+![Track](/img/reference/score/track.png)
 
 ### Staff (Score.tracks[].staves)
 
@@ -67,28 +83,53 @@ A single staff in the data model, might result in 2 visual staffs being rendered
 
 The staff is again just a container for the individual bars of the song. It contains some information about which visual staves to show or the string tuning for fretted instruments.
 
+**Example**
+
+In the following example you can see both kinds of staff representations visually. For the first track we have two individual staves in the data model.
+Each staff of the first track has own individual notes inside. 
+On the second track there is only one staff in the data model but still it is displayed as two visual staff representations. Both visual staves of the second
+track have the same notes, but just with a different display (standard notation or guitar tabs).
+![Staff](/img/reference/score/staff.png)
+
 ### Bar (Score.tracks[].staves[].bars)
 
 A [`Bar`](https://en.wikipedia.org/wiki/Bar_(music)) (aka. measure) is another container to bring us closer to the individual notes.
 Bars split the staff into segments separated with vertical lines when rendered. 
 
-The bar itself defines some basics like the clef shown or if simile marks indicate a repeats. 
+The bar itself defines some basics like the clef shown or if simile marks indicate a repeats. The list of bars is ordered in the timewise / indexed fashion.
 
 The bars contain voices as a next level. 
+
+**Example**
+![Bar](/img/reference/score/bar.png)
+
 
 ### Voice (Score.tracks[].staves[].voices[])
 
 A [`Voice`](https://en.wikipedia.org/wiki/Voicing_(music)) allows to have multiple independent notes placed within the same bar indicating the simultaneous playing of them with different duration.
 
-The voice is again just a container for the individual beats played in it. 
+The voice is again just a container for the individual beats played in it. Multiple voices are usually only used for certain types of instruments where 
+this kind of display and play type is possible and common. It is similar to the concept of multiple staves. Voices can also be seen as multiple staves squashed
+into one. 
+
+This list is ordered in the fashion that the first item is the primary voice, and others are considered additional ones.
+
+**Example**
+
+By default alphaTab renders the primary voices fully black and additional voices as semi transparent.
+![Voice](/img/reference/score/voices.png)
 
 ### Beat (Score.tracks[].staves[].voices[].beats)
 
 A [`Beat`](https://en.wikipedia.org/wiki/Chord_(music)) (aka. Chord) group multiple notes played at the same time with the same length. 
 
 This is the first level here we have a bit more information about the actual music notation like: the durations, tuplets, lyrics, whammy bar effects, chord diagrams, grace notes, etc. 
+This list is ordered in a timewise fashion from left to right. 
 
 The notes will ultimately contain the individual notes. 
+
+**Example**
+![Beat](/img/reference/score/beats.png)
 
 ### Note (Score.tracks[].staves[].voices[].beats[].notes)
 
@@ -100,6 +141,8 @@ In alphaTab there can be 3 types of notes:
 2. Piano notes where the note pitch is determined by combining an octave and the tone within this octave. 
 3. Percussion notes where the a combination of the percussion element and a variation indicate what to play.
 
+The note list is not ordered in any particular fashion.
+
 Notes have a huge set of annotations and effects which can influence the display and playback like: 
 
 * Hammer-Ons/Pull-Offs
@@ -110,5 +153,7 @@ Notes have a huge set of annotations and effects which can influence the display
 * Slides
 * and much more...
 
+**Example**
+![Notes](/img/reference/score/notes.png)
 
 
