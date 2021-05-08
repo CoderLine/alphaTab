@@ -124,6 +124,9 @@ export class AlphaSynthWebWorker {
                 break;
             case 'alphaSynth.destroy':
                 this._player.destroy();
+                this._main.postMessage({
+                    cmd: 'alphaSynth.destroyed'
+                });
                 break;
         }
     }
