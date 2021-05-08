@@ -150,6 +150,7 @@ export class AlphaSynth implements IAlphaSynth {
     public destroy(): void {
         Logger.debug('AlphaSynth', 'Destroying player');
         this.stop();
+        this.output.destroy();
     }
 
     /**

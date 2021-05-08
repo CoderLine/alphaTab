@@ -61,6 +61,7 @@ class SelectionInfo {
 export class AlphaTabApiBase<TSettings> {
     private _startTime: number = 0;
     private _trackIndexes: number[] | null = null;
+    private _isDestroyed: boolean = false;
     /**
      * Gets the UI facade to use for interacting with the user interface.
      */
@@ -122,6 +123,9 @@ export class AlphaTabApiBase<TSettings> {
 
         this.container.resize.on(
             Environment.throttle(() => {
+                if (this._isDestroyed) {
+                    return;
+                }
                 if (this.container.width !== this.renderer.width) {
                     this.triggerResize();
                 }
@@ -164,6 +168,7 @@ export class AlphaTabApiBase<TSettings> {
      * Destroys the alphaTab control and restores the initial state of the UI.
      */
     public destroy(): void {
+        this._isDestroyed = true;
         if (this.player) {
             this.player.destroy();
         }
@@ -678,7 +683,11 @@ export class AlphaTabApiBase<TSettings> {
         // we generate a new midi file containing only the beat
         let midiFile: MidiFile = new MidiFile();
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
-        let generator: MidiFileGenerator = new MidiFileGenerator(beat.voice.bar.staff.track.score, this.settings, handler);
+        let generator: MidiFileGenerator = new MidiFileGenerator(
+            beat.voice.bar.staff.track.score,
+            this.settings,
+            handler
+        );
         generator.generateSingleBeat(beat);
 
         this.player.playOneTimeMidiFile(midiFile);
@@ -696,12 +705,15 @@ export class AlphaTabApiBase<TSettings> {
         // we generate a new midi file containing only the beat
         let midiFile: MidiFile = new MidiFile();
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
-        let generator: MidiFileGenerator = new MidiFileGenerator(note.beat.voice.bar.staff.track.score, this.settings, handler);
+        let generator: MidiFileGenerator = new MidiFileGenerator(
+            note.beat.voice.bar.staff.track.score,
+            this.settings,
+            handler
+        );
         generator.generateSingleNote(note);
 
         this.player.playOneTimeMidiFile(midiFile);
     }
-
 
     private _cursorWrapper: IContainer | null = null;
     private _barCursor: IContainer | null = null;
@@ -867,7 +879,7 @@ export class AlphaTabApiBase<TSettings> {
                         if (
                             nextBeatBoundings &&
                             nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                            barBoundings.staveGroupBounds
+                                barBoundings.staveGroupBounds
                         ) {
                             nextBeatX = nextBeatBoundings.visualBounds.x;
                         }
@@ -943,6 +955,9 @@ export class AlphaTabApiBase<TSettings> {
 
     public playedBeatChanged: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
     private onPlayedBeatChanged(beat: Beat): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.playedBeatChanged as EventEmitterOfT<Beat>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'playedBeatChanged', beat);
     }
@@ -956,6 +971,10 @@ export class AlphaTabApiBase<TSettings> {
     public beatMouseUp: IEventEmitterOfT<Beat | null> = new EventEmitterOfT<Beat | null>();
 
     private onBeatMouseDown(originalEvent: IMouseEventArgs, beat: Beat): void {
+        if (this._isDestroyed) {
+            return;
+        }
+
         if (
             this.settings.player.enablePlayer &&
             this.settings.player.enableCursor &&
@@ -970,6 +989,10 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private onBeatMouseMove(originalEvent: IMouseEventArgs, beat: Beat): void {
+        if (this._isDestroyed) {
+            return;
+        }
+
         if (this.settings.player.enableUserInteraction) {
             if (!this._selectionEnd || this._selectionEnd.beat !== beat) {
                 this._selectionEnd = new SelectionInfo(beat);
@@ -981,6 +1004,10 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private onBeatMouseUp(originalEvent: IMouseEventArgs, beat: Beat | null): void {
+        if (this._isDestroyed) {
+            return;
+        }
+
         if (this.settings.player.enableUserInteraction) {
             // for the selection ensure start < end
             if (this._selectionEnd) {
@@ -1046,7 +1073,6 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             this.cursorSelectRange(null, null);
         }
-
     }
 
     private setupClickHandling(): void {
@@ -1183,36 +1209,54 @@ export class AlphaTabApiBase<TSettings> {
 
     public scoreLoaded: IEventEmitterOfT<Score> = new EventEmitterOfT<Score>();
     private onScoreLoaded(score: Score): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.scoreLoaded as EventEmitterOfT<Score>).trigger(score);
         this.uiFacade.triggerEvent(this.container, 'scoreLoaded', score);
     }
 
     public resize: IEventEmitterOfT<ResizeEventArgs> = new EventEmitterOfT<ResizeEventArgs>();
     private onResize(e: ResizeEventArgs): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.resize as EventEmitterOfT<ResizeEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'resize', e);
     }
 
     public renderStarted: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
     private onRenderStarted(resize: boolean): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.renderStarted as EventEmitterOfT<boolean>).trigger(resize);
         this.uiFacade.triggerEvent(this.container, 'renderStarted', resize);
     }
 
     public renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
     private onRenderFinished(renderingResult: RenderFinishedEventArgs): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.renderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(renderingResult);
         this.uiFacade.triggerEvent(this.container, 'renderFinished', renderingResult);
     }
 
     public postRenderFinished: IEventEmitter = new EventEmitter();
     private onPostRenderFinished(): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.postRenderFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'postRenderFinished', null);
     }
 
     public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
     public onError(error: Error): void {
+        if (this._isDestroyed) {
+            return;
+        }
         Logger.error('API', 'An unexpected error occurred', error);
         (this.error as EventEmitterOfT<Error>).trigger(error);
         this.uiFacade.triggerEvent(this.container, 'error', error);
@@ -1220,54 +1264,72 @@ export class AlphaTabApiBase<TSettings> {
 
     public playerReady: IEventEmitter = new EventEmitter();
     private onPlayerReady(): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.playerReady as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'playerReady', null);
     }
 
     public playerFinished: IEventEmitter = new EventEmitter();
     private onPlayerFinished(): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.playerFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'playerFinished', null);
     }
 
     public soundFontLoaded: IEventEmitter = new EventEmitter();
     private onSoundFontLoaded(): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.soundFontLoaded as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'soundFontLoaded', null);
     }
 
     public midiLoad: IEventEmitterOfT<MidiFile> = new EventEmitterOfT<MidiFile>();
-    private onMidiLoad(e:MidiFile): void {
+    private onMidiLoad(e: MidiFile): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.midiLoad as EventEmitterOfT<MidiFile>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'midiLoad', e);
     }
 
     public midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
-    private onMidiLoaded(e:PositionChangedEventArgs): void {
+    private onMidiLoaded(e: PositionChangedEventArgs): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'midiFileLoaded', e);
     }
 
-    public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<
-        PlayerStateChangedEventArgs
-    >();
+    public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<PlayerStateChangedEventArgs>();
     private onPlayerStateChanged(e: PlayerStateChangedEventArgs): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.playerStateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'playerStateChanged', e);
     }
 
-    public playerPositionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<
-        PositionChangedEventArgs
-    >();
+    public playerPositionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
     private onPlayerPositionChanged(e: PositionChangedEventArgs): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.playerPositionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'playerPositionChanged', e);
     }
 
-    public midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<
-        MidiEventsPlayedEventArgs
-    >();
+    public midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
     private onMidiEventsPlayed(e: MidiEventsPlayedEventArgs): void {
+        if (this._isDestroyed) {
+            return;
+        }
         (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'midiEventsPlayed', e);
     }

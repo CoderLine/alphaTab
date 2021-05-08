@@ -50,6 +50,12 @@ namespace AlphaTab
         }
 
         /// <inheritdoc />
+        public void Destroy()
+        {
+            Dispose();
+        }
+
+        /// <inheritdoc />
         public void Dispose()
         {
             Close();

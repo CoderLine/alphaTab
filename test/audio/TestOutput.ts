@@ -17,6 +17,10 @@ export class TestOutput implements ISynthOutput {
         // nothing to do
     }
 
+    public destroy(): void {
+        // nothing to do
+    }
+
     public next(): void {
         (this.sampleRequest as EventEmitter).trigger();
     }

@@ -22,6 +22,11 @@ export interface ISynthOutput {
     play(): void;
 
     /**
+     * Requests the output to destroy itself.
+     */
+    destroy(): void;
+
+    /**
      * Called when the output should stop the playback.
      */
     pause(): void;
