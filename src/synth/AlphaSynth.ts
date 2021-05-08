@@ -149,7 +149,7 @@ export class AlphaSynth implements IAlphaSynth {
 
     public destroy(): void {
         Logger.debug('AlphaSynth', 'Destroying player');
-        this.stop(true);
+        this.internalStop(true);
         this.output.destroy();
     }
 
@@ -261,7 +261,11 @@ export class AlphaSynth implements IAlphaSynth {
         }
     }
 
-    public stop(destroying: boolean = false): void {
+    public stop(): void {
+        this.internalStop(false);
+    }
+
+    public internalStop(destroying: boolean = false): void {
         if (!this._isMidiLoaded) {
             return;
         }
