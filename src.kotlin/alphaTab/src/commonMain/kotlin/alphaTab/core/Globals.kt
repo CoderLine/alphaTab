@@ -113,11 +113,11 @@ fun String.charAt(index: Double): String {
 }
 
 fun String.charCodeAt(index: Int): Double {
-    return this[index].toDouble()
+    return this[index].code.toDouble()
 }
 
 fun String.charCodeAt(index: Double): Double {
-    return this[index.toInt()].toDouble()
+    return this[index.toInt()].code.toDouble()
 }
 
 fun String.split(delimiter: String): MutableList<String> {

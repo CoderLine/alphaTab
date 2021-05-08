@@ -1,8 +1,7 @@
 package alphaTab
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.flow
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -22,11 +21,12 @@ class EnvironmentPartials {
 
         }
 
+        private val throttleScope = CoroutineScope(Dispatchers.Default)
         internal fun throttle(toThrottle: () -> Unit, delay: Double): () -> Unit {
-            var job:kotlinx.coroutines.Job? = null
+            var job:Job? = null
             return {
                 job?.cancel()
-                job = GlobalScope.launch {
+                job = throttleScope.launch {
                     delay(delay.toLong())
                     toThrottle()
                 }

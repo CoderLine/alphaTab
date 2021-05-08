@@ -310,6 +310,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                         return 'lastIndexOfInDouble';
                     case 'trimRight':
                         return 'trimEnd';
+                    case 'toLowerCase':
+                        return 'lowercase';
+                    case 'toUpperCase':
+                        return 'uppercase';
                 }
                 break;
         }

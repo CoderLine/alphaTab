@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.4.10"
+    kotlin("multiplatform") version "1.5.0"
 //    id("com.android.library")
 //    id("kotlin-android-extensions")
 }
@@ -27,7 +27,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC")
             }
         }
         commonMain.kotlin.srcDirs("../../dist/lib.kotlin/src")
@@ -49,7 +49,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                api("org.jetbrains.skija:skija-$target:0.89.32")
+                api("org.jetbrains.skija:skija-$target:0.91.3")
             }
         }
         jvmMain.kotlin.srcDirs("src/jvmCommon/kotlin")

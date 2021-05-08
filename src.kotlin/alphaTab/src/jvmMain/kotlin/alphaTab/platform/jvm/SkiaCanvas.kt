@@ -30,6 +30,7 @@ val CustomTypeFaces = HashMap<String, Typeface>();
 
 // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/modules/canvas/offscreencanvas2d/offscreen_canvas_rendering_context_2d.cc
 
+@Suppress("RedundantSemicolon")
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
 public class SkiaCanvas : ICanvas {
@@ -38,7 +39,7 @@ public class SkiaCanvas : ICanvas {
             val skData = Data.makeFromBytes(data.asByteArray())
             skData.use {
                 val face = Typeface.makeFromData(skData)
-                CustomTypeFaces[customTypeFaceKey(face)] = face;
+                CustomTypeFaces[customTypeFaceKey(face)] = face
             }
         }
 
@@ -51,7 +52,7 @@ public class SkiaCanvas : ICanvas {
             isBold: Boolean,
             isItalic: Boolean
         ): String {
-            return fontFamily.toLowerCase() + "_" + isBold + "_" + isItalic;
+            return fontFamily.lowercase() + "_" + isBold + "_" + isItalic;
         }
 
     }
@@ -318,14 +319,14 @@ public class SkiaCanvas : ICanvas {
         // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/core/html/canvas/text_metrics.cc#L14
         return when (textBaseline) {
             TextBaseline.Top -> // kHangingTextBaseline
-                return floatAscent(font.metrics) * HangingAsPercentOfAscent / 100.0f
+                floatAscent(font.metrics) * HangingAsPercentOfAscent / 100.0f
             TextBaseline.Middle -> {// kMiddleTextBaseline
                 val (emHeightAscent, emHeightDescent) = normalizedTypoAscentDescent(font)
-                return (emHeightAscent - emHeightDescent) / 2.0f
+                (emHeightAscent - emHeightDescent) / 2.0f
             }
             TextBaseline.Bottom -> {// kBottomTextBaseline
                 val (_, emHeightDescent) = normalizedTypoAscentDescent(font)
-                return -emHeightDescent
+                -emHeightDescent
             }
         }
     }
