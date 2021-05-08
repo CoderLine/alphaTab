@@ -122,6 +122,9 @@ export class AlphaSynthWebWorker {
             case 'alphaSynth.resetChannelStates':
                 this._player.resetChannelStates();
                 break;
+            case 'alphaSynth.destroy':
+                this._player.destroy();
+                break;
         }
     }
 

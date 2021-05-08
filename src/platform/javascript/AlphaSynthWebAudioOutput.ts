@@ -119,6 +119,11 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         this._audioNode = null;
     }
 
+    public destroy(): void {
+        this.pause();
+        this._context?.close();        
+    }
+
     public addSamples(f: Float32Array): void {
         this._circularBuffer.write(f, 0, f.length);
     }

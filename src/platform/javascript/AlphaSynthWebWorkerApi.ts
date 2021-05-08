@@ -228,7 +228,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public destroy(): void {
-        this._synth.terminate();
+        this._synth.postMessage({
+            cmd: 'alphaSynth.destroy'
+        });
     }
 
     //
@@ -349,6 +351,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 this._workerIsReady = true;
                 this.checkReady();
                 break;
+            case 'alphaSynth.destroyed':
+                this._synth.terminate();
+                break;
             case 'alphaSynth.readyForPlayback':
                 this._workerIsReadyForPlayback = true;
                 this.checkReadyForPlayback();
@@ -398,6 +403,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 break;
             case 'alphaSynth.output.pause':
                 this._output.pause();
+                break;
+            case 'alphaSynth.output.destroy':
+                this._output.destroy();
                 break;
             case 'alphaSynth.output.resetSamples':
                 this._output.resetSamples();

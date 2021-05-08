@@ -48,6 +48,12 @@ namespace AlphaTab
 
             ((EventEmitter) Ready).Trigger();
         }
+		
+        /// <inheritdoc />
+		public void Destroy()
+		{
+			Dispose();
+		}
 
         /// <inheritdoc />
         public void Dispose()

@@ -149,7 +149,8 @@ export class AlphaSynth implements IAlphaSynth {
 
     public destroy(): void {
         Logger.debug('AlphaSynth', 'Destroying player');
-        this.stop();
+        this.stop(true);
+        this.output.destroy();
     }
 
     /**
@@ -260,7 +261,7 @@ export class AlphaSynth implements IAlphaSynth {
         }
     }
 
-    public stop(): void {
+    public stop(destroying: boolean = false): void {
         if (!this._isMidiLoaded) {
             return;
         }
@@ -270,9 +271,11 @@ export class AlphaSynth implements IAlphaSynth {
         this._sequencer.stop();
         this._synthesizer.noteOffAll(true);
         this.tickPosition = this._sequencer.playbackRange ? this._sequencer.playbackRange.startTick : 0;
-        (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
-            new PlayerStateChangedEventArgs(this.state, true)
-        );
+        if (!destroying) {
+            (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
+                new PlayerStateChangedEventArgs(this.state, true)
+            );
+        }
     }
 
     public playOneTimeMidiFile(midi: MidiFile): void {
