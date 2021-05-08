@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: You have an issue or question regarding alphaTab itself?
+    url: https://github.com/CoderLine/alphaTab/issues/new/choose
+    about: This repository is purely for tracking the work for the alphatab.net website and documentation, let's hop over to the main repository for such questions.
