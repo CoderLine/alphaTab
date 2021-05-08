@@ -1,5 +1,5 @@
 ---
-name: "\U2753 You are missing some info or some info is wrong?"
+name: "❓ You are missing some info or some info is wrong?"
 about: That's not good. Let us know what info is incorrect or missing.
 title: ''
 labels: "enhancement"
