@@ -94,3 +94,8 @@ tasks.named<org.gradle.jvm.tasks.Jar>("jvmSourcesJar") {
 //        targetSdkVersion(29)
 //    }
 //}
+
+extensions.findByName("buildScan")?.withGroovyBuilder {
+    setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
+    setProperty("termsOfServiceAgree", "yes")
+}
