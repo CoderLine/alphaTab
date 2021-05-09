@@ -36,14 +36,14 @@
     "build-csharp": "npm run generate-csharp && cd src.csharp && dotnet build -c Release",
     "build-csharp-ci": "npm run clean && npm run generate-csharp && cd src.csharp && dotnet build -c Release",
     "build-kotlin": "npm run generate-kotlin && cd src.kotlin/alphaTab && gradlew assemble",
-    "build-kotlin-ci": "npm run clean && npm run generate-kotlin && cd src.kotlin/alphaTab && gradlew assemble --no-daemon",
+    "build-kotlin-ci": "npm run clean && npm run generate-kotlin && cd src.kotlin/alphaTab && gradlew assemble --scan",
     "start": "node scripts/setup-playground.js && npm run build && concurrently --kill-others \"tsc --project tsconfig.build.json --watch\" \"rollup -c rollup.config.js -w\"",
     "test": "npm run generate-typescript && tsc --project tsconfig.json && concurrently --kill-others \"tsc --project tsconfig.json -w\" \"karma start karma.conf.js --browsers Chrome --no-single-run --reporters spec,kjhtml\"",
     "test-ci": "npm run generate-typescript && tsc --project tsconfig.json && karma start karma.conf.js --browsers ChromeHeadless --single-run --reporters spec",
     "test-csharp": "cd src.csharp && dotnet test",
     "test-csharp-ci": "cd src.csharp && dotnet test",
     "test-kotlin": "cd src.kotlin/alphaTab && gradlew jvmTest",
-    "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew jvmTest --no-daemon"
+    "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew jvmTest --scan"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^19.0.0",
