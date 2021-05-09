@@ -82,6 +82,10 @@ kotlin {
     }
 }
 
+tasks.named<org.gradle.jvm.tasks.Jar>("jvmSourcesJar") {
+    exclude("*")
+}
+
 //android {
 //    compileSdkVersion(29)
 //    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
