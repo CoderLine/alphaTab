@@ -50,6 +50,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
+            !~/.gradle/**/*.lock
           key: ${{ runner.os }}-gradle-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-${{ github.job }}-
