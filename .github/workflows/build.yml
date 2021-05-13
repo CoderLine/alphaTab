@@ -45,12 +45,12 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
+      - run: TASKKILL /F /IM java.exe /T
       - uses: actions/cache@v2
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-            !~/.gradle/**/*.lock
           key: ${{ runner.os }}-gradle-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-${{ github.job }}-
