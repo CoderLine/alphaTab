@@ -45,7 +45,6 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - run: TASKKILL /F /IM java.exe /T
       - uses: actions/cache@v2
         with:
           path: |
@@ -56,4 +55,6 @@ jobs:
             ${{ runner.os }}-gradle-${{ github.job }}-
       - run: npm install
       - run: npm run build-kotlin-ci
-      - run: npm run test-kotlin-ci      
+      - run: npm run test-kotlin-ci
+      - run: TASKKILL /F /IM java.exe /T
+      - run: Get-ChildItem -Path ~/.gradle/caches/modules-2
