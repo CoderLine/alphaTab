@@ -56,4 +56,4 @@ jobs:
       - run: npm install
       - run: npm run build-kotlin-ci
       - run: npm run test-kotlin-ci
-      - run: gradlew --stop
+      - run: ./src.kotlin/alphaTab/gradlew --stop
