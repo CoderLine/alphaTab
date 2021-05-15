@@ -994,7 +994,10 @@ export default class CSharpEmitterContext {
             symbol = this.typeChecker.getAliasedSymbol(symbol);
         }
 
-        if (symbol.flags & ts.SymbolFlags.Interface || symbol.flags & ts.SymbolFlags.Class) {
+        if (symbol.flags & ts.SymbolFlags.Interface || 
+            symbol.flags & ts.SymbolFlags.Class ||
+            symbol.flags & ts.SymbolFlags.BlockScopedVariable ||
+            symbol.flags & ts.SymbolFlags.FunctionScopedVariable) {
             return false;
         }
 
