@@ -931,6 +931,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     }
 
     private isNullable(expr: cs.Expression): boolean {
+        const parent = expr.parent;
         if (cs.isParenthesizedExpression(expr)) {
             return this.isNullable(expr.expression);
         }
@@ -952,7 +953,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             return true;
         }
 
-        if (tsNode.kind === ts.SyntaxKind.AsExpression) {
+        if (parent && parent.tsNode?.kind === ts.SyntaxKind.AsExpression) {
             return false;
         }
 
@@ -971,6 +972,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         } else {
             type = this._context.typeChecker.getTypeAtLocation(tsNode);
         }
+
         return this._context.isNullableType(type);
     }
 

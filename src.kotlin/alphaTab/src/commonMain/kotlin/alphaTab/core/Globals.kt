@@ -150,9 +150,12 @@ fun IAlphaTabEnum.toDouble(): Double {
 fun IAlphaTabEnum?.toDouble(): Double? {
     return this?.value.toDouble()
 }
-fun Any.toDouble(): Double {
+fun Any?.toDouble(): Double {
     if(this is Double) {
         return this
+    }
+    if(this == null) {
+        throw ClassCastException("Cannot cast null to double")
     }
     throw ClassCastException("Cannot cast ${this::class.simpleName} to double")
 }
