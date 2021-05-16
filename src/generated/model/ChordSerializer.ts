@@ -29,25 +29,25 @@ export class ChordSerializer {
     public static setProperty(obj: Chord, property: string, v: unknown): boolean {
         switch (property) {
             case "name":
-                obj.name = (v! as string);
+                obj.name = v! as string;
                 return true;
             case "firstfret":
-                obj.firstFret = (v! as number);
+                obj.firstFret = v! as number;
                 return true;
             case "strings":
-                obj.strings = (v! as number[]);
+                obj.strings = v! as number[];
                 return true;
             case "barrefrets":
-                obj.barreFrets = (v! as number[]);
+                obj.barreFrets = v! as number[];
                 return true;
             case "showname":
-                obj.showName = (v! as boolean);
+                obj.showName = v! as boolean;
                 return true;
             case "showdiagram":
-                obj.showDiagram = (v! as boolean);
+                obj.showDiagram = v! as boolean;
                 return true;
             case "showfingering":
-                obj.showFingering = (v! as boolean);
+                obj.showFingering = v! as boolean;
                 return true;
         } 
         return false; 

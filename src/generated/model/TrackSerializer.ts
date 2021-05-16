@@ -35,24 +35,24 @@ export class TrackSerializer {
         switch (property) {
             case "staves":
                 obj.staves = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
+                for (const o of v as (Map<string, unknown> | null)[]) {
                     const i = new Staff();
                     StaffSerializer.fromJson(i, o)
                     obj.addStaff(i);
                 }
                 return true;
             case "color":
-                obj.color = (Color.fromJson(v)!);
+                obj.color = Color.fromJson(v)!;
                 return true;
             case "name":
-                obj.name = (v! as string);
+                obj.name = v! as string;
                 return true;
             case "shortname":
-                obj.shortName = (v! as string);
+                obj.shortName = v! as string;
                 return true;
             case "percussionarticulations":
                 obj.percussionArticulations = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
+                for (const o of v as (Map<string, unknown> | null)[]) {
                     const i = new InstrumentArticulation();
                     InstrumentArticulationSerializer.fromJson(i, o)
                     obj.percussionArticulations.push(i);
@@ -60,7 +60,7 @@ export class TrackSerializer {
                 return true;
         } 
         if (["playbackinfo"].indexOf(property) >= 0) {
-            PlaybackInformationSerializer.fromJson(obj.playbackInfo, (v as Map<string, unknown>));
+            PlaybackInformationSerializer.fromJson(obj.playbackInfo, v as Map<string, unknown>);
             return true;
         } 
         return false; 

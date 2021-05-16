@@ -30,28 +30,28 @@ export class PlaybackInformationSerializer {
     public static setProperty(obj: PlaybackInformation, property: string, v: unknown): boolean {
         switch (property) {
             case "volume":
-                obj.volume = (v! as number);
+                obj.volume = v! as number;
                 return true;
             case "balance":
-                obj.balance = (v! as number);
+                obj.balance = v! as number;
                 return true;
             case "port":
-                obj.port = (v! as number);
+                obj.port = v! as number;
                 return true;
             case "program":
-                obj.program = (v! as number);
+                obj.program = v! as number;
                 return true;
             case "primarychannel":
-                obj.primaryChannel = (v! as number);
+                obj.primaryChannel = v! as number;
                 return true;
             case "secondarychannel":
-                obj.secondaryChannel = (v! as number);
+                obj.secondaryChannel = v! as number;
                 return true;
             case "ismute":
-                obj.isMute = (v! as boolean);
+                obj.isMute = v! as boolean;
                 return true;
             case "issolo":
-                obj.isSolo = (v! as boolean);
+                obj.isSolo = v! as boolean;
                 return true;
         } 
         return false; 

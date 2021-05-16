@@ -39,7 +39,7 @@ internal open class JsonHelperPartials {
 
 
         public fun <T : Enum<T>> parseEnum(value: String, values: Array<T>): T? {
-            val valueLower = value.toLowerCase()
+            val valueLower = value.lowercase()
             for (e in values) {
                 if (valueLower.equals(e.name, true)) {
                     return e

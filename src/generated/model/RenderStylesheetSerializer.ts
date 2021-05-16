@@ -23,7 +23,7 @@ export class RenderStylesheetSerializer {
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
         switch (property) {
             case "hidedynamics":
-                obj.hideDynamics = (v! as boolean);
+                obj.hideDynamics = v! as boolean;
                 return true;
         } 
         return false; 

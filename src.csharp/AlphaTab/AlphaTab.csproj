@@ -8,7 +8,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);0162;1591;1573;NU5105;0168</NoWarn>
         <NoWarn>$(NoWarn);8600;8601;8602;8603;8604;8605</NoWarn>
-        <TargetFramework>netstandard20</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>8</LangVersion>
     </PropertyGroup>
@@ -27,6 +27,6 @@
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
       <PackageReference Include="SkiaSharp" Version="2.80.2" />
       <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.80.2" />
-      <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
+      <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
     </ItemGroup>
 </Project>

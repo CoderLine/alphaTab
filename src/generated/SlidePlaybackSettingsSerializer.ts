@@ -25,13 +25,13 @@ export class SlidePlaybackSettingsSerializer {
     public static setProperty(obj: SlidePlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "simpleslidepitchoffset":
-                obj.simpleSlidePitchOffset = (v! as number);
+                obj.simpleSlidePitchOffset = v! as number;
                 return true;
             case "simpleslidedurationratio":
-                obj.simpleSlideDurationRatio = (v! as number);
+                obj.simpleSlideDurationRatio = v! as number;
                 return true;
             case "shiftslidedurationratio":
-                obj.shiftSlideDurationRatio = (v! as number);
+                obj.shiftSlideDurationRatio = v! as number;
                 return true;
         } 
         return false; 

@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.4.10"
+    kotlin("multiplatform") version "1.5.0"
 //    id("com.android.library")
 //    id("kotlin-android-extensions")
 }
@@ -16,7 +16,7 @@ repositories {
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "10"
+            kotlinOptions.jvmTarget = "11"
         }
         testRuns["test"].executionTask.configure {
             useJUnit()
@@ -27,7 +27,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC")
             }
         }
         commonMain.kotlin.srcDirs("../../dist/lib.kotlin/src")
@@ -49,7 +49,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                api("org.jetbrains.skija:skija-$target:0.89.32")
+                api("org.jetbrains.skija:skija-$target:0.91.3")
             }
         }
         jvmMain.kotlin.srcDirs("src/jvmCommon/kotlin")
@@ -82,6 +82,10 @@ kotlin {
     }
 }
 
+tasks.named<org.gradle.jvm.tasks.Jar>("jvmSourcesJar") {
+    exclude("*")
+}
+
 //android {
 //    compileSdkVersion(29)
 //    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -90,3 +94,8 @@ kotlin {
 //        targetSdkVersion(29)
 //    }
 //}
+
+extensions.findByName("buildScan")?.withGroovyBuilder {
+    setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
+    setProperty("termsOfServiceAgree", "yes")
+}

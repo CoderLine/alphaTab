@@ -29,7 +29,7 @@ jobs:
           node-version: '12.x'
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '3.1.100'
+          dotnet-version: '5.0.x'
       - run: npm install
       - run: npm run build-csharp-ci
       - run: npm run test-csharp-ci
@@ -45,6 +45,15 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-cache-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-cache-${{ github.job }}-
       - run: npm install
       - run: npm run build-kotlin-ci
-      - run: npm run test-kotlin-ci      
+      - run: npm run test-kotlin-ci
+      - run: ./src.kotlin/alphaTab/gradlew --stop

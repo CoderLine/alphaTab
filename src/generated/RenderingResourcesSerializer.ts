@@ -41,55 +41,55 @@ export class RenderingResourcesSerializer {
     public static setProperty(obj: RenderingResources, property: string, v: unknown): boolean {
         switch (property) {
             case "copyrightfont":
-                obj.copyrightFont = (Font.fromJson(v)!);
+                obj.copyrightFont = Font.fromJson(v)!;
                 return true;
             case "titlefont":
-                obj.titleFont = (Font.fromJson(v)!);
+                obj.titleFont = Font.fromJson(v)!;
                 return true;
             case "subtitlefont":
-                obj.subTitleFont = (Font.fromJson(v)!);
+                obj.subTitleFont = Font.fromJson(v)!;
                 return true;
             case "wordsfont":
-                obj.wordsFont = (Font.fromJson(v)!);
+                obj.wordsFont = Font.fromJson(v)!;
                 return true;
             case "effectfont":
-                obj.effectFont = (Font.fromJson(v)!);
+                obj.effectFont = Font.fromJson(v)!;
                 return true;
             case "fretboardnumberfont":
-                obj.fretboardNumberFont = (Font.fromJson(v)!);
+                obj.fretboardNumberFont = Font.fromJson(v)!;
                 return true;
             case "tablaturefont":
-                obj.tablatureFont = (Font.fromJson(v)!);
+                obj.tablatureFont = Font.fromJson(v)!;
                 return true;
             case "gracefont":
-                obj.graceFont = (Font.fromJson(v)!);
+                obj.graceFont = Font.fromJson(v)!;
                 return true;
             case "stafflinecolor":
-                obj.staffLineColor = (Color.fromJson(v)!);
+                obj.staffLineColor = Color.fromJson(v)!;
                 return true;
             case "barseparatorcolor":
-                obj.barSeparatorColor = (Color.fromJson(v)!);
+                obj.barSeparatorColor = Color.fromJson(v)!;
                 return true;
             case "barnumberfont":
-                obj.barNumberFont = (Font.fromJson(v)!);
+                obj.barNumberFont = Font.fromJson(v)!;
                 return true;
             case "barnumbercolor":
-                obj.barNumberColor = (Color.fromJson(v)!);
+                obj.barNumberColor = Color.fromJson(v)!;
                 return true;
             case "fingeringfont":
-                obj.fingeringFont = (Font.fromJson(v)!);
+                obj.fingeringFont = Font.fromJson(v)!;
                 return true;
             case "markerfont":
-                obj.markerFont = (Font.fromJson(v)!);
+                obj.markerFont = Font.fromJson(v)!;
                 return true;
             case "mainglyphcolor":
-                obj.mainGlyphColor = (Color.fromJson(v)!);
+                obj.mainGlyphColor = Color.fromJson(v)!;
                 return true;
             case "secondaryglyphcolor":
-                obj.secondaryGlyphColor = (Color.fromJson(v)!);
+                obj.secondaryGlyphColor = Color.fromJson(v)!;
                 return true;
             case "scoreinfocolor":
-                obj.scoreInfoColor = (Color.fromJson(v)!);
+                obj.scoreInfoColor = Color.fromJson(v)!;
                 return true;
         } 
         return false; 

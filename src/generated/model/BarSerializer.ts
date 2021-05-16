@@ -23,33 +23,33 @@ export class BarSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("id", obj.id); 
-        o.set("clef", (obj.clef as number)); 
-        o.set("clefOttava", (obj.clefOttava as number)); 
+        o.set("clef", obj.clef as number); 
+        o.set("clefOttava", obj.clefOttava as number); 
         o.set("voices", obj.voices.map(i => VoiceSerializer.toJson(i))); 
-        o.set("simileMark", (obj.simileMark as number)); 
+        o.set("simileMark", obj.simileMark as number); 
         return o; 
     }
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (v! as number);
+                obj.id = v! as number;
                 return true;
             case "clef":
-                obj.clef = (JsonHelper.parseEnum<Clef>(v, Clef)!);
+                obj.clef = JsonHelper.parseEnum<Clef>(v, Clef)!;
                 return true;
             case "clefottava":
-                obj.clefOttava = (JsonHelper.parseEnum<Ottavia>(v, Ottavia)!);
+                obj.clefOttava = JsonHelper.parseEnum<Ottavia>(v, Ottavia)!;
                 return true;
             case "voices":
                 obj.voices = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
+                for (const o of v as (Map<string, unknown> | null)[]) {
                     const i = new Voice();
                     VoiceSerializer.fromJson(i, o)
                     obj.addVoice(i);
                 }
                 return true;
             case "similemark":
-                obj.simileMark = (JsonHelper.parseEnum<SimileMark>(v, SimileMark)!);
+                obj.simileMark = JsonHelper.parseEnum<SimileMark>(v, SimileMark)!;
                 return true;
         } 
         return false; 

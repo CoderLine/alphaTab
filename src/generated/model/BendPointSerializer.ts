@@ -24,10 +24,10 @@ export class BendPointSerializer {
     public static setProperty(obj: BendPoint, property: string, v: unknown): boolean {
         switch (property) {
             case "offset":
-                obj.offset = (v! as number);
+                obj.offset = v! as number;
                 return true;
             case "value":
-                obj.value = (v! as number);
+                obj.value = v! as number;
                 return true;
         } 
         return false; 

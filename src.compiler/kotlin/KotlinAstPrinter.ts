@@ -35,8 +35,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeLine('    "NON_EXHAUSTIVE_WHEN",');
         this.writeLine('    "UNCHECKED_CAST",');
         this.writeLine('    "USELESS_CAST",');
-        this.writeLine('    "UNNECESSARY_NOT_NULL_ASSERTION",');
-        this.writeLine('    "UNNECESSARY_SAFE_CALL",');
+        // this.writeLine('    "UNNECESSARY_NOT_NULL_ASSERTION",');
+        // this.writeLine('    "UNNECESSARY_SAFE_CALL",');
         this.writeLine('    "UNUSED_ANONYMOUS_PARAMETER",');
         this.writeLine('    "UNUSED_PARAMETER",');
         this.writeLine('    "UNUSED_VALUE",');
@@ -921,21 +921,59 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.write('.');
         } else if (cs.isTypeReference(expr.expression)) {
             this.write('.');
-        } else if (
-            cs.isNonNullExpression(expr.expression) ||
-            cs.isIdentifier(expr.expression) ||
-            cs.isArrayCreationExpression(expr.expression) ||
-            cs.isNewExpression(expr.expression) ||
-            cs.isThisLiteral(expr.expression) ||
-            cs.isBaseLiteralExpression(expr.expression) ||
-            expr.tsNode!.kind === ts.SyntaxKind.AsExpression
-        ) {
-            this.write('.');
-        } else {
+        } else if (this.isNullable(expr.expression)) {
             this.write('!!.');
+        } else {
+            this.write('.');
         }
         const name = this._context.getSymbolName(expr) ?? expr.member;
         this.write(name);
+    }
+
+    private isNullable(expr: cs.Expression): boolean {
+        const parent = expr.parent;
+        if (cs.isParenthesizedExpression(expr)) {
+            return this.isNullable(expr.expression);
+        }
+
+        if (
+            cs.isNonNullExpression(expr) ||
+            cs.isIdentifier(expr) ||
+            cs.isArrayCreationExpression(expr) ||
+            cs.isNewExpression(expr) ||
+            cs.isThisLiteral(expr) ||
+            cs.isBaseLiteralExpression(expr) ||
+            cs.isNumericLiteral(expr)
+        ) {
+            return false;
+        }
+
+        const tsNode = (expr as cs.Expression).tsNode;
+        if (!tsNode) {
+            return true;
+        }
+
+        if (parent && parent.tsNode?.kind === ts.SyntaxKind.AsExpression) {
+            return false;
+        }
+
+        const symbol = this._context.typeChecker.getSymbolAtLocation(tsNode);
+        let type: ts.Type;
+        if (symbol && symbol.valueDeclaration) {
+            if (
+                (symbol.flags & ts.SymbolFlags.BlockScopedVariable) !== 0 ||
+                (symbol.flags & ts.SymbolFlags.FunctionScopedVariable) !== 0 ||
+                (symbol.flags & ts.SymbolFlags.BlockScoped) !== 0
+            ) {
+                type = this._context.typeChecker.getTypeAtLocation(tsNode);
+            } else {
+                type = this._context.typeChecker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
+            }
+        } else {
+            type = this._context.typeChecker.getTypeAtLocation(tsNode);
+        }
+
+        return this._context.isNullableType(type);
     }
 
     protected isMethodAsDelegate(expr: cs.MemberAccessExpression) {
@@ -956,7 +994,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.writeExpression(expr.argumentExpression);
             this.write(')');
             return;
-        } else if (expr.expression.nodeType !== cs.SyntaxKind.NonNullExpression) {
+        } else if (this.isNullable(expr.expression)) {
             this.write('!!');
         }
         this.write('[');
@@ -980,14 +1018,14 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     return;
                 case cs.PrimitiveType.Double:
                     this.writeExpression(expr.expression);
-                    if (expr.expression.nodeType !== cs.SyntaxKind.NonNullExpression) {
+                    if (this.isNullable(expr.expression)) {
                         this.write('!!');
                     }
                     this.write('.toDouble()');
                     return;
                 case cs.PrimitiveType.Int:
                     this.writeExpression(expr.expression);
-                    if (expr.expression.nodeType !== cs.SyntaxKind.NonNullExpression) {
+                    if (this.isNullable(expr.expression)) {
                         this.write('!!');
                     }
                     this.write('.toInt()');
@@ -1004,7 +1042,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected writeNonNullExpression(expr: cs.NonNullExpression) {
         this.writeExpression(expr.expression);
-        this.write('!!');
+        if (!cs.isNonNullExpression(expr.expression)) {
+            this.write('!!');
+        }
     }
 
     protected writeCatchClause(c: cs.CatchClause): void {

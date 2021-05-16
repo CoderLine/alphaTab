@@ -10,7 +10,9 @@ class TypeHelper {
             return RegExp(pattern, flags)
         }
 
+        @ExperimentalContracts
         public fun isTruthy(s: String?): Boolean {
+            contract { returns(true) implies (s != null) }
             return s != null && s.isNotEmpty()
         }
 
