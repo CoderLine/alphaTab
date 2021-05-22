@@ -289,6 +289,9 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
+    /**
+     * @internal
+     */
     private triggerResize(): void {
         if (!this.container.isVisible) {
             Logger.warning(
@@ -334,6 +337,7 @@ export class AlphaTabApiBase<TSettings> {
     public tex(tex: string, tracks?: number[]): void {
         try {
             let parser: AlphaTexImporter = new AlphaTexImporter();
+            parser.logErrors = true;
             parser.initFromString(tex, this.settings);
             let score: Score = parser.readScore();
             this.renderScore(score, tracks);

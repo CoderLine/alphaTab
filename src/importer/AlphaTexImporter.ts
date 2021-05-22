@@ -125,6 +125,8 @@ export class AlphaTexImporter extends ScoreImporter {
     private _staffHasExplicitTuning: boolean = false;
     private _staffTuningApplied: boolean = false;
 
+    public logErrors:boolean = false;
+
     public constructor() {
         super();
     }
@@ -197,13 +199,17 @@ export class AlphaTexImporter extends ScoreImporter {
         } else {
             e = AlphaTexError.symbolError(this._curChPos, nonterm, expected, expected, this._syData);
         }
-        Logger.error(this.name, e.message!);
+        if(this.logErrors) {
+            Logger.error(this.name, e.message!);
+        }
         throw e;
     }
 
     private errorMessage(message: string): void {
         let e: AlphaTexError = AlphaTexError.errorMessage(this._curChPos, message);
-        Logger.error(this.name, e.message!);
+        if(this.logErrors) {
+            Logger.error(this.name, e.message!);
+        }
         throw e;
     }
 

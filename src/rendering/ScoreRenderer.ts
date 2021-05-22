@@ -126,7 +126,6 @@ export class ScoreRenderer implements IScoreRenderer {
         (this.preRender as EventEmitterOfT<boolean>).trigger(false);
         this.recreateLayout();
         this.layoutAndRender();
-        this._renderedTracks = this.tracks;
         Logger.debug('Rendering', 'Rendering finished');
     }
 
@@ -157,6 +156,7 @@ export class ScoreRenderer implements IScoreRenderer {
         );
         this.layout!.layoutAndRender();
         this.layout!.renderAnnotation();
+        this._renderedTracks = this.tracks;
         this.onRenderFinished();
         (this.postRenderFinished as EventEmitter).trigger();
     }

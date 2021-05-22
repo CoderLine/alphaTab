@@ -32,7 +32,8 @@ class VisualTestHelperPartials {
             settings: Settings? = null,
             tracks: MutableList<Double>? = null,
             message: String? = null,
-            tolerancePercent: Double = 1.0
+            tolerancePercent: Double = 1.0,
+            triggerResize: Boolean = false
         ) {
             try {
                 val fullInputFile = "test-data/visual-tests/$inputFile"
@@ -46,7 +47,8 @@ class VisualTestHelperPartials {
                     settings,
                     tracks,
                     message,
-                    tolerancePercent
+                    tolerancePercent,
+                    triggerResize
                 )
             } catch (e: Throwable) {
                 Assert.fail("Failed to run visual test $e")
@@ -86,7 +88,8 @@ class VisualTestHelperPartials {
             settings: Settings? = null,
             tracks: MutableList<Double>? = null,
             message: String? = null,
-            tolerancePercent: Double = 1.0
+            tolerancePercent: Double = 1.0,
+            triggerResize: Boolean = false
         ) {
             val actualSettings = settings ?: Settings()
             val actualTracks = tracks ?: ArrayList()
@@ -116,9 +119,10 @@ class VisualTestHelperPartials {
 
             val referenceFileData = TestPlatformPartials.loadFile(actualReferenceFileName)
 
-            val result = ArrayList<RenderFinishedEventArgs>()
+            var result = ArrayList<RenderFinishedEventArgs>()
             var totalWidth = 0.0
             var totalHeight = 0.0
+            var isResizeRender = false
 
             val renderer = ScoreRenderer(actualSettings)
             renderer.width = 1300.0
@@ -128,6 +132,11 @@ class VisualTestHelperPartials {
 
             var error: Throwable? = null
 
+            renderer.preRender.on { _ ->
+                result = ArrayList<RenderFinishedEventArgs>()
+                totalWidth = 0.0
+                totalHeight = 0.0
+            }
             renderer.partialRenderFinished.on { e ->
                 result.add(e)
             }
@@ -135,7 +144,13 @@ class VisualTestHelperPartials {
                 totalWidth = e.totalWidth
                 totalHeight = e.totalHeight
                 result.add(e)
-                waitHandle.release()
+                if(!triggerResize || isResizeRender) {
+                    waitHandle.release()
+                } else if(triggerResize) {
+                    isResizeRender = true
+                    renderer.resizeRender()
+                }
+                
             }
             renderer.error.on { e ->
                 error = e

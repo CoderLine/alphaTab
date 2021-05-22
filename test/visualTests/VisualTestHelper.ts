@@ -24,7 +24,8 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 1,
+        triggerResize: boolean = false
     ): Promise<void> {
         try {
             const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
@@ -37,7 +38,8 @@ export class VisualTestHelper {
                 settings,
                 tracks,
                 message,
-                tolerancePercent
+                tolerancePercent,
+                triggerResize
             );
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
@@ -82,7 +84,7 @@ export class VisualTestHelper {
      * @partial
      */
     private static async loadFonts(): Promise<void> {
-        if(VisualTestHelper._fontsLoaded) {
+        if (VisualTestHelper._fontsLoaded) {
             return;
         }
         VisualTestHelper._fontsLoaded = true;
@@ -140,7 +142,7 @@ export class VisualTestHelper {
 
         await Promise.all(promises);
 
-        for(const font of allFonts) {
+        for (const font of allFonts) {
             document.fonts.add(font);
         }
     }
@@ -155,7 +157,8 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 1,
+        triggerResize: boolean = false
     ): Promise<void> {
         try {
             if (!settings) {
@@ -222,8 +225,14 @@ export class VisualTestHelper {
             let result: RenderFinishedEventArgs[] = [];
             let totalWidth: number = 0;
             let totalHeight: number = 0;
+            let isResizeRender = false;
             let render = new Promise<void>((resolve, reject) => {
                 const api = new AlphaTabApi(renderElement, settings);
+                api.renderStarted.on(isResize => {
+                    result = [];
+                    totalWidth = 0;
+                    totalHeight = 0;
+                });
                 api.renderer.partialRenderFinished.on(e => {
                     if (e) {
                         result.push(e);
@@ -233,7 +242,14 @@ export class VisualTestHelper {
                     totalWidth = e.totalWidth;
                     totalHeight = e.totalHeight;
                     result.push(e);
-                    resolve();
+
+                    if (!triggerResize || isResizeRender) {
+                        resolve();
+                    } else if(triggerResize) {
+                        isResizeRender = true;
+                        // @ts-ignore 
+                        api.triggerResize();
+                    }
                 });
                 api.error.on(e => {
                     reject(`Failed to render image: ${e}`);
@@ -459,7 +475,7 @@ export class VisualTestHelper {
                     let totalPixels = match.totalPixels - match.transparentPixels;
                     let percentDifference = (match.differentPixels / totalPixels) * 100;
                     result.pass = percentDifference < tolerancePercent;
-                    // result.pass = match.differentPixels < 5;
+                    // result.pass = match.differentPixels === 0;
 
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
