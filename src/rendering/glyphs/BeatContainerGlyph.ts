@@ -35,7 +35,7 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
-        let preBeatStretch: number = this.onTimeX;
+        let preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
         if(this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
             preBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
         }

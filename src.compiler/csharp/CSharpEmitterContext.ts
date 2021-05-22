@@ -41,7 +41,7 @@ export default class CSharpEmitterContext {
     }
 
     public registerUnresolvedTypeNode(unresolved: cs.UnresolvedTypeNode) {
-        if(this.processingSkippedElement) {
+        if (this.processingSkippedElement) {
             return;
         }
         this._unresolvedTypeNodes.push(unresolved);
@@ -479,7 +479,11 @@ export default class CSharpEmitterContext {
         return this.createBasicFunctionType(node, returnType, parameterTypes);
     }
 
-    protected createBasicFunctionType(node:cs.Node, returnType: cs.TypeNode, parameterTypes: cs.TypeNode[]): cs.TypeNode {
+    protected createBasicFunctionType(
+        node: cs.Node,
+        returnType: cs.TypeNode,
+        parameterTypes: cs.TypeNode[]
+    ): cs.TypeNode {
         return {
             nodeType: cs.SyntaxKind.FunctionTypeNode,
             parent: node.parent,
@@ -488,7 +492,7 @@ export default class CSharpEmitterContext {
             returnType: returnType
         } as cs.FunctionTypeNode;
     }
-    
+
     private resolveUnionType(
         parent: cs.Node,
         tsType: ts.Type,
@@ -784,12 +788,13 @@ export default class CSharpEmitterContext {
             return text;
         }
 
-        if(!text) {
+        if (!text) {
             return '';
         }
 
-        return text.split('.')
-            .map(p=> p.substr(0, 1).toUpperCase() + p.substr(1))
+        return text
+            .split('.')
+            .map(p => p.substr(0, 1).toUpperCase() + p.substr(1))
             .join('.');
     }
 
@@ -994,10 +999,12 @@ export default class CSharpEmitterContext {
             symbol = this.typeChecker.getAliasedSymbol(symbol);
         }
 
-        if (symbol.flags & ts.SymbolFlags.Interface || 
+        if (
+            symbol.flags & ts.SymbolFlags.Interface ||
             symbol.flags & ts.SymbolFlags.Class ||
             symbol.flags & ts.SymbolFlags.BlockScopedVariable ||
-            symbol.flags & ts.SymbolFlags.FunctionScopedVariable) {
+            symbol.flags & ts.SymbolFlags.FunctionScopedVariable
+        ) {
             return false;
         }
 
@@ -1176,11 +1183,7 @@ export default class CSharpEmitterContext {
         return this.hasAnyBaseTypeClassMember(classType, classElement.name!.getText());
     }
 
-    protected hasAnyBaseTypeClassMember(
-        classType: ts.Type,
-        memberName: string,
-        allowInterfaces: boolean = false
-    ) {
+    protected hasAnyBaseTypeClassMember(classType: ts.Type, memberName: string, allowInterfaces: boolean = false) {
         const baseTypes = classType.getBaseTypes();
         if (!baseTypes) {
             return false;
@@ -1211,10 +1214,10 @@ export default class CSharpEmitterContext {
     }
 
     public isValueTypeExpression(expression: ts.NonNullExpression) {
-        let tsType:ts.Type;
-        if(ts.isIdentifier(expression.expression)) {
+        let tsType: ts.Type;
+        if (ts.isIdentifier(expression.expression)) {
             const symbol = this.typeChecker.getSymbolAtLocation(expression.expression);
-            if(symbol?.valueDeclaration) {
+            if (symbol?.valueDeclaration) {
                 tsType = this.typeChecker.getTypeAtLocation(symbol.valueDeclaration);
             } else {
                 tsType = this.typeChecker.getTypeAtLocation(expression);
@@ -1241,6 +1244,10 @@ export default class CSharpEmitterContext {
         }
 
         return false;
+    }
+
+    public isInternal(node: ts.Node) {
+        return !!ts.getJSDocTags(node).find(t => t.tagName.text === 'internal');
     }
 
     public rewriteVisibilities() {

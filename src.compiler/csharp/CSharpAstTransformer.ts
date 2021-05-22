@@ -551,7 +551,7 @@ export default class CSharpAstTransformer {
             name: this._context.toPascalCase((d.name as ts.Identifier).text),
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, d.type ?? d, returnType),
-            visibility: this.mapVisibility(d.modifiers),
+            visibility: this.mapVisibility(d),
             tsNode: d,
             skipEmit: this.shouldSkip(d, true)
         };
@@ -967,7 +967,7 @@ export default class CSharpAstTransformer {
                 name: propertyName,
                 nodeType: cs.SyntaxKind.PropertyDeclaration,
                 parent: parent,
-                visibility: this.mapVisibility(classElement.modifiers),
+                visibility: this.mapVisibility(classElement),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
                 skipEmit: this.shouldSkip(classElement, false)
             };
@@ -1038,7 +1038,7 @@ export default class CSharpAstTransformer {
                 name: propertyName,
                 nodeType: cs.SyntaxKind.PropertyDeclaration,
                 parent: parent,
-                visibility: this.mapVisibility(classElement.modifiers),
+                visibility: this.mapVisibility(classElement),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
                 skipEmit: this.shouldSkip(classElement, false)
             };
@@ -1091,7 +1091,7 @@ export default class CSharpAstTransformer {
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.PropertyDeclaration
     ) {
-        const visibility = this.mapVisibility(classElement.modifiers);
+        const visibility = this.mapVisibility(classElement);
         const type = this._context.typeChecker.getTypeAtLocation(classElement);
         const csProperty: cs.PropertyDeclaration = {
             parent: parent,
@@ -1203,7 +1203,7 @@ export default class CSharpAstTransformer {
             name: this._context.toPascalCase((classElement.name as ts.Identifier).text),
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-            visibility: this.mapVisibility(classElement.modifiers),
+            visibility: this.mapVisibility(classElement),
             tsNode: classElement,
             skipEmit: this.shouldSkip(classElement, false)
         };
@@ -1852,9 +1852,13 @@ export default class CSharpAstTransformer {
 
         this._context.registerSymbol(csMethod);
     }
-    protected mapVisibility(modifiers: ts.ModifiersArray | undefined): cs.Visibility {
-        if (modifiers) {
-            for (const m of modifiers) {
+    protected mapVisibility(node: ts.Node): cs.Visibility {
+        if(this._context.isInternal(node)) {
+            return cs.Visibility.Internal;
+        }
+        
+        if (node.modifiers) {
+            for (const m of node.modifiers) {
                 switch (m.kind) {
                     case ts.SyntaxKind.PublicKeyword:
                         return cs.Visibility.Public;
@@ -1913,7 +1917,7 @@ export default class CSharpAstTransformer {
             name: '.ctor',
             parameters: [],
             isStatic: false,
-            visibility: this.mapVisibility(classElement.modifiers),
+            visibility: this.mapVisibility(classElement),
             tsNode: classElement,
             skipEmit: this.shouldSkip(classElement, false)
         };
