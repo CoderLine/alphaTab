@@ -293,9 +293,8 @@ export class TabBarRenderer extends BarRendererBase {
                 let y1: number = cy + this.y;
                 let y2: number = cy + this.y + this.height - this._tupletSize;
                 let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
-                if (!startGlyph.noteNumbers) {
-                    y1 +=
-                        this.height -
+                if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
+                    y1 += this.height -
                         this.settings.notation.rhythmHeight * this.settings.display.scale -
                         this._tupletSize;
                 } else {
@@ -491,14 +490,14 @@ export class TabBarRenderer extends BarRendererBase {
             canvas.moveTo(x, y);
 
             let lineY = topY;
-            // draw until next hole
-            if (holes.length > 0) {
+            // draw until next hole (if hole reaches into line)
+            if (holes.length > 0 && holes[holes.length -1].bottomY > lineY) {
                 const bottomHole = holes.pop()!;
                 lineY = cy + bottomHole.bottomY;
                 canvas.lineTo(x, lineY);
                 y = cy + bottomHole.topY;
             } else {
-                canvas.lineTo(x, topY);
+                canvas.lineTo(x, lineY);
                 break;
             }
         }
@@ -522,7 +521,7 @@ export class TabBarRenderer extends BarRendererBase {
             let y1: number = cy + this.y;
             let y2: number = cy + this.y + this.height - this._tupletSize;
             let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
-            if (!startGlyph.noteNumbers) {
+            if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
                 y1 +=
                     this.height - this.settings.notation.rhythmHeight * this.settings.display.scale - this._tupletSize;
             } else {

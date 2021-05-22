@@ -107,22 +107,25 @@ export class PixelMatch {
 
         // check if images are identical
         const len = width * height;
-        const a32 = new DataView(img1.buffer);
-        const b32 = new DataView(img2.buffer);
         let identical = true;
         let transparentPixels = 0;
 
         for (let i = 0; i < len; i++) {
-            if (a32.getInt32(i, true) !== b32.getInt32(i, true)) {
+            const img1r = img1[(i * 4) + 0];
+            const img1g = img1[(i * 4) + 1];
+            const img1b = img1[(i * 4) + 2];
+            const img1a = img1[(i * 4) + 3];
+
+            const img2r = img2[(i * 4) + 0];
+            const img2g = img2[(i * 4) + 1];
+            const img2b = img2[(i * 4) + 2];
+            const img2a = img2[(i * 4) + 3];
+
+            if (img1r !== img2r || img1g !== img2g || img1b !== img2b || img1a !== img2a) {
                 identical = false;
                 break;
             }
-            if (
-                a32.getUint8(i) === 0xff &&
-                a32.getUint8(i + 1) === 0 &&
-                a32.getUint8(i + 2) === 0 &&
-                a32.getUint8(i + 3) === 0
-            ) {
+            if (img1a === 0) {
                 transparentPixels++;
             }
         }
