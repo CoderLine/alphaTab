@@ -40,7 +40,7 @@ export class BeatContainerGlyph extends Glyph {
             preBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
         }
 
-        let postBeatStretch: number = this.onNotes.width - this.onNotes.centerX;
+        let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.centerX;
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
         if(helper && helper.hasFlag || this.beat.graceType !== GraceType.None) {
@@ -57,8 +57,8 @@ export class BeatContainerGlyph extends Glyph {
 
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
         // store sizes for special renderers like the EffectBarRenderer
-        layoutings.setPreBeatSize(this.beat, this.preNotes.width);
-        layoutings.setOnBeatSize(this.beat, this.onNotes.width);
+        layoutings.setPreBeatSize(this.beat, this.preNotes.computedWidth);
+        layoutings.setOnBeatSize(this.beat, this.onNotes.computedWidth);
         layoutings.setBeatCenterX(this.beat, this.onNotes.centerX);
     }
 
