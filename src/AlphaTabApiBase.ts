@@ -289,6 +289,9 @@ export class AlphaTabApiBase<TSettings> {
         }
     }
 
+    /**
+     * @internal
+     */
     private triggerResize(): void {
         if (!this.container.isVisible) {
             Logger.warning(

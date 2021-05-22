@@ -126,6 +126,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             w += g.width;
         }
         this.width = w;
+        this.computedWidth = w;
         if (this.container.beat.isEmpty) {
             this.centerX = this.width / 2;
         } else if (this.container.beat.isRest) {
