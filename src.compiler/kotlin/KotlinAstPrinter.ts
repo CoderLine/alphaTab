@@ -1147,7 +1147,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     }
 
     protected writeForStatement(s: cs.ForStatement) {
-        if (!this.tryWriteForRange(s)) {
+        if (/*!this.tryWriteForRange(s)*/ true) {
             this.write('if(true) ');
             this.beginBlock();
 
