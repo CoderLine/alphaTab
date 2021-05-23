@@ -78,7 +78,7 @@ function findSerializerModule(type: ts.Type, options: ts.CompilerOptions) {
 
 //
 // fromJson
-function generateFromJsonBody(importer: (name: string, module: string) => void) {
+function generateFromJsonBody(isStrict:boolean, importer: (name: string, module: string) => void) {
     importer('JsonHelper', '@src/io/JsonHelper');
     return ts.factory.createBlock(
         addNewLines([
@@ -109,6 +109,7 @@ function generateFromJsonBody(importer: (name: string, module: string) => void) 
                                 undefined,
                                 [
                                     ts.factory.createIdentifier('obj'),
+                                    isStrict ? ts.factory.createIdentifier('k') :
                                     ts.factory.createCallExpression(
                                         ts.factory.createPropertyAccessExpression(
                                             ts.factory.createIdentifier('k'),
@@ -128,7 +129,7 @@ function generateFromJsonBody(importer: (name: string, module: string) => void) 
     );
 }
 
-function createFromJsonMethod(input: ts.ClassDeclaration, importer: (name: string, module: string) => void) {
+function createFromJsonMethod(input: ts.ClassDeclaration, isStrict: boolean, importer: (name: string, module: string) => void) {
     return ts.factory.createMethodDeclaration(
         undefined,
         [
@@ -158,7 +159,7 @@ function createFromJsonMethod(input: ts.ClassDeclaration, importer: (name: strin
             )
         ],
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-        generateFromJsonBody(importer)
+        generateFromJsonBody(isStrict, importer)
     );
 }
 //
@@ -1231,6 +1232,8 @@ export default createEmitter('json', (program, input) => {
         path.resolve(input.getSourceFile().fileName)
     );
 
+    const isStrict = !!ts.getJSDocTags(input).find(t => t.tagName.text === 'json_strict');
+
     let propertiesToSerialize: JsonProperty[] = [];
     input.members.forEach(member => {
         if (ts.isPropertyDeclaration(member)) {
@@ -1240,7 +1243,7 @@ export default createEmitter('json', (program, input) => {
                     m => m.kind === ts.SyntaxKind.StaticKeyword || m.kind === ts.SyntaxKind.PrivateKeyword
                 )
             ) {
-                const jsonNames = [(member.name as ts.Identifier).text];
+                const jsonNames = [(member.name as ts.Identifier).text.toLowerCase()];
 
                 if (ts.getJSDocTags(member).find(t => t.tagName.text === 'json_on_parent')) {
                     jsonNames.push('');
@@ -1290,7 +1293,7 @@ export default createEmitter('json', (program, input) => {
             undefined,
             undefined,
             [
-                createFromJsonMethod(input, importer),
+                createFromJsonMethod(input, isStrict, importer),
                 createToJsonMethod(program, input, propertiesToSerialize, importer),
                 createSetPropertyMethod(program, input, propertiesToSerialize, importer)
             ]

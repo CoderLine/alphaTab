@@ -13,6 +13,7 @@ import { TripletFeel } from '@src/model/TripletFeel';
  * The MasterBar stores information about a bar which affects
  * all tracks.
  * @json
+ * @json_strict
  */
 export class MasterBar {
     public static readonly MaxAlternateEndings: number = 8;

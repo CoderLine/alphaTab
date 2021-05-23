@@ -20,20 +20,20 @@ export class PlayerSettingsSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("soundFont", obj.soundFont); 
-        o.set("scrollElement", obj.scrollElement); 
-        o.set("enablePlayer", obj.enablePlayer); 
-        o.set("enableCursor", obj.enableCursor); 
-        o.set("enableUserInteraction", obj.enableUserInteraction); 
-        o.set("scrollOffsetX", obj.scrollOffsetX); 
-        o.set("scrollOffsetY", obj.scrollOffsetY); 
-        o.set("scrollMode", obj.scrollMode as number); 
-        o.set("scrollSpeed", obj.scrollSpeed); 
-        o.set("songBookBendDuration", obj.songBookBendDuration); 
-        o.set("songBookDipDuration", obj.songBookDipDuration); 
+        o.set("soundfont", obj.soundFont); 
+        o.set("scrollelement", obj.scrollElement); 
+        o.set("enableplayer", obj.enablePlayer); 
+        o.set("enablecursor", obj.enableCursor); 
+        o.set("enableuserinteraction", obj.enableUserInteraction); 
+        o.set("scrolloffsetx", obj.scrollOffsetX); 
+        o.set("scrolloffsety", obj.scrollOffsetY); 
+        o.set("scrollmode", obj.scrollMode as number); 
+        o.set("scrollspeed", obj.scrollSpeed); 
+        o.set("songbookbendduration", obj.songBookBendDuration); 
+        o.set("songbookdipduration", obj.songBookDipDuration); 
         o.set("vibrato", VibratoPlaybackSettingsSerializer.toJson(obj.vibrato)); 
         o.set("slide", SlidePlaybackSettingsSerializer.toJson(obj.slide)); 
-        o.set("playTripletFeel", obj.playTripletFeel); 
+        o.set("playtripletfeel", obj.playTripletFeel); 
         return o; 
     }
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {

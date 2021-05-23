@@ -15,7 +15,7 @@ export class ScoreSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Score | null): Map<string, unknown> | null {
         if (!obj) {
@@ -28,13 +28,13 @@ export class ScoreSerializer {
         o.set("instructions", obj.instructions); 
         o.set("music", obj.music); 
         o.set("notices", obj.notices); 
-        o.set("subTitle", obj.subTitle); 
+        o.set("subtitle", obj.subTitle); 
         o.set("title", obj.title); 
         o.set("words", obj.words); 
         o.set("tab", obj.tab); 
         o.set("tempo", obj.tempo); 
-        o.set("tempoLabel", obj.tempoLabel); 
-        o.set("masterBars", obj.masterBars.map(i => MasterBarSerializer.toJson(i))); 
+        o.set("tempolabel", obj.tempoLabel); 
+        o.set("masterbars", obj.masterBars.map(i => MasterBarSerializer.toJson(i))); 
         o.set("tracks", obj.tracks.map(i => TrackSerializer.toJson(i))); 
         o.set("stylesheet", RenderStylesheetSerializer.toJson(obj.stylesheet)); 
         return o; 

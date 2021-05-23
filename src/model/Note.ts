@@ -27,6 +27,7 @@ import { PercussionMapper } from '@src/model/PercussionMapper';
  * It also can be modified by a lot of different effects.
  * @cloneable
  * @json
+ * @json_strict
  */
 export class Note {
     public static GlobalNoteId: number = 0;

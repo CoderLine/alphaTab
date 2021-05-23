@@ -11,6 +11,7 @@ import { InstrumentArticulation } from './InstrumentArticulation';
  * This public class describes a single track or instrument of score.
  * It is bascially a list of staffs containing individual music notation kinds.
  * @json
+ * @json_strict
  */
 export class Track {
     private static readonly ShortNameMaxLength: number = 10;

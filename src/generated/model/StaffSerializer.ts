@@ -15,7 +15,7 @@ export class StaffSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Staff | null): Map<string, unknown> | null {
         if (!obj) {
@@ -31,13 +31,13 @@ export class StaffSerializer {
             }
         } 
         o.set("capo", obj.capo); 
-        o.set("transpositionPitch", obj.transpositionPitch); 
-        o.set("displayTranspositionPitch", obj.displayTranspositionPitch); 
-        o.set("stringTuning", TuningSerializer.toJson(obj.stringTuning)); 
-        o.set("showTablature", obj.showTablature); 
-        o.set("showStandardNotation", obj.showStandardNotation); 
-        o.set("isPercussion", obj.isPercussion); 
-        o.set("standardNotationLineCount", obj.standardNotationLineCount); 
+        o.set("transpositionpitch", obj.transpositionPitch); 
+        o.set("displaytranspositionpitch", obj.displayTranspositionPitch); 
+        o.set("stringtuning", TuningSerializer.toJson(obj.stringTuning)); 
+        o.set("showtablature", obj.showTablature); 
+        o.set("showstandardnotation", obj.showStandardNotation); 
+        o.set("ispercussion", obj.isPercussion); 
+        o.set("standardnotationlinecount", obj.standardNotationLineCount); 
         return o; 
     }
     public static setProperty(obj: Staff, property: string, v: unknown): boolean {

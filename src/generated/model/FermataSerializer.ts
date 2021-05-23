@@ -11,7 +11,7 @@ export class FermataSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Fermata | null): Map<string, unknown> | null {
         if (!obj) {

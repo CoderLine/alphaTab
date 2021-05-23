@@ -68,10 +68,10 @@ export class ComparisonHelpers {
                                     switch (key) {
                                         // some ignored keys
                                         case 'id':
-                                        case 'hammerPullOriginNoteId':
-                                        case 'hammerPullDestinationNoteId':
-                                        case 'tieOriginNoteId':
-                                        case 'tieDestinationNoteId':
+                                        case 'hammerpulloriginnoteid':
+                                        case 'hammerpulldestinationnoteid':
+                                        case 'tieoriginnoteid':
+                                        case 'tiedestinationnoteid':
                                             break;
                                         default:
                                             if (!ignoreKeys || ignoreKeys.indexOf(key) === -1) {

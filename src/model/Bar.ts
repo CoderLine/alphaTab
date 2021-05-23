@@ -9,6 +9,7 @@ import { Settings } from '@src/Settings';
 /**
  * A bar is a single block within a track, also known as Measure.
  * @json
+ * @json_strict
  */
 export class Bar {
     private static _globalBarId: number = 0;

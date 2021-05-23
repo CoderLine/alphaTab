@@ -16,7 +16,7 @@ export class TrackSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Track | null): Map<string, unknown> | null {
         if (!obj) {
@@ -24,11 +24,11 @@ export class TrackSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("staves", obj.staves.map(i => StaffSerializer.toJson(i))); 
-        o.set("playbackInfo", PlaybackInformationSerializer.toJson(obj.playbackInfo)); 
+        o.set("playbackinfo", PlaybackInformationSerializer.toJson(obj.playbackInfo)); 
         o.set("color", Color.toJson(obj.color)); 
         o.set("name", obj.name); 
-        o.set("shortName", obj.shortName); 
-        o.set("percussionArticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i))); 
+        o.set("shortname", obj.shortName); 
+        o.set("percussionarticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i))); 
         return o; 
     }
     public static setProperty(obj: Track, property: string, v: unknown): boolean {

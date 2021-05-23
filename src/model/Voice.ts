@@ -8,6 +8,7 @@ import { GraceGroup } from './GraceGroup';
  * A voice represents a group of beats
  * that can be played during a bar.
  * @json
+ * @json_strict
  */
 export class Voice {
     private _beatLookup!: Map<number, Beat>;
