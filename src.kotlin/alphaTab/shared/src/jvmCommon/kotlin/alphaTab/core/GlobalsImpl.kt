@@ -38,7 +38,7 @@ actual fun UByteArray.decodeToString(encoding: String): String {
 
 var invariantDoubleFormat = DecimalFormat().apply {
     this.minimumFractionDigits = 0
-    this.maximumFractionDigits = Int.MAX_VALUE
+    this.maximumFractionDigits = 12
     this.decimalFormatSymbols.decimalSeparator = '.'
     this.isGroupingUsed = false
 }

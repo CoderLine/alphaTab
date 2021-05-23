@@ -17,7 +17,7 @@ class Uint8Array : Iterable<UByte> {
         this._data = UByteArray(size.toInt())
     }
 
-    internal constructor(data: UByteArray) {
+    public constructor(data: UByteArray) {
         this._data = data
     }
 
