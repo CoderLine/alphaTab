@@ -147,9 +147,8 @@ namespace AlphaTab.Platform.CSharp
             }
             else
             {
-                var serialized = JsonConverter.ScoreToJsObject(score);
                 _workerQueue.Add(() =>
-                    RenderScore(JsonConverter.JsObjectToScore(serialized, _renderer.Settings),
+                    RenderScore(score,
                         trackIndexes));
             }
         }
