@@ -99,7 +99,7 @@ namespace AlphaTab.VisualTests
             {
                 Width = 1300
             };
-            renderer.PreRender.On(isResize => 
+            renderer.PreRender.On(isResize =>
             {
                 result = new AlphaTab.Core.List<RenderFinishedEventArgs>();
                 totalWidth = 0.0;
@@ -129,9 +129,7 @@ namespace AlphaTab.VisualTests
             });
             renderer.Error.On((e) => { task.SetException(e); });
 
-            var renderScore =
-                JsonConverter.JsObjectToScore(JsonConverter.ScoreToJsObject(score), settings);
-            renderer.RenderScore(renderScore, tracks);
+            renderer.RenderScore(score, tracks);
 
             if (await Task.WhenAny(task.Task, Task.Delay(2000)) == task.Task)
             {

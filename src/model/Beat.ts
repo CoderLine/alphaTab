@@ -802,8 +802,17 @@ export class Beat {
             this.graceGroup = new GraceGroup();
             this.graceGroup.addBeat(this);
             this.graceGroup.isComplete = true;
+            this.graceGroup.finish();
             this.updateDurations();
             this.voice.insertBeat(this, cloneBeat);
+
+            // ensure cloned beat has also a grace simple grace group for itself
+            // (see Voice.finish where every beat gets one)
+            // this ensures later that grace rods are assigned correctly to this beat. 
+            cloneBeat.graceGroup = new GraceGroup();
+            cloneBeat.graceGroup.addBeat(this);
+            cloneBeat.graceGroup.isComplete = true;
+            cloneBeat.graceGroup.finish();
         }
     }
 

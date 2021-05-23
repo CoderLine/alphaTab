@@ -16,7 +16,7 @@ export class GraceGroup {
 
     /**
      * true if the grace beat are followed by a normal beat within the same
-     * bar. 
+     * bar.
      */
     public isComplete: boolean = false;
 
@@ -25,11 +25,14 @@ export class GraceGroup {
      * @param beat The beat to add
      */
     public addBeat(beat: Beat) {
-        if (this.beats.length === 0) {
-            this.id = beat.absoluteDisplayStart + "_" + beat.voice.index;
-        }
         beat.graceIndex = this.beats.length;
         beat.graceGroup = this;
         this.beats.push(beat);
+    }
+
+    public finish() {
+        if (this.beats.length > 0) {
+            this.id = this.beats[0].absoluteDisplayStart + '_' + this.beats[0].voice.index;
+        }
     }
 }
