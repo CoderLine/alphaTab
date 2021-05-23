@@ -141,7 +141,8 @@ export class Voice {
                     const lastGraceBeat = beat.graceGroup!.beats[beat.graceGroup!.beats.length - 1];
                     if (firstGraceBeat.graceType !== GraceType.BendGrace) {
                         // find out the stolen duration first
-                        let stolenDuration: number = (lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration) - firstGraceBeat.playbackStart;
+                        let stolenDuration: number =
+                            lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration - firstGraceBeat.playbackStart;
 
                         switch (firstGraceBeat.graceType) {
                             case GraceType.BeforeBeat:
@@ -150,7 +151,8 @@ export class Voice {
                                     firstGraceBeat.previousBeat.playbackDuration -= stolenDuration;
                                     // place beats starting after new beat end
                                     if (firstGraceBeat.previousBeat.voice == this) {
-                                        currentPlaybackTick = firstGraceBeat.previousBeat.playbackStart +
+                                        currentPlaybackTick =
+                                            firstGraceBeat.previousBeat.playbackStart +
                                             firstGraceBeat.previousBeat.playbackDuration;
                                     } else {
                                         // stealing into the previous bar
@@ -170,7 +172,7 @@ export class Voice {
 
                                 break;
                             case GraceType.OnBeat:
-                                // steal duration from current beat 
+                                // steal duration from current beat
                                 beat.playbackDuration -= stolenDuration;
                                 if (lastGraceBeat.voice === this) {
                                     // with changed durations, update current position to be after the last grace beat
@@ -184,6 +186,9 @@ export class Voice {
                     }
                 }
 
+                beat.displayStart = currentDisplayTick;
+                beat.playbackStart = currentPlaybackTick;   
+
                 if (beat.fermata) {
                     this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
                 } else {
@@ -191,11 +196,15 @@ export class Voice {
                 }
 
                 this._beatLookup.set(beat.playbackStart, beat);
+            } else {
+                beat.displayStart = currentDisplayTick;
+                beat.playbackStart = currentPlaybackTick;    
             }
 
-            beat.displayStart = currentDisplayTick;
-            beat.playbackStart = currentPlaybackTick;
             beat.finishTuplet();
+            if (beat.graceGroup) {
+                beat.graceGroup.finish();
+            }
             currentDisplayTick += beat.displayDuration;
             currentPlaybackTick += beat.playbackDuration;
         }

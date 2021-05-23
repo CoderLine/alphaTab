@@ -159,9 +159,7 @@ class VisualTestHelperPartials {
 
             val job = GlobalScope.launch {
                 try {
-                    val renderScore =
-                        JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
-                    renderer.renderScore(renderScore, actualTracks)
+                    renderer.renderScore(score, actualTracks)
                 } catch (e: Throwable) {
                     error = e
                     waitHandle.release()
