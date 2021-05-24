@@ -1,6 +1,9 @@
 package alphaTab.platform.android
 
 import alphaTab.Settings
+import alphaTab.core.IList
+import alphaTab.core.objectListOf
+import alphaTab.core.toCharArray
 import alphaTab.model.Color
 import alphaTab.model.Font
 import alphaTab.model.MusicFontSymbol
@@ -43,7 +46,7 @@ public class AndroidCanvas : ICanvas {
             isBold: Boolean,
             isItalic: Boolean
         ): String {
-            return fontFamily.toLowerCase(Locale.ROOT) + "_" + isBold + "_" + isItalic
+            return fontFamily.lowercase() + "_" + isBold + "_" + isItalic
         }
     }
 
@@ -299,19 +302,19 @@ public class AndroidCanvas : ICanvas {
         symbol: MusicFontSymbol,
         centerAtPosition: Boolean?
     ) {
-        fillMusicFontSymbols(x, y, scale, mutableListOf(symbol), centerAtPosition)
+        fillMusicFontSymbols(x, y, scale, objectListOf(symbol), centerAtPosition)
     }
 
     override fun fillMusicFontSymbols(
         x: Double,
         y: Double,
         scale: Double,
-        symbols: MutableList<MusicFontSymbol>,
+        symbols: IList<MusicFontSymbol>,
         centerAtPosition: Boolean?
     ) {
         val s = String(symbols
             .filter { it != MusicFontSymbol.None }
-            .map { it.value.toChar() }
+            .map<Char> { it.value.toChar() }
             .toCharArray()
         )
 

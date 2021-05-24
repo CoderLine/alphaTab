@@ -314,38 +314,7 @@ export default class CSharpEmitterContext {
                     mapValueType = this.getTypeFromTsType(node, mapType.typeArguments[1]);
                 }
 
-                let isValueType = false;
-                if (mapValueType) {
-                    switch (mapValueType.nodeType) {
-                        case cs.SyntaxKind.PrimitiveTypeNode:
-                            switch ((mapValueType as cs.PrimitiveTypeNode).type) {
-                                case cs.PrimitiveType.Bool:
-                                case cs.PrimitiveType.Int:
-                                case cs.PrimitiveType.Double:
-                                    isValueType = true;
-                                    break;
-                            }
-                            break;
-                        case cs.SyntaxKind.TypeReference:
-                            const ref = (mapValueType as cs.TypeReference).reference;
-                            if (typeof ref !== 'string') {
-                                switch (ref.nodeType) {
-                                    case cs.SyntaxKind.EnumDeclaration:
-                                        isValueType = true;
-                                        break;
-                                }
-                            }
-                            break;
-                    }
-                }
-
-                return {
-                    nodeType: cs.SyntaxKind.TypeReference,
-                    parent: node.parent,
-                    tsNode: node.tsNode,
-                    reference: this.buildCoreNamespace(tsSymbol) + (isValueType ? 'ValueTypeMap' : 'Map'),
-                    typeArguments: [mapKeyType, mapValueType]
-                } as cs.TypeReference;
+                return this.createMapType(tsSymbol, node, mapKeyType!, mapValueType!);
             case 'Array':
                 const arrayType = tsType as ts.TypeReference;
                 let arrayElementType: cs.TypeNode | null = null;
@@ -364,13 +333,7 @@ export default class CSharpEmitterContext {
                     } as cs.PrimitiveTypeNode;
                 }
 
-                return {
-                    nodeType: cs.SyntaxKind.ArrayTypeNode,
-                    parent: node.parent,
-                    tsNode: node.tsNode,
-                    elementType: arrayElementType
-                } as cs.ArrayTypeNode;
-
+                return this.createArrayListType(tsSymbol, node, arrayElementType);
             case ts.InternalSymbolName.Type:
                 let csType: cs.TypeNode | null = null;
 
@@ -387,6 +350,57 @@ export default class CSharpEmitterContext {
                     typeArguments: typeArguments
                 } as cs.TypeReference;
         }
+    }
+
+    protected createArrayListType(tsSymbol: ts.Symbol, node: cs.Node, arrayElementType: cs.TypeNode): cs.TypeNode {
+        return {
+            nodeType: cs.SyntaxKind.ArrayTypeNode,
+            parent: node.parent,
+            tsNode: node.tsNode,
+            elementType: arrayElementType
+        } as cs.ArrayTypeNode;
+    }
+
+    protected createMapType(
+        symbol: ts.Symbol,
+        node: cs.Node,
+        mapKeyType: cs.TypeNode,
+        mapValueType: cs.TypeNode
+    ): cs.TypeNode {
+        return {
+            nodeType: cs.SyntaxKind.MapTypeNode,
+            parent: node.parent,
+            tsNode: node.tsNode,
+            keyType: mapKeyType,
+            valueType: mapValueType,
+            valueIsValueType: this.isCsValueType(mapValueType),
+            keyIsValueType: this.isCsValueType(mapKeyType)
+        } as cs.MapTypeNode;
+    }
+
+    protected isCsValueType(mapValueType: cs.TypeNode) {
+        if (mapValueType) {
+            switch (mapValueType.nodeType) {
+                case cs.SyntaxKind.PrimitiveTypeNode:
+                    switch ((mapValueType as cs.PrimitiveTypeNode).type) {
+                        case cs.PrimitiveType.Bool:
+                        case cs.PrimitiveType.Int:
+                        case cs.PrimitiveType.Double:
+                            return true;
+                    }
+                    break;
+                case cs.SyntaxKind.TypeReference:
+                    const ref = (mapValueType as cs.TypeReference).reference;
+                    if (typeof ref !== 'string') {
+                        switch (ref.nodeType) {
+                            case cs.SyntaxKind.EnumDeclaration:
+                                return true;
+                        }
+                    }
+                    break;
+            }
+        }
+        return false;
     }
 
     private resolveFunctionTypeFromTsType(node: cs.Node, tsType: ts.Type): cs.TypeNode | null {
@@ -754,7 +768,7 @@ export default class CSharpEmitterContext {
         return result;
     }
 
-    private buildCoreNamespace(aliasSymbol: ts.Symbol) {
+    protected buildCoreNamespace(aliasSymbol: ts.Symbol) {
         let suffix = '';
         for (const decl of aliasSymbol.declarations) {
             let fileName = path.basename(decl.getSourceFile().fileName).toLowerCase();
@@ -1356,6 +1370,11 @@ export default class CSharpEmitterContext {
                 if (csArrayType.elementType) {
                     this.makePublic(csArrayType.elementType, visited);
                 }
+                break;
+            case cs.SyntaxKind.MapTypeNode:
+                const mapType = node as cs.MapTypeNode;
+                this.makePublic(mapType.keyType, visited);
+                this.makePublic(mapType.valueType, visited);
                 break;
         }
     }

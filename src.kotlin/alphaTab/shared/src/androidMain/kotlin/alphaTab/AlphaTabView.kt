@@ -1,5 +1,6 @@
 package alphaTab
 
+import alphaTab.core.*
 import alphaTab.core.ecmaScript.Map
 import alphaTab.model.Score
 import alphaTab.model.Track
@@ -98,9 +99,9 @@ class AlphaTabView : RelativeLayout {
 
     override fun onRestoreInstanceState(state: Parcelable?) {
         super.onRestoreInstanceState(state)
-        if(state is SavedState) {
+        if (state is SavedState) {
             _api.settings = state.settings!!
-            _api.renderScore(state.score!!, state.indexes.toMutableList())
+            _api.renderScore(state.score!!, state.indexes)
         }
     }
 
@@ -108,13 +109,13 @@ class AlphaTabView : RelativeLayout {
         val tracks = _tracks ?: return
 
         var score: Score? = null
-        val trackIndexes = ArrayList<Double>()
+        val trackIndexes = DoubleList()
         for (track in tracks) {
             if (score == null) {
                 score = track.score
             }
             if (score == track.score) {
-                trackIndexes.add(track.index)
+                trackIndexes.push(track.index)
             }
         }
 
@@ -127,7 +128,7 @@ class AlphaTabView : RelativeLayout {
     class SavedState : BaseSavedState {
         public var score: Score? = null
         public var settings: Settings? = null
-        public var indexes: List<Double> = emptyList()
+        public var indexes: IDoubleList = DoubleList()
 
         constructor(source: Parcelable?) : super(source)
 
@@ -148,8 +149,8 @@ class AlphaTabView : RelativeLayout {
                 alphaTab.generated.SettingsSerializer.fromJson(settings!!, settingsSerialized)
             }
 
-            indexes = emptyList()
-            source.readList(indexes, null)
+            indexes = DoubleList()
+            readList(source, indexes)
         }
 
         override fun writeToParcel(out: Parcel?, flags: Int) {
@@ -167,15 +168,14 @@ class AlphaTabView : RelativeLayout {
             if (settingsSerialized != null) {
                 writeMap(out, settingsSerialized)
             }
-
-            out.writeList(indexes)
+            writeList(out, indexes)
         }
 
-        private fun writeMap(out: Parcel, map: Map<String, Any?>) {
+        private fun writeMap(out: Parcel, map: IMap<String, Any?>) {
             out.writeInt(map.size.toInt())
-            for(kvp in map) {
-                out.writeString(kvp.key)
-                writeValue(out, kvp.value)
+            for (kvp in map) {
+                out.writeString(kvp.first)
+                writeValue(out, kvp.second)
 
             }
         }
@@ -183,9 +183,16 @@ class AlphaTabView : RelativeLayout {
         private fun writeValue(out: Parcel, value: Any?) {
             when (value) {
                 is Map<*, *> -> {
-                    writeMap(out, value as Map<String, Any?>)
+                    @Suppress("UNCHECKED_CAST")
+                    writeMap(out, value as IMap<String, Any?>)
                 }
-                is List<*> -> {
+                is IList<*> -> {
+                    writeList(out, value)
+                }
+                is IDoubleList -> {
+                    writeList(out, value)
+                }
+                is IBooleanList -> {
                     writeList(out, value)
                 }
                 else -> {
@@ -194,10 +201,33 @@ class AlphaTabView : RelativeLayout {
             }
         }
 
-        private fun writeList(out: Parcel, value: List<*>) {
-            out.writeInt(value.size)
-            for(v in value) {
+        private fun writeList(out: Parcel, value: IList<*>) {
+            out.writeInt(value.length.toInt())
+            for (v in value) {
                 writeValue(out, v)
+            }
+        }
+
+        private fun writeList(out: Parcel, value: IDoubleList) {
+            out.writeInt(value.length.toInt())
+            for (v in value) {
+                out.writeValue(v)
+            }
+        }
+
+        private fun readList(out: Parcel, value: IDoubleList) {
+            val size = out.readInt()
+            var i = 0
+            while (i < size) {
+                value.push(out.readDouble())
+                i++;
+            }
+        }
+
+        private fun writeList(out: Parcel, value: IBooleanList) {
+            out.writeInt(value.length.toInt())
+            for (v in value) {
+                out.writeValue(v)
             }
         }
 

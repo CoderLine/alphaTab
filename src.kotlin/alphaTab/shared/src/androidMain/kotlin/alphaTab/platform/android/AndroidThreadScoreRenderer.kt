@@ -1,6 +1,7 @@
 package alphaTab.platform.android
 
 import alphaTab.*
+import alphaTab.core.IDoubleList
 import alphaTab.core.ecmaScript.Error
 import alphaTab.model.JsonConverter
 import alphaTab.model.Score
@@ -110,14 +111,13 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
         }
     }
 
-    override fun renderScore(score: Score, trackIndexes: MutableList<Double>) {
+    override fun renderScore(score: Score, trackIndexes: IDoubleList) {
         if (checkAccess()) {
             _renderer.renderScore(score, trackIndexes)
         } else {
             _workerQueue.add {
-                val serialized = JsonConverter.scoreToJsObject(score)
                 renderScore(
-                    JsonConverter.jsObjectToScore(serialized, _renderer.settings),
+                    score,
                     trackIndexes
                 )
             }

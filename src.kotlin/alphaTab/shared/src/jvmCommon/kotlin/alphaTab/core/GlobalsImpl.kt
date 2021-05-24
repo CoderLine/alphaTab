@@ -7,13 +7,6 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
 
-actual class LateInitList<T> : java.util.ArrayList<T>, MutableList<T> {
-    @Suppress("UNCHECKED_CAST")
-    public actual constructor(size: Int) : super(arrayOfNulls<Any>(size).toList() as List<T>) {
-
-    }
-}
-
 
 @ExperimentalUnsignedTypes
 actual fun UByteArray.decodeToFloatArray(): FloatArray {
@@ -44,6 +37,15 @@ var invariantDoubleFormat = DecimalFormat().apply {
 }
 
 actual fun Double.toInvariantString(): String {
+    // TODO: On android/java the DecimalFormat is terribly slow, we need a more efficient
+    // mechanism to convert doubles to string.
+//    val sb = StringBuilder()
+//    val integerPart = this.toInt();
+//    var fractionalPart = (this - integerPart)
+//    if(fractionalPart > 0.0000001) {
+//        return integerPart + "." + (fractionalPart * )
+//    }
+//    return
     return invariantDoubleFormat.format(this)
 }
 

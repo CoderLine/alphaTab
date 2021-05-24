@@ -261,34 +261,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
     protected getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol, expression: cs.Expression): string | null {
         switch (parentSymbol.name) {
-            case 'Array':
-                switch (symbol.name) {
-                    case 'length':
-                        // new Array<string>(other.length)
-                        if (expression.parent &&
-                            cs.isNewExpression(expression.parent) &&
-                            (expression.parent.tsNode as ts.NewExpression).arguments?.length === 1 &&
-                            (expression.parent.type as cs.UnresolvedTypeNode).tsType?.symbol
-                                ?.name === 'ArrayConstructor'
-                        ) {
-                            return 'size';
-                        }
-
-                        return 'size.toDouble()';
-                    case 'push':
-                        return 'add';
-                    case 'indexOf':
-                        return 'indexOfInDouble';
-                    case 'filter':
-                        return 'filterBy';
-                    case 'reverse':
-                        return 'rev';
-                    case 'fill':
-                        return 'fillWith';
-                    case 'map':
-                        return 'mapTo';
-                }
-                break;
             case 'String':
                 switch (symbol.name) {
                     case 'length':

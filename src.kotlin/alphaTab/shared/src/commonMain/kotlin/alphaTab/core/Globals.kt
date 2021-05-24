@@ -3,10 +3,6 @@ package alphaTab.core
 import alphaTab.core.ecmaScript.RegExp
 import system.globalization.CultureInfo
 
-expect class LateInitList<T> : MutableList<T> {
-    public constructor(size:Int)
-}
-
 @kotlin.ExperimentalUnsignedTypes
 expect fun UByteArray.decodeToFloatArray(): FloatArray
 
@@ -28,45 +24,8 @@ fun String.replace(pattern: RegExp, replacement: String): String {
     return pattern.replace(this, replacement)
 }
 
-fun <T> MutableList<T>.sort(comparer: ((a: T, b: T) -> Double)) {
-    this.sortWith { a, b -> comparer(a, b).toInt() }
-}
-
-fun <TIn, TOut> MutableList<TIn>.mapTo(transform: (v: TIn) -> TOut): MutableList<TOut> {
-    return this.map(transform).toMutableList()
-}
-
-fun <T> MutableList<T>.filterBy(predicate: (T) -> Boolean): MutableList<T> {
-    return this.filter(predicate).toMutableList()
-}
-
-fun <T> MutableList<T>.slice(): MutableList<T> {
-    return this.toMutableList()
-}
-
-fun <T> MutableList<T>.slice(start: Double): MutableList<T> {
-    return this.subList(start.toInt(), this.size)
-}
-
-fun <T> MutableList<T>.rev(): MutableList<T> {
-    this.reverse()
-    return this
-}
-
-fun <T> MutableList<T>.fillWith(value: T): MutableList<T> {
-    this.fill(value)
-    return this
-}
-
-fun <T> MutableList<T>.splice(start: Double, deleteCount: Double, vararg newItems: T) {
-    if (deleteCount > 0) {
-        this.removeAll(this.subList(start.toInt(), (start + deleteCount).toInt()))
-    }
-    this.addAll(start.toInt(), newItems.asList())
-}
-
-fun <T> MutableList<T>.pop(): T {
-    return this.removeLast()
+fun Iterable<Char>.toCharArray(): CharArray {
+    return this.toList().toCharArray()
 }
 
 fun String.indexOfInDouble(item: String): Double {
@@ -91,19 +50,6 @@ fun String.lastIndexOfInDouble(item: String): Double {
     return this.lastIndexOf(item).toDouble()
 }
 
-fun <T> List<T>.indexOfInDouble(item: T): Double {
-    return this.indexOf(item).toDouble()
-}
-
-@kotlin.jvm.JvmName("joinDouble")
-fun Iterable<Double>.join(separator: String): String {
-    return this.map { it.toInvariantString() }.join(separator)
-}
-
-fun <T> Iterable<T>.join(separator: String): String {
-    return this.joinToString(separator)
-}
-
 operator fun Double.plus(str: String): String {
     return this.toString() + str
 }
@@ -120,10 +66,10 @@ fun String.charCodeAt(index: Double): Double {
     return this[index.toInt()].code.toDouble()
 }
 
-fun String.split(delimiter: String): MutableList<String> {
+fun String.split(delimiter: String): IList<String> {
     @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
     return this.split(delimiters = arrayOf(delimiter), ignoreCase = false, limit = 0)
-        .toMutableList()
+        .toObjectList()
 }
 
 fun String.substring(startIndex: Double, endIndex: Double): String {

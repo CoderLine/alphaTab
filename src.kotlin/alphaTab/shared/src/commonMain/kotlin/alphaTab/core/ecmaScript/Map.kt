@@ -3,7 +3,7 @@ package alphaTab.core.ecmaScript
 import kotlin.collections.Map
 
 class Map<TKey, TValue> : Iterable<Map.Entry<TKey, TValue>> {
-    private val _map: HashMap <TKey, TValue>
+    private val _map: LinkedHashMap <TKey, TValue>
 
     public val size: Double
         get() {
@@ -11,19 +11,19 @@ class Map<TKey, TValue> : Iterable<Map.Entry<TKey, TValue>> {
         }
 
     public constructor() {
-        _map = HashMap(6)
+        _map = LinkedHashMap(6)
     }
 
-    public fun keys(): MutableList<TKey> {
-        return _map.keys.toMutableList()
+    public fun keys(): Iterable<TKey> {
+        return _map.keys
     }
 
-    public fun values(): MutableList<TValue> {
-        return _map.values.toMutableList()
+    public fun values(): Iterable<TValue> {
+        return _map.values
     }
 
     public constructor(entries: Iterable<Pair<TKey, TValue>>) {
-        _map = HashMap ()
+        _map = LinkedHashMap ()
         _map.putAll(entries)
     }
 

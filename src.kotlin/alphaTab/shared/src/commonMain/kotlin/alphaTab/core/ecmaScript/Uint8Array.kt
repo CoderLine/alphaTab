@@ -9,7 +9,7 @@ class Uint8Array : Iterable<UByte> {
             return ArrayBuffer(_data)
         }
 
-    public constructor(x: List<Double>) {
+    public constructor(x: Iterable<Double>) {
         this._data = x.map { d -> d.toInt().toUByte() }.toUByteArray()
     }
 
