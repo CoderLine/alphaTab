@@ -10,7 +10,6 @@ public interface IList<T> : Iterable<T> {
     fun push(item: T)
     fun pop(): T
 
-    fun sort()
     fun sort(comparison: (a: T, b: T) -> Double)
 
     fun filter(predicate: (T) -> Boolean): IList<T>
@@ -22,7 +21,8 @@ public interface IList<T> : Iterable<T> {
 
     fun slice(): IList<T>
     fun slice(start: Double): IList<T>
-    fun splice(start: Double, deleteCount: Double, newElements: Iterable<T>)
+    fun splice(start: Double, deleteCount: Double)
+    fun splice(start: Double, deleteCount: Double, newElements: kotlin.collections.List<T>)
 
     fun join(separator: String): String
 }
@@ -30,98 +30,106 @@ public interface IList<T> : Iterable<T> {
 public fun <T> Iterable<T>.toObjectList(): IList<T> {
     return List(this)
 }
+
 public fun <T> objectListOf(): IList<T> = List()
 public fun <T> objectListOf(vararg elements: T): IList<T> = List(*elements)
-public fun <T> IList<T>.splice(start: Double, deleteCount: Double, vararg newElements: T)
-{
-
+public fun <T> IList<T>.splice(start: Double, deleteCount: Double, vararg newElements: T) {
+    this.splice(start, deleteCount, newElements.asList());
 }
 
 public class List<T> : IList<T> {
+    private val _data: MutableList<T>
+
     public constructor() {
-        TODO("Not yet implemented")
+        _data = ArrayList()
     }
 
     public constructor(size: Int) {
-        TODO("Not yet implemented")
+        @Suppress("UNCHECKED_CAST")
+        _data = arrayOfNulls<Any>(size).toList() as MutableList<T>
     }
 
     public constructor(vararg elements: T) {
-        TODO("Not yet implemented")
+        _data = elements.toMutableList()
     }
 
     public constructor(elements: Iterable<T>) {
-        TODO("Not yet implemented")
+        _data = elements.toMutableList()
     }
 
     override val length: Double
-        get() = TODO("Not yet implemented")
+        get() = _data.size.toDouble()
 
-    override fun get(index: Int): T {
-        TODO("Not yet implemented")
-    }
+    override fun get(index: Int): T = _data[index]
 
     override fun set(index: Int, value: T) {
-        TODO("Not yet implemented")
+        _data[index] = value
     }
 
-    override fun indexOf(value: T): Double {
-        TODO("Not yet implemented")
-    }
-
+    override fun indexOf(value: T): Double = _data.indexOf(value).toDouble()
     override fun push(item: T) {
-        TODO("Not yet implemented")
+        _data.add(item)
     }
 
-    override fun pop(): T {
-        TODO("Not yet implemented")
-    }
-
-    override fun sort() {
-        TODO("Not yet implemented")
-    }
+    override fun pop(): T = _data.removeLast()
 
     override fun sort(comparison: (a: T, b: T) -> Double) {
-        TODO("Not yet implemented")
+        _data.sortWith { a, b -> comparison(a, b).toInt() }
     }
 
     override fun filter(predicate: (T) -> Boolean): IList<T> {
-        TODO("Not yet implemented")
+        return List(_data.filter(predicate))
     }
 
     override fun <TOut> map(transform: (v: T) -> TOut): IList<TOut> {
-        TODO("Not yet implemented")
+        return List(_data.map(transform))
     }
 
     override fun map(transform: (v: T) -> Double): IDoubleList {
-        TODO("Not yet implemented")
+        return DoubleList(_data.map(transform))
     }
 
     override fun reverse(): IList<T> {
-        TODO("Not yet implemented")
+        _data.reverse()
+        return this
     }
 
     override fun fill(value: T): IList<T> {
-        TODO("Not yet implemented")
+        _data.fill(value)
+        return this
     }
 
     override fun slice(): IList<T> {
-        TODO("Not yet implemented")
+        return List(_data)
     }
 
     override fun slice(start: Double): IList<T> {
-        TODO("Not yet implemented")
+        return List(_data.subList(start.toInt(), _data.size))
     }
 
     override fun join(separator: String): String {
-        TODO("Not yet implemented")
+        return _data.joinToString(separator)
     }
 
     override fun iterator(): Iterator<T> {
-        TODO("Not yet implemented")
+        return _data.iterator()
     }
 
-    override fun splice(start: Double, deleteCount: Double, newElements: Iterable<T>) {
-        TODO("Not yet implemented")
+    override fun splice(start: Double, deleteCount: Double) {
+        if (deleteCount > 0) {
+            _data.removeAll(_data.subList(start.toInt(), (start + deleteCount).toInt()))
+        }
     }
+
+    override fun splice(
+        start: Double,
+        deleteCount: Double,
+        newElements: kotlin.collections.List<T>
+    ) {
+        if (deleteCount > 0) {
+            _data.removeAll(_data.subList(start.toInt(), (start + deleteCount).toInt()))
+        }
+        _data.addAll(start.toInt(), newElements)
+    }
+
 }

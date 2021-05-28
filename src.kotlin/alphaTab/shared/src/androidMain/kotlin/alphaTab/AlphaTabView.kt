@@ -1,7 +1,6 @@
 package alphaTab
 
 import alphaTab.core.*
-import alphaTab.core.ecmaScript.Map
 import alphaTab.model.Score
 import alphaTab.model.Track
 import alphaTab.platform.android.AndroidEnvironment

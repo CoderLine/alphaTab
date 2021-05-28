@@ -2,6 +2,7 @@ package alphaTab.io
 
 import alphaTab.AlphaTabError
 import alphaTab.AlphaTabErrorType
+import alphaTab.core.IMap
 import kotlin.contracts.ExperimentalContracts
 import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
@@ -16,9 +17,9 @@ internal open class JsonHelperPartials {
                 }
             }
 
-            if (o is alphaTab.core.ecmaScript.Map<*, *>) {
+            if (o is IMap<*, *>) {
                 for (kvp in o) {
-                    func(kvp.value, (kvp.key!!) as String)
+                    func(kvp.second, (kvp.first!!) as String)
                 }
             }
         }
@@ -30,9 +31,9 @@ internal open class JsonHelperPartials {
                 }
             }
 
-            if (o is alphaTab.core.ecmaScript.Map<*, *>) {
+            if (o is IMap<*, *>) {
                 for (kvp in o) {
-                    func(kvp.value, (kvp.key!!) as String)
+                    func(kvp.second, (kvp.first!!) as String)
                 }
             }
         }

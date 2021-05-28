@@ -1,6 +1,13 @@
 package alphaTab.core
 
 public interface IDoubleObjectMap<TValue> : IMap<Double, TValue> {
+    override fun has(key: Double): Boolean
+    override fun get(key: Double): TValue?
+    override fun set(key: Double, value: TValue)
+    override fun delete(key: Double)
+    override fun values(): Iterable<TValue>
+    override fun keys(): Iterable<Double>
+    override fun clear()
 }
 
 

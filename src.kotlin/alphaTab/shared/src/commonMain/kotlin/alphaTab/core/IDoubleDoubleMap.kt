@@ -1,8 +1,8 @@
 package alphaTab.core
 
 public interface IDoubleDoubleMap : IMap<Double, Double> {
-}
 
+}
 
 public class DoubleDoubleMap : IDoubleDoubleMap {
     override val size: Double
