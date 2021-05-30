@@ -1,7 +1,7 @@
 package alphaTab.platform.android
 
 import alphaTab.*
-import alphaTab.core.IDoubleList
+import alphaTab.collections.DoubleList
 import alphaTab.core.ecmaScript.Error
 import alphaTab.model.JsonConverter
 import alphaTab.model.Score
@@ -9,8 +9,6 @@ import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.ScoreRenderer
 import alphaTab.rendering.utils.BoundsLookup
-import system.Action
-import system.ActionOfT
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.Semaphore
@@ -20,16 +18,16 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
-    private val _uiInvoke: ActionOfT<Action>
+    private val _uiInvoke: ( action: (() -> Unit) ) -> Unit
 
     private val _workerThread: Thread
-    private val _workerQueue: BlockingQueue<Action>
+    private val _workerQueue: BlockingQueue<() -> Unit>
     private val _threadStartedEvent: Semaphore
     private var _isCancelled = false
     private lateinit var _renderer: ScoreRenderer
     private var _width: Double = 0.0
 
-    public constructor(settings: Settings, uiInvoke: ActionOfT<Action>) {
+    public constructor(settings: Settings, uiInvoke: ( action: (() -> Unit) ) -> Unit) {
         _uiInvoke = uiInvoke
         _threadStartedEvent = Semaphore(1)
         _threadStartedEvent.acquire()
@@ -111,7 +109,7 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
         }
     }
 
-    override fun renderScore(score: Score, trackIndexes: IDoubleList) {
+    override fun renderScore(score: Score, trackIndexes: DoubleList) {
         if (checkAccess()) {
             _renderer.renderScore(score, trackIndexes)
         } else {

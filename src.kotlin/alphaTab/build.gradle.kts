@@ -2,7 +2,6 @@ buildscript {
     repositories {
         gradlePluginPortal()
         google()
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -14,7 +13,6 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven("https://packages.jetbrains.team/maven/p/skija/maven")
     }

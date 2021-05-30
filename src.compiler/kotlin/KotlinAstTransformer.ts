@@ -11,9 +11,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     }
 
     public get extension(): string {
-        return '.kt'
+        return '.kt';
     }
-
 
     private _paramReferences: Map<string, cs.Identifier[]>[] = [];
     private _paramsWithAssignment: Set<string>[] = [];
@@ -98,7 +97,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         // a == this or this == a
         // within an equals method needs to have the operator ===
 
-        if (bin && 
+        if (
+            bin &&
             cs.isBinaryExpression(bin) &&
             (expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken ||
                 expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsToken) &&
@@ -265,12 +265,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 switch (symbol.name) {
                     case 'length':
                         if (
-                            expression.parent && (
-                            cs.isReturnStatement(expression.parent) ||
-                            cs.isVariableDeclaration(expression.parent) ||
-                            (cs.isBinaryExpression(expression.parent) &&
-                                expression.parent.operator === '=')
-                            )
+                            expression.parent &&
+                            (cs.isReturnStatement(expression.parent) ||
+                                cs.isVariableDeclaration(expression.parent) ||
+                                (cs.isBinaryExpression(expression.parent) && expression.parent.operator === '='))
                         ) {
                             return 'length.toDouble()';
                         }
@@ -286,6 +284,14 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                         return 'lowercase';
                     case 'toUpperCase':
                         return 'uppercase';
+                    case 'split':
+                        return 'splitBy';
+                }
+                break;
+            case 'Number':
+                switch (symbol.name) {
+                    case 'toString':
+                        return 'toInvariantString';
                 }
                 break;
         }
@@ -355,7 +361,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             } as cs.MemberAccessExpression;
 
             let expr = this.visitExpression(methodAccess, expression.expression);
-            if(!expr) {
+            if (!expr) {
                 return null;
             }
             methodAccess.expression = expr;
@@ -385,5 +391,66 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     private isCastToEnum(expression: ts.AsExpression) {
         let targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
         return targetType.flags & ts.TypeFlags.Enum || targetType.flags & ts.TypeFlags.EnumLiteral;
+    }
+
+    protected createMapEntry(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
+        const csExpr = {
+            parent: parent,
+            tsNode: expression,
+            nodeType: cs.SyntaxKind.InvocationExpression,
+            arguments: [],
+            expression: {} as cs.Expression
+        } as cs.InvocationExpression;
+
+        let mapEntryTypeName = 'MapEntry';
+        if (expression.elements.length === 2) {
+            const keyType = this._context.getType(expression.elements[0]);
+            let keyTypeContainerName = this.getContainerTypeName(keyType);
+
+            const valueType = this._context.getType(expression.elements[1]);
+            let valueTypeContainerName = this.getContainerTypeName(valueType);
+
+            if (keyTypeContainerName || valueTypeContainerName) {
+                keyTypeContainerName = keyTypeContainerName || 'Object';
+                valueTypeContainerName = valueTypeContainerName || 'Object';
+                mapEntryTypeName = keyTypeContainerName + valueTypeContainerName + mapEntryTypeName;
+            }
+        }
+
+        csExpr.expression = {
+            nodeType: cs.SyntaxKind.Identifier,
+            text: this._context.makeTypeName(`alphaTab.collections.${mapEntryTypeName}`),
+            parent: csExpr,
+            tsNode: expression
+        } as cs.Identifier;
+
+        expression.elements.forEach(e => {
+            const ex = this.visitExpression(csExpr, e);
+            if (ex) {
+                csExpr.arguments.push(ex);
+            }
+        });
+
+        return csExpr;
+    }
+
+    private getContainerTypeName(tsType: ts.Type): string | null {
+        if (this._context.isNullableType(tsType)) {
+            return null;
+        }
+        if (
+            (tsType.flags & ts.TypeFlags.Enum) !== 0 ||
+            (tsType.flags & ts.TypeFlags.EnumLike) !== 0 ||
+            (tsType.flags & ts.TypeFlags.EnumLiteral) !== 0
+        ) {
+            return null;
+        }
+        if ((tsType.flags & ts.TypeFlags.Number) !== 0 || (tsType.flags & ts.TypeFlags.NumberLiteral) !== 0) {
+            return 'Double';
+        }
+        if ((tsType.flags & ts.TypeFlags.Boolean) !== 0 || (tsType.flags & ts.TypeFlags.BooleanLiteral) !== 0) {
+            return 'Boolean';
+        }
+        return null;
     }
 }

@@ -10,8 +10,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ScrollView
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.view.children
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts

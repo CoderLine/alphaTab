@@ -40,43 +40,18 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
             }
-        }
-
-        val androidMain by getting {
-            dependencies {
-                implementation("com.google.android.material:material:1.3.0")
-            }
-        }
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-                implementation("junit:junit:4.13.2")
-            }
             kotlin.srcDirs("../../../dist/lib.kotlin/test")
         }
-//        val iosMain by getting
-//        val iosTest by getting
 
-        val os = System.getProperty("os.name")
-        val skijaTarget = when {
-            os == "Mac OS X" -> {
-                "macos-x64"
-            }
-            os.startsWith("Win") -> {
-                "windows"
-            }
-            os.startsWith("Linux") -> {
-                "linux"
-            }
-            else -> {
-                throw Error("Unsupported OS: $os")
-            }
-        }
         val jvmMain by getting {
+            kotlin.srcDirs("src/jvmCommonMain/kotlin")
             dependencies {
-                implementation("org.jetbrains.skija:skija-$skijaTarget:0.91.3")
+                // TODO: check with Skija devs to have a platform independent lib
+                implementation("org.jetbrains.skija:skija-windows:0.91.3")
+                implementation("org.eclipse.collections:eclipse-collections-api:10.4.0")
+                implementation("org.eclipse.collections:eclipse-collections:10.4.0")
+
             }
-            kotlin.srcDirs("src/jvmCommon/kotlin")
             resources.srcDirs("../../../font/").apply {
                 this.filter.include("**/*.ttf")
                 this.filter.include("**/*.sf2")
@@ -84,11 +59,37 @@ kotlin {
         }
 
         val jvmTest by getting {
+            //kotlin.srcDirs("src/jvmCommonTest")
             dependencies {
+                implementation(kotlin("test"))
                 implementation(kotlin("test-junit"))
+                implementation("junit:junit:4.13.2")
             }
-            kotlin.srcDirs("../../../dist/lib.kotlin/test")
         }
+
+        val androidMain by getting {
+            kotlin.srcDirs("src/jvmCommonMain/kotlin")
+            dependencies {
+                implementation("org.eclipse.collections:eclipse-collections-api:10.4.0")
+                implementation("org.eclipse.collections:eclipse-collections:10.4.0")
+                implementation("androidx.core:core-ktx:1.5.0")
+                implementation("androidx.appcompat:appcompat:1.3.0")
+                implementation("com.google.android.material:material:1.3.0")
+                implementation("androidx.recyclerview:recyclerview:1.2.0")
+                implementation("com.google.android.flexbox:flexbox:3.0.0")
+            }
+        }
+        val androidTest by getting {
+            dependencies {
+//                implementation(kotlin("test"))
+                implementation(kotlin("test-junit"))
+                implementation("junit:junit:4.13.2")
+            }
+        }
+
+//        val iosMain by getting
+//        val iosTest by getting
+
     }
 }
 
@@ -96,13 +97,10 @@ android {
     compileSdkVersion(30)
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDirs(
-        "../../../dist/lib.kotlin/src",
         "../../../font/bravura",
         "../../../font/sonivox"
     )
-    sourceSets["main"].java.srcDir("src/jvmCommon/kotlin")
     sourceSets["androidTest"].manifest.srcFile("src/androidTest/AndroidManifest.xml")
-    sourceSets["androidTest"].java.srcDirs("src/androidTest/kotlin", "../../../dist/lib.kotlin/test")
     sourceSets["androidTest"].assets.srcDirs(
         "../../../test-data/",
         "../../../font/bravura",
@@ -127,15 +125,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.0")
-        implementation("androidx.core:core-ktx:1.5.0")
-        implementation("androidx.appcompat:appcompat:1.3.0")
-        implementation("com.google.android.material:material:1.3.0")
-        implementation("com.google.android:flexbox:2.0.1")
-        testImplementation("junit:junit:4.13.2")
-        androidTestImplementation("androidx.test.ext:junit:1.1.2")
-        androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    packagingOptions {
+        exclude("LICENSE-EPL-1.0.txt")
+        exclude("LICENSE-EDL-1.0.txt")
     }
 }
 
@@ -154,6 +146,18 @@ tasks.whenTaskAdded {
         this.finalizedBy(fetchTestResultsTask)
     }
 }
+
+// TODO: remove assertions for faster library.
+//tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)
+//    .all {
+//        kotlinOptions {
+//            freeCompilerArgs += [
+//                '-Xno-call-assertions',
+//                '-Xno-receiver-assertions',
+//                '-Xno-param-assertions'
+//            ]
+//        }
+//    }
 
 //val packForXcode by tasks.creating(Sync::class) {
 //    group = "build"

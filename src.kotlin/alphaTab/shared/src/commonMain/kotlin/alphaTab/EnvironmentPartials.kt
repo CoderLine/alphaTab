@@ -6,14 +6,14 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
-internal expect fun createPlatformSpecificRenderEngines(engines: alphaTab.core.IMap<String, RenderEngineFactory>)
+internal expect fun createPlatformSpecificRenderEngines(engines: alphaTab.collections.Map<String, RenderEngineFactory>)
 
 @Suppress("UNUSED_PARAMETER")
 @kotlin.contracts.ExperimentalContracts
 @ExperimentalUnsignedTypes
 class EnvironmentPartials {
     companion object {
-        internal fun createPlatformSpecificRenderEngines(engines: alphaTab.core.IMap<String, RenderEngineFactory>) {
+        internal fun createPlatformSpecificRenderEngines(engines: alphaTab.collections.Map<String, RenderEngineFactory>) {
             alphaTab.createPlatformSpecificRenderEngines(engines)
         }
 

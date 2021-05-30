@@ -2808,28 +2808,7 @@ export default class CSharpAstTransformer {
 
     protected visitArrayLiteralExpression(parent: cs.Node, expression: ts.ArrayLiteralExpression) {
         if (this.isMapInitializer(expression)) {
-            const csExpr = {
-                parent: parent,
-                tsNode: expression,
-                nodeType: cs.SyntaxKind.InvocationExpression,
-                arguments: [],
-                expression: {} as cs.Expression
-            } as cs.InvocationExpression;
-
-            csExpr.expression = this.makeMemberAccess(
-                csExpr,
-                this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                this._context.toPascalCase('createMapEntry')
-            );
-
-            expression.elements.forEach(e => {
-                const ex = this.visitExpression(csExpr, e);
-                if (ex) {
-                    csExpr.arguments.push(ex);
-                }
-            });
-
-            return csExpr;
+            return this.createMapEntry(parent, expression);
         } else if (this.isSetInitializer(expression)) {
             const csExpr = {
                 parent: parent,
@@ -2876,6 +2855,31 @@ export default class CSharpAstTransformer {
             return csExpr;
         }
     }
+    protected createMapEntry(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
+        const csExpr = {
+            parent: parent,
+            tsNode: expression,
+            nodeType: cs.SyntaxKind.InvocationExpression,
+            arguments: [],
+            expression: {} as cs.Expression
+        } as cs.InvocationExpression;
+
+        csExpr.expression = this.makeMemberAccess(
+            csExpr,
+            this._context.makeTypeName('alphaTab.core.TypeHelper'),
+            this._context.toPascalCase('createMapEntry')
+        );
+
+        expression.elements.forEach(e => {
+            const ex = this.visitExpression(csExpr, e);
+            if (ex) {
+                csExpr.arguments.push(ex);
+            }
+        });
+
+        return csExpr;
+    }
+
     protected isMapInitializer(expression: ts.ArrayLiteralExpression) {
         const isCandidate =
             expression.elements.length === 2 &&
@@ -2960,6 +2964,13 @@ export default class CSharpAstTransformer {
                         return 'TrimEnd';
                     case 'trimLeft':
                         return 'TrimStart';
+                }
+                break;
+            case 'NumberConstructor':
+            case 'Number':
+                switch (symbol.name) {
+                    case 'toString':
+                        return 'toInvariantString';
                 }
                 break;
         }
@@ -3069,7 +3080,7 @@ export default class CSharpAstTransformer {
         } as cs.InvocationExpression;
         const memberAccess = (callExpr.expression = {
             expression: null!,
-            member: this._context.toPascalCase('toString'),
+            member: this._context.toPascalCase('toInvariantString'),
             parent: callExpr,
             tsNode: expr.tsNode,
             nodeType: cs.SyntaxKind.MemberAccessExpression
@@ -3084,22 +3095,6 @@ export default class CSharpAstTransformer {
         } as cs.ParenthesizedExpression;
         expr.parent = par;
         memberAccess.expression = par;
-
-        const invariantCultureInfo = {
-            parent: callExpr,
-            nodeType: cs.SyntaxKind.MemberAccessExpression,
-            tsNode: expr.tsNode,
-            expression: null!,
-            member: this._context.toPascalCase('invariantCulture')
-        } as cs.MemberAccessExpression;
-
-        invariantCultureInfo.expression = {
-            parent: invariantCultureInfo,
-            tsNode: expr.tsNode,
-            nodeType: cs.SyntaxKind.Identifier,
-            text: this._context.makeTypeName('system.globalization.CultureInfo')
-        } as cs.Identifier;
-        callExpr.arguments.push(invariantCultureInfo);
 
         return callExpr;
     }
@@ -3203,6 +3198,13 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.InvocationExpression
         } as cs.InvocationExpression;
 
+        // number.ToString
+        const isNumberToString =
+        ts.isPropertyAccessExpression(expression.expression) &&
+        this._context.typeChecker.getTypeAtLocation(expression.expression.expression).flags & ts.TypeFlags.Number &&
+        (expression.expression.name as ts.Identifier).text === 'toString' &&
+        expression.arguments.length === 0;
+
         callExpression.expression = this.visitExpression(callExpression, expression.expression)!;
         if (!callExpression.expression) {
             return null;
@@ -3222,31 +3224,6 @@ export default class CSharpAstTransformer {
             }
         });
 
-        // number.ToString
-        const isNumberToString =
-            ts.isPropertyAccessExpression(expression.expression) &&
-            this._context.typeChecker.getTypeAtLocation(expression.expression.expression).flags & ts.TypeFlags.Number &&
-            (expression.expression.name as ts.Identifier).text === 'toString' &&
-            expression.arguments.length === 0;
-
-        if (isNumberToString) {
-            const invariantCultureInfo = {
-                parent: parent,
-                nodeType: cs.SyntaxKind.MemberAccessExpression,
-                tsNode: expression,
-                expression: null!,
-                member: this._context.toPascalCase('invariantCulture')
-            } as cs.MemberAccessExpression;
-
-            invariantCultureInfo.expression = {
-                parent: invariantCultureInfo,
-                tsNode: expression.expression,
-                nodeType: cs.SyntaxKind.Identifier,
-                text: this._context.makeTypeName('system.globalization.CultureInfo')
-            } as cs.Identifier;
-
-            callExpression.arguments.push(invariantCultureInfo);
-        }
 
         if (expression.typeArguments) {
             callExpression.typeArguments = [];

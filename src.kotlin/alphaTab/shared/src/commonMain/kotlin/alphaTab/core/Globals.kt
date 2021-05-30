@@ -1,7 +1,6 @@
 package alphaTab.core
 
 import alphaTab.core.ecmaScript.RegExp
-import system.globalization.CultureInfo
 
 @kotlin.ExperimentalUnsignedTypes
 expect fun UByteArray.decodeToFloatArray(): FloatArray
@@ -20,6 +19,10 @@ fun String.substr(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
 
+fun String.splitBy(separator:String): alphaTab.collections.List<String> {
+    TODO("")
+}
+
 fun String.replace(pattern: RegExp, replacement: String): String {
     return pattern.replace(this, replacement)
 }
@@ -32,18 +35,13 @@ fun String.indexOfInDouble(item: String): Double {
     return this.indexOf(item).toDouble()
 }
 
-fun Double.toString(base: Double): String {
+fun Double.toInvariantString(base: Double): String {
     return this.toInt().toString(base.toInt())
 }
 
 expect fun Double.toInvariantString(): String
-
-fun Double.toString(cultureInfo: CultureInfo): String {
-    if (cultureInfo.isInvariant) {
-        return this.toInvariantString()
-    } else {
-        return this.toString()
-    }
+fun IAlphaTabEnum.toInvariantString(): String {
+    return this.toString()
 }
 
 fun String.lastIndexOfInDouble(item: String): Double {
@@ -66,10 +64,9 @@ fun String.charCodeAt(index: Double): Double {
     return this[index.toInt()].code.toDouble()
 }
 
-fun String.split(delimiter: String): IList<String> {
+fun String.split(delimiter: String): alphaTab.collections.List<String> {
     @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
-    return this.split(delimiters = arrayOf(delimiter), ignoreCase = false, limit = 0)
-        .toObjectList()
+    return alphaTab.collections.List(this.split(delimiters = arrayOf(delimiter), ignoreCase = false, limit = 0))
 }
 
 fun String.substring(startIndex: Double, endIndex: Double): String {

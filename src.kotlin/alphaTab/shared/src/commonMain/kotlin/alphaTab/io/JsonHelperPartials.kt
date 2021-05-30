@@ -2,7 +2,7 @@ package alphaTab.io
 
 import alphaTab.AlphaTabError
 import alphaTab.AlphaTabErrorType
-import alphaTab.core.IMap
+import alphaTab.collections.Map
 import kotlin.contracts.ExperimentalContracts
 import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
@@ -16,24 +16,12 @@ internal open class JsonHelperPartials {
                     func(kvp.value, (kvp.key!!) as String)
                 }
             }
-
-            if (o is IMap<*, *>) {
-                for (kvp in o) {
-                    func(kvp.second, (kvp.first!!) as String)
-                }
-            }
         }
 
         public fun forEach(o: Any?, func: (v: Any?, k: String) -> Unit) {
             if (o is Map<*, *>) {
                 for (kvp in o) {
                     func(kvp.value, (kvp.key!!) as String)
-                }
-            }
-
-            if (o is IMap<*, *>) {
-                for (kvp in o) {
-                    func(kvp.second, (kvp.first!!) as String)
                 }
             }
         }

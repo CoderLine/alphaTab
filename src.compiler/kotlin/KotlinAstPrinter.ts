@@ -619,10 +619,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 } else {
                     var elementTypeName = this.getContainerTypeName(arrayType.elementType);
                     if (elementTypeName) {
-                        this.write('alphaTab.core.');
-                        if (!forNew) {
-                            this.write('I');
-                        }
+                        this.write('alphaTab.collections.');
                         this.write(elementTypeName);
                         this.write('List');
                     } else {
@@ -630,12 +627,12 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                             cs.isPrimitiveTypeNode(arrayType.elementType) &&
                             arrayType.elementType.type === cs.PrimitiveType.Dynamic;
                         if (isDynamicArray && !forNew) {
-                            this.write('alphaTab.core.IList<*>');
+                            this.write('alphaTab.collections.List<*>');
                         } else {
                             if (forNew) {
-                                this.write('alphaTab.core.List<');
+                                this.write('alphaTab.collections.List<');
                             } else {
-                                this.write('alphaTab.core.IList<');
+                                this.write('alphaTab.collections.List<');
                             }
                             this.writeType(arrayType.elementType);
                             this.write('>');
@@ -650,11 +647,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 var keyTypeName = this.getContainerTypeName(mapType.keyType);
                 var valueTypeName = this.getContainerTypeName(mapType.valueType);
 
-                this.write('alphaTab.core.');
-                if (!forNew) {
-                    this.write('I');
-                }
-
+                this.write('alphaTab.collections.');
                 if (keyTypeName && valueTypeName) {
 
                     this.write(keyTypeName);
@@ -948,11 +941,12 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 }
 
                 let type = elementType ? this.getContainerTypeName(elementType) : null;
+                this.write('alphaTab.collections.')
                 if (type) {
-                    this.write(type.substr(0, 1).toLowerCase() + type.substr(1));
-                    this.write('ListOf')
+                    this.write(type);
+                    this.write('List')
                 } else {
-                    this.write('objectListOf');
+                    this.write('List');
                     if (expr.type && cs.isArrayTypeNode(expr.type)) {
                         this.write('<');
                         this.writeType(expr.type.elementType);
@@ -977,7 +971,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             }
         } else if (expr.values && expr.values.length > 0) {
             // TODO: check for typed array creation
-            this.write('objectListOf(');
+            this.write('alphaTab.collections.')
+            this.write('List(');
             this.writeCommaSeparated(expr.values, v => {
                 if (expr.values!.length > 10) {
                     this.writeLine();

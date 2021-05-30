@@ -1,8 +1,7 @@
 package alphaTab.platform.android
 
 import alphaTab.Settings
-import alphaTab.core.IList
-import alphaTab.core.objectListOf
+import alphaTab.collections.List
 import alphaTab.core.toCharArray
 import alphaTab.model.Color
 import alphaTab.model.Font
@@ -302,14 +301,14 @@ public class AndroidCanvas : ICanvas {
         symbol: MusicFontSymbol,
         centerAtPosition: Boolean?
     ) {
-        fillMusicFontSymbols(x, y, scale, objectListOf(symbol), centerAtPosition)
+        fillMusicFontSymbols(x, y, scale, alphaTab.collections.List(symbol), centerAtPosition)
     }
 
     override fun fillMusicFontSymbols(
         x: Double,
         y: Double,
         scale: Double,
-        symbols: IList<MusicFontSymbol>,
+        symbols: alphaTab.collections.List<MusicFontSymbol>,
         centerAtPosition: Boolean?
     ) {
         val s = String(symbols

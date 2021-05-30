@@ -1,6 +1,7 @@
 package alphaTab
 
 import alphaTab.core.*
+import alphaTab.collections.*
 import alphaTab.model.Score
 import alphaTab.model.Track
 import alphaTab.platform.android.AndroidEnvironment
@@ -127,7 +128,7 @@ class AlphaTabView : RelativeLayout {
     class SavedState : BaseSavedState {
         public var score: Score? = null
         public var settings: Settings? = null
-        public var indexes: IDoubleList = DoubleList()
+        public var indexes: DoubleList = DoubleList()
 
         constructor(source: Parcelable?) : super(source)
 
@@ -170,28 +171,27 @@ class AlphaTabView : RelativeLayout {
             writeList(out, indexes)
         }
 
-        private fun writeMap(out: Parcel, map: IMap<String, Any?>) {
+        private fun writeMap(out: Parcel, map: alphaTab.collections.Map<String, Any?>) {
             out.writeInt(map.size.toInt())
             for (kvp in map) {
-                out.writeString(kvp.first)
-                writeValue(out, kvp.second)
-
+                out.writeString(kvp.key)
+                writeValue(out, kvp.value)
             }
         }
 
         private fun writeValue(out: Parcel, value: Any?) {
             when (value) {
-                is Map<*, *> -> {
+                is alphaTab.collections.Map<*, *> -> {
                     @Suppress("UNCHECKED_CAST")
-                    writeMap(out, value as IMap<String, Any?>)
+                    writeMap(out, value as alphaTab.collections.Map<String, Any?>)
                 }
-                is IList<*> -> {
+                is alphaTab.collections.List<*> -> {
                     writeList(out, value)
                 }
-                is IDoubleList -> {
+                is DoubleList -> {
                     writeList(out, value)
                 }
-                is IBooleanList -> {
+                is BooleanList -> {
                     writeList(out, value)
                 }
                 else -> {
@@ -200,21 +200,21 @@ class AlphaTabView : RelativeLayout {
             }
         }
 
-        private fun writeList(out: Parcel, value: IList<*>) {
+        private fun writeList(out: Parcel, value: alphaTab.collections.List<*>) {
             out.writeInt(value.length.toInt())
             for (v in value) {
                 writeValue(out, v)
             }
         }
 
-        private fun writeList(out: Parcel, value: IDoubleList) {
+        private fun writeList(out: Parcel, value: DoubleList) {
             out.writeInt(value.length.toInt())
             for (v in value) {
                 out.writeValue(v)
             }
         }
 
-        private fun readList(out: Parcel, value: IDoubleList) {
+        private fun readList(out: Parcel, value: DoubleList) {
             val size = out.readInt()
             var i = 0
             while (i < size) {
@@ -223,7 +223,7 @@ class AlphaTabView : RelativeLayout {
             }
         }
 
-        private fun writeList(out: Parcel, value: IBooleanList) {
+        private fun writeList(out: Parcel, value: BooleanList) {
             out.writeInt(value.length.toInt())
             for (v in value) {
                 out.writeValue(v)
