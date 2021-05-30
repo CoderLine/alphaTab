@@ -2966,11 +2966,10 @@ export default class CSharpAstTransformer {
                         return 'TrimStart';
                 }
                 break;
-            case 'NumberConstructor':
             case 'Number':
                 switch (symbol.name) {
                     case 'toString':
-                        return 'toInvariantString';
+                        return 'ToInvariantString';
                 }
                 break;
         }

@@ -770,23 +770,26 @@ export default class CSharpEmitterContext {
 
     protected buildCoreNamespace(aliasSymbol: ts.Symbol) {
         let suffix = '';
-        for (const decl of aliasSymbol.declarations) {
-            let fileName = path.basename(decl.getSourceFile().fileName).toLowerCase();
-            if (fileName.startsWith('lib.') && fileName.endsWith('.d.ts')) {
-                fileName = fileName.substring(4, fileName.length - 5);
-                if (fileName.length) {
-                    suffix = fileName.split('.').map(s => {
-                        if (s.match(/es[0-9]{4}/)) {
-                            return '.' + this.toPascalCase('ecmaScript');
-                        }
-                        if (s.match(/es[0-9]{1}/)) {
-                            return '.' + this.toPascalCase('ecmaScript');
-                        }
-                        return '.' + this.toPascalCase(s);
-                    })[0];
+        if (aliasSymbol.name !== 'Map') {
+            for (const decl of aliasSymbol.declarations) {
+                let fileName = path.basename(decl.getSourceFile().fileName).toLowerCase();
+                if (fileName.startsWith('lib.') && fileName.endsWith('.d.ts')) {
+                    fileName = fileName.substring(4, fileName.length - 5);
+                    if (fileName.length) {
+                        suffix = fileName.split('.').map(s => {
+                            if (s.match(/es[0-9]{4}/)) {
+                                return '.' + this.toPascalCase('ecmaScript');
+                            }
+                            if (s.match(/es[0-9]{1}/)) {
+                                return '.' + this.toPascalCase('ecmaScript');
+                            }
+                            return '.' + this.toPascalCase(s);
+                        })[0];
+                    }
                 }
             }
         }
+
         return this.toPascalCase('alphaTab.core') + suffix + '.';
     }
     protected toCoreTypeName(s: string) {
