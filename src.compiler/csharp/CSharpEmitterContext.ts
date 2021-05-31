@@ -793,6 +793,9 @@ export default class CSharpEmitterContext {
         return this.toPascalCase('alphaTab.core') + suffix + '.';
     }
     protected toCoreTypeName(s: string) {
+        if(s === 'Map') {
+            return 'IMap'
+        }
         return s;
     }
 
