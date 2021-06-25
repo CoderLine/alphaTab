@@ -49,7 +49,7 @@ export class FlagGlyph extends MusicFontGlyph {
             case Duration.OneHundredTwentyEighth:
                 return MusicFontSymbol.FlagOneHundredTwentyEighthDown;
             case Duration.TwoHundredFiftySixth:
-                return MusicFontSymbol.FlagOneHundredTwentyEighthDown;
+                return MusicFontSymbol.FlagTwoHundredFiftySixthDown;
             default:
                 return MusicFontSymbol.FlagEighthDown;
         }
