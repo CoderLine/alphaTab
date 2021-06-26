@@ -10,14 +10,14 @@ export class RenderStylesheetSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: RenderStylesheet | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("hideDynamics", obj.hideDynamics); 
+        o.set("hidedynamics", obj.hideDynamics); 
         return o; 
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {

@@ -46,6 +46,7 @@ export enum BeatBeamingMode {
  * A beat is a single block within a bar. A beat is a combination
  * of several notes played at the same time.
  * @json
+ * @json_strict
  * @cloneable
  */
 export class Beat {

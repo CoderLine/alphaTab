@@ -6,6 +6,7 @@ import { Staff } from '@src/model/Staff';
 /**
  * A chord definition.
  * @json
+ * @json_strict
  */
 export class Chord {
     /**

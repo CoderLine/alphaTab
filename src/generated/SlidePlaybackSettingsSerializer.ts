@@ -17,9 +17,9 @@ export class SlidePlaybackSettingsSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("simpleSlidePitchOffset", obj.simpleSlidePitchOffset); 
-        o.set("simpleSlideDurationRatio", obj.simpleSlideDurationRatio); 
-        o.set("shiftSlideDurationRatio", obj.shiftSlideDurationRatio); 
+        o.set("simpleslidepitchoffset", obj.simpleSlidePitchOffset); 
+        o.set("simpleslidedurationratio", obj.simpleSlideDurationRatio); 
+        o.set("shiftslidedurationratio", obj.shiftSlideDurationRatio); 
         return o; 
     }
     public static setProperty(obj: SlidePlaybackSettings, property: string, v: unknown): boolean {

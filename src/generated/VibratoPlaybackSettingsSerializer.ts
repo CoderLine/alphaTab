@@ -17,14 +17,14 @@ export class VibratoPlaybackSettingsSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("noteWideLength", obj.noteWideLength); 
-        o.set("noteWideAmplitude", obj.noteWideAmplitude); 
-        o.set("noteSlightLength", obj.noteSlightLength); 
-        o.set("noteSlightAmplitude", obj.noteSlightAmplitude); 
-        o.set("beatWideLength", obj.beatWideLength); 
-        o.set("beatWideAmplitude", obj.beatWideAmplitude); 
-        o.set("beatSlightLength", obj.beatSlightLength); 
-        o.set("beatSlightAmplitude", obj.beatSlightAmplitude); 
+        o.set("notewidelength", obj.noteWideLength); 
+        o.set("notewideamplitude", obj.noteWideAmplitude); 
+        o.set("noteslightlength", obj.noteSlightLength); 
+        o.set("noteslightamplitude", obj.noteSlightAmplitude); 
+        o.set("beatwidelength", obj.beatWideLength); 
+        o.set("beatwideamplitude", obj.beatWideAmplitude); 
+        o.set("beatslightlength", obj.beatSlightLength); 
+        o.set("beatslightamplitude", obj.beatSlightAmplitude); 
         return o; 
     }
     public static setProperty(obj: VibratoPlaybackSettings, property: string, v: unknown): boolean {

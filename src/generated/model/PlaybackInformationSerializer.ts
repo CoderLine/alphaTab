@@ -10,7 +10,7 @@ export class PlaybackInformationSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: PlaybackInformation | null): Map<string, unknown> | null {
         if (!obj) {
@@ -21,10 +21,10 @@ export class PlaybackInformationSerializer {
         o.set("balance", obj.balance); 
         o.set("port", obj.port); 
         o.set("program", obj.program); 
-        o.set("primaryChannel", obj.primaryChannel); 
-        o.set("secondaryChannel", obj.secondaryChannel); 
-        o.set("isMute", obj.isMute); 
-        o.set("isSolo", obj.isSolo); 
+        o.set("primarychannel", obj.primaryChannel); 
+        o.set("secondarychannel", obj.secondaryChannel); 
+        o.set("ismute", obj.isMute); 
+        o.set("issolo", obj.isSolo); 
         return o; 
     }
     public static setProperty(obj: PlaybackInformation, property: string, v: unknown): boolean {

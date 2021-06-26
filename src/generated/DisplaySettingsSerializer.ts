@@ -21,13 +21,13 @@ export class DisplaySettingsSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("scale", obj.scale); 
-        o.set("stretchForce", obj.stretchForce); 
-        o.set("layoutMode", obj.layoutMode as number); 
-        o.set("staveProfile", obj.staveProfile as number); 
-        o.set("barsPerRow", obj.barsPerRow); 
-        o.set("startBar", obj.startBar); 
-        o.set("barCount", obj.barCount); 
-        o.set("barCountPerPartial", obj.barCountPerPartial); 
+        o.set("stretchforce", obj.stretchForce); 
+        o.set("layoutmode", obj.layoutMode as number); 
+        o.set("staveprofile", obj.staveProfile as number); 
+        o.set("barsperrow", obj.barsPerRow); 
+        o.set("startbar", obj.startBar); 
+        o.set("barcount", obj.barCount); 
+        o.set("barcountperpartial", obj.barCountPerPartial); 
         o.set("resources", RenderingResourcesSerializer.toJson(obj.resources)); 
         o.set("padding", obj.padding); 
         return o; 

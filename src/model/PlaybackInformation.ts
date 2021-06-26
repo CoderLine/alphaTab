@@ -2,6 +2,7 @@
  * This public class stores the midi specific information of a track needed
  * for playback.
  * @json
+ * @json_strict
  */
 export class PlaybackInformation {
     /**

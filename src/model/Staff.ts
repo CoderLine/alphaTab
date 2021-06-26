@@ -8,6 +8,7 @@ import { Tuning } from './Tuning';
  * This class describes a single staff within a track. There are instruments like pianos
  * where a single track can contain multiple staffs.
  * @json
+ * @json_strict
  */
 export class Staff {
     /**

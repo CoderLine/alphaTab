@@ -493,6 +493,26 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 }
 
                 break;
+            case cs.SyntaxKind.MapTypeNode:
+                const mapType = type as cs.MapTypeNode;
+                if (!mapType.valueIsValueType) {
+                    if (forNew) {
+                        this.write('AlphaTab.Core.Map<');
+                    } else {
+                        this.write('AlphaTab.Core.IMap<');
+                    }
+                } else {
+                    if (forNew) {
+                        this.write('AlphaTab.Core.ValueTypeMap<');
+                    } else {
+                        this.write('AlphaTab.Core.IValueTypeMap<');
+                    }
+                }
+                this.writeType(mapType.keyType);
+                this.write(', ');
+                this.writeType(mapType.valueType);
+                this.write('>');
+                break;
             case cs.SyntaxKind.FunctionTypeNode:
                 const functionType = type as cs.FunctionTypeNode;
                 if (
@@ -699,7 +719,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeNonNullExpression(expr: cs.NonNullExpression) {
         this.writeExpression(expr.expression);
-        if(!cs.isNonNullExpression(expr)) {
+        if (!cs.isNonNullExpression(expr)) {
             this.write('!');
         }
     }

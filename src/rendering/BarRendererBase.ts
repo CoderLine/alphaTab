@@ -311,7 +311,7 @@ export class BarRendererBase {
     }
 
     protected getVoiceContainer(voice: Voice): VoiceContainerGlyph | undefined {
-        return this._voiceContainers.get(voice.index);
+        return this._voiceContainers.has(voice.index) ? this._voiceContainers.get(voice.index) : undefined;
     }
 
     public getBeatContainer(beat: Beat): BeatContainerGlyph | undefined {

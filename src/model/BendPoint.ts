@@ -3,6 +3,7 @@
  * describe WhammyBar and String Bending effects.
  * @cloneable
  * @json
+ * @json_strict
  */
 export class BendPoint {
     public static readonly MaxPosition: number = 60;

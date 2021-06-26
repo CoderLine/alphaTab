@@ -10,6 +10,7 @@ import { Note } from './Note';
  * model. It stores the basic information of
  * a song and stores the sub components.
  * @json
+ * @json_strict
  */
 export class Score {
     private _noteByIdLookup: Map<number, Note> = new Map<number, Note>();
