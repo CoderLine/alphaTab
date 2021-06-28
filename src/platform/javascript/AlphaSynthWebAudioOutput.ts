@@ -16,16 +16,13 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
     private static readonly BufferSize: number = 4096;
     private static readonly PreferredSampleRate: number = 44100;
     private static readonly TotalBufferTimeInMilliseconds: number = 5000;
-    private static readonly BufferCount: number = Math.floor(
-        (AlphaSynthWebAudioOutput.TotalBufferTimeInMilliseconds * AlphaSynthWebAudioOutput.PreferredSampleRate / 1000) /
-        AlphaSynthWebAudioOutput.BufferSize
-    );
 
     private _context: AudioContext | null = null;
     private _buffer: AudioBuffer | null = null;
     private _source: AudioBufferSourceNode | null = null;
     private _audioNode: ScriptProcessorNode | null = null;
     private _circularBuffer!: CircularSampleBuffer;
+    private _bufferCount: number = 0;
 
     public get sampleRate(): number {
         return this._context ? this._context.sampleRate : AlphaSynthWebAudioOutput.PreferredSampleRate;
@@ -33,10 +30,13 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
 
     public open(): void {
         this.patchIosSampleRate();
-        this._circularBuffer = new CircularSampleBuffer(
-            AlphaSynthWebAudioOutput.BufferSize * AlphaSynthWebAudioOutput.BufferCount
-        );
         this._context = this.createAudioContext();
+        this._bufferCount = Math.floor(
+            (AlphaSynthWebAudioOutput.TotalBufferTimeInMilliseconds * this.sampleRate) /
+                1000 /
+                AlphaSynthWebAudioOutput.BufferSize
+        );
+        this._circularBuffer = new CircularSampleBuffer(AlphaSynthWebAudioOutput.BufferSize * this._bufferCount);
         let ctx: AudioContext = this._context;
         if (ctx.state === 'suspended') {
             Logger.debug('WebAudio', 'Audio Context is suspended');
@@ -64,10 +64,16 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
             Logger.debug('WebAudio', 'Audio Context is suspended, try resume');
             this._context.resume().then(
                 () => {
-                    Logger.debug('WebAudio', `Audio Context resume success: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}`);
+                    Logger.debug(
+                        'WebAudio',
+                        `Audio Context resume success: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}`
+                    );
                 },
                 reason => {
-                    Logger.debug('WebAudio', `Audio Context resume failed: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}, reason=${reason}`);
+                    Logger.debug(
+                        'WebAudio',
+                        `Audio Context resume failed: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}, reason=${reason}`
+                    );
                 }
             );
         }
@@ -90,9 +96,13 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
 
     private createAudioContext(): AudioContext {
         if ('AudioContext' in Environment.globalThis) {
-            return new AudioContext();
+            return new AudioContext({
+                sampleRate: AlphaSynthWebAudioOutput.PreferredSampleRate
+            });
         } else if ('webkitAudioContext' in Environment.globalThis) {
-            return new webkitAudioContext();
+            return new webkitAudioContext({
+                sampleRate: AlphaSynthWebAudioOutput.PreferredSampleRate
+            });
         }
         throw new AlphaTabError(AlphaTabErrorType.General, 'AudioContext not found');
     }
@@ -109,7 +119,7 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         this._audioNode = ctx.createScriptProcessor(AlphaSynthWebAudioOutput.BufferSize, 0, 2);
         this._audioNode.onaudioprocess = this.generateSound.bind(this);
         this._circularBuffer.clear();
-        
+
         this.requestBuffers();
 
         this._source = ctx.createBufferSource();
@@ -119,10 +129,13 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         this._source.start(0);
         this._audioNode.connect(ctx.destination, 0, 0);
 
-        Logger.debug('WebAudio', `Created nodes.
+        Logger.debug(
+            'WebAudio',
+            `Created nodes.
             buffer.sampleRate=${this._buffer.sampleRate}, buffer.length=${this._buffer.length}, buffer.duration=${this._buffer.duration},
             processor.bufferSize=${this._audioNode.bufferSize}
-        `);            
+        `
+        );
     }
 
     public pause(): void {
@@ -142,9 +155,9 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         this._context?.close();
     }
 
-    public addSamples(f: Float32Array): void {       
+    public addSamples(f: Float32Array): void {
         this._circularBuffer.write(f, 0, f.length);
-        Logger.debug('WebAudio', `Added new samples. count=${f.length}, circularBuffer=${this._circularBuffer.count}`);   
+        Logger.debug('WebAudio', `Added new samples. count=${f.length}, circularBuffer=${this._circularBuffer.count}`);
     }
 
     public resetSamples(): void {
@@ -154,10 +167,12 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
     private requestBuffers(): void {
         // if we fall under the half of buffers
         // we request one half
-        const halfBufferCount = (AlphaSynthWebAudioOutput.BufferCount / 2) | 0;
+        const halfBufferCount = (this._bufferCount / 2) | 0;
         let count: number = halfBufferCount * AlphaSynthWebAudioOutput.BufferSize;
         if (this._circularBuffer.count < count) {
-            Logger.debug('WebAudio', `Samples dropped under 1/2, requesting new ones: 
+            Logger.debug(
+                'WebAudio',
+                `Samples dropped under 1/2, requesting new ones: 
                 circularBuffer:${this._circularBuffer.count}, halfSamples=${count}, halfBufferCount=${halfBufferCount}
             `);
             for (let i: number = 0; i < halfBufferCount; i++) {
@@ -176,14 +191,20 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
             buffer = new Float32Array(samples);
             this._outputBuffer = buffer;
         }
-        Logger.debug('WebAudio', `Generating sound: 
+        Logger.debug(
+            'WebAudio',
+            `Generating sound: 
             samples=${samples}, circularBuffer:${this._circularBuffer.count}, 
-        `);
+        `
+        );
         const actualSamples = this._circularBuffer.read(buffer, 0, Math.min(buffer.length, this._circularBuffer.count));
-        if(actualSamples !== samples) {
-            Logger.debug('WebAudio', `Not enough samples!: 
+        if (actualSamples !== samples) {
+            Logger.debug(
+                'WebAudio',
+                `Not enough samples!: 
             actualSamples=${actualSamples}, samples:${samples}, 
-            `);
+            `
+            );
         }
         let s: number = 0;
         for (let i: number = 0; i < left.length; i++) {
