@@ -24,7 +24,6 @@ import { Voice } from '@src/synth/synthesis/Voice';
 import { VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceEnvelope';
 import { SynthHelper } from '@src/synth/SynthHelper';
 import { TypeConversions } from '@src/io/TypeConversions';
-import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 import { MetaEventType } from '@src/midi/MetaEvent';
@@ -145,7 +144,6 @@ export class TinySoundFont {
     }
 
     private processMidiMessage(e: MidiEvent): void {
-        Logger.debug('Midi', 'Processing midi ' + e.command);
         const command: MidiEventType = e.command;
         const channel: number = e.channel;
         const data1: number = e.data1;

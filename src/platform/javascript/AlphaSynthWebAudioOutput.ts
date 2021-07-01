@@ -3,6 +3,7 @@ import { ISynthOutput } from '@src/synth/ISynthOutput';
 import { EventEmitter, IEventEmitterOfT, IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
 import { Environment } from '@src/Environment';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { Logger } from '@src/Logger';
 
 declare var webkitAudioContext: any;
 
@@ -13,14 +14,16 @@ declare var webkitAudioContext: any;
  */
 export class AlphaSynthWebAudioOutput implements ISynthOutput {
     private static readonly BufferSize: number = 4096;
-    private static readonly BufferCount: number = 10;
     private static readonly PreferredSampleRate: number = 44100;
+    private static readonly TotalBufferTimeInMilliseconds: number = 5000;
 
     private _context: AudioContext | null = null;
     private _buffer: AudioBuffer | null = null;
     private _source: AudioBufferSourceNode | null = null;
     private _audioNode: ScriptProcessorNode | null = null;
     private _circularBuffer!: CircularSampleBuffer;
+    private _bufferCount: number = 0;
+    private _requestedBufferCount: number = 0;
 
     public get sampleRate(): number {
         return this._context ? this._context.sampleRate : AlphaSynthWebAudioOutput.PreferredSampleRate;
@@ -28,15 +31,18 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
 
     public open(): void {
         this.patchIosSampleRate();
-        this._circularBuffer = new CircularSampleBuffer(
-            AlphaSynthWebAudioOutput.BufferSize * AlphaSynthWebAudioOutput.BufferCount
-        );
         this._context = this.createAudioContext();
-        // possible fix for Web Audio in iOS 9 (issue #4)
-        let ctx: any = this._context;
+        this._bufferCount = Math.floor(
+            (AlphaSynthWebAudioOutput.TotalBufferTimeInMilliseconds * this.sampleRate) /
+            1000 /
+            AlphaSynthWebAudioOutput.BufferSize
+        );
+        this._circularBuffer = new CircularSampleBuffer(AlphaSynthWebAudioOutput.BufferSize * this._bufferCount);
+        let ctx: AudioContext = this._context;
         if (ctx.state === 'suspended') {
+            Logger.debug('WebAudio', 'Audio Context is suspended');
             let resume = () => {
-                ctx.resume();
+                this.activate();
                 Environment.globalThis.setTimeout(() => {
                     if (ctx.state === 'running') {
                         document.body.removeEventListener('touchend', resume, false);
@@ -55,8 +61,23 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
             this._context = this.createAudioContext();
         }
 
-        // tslint:disable-next-line: no-floating-promises
-        this._context.resume();
+        if (this._context.state === 'suspended' || (this._context.state as string) === 'interrupted') {
+            Logger.debug('WebAudio', 'Audio Context is suspended, trying resume');
+            this._context.resume().then(
+                () => {
+                    Logger.debug(
+                        'WebAudio',
+                        `Audio Context resume success: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}`
+                    );
+                },
+                reason => {
+                    Logger.debug(
+                        'WebAudio',
+                        `Audio Context resume failed: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}, reason=${reason}`
+                    );
+                }
+            );
+        }
     }
 
     private patchIosSampleRate(): void {
@@ -76,11 +97,15 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
 
     private createAudioContext(): AudioContext {
         if ('AudioContext' in Environment.globalThis) {
-            return new AudioContext();
+            return new AudioContext({
+                sampleRate: AlphaSynthWebAudioOutput.PreferredSampleRate
+            });
         } else if ('webkitAudioContext' in Environment.globalThis) {
-            return new webkitAudioContext();
+            return new webkitAudioContext({
+                sampleRate: AlphaSynthWebAudioOutput.PreferredSampleRate
+            });
         }
-        throw new AlphaTabError(AlphaTabErrorType.General, "AudioContext not found");
+        throw new AlphaTabError(AlphaTabErrorType.General, 'AudioContext not found');
     }
 
     public play(): void {
@@ -88,17 +113,16 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
         if (!ctx) {
             return;
         }
-        if (ctx.state === 'suspended' || (ctx.state as string) === 'interrupted') {
-            // tslint:disable-next-line: no-floating-promises
-            ctx.resume();
-        }
+        this.activate();
         // create an empty buffer source (silence)
-        this._buffer = ctx.createBuffer(2, 4096, ctx.sampleRate);
+        this._buffer = ctx.createBuffer(2, AlphaSynthWebAudioOutput.BufferSize, ctx.sampleRate);
         // create a script processor node which will replace the silence with the generated audio
-        this._audioNode = ctx.createScriptProcessor(4096, 0, 2);
+        this._audioNode = ctx.createScriptProcessor(AlphaSynthWebAudioOutput.BufferSize, 0, 2);
         this._audioNode.onaudioprocess = this.generateSound.bind(this);
         this._circularBuffer.clear();
+
         this.requestBuffers();
+
         this._source = ctx.createBufferSource();
         this._source.buffer = this._buffer;
         this._source.loop = true;
@@ -121,11 +145,12 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
 
     public destroy(): void {
         this.pause();
-        this._context?.close();        
+        this._context?.close();
     }
 
     public addSamples(f: Float32Array): void {
         this._circularBuffer.write(f, 0, f.length);
+        this._requestedBufferCount--;
     }
 
     public resetSamples(): void {
@@ -135,21 +160,27 @@ export class AlphaSynthWebAudioOutput implements ISynthOutput {
     private requestBuffers(): void {
         // if we fall under the half of buffers
         // we request one half
-        let count: number = ((10 / 2) | 0) * 4096;
-        if (this._circularBuffer.count < count && this.sampleRequest) {
-            for (let i: number = 0; i < ((10 / 2) | 0); i++) {
+        const halfBufferCount = (this._bufferCount / 2) | 0;
+        let halfSamples: number = halfBufferCount * AlphaSynthWebAudioOutput.BufferSize;
+        // Issue #631: it can happen that requestBuffers is called multiple times
+        // before we already get samples via addSamples, therefore we need to
+        // remember how many buffers have been requested, and consider them as available.
+        let bufferedSamples = this._circularBuffer.count + this._requestedBufferCount * AlphaSynthWebAudioOutput.BufferSize;
+        if (bufferedSamples < halfSamples) {
+            for (let i: number = 0; i < halfBufferCount; i++) {
                 (this.sampleRequest as EventEmitter).trigger();
             }
+            this._requestedBufferCount += halfBufferCount;
         }
     }
 
-    private _outputBuffer:Float32Array = new Float32Array(0);
+    private _outputBuffer: Float32Array = new Float32Array(0);
     private generateSound(e: AudioProcessingEvent): void {
         let left: Float32Array = e.outputBuffer.getChannelData(0);
         let right: Float32Array = e.outputBuffer.getChannelData(1);
         let samples: number = left.length + right.length;
         let buffer = this._outputBuffer;
-        if(buffer.length != samples) {
+        if (buffer.length !== samples) {
             buffer = new Float32Array(samples);
             this._outputBuffer = buffer;
         }
