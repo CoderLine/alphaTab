@@ -107,7 +107,7 @@ namespace AlphaTab
         {
             // if we fall under the half of buffers
             // we request one half
-            const int halfBufferCount = _bufferCount / 2;
+            var halfBufferCount = _bufferCount / 2;
             var halfSamples = halfBufferCount * BufferSize;
             // Issue #631: it can happen that requestBuffers is called multiple times
             // before we already get samples via addSamples, therefore we need to
