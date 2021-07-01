@@ -144,7 +144,6 @@ export class TinySoundFont {
     }
 
     private processMidiMessage(e: MidiEvent): void {
-        // Logger.debug('Midi', 'Processing midi ' + e.command);
         const command: MidiEventType = e.command;
         const channel: number = e.channel;
         const data1: number = e.data1;
