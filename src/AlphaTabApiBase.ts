@@ -892,59 +892,77 @@ export class AlphaTabApiBase<TSettings> {
                     // Logger.Info("Player",
                     //    "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
                     //    "(" + Player.PlaybackRange + ")");
-                    beatCursor!.transitionToX(duration, nextBeatX);
+
+                    // we need to put the transition to an own animation frame
+                    // otherwise the stop animation above is not applied. 
+                    this.uiFacade.beginInvoke(() => { 
+                        beatCursor!.transitionToX(duration, nextBeatX);
+                    });
                 }
             }
             if (!this._beatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
                 let scrollElement: IContainer = this.uiFacade.getScrollContainer();
                 let isVertical: boolean = Environment.getLayoutEngineFactory(this.settings).vertical;
                 let mode: ScrollMode = this.settings.player.scrollMode;
-                let elementOffset: Bounds = this.uiFacade.getOffset(scrollElement, this.container);
                 if (isVertical) {
-                    switch (mode) {
-                        case ScrollMode.Continuous:
-                            let y: number =
-                                elementOffset.y + barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
-                            if (y !== this._lastScroll) {
-                                this._lastScroll = y;
-                                this.uiFacade.scrollToY(scrollElement, y, this.settings.player.scrollSpeed);
-                            }
-                            break;
-                        case ScrollMode.OffScreen:
-                            let elementBottom: number =
-                                scrollElement.scrollTop + this.uiFacade.getOffset(null, scrollElement).h;
-                            if (
-                                barBoundings.visualBounds.y + barBoundings.visualBounds.h >= elementBottom ||
-                                barBoundings.visualBounds.y < scrollElement.scrollTop
-                            ) {
-                                let scrollTop: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
-                                this._lastScroll = barBoundings.visualBounds.x;
-                                this.uiFacade.scrollToY(scrollElement, scrollTop, this.settings.player.scrollSpeed);
-                            }
-                            break;
+                    // when scrolling on the y-axis, we preliminary check if the new beat/bar have
+                    // moved on the y-axis
+                    let y: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
+                    if (y !== this._lastScroll) {
+                        this._lastScroll = y;
+                        switch (mode) {
+                            case ScrollMode.Continuous:
+                                let elementOffset: Bounds = this.uiFacade.getOffset(scrollElement, this.container);
+                                this.uiFacade.scrollToY(
+                                    scrollElement,
+                                    elementOffset.y + y,
+                                    this.settings.player.scrollSpeed
+                                );
+                                break;
+                            case ScrollMode.OffScreen:
+                                let elementBottom: number =
+                                    scrollElement.scrollTop + this.uiFacade.getOffset(null, scrollElement).h;
+                                if (
+                                    barBoundings.visualBounds.y + barBoundings.visualBounds.h >= elementBottom ||
+                                    barBoundings.visualBounds.y < scrollElement.scrollTop
+                                ) {
+                                    let scrollTop: number =
+                                        barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
+                                    this.uiFacade.scrollToY(scrollElement, scrollTop, this.settings.player.scrollSpeed);
+                                }
+                                break;
+                        }
                     }
                 } else {
-                    switch (mode) {
-                        case ScrollMode.Continuous:
-                            let x: number = barBoundings.visualBounds.x;
-                            if (x !== this._lastScroll) {
+                    // when scrolling on the x-axis, we preliminary check if the new bar has
+                    // moved on the x-axis
+                    let x: number = barBoundings.visualBounds.x;
+                    if (x !== this._lastScroll) {
+                        this._lastScroll = x;
+                        switch (mode) {
+                            case ScrollMode.Continuous:
                                 let scrollLeft: number = barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
                                 this._lastScroll = barBoundings.visualBounds.x;
                                 this.uiFacade.scrollToX(scrollElement, scrollLeft, this.settings.player.scrollSpeed);
-                            }
-                            break;
-                        case ScrollMode.OffScreen:
-                            let elementRight: number =
-                                scrollElement.scrollLeft + this.uiFacade.getOffset(null, scrollElement).w;
-                            if (
-                                barBoundings.visualBounds.x + barBoundings.visualBounds.w >= elementRight ||
-                                barBoundings.visualBounds.x < scrollElement.scrollLeft
-                            ) {
-                                let scrollLeft: number = barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
-                                this._lastScroll = barBoundings.visualBounds.x;
-                                this.uiFacade.scrollToX(scrollElement, scrollLeft, this.settings.player.scrollSpeed);
-                            }
-                            break;
+                                break;
+                            case ScrollMode.OffScreen:
+                                let elementRight: number =
+                                    scrollElement.scrollLeft + this.uiFacade.getOffset(null, scrollElement).w;
+                                if (
+                                    barBoundings.visualBounds.x + barBoundings.visualBounds.w >= elementRight ||
+                                    barBoundings.visualBounds.x < scrollElement.scrollLeft
+                                ) {
+                                    let scrollLeft: number =
+                                        barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
+                                    this._lastScroll = barBoundings.visualBounds.x;
+                                    this.uiFacade.scrollToX(
+                                        scrollElement,
+                                        scrollLeft,
+                                        this.settings.player.scrollSpeed
+                                    );
+                                }
+                                break;
+                        }
                     }
                 }
             }
