@@ -8,7 +8,7 @@ import { Lazy } from '@src/util/Lazy';
  * @target web
  */
 export class HtmlElementContainer implements IContainer {
-    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(() => new ResizeObserver((entries:ResizeObserverEntry[]) => {
+    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(() => new ResizeObserver((entries: ResizeObserverEntry[]) => {
         for (const e of entries) {
             let evt = new CustomEvent('resize', {
                 detail: e
@@ -18,21 +18,25 @@ export class HtmlElementContainer implements IContainer {
     }));
 
     private _resizeListeners: number = 0;
+    private _top: number = 0;
+    private _left: number = 0;
 
     public get top(): number {
-        return parseFloat(this.element.style.top);
+        return this._top;
     }
 
     public set top(value: number) {
-        this.element.style.top = value + 'px';
+        this._top = value;
+        this.updateTranslate();
     }
 
     public get left(): number {
-        return parseFloat(this.element.style.top);
+        return this._left;
     }
 
     public set left(value: number) {
-        this.element.style.left = value + 'px';
+        this._left = value;
+        this.updateTranslate();
     }
 
     public get width(): number {
@@ -159,8 +163,13 @@ export class HtmlElementContainer implements IContainer {
     public transitionToX(duration: number, x: number): void {
         this.element.style.transition = 'all 0s linear';
         this.element.style.transitionDuration = duration + 'ms';
-        this.element.style.left = x + 'px';
+        this.left = x;
     }
+
+    private updateTranslate() {
+        this.element.style.transform = `translate(${this._left}px, ${this._top}px)`;
+    }
+    
 
     /**
      * This event occurs when the control was resized.

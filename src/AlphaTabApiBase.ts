@@ -766,9 +766,7 @@ export class AlphaTabApiBase<TSettings> {
         if (this.player) {
             this.player.positionChanged.on(e => {
                 this._previousTick = e.currentTick;
-                this.uiFacade.beginInvoke(() => {
-                    this.cursorUpdateTick(e.currentTick, false);
-                });
+                this.cursorUpdateTick(e.currentTick, false);
             });
             this.player.stateChanged.on(e => {
                 this._playerState = e.state;
@@ -891,12 +889,10 @@ export class AlphaTabApiBase<TSettings> {
                 }
 
                 if (beatCursor) {
-                    this.uiFacade.beginInvoke(() => {
-                        // Logger.Info("Player",
-                        //    "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
-                        //    "(" + Player.PlaybackRange + ")");
-                        beatCursor!.transitionToX(duration, nextBeatX);
-                    });
+                    // Logger.Info("Player",
+                    //    "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
+                    //    "(" + Player.PlaybackRange + ")");
+                    beatCursor!.transitionToX(duration, nextBeatX);
                 }
             }
             if (!this._beatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
