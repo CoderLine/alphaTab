@@ -40,6 +40,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _totalResultCount: number = 0;
     private _initialTrackIndexes: number[] | null = null;
     private _intersectionObserver: IntersectionObserver;
+    private _barToElementLookup: Map<number, HTMLElement> = new Map<number, HTMLElement>();
 
     public rootContainerBecameVisible: IEventEmitter = new EventEmitter();
     public canRenderChanged: IEventEmitter = new EventEmitter();
@@ -84,10 +85,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public constructor(rootElement: HTMLElement) {
-        if(Environment.webPlatform !== WebPlatform.Browser) {
-           throw new AlphaTabError(AlphaTabErrorType.General,
-            'Usage of AlphaTabApi is only possible in browser environments. For usage in node use the Low Level APIs'
-           );    
+        if (Environment.webPlatform !== WebPlatform.Browser) {
+            throw new AlphaTabError(
+                AlphaTabErrorType.General,
+                'Usage of AlphaTabApi is only possible in browser environments. For usage in node use the Low Level APIs'
+            );
         }
         rootElement.classList.add('alphaTab');
         this.rootContainer = new HtmlElementContainer(rootElement);
@@ -255,6 +257,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     public initialRender(): void {
         this._api.renderer.preRender.on((_: boolean) => {
             this._totalResultCount = 0;
+            this._barToElementLookup.clear();
         });
 
         const initialRender = () => {
@@ -402,6 +405,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                     placeholder.dataset['svg'] = body;
                     this._intersectionObserver.observe(placeholder);
                 }
+
+                // remember which bar is contained in which node for faster lookup
+                // on highlight/unhighlight
+                for (let i = renderResult.firstMasterBarIndex; i <= renderResult.lastMasterBarIndex; i++) {
+                    this._barToElementLookup.set(i, placeholder);
+                }
             } else {
                 if (this._totalResultCount < canvasElement.childElementCount) {
                     canvasElement.replaceChild(
@@ -417,13 +426,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private replacePlaceholder(placeholder: HTMLElement, body: any) {
-        if (typeof placeholder.outerHTML === 'string') {
-            placeholder.outerHTML = body;
-        } else {
-            const display = document.createElement('div');
-            display.innerHTML = body;
-            placeholder.parentNode?.replaceChild(display.firstChild!, placeholder);
-        }
+        placeholder.innerHTML = body;
+        delete placeholder.dataset['svg'];
     }
 
     /**
@@ -466,20 +470,25 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         });
     }
 
-    public highlightElements(groupId: string): void {
-        let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
+    private _highlightedElements: HTMLElement[] = [];
+    public highlightElements(masterBarIndex: number, groupId: string): void {
+        const element = this._barToElementLookup.get(masterBarIndex)!;
         let elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
         for (let i: number = 0; i < elementsToHighlight.length; i++) {
             elementsToHighlight.item(i)!.classList.add('at-highlight');
+            this._highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
         }
     }
 
     public removeHighlights(): void {
-        let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
-        let elements: HTMLCollection = element.getElementsByClassName('at-highlight');
-        while (elements.length > 0) {
-            elements.item(0)!.classList.remove('at-highlight');
+        const highlightedElements = this._highlightedElements;
+        if (!highlightedElements) {
+            return;
         }
+        for (const element of highlightedElements) {
+            element.classList.remove('at-highlight');
+        }
+        this._highlightedElements = [];
     }
 
     public destroyCursors(): void {
