@@ -137,9 +137,15 @@ export class PlayerSettings {
     public scrollMode: ScrollMode = ScrollMode.Continuous;
 
     /**
-     * Gets or sets how fast the scrolling to the new position should happen (in milliseconds)
+     * Gets or sets how fast the scrolling to the new position should happen (in milliseconds).
      */
     public scrollSpeed: number = 300;
+
+    /**
+     * Gets or sets whether the native browser smooth scroll mechanism should be used over a custom animation.
+     * @target web
+     */
+    public nativeBrowserSmoothScroll: boolean = true;
 
     /**
      * Gets or sets the bend duration in milliseconds for songbook bends.
