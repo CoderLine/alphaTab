@@ -788,24 +788,16 @@ export class AlphaTabApiBase<TSettings> {
      * @param stop
      */
     private cursorUpdateTick(tick: number, stop: boolean = false): void {
-        this.uiFacade.beginInvoke(() => {
-            let cache: MidiTickLookup | null = this._tickCache;
-            if (cache) {
-                let tracks: Track[] = this.tracks;
-                if (tracks.length > 0) {
-                    let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick);
-                    if (beat) {
-                        this.cursorUpdateBeat(
-                            beat.currentBeat,
-                            beat.nextBeat,
-                            beat.duration,
-                            stop,
-                            beat.beatsToHighlight
-                        );
-                    }
+        let cache: MidiTickLookup | null = this._tickCache;
+        if (cache) {
+            let tracks: Track[] = this.tracks;
+            if (tracks.length > 0) {
+                let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick);
+                if (beat) {
+                    this.cursorUpdateBeat(beat.currentBeat, beat.nextBeat, beat.duration, stop, beat.beatsToHighlight);
                 }
             }
-        });
+        }
     }
 
     /**
@@ -834,27 +826,38 @@ export class AlphaTabApiBase<TSettings> {
         if (beat === previousBeat && cache === previousCache && previousState === this._playerState) {
             return;
         }
-        let barCursor: IContainer | null = this._barCursor;
-        let beatCursor: IContainer | null = this._beatCursor;
         let beatBoundings: BeatBounds | null = cache.findBeat(beat);
         if (!beatBoundings) {
             return;
         }
+
+        this.uiFacade.beginInvoke(() => {
+            this.internalCursorUpdateBeat(beat, nextBeat, duration, stop, beatsToHighlight, cache!, beatBoundings!);
+        });
+    }
+
+    private internalCursorUpdateBeat(
+        beat: Beat,
+        nextBeat: Beat | null,
+        duration: number,
+        stop: boolean,
+        beatsToHighlight: Beat[] | null,
+        cache: BoundsLookup,
+        beatBoundings: BeatBounds
+    ) {
+        let barCursor: IContainer | null = this._barCursor;
+        let beatCursor: IContainer | null = this._beatCursor;
+
         let barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
         let barBounds: Bounds = barBoundings.visualBounds;
         if (barCursor) {
-            barCursor.top = barBounds.y;
-            barCursor.left = barBounds.x;
-            barCursor.width = barBounds.w;
-            barCursor.height = barBounds.h;
+            barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
         }
 
         if (beatCursor) {
             // move beat to start position immediately
             beatCursor.stopAnimation();
-            beatCursor.top = barBounds.y;
-            beatCursor.left = beatBoundings.visualBounds.x;
-            beatCursor.height = barBounds.h;
+            beatCursor.setBounds(beatBoundings.visualBounds.x, barBounds.y, 1, barBounds.h);
         }
 
         // if playing, animate the cursor to the next beat
@@ -865,7 +868,7 @@ export class AlphaTabApiBase<TSettings> {
                 if (beatsToHighlight) {
                     for (let highlight of beatsToHighlight) {
                         let className: string = BeatContainerGlyph.getGroupId(highlight);
-                        this.uiFacade.highlightElements(className);
+                        this.uiFacade.highlightElements(beat.voice.bar.index, className);
                     }
                 }
                 let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
@@ -894,8 +897,8 @@ export class AlphaTabApiBase<TSettings> {
                     //    "(" + Player.PlaybackRange + ")");
 
                     // we need to put the transition to an own animation frame
-                    // otherwise the stop animation above is not applied. 
-                    this.uiFacade.beginInvoke(() => { 
+                    // otherwise the stop animation above is not applied.
+                    this.uiFacade.beginInvoke(() => {
                         beatCursor!.transitionToX(duration, nextBeatX);
                     });
                 }
@@ -1192,35 +1195,43 @@ export class AlphaTabApiBase<TSettings> {
                 startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.x +
                 startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.w;
             let startSelection: IContainer = this.uiFacade.createSelectionElement()!;
-            startSelection.top = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
-            startSelection.left = startX;
-            startSelection.width = staffEndX - startX;
-            startSelection.height = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h;
+            startSelection.setBounds(
+                startX,
+                startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
+                staffEndX - startX,
+                startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
+            );
             selectionWrapper.appendChild(startSelection);
             let staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index + 1;
             let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index;
             for (let staffIndex: number = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
                 let staffBounds: StaveGroupBounds = cache.staveGroups[staffIndex];
                 let middleSelection: IContainer = this.uiFacade.createSelectionElement()!;
-                middleSelection.top = staffBounds.visualBounds.y;
-                middleSelection.left = staffStartX;
-                middleSelection.width = staffEndX - staffStartX;
-                middleSelection.height = staffBounds.visualBounds.h;
+                middleSelection.setBounds(
+                    staffStartX,
+                    staffBounds.visualBounds.y,
+                    staffEndX - staffStartX,
+                    staffBounds.visualBounds.h
+                );
                 selectionWrapper.appendChild(middleSelection);
             }
             let endSelection: IContainer = this.uiFacade.createSelectionElement()!;
-            endSelection.top = endBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
-            endSelection.left = staffStartX;
-            endSelection.width = endX - staffStartX;
-            endSelection.height = endBeat.bounds!.barBounds.masterBarBounds.visualBounds.h;
+            endSelection.setBounds(
+                staffStartX,
+                endBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
+                endX - staffStartX,
+                endBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
+            );
             selectionWrapper.appendChild(endSelection);
         } else {
             // if the beats are on the same staff, we simply highlight from the startbeat to endbeat
             let selection: IContainer = this.uiFacade.createSelectionElement()!;
-            selection.top = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
-            selection.left = startX;
-            selection.width = endX - startX;
-            selection.height = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h;
+            selection.setBounds(
+                startX,
+                startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
+                endX - startX,
+                startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
+            );
             selectionWrapper.appendChild(selection);
         }
     }
@@ -1325,7 +1336,8 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'midiFileLoaded', e);
     }
 
-    public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<PlayerStateChangedEventArgs>();
+    public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> =
+        new EventEmitterOfT<PlayerStateChangedEventArgs>();
     private onPlayerStateChanged(e: PlayerStateChangedEventArgs): void {
         if (this._isDestroyed) {
             return;
@@ -1334,7 +1346,8 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'playerStateChanged', e);
     }
 
-    public playerPositionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
+    public playerPositionChanged: IEventEmitterOfT<PositionChangedEventArgs> =
+        new EventEmitterOfT<PositionChangedEventArgs>();
     private onPlayerPositionChanged(e: PositionChangedEventArgs): void {
         if (this._isDestroyed) {
             return;
@@ -1343,7 +1356,8 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'playerPositionChanged', e);
     }
 
-    public midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
+    public midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
+        new EventEmitterOfT<MidiEventsPlayedEventArgs>();
     private onMidiEventsPlayed(e: MidiEventsPlayedEventArgs): void {
         if (this._isDestroyed) {
             return;

@@ -8,37 +8,20 @@ import { Lazy } from '@src/util/Lazy';
  * @target web
  */
 export class HtmlElementContainer implements IContainer {
-    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(() => new ResizeObserver((entries: ResizeObserverEntry[]) => {
-        for (const e of entries) {
-            let evt = new CustomEvent('resize', {
-                detail: e
-            });
-            e.target.dispatchEvent(evt);
-        }
-    }));
+    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(
+        () =>
+            new ResizeObserver((entries: ResizeObserverEntry[]) => {
+                for (const e of entries) {
+                    let evt = new CustomEvent('resize', {
+                        detail: e
+                    });
+                    e.target.dispatchEvent(evt);
+                }
+            })
+    );
 
     private _resizeListeners: number = 0;
-    private _top: number = 0;
-    private _left: number = 0;
-
-    public get top(): number {
-        return this._top;
-    }
-
-    public set top(value: number) {
-        this._top = value;
-        this.updateTranslate();
-    }
-
-    public get left(): number {
-        return this._left;
-    }
-
-    public set left(value: number) {
-        this._left = value;
-        this.updateTranslate();
-    }
-
+    
     public get width(): number {
         return this.element.offsetWidth;
     }
@@ -163,13 +146,33 @@ export class HtmlElementContainer implements IContainer {
     public transitionToX(duration: number, x: number): void {
         this.element.style.transition = 'all 0s linear';
         this.element.style.transitionDuration = duration + 'ms';
-        this.left = x;
+        this.setBounds(x, NaN, NaN, NaN);
     }
 
-    private updateTranslate() {
-        this.element.style.transform = `translate(${this._left}px, ${this._top}px)`;
+    private _x:number = 0;
+    private _y:number = 0;
+    private _w:number = 0;
+    private _h:number = 0;
+    public setBounds(x: number, y: number, w: number, h: number) {
+        if(isNaN(x)) { 
+            x = this._x;
+        }
+        if(isNaN(y)) { 
+            y = this._y;
+        }
+        if(isNaN(w)) { 
+            w = this._w;
+        }
+        if(isNaN(h)) { 
+            h = this._h;
+        }
+        this.element.style.transform = `translate(${x}px, ${y}px) scale(${w}, ${h})`;
+        this.element.style.transformOrigin = 'top left';
+        this._x = x;
+        this._y = y;
+        this._w = w;
+        this._h = h;
     }
-    
 
     /**
      * This event occurs when the control was resized.

@@ -519,12 +519,16 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         barCursor.style.left = '0';
         barCursor.style.top = '0';
         barCursor.style.willChange = 'transform';
+        barCursor.style.width = '1px';
+        barCursor.style.height = '1px';
         beatCursor.style.position = 'absolute';
         beatCursor.style.left = '0';
         beatCursor.style.top = '0';
         beatCursor.style.transition = 'all 0s linear';
         beatCursor.style.willChange = 'transform';
-        
+        beatCursor.style.width = '3px';
+        beatCursor.style.height = '1px';
+
         // add cursors to UI
         element.insertBefore(cursorWrapper, element.firstChild);
         cursorWrapper.appendChild(selectionWrapper);

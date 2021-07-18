@@ -6,16 +6,6 @@ import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
  */
 export interface IContainer {
     /**
-     * Gets or sets the Y-position of the control, relative to its parent.
-     */
-    top: number;
-
-    /**
-     * Gets or sets the X-position of the control, relative to its parent.
-     */
-    left: number;
-
-    /**
      * Gets or sets the width of the control.
      */
     width: number;
@@ -50,6 +40,15 @@ export interface IContainer {
      * Stops the animations of this control immediately.
      */
     stopAnimation(): void;
+
+    /**
+     * Sets the position and size of the container for efficient repositioning.
+     * @param x The X-position
+     * @param y The Y-position
+     * @param w The width
+     * @param h The height
+     */
+    setBounds(x:number, y:number, w:number, h:number): void;
 
     /**
      * Tells the control to move to the given X-position in the given time.
