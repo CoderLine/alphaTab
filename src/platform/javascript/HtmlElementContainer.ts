@@ -2,6 +2,7 @@ import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
+import { Bounds } from '@src/rendering/utils/Bounds';
 import { Lazy } from '@src/util/Lazy';
 
 /**
@@ -21,7 +22,7 @@ export class HtmlElementContainer implements IContainer {
     );
 
     private _resizeListeners: number = 0;
-    
+
     public get width(): number {
         return this.element.offsetWidth;
     }
@@ -117,19 +118,11 @@ export class HtmlElementContainer implements IContainer {
                 if (this._resizeListeners === 0) {
                     HtmlElementContainer.resizeObserver.value.observe(this.element);
                 }
-                this.element.addEventListener(
-                    'resize',
-                    value,
-                    true
-                );
+                this.element.addEventListener('resize', value, true);
                 this._resizeListeners++;
             },
             off: (value: any) => {
-                this.element.removeEventListener(
-                    'resize',
-                    value,
-                    true
-                );
+                this.element.removeEventListener('resize', value, true);
                 this._resizeListeners--;
                 if (this._resizeListeners <= 0) {
                     this._resizeListeners = 0;
@@ -144,34 +137,35 @@ export class HtmlElementContainer implements IContainer {
     }
 
     public transitionToX(duration: number, x: number): void {
-        this.element.style.transition = 'all 0s linear';
-        this.element.style.transitionDuration = duration + 'ms';
+        this.element.style.transition = `transform ${duration}ms linear`;
         this.setBounds(x, NaN, NaN, NaN);
     }
 
-    private _x:number = 0;
-    private _y:number = 0;
-    private _w:number = 0;
-    private _h:number = 0;
+    private _lastBounds: Bounds = new Bounds();
+
+    public getBounds() {
+        return this._lastBounds;
+    }
+
     public setBounds(x: number, y: number, w: number, h: number) {
-        if(isNaN(x)) { 
-            x = this._x;
+        if (isNaN(x)) {
+            x = this._lastBounds.x;
         }
-        if(isNaN(y)) { 
-            y = this._y;
+        if (isNaN(y)) {
+            y = this._lastBounds.y;
         }
-        if(isNaN(w)) { 
-            w = this._w;
+        if (isNaN(w)) {
+            w = this._lastBounds.w;
         }
-        if(isNaN(h)) { 
-            h = this._h;
+        if (isNaN(h)) {
+            h = this._lastBounds.h;
         }
         this.element.style.transform = `translate(${x}px, ${y}px) scale(${w}, ${h})`;
         this.element.style.transformOrigin = 'top left';
-        this._x = x;
-        this._y = y;
-        this._w = w;
-        this._h = h;
+        this._lastBounds.x = x;
+        this._lastBounds.y = y;
+        this._lastBounds.w = w;
+        this._lastBounds.h = h;
     }
 
     /**

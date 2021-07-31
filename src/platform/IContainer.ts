@@ -1,5 +1,6 @@
 import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import { Bounds } from '@src/rendering/utils/Bounds';
 
 /**
  * This interface represents a container control in the UI layer.
@@ -49,6 +50,11 @@ export interface IContainer {
      * @param h The height
      */
     setBounds(x:number, y:number, w:number, h:number): void;
+
+    /**
+     * Gets the current position and size of the container.
+     */
+    getBounds(): Bounds;
 
     /**
      * Tells the control to move to the given X-position in the given time.

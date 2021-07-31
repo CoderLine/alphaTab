@@ -115,6 +115,12 @@ export class PlayerSettings {
      */
     public enableCursor: boolean = true;
 
+
+    /**
+     * Gets or sets whether the beat cursor should be animated or just ticking. 
+     */
+    public enableAnimatedBeatCursor: boolean = true;
+
     /**
      * Gets or sets alphaTab should provide user interaction features to
      * select playback ranges and jump to the playback position by click (aka. seeking).

@@ -794,7 +794,7 @@ export class AlphaTabApiBase<TSettings> {
             if (tracks.length > 0) {
                 // TODO: perf - searching the new beat every time from scratch is not needed
                 // from the previous result we should know which the next beat is
-                // unless we're looping we can take the known next beat as a hint 
+                // unless we're looping we can take the known next beat as a hint
                 let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick);
                 if (beat) {
                     this.cursorUpdateBeat(beat.currentBeat, beat.nextBeat, beat.duration, stop, beat.beatsToHighlight);
@@ -834,7 +834,9 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        this.internalCursorUpdateBeat(beat, nextBeat, duration, stop, beatsToHighlight, cache!, beatBoundings!);
+        this.uiFacade.beginInvoke(() => {
+            this.internalCursorUpdateBeat(beat, nextBeat, duration, stop, beatsToHighlight, cache!, beatBoundings!);
+        });
     }
 
     private internalCursorUpdateBeat(
@@ -846,20 +848,21 @@ export class AlphaTabApiBase<TSettings> {
         cache: BoundsLookup,
         beatBoundings: BeatBounds
     ) {
-        let barCursor: IContainer | null = this._barCursor;
-        let beatCursor: IContainer | null = this._beatCursor;
+        let barCursor: IContainer = this._barCursor!;
+        let beatCursor: IContainer = this._beatCursor!;
 
         let barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
         let barBounds: Bounds = barBoundings.visualBounds;
-        if (barCursor) {
-            barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
-        }
+        let needsNewAnimationFrame = false;
 
-        if (beatCursor) {
-            // move beat to start position immediately
-            beatCursor.stopAnimation();
-            beatCursor.setBounds(beatBoundings.visualBounds.x, barBounds.y, 1, barBounds.h);
-        }
+        barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
+
+        // move beat to start position immediately
+        const previousBeatBounds: Bounds = beatCursor.getBounds();
+        needsNewAnimationFrame =
+            previousBeatBounds!.y !== barBounds.y || beatBoundings.visualBounds.x < previousBeatBounds!.x;
+        beatCursor.stopAnimation();
+        beatCursor.setBounds(beatBoundings.visualBounds.x, barBounds.y, 1, barBounds.h);
 
         // if playing, animate the cursor to the next beat
         this.uiFacade.removeHighlights();
@@ -872,36 +875,40 @@ export class AlphaTabApiBase<TSettings> {
                         this.uiFacade.highlightElements(beat.voice.bar.index, className);
                     }
                 }
-                let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
-                // get position of next beat on same stavegroup
-                if (nextBeat) {
-                    // if we are moving within the same bar or to the next bar
-                    // transition to the next beat, otherwise transition to the end of the bar.
-                    if (
-                        nextBeat.voice.bar.index === beat.voice.bar.index ||
-                        nextBeat.voice.bar.index === beat.voice.bar.index + 1
-                    ) {
-                        let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
+
+                if (this.settings.player.enableAnimatedBeatCursor) {
+                    let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
+                    // get position of next beat on same stavegroup
+                    if (nextBeat) {
+                        // if we are moving within the same bar or to the next bar
+                        // transition to the next beat, otherwise transition to the end of the bar.
                         if (
-                            nextBeatBoundings &&
-                            nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                                barBoundings.staveGroupBounds
+                            (nextBeat.voice.bar.index === beat.voice.bar.index && nextBeat.index > beat.index) ||
+                            nextBeat.voice.bar.index === beat.voice.bar.index + 1
                         ) {
-                            nextBeatX = nextBeatBoundings.visualBounds.x;
+                            let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
+                            if (
+                                nextBeatBoundings &&
+                                nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
+                                    barBoundings.staveGroupBounds
+                            ) {
+                                nextBeatX = nextBeatBoundings.visualBounds.x;
+                            }
                         }
                     }
-                }
-
-                if (beatCursor) {
-                    // Logger.Info("Player",
-                    //    "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
-                    //    "(" + Player.PlaybackRange + ")");
 
                     // we need to put the transition to an own animation frame
                     // otherwise the stop animation above is not applied.
-                    this.uiFacade.beginInvoke(() => {
-                        beatCursor!.transitionToX(duration, nextBeatX);
-                    });
+                    // but only if we changed on the y axis.
+                    // as long we scroll horizontally we can keep the animation
+                    // alive.
+                    if (needsNewAnimationFrame) {
+                        this.uiFacade.beginInvoke(() => {
+                            beatCursor!.transitionToX(duration, nextBeatX);
+                        });
+                    } else {
+                        beatCursor.transitionToX(duration, nextBeatX);
+                    }
                 }
             }
             if (!this._beatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {

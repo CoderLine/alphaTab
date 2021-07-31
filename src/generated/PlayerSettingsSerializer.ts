@@ -24,6 +24,7 @@ export class PlayerSettingsSerializer {
         o.set("scrollElement", obj.scrollElement); 
         o.set("enablePlayer", obj.enablePlayer); 
         o.set("enableCursor", obj.enableCursor); 
+        o.set("enableAnimatedBeatCursor", obj.enableAnimatedBeatCursor); 
         o.set("enableUserInteraction", obj.enableUserInteraction); 
         o.set("scrollOffsetX", obj.scrollOffsetX); 
         o.set("scrollOffsetY", obj.scrollOffsetY); 
@@ -51,6 +52,9 @@ export class PlayerSettingsSerializer {
                 return true;
             case "enablecursor":
                 obj.enableCursor = v! as boolean;
+                return true;
+            case "enableanimatedbeatcursor":
+                obj.enableAnimatedBeatCursor = v! as boolean;
                 return true;
             case "enableuserinteraction":
                 obj.enableUserInteraction = v! as boolean;
