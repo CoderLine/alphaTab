@@ -725,7 +725,7 @@ export class AlphaTabApiBase<TSettings> {
     private _selectionWrapper: IContainer | null = null;
     private _previousTick: number = 0;
     private _playerState: PlayerState = PlayerState.Paused;
-    private _currentBeat: Beat | null = null;
+    private _currentBeat: MidiTickLookupFindBeatResult | null = null;
     private _previousStateForCursor: PlayerState = PlayerState.Paused;
     private _previousCursorCache: BoundsLookup | null = null;
     private _lastScroll: number = 0;
@@ -771,11 +771,12 @@ export class AlphaTabApiBase<TSettings> {
             this.player.stateChanged.on(e => {
                 this._playerState = e.state;
                 if (!e.stopped && e.state === PlayerState.Paused) {
-                    let currentBeat: Beat | null = this._currentBeat;
-                    let tickCache: MidiTickLookup | null = this._tickCache;
+                    let currentBeat = this._currentBeat;
+                    let tickCache = this._tickCache;
                     if (currentBeat && tickCache) {
                         this.player!.tickPosition =
-                            tickCache.getMasterBarStart(currentBeat.voice.bar.masterBar) + currentBeat.playbackStart;
+                            tickCache.getMasterBarStart(currentBeat.currentBeat.voice.bar.masterBar) +
+                            currentBeat.currentBeat.playbackStart;
                     }
                 }
             });
@@ -795,9 +796,9 @@ export class AlphaTabApiBase<TSettings> {
                 // TODO: perf - searching the new beat every time from scratch is not needed
                 // from the previous result we should know which the next beat is
                 // unless we're looping we can take the known next beat as a hint
-                let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick);
+                let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
                 if (beat) {
-                    this.cursorUpdateBeat(beat.currentBeat, beat.nextBeat, beat.duration, stop, beat.beatsToHighlight);
+                    this.cursorUpdateBeat(beat, stop);
                 }
             }
         }
@@ -806,13 +807,12 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * updates the cursors to highlight the specified beat
      */
-    private cursorUpdateBeat(
-        beat: Beat,
-        nextBeat: Beat | null,
-        duration: number,
-        stop: boolean,
-        beatsToHighlight: Beat[] | null = null
-    ): void {
+    private cursorUpdateBeat(lookupResult: MidiTickLookupFindBeatResult, stop: boolean): void {
+        const beat: Beat = lookupResult.currentBeat;
+        const nextBeat: Beat | null = lookupResult.nextBeat;
+        const duration: number = lookupResult.duration;
+        const beatsToHighlight = lookupResult.beatsToHighlight;
+
         if (!beat) {
             return;
         }
@@ -820,13 +820,13 @@ export class AlphaTabApiBase<TSettings> {
         if (!cache) {
             return;
         }
-        let previousBeat: Beat | null = this._currentBeat;
+        let previousBeat = this._currentBeat;
         let previousCache: BoundsLookup | null = this._previousCursorCache;
         let previousState: PlayerState | null = this._previousStateForCursor;
-        this._currentBeat = beat;
+        this._currentBeat = lookupResult;
         this._previousCursorCache = cache;
         this._previousStateForCursor = this._playerState;
-        if (beat === previousBeat && cache === previousCache && previousState === this._playerState) {
+        if (beat === previousBeat?.currentBeat && cache === previousCache && previousState === this._playerState) {
             return;
         }
         let beatBoundings: BeatBounds | null = cache.findBeat(beat);
@@ -861,15 +861,19 @@ export class AlphaTabApiBase<TSettings> {
         const previousBeatBounds: Bounds = beatCursor.getBounds();
         needsNewAnimationFrame =
             previousBeatBounds!.y !== barBounds.y || beatBoundings.visualBounds.x < previousBeatBounds!.x;
-        beatCursor.stopAnimation();
+        if (this.settings.player.enableAnimatedBeatCursor) {
+            beatCursor.stopAnimation();
+        }
         beatCursor.setBounds(beatBoundings.visualBounds.x, barBounds.y, 1, barBounds.h);
 
         // if playing, animate the cursor to the next beat
-        this.uiFacade.removeHighlights();
+        if (this.settings.player.enableElementHighlighting) {
+            this.uiFacade.removeHighlights();
+        }
         if (this._playerState === PlayerState.Playing || stop) {
             duration /= this.playbackSpeed;
             if (!stop) {
-                if (beatsToHighlight) {
+                if (this.settings.player.enableElementHighlighting && beatsToHighlight) {
                     for (let highlight of beatsToHighlight) {
                         let className: string = BeatContainerGlyph.getGroupId(highlight);
                         this.uiFacade.highlightElements(beat.voice.bar.index, className);
@@ -1057,7 +1061,10 @@ export class AlphaTabApiBase<TSettings> {
                 // move to selection start
                 this._currentBeat = null; // reset current beat so it is updating the cursor
                 if (this._playerState === PlayerState.Paused) {
-                    this.cursorUpdateBeat(this._selectionStart.beat, null, 0, false, [this._selectionStart.beat]);
+                    const lookupResult = new MidiTickLookupFindBeatResult();
+                    lookupResult.currentBeat = this._selectionStart.beat;
+                    lookupResult.beatsToHighlight = [this._selectionStart.beat];
+                    this.cursorUpdateBeat(lookupResult, false);
                 }
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
                 // set playback range

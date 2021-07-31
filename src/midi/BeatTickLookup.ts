@@ -1,10 +1,13 @@
 import { Beat } from '@src/model/Beat';
+import { MasterBarTickLookup } from './MasterBarTickLookup';
 
 /**
  * Represents the time period, for which a {@link Beat} is played.
  */
 export class BeatTickLookup {
     private _highlightedBeats: Map<number, boolean> = new Map();
+
+    public index: number = 0;
 
     /**
      * Gets or sets the start time in midi ticks at which the given beat is played.
@@ -31,6 +34,8 @@ export class BeatTickLookup {
      * the beat of this lookup starts playing.
      */
     public beatsToHighlight: Beat[] = [];
+
+    public masterBar!: MasterBarTickLookup;
 
     public highlightBeat(beat: Beat): void {
         if (!this._highlightedBeats.has(beat.id)) {

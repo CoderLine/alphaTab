@@ -122,6 +122,12 @@ export class PlayerSettings {
     public enableAnimatedBeatCursor: boolean = true;
 
     /**
+     * Gets or sets whether the notation elements of the currently played beat should be
+     * highlighted 
+     */
+    public enableElementHighlighting: boolean = true;
+
+    /**
      * Gets or sets alphaTab should provide user interaction features to
      * select playback ranges and jump to the playback position by click (aka. seeking).
      */
