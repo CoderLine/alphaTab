@@ -33,6 +33,10 @@ export class CoreSettingsSerializer {
         o.set("logLevel", obj.logLevel as number); 
         o.set("useWorkers", obj.useWorkers); 
         o.set("includeNoteBounds", obj.includeNoteBounds); 
+        /*@target web*/
+        o.set("enableJqueryEvents", obj.enableJqueryEvents); 
+        /*@target web*/
+        o.set("enableBrowserEvents", obj.enableBrowserEvents); 
         return o; 
     }
     public static setProperty(obj: CoreSettings, property: string, v: unknown): boolean {
@@ -71,6 +75,14 @@ export class CoreSettingsSerializer {
                 return true;
             case "includenotebounds":
                 obj.includeNoteBounds = v! as boolean;
+                return true;
+            /*@target web*/
+            case "enablejqueryevents":
+                obj.enableJqueryEvents = v! as boolean;
+                return true;
+            /*@target web*/
+            case "enablebrowserevents":
+                obj.enableBrowserEvents = v! as boolean;
                 return true;
         } 
         return false; 

@@ -792,6 +792,9 @@ export class AlphaTabApiBase<TSettings> {
         if (cache) {
             let tracks: Track[] = this.tracks;
             if (tracks.length > 0) {
+                // TODO: perf - searching the new beat every time from scratch is not needed
+                // from the previous result we should know which the next beat is
+                // unless we're looping we can take the known next beat as a hint 
                 let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick);
                 if (beat) {
                     this.cursorUpdateBeat(beat.currentBeat, beat.nextBeat, beat.duration, stop, beat.beatsToHighlight);
@@ -831,9 +834,7 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        this.uiFacade.beginInvoke(() => {
-            this.internalCursorUpdateBeat(beat, nextBeat, duration, stop, beatsToHighlight, cache!, beatBoundings!);
-        });
+        this.internalCursorUpdateBeat(beat, nextBeat, duration, stop, beatsToHighlight, cache!, beatBoundings!);
     }
 
     private internalCursorUpdateBeat(

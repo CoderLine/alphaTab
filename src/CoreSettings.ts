@@ -67,6 +67,23 @@ export class CoreSettings {
     public includeNoteBounds: boolean = false;
 
     /**
+     * Gets or sets whether jQuery events are triggered beside
+     * the other event systems. This can gain a performance boost
+     * because these events can be costly on slow devices. 
+     * @target web
+     */
+    public enableJqueryEvents:boolean = true;
+
+     
+    /**
+     * Gets or sets whether native browser events are triggered beside
+     * the other event systems. This can gain a performance boost
+     * because these events can be costly on slow devices. 
+     * @target web
+     */
+    public enableBrowserEvents:boolean = true;
+
+    /**
      * @target web
      */
     public constructor() {

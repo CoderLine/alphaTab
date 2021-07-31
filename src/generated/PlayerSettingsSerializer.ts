@@ -29,6 +29,8 @@ export class PlayerSettingsSerializer {
         o.set("scrollOffsetY", obj.scrollOffsetY); 
         o.set("scrollMode", obj.scrollMode as number); 
         o.set("scrollSpeed", obj.scrollSpeed); 
+        /*@target web*/
+        o.set("nativeBrowserSmoothScroll", obj.nativeBrowserSmoothScroll); 
         o.set("songBookBendDuration", obj.songBookBendDuration); 
         o.set("songBookDipDuration", obj.songBookDipDuration); 
         o.set("vibrato", VibratoPlaybackSettingsSerializer.toJson(obj.vibrato)); 
@@ -64,6 +66,10 @@ export class PlayerSettingsSerializer {
                 return true;
             case "scrollspeed":
                 obj.scrollSpeed = v! as number;
+                return true;
+            /*@target web*/
+            case "nativebrowsersmoothscroll":
+                obj.nativeBrowserSmoothScroll = v! as boolean;
                 return true;
             case "songbookbendduration":
                 obj.songBookBendDuration = v! as number;

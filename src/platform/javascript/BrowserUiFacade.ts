@@ -191,18 +191,22 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         details: unknown = null,
         originalEvent?: IMouseEventArgs
     ): void {
-        let element: HTMLElement = (container as HtmlElementContainer).element;
-        name = 'alphaTab.' + name;
-        let e: any = document.createEvent('CustomEvent');
         let originalMouseEvent: MouseEvent | null = originalEvent
             ? (originalEvent as BrowserMouseEventArgs).mouseEvent
             : null;
-        e.initCustomEvent(name, false, false, details);
-        if (originalMouseEvent) {
-            e.originalEvent = originalMouseEvent;
+        let element: HTMLElement = (container as HtmlElementContainer).element;
+
+        if (this._api.settings.core.enableBrowserEvents) {
+            name = 'alphaTab.' + name;
+            let e: any = document.createEvent('CustomEvent');
+            e.initCustomEvent(name, false, false, details);
+            if (originalMouseEvent) {
+                e.originalEvent = originalMouseEvent;
+            }
+            element.dispatchEvent(e);
         }
-        element.dispatchEvent(e);
-        if (window && 'jQuery' in window) {
+
+        if (this._api.settings.core.enableJqueryEvents && window && 'jQuery' in window) {
             let jquery: any = (window as any)['jQuery'];
             let args: unknown[] = [];
             args.push(details);
