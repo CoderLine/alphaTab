@@ -17,7 +17,7 @@ import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { IUiFacade } from '@src/platform/IUiFacade';
-import { AlphaSynthWebAudioOutput } from '@src/platform/javascript/AlphaSynthWebAudioOutput';
+import { AlphaSynthScriptProcessorOutput } from '@src/platform/javascript/AlphaSynthScriptProcessorOutput';
 import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';
 import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWorkerScoreRenderer';
@@ -28,6 +28,7 @@ import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import { WebPlatform } from './WebPlatform';
 import { AlphaTabError } from '@src/AlphaTabError';
 import { AlphaTabErrorType } from '@src/alphatab';
+import { AlphaSynthAudioWorkletOutput } from './AlphaSynthAudioWorkletOutput';
 
 /**
  * @target web
@@ -431,7 +432,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
      * initializes a alphaSynth version for the client.
      */
     public createWorkerPlayer(): IAlphaSynth | null {
-        let supportsWebAudio: boolean = 'ScriptProcessorNode' in window;
+        
         let alphaSynthScriptFile: string | null = Environment.scriptFile;
         if (!alphaSynthScriptFile) {
             Logger.error('Player', 'alphaTab script file could not be detected, player cannot initialize');
@@ -439,10 +440,21 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
 
         let player: AlphaSynthWebWorkerApi | null = null;
-        if (supportsWebAudio) {
+        let supportsScriptProcessor: boolean = 'ScriptProcessorNode' in window;
+        let supportsAudioWorklets: boolean = window.isSecureContext && 'AudioWorkletNode' in window;
+        
+        if(supportsAudioWorklets) {
+            Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
+            player = new AlphaSynthWebWorkerApi(
+                new AlphaSynthAudioWorkletOutput(),
+                alphaSynthScriptFile,
+                this._api.settings.core.logLevel
+            );
+        }
+        else if (supportsScriptProcessor) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api for playback');
             player = new AlphaSynthWebWorkerApi(
-                new AlphaSynthWebAudioOutput(),
+                new AlphaSynthScriptProcessorOutput(),
                 alphaSynthScriptFile,
                 this._api.settings.core.logLevel
             );
