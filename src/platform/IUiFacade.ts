@@ -110,8 +110,9 @@ export interface IUiFacade<TSettings> {
     /**
      * Tells the UI layer to highlight the music notation elements with the given ID.
      * @param groupId The group id that identifies the elements to be highlighted.
+     * @param masterBarIndex The index of the related masterbar of the highlighted group.
      */
-    highlightElements(groupId: string): void;
+    highlightElements(groupId: string, masterBarIndex:number): void;
 
     /**
      * Creates a new UI element that is used to display the selection rectangle.

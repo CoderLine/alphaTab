@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Wpf
 {
@@ -42,18 +43,6 @@ namespace AlphaTab.Wpf
                 },
                 value => { }
             );
-        }
-
-        public double Top
-        {
-            get => (float) Canvas.GetTop(Control);
-            set => Canvas.SetTop(Control, value);
-        }
-
-        public double Left
-        {
-            get => (float) Canvas.GetLeft(Control);
-            set => Canvas.SetLeft(Control, value);
         }
 
         public double Width
@@ -133,13 +122,48 @@ namespace AlphaTab.Wpf
                 new DoubleAnimation(x, new Duration(TimeSpan.FromMilliseconds(duration))));
         }
 
-
         public void Clear()
         {
             if (Control is Panel p)
             {
                 p.Children.Clear();
             }
+        }
+
+        private readonly Bounds _lastBounds = new Bounds();
+
+        public Bounds GetBounds()
+        {
+            return _lastBounds;
+        }
+
+        public void SetBounds(double x, double y, double w, double h)
+        {
+            if (double.IsNaN(x))
+            {
+                x = _lastBounds.X;
+            }
+            if (double.IsNaN(y))
+            {
+                y = _lastBounds.Y;
+            }
+            if (double.IsNaN(w))
+            {
+                w = _lastBounds.W;
+            }
+            if (double.IsNaN(h))
+            {
+                h = _lastBounds.H;
+            }
+
+            Canvas.SetLeft(Control, x);
+            Canvas.SetTop(Control, y);
+            Control.Width = w;
+            Control.Height = h;
+            _lastBounds.X = x;
+            _lastBounds.Y = y;
+            _lastBounds.W = w;
+            _lastBounds.H = h;
         }
 
         public IEventEmitter Resize { get; set; }

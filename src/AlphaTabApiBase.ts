@@ -836,119 +836,131 @@ export class AlphaTabApiBase<TSettings> {
         if (beat === previousBeat && cache === previousCache && previousState === this._playerState) {
             return;
         }
-        let barCursor: IContainer | null = this._barCursor;
-        let beatCursor: IContainer | null = this._beatCursor;
+        let barCursor: IContainer = this._barCursor!;
+        let beatCursor: IContainer = this._beatCursor!;
         let beatBoundings: BeatBounds | null = cache.findBeat(beat);
         if (!beatBoundings) {
             return;
         }
+
         let barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
         let barBounds: Bounds = barBoundings.visualBounds;
-        if (barCursor) {
-            barCursor.top = barBounds.y;
-            barCursor.left = barBounds.x;
-            barCursor.width = barBounds.w;
-            barCursor.height = barBounds.h;
-        }
+        barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
 
-        if (beatCursor) {
-            // move beat to start position immediately
+        // move beat to start position immediately
+        if (this.settings.player.enableAnimatedBeatCursor) {
             beatCursor.stopAnimation();
-            beatCursor.top = barBounds.y;
-            beatCursor.left = beatBoundings.visualBounds.x;
-            beatCursor.height = barBounds.h;
         }
+        beatCursor.setBounds(beatBoundings.visualBounds.x, barBounds.y, 1, barBounds.h);
 
         // if playing, animate the cursor to the next beat
-        this.uiFacade.removeHighlights();
+        if (this.settings.player.enableElementHighlighting) {
+            this.uiFacade.removeHighlights();
+        }
         if (this._playerState === PlayerState.Playing || stop) {
             duration /= this.playbackSpeed;
             if (!stop) {
-                if (beatsToHighlight) {
+                if (this.settings.player.enableElementHighlighting && beatsToHighlight) {
                     for (let highlight of beatsToHighlight) {
                         let className: string = BeatContainerGlyph.getGroupId(highlight);
-                        this.uiFacade.highlightElements(className);
-                    }
-                }
-                let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
-                // get position of next beat on same stavegroup
-                if (nextBeat) {
-                    // if we are moving within the same bar or to the next bar
-                    // transition to the next beat, otherwise transition to the end of the bar.
-                    if (
-                        nextBeat.voice.bar.index === beat.voice.bar.index ||
-                        nextBeat.voice.bar.index === beat.voice.bar.index + 1
-                    ) {
-                        let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
-                        if (
-                            nextBeatBoundings &&
-                            nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                                barBoundings.staveGroupBounds
-                        ) {
-                            nextBeatX = nextBeatBoundings.visualBounds.x;
-                        }
+                        this.uiFacade.highlightElements(className, beat.voice.bar.index);
                     }
                 }
 
-                if (beatCursor) {
-                    this.uiFacade.beginInvoke(() => {
-                        // Logger.Info("Player",
-                        //    "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
-                        //    "(" + Player.PlaybackRange + ")");
-                        beatCursor!.transitionToX(duration, nextBeatX);
-                    });
+                if (this.settings.player.enableAnimatedBeatCursor) {
+                    let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
+                    // get position of next beat on same stavegroup
+                    if (nextBeat) {
+                        // if we are moving within the same bar or to the next bar
+                        // transition to the next beat, otherwise transition to the end of the bar.
+                        if (
+                            nextBeat.voice.bar.index === beat.voice.bar.index ||
+                            nextBeat.voice.bar.index === beat.voice.bar.index + 1
+                        ) {
+                            let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
+                            if (
+                                nextBeatBoundings &&
+                                nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
+                                    barBoundings.staveGroupBounds
+                            ) {
+                                nextBeatX = nextBeatBoundings.visualBounds.x;
+                            }
+                        }
+                    }
+
+                    if (beatCursor) {
+                        this.uiFacade.beginInvoke(() => {
+                            // Logger.Info("Player",
+                            //    "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
+                            //    "(" + Player.PlaybackRange + ")");
+                            beatCursor!.transitionToX(duration, nextBeatX);
+                        });
+                    }
                 }
             }
             if (!this._beatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
                 let scrollElement: IContainer = this.uiFacade.getScrollContainer();
                 let isVertical: boolean = Environment.getLayoutEngineFactory(this.settings).vertical;
                 let mode: ScrollMode = this.settings.player.scrollMode;
-                let elementOffset: Bounds = this.uiFacade.getOffset(scrollElement, this.container);
                 if (isVertical) {
-                    switch (mode) {
-                        case ScrollMode.Continuous:
-                            let y: number =
-                                elementOffset.y + barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
-                            if (y !== this._lastScroll) {
-                                this._lastScroll = y;
-                                this.uiFacade.scrollToY(scrollElement, y, this.settings.player.scrollSpeed);
-                            }
-                            break;
-                        case ScrollMode.OffScreen:
-                            let elementBottom: number =
-                                scrollElement.scrollTop + this.uiFacade.getOffset(null, scrollElement).h;
-                            if (
-                                barBoundings.visualBounds.y + barBoundings.visualBounds.h >= elementBottom ||
-                                barBoundings.visualBounds.y < scrollElement.scrollTop
-                            ) {
-                                let scrollTop: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
-                                this._lastScroll = barBoundings.visualBounds.x;
-                                this.uiFacade.scrollToY(scrollElement, scrollTop, this.settings.player.scrollSpeed);
-                            }
-                            break;
+                    // when scrolling on the y-axis, we preliminary check if the new beat/bar have
+                    // moved on the y-axis
+                    let y: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
+                    if (y !== this._lastScroll) {
+                        this._lastScroll = y;
+                        switch (mode) {
+                            case ScrollMode.Continuous:
+                                let elementOffset: Bounds = this.uiFacade.getOffset(scrollElement, this.container);
+                                this.uiFacade.scrollToY(
+                                    scrollElement,
+                                    elementOffset.y + y,
+                                    this.settings.player.scrollSpeed
+                                );
+                                break;
+                            case ScrollMode.OffScreen:
+                                let elementBottom: number =
+                                    scrollElement.scrollTop + this.uiFacade.getOffset(null, scrollElement).h;
+                                if (
+                                    barBoundings.visualBounds.y + barBoundings.visualBounds.h >= elementBottom ||
+                                    barBoundings.visualBounds.y < scrollElement.scrollTop
+                                ) {
+                                    let scrollTop: number =
+                                        barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
+                                    this.uiFacade.scrollToY(scrollElement, scrollTop, this.settings.player.scrollSpeed);
+                                }
+                                break;
+                        }
                     }
                 } else {
-                    switch (mode) {
-                        case ScrollMode.Continuous:
-                            let x: number = barBoundings.visualBounds.x;
-                            if (x !== this._lastScroll) {
-                                let scrollLeft: number = barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
+                    // when scrolling on the x-axis, we preliminary check if the new bar has
+                    // moved on the x-axis
+                    let x: number = barBoundings.visualBounds.x;
+                    if (x !== this._lastScroll) {
+                        this._lastScroll = x;
+                        switch (mode) {
+                            case ScrollMode.Continuous:
+                                let scrollLeftContinuous: number = barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
                                 this._lastScroll = barBoundings.visualBounds.x;
-                                this.uiFacade.scrollToX(scrollElement, scrollLeft, this.settings.player.scrollSpeed);
-                            }
-                            break;
-                        case ScrollMode.OffScreen:
-                            let elementRight: number =
-                                scrollElement.scrollLeft + this.uiFacade.getOffset(null, scrollElement).w;
-                            if (
-                                barBoundings.visualBounds.x + barBoundings.visualBounds.w >= elementRight ||
-                                barBoundings.visualBounds.x < scrollElement.scrollLeft
-                            ) {
-                                let scrollLeft: number = barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
-                                this._lastScroll = barBoundings.visualBounds.x;
-                                this.uiFacade.scrollToX(scrollElement, scrollLeft, this.settings.player.scrollSpeed);
-                            }
-                            break;
+                                this.uiFacade.scrollToX(scrollElement, scrollLeftContinuous, this.settings.player.scrollSpeed);
+                                break;
+                            case ScrollMode.OffScreen:
+                                let elementRight: number =
+                                    scrollElement.scrollLeft + this.uiFacade.getOffset(null, scrollElement).w;
+                                if (
+                                    barBoundings.visualBounds.x + barBoundings.visualBounds.w >= elementRight ||
+                                    barBoundings.visualBounds.x < scrollElement.scrollLeft
+                                ) {
+                                    let scrollLeftOffScreen: number =
+                                        barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
+                                    this._lastScroll = barBoundings.visualBounds.x;
+                                    this.uiFacade.scrollToX(
+                                        scrollElement,
+                                        scrollLeftOffScreen,
+                                        this.settings.player.scrollSpeed
+                                    );
+                                }
+                                break;
+                        }
                     }
                 }
             }
@@ -1178,35 +1190,43 @@ export class AlphaTabApiBase<TSettings> {
                 startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.x +
                 startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.w;
             let startSelection: IContainer = this.uiFacade.createSelectionElement()!;
-            startSelection.top = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
-            startSelection.left = startX;
-            startSelection.width = staffEndX - startX;
-            startSelection.height = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h;
+            startSelection.setBounds(
+                startX,
+                startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
+                staffEndX - startX,
+                startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
+            );
             selectionWrapper.appendChild(startSelection);
             let staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index + 1;
             let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index;
             for (let staffIndex: number = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
                 let staffBounds: StaveGroupBounds = cache.staveGroups[staffIndex];
                 let middleSelection: IContainer = this.uiFacade.createSelectionElement()!;
-                middleSelection.top = staffBounds.visualBounds.y;
-                middleSelection.left = staffStartX;
-                middleSelection.width = staffEndX - staffStartX;
-                middleSelection.height = staffBounds.visualBounds.h;
+                middleSelection.setBounds(
+                    staffStartX,
+                    staffBounds.visualBounds.y,
+                    staffEndX - staffStartX,
+                    staffBounds.visualBounds.h
+                );
                 selectionWrapper.appendChild(middleSelection);
             }
             let endSelection: IContainer = this.uiFacade.createSelectionElement()!;
-            endSelection.top = endBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
-            endSelection.left = staffStartX;
-            endSelection.width = endX - staffStartX;
-            endSelection.height = endBeat.bounds!.barBounds.masterBarBounds.visualBounds.h;
+            endSelection.setBounds(
+                staffStartX,
+                endBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
+                endX - staffStartX,
+                endBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
+            );
             selectionWrapper.appendChild(endSelection);
         } else {
             // if the beats are on the same staff, we simply highlight from the startbeat to endbeat
             let selection: IContainer = this.uiFacade.createSelectionElement()!;
-            selection.top = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y;
-            selection.left = startX;
-            selection.width = endX - startX;
-            selection.height = startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h;
+            selection.setBounds(
+                startX,
+                startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
+                endX - startX,
+                startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
+            );
             selectionWrapper.appendChild(selection);
         }
     }
@@ -1311,7 +1331,8 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'midiFileLoaded', e);
     }
 
-    public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<PlayerStateChangedEventArgs>();
+    public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> =
+        new EventEmitterOfT<PlayerStateChangedEventArgs>();
     private onPlayerStateChanged(e: PlayerStateChangedEventArgs): void {
         if (this._isDestroyed) {
             return;
@@ -1320,7 +1341,8 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'playerStateChanged', e);
     }
 
-    public playerPositionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
+    public playerPositionChanged: IEventEmitterOfT<PositionChangedEventArgs> =
+        new EventEmitterOfT<PositionChangedEventArgs>();
     private onPlayerPositionChanged(e: PositionChangedEventArgs): void {
         if (this._isDestroyed) {
             return;
@@ -1329,7 +1351,8 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'playerPositionChanged', e);
     }
 
-    public midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
+    public midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
+        new EventEmitterOfT<MidiEventsPlayedEventArgs>();
     private onMidiEventsPlayed(e: MidiEventsPlayedEventArgs): void {
         if (this._isDestroyed) {
             return;
