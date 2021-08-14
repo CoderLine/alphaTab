@@ -91,7 +91,7 @@ namespace AlphaTab.Platform.CSharp
         public abstract Cursors? CreateCursors();
         public abstract void BeginInvoke(Action action);
         public abstract void RemoveHighlights();
-        public abstract void HighlightElements(string groupId);
+        public abstract void HighlightElements(string groupId, double masterBarIndex);
         public abstract IContainer? CreateSelectionElement();
         public abstract IContainer GetScrollContainer();
         public abstract Bounds GetOffset(IContainer? scrollElement, IContainer container);

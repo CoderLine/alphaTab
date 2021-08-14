@@ -56,6 +56,7 @@ import { CapellaImporter } from './importer/CapellaImporter';
 import { ResizeObserverPolyfill } from './platform/javascript/ResizeObserverPolyfill';
 import { WebPlatform } from './platform/javascript/WebPlatform';
 import { IntersectionObserverPolyfill } from './platform/javascript/IntersectionObserverPolyfill';
+import { AlphaSynthWebWorklet } from './platform/javascript/AlphaSynthAudioWorkletOutput';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -207,6 +208,13 @@ export class Environment {
 
     /**
      * @target web
+     */
+    public static get isRunningInAudioWorklet(): boolean {
+        return 'AudioWorkletGlobalScope' in Environment.globalThis;
+    }
+
+    /**
+     * @target web
      * @partial
      */
     public static throttle(action: () => void, delay: number): () => void {
@@ -221,7 +229,7 @@ export class Environment {
      * @target web
      */
     private static detectScriptFile(): string | null {
-        if (Environment.isRunningInWorker || Environment.webPlatform !== WebPlatform.Browser) {
+        if (!('document' in Environment.globalThis)) {
             return null;
         }
         return (document.currentScript as HTMLScriptElement).src;
@@ -462,7 +470,9 @@ export class Environment {
      * @partial
      */
     public static platformInit(): void {
-        if (Environment.isRunningInWorker) {
+        if (Environment.isRunningInAudioWorklet) {
+            AlphaSynthWebWorklet.init();
+        } else if (Environment.isRunningInWorker) {
             AlphaTabWebWorker.init();
             AlphaSynthWebWorker.init();
         } else if (Environment.webPlatform === WebPlatform.Browser) {
