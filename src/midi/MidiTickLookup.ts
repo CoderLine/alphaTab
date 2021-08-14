@@ -43,7 +43,7 @@ export class MidiTickLookupFindBeatResult {
     /**
      * Gets or sets the beat lookup for the next beat.
      */
-    public nextBeatLookup!: BeatTickLookup | null;
+    public nextBeatLookup: BeatTickLookup | null = null;
 }
 
 /**
