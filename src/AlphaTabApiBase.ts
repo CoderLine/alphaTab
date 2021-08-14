@@ -761,7 +761,7 @@ export class AlphaTabApiBase<TSettings> {
         this._playerState = PlayerState.Paused;
         // we need to update our position caches if we render a tablature
         this.renderer.postRenderFinished.on(() => {
-            this.cursorUpdateTick(this._previousTick, false, false);
+            this.cursorUpdateTick(this._previousTick, false, true);
         });
         if (this.player) {
             this.player.positionChanged.on(e => {
