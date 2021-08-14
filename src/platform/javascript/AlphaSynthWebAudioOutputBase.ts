@@ -6,6 +6,9 @@ import { ISynthOutput } from '@src/synth/ISynthOutput';
 
 declare var webkitAudioContext: any;
 
+/**
+ * @target web
+ */
 export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     protected static readonly BufferSize: number = 4096;
     protected static readonly PreferredSampleRate: number = 44100;
