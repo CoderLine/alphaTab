@@ -1,0 +1,28 @@
+---
+title: player.nativeBrowserSmoothScroll
+javaScriptOnly: true
+category: Player
+description: Gets or sets whether the native browser smooth scroll mechanism should be used over a custom animation.
+sidebarPath: /docs/reference/settings
+since: 1.3.0-alpha.125
+---
+
+import PropertyDescription from '../../../../src/property-description';
+import {TypeTable, TypeRow} from '../../../../src/type-table';
+
+## Description
+
+This setting configures whether the [native browser feature](https://developer.mozilla.org/en-US/docs/Web/API/ScrollToOptions/behavior) for smooth scrolling should be used over
+a custom animation. If this setting is enabled, options like the `scrollSpeed` will not have any effect anymore.
+
+<PropertyDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow name="bool" />
+</TypeTable>
+
+## Default Value
+
+`true`
