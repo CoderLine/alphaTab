@@ -79,6 +79,11 @@ export class AlphaSynthWebWorklet {
                     }
                     let left: Float32Array = outputs[0][0];
                     let right: Float32Array = outputs[0][1];
+
+                    if (!left || !right) {
+                        return true;
+                    }
+
                     let samples: number = left.length + right.length;
                     let buffer = this._outputBuffer;
                     if (buffer.length !== samples) {

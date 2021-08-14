@@ -618,6 +618,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     public createSelectionElement(): IContainer | null {
         let element: HTMLElement = document.createElement('div');
         element.style.position = 'absolute';
+        element.style.width = '1px';
+        element.style.height = '1px';
         return new HtmlElementContainer(element);
     }
 

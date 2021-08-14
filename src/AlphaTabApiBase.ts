@@ -725,7 +725,7 @@ export class AlphaTabApiBase<TSettings> {
     private _selectionWrapper: IContainer | null = null;
     private _previousTick: number = 0;
     private _playerState: PlayerState = PlayerState.Paused;
-    private _currentBeat: Beat | null = null;
+    private _currentBeat: MidiTickLookupFindBeatResult | null = null;
     private _previousStateForCursor: PlayerState = PlayerState.Paused;
     private _previousCursorCache: BoundsLookup | null = null;
     private _lastScroll: number = 0;
@@ -761,23 +761,24 @@ export class AlphaTabApiBase<TSettings> {
         this._playerState = PlayerState.Paused;
         // we need to update our position caches if we render a tablature
         this.renderer.postRenderFinished.on(() => {
-            this.cursorUpdateTick(this._previousTick, false);
+            this.cursorUpdateTick(this._previousTick, false, true);
         });
         if (this.player) {
             this.player.positionChanged.on(e => {
                 this._previousTick = e.currentTick;
                 this.uiFacade.beginInvoke(() => {
-                    this.cursorUpdateTick(e.currentTick, false);
+                    this.cursorUpdateTick(e.currentTick, false, e.isSeek);
                 });
             });
             this.player.stateChanged.on(e => {
                 this._playerState = e.state;
                 if (!e.stopped && e.state === PlayerState.Paused) {
-                    let currentBeat: Beat | null = this._currentBeat;
-                    let tickCache: MidiTickLookup | null = this._tickCache;
+                    let currentBeat = this._currentBeat;
+                    let tickCache = this._tickCache;
                     if (currentBeat && tickCache) {
                         this.player!.tickPosition =
-                            tickCache.getMasterBarStart(currentBeat.voice.bar.masterBar) + currentBeat.playbackStart;
+                            tickCache.getMasterBarStart(currentBeat.currentBeat.voice.bar.masterBar) +
+                            currentBeat.currentBeat.playbackStart;
                     }
                 }
             });
@@ -789,37 +790,32 @@ export class AlphaTabApiBase<TSettings> {
      * @param tick
      * @param stop
      */
-    private cursorUpdateTick(tick: number, stop: boolean = false): void {
-        this.uiFacade.beginInvoke(() => {
-            let cache: MidiTickLookup | null = this._tickCache;
-            if (cache) {
-                let tracks: Track[] = this.tracks;
-                if (tracks.length > 0) {
-                    let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick);
-                    if (beat) {
-                        this.cursorUpdateBeat(
-                            beat.currentBeat,
-                            beat.nextBeat,
-                            beat.duration,
-                            stop,
-                            beat.beatsToHighlight
-                        );
-                    }
+    private cursorUpdateTick(tick: number, stop: boolean, forceImmediateUpdate: boolean): void {
+        let cache: MidiTickLookup | null = this._tickCache;
+        if (cache) {
+            let tracks: Track[] = this.tracks;
+            if (tracks.length > 0) {
+                let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
+                if (beat) {
+                    this.cursorUpdateBeat(beat, stop, forceImmediateUpdate);
                 }
             }
-        });
+        }
     }
 
     /**
      * updates the cursors to highlight the specified beat
      */
     private cursorUpdateBeat(
-        beat: Beat,
-        nextBeat: Beat | null,
-        duration: number,
+        lookupResult: MidiTickLookupFindBeatResult,
         stop: boolean,
-        beatsToHighlight: Beat[] | null = null
+        forceImmediateUpdate: boolean
     ): void {
+        const beat: Beat = lookupResult.currentBeat;
+        const nextBeat: Beat | null = lookupResult.nextBeat;
+        const duration: number = lookupResult.duration;
+        const beatsToHighlight = lookupResult.beatsToHighlight;
+
         if (!beat) {
             return;
         }
@@ -827,27 +823,59 @@ export class AlphaTabApiBase<TSettings> {
         if (!cache) {
             return;
         }
-        let previousBeat: Beat | null = this._currentBeat;
+        let previousBeat = this._currentBeat;
         let previousCache: BoundsLookup | null = this._previousCursorCache;
         let previousState: PlayerState | null = this._previousStateForCursor;
-        this._currentBeat = beat;
+        this._currentBeat = lookupResult;
         this._previousCursorCache = cache;
         this._previousStateForCursor = this._playerState;
-        if (beat === previousBeat && cache === previousCache && previousState === this._playerState) {
+        if (beat === previousBeat?.currentBeat && cache === previousCache && previousState === this._playerState) {
             return;
         }
-        let barCursor: IContainer = this._barCursor!;
-        let beatCursor: IContainer = this._beatCursor!;
         let beatBoundings: BeatBounds | null = cache.findBeat(beat);
         if (!beatBoundings) {
             return;
         }
 
+        this.uiFacade.beginInvoke(() => {
+            this.internalCursorUpdateBeat(
+                beat,
+                nextBeat,
+                duration,
+                stop,
+                beatsToHighlight,
+                cache!,
+                beatBoundings!,
+                forceImmediateUpdate
+            );
+        });
+    }
+
+    private internalCursorUpdateBeat(
+        beat: Beat,
+        nextBeat: Beat | null,
+        duration: number,
+        stop: boolean,
+        beatsToHighlight: Beat[] | null,
+        cache: BoundsLookup,
+        beatBoundings: BeatBounds,
+        forceImmediateUpdate: boolean
+    ) {
+        let barCursor: IContainer = this._barCursor!;
+        let beatCursor: IContainer = this._beatCursor!;
+
         let barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
         let barBounds: Bounds = barBoundings.visualBounds;
+        let needsNewAnimationFrame = false;
+
         barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
 
         // move beat to start position immediately
+        const previousBeatBounds: Bounds = beatCursor.getBounds();
+        needsNewAnimationFrame =
+            forceImmediateUpdate ||
+            previousBeatBounds!.y !== barBounds.y ||
+            beatBoundings.visualBounds.x < previousBeatBounds!.x;
         if (this.settings.player.enableAnimatedBeatCursor) {
             beatCursor.stopAnimation();
         }
@@ -874,7 +902,7 @@ export class AlphaTabApiBase<TSettings> {
                         // if we are moving within the same bar or to the next bar
                         // transition to the next beat, otherwise transition to the end of the bar.
                         if (
-                            nextBeat.voice.bar.index === beat.voice.bar.index ||
+                            (nextBeat.voice.bar.index === beat.voice.bar.index && nextBeat.index > beat.index) ||
                             nextBeat.voice.bar.index === beat.voice.bar.index + 1
                         ) {
                             let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
@@ -888,13 +916,17 @@ export class AlphaTabApiBase<TSettings> {
                         }
                     }
 
-                    if (beatCursor) {
+                    // we need to put the transition to an own animation frame
+                    // otherwise the stop animation above is not applied.
+                    // but only if we changed on the y axis.
+                    // as long we scroll horizontally we can keep the animation
+                    // alive.
+                    if (needsNewAnimationFrame) {
                         this.uiFacade.beginInvoke(() => {
-                            // Logger.Info("Player",
-                            //    "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
-                            //    "(" + Player.PlaybackRange + ")");
                             beatCursor!.transitionToX(duration, nextBeatX);
                         });
+                    } else {
+                        beatCursor.transitionToX(duration, nextBeatX);
                     }
                 }
             }
@@ -939,9 +971,14 @@ export class AlphaTabApiBase<TSettings> {
                         this._lastScroll = x;
                         switch (mode) {
                             case ScrollMode.Continuous:
-                                let scrollLeftContinuous: number = barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
+                                let scrollLeftContinuous: number =
+                                    barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
                                 this._lastScroll = barBoundings.visualBounds.x;
-                                this.uiFacade.scrollToX(scrollElement, scrollLeftContinuous, this.settings.player.scrollSpeed);
+                                this.uiFacade.scrollToX(
+                                    scrollElement,
+                                    scrollLeftContinuous,
+                                    this.settings.player.scrollSpeed
+                                );
                                 break;
                             case ScrollMode.OffScreen:
                                 let elementRight: number =
@@ -1044,7 +1081,7 @@ export class AlphaTabApiBase<TSettings> {
                 // move to selection start
                 this._currentBeat = null; // reset current beat so it is updating the cursor
                 if (this._playerState === PlayerState.Paused) {
-                    this.cursorUpdateBeat(this._selectionStart.beat, null, 0, false, [this._selectionStart.beat]);
+                    this.cursorUpdateTick(this._selectionStart.beat.absolutePlaybackStart, false, true);
                 }
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
                 // set playback range
