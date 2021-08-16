@@ -103,7 +103,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     public pause(): void {
         if (this._source) {
             this._source.stop(0);
-            this._source.disconnect(0);
+            this._source.disconnect();
         }
         this._source = null;
     }

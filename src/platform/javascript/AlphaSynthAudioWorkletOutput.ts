@@ -149,10 +149,13 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
         // create a script processor node which will replace the silence with the generated audio
         ctx.audioWorklet.addModule(Environment.scriptFile!).then(
             () => {
-                this._worklet = new AudioWorkletNode(ctx!, 'alphatab');
+                this._worklet = new AudioWorkletNode(ctx!, 'alphatab', {
+                    numberOfOutputs: 1,
+                    outputChannelCount: [2]
+                });
                 this._worklet.port.onmessage = this.handleMessage.bind(this);
 
-                this._source!.connect(this._worklet, 0, 0);
+                this._source!.connect(this._worklet);
                 this._source!.start(0);
                 this._worklet.connect(ctx!.destination);
             },
@@ -178,7 +181,8 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     public pause(): void {
         super.pause();
         if (this._worklet) {
-            this._worklet.disconnect(0);
+            this._worklet.port.onmessage = null;
+            this._worklet.disconnect();
         }
         this._worklet = null;
     }
