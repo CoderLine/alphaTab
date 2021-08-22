@@ -20,14 +20,31 @@ declare var AudioWorkletProcessor: {
     new (options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
 };
 
+// Bug 646: Safari 14.1 is buggy regarding audio worklets
+// globalThis cannot be used to access registerProcessor or samplerate
+// we need to really use them as globals
+/**
+ * @target web
+ */
+declare var registerProcessor: any;
+/**
+ * @target web
+ */
+declare var sampleRate: number;
+
 /**
  * This class implements a HTML5 Web Audio API based audio output device
  * for alphaSynth using the modern Audio Worklets.
  * @target web
  */
 export class AlphaSynthWebWorklet {
+    private static _isRegistered = false;
     public static init() {
-        (Environment.globalThis as any).registerProcessor(
+        if(AlphaSynthWebWorklet._isRegistered) {
+            return;
+        }
+        AlphaSynthWebWorklet._isRegistered = true; 
+        registerProcessor(
             'alphatab',
             class AlphaSynthWebWorkletProcessor extends AudioWorkletProcessor {
                 public static readonly BufferSize: number = 4096;
@@ -41,9 +58,11 @@ export class AlphaSynthWebWorklet {
                 constructor(...args: any[]) {
                     super(...args);
 
+                    Logger.info('WebAudio', 'creating processor');
+
                     this._bufferCount = Math.floor(
                         (AlphaSynthWebWorkletProcessor.TotalBufferTimeInMilliseconds *
-                            Environment.globalThis.sampleRate) /
+                            sampleRate) /
                             1000 /
                             AlphaSynthWebWorkletProcessor.BufferSize
                     );
@@ -77,6 +96,7 @@ export class AlphaSynthWebWorklet {
                     if (outputs.length !== 1 && outputs[0].length !== 2) {
                         return false;
                     }
+
                     let left: Float32Array = outputs[0][0];
                     let right: Float32Array = outputs[0][1];
 
@@ -160,7 +180,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
                 this._worklet.connect(ctx!.destination);
             },
             reason => {
-                Logger.debug('WebAudio', `Audio Worklet creation failed: reason=${reason}`);
+                Logger.error('WebAudio', `Audio Worklet creation failed: reason=${reason}`);
             }
         );
     }
