@@ -1,7 +1,7 @@
-name: 🕷️ Bug (Form)
+name: 🕷️ Bug Report
 description: Report a bug.
-title: "<title>"
 labels: ":spider: type-bug"
+assignees: Danielku15
 body:
 - type: checkboxes
   attributes:
