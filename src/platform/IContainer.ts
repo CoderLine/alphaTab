@@ -1,6 +1,5 @@
 import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import { Bounds } from '@src/rendering/utils/Bounds';
 
 /**
  * This interface represents a container control in the UI layer.
