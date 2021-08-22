@@ -761,13 +761,13 @@ export class AlphaTabApiBase<TSettings> {
         this._playerState = PlayerState.Paused;
         // we need to update our position caches if we render a tablature
         this.renderer.postRenderFinished.on(() => {
-            this.cursorUpdateTick(this._previousTick, false, true);
+            this.cursorUpdateTick(this._previousTick, false);
         });
         if (this.player) {
             this.player.positionChanged.on(e => {
                 this._previousTick = e.currentTick;
                 this.uiFacade.beginInvoke(() => {
-                    this.cursorUpdateTick(e.currentTick, false, e.isSeek);
+                    this.cursorUpdateTick(e.currentTick, false);
                 });
             });
             this.player.stateChanged.on(e => {
@@ -790,14 +790,14 @@ export class AlphaTabApiBase<TSettings> {
      * @param tick
      * @param stop
      */
-    private cursorUpdateTick(tick: number, stop: boolean, forceImmediateUpdate: boolean): void {
+    private cursorUpdateTick(tick: number, stop: boolean): void {
         let cache: MidiTickLookup | null = this._tickCache;
         if (cache) {
             let tracks: Track[] = this.tracks;
             if (tracks.length > 0) {
                 let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
                 if (beat) {
-                    this.cursorUpdateBeat(beat, stop, forceImmediateUpdate);
+                    this.cursorUpdateBeat(beat, stop);
                 }
             }
         }
@@ -808,8 +808,7 @@ export class AlphaTabApiBase<TSettings> {
      */
     private cursorUpdateBeat(
         lookupResult: MidiTickLookupFindBeatResult,
-        stop: boolean,
-        forceImmediateUpdate: boolean
+        stop: boolean
     ): void {
         const beat: Beat = lookupResult.currentBeat;
         const nextBeat: Beat | null = lookupResult.nextBeat;
@@ -845,8 +844,7 @@ export class AlphaTabApiBase<TSettings> {
                 stop,
                 beatsToHighlight,
                 cache!,
-                beatBoundings!,
-                forceImmediateUpdate
+                beatBoundings!
             );
         });
     }
@@ -858,24 +856,17 @@ export class AlphaTabApiBase<TSettings> {
         stop: boolean,
         beatsToHighlight: Beat[] | null,
         cache: BoundsLookup,
-        beatBoundings: BeatBounds,
-        forceImmediateUpdate: boolean
+        beatBoundings: BeatBounds
     ) {
         let barCursor: IContainer = this._barCursor!;
         let beatCursor: IContainer = this._beatCursor!;
 
         let barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
         let barBounds: Bounds = barBoundings.visualBounds;
-        let needsNewAnimationFrame = false;
 
         barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
 
         // move beat to start position immediately
-        const previousBeatBounds: Bounds = beatCursor.getBounds();
-        needsNewAnimationFrame =
-            forceImmediateUpdate ||
-            previousBeatBounds!.y !== barBounds.y ||
-            beatBoundings.visualBounds.x < previousBeatBounds!.x;
         if (this.settings.player.enableAnimatedBeatCursor) {
             beatCursor.stopAnimation();
         }
@@ -918,16 +909,9 @@ export class AlphaTabApiBase<TSettings> {
 
                     // we need to put the transition to an own animation frame
                     // otherwise the stop animation above is not applied.
-                    // but only if we changed on the y axis.
-                    // as long we scroll horizontally we can keep the animation
-                    // alive.
-                    if (needsNewAnimationFrame) {
-                        this.uiFacade.beginInvoke(() => {
-                            beatCursor!.transitionToX(duration, nextBeatX);
-                        });
-                    } else {
-                        beatCursor.transitionToX(duration, nextBeatX);
-                    }
+                    this.uiFacade.beginInvoke(() => {
+                        beatCursor!.transitionToX(duration, nextBeatX);
+                    });
                 }
             }
             if (!this._beatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
@@ -1081,7 +1065,7 @@ export class AlphaTabApiBase<TSettings> {
                 // move to selection start
                 this._currentBeat = null; // reset current beat so it is updating the cursor
                 if (this._playerState === PlayerState.Paused) {
-                    this.cursorUpdateTick(this._selectionStart.beat.absolutePlaybackStart, false, true);
+                    this.cursorUpdateTick(this._selectionStart.beat.absolutePlaybackStart, false);
                 }
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
                 // set playback range

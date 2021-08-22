@@ -143,10 +143,6 @@ export class HtmlElementContainer implements IContainer {
 
     private _lastBounds: Bounds = new Bounds();
 
-    public getBounds() {
-        return this._lastBounds;
-    }
-
     public setBounds(x: number, y: number, w: number, h: number) {
         if (isNaN(x)) {
             x = this._lastBounds.x;
