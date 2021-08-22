@@ -52,12 +52,6 @@ export interface IContainer {
     setBounds(x: number, y: number, w: number, h: number): void;
 
     /**
-     * Gets the current position and size of the container. These
-     * values might be only filled correctly after a call to setBounds.
-     */
-    getBounds(): Bounds;
-
-    /**
      * Tells the control to move to the given X-position in the given time.
      * @param duration The milliseconds that should be needed to reach the new X-position
      * @param x The new X-position

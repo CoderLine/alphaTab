@@ -105,39 +105,12 @@ namespace AlphaTab.WinForms
             Control.Controls.Clear();
         }
 
-        private readonly Bounds _lastBounds = new Bounds();
-
-        public Bounds GetBounds()
-        {
-            return _lastBounds;
-        }
-
         public void SetBounds(double x, double y, double w, double h)
         {
-            if (double.IsNaN(x))
-            {
-                x = _lastBounds.X;
-            }
-            if (double.IsNaN(y))
-            {
-                y = _lastBounds.Y;
-            }
-            if (double.IsNaN(w))
-            {
-                w = _lastBounds.W;
-            }
-            if (double.IsNaN(h))
-            {
-                h = _lastBounds.H;
-            }
             Control.Left = (int)x;
             Control.Top = (int)y;
             Control.Width = (int)w;
             Control.Height = (int)h;
-            _lastBounds.X = x;
-            _lastBounds.Y = y;
-            _lastBounds.W = w;
-            _lastBounds.H = h;
         }
 
         public IEventEmitter Resize { get; set; }
