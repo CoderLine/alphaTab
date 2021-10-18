@@ -416,10 +416,11 @@ export class MusicXmlImporter extends ScoreImporter {
     private _divisionsPerQuarterNote: number = 0;
 
     private parseHarmony(element: XmlNode, track: Track): void {
-        let rootStep: string | null = null;
+        let rootStep: string = '';
         let rootAlter: string = '';
-        // let kind: string | null = null;
-        // let kindText: string | null = null;
+        let kind: string  = '';
+        let kindText: string = '';
+        let chord: Chord = new Chord();
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -431,7 +432,7 @@ export class MusicXmlImporter extends ScoreImporter {
                                         rootStep = rootChild.innerText;
                                         break;
                                     case 'root-alter':
-                                        switch (parseInt(c.innerText)) {
+                                        switch (parseInt(rootChild.innerText)) {
                                             case -2:
                                                 rootAlter = ' bb';
                                                 break;
@@ -454,92 +455,153 @@ export class MusicXmlImporter extends ScoreImporter {
                         }
                         break;
                     case 'kind':
-                        // kindText = c.getAttribute('text');
-                        // kind = c.innerText;
+                        kind = c.innerText;
+                        if(c.getAttribute('text')){      
+                            kindText = c.getAttribute('text');
+                        } else {
+                            switch (kind) {
+                                // triads
+                                case "major":
+                                    kindText = '';
+                                    break;
+                                case "minor":
+                                    kindText = "m";
+                                    break;
+                                case "augmented":
+                                    kindText = "+";
+                                    break;
+                                case "diminished":
+                                    kindText = "\u25CB";
+                                    break;
+                                // Sevenths
+                                case "dominant":
+                                    kindText = "7";
+                                    break;
+                                case "major-seventh":
+                                    kindText = "maj7";
+                                    break;
+                                case "minor-seventh":
+                                    kindText = "m7";
+                                    break;
+                                case "diminished-seventh":
+                                    kindText = "\u25CB7";
+                                    break;
+                                case "augmented-seventh":
+                                    kindText = "+7";
+                                    break;
+                                case "half-diminished":
+                                    kindText = "\u2349";
+                                    break;
+                                // Sixths
+                                case "major-sixth":
+                                    kindText = "maj6";
+                                    break;
+                                case "minor-sixth":
+                                    kindText = "m6";
+                                    break;
+                                // Ninths
+                                case "dominant-ninth":
+                                    kindText = "9";
+                                    break;
+                                case "major-ninth":
+                                    kindText = "maj9";
+                                    break;
+                                case "minor-ninth":
+                                    kindText = "m9";
+                                    break;
+                                // 11ths
+                                case "dominant-11th":
+                                    kindText = "11";
+                                    break;
+                                case "major-11th":
+                                    kindText = "maj11";
+                                    break;
+                                case "minor-11th":
+                                    kindText = "m11";
+                                    break;
+                                // 13ths
+                                case "dominant-13th":
+                                    kindText = "13";
+                                    break;
+                                case "major-13th":
+                                    kindText = "maj13";
+                                    break;
+                                case "minor-13th":
+                                    kindText = "m13";
+                                    break;
+                                // Suspended
+                                case "suspended-second":
+                                    kindText = "sus2";
+                                    break;
+                                case "suspended-fourth":
+                                    kindText = "sus4";
+                                    break;
+                            // TODO: find proper names for the rest
+                            //    case "major-minor":
+                            //        break;
+                            //    // Functional sixths
+                            //    case "Neapolitan":
+                            //        break;
+                            //    case "Italian":
+                            //        break;
+                            //    case "French":
+                            //        break;
+                            //    case "German":
+                            //        break;
+                            //    // Other
+                            //    case "pedal":
+                            //        break;
+                            //    case "power":
+                            //        break;
+                            //    case "Tristan":
+                            //        break;
+                            // 
+                            }
+                        }
                         break;
-                }
+                    case 'frame':
+                        for (let frameChild of c.childNodes) {
+                            if (frameChild.nodeType === XmlNodeType.Element) {
+                                switch (frameChild.localName) {
+                                    case 'frame-strings':
+                                        let stringsCount:number = parseInt(frameChild.innerText);
+                                        for(let i = 0; i < stringsCount; i++){ // set strings unplayed as default
+                                            chord.strings[i] = -1;
+                                        } 
+                                        break;                               
+                                    case 'first-fret':
+                                        chord.firstFret = parseInt(frameChild.innerText);
+                                        break;
+                                    case 'frame-note':
+                                        let stringNo: number | null = null;
+                                        let fretNo: number | null  = null;
+                                        for (let noteChild of frameChild.childNodes) {
+                                            switch (noteChild.localName) {
+                                                case 'string':
+                                                    stringNo = parseInt(noteChild.innerText);
+                                                    break;
+                                                case 'fret':
+                                                    fretNo = parseInt(noteChild.innerText);
+                                                    if (stringNo && fretNo){
+                                                        chord.strings[stringNo - 1] = fretNo;																
+                                                    }
+                                                    break;
+                                                case 'barre':
+                                                    if (stringNo && fretNo && noteChild.getAttribute('type') === "start"){														
+                                                        chord.barreFrets.push(fretNo);
+                                                    }
+                                                    break;
+                                            }
+                                        }
+                                        break;		
+                                }
+                            }
+                        }
+                        break
+                }		
             }
         }
-        let chord: Chord = new Chord();
-        chord.name = rootStep + rootAlter;
-        // TODO: find proper names for the rest
-        // switch (kind)
-        // {
-        //    // triads
-        //    case "major":
-        //        break;
-        //    case "minor":
-        //        chord.Name += "m";
-        //        break;
-        //    // Sevenths
-        //    case "augmented":
-        //        break;
-        //    case "diminished":
-        //        break;
-        //    case "dominant":
-        //        break;
-        //    case "major-seventh":
-        //        chord.Name += "7M";
-        //        break;
-        //    case "minor-seventh":
-        //        chord.Name += "m7";
-        //        break;
-        //    case "diminished-seventh":
-        //        break;
-        //    case "augmented-seventh":
-        //        break;
-        //    case "half-diminished":
-        //        break;
-        //    case "major-minor":
-        //        break;
-        //    // Sixths
-        //    case "major-sixth":
-        //        break;
-        //    case "minor-sixth":
-        //        break;
-        //    // Ninths
-        //    case "dominant-ninth":
-        //        break;
-        //    case "major-ninth":
-        //        break;
-        //    case "minor-ninth":
-        //        break;
-        //    // 11ths
-        //    case "dominant-11th":
-        //        break;
-        //    case "major-11th":
-        //        break;
-        //    case "minor-11th":
-        //        break;
-        //    // 13ths
-        //    case "dominant-13th":
-        //        break;
-        //    case "major-13th":
-        //        break;
-        //    case "minor-13th":
-        //        break;
-        //    // Suspended
-        //    case "suspended-second":
-        //        break;
-        //    case "suspended-fourth":
-        //        break;
-        //    // Functional sixths
-        //    case "Neapolitan":
-        //        break;
-        //    case "Italian":
-        //        break;
-        //    case "French":
-        //        break;
-        //    case "German":
-        //        break;
-        //    // Other
-        //    case "pedal":
-        //        break;
-        //    case "power":
-        //        break;
-        //    case "Tristan":
-        //        break;
-        // }
+        // TODO: Altered degrees
         // var degree = element.GetElementsByTagName("degree");
         // if (degree.Length > 0)
         // {
@@ -555,8 +617,25 @@ export class MusicXmlImporter extends ScoreImporter {
         //        chord.Name += "#" + degreeValue;
         //    }
         // }
+        chord.name = rootStep + rootAlter + kindText;
         this._currentChord = ModelUtils.newGuid();
+        
+        let duplicate: boolean = false;
+         
         for (let staff of track.staves) {
+            if(chord.strings.length > 0){
+                for (let c of staff.chords.values()) {
+                    if (String(c.strings) === String(chord.strings)) {
+                        duplicate = true;
+                        break;
+                    }
+                }
+                if (duplicate) {
+                   chord.showDiagram = false;
+                }
+            }else{
+                chord.showDiagram = false;
+            }
             staff.addChord(this._currentChord, chord);
         }
     }
