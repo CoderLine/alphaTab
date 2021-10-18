@@ -434,19 +434,19 @@ export class MusicXmlImporter extends ScoreImporter {
                                     case 'root-alter':
                                         switch (parseInt(rootChild.innerText)) {
                                             case -2:
-                                                rootAlter = ' bb';
+                                                rootAlter = 'bb';
                                                 break;
                                             case -1:
-                                                rootAlter = ' b';
+                                                rootAlter = 'b';
                                                 break;
                                             case 0:
                                                 rootAlter = '';
                                                 break;
                                             case 1:
-                                                rootAlter = ' #';
+                                                rootAlter = '#';
                                                 break;
                                             case 2:
-                                                rootAlter = ' ##';
+                                                rootAlter = '##';
                                                 break;
                                         }
                                         break;
