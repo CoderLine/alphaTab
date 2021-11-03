@@ -3,6 +3,7 @@ import { DisplaySettings } from '@src/DisplaySettings';
 import { ImporterSettings } from '@src/ImporterSettings';
 import { FingeringMode, NotationMode, NotationSettings, NotationElement } from '@src/NotationSettings';
 import { PlayerSettings } from '@src/PlayerSettings';
+import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 
 /**
  * This public class contains instance specific settings for alphaTab
@@ -56,5 +57,12 @@ export class Settings {
         let settings: Settings = new Settings();
         settings.setSongBookModeSettings();
         return settings;
+    }
+
+    /**
+     * @target web
+     */
+    public fillFromJson(json: any): void {
+        SettingsSerializer.fromJson(this, json);
     }
 }
