@@ -3,7 +3,7 @@ import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 import { DynamicValue } from '@src/model/DynamicValue';
 
 export class FlatMidiEventGenerator implements IMidiFileHandler {
-    public midiEvents: MidiEvent[];
+    public midiEvents: FlatMidiEvent[];
 
     public constructor() {
         this.midiEvents = [];
@@ -62,7 +62,7 @@ export class FlatMidiEventGenerator implements IMidiFileHandler {
     }
 }
 
-export class MidiEvent {
+export class FlatMidiEvent {
     public tick: number = 0;
 
     public constructor(tick: number) {
@@ -73,7 +73,7 @@ export class MidiEvent {
         return `Tick[${this.tick}]`;
     }
 
-    protected equals_FlatMidiEventGenerator_MidiEvent(other: MidiEvent): boolean {
+    protected equals_FlatMidiEventGenerator_MidiEvent(other: FlatMidiEvent): boolean {
         return this.tick === other.tick;
     }
 
@@ -86,14 +86,14 @@ export class MidiEvent {
             return true;
         }
 
-        if (obj instanceof MidiEvent) {
+        if (obj instanceof FlatMidiEvent) {
             return this.tick === obj.tick;
         }
         return false;
     }
 }
 
-export class TempoEvent extends MidiEvent {
+export class TempoEvent extends FlatMidiEvent {
     public tempo: number = 0;
 
     public constructor(tick: number, tempo: number) {
@@ -118,7 +118,7 @@ export class TempoEvent extends MidiEvent {
     }
 }
 
-export class TimeSignatureEvent extends MidiEvent {
+export class TimeSignatureEvent extends FlatMidiEvent {
     public numerator: number = 0;
     public denominator: number = 0;
 
@@ -145,7 +145,7 @@ export class TimeSignatureEvent extends MidiEvent {
     }
 }
 
-export class TrackMidiEvent extends MidiEvent {
+export class TrackMidiEvent extends FlatMidiEvent {
     public track: number = 0;
 
     public constructor(tick: number, track: number) {

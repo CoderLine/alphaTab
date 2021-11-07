@@ -45,7 +45,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { TextBaseline } from '@src/platform/ICanvas';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { NoteCloner } from '@src/generated/model/NoteCloner';
-import { Logger } from '@src/alphatab';
+import { Logger } from '@src/Logger';
 
 /**
  * This structure represents a duration within a gpif
@@ -136,7 +136,7 @@ export class GpifParser {
         try {
             dom.parse(xml);
         } catch (e) {
-            throw new UnsupportedFormatError('Could not parse XML', e);
+            throw new UnsupportedFormatError('Could not parse XML', e as Error);
         }
 
         this.parseDom(dom);

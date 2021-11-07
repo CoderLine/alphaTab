@@ -6,8 +6,8 @@
 import { DisplaySettings } from "@src/DisplaySettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesSerializer";
-import { LayoutMode } from "@src/DisplaySettings";
-import { StaveProfile } from "@src/DisplaySettings";
+import { LayoutMode } from "@src/LayoutMode";
+import { StaveProfile } from "@src/StaveProfile";
 export class DisplaySettingsSerializer {
     public static fromJson(obj: DisplaySettings, m: unknown): void {
         if (!m) {

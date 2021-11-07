@@ -1,5 +1,4 @@
-import { AlphaTabError } from "@src/alphatab";
-import { AlphaTabErrorType } from "@src/AlphaTabError";
+import { AlphaTabError, AlphaTabErrorType } from "@src/AlphaTabError";
 
 /**
  * @partial

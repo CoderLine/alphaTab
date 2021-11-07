@@ -1,4 +1,5 @@
-import { LayoutMode, StaveProfile } from '@src/DisplaySettings';
+import { LayoutMode} from '@src/LayoutMode';
+import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7Importer } from '@src/importer/Gp7Importer';
@@ -41,14 +42,12 @@ import { WhammyBarEffectInfo } from '@src/rendering/effects/WhammyBarEffectInfo'
 import { WideBeatVibratoEffectInfo } from '@src/rendering/effects/WideBeatVibratoEffectInfo';
 import { WideNoteVibratoEffectInfo } from '@src/rendering/effects/WideNoteVibratoEffectInfo';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { HorizontalScreenLayout } from '@src/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@src/rendering/layout/PageViewLayout';
 import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { ScoreBarRendererFactory } from '@src/rendering/ScoreBarRendererFactory';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
-import { Settings } from '@src/Settings';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
 import { LeftHandTapEffectInfo } from './rendering/effects/LeftHandTapEffectInfo';
@@ -294,22 +293,19 @@ export class Environment {
     public static layoutEngines: Map<LayoutMode, LayoutEngineFactory> = Environment.createDefaultLayoutEngines();
     public static staveProfiles: Map<StaveProfile, BarRendererFactory[]> = Environment.createDefaultStaveProfiles();
 
-    public static createScoreRenderer(settings: Settings): IScoreRenderer {
-        return new ScoreRenderer(settings);
-    }
-
-    public static getRenderEngineFactory(settings: Settings): RenderEngineFactory {
-        if (!settings.core.engine || !Environment.renderEngines.has(settings.core.engine)) {
+   
+    public static getRenderEngineFactory(engine:string): RenderEngineFactory {
+        if (!engine || !Environment.renderEngines.has(engine)) {
             return Environment.renderEngines.get('default')!;
         }
-        return Environment.renderEngines.get(settings.core.engine)!;
+        return Environment.renderEngines.get(engine)!;
     }
 
-    public static getLayoutEngineFactory(settings: Settings): LayoutEngineFactory {
-        if (!settings.display.layoutMode || !Environment.layoutEngines.has(settings.display.layoutMode)) {
+    public static getLayoutEngineFactory(layoutMode: LayoutMode): LayoutEngineFactory {
+        if (!layoutMode || !Environment.layoutEngines.has(layoutMode)) {
             return Environment.layoutEngines.get(LayoutMode.Page)!;
         }
-        return Environment.layoutEngines.get(settings.display.layoutMode)!;
+        return Environment.layoutEngines.get(layoutMode)!;
     }
 
     /**

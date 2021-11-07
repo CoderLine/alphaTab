@@ -1,4 +1,4 @@
-import { StaveProfile } from '@src/DisplaySettings';
+import { StaveProfile } from '@src/StaveProfile';
 import { Settings } from '@src/Settings';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 

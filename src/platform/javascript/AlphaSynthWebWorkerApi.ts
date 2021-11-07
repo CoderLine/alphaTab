@@ -11,7 +11,7 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { ProgressEventArgs } from '@src/alphatab';
+import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { FileLoadError } from '@src/FileLoadError';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEventType } from '@src/midi/MidiEvent';

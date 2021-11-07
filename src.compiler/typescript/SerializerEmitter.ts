@@ -53,7 +53,7 @@ function createStringUnknownMapNode(): ts.TypeNode {
 }
 
 function findModule(type: ts.Type, options: ts.CompilerOptions) {
-    if (type.symbol) {
+    if (type.symbol && type.symbol.declarations) {
         for (const decl of type.symbol.declarations) {
             const file = decl.getSourceFile();
             if (file) {
@@ -601,27 +601,23 @@ function createEnumMapping(type: ts.Type): ts.Expression {
     );
 }
 
-function stripRanges<T extends ts.Node>(node: T) {
-    (node as any).pos = -1;
-    (node as any).end = -1;
-    return node;
-}
-
-function getDeepMutableClone<T extends ts.Node>(node: T): T {
-    return ts.transform(node, [context => node => deepCloneWithContext(node, context)]).transformed[0];
-
-    function deepCloneWithContext<T extends ts.Node>(node: T, context: ts.TransformationContext): T {
-        const clonedNode = ts.visitEachChild(
-            stripRanges(ts.getMutableClone(node)),
-            child => deepCloneWithContext(child, context),
-            context
-        );
-        (clonedNode as any).parent = undefined as any;
-        ts.forEachChild(clonedNode, child => {
-            (child as any).parent = clonedNode;
-        });
-        return clonedNode;
+function cloneTypeNode(node: ts.TypeNode): ts.TypeNode {
+    if(ts.isUnionTypeNode(node)) {
+        return ts.factory.createUnionTypeNode(node.types.map(cloneTypeNode));
+    } else if(node.kind === ts.SyntaxKind.StringKeyword 
+        || node.kind === ts.SyntaxKind.NumberKeyword
+        || node.kind === ts.SyntaxKind.BooleanKeyword
+        || node.kind === ts.SyntaxKind.UnknownKeyword
+        || node.kind === ts.SyntaxKind.AnyKeyword
+        || node.kind === ts.SyntaxKind.VoidKeyword) {
+        return ts.factory.createKeywordTypeNode(node.kind);
+    } else if(ts.isLiteralTypeNode(node)) {
+        return ts.factory.createLiteralTypeNode(node.literal);
+    } else if(ts.isArrayTypeNode(node)) {
+        return ts.factory.createArrayTypeNode(cloneTypeNode(node.elementType));
     }
+
+    throw new Error(`Unsupported TypeNode: '${ts.SyntaxKind[node.kind]}' extend type node cloning`);
 }
 
 function generateSetPropertyBody(
@@ -658,7 +654,7 @@ function generateSetPropertyBody(
                         type.isNullable
                             ? ts.factory.createIdentifier('v')
                             : ts.factory.createNonNullExpression(ts.factory.createIdentifier('v')),
-                        getDeepMutableClone(prop.property.type!)
+                            cloneTypeNode(prop.property.type!)
                     )
                 )
             );
@@ -680,7 +676,7 @@ function generateSetPropertyBody(
             const collectionAddMethod = ts
                 .getJSDocTags(prop.property)
                 .filter(t => t.tagName.text === 'json_add')
-                .map(t => t.comment ?? '')[0];
+                .map(t => t.comment ?? '')[0] as string;
 
             // obj.fieldName = [];
             // for(const i of value) {
@@ -820,7 +816,7 @@ function generateSetPropertyBody(
                 mapValue = ts.factory.createAsExpression(
                     ts.factory.createIdentifier('v'),
                     ts.isTypeReferenceNode(prop.property.type!) && prop.property.type.typeArguments
-                        ? getDeepMutableClone(prop.property.type.typeArguments[1])
+                        ? cloneTypeNode(prop.property.type.typeArguments[1])
                         : ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
                 );
             } else {
@@ -836,7 +832,7 @@ function generateSetPropertyBody(
             const collectionAddMethod = ts
                 .getJSDocTags(prop.property)
                 .filter(t => t.tagName.text === 'json_add')
-                .map(t => t.comment ?? '')[0];
+                .map(t => t.comment ?? '')[0] as string;
 
             caseStatements.push(
                 assignField(
@@ -1251,7 +1247,7 @@ export default createEmitter('json', (program, input) => {
                         property: propertyDeclaration,
                         jsonNames: jsonNames,
                         partialNames: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_partial_names'),
-                        target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment
+                        target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment as string
                     });
                 }
             }

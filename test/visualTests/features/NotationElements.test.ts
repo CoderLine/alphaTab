@@ -1,4 +1,4 @@
-import { LayoutMode } from '@src/DisplaySettings';
+import { LayoutMode } from '@src/LayoutMode';
 import { Settings } from '@src/Settings';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { NotationElement } from '@src/NotationSettings';

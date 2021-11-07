@@ -1,4 +1,4 @@
-import { Settings } from '@src/alphatab';
+import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IWriteable } from '@src/io/IWriteable';
 import { Score } from '@src/model/Score';

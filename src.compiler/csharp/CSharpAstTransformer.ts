@@ -638,7 +638,7 @@ export default class CSharpAstTransformer {
                     !!d.initializer.modifiers &&
                     !!d.initializer.modifiers.find(m => m.kind === ts.SyntaxKind.AsyncKeyword);
 
-                const functionType = type.symbol.declarations.find(d =>
+                const functionType = type.symbol.declarations!.find(d =>
                     ts.isFunctionTypeNode(d)
                 ) as ts.FunctionTypeNode;
 

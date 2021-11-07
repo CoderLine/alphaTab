@@ -978,7 +978,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected isMethodAsDelegate(expr: cs.MemberAccessExpression) {
         if (
-            expr.tsSymbol &&
+            expr.tsSymbol?.valueDeclaration &&
             ts.isMethodDeclaration(expr.tsSymbol.valueDeclaration) &&
             !ts.isCallExpression(expr.tsNode!.parent)
         ) {

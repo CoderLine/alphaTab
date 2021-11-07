@@ -1,4 +1,5 @@
-import { LayoutMode, StaveProfile } from '@src/DisplaySettings';
+import { LayoutMode } from '@src/LayoutMode';
+import { StaveProfile } from '@src/StaveProfile';
 import { Settings } from '@src/Settings';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { NotationElement } from '@src/NotationSettings';

@@ -97,7 +97,7 @@ export class AlphaTabWebWorker {
         try {
             this._renderer.renderScore(score, trackIndexes);
         } catch (e) {
-            this.error(e);
+            this.error(e as Error);
         }
     }
 

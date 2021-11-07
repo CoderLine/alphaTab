@@ -114,7 +114,7 @@ export class AlphaTabApiBase<TSettings> {
         if (
             this.settings.core.useWorkers &&
             this.uiFacade.areWorkersSupported &&
-            Environment.getRenderEngineFactory(this.settings).supportsWorkers
+            Environment.getRenderEngineFactory(this.settings.core.engine).supportsWorkers
         ) {
             this.renderer = this.uiFacade.createWorkerRenderer();
         } else {
@@ -208,7 +208,7 @@ export class AlphaTabApiBase<TSettings> {
                 }
             );
         } catch (e) {
-            this.onError(e);
+            this.onError(e as Error);
             return false;
         }
     }
@@ -342,7 +342,7 @@ export class AlphaTabApiBase<TSettings> {
             let score: Score = parser.readScore();
             this.renderScore(score, tracks);
         } catch (e) {
-            this.onError(e);
+            this.onError(e as Error);
         }
     }
 
@@ -916,7 +916,7 @@ export class AlphaTabApiBase<TSettings> {
             }
             if (!this._beatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
                 let scrollElement: IContainer = this.uiFacade.getScrollContainer();
-                let isVertical: boolean = Environment.getLayoutEngineFactory(this.settings).vertical;
+                let isVertical: boolean = Environment.getLayoutEngineFactory(this.settings.display.layoutMode).vertical;
                 let mode: ScrollMode = this.settings.player.scrollMode;
                 if (isVertical) {
                     // when scrolling on the y-axis, we preliminary check if the new beat/bar have

@@ -33,7 +33,7 @@ export class Gp7Importer extends ScoreImporter {
         try {
             entries = fileSystem.read();
         } catch (e) {
-            throw new UnsupportedFormatError('No Zip archive', e);
+            throw new UnsupportedFormatError('No Zip archive', e as Error);
         }
 
         Logger.debug(this.name, 'Zip entries loaded');
