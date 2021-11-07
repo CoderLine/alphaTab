@@ -4,5 +4,6 @@
  */
 export enum WebPlatform {
     Browser,
-    NodeJs
+    NodeJs,
+    BrowserModule
 }

@@ -14,6 +14,12 @@ const commonOutput = {
     }
 };
 
+const importMetaPlugin = {
+    resolveImportMeta() {
+        return '{}'; // prevent import.meta to be empty in non ES outputs
+    }
+};
+
 const isWatch = process.env.ROLLUP_WATCH;
 
 module.exports = [
@@ -22,14 +28,22 @@ module.exports = [
         output: [
             {
                 file: 'dist/alphaTab.js',
-                name: 'alphaTab'
+                plugins: [importMetaPlugin]
             },
             {
                 file: 'dist/alphaTab.min.js',
-                name: 'alphaTab',
+                plugins: [terser(), importMetaPlugin]
+            },
+            {
+                file: 'dist/alphaTab.mjs',
+                format: 'es'
+            },
+            {
+                file: 'dist/alphaTab.min.mjs',
+                format: 'es',
                 plugins: [terser()]
             }
-        ].map(o => ({ ...o, ...commonOutput })),
+        ].map(o => ({ ...commonOutput, ...o })),
         external: [],
         watch: {
             include: 'dist/lib/**',
@@ -64,12 +78,13 @@ module.exports = [
                 }
             }),
 
-            isWatch && serve({
-                open: true,
-                openPage: '/playground/control.html',
-                contentBase: '', 
-                port: 8080
-            })
+            isWatch &&
+                serve({
+                    open: true,
+                    openPage: '/playground/control.html',
+                    contentBase: '',
+                    port: 8080
+                })
         ]
     },
     {

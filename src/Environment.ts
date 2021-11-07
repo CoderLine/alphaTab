@@ -215,6 +215,21 @@ export class Environment {
 
     /**
      * @target web
+     */
+    public static createAlphaTabWorker(scriptFile: string): Worker {
+        if (Environment.webPlatform === WebPlatform.BrowserModule) {
+            let script: string = `import * as alphaTab from '${scriptFile}'`;
+            let blob: Blob = new Blob([script], { type: 'text/javascript' });
+            return new Worker(URL.createObjectURL(blob), { type: 'module' });
+        } else {
+            let script: string = `importScripts('${scriptFile}')`;
+            let blob: Blob = new Blob([script]);
+            return new Worker(URL.createObjectURL(blob));
+        }
+    }
+
+    /**
+     * @target web
      * @partial
      */
     public static throttle(action: () => void, delay: number): () => void {
@@ -229,10 +244,25 @@ export class Environment {
      * @target web
      */
     private static detectScriptFile(): string | null {
-        if (!('document' in Environment.globalThis)) {
-            return null;
+        // normal browser include as <script>
+        if ('document' in Environment.globalThis && document.currentScript) {
+            return (document.currentScript as HTMLScriptElement).src;
         }
-        return (document.currentScript as HTMLScriptElement).src;
+
+        // browser include as ES6 import
+        // <script type="module">
+        // import * as alphaTab from 'dist/alphaTab.js';
+        try {
+            // @ts-ignore
+            const meta = import.meta;
+            if ('url' in meta) {
+                return meta.url;
+            }
+        } catch (e) {
+            // ignore potential errors
+        }
+
+        return null;
     }
 
     /**
@@ -475,7 +505,10 @@ export class Environment {
         } else if (Environment.isRunningInWorker) {
             AlphaTabWebWorker.init();
             AlphaSynthWebWorker.init();
-        } else if (Environment.webPlatform === WebPlatform.Browser) {
+        } else if (
+            Environment.webPlatform === WebPlatform.Browser ||
+            Environment.webPlatform === WebPlatform.BrowserModule
+        ) {
             Environment.registerJQueryPlugin();
             Environment.HighDpiFactor = window.devicePixelRatio;
             // ResizeObserver API does not yet exist so long on Safari (only start 2020 with iOS Safari 13.7 and Desktop 13.1)
@@ -506,6 +539,15 @@ export class Environment {
             }
         } catch (e) {
             // no node.js
+        }
+
+        try {
+            // @ts-ignore
+            if ('url' in import.meta) {
+                return WebPlatform.BrowserModule;
+            }
+        } catch (e) {
+            // no browser module
         }
 
         return WebPlatform.Browser;

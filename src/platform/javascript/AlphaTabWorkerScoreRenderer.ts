@@ -8,6 +8,7 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
+import { Environment } from '@src/Environment';
 
 /**
  * @target web
@@ -29,9 +30,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
 
         // first try blob worker
         try {
-            let script: string = `importScripts('${settings.core.scriptFile}')`;
-            let blob: Blob = new Blob([script]);
-            this._worker = new Worker(URL.createObjectURL(blob));
+            this._worker = Environment.createAlphaTabWorker(settings.core.scriptFile);
         } catch (e) {
             try {
                 this._worker = new Worker(settings.core.scriptFile);

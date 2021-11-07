@@ -86,7 +86,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public constructor(rootElement: HTMLElement) {
-        if (Environment.webPlatform !== WebPlatform.Browser) {
+        if (Environment.webPlatform !== WebPlatform.Browser &&
+            Environment.webPlatform !== WebPlatform.BrowserModule) {
             throw new AlphaTabError(
                 AlphaTabErrorType.General,
                 'Usage of AlphaTabApi is only possible in browser environments. For usage in node use the Low Level APIs'
