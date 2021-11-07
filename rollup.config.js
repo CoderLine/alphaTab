@@ -35,11 +35,11 @@ module.exports = [
                 plugins: [terser(), importMetaPlugin]
             },
             {
-                file: 'dist/alphaTab.es.js',
+                file: 'dist/alphaTab.mjs',
                 format: 'es'
             },
             {
-                file: 'dist/alphaTab.es.min.js',
+                file: 'dist/alphaTab.min.mjs',
                 format: 'es',
                 plugins: [terser()]
             }
