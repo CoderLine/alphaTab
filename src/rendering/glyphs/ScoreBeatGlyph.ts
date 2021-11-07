@@ -21,7 +21,7 @@ import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
 import { BeatBounds } from '../utils/BeatBounds';
 import { PercussionMapper } from '../../model/PercussionMapper';
 import { PercussionNoteHeadGlyph } from './PercussionNoteHeadGlyph';
-import { Logger } from '@src/alphatab';
+import { Logger } from '@src/Logger';
 import { ArticStaccatoAboveGlyph } from './ArticStaccatoAboveGlyph';
 import { MusicFontSymbol } from '../../model/MusicFontSymbol';
 import { ICanvas, TextBaseline } from '@src/platform/ICanvas';

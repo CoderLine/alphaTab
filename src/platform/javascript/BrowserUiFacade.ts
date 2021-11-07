@@ -26,9 +26,8 @@ import { Cursors } from '@src/platform/Cursors';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import { WebPlatform } from './WebPlatform';
-import { AlphaTabError } from '@src/AlphaTabError';
-import { AlphaTabErrorType } from '@src/alphatab';
-import { AlphaSynthAudioWorkletOutput } from './AlphaSynthAudioWorkletOutput';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 
 /**
  * @target web

@@ -1,4 +1,4 @@
-import { StaveProfile } from '@src/DisplaySettings';
+import { StaveProfile } from '@src/StaveProfile';
 import { Environment } from '@src/Environment';
 import { Bar } from '@src/model/Bar';
 import { Chord } from '@src/model/Chord';

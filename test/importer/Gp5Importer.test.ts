@@ -1,4 +1,4 @@
-import { Settings } from '@src/alphatab';
+import { Settings } from '@src/Settings';
 import { Beat } from '@src/model/Beat';
 import { Score } from '@src/model/Score';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';

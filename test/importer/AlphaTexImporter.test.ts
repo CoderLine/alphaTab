@@ -1,4 +1,4 @@
-import { StaveProfile } from '@src/DisplaySettings';
+import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { Beat } from '@src/model/Beat';

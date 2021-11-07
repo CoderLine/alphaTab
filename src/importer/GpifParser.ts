@@ -45,7 +45,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { TextBaseline } from '@src/platform/ICanvas';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { NoteCloner } from '@src/generated/model/NoteCloner';
-import { Logger } from '@src/alphatab';
+import { Logger } from '@src/Logger';
 
 /**
  * This structure represents a duration within a gpif

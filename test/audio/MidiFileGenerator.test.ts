@@ -19,7 +19,7 @@ import {
     NoteBendEvent,
     ControlChangeEvent,
     FlatMidiEventGenerator,
-    MidiEvent as FlatMidiEvent,
+    FlatMidiEvent as FlatMidiEvent,
     NoteEvent,
     ProgramChangeEvent,
     TempoEvent,

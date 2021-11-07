@@ -21,7 +21,7 @@ import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TextAlign } from '@src/platform/ICanvas';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { Logger } from '@src/alphatab';
+import { Logger } from '@src/Logger';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { Ottavia } from '@src/model/Ottavia';
