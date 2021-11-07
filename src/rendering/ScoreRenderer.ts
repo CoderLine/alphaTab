@@ -1,4 +1,4 @@
-import { LayoutMode } from '@src/DisplaySettings';
+import { LayoutMode } from '@src/LayoutMode';
 import { Environment } from '@src/Environment';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Score } from '@src/model/Score';
@@ -48,7 +48,7 @@ export class ScoreRenderer implements IScoreRenderer {
 
     private recreateCanvas(): boolean {
         if (this._currentRenderEngine !== this.settings.core.engine) {
-            this.canvas = Environment.getRenderEngineFactory(this.settings).createCanvas();
+            this.canvas = Environment.getRenderEngineFactory(this.settings.core.engine).createCanvas();
             this._currentRenderEngine = this.settings.core.engine;
             return true;
         }
@@ -57,7 +57,7 @@ export class ScoreRenderer implements IScoreRenderer {
 
     private recreateLayout(): boolean {
         if (!this.layout || this._currentLayoutMode !== this.settings.display.layoutMode) {
-            this.layout = Environment.getLayoutEngineFactory(this.settings).createLayout(this);
+            this.layout = Environment.getLayoutEngineFactory(this.settings.display.layoutMode).createLayout(this);
             this._currentLayoutMode = this.settings.display.layoutMode;
             return true;
         }

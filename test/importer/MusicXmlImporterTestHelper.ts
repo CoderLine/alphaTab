@@ -1,4 +1,4 @@
-import { LayoutMode } from '@src/DisplaySettings';
+import { LayoutMode } from '@src/LayoutMode';
 import { MusicXmlImporter } from '@src/importer/MusicXmlImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@src/io/ByteBuffer';

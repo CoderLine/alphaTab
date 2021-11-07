@@ -2,15 +2,31 @@ const resolve = require('./rollup.resolve');
 const terser = require('rollup-plugin-terser').terser;
 const dts = require('rollup-plugin-dts').default;
 const copy = require('rollup-plugin-copy');
-const branch = require('git-branch');
 const license = require('rollup-plugin-license');
 const serve = require('rollup-plugin-serve');
+const fs = require('fs');
+
+function getGitBranch() {
+    const filepath = '.git/HEAD';
+    if (!fs.existsSync(filepath)) {
+        throw new Error('.git/HEAD does not exist');
+    }
+    const buf = fs.readFileSync(filepath);
+    const match = /ref: refs\/heads\/([^\n]+)/.exec(buf.toString());
+    return match ? match[1] : '';
+}
 
 const commonOutput = {
     name: 'alphaTab',
     format: 'umd',
     globals: {
         jQuery: 'jQuery'
+    }
+};
+
+const importMetaPlugin = {
+    resolveImportMeta() {
+        return '{}'; // prevent import.meta to be empty in non ES outputs
     }
 };
 
@@ -22,14 +38,22 @@ module.exports = [
         output: [
             {
                 file: 'dist/alphaTab.js',
-                name: 'alphaTab'
+                plugins: [importMetaPlugin]
             },
             {
                 file: 'dist/alphaTab.min.js',
-                name: 'alphaTab',
+                plugins: [terser(), importMetaPlugin]
+            },
+            {
+                file: 'dist/alphaTab.mjs',
+                format: 'es'
+            },
+            {
+                file: 'dist/alphaTab.min.mjs',
+                format: 'es',
                 plugins: [terser()]
             }
-        ].map(o => ({ ...o, ...commonOutput })),
+        ].map(o => ({ ...commonOutput, ...o })),
         external: [],
         watch: {
             include: 'dist/lib/**',
@@ -43,7 +67,7 @@ module.exports = [
                     },
                     data() {
                         let buildNumber = process.env.GITHUB_RUN_NUMBER || 0;
-                        let gitBranch = branch.sync();
+                        let gitBranch = getGitBranch();
                         return {
                             branch: gitBranch,
                             build: buildNumber
@@ -64,12 +88,13 @@ module.exports = [
                 }
             }),
 
-            isWatch && serve({
-                open: true,
-                openPage: '/playground/control.html',
-                contentBase: '', 
-                port: 8080
-            })
+            isWatch &&
+                serve({
+                    open: true,
+                    openPage: '/playground/control.html',
+                    contentBase: '',
+                    port: 8080
+                })
         ]
     },
     {

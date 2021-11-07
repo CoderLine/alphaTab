@@ -1,4 +1,5 @@
-import { LayoutMode, StaveProfile } from '@src/DisplaySettings';
+import { LayoutMode} from '@src/LayoutMode';
+import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7Importer } from '@src/importer/Gp7Importer';
@@ -41,14 +42,12 @@ import { WhammyBarEffectInfo } from '@src/rendering/effects/WhammyBarEffectInfo'
 import { WideBeatVibratoEffectInfo } from '@src/rendering/effects/WideBeatVibratoEffectInfo';
 import { WideNoteVibratoEffectInfo } from '@src/rendering/effects/WideNoteVibratoEffectInfo';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { HorizontalScreenLayout } from '@src/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@src/rendering/layout/PageViewLayout';
 import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { ScoreBarRendererFactory } from '@src/rendering/ScoreBarRendererFactory';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
-import { Settings } from '@src/Settings';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
 import { LeftHandTapEffectInfo } from './rendering/effects/LeftHandTapEffectInfo';
@@ -56,6 +55,7 @@ import { CapellaImporter } from './importer/CapellaImporter';
 import { ResizeObserverPolyfill } from './platform/javascript/ResizeObserverPolyfill';
 import { WebPlatform } from './platform/javascript/WebPlatform';
 import { IntersectionObserverPolyfill } from './platform/javascript/IntersectionObserverPolyfill';
+import { AlphaSynthWebWorklet } from './platform/javascript/AlphaSynthAudioWorkletOutput';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -207,6 +207,28 @@ export class Environment {
 
     /**
      * @target web
+     */
+    public static get isRunningInAudioWorklet(): boolean {
+        return 'AudioWorkletGlobalScope' in Environment.globalThis;
+    }
+
+    /**
+     * @target web
+     */
+    public static createAlphaTabWorker(scriptFile: string): Worker {
+        if (Environment.webPlatform === WebPlatform.BrowserModule) {
+            let script: string = `import * as alphaTab from '${scriptFile}'`;
+            let blob: Blob = new Blob([script], { type: 'text/javascript' });
+            return new Worker(URL.createObjectURL(blob), { type: 'module' });
+        } else {
+            let script: string = `importScripts('${scriptFile}')`;
+            let blob: Blob = new Blob([script]);
+            return new Worker(URL.createObjectURL(blob));
+        }
+    }
+
+    /**
+     * @target web
      * @partial
      */
     public static throttle(action: () => void, delay: number): () => void {
@@ -221,10 +243,25 @@ export class Environment {
      * @target web
      */
     private static detectScriptFile(): string | null {
-        if (Environment.isRunningInWorker || Environment.webPlatform !== WebPlatform.Browser) {
-            return null;
+        // normal browser include as <script>
+        if ('document' in Environment.globalThis && document.currentScript) {
+            return (document.currentScript as HTMLScriptElement).src;
         }
-        return (document.currentScript as HTMLScriptElement).src;
+
+        // browser include as ES6 import
+        // <script type="module">
+        // import * as alphaTab from 'dist/alphaTab.js';
+        try {
+            // @ts-ignore
+            const meta = import.meta;
+            if ('url' in meta) {
+                return meta.url;
+            }
+        } catch (e) {
+            // ignore potential errors
+        }
+
+        return null;
     }
 
     /**
@@ -256,22 +293,19 @@ export class Environment {
     public static layoutEngines: Map<LayoutMode, LayoutEngineFactory> = Environment.createDefaultLayoutEngines();
     public static staveProfiles: Map<StaveProfile, BarRendererFactory[]> = Environment.createDefaultStaveProfiles();
 
-    public static createScoreRenderer(settings: Settings): IScoreRenderer {
-        return new ScoreRenderer(settings);
-    }
-
-    public static getRenderEngineFactory(settings: Settings): RenderEngineFactory {
-        if (!settings.core.engine || !Environment.renderEngines.has(settings.core.engine)) {
+   
+    public static getRenderEngineFactory(engine:string): RenderEngineFactory {
+        if (!engine || !Environment.renderEngines.has(engine)) {
             return Environment.renderEngines.get('default')!;
         }
-        return Environment.renderEngines.get(settings.core.engine)!;
+        return Environment.renderEngines.get(engine)!;
     }
 
-    public static getLayoutEngineFactory(settings: Settings): LayoutEngineFactory {
-        if (!settings.display.layoutMode || !Environment.layoutEngines.has(settings.display.layoutMode)) {
+    public static getLayoutEngineFactory(layoutMode: LayoutMode): LayoutEngineFactory {
+        if (!layoutMode || !Environment.layoutEngines.has(layoutMode)) {
             return Environment.layoutEngines.get(LayoutMode.Page)!;
         }
-        return Environment.layoutEngines.get(settings.display.layoutMode)!;
+        return Environment.layoutEngines.get(layoutMode)!;
     }
 
     /**
@@ -462,10 +496,15 @@ export class Environment {
      * @partial
      */
     public static platformInit(): void {
-        if (Environment.isRunningInWorker) {
+        if (Environment.isRunningInAudioWorklet) {
+            AlphaSynthWebWorklet.init();
+        } else if (Environment.isRunningInWorker) {
             AlphaTabWebWorker.init();
             AlphaSynthWebWorker.init();
-        } else if (Environment.webPlatform === WebPlatform.Browser) {
+        } else if (
+            Environment.webPlatform === WebPlatform.Browser ||
+            Environment.webPlatform === WebPlatform.BrowserModule
+        ) {
             Environment.registerJQueryPlugin();
             Environment.HighDpiFactor = window.devicePixelRatio;
             // ResizeObserver API does not yet exist so long on Safari (only start 2020 with iOS Safari 13.7 and Desktop 13.1)
@@ -496,6 +535,15 @@ export class Environment {
             }
         } catch (e) {
             // no node.js
+        }
+
+        try {
+            // @ts-ignore
+            if ('url' in import.meta) {
+                return WebPlatform.BrowserModule;
+            }
+        } catch (e) {
+            // no browser module
         }
 
         return WebPlatform.Browser;

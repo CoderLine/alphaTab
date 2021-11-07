@@ -1,5 +1,7 @@
 import { CoreSettings } from '@src/CoreSettings';
-import { DisplaySettings, LayoutMode, StaveProfile } from '@src/DisplaySettings';
+import { DisplaySettings } from '@src/DisplaySettings';
+import { LayoutMode } from '@src/LayoutMode';
+import { StaveProfile } from '@src/StaveProfile';
 import { ImporterSettings } from '@src/ImporterSettings';
 import { FingeringMode, NotationMode, NotationSettings, TabRhythmMode } from '@src/NotationSettings';
 import { PlayerSettings, ScrollMode, VibratoPlaybackSettings } from '@src/PlayerSettings';

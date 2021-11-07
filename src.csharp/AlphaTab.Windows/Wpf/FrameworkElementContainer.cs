@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Wpf
 {
@@ -42,18 +43,6 @@ namespace AlphaTab.Wpf
                 },
                 value => { }
             );
-        }
-
-        public double Top
-        {
-            get => (float) Canvas.GetTop(Control);
-            set => Canvas.SetTop(Control, value);
-        }
-
-        public double Left
-        {
-            get => (float) Canvas.GetLeft(Control);
-            set => Canvas.SetLeft(Control, value);
         }
 
         public double Width
@@ -133,13 +122,20 @@ namespace AlphaTab.Wpf
                 new DoubleAnimation(x, new Duration(TimeSpan.FromMilliseconds(duration))));
         }
 
-
         public void Clear()
         {
             if (Control is Panel p)
             {
                 p.Children.Clear();
             }
+        }
+
+        public void SetBounds(double x, double y, double w, double h)
+        {
+            Canvas.SetLeft(Control, x);
+            Canvas.SetTop(Control, y);
+            Control.Width = w;
+            Control.Height = h;
         }
 
         public IEventEmitter Resize { get; set; }

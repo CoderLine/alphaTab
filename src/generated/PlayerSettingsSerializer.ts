@@ -24,11 +24,15 @@ export class PlayerSettingsSerializer {
         o.set("scrollelement", obj.scrollElement); 
         o.set("enableplayer", obj.enablePlayer); 
         o.set("enablecursor", obj.enableCursor); 
+        o.set("enableanimatedbeatcursor", obj.enableAnimatedBeatCursor); 
+        o.set("enableelementhighlighting", obj.enableElementHighlighting); 
         o.set("enableuserinteraction", obj.enableUserInteraction); 
         o.set("scrolloffsetx", obj.scrollOffsetX); 
         o.set("scrolloffsety", obj.scrollOffsetY); 
         o.set("scrollmode", obj.scrollMode as number); 
         o.set("scrollspeed", obj.scrollSpeed); 
+        /*@target web*/
+        o.set("nativebrowsersmoothscroll", obj.nativeBrowserSmoothScroll); 
         o.set("songbookbendduration", obj.songBookBendDuration); 
         o.set("songbookdipduration", obj.songBookDipDuration); 
         o.set("vibrato", VibratoPlaybackSettingsSerializer.toJson(obj.vibrato)); 
@@ -50,6 +54,12 @@ export class PlayerSettingsSerializer {
             case "enablecursor":
                 obj.enableCursor = v! as boolean;
                 return true;
+            case "enableanimatedbeatcursor":
+                obj.enableAnimatedBeatCursor = v! as boolean;
+                return true;
+            case "enableelementhighlighting":
+                obj.enableElementHighlighting = v! as boolean;
+                return true;
             case "enableuserinteraction":
                 obj.enableUserInteraction = v! as boolean;
                 return true;
@@ -64,6 +74,10 @@ export class PlayerSettingsSerializer {
                 return true;
             case "scrollspeed":
                 obj.scrollSpeed = v! as number;
+                return true;
+            /*@target web*/
+            case "nativebrowsersmoothscroll":
+                obj.nativeBrowserSmoothScroll = v! as boolean;
                 return true;
             case "songbookbendduration":
                 obj.songBookBendDuration = v! as number;

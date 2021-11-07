@@ -2,38 +2,26 @@ import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { IContainer } from '@src/platform/IContainer';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
+import { Bounds } from '@src/rendering/utils/Bounds';
 import { Lazy } from '@src/util/Lazy';
 
 /**
  * @target web
  */
 export class HtmlElementContainer implements IContainer {
-    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(() => new ResizeObserver((entries:ResizeObserverEntry[]) => {
-        for (const e of entries) {
-            let evt = new CustomEvent('resize', {
-                detail: e
-            });
-            e.target.dispatchEvent(evt);
-        }
-    }));
+    private static resizeObserver: Lazy<ResizeObserver> = new Lazy<ResizeObserver>(
+        () =>
+            new ResizeObserver((entries: ResizeObserverEntry[]) => {
+                for (const e of entries) {
+                    let evt = new CustomEvent('resize', {
+                        detail: e
+                    });
+                    e.target.dispatchEvent(evt);
+                }
+            })
+    );
 
     private _resizeListeners: number = 0;
-
-    public get top(): number {
-        return parseFloat(this.element.style.top);
-    }
-
-    public set top(value: number) {
-        this.element.style.top = value + 'px';
-    }
-
-    public get left(): number {
-        return parseFloat(this.element.style.top);
-    }
-
-    public set left(value: number) {
-        this.element.style.left = value + 'px';
-    }
 
     public get width(): number {
         return this.element.offsetWidth;
@@ -130,19 +118,11 @@ export class HtmlElementContainer implements IContainer {
                 if (this._resizeListeners === 0) {
                     HtmlElementContainer.resizeObserver.value.observe(this.element);
                 }
-                this.element.addEventListener(
-                    'resize',
-                    value,
-                    true
-                );
+                this.element.addEventListener('resize', value, true);
                 this._resizeListeners++;
             },
             off: (value: any) => {
-                this.element.removeEventListener(
-                    'resize',
-                    value,
-                    true
-                );
+                this.element.removeEventListener('resize', value, true);
                 this._resizeListeners--;
                 if (this._resizeListeners <= 0) {
                     this._resizeListeners = 0;
@@ -157,9 +137,31 @@ export class HtmlElementContainer implements IContainer {
     }
 
     public transitionToX(duration: number, x: number): void {
-        this.element.style.transition = 'all 0s linear';
-        this.element.style.transitionDuration = duration + 'ms';
-        this.element.style.left = x + 'px';
+        this.element.style.transition = `transform ${duration}ms linear`;
+        this.setBounds(x, NaN, NaN, NaN);
+    }
+
+    private _lastBounds: Bounds = new Bounds();
+
+    public setBounds(x: number, y: number, w: number, h: number) {
+        if (isNaN(x)) {
+            x = this._lastBounds.x;
+        }
+        if (isNaN(y)) {
+            y = this._lastBounds.y;
+        }
+        if (isNaN(w)) {
+            w = this._lastBounds.w;
+        }
+        if (isNaN(h)) {
+            h = this._lastBounds.h;
+        }
+        this.element.style.transform = `translate(${x}px, ${y}px) scale(${w}, ${h})`;
+        this.element.style.transformOrigin = 'top left';
+        this._lastBounds.x = x;
+        this._lastBounds.y = y;
+        this._lastBounds.w = w;
+        this._lastBounds.h = h;
     }
 
     /**

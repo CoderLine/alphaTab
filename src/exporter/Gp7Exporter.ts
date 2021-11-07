@@ -1,4 +1,4 @@
-import { Logger } from '@src/alphatab';
+import { Logger } from '@src/Logger';
 import { Score } from '@src/model/Score';
 import { ZipEntry } from '@src/zip/ZipEntry';
 import { ScoreExporter } from './ScoreExporter';

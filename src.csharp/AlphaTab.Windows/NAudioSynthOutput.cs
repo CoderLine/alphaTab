@@ -13,11 +13,13 @@ namespace AlphaTab
     public class NAudioSynthOutput : WaveProvider32, ISynthOutput, IDisposable
     {
         private const int BufferSize = 4096;
-        private const int BufferCount = 10;
         private const int PreferredSampleRate = 44100;
-
+        private const int TotalBufferTimeInMilliseconds = 5000;
+        
         private DirectSoundOut _context;
         private CircularSampleBuffer _circularBuffer;
+        private int _bufferCount = 0;
+        private int _requestedBufferCount = 0;
 
         /// <inheritdoc />
         public double SampleRate => PreferredSampleRate;
@@ -41,8 +43,12 @@ namespace AlphaTab
         /// <inheritdoc />
         public void Open()
         {
-            _circularBuffer = new CircularSampleBuffer(BufferSize * BufferCount);
-
+            _bufferCount = (int)(
+                (TotalBufferTimeInMilliseconds * PreferredSampleRate) /
+                1000 /
+                BufferSize
+            );
+            _circularBuffer = new CircularSampleBuffer(BufferSize * _bufferCount);
             _context = new DirectSoundOut(100);
             _context.Init(this);
 
@@ -88,6 +94,7 @@ namespace AlphaTab
         public void AddSamples(Float32Array f)
         {
             _circularBuffer.Write(f, 0, f.Length);
+            _requestedBufferCount--;
         }
 
         /// <inheritdoc />
@@ -100,12 +107,19 @@ namespace AlphaTab
         {
             // if we fall under the half of buffers
             // we request one half
-            const int count = BufferCount / 2 * BufferSize;
-            if (_circularBuffer.Count < count && SampleRequest != null)
+            var halfBufferCount = _bufferCount / 2;
+            var halfSamples = halfBufferCount * BufferSize;
+            // Issue #631: it can happen that requestBuffers is called multiple times
+            // before we already get samples via addSamples, therefore we need to
+            // remember how many buffers have been requested, and consider them as available.
+            var bufferedSamples = _circularBuffer.Count + _requestedBufferCount * BufferSize;
+ 
+            if (bufferedSamples < halfSamples)
             {
-                for (var i = 0; i < BufferCount / 2; i++)
+                for (var i = 0; i < halfBufferCount; i++)
                 {
                     ((EventEmitter) SampleRequest).Trigger();
+                    _requestedBufferCount++;
                 }
             }
         }

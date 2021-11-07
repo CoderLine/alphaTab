@@ -17,7 +17,7 @@ import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { IUiFacade } from '@src/platform/IUiFacade';
-import { AlphaSynthWebAudioOutput } from '@src/platform/javascript/AlphaSynthWebAudioOutput';
+import { AlphaSynthScriptProcessorOutput } from '@src/platform/javascript/AlphaSynthScriptProcessorOutput';
 import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';
 import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWorkerScoreRenderer';
@@ -26,8 +26,8 @@ import { Cursors } from '@src/platform/Cursors';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import { WebPlatform } from './WebPlatform';
-import { AlphaTabError } from '@src/AlphaTabError';
-import { AlphaTabErrorType } from '@src/alphatab';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 
 /**
  * @target web
@@ -40,6 +40,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _totalResultCount: number = 0;
     private _initialTrackIndexes: number[] | null = null;
     private _intersectionObserver: IntersectionObserver;
+    private _barToElementLookup: Map<number, HTMLElement> = new Map<number, HTMLElement>();
 
     public rootContainerBecameVisible: IEventEmitter = new EventEmitter();
     public canRenderChanged: IEventEmitter = new EventEmitter();
@@ -84,10 +85,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public constructor(rootElement: HTMLElement) {
-        if(Environment.webPlatform !== WebPlatform.Browser) {
-           throw new AlphaTabError(AlphaTabErrorType.General,
-            'Usage of AlphaTabApi is only possible in browser environments. For usage in node use the Low Level APIs'
-           );    
+        if (Environment.webPlatform !== WebPlatform.Browser &&
+            Environment.webPlatform !== WebPlatform.BrowserModule) {
+            throw new AlphaTabError(
+                AlphaTabErrorType.General,
+                'Usage of AlphaTabApi is only possible in browser environments. For usage in node use the Low Level APIs'
+            );
         }
         rootElement.classList.add('alphaTab');
         this.rootContainer = new HtmlElementContainer(rootElement);
@@ -255,6 +258,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     public initialRender(): void {
         this._api.renderer.preRender.on((_: boolean) => {
             this._totalResultCount = 0;
+            this._barToElementLookup.clear();
         });
 
         const initialRender = () => {
@@ -402,6 +406,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                     placeholder.dataset['svg'] = body;
                     this._intersectionObserver.observe(placeholder);
                 }
+
+                // remember which bar is contained in which node for faster lookup
+                // on highlight/unhighlight
+                for (let i = renderResult.firstMasterBarIndex; i <= renderResult.lastMasterBarIndex; i++) {
+                    this._barToElementLookup.set(i, placeholder);
+                }
             } else {
                 if (this._totalResultCount < canvasElement.childElementCount) {
                     canvasElement.replaceChild(
@@ -417,13 +427,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private replacePlaceholder(placeholder: HTMLElement, body: any) {
-        if (typeof placeholder.outerHTML === 'string') {
-            placeholder.outerHTML = body;
-        } else {
-            const display = document.createElement('div');
-            display.innerHTML = body;
-            placeholder.parentNode?.replaceChild(display.firstChild!, placeholder);
-        }
+        placeholder.innerHTML = body;
+        delete placeholder.dataset['svg'];
     }
 
     /**
@@ -431,7 +436,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
      * initializes a alphaSynth version for the client.
      */
     public createWorkerPlayer(): IAlphaSynth | null {
-        let supportsWebAudio: boolean = 'ScriptProcessorNode' in window;
+        
         let alphaSynthScriptFile: string | null = Environment.scriptFile;
         if (!alphaSynthScriptFile) {
             Logger.error('Player', 'alphaTab script file could not be detected, player cannot initialize');
@@ -439,10 +444,21 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
 
         let player: AlphaSynthWebWorkerApi | null = null;
-        if (supportsWebAudio) {
+        let supportsScriptProcessor: boolean = 'ScriptProcessorNode' in window;
+        let supportsAudioWorklets: boolean = window.isSecureContext && 'AudioWorkletNode' in window;
+        
+        if(supportsAudioWorklets) {
+            Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
+            player = new AlphaSynthWebWorkerApi(
+                new AlphaSynthAudioWorkletOutput(),
+                alphaSynthScriptFile,
+                this._api.settings.core.logLevel
+            );
+        }
+        else if (supportsScriptProcessor) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api for playback');
             player = new AlphaSynthWebWorkerApi(
-                new AlphaSynthWebAudioOutput(),
+                new AlphaSynthScriptProcessorOutput(),
                 alphaSynthScriptFile,
                 this._api.settings.core.logLevel
             );
@@ -466,20 +482,27 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         });
     }
 
-    public highlightElements(groupId: string): void {
-        let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
-        let elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
-        for (let i: number = 0; i < elementsToHighlight.length; i++) {
-            elementsToHighlight.item(i)!.classList.add('at-highlight');
+    private _highlightedElements: HTMLElement[] = [];
+    public highlightElements(groupId: string, masterBarIndex: number): void {
+        const element = this._barToElementLookup.get(masterBarIndex);
+        if (element) {
+            let elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
+            for (let i: number = 0; i < elementsToHighlight.length; i++) {
+                elementsToHighlight.item(i)!.classList.add('at-highlight');
+                this._highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
+            }
         }
     }
 
     public removeHighlights(): void {
-        let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
-        let elements: HTMLCollection = element.getElementsByClassName('at-highlight');
-        while (elements.length > 0) {
-            elements.item(0)!.classList.remove('at-highlight');
+        const highlightedElements = this._highlightedElements;
+        if (!highlightedElements) {
+            return;
         }
+        for (const element of highlightedElements) {
+            element.classList.remove('at-highlight');
+        }
+        this._highlightedElements = [];
     }
 
     public destroyCursors(): void {
@@ -501,14 +524,29 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         // required css styles
         element.style.position = 'relative';
         element.style.textAlign = 'left';
+
         cursorWrapper.style.position = 'absolute';
         cursorWrapper.style.zIndex = '1000';
         cursorWrapper.style.display = 'inline';
         cursorWrapper.style.pointerEvents = 'none';
+
         selectionWrapper.style.position = 'absolute';
+
         barCursor.style.position = 'absolute';
+        barCursor.style.left = '0';
+        barCursor.style.top = '0';
+        barCursor.style.willChange = 'transform';
+        barCursor.style.width = '1px';
+        barCursor.style.height = '1px';
+
         beatCursor.style.position = 'absolute';
         beatCursor.style.transition = 'all 0s linear';
+        beatCursor.style.left = '0';
+        beatCursor.style.top = '0';
+        beatCursor.style.willChange = 'transform';
+        beatCursor.style.width = '3px';
+        beatCursor.style.height = '1px';
+
         // add cursors to UI
         element.insertBefore(cursorWrapper, element.firstChild);
         cursorWrapper.appendChild(selectionWrapper);
@@ -545,7 +583,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return b;
     }
 
+    private _scrollContainer: IContainer | null = null;
     public getScrollContainer(): IContainer {
+        if (this._scrollContainer) {
+            return this._scrollContainer;
+        }
+
         let scrollElement: HTMLElement =
             // tslint:disable-next-line: strict-type-predicates
             typeof this._api.settings.player.scrollElement === 'string'
@@ -567,12 +610,16 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 }
             }
         }
-        return new HtmlElementContainer(scrollElement);
+
+        this._scrollContainer = new HtmlElementContainer(scrollElement);
+        return this._scrollContainer;
     }
 
     public createSelectionElement(): IContainer | null {
         let element: HTMLElement = document.createElement('div');
         element.style.position = 'absolute';
+        element.style.width = '1px';
+        element.style.height = '1px';
         return new HtmlElementContainer(element);
     }
 
@@ -585,38 +632,53 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private internalScrollToY(element: HTMLElement, scrollTargetY: number, speed: number): void {
-        let startY: number = element.scrollTop;
-        let diff: number = scrollTargetY - startY;
-        let start: number = 0;
-        let step = (x: number) => {
-            if (start === 0) {
-                start = x;
-            }
-            let time: number = x - start;
-            let percent: number = Math.min(time / speed, 1);
-            element.scrollTop = (startY + diff * percent) | 0;
-            if (time < speed) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
+        if (this._api.settings.player.nativeBrowserSmoothScroll) {
+            element.scrollTo({
+                top: scrollTargetY,
+                behavior: 'smooth'
+            });
+        } else {
+            let startY: number = element.scrollTop;
+            let diff: number = scrollTargetY - startY;
+
+            let start: number = 0;
+            let step = (x: number) => {
+                if (start === 0) {
+                    start = x;
+                }
+                let time: number = x - start;
+                let percent: number = Math.min(time / speed, 1);
+                element.scrollTop = (startY + diff * percent) | 0;
+                if (time < speed) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
     }
 
     private internalScrollToX(element: HTMLElement, scrollTargetX: number, speed: number): void {
-        let startX: number = element.scrollLeft;
-        let diff: number = scrollTargetX - startX;
-        let start: number = 0;
-        let step = (t: number) => {
-            if (start === 0) {
-                start = t;
-            }
-            let time: number = t - start;
-            let percent: number = Math.min(time / speed, 1);
-            element.scrollLeft = (startX + diff * percent) | 0;
-            if (time < speed) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
+        if (this._api.settings.player.nativeBrowserSmoothScroll) {
+            element.scrollTo({
+                left: scrollTargetX,
+                behavior: 'smooth'
+            });
+        } else {
+            let startX: number = element.scrollLeft;
+            let diff: number = scrollTargetX - startX;
+            let start: number = 0;
+            let step = (t: number) => {
+                if (start === 0) {
+                    start = t;
+                }
+                let time: number = t - start;
+                let percent: number = Math.min(time / speed, 1);
+                element.scrollLeft = (startX + diff * percent) | 0;
+                if (time < speed) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
     }
 }

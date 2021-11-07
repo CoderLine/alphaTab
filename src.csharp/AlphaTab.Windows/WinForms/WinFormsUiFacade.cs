@@ -212,7 +212,7 @@ namespace AlphaTab.WinForms
         {
         }
 
-        public override void HighlightElements(string groupId)
+        public override void HighlightElements(string groupId, double masterBarIndex)
         {
         }
 

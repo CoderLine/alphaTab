@@ -770,7 +770,7 @@ export default class CSharpEmitterContext {
 
     protected buildCoreNamespace(aliasSymbol: ts.Symbol) {
         let suffix = '';
-        if (aliasSymbol.name !== 'Map') {
+        if (aliasSymbol.name !== 'Map' && aliasSymbol.declarations) {
             for (const decl of aliasSymbol.declarations) {
                 let fileName = path.basename(decl.getSourceFile().fileName).toLowerCase();
                 if (fileName.startsWith('lib.') && fileName.endsWith('.d.ts')) {
@@ -955,9 +955,14 @@ export default class CSharpEmitterContext {
 
         // unwrap symbol of expression to get declared type
         let symbol = this.typeChecker.getSymbolAtLocation(expression);
-        if (!symbol || !symbol.declarations || symbol.declarations.length === 0) {
+        if (!symbol) {
             return undefined;
         }
+        const declarations = symbol.declarations;
+        if (!declarations || declarations.length === 0) {
+            return undefined;
+        }
+
         if (symbol.flags & ts.SymbolFlags.Alias) {
             symbol = this.typeChecker.getAliasedSymbol(symbol);
         }
@@ -966,7 +971,7 @@ export default class CSharpEmitterContext {
         }
 
         // declared type must be nullable
-        let declaredType = this.typeChecker.getTypeAtLocation(symbol.declarations[0]);
+        let declaredType = this.typeChecker.getTypeAtLocation(declarations[0]);
         if (!this.isNullableType(declaredType)) {
             return undefined;
         }
@@ -1011,7 +1016,11 @@ export default class CSharpEmitterContext {
         // we consider the expression as smart casted if the declared symbol has a different
         // contextual type than the declared type.
         let symbol = this.typeChecker.getSymbolAtLocation(expression);
-        if (!symbol || !symbol.declarations || symbol.declarations.length === 0) {
+        if (!symbol) {
+            return false;
+        }
+        const declarations = symbol.declarations;
+        if (!declarations || declarations.length === 0) {
             return false;
         }
 
@@ -1028,7 +1037,7 @@ export default class CSharpEmitterContext {
             return false;
         }
 
-        let declaredType = this.typeChecker.getTypeAtLocation(symbol.declarations[0]);
+        let declaredType = this.typeChecker.getTypeAtLocation(declarations[0]);
         if (!this.isNullableType(declaredType)) {
             return false;
         }
@@ -1057,7 +1066,11 @@ export default class CSharpEmitterContext {
         // we consider the expression as smart casted if the declared symbol has a different
         // contextual type than the declared type.
         let symbol = this.typeChecker.getSymbolAtLocation(expression);
-        if (!symbol || !symbol.declarations || symbol.declarations.length === 0) {
+        if (!symbol) {
+            return null;
+        }
+        const declarations = symbol.declarations;
+        if(!declarations || declarations.length === 0){
             return null;
         }
 
@@ -1077,7 +1090,7 @@ export default class CSharpEmitterContext {
             }
         }
 
-        let declaredType = this.typeChecker.getTypeAtLocation(symbol.declarations[0]);
+        let declaredType = this.typeChecker.getTypeAtLocation(declarations[0]);
 
         let contextualTypeNullable = contextualType;
         contextualType = this.typeChecker.getNonNullableType(contextualType);
@@ -1388,7 +1401,7 @@ export default class CSharpEmitterContext {
     public isStaticSymbol(tsSymbol: ts.Symbol) {
         return (
             (tsSymbol.flags & ts.SymbolFlags.EnumMember) !== 0 ||
-            !!tsSymbol.declarations.find(
+            !!tsSymbol.declarations?.find(
                 d => d.modifiers && !!d.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)
             )
         );

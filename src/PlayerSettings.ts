@@ -116,6 +116,17 @@ export class PlayerSettings {
     public enableCursor: boolean = true;
 
     /**
+     * Gets or sets whether the beat cursor should be animated or just ticking.
+     */
+    public enableAnimatedBeatCursor: boolean = true;
+
+    /**
+     * Gets or sets whether the notation elements of the currently played beat should be
+     * highlighted.
+     */
+    public enableElementHighlighting: boolean = true;
+
+    /**
      * Gets or sets alphaTab should provide user interaction features to
      * select playback ranges and jump to the playback position by click (aka. seeking).
      */
@@ -140,6 +151,12 @@ export class PlayerSettings {
      * Gets or sets how fast the scrolling to the new position should happen (in milliseconds)
      */
     public scrollSpeed: number = 300;
+
+    /**
+     * Gets or sets whether the native browser smooth scroll mechanism should be used over a custom animation.
+     * @target web
+     */
+    public nativeBrowserSmoothScroll: boolean = true;
 
     /**
      * Gets or sets the bend duration in milliseconds for songbook bends.

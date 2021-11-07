@@ -2,7 +2,7 @@ import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
 import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
-import { LayoutMode } from '@src/DisplaySettings';
+import { LayoutMode } from '@src/LayoutMode';
 import { IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Track } from '@src/model/Track';
 import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';

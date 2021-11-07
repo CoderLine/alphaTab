@@ -11,10 +11,11 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { ProgressEventArgs } from '@src/alphatab';
+import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { FileLoadError } from '@src/FileLoadError';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEventType } from '@src/midi/MidiEvent';
+import { Environment } from '@src/Environment';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -204,9 +205,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._output.sampleRequest.on(this.onOutputSampleRequest.bind(this));
         this._output.open();
         try {
-            let script: string = "importScripts('" + alphaSynthScriptFile + "')";
-            let blob: Blob = new Blob([script]);
-            this._synth = new Worker(URL.createObjectURL(blob));
+            this._synth = Environment.createAlphaTabWorker(alphaSynthScriptFile)
         } catch (e) {
             // fallback to direct worker
             try {
