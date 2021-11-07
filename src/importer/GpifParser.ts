@@ -136,7 +136,7 @@ export class GpifParser {
         try {
             dom.parse(xml);
         } catch (e) {
-            throw new UnsupportedFormatError('Could not parse XML', e);
+            throw new UnsupportedFormatError('Could not parse XML', e as Error);
         }
 
         this.parseDom(dom);

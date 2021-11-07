@@ -208,7 +208,7 @@ export class AlphaTabApiBase<TSettings> {
                 }
             );
         } catch (e) {
-            this.onError(e);
+            this.onError(e as Error);
             return false;
         }
     }
@@ -342,7 +342,7 @@ export class AlphaTabApiBase<TSettings> {
             let score: Score = parser.readScore();
             this.renderScore(score, tracks);
         } catch (e) {
-            this.onError(e);
+            this.onError(e as Error);
         }
     }
 

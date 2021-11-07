@@ -2,9 +2,19 @@ const resolve = require('./rollup.resolve');
 const terser = require('rollup-plugin-terser').terser;
 const dts = require('rollup-plugin-dts').default;
 const copy = require('rollup-plugin-copy');
-const branch = require('git-branch');
 const license = require('rollup-plugin-license');
 const serve = require('rollup-plugin-serve');
+const fs = require('fs');
+
+function getGitBranch() {
+    const filepath = '.git/HEAD';
+    if (!fs.existsSync(filepath)) {
+        throw new Error('.git/HEAD does not exist');
+    }
+    const buf = fs.readFileSync(filepath);
+    const match = /ref: refs\/heads\/([^\n]+)/.exec(buf.toString());
+    return match ? match[1] : '';
+}
 
 const commonOutput = {
     name: 'alphaTab',
@@ -57,7 +67,7 @@ module.exports = [
                     },
                     data() {
                         let buildNumber = process.env.GITHUB_RUN_NUMBER || 0;
-                        let gitBranch = branch.sync();
+                        let gitBranch = getGitBranch();
                         return {
                             branch: gitBranch,
                             build: buildNumber

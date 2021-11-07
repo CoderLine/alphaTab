@@ -55,7 +55,7 @@ export class CapellaImporter extends ScoreImporter {
             let score: Score = capellaParser.score;
             return score;
         } catch (e) {
-            throw new UnsupportedFormatError('Failed to parse CapXML', e);
+            throw new UnsupportedFormatError('Failed to parse CapXML', e as Error);
         }
     }
 }
