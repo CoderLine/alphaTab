@@ -143,7 +143,7 @@ export class VisualTestHelper {
         await Promise.all(promises);
 
         for (const font of allFonts) {
-            document.fonts.add(font);
+            (document.fonts as any).add(font);
         }
     }
 

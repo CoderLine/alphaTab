@@ -46,6 +46,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         }
 
         if (
+            classType.symbol.valueDeclaration && 
             ts.isClassDeclaration(classType.symbol.valueDeclaration) &&
             classType.symbol.valueDeclaration.heritageClauses
         ) {
