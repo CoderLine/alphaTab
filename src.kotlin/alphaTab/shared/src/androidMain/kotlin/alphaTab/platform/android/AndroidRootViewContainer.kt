@@ -27,12 +27,11 @@ class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener, View.O
 //        _view.setOnTouchListener(this)
     }
 
-    override var top: Double
-        get() = 0.0
-        set(value) {}
-    override var left: Double
-        get() = 0.0
-        set(value) {}
+    override fun setBounds(x: Double, y: Double, w: Double, h: Double) {
+        width = w
+        height = h
+    }
+
     override var width: Double
         get() = _outerHorizontalScrollView.measuredWidth.toDouble()
         set(value) {

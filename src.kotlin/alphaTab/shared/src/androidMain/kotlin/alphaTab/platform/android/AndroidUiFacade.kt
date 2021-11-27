@@ -215,7 +215,7 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
         return null
     }
 
-    override fun highlightElements(groupId: String) {
+    override fun highlightElements(groupId: String, masterBarIndex: Double) {
     }
 
     override fun getScrollContainer(): IContainer {

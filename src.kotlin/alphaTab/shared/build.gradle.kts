@@ -30,7 +30,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             }
             kotlin.srcDirs("../../../dist/lib.kotlin/src")
         }
@@ -47,7 +47,7 @@ kotlin {
             kotlin.srcDirs("src/jvmCommonMain/kotlin")
             dependencies {
                 // TODO: check with Skija devs to have a platform independent lib
-                implementation("org.jetbrains.skija:skija-windows:0.91.3")
+                implementation("org.jetbrains.skija:skija-windows:0.93.4")
                 implementation("org.eclipse.collections:eclipse-collections-api:10.4.0")
                 implementation("org.eclipse.collections:eclipse-collections:10.4.0")
 
@@ -72,10 +72,10 @@ kotlin {
             dependencies {
                 implementation("org.eclipse.collections:eclipse-collections-api:10.4.0")
                 implementation("org.eclipse.collections:eclipse-collections:10.4.0")
-                implementation("androidx.core:core-ktx:1.5.0")
-                implementation("androidx.appcompat:appcompat:1.3.0")
-                implementation("com.google.android.material:material:1.3.0")
-                implementation("androidx.recyclerview:recyclerview:1.2.0")
+                implementation("androidx.core:core-ktx:1.7.0")
+                implementation("androidx.appcompat:appcompat:1.3.1")
+                implementation("com.google.android.material:material:1.4.0")
+                implementation("androidx.recyclerview:recyclerview:1.2.1")
                 implementation("com.google.android.flexbox:flexbox:3.0.0")
             }
         }
@@ -107,7 +107,7 @@ android {
         "../../../font/roboto",
         "../../../font/ptserif"
     )
-    aaptOptions{
+    androidResources {
         ignoreAssetsPattern = arrayOf(
             "eot",
             "otf",
@@ -136,13 +136,17 @@ val fetchTestResultsTask by tasks.registering {
     doLast {
         exec {
             executable = android.adbExecutable.toString()
-            args = listOf("pull", "/storage/emulated/0/Documents/test-results", "$buildDir/reports/androidTests/connected/")
+            args = listOf(
+                "pull",
+                "/storage/emulated/0/Documents/test-results",
+                "$buildDir/reports/androidTests/connected/"
+            )
         }
     }
 }
 
 tasks.whenTaskAdded {
-    if(this.name == "connectedDebugAndroidTest") {
+    if (this.name == "connectedDebugAndroidTest") {
         this.finalizedBy(fetchTestResultsTask)
     }
 }

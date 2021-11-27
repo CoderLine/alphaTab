@@ -2,6 +2,7 @@ package alphaTab.platform.jvm
 
 import alphaTab.Settings
 import alphaTab.core.BitConverter
+import alphaTab.core.toCharArray
 import alphaTab.model.Color
 import alphaTab.model.Font
 import alphaTab.model.MusicFontSymbol
@@ -26,7 +27,7 @@ const val MusicFontSize = 34
 
 const val HangingAsPercentOfAscent = 80
 
-val CustomTypeFaces = HashMap<String, Typeface>();
+val CustomTypeFaces = HashMap<String, Typeface>()
 
 // https://github.com/chromium/chromium/blob/99314be8152e688bafbbf9a615536bdbb289ea87/third_party/blink/renderer/modules/canvas/offscreencanvas2d/offscreen_canvas_rendering_context_2d.cc
 
@@ -131,7 +132,7 @@ public class SkiaCanvas : ICanvas {
 
     override fun fillRect(x: Double, y: Double, w: Double, h: Double) {
         createPaint().use {
-            it.blendMode = BlendMode.SRC_OVER
+            it.setBlendMode(BlendMode.SRC_OVER)
             it.mode = PaintMode.FILL
             _surface.canvas.drawRect(
                 Rect(
@@ -154,7 +155,7 @@ public class SkiaCanvas : ICanvas {
 
     override fun strokeRect(x: Double, y: Double, w: Double, h: Double) {
         createPaint().use {
-            it.blendMode = BlendMode.SRC_OVER
+            it.setBlendMode(BlendMode.SRC_OVER)
             it.mode = PaintMode.STROKE
             _surface.canvas.drawRect(
                 Rect(
@@ -413,19 +414,19 @@ public class SkiaCanvas : ICanvas {
         symbol: MusicFontSymbol,
         centerAtPosition: Boolean?
     ) {
-        fillMusicFontSymbols(x, y, scale, mutableListOf(symbol), centerAtPosition)
+        fillMusicFontSymbols(x, y, scale, alphaTab.collections.List(symbol), centerAtPosition)
     }
 
     override fun fillMusicFontSymbols(
         x: Double,
         y: Double,
         scale: Double,
-        symbols: MutableList<MusicFontSymbol>,
+        symbols: alphaTab.collections.List<MusicFontSymbol>,
         centerAtPosition: Boolean?
     ) {
         val s = String(symbols
             .filter { it != MusicFontSymbol.None }
-            .map { it.value.toChar() }
+            .map<Char> { it.value.toChar() }
             .toCharArray()
         )
 

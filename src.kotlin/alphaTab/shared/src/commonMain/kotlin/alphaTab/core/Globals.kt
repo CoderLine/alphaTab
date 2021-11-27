@@ -1,5 +1,6 @@
 package alphaTab.core
 
+import alphaTab.collections.List
 import alphaTab.core.ecmaScript.RegExp
 
 @kotlin.ExperimentalUnsignedTypes
@@ -133,4 +134,13 @@ class Globals {
             return Double.NaN
         }
     }
+}
+
+public fun List<Char>.toCharArray(): CharArray {
+    val result = CharArray(length.toInt())
+    var index = 0
+    for (element in this) {
+        result[index++] = element
+    }
+    return result
 }

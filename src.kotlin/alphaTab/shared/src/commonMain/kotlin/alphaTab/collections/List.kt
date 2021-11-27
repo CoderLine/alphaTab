@@ -14,8 +14,12 @@ public class List<T> : Iterable<T> {
         _data = items.toMutableList()
     }
 
-    public constructor(size:Int) {
+    public constructor(size: Int) {
         _data = ArrayList()
+        var remaining = size
+        while (remaining-- > 0) {
+            _data.add(null as T)
+        }
     }
 
     public constructor(items: Iterable<T>) {
@@ -43,42 +47,45 @@ public class List<T> : Iterable<T> {
     }
 
     public fun filter(predicate: (T) -> Boolean): List<T> {
-        return List(_data.filter(predicate).toMutableList())
+        return List(_data.filter(predicate))
     }
 
     public fun indexOf(value: T): Double {
-        TODO("")
+        return _data.indexOf(value).toDouble()
     }
-    
+
     public fun pop(): T {
-        TODO("")
+        return _data.removeLast()
     }
 
     public fun sort(comparison: (a: T, b: T) -> Double) {
-        TODO("")
-    }    
-    
+        _data.sortWith { a, b -> comparison(a, b).toInt() }
+    }
+
     public fun <TOut> map(transform: (v: T) -> TOut): List<TOut> {
-        TODO("")
+        return List(_data.map(transform))
     }
-    
+
     public fun map(transform: (v: T) -> Double): DoubleList {
-        TODO("")
+        return DoubleList(_data.map(transform))
     }
-    
+
     public fun reverse(): List<T> {
-        TODO("")
-    }
-    
-    public fun slice(): List<T> {
-        TODO("")
-    }
-    
-    public fun slice(start: Double): List<T> {
+        _data.reverse()
         return this
     }
-    
+
+    public fun slice(): List<T> {
+        // TODO("")
+        return this
+    }
+
+    public fun slice(start: Double): List<T> {
+        return null as List<T> // this
+    }
+
     public fun splice(start: Double, deleteCount: Double, vararg newElements: T) {
+
     }
 
     public fun join(separator: String): String {

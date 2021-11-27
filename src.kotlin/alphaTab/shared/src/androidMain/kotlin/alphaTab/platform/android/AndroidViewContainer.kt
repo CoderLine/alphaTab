@@ -23,12 +23,11 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTou
 //        _view.setOnTouchListener(this)
     }
 
-    override var top: Double
-        get() = 0.0
-        set(value) {}
-    override var left: Double
-        get() = 0.0
-        set(value) {}
+    override fun setBounds(x: Double, y: Double, w: Double, h: Double) {
+        width = w
+        height = h
+    }
+
     override var width: Double
         get() = _view.measuredWidth.toDouble()
         set(value) {
