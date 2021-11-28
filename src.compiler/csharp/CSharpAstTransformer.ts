@@ -14,9 +14,8 @@ export default class CSharpAstTransformer {
     protected _testMethodAttribute: string = 'microsoft.visualStudio.testTools.unitTesting.TestMethod';
 
     public get extension(): string {
-        return '.cs'
+        return '.cs';
     }
-
 
     public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
         this._typeScriptFile = typeScript;
@@ -143,11 +142,27 @@ export default class CSharpAstTransformer {
             globalExports.forEach(x => {
                 if (!x.name && x.exportClause) {
                     if (ts.isNamespaceExport(x.exportClause)) {
-                        this._context.addTsNodeDiagnostics(
-                            x.exportClause,
-                            'Namespace exports are not yet supported',
-                            ts.DiagnosticCategory.Error
-                        );
+                        if (!x.moduleSpecifier) {
+                            this._context.addTsNodeDiagnostics(
+                                x.exportClause,
+                                'Failed to export namespace, missing module specifier',
+                                ts.DiagnosticCategory.Error
+                            );
+                        } else {
+                            const module = this._context.typeChecker.getSymbolAtLocation(x.moduleSpecifier);
+                            if (!module) {
+                                this._context.addTsNodeDiagnostics(
+                                    x.exportClause,
+                                    'Failed to export namespace, cannot resolve module',
+                                    ts.DiagnosticCategory.Error
+                                );
+                            } else {
+                                const exports = this._context.typeChecker.getExportsOfModule(module);
+                                for (const exp of exports) {
+                                    this._context.registerSymbolAsExported(exp);
+                                }
+                            }
+                        }
                     } else {
                         x.exportClause.elements.forEach(e => {
                             const symbol = this._context.typeChecker.getTypeAtLocation(e.name)?.symbol;
@@ -1853,10 +1868,10 @@ export default class CSharpAstTransformer {
         this._context.registerSymbol(csMethod);
     }
     protected mapVisibility(node: ts.Node): cs.Visibility {
-        if(this._context.isInternal(node)) {
+        if (this._context.isInternal(node)) {
             return cs.Visibility.Internal;
         }
-        
+
         if (node.modifiers) {
             for (const m of node.modifiers) {
                 switch (m.kind) {
@@ -1931,10 +1946,13 @@ export default class CSharpAstTransformer {
                 block.statements.length > 0 &&
                 cs.isExpressionStatement(block.statements[0]) &&
                 cs.isInvocationExpression((block.statements[0] as cs.ExpressionStatement).expression) &&
-                cs.isBaseLiteralExpression(((block.statements[0] as cs.ExpressionStatement).expression as cs.InvocationExpression).expression)
+                cs.isBaseLiteralExpression(
+                    ((block.statements[0] as cs.ExpressionStatement).expression as cs.InvocationExpression).expression
+                )
             ) {
-                csConstructor.baseConstructorArguments = ((block.statements[0] as cs.ExpressionStatement)
-                    .expression as cs.InvocationExpression).arguments;
+                csConstructor.baseConstructorArguments = (
+                    (block.statements[0] as cs.ExpressionStatement).expression as cs.InvocationExpression
+                ).arguments;
                 block.statements.shift();
             }
         }
@@ -2098,11 +2116,7 @@ export default class CSharpAstTransformer {
     }
 
     protected visitThisExpression(parent: cs.Node, expression: ts.ThisExpression) {
-        if (
-            cs.isMemberAccessExpression(parent) &&
-            parent.tsSymbol &&
-            this._context.isStaticSymbol(parent.tsSymbol)
-        ) {
+        if (cs.isMemberAccessExpression(parent) && parent.tsSymbol && this._context.isStaticSymbol(parent.tsSymbol)) {
             const identifier = {
                 parent: parent,
                 tsNode: expression,
