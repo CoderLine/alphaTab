@@ -912,4 +912,19 @@ describe('AlphaTexImporterTest', () => {
             // success
         }
     })
+
+    function runSectionNoteSymbolTest(noteSymbol:string) {
+        const score = parseTex(`1.3.4 * 4 | \\section Verse ${noteSymbol}.1 | 2.3.4*4`);
+
+        expect(score.masterBars.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toEqual(4);
+        expect(score.masterBars[1].section!.text).toEqual('Verse');
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toEqual(1);
+    }
+
+    it('does-not-interpret-note-symbols-on-section', () => {
+        runSectionNoteSymbolTest('r');
+        runSectionNoteSymbolTest('-');
+        runSectionNoteSymbolTest('x');
+    })
 });
