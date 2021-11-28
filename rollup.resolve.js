@@ -14,7 +14,9 @@ module.exports = function (options) {
 
             const extension = types ? '.d.ts' : '.js';
 
-            if (importee.startsWith('**')) {
+            if (fs.existsSync(importee)) {
+                return importee;
+            } else if (importee.startsWith('**')) {
                 return importee;
             } else {
                 const importerDir = path.dirname(importer);
@@ -44,11 +46,7 @@ module.exports = function (options) {
                     cwd: process.cwd()
                 });
                 const source = files
-                    .map(
-                        (file, i) =>
-                            `import _${i} from ${JSON.stringify(path.join(process.cwd(), file))}; 
-                            export { _${i} };`
-                    )
+                    .map((file, i) => `export * as _${i} from ${JSON.stringify(path.join(process.cwd(), file))};`)
                     .join('\r\n');
                 return source;
             }
