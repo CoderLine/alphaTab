@@ -14,9 +14,9 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { SynthEvent } from './synthesis/SynthEvent';
-import { Queue } from './ds/Queue';
-import { MidiEventsPlayedEventArgs } from './MidiEventsPlayedEventArgs';
+import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
+import { Queue } from '@src/synth/ds/Queue';
+import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 
 /**

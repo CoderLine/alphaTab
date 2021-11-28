@@ -2,7 +2,7 @@ import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
 import { Settings } from '@src/Settings';
-import { GraceGroup } from './GraceGroup';
+import { GraceGroup } from '@src/model/GraceGroup';
 
 /**
  * A voice represents a group of beats

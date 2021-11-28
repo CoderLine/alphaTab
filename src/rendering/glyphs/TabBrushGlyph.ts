@@ -5,7 +5,7 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { NoteYPosition } from '../BarRendererBase';
+import { NoteYPosition } from '@src/rendering/BarRendererBase';
 
 export class TabBrushGlyph extends Glyph {
     private _beat: Beat;

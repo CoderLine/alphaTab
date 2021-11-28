@@ -3,7 +3,7 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { NotationElement } from '@src/NotationSettings';
-import { NoteEffectInfoBase } from './NoteEffectInfoBase';
+import { NoteEffectInfoBase } from '@src/rendering/effects/NoteEffectInfoBase';
 import { Note } from '@src/model/Note';
 import { LeftHandTapGlyph } from '@src/rendering/glyphs/LeftHandTapGlyph';
 

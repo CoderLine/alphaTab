@@ -5,7 +5,7 @@ import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventA
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { LogLevel } from '@src/LogLevel';
-import { MidiEventsPlayedEventArgs } from './MidiEventsPlayedEventArgs';
+import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEventType } from '@src/midi/MidiEvent';
 
 /**

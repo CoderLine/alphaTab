@@ -1,4 +1,4 @@
-const join = require('path').join;
+const path = require('path');
 const glob = require('glob').sync;
 const fs = require('fs');
 
@@ -17,19 +17,24 @@ module.exports = function (options) {
             if (importee.startsWith('**')) {
                 return importee;
             } else {
+                const importerDir = path.dirname(importer);
+                let resolved = importee;
+
                 const match = Object.entries(mappings).filter(m => importee.startsWith(m[0]));
-                if (!match || match.length === 0) {
-                    return null;
+                if (match && match.length > 0) {
+                    if (match[0][1].endsWith(extension)) {
+                        resolved = path.join(process.cwd(), match[0][1]);
+                    } else {
+                        resolved = path.join(process.cwd(), match[0][1], importee.substring(match[0][0].length));
+                    }
+                } else {
+                    resolved = path.join(importerDir, importee);
                 }
 
-                if (match[0][1].endsWith(extension)) {
-                    return join(process.cwd(), match[0][1]);
+                if (fs.existsSync(path.join(resolved, 'index' + extension))) {
+                    resolved = path.join(resolved, 'index');
                 }
 
-                let resolved = join(process.cwd(), match[0][1], importee.substring(match[0][0].length));
-                if (fs.existsSync(join(resolved, 'index' + extension))) {
-                    return join(resolved, 'index' + extension);
-                }
                 return resolved + extension;
             }
         },
@@ -41,7 +46,7 @@ module.exports = function (options) {
                 const source = files
                     .map(
                         (file, i) =>
-                            `import _${i} from ${JSON.stringify(join(process.cwd(), file))}; 
+                            `import _${i} from ${JSON.stringify(path.join(process.cwd(), file))}; 
                             export { _${i} };`
                     )
                     .join('\r\n');

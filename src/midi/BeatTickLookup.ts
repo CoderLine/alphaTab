@@ -1,5 +1,5 @@
 import { Beat } from '@src/model/Beat';
-import { MasterBarTickLookup } from './MasterBarTickLookup';
+import { MasterBarTickLookup } from '@src/midi/MasterBarTickLookup';
 
 /**
  * Represents the time period, for which a {@link Beat} is played.

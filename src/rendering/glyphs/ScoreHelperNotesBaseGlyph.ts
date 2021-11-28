@@ -4,7 +4,7 @@ import { BendNoteHeadGroupGlyph } from '@src/rendering/glyphs/BendNoteHeadGroupG
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { TieGlyph } from './TieGlyph';
+import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 
 export class ScoreHelperNotesBaseGlyph extends Glyph {
     public static readonly EndPadding: number = ((10 / 2) | 0) + 3;

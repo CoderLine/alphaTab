@@ -1,8 +1,8 @@
 import { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 import { Environment } from '@src/Environment';
 import { Logger } from '@src/Logger';
-import { AlphaSynthWorkerSynthOutput } from './AlphaSynthWorkerSynthOutput';
-import { AlphaSynthWebAudioOutputBase } from './AlphaSynthWebAudioOutputBase';
+import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
+import { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
 
 /**
  * @target web
