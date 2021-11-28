@@ -913,7 +913,7 @@ describe('AlphaTexImporterTest', () => {
         }
     })
 
-    function runSectionNoteSymbolTest(noteSymbol:String) {
+    function runSectionNoteSymbolTest(noteSymbol:string) {
         const score = parseTex(`1.3.4 * 4 | \\section Verse ${noteSymbol}.1 | 2.3.4*4`);
 
         expect(score.masterBars.length).toEqual(3);
