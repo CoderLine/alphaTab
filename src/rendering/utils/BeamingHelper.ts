@@ -10,8 +10,8 @@ import { Voice } from '@src/model/Voice';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { AccidentalHelper } from './AccidentalHelper';
-import { BarRendererBase, NoteYPosition } from '../BarRendererBase';
+import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
+import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 
 class BeatLinePositions {
     public staffId: string = '';

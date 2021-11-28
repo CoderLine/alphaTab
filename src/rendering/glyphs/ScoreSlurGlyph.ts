@@ -1,10 +1,10 @@
 import { Note } from '@src/model/Note';
-import { ScoreLegatoGlyph } from './ScoreLegatoGlyph';
-import { ScoreBarRenderer } from '../ScoreBarRenderer';
-import { NoteYPosition, NoteXPosition } from '../BarRendererBase';
-import { BeamDirection } from '../utils/BeamDirection';
+import { ScoreLegatoGlyph } from '@src/rendering/glyphs/ScoreLegatoGlyph';
+import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import { NoteYPosition, NoteXPosition } from '@src/rendering/BarRendererBase';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { GraceType } from '@src/model/GraceType';
-import { BeatXPosition } from '../BeatXPosition';
+import { BeatXPosition } from '@src/rendering/BeatXPosition';
 
 export class ScoreSlurGlyph extends ScoreLegatoGlyph {
     private _startNote: Note;

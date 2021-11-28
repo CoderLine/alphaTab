@@ -4,8 +4,8 @@ import { Beat } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { PercussionMapper } from '../../model/PercussionMapper';
-import { ScoreBarRenderer } from '../ScoreBarRenderer';
+import { PercussionMapper } from '@src/model/PercussionMapper';
+import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 
 
 class BeatLines {

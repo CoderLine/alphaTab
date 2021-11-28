@@ -29,7 +29,7 @@ import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEve
 import { MetaEventType } from '@src/midi/MetaEvent';
 import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
 import { MetaDataEvent } from '@src/midi/MetaDataEvent';
-import { Queue } from '../ds/Queue';
+import { Queue } from '@src/synth/ds/Queue';
 
 /**
  * This is a tiny soundfont based synthesizer.

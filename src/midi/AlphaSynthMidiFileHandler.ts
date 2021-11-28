@@ -9,7 +9,7 @@ import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { Midi20PerNotePitchBendEvent } from './Midi20PerNotePitchBendEvent';
+import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 
 /**
  * This implementation of the {@link IMidiFileHandler}

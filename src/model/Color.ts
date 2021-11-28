@@ -1,5 +1,5 @@
 import { FormatError } from '@src/FormatError';
-import { ModelUtils } from './ModelUtils';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
  * @json_immutable

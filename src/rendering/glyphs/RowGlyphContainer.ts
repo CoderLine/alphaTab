@@ -1,6 +1,6 @@
 import { TextAlign } from '@src/platform/ICanvas';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { Glyph } from './Glyph';
+import { Glyph } from '@src/rendering/glyphs/Glyph';
 
 export class RowGlyphContainer extends GlyphGroup {
     private _glyphWidth: number = 0;

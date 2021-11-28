@@ -1,6 +1,6 @@
 import { IReadable } from '@src/io/IReadable';
 import { IWriteable } from '@src/io/IWriteable';
-import { IOHelper } from './IOHelper';
+import { IOHelper } from '@src/io/IOHelper';
 
 export class ByteBuffer implements IWriteable, IReadable {
     private _buffer!: Uint8Array;
