@@ -19,7 +19,7 @@ import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
 import { EventEmitterOfT } from '@src/EventEmitter';
 import { NotationSettings, NotationElement } from '@src/NotationSettings';
-import { TuningContainerGlyph } from '../glyphs/TuningContainerGlyph';
+import { TuningContainerGlyph } from '@src/rendering/glyphs/TuningContainerGlyph';
 
 /**
  * This is the base public class for creating new layouting engines for the score renderer.

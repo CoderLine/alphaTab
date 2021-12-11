@@ -1,6 +1,6 @@
 import { Chord } from '@src/model/Chord';
 import { ChordDiagramGlyph } from '@src/rendering/glyphs/ChordDiagramGlyph';
-import { RowContainerGlyph } from './RowContainerGlyph';
+import { RowContainerGlyph } from '@src/rendering/glyphs/RowContainerGlyph';
 
 export class ChordDiagramContainerGlyph extends RowContainerGlyph {
     public constructor(x: number, y: number) {

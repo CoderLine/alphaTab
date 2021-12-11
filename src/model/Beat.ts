@@ -22,7 +22,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
-import { GraceGroup } from './GraceGroup';
+import { GraceGroup } from '@src/model/GraceGroup';
 
 /**
  * Lists the different modes on how beaming for a beat should be done. 

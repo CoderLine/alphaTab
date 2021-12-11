@@ -1,7 +1,7 @@
 import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { Duration } from '@src/model/Duration';
 import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 

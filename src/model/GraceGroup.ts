@@ -1,4 +1,4 @@
-import { Beat } from './Beat';
+import { Beat } from '@src/model/Beat';
 
 /**
  * Represents a group of grace beats that belong together

@@ -1451,6 +1451,10 @@ export class AlphaTexImporter extends ScoreImporter {
         }
     }
 
+    private isNoteText(txt: string) {
+        return txt === 'x'  || txt === '-' || txt === 'r';
+    }
+
     private note(beat: Beat): boolean {
         // fret.string
         let isDead: boolean = false;
@@ -1823,7 +1827,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 let text: string = this._syData as string;
                 this._sy = this.newSy();
                 let marker: string = '';
-                if (this._sy === AlphaTexSymbols.String) {
+                if (this._sy === AlphaTexSymbols.String && !this.isNoteText((this._syData as string).toLowerCase())) {
                     marker = text;
                     text = this._syData as string;
                     this._sy = this.newSy();

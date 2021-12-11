@@ -5,7 +5,7 @@ import { PlaybackInformation } from '@src/model/PlaybackInformation';
 import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Settings } from '@src/Settings';
-import { InstrumentArticulation } from './InstrumentArticulation';
+import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 
 /**
  * This public class describes a single track or instrument of score.

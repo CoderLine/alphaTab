@@ -4,7 +4,7 @@ import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeatXPosition } from '../BeatXPosition';
+import { BeatXPosition } from '@src/rendering/BeatXPosition';
 
 export class ScoreTieGlyph extends TieGlyph {
     protected startNote: Note;

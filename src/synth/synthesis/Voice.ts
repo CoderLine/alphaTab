@@ -10,8 +10,8 @@ import { VoiceEnvelope, VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceE
 import { VoiceLfo } from '@src/synth/synthesis/VoiceLfo';
 import { VoiceLowPass } from '@src/synth/synthesis/VoiceLowPass';
 import { SynthHelper } from '@src/synth/SynthHelper';
-import { SynthConstants } from '../SynthConstants';
-import { Channel } from './Channel';
+import { SynthConstants } from '@src/synth/SynthConstants';
+import { Channel } from '@src/synth/synthesis/Channel';
 
 export class Voice {
     /**

@@ -26,7 +26,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { RenderingResources } from '@src/RenderingResources';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { ReservedLayoutAreaSlot } from './utils/BarCollisionHelper';
+import { ReservedLayoutAreaSlot } from '@src/rendering/utils/BarCollisionHelper';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation

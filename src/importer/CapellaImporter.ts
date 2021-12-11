@@ -8,7 +8,7 @@ import { Logger } from '@src/Logger';
 import { ZipReader } from '@src/zip/ZipReader';
 import { ZipEntry } from "@src/zip/ZipEntry";
 import { IOHelper } from '@src/io/IOHelper';
-import { CapellaParser } from './CapellaParser';
+import { CapellaParser } from '@src/importer/CapellaParser';
 
 /**
  * This ScoreImporter can read Capella (cap/capx) files.

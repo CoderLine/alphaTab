@@ -1,7 +1,7 @@
 import { Tuning } from '@src/model/Tuning';
 import { TextAlign } from '@src/platform/ICanvas';
-import { RowContainerGlyph } from './RowContainerGlyph';
-import { TuningGlyph } from './TuningGlyph';
+import { RowContainerGlyph } from '@src/rendering/glyphs/RowContainerGlyph';
+import { TuningGlyph } from '@src/rendering/glyphs/TuningGlyph';
 
 export class TuningContainerGlyph extends RowContainerGlyph {
     public constructor(x: number, y: number) {

@@ -50,12 +50,12 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
-import { LeftHandTapEffectInfo } from './rendering/effects/LeftHandTapEffectInfo';
-import { CapellaImporter } from './importer/CapellaImporter';
-import { ResizeObserverPolyfill } from './platform/javascript/ResizeObserverPolyfill';
-import { WebPlatform } from './platform/javascript/WebPlatform';
-import { IntersectionObserverPolyfill } from './platform/javascript/IntersectionObserverPolyfill';
-import { AlphaSynthWebWorklet } from './platform/javascript/AlphaSynthAudioWorkletOutput';
+import { LeftHandTapEffectInfo } from '@src/rendering/effects/LeftHandTapEffectInfo';
+import { CapellaImporter } from '@src/importer/CapellaImporter';
+import { ResizeObserverPolyfill } from '@src/platform/javascript/ResizeObserverPolyfill';
+import { WebPlatform } from '@src/platform/javascript/WebPlatform';
+import { IntersectionObserverPolyfill } from '@src/platform/javascript/IntersectionObserverPolyfill';
+import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;

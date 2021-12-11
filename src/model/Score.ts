@@ -3,7 +3,7 @@ import { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { RepeatGroup } from '@src/model/RepeatGroup';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
-import { Note } from './Note';
+import { Note } from '@src/model/Note';
 
 /**
  * The score is the root node of the complete

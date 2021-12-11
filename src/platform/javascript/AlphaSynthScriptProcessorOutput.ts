@@ -1,5 +1,5 @@
 import { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
-import { AlphaSynthWebAudioOutputBase } from './AlphaSynthWebAudioOutputBase';
+import { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
 
 // tslint:disable: deprecation
 

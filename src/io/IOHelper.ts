@@ -1,6 +1,6 @@
 import { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
-import { IWriteable } from './IWriteable';
+import { IWriteable } from '@src/io/IWriteable';
 
 export class IOHelper {
     public static readInt32BE(input: IReadable): number {

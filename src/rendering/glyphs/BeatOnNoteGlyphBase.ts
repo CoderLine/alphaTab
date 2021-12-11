@@ -1,8 +1,8 @@
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
+import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { Note } from '@src/model/Note';
-import { BeatBounds } from '../utils/BeatBounds';
+import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 
 export class BeatOnNoteGlyphBase extends BeatGlyphBase {
     public beamingHelper!: BeamingHelper;

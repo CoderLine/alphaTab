@@ -2,7 +2,7 @@ import { Bar } from '@src/model/Bar';
 import { Chord } from '@src/model/Chord';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
-import { Tuning } from './Tuning';
+import { Tuning } from '@src/model/Tuning';
 
 /**
  * This class describes a single staff within a track. There are instruments like pianos

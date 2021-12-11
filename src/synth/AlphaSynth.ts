@@ -14,9 +14,9 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
 import { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { SynthEvent } from './synthesis/SynthEvent';
-import { Queue } from './ds/Queue';
-import { MidiEventsPlayedEventArgs } from './MidiEventsPlayedEventArgs';
+import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
+import { Queue } from '@src/synth/ds/Queue';
+import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 
 /**
@@ -63,6 +63,7 @@ export class AlphaSynth implements IAlphaSynth {
     public set masterVolume(value: number) {
         value = Math.max(value, SynthConstants.MinVolume);
         this._synthesizer.masterVolume = value;
+        this.onAudioSettingsUpdate();
     }
 
     public get metronomeVolume(): number {
@@ -73,6 +74,7 @@ export class AlphaSynth implements IAlphaSynth {
         value = Math.max(value, SynthConstants.MinVolume);
         this._metronomeVolume = value;
         this._synthesizer.metronomeVolume = value;
+        this.onAudioSettingsUpdate();
     }
 
     public get countInVolume(): number {
@@ -100,7 +102,7 @@ export class AlphaSynth implements IAlphaSynth {
         value = SynthHelper.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
         let oldSpeed: number = this._sequencer.playbackSpeed;
         this._sequencer.playbackSpeed = value;
-        this.updateTimePosition(this._timePosition * (oldSpeed / value), true);
+        this.timePosition = this.timePosition * (oldSpeed / value);
     }
 
     public get tickPosition(): number {
@@ -348,6 +350,7 @@ export class AlphaSynth implements IAlphaSynth {
 
     public setChannelMute(channel: number, mute: boolean): void {
         this._synthesizer.channelSetMute(channel, mute);
+        this.onAudioSettingsUpdate();
     }
 
     public resetChannelStates(): void {
@@ -356,11 +359,19 @@ export class AlphaSynth implements IAlphaSynth {
 
     public setChannelSolo(channel: number, solo: boolean): void {
         this._synthesizer.channelSetSolo(channel, solo);
+        this.onAudioSettingsUpdate();
     }
 
     public setChannelVolume(channel: number, volume: number): void {
         volume = Math.max(volume, SynthConstants.MinVolume);
         this._synthesizer.channelSetMixVolume(channel, volume);
+        this.onAudioSettingsUpdate();
+    }
+    private onAudioSettingsUpdate() {
+        // seeking to the currently known position, will ensure we
+        // clear all audio buffers and re-generate the audio 
+        // which was not actually played yet. 
+        this.timePosition = this.timePosition;
     }
 
     private onSamplesPlayed(sampleCount: number): void {
