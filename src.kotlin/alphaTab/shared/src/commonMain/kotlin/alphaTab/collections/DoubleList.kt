@@ -9,7 +9,6 @@ public expect class DoubleList : IDoubleIterable {
 
     public constructor()
     public constructor(size:Int)
-    public constructor(elements: Iterable<Double>)
     public constructor(vararg elements: Double)
 
     public operator fun get(index: Int): Double

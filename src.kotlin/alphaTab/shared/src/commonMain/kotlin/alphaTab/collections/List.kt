@@ -14,6 +14,7 @@ public class List<T> : Iterable<T> {
         _data = items.toMutableList()
     }
 
+    @Suppress("UNCHECKED_CAST")
     public constructor(size: Int) {
         _data = ArrayList()
         var remaining = size
@@ -67,7 +68,11 @@ public class List<T> : Iterable<T> {
     }
 
     public fun map(transform: (v: T) -> Double): DoubleList {
-        return DoubleList(_data.map(transform))
+        val mapped = DoubleList(_data.size)
+        _data.forEachIndexed { index, item ->
+            mapped[index] = transform(item)
+        }
+        return mapped
     }
 
     public fun reverse(): List<T> {
@@ -76,19 +81,25 @@ public class List<T> : Iterable<T> {
     }
 
     public fun slice(): List<T> {
-        // TODO("")
-        return this
+        return List(ArrayList(_data))
     }
 
     public fun slice(start: Double): List<T> {
-        return null as List<T> // this
+        return List(_data.subList(start.toInt(), _data.size))
     }
 
     public fun splice(start: Double, deleteCount: Double, vararg newElements: T) {
+        var actualStart = start.toInt()
+        if (actualStart < 0)
+        {
+            actualStart += _data.size
+        }
 
+        _data.subList(start.toInt(), deleteCount.toInt()).clear()
+        _data.addAll(start.toInt(), newElements.toList())
     }
 
     public fun join(separator: String): String {
-        return ""
+        return _data.joinToString(separator)
     }
 }

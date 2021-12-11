@@ -126,8 +126,8 @@ android {
     }
 
     packagingOptions {
-        exclude("LICENSE-EPL-1.0.txt")
-        exclude("LICENSE-EDL-1.0.txt")
+        resources.excludes.add("LICENSE-EPL-1.0.txt")
+        resources.excludes.add("LICENSE-EDL-1.0.txt")
     }
 }
 

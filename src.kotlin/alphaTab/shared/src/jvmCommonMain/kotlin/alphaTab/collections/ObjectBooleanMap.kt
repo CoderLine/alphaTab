@@ -1,38 +1,66 @@
 package alphaTab.collections
 
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectBooleanHashMap
+
 public actual class ObjectBooleanMap<TKey> : Iterable<ObjectBooleanMapEntry<TKey>> {
+    private val _data: ObjectBooleanHashMap<TKey>
+
     public actual val size: Double
-        get() = TODO("")
-    
+        get() = _data.size().toDouble()
+
     public actual constructor() {
-        TODO("")
+        _data = ObjectBooleanHashMap()
     }
-    public actual constructor(items:Iterable<ObjectBooleanMapEntry<TKey>>) {
-        TODO("")
+
+    public actual constructor(items: Iterable<ObjectBooleanMapEntry<TKey>>) {
+        _data = ObjectBooleanHashMap()
+        for (item in items) {
+            _data.put(item.key, item.value)
+        }
     }
 
     public actual fun has(key: TKey): Boolean {
-        TODO("")
+        return _data.containsKey(key)
     }
+
     public actual fun get(key: TKey): Boolean {
-        TODO("")
+        return _data.get(key)
     }
+
     public actual fun set(key: TKey, value: Boolean) {
-        TODO("")
+        _data.put(key, value)
     }
+
     public actual fun delete(key: TKey) {
-        TODO("")
+        _data.removeKey(key)
     }
+
     public actual fun values(): IBooleanIterable {
-        TODO("")
+        return EclipseBooleanIterable(_data.values())
     }
+
     public actual fun keys(): Iterable<TKey> {
-        TODO("")
+        return _data.keysView()
     }
+
     public actual fun clear() {
-        TODO("")
+        _data.clear()
     }
+
     public override fun iterator(): Iterator<ObjectBooleanMapEntry<TKey>> {
-        TODO("")
+        return EclipseObjectBooleanMapIterator(_data)
+    }
+}
+
+internal class EclipseObjectBooleanMapIterator<TKey>(private val _data: ObjectBooleanHashMap<TKey>) : Iterator<ObjectBooleanMapEntry<TKey>> {
+    private val _keyIterator = _data.keySet().iterator()
+
+    override fun hasNext(): Boolean {
+        return _keyIterator.hasNext()
+    }
+
+    override fun next(): ObjectBooleanMapEntry<TKey> {
+        val next = _keyIterator.next()
+        return ObjectBooleanMapEntry(next, _data.get(next))
     }
 }

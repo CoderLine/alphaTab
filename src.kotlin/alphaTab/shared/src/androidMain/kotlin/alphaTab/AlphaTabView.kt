@@ -1,7 +1,7 @@
 package alphaTab
 
-import alphaTab.core.*
-import alphaTab.collections.*
+import alphaTab.collections.BooleanList
+import alphaTab.collections.DoubleList
 import alphaTab.model.Score
 import alphaTab.model.Track
 import alphaTab.platform.android.AndroidEnvironment
@@ -10,6 +10,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.Creator
@@ -17,12 +18,17 @@ import android.util.AttributeSet
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import net.alphatab.R
-import java.io.StringWriter
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 class AlphaTabView : RelativeLayout {
+    companion object {
+        const val SuperStateKey = "super_state"
+        const val LayoutStateKey = "layout_state"
+        const val AlphaTabStateKey = "at_state"
+    }
+
     private lateinit var _layoutView: RecyclerView
 
     private lateinit var _api: AlphaTabApiBase<AlphaTabView>
@@ -88,20 +94,46 @@ class AlphaTabView : RelativeLayout {
         _api = AlphaTabApiBase(AndroidUiFacade(_layoutView), this)
     }
 
-    override fun onSaveInstanceState(): Parcelable? {
+    override fun onSaveInstanceState(): Parcelable {
+        val bundle = Bundle()
+
         val superState = super.onSaveInstanceState()
+        if (superState != null) {
+            bundle.putParcelable(SuperStateKey, superState)
+        }
+
+        val layoutManagerState = _layoutView.layoutManager?.onSaveInstanceState()
+        if (layoutManagerState != null) {
+            bundle.putParcelable(LayoutStateKey, layoutManagerState)
+        }
+
         val state = SavedState(superState)
         state.score = _api.score
         state.settings = _api.settings
         state.indexes = _api.tracks.map { it.index }
-        return state
+        bundle.putParcelable(AlphaTabStateKey, state)
+
+        return bundle
     }
 
     override fun onRestoreInstanceState(state: Parcelable?) {
-        super.onRestoreInstanceState(state)
-        if (state is SavedState) {
-            _api.settings = state.settings!!
-            _api.renderScore(state.score!!, state.indexes)
+        if (state is Bundle) {
+            if (state.containsKey(SuperStateKey)) {
+                super.onRestoreInstanceState(state.getParcelable(SuperStateKey))
+            }
+
+            val layoutManager = _layoutView.layoutManager
+            if(state.containsKey(LayoutStateKey) && layoutManager != null) {
+                layoutManager.onRestoreInstanceState(state.getParcelable(LayoutStateKey))
+            }
+
+            if(state.containsKey(AlphaTabStateKey)) {
+                val atState = state.getParcelable<SavedState>(AlphaTabStateKey)!!
+                _api.settings = atState.settings!!
+                _api.renderScore(atState.score!!, atState.indexes)
+            }
+        } else {
+            super.onRestoreInstanceState(state)
         }
     }
 
@@ -219,7 +251,7 @@ class AlphaTabView : RelativeLayout {
             var i = 0
             while (i < size) {
                 value.push(out.readDouble())
-                i++;
+                i++
             }
         }
 

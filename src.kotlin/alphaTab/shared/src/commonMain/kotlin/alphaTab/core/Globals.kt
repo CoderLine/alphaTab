@@ -21,7 +21,7 @@ fun String.substr(startIndex: Double): String {
 }
 
 fun String.splitBy(separator:String): alphaTab.collections.List<String> {
-    TODO("")
+    return List(this.split(separator))
 }
 
 fun String.replace(pattern: RegExp, replacement: String): String {

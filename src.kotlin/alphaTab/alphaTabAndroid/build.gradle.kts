@@ -24,4 +24,10 @@ android {
             isMinifyEnabled = false
         }
     }
+
+    packagingOptions {
+        resources.excludes.add("LICENSE-EPL-1.0.txt")
+        resources.excludes.add("LICENSE-EDL-1.0.txt")
+    }
 }
+

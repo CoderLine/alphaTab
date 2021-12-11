@@ -1,38 +1,67 @@
 package alphaTab.collections
 
+import org.eclipse.collections.impl.map.mutable.primitive.DoubleObjectHashMap
+
 public actual class DoubleObjectMap<TValue> : Iterable<DoubleObjectMapEntry<TValue>> {
-    public actual val size:Double
-        get() = TODO("")
+    private val _data: DoubleObjectHashMap<TValue>
+
+    public actual val size: Double
+        get() = _data.size().toDouble()
 
     public actual constructor() {
-        TODO("")
+        _data = DoubleObjectHashMap()
     }
+
     public actual constructor(items: Iterable<DoubleObjectMapEntry<TValue>>) {
-        TODO("")
+        _data = DoubleObjectHashMap()
+        for (item in items) {
+            _data.put(item.key, item.value)
+        }
     }
 
     public actual fun has(key: Double): Boolean {
-        TODO("")
+        return _data.containsKey(key)
     }
+
     public actual fun get(key: Double): TValue {
-        TODO("")
+        return _data.get(key)
     }
+
     public actual fun set(key: Double, value: TValue) {
-        TODO("")
+        _data.put(key, value)
     }
+
     public actual fun delete(key: Double) {
-        TODO("")
+        _data.removeKey(key)
     }
+
     public actual fun values(): Iterable<TValue> {
-        TODO("")
+        return _data.values()
     }
+
     public actual fun keys(): IDoubleIterable {
-        TODO("")
+        return EclipseDoubleIterable(_data.keysView())
     }
+
     public actual fun clear() {
-        TODO("")
+        _data.clear()
     }
+
     public override fun iterator(): Iterator<DoubleObjectMapEntry<TValue>> {
-        TODO("")
+        return EclipseDoubleObjectMapIterator(_data)
     }
 }
+
+internal class EclipseDoubleObjectMapIterator<TValue>(private val _data: DoubleObjectHashMap<TValue>) : Iterator<DoubleObjectMapEntry<TValue>> {
+    private val _keyIterator = _data.keySet().doubleIterator()
+
+    override fun hasNext(): Boolean {
+        return _keyIterator.hasNext()
+    }
+
+    override fun next(): DoubleObjectMapEntry<TValue> {
+        val next = _keyIterator.next()
+        return DoubleObjectMapEntry(next, _data.get(next))
+    }
+}
+

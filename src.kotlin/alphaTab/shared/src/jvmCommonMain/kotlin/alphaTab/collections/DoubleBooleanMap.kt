@@ -3,38 +3,64 @@ package alphaTab.collections
 import org.eclipse.collections.impl.map.mutable.primitive.DoubleBooleanHashMap
 
 internal actual class DoubleBooleanMap : Iterable<DoubleBooleanMapEntry> {
-    public actual val size:Double
-        get() = TODO("")
+    private val _data: DoubleBooleanHashMap
+
+    public actual val size: Double
+        get() = _data.size().toDouble()
 
     public actual constructor() {
-        TODO("")
+        _data = DoubleBooleanHashMap()
     }
+
     public actual constructor(items: Iterable<DoubleBooleanMapEntry>) {
-        TODO("")
+        _data = DoubleBooleanHashMap()
+        for (item in items) {
+            _data.put(item.key, item.value)
+        }
     }
 
     public actual fun has(key: Double): Boolean {
-        TODO("")
+        return _data.containsKey(key)
     }
+
     public actual fun get(key: Double): Boolean {
-        TODO("")
+        return _data.get(key)
     }
+
     public actual fun set(key: Double, value: Boolean) {
-        TODO("")
+        _data.put(key, value)
     }
+
     public actual fun delete(key: Double) {
-        TODO("")
+        _data.removeKey(key)
     }
+
     public actual fun values(): IBooleanIterable {
-        TODO("")
+        return EclipseBooleanIterable(_data.values())
     }
+
     public actual fun keys(): IDoubleIterable {
-        TODO("")
+        return EclipseDoubleIterable(_data.keysView())
     }
+
     public actual fun clear() {
-        TODO("")
+        _data.clear()
     }
+
     public override fun iterator(): Iterator<DoubleBooleanMapEntry> {
-        TODO("")
+        return EclipseDoubleBooleanMapIterator(_data)
+    }
+}
+
+internal class EclipseDoubleBooleanMapIterator(private val _data: DoubleBooleanHashMap) : Iterator<DoubleBooleanMapEntry> {
+    private val _keyIterator = _data.keySet().doubleIterator()
+
+    override fun hasNext(): Boolean {
+        return _keyIterator.hasNext()
+    }
+
+    override fun next(): DoubleBooleanMapEntry {
+        val next = _keyIterator.next()
+        return DoubleBooleanMapEntry(next, _data.get(next))
     }
 }
