@@ -95,7 +95,7 @@ public class List<T> : Iterable<T> {
             actualStart += _data.size
         }
 
-        _data.subList(start.toInt(), deleteCount.toInt()).clear()
+        _data.subList(start.toInt(), (start + deleteCount).toInt()).clear()
         _data.addAll(start.toInt(), newElements.toList())
     }
 

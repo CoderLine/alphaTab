@@ -1,13 +1,5 @@
 package alphaTab.core.ecmaScript
 
-open class Error : Throwable {
-    public override val message: String
+import kotlin.Exception
 
-    public constructor() : super() {
-        this.message = ""
-    }
-
-    public constructor(msg: String) : super(msg) {
-        this.message = msg;
-    }
-}
+typealias Error = Exception

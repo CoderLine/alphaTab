@@ -46,7 +46,8 @@ actual fun Double.toInvariantString(): String {
 //        return integerPart + "." + (fractionalPart * )
 //    }
 //    return
-    return invariantDoubleFormat.format(this)
+    return this.toInt().toString();
+    // return invariantDoubleFormat.format(this)
 }
 
 actual fun String.toDoubleOrNaN(): Double {

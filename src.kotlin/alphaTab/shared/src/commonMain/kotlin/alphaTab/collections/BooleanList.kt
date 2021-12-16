@@ -4,7 +4,17 @@ public interface IBooleanIterable : Iterable<Boolean> {
     public override fun iterator(): BooleanIterator
 }
 
-internal expect class BooleanList(vararg elements: Boolean) : IBooleanIterable {
-    public val length:Double
-    public operator fun get(index: Int): Boolean
+internal class BooleanList(vararg elements: Boolean) : IBooleanIterable {
+    private val _data: BooleanArray = elements
+
+    public val length: Double
+        get() = _data.size.toDouble()
+
+    public operator fun get(index: Int): Boolean {
+        return _data[index]
+    }
+
+    public override fun iterator(): BooleanIterator {
+        return _data.iterator()
+    }
 }

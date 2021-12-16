@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         _alphaTabView = findViewById(R.id.alphatab_view)
-        _alphaTabView.settings.core.logLevel = LogLevel.Debug
+        _alphaTabView.settings.core.logLevel = LogLevel.Info
         _alphaTabView.settings.display.scale = 3.0
         _alphaTabView.settings.display.barCountPerPartial = 4.0
         Logger.logLevel = LogLevel.Debug

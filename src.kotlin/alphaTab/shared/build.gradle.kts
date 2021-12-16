@@ -48,9 +48,6 @@ kotlin {
             dependencies {
                 // TODO: check with Skija devs to have a platform independent lib
                 implementation("org.jetbrains.skija:skija-windows:0.93.4")
-                implementation("org.eclipse.collections:eclipse-collections-api:10.4.0")
-                implementation("org.eclipse.collections:eclipse-collections:10.4.0")
-
             }
             resources.srcDirs("../../../font/").apply {
                 this.filter.include("**/*.ttf")
@@ -70,10 +67,8 @@ kotlin {
         val androidMain by getting {
             kotlin.srcDirs("src/jvmCommonMain/kotlin")
             dependencies {
-                implementation("org.eclipse.collections:eclipse-collections-api:10.4.0")
-                implementation("org.eclipse.collections:eclipse-collections:10.4.0")
                 implementation("androidx.core:core-ktx:1.7.0")
-                implementation("androidx.appcompat:appcompat:1.3.1")
+                implementation("androidx.appcompat:appcompat:1.4.0")
                 implementation("com.google.android.material:material:1.4.0")
                 implementation("androidx.recyclerview:recyclerview:1.2.1")
                 implementation("com.google.android.flexbox:flexbox:3.0.0")
@@ -123,11 +118,6 @@ android {
         minSdkVersion(24)
         targetSdkVersion(30)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    packagingOptions {
-        resources.excludes.add("LICENSE-EPL-1.0.txt")
-        resources.excludes.add("LICENSE-EDL-1.0.txt")
     }
 }
 
