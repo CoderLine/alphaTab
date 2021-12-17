@@ -1,9 +1,9 @@
 package alphaTab.platform.android
 
+import alphaTab.*
+import alphaTab.Environment
 import alphaTab.EventEmitter
 import alphaTab.EventEmitterOfT
-import alphaTab.IEventEmitter
-import alphaTab.IEventEmitterOfT
 import alphaTab.platform.IContainer
 import alphaTab.platform.IMouseEventArgs
 import android.view.MotionEvent
@@ -33,14 +33,14 @@ class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener, View.O
     }
 
     override var width: Double
-        get() = _outerHorizontalScrollView.measuredWidth.toDouble()
+        get() = (_outerHorizontalScrollView.measuredWidth / Environment.HighDpiFactor)
         set(value) {
-            _outerHorizontalScrollView.minimumWidth = value.toInt()
+            _outerHorizontalScrollView.minimumWidth = (value * Environment.HighDpiFactor).toInt()
         }
     override var height: Double
-        get() = _outerHorizontalScrollView.measuredHeight.toDouble()
+        get() = (_outerHorizontalScrollView.measuredHeight / Environment.HighDpiFactor)
         set(value) {
-            _outerHorizontalScrollView.minimumHeight = value.toInt()
+            _outerHorizontalScrollView.minimumHeight = (value * Environment.HighDpiFactor).toInt()
         }
     override val isVisible: Boolean
         get() = _outerHorizontalScrollView.visibility == View.VISIBLE && _outerHorizontalScrollView.width > 0

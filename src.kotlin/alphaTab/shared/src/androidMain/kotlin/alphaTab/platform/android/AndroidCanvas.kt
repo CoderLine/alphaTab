@@ -1,7 +1,7 @@
 package alphaTab.platform.android
 
+import alphaTab.Environment
 import alphaTab.Settings
-import alphaTab.collections.List
 import alphaTab.core.toCharArray
 import alphaTab.model.Color
 import alphaTab.model.Font
@@ -11,8 +11,6 @@ import alphaTab.platform.TextAlign
 import alphaTab.platform.TextBaseline
 import android.content.Context
 import android.graphics.*
-import java.util.*
-import kotlin.collections.HashMap
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalUnsignedTypes
@@ -85,14 +83,15 @@ public class AndroidCanvas : ICanvas {
 
     override fun beginRender(width: Double, height: Double) {
         val newImage = Bitmap.createBitmap(
-            width.toInt(),
-            height.toInt(),
+            (width * Environment.HighDpiFactor).toInt(),
+            (height * Environment.HighDpiFactor).toInt(),
             Bitmap.Config.ARGB_8888
         )
         newImage.isPremultiplied = true
 
         _surface = newImage
         _canvas = Canvas(_surface)
+        _canvas.scale(Environment.HighDpiFactor.toFloat(), Environment.HighDpiFactor.toFloat())
         _path?.close()
 
         textBaseline = TextBaseline.Top
@@ -286,7 +285,7 @@ public class AndroidCanvas : ICanvas {
         }
         var size = 0.0
 
-        textRun(typeFace, font.size * settings.display.scale, fun(paint) {
+        textRun(typeFace, font.size, fun(paint) {
             val bounds = Rect()
             paint.getTextBounds(text, 0, text.length, bounds)
             size = bounds.width().toDouble()

@@ -88,7 +88,7 @@ class AlphaTabView : RelativeLayout {
     }
 
     private fun init(context: Context) {
-        AndroidEnvironment.initializeAndroid(context)
+        AndroidEnvironment.initializeAndroid(context, resources.displayMetrics)
         inflate(context, R.layout.alphatab_view, this)
         _layoutView = findViewById(R.id.mainContentView)
         _api = AlphaTabApiBase(AndroidUiFacade(_layoutView), this)

@@ -1,9 +1,9 @@
 package alphaTab.platform.android
 
+import alphaTab.*
+import alphaTab.Environment
 import alphaTab.EventEmitter
 import alphaTab.EventEmitterOfT
-import alphaTab.IEventEmitter
-import alphaTab.IEventEmitterOfT
 import alphaTab.platform.IContainer
 import alphaTab.platform.IMouseEventArgs
 import android.view.MotionEvent
@@ -29,22 +29,24 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTou
     }
 
     override var width: Double
-        get() = _view.measuredWidth.toDouble()
+        get() = (_view.measuredWidth / Environment.HighDpiFactor)
         set(value) {
+            val scaled = (value * Environment.HighDpiFactor).toInt()
             val params = _view.layoutParams
             if(params != null) {
-                params.width = value.toInt()
+                params.width = scaled
             }
-            _view.minimumWidth = value.toInt()
+            _view.minimumWidth = scaled
         }
     override var height: Double
         get() = _view.measuredHeight.toDouble()
         set(value) {
+            val scaled = (value * Environment.HighDpiFactor).toInt()
             val params = _view.layoutParams
             if(params != null) {
-                params.height = value.toInt()
+                params.height = scaled
             }
-            _view.minimumHeight = value.toInt()
+            _view.minimumHeight = scaled
         }
     override val isVisible: Boolean
         get() = _view.visibility == View.VISIBLE && _view.width > 0

@@ -104,6 +104,22 @@ public class DoubleList : IDoubleIterable {
     }
 
     public override fun iterator(): DoubleIterator {
-        return _items.iterator()
+        return Iterator(this)
+    }
+
+    private class Iterator(private val list:DoubleList) : DoubleIterator()  {
+        private var _index = 0
+        override fun hasNext(): Boolean {
+            return _index < list._size
+        }
+
+        override fun nextDouble(): Double {
+            if(_index >= list._size) {
+                throw NoSuchElementException("List has no more elements")
+            }
+            val value = list[_index]
+            _index++
+            return value
+        }
     }
 }

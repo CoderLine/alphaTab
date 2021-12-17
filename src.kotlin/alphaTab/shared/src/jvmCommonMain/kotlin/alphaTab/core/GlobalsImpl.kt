@@ -39,15 +39,12 @@ var invariantDoubleFormat = DecimalFormat().apply {
 actual fun Double.toInvariantString(): String {
     // TODO: On android/java the DecimalFormat is terribly slow, we need a more efficient
     // mechanism to convert doubles to string.
-//    val sb = StringBuilder()
-//    val integerPart = this.toInt();
-//    var fractionalPart = (this - integerPart)
-//    if(fractionalPart > 0.0000001) {
-//        return integerPart + "." + (fractionalPart * )
-//    }
-//    return
+    val integerPart = this.toInt();
+    val fractionalPart = (this - integerPart)
+    if(fractionalPart > 0.0000001) {
+        return invariantDoubleFormat.format(this)
+    }
     return this.toInt().toString();
-    // return invariantDoubleFormat.format(this)
 }
 
 actual fun String.toDoubleOrNaN(): Double {

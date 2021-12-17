@@ -1,29 +1,34 @@
 package alphaTab.platform.android
 
+import alphaTab.rendering.RenderFinishedEventArgs
 import android.graphics.Bitmap
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexboxLayoutManager
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalContracts
 class AlphaTabRenderResultViewHolder(imageView:ImageView) : RecyclerView.ViewHolder(imageView) {
     private val _imageView:ImageView = imageView
-    fun bindTo(bitmap: Bitmap) {
-        _imageView.maxWidth = bitmap.width
-        _imageView.maxHeight = bitmap.height
-        _imageView.minimumWidth = bitmap.width
-        _imageView.minimumHeight = bitmap.height
+    fun bindTo(result: RenderFinishedEventArgs) {
+        val bitmap = result.renderResult as Bitmap
+        _imageView.maxWidth = result.width.toInt()
+        _imageView.maxHeight = result.height.toInt()
+        _imageView.minimumWidth = result.width.toInt()
+        _imageView.minimumHeight = result.height.toInt()
         _imageView.setImageBitmap(bitmap)
     }
 }
 
+@ExperimentalContracts
 class AlphaTabRenderResultAdapter : RecyclerView.Adapter<AlphaTabRenderResultViewHolder>() {
     private class Counter {
         public var count: Int = 0
     }
 
-    private val _images: ArrayList<Bitmap> = arrayListOf()
+    private val _images: ArrayList<RenderFinishedEventArgs> = arrayListOf()
     private var totalResultCount: ConcurrentLinkedQueue<Counter> = ConcurrentLinkedQueue()
     fun reset() {
         totalResultCount.add(Counter())
@@ -39,7 +44,7 @@ class AlphaTabRenderResultAdapter : RecyclerView.Adapter<AlphaTabRenderResultVie
         }
     }
 
-    fun addResult(result: Bitmap) {
+    fun addResult(result: RenderFinishedEventArgs) {
         val counter = totalResultCount.peek()
         if (counter != null) {
             if (counter.count < _images.size) {

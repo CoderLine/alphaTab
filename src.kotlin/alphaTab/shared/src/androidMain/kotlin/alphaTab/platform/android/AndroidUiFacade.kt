@@ -187,7 +187,7 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 val body = renderResults.renderResult
 
                 if (body is Bitmap) {
-                    _renderResultAdapter.addResult(body)
+                    _renderResultAdapter.addResult(renderResults)
                 }
             }
         }
