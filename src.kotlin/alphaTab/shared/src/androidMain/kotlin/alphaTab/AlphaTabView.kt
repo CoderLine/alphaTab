@@ -129,8 +129,12 @@ class AlphaTabView : RelativeLayout {
 
             if(state.containsKey(AlphaTabStateKey)) {
                 val atState = state.getParcelable<SavedState>(AlphaTabStateKey)!!
-                _api.settings = atState.settings!!
-                _api.renderScore(atState.score!!, atState.indexes)
+                if(atState.settings != null) {
+                    _api.settings = atState.settings!!
+                }
+                if(atState.score != null) {
+                    _api.renderScore(atState.score!!, atState.indexes)
+                }
             }
         } else {
             super.onRestoreInstanceState(state)

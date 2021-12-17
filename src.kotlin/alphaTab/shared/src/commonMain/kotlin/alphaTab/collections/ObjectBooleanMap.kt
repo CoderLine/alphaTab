@@ -1,17 +1,32 @@
 package alphaTab.collections
 
 public open class ObjectBooleanMapEntry<TKey> {
-    private val _key: TKey
-    public open val key: TKey
+    private var _key: TKey
+    public var key: TKey
         get() = _key
+        internal set(value) {
+            _key = value
+        }
 
-    private val _value: Boolean
-    public open val value: Boolean
+    private var _value: Boolean
+    public var value: Boolean
         get() = _value
+        internal set(value) {
+            _value = value
+        }
+
 
     public constructor() {
         _key = null as TKey
         _value = false
+    }
+
+    public operator fun component1(): TKey {
+        return _key
+    }
+
+    public operator fun component2(): Boolean {
+        return _value
     }
 
     public constructor(key: TKey, value: Boolean) {
@@ -20,20 +35,19 @@ public open class ObjectBooleanMapEntry<TKey> {
     }
 }
 
-internal class ObjectBooleanMapEntryInternal<TKey> : ObjectBooleanMapEntry<TKey>() {
-    public var hashCode: Int = 0
-    public var next: Int = 0
-    public override var key: TKey = null as TKey
-    public override var value: Boolean = false
+public class ObjectBooleanMapEntryInternal<TKey> : ObjectBooleanMapEntry<TKey>(),
+    IMapEntryInternal {
+    public override var hashCode: Int = 0
+    public override var next: Int = 0
+
+    override fun reset() {
+        key = null as TKey
+        value = false
+    }
 }
 
-public class ObjectBooleanMap<TKey> : Iterable<ObjectBooleanMapEntry<TKey>> {
-    private var _count: Int = 0
-    private var _freeCount: Int = 0
-    private var _buckets: IntArray? = null
-    private var _entries: Array<ObjectBooleanMapEntryInternal<TKey>> = arrayOf()
-    private var _freeList: Int = 0
-
+public class ObjectBooleanMap<TKey> :
+    MapBase<ObjectBooleanMapEntry<TKey>, ObjectBooleanMapEntryInternal<TKey>> {
     public constructor()
     public constructor(iterable: Iterable<ObjectBooleanMapEntry<TKey>>) {
         for (it in iterable) {
@@ -41,32 +55,15 @@ public class ObjectBooleanMap<TKey> : Iterable<ObjectBooleanMapEntry<TKey>> {
         }
     }
 
-    public val size: Double
-        get() = (_count - _freeCount).toDouble()
-
     public fun has(key: TKey): Boolean {
-        return findEntry(key) >= 0
-    }
-
-    private fun findEntry(key: TKey): Int {
-        val buckets = _buckets
-        if (buckets != null) {
-            val hashCode = key.hashCode() and 0x7FFFFFFF
-            var i = buckets[hashCode % buckets.size]
-            while (i >= 0) {
-                if (_entries[i].hashCode == hashCode) {
-                    return i
-                }
-
-                i = _entries[i].next
-            }
-        }
-        return -1
+        return findEntryInternal(key.hashCode()) >= 0
     }
 
     public fun get(key: TKey): Boolean {
-        val i = findEntry(key)
-        if (i >= 0) return _entries[i].value
+        val i = findEntryInternal(key.hashCode())
+        if (i >= 0) {
+            return entries[i].value
+        }
         throw KeyNotFoundException()
     }
 
@@ -75,119 +72,15 @@ public class ObjectBooleanMap<TKey> : Iterable<ObjectBooleanMapEntry<TKey>> {
     }
 
     private fun insert(key: TKey, value: Boolean) {
-        var buckets = _buckets
-        if (buckets == null) {
-            buckets = initialize(0)
-        }
-
-        val hashCode = key.hashCode() and 0x7FFFFFFF
-        var targetBucket = hashCode % buckets.size
-
-        var i = buckets[targetBucket]
-        while (i >= 0) {
-            if (_entries[i].hashCode == hashCode) {
-                _entries[i].value = value
-                return
-            }
-
-            i = _entries[i].next
-        }
-
-        val index: Int
-        if (_freeCount > 0) {
-            index = _freeList
-            _freeList = _entries[index].next
-            _freeCount--
-        } else {
-            if (_count == _entries.size) {
-                buckets = resize()
-                targetBucket = hashCode and buckets.size
-            }
-            index = _count
-            _count++
-        }
-
-        val entry = _entries[index]
-        entry.hashCode = hashCode
-        entry.next = buckets[targetBucket]
-        entry.key = key
-        entry.value = value
-        buckets[targetBucket] = index
-    }
-
-    private fun resize(): IntArray {
-        return resize(HashHelpers.expandPrime(_count), false)
-    }
-
-    private fun resize(newSize: Int, forceNewHashCodes: Boolean): IntArray {
-        val newBuckets = IntArray(newSize) {
-            -1
-        }
-        val newEntries = Array(newSize) {
-            ObjectBooleanMapEntryInternal<TKey>()
-        }
-        _entries.copyInto(newEntries, 0, 0, _count)
-
-        if (forceNewHashCodes) {
-            for (i in 0 until _count) {
-                if (newEntries[i].hashCode != -1) {
-                    newEntries[i].hashCode = newEntries[i].key.hashCode() and 0x7FFFFFFF
-                }
-            }
-        }
-        for (i in 0 until _count) {
-            if (newEntries[i].hashCode >= 0) {
-                val bucket = newEntries[i].hashCode % newSize
-                newEntries[i].next = newBuckets[bucket]
-                newBuckets[bucket] = i
-            }
-        }
-        _buckets = newBuckets
-        _entries = newEntries
-        return newBuckets
-    }
-
-
-    private fun initialize(capacity: Int): IntArray {
-        val size = HashHelpers.getPrime(capacity)
-        _buckets = IntArray(size) {
-            -1
-        }
-        _entries = Array(size) {
-            ObjectBooleanMapEntryInternal()
-        }
-        _freeList = -1
-        return _buckets!!
+        insertInternal(
+            key as Any, value,
+            { entry, k -> entry.key = k as TKey },
+            { entry, v -> entry.value = v }
+        )
     }
 
     public fun delete(key: TKey) {
-        val buckets = _buckets
-        if (buckets != null) {
-            val hashCode = key.hashCode() and 0x7FFFFFFF
-            val bucket = hashCode % buckets.size
-            var last = -1
-            var i = buckets[bucket]
-            while (i >= 0) {
-                if (_entries[i].hashCode == hashCode) {
-                    if (last < 0) {
-                        buckets[bucket] = _entries[i].next
-                    } else {
-                        _entries[last].next = _entries[i].next
-                    }
-                    _entries[i].hashCode = -1
-                    _entries[i].next = _freeList
-                    _entries[i].key = null as TKey
-                    _entries[i].value = false
-                    _freeList = i
-                    _freeCount++
-                    return
-                }
-
-
-                last = i
-                i = _entries[i].next
-            }
-        }
+        deleteInternal(key.hashCode())
     }
 
     private var _values: ValueCollection<TKey>? = null
@@ -202,69 +95,35 @@ public class ObjectBooleanMap<TKey> : Iterable<ObjectBooleanMapEntry<TKey>> {
         return _keys!!
     }
 
-    public fun clear() {
-        if (_count > 0) {
-            _buckets?.fill(-1)
-            _entries.fill(ObjectBooleanMapEntryInternal())
-            _freeList = -1
-            _count = 0
-            _freeCount = 0
+    override fun createEntries(size: Int): Array<ObjectBooleanMapEntryInternal<TKey>> {
+        return Array(size) {
+            ObjectBooleanMapEntryInternal()
         }
     }
 
-    override fun iterator(): Iterator<ObjectBooleanMapEntry<TKey>> {
-        return MapIterator(this)
-    }
-
-    private class MapIterator<TKey>(private val map: ObjectBooleanMap<TKey>) :
-        Iterator<ObjectBooleanMapEntry<TKey>> {
-        private var _index = 0
-        private var _currentValue: ObjectBooleanMapEntry<TKey>? = null
-
-        override fun hasNext(): Boolean {
-            while (_index < map._count) {
-                if (map._entries[_index].hashCode >= 0) {
-                    _currentValue = map._entries[_index]
-                    _index++
-                    return true
-                }
-            }
-            _index = map._count + 1
-            _currentValue = null
-            return false
-        }
-
-        override fun next(): ObjectBooleanMapEntry<TKey> {
-            return _currentValue!!
+    override fun createEntries(
+        size: Int,
+        old: Array<ObjectBooleanMapEntryInternal<TKey>>
+    ): Array<ObjectBooleanMapEntryInternal<TKey>> {
+        return Array(size) {
+            if (it < old.size) old[it] else ObjectBooleanMapEntryInternal()
         }
     }
 
     private class ValueCollection<TKey>(private val map: ObjectBooleanMap<TKey>) :
         IBooleanIterable {
         override fun iterator(): BooleanIterator {
-            return ValueIterator(map)
+            return ValueIterator(map.iterator())
         }
 
-        private class ValueIterator<TKey>(private val map: ObjectBooleanMap<TKey>) :
+        private class ValueIterator<TKey>(private val iterator: Iterator<ObjectBooleanMapEntry<TKey>>) :
             BooleanIterator() {
-            private var _index = 0
-            private var _currentValue = false
-
             override fun hasNext(): Boolean {
-                while (_index < map._count) {
-                    if (map._entries[_index].hashCode >= 0) {
-                        _currentValue = map._entries[_index].value
-                        _index++
-                        return true
-                    }
-                }
-                _index = map._count + 1
-                _currentValue = false
-                return false
+                return iterator.hasNext()
             }
 
             override fun nextBoolean(): Boolean {
-                return _currentValue
+                return iterator.next().value
             }
         }
     }
@@ -272,28 +131,16 @@ public class ObjectBooleanMap<TKey> : Iterable<ObjectBooleanMapEntry<TKey>> {
 
     private class KeyCollection<TKey>(private val map: ObjectBooleanMap<TKey>) : Iterable<TKey> {
         override fun iterator(): Iterator<TKey> {
-            return KeyIterator(map)
+            return KeyIterator(map.iterator())
         }
 
-        private class KeyIterator<TKey>(private val map: ObjectBooleanMap<TKey>) : Iterator<TKey> {
-            private var _index = 0
-            private var _currentValue = null as TKey
-
+        private class KeyIterator<TKey>(private val iterator: Iterator<ObjectBooleanMapEntry<TKey>>) : Iterator<TKey> {
             override fun hasNext(): Boolean {
-                while (_index < map._count) {
-                    if (map._entries[_index].hashCode >= 0) {
-                        _currentValue = map._entries[_index].key
-                        _index++
-                        return true
-                    }
-                }
-                _index = map._count + 1
-                _currentValue = null as TKey
-                return false
+                return iterator.hasNext()
             }
 
             override fun next(): TKey {
-                return _currentValue
+                return iterator.next().key
             }
         }
     }

@@ -10,9 +10,9 @@ public class DoubleList : IDoubleIterable {
     }
 
     private var _items: DoubleArray
-    private var _size: Double = 0.0
+    private var _size: Int = 0
 
-    public val length: Double = _size
+    public val length: Double get() = _size.toDouble()
 
     public constructor() {
         _items = DoubleArray(0)
@@ -38,17 +38,17 @@ public class DoubleList : IDoubleIterable {
         val array = _items
         val size = _size
         if (size < array.size) {
-            _size += 1
-            array[_size.toInt()] = item
+            _size = size + 1
+            array[size] = item
         } else {
             addWithResize(item)
         }
     }
 
     private fun addWithResize(item: Double) {
-        val size = _size.toInt()
+        val size = _size
         grow(size + 1)
-        _size++
+        _size = (size + 1)
         _items[size] = item
     }
 
@@ -60,7 +60,7 @@ public class DoubleList : IDoubleIterable {
 
         val newItems = DoubleArray(newCapacity)
         if (_size > 0) {
-            _items.copyInto(newItems, 0, 0, _size.toInt())
+            _items.copyInto(newItems, 0, 0, _size)
         }
         _items = newItems
     }

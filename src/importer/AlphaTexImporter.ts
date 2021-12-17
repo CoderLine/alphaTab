@@ -66,7 +66,7 @@ export class AlphaTexError extends AlphaTabError {
     public symbol: AlphaTexSymbols = AlphaTexSymbols.No;
     public symbolData: unknown = null;
 
-    public constructor(message: string) {
+    public constructor(message: string | null) {
         super(AlphaTabErrorType.AlphaTex, message);
         Object.setPrototypeOf(this, AlphaTexError.prototype);
     }

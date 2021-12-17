@@ -1,6 +1,7 @@
 package alphaTab
 
 import alphaTab.platform.jvm.SkiaCanvas
+import java.util.HashMap
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalUnsignedTypes
