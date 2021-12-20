@@ -89,7 +89,7 @@ kotlin {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 31
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDirs(
         "../../../font/bravura",
@@ -115,8 +115,8 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion(24)
-        targetSdkVersion(30)
+        minSdk = 24
+        targetSdk = 31
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 }
@@ -142,16 +142,15 @@ tasks.whenTaskAdded {
 }
 
 // TODO: remove assertions for faster library.
-//tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)
-//    .all {
-//        kotlinOptions {
-//            freeCompilerArgs += [
-//                '-Xno-call-assertions',
-//                '-Xno-receiver-assertions',
-//                '-Xno-param-assertions'
-//            ]
-//        }
-//    }
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs = listOf(
+            "-Xno-call-assertions",
+            "-Xno-receiver-assertions",
+            "-Xno-param-assertions"
+        )
+    }
+}
 
 //val packForXcode by tasks.creating(Sync::class) {
 //    group = "build"

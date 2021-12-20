@@ -31,7 +31,7 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTou
     override var width: Double
         get() = (_view.measuredWidth / Environment.HighDpiFactor)
         set(value) {
-            val scaled = (value * Environment.HighDpiFactor).toInt()
+            val scaled = (value / Environment.HighDpiFactor).toInt()
             val params = _view.layoutParams
             if(params != null) {
                 params.width = scaled
@@ -41,7 +41,7 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTou
     override var height: Double
         get() = _view.measuredHeight.toDouble()
         set(value) {
-            val scaled = (value * Environment.HighDpiFactor).toInt()
+            val scaled = (value / Environment.HighDpiFactor).toInt()
             val params = _view.layoutParams
             if(params != null) {
                 params.height = scaled
