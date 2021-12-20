@@ -76,7 +76,7 @@ export class BeatContainerGlyph extends Glyph {
         this.updateWidth();
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.preNotes.x = 0;
         this.preNotes.renderer = this.renderer;
         this.preNotes.container = this;
@@ -136,7 +136,7 @@ export class BeatContainerGlyph extends Glyph {
         return 'b' + beat.id;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this.beat.voice.isEmpty) {
             return;
         }

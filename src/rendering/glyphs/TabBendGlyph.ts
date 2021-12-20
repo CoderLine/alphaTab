@@ -122,7 +122,7 @@ export class TabBendGlyph extends Glyph {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         let bendHeight: number = this._maxBendValue * TabBendGlyph.BendValueHeight * this.scale;
         this.renderer.registerOverflowTop(bendHeight);
@@ -204,7 +204,7 @@ export class TabBendGlyph extends Glyph {
         return renderingPoints;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let color: Color = canvas.color;
         if (this._notes.length > 1) {
             canvas.color = this.renderer.resources.secondaryGlyphColor;

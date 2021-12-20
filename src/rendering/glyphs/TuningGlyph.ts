@@ -16,7 +16,7 @@ export class TuningGlyph extends GlyphGroup {
         this.glyphs = [];
     }
 
-    public doLayout() {
+    public override doLayout() {
         if (this.glyphs!.length > 0) {
             return;
         }

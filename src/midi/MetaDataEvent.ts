@@ -10,7 +10,7 @@ export class MetaDataEvent extends MetaEvent {
         this.data = data;
     }
 
-    public writeTo(s: IWriteable): void {
+    public override writeTo(s: IWriteable): void {
         s.writeByte(0xff);
         s.writeByte(this.metaStatus as number);
         let l: number = this.data.length;

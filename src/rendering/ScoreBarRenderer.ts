@@ -63,7 +63,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         return (BarRendererBase.LineSpacing + 1) * this.scale;
     }
 
-    protected updateSizes(): void {
+    protected override updateSizes(): void {
         let res: RenderingResources = this.resources;
         let glyphOverflow: number = res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2;
         this.topPadding = glyphOverflow * this.scale;
@@ -81,7 +81,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         this._firstLineY = (fullLineHeight - actualLineHeight) / 2;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.updateFirstLineY();
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
@@ -116,7 +116,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
         this.paintBeams(cx, cy, canvas);
         this.paintTuplets(cx, cy, canvas);
@@ -377,11 +377,11 @@ export class ScoreBarRenderer extends BarRendererBase {
         return this.getScoreHeight(size);
     }
 
-    public get middleYPosition(): number {
+    public override get middleYPosition(): number {
         return this.getScoreY(this.bar.staff.standardNotationLineCount - 1);
     }
 
-    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let y = super.getNoteY(note, requestedPosition);
         if (isNaN(y)) {
             // NOTE: some might request the note position before the glyphs have been created
@@ -397,7 +397,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         return this.calculateBeamYWithDirection(h, x, h.direction);
     }
 
-    public applyLayoutingInfo(): boolean {
+    public override applyLayoutingInfo(): boolean {
         const result = super.applyLayoutingInfo();
         if (result && this.bar.isMultiVoice) {
             // consider rest overflows
@@ -736,7 +736,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         }
     }
 
-    protected createPreBeatGlyphs(): void {
+    protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
         if (this.bar.masterBar.isRepeatStart) {
             this.addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
@@ -793,7 +793,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getScoreHeight(-0.5), this.bar.index + 1));
     }
 
-    protected createBeatGlyphs(): void {
+    protected override createBeatGlyphs(): void {
         for (let v: number = 0; v < this.bar.voices.length; v++) {
             let voice: Voice = this.bar.voices[v];
             if (this.hasVoiceContainer(voice)) {
@@ -802,7 +802,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         }
     }
 
-    protected createPostBeatGlyphs(): void {
+    protected override createPostBeatGlyphs(): void {
         super.createPostBeatGlyphs();
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
@@ -902,7 +902,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         );
     }
 
-    protected createVoiceGlyphs(v: Voice): void {
+    protected override createVoiceGlyphs(v: Voice): void {
         for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
             let b: Beat = v.beats[i];
             let container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
@@ -940,7 +940,7 @@ export class ScoreBarRenderer extends BarRendererBase {
     }
 
     // private static readonly Random Random = new Random();
-    protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
+    protected override paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
         let res: RenderingResources = this.resources;
         // canvas.color = Color.random(100);
@@ -959,7 +959,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         this.paintSimileMark(cx, cy, canvas);
     }
 
-    public completeBeamingHelper(helper: BeamingHelper) {
+    public override completeBeamingHelper(helper: BeamingHelper) {
         // for multi-voice bars we need to register the positions 
         // for multi-voice rest displacement to avoid collisions
         if (this.bar.isMultiVoice && helper.highestNoteInHelper && helper.lowestNoteInHelper) {

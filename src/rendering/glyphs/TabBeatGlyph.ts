@@ -19,21 +19,21 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public noteNumbers: TabNoteChordGlyph | null = null;
     public restGlyph: TabRestGlyph | null = null;
 
-    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+    public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         return this.noteNumbers ? this.noteNumbers.getNoteX(note, requestedPosition) : 0;
     }
     
-    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return this.noteNumbers ? this.noteNumbers.getNoteY(note, requestedPosition) : 0;
     }
 
-    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
+    public override buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
         if(this.noteNumbers) {
             this.noteNumbers.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         if (!this.container.beat.isRest) {
             //
@@ -136,7 +136,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    public updateBeamingHelper(): void {
+    public override updateBeamingHelper(): void {
         if (!this.container.beat.isRest) {
             this.noteNumbers!.updateBeamingHelper(this.container.x + this.x);
         } else {

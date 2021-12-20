@@ -18,7 +18,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         super(beat, voiceContainer);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this._effectSlurs = [];
         super.doLayout();
         if (this._bend) {
@@ -28,7 +28,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
     }
 
-    protected createTies(n: Note): void {
+    protected override createTies(n: Note): void {
         if (!n.isVisible) {
             return;
         }

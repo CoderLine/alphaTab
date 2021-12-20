@@ -50,7 +50,7 @@ export class SystemExclusiveEvent extends SystemCommonEvent {
         this.data = data;
     }
 
-    public writeTo(s: IWriteable): void {
+    public override writeTo(s: IWriteable): void {
         s.writeByte(0xf0);
         let l: number = this.data.length + 2;
         s.writeByte(this.manufacturerId);

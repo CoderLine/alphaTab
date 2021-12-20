@@ -14,12 +14,12 @@ export class OttavaGlyph extends GroupedEffectGlyph {
         this._aboveStaff = aboveStaff;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this.height = 13 * this.scale;
     }
 
-    protected paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
+    protected override paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
         this.paintOttava(cx, cy, canvas);
     }
 

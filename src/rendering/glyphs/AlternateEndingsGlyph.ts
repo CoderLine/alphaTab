@@ -18,7 +18,7 @@ export class AlternateEndingsGlyph extends EffectGlyph {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this.height = this.renderer.resources.wordsFont.size + (AlternateEndingsGlyph.Padding * this.scale + 2);
         let endingsStrings: string = '';
@@ -29,7 +29,7 @@ export class AlternateEndingsGlyph extends EffectGlyph {
         this._endingsString = endingsStrings;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
         let baseline: TextBaseline = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Top;

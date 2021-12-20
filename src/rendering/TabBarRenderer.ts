@@ -51,7 +51,7 @@ export class TabBarRenderer extends BarRendererBase {
         return (TabBarRenderer.TabLineSpacing + 1) * this.scale;
     }
 
-    protected updateSizes(): void {
+    protected override updateSizes(): void {
         let res: RenderingResources = this.resources;
         let numberOverflow: number = (res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2) * this.scale;
         this.topPadding = numberOverflow;
@@ -72,7 +72,7 @@ export class TabBarRenderer extends BarRendererBase {
         this._firstLineY = (res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2) * this.scale;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.updateFirstLineY();
         super.doLayout();
         if (this.settings.notation.rhythmMode !== TabRhythmMode.Hidden) {
@@ -93,7 +93,7 @@ export class TabBarRenderer extends BarRendererBase {
         }
     }
 
-    protected createPreBeatGlyphs(): void {
+    protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
         if (this.bar.masterBar.isRepeatStart) {
             this.addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
@@ -145,7 +145,7 @@ export class TabBarRenderer extends BarRendererBase {
         );
     }
 
-    protected createVoiceGlyphs(v: Voice): void {
+    protected override createVoiceGlyphs(v: Voice): void {
         for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
             let b: Beat = v.beats[i];
             let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
@@ -155,7 +155,7 @@ export class TabBarRenderer extends BarRendererBase {
         }
     }
 
-    protected createPostBeatGlyphs(): void {
+    protected override createPostBeatGlyphs(): void {
         super.createPostBeatGlyphs();
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
@@ -181,11 +181,11 @@ export class TabBarRenderer extends BarRendererBase {
         return this.lineOffset * line;
     }
 
-    public get middleYPosition(): number {
+    public override get middleYPosition(): number {
         return this.getTabY(this.bar.staff.tuning.length - 1);
     }
 
-    protected paintBackground(cx: number, cy: number, canvas: ICanvas): void {
+    protected override paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
         let res: RenderingResources = this.resources;
         //
@@ -241,7 +241,7 @@ export class TabBarRenderer extends BarRendererBase {
         this.paintSimileMark(cx, cy, canvas);
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
         if (this.settings.notation.rhythmMode !== TabRhythmMode.Hidden) {
             this.paintBeams(cx, cy, canvas);

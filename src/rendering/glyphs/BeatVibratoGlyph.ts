@@ -12,7 +12,7 @@ export class BeatVibratoGlyph extends GroupedEffectGlyph {
         this._type = type;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         switch (this._type) {
             case VibratoType.Slight:

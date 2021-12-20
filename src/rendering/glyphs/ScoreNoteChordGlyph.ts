@@ -97,7 +97,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         let direction: BeamDirection = this.direction;
         for (const effect of this.aboveBeatEffects.values()) {
@@ -150,7 +150,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // TODO: this method seems to be quite heavy according to the profiler, why?
         let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         //

@@ -14,7 +14,7 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
     private _bufferCount: number = 0;
     private _requestedBufferCount: number = 0;
 
-    public open() {
+    public override open() {
         super.open();
         this._bufferCount = Math.floor(
             (AlphaSynthWebAudioOutputBase.TotalBufferTimeInMilliseconds * this.sampleRate) /
@@ -25,7 +25,7 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
         this.onReady();
     }
 
-    public play(): void {
+    public override play(): void {
         super.play();
         let ctx = this._context!;
         // create a script processor node which will replace the silence with the generated audio
@@ -41,7 +41,7 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
         this._audioNode.connect(ctx.destination, 0, 0);
     }
 
-    public pause(): void {
+    public override pause(): void {
         super.pause();
         if (this._audioNode) {
             this._audioNode.disconnect(0);

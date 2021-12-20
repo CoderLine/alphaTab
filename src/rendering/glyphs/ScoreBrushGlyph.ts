@@ -15,11 +15,11 @@ export class ScoreBrushGlyph extends Glyph {
         this._beat = beat;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 10 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let scoreBarRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let lineSize: number = scoreBarRenderer.lineOffset;
         let startY: number = cy + this.y + (scoreBarRenderer.getNoteY(this._beat.maxNote!, NoteYPosition.Bottom) - lineSize);

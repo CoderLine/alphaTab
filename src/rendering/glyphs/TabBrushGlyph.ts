@@ -15,11 +15,11 @@ export class TabBrushGlyph extends Glyph {
         this._beat = beat;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 10 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let tabBarRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         let startY: number =
             cy + this.x + (tabBarRenderer.getNoteY(this._beat.maxNote!, NoteYPosition.Top));

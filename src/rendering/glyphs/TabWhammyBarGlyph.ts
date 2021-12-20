@@ -53,7 +53,7 @@ export class TabWhammyBarGlyph extends Glyph {
         return renderingPoints;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this._isSimpleDip =
             this.renderer.settings.notation.notationMode === NotationMode.SongBook &&
@@ -104,7 +104,7 @@ export class TabWhammyBarGlyph extends Glyph {
         return offset;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: BarRendererBase = this.renderer;
         let endBeat: Beat | null = this._beat.nextBeat;
         let endNoteRenderer: TabBarRenderer | null = null;

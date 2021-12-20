@@ -13,7 +13,7 @@ export class HarmonicsEffectInfo extends NoteEffectInfoBase {
     private _beat: Beat | null = null;
     private _effectId: string;
 
-    public get effectId(): string {
+    public override get effectId(): string {
         return this._effectId;
     }
 

@@ -11,7 +11,7 @@ export class DigitGlyph extends MusicFontGlyph {
         this._scale = scale;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = this.getDigitWidth(this._digit) * this.scale * this._scale;
     }
 
