@@ -139,6 +139,7 @@ export interface NamedTypeDeclaration extends NamedElement, DocumentedElement, N
     typeParameters?: TypeParameterDeclaration[];
     visibility: Visibility;
     partial: boolean;
+    hasVirtualMember: boolean;
 }
 
 export interface ClassDeclaration extends NamedTypeDeclaration {

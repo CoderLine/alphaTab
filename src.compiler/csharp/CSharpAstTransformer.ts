@@ -346,7 +346,8 @@ export default class CSharpAstTransformer {
             tsNode: node,
             partial: false,
             skipEmit: this.shouldSkip(node, false),
-            tsSymbol: this._context.getSymbolForDeclaration(node)
+            tsSymbol: this._context.getSymbolForDeclaration(node),
+            hasVirtualMember: false
         };
 
         if (node.name) {
@@ -398,7 +399,8 @@ export default class CSharpAstTransformer {
             tsNode: node,
             skipEmit: this.shouldSkip(node, false),
             partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
-            tsSymbol: this._context.getSymbolForDeclaration(node)
+            tsSymbol: this._context.getSymbolForDeclaration(node),
+            hasVirtualMember: false
         };
 
         if (node.name) {
@@ -499,7 +501,8 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             isAbstract: false,
             partial: false,
-            members: []
+            members: [],
+            hasVirtualMember: false
         };
 
         if (this._testClassAttribute.length > 0) {
@@ -738,7 +741,8 @@ export default class CSharpAstTransformer {
             partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
             members: [],
             skipEmit: this.shouldSkip(node, false),
-            tsSymbol: this._context.getSymbolForDeclaration(node)
+            tsSymbol: this._context.getSymbolForDeclaration(node),
+            hasVirtualMember: false
         };
 
         if (node.name) {
@@ -970,6 +974,10 @@ export default class CSharpAstTransformer {
                 tsNode: classElement,
                 body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
+
+            if(this._context.markOverride(classElement)) {
+                member.isOverride = true;
+            }
         } else {
             const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
             const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
@@ -984,18 +992,14 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 visibility: this.mapVisibility(classElement),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-                skipEmit: this.shouldSkip(classElement, false)
+                skipEmit: this.shouldSkip(classElement, false),
+                tsNode: classElement,
+                tsSymbol: this._context.getSymbolForDeclaration(classElement),
             };
 
-            if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
-                if (this._context.isOverride(classElement)) {
-                    newProperty.isVirtual = false;
-                    newProperty.isOverride = true;
-                } else {
-                    newProperty.isVirtual = true;
-                    newProperty.isOverride = false;
-                }
-            }
+            if(this._context.markOverride(classElement)) {
+                newProperty.isOverride = true;
+            }          
 
             if (classElement.modifiers) {
                 classElement.modifiers.forEach(m => {
@@ -1040,6 +1044,11 @@ export default class CSharpAstTransformer {
                 tsNode: classElement,
                 body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
+
+            if(this._context.markOverride(classElement)) {
+                member.isOverride = true;
+            }
+
             return member.setAccessor;
         } else {
             const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
@@ -1055,17 +1064,13 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 visibility: this.mapVisibility(classElement),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-                skipEmit: this.shouldSkip(classElement, false)
+                skipEmit: this.shouldSkip(classElement, false),
+                tsNode: classElement,
+                tsSymbol: this._context.getSymbolForDeclaration(classElement),
             };
 
-            if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
-                if (this._context.isOverride(classElement)) {
-                    newProperty.isVirtual = false;
-                    newProperty.isOverride = true;
-                } else {
-                    newProperty.isVirtual = true;
-                    newProperty.isOverride = false;
-                }
+            if(this._context.markOverride(classElement)) {
+                newProperty.isOverride = true;
             }
 
             if (classElement.modifiers) {
@@ -1119,21 +1124,16 @@ export default class CSharpAstTransformer {
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: visibility,
             tsNode: classElement,
+            tsSymbol: this._context.getSymbolForDeclaration(classElement),
             skipEmit: this.shouldSkip(classElement, false)
         };
 
-        if (csProperty.visibility === cs.Visibility.Public || csProperty.visibility === cs.Visibility.Protected) {
-            if (this._context.isOverride(classElement)) {
-                csProperty.isVirtual = false;
-                csProperty.isOverride = true;
-            } else {
-                csProperty.isVirtual = true;
-                csProperty.isOverride = false;
-            }
-        }
-
         if (classElement.name) {
             csProperty.documentation = this.visitDocumentation(classElement.name);
+        }
+
+        if(this._context.markOverride(classElement)) {
+            csProperty.isOverride = true;
         }
 
         let isReadonly = false;
@@ -1220,6 +1220,7 @@ export default class CSharpAstTransformer {
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: this.mapVisibility(classElement),
             tsNode: classElement,
+            tsSymbol: this._context.getSymbolForDeclaration(classElement),
             skipEmit: this.shouldSkip(classElement, false)
         };
 
@@ -1227,16 +1228,10 @@ export default class CSharpAstTransformer {
             csMethod.documentation = this.visitDocumentation(classElement.name);
         }
 
-        if (csMethod.visibility === cs.Visibility.Public || csMethod.visibility === cs.Visibility.Protected) {
-            if (this._context.isOverride(classElement)) {
-                csMethod.isVirtual = false;
-                csMethod.isOverride = true;
-            } else {
-                csMethod.isVirtual = true;
-                csMethod.isOverride = false;
-            }
+        if(this._context.markOverride(classElement)) {
+            csMethod.isOverride = true;
         }
-
+       
         if (classElement.modifiers) {
             classElement.modifiers.forEach(m => {
                 switch (m.kind) {

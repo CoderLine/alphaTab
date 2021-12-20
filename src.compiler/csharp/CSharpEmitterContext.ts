@@ -8,6 +8,7 @@ export default class CSharpEmitterContext {
     private _fileLookup: Map<ts.SourceFile, cs.SourceFile> = new Map();
     private _symbolLookup: Map<SymbolKey, cs.NamedElement & cs.Node> = new Map();
     private _exportedSymbols: Map<SymbolKey, boolean> = new Map();
+    private _virtualSymbols: Map<SymbolKey, boolean> = new Map();
     private _symbolConst: Map<SymbolKey, boolean> = new Map();
 
     private _diagnostics: ts.Diagnostic[] = [];
@@ -793,7 +794,7 @@ export default class CSharpEmitterContext {
         return this.toPascalCase('alphaTab.core') + suffix + '.';
     }
     protected toCoreTypeName(s: string) {
-        if(s === 'Map') {
+        if (s === 'Map') {
             return 'IMap'
         }
         return s;
@@ -862,8 +863,8 @@ export default class CSharpEmitterContext {
         const declaration = symbol.valueDeclaration
             ? symbol.valueDeclaration
             : symbol.declarations && symbol.declarations.length > 0
-            ? symbol.declarations[0]
-            : undefined;
+                ? symbol.declarations[0]
+                : undefined;
 
         if (declaration) {
             return symbol.name + '_' + declaration.getSourceFile().fileName + '_' + declaration.pos;
@@ -1070,7 +1071,7 @@ export default class CSharpEmitterContext {
             return null;
         }
         const declarations = symbol.declarations;
-        if(!declarations || declarations.length === 0){
+        if (!declarations || declarations.length === 0) {
             return null;
         }
 
@@ -1184,7 +1185,7 @@ export default class CSharpEmitterContext {
         return false;
     }
 
-    public isOverride(classElement: ts.ClassElement): boolean {
+    public markOverride(classElement: ts.ClassElement): boolean {
         let parent: ts.Node = classElement;
         while (parent.kind !== ts.SyntaxKind.ClassDeclaration) {
             if (parent.parent) {
@@ -1205,45 +1206,42 @@ export default class CSharpEmitterContext {
             return false;
         }
 
-        if (this.isClassElementOverride(classType, classElement)) {
-            return true;
-        }
 
-        return false;
-    }
+        const overridden = this.getOverriddenMembers(classType, classElement);
+        if(overridden.length > 0) {
+            const member = this.typeChecker.getSymbolAtLocation(classElement) ?? this.typeChecker.getSymbolAtLocation(classElement.name!);
+            this._virtualSymbols.set(this.getSymbolKey(member), true);
 
-    protected isClassElementOverride(classType: ts.InterfaceType, classElement: ts.ClassElement) {
-        return this.hasAnyBaseTypeClassMember(classType, classElement.name!.getText());
-    }
-
-    protected hasAnyBaseTypeClassMember(classType: ts.Type, memberName: string, allowInterfaces: boolean = false) {
-        const baseTypes = classType.getBaseTypes();
-        if (!baseTypes) {
-            return false;
-        }
-
-        for (const baseType of baseTypes) {
-            if (
-                ((allowInterfaces && baseType.isClassOrInterface()) || baseType.isClass()) &&
-                this.hasClassMember(baseType, memberName)
-            ) {
-                return true;
+            for (const s of overridden) {
+                const symbolKey = this.getSymbolKey(s);
+                this._virtualSymbols.set(symbolKey, true);
             }
         }
+     
 
-        return false;
+        return overridden.length > 0;
     }
 
-    protected hasClassMember(baseType: ts.Type, name: string): boolean {
-        if (
-            baseType.symbol &&
-            baseType.symbol.members &&
-            baseType.symbol.members.has(ts.escapeLeadingUnderscores(name))
-        ) {
-            return true;
+    protected getOverriddenMembers(classType: ts.InterfaceType, classElement: ts.ClassElement): ts.Symbol[] {
+        const symbols: ts.Symbol[] = [];
+        this.collectOverriddenMembersByName(symbols, classType, classElement.name!.getText(), false, false);
+        return symbols;
+    }
+
+    protected collectOverriddenMembersByName(symbols: ts.Symbol[], classType: ts.InterfaceType, memberName: string, includeOwnMembers: boolean = false, allowInterfaces: boolean = false) {
+        const member = classType.symbol?.members?.get(ts.escapeLeadingUnderscores(memberName));
+        if (includeOwnMembers && member) {
+            symbols.push(member);
         }
 
-        return this.hasAnyBaseTypeClassMember(baseType, name);
+        const baseTypes = classType.getBaseTypes();
+        if (baseTypes) {
+            for (const baseType of baseTypes) {
+                if (((allowInterfaces && baseType.isClassOrInterface()) || baseType.isClass())) {
+                    this.collectOverriddenMembersByName(symbols, baseType, memberName, true, allowInterfaces);
+                }
+            }
+        }
     }
 
     public isValueTypeExpression(expression: ts.NonNullExpression) {
@@ -1284,30 +1282,83 @@ export default class CSharpEmitterContext {
     }
 
     public rewriteVisibilities() {
-        const visited: Set<SymbolKey> = new Set();
+        const visitedVisibility: Set<SymbolKey> = new Set();
+        const visitedVirtual: Map<SymbolKey, boolean> = new Map();
         for (const kvp of this._symbolLookup) {
             const symbolKey = this.getSymbolKey(kvp[1].tsSymbol!);
             switch (kvp[1].nodeType) {
                 case cs.SyntaxKind.ClassDeclaration:
                 case cs.SyntaxKind.EnumDeclaration:
                 case cs.SyntaxKind.InterfaceDeclaration:
-                    if (!visited.has(symbolKey)) {
-                        const csType = kvp[1] as cs.NamedTypeDeclaration;
+                    const csType = kvp[1] as cs.NamedTypeDeclaration;
+                    if (!visitedVisibility.has(symbolKey)) {
                         const shouldBePublic = !!ts
                             .getJSDocTags(csType.tsNode!)
                             .find(t => t.tagName.text === 'csharp_public');
                         if (csType.visibility === cs.Visibility.Public || shouldBePublic) {
                             if (this._exportedSymbols.has(symbolKey) || shouldBePublic) {
-                                this.makePublic(csType, visited);
+                                this.makePublic(csType, visitedVisibility);
                             } else {
                                 csType.visibility = cs.Visibility.Internal;
                             }
                         }
                     }
+
+                    if (this.makeVirtual(csType, visitedVirtual)) {
+                        csType.hasVirtualMember = true;
+                    }
+
                     break;
             }
         }
     }
+
+    private makeVirtual(node: cs.Node, visited: Map<SymbolKey, boolean>): boolean {
+        const x = this.getSymbolKey(this.getSymbolForDeclaration(node.tsNode!));
+        if (visited.has(x)) {
+            return visited.get(x)!;
+        }
+
+        let hasVirtualMember = false;
+
+        switch (node.nodeType) {
+            case cs.SyntaxKind.ClassDeclaration:
+                const csClass = node as cs.ClassDeclaration;
+                csClass.members.forEach(m => {
+                    if(this.makeVirtual(m, visited)) {
+                        hasVirtualMember = true;
+                    }
+                });
+                break;
+
+            case cs.SyntaxKind.MethodDeclaration:
+                const csMethod = node as cs.MethodDeclaration;
+                
+                const methodKey = this.getSymbolKey(csMethod.tsSymbol!);
+                if(!csMethod.isOverride && this._virtualSymbols.has(methodKey)) {
+                    csMethod.isVirtual = true;
+                    hasVirtualMember = true;
+                }
+
+                break;
+
+            case cs.SyntaxKind.PropertyDeclaration:
+                const csProperty = node as cs.PropertyDeclaration;
+
+                const propKey = this.getSymbolKey(csProperty.tsSymbol!);
+                if(!csProperty.isOverride && this._virtualSymbols.has(propKey)) {
+                    csProperty.isVirtual = true;
+                    hasVirtualMember = true;
+                }
+
+                break;
+        }
+
+        visited.set(x, hasVirtualMember);
+
+        return hasVirtualMember;
+    }
+
 
     private makePublic(node: cs.Node, visited: Set<SymbolKey>) {
         if (node.tsSymbol) {

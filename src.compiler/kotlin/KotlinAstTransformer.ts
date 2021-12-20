@@ -10,7 +10,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         this._testMethodAttribute = 'org.junit.Test';
     }
 
-    public get extension(): string {
+    public override get extension(): string {
         return '.kt';
     }
 
@@ -21,7 +21,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return 'param' + name;
     }
 
-    protected getIdentifierName(identifier: cs.Identifier, expression: ts.Identifier): string {
+    protected override getIdentifierName(identifier: cs.Identifier, expression: ts.Identifier): string {
         const paramName = super.getIdentifierName(identifier, expression);
         if (
             identifier.tsSymbol &&
@@ -44,7 +44,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return paramName;
     }
 
-    protected visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {
+    protected override visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {
         const pre = super.visitPrefixUnaryExpression(parent, expression);
         if (pre) {
             switch (pre.operator) {
@@ -60,7 +60,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return pre;
     }
 
-    protected visitPostfixUnaryExpression(parent: cs.Node, expression: ts.PostfixUnaryExpression) {
+    protected override visitPostfixUnaryExpression(parent: cs.Node, expression: ts.PostfixUnaryExpression) {
         const post = super.visitPostfixUnaryExpression(parent, expression);
         if (post) {
             switch (post.operator) {
@@ -76,7 +76,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return post;
     }
 
-    protected visitBinaryExpression(parent: cs.Node, expression: ts.BinaryExpression) {
+    protected override visitBinaryExpression(parent: cs.Node, expression: ts.BinaryExpression) {
         const bin = super.visitBinaryExpression(parent, expression);
         // detect parameter assignment
         if (
@@ -167,7 +167,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         block.statements.unshift(...localParams);
     }
 
-    protected visitGetAccessor(parent: cs.ClassDeclaration, classElement: ts.GetAccessorDeclaration) {
+    protected override visitGetAccessor(parent: cs.ClassDeclaration, classElement: ts.GetAccessorDeclaration) {
         this._paramReferences.push(new Map<string, cs.Identifier[]>());
         this._paramsWithAssignment.push(new Set<string>());
 
@@ -179,7 +179,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return el;
     }
 
-    protected visitSetAccessor(parent: cs.ClassDeclaration, classElement: ts.SetAccessorDeclaration) {
+    protected override visitSetAccessor(parent: cs.ClassDeclaration, classElement: ts.SetAccessorDeclaration) {
         this._paramReferences.push(new Map<string, cs.Identifier[]>());
         this._paramsWithAssignment.push(new Set<string>());
 
@@ -194,7 +194,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return el;
     }
 
-    protected visitConstructorDeclaration(parent: cs.ClassDeclaration, classElement: ts.ConstructorDeclaration) {
+    protected override visitConstructorDeclaration(parent: cs.ClassDeclaration, classElement: ts.ConstructorDeclaration) {
         this._paramReferences.push(new Map<string, cs.Identifier[]>());
         this._paramsWithAssignment.push(new Set<string>());
 
@@ -210,7 +210,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return constr;
     }
 
-    protected visitArrowExpression(parent: cs.Node, expression: ts.ArrowFunction) {
+    protected override visitArrowExpression(parent: cs.Node, expression: ts.ArrowFunction) {
         this._paramReferences.push(new Map<string, cs.Identifier[]>());
         this._paramsWithAssignment.push(new Set<string>());
 
@@ -222,7 +222,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return func;
     }
 
-    protected visitFunctionExpression(parent: cs.Node, expression: ts.FunctionExpression) {
+    protected override visitFunctionExpression(parent: cs.Node, expression: ts.FunctionExpression) {
         this._paramReferences.push(new Map<string, cs.Identifier[]>());
         this._paramsWithAssignment.push(new Set<string>());
 
@@ -234,7 +234,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return func;
     }
 
-    protected visitMethodDeclaration(
+    protected override visitMethodDeclaration(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.MethodDeclaration
     ) {
@@ -253,13 +253,13 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return method;
     }
 
-    protected visitPropertyAccessExpression(parent: cs.Node, expression: ts.PropertyAccessExpression) {
+    protected override visitPropertyAccessExpression(parent: cs.Node, expression: ts.PropertyAccessExpression) {
         const base = super.visitPropertyAccessExpression(parent, expression);
 
         return base;
     }
 
-    protected getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol, expression: cs.Expression): string | null {
+    protected override getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol, expression: cs.Expression): string | null {
         switch (parentSymbol.name) {
             case 'String':
                 switch (symbol.name) {
@@ -298,19 +298,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return null;
     }
 
-    private isWithinForInitializer(expression: ts.Node): Boolean {
-        if (!expression.parent) {
-            return false;
-        }
-
-        if (ts.isForStatement(expression.parent) && expression.parent.initializer === expression) {
-            return true;
-        }
-
-        return this.isWithinForInitializer(expression.parent!);
-    }
-
-    protected visitNonNullExpression(parent: cs.Node, expression: ts.NonNullExpression) {
+    protected override visitNonNullExpression(parent: cs.Node, expression: ts.NonNullExpression) {
         const nonNullExpression = {
             expression: {} as cs.Expression,
             parent: parent,
@@ -326,7 +314,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return nonNullExpression;
     }
 
-    protected visitAsExpression(parent: cs.Node, expression: ts.AsExpression): cs.Expression | null {
+    protected override visitAsExpression(parent: cs.Node, expression: ts.AsExpression): cs.Expression | null {
         if (this.isCastToEnum(expression)) {
             const methodAccess = {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
@@ -393,7 +381,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return targetType.flags & ts.TypeFlags.Enum || targetType.flags & ts.TypeFlags.EnumLiteral;
     }
 
-    protected createMapEntry(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
+    protected override createMapEntry(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
         const csExpr = {
             parent: parent,
             tsNode: expression,

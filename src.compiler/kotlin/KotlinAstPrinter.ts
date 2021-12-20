@@ -246,7 +246,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         if (d.isAbstract) {
             this.write('abstract ');
-        } else {
+        } else if(d.hasVirtualMember) {
             this.write('open ');
         }
 
@@ -1497,7 +1497,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeLine(`import ${using.namespaceOrTypeName}.*`);
     }
 
-    protected writeSemicolon() {
+    protected override writeSemicolon() {
         this.writeLine();
     }
 }

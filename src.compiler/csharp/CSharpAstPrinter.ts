@@ -258,12 +258,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         if (d.isAbstract) {
             this.write('abstract ');
         }
-
-        if (d.isVirtual) {
+        else if (d.isVirtual) {
             this.write('virtual ');
         }
-
-        if (d.isOverride) {
+        else if (d.isOverride) {
             this.write('override ');
         }
 
@@ -351,12 +349,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
             if (d.isAbstract) {
                 this.write('abstract ');
             }
-
-            if (d.isVirtual) {
+            else if (d.isVirtual) {
                 this.write('virtual ');
             }
-
-            if (d.isOverride) {
+            else if (d.isOverride) {
                 this.write('override ');
             }
         }
