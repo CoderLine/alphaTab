@@ -25,7 +25,6 @@ import kotlin.contracts.ExperimentalContracts
 class AlphaTabView : RelativeLayout {
     companion object {
         const val SuperStateKey = "super_state"
-        const val LayoutStateKey = "layout_state"
         const val AlphaTabStateKey = "at_state"
     }
 
@@ -87,11 +86,16 @@ class AlphaTabView : RelativeLayout {
         init(context)
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        _api.destroy()
+    }
+
     private fun init(context: Context) {
         AndroidEnvironment.initializeAndroid(context, resources.displayMetrics)
         inflate(context, R.layout.alphatab_view, this)
         _layoutView = findViewById(R.id.mainContentView)
-        _api = AlphaTabApiBase(AndroidUiFacade(_layoutView), this)
+        _api = AlphaTabApiBase(AndroidUiFacade(findViewById(R.id.screenSizeView), _layoutView), this)
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -100,11 +104,6 @@ class AlphaTabView : RelativeLayout {
         val superState = super.onSaveInstanceState()
         if (superState != null) {
             bundle.putParcelable(SuperStateKey, superState)
-        }
-
-        val layoutManagerState = _layoutView.layoutManager?.onSaveInstanceState()
-        if (layoutManagerState != null) {
-            bundle.putParcelable(LayoutStateKey, layoutManagerState)
         }
 
         val state = SavedState(superState)
@@ -116,15 +115,11 @@ class AlphaTabView : RelativeLayout {
         return bundle
     }
 
+
     override fun onRestoreInstanceState(state: Parcelable?) {
         if (state is Bundle) {
             if (state.containsKey(SuperStateKey)) {
                 super.onRestoreInstanceState(state.getParcelable(SuperStateKey))
-            }
-
-            val layoutManager = _layoutView.layoutManager
-            if(state.containsKey(LayoutStateKey) && layoutManager != null) {
-                layoutManager.onRestoreInstanceState(state.getParcelable(LayoutStateKey))
             }
 
             if(state.containsKey(AlphaTabStateKey)) {
@@ -173,11 +168,11 @@ class AlphaTabView : RelativeLayout {
             if (source == null) {
                 return
             }
-            val scoreSerialized = source.readHashMap(null)
-            if (scoreSerialized != null) {
-                score = Score()
-                alphaTab.generated.model.ScoreSerializer.fromJson(score!!, scoreSerialized)
-            }
+//            val scoreSerialized = source.readHashMap(null)
+//            if (scoreSerialized != null) {
+//                score = Score()
+//                alphaTab.generated.model.ScoreSerializer.fromJson(score!!, scoreSerialized)
+//            }
 
             val settingsSerialized = source.readHashMap(null)
             if (settingsSerialized != null) {
@@ -195,10 +190,10 @@ class AlphaTabView : RelativeLayout {
                 return
             }
 
-            val scoreSerialized = alphaTab.generated.model.ScoreSerializer.toJson(score)
-            if (scoreSerialized != null) {
-                writeMap(out, scoreSerialized)
-            }
+//            val scoreSerialized = alphaTab.generated.model.ScoreSerializer.toJson(score)
+//            if (scoreSerialized != null) {
+//                writeMap(out, scoreSerialized)
+//            }
 
             val settingsSerialized = alphaTab.generated.SettingsSerializer.toJson(settings)
             if (settingsSerialized != null) {

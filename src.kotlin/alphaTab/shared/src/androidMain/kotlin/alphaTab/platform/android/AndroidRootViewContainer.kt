@@ -11,20 +11,22 @@ import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ScrollView
 import androidx.core.view.children
+import androidx.recyclerview.widget.RecyclerView
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTouchListener {
-    private val _innerVerticalScrollView: ScrollView
-    private val _outerHorizontalScrollView: HorizontalScrollView
+    private val _screenSizeView: View
+    private val _mainContentView: RecyclerView
 
-    public constructor(innerVerticalScrollView: ScrollView,
-                       outerHorizontalScrollView: HorizontalScrollView) {
-        _innerVerticalScrollView = innerVerticalScrollView
-        _outerHorizontalScrollView = outerHorizontalScrollView
-        _outerHorizontalScrollView.addOnLayoutChangeListener(this)
-//        _view.setOnTouchListener(this)
+    public constructor(
+        screenSizeView: View,
+        mainContentView: RecyclerView
+    ) {
+        _screenSizeView = screenSizeView
+        _mainContentView = mainContentView
+        screenSizeView.addOnLayoutChangeListener(this)
     }
 
     override fun setBounds(x: Double, y: Double, w: Double, h: Double) {
@@ -33,33 +35,27 @@ class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener, View.O
     }
 
     override var width: Double
-        get() = (_outerHorizontalScrollView.measuredWidth / Environment.HighDpiFactor)
+        get() = (_screenSizeView.measuredWidth / Environment.HighDpiFactor)
         set(value) {
-            _outerHorizontalScrollView.minimumWidth = (value * Environment.HighDpiFactor).toInt()
         }
     override var height: Double
-        get() = (_outerHorizontalScrollView.measuredHeight / Environment.HighDpiFactor)
+        get() = (_screenSizeView.measuredHeight / Environment.HighDpiFactor)
         set(value) {
-            _outerHorizontalScrollView.minimumHeight = (value * Environment.HighDpiFactor).toInt()
         }
     override val isVisible: Boolean
-        get() = _outerHorizontalScrollView.visibility == View.VISIBLE && _outerHorizontalScrollView.width > 0
+        get() = _screenSizeView.visibility == View.VISIBLE
+
     override var scrollLeft: Double
-        get() = _outerHorizontalScrollView.scrollX.toDouble()
+        get() = 0.0
         set(value) {
-            _outerHorizontalScrollView.scrollX = value.toInt()
         }
     override var scrollTop: Double
-        get() = _innerVerticalScrollView.scrollY.toDouble()
+        get() = 0.0
         set(value) {
-            _innerVerticalScrollView.scrollY = value.toInt()
         }
 
     override fun appendChild(child: IContainer) {
-        val childView = (child as AndroidViewContainer)._view
-        if (!_innerVerticalScrollView.children.any { it == childView }) {
-            _innerVerticalScrollView.addView(childView)
-        }
+
     }
 
     override fun stopAnimation() {
@@ -69,7 +65,6 @@ class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener, View.O
     }
 
     override fun clear() {
-        _innerVerticalScrollView.removeAllViews()
     }
 
     override var resize: IEventEmitter = EventEmitter()

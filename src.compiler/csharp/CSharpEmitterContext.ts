@@ -1185,6 +1185,11 @@ export default class CSharpEmitterContext {
         return false;
     }
 
+    public markAsSubclassed(classElement: ts.Symbol) {
+        const key = this.getSymbolKey(classElement);
+        this._virtualSymbols.set(key, true);
+    }
+    
     public markOverride(classElement: ts.ClassElement): boolean {
         let parent: ts.Node = classElement;
         while (parent.kind !== ts.SyntaxKind.ClassDeclaration) {
@@ -1305,7 +1310,7 @@ export default class CSharpEmitterContext {
                     }
 
                     if (this.makeVirtual(csType, visitedVirtual)) {
-                        csType.hasVirtualMember = true;
+                        csType.hasVirtualMembersOrSubClasses = true;
                     }
 
                     break;
@@ -1329,6 +1334,22 @@ export default class CSharpEmitterContext {
                         hasVirtualMember = true;
                     }
                 });
+
+                let baseClass = csClass.baseClass;
+                while(baseClass != null) {
+                    if(cs.isTypeReference(baseClass)) {
+                        const ref = baseClass.reference;
+                        if(cs.isNode(ref) && cs.isClassDeclaration(ref)) {
+                            ref.hasVirtualMembersOrSubClasses = true;
+                            baseClass = ref;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
                 break;
 
             case cs.SyntaxKind.MethodDeclaration:

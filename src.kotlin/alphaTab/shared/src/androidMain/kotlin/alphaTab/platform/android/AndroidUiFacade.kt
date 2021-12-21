@@ -31,18 +31,20 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 class AndroidUiFacade : IUiFacade<AlphaTabView> {
+    private var _screenSizeView: View
     private var _layoutView: RecyclerView
     private var _renderResultAdapter: AlphaTabRenderResultAdapter
     private var _handler: Handler
     private var _internalRootContainerBecameVisible: EventEmitter? = EventEmitter()
 
-    public constructor(layoutView: RecyclerView) {
+    public constructor(screenSizeView: View, layoutView: RecyclerView) {
+        _screenSizeView = screenSizeView
         _layoutView = layoutView
         layoutView.layoutManager = AlphaTabLayoutManager(layoutView.context)
         _renderResultAdapter = AlphaTabRenderResultAdapter()
         layoutView.adapter =_renderResultAdapter
 
-        rootContainer = AndroidViewContainer(layoutView)
+        rootContainer = AndroidRootViewContainer(_screenSizeView, _layoutView)
         _handler = Handler(layoutView.context.mainLooper)
         rootContainerBecameVisible = object : IEventEmitter,
             ViewTreeObserver.OnGlobalLayoutListener, View.OnLayoutChangeListener {
@@ -94,7 +96,7 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
     override val canRender: Boolean
         get() = true
 
-    private lateinit var api: AlphaTabApiBase<AlphaTabView>
+    public lateinit var api: AlphaTabApiBase<AlphaTabView>
     public lateinit var settingsContainer: AlphaTabView
 
     public override fun initialize(api: AlphaTabApiBase<AlphaTabView>, settings: AlphaTabView) {

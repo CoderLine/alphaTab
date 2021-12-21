@@ -139,7 +139,7 @@ export interface NamedTypeDeclaration extends NamedElement, DocumentedElement, N
     typeParameters?: TypeParameterDeclaration[];
     visibility: Visibility;
     partial: boolean;
-    hasVirtualMember: boolean;
+    hasVirtualMembersOrSubClasses: boolean;
 }
 
 export interface ClassDeclaration extends NamedTypeDeclaration {
@@ -501,6 +501,7 @@ export interface CatchClause extends Node {
 }
 
 // Node Tests
+export function isNode(node: any): node is Node { return typeof(node) === 'object' && 'nodeType' in node; }
 export function isSourceFile(node: Node): node is SourceFile { return node.nodeType === SyntaxKind.SourceFile; }
 export function isUsingDeclaration(node: Node): node is UsingDeclaration { return node.nodeType === SyntaxKind.UsingDeclaration; }
 export function isNamespaceDeclaration(node: Node): node is NamespaceDeclaration { return node.nodeType === SyntaxKind.NamespaceDeclaration; }

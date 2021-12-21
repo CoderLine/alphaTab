@@ -3,7 +3,6 @@ package alphaTab.platform.android
 import alphaTab.*
 import alphaTab.collections.DoubleList
 import alphaTab.core.ecmaScript.Error
-import alphaTab.model.JsonConverter
 import alphaTab.model.Score
 import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
@@ -24,7 +23,7 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
     private val _workerQueue: BlockingQueue<() -> Unit>
     private val _threadStartedEvent: Semaphore
     private var _isCancelled = false
-    private lateinit var _renderer: ScoreRenderer
+    public lateinit var renderer: ScoreRenderer
     private var _width: Double = 0.0
 
     public constructor(settings: Settings, uiInvoke: ( action: (() -> Unit) ) -> Unit) {
@@ -58,20 +57,20 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
     }
 
     private fun initialize(settings: Settings) {
-        _renderer = ScoreRenderer(settings)
-        _renderer.partialRenderFinished.on {
+        renderer = ScoreRenderer(settings)
+        renderer.partialRenderFinished.on {
             _uiInvoke { onPartialRenderFinished(it) }
         }
-        _renderer.renderFinished.on {
+        renderer.renderFinished.on {
             _uiInvoke { onRenderFinished(it) }
         }
-        _renderer.postRenderFinished.on {
-            _uiInvoke { onPostFinished(_renderer.boundsLookup) }
+        renderer.postRenderFinished.on {
+            _uiInvoke { onPostFinished(renderer.boundsLookup) }
         }
-        _renderer.preRender.on {
+        renderer.preRender.on {
             _uiInvoke { onPreRender(it) }
         }
-        _renderer.error.on {
+        renderer.error.on {
             _uiInvoke { onError(it) }
         }
     }
@@ -87,15 +86,15 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
         set(value) {
             _width = value
             if (checkAccess()) {
-                _renderer.width = value
+                renderer.width = value
             } else {
-                _workerQueue.add { _renderer.width = value }
+                _workerQueue.add { renderer.width = value }
             }
         }
 
     override fun render() {
         if (checkAccess()) {
-            _renderer.render()
+            renderer.render()
         } else {
             _workerQueue.add { render() }
         }
@@ -103,7 +102,7 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
 
     override fun resizeRender() {
         if (checkAccess()) {
-            _renderer.resizeRender()
+            renderer.resizeRender()
         } else {
             _workerQueue.add { resizeRender() }
         }
@@ -111,7 +110,7 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
 
     override fun renderScore(score: Score, trackIndexes: DoubleList) {
         if (checkAccess()) {
-            _renderer.renderScore(score, trackIndexes)
+            renderer.renderScore(score, trackIndexes)
         } else {
             _workerQueue.add {
                 renderScore(
@@ -124,7 +123,7 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
 
     override fun updateSettings(settings: Settings) {
         if (checkAccess()) {
-            _renderer.updateSettings(settings)
+            renderer.updateSettings(settings)
         } else {
             _workerQueue.add { updateSettings(settings) }
         }

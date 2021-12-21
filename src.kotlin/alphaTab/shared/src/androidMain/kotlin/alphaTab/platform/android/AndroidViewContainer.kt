@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ScrollView
+import androidx.recyclerview.widget.RecyclerView
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -31,22 +32,32 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTou
     override var width: Double
         get() = (_view.measuredWidth / Environment.HighDpiFactor)
         set(value) {
-            val scaled = (value / Environment.HighDpiFactor).toInt()
-            val params = _view.layoutParams
-            if(params != null) {
-                params.width = scaled
+            val scaled = (value * Environment.HighDpiFactor).toInt()
+            if (_view is RecyclerView) {
+                // width in layout managed needs to be set to
+                // exceed screen width
+                (_view.layoutManager as AlphaTabLayoutManager).width = scaled
+            } else {
+                val params = _view.layoutParams
+                if (params != null) {
+                    params.width = scaled
+                }
+                _view.minimumWidth = scaled
             }
-            _view.minimumWidth = scaled
         }
     override var height: Double
         get() = _view.measuredHeight.toDouble()
         set(value) {
-            val scaled = (value / Environment.HighDpiFactor).toInt()
-            val params = _view.layoutParams
-            if(params != null) {
-                params.height = scaled
+            val scaled = (value * Environment.HighDpiFactor).toInt()
+            if (_view is RecyclerView) {
+                // height is handled automatically
+            } else {
+                val params = _view.layoutParams
+                if (params != null) {
+                    params.height = scaled
+                }
+                _view.minimumHeight = scaled
             }
-            _view.minimumHeight = scaled
         }
     override val isVisible: Boolean
         get() = _view.visibility == View.VISIBLE && _view.width > 0

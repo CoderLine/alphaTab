@@ -246,7 +246,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         if (d.isAbstract) {
             this.write('abstract ');
-        } else if(d.hasVirtualMember) {
+        } else if(d.hasVirtualMembersOrSubClasses) {
             this.write('open ');
         }
 

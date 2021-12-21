@@ -347,7 +347,7 @@ export default class CSharpAstTransformer {
             partial: false,
             skipEmit: this.shouldSkip(node, false),
             tsSymbol: this._context.getSymbolForDeclaration(node),
-            hasVirtualMember: false
+            hasVirtualMembersOrSubClasses: false
         };
 
         if (node.name) {
@@ -400,7 +400,7 @@ export default class CSharpAstTransformer {
             skipEmit: this.shouldSkip(node, false),
             partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
             tsSymbol: this._context.getSymbolForDeclaration(node),
-            hasVirtualMember: false
+            hasVirtualMembersOrSubClasses: false
         };
 
         if (node.name) {
@@ -502,7 +502,7 @@ export default class CSharpAstTransformer {
             isAbstract: false,
             partial: false,
             members: [],
-            hasVirtualMember: false
+            hasVirtualMembersOrSubClasses: false
         };
 
         if (this._testClassAttribute.length > 0) {
@@ -742,7 +742,7 @@ export default class CSharpAstTransformer {
             members: [],
             skipEmit: this.shouldSkip(node, false),
             tsSymbol: this._context.getSymbolForDeclaration(node),
-            hasVirtualMember: false
+            hasVirtualMembersOrSubClasses: false
         };
 
         if (node.name) {

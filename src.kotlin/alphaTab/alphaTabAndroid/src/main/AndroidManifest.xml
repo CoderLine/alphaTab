@@ -8,7 +8,6 @@
         android:theme="@style/AppTheme"
         android:label="@string/alphatab">
         <activity android:name="net.alphatab.android.MainActivity"
-                  tools:ignore="LockedOrientationActivity"
                   android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

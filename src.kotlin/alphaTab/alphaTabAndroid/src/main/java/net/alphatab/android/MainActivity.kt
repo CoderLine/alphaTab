@@ -8,6 +8,8 @@ import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.importer.ScoreLoader
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -31,7 +33,11 @@ class MainActivity : AppCompatActivity() {
         _alphaTabView = findViewById(R.id.alphatab_view)
         _alphaTabView.settings.core.logLevel = LogLevel.Debug
         _alphaTabView.settings.display.barCountPerPartial = 4.0
-        _alphaTabView.settings.display.layoutMode = LayoutMode.Horizontal
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            _alphaTabView.settings.display.layoutMode = LayoutMode.Horizontal
+        } else {
+            _alphaTabView.settings.display.layoutMode = LayoutMode.Page
+        }
         Logger.logLevel = LogLevel.Debug
     }
 
@@ -40,6 +46,10 @@ class MainActivity : AppCompatActivity() {
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "*/*"
         startActivityForResult(intent, OPEN_REQUEST_CODE)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -52,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                     _alphaTabView.tracks = arrayListOf(score.tracks[0])
                 } catch (e: Exception) {
                     Log.e("AlphaTab", "Failed to load file: $e, ${e.stackTraceToString()}")
-                    Toast.makeText(this, R.string.open_failed, Toast.LENGTH_LONG)
+                    Toast.makeText(this, R.string.open_failed, Toast.LENGTH_LONG).show()
                 }
                 return
             }
