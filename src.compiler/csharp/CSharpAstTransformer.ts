@@ -330,11 +330,16 @@ export default class CSharpAstTransformer {
         }
         const tags = ts.getJSDocTags(node).filter(t => t.tagName.text === 'target');
         if (tags.length > 0) {
-            return !tags.find(t => t.comment === 'csharp');
+            return !tags.find(t => t.comment === this.targetTag);
         }
 
         return false;
     }
+
+    public get targetTag(): string {
+        return 'csharp';
+    }
+
 
     protected visitEnumDeclaration(node: ts.EnumDeclaration) {
         const csEnum: cs.EnumDeclaration = {

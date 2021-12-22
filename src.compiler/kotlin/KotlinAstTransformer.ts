@@ -14,6 +14,11 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return '.kt';
     }
 
+
+    public override get targetTag(): string {
+        return 'kotlin';
+    }
+
     private _paramReferences: Map<string, cs.Identifier[]>[] = [];
     private _paramsWithAssignment: Set<string>[] = [];
 
