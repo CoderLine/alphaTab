@@ -192,11 +192,10 @@ export class IOHelper {
     }
 
 
-    private static _doubleConverter: DataView = new DataView(new ArrayBuffer(8))
     public static readNumber(o: IReadable): number {
-        let bytes: Uint8Array = new Uint8Array(this._doubleConverter.buffer);
+        let bytes: Uint8Array = new Uint8Array(8);
         o.read(bytes, 0, bytes.length);
-        return IOHelper._doubleConverter.getFloat64(0, true)
+        return TypeConversions.bytesToFloat64(bytes)
     }
 
     public static readString(o: IReadable): string {
@@ -244,8 +243,7 @@ export class IOHelper {
     }
 
     public static writeNumber(o: IWriteable, v: number) {
-        this._doubleConverter.setFloat64(0, v, true);
-        const bytes: Uint8Array = new Uint8Array(this._doubleConverter.buffer);
+        const bytes = TypeConversions.float64ToBytes(v);
         o.write(bytes, 0, bytes.length);
     }
 

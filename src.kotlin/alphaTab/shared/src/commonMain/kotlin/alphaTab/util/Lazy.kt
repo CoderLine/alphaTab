@@ -1,4 +1,4 @@
-package alphaTab.core
+package alphaTab.util
 
 internal object UninitializedValue
 

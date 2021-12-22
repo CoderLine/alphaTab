@@ -1,7 +1,6 @@
 package alphaTab.platform.jvm
 
 import alphaTab.Settings
-import alphaTab.core.BitConverter
 import alphaTab.model.Color
 import alphaTab.model.Font
 import alphaTab.model.MusicFontSymbol
@@ -11,6 +10,8 @@ import alphaTab.platform.TextBaseline
 import org.jetbrains.skija.*
 import org.jetbrains.skija.shaper.Shaper
 import java.lang.IllegalStateException
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import kotlin.contracts.ExperimentalContracts
 import kotlin.math.floor
 
@@ -375,12 +376,19 @@ public class SkiaCanvas : ICanvas {
     private fun typoAscenderDescender(typeface: Typeface): Pair<Short, Short> {
         val buffer = typeface.getTableData("OS/2")
         if (buffer != null && buffer.size >= 72) {
-            val ascender = BitConverter.getInt16(buffer.bytes, 68, false)
-            val descender = -BitConverter.getInt16(buffer.bytes, 70, false)
+            val ascender = getInt16(buffer.bytes, 68, false)
+            val descender = -getInt16(buffer.bytes, 70, false)
             return Pair(ascender, descender.toShort())
         }
 
         return Pair(0.toShort(), 0.toShort())
+    }
+
+    fun getInt16(src: ByteArray, pos: Int, littleEndian: Boolean): Short {
+        return ByteBuffer
+            .wrap(src)
+            .order(if (littleEndian) ByteOrder.LITTLE_ENDIAN else ByteOrder.BIG_ENDIAN)
+            .getShort(pos)
     }
 
     private fun floatAscent(metrics: FontMetrics): Float {

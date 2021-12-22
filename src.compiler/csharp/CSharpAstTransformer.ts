@@ -296,10 +296,6 @@ export default class CSharpAstTransformer {
         additionalNestedNonExportsDeclarations?: ts.Declaration[],
         globalStatements?: ts.Statement[]
     ): ts.Node {
-        if (this.shouldSkip(node, false)) {
-            return node;
-        }
-
         if (ts.isClassDeclaration(node)) {
             this.visitClassDeclaration(
                 node,
@@ -431,7 +427,9 @@ export default class CSharpAstTransformer {
             });
         }
 
-        node.members.forEach(m => this.visitInterfaceElement(csInterface, m));
+        if(!csInterface.skipEmit){
+            node.members.forEach(m => this.visitInterfaceElement(csInterface, m));
+        }
 
         this._csharpFile.namespace.declarations.push(csInterface);
         this._context.registerSymbol(csInterface);
@@ -782,32 +780,34 @@ export default class CSharpAstTransformer {
             });
         }
 
-        node.members.forEach(m => this.visitClassElement(csClass, m));
+        if (!csClass.skipEmit) {
+            node.members.forEach(m => this.visitClassElement(csClass, m));
 
-        if (globalStatements && globalStatements.length > 0) {
-            const staticConstructor = {
-                parent: csClass,
-                isStatic: true,
-                name: 'cctor',
-                nodeType: cs.SyntaxKind.ConstructorDeclaration,
-                parameters: [],
-                visibility: cs.Visibility.None,
-                tsNode: node,
-                body: {
-                    parent: null,
-                    nodeType: cs.SyntaxKind.Block,
-                    statements: []
-                } as cs.Block
-            } as cs.ConstructorDeclaration;
+            if (globalStatements && globalStatements.length > 0) {
+                const staticConstructor = {
+                    parent: csClass,
+                    isStatic: true,
+                    name: 'cctor',
+                    nodeType: cs.SyntaxKind.ConstructorDeclaration,
+                    parameters: [],
+                    visibility: cs.Visibility.None,
+                    tsNode: node,
+                    body: {
+                        parent: null,
+                        nodeType: cs.SyntaxKind.Block,
+                        statements: []
+                    } as cs.Block
+                } as cs.ConstructorDeclaration;
 
-            globalStatements.forEach(s => {
-                const st = this.visitStatement(staticConstructor.body!, s)!;
-                if (st) {
-                    (staticConstructor.body as cs.Block).statements.push(st);
-                }
-            });
+                globalStatements.forEach(s => {
+                    const st = this.visitStatement(staticConstructor.body!, s)!;
+                    if (st) {
+                        (staticConstructor.body as cs.Block).statements.push(st);
+                    }
+                });
 
-            csClass.members.push(staticConstructor);
+                csClass.members.push(staticConstructor);
+            }
         }
 
         this._csharpFile.namespace.declarations.push(csClass);
@@ -980,7 +980,7 @@ export default class CSharpAstTransformer {
                 body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
 
-            if(this._context.markOverride(classElement)) {
+            if (this._context.markOverride(classElement)) {
                 member.isOverride = true;
             }
         } else {
@@ -1002,9 +1002,9 @@ export default class CSharpAstTransformer {
                 tsSymbol: this._context.getSymbolForDeclaration(classElement),
             };
 
-            if(this._context.markOverride(classElement)) {
+            if (this._context.markOverride(classElement)) {
                 newProperty.isOverride = true;
-            }          
+            }
 
             if (classElement.modifiers) {
                 classElement.modifiers.forEach(m => {
@@ -1050,7 +1050,7 @@ export default class CSharpAstTransformer {
                 body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
 
-            if(this._context.markOverride(classElement)) {
+            if (this._context.markOverride(classElement)) {
                 member.isOverride = true;
             }
 
@@ -1074,7 +1074,7 @@ export default class CSharpAstTransformer {
                 tsSymbol: this._context.getSymbolForDeclaration(classElement),
             };
 
-            if(this._context.markOverride(classElement)) {
+            if (this._context.markOverride(classElement)) {
                 newProperty.isOverride = true;
             }
 
@@ -1137,7 +1137,7 @@ export default class CSharpAstTransformer {
             csProperty.documentation = this.visitDocumentation(classElement.name);
         }
 
-        if(this._context.markOverride(classElement)) {
+        if (this._context.markOverride(classElement)) {
             csProperty.isOverride = true;
         }
 
@@ -1233,10 +1233,10 @@ export default class CSharpAstTransformer {
             csMethod.documentation = this.visitDocumentation(classElement.name);
         }
 
-        if(this._context.markOverride(classElement)) {
+        if (this._context.markOverride(classElement)) {
             csMethod.isOverride = true;
         }
-       
+
         if (classElement.modifiers) {
             classElement.modifiers.forEach(m => {
                 switch (m.kind) {
@@ -3213,10 +3213,10 @@ export default class CSharpAstTransformer {
 
         // number.ToString
         const isNumberToString =
-        ts.isPropertyAccessExpression(expression.expression) &&
-        this._context.typeChecker.getTypeAtLocation(expression.expression.expression).flags & ts.TypeFlags.Number &&
-        (expression.expression.name as ts.Identifier).text === 'toString' &&
-        expression.arguments.length === 0;
+            ts.isPropertyAccessExpression(expression.expression) &&
+            this._context.typeChecker.getTypeAtLocation(expression.expression.expression).flags & ts.TypeFlags.Number &&
+            (expression.expression.name as ts.Identifier).text === 'toString' &&
+            expression.arguments.length === 0;
 
         callExpression.expression = this.visitExpression(callExpression, expression.expression)!;
         if (!callExpression.expression) {
@@ -3424,7 +3424,7 @@ export default class CSharpAstTransformer {
                 (node.tsSymbol.flags & ts.SymbolFlags.Variable) === ts.SymbolFlags.Variable ||
                 (node.tsSymbol.flags & ts.SymbolFlags.EnumMember) === ts.SymbolFlags.EnumMember ||
                 (node.tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable) ===
-                    ts.SymbolFlags.FunctionScopedVariable ||
+                ts.SymbolFlags.FunctionScopedVariable ||
                 (node.tsSymbol.flags & ts.SymbolFlags.BlockScopedVariable) === ts.SymbolFlags.BlockScopedVariable
             ) {
                 let smartCastType = this._context.getSmartCastType(expression);

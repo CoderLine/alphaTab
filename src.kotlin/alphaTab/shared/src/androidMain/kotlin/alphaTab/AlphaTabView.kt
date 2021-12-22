@@ -95,7 +95,8 @@ class AlphaTabView : RelativeLayout {
         AndroidEnvironment.initializeAndroid(context, resources.displayMetrics)
         inflate(context, R.layout.alphatab_view, this)
         _layoutView = findViewById(R.id.mainContentView)
-        _api = AlphaTabApiBase(AndroidUiFacade(findViewById(R.id.screenSizeView), _layoutView), this)
+        _api =
+            AlphaTabApiBase(AndroidUiFacade(findViewById(R.id.screenSizeView), _layoutView), this)
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -122,12 +123,12 @@ class AlphaTabView : RelativeLayout {
                 super.onRestoreInstanceState(state.getParcelable(SuperStateKey))
             }
 
-            if(state.containsKey(AlphaTabStateKey)) {
+            if (state.containsKey(AlphaTabStateKey)) {
                 val atState = state.getParcelable<SavedState>(AlphaTabStateKey)!!
-                if(atState.settings != null) {
+                if (atState.settings != null) {
                     _api.settings = atState.settings!!
                 }
-                if(atState.score != null) {
+                if (atState.score != null) {
                     _api.renderScore(atState.score!!, atState.indexes)
                 }
             }
@@ -170,22 +171,30 @@ class AlphaTabView : RelativeLayout {
             }
 
             val settingsBytesSize = source.readInt()
-            val settingsSerialized = ByteArray(settingsBytesSize)
-            source.readByteArray(settingsSerialized)
-            settings = Settings()
-            alphaTab.generated.SettingsSerializer.fromBinary(settings!!, ByteBuffer.fromBuffer(
-                Uint8Array(settingsSerialized.asUByteArray())
-            ))
+            if(settingsBytesSize > 0) {
+                val settingsSerialized = ByteArray(settingsBytesSize)
+                source.readByteArray(settingsSerialized)
+                settings = Settings()
+                alphaTab.generated.SettingsSerializer.fromBinary(
+                    settings!!, ByteBuffer.fromBuffer(
+                        Uint8Array(settingsSerialized.asUByteArray())
+                    )
+                )
+            }
 
             val scoreBytesSize = source.readInt()
-            val scoreSerialized = ByteArray(scoreBytesSize)
-            source.readByteArray(scoreSerialized)
+            if(scoreBytesSize > 0) {
+                val scoreSerialized = ByteArray(scoreBytesSize)
+                source.readByteArray(scoreSerialized)
 
-            score = Score()
-            alphaTab.generated.model.ScoreSerializer.fromBinary(score!!, ByteBuffer.fromBuffer(
-                Uint8Array(scoreSerialized.asUByteArray())
-            ))
-            score!!.finish(settings!!)
+                score = Score()
+                alphaTab.generated.model.ScoreSerializer.fromBinary(
+                    score!!, ByteBuffer.fromBuffer(
+                        Uint8Array(scoreSerialized.asUByteArray())
+                    )
+                )
+                score!!.finish(settings!!)
+            }
 
             indexes = DoubleList()
             readList(source, indexes)
@@ -197,17 +206,27 @@ class AlphaTabView : RelativeLayout {
                 return
             }
 
-            val settingsSerialized = ByteBuffer.withCapacity(1024.0)
-            alphaTab.generated.SettingsSerializer.toBinary(settings, settingsSerialized)
-            val settingsBuffer = settingsSerialized.toArray().buffer.raw
-            out.writeInt(settingsBuffer.size)
-            out.writeByteArray(settingsBuffer.asByteArray())
+            val settingsLocal = settings
+            if (settingsLocal != null) {
+                val settingsSerialized = ByteBuffer.withCapacity(1024.0)
+                alphaTab.generated.SettingsSerializer.toBinary(settings, settingsSerialized)
+                val settingsBuffer = settingsSerialized.toArray().buffer.raw
+                out.writeInt(settingsBuffer.size)
+                out.writeByteArray(settingsBuffer.asByteArray())
+            } else {
+                out.writeInt(0);
+            }
 
-            val scoreSerialized = ByteBuffer.withCapacity(1024.0)
-            alphaTab.generated.model.ScoreSerializer.toBinary(score, scoreSerialized)
-            val scoreBuffer = scoreSerialized.toArray().buffer.raw
-            out.writeInt(scoreBuffer.size)
-            out.writeByteArray(scoreBuffer.asByteArray())
+            val scoreLocal = score
+            if (scoreLocal != null) {
+                val scoreSerialized = ByteBuffer.withCapacity(1024.0)
+                alphaTab.generated.model.ScoreSerializer.toBinary(score, scoreSerialized)
+                val scoreBuffer = scoreSerialized.toArray().buffer.raw
+                out.writeInt(scoreBuffer.size)
+                out.writeByteArray(scoreBuffer.asByteArray())
+            } else {
+                out.writeInt(0);
+            }
 
             writeList(out, indexes)
         }
