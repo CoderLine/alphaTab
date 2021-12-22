@@ -63,5 +63,30 @@ actual class BitConverter {
                 .order(if (littleEndian) ByteOrder.LITTLE_ENDIAN else ByteOrder.BIG_ENDIAN)
                 .getInt(pos)
         }
+
+        @kotlin.jvm.JvmStatic
+        public actual fun getFloat(src: ByteArray, pos: Int, littleEndian: Boolean): Float {
+            return ByteBuffer
+                .wrap(src)
+                .order(if (littleEndian) ByteOrder.LITTLE_ENDIAN else ByteOrder.BIG_ENDIAN)
+                .getFloat(pos)
+        }
+
+        @kotlin.jvm.JvmStatic
+        public actual fun getDouble(src: ByteArray, pos: Int, littleEndian: Boolean): Double {
+            return ByteBuffer
+                .wrap(src)
+                .order(if (littleEndian) ByteOrder.LITTLE_ENDIAN else ByteOrder.BIG_ENDIAN)
+                .getDouble(pos)
+        }
+
+
+        @kotlin.jvm.JvmStatic
+        public actual fun put(dest: ByteArray, pos: Int, v:Double, littleEndian: Boolean) {
+            ByteBuffer
+                .wrap(dest)
+                .order(if (littleEndian) ByteOrder.LITTLE_ENDIAN else ByteOrder.BIG_ENDIAN)
+                .putDouble(pos, v)
+        }
     }
 }

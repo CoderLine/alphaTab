@@ -75,7 +75,7 @@ export class DisplaySettingsSerializer {
         RenderingResourcesSerializer.toBinary(obj.resources, w); 
         if (obj.padding !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeNumberArray(w, obj.padding);
+            IOHelper.writeNumberArray(w, obj.padding!);
         }
         else {
             IOHelper.writeNull(w);

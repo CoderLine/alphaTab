@@ -191,12 +191,12 @@ export class IOHelper {
         return o.readByte() !== 0;
     }
 
-    public static readNumber(o: IReadable): number {
-        let bytes: Uint8Array = new Uint8Array(8);
-        o.read(bytes, 0, bytes.length);
 
-        let array: Float64Array = new Float64Array(bytes.buffer);
-        return array[0];
+    private static _doubleConverter: DataView = new DataView(new ArrayBuffer(8))
+    public static readNumber(o: IReadable): number {
+        let bytes: Uint8Array = new Uint8Array(this._doubleConverter.buffer);
+        o.read(bytes, 0, bytes.length);
+        return IOHelper._doubleConverter.getFloat64(0, true)
     }
 
     public static readString(o: IReadable): string {
@@ -244,9 +244,8 @@ export class IOHelper {
     }
 
     public static writeNumber(o: IWriteable, v: number) {
-        let bytes: Uint8Array = new Uint8Array(8);
-        let array: Float64Array = new Float64Array(bytes.buffer);
-        array[0] = v;
+        this._doubleConverter.setFloat64(0, v, true);
+        const bytes: Uint8Array = new Uint8Array(this._doubleConverter.buffer);
         o.write(bytes, 0, bytes.length);
     }
 
@@ -264,7 +263,7 @@ export class IOHelper {
         }
     }
 
-    public static isEof(o:IReadable) {
+    public static isEof(o: IReadable) {
         return o.position >= o.length;
     }
 }

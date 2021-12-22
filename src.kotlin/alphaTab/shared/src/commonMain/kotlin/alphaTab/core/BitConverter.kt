@@ -13,6 +13,9 @@ expect class BitConverter {
         fun put(dest: ByteArray, pos: Int, v: Int, littleEndian: Boolean)
 
         @kotlin.jvm.JvmStatic
+        fun put(dest: ByteArray, pos: Int, v: Double, littleEndian: Boolean)
+
+        @kotlin.jvm.JvmStatic
         fun getInt16(src: ByteArray, pos: Int, littleEndian: Boolean): Short
 
         @kotlin.jvm.JvmStatic
@@ -23,5 +26,11 @@ expect class BitConverter {
 
         @kotlin.jvm.JvmStatic
         fun getInt32(src: ByteArray, pos: Int, littleEndian: Boolean): Int
+
+        @kotlin.jvm.JvmStatic
+        fun getFloat(src: ByteArray, pos: Int, littleEndian: Boolean): Float
+
+        @kotlin.jvm.JvmStatic
+        fun getDouble(src: ByteArray, pos: Int, littleEndian: Boolean): Double
     }
 }

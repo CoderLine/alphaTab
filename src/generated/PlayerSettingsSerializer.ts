@@ -82,7 +82,7 @@ export class PlayerSettingsSerializer {
         IOHelper.writeNotNull(w); 
         if (obj.soundFont !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.soundFont);
+            IOHelper.writeString(w, obj.soundFont!);
         }
         else {
             IOHelper.writeNull(w);

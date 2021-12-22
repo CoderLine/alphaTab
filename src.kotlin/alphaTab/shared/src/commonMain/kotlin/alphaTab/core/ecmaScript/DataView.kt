@@ -6,11 +6,15 @@ import alphaTab.core.BitConverter
 class DataView {
     private val _buffer: ArrayBuffer
 
+    public val size: Int get() = _buffer.raw.size
+
+    public val buffer:ArrayBuffer get() = _buffer
+
     public constructor(buffer: ArrayBuffer) {
         this._buffer = buffer
     }
 
-    public fun getUint8(offset:Double): Double {
+    public fun getUint8(offset: Double): Double {
         return _buffer.raw[offset.toInt()].toDouble()
     }
 
@@ -62,5 +66,13 @@ class DataView {
 
     public fun getInt8(offset: Double): Double {
         return _buffer.raw[offset.toInt()].toByte().toDouble()
+    }
+
+    public fun getFloat64(offset: Double, littleEndian: Boolean): Double {
+        return BitConverter.getDouble(_buffer.raw.asByteArray(), offset.toInt(), littleEndian)
+    }
+
+    public fun setFloat64(offset: Double, value:Double, littleEndian: Boolean) {
+        BitConverter.put(_buffer.raw.asByteArray(), offset.toInt(), value, littleEndian)
     }
 }

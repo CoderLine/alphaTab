@@ -2,6 +2,8 @@ package alphaTab
 
 import alphaTab.collections.BooleanList
 import alphaTab.collections.DoubleList
+import alphaTab.core.ecmaScript.Uint8Array
+import alphaTab.io.ByteBuffer
 import alphaTab.model.Score
 import alphaTab.model.Track
 import alphaTab.platform.android.AndroidEnvironment
@@ -43,8 +45,6 @@ class AlphaTabView : RelativeLayout {
     private var _settings: Settings = Settings().apply {
         this.player.enableCursor = true
         this.player.enableCursor = true
-        // TODO: horizontal layout does not work yet correctly
-        //this.display.layoutMode = LayoutMode.Horizontal
     }
 
     public var settings: Settings
@@ -168,17 +168,24 @@ class AlphaTabView : RelativeLayout {
             if (source == null) {
                 return
             }
-//            val scoreSerialized = source.readHashMap(null)
-//            if (scoreSerialized != null) {
-//                score = Score()
-//                alphaTab.generated.model.ScoreSerializer.fromJson(score!!, scoreSerialized)
-//            }
 
-            val settingsSerialized = source.readHashMap(null)
-            if (settingsSerialized != null) {
-                settings = Settings()
-                alphaTab.generated.SettingsSerializer.fromJson(settings!!, settingsSerialized)
-            }
+            val settingsBytesSize = source.readInt()
+            val settingsSerialized = ByteArray(settingsBytesSize)
+            source.readByteArray(settingsSerialized)
+            settings = Settings()
+            alphaTab.generated.SettingsSerializer.fromBinary(settings!!, ByteBuffer.fromBuffer(
+                Uint8Array(settingsSerialized.asUByteArray())
+            ))
+
+            val scoreBytesSize = source.readInt()
+            val scoreSerialized = ByteArray(scoreBytesSize)
+            source.readByteArray(scoreSerialized)
+
+            score = Score()
+            alphaTab.generated.model.ScoreSerializer.fromBinary(score!!, ByteBuffer.fromBuffer(
+                Uint8Array(scoreSerialized.asUByteArray())
+            ))
+            score!!.finish(settings!!)
 
             indexes = DoubleList()
             readList(source, indexes)
@@ -190,15 +197,18 @@ class AlphaTabView : RelativeLayout {
                 return
             }
 
-//            val scoreSerialized = alphaTab.generated.model.ScoreSerializer.toJson(score)
-//            if (scoreSerialized != null) {
-//                writeMap(out, scoreSerialized)
-//            }
+            val settingsSerialized = ByteBuffer.withCapacity(1024.0)
+            alphaTab.generated.SettingsSerializer.toBinary(settings, settingsSerialized)
+            val settingsBuffer = settingsSerialized.toArray().buffer.raw
+            out.writeInt(settingsBuffer.size)
+            out.writeByteArray(settingsBuffer.asByteArray())
 
-            val settingsSerialized = alphaTab.generated.SettingsSerializer.toJson(settings)
-            if (settingsSerialized != null) {
-                writeMap(out, settingsSerialized)
-            }
+            val scoreSerialized = ByteBuffer.withCapacity(1024.0)
+            alphaTab.generated.model.ScoreSerializer.toBinary(score, scoreSerialized)
+            val scoreBuffer = scoreSerialized.toArray().buffer.raw
+            out.writeInt(scoreBuffer.size)
+            out.writeByteArray(scoreBuffer.asByteArray())
+
             writeList(out, indexes)
         }
 

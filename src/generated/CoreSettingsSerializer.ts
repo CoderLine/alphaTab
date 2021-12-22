@@ -79,7 +79,7 @@ export class CoreSettingsSerializer {
         /*@target web*/
         if (obj.scriptFile !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.scriptFile);
+            IOHelper.writeString(w, obj.scriptFile!);
         }
         else {
             IOHelper.writeNull(w);
@@ -87,7 +87,7 @@ export class CoreSettingsSerializer {
         /*@target web*/
         if (obj.fontDirectory !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.fontDirectory);
+            IOHelper.writeString(w, obj.fontDirectory!);
         }
         else {
             IOHelper.writeNull(w);
@@ -95,7 +95,7 @@ export class CoreSettingsSerializer {
         /*@target web*/
         if (obj.file !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.file);
+            IOHelper.writeString(w, obj.file!);
         }
         else {
             IOHelper.writeNull(w);

@@ -1,13 +1,5 @@
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IReadable } from '@src/io/IReadable';
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-
-export class EndOfReaderError extends AlphaTabError {
-    public constructor() {
-        super(AlphaTabErrorType.Format, 'Unexpected end of data within reader');
-        Object.setPrototypeOf(this, EndOfReaderError.prototype);
-    }
-}
+import { EndOfReaderError, IReadable } from '@src/io/IReadable';
 
 /**
  * This utility public class allows bitwise reading of a stream

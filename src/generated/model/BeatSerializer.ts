@@ -183,7 +183,7 @@ export class BeatSerializer {
         IOHelper.writeBoolean(w, obj.fadeIn); 
         if (obj.lyrics !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeStringArray(w, obj.lyrics);
+            IOHelper.writeStringArray(w, obj.lyrics!);
         }
         else {
             IOHelper.writeNull(w);
@@ -194,7 +194,7 @@ export class BeatSerializer {
         IOHelper.writeBoolean(w, obj.tap); 
         if (obj.text !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.text);
+            IOHelper.writeString(w, obj.text!);
         }
         else {
             IOHelper.writeNull(w);
@@ -212,7 +212,7 @@ export class BeatSerializer {
         IOHelper.writeInt32LE(w, obj.vibrato as number); 
         if (obj.chordId !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.chordId);
+            IOHelper.writeString(w, obj.chordId!);
         }
         else {
             IOHelper.writeNull(w);
@@ -221,7 +221,7 @@ export class BeatSerializer {
         IOHelper.writeInt32LE(w, obj.pickStroke as number); 
         if (obj.tremoloSpeed !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeInt32LE(w, obj.tremoloSpeed as number);
+            IOHelper.writeInt32LE(w, obj.tremoloSpeed! as number);
         }
         else {
             IOHelper.writeNull(w);
@@ -235,7 +235,7 @@ export class BeatSerializer {
         IOHelper.writeBoolean(w, obj.invertBeamDirection); 
         if (obj.preferredBeamDirection !== null) {
             IOHelper.writeNotNull(w);
-            IOHelper.writeInt32LE(w, obj.preferredBeamDirection as number);
+            IOHelper.writeInt32LE(w, obj.preferredBeamDirection! as number);
         }
         else {
             IOHelper.writeNull(w);

@@ -67,7 +67,7 @@ function generateToBinaryBody(
                 propertyStatements.push(createNodeFromSource<ts.IfStatement>(
                     `if ( obj.${fieldName} !== null ) {
                         IOHelper.writeNotNull(w);
-                        IOHelper.${primitiveWrite}(w, obj.${fieldName});
+                        IOHelper.${primitiveWrite}(w, obj.${fieldName}!);
                     } else {
                         IOHelper.writeNull(w);
                     }`,
@@ -87,7 +87,7 @@ function generateToBinaryBody(
                     createNodeFromSource<ts.IfStatement>(
                         `if( obj.${fieldName} !== null ) {
                             IOHelper.writeNotNull(w);
-                            IOHelper.writeInt32LE(w, obj.${fieldName} as number);
+                            IOHelper.writeInt32LE(w, obj.${fieldName}! as number);
                         } else {
                             IOHelper.writeNull(w);
                         }`,
