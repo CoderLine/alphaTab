@@ -7,6 +7,7 @@ import { Voice } from "@src/model/Voice";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { Beat } from "@src/model/Beat";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
@@ -28,6 +29,9 @@ export class VoiceSerializer {
         return o; 
     }
     public static fromBinary(o: Voice | null, r: IReadable): Voice | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 

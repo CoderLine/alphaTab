@@ -6,6 +6,7 @@
 import { VibratoPlaybackSettings } from "@src/PlayerSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
 export class VibratoPlaybackSettingsSerializer {
@@ -31,6 +32,9 @@ export class VibratoPlaybackSettingsSerializer {
         return o; 
     }
     public static fromBinary(o: VibratoPlaybackSettings | null, r: IReadable): VibratoPlaybackSettings | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 

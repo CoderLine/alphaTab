@@ -6,6 +6,7 @@
 import { CoreSettings } from "@src/CoreSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
 import { LogLevel } from "@src/LogLevel";
@@ -39,6 +40,9 @@ export class CoreSettingsSerializer {
         return o; 
     }
     public static fromBinary(o: CoreSettings | null, r: IReadable): CoreSettings | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 
@@ -72,6 +76,30 @@ export class CoreSettingsSerializer {
             return;
         } 
         IOHelper.writeNotNull(w); 
+        /*@target web*/
+        if (obj.scriptFile !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeString(w, obj.scriptFile);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
+        /*@target web*/
+        if (obj.fontDirectory !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeString(w, obj.fontDirectory);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
+        /*@target web*/
+        if (obj.file !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeString(w, obj.file);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
         /*@target web*/
         IOHelper.writeBoolean(w, obj.tex); 
         /*@target web*/

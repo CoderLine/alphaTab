@@ -9,6 +9,7 @@ import { SectionSerializer } from "@src/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { FermataSerializer } from "@src/generated/model/FermataSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
 import { KeySignature } from "@src/model/KeySignature";
@@ -53,6 +54,9 @@ export class MasterBarSerializer {
         return o; 
     }
     public static fromBinary(o: MasterBar | null, r: IReadable): MasterBar | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 

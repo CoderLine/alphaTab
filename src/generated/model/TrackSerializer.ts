@@ -10,6 +10,7 @@ import { PlaybackInformationSerializer } from "@src/generated/model/PlaybackInfo
 import { Color } from "@src/model/Color";
 import { InstrumentArticulationSerializer } from "@src/generated/model/InstrumentArticulationSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { Staff } from "@src/model/Staff";
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 import { IWriteable } from "@src/io/IWriteable";
@@ -35,6 +36,9 @@ export class TrackSerializer {
         return o; 
     }
     public static fromBinary(o: Track | null, r: IReadable): Track | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 
@@ -48,7 +52,7 @@ export class TrackSerializer {
                 obj.addStaff(it);
             }
         } 
-        obj.playbackInfo = PlaybackInformationSerializer.fromBinary(obj.playbackInfo, r); 
+        PlaybackInformationSerializer.fromBinary(obj.playbackInfo, r); 
         obj.color = Color.fromBinary(r)!; 
         obj.name = IOHelper.readString(r); 
         obj.shortName = IOHelper.readString(r); 

@@ -7,6 +7,7 @@ import { Note } from "@src/model/Note";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { BendPoint } from "@src/model/BendPoint";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
@@ -76,6 +77,9 @@ export class NoteSerializer {
         return o; 
     }
     public static fromBinary(o: Note | null, r: IReadable): Note | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 

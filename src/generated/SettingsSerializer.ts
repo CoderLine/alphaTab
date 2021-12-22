@@ -11,6 +11,7 @@ import { NotationSettingsSerializer } from "@src/generated/NotationSettingsSeria
 import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSerializer";
 import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
 export class SettingsSerializer {
@@ -33,15 +34,18 @@ export class SettingsSerializer {
         return o; 
     }
     public static fromBinary(o: Settings | null, r: IReadable): Settings | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 
         const obj = o != null ? o : new Settings(); 
-        obj.core = CoreSettingsSerializer.fromBinary(obj.core, r); 
-        obj.display = DisplaySettingsSerializer.fromBinary(obj.display, r); 
-        obj.notation = NotationSettingsSerializer.fromBinary(obj.notation, r); 
-        obj.importer = ImporterSettingsSerializer.fromBinary(obj.importer, r); 
-        obj.player = PlayerSettingsSerializer.fromBinary(obj.player, r); 
+        CoreSettingsSerializer.fromBinary(obj.core, r); 
+        DisplaySettingsSerializer.fromBinary(obj.display, r); 
+        NotationSettingsSerializer.fromBinary(obj.notation, r); 
+        ImporterSettingsSerializer.fromBinary(obj.importer, r); 
+        PlayerSettingsSerializer.fromBinary(obj.player, r); 
         return obj; 
     }
     public static toBinary(obj: Settings | null, w: IWriteable): void {

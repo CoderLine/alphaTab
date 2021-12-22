@@ -7,6 +7,7 @@ import { DisplaySettings } from "@src/DisplaySettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
 import { LayoutMode } from "@src/LayoutMode";
@@ -36,6 +37,9 @@ export class DisplaySettingsSerializer {
         return o; 
     }
     public static fromBinary(o: DisplaySettings | null, r: IReadable): DisplaySettings | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 
@@ -48,7 +52,7 @@ export class DisplaySettingsSerializer {
         obj.startBar = IOHelper.readNumber(r); 
         obj.barCount = IOHelper.readNumber(r); 
         obj.barCountPerPartial = IOHelper.readNumber(r); 
-        obj.resources = RenderingResourcesSerializer.fromBinary(obj.resources, r); 
+        RenderingResourcesSerializer.fromBinary(obj.resources, r); 
         if (!IOHelper.readNull(r)) {
             obj.padding = IOHelper.readNumberArray(r);
         } 
@@ -69,6 +73,13 @@ export class DisplaySettingsSerializer {
         IOHelper.writeNumber(w, obj.barCount); 
         IOHelper.writeNumber(w, obj.barCountPerPartial); 
         RenderingResourcesSerializer.toBinary(obj.resources, w); 
+        if (obj.padding !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeNumberArray(w, obj.padding);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
     }
     public static setProperty(obj: DisplaySettings, property: string, v: unknown): boolean {
         switch (property) {

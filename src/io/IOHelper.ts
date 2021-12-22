@@ -263,4 +263,8 @@ export class IOHelper {
             IOHelper.writeNumber(o, s);
         }
     }
+
+    public static isEof(o:IReadable) {
+        return o.position >= o.length;
+    }
 }

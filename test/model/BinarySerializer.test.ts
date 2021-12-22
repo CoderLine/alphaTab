@@ -35,7 +35,8 @@ describe('BinarySerializerTest', () => {
             ScoreSerializer.toBinary(expected, expectedBinary);
 
             expectedBinary.position = 0;
-            const actual = ScoreSerializer.fromBinary(new Score(), expectedBinary);
+            const actual = ScoreSerializer.fromBinary(new Score(), expectedBinary)!;
+            actual.finish(new Settings());
 
             const actualJson = JsonConverter.scoreToJsObject(actual);
             const expectedJson = JsonConverter.scoreToJsObject(expected);
@@ -101,8 +102,6 @@ describe('BinarySerializerTest', () => {
         expected.core.fontDirectory = 'font';
         /**@target web*/
         expected.core.tex = true;
-        /**@target web*/
-        expected.core.tracks = [1, 2, 3];
 
         expected.core.enableLazyLoading = false;
         expected.core.engine = "engine";
@@ -142,8 +141,8 @@ describe('BinarySerializerTest', () => {
         SettingsSerializer.toBinary(expected, expectedBinary);
 
         expectedBinary.position = 0;
-        const actual = SettingsSerializer.fromBinary(new Settings(), expectedBinary);
-
+        const actual = SettingsSerializer.fromBinary(new Settings(), expectedBinary)!;
+        
         const expectedJson = JsonConverter.settingsToJsObject(expected);
         const actualJson = JsonConverter.settingsToJsObject(actual);
 

@@ -6,6 +6,7 @@
 import { Chord } from "@src/model/Chord";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
 export class ChordSerializer {
@@ -30,6 +31,9 @@ export class ChordSerializer {
         return o; 
     }
     public static fromBinary(o: Chord | null, r: IReadable): Chord | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 

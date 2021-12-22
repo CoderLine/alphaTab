@@ -9,6 +9,7 @@ import { BarSerializer } from "@src/generated/model/BarSerializer";
 import { ChordSerializer } from "@src/generated/model/ChordSerializer";
 import { TuningSerializer } from "@src/generated/model/TuningSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { Bar } from "@src/model/Bar";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
@@ -44,6 +45,9 @@ export class StaffSerializer {
         return o; 
     }
     public static fromBinary(o: Staff | null, r: IReadable): Staff | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 
@@ -66,7 +70,7 @@ export class StaffSerializer {
         obj.capo = IOHelper.readNumber(r); 
         obj.transpositionPitch = IOHelper.readNumber(r); 
         obj.displayTranspositionPitch = IOHelper.readNumber(r); 
-        obj.stringTuning = TuningSerializer.fromBinary(obj.stringTuning, r); 
+        TuningSerializer.fromBinary(obj.stringTuning, r); 
         obj.showTablature = IOHelper.readBoolean(r); 
         obj.showStandardNotation = IOHelper.readBoolean(r); 
         obj.isPercussion = IOHelper.readBoolean(r); 

@@ -64,15 +64,15 @@ function generateToBinaryBody(
         const primitiveWrite = getPrimitiveWriteMethod(type.type!, typeChecker);
         if (primitiveWrite) {
             if (type.isNullable) {
-                createNodeFromSource<ts.ExpressionStatement>(
-                    `if ( obj.${fieldName} !== null && obj.${fieldName} !== undefined ) {
+                propertyStatements.push(createNodeFromSource<ts.IfStatement>(
+                    `if ( obj.${fieldName} !== null ) {
                         IOHelper.writeNotNull(w);
                         IOHelper.${primitiveWrite}(w, obj.${fieldName});
                     } else {
                         IOHelper.writeNull(w);
                     }`,
-                    ts.SyntaxKind.ExpressionStatement
-                )
+                    ts.SyntaxKind.IfStatement
+                ));
             } else {
                 propertyStatements.push(
                     createNodeFromSource<ts.ExpressionStatement>(
@@ -84,14 +84,14 @@ function generateToBinaryBody(
         } else if (isEnumType(type.type!)) {
             if (type.isNullable) {
                 propertyStatements.push(
-                    createNodeFromSource<ts.ExpressionStatement>(
-                        `if( typeof(obj.${fieldName}) === 'number') {
+                    createNodeFromSource<ts.IfStatement>(
+                        `if( obj.${fieldName} !== null ) {
                             IOHelper.writeNotNull(w);
                             IOHelper.writeInt32LE(w, obj.${fieldName} as number);
                         } else {
                             IOHelper.writeNull(w);
                         }`,
-                        ts.SyntaxKind.ExpressionStatement
+                        ts.SyntaxKind.IfStatement
                     )
                 );
             } else {
@@ -140,7 +140,7 @@ function generateToBinaryBody(
             } else {
                 throw new Error(
                     'only Map<Primitive, *> maps are supported extend if needed: ' +
-                        mapType.typeArguments![0].symbol.name
+                    mapType.typeArguments![0].symbol.name
                 );
             }
 

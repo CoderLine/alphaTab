@@ -9,6 +9,7 @@ import { NoteSerializer } from "@src/generated/model/NoteSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { Note } from "@src/model/Note";
 import { Automation } from "@src/model/Automation";
 import { BendPoint } from "@src/model/BendPoint";
@@ -78,6 +79,9 @@ export class BeatSerializer {
         return o; 
     }
     public static fromBinary(o: Beat | null, r: IReadable): Beat | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 
@@ -177,10 +181,24 @@ export class BeatSerializer {
         } 
         IOHelper.writeNumber(w, obj.dots); 
         IOHelper.writeBoolean(w, obj.fadeIn); 
+        if (obj.lyrics !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeStringArray(w, obj.lyrics);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
         IOHelper.writeBoolean(w, obj.hasRasgueado); 
         IOHelper.writeBoolean(w, obj.pop); 
         IOHelper.writeBoolean(w, obj.slap); 
         IOHelper.writeBoolean(w, obj.tap); 
+        if (obj.text !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeString(w, obj.text);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
         IOHelper.writeInt32LE(w, obj.brushType as number); 
         IOHelper.writeNumber(w, obj.brushDuration); 
         IOHelper.writeNumber(w, obj.tupletDenominator); 
@@ -192,9 +210,22 @@ export class BeatSerializer {
             BendPointSerializer.toBinary(i, w);
         } 
         IOHelper.writeInt32LE(w, obj.vibrato as number); 
+        if (obj.chordId !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeString(w, obj.chordId);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
         IOHelper.writeInt32LE(w, obj.graceType as number); 
         IOHelper.writeInt32LE(w, obj.pickStroke as number); 
-        IOHelper.writeNotNull(w); 
+        if (obj.tremoloSpeed !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeInt32LE(w, obj.tremoloSpeed as number);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
         IOHelper.writeInt32LE(w, obj.crescendo as number); 
         IOHelper.writeNumber(w, obj.displayStart); 
         IOHelper.writeNumber(w, obj.playbackStart); 
@@ -202,7 +233,13 @@ export class BeatSerializer {
         IOHelper.writeNumber(w, obj.playbackDuration); 
         IOHelper.writeInt32LE(w, obj.dynamics as number); 
         IOHelper.writeBoolean(w, obj.invertBeamDirection); 
-        IOHelper.writeNotNull(w); 
+        if (obj.preferredBeamDirection !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeInt32LE(w, obj.preferredBeamDirection as number);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
         IOHelper.writeInt32LE(w, obj.beamingMode as number); 
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {

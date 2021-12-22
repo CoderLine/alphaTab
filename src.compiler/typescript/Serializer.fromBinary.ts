@@ -37,7 +37,14 @@ function generateFromBinaryBody(
 ) {
     const statements: ts.Statement[] = [];
 
+    importer('EndOfReaderError', '@src/io/IReadable');
     statements.push(
+        createNodeFromSource<ts.IfStatement>(
+            `if(IOHelper.isEof(r)) {
+                throw new EndOfReaderError()
+            }`,
+            ts.SyntaxKind.IfStatement
+        ),
         createNodeFromSource<ts.IfStatement>(
             `if(IOHelper.readNull(r)) { 
                 return null;
@@ -163,15 +170,14 @@ function generateFromBinaryBody(
                 );
             } else if (isEnumType(mapType.typeArguments![0])) {
                 readKey = createNodeFromSource<ts.NonNullExpression>(
-                    `JsonHelper.parseEnum<${mapType.typeArguments![0].symbol.name}>(IOHelper.readInt32LE(r), ${
-                        mapType.typeArguments![0].symbol.name
+                    `JsonHelper.parseEnum<${mapType.typeArguments![0].symbol.name}>(IOHelper.readInt32LE(r), ${mapType.typeArguments![0].symbol.name
                     })!`,
                     ts.SyntaxKind.NonNullExpression
                 );
             } else {
                 throw new Error(
                     'only Map<Primitive, *> maps are supported extend if needed: ' +
-                        mapType.typeArguments![0].symbol.name
+                    mapType.typeArguments![0].symbol.name
                 );
             }
 
@@ -184,8 +190,7 @@ function generateFromBinaryBody(
                 );
             } else if (isEnumType(mapType.typeArguments![1])) {
                 readValue = createNodeFromSource<ts.CallExpression>(
-                    `JsonHelper.parseEnum<${mapType.typeArguments![1].symbol.name}>(IOHelper.readInt32LE(r), ${
-                        mapType.typeArguments![1].symbol.name
+                    `JsonHelper.parseEnum<${mapType.typeArguments![1].symbol.name}>(IOHelper.readInt32LE(r), ${mapType.typeArguments![1].symbol.name
                     })!`,
                     ts.SyntaxKind.CallExpression
                 );
@@ -234,7 +239,7 @@ function generateFromBinaryBody(
             );
 
             propertyStatements.push(ts.factory.createBlock(mapStatements));
-        }  else if (isImmutable(type.type)) {
+        } else if (isImmutable(type.type)) {
             let itemSerializer = type.type.symbol.name;
             importer(itemSerializer, findModule(type.type, program.getCompilerOptions()));
             propertyStatements.push(
@@ -243,15 +248,25 @@ function generateFromBinaryBody(
                     ts.SyntaxKind.ExpressionStatement
                 )
             );
+
         } else {
             let itemSerializer = type.type.symbol.name + 'Serializer';
             importer(itemSerializer, findSerializerModule(type.type, program.getCompilerOptions()));
-            propertyStatements.push(
-                createNodeFromSource<ts.ExpressionStatement>(
-                    `obj.${fieldName} = ${itemSerializer}.fromBinary(obj.${fieldName}, r);`,
-                    ts.SyntaxKind.ExpressionStatement
-                )
-            );
+            if (type.isNullable) {
+                propertyStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `obj.${fieldName} = ${itemSerializer}.fromBinary(obj.${fieldName}, r);`,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
+            } else {
+                propertyStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `${itemSerializer}.fromBinary(obj.${fieldName}, r);`,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
+            }
         }
 
         if (prop.target) {

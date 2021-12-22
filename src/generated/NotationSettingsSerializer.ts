@@ -6,6 +6,7 @@
 import { NotationSettings } from "@src/NotationSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
 import { NotationMode } from "@src/NotationSettings";
@@ -44,6 +45,9 @@ export class NotationSettingsSerializer {
         return o; 
     }
     public static fromBinary(o: NotationSettings | null, r: IReadable): NotationSettings | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 

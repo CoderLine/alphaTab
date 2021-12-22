@@ -7,6 +7,7 @@ import { Bar } from "@src/model/Bar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { Voice } from "@src/model/Voice";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
@@ -33,6 +34,9 @@ export class BarSerializer {
         return o; 
     }
     public static fromBinary(o: Bar | null, r: IReadable): Bar | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 

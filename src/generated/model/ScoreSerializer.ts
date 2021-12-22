@@ -9,6 +9,7 @@ import { MasterBarSerializer } from "@src/generated/model/MasterBarSerializer";
 import { TrackSerializer } from "@src/generated/model/TrackSerializer";
 import { RenderStylesheetSerializer } from "@src/generated/model/RenderStylesheetSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { MasterBar } from "@src/model/MasterBar";
 import { Track } from "@src/model/Track";
 import { IWriteable } from "@src/io/IWriteable";
@@ -43,6 +44,9 @@ export class ScoreSerializer {
         return o; 
     }
     public static fromBinary(o: Score | null, r: IReadable): Score | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 
@@ -77,7 +81,7 @@ export class ScoreSerializer {
                 obj.addTrack(it);
             }
         } 
-        obj.stylesheet = RenderStylesheetSerializer.fromBinary(obj.stylesheet, r); 
+        RenderStylesheetSerializer.fromBinary(obj.stylesheet, r); 
         return obj; 
     }
     public static toBinary(obj: Score | null, w: IWriteable): void {

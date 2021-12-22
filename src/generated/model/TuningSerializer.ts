@@ -6,6 +6,7 @@
 import { Tuning } from "@src/model/Tuning";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
 export class TuningSerializer {
@@ -26,6 +27,9 @@ export class TuningSerializer {
         return o; 
     }
     public static fromBinary(o: Tuning | null, r: IReadable): Tuning | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 

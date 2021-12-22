@@ -8,6 +8,7 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { VibratoPlaybackSettingsSerializer } from "@src/generated/VibratoPlaybackSettingsSerializer";
 import { SlidePlaybackSettingsSerializer } from "@src/generated/SlidePlaybackSettingsSerializer";
 import { IReadable } from "@src/io/IReadable";
+import { EndOfReaderError } from "@src/io/IReadable";
 import { IWriteable } from "@src/io/IWriteable";
 import { IOHelper } from "@src/io/IOHelper";
 import { ScrollMode } from "@src/PlayerSettings";
@@ -44,6 +45,9 @@ export class PlayerSettingsSerializer {
         return o; 
     }
     public static fromBinary(o: PlayerSettings | null, r: IReadable): PlayerSettings | null {
+        if (IOHelper.isEof(r)) {
+            throw new EndOfReaderError();
+        } 
         if (IOHelper.readNull(r)) {
             return null;
         } 
@@ -65,8 +69,8 @@ export class PlayerSettingsSerializer {
         obj.nativeBrowserSmoothScroll = IOHelper.readBoolean(r); 
         obj.songBookBendDuration = IOHelper.readNumber(r); 
         obj.songBookDipDuration = IOHelper.readNumber(r); 
-        obj.vibrato = VibratoPlaybackSettingsSerializer.fromBinary(obj.vibrato, r); 
-        obj.slide = SlidePlaybackSettingsSerializer.fromBinary(obj.slide, r); 
+        VibratoPlaybackSettingsSerializer.fromBinary(obj.vibrato, r); 
+        SlidePlaybackSettingsSerializer.fromBinary(obj.slide, r); 
         obj.playTripletFeel = IOHelper.readBoolean(r); 
         return obj; 
     }
@@ -76,6 +80,13 @@ export class PlayerSettingsSerializer {
             return;
         } 
         IOHelper.writeNotNull(w); 
+        if (obj.soundFont !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeString(w, obj.soundFont);
+        }
+        else {
+            IOHelper.writeNull(w);
+        } 
         IOHelper.writeString(w, obj.scrollElement); 
         IOHelper.writeBoolean(w, obj.enablePlayer); 
         IOHelper.writeBoolean(w, obj.enableCursor); 
