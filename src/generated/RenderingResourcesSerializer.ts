@@ -7,6 +7,9 @@ import { RenderingResources } from "@src/RenderingResources";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { Font } from "@src/model/Font";
 import { Color } from "@src/model/Color";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 export class RenderingResourcesSerializer {
     public static fromJson(obj: RenderingResources, m: unknown): void {
         if (!m) {
@@ -37,6 +40,36 @@ export class RenderingResourcesSerializer {
         o.set("secondaryglyphcolor", Color.toJson(obj.secondaryGlyphColor)); 
         o.set("scoreinfocolor", Color.toJson(obj.scoreInfoColor)); 
         return o; 
+    }
+    public static fromBinary(obj: RenderingResources, r: IReadable): RenderingResources {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        return obj; 
+    }
+    public static toBinary(obj: RenderingResources | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        Font.toBinary(obj.copyrightFont, w); 
+        Font.toBinary(obj.titleFont, w); 
+        Font.toBinary(obj.subTitleFont, w); 
+        Font.toBinary(obj.wordsFont, w); 
+        Font.toBinary(obj.effectFont, w); 
+        Font.toBinary(obj.fretboardNumberFont, w); 
+        Font.toBinary(obj.tablatureFont, w); 
+        Font.toBinary(obj.graceFont, w); 
+        Color.toBinary(obj.staffLineColor, w); 
+        Color.toBinary(obj.barSeparatorColor, w); 
+        Font.toBinary(obj.barNumberFont, w); 
+        Color.toBinary(obj.barNumberColor, w); 
+        Font.toBinary(obj.fingeringFont, w); 
+        Font.toBinary(obj.markerFont, w); 
+        Color.toBinary(obj.mainGlyphColor, w); 
+        Color.toBinary(obj.secondaryGlyphColor, w); 
+        Color.toBinary(obj.scoreInfoColor, w); 
     }
     public static setProperty(obj: RenderingResources, property: string, v: unknown): boolean {
         switch (property) {

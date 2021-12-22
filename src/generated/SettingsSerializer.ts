@@ -10,6 +10,9 @@ import { DisplaySettingsSerializer } from "@src/generated/DisplaySettingsSeriali
 import { NotationSettingsSerializer } from "@src/generated/NotationSettingsSerializer";
 import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSerializer";
 import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 export class SettingsSerializer {
     public static fromJson(obj: Settings, m: unknown): void {
         if (!m) {
@@ -28,6 +31,24 @@ export class SettingsSerializer {
         o.set("importer", ImporterSettingsSerializer.toJson(obj.importer)); 
         o.set("player", PlayerSettingsSerializer.toJson(obj.player)); 
         return o; 
+    }
+    public static fromBinary(obj: Settings, r: IReadable): Settings {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        return obj; 
+    }
+    public static toBinary(obj: Settings | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        CoreSettingsSerializer.toBinary(obj.core, w); 
+        DisplaySettingsSerializer.toBinary(obj.display, w); 
+        NotationSettingsSerializer.toBinary(obj.notation, w); 
+        ImporterSettingsSerializer.toBinary(obj.importer, w); 
+        PlayerSettingsSerializer.toBinary(obj.player, w); 
     }
     public static setProperty(obj: Settings, property: string, v: unknown): boolean {
         if (["core", ""].indexOf(property) >= 0) {

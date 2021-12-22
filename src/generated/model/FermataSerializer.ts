@@ -5,6 +5,9 @@
 // </auto-generated>
 import { Fermata } from "@src/model/Fermata";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 import { FermataType } from "@src/model/Fermata";
 export class FermataSerializer {
     public static fromJson(obj: Fermata, m: unknown): void {
@@ -21,6 +24,23 @@ export class FermataSerializer {
         o.set("type", obj.type as number); 
         o.set("length", obj.length); 
         return o; 
+    }
+    public static fromBinary(obj: Fermata, r: IReadable): Fermata {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.type = JsonHelper.parseEnum<FermataType>(IOHelper.readInt32LE(r), FermataType)!; 
+        obj.length = IOHelper.readNumber(r); 
+        return obj; 
+    }
+    public static toBinary(obj: Fermata | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeInt32LE(w, obj.type as number); 
+        IOHelper.writeNumber(w, obj.length); 
     }
     public static setProperty(obj: Fermata, property: string, v: unknown): boolean {
         switch (property) {

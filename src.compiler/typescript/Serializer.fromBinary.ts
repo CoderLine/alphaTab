@@ -1,5 +1,15 @@
 import * as ts from 'typescript';
-import { addNewLines, getTypeWithNullableInfo, hasFlag, isEnumType, isMap, isTypedArray, unwrapArrayItemType } from '../BuilderHelpers';
+import {
+    addNewLines,
+    createNodeFromSource,
+    getTypeWithNullableInfo,
+    hasFlag,
+    isEnumType,
+    isMap,
+    isTypedArray,
+    setMethodBody,
+    unwrapArrayItemType
+} from '../BuilderHelpers';
 import { findModule, findSerializerModule, JsonProperty } from './Serializer.common';
 
 export function createFromBinaryMethod(
@@ -9,55 +19,29 @@ export function createFromBinaryMethod(
     importer: (name: string, module: string) => void
 ) {
     importer('IReadable', '@src/io/IReadable');
-    return ts.factory.createMethodDeclaration(
-        undefined,
-        [
-            ts.factory.createModifier(ts.SyntaxKind.PublicKeyword),
-            ts.factory.createModifier(ts.SyntaxKind.StaticKeyword)
-        ],
-        undefined,
-        'fromBinary',
-        undefined,
-        undefined,
-        [
-            ts.factory.createParameterDeclaration(
-                undefined,
-                undefined,
-                undefined,
-                'obj',
-                undefined,
-                ts.factory.createTypeReferenceNode(input.name!.text, undefined)
-            ),
-            ts.factory.createParameterDeclaration(
-                undefined,
-                undefined,
-                undefined,
-                'r',
-                undefined,
-                ts.factory.createTypeReferenceNode('IReadable', undefined),
-            )
-        ],
-        ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-        generateFromBinaryBody(program, propertiesToSerialize, importer)
+    const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
+        `public class Serializer {
+            public static fromBinary(obj: ${input.name!.text}, r: IReadable): ${input.name!.text} {
+            }
+        }`,
+        ts.SyntaxKind.MethodDeclaration
     );
+    return setMethodBody(methodDecl, generateFromBinaryBody(program, propertiesToSerialize, importer));
 }
 
-function generateFromBinaryBody(program: ts.Program, propertiesToSerialize: JsonProperty[], importer: (name: string, module: string) => void) {
+function generateFromBinaryBody(
+    program: ts.Program,
+    propertiesToSerialize: JsonProperty[],
+    importer: (name: string, module: string) => void
+) {
     const statements: ts.Statement[] = [];
 
     statements.push(
-        ts.factory.createIfStatement(
-            ts.factory.createCallExpression(
-                ts.factory.createPropertyAccessExpression(
-                    ts.factory.createIdentifier('IOHelper'),
-                    'readNull'
-                ),
-                undefined,
-                [ts.factory.createIdentifier('r')]
-            ),
-            ts.factory.createBlock([
-                ts.factory.createReturnStatement()
-            ])
+        createNodeFromSource<ts.IfStatement>(
+            `if(IOHelper.readNull(r)) { 
+                return obj;
+            }`,
+            ts.SyntaxKind.IfStatement
         )
     );
 
@@ -74,191 +58,71 @@ function generateFromBinaryBody(program: ts.Program, propertiesToSerialize: Json
 
         let propertyStatements: ts.Statement[] = [];
 
-        function assign(expr: ts.Expression): ts.Statement {
-            return ts.factory.createExpressionStatement(ts.factory.createAssignment(
-                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
-                expr
-            ));
-        }
-
         let primitiveRead = getPrimitiveReadMethod(type.type!, typeChecker);
         if (primitiveRead) {
             if (type.isNullable) {
                 propertyStatements.push(
-                    ts.factory.createIfStatement(
-                        ts.factory.createPrefixUnaryExpression(ts.SyntaxKind.ExclamationToken,
-                            ts.factory.createCallExpression(
-                                ts.factory.createPropertyAccessExpression(
-                                    ts.factory.createIdentifier('IOHelper'),
-                                    'readNull'
-                                ),
-                                undefined,
-                                [ts.factory.createIdentifier('r')]
-                            )
-                        ),
-                        ts.factory.createBlock([
-                            assign(ts.factory.createCallExpression(
-                                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('IOHelper'), primitiveRead),
-                                undefined,
-                                [
-                                    ts.factory.createIdentifier('r'),
-                                ]
-                            ))
-                        ])
+                    createNodeFromSource<ts.IfStatement>(
+                        `if(!IOHelper.readNull(r)) {
+                            obj.${fieldName} = IOHelper.${primitiveRead}(r);
+                        }`,
+                        ts.SyntaxKind.IfStatement
                     )
                 );
             } else {
                 propertyStatements.push(
-                    assign(ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('IOHelper'), primitiveRead),
-                        undefined,
-                        [
-                            ts.factory.createIdentifier('r'),
-                        ]
-                    ))
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `obj.${fieldName} = IOHelper.${primitiveRead}(r);`,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
                 );
             }
         } else if (isEnumType(type.type!)) {
             if (type.isNullable) {
                 propertyStatements.push(
-                    ts.factory.createIfStatement(
-                        ts.factory.createPrefixUnaryExpression(ts.SyntaxKind.ExclamationToken,
-                            ts.factory.createCallExpression(
-                                ts.factory.createPropertyAccessExpression(
-                                    ts.factory.createIdentifier('IOHelper'),
-                                    'readNull'
-                                ),
-                                undefined,
-                                [ts.factory.createIdentifier('r')]
-                            )
-                        ),
-                        ts.factory.createBlock([
-                            assign(ts.factory.createCallExpression(
-                                ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('JsonHelper'), 'parseEnum'),
-                                [ts.factory.createTypeReferenceNode(type.type.symbol.name)],
-                                [
-                                    ts.factory.createCallExpression(
-                                        ts.factory.createPropertyAccessExpression(
-                                            ts.factory.createIdentifier('IOHelper'),
-                                            'readInt32LE'
-                                        ),
-                                        undefined,
-                                        [ts.factory.createIdentifier('r')]
-                                    ),
-                                    ts.factory.createIdentifier(type.type.symbol.name)
-                                ]
-                            )
-                            )
-                        ])
+                    createNodeFromSource<ts.IfStatement>(
+                        `if(!IOHelper.readNull(r)) {
+                            obj.${fieldName} = JsonHelper.parseEnum<${type.type.symbol.name}>(IOHelper.readInt32LE(r), ${type.type.symbol.name});
+                        }`,
+                        ts.SyntaxKind.IfStatement
                     )
                 );
             } else {
                 propertyStatements.push(
-                    assign(ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('JsonHelper'), 'parseEnum'),
-                        [ts.factory.createTypeReferenceNode(type.type.symbol.name)],
-                        [
-                            ts.factory.createCallExpression(
-                                ts.factory.createPropertyAccessExpression(
-                                    ts.factory.createIdentifier('IOHelper'),
-                                    'readInt32LE'
-                                ),
-                                undefined,
-                                [ts.factory.createIdentifier('r')]
-                            ),
-                            ts.factory.createIdentifier(type.type.symbol.name)
-                        ]
-                    ))
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `obj.${fieldName} = JsonHelper.parseEnum<${type.type.symbol.name}>(IOHelper.readInt32LE(r), ${type.type.symbol.name})!;`,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
                 );
             }
         } else if (isArray) {
             const arrayItemType = unwrapArrayItemType(type.type!, typeChecker)!;
-            const collectionAddMethod = ts
-                .getJSDocTags(prop.property)
-                .filter(t => t.tagName.text === 'json_add')
-                .map(t => t.comment ?? '')[0] as string;
+            const collectionAddMethod =
+                (ts
+                    .getJSDocTags(prop.property)
+                    .filter(t => t.tagName.text === 'json_add')
+                    .map(t => t.comment ?? '')[0] as string) || `${fieldName}.push`;
 
             let itemSerializer = arrayItemType.symbol.name + 'Serializer';
             importer(itemSerializer, findSerializerModule(arrayItemType, program.getCompilerOptions()));
             importer(arrayItemType.symbol.name, findModule(arrayItemType, program.getCompilerOptions()));
 
             const loopItems = [
-                assign(ts.factory.createArrayLiteralExpression(undefined)),
-                ts.factory.createVariableStatement(undefined, ts.factory.createVariableDeclarationList([
-                    ts.factory.createVariableDeclaration('length', undefined, undefined,
-                        ts.factory.createCallExpression(
-                            ts.factory.createPropertyAccessExpression(
-                                ts.factory.createIdentifier('IOHelper'),
-                                'readInt32LE'
-                            ),
-                            undefined,
-                            [ts.factory.createIdentifier('r')]
-                        )
-                    )
-                ], ts.NodeFlags.Const)),
-                ts.factory.createForStatement(
-                    ts.factory.createVariableDeclarationList([
-                        ts.factory.createVariableDeclaration('i', undefined, undefined, ts.factory.createNumericLiteral("0"))
-                    ], ts.NodeFlags.Let),
-                    ts.factory.createBinaryExpression(ts.factory.createIdentifier('i'), ts.SyntaxKind.LessThanToken, ts.factory.createIdentifier('length')),
-                    ts.factory.createPostfixIncrement(ts.factory.createIdentifier('i')),
-                    ts.factory.createBlock(
-                        [
-                            ts.factory.createVariableStatement(
-                                undefined,
-                                ts.factory.createVariableDeclarationList(
-                                    [
-                                        ts.factory.createVariableDeclaration(
-                                            'it',
-                                            undefined,
-                                            undefined,
-                                            ts.factory.createNewExpression(
-                                                ts.factory.createIdentifier(arrayItemType.symbol.name),
-                                                undefined,
-                                                []
-                                            )
-                                        )
-                                    ],
-                                    ts.NodeFlags.Const
-                                )
-                            ),
-                            ts.factory.createCallExpression(
-                                ts.factory.createPropertyAccessExpression(
-                                    ts.factory.createIdentifier(itemSerializer),
-                                    'fromBinary'
-                                ),
-                                undefined,
-                                [
-                                    ts.factory.createIdentifier('it'), 
-                                    ts.factory.createIdentifier('r')
-                                ]
-                            ),
-                            ts.factory.createExpressionStatement(
-                                collectionAddMethod
-                                    ? // obj.addFieldName(i)
-                                    ts.factory.createCallExpression(
-                                        ts.factory.createPropertyAccessExpression(
-                                            ts.factory.createIdentifier('obj'),
-                                            collectionAddMethod
-                                        ),
-                                        undefined,
-                                        [ts.factory.createIdentifier('it')]
-                                    )
-                                    : // obj.fieldName.push(i)
-                                    ts.factory.createCallExpression(
-                                        ts.factory.createPropertyAccessExpression(
-                                            ts.factory.createPropertyAccessExpression(
-                                                ts.factory.createIdentifier('obj'),
-                                                fieldName
-                                            ),
-                                            'push'
-                                        ),
-                                        undefined,
-                                        [ts.factory.createIdentifier('it')]
-                                    )
-                            )
-                        ].filter(s => !!s) as ts.Statement[]
-                    )
+                createNodeFromSource<ts.ExpressionStatement>(
+                    `obj.${fieldName} = [];`,
+                    ts.SyntaxKind.ExpressionStatement
+                ),
+                createNodeFromSource<ts.VariableStatement>(
+                    `const length = IOHelper.readInt32LE(r);`,
+                    ts.SyntaxKind.VariableStatement
+                ),
+                createNodeFromSource<ts.ForStatement>(
+                    `for(let i = 0; i < length; i++) {
+                        const it = new ${arrayItemType.symbol.name}();
+                        ${itemSerializer}.fromBinary(it, r);
+                        obj.${collectionAddMethod}(it);
+                    }`,
+                    ts.SyntaxKind.ForStatement
                 )
             ];
 
@@ -270,7 +134,101 @@ function generateFromBinaryBody(program: ts.Program, propertiesToSerialize: Json
                 propertyStatements.push(ts.factory.createBlock(loopItems));
             }
         } else if (isMap(type.type)) {
-            
+            const mapType = type.type as ts.TypeReference;
+
+            const mapStatements: ts.Statement[] = [
+                createNodeFromSource<ts.VariableStatement>(
+                    `const size = IOHelper.readInt32LE(r);`,
+                    ts.SyntaxKind.VariableStatement
+                )
+            ];
+
+            const collectionAddMethod =
+                (ts
+                    .getJSDocTags(prop.property)
+                    .filter(t => t.tagName.text === 'json_add')
+                    .map(t => t.comment ?? '')[0] as string) || fieldName + '.set';
+
+            let readKey: ts.Expression;
+            const primitiveKeyRead = getPrimitiveReadMethod(mapType.typeArguments![0], typeChecker);
+            if (primitiveKeyRead) {
+                readKey = createNodeFromSource<ts.CallExpression>(
+                    `IOHelper.${primitiveKeyRead}(r)`,
+                    ts.SyntaxKind.CallExpression
+                );
+            } else if (isEnumType(mapType.typeArguments![0])) {
+                readKey = createNodeFromSource<ts.NonNullExpression>(
+                    `JsonHelper.parseEnum<${mapType.typeArguments![0].symbol.name}>(IOHelper.readInt32LE(r), ${
+                        mapType.typeArguments![0].symbol.name
+                    })!`,
+                    ts.SyntaxKind.NonNullExpression
+                );
+            } else {
+                throw new Error(
+                    'only Map<Primitive, *> maps are supported extend if needed: ' +
+                        mapType.typeArguments![0].symbol.name
+                );
+            }
+
+            let readValue: ts.Expression;
+            const primitiveValueRead = getPrimitiveReadMethod(mapType.typeArguments![1], typeChecker);
+            if (primitiveValueRead) {
+                readValue = createNodeFromSource<ts.CallExpression>(
+                    `IOHelper.${primitiveValueRead}(r)`,
+                    ts.SyntaxKind.CallExpression
+                );
+            } else if (isEnumType(mapType.typeArguments![1])) {
+                readValue = createNodeFromSource<ts.CallExpression>(
+                    `JsonHelper.parseEnum<${mapType.typeArguments![1].symbol.name}>(IOHelper.readInt32LE(r), ${
+                        mapType.typeArguments![1].symbol.name
+                    })!`,
+                    ts.SyntaxKind.CallExpression
+                );
+            } else {
+                const itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
+                importer(itemSerializer, findSerializerModule(mapType.typeArguments![1], program.getCompilerOptions()));
+
+                readValue = createNodeFromSource<ts.CallExpression>(
+                    `${itemSerializer}.fromBinary(new ${mapType.typeArguments![1].symbol.name}(),r)`,
+                    ts.SyntaxKind.CallExpression
+                );
+            }
+
+            mapStatements.push(
+                ts.factory.createForStatement(
+                    ts.factory.createVariableDeclarationList(
+                        [
+                            ts.factory.createVariableDeclaration(
+                                'i',
+                                undefined,
+                                undefined,
+                                ts.factory.createIdentifier('0')
+                            )
+                        ],
+                        ts.NodeFlags.Let
+                    ),
+                    ts.factory.createBinaryExpression(
+                        ts.factory.createIdentifier('i'),
+                        ts.SyntaxKind.LessThanToken,
+                        ts.factory.createIdentifier('size')
+                    ),
+                    ts.factory.createPostfixIncrement(ts.factory.createIdentifier('i')),
+                    ts.factory.createBlock([
+                        ts.factory.createExpressionStatement(
+                            ts.factory.createCallExpression(
+                                ts.factory.createPropertyAccessExpression(
+                                    ts.factory.createIdentifier('obj'),
+                                    collectionAddMethod
+                                ),
+                                undefined,
+                                [readKey, readValue]
+                            )
+                        )
+                    ])
+                )
+            );
+
+            propertyStatements.push(ts.factory.createBlock(mapStatements));
         }
 
         if (prop.target) {
@@ -282,6 +240,10 @@ function generateFromBinaryBody(program: ts.Program, propertiesToSerialize: Json
         statements.push(...propertyStatements);
     }
 
+    statements.push(createNodeFromSource<ts.ReturnStatement>(
+        `return obj;`,
+        ts.SyntaxKind.ReturnStatement
+    ))
 
     return ts.factory.createBlock(addNewLines(statements));
 }

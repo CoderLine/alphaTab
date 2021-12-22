@@ -6,7 +6,10 @@
 import { Voice } from "@src/model/Voice";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
+import { IReadable } from "@src/io/IReadable";
 import { Beat } from "@src/model/Beat";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 export class VoiceSerializer {
     public static fromJson(obj: Voice, m: unknown): void {
         if (!m) {
@@ -24,6 +27,36 @@ export class VoiceSerializer {
         o.set("isempty", obj.isEmpty); 
         return o; 
     }
+    public static fromBinary(obj: Voice, r: IReadable): Voice {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.id = IOHelper.readNumber(r); 
+        {
+            obj.beats = [];
+            const length = IOHelper.readInt32LE(r);
+            for (let i = 0;i < length;i++) {
+                const it = new Beat();
+                BeatSerializer.fromBinary(it, r);
+                obj.addBeat(it);
+            }
+        } 
+        obj.isEmpty = IOHelper.readBoolean(r); 
+        return obj; 
+    }
+    public static toBinary(obj: Voice | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeNumber(w, obj.id); 
+        IOHelper.writeInt32LE(w, obj.beats.length); 
+        for (const i of obj.beats) {
+            BeatSerializer.toBinary(i, w);
+        } 
+        IOHelper.writeBoolean(w, obj.isEmpty); 
+    }
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
@@ -31,9 +64,9 @@ export class VoiceSerializer {
                 return true;
             case "beats":
                 obj.beats = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Beat();
-                    BeatSerializer.fromJson(i, o)
+                    BeatSerializer.fromJson(i, o);
                     obj.addBeat(i);
                 }
                 return true;

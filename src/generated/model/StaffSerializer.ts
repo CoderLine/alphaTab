@@ -8,7 +8,10 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { BarSerializer } from "@src/generated/model/BarSerializer";
 import { ChordSerializer } from "@src/generated/model/ChordSerializer";
 import { TuningSerializer } from "@src/generated/model/TuningSerializer";
+import { IReadable } from "@src/io/IReadable";
 import { Bar } from "@src/model/Bar";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 import { Chord } from "@src/model/Chord";
 export class StaffSerializer {
     public static fromJson(obj: Staff, m: unknown): void {
@@ -40,13 +43,65 @@ export class StaffSerializer {
         o.set("standardnotationlinecount", obj.standardNotationLineCount); 
         return o; 
     }
+    public static fromBinary(obj: Staff, r: IReadable): Staff {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        {
+            obj.bars = [];
+            const length = IOHelper.readInt32LE(r);
+            for (let i = 0;i < length;i++) {
+                const it = new Bar();
+                BarSerializer.fromBinary(it, r);
+                obj.addBar(it);
+            }
+        } 
+        {
+            const size = IOHelper.readInt32LE(r);
+            for (let i = 0;i < size;i++) {
+                obj.addChord(IOHelper.readString(r), ChordSerializer.fromBinary(new Chord(), r));
+            }
+        } 
+        obj.capo = IOHelper.readNumber(r); 
+        obj.transpositionPitch = IOHelper.readNumber(r); 
+        obj.displayTranspositionPitch = IOHelper.readNumber(r); 
+        obj.showTablature = IOHelper.readBoolean(r); 
+        obj.showStandardNotation = IOHelper.readBoolean(r); 
+        obj.isPercussion = IOHelper.readBoolean(r); 
+        obj.standardNotationLineCount = IOHelper.readNumber(r); 
+        return obj; 
+    }
+    public static toBinary(obj: Staff | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeInt32LE(w, obj.bars.length); 
+        for (const i of obj.bars) {
+            BarSerializer.toBinary(i, w);
+        } 
+        IOHelper.writeInt32LE(w, obj.chords.size); 
+        for (const [k, v] of obj.chords) {
+            IOHelper.writeString(w, k);
+            ChordSerializer.toBinary(v, w);
+        } 
+        IOHelper.writeNumber(w, obj.capo); 
+        IOHelper.writeNumber(w, obj.transpositionPitch); 
+        IOHelper.writeNumber(w, obj.displayTranspositionPitch); 
+        TuningSerializer.toBinary(obj.stringTuning, w); 
+        IOHelper.writeBoolean(w, obj.showTablature); 
+        IOHelper.writeBoolean(w, obj.showStandardNotation); 
+        IOHelper.writeBoolean(w, obj.isPercussion); 
+        IOHelper.writeNumber(w, obj.standardNotationLineCount); 
+    }
     public static setProperty(obj: Staff, property: string, v: unknown): boolean {
         switch (property) {
             case "bars":
                 obj.bars = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Bar();
-                    BarSerializer.fromJson(i, o)
+                    BarSerializer.fromJson(i, o);
                     obj.addBar(i);
                 }
                 return true;

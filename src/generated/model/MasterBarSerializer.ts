@@ -8,6 +8,9 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { SectionSerializer } from "@src/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { FermataSerializer } from "@src/generated/model/FermataSerializer";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 import { KeySignature } from "@src/model/KeySignature";
 import { KeySignatureType } from "@src/model/KeySignatureType";
 import { TripletFeel } from "@src/model/TripletFeel";
@@ -48,6 +51,56 @@ export class MasterBarSerializer {
         o.set("start", obj.start); 
         o.set("isanacrusis", obj.isAnacrusis); 
         return o; 
+    }
+    public static fromBinary(obj: MasterBar, r: IReadable): MasterBar {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.alternateEndings = IOHelper.readNumber(r); 
+        obj.keySignature = JsonHelper.parseEnum<KeySignature>(IOHelper.readInt32LE(r), KeySignature)!; 
+        obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(IOHelper.readInt32LE(r), KeySignatureType)!; 
+        obj.isDoubleBar = IOHelper.readBoolean(r); 
+        obj.isRepeatStart = IOHelper.readBoolean(r); 
+        obj.repeatCount = IOHelper.readNumber(r); 
+        obj.timeSignatureNumerator = IOHelper.readNumber(r); 
+        obj.timeSignatureDenominator = IOHelper.readNumber(r); 
+        obj.timeSignatureCommon = IOHelper.readBoolean(r); 
+        obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(IOHelper.readInt32LE(r), TripletFeel)!; 
+        {
+            const size = IOHelper.readInt32LE(r);
+            for (let i = 0;i < size;i++) {
+                obj.fermata.set(IOHelper.readNumber(r), FermataSerializer.fromBinary(new Fermata(), r));
+            }
+        } 
+        obj.start = IOHelper.readNumber(r); 
+        obj.isAnacrusis = IOHelper.readBoolean(r); 
+        return obj; 
+    }
+    public static toBinary(obj: MasterBar | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeNumber(w, obj.alternateEndings); 
+        IOHelper.writeInt32LE(w, obj.keySignature as number); 
+        IOHelper.writeInt32LE(w, obj.keySignatureType as number); 
+        IOHelper.writeBoolean(w, obj.isDoubleBar); 
+        IOHelper.writeBoolean(w, obj.isRepeatStart); 
+        IOHelper.writeNumber(w, obj.repeatCount); 
+        IOHelper.writeNumber(w, obj.timeSignatureNumerator); 
+        IOHelper.writeNumber(w, obj.timeSignatureDenominator); 
+        IOHelper.writeBoolean(w, obj.timeSignatureCommon); 
+        IOHelper.writeInt32LE(w, obj.tripletFeel as number); 
+        SectionSerializer.toBinary(obj.section, w); 
+        AutomationSerializer.toBinary(obj.tempoAutomation, w); 
+        IOHelper.writeInt32LE(w, obj.fermata.size); 
+        for (const [k, v] of obj.fermata) {
+            IOHelper.writeNumber(w, k);
+            FermataSerializer.toBinary(v, w);
+        } 
+        IOHelper.writeNumber(w, obj.start); 
+        IOHelper.writeBoolean(w, obj.isAnacrusis); 
     }
     public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
         switch (property) {

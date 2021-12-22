@@ -1,5 +1,15 @@
 import * as ts from 'typescript';
-import { addNewLines, getTypeWithNullableInfo, hasFlag, isEnumType, isMap, isTypedArray, unwrapArrayItemType } from '../BuilderHelpers';
+import {
+    addNewLines,
+    createNodeFromSource,
+    getTypeWithNullableInfo,
+    hasFlag,
+    isEnumType,
+    isMap,
+    isTypedArray,
+    setMethodBody,
+    unwrapArrayItemType
+} from '../BuilderHelpers';
 import { findModule, findSerializerModule, isImmutable, JsonProperty } from './Serializer.common';
 
 export function createToBinaryMethod(
@@ -10,62 +20,32 @@ export function createToBinaryMethod(
 ) {
     importer('IWriteable', '@src/io/IWriteable');
     importer('IOHelper', '@src/io/IOHelper');
-    return ts.factory.createMethodDeclaration(
-        undefined,
-        [
-            ts.factory.createModifier(ts.SyntaxKind.PublicKeyword),
-            ts.factory.createModifier(ts.SyntaxKind.StaticKeyword)
-        ],
-        undefined,
-        'toBinary',
-        undefined,
-        undefined,
-        [
-            ts.factory.createParameterDeclaration(
-                undefined,
-                undefined,
-                undefined,
-                'obj',
-                undefined,
-                ts.factory.createUnionTypeNode([
-                    ts.factory.createTypeReferenceNode(input.name!.text, undefined),
-                    ts.factory.createLiteralTypeNode(ts.factory.createNull())
-                ])
-            ),
-            ts.factory.createParameterDeclaration(
-                undefined,
-                undefined,
-                undefined,
-                'w',
-                undefined,
-                ts.factory.createTypeReferenceNode('IWritable', undefined),
-            )
-        ],
-        ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-        generateToBinaryBody(program, propertiesToSerialize, importer)
+    const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
+        `public class Serializer {
+            public static toBinary(obj: ${input.name!.text} | null, w: IWriteable): void {
+            }
+        }`,
+        ts.SyntaxKind.MethodDeclaration
     );
+    return setMethodBody(methodDecl, generateToBinaryBody(program, propertiesToSerialize, importer));
 }
 
-function generateToBinaryBody(program: ts.Program, propertiesToSerialize: JsonProperty[], importer: (name: string, module: string) => void): ts.Block {
+function generateToBinaryBody(
+    program: ts.Program,
+    propertiesToSerialize: JsonProperty[],
+    importer: (name: string, module: string) => void
+): ts.Block {
     const statements: ts.Statement[] = [];
 
     statements.push(
-        ts.factory.createIfStatement(
-            ts.factory.createPrefixUnaryExpression(ts.SyntaxKind.ExclamationToken, ts.factory.createIdentifier('obj')),
-            ts.factory.createBlock([
-                ts.factory.createExpressionStatement(
-                    ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(
-                            ts.factory.createIdentifier('IOHelper'),
-                            'writeNull'
-                        ),
-                        undefined,
-                        [ts.factory.createIdentifier('w')]
-                    )
-                ),
-                ts.factory.createReturnStatement()
-            ])
-        )
+        createNodeFromSource<ts.IfStatement>(
+            `if(!obj) {
+                IOHelper.writeNull(w);
+                return;
+            }`,
+            ts.SyntaxKind.IfStatement
+        ),
+        createNodeFromSource<ts.ExpressionStatement>(`IOHelper.writeNotNull(w);`, ts.SyntaxKind.ExpressionStatement)
     );
 
     for (let prop of propertiesToSerialize) {
@@ -83,77 +63,42 @@ function generateToBinaryBody(program: ts.Program, propertiesToSerialize: JsonPr
 
         const primitiveWrite = getPrimitiveWriteMethod(type.type!, typeChecker);
         if (primitiveWrite) {
-            propertyStatements.push(
-                ts.factory.createExpressionStatement(
-                    ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('IOHelper'), primitiveWrite),
-                        undefined,
-                        [
-                            ts.factory.createIdentifier('w'),
-                            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName)
-                        ]
-                    )
-                )
-            );
-        } else if (isEnumType(type.type!)) {
             if (type.isNullable) {
+                createNodeFromSource<ts.ExpressionStatement>(
+                    `if ( obj.${fieldName} !== null && obj.${fieldName} !== undefined ) {
+                        IOHelper.writeNotNull(w);
+                        IOHelper.${primitiveWrite}(w, obj.${fieldName});
+                    } else {
+                        IOHelper.writeNull(w);
+                    }`,
+                    ts.SyntaxKind.ExpressionStatement
+                )
+            } else {
                 propertyStatements.push(
-                    ts.factory.createIfStatement(
-                        ts.factory.createBinaryExpression(
-                            ts.factory.createTypeOfExpression(ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName)),
-                            ts.SyntaxKind.EqualsEqualsEqualsToken,
-                            ts.factory.createStringLiteral('number')
-                        ),
-                        ts.factory.createBlock([
-                            ts.factory.createExpressionStatement(
-                                ts.factory.createCallExpression(
-                                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('IOHelper'), 'writeInt32LE'),
-                                    undefined,
-                                    [
-                                        ts.factory.createIdentifier('w'),
-                                        ts.factory.createAsExpression(
-                                            ts.factory.createPropertyAccessExpression(
-                                                ts.factory.createIdentifier('obj'),
-                                                fieldName
-                                            ),
-                                            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
-                                        )
-                                    ]
-                                )
-                            )
-                        ]),
-                        ts.factory.createBlock([
-                            ts.factory.createExpressionStatement(
-                                ts.factory.createCallExpression(
-                                    ts.factory.createPropertyAccessExpression(
-                                        ts.factory.createIdentifier('IOHelper'),
-                                        'writeNull'
-                                    ),
-                                    undefined,
-                                    [ts.factory.createIdentifier('w')]
-                                )
-                            )
-                        ])
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `IOHelper.${primitiveWrite}(w, obj.${fieldName});`,
+                        ts.SyntaxKind.ExpressionStatement
                     )
                 );
             }
-            else {
+        } else if (isEnumType(type.type!)) {
+            if (type.isNullable) {
                 propertyStatements.push(
-                    ts.factory.createExpressionStatement(
-                        ts.factory.createCallExpression(
-                            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('IOHelper'), 'writeInt32LE'),
-                            undefined,
-                            [
-                                ts.factory.createIdentifier('w'),
-                                ts.factory.createAsExpression(
-                                    ts.factory.createPropertyAccessExpression(
-                                        ts.factory.createIdentifier('obj'),
-                                        fieldName
-                                    ),
-                                    ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
-                                )
-                            ]
-                        )
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `if( typeof(obj.${fieldName}) === 'number') {
+                            IOHelper.writeNotNull(w);
+                            IOHelper.writeInt32LE(w, obj.${fieldName} as number);
+                        } else {
+                            IOHelper.writeNull(w);
+                        }`,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
+            } else {
+                propertyStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `IOHelper.writeInt32LE(w, obj.${fieldName} as number);`,
+                        ts.SyntaxKind.ExpressionStatement
                     )
                 );
             }
@@ -163,49 +108,18 @@ function generateToBinaryBody(program: ts.Program, propertiesToSerialize: JsonPr
             importer(itemSerializer, findSerializerModule(arrayItemType, program.getCompilerOptions()));
 
             propertyStatements.push(
-                ts.factory.createExpressionStatement(
-                    ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('IOHelper'), 'writeInt32LE'),
-                        undefined,
-                        [
-                            ts.factory.createIdentifier('w'),
-                            ts.factory.createPropertyAccessExpression(
-                                ts.factory.createPropertyAccessExpression(
-                                    ts.factory.createIdentifier('obj'),
-                                    fieldName
-                                ),
-                                'length'
-                            ),
-                        ]
-                    )
+                createNodeFromSource<ts.ExpressionStatement>(
+                    `IOHelper.writeInt32LE(w, obj.${fieldName}.length);`,
+                    ts.SyntaxKind.ExpressionStatement
                 )
             );
 
             propertyStatements.push(
-                ts.factory.createForOfStatement(undefined,
-                    ts.factory.createVariableDeclarationList(
-                        [ts.factory.createVariableDeclaration('o')],
-                        ts.NodeFlags.Const
-                    ),
-                    ts.factory.createPropertyAccessExpression(
-                        ts.factory.createIdentifier('obj'),
-                        fieldName
-                    ),
-                    ts.factory.createBlock([
-                        ts.factory.createExpressionStatement(
-                            ts.factory.createCallExpression(
-                                ts.factory.createPropertyAccessExpression(
-                                    ts.factory.createIdentifier(itemSerializer),
-                                    'toBinary'
-                                ),
-                                undefined,
-                                [
-                                    ts.factory.createIdentifier('w'),
-                                    ts.factory.createIdentifier('i')
-                                ]
-                            )
-                        )
-                    ])
+                createNodeFromSource<ts.ForOfStatement>(
+                    `for(const i of obj.${fieldName}) {
+                        ${itemSerializer}.toBinary(i, w)
+                    }`,
+                    ts.SyntaxKind.ForOfStatement
                 )
             );
         } else if (isMap(type.type)) {
@@ -214,115 +128,70 @@ function generateToBinaryBody(program: ts.Program, propertiesToSerialize: JsonPr
             let writeKey: ts.Expression;
             const primitiveKeyWrite = getPrimitiveWriteMethod(mapType.typeArguments![0], typeChecker);
             if (primitiveKeyWrite) {
-                writeKey = ts.factory.createCallExpression(
-                    ts.factory.createPropertyAccessExpression(
-                        ts.factory.createIdentifier("IOHelper"),
-                        primitiveKeyWrite
-                    ),
-                    undefined,
-                    [
-                        ts.factory.createIdentifier('w'),
-                        ts.factory.createIdentifier('k')
-                    ]
+                writeKey = createNodeFromSource<ts.CallExpression>(
+                    `IOHelper.${primitiveKeyWrite}(w, k)`,
+                    ts.SyntaxKind.CallExpression
                 );
             } else if (isEnumType(mapType.typeArguments![0])) {
-                writeKey = ts.factory.createCallExpression(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('IOHelper'), 'writeInt32LE'),
-                    undefined,
-                    [
-                        ts.factory.createIdentifier('w'),
-                        ts.factory.createAsExpression(
-                            ts.factory.createIdentifier('k'),
-                            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
-                        )
-                    ]
+                writeKey = createNodeFromSource<ts.CallExpression>(
+                    `IOHelper.writeInt32LE(w, k as number)`,
+                    ts.SyntaxKind.CallExpression
                 );
             } else {
-                throw new Error('only Map<Primitive, *> maps are supported extend if needed: ' + mapType.typeArguments![0].symbol.name);
+                throw new Error(
+                    'only Map<Primitive, *> maps are supported extend if needed: ' +
+                        mapType.typeArguments![0].symbol.name
+                );
             }
 
             propertyStatements.push(
-                ts.factory.createExpressionStatement(
-                    ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('IOHelper'), 'writeInt32LE'),
-                        undefined,
-                        [
-                            ts.factory.createIdentifier('w'),
-                            ts.factory.createPropertyAccessExpression(
-                                ts.factory.createPropertyAccessExpression(
-                                    ts.factory.createIdentifier('obj'),
-                                    fieldName
-                                ),
-                                'size'
-                            ),
-                        ]
-                    )
+                createNodeFromSource<ts.ExpressionStatement>(
+                    `IOHelper.writeInt32LE(w, obj.${fieldName}.size)`,
+                    ts.SyntaxKind.ExpressionStatement
                 )
             );
 
             let writeValue: ts.Expression;
             const primitiveValueWrite = getPrimitiveWriteMethod(mapType.typeArguments![1], typeChecker);
             if (primitiveValueWrite) {
-                writeValue = ts.factory.createCallExpression(
-                    ts.factory.createPropertyAccessExpression(
-                        ts.factory.createIdentifier("IOHelper"),
-                        primitiveValueWrite
-                    ),
-                    undefined,
-                    [
-                        ts.factory.createIdentifier('w'),
-                        ts.factory.createIdentifier('v')
-                    ]
+                writeValue = createNodeFromSource<ts.CallExpression>(
+                    `IOHelper.${primitiveValueWrite}(w, v)`,
+                    ts.SyntaxKind.CallExpression
                 );
             } else if (isEnumType(mapType.typeArguments![1])) {
-                writeValue = ts.factory.createCallExpression(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('IOHelper'), 'writeInt32LE'),
-                    undefined,
-                    [
-                        ts.factory.createIdentifier('w'),
-                        ts.factory.createAsExpression(
-                            ts.factory.createIdentifier('v'),
-                            ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
-                        )
-                    ]
+                writeValue = createNodeFromSource<ts.CallExpression>(
+                    `IOHelper.writeInt32LE(w, v as number)`,
+                    ts.SyntaxKind.CallExpression
                 );
             } else {
                 const itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
                 importer(itemSerializer, findSerializerModule(mapType.typeArguments![1], program.getCompilerOptions()));
 
-                writeValue = ts.factory.createCallExpression(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier(itemSerializer), 'toBinary'),
-                    undefined,
-                    [
-                        ts.factory.createIdentifier('w'),
-                        ts.factory.createIdentifier('v'),
-                    ]
+                writeValue = createNodeFromSource<ts.CallExpression>(
+                    `${itemSerializer}.toBinary(v, w)`,
+                    ts.SyntaxKind.CallExpression
                 );
             }
 
             propertyStatements.push(
-                ts.factory.createForOfStatement(undefined,
+                ts.factory.createForOfStatement(
+                    undefined,
                     ts.factory.createVariableDeclarationList(
-                        [ts.factory.createVariableDeclaration(
-                            ts.factory.createArrayBindingPattern([
-                                ts.factory.createBindingElement(undefined, undefined, 'k', undefined),
-                                ts.factory.createBindingElement(undefined, undefined, 'v', undefined),
-                            ])
-                        )],
+                        [
+                            ts.factory.createVariableDeclaration(
+                                ts.factory.createArrayBindingPattern([
+                                    ts.factory.createBindingElement(undefined, undefined, 'k', undefined),
+                                    ts.factory.createBindingElement(undefined, undefined, 'v', undefined)
+                                ])
+                            )
+                        ],
                         ts.NodeFlags.Const
                     ),
-                    ts.factory.createPropertyAccessExpression(
-                        ts.factory.createIdentifier('obj'),
-                        fieldName
-                    ),
+                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
                     ts.factory.createBlock([
-                        ts.factory.createExpressionStatement(
-                            writeKey
-                        ),
+                        ts.factory.createExpressionStatement(writeKey),
 
-                        ts.factory.createExpressionStatement(
-                            writeValue
-                        )
+                        ts.factory.createExpressionStatement(writeValue)
                     ])
                 )
             );
@@ -330,47 +199,21 @@ function generateToBinaryBody(program: ts.Program, propertiesToSerialize: JsonPr
             let itemSerializer = type.type.symbol.name;
             importer(itemSerializer, findModule(type.type, program.getCompilerOptions()));
             propertyStatements.push(
-                ts.factory.createExpressionStatement(
-                    ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(
-                            ts.factory.createIdentifier(itemSerializer),
-                            'toBinary'
-                        ),
-                        [],
-                        [
-                            ts.factory.createPropertyAccessExpression(
-                                ts.factory.createIdentifier('obj'),
-                                fieldName
-                            ),
-                            ts.factory.createIdentifier('w')
-                        ]
-                    )
+                createNodeFromSource<ts.ExpressionStatement>(
+                    `${itemSerializer}.toBinary(obj.${fieldName}, w);`,
+                    ts.SyntaxKind.ExpressionStatement
                 )
             );
-
         } else {
             let itemSerializer = type.type.symbol.name + 'Serializer';
             importer(itemSerializer, findSerializerModule(type.type, program.getCompilerOptions()));
             propertyStatements.push(
-                ts.factory.createExpressionStatement(
-                    ts.factory.createCallExpression(
-                        ts.factory.createPropertyAccessExpression(
-                            ts.factory.createIdentifier(itemSerializer),
-                            'toBinary'
-                        ),
-                        [],
-                        [
-                            ts.factory.createPropertyAccessExpression(
-                                ts.factory.createIdentifier('obj'),
-                                fieldName
-                            ),
-                            ts.factory.createIdentifier('w')
-                        ]
-                    )
+                createNodeFromSource<ts.ExpressionStatement>(
+                    `${itemSerializer}.toBinary(obj.${fieldName}, w);`,
+                    ts.SyntaxKind.ExpressionStatement
                 )
             );
         }
-
 
         if (prop.target) {
             propertyStatements = propertyStatements.map(s =>

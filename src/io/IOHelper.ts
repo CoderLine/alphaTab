@@ -157,26 +157,110 @@ export class IOHelper {
     }
 
     public static writeInt32BE(o: IWriteable, v: number) {
-        o.writeByte((v >> 24) & 0xFF);
-        o.writeByte((v >> 16) & 0xFF);
-        o.writeByte((v >> 8) & 0xFF);
-        o.writeByte((v >> 0) & 0xFF);
+        o.writeByte((v >> 24) & 0xff);
+        o.writeByte((v >> 16) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
+        o.writeByte((v >> 0) & 0xff);
     }
 
     public static writeInt32LE(o: IWriteable, v: number) {
-        o.writeByte((v >> 0) & 0xFF);
-        o.writeByte((v >> 8) & 0xFF);
-        o.writeByte((v >> 16) & 0xFF);
-        o.writeByte((v >> 24) & 0xFF);
+        o.writeByte((v >> 0) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
+        o.writeByte((v >> 16) & 0xff);
+        o.writeByte((v >> 24) & 0xff);
     }
 
     public static writeUInt16LE(o: IWriteable, v: number) {
-        o.writeByte((v >> 0) & 0xFF);
-        o.writeByte((v >> 8) & 0xFF);
+        o.writeByte((v >> 0) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
     }
 
     public static writeInt16LE(o: IWriteable, v: number) {
-        o.writeByte((v >> 0) & 0xFF);
-        o.writeByte((v >> 8) & 0xFF);
+        o.writeByte((v >> 0) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
+    }
+
+    public static readUnknown(o: IReadable): unknown {
+        return null; // ignore
+    }
+
+    public static readNull(o: IReadable): boolean {
+        return IOHelper.readBoolean(o);
+    }
+    public static readBoolean(o: IReadable): boolean {
+        return o.readByte() !== 0;
+    }
+
+    public static readNumber(o: IReadable): number {
+        let bytes: Uint8Array = new Uint8Array(8);
+        o.read(bytes, 0, bytes.length);
+
+        let array: Float64Array = new Float64Array(bytes.buffer);
+        return array[0];
+    }
+
+    public static readString(o: IReadable): string {
+        const size = IOHelper.readInt32LE(o);
+        return IOHelper.read8BitChars(o, size);
+    }
+
+    public static readNumberArray(o: IReadable): number[] {
+        const size = IOHelper.readInt32LE(o);
+        const numbers: number[] = [];
+        for (let i = 0; i < size; i++) {
+            numbers.push(IOHelper.readNumber(o));
+        }
+        return numbers;
+    }
+    public static readStringArray(o: IReadable): string[] {
+        const size = IOHelper.readInt32LE(o);
+        const strings: string[] = [];
+        for (let i = 0; i < size; i++) {
+            strings.push(IOHelper.readString(o));
+        }
+        return strings;
+    }
+
+    public static writeUnknown(o: IWriteable, v: unknown) {
+        // ignore
+    }
+
+    public static writeNull(o: IWriteable) {
+        IOHelper.writeBoolean(o, true);
+    }
+    public static writeNotNull(o: IWriteable) {
+        IOHelper.writeBoolean(o, false);
+    }
+
+    public static writeBoolean(o: IWriteable, v: boolean) {
+        o.writeByte(v ? 1 : 0);
+    }
+
+    public static writeString(o: IWriteable, v: string) {
+        const encoder = new TextEncoder();
+        const encoded = encoder.encode(v);
+        IOHelper.writeInt32LE(o, encoded.length);
+        o.write(encoded, 0, encoded.length);
+    }
+
+    public static writeNumber(o: IWriteable, v: number) {
+        let bytes: Uint8Array = new Uint8Array(8);
+        let array: Float64Array = new Float64Array(bytes.buffer);
+        array[0] = v;
+        o.write(bytes, 0, bytes.length);
+    }
+
+    public static writeStringArray(o: IWriteable, v: string[]) {
+        IOHelper.writeInt32LE(o, v.length);
+        for (const s of v) {
+            IOHelper.writeString(o, s);
+        }
+    }
+
+    public static writeNumberArray(o: IWriteable, v: number[]) {
+        IOHelper.writeInt32LE(o, v.length);
+        for (const s of v) {
+            IOHelper.writeNumber(o, s);
+        }
     }
 }

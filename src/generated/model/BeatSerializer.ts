@@ -8,14 +8,17 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { NoteSerializer } from "@src/generated/model/NoteSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
+import { IReadable } from "@src/io/IReadable";
 import { Note } from "@src/model/Note";
+import { Automation } from "@src/model/Automation";
+import { BendPoint } from "@src/model/BendPoint";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 import { BendStyle } from "@src/model/BendStyle";
 import { Ottavia } from "@src/model/Ottavia";
 import { Duration } from "@src/model/Duration";
-import { Automation } from "@src/model/Automation";
 import { BrushType } from "@src/model/BrushType";
 import { WhammyType } from "@src/model/WhammyType";
-import { BendPoint } from "@src/model/BendPoint";
 import { VibratoType } from "@src/model/VibratoType";
 import { GraceType } from "@src/model/GraceType";
 import { PickStroke } from "@src/model/PickStroke";
@@ -74,6 +77,133 @@ export class BeatSerializer {
         o.set("beamingmode", obj.beamingMode as number); 
         return o; 
     }
+    public static fromBinary(obj: Beat, r: IReadable): Beat {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.id = IOHelper.readNumber(r); 
+        {
+            obj.notes = [];
+            const length = IOHelper.readInt32LE(r);
+            for (let i = 0;i < length;i++) {
+                const it = new Note();
+                NoteSerializer.fromBinary(it, r);
+                obj.addNote(it);
+            }
+        } 
+        obj.isEmpty = IOHelper.readBoolean(r); 
+        obj.whammyStyle = JsonHelper.parseEnum<BendStyle>(IOHelper.readInt32LE(r), BendStyle)!; 
+        obj.ottava = JsonHelper.parseEnum<Ottavia>(IOHelper.readInt32LE(r), Ottavia)!; 
+        obj.isLegatoOrigin = IOHelper.readBoolean(r); 
+        obj.duration = JsonHelper.parseEnum<Duration>(IOHelper.readInt32LE(r), Duration)!; 
+        {
+            obj.automations = [];
+            const length = IOHelper.readInt32LE(r);
+            for (let i = 0;i < length;i++) {
+                const it = new Automation();
+                AutomationSerializer.fromBinary(it, r);
+                obj.automations.push(it);
+            }
+        } 
+        obj.dots = IOHelper.readNumber(r); 
+        obj.fadeIn = IOHelper.readBoolean(r); 
+        if (!IOHelper.readNull(r)) {
+            obj.lyrics = IOHelper.readStringArray(r);
+        } 
+        obj.hasRasgueado = IOHelper.readBoolean(r); 
+        obj.pop = IOHelper.readBoolean(r); 
+        obj.slap = IOHelper.readBoolean(r); 
+        obj.tap = IOHelper.readBoolean(r); 
+        if (!IOHelper.readNull(r)) {
+            obj.text = IOHelper.readString(r);
+        } 
+        obj.brushType = JsonHelper.parseEnum<BrushType>(IOHelper.readInt32LE(r), BrushType)!; 
+        obj.brushDuration = IOHelper.readNumber(r); 
+        obj.tupletDenominator = IOHelper.readNumber(r); 
+        obj.tupletNumerator = IOHelper.readNumber(r); 
+        obj.isContinuedWhammy = IOHelper.readBoolean(r); 
+        obj.whammyBarType = JsonHelper.parseEnum<WhammyType>(IOHelper.readInt32LE(r), WhammyType)!; 
+        {
+            obj.whammyBarPoints = [];
+            const length = IOHelper.readInt32LE(r);
+            for (let i = 0;i < length;i++) {
+                const it = new BendPoint();
+                BendPointSerializer.fromBinary(it, r);
+                obj.addWhammyBarPoint(it);
+            }
+        } 
+        obj.vibrato = JsonHelper.parseEnum<VibratoType>(IOHelper.readInt32LE(r), VibratoType)!; 
+        if (!IOHelper.readNull(r)) {
+            obj.chordId = IOHelper.readString(r);
+        } 
+        obj.graceType = JsonHelper.parseEnum<GraceType>(IOHelper.readInt32LE(r), GraceType)!; 
+        obj.pickStroke = JsonHelper.parseEnum<PickStroke>(IOHelper.readInt32LE(r), PickStroke)!; 
+        if (!IOHelper.readNull(r)) {
+            obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(IOHelper.readInt32LE(r), Duration);
+        } 
+        obj.crescendo = JsonHelper.parseEnum<CrescendoType>(IOHelper.readInt32LE(r), CrescendoType)!; 
+        obj.displayStart = IOHelper.readNumber(r); 
+        obj.playbackStart = IOHelper.readNumber(r); 
+        obj.displayDuration = IOHelper.readNumber(r); 
+        obj.playbackDuration = IOHelper.readNumber(r); 
+        obj.dynamics = JsonHelper.parseEnum<DynamicValue>(IOHelper.readInt32LE(r), DynamicValue)!; 
+        obj.invertBeamDirection = IOHelper.readBoolean(r); 
+        if (!IOHelper.readNull(r)) {
+            obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(IOHelper.readInt32LE(r), BeamDirection);
+        } 
+        obj.beamingMode = JsonHelper.parseEnum<BeatBeamingMode>(IOHelper.readInt32LE(r), BeatBeamingMode)!; 
+        return obj; 
+    }
+    public static toBinary(obj: Beat | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeNumber(w, obj.id); 
+        IOHelper.writeInt32LE(w, obj.notes.length); 
+        for (const i of obj.notes) {
+            NoteSerializer.toBinary(i, w);
+        } 
+        IOHelper.writeBoolean(w, obj.isEmpty); 
+        IOHelper.writeInt32LE(w, obj.whammyStyle as number); 
+        IOHelper.writeInt32LE(w, obj.ottava as number); 
+        IOHelper.writeBoolean(w, obj.isLegatoOrigin); 
+        IOHelper.writeInt32LE(w, obj.duration as number); 
+        IOHelper.writeInt32LE(w, obj.automations.length); 
+        for (const i of obj.automations) {
+            AutomationSerializer.toBinary(i, w);
+        } 
+        IOHelper.writeNumber(w, obj.dots); 
+        IOHelper.writeBoolean(w, obj.fadeIn); 
+        IOHelper.writeBoolean(w, obj.hasRasgueado); 
+        IOHelper.writeBoolean(w, obj.pop); 
+        IOHelper.writeBoolean(w, obj.slap); 
+        IOHelper.writeBoolean(w, obj.tap); 
+        IOHelper.writeInt32LE(w, obj.brushType as number); 
+        IOHelper.writeNumber(w, obj.brushDuration); 
+        IOHelper.writeNumber(w, obj.tupletDenominator); 
+        IOHelper.writeNumber(w, obj.tupletNumerator); 
+        IOHelper.writeBoolean(w, obj.isContinuedWhammy); 
+        IOHelper.writeInt32LE(w, obj.whammyBarType as number); 
+        IOHelper.writeInt32LE(w, obj.whammyBarPoints.length); 
+        for (const i of obj.whammyBarPoints) {
+            BendPointSerializer.toBinary(i, w);
+        } 
+        IOHelper.writeInt32LE(w, obj.vibrato as number); 
+        IOHelper.writeInt32LE(w, obj.graceType as number); 
+        IOHelper.writeInt32LE(w, obj.pickStroke as number); 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeInt32LE(w, obj.crescendo as number); 
+        IOHelper.writeNumber(w, obj.displayStart); 
+        IOHelper.writeNumber(w, obj.playbackStart); 
+        IOHelper.writeNumber(w, obj.displayDuration); 
+        IOHelper.writeNumber(w, obj.playbackDuration); 
+        IOHelper.writeInt32LE(w, obj.dynamics as number); 
+        IOHelper.writeBoolean(w, obj.invertBeamDirection); 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeInt32LE(w, obj.beamingMode as number); 
+    }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
@@ -81,9 +211,9 @@ export class BeatSerializer {
                 return true;
             case "notes":
                 obj.notes = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Note();
-                    NoteSerializer.fromJson(i, o)
+                    NoteSerializer.fromJson(i, o);
                     obj.addNote(i);
                 }
                 return true;
@@ -104,9 +234,9 @@ export class BeatSerializer {
                 return true;
             case "automations":
                 obj.automations = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Automation();
-                    AutomationSerializer.fromJson(i, o)
+                    AutomationSerializer.fromJson(i, o);
                     obj.automations.push(i);
                 }
                 return true;
@@ -154,9 +284,9 @@ export class BeatSerializer {
                 return true;
             case "whammybarpoints":
                 obj.whammyBarPoints = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new BendPoint();
-                    BendPointSerializer.fromJson(i, o)
+                    BendPointSerializer.fromJson(i, o);
                     obj.addWhammyBarPoint(i);
                 }
                 return true;

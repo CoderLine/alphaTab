@@ -5,6 +5,9 @@
 // </auto-generated>
 import { NotationSettings } from "@src/NotationSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 import { NotationMode } from "@src/NotationSettings";
 import { FingeringMode } from "@src/NotationSettings";
 import { NotationElement } from "@src/NotationSettings";
@@ -39,6 +42,50 @@ export class NotationSettingsSerializer {
         o.set("extendlineeffectstobeatend", obj.extendLineEffectsToBeatEnd); 
         o.set("slurheight", obj.slurHeight); 
         return o; 
+    }
+    public static fromBinary(obj: NotationSettings, r: IReadable): NotationSettings {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.notationMode = JsonHelper.parseEnum<NotationMode>(IOHelper.readInt32LE(r), NotationMode)!; 
+        obj.fingeringMode = JsonHelper.parseEnum<FingeringMode>(IOHelper.readInt32LE(r), FingeringMode)!; 
+        {
+            const size = IOHelper.readInt32LE(r);
+            for (let i = 0;i < size;i++) {
+                obj.elements.set(JsonHelper.parseEnum<NotationElement>(IOHelper.readInt32LE(r), NotationElement)!, IOHelper.readBoolean(r));
+            }
+        } 
+        obj.rhythmMode = JsonHelper.parseEnum<TabRhythmMode>(IOHelper.readInt32LE(r), TabRhythmMode)!; 
+        obj.rhythmHeight = IOHelper.readNumber(r); 
+        obj.transpositionPitches = IOHelper.readNumberArray(r); 
+        obj.displayTranspositionPitches = IOHelper.readNumberArray(r); 
+        obj.smallGraceTabNotes = IOHelper.readBoolean(r); 
+        obj.extendBendArrowsOnTiedNotes = IOHelper.readBoolean(r); 
+        obj.extendLineEffectsToBeatEnd = IOHelper.readBoolean(r); 
+        obj.slurHeight = IOHelper.readNumber(r); 
+        return obj; 
+    }
+    public static toBinary(obj: NotationSettings | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeInt32LE(w, obj.notationMode as number); 
+        IOHelper.writeInt32LE(w, obj.fingeringMode as number); 
+        IOHelper.writeInt32LE(w, obj.elements.size); 
+        for (const [k, v] of obj.elements) {
+            IOHelper.writeInt32LE(w, k as number);
+            IOHelper.writeBoolean(w, v);
+        } 
+        IOHelper.writeInt32LE(w, obj.rhythmMode as number); 
+        IOHelper.writeNumber(w, obj.rhythmHeight); 
+        IOHelper.writeNumberArray(w, obj.transpositionPitches); 
+        IOHelper.writeNumberArray(w, obj.displayTranspositionPitches); 
+        IOHelper.writeBoolean(w, obj.smallGraceTabNotes); 
+        IOHelper.writeBoolean(w, obj.extendBendArrowsOnTiedNotes); 
+        IOHelper.writeBoolean(w, obj.extendLineEffectsToBeatEnd); 
+        IOHelper.writeNumber(w, obj.slurHeight); 
     }
     public static setProperty(obj: NotationSettings, property: string, v: unknown): boolean {
         switch (property) {

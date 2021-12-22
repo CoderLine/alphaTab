@@ -5,6 +5,9 @@
 // </auto-generated>
 import { ImporterSettings } from "@src/ImporterSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 export class ImporterSettingsSerializer {
     public static fromJson(obj: ImporterSettings, m: unknown): void {
         if (!m) {
@@ -21,6 +24,25 @@ export class ImporterSettingsSerializer {
         o.set("mergepartgroupsinmusicxml", obj.mergePartGroupsInMusicXml); 
         o.set("beattextaslyrics", obj.beatTextAsLyrics); 
         return o; 
+    }
+    public static fromBinary(obj: ImporterSettings, r: IReadable): ImporterSettings {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.encoding = IOHelper.readString(r); 
+        obj.mergePartGroupsInMusicXml = IOHelper.readBoolean(r); 
+        obj.beatTextAsLyrics = IOHelper.readBoolean(r); 
+        return obj; 
+    }
+    public static toBinary(obj: ImporterSettings | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeString(w, obj.encoding); 
+        IOHelper.writeBoolean(w, obj.mergePartGroupsInMusicXml); 
+        IOHelper.writeBoolean(w, obj.beatTextAsLyrics); 
     }
     public static setProperty(obj: ImporterSettings, property: string, v: unknown): boolean {
         switch (property) {

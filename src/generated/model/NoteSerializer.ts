@@ -6,10 +6,13 @@
 import { Note } from "@src/model/Note";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
+import { IReadable } from "@src/io/IReadable";
+import { BendPoint } from "@src/model/BendPoint";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 import { AccentuationType } from "@src/model/AccentuationType";
 import { BendType } from "@src/model/BendType";
 import { BendStyle } from "@src/model/BendStyle";
-import { BendPoint } from "@src/model/BendPoint";
 import { HarmonicType } from "@src/model/HarmonicType";
 import { SlideInType } from "@src/model/SlideInType";
 import { SlideOutType } from "@src/model/SlideOutType";
@@ -72,6 +75,110 @@ export class NoteSerializer {
         o.set("dynamics", obj.dynamics as number); 
         return o; 
     }
+    public static fromBinary(obj: Note, r: IReadable): Note {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.id = IOHelper.readNumber(r); 
+        obj.accentuated = JsonHelper.parseEnum<AccentuationType>(IOHelper.readInt32LE(r), AccentuationType)!; 
+        obj.bendType = JsonHelper.parseEnum<BendType>(IOHelper.readInt32LE(r), BendType)!; 
+        obj.bendStyle = JsonHelper.parseEnum<BendStyle>(IOHelper.readInt32LE(r), BendStyle)!; 
+        obj.isContinuedBend = IOHelper.readBoolean(r); 
+        {
+            obj.bendPoints = [];
+            const length = IOHelper.readInt32LE(r);
+            for (let i = 0;i < length;i++) {
+                const it = new BendPoint();
+                BendPointSerializer.fromBinary(it, r);
+                obj.addBendPoint(it);
+            }
+        } 
+        obj.fret = IOHelper.readNumber(r); 
+        obj.string = IOHelper.readNumber(r); 
+        obj.octave = IOHelper.readNumber(r); 
+        obj.tone = IOHelper.readNumber(r); 
+        obj.percussionArticulation = IOHelper.readNumber(r); 
+        obj.isVisible = IOHelper.readBoolean(r); 
+        obj.isLeftHandTapped = IOHelper.readBoolean(r); 
+        obj.isHammerPullOrigin = IOHelper.readBoolean(r); 
+        obj.hammerPullOriginNoteId = IOHelper.readNumber(r); 
+        obj.hammerPullDestinationNoteId = IOHelper.readNumber(r); 
+        obj.isSlurDestination = IOHelper.readBoolean(r); 
+        obj.slurOriginNoteId = IOHelper.readNumber(r); 
+        obj.slurDestinationNoteId = IOHelper.readNumber(r); 
+        obj.harmonicType = JsonHelper.parseEnum<HarmonicType>(IOHelper.readInt32LE(r), HarmonicType)!; 
+        obj.harmonicValue = IOHelper.readNumber(r); 
+        obj.isGhost = IOHelper.readBoolean(r); 
+        obj.isLetRing = IOHelper.readBoolean(r); 
+        obj.isPalmMute = IOHelper.readBoolean(r); 
+        obj.isDead = IOHelper.readBoolean(r); 
+        obj.isStaccato = IOHelper.readBoolean(r); 
+        obj.slideInType = JsonHelper.parseEnum<SlideInType>(IOHelper.readInt32LE(r), SlideInType)!; 
+        obj.slideOutType = JsonHelper.parseEnum<SlideOutType>(IOHelper.readInt32LE(r), SlideOutType)!; 
+        obj.vibrato = JsonHelper.parseEnum<VibratoType>(IOHelper.readInt32LE(r), VibratoType)!; 
+        obj.tieOriginNoteId = IOHelper.readNumber(r); 
+        obj.tieDestinationNoteId = IOHelper.readNumber(r); 
+        obj.isTieDestination = IOHelper.readBoolean(r); 
+        obj.leftHandFinger = JsonHelper.parseEnum<Fingers>(IOHelper.readInt32LE(r), Fingers)!; 
+        obj.rightHandFinger = JsonHelper.parseEnum<Fingers>(IOHelper.readInt32LE(r), Fingers)!; 
+        obj.isFingering = IOHelper.readBoolean(r); 
+        obj.trillValue = IOHelper.readNumber(r); 
+        obj.trillSpeed = JsonHelper.parseEnum<Duration>(IOHelper.readInt32LE(r), Duration)!; 
+        obj.durationPercent = IOHelper.readNumber(r); 
+        obj.accidentalMode = JsonHelper.parseEnum<NoteAccidentalMode>(IOHelper.readInt32LE(r), NoteAccidentalMode)!; 
+        obj.dynamics = JsonHelper.parseEnum<DynamicValue>(IOHelper.readInt32LE(r), DynamicValue)!; 
+        return obj; 
+    }
+    public static toBinary(obj: Note | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeNumber(w, obj.id); 
+        IOHelper.writeInt32LE(w, obj.accentuated as number); 
+        IOHelper.writeInt32LE(w, obj.bendType as number); 
+        IOHelper.writeInt32LE(w, obj.bendStyle as number); 
+        IOHelper.writeBoolean(w, obj.isContinuedBend); 
+        IOHelper.writeInt32LE(w, obj.bendPoints.length); 
+        for (const i of obj.bendPoints) {
+            BendPointSerializer.toBinary(i, w);
+        } 
+        IOHelper.writeNumber(w, obj.fret); 
+        IOHelper.writeNumber(w, obj.string); 
+        IOHelper.writeNumber(w, obj.octave); 
+        IOHelper.writeNumber(w, obj.tone); 
+        IOHelper.writeNumber(w, obj.percussionArticulation); 
+        IOHelper.writeBoolean(w, obj.isVisible); 
+        IOHelper.writeBoolean(w, obj.isLeftHandTapped); 
+        IOHelper.writeBoolean(w, obj.isHammerPullOrigin); 
+        IOHelper.writeNumber(w, obj.hammerPullOriginNoteId); 
+        IOHelper.writeNumber(w, obj.hammerPullDestinationNoteId); 
+        IOHelper.writeBoolean(w, obj.isSlurDestination); 
+        IOHelper.writeNumber(w, obj.slurOriginNoteId); 
+        IOHelper.writeNumber(w, obj.slurDestinationNoteId); 
+        IOHelper.writeInt32LE(w, obj.harmonicType as number); 
+        IOHelper.writeNumber(w, obj.harmonicValue); 
+        IOHelper.writeBoolean(w, obj.isGhost); 
+        IOHelper.writeBoolean(w, obj.isLetRing); 
+        IOHelper.writeBoolean(w, obj.isPalmMute); 
+        IOHelper.writeBoolean(w, obj.isDead); 
+        IOHelper.writeBoolean(w, obj.isStaccato); 
+        IOHelper.writeInt32LE(w, obj.slideInType as number); 
+        IOHelper.writeInt32LE(w, obj.slideOutType as number); 
+        IOHelper.writeInt32LE(w, obj.vibrato as number); 
+        IOHelper.writeNumber(w, obj.tieOriginNoteId); 
+        IOHelper.writeNumber(w, obj.tieDestinationNoteId); 
+        IOHelper.writeBoolean(w, obj.isTieDestination); 
+        IOHelper.writeInt32LE(w, obj.leftHandFinger as number); 
+        IOHelper.writeInt32LE(w, obj.rightHandFinger as number); 
+        IOHelper.writeBoolean(w, obj.isFingering); 
+        IOHelper.writeNumber(w, obj.trillValue); 
+        IOHelper.writeInt32LE(w, obj.trillSpeed as number); 
+        IOHelper.writeNumber(w, obj.durationPercent); 
+        IOHelper.writeInt32LE(w, obj.accidentalMode as number); 
+        IOHelper.writeInt32LE(w, obj.dynamics as number); 
+    }
     public static setProperty(obj: Note, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
@@ -91,9 +198,9 @@ export class NoteSerializer {
                 return true;
             case "bendpoints":
                 obj.bendPoints = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new BendPoint();
-                    BendPointSerializer.fromJson(i, o)
+                    BendPointSerializer.fromJson(i, o);
                     obj.addBendPoint(i);
                 }
                 return true;

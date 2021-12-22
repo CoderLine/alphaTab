@@ -6,6 +6,9 @@
 import { DisplaySettings } from "@src/DisplaySettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesSerializer";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 import { LayoutMode } from "@src/LayoutMode";
 import { StaveProfile } from "@src/StaveProfile";
 export class DisplaySettingsSerializer {
@@ -31,6 +34,39 @@ export class DisplaySettingsSerializer {
         o.set("resources", RenderingResourcesSerializer.toJson(obj.resources)); 
         o.set("padding", obj.padding); 
         return o; 
+    }
+    public static fromBinary(obj: DisplaySettings, r: IReadable): DisplaySettings {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.scale = IOHelper.readNumber(r); 
+        obj.stretchForce = IOHelper.readNumber(r); 
+        obj.layoutMode = JsonHelper.parseEnum<LayoutMode>(IOHelper.readInt32LE(r), LayoutMode)!; 
+        obj.staveProfile = JsonHelper.parseEnum<StaveProfile>(IOHelper.readInt32LE(r), StaveProfile)!; 
+        obj.barsPerRow = IOHelper.readNumber(r); 
+        obj.startBar = IOHelper.readNumber(r); 
+        obj.barCount = IOHelper.readNumber(r); 
+        obj.barCountPerPartial = IOHelper.readNumber(r); 
+        if (!IOHelper.readNull(r)) {
+            obj.padding = IOHelper.readNumberArray(r);
+        } 
+        return obj; 
+    }
+    public static toBinary(obj: DisplaySettings | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeNumber(w, obj.scale); 
+        IOHelper.writeNumber(w, obj.stretchForce); 
+        IOHelper.writeInt32LE(w, obj.layoutMode as number); 
+        IOHelper.writeInt32LE(w, obj.staveProfile as number); 
+        IOHelper.writeNumber(w, obj.barsPerRow); 
+        IOHelper.writeNumber(w, obj.startBar); 
+        IOHelper.writeNumber(w, obj.barCount); 
+        IOHelper.writeNumber(w, obj.barCountPerPartial); 
+        RenderingResourcesSerializer.toBinary(obj.resources, w); 
     }
     public static setProperty(obj: DisplaySettings, property: string, v: unknown): boolean {
         switch (property) {

@@ -5,6 +5,9 @@
 // </auto-generated>
 import { Chord } from "@src/model/Chord";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 export class ChordSerializer {
     public static fromJson(obj: Chord, m: unknown): void {
         if (!m) {
@@ -25,6 +28,33 @@ export class ChordSerializer {
         o.set("showdiagram", obj.showDiagram); 
         o.set("showfingering", obj.showFingering); 
         return o; 
+    }
+    public static fromBinary(obj: Chord, r: IReadable): Chord {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.name = IOHelper.readString(r); 
+        obj.firstFret = IOHelper.readNumber(r); 
+        obj.strings = IOHelper.readNumberArray(r); 
+        obj.barreFrets = IOHelper.readNumberArray(r); 
+        obj.showName = IOHelper.readBoolean(r); 
+        obj.showDiagram = IOHelper.readBoolean(r); 
+        obj.showFingering = IOHelper.readBoolean(r); 
+        return obj; 
+    }
+    public static toBinary(obj: Chord | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeString(w, obj.name); 
+        IOHelper.writeNumber(w, obj.firstFret); 
+        IOHelper.writeNumberArray(w, obj.strings); 
+        IOHelper.writeNumberArray(w, obj.barreFrets); 
+        IOHelper.writeBoolean(w, obj.showName); 
+        IOHelper.writeBoolean(w, obj.showDiagram); 
+        IOHelper.writeBoolean(w, obj.showFingering); 
     }
     public static setProperty(obj: Chord, property: string, v: unknown): boolean {
         switch (property) {

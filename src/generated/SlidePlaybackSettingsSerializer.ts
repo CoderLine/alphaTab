@@ -5,6 +5,9 @@
 // </auto-generated>
 import { SlidePlaybackSettings } from "@src/PlayerSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 export class SlidePlaybackSettingsSerializer {
     public static fromJson(obj: SlidePlaybackSettings, m: unknown): void {
         if (!m) {
@@ -21,6 +24,25 @@ export class SlidePlaybackSettingsSerializer {
         o.set("simpleslidedurationratio", obj.simpleSlideDurationRatio); 
         o.set("shiftslidedurationratio", obj.shiftSlideDurationRatio); 
         return o; 
+    }
+    public static fromBinary(obj: SlidePlaybackSettings, r: IReadable): SlidePlaybackSettings {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.simpleSlidePitchOffset = IOHelper.readNumber(r); 
+        obj.simpleSlideDurationRatio = IOHelper.readNumber(r); 
+        obj.shiftSlideDurationRatio = IOHelper.readNumber(r); 
+        return obj; 
+    }
+    public static toBinary(obj: SlidePlaybackSettings | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeNumber(w, obj.simpleSlidePitchOffset); 
+        IOHelper.writeNumber(w, obj.simpleSlideDurationRatio); 
+        IOHelper.writeNumber(w, obj.shiftSlideDurationRatio); 
     }
     public static setProperty(obj: SlidePlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {

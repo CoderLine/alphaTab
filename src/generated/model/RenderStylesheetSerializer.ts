@@ -5,6 +5,9 @@
 // </auto-generated>
 import { RenderStylesheet } from "@src/model/RenderStylesheet";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 export class RenderStylesheetSerializer {
     public static fromJson(obj: RenderStylesheet, m: unknown): void {
         if (!m) {
@@ -19,6 +22,21 @@ export class RenderStylesheetSerializer {
         const o = new Map<string, unknown>(); 
         o.set("hidedynamics", obj.hideDynamics); 
         return o; 
+    }
+    public static fromBinary(obj: RenderStylesheet, r: IReadable): RenderStylesheet {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.hideDynamics = IOHelper.readBoolean(r); 
+        return obj; 
+    }
+    public static toBinary(obj: RenderStylesheet | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeBoolean(w, obj.hideDynamics); 
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
         switch (property) {

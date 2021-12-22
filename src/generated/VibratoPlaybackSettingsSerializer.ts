@@ -5,6 +5,9 @@
 // </auto-generated>
 import { VibratoPlaybackSettings } from "@src/PlayerSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { IReadable } from "@src/io/IReadable";
+import { IWriteable } from "@src/io/IWriteable";
+import { IOHelper } from "@src/io/IOHelper";
 export class VibratoPlaybackSettingsSerializer {
     public static fromJson(obj: VibratoPlaybackSettings, m: unknown): void {
         if (!m) {
@@ -26,6 +29,35 @@ export class VibratoPlaybackSettingsSerializer {
         o.set("beatslightlength", obj.beatSlightLength); 
         o.set("beatslightamplitude", obj.beatSlightAmplitude); 
         return o; 
+    }
+    public static fromBinary(obj: VibratoPlaybackSettings, r: IReadable): VibratoPlaybackSettings {
+        if (IOHelper.readNull(r)) {
+            return obj;
+        } 
+        obj.noteWideLength = IOHelper.readNumber(r); 
+        obj.noteWideAmplitude = IOHelper.readNumber(r); 
+        obj.noteSlightLength = IOHelper.readNumber(r); 
+        obj.noteSlightAmplitude = IOHelper.readNumber(r); 
+        obj.beatWideLength = IOHelper.readNumber(r); 
+        obj.beatWideAmplitude = IOHelper.readNumber(r); 
+        obj.beatSlightLength = IOHelper.readNumber(r); 
+        obj.beatSlightAmplitude = IOHelper.readNumber(r); 
+        return obj; 
+    }
+    public static toBinary(obj: VibratoPlaybackSettings | null, w: IWriteable): void {
+        if (!obj) {
+            IOHelper.writeNull(w);
+            return;
+        } 
+        IOHelper.writeNotNull(w); 
+        IOHelper.writeNumber(w, obj.noteWideLength); 
+        IOHelper.writeNumber(w, obj.noteWideAmplitude); 
+        IOHelper.writeNumber(w, obj.noteSlightLength); 
+        IOHelper.writeNumber(w, obj.noteSlightAmplitude); 
+        IOHelper.writeNumber(w, obj.beatWideLength); 
+        IOHelper.writeNumber(w, obj.beatWideAmplitude); 
+        IOHelper.writeNumber(w, obj.beatSlightLength); 
+        IOHelper.writeNumber(w, obj.beatSlightAmplitude); 
     }
     public static setProperty(obj: VibratoPlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {
