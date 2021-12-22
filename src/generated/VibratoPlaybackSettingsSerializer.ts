@@ -30,10 +30,11 @@ export class VibratoPlaybackSettingsSerializer {
         o.set("beatslightamplitude", obj.beatSlightAmplitude); 
         return o; 
     }
-    public static fromBinary(obj: VibratoPlaybackSettings, r: IReadable): VibratoPlaybackSettings {
+    public static fromBinary(o: VibratoPlaybackSettings | null, r: IReadable): VibratoPlaybackSettings | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new VibratoPlaybackSettings(); 
         obj.noteWideLength = IOHelper.readNumber(r); 
         obj.noteWideAmplitude = IOHelper.readNumber(r); 
         obj.noteSlightLength = IOHelper.readNumber(r); 

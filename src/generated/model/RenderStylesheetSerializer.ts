@@ -23,10 +23,11 @@ export class RenderStylesheetSerializer {
         o.set("hidedynamics", obj.hideDynamics); 
         return o; 
     }
-    public static fromBinary(obj: RenderStylesheet, r: IReadable): RenderStylesheet {
+    public static fromBinary(o: RenderStylesheet | null, r: IReadable): RenderStylesheet | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new RenderStylesheet(); 
         obj.hideDynamics = IOHelper.readBoolean(r); 
         return obj; 
     }

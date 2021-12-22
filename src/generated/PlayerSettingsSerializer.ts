@@ -43,10 +43,11 @@ export class PlayerSettingsSerializer {
         o.set("playtripletfeel", obj.playTripletFeel); 
         return o; 
     }
-    public static fromBinary(obj: PlayerSettings, r: IReadable): PlayerSettings {
+    public static fromBinary(o: PlayerSettings | null, r: IReadable): PlayerSettings | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new PlayerSettings(); 
         if (!IOHelper.readNull(r)) {
             obj.soundFont = IOHelper.readString(r);
         } 
@@ -64,6 +65,8 @@ export class PlayerSettingsSerializer {
         obj.nativeBrowserSmoothScroll = IOHelper.readBoolean(r); 
         obj.songBookBendDuration = IOHelper.readNumber(r); 
         obj.songBookDipDuration = IOHelper.readNumber(r); 
+        obj.vibrato = VibratoPlaybackSettingsSerializer.fromBinary(obj.vibrato, r); 
+        obj.slide = SlidePlaybackSettingsSerializer.fromBinary(obj.slide, r); 
         obj.playTripletFeel = IOHelper.readBoolean(r); 
         return obj; 
     }

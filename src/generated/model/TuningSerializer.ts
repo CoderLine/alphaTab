@@ -25,10 +25,11 @@ export class TuningSerializer {
         o.set("tunings", obj.tunings); 
         return o; 
     }
-    public static fromBinary(obj: Tuning, r: IReadable): Tuning {
+    public static fromBinary(o: Tuning | null, r: IReadable): Tuning | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Tuning(); 
         obj.isStandard = IOHelper.readBoolean(r); 
         obj.name = IOHelper.readString(r); 
         obj.tunings = IOHelper.readNumberArray(r); 

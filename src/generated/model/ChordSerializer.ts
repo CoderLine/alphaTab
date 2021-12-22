@@ -29,10 +29,11 @@ export class ChordSerializer {
         o.set("showfingering", obj.showFingering); 
         return o; 
     }
-    public static fromBinary(obj: Chord, r: IReadable): Chord {
+    public static fromBinary(o: Chord | null, r: IReadable): Chord | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Chord(); 
         obj.name = IOHelper.readString(r); 
         obj.firstFret = IOHelper.readNumber(r); 
         obj.strings = IOHelper.readNumberArray(r); 

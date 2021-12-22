@@ -32,10 +32,11 @@ export class InstrumentArticulationSerializer {
         o.set("outputmidinumber", obj.outputMidiNumber); 
         return o; 
     }
-    public static fromBinary(obj: InstrumentArticulation, r: IReadable): InstrumentArticulation {
+    public static fromBinary(o: InstrumentArticulation | null, r: IReadable): InstrumentArticulation | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new InstrumentArticulation(); 
         obj.elementType = IOHelper.readString(r); 
         obj.staffLine = IOHelper.readNumber(r); 
         obj.noteHeadDefault = JsonHelper.parseEnum<MusicFontSymbol>(IOHelper.readInt32LE(r), MusicFontSymbol)!; 

@@ -28,10 +28,11 @@ export class AutomationSerializer {
         o.set("text", obj.text); 
         return o; 
     }
-    public static fromBinary(obj: Automation, r: IReadable): Automation {
+    public static fromBinary(o: Automation | null, r: IReadable): Automation | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Automation(); 
         obj.isLinear = IOHelper.readBoolean(r); 
         obj.type = JsonHelper.parseEnum<AutomationType>(IOHelper.readInt32LE(r), AutomationType)!; 
         obj.value = IOHelper.readNumber(r); 

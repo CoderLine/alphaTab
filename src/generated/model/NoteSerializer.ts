@@ -75,10 +75,11 @@ export class NoteSerializer {
         o.set("dynamics", obj.dynamics as number); 
         return o; 
     }
-    public static fromBinary(obj: Note, r: IReadable): Note {
+    public static fromBinary(o: Note | null, r: IReadable): Note | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Note(); 
         obj.id = IOHelper.readNumber(r); 
         obj.accentuated = JsonHelper.parseEnum<AccentuationType>(IOHelper.readInt32LE(r), AccentuationType)!; 
         obj.bendType = JsonHelper.parseEnum<BendType>(IOHelper.readInt32LE(r), BendType)!; 

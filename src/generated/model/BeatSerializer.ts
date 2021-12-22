@@ -77,10 +77,11 @@ export class BeatSerializer {
         o.set("beamingmode", obj.beamingMode as number); 
         return o; 
     }
-    public static fromBinary(obj: Beat, r: IReadable): Beat {
+    public static fromBinary(o: Beat | null, r: IReadable): Beat | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Beat(); 
         obj.id = IOHelper.readNumber(r); 
         {
             obj.notes = [];

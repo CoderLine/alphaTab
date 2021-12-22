@@ -30,10 +30,11 @@ export class PlaybackInformationSerializer {
         o.set("issolo", obj.isSolo); 
         return o; 
     }
-    public static fromBinary(obj: PlaybackInformation, r: IReadable): PlaybackInformation {
+    public static fromBinary(o: PlaybackInformation | null, r: IReadable): PlaybackInformation | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new PlaybackInformation(); 
         obj.volume = IOHelper.readNumber(r); 
         obj.balance = IOHelper.readNumber(r); 
         obj.port = IOHelper.readNumber(r); 

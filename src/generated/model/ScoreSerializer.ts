@@ -42,10 +42,11 @@ export class ScoreSerializer {
         o.set("stylesheet", RenderStylesheetSerializer.toJson(obj.stylesheet)); 
         return o; 
     }
-    public static fromBinary(obj: Score, r: IReadable): Score {
+    public static fromBinary(o: Score | null, r: IReadable): Score | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Score(); 
         obj.album = IOHelper.readString(r); 
         obj.artist = IOHelper.readString(r); 
         obj.copyright = IOHelper.readString(r); 
@@ -76,6 +77,7 @@ export class ScoreSerializer {
                 obj.addTrack(it);
             }
         } 
+        obj.stylesheet = RenderStylesheetSerializer.fromBinary(obj.stylesheet, r); 
         return obj; 
     }
     public static toBinary(obj: Score | null, w: IWriteable): void {

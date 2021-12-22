@@ -25,10 +25,11 @@ export class FermataSerializer {
         o.set("length", obj.length); 
         return o; 
     }
-    public static fromBinary(obj: Fermata, r: IReadable): Fermata {
+    public static fromBinary(o: Fermata | null, r: IReadable): Fermata | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Fermata(); 
         obj.type = JsonHelper.parseEnum<FermataType>(IOHelper.readInt32LE(r), FermataType)!; 
         obj.length = IOHelper.readNumber(r); 
         return obj; 

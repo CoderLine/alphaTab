@@ -32,10 +32,16 @@ export class SettingsSerializer {
         o.set("player", PlayerSettingsSerializer.toJson(obj.player)); 
         return o; 
     }
-    public static fromBinary(obj: Settings, r: IReadable): Settings {
+    public static fromBinary(o: Settings | null, r: IReadable): Settings | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Settings(); 
+        obj.core = CoreSettingsSerializer.fromBinary(obj.core, r); 
+        obj.display = DisplaySettingsSerializer.fromBinary(obj.display, r); 
+        obj.notation = NotationSettingsSerializer.fromBinary(obj.notation, r); 
+        obj.importer = ImporterSettingsSerializer.fromBinary(obj.importer, r); 
+        obj.player = PlayerSettingsSerializer.fromBinary(obj.player, r); 
         return obj; 
     }
     public static toBinary(obj: Settings | null, w: IWriteable): void {

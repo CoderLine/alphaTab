@@ -27,10 +27,11 @@ export class VoiceSerializer {
         o.set("isempty", obj.isEmpty); 
         return o; 
     }
-    public static fromBinary(obj: Voice, r: IReadable): Voice {
+    public static fromBinary(o: Voice | null, r: IReadable): Voice | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Voice(); 
         obj.id = IOHelper.readNumber(r); 
         {
             obj.beats = [];

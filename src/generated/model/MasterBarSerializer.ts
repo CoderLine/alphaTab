@@ -52,10 +52,11 @@ export class MasterBarSerializer {
         o.set("isanacrusis", obj.isAnacrusis); 
         return o; 
     }
-    public static fromBinary(obj: MasterBar, r: IReadable): MasterBar {
+    public static fromBinary(o: MasterBar | null, r: IReadable): MasterBar | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new MasterBar(); 
         obj.alternateEndings = IOHelper.readNumber(r); 
         obj.keySignature = JsonHelper.parseEnum<KeySignature>(IOHelper.readInt32LE(r), KeySignature)!; 
         obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(IOHelper.readInt32LE(r), KeySignatureType)!; 
@@ -66,10 +67,12 @@ export class MasterBarSerializer {
         obj.timeSignatureDenominator = IOHelper.readNumber(r); 
         obj.timeSignatureCommon = IOHelper.readBoolean(r); 
         obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(IOHelper.readInt32LE(r), TripletFeel)!; 
+        obj.section = SectionSerializer.fromBinary(obj.section, r); 
+        obj.tempoAutomation = AutomationSerializer.fromBinary(obj.tempoAutomation, r); 
         {
             const size = IOHelper.readInt32LE(r);
             for (let i = 0;i < size;i++) {
-                obj.fermata.set(IOHelper.readNumber(r), FermataSerializer.fromBinary(new Fermata(), r));
+                obj.fermata.set(IOHelper.readNumber(r), FermataSerializer.fromBinary(new Fermata(), r)!);
             }
         } 
         obj.start = IOHelper.readNumber(r); 

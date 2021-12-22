@@ -43,10 +43,11 @@ export class NotationSettingsSerializer {
         o.set("slurheight", obj.slurHeight); 
         return o; 
     }
-    public static fromBinary(obj: NotationSettings, r: IReadable): NotationSettings {
+    public static fromBinary(o: NotationSettings | null, r: IReadable): NotationSettings | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new NotationSettings(); 
         obj.notationMode = JsonHelper.parseEnum<NotationMode>(IOHelper.readInt32LE(r), NotationMode)!; 
         obj.fingeringMode = JsonHelper.parseEnum<FingeringMode>(IOHelper.readInt32LE(r), FingeringMode)!; 
         {

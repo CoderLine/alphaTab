@@ -10,7 +10,7 @@ import {
     setMethodBody,
     unwrapArrayItemType
 } from '../BuilderHelpers';
-import { findModule, findSerializerModule, JsonProperty } from './Serializer.common';
+import { findModule, findSerializerModule, isImmutable, JsonProperty } from './Serializer.common';
 
 export function createFromBinaryMethod(
     program: ts.Program,
@@ -21,16 +21,17 @@ export function createFromBinaryMethod(
     importer('IReadable', '@src/io/IReadable');
     const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
         `public class Serializer {
-            public static fromBinary(obj: ${input.name!.text}, r: IReadable): ${input.name!.text} {
+            public static fromBinary(o: ${input.name!.text} | null, r: IReadable): ${input.name!.text} | null {
             }
         }`,
         ts.SyntaxKind.MethodDeclaration
     );
-    return setMethodBody(methodDecl, generateFromBinaryBody(program, propertiesToSerialize, importer));
+    return setMethodBody(methodDecl, generateFromBinaryBody(program, input, propertiesToSerialize, importer));
 }
 
 function generateFromBinaryBody(
     program: ts.Program,
+    input: ts.ClassDeclaration,
     propertiesToSerialize: JsonProperty[],
     importer: (name: string, module: string) => void
 ) {
@@ -39,9 +40,13 @@ function generateFromBinaryBody(
     statements.push(
         createNodeFromSource<ts.IfStatement>(
             `if(IOHelper.readNull(r)) { 
-                return obj;
+                return null;
             }`,
             ts.SyntaxKind.IfStatement
+        ),
+        createNodeFromSource<ts.VariableStatement>(
+            `const obj = o != null ? o : new ${input.name!.text}();`,
+            ts.SyntaxKind.VariableStatement
         )
     );
 
@@ -188,9 +193,9 @@ function generateFromBinaryBody(
                 const itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
                 importer(itemSerializer, findSerializerModule(mapType.typeArguments![1], program.getCompilerOptions()));
 
-                readValue = createNodeFromSource<ts.CallExpression>(
-                    `${itemSerializer}.fromBinary(new ${mapType.typeArguments![1].symbol.name}(),r)`,
-                    ts.SyntaxKind.CallExpression
+                readValue = createNodeFromSource<ts.NonNullExpression>(
+                    `${itemSerializer}.fromBinary(new ${mapType.typeArguments![1].symbol.name}(), r)!`,
+                    ts.SyntaxKind.NonNullExpression
                 );
             }
 
@@ -229,6 +234,24 @@ function generateFromBinaryBody(
             );
 
             propertyStatements.push(ts.factory.createBlock(mapStatements));
+        }  else if (isImmutable(type.type)) {
+            let itemSerializer = type.type.symbol.name;
+            importer(itemSerializer, findModule(type.type, program.getCompilerOptions()));
+            propertyStatements.push(
+                createNodeFromSource<ts.ExpressionStatement>(
+                    `obj.${fieldName} = ${itemSerializer}.fromBinary(r)!;`,
+                    ts.SyntaxKind.ExpressionStatement
+                )
+            );
+        } else {
+            let itemSerializer = type.type.symbol.name + 'Serializer';
+            importer(itemSerializer, findSerializerModule(type.type, program.getCompilerOptions()));
+            propertyStatements.push(
+                createNodeFromSource<ts.ExpressionStatement>(
+                    `obj.${fieldName} = ${itemSerializer}.fromBinary(obj.${fieldName}, r);`,
+                    ts.SyntaxKind.ExpressionStatement
+                )
+            );
         }
 
         if (prop.target) {

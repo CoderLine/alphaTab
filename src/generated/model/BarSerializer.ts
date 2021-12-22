@@ -32,10 +32,11 @@ export class BarSerializer {
         o.set("similemark", obj.simileMark as number); 
         return o; 
     }
-    public static fromBinary(obj: Bar, r: IReadable): Bar {
+    public static fromBinary(o: Bar | null, r: IReadable): Bar | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Bar(); 
         obj.id = IOHelper.readNumber(r); 
         obj.clef = JsonHelper.parseEnum<Clef>(IOHelper.readInt32LE(r), Clef)!; 
         obj.clefOttava = JsonHelper.parseEnum<Ottavia>(IOHelper.readInt32LE(r), Ottavia)!; 

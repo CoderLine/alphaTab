@@ -35,10 +35,11 @@ export class DisplaySettingsSerializer {
         o.set("padding", obj.padding); 
         return o; 
     }
-    public static fromBinary(obj: DisplaySettings, r: IReadable): DisplaySettings {
+    public static fromBinary(o: DisplaySettings | null, r: IReadable): DisplaySettings | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new DisplaySettings(); 
         obj.scale = IOHelper.readNumber(r); 
         obj.stretchForce = IOHelper.readNumber(r); 
         obj.layoutMode = JsonHelper.parseEnum<LayoutMode>(IOHelper.readInt32LE(r), LayoutMode)!; 
@@ -47,6 +48,7 @@ export class DisplaySettingsSerializer {
         obj.startBar = IOHelper.readNumber(r); 
         obj.barCount = IOHelper.readNumber(r); 
         obj.barCountPerPartial = IOHelper.readNumber(r); 
+        obj.resources = RenderingResourcesSerializer.fromBinary(obj.resources, r); 
         if (!IOHelper.readNull(r)) {
             obj.padding = IOHelper.readNumberArray(r);
         } 

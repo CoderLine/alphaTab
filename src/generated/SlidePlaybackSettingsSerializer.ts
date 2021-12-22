@@ -25,10 +25,11 @@ export class SlidePlaybackSettingsSerializer {
         o.set("shiftslidedurationratio", obj.shiftSlideDurationRatio); 
         return o; 
     }
-    public static fromBinary(obj: SlidePlaybackSettings, r: IReadable): SlidePlaybackSettings {
+    public static fromBinary(o: SlidePlaybackSettings | null, r: IReadable): SlidePlaybackSettings | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new SlidePlaybackSettings(); 
         obj.simpleSlidePitchOffset = IOHelper.readNumber(r); 
         obj.simpleSlideDurationRatio = IOHelper.readNumber(r); 
         obj.shiftSlideDurationRatio = IOHelper.readNumber(r); 

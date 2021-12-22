@@ -41,10 +41,28 @@ export class RenderingResourcesSerializer {
         o.set("scoreinfocolor", Color.toJson(obj.scoreInfoColor)); 
         return o; 
     }
-    public static fromBinary(obj: RenderingResources, r: IReadable): RenderingResources {
+    public static fromBinary(o: RenderingResources | null, r: IReadable): RenderingResources | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new RenderingResources(); 
+        obj.copyrightFont = Font.fromBinary(r)!; 
+        obj.titleFont = Font.fromBinary(r)!; 
+        obj.subTitleFont = Font.fromBinary(r)!; 
+        obj.wordsFont = Font.fromBinary(r)!; 
+        obj.effectFont = Font.fromBinary(r)!; 
+        obj.fretboardNumberFont = Font.fromBinary(r)!; 
+        obj.tablatureFont = Font.fromBinary(r)!; 
+        obj.graceFont = Font.fromBinary(r)!; 
+        obj.staffLineColor = Color.fromBinary(r)!; 
+        obj.barSeparatorColor = Color.fromBinary(r)!; 
+        obj.barNumberFont = Font.fromBinary(r)!; 
+        obj.barNumberColor = Color.fromBinary(r)!; 
+        obj.fingeringFont = Font.fromBinary(r)!; 
+        obj.markerFont = Font.fromBinary(r)!; 
+        obj.mainGlyphColor = Color.fromBinary(r)!; 
+        obj.secondaryGlyphColor = Color.fromBinary(r)!; 
+        obj.scoreInfoColor = Color.fromBinary(r)!; 
         return obj; 
     }
     public static toBinary(obj: RenderingResources | null, w: IWriteable): void {

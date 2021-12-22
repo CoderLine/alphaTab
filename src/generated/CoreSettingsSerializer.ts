@@ -38,10 +38,11 @@ export class CoreSettingsSerializer {
         o.set("includenotebounds", obj.includeNoteBounds); 
         return o; 
     }
-    public static fromBinary(obj: CoreSettings, r: IReadable): CoreSettings {
+    public static fromBinary(o: CoreSettings | null, r: IReadable): CoreSettings | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new CoreSettings(); 
         /*@target web*/
         if (!IOHelper.readNull(r)) {
             obj.scriptFile = IOHelper.readString(r);

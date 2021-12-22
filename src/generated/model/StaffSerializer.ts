@@ -43,10 +43,11 @@ export class StaffSerializer {
         o.set("standardnotationlinecount", obj.standardNotationLineCount); 
         return o; 
     }
-    public static fromBinary(obj: Staff, r: IReadable): Staff {
+    public static fromBinary(o: Staff | null, r: IReadable): Staff | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Staff(); 
         {
             obj.bars = [];
             const length = IOHelper.readInt32LE(r);
@@ -59,12 +60,13 @@ export class StaffSerializer {
         {
             const size = IOHelper.readInt32LE(r);
             for (let i = 0;i < size;i++) {
-                obj.addChord(IOHelper.readString(r), ChordSerializer.fromBinary(new Chord(), r));
+                obj.addChord(IOHelper.readString(r), ChordSerializer.fromBinary(new Chord(), r)!);
             }
         } 
         obj.capo = IOHelper.readNumber(r); 
         obj.transpositionPitch = IOHelper.readNumber(r); 
         obj.displayTranspositionPitch = IOHelper.readNumber(r); 
+        obj.stringTuning = TuningSerializer.fromBinary(obj.stringTuning, r); 
         obj.showTablature = IOHelper.readBoolean(r); 
         obj.showStandardNotation = IOHelper.readBoolean(r); 
         obj.isPercussion = IOHelper.readBoolean(r); 

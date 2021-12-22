@@ -24,10 +24,11 @@ export class BendPointSerializer {
         o.set("value", obj.value); 
         return o; 
     }
-    public static fromBinary(obj: BendPoint, r: IReadable): BendPoint {
+    public static fromBinary(o: BendPoint | null, r: IReadable): BendPoint | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new BendPoint(); 
         obj.offset = IOHelper.readNumber(r); 
         obj.value = IOHelper.readNumber(r); 
         return obj; 

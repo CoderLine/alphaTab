@@ -34,10 +34,11 @@ export class TrackSerializer {
         o.set("percussionarticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i))); 
         return o; 
     }
-    public static fromBinary(obj: Track, r: IReadable): Track {
+    public static fromBinary(o: Track | null, r: IReadable): Track | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Track(); 
         {
             obj.staves = [];
             const length = IOHelper.readInt32LE(r);
@@ -47,6 +48,8 @@ export class TrackSerializer {
                 obj.addStaff(it);
             }
         } 
+        obj.playbackInfo = PlaybackInformationSerializer.fromBinary(obj.playbackInfo, r); 
+        obj.color = Color.fromBinary(r)!; 
         obj.name = IOHelper.readString(r); 
         obj.shortName = IOHelper.readString(r); 
         {

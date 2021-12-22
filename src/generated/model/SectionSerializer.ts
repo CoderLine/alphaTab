@@ -24,10 +24,11 @@ export class SectionSerializer {
         o.set("text", obj.text); 
         return o; 
     }
-    public static fromBinary(obj: Section, r: IReadable): Section {
+    public static fromBinary(o: Section | null, r: IReadable): Section | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new Section(); 
         obj.marker = IOHelper.readString(r); 
         obj.text = IOHelper.readString(r); 
         return obj; 

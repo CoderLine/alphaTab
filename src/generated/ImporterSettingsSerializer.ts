@@ -25,10 +25,11 @@ export class ImporterSettingsSerializer {
         o.set("beattextaslyrics", obj.beatTextAsLyrics); 
         return o; 
     }
-    public static fromBinary(obj: ImporterSettings, r: IReadable): ImporterSettings {
+    public static fromBinary(o: ImporterSettings | null, r: IReadable): ImporterSettings | null {
         if (IOHelper.readNull(r)) {
-            return obj;
+            return null;
         } 
+        const obj = o != null ? o : new ImporterSettings(); 
         obj.encoding = IOHelper.readString(r); 
         obj.mergePartGroupsInMusicXml = IOHelper.readBoolean(r); 
         obj.beatTextAsLyrics = IOHelper.readBoolean(r); 
