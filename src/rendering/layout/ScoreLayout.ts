@@ -152,8 +152,9 @@ export abstract class ScoreLayout {
             let chords: Map<string, Chord> = new Map<string, Chord>();
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
-                    if (staff.chords) {
-                        for (const [chordId, chord] of staff.chords) {
+                    const sc = staff.chords;
+                    if (sc) {
+                        for (const [chordId, chord] of sc) {
                             if (!chords.has(chordId)) {
                                 if (chord.showDiagram) {
                                     chords.set(chordId, chord);

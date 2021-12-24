@@ -91,7 +91,9 @@ function generateClonePropertyStatements(
                         [ts.factory.createVariableDeclaration('i')],
                         ts.NodeFlags.Const
                     ),
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('original'), propertyName),
+                    ts.factory.createNonNullExpression(
+                        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('original'), propertyName)
+                    ),
                     ts.factory.createBlock([
                         ts.factory.createExpressionStatement(
                             collectionAddMethod

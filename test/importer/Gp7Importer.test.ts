@@ -95,27 +95,27 @@ describe('Gp7ImporterTest', () => {
         const reader = await prepareGp7ImporterWithFile('guitarpro7/bends.gp');
         let score: Score = reader.readScore();
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendType).toEqual(BendType.Bend);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints.length).toEqual(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[0].value).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[1].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[1].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).toEqual(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).toEqual(4);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendType).toEqual(BendType.Bend);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints.length).toEqual(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[0].value).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[1].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[1].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).toEqual(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].value).toEqual(4);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendType).toEqual(BendType.BendRelease);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints.length).toEqual(4);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints[0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints[0].value).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints[1].offset).toEqual(30);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints[1].value).toEqual(12);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints[2].offset).toEqual(30);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints[2].value).toEqual(12);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints[3].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints[3].value).toEqual(6);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints!.length).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].offset).toEqual(30);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].value).toEqual(12);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].offset).toEqual(30);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].value).toEqual(12);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![3].offset).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![3].value).toEqual(6);
     });
 
     it('bends-advanced', async () => {
@@ -127,203 +127,203 @@ describe('Gp7ImporterTest', () => {
         // // Bar 1
         let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         note = score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0];
         expect(note.bendType).toEqual(BendType.BendRelease);
-        expect(note.bendPoints.length).toEqual(4);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(10.2);
-        expect(note.bendPoints[1].value).toEqual(4);
-        expect(note.bendPoints[2].offset).toBeCloseTo(20.4);
-        expect(note.bendPoints[2].value).toEqual(4);
-        expect(note.bendPoints[3].offset).toBeCloseTo(30);
-        expect(note.bendPoints[3].value).toEqual(0);
+        expect(note.bendPoints!.length).toEqual(4);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(10.2);
+        expect(note.bendPoints![1].value).toEqual(4);
+        expect(note.bendPoints![2].offset).toBeCloseTo(20.4);
+        expect(note.bendPoints![2].value).toEqual(4);
+        expect(note.bendPoints![3].offset).toBeCloseTo(30);
+        expect(note.bendPoints![3].value).toEqual(0);
 
         // // Bar 2
         note = score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(59.4);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(59.4);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         note = score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0];
         expect(note.bendType).toEqual(BendType.BendRelease);
-        expect(note.bendPoints.length).toEqual(4);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(10.2);
-        expect(note.bendPoints[1].value).toEqual(4);
-        expect(note.bendPoints[2].offset).toBeCloseTo(45.6);
-        expect(note.bendPoints[2].value).toEqual(4);
-        expect(note.bendPoints[3].offset).toBeCloseTo(59.4);
-        expect(note.bendPoints[3].value).toEqual(0);
+        expect(note.bendPoints!.length).toEqual(4);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(10.2);
+        expect(note.bendPoints![1].value).toEqual(4);
+        expect(note.bendPoints![2].offset).toBeCloseTo(45.6);
+        expect(note.bendPoints![2].value).toEqual(4);
+        expect(note.bendPoints![3].offset).toBeCloseTo(59.4);
+        expect(note.bendPoints![3].value).toEqual(0);
 
         // // Bar 3
         note = score.tracks[0].staves[0].bars[2].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.Prebend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(4);
-        expect(note.bendPoints[1].offset).toBeCloseTo(60);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(4);
+        expect(note.bendPoints![1].offset).toBeCloseTo(60);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         note = score.tracks[0].staves[0].bars[2].voices[0].beats[1].notes[0];
         expect(note.bendType).toEqual(BendType.PrebendBend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(4);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(6);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(4);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(6);
 
         // // Bar 4
         note = score.tracks[0].staves[0].bars[3].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.PrebendRelease);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(4);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(0);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(4);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(0);
 
         // // Bar 5
         note = score.tracks[0].staves[0].bars[4].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(14.4);
-        expect(note.bendPoints[1].value).toEqual(8);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(14.4);
+        expect(note.bendPoints![1].value).toEqual(8);
 
         note = score.tracks[0].staves[0].bars[4].voices[0].beats[1].notes[0];
         expect(note.bendType).toEqual(BendType.BendRelease);
-        expect(note.bendPoints.length).toEqual(4);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(9);
-        expect(note.bendPoints[1].value).toEqual(8);
-        expect(note.bendPoints[2].offset).toBeCloseTo(20.4);
-        expect(note.bendPoints[2].value).toEqual(8);
-        expect(note.bendPoints[3].offset).toBeCloseTo(31.2);
-        expect(note.bendPoints[3].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(4);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(9);
+        expect(note.bendPoints![1].value).toEqual(8);
+        expect(note.bendPoints![2].offset).toBeCloseTo(20.4);
+        expect(note.bendPoints![2].value).toEqual(8);
+        expect(note.bendPoints![3].offset).toBeCloseTo(31.2);
+        expect(note.bendPoints![3].value).toEqual(4);
 
         // // Bar 6
         note = score.tracks[0].staves[0].bars[5].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.Prebend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(8);
-        expect(note.bendPoints[1].offset).toBeCloseTo(60);
-        expect(note.bendPoints[1].value).toEqual(8);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(8);
+        expect(note.bendPoints![1].offset).toBeCloseTo(60);
+        expect(note.bendPoints![1].value).toEqual(8);
 
         note = score.tracks[0].staves[0].bars[5].voices[0].beats[1].notes[0];
         expect(note.bendType).toEqual(BendType.PrebendBend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(8);
-        expect(note.bendPoints[1].offset).toBeCloseTo(16.2);
-        expect(note.bendPoints[1].value).toEqual(12);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(8);
+        expect(note.bendPoints![1].offset).toBeCloseTo(16.2);
+        expect(note.bendPoints![1].value).toEqual(12);
 
         // // Bar 7
         note = score.tracks[0].staves[0].bars[6].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.PrebendRelease);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(8);
-        expect(note.bendPoints[1].offset).toBeCloseTo(14.4);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(8);
+        expect(note.bendPoints![1].offset).toBeCloseTo(14.4);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         // // Bar 8
         note = score.tracks[0].staves[0].bars[7].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         // // Bar 9
         note = score.tracks[0].staves[0].bars[8].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.BendRelease);
-        expect(note.bendPoints.length).toEqual(4);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(10.2);
-        expect(note.bendPoints[1].value).toEqual(4);
-        expect(note.bendPoints[2].offset).toBeCloseTo(20.4);
-        expect(note.bendPoints[2].value).toEqual(4);
-        expect(note.bendPoints[3].offset).toBeCloseTo(30);
-        expect(note.bendPoints[3].value).toEqual(0);
+        expect(note.bendPoints!.length).toEqual(4);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(10.2);
+        expect(note.bendPoints![1].value).toEqual(4);
+        expect(note.bendPoints![2].offset).toBeCloseTo(20.4);
+        expect(note.bendPoints![2].value).toEqual(4);
+        expect(note.bendPoints![3].offset).toBeCloseTo(30);
+        expect(note.bendPoints![3].value).toEqual(0);
         // Combined Bends
 
         // // Bar 10
         note = score.tracks[0].staves[0].bars[9].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         note = score.tracks[0].staves[0].bars[9].voices[0].beats[1].notes[0];
         expect(note.bendType).toEqual(BendType.Release);
         expect(note.isContinuedBend).toBe(true);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(4);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(0);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(4);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(0);
 
         note = score.tracks[0].staves[0].bars[9].voices[0].beats[2].notes[0];
         expect(note.bendType).toEqual(BendType.Bend);
         expect(note.isContinuedBend).toBe(false);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         // // Bar 11
         note = score.tracks[0].staves[0].bars[10].voices[0].beats[0].notes[0];
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         note = score.tracks[0].staves[0].bars[10].voices[0].beats[1].notes[0];
         expect(note.bendType).toEqual(BendType.Bend);
         expect(note.isContinuedBend).toBe(true);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(4);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(8);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(4);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(8);
 
         note = score.tracks[0].staves[0].bars[10].voices[0].beats[2].notes[0];
         expect(note.bendType).toEqual(BendType.Release);
         expect(note.isContinuedBend).toBe(true);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(8);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(8);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         note = score.tracks[0].staves[0].bars[10].voices[0].beats[3].notes[0];
         expect(note.bendType).toEqual(BendType.Release);
         expect(note.isContinuedBend).toBe(true);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(4);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(0);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(4);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(0);
 
         // Grace Bends
 
@@ -331,70 +331,70 @@ describe('Gp7ImporterTest', () => {
         note = score.tracks[0].staves[0].bars[11].voices[0].beats[0].notes[0];
         expect(note.beat.graceType).toEqual(GraceType.BeforeBeat);
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         // // Bar 13
         note = score.tracks[0].staves[0].bars[12].voices[0].beats[0].notes[0];
         expect(note.beat.graceType).toEqual(GraceType.BeforeBeat);
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         note = score.tracks[0].staves[0].bars[12].voices[0].beats[1].notes[0];
         expect(note.isContinuedBend).toBe(true);
         expect(note.bendType).toEqual(BendType.Hold);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(4);
-        expect(note.bendPoints[1].offset).toBeCloseTo(60);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(4);
+        expect(note.bendPoints![1].offset).toBeCloseTo(60);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         // // Bar 14
         note = score.tracks[0].staves[0].bars[13].voices[0].beats[0].notes[0];
         expect(note.beat.graceType).toEqual(GraceType.OnBeat);
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(18);
-        expect(note.bendPoints[1].value).toEqual(1);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(18);
+        expect(note.bendPoints![1].value).toEqual(1);
 
         note = score.tracks[0].staves[0].bars[13].voices[0].beats[1].notes[0];
         expect(note.isContinuedBend).toBe(true);
         expect(note.bendType).toEqual(BendType.Hold);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(1);
-        expect(note.bendPoints[1].offset).toBeCloseTo(60);
-        expect(note.bendPoints[1].value).toEqual(1);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(1);
+        expect(note.bendPoints![1].offset).toBeCloseTo(60);
+        expect(note.bendPoints![1].value).toEqual(1);
 
         // // Bar 15
         note = score.tracks[0].staves[0].bars[14].voices[0].beats[0].notes[0];
         expect(note.beat.graceType).toEqual(GraceType.BeforeBeat);
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         note = score.tracks[0].staves[0].bars[14].voices[0].beats[1].notes[0];
         expect(note.fret).toEqual(12);
         expect(note.isTieDestination).toBe(true);
         expect(note.isContinuedBend).toBe(true);
         expect(note.bendType).toEqual(BendType.Hold);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(4);
-        expect(note.bendPoints[1].offset).toBeCloseTo(60);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(4);
+        expect(note.bendPoints![1].offset).toBeCloseTo(60);
+        expect(note.bendPoints![1].value).toEqual(4);
 
         note = score.tracks[0].staves[0].bars[14].voices[0].beats[1].notes[1];
         expect(note.fret).toEqual(10);
@@ -408,11 +408,11 @@ describe('Gp7ImporterTest', () => {
         // // Bar 16
         note = score.tracks[0].staves[0].bars[15].voices[0].beats[0].notes[1];
         expect(note.bendType).toEqual(BendType.Bend);
-        expect(note.bendPoints.length).toEqual(2);
-        expect(note.bendPoints[0].offset).toBeCloseTo(0);
-        expect(note.bendPoints[0].value).toEqual(0);
-        expect(note.bendPoints[1].offset).toBeCloseTo(15);
-        expect(note.bendPoints[1].value).toEqual(4);
+        expect(note.bendPoints!.length).toEqual(2);
+        expect(note.bendPoints![0].offset).toBeCloseTo(0);
+        expect(note.bendPoints![0].value).toEqual(0);
+        expect(note.bendPoints![1].offset).toBeCloseTo(15);
+        expect(note.bendPoints![1].value).toEqual(4);
     });
 
     it('whammy-advanced', async () => {

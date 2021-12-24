@@ -30,7 +30,7 @@ export class NotationSettingsSerializer {
         {
             const m = new Map<string, unknown>();
             o.set("elements", m);
-            for (const [k, v] of obj.elements) {
+            for (const [k, v] of obj.elements!) {
                 m.set(k.toString(), v);
             }
         } 
@@ -79,7 +79,7 @@ export class NotationSettingsSerializer {
         IOHelper.writeInt32LE(w, obj.notationMode as number); 
         IOHelper.writeInt32LE(w, obj.fingeringMode as number); 
         IOHelper.writeInt32LE(w, obj.elements.size); 
-        for (const [k, v] of obj.elements) {
+        for (const [k, v] of obj.elements!) {
             IOHelper.writeInt32LE(w, k as number);
             IOHelper.writeBoolean(w, v);
         } 

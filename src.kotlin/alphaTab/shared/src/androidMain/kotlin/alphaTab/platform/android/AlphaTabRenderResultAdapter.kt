@@ -92,6 +92,7 @@ class AlphaTabRenderResultAdapter : RecyclerView.Adapter<AlphaTabRenderResultVie
             ViewGroup.LayoutParams.WRAP_CONTENT
         ).apply {
             this.flexGrow = 0f
+            this.flexShrink = 0f
         }
         return AlphaTabRenderResultViewHolder(view)
     }

@@ -1563,23 +1563,27 @@ export class AlphaTexImporter extends ScoreImporter {
                     note.addBendPoint(new BendPoint(offset, value));
                     this._sy = this.newSy();
                 }
-                while (note.bendPoints.length > 60) {
-                    note.bendPoints.splice(note.bendPoints.length - 1, 1);
-                }
-                // set positions
-                if (exact) {
-                    note.bendPoints.sort((a, b) => {
-                        return a.offset - b.offset;
-                    });
-                } else {
-                    let count: number = note.bendPoints.length;
-                    let step: number = (60 / (count - 1)) | 0;
-                    let i: number = 0;
-                    while (i < count) {
-                        note.bendPoints[i].offset = Math.min(60, i * step);
-                        i++;
+                const points = note.bendPoints;
+                if(points != null){
+                    while (points.length > 60) {
+                        points.splice(points.length - 1, 1);
+                    }
+                    // set positions
+                    if (exact) {
+                        points.sort((a, b) => {
+                            return a.offset - b.offset;
+                        });
+                    } else {
+                        let count: number = points.length;
+                        let step: number = (60 / (count - 1)) | 0;
+                        let i: number = 0;
+                        while (i < count) {
+                            points[i].offset = Math.min(60, i * step);
+                            i++;
+                        }
                     }
                 }
+               
                 if (this._sy !== AlphaTexSymbols.RParensis) {
                     this.error('bend-effect', AlphaTexSymbols.RParensis, true);
                 }

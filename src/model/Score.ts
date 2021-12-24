@@ -13,7 +13,6 @@ import { Note } from '@src/model/Note';
  * @json_strict
  */
 export class Score {
-    private _noteByIdLookup: Map<number, Note> = new Map<number, Note>();
     private _currentRepeatGroup: RepeatGroup = new RepeatGroup();
 
     /**
@@ -136,15 +135,5 @@ export class Score {
         for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
             this.tracks[i].finish(settings);
         }
-    }
-
-    public registerNote(note: Note) {
-        this._noteByIdLookup.set(note.id, note);
-    }
-
-    public getNoteById(noteId: number): Note | null {
-        return this._noteByIdLookup.has(noteId)
-            ? this._noteByIdLookup.get(noteId)!
-            : null;
     }
 }

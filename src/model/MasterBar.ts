@@ -118,6 +118,7 @@ export class MasterBar {
 
     /**
      * Gets or sets the fermatas for this bar. The key is the offset of the fermata in midi ticks.
+     * @json_add addFermata
      */
     public fermata: Map<number, Fermata> | null = null;
 

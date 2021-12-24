@@ -39,7 +39,9 @@ export class NoteSerializer {
         o.set("bendtype", obj.bendType as number); 
         o.set("bendstyle", obj.bendStyle as number); 
         o.set("iscontinuedbend", obj.isContinuedBend); 
-        o.set("bendpoints", obj.bendPoints.map(i => BendPointSerializer.toJson(i))); 
+        if (obj.bendPoints !== null) {
+            o.set("bendpoints", obj.bendPoints?.map(i => BendPointSerializer.toJson(i)));
+        } 
         o.set("fret", obj.fret); 
         o.set("string", obj.string); 
         o.set("octave", obj.octave); 
@@ -48,11 +50,7 @@ export class NoteSerializer {
         o.set("isvisible", obj.isVisible); 
         o.set("islefthandtapped", obj.isLeftHandTapped); 
         o.set("ishammerpullorigin", obj.isHammerPullOrigin); 
-        o.set("hammerpulloriginnoteid", obj.hammerPullOriginNoteId); 
-        o.set("hammerpulldestinationnoteid", obj.hammerPullDestinationNoteId); 
         o.set("isslurdestination", obj.isSlurDestination); 
-        o.set("sluroriginnoteid", obj.slurOriginNoteId); 
-        o.set("slurdestinationnoteid", obj.slurDestinationNoteId); 
         o.set("harmonictype", obj.harmonicType as number); 
         o.set("harmonicvalue", obj.harmonicValue); 
         o.set("isghost", obj.isGhost); 
@@ -63,8 +61,6 @@ export class NoteSerializer {
         o.set("slideintype", obj.slideInType as number); 
         o.set("slideouttype", obj.slideOutType as number); 
         o.set("vibrato", obj.vibrato as number); 
-        o.set("tieoriginnoteid", obj.tieOriginNoteId); 
-        o.set("tiedestinationnoteid", obj.tieDestinationNoteId); 
         o.set("istiedestination", obj.isTieDestination); 
         o.set("lefthandfinger", obj.leftHandFinger as number); 
         o.set("righthandfinger", obj.rightHandFinger as number); 
@@ -89,7 +85,7 @@ export class NoteSerializer {
         obj.bendType = JsonHelper.parseEnum<BendType>(IOHelper.readInt32LE(r), BendType)!; 
         obj.bendStyle = JsonHelper.parseEnum<BendStyle>(IOHelper.readInt32LE(r), BendStyle)!; 
         obj.isContinuedBend = IOHelper.readBoolean(r); 
-        {
+        if (!IOHelper.readNull(r)) {
             obj.bendPoints = [];
             const length = IOHelper.readInt32LE(r);
             for (let i = 0;i < length;i++) {
@@ -106,11 +102,7 @@ export class NoteSerializer {
         obj.isVisible = IOHelper.readBoolean(r); 
         obj.isLeftHandTapped = IOHelper.readBoolean(r); 
         obj.isHammerPullOrigin = IOHelper.readBoolean(r); 
-        obj.hammerPullOriginNoteId = IOHelper.readNumber(r); 
-        obj.hammerPullDestinationNoteId = IOHelper.readNumber(r); 
         obj.isSlurDestination = IOHelper.readBoolean(r); 
-        obj.slurOriginNoteId = IOHelper.readNumber(r); 
-        obj.slurDestinationNoteId = IOHelper.readNumber(r); 
         obj.harmonicType = JsonHelper.parseEnum<HarmonicType>(IOHelper.readInt32LE(r), HarmonicType)!; 
         obj.harmonicValue = IOHelper.readNumber(r); 
         obj.isGhost = IOHelper.readBoolean(r); 
@@ -121,8 +113,6 @@ export class NoteSerializer {
         obj.slideInType = JsonHelper.parseEnum<SlideInType>(IOHelper.readInt32LE(r), SlideInType)!; 
         obj.slideOutType = JsonHelper.parseEnum<SlideOutType>(IOHelper.readInt32LE(r), SlideOutType)!; 
         obj.vibrato = JsonHelper.parseEnum<VibratoType>(IOHelper.readInt32LE(r), VibratoType)!; 
-        obj.tieOriginNoteId = IOHelper.readNumber(r); 
-        obj.tieDestinationNoteId = IOHelper.readNumber(r); 
         obj.isTieDestination = IOHelper.readBoolean(r); 
         obj.leftHandFinger = JsonHelper.parseEnum<Fingers>(IOHelper.readInt32LE(r), Fingers)!; 
         obj.rightHandFinger = JsonHelper.parseEnum<Fingers>(IOHelper.readInt32LE(r), Fingers)!; 
@@ -145,9 +135,15 @@ export class NoteSerializer {
         IOHelper.writeInt32LE(w, obj.bendType as number); 
         IOHelper.writeInt32LE(w, obj.bendStyle as number); 
         IOHelper.writeBoolean(w, obj.isContinuedBend); 
-        IOHelper.writeInt32LE(w, obj.bendPoints.length); 
-        for (const i of obj.bendPoints) {
-            BendPointSerializer.toBinary(i, w);
+        if (obj.bendPoints !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeInt32LE(w, obj.bendPoints!.length);
+            for (const i of obj.bendPoints!) {
+                BendPointSerializer.toBinary(i, w);
+            }
+        }
+        else {
+            IOHelper.writeNull(w);
         } 
         IOHelper.writeNumber(w, obj.fret); 
         IOHelper.writeNumber(w, obj.string); 
@@ -157,11 +153,7 @@ export class NoteSerializer {
         IOHelper.writeBoolean(w, obj.isVisible); 
         IOHelper.writeBoolean(w, obj.isLeftHandTapped); 
         IOHelper.writeBoolean(w, obj.isHammerPullOrigin); 
-        IOHelper.writeNumber(w, obj.hammerPullOriginNoteId); 
-        IOHelper.writeNumber(w, obj.hammerPullDestinationNoteId); 
         IOHelper.writeBoolean(w, obj.isSlurDestination); 
-        IOHelper.writeNumber(w, obj.slurOriginNoteId); 
-        IOHelper.writeNumber(w, obj.slurDestinationNoteId); 
         IOHelper.writeInt32LE(w, obj.harmonicType as number); 
         IOHelper.writeNumber(w, obj.harmonicValue); 
         IOHelper.writeBoolean(w, obj.isGhost); 
@@ -172,8 +164,6 @@ export class NoteSerializer {
         IOHelper.writeInt32LE(w, obj.slideInType as number); 
         IOHelper.writeInt32LE(w, obj.slideOutType as number); 
         IOHelper.writeInt32LE(w, obj.vibrato as number); 
-        IOHelper.writeNumber(w, obj.tieOriginNoteId); 
-        IOHelper.writeNumber(w, obj.tieDestinationNoteId); 
         IOHelper.writeBoolean(w, obj.isTieDestination); 
         IOHelper.writeInt32LE(w, obj.leftHandFinger as number); 
         IOHelper.writeInt32LE(w, obj.rightHandFinger as number); 
@@ -202,11 +192,13 @@ export class NoteSerializer {
                 obj.isContinuedBend = v! as boolean;
                 return true;
             case "bendpoints":
-                obj.bendPoints = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new BendPoint();
-                    BendPointSerializer.fromJson(i, o);
-                    obj.addBendPoint(i);
+                if (v) {
+                    obj.bendPoints = [];
+                    for (const o of (v as (Map<string, unknown> | null)[])) {
+                        const i = new BendPoint();
+                        BendPointSerializer.fromJson(i, o);
+                        obj.addBendPoint(i);
+                    }
                 }
                 return true;
             case "fret":
@@ -233,20 +225,8 @@ export class NoteSerializer {
             case "ishammerpullorigin":
                 obj.isHammerPullOrigin = v! as boolean;
                 return true;
-            case "hammerpulloriginnoteid":
-                obj.hammerPullOriginNoteId = v! as number;
-                return true;
-            case "hammerpulldestinationnoteid":
-                obj.hammerPullDestinationNoteId = v! as number;
-                return true;
             case "isslurdestination":
                 obj.isSlurDestination = v! as boolean;
-                return true;
-            case "sluroriginnoteid":
-                obj.slurOriginNoteId = v! as number;
-                return true;
-            case "slurdestinationnoteid":
-                obj.slurDestinationNoteId = v! as number;
                 return true;
             case "harmonictype":
                 obj.harmonicType = JsonHelper.parseEnum<HarmonicType>(v, HarmonicType)!;
@@ -277,12 +257,6 @@ export class NoteSerializer {
                 return true;
             case "vibrato":
                 obj.vibrato = JsonHelper.parseEnum<VibratoType>(v, VibratoType)!;
-                return true;
-            case "tieoriginnoteid":
-                obj.tieOriginNoteId = v! as number;
-                return true;
-            case "tiedestinationnoteid":
-                obj.tieDestinationNoteId = v! as number;
                 return true;
             case "istiedestination":
                 obj.isTieDestination = v! as boolean;

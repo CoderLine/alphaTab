@@ -27,10 +27,10 @@ export class StaffSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("bars", obj.bars.map(i => BarSerializer.toJson(i))); 
-        {
+        if (obj.chords !== null) {
             const m = new Map<string, unknown>();
             o.set("chords", m);
-            for (const [k, v] of obj.chords) {
+            for (const [k, v] of obj.chords!) {
                 m.set(k.toString(), ChordSerializer.toJson(v));
             }
         } 
@@ -87,10 +87,15 @@ export class StaffSerializer {
         for (const i of obj.bars) {
             BarSerializer.toBinary(i, w);
         } 
-        IOHelper.writeInt32LE(w, obj.chords.size); 
-        for (const [k, v] of obj.chords) {
-            IOHelper.writeString(w, k);
-            ChordSerializer.toBinary(v, w);
+        if (obj.chords !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeInt32LE(w, obj.chords.size);
+            for (const [k, v] of obj.chords!) {
+                IOHelper.writeString(w, k);
+                ChordSerializer.toBinary(v, w);
+            }
+        }
+        else {
         } 
         IOHelper.writeNumber(w, obj.capo); 
         IOHelper.writeNumber(w, obj.transpositionPitch); 

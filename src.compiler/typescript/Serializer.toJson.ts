@@ -134,69 +134,79 @@ function generateToJsonBody(
             const arrayItemType = unwrapArrayItemType(type.type!, typeChecker)!;
             let itemSerializer = arrayItemType.symbol.name + 'Serializer';
             importer(itemSerializer, findSerializerModule(arrayItemType, program.getCompilerOptions()));
+            if (type.isNullable) {
+                propertyStatements.push(
+                    createNodeFromSource<ts.IfStatement>(
+                        `if(obj.${fieldName} !== null) {
+                            o.set(${JSON.stringify(jsonName)}, obj.${fieldName}?.map(i => ${itemSerializer}.toJson(i)));
+                        }`,
+                        ts.SyntaxKind.IfStatement
+                    )
+                );
+            } else {
+                propertyStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `
+                        o.set(${JSON.stringify(jsonName)}, obj.${fieldName}.map(i => ${itemSerializer}.toJson(i)));
+                    `,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
+            }
 
-            propertyStatements.push(
-                createNodeFromSource<ts.ExpressionStatement>(
-                    `
-                    o.set(${JSON.stringify(jsonName)}, obj.${fieldName}.map(i => ${itemSerializer}.toJson(i)));
-                `,
-                    ts.SyntaxKind.ExpressionStatement
-                )
-            );
         } else if (isMap(type.type)) {
             const mapType = type.type as ts.TypeReference;
             if (!isPrimitiveType(mapType.typeArguments![0])) {
                 throw new Error('only Map<Primitive, *> maps are supported extend if needed!');
             }
 
+            let serializeBlock: ts.Block;
             if (isPrimitiveToJson(mapType.typeArguments![1], typeChecker)) {
-                propertyStatements.push(
-                    createNodeFromSource<ts.Block>(
-                        `
-                    {
-                        const m = new Map<string, unknown>();
-                        o.set(${JSON.stringify(jsonName)}, m);
-                        for(const [k, v] of obj.${fieldName}) {
-                            m.set(k.toString(), v);
-                        }
+                serializeBlock = createNodeFromSource<ts.Block>(
+                    `{
+                    const m = new Map<string, unknown>();
+                    o.set(${JSON.stringify(jsonName)}, m);
+                    for(const [k, v] of obj.${fieldName}!) {
+                        m.set(k.toString(), v);
                     }
-                    `,
-                        ts.SyntaxKind.Block
-                    )
-                );
+                }`, ts.SyntaxKind.Block);
             } else if (isEnumType(mapType.typeArguments![1])) {
-                propertyStatements.push(
-                    createNodeFromSource<ts.Block>(
-                        `
-                    {
-                        const m = new Map<string, unknown>();
-                        o.set(${JSON.stringify(jsonName)}, m);
-                        for(const [k, v] of obj.${fieldName}) {
-                            m.set(k.toString(), v as number);
-                        }
+                serializeBlock = createNodeFromSource<ts.Block>(
+                    `{
+                    const m = new Map<string, unknown>();
+                    o.set(${JSON.stringify(jsonName)}, m);
+                    for(const [k, v] of obj.${fieldName}!) {
+                        m.set(k.toString(), v as number);
                     }
-                    `,
-                        ts.SyntaxKind.Block
-                    )
-                );
+                }`, ts.SyntaxKind.Block);
             } else {
                 const itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
                 importer(itemSerializer, findSerializerModule(mapType.typeArguments![1], program.getCompilerOptions()));
-
-                propertyStatements.push(
-                    createNodeFromSource<ts.Block>(
-                        `
-                    {
-                        const m = new Map<string, unknown>();
-                        o.set(${JSON.stringify(jsonName)}, m);
-                        for(const [k, v] of obj.${fieldName}) {
-                            m.set(k.toString(), ${itemSerializer}.toJson(v));
-                        }
+                
+                serializeBlock = createNodeFromSource<ts.Block>(
+                    `{
+                    const m = new Map<string, unknown>();
+                    o.set(${JSON.stringify(jsonName)}, m);
+                    for(const [k, v] of obj.${fieldName}!) {
+                        m.set(k.toString(), ${itemSerializer}.toJson(v));
                     }
-                    `,
-                        ts.SyntaxKind.Block
-                    )
+                }`, ts.SyntaxKind.Block);            
+            }
+
+            if(type.isNullable) {
+                propertyStatements.push(ts.factory.createIfStatement(
+                    ts.factory.createBinaryExpression(
+                        ts.factory.createPropertyAccessExpression(
+                            ts.factory.createIdentifier('obj'),
+                            fieldName
+                        ), 
+                        ts.SyntaxKind.ExclamationEqualsEqualsToken,
+                        ts.factory.createNull()
+                    ),
+                    serializeBlock)
                 );
+            } else {
+                propertyStatements.push(serializeBlock);
             }
         } else if (isImmutable(type.type)) {
             let itemSerializer = type.type.symbol.name;

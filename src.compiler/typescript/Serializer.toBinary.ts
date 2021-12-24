@@ -107,21 +107,38 @@ function generateToBinaryBody(
             let itemSerializer = arrayItemType.symbol.name + 'Serializer';
             importer(itemSerializer, findSerializerModule(arrayItemType, program.getCompilerOptions()));
 
-            propertyStatements.push(
-                createNodeFromSource<ts.ExpressionStatement>(
-                    `IOHelper.writeInt32LE(w, obj.${fieldName}.length);`,
-                    ts.SyntaxKind.ExpressionStatement
-                )
-            );
+            if (type.isNullable) {
+                propertyStatements.push(
+                    createNodeFromSource<ts.IfStatement>(
+                        `if(obj.${fieldName} !== null) {
+                            IOHelper.writeNotNull(w);
+                            IOHelper.writeInt32LE(w, obj.${fieldName}!.length);
+                            for(const i of obj.${fieldName}!) {
+                                ${itemSerializer}.toBinary(i, w)
+                            }
+                        } else {
+                            IOHelper.writeNull(w);
+                        }`,
+                        ts.SyntaxKind.IfStatement
+                    )
+                );
+            } else {
+                propertyStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `IOHelper.writeInt32LE(w, obj.${fieldName}.length);`,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
 
-            propertyStatements.push(
-                createNodeFromSource<ts.ForOfStatement>(
-                    `for(const i of obj.${fieldName}) {
-                        ${itemSerializer}.toBinary(i, w)
-                    }`,
-                    ts.SyntaxKind.ForOfStatement
-                )
-            );
+                propertyStatements.push(
+                    createNodeFromSource<ts.ForOfStatement>(
+                        `for(const i of obj.${fieldName}) {
+                            ${itemSerializer}.toBinary(i, w)
+                        }`,
+                        ts.SyntaxKind.ForOfStatement
+                    )
+                );
+            }
         } else if (isMap(type.type)) {
             const mapType = type.type as ts.TypeReference;
 
@@ -144,12 +161,6 @@ function generateToBinaryBody(
                 );
             }
 
-            propertyStatements.push(
-                createNodeFromSource<ts.ExpressionStatement>(
-                    `IOHelper.writeInt32LE(w, obj.${fieldName}.size)`,
-                    ts.SyntaxKind.ExpressionStatement
-                )
-            );
 
             let writeValue: ts.Expression;
             const primitiveValueWrite = getPrimitiveWriteMethod(mapType.typeArguments![1], typeChecker);
@@ -173,28 +184,57 @@ function generateToBinaryBody(
                 );
             }
 
-            propertyStatements.push(
-                ts.factory.createForOfStatement(
-                    undefined,
-                    ts.factory.createVariableDeclarationList(
-                        [
-                            ts.factory.createVariableDeclaration(
-                                ts.factory.createArrayBindingPattern([
-                                    ts.factory.createBindingElement(undefined, undefined, 'k', undefined),
-                                    ts.factory.createBindingElement(undefined, undefined, 'v', undefined)
-                                ])
-                            )
-                        ],
-                        ts.NodeFlags.Const
-                    ),
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
-                    ts.factory.createBlock([
-                        ts.factory.createExpressionStatement(writeKey),
-
-                        ts.factory.createExpressionStatement(writeValue)
-                    ])
-                )
+            const writeLength = createNodeFromSource<ts.ExpressionStatement>(
+                `IOHelper.writeInt32LE(w, obj.${fieldName}.size)`,
+                ts.SyntaxKind.ExpressionStatement
             );
+            const writeItems = ts.factory.createForOfStatement(
+                undefined,
+                ts.factory.createVariableDeclarationList(
+                    [
+                        ts.factory.createVariableDeclaration(
+                            ts.factory.createArrayBindingPattern([
+                                ts.factory.createBindingElement(undefined, undefined, 'k', undefined),
+                                ts.factory.createBindingElement(undefined, undefined, 'v', undefined)
+                            ])
+                        )
+                    ],
+                    ts.NodeFlags.Const
+                ),
+                ts.factory.createNonNullExpression(
+                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName)
+                ),
+                ts.factory.createBlock([
+                    ts.factory.createExpressionStatement(writeKey),
+
+                    ts.factory.createExpressionStatement(writeValue)
+                ])
+            );
+
+            if (type.isNullable) {
+                const conditional = createNodeFromSource<ts.IfStatement>(
+                    `if(obj.${fieldName} !== null) {
+                        
+                    } else {
+                        IOHelper.writeNull(w);
+                    }`,
+                    ts.SyntaxKind.IfStatement
+                );
+                propertyStatements.push(
+                    ts.factory.updateIfStatement(conditional, conditional.expression, ts.factory.createBlock([
+                        createNodeFromSource<ts.ExpressionStatement>(
+                            `IOHelper.writeNotNull(w);`,
+                            ts.SyntaxKind.ExpressionStatement
+                        ),
+                        writeLength,
+                        writeItems
+                    ]), conditional.thenStatement)
+                );
+            } else {
+                propertyStatements.push(writeLength);
+                propertyStatements.push(writeItems);
+            }
+
         } else if (isImmutable(type.type)) {
             let itemSerializer = type.type.symbol.name;
             importer(itemSerializer, findModule(type.type, program.getCompilerOptions()));

@@ -571,8 +571,8 @@ export class GpifWriter {
     }
 
     private writeBend(properties: XmlNode, note: Note) {
-        if (note.hasBend && note.bendPoints.length <= 4) {
-            this.writeStandardBend(properties, note.bendPoints);
+        if (note.hasBend && note.bendPoints!.length <= 4) {
+            this.writeStandardBend(properties, note.bendPoints!);
         }
     }
 
@@ -1184,8 +1184,9 @@ export class GpifWriter {
         diagramCollectionProperty.attributes.set('name', name);
         const diagramCollectionItems = diagramCollectionProperty.addElement('Items');
 
-        if (staff.chords) {
-            for (const [id, chord] of staff.chords) {
+        const sc = staff.chords;
+        if (sc) {
+            for (const [id, chord] of sc) {
                 const diagramCollectionItem = diagramCollectionItems.addElement('Item');
                 diagramCollectionItem.attributes.set('id', id);
                 diagramCollectionItem.attributes.set('name', chord.name);

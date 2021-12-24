@@ -140,7 +140,21 @@ function generateFromBinaryBody(
 
             if (type.isNullable) {
                 propertyStatements.push(
-                    ts.factory.createIfStatement(ts.factory.createIdentifier('v'), ts.factory.createBlock(loopItems))
+                    ts.factory.createIfStatement(
+                        ts.factory.createPrefixUnaryExpression(
+                            ts.SyntaxKind.ExclamationToken,
+                            ts.factory.createCallExpression(
+                                ts.factory.createPropertyAccessExpression(
+                                    ts.factory.createIdentifier('IOHelper'),
+                                    'readNull'
+                                ),
+                                undefined,
+                                [
+                                    ts.factory.createIdentifier('r')
+                                ]
+                            )
+                        )
+                   , ts.factory.createBlock(loopItems))
                 );
             } else {
                 propertyStatements.push(ts.factory.createBlock(loopItems));

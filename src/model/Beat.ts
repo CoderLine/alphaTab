@@ -778,18 +778,18 @@ export class Beat {
                 // remove bend on cloned note
                 cloneNote.bendType = BendType.None;
                 cloneNote.maxBendPoint = null;
-                cloneNote.bendPoints = [];
+                cloneNote.bendPoints = null;
                 cloneNote.bendStyle = BendStyle.Default;
                 cloneNote.id = Note.GlobalNoteId++;
 
                 // fix ties
                 if (note.isTieOrigin) {
-                    cloneNote.tieDestinationNoteId = note.tieDestination!.id;
-                    note.tieDestination!.tieOriginNoteId = cloneNote.id;
+                    cloneNote.tieDestination = note.tieDestination!;
+                    note.tieDestination!.tieOrigin = cloneNote;
                 }
                 if (note.isTieDestination) {
-                    cloneNote.tieOriginNoteId = note.tieOrigin ? note.tieOrigin.id : -1;
-                    note.tieOrigin!.tieDestinationNoteId = cloneNote.id;
+                    cloneNote.tieOrigin = note.tieOrigin ? note.tieOrigin : null;
+                    note.tieOrigin!.tieDestination = cloneNote;
                 }
 
                 // if the note has a bend which is continued on the next note
@@ -798,7 +798,7 @@ export class Beat {
                     let tieDestination: Note | null = Note.findTieOrigin(note);
                     if (tieDestination && tieDestination.hasBend) {
                         cloneNote.bendType = BendType.Hold;
-                        let lastPoint: BendPoint = note.bendPoints[note.bendPoints.length - 1];
+                        let lastPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
                         cloneNote.addBendPoint(new BendPoint(0, lastPoint.value));
                         cloneNote.addBendPoint(new BendPoint(BendPoint.MaxPosition, lastPoint.value));
                     }
@@ -852,6 +852,7 @@ export class Beat {
         return this.noteStringLookup.has(noteString);
     }
 
+    // TODO: can be likely eliminated
     public getNoteWithRealValue(noteRealValue: number): Note | null {
         if (this.noteValueLookup.has(noteRealValue)) {
             return this.noteValueLookup.get(noteRealValue)!;
@@ -862,7 +863,6 @@ export class Beat {
     public chain() {
         for (const n of this.notes) {
             this.noteValueLookup.set(n.realValue, n);
-            n.chain();
         }
     }
 }

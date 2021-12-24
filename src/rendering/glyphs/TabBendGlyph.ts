@@ -182,14 +182,14 @@ export class TabBendGlyph extends Glyph {
         // though it might not be 100% correct from timing perspective.
         switch (note.bendType) {
             case BendType.Custom:
-                for (let bendPoint of note.bendPoints) {
+                for (let bendPoint of note.bendPoints!) {
                     renderingPoints.push(new TabBendRenderPoint(bendPoint.offset, bendPoint.value));
                 }
                 break;
             case BendType.BendRelease:
-                renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints[0].value));
-                renderingPoints.push(new TabBendRenderPoint((BendPoint.MaxPosition / 2) | 0, note.bendPoints[1].value));
-                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints[3].value));
+                renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints![0].value));
+                renderingPoints.push(new TabBendRenderPoint((BendPoint.MaxPosition / 2) | 0, note.bendPoints![1].value));
+                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints![3].value));
                 break;
             case BendType.Bend:
             case BendType.Hold:
@@ -197,8 +197,8 @@ export class TabBendGlyph extends Glyph {
             case BendType.PrebendBend:
             case BendType.PrebendRelease:
             case BendType.Release:
-                renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints[0].value));
-                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints[1].value));
+                renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints![0].value));
+                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints![1].value));
                 break;
         }
         return renderingPoints;

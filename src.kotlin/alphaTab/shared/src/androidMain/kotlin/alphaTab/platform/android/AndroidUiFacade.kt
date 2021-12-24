@@ -103,7 +103,7 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
         settingsContainer = settings
         api.settings = settings.settings
         settings.settingsChanged.on(this::onSettingsChanged)
-        _layoutView.layoutManager = AlphaTabLayoutManager(_layoutView.context, this)
+        _layoutView.layoutManager = AlphaTabLayoutManager(_layoutView.context)
     }
 
     private fun onSettingsChanged() {

@@ -42,10 +42,10 @@ export class MasterBarSerializer {
         o.set("tripletfeel", obj.tripletFeel as number); 
         o.set("section", SectionSerializer.toJson(obj.section)); 
         o.set("tempoautomation", AutomationSerializer.toJson(obj.tempoAutomation)); 
-        {
+        if (obj.fermata !== null) {
             const m = new Map<string, unknown>();
             o.set("fermata", m);
-            for (const [k, v] of obj.fermata) {
+            for (const [k, v] of obj.fermata!) {
                 m.set(k.toString(), FermataSerializer.toJson(v));
             }
         } 
@@ -76,7 +76,7 @@ export class MasterBarSerializer {
         {
             const size = IOHelper.readInt32LE(r);
             for (let i = 0;i < size;i++) {
-                obj.fermata.set(IOHelper.readNumber(r), FermataSerializer.fromBinary(new Fermata(), r)!);
+                obj.addFermata(IOHelper.readNumber(r), FermataSerializer.fromBinary(new Fermata(), r)!);
             }
         } 
         obj.start = IOHelper.readNumber(r); 
@@ -101,10 +101,15 @@ export class MasterBarSerializer {
         IOHelper.writeInt32LE(w, obj.tripletFeel as number); 
         SectionSerializer.toBinary(obj.section, w); 
         AutomationSerializer.toBinary(obj.tempoAutomation, w); 
-        IOHelper.writeInt32LE(w, obj.fermata.size); 
-        for (const [k, v] of obj.fermata) {
-            IOHelper.writeNumber(w, k);
-            FermataSerializer.toBinary(v, w);
+        if (obj.fermata !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeInt32LE(w, obj.fermata.size);
+            for (const [k, v] of obj.fermata!) {
+                IOHelper.writeNumber(w, k);
+                FermataSerializer.toBinary(v, w);
+            }
+        }
+        else {
         } 
         IOHelper.writeNumber(w, obj.start); 
         IOHelper.writeBoolean(w, obj.isAnacrusis); 
@@ -146,7 +151,7 @@ export class MasterBarSerializer {
                 JsonHelper.forEach(v, (v, k) => {
                     const i = new Fermata(); 
                     FermataSerializer.fromJson(i, v as Map<string, unknown>); 
-                    obj.fermata.set(parseInt(k), i); 
+                    obj.addFermata(parseInt(k), i); 
                 });
                 return true;
             case "start":

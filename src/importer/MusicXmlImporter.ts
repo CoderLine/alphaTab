@@ -812,7 +812,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         } else if (element.getAttribute('type') === 'stop' && this._tieStarts.length > 0 && !note.isTieDestination) {
             note.isTieDestination = true;
-            note.tieOriginNoteId = this._tieStarts[0].id;
+            note.tieOrigin = this._tieStarts[0];
             this._tieStarts.splice(0, 1);
             this._tieStartIds.delete(note.id);
         }
@@ -856,8 +856,8 @@ export class MusicXmlImporter extends ScoreImporter {
                                 if (this._slurStarts.has(slurNumber)) {
                                     note.isSlurDestination = true;
                                     let slurStart: Note = this._slurStarts.get(slurNumber)!;
-                                    slurStart.slurDestinationNoteId = note.id;
-                                    note.slurOriginNoteId = note.id;
+                                    slurStart.slurDestination = note;
+                                    note.slurOrigin = note;
                                 }
                                 break;
                         }

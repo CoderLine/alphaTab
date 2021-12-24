@@ -61,7 +61,9 @@ export class BeatSerializer {
         o.set("tupletnumerator", obj.tupletNumerator); 
         o.set("iscontinuedwhammy", obj.isContinuedWhammy); 
         o.set("whammybartype", obj.whammyBarType as number); 
-        o.set("whammybarpoints", obj.whammyBarPoints.map(i => BendPointSerializer.toJson(i))); 
+        if (obj.whammyBarPoints !== null) {
+            o.set("whammybarpoints", obj.whammyBarPoints?.map(i => BendPointSerializer.toJson(i)));
+        } 
         o.set("vibrato", obj.vibrato as number); 
         o.set("chordid", obj.chordId); 
         o.set("gracetype", obj.graceType as number); 
@@ -128,7 +130,7 @@ export class BeatSerializer {
         obj.tupletNumerator = IOHelper.readNumber(r); 
         obj.isContinuedWhammy = IOHelper.readBoolean(r); 
         obj.whammyBarType = JsonHelper.parseEnum<WhammyType>(IOHelper.readInt32LE(r), WhammyType)!; 
-        {
+        if (!IOHelper.readNull(r)) {
             obj.whammyBarPoints = [];
             const length = IOHelper.readInt32LE(r);
             for (let i = 0;i < length;i++) {
@@ -205,9 +207,15 @@ export class BeatSerializer {
         IOHelper.writeNumber(w, obj.tupletNumerator); 
         IOHelper.writeBoolean(w, obj.isContinuedWhammy); 
         IOHelper.writeInt32LE(w, obj.whammyBarType as number); 
-        IOHelper.writeInt32LE(w, obj.whammyBarPoints.length); 
-        for (const i of obj.whammyBarPoints) {
-            BendPointSerializer.toBinary(i, w);
+        if (obj.whammyBarPoints !== null) {
+            IOHelper.writeNotNull(w);
+            IOHelper.writeInt32LE(w, obj.whammyBarPoints!.length);
+            for (const i of obj.whammyBarPoints!) {
+                BendPointSerializer.toBinary(i, w);
+            }
+        }
+        else {
+            IOHelper.writeNull(w);
         } 
         IOHelper.writeInt32LE(w, obj.vibrato as number); 
         if (obj.chordId !== null) {
@@ -321,11 +329,13 @@ export class BeatSerializer {
                 obj.whammyBarType = JsonHelper.parseEnum<WhammyType>(v, WhammyType)!;
                 return true;
             case "whammybarpoints":
-                obj.whammyBarPoints = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new BendPoint();
-                    BendPointSerializer.fromJson(i, o);
-                    obj.addWhammyBarPoint(i);
+                if (v) {
+                    obj.whammyBarPoints = [];
+                    for (const o of (v as (Map<string, unknown> | null)[])) {
+                        const i = new BendPoint();
+                        BendPointSerializer.fromJson(i, o);
+                        obj.addWhammyBarPoint(i);
+                    }
                 }
                 return true;
             case "vibrato":
