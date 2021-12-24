@@ -1,9 +1,8 @@
 package alphaTab.platform.android
 
-import alphaTab.AlphaTabApiBase
-import alphaTab.AlphaTabView
+import alphaTab.*
+import alphaTab.Environment
 import alphaTab.EventEmitter
-import alphaTab.IEventEmitter
 import alphaTab.core.ecmaScript.Error
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.importer.ScoreLoader
@@ -102,12 +101,18 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
         this.api = api
         settingsContainer = settings
         api.settings = settings.settings
+
         settings.settingsChanged.on(this::onSettingsChanged)
-        _layoutView.layoutManager = AlphaTabLayoutManager(_layoutView.context)
+        val isVertical = Environment.getLayoutEngineFactory(api.settings.display.layoutMode).vertical
+        _layoutView.layoutManager = AlphaTabLayoutManager(_layoutView.context).apply {
+            this.updateOrientation(isVertical)
+        }
     }
 
     private fun onSettingsChanged() {
         api.settings = settingsContainer.settings
+        val isVertical = Environment.getLayoutEngineFactory(api.settings.display.layoutMode).vertical
+        (_layoutView.layoutManager as AlphaTabLayoutManager).updateOrientation(isVertical)
         api.updateSettings()
         api.render()
     }
