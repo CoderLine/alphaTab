@@ -435,7 +435,7 @@ export class MidiFileGenerator {
         if (note.hasBend) {
             initialBend = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
         } else if (note.beat.hasWhammyBar) {
-            initialBend = MidiFileGenerator.getPitchWheel(note.beat.whammyBarPoints[0].value);
+            initialBend = MidiFileGenerator.getPitchWheel(note.beat.whammyBarPoints![0].value);
         } else if (
             note.isTieDestination ||
             (note.slideOrigin && note.slideOrigin.slideOutType === SlideOutType.Legato)
@@ -1006,7 +1006,7 @@ export class MidiFileGenerator {
     }
 
     private generateWhammy(beat: Beat, noteStart: number, noteDuration: MidiNoteDuration, channel: number): void {
-        const bendPoints: BendPoint[] = beat.whammyBarPoints;
+        const bendPoints: BendPoint[] = beat.whammyBarPoints!;
         const track: Track = beat.voice.bar.staff.track;
         const duration: number = noteDuration.noteOnly;
         // ensure prebends are slightly before the actual note.

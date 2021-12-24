@@ -34,9 +34,7 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTou
         set(value) {
             val scaled = (value * Environment.HighDpiFactor).toInt()
             if (_view is RecyclerView) {
-                // width in layout managed needs to be set to
-                // exceed screen width
-                (_view.layoutManager as AlphaTabLayoutManager).width = scaled
+                // width is handled automatically
             } else {
                 val params = _view.layoutParams
                 if (params != null) {

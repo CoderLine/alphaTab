@@ -119,7 +119,7 @@ export class MasterBar {
     /**
      * Gets or sets the fermatas for this bar. The key is the offset of the fermata in midi ticks.
      */
-    public fermata: Map<number, Fermata> = new Map<number, Fermata>();
+    public fermata: Map<number, Fermata> | null = null;
 
     /**
      * The timeline position of the voice within the whole score. (unit: midi ticks)
@@ -134,7 +134,7 @@ export class MasterBar {
     /**
      * Calculates the time spent in this bar. (unit: midi ticks)
      */
-    public calculateDuration(respectAnacrusis:boolean = true): number {
+    public calculateDuration(respectAnacrusis: boolean = true): number {
         if (this.isAnacrusis && respectAnacrusis) {
             let duration: number = 0;
             for (let track of this.score.tracks) {
@@ -158,7 +158,12 @@ export class MasterBar {
      * @param fermata The fermata.
      */
     public addFermata(offset: number, fermata: Fermata): void {
-        this.fermata.set(offset, fermata);
+        let fermataMap = this.fermata;
+        if (fermataMap === null) {
+            fermataMap = new Map<number, Fermata>();
+            this.fermata = fermataMap;
+        }
+        fermataMap.set(offset, fermata);
     }
 
     /**
@@ -167,8 +172,12 @@ export class MasterBar {
      * @returns
      */
     public getFermata(beat: Beat): Fermata | null {
-        if (this.fermata.has(beat.playbackStart)) {
-            return this.fermata.get(beat.playbackStart)!;
+        const fermataMap = this.fermata;
+        if (fermataMap === null) {
+            return null;
+        }
+        if (fermataMap.has(beat.playbackStart)) {
+            return fermataMap.get(beat.playbackStart)!;
         }
         return null;
     }

@@ -125,7 +125,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _staffHasExplicitTuning: boolean = false;
     private _staffTuningApplied: boolean = false;
 
-    public logErrors:boolean = false;
+    public logErrors: boolean = false;
 
     public constructor() {
         super();
@@ -140,11 +140,11 @@ export class AlphaTexImporter extends ScoreImporter {
         this._input = tex;
         this.settings = settings;
     }
-    
+
 
     public readScore(): Score {
         try {
-            if(this.data.length > 0) {
+            if (this.data.length > 0) {
                 this._input = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
             }
             this._allowTuning = true;
@@ -199,7 +199,7 @@ export class AlphaTexImporter extends ScoreImporter {
         } else {
             e = AlphaTexError.symbolError(this._curChPos, nonterm, expected, expected, this._syData);
         }
-        if(this.logErrors) {
+        if (this.logErrors) {
             Logger.error(this.name, e.message!);
         }
         throw e;
@@ -207,7 +207,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private errorMessage(message: string): void {
         let e: AlphaTexError = AlphaTexError.errorMessage(this._curChPos, message);
-        if(this.logErrors) {
+        if (this.logErrors) {
             Logger.error(this.name, e.message!);
         }
         throw e;
@@ -737,7 +737,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('tuning', AlphaTexSymbols.Tuning, true);
                         break;
                 }
-                if (strings !== this._currentStaff.tuning.length && this._currentStaff.chords.size > 0) {
+                if (strings !== this._currentStaff.tuning.length && (this._currentStaff.chords?.size ?? 0) > 0) {
                     this.errorMessage('Tuning must be defined before any chord');
                 }
                 return true;
@@ -1286,22 +1286,24 @@ export class AlphaTexImporter extends ScoreImporter {
                 beat.addWhammyBarPoint(new BendPoint(offset, value));
                 this._sy = this.newSy();
             }
-            while (beat.whammyBarPoints.length > 60) {
-                beat.removeWhammyBarPoint(beat.whammyBarPoints.length - 1);
-            }
-            // set positions
-            if (!exact) {
-                let count: number = beat.whammyBarPoints.length;
-                let step: number = (60 / count) | 0;
-                let i: number = 0;
-                while (i < count) {
-                    beat.whammyBarPoints[i].offset = Math.min(60, i * step);
-                    i++;
+            if (beat.whammyBarPoints != null) {
+                while (beat.whammyBarPoints.length > 60) {
+                    beat.removeWhammyBarPoint(beat.whammyBarPoints.length - 1);
                 }
-            } else {
-                beat.whammyBarPoints.sort((a, b) => {
-                    return a.offset - b.offset;
-                });
+                // set positions
+                if (!exact) {
+                    let count: number = beat.whammyBarPoints.length;
+                    let step: number = (60 / count) | 0;
+                    let i: number = 0;
+                    while (i < count) {
+                        beat.whammyBarPoints[i].offset = Math.min(60, i * step);
+                        i++;
+                    }
+                } else {
+                    beat.whammyBarPoints.sort((a, b) => {
+                        return a.offset - b.offset;
+                    });
+                }
             }
             this._allowNegatives = false;
             if (this._sy !== AlphaTexSymbols.RParensis) {
@@ -1315,7 +1317,7 @@ export class AlphaTexImporter extends ScoreImporter {
             this._sy = this.newSy();
             let chordName: string = (this._syData as string);
             let chordId: string = this.getChordId(this._currentStaff, chordName);
-            if (!this._currentStaff.chords.has(chordId)) {
+            if (!this._currentStaff.hasChord(chordId)) {
                 let chord: Chord = new Chord();
                 chord.showDiagram = false;
                 chord.name = chordName;
@@ -1452,7 +1454,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private isNoteText(txt: string) {
-        return txt === 'x'  || txt === '-' || txt === 'r';
+        return txt === 'x' || txt === '-' || txt === 'r';
     }
 
     private note(beat: Beat): boolean {
@@ -1857,7 +1859,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
             } else {
                 if (bar.index === 0) {
-                    if(!this.handleStaffMeta()) {
+                    if (!this.handleStaffMeta()) {
                         this.error('measure-effects', AlphaTexSymbols.String, false);
                     }
                 } else {

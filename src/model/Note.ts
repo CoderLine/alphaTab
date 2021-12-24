@@ -639,9 +639,9 @@ export class Note {
         } else if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
             return Math.floor(this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2) ;
         } else if (this.beat.hasWhammyBar) {
-            return Math.floor(this.beat.whammyBarPoints[0].value / 2);
+            return Math.floor(this.beat.whammyBarPoints![0].value / 2);
         } else if (this.beat.isContinuedWhammy) {
-            return Math.floor(this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value / 2);
+            return Math.floor(this.beat.previousBeat!.whammyBarPoints![this.beat.previousBeat!.whammyBarPoints!.length - 1].value / 2);
         }
         return 0;
     }
@@ -698,11 +698,11 @@ export class Note {
             return this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value % 2 !== 0;
         }
         if (this.beat.hasWhammyBar) {
-            return this.beat.whammyBarPoints[0].value % 2 !== 0;
+            return this.beat.whammyBarPoints![0].value % 2 !== 0;
         }
         if (this.beat.isContinuedWhammy) {
             return (
-                this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value %
+                this.beat.previousBeat!.whammyBarPoints![this.beat.previousBeat!.whammyBarPoints!.length - 1].value %
                 2 !==
                 0
             );

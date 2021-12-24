@@ -111,8 +111,8 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         }
     }
 
-    public renderScore(score: Score, trackIndexes: number[]): void {
-        let jsObject: unknown = JsonConverter.scoreToJsObject(score);
+    public renderScore(score: Score | null, trackIndexes: number[] | null): void {
+        let jsObject: unknown = score == null ? null : JsonConverter.scoreToJsObject(score);
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
             score: jsObject,

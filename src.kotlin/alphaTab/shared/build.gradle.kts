@@ -141,10 +141,9 @@ tasks.whenTaskAdded {
     }
 }
 
-// TODO: remove assertions for faster library.
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
-        freeCompilerArgs = listOf(
+        freeCompilerArgs += listOf(
             "-Xno-call-assertions",
             "-Xno-receiver-assertions",
             "-Xno-param-assertions"

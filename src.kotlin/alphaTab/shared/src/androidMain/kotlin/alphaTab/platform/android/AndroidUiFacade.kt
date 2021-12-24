@@ -40,7 +40,6 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
     public constructor(screenSizeView: View, layoutView: RecyclerView) {
         _screenSizeView = screenSizeView
         _layoutView = layoutView
-        layoutView.layoutManager = AlphaTabLayoutManager(layoutView.context)
         _renderResultAdapter = AlphaTabRenderResultAdapter()
         layoutView.adapter =_renderResultAdapter
 
@@ -104,6 +103,7 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
         settingsContainer = settings
         api.settings = settings.settings
         settings.settingsChanged.on(this::onSettingsChanged)
+        _layoutView.layoutManager = AlphaTabLayoutManager(_layoutView.context, this)
     }
 
     private fun onSettingsChanged() {
@@ -186,14 +186,11 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
             }
             // NOTE: here we try to replace existing children
             else {
-                val body = renderResults.renderResult
-
-                if (body is Bitmap) {
-                    _renderResultAdapter.addResult(renderResults)
-                }
+                _renderResultAdapter.addResult(renderResults)
             }
         }
     }
+
 
     override fun destroyCursors() {
     }

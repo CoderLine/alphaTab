@@ -11,6 +11,7 @@ import alphaTab.platform.TextAlign
 import alphaTab.platform.TextBaseline
 import android.content.Context
 import android.graphics.*
+import java.io.ByteArrayOutputStream
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalUnsignedTypes

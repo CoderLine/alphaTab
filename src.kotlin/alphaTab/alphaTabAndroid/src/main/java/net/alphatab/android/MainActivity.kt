@@ -1,73 +1,63 @@
 package net.alphatab.android
 
 import alphaTab.AlphaTabView
-import alphaTab.LayoutMode
-import alphaTab.LogLevel
-import alphaTab.Logger
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.importer.ScoreLoader
-import android.app.Activity
-import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
+import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.ByteArrayOutputStream
 import kotlin.contracts.ExperimentalContracts
-
-const val OPEN_REQUEST_CODE = 41
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var _viewModel: ViewScoreViewModel
     private lateinit var _alphaTabView: AlphaTabView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         _alphaTabView = findViewById(R.id.alphatab_view)
-        _alphaTabView.settings.core.logLevel = LogLevel.Debug
-        _alphaTabView.settings.display.barCountPerPartial = 4.0
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            _alphaTabView.settings.display.layoutMode = LayoutMode.Horizontal
-        } else {
-            _alphaTabView.settings.display.layoutMode = LayoutMode.Page
+        _viewModel = ViewModelProvider(this).get(ViewScoreViewModel::class.java)
+
+        val widthDp = resources.displayMetrics.widthPixels /
+            resources.displayMetrics.density
+        _viewModel.updateLayout(widthDp)
+
+        observeViewModel()
+        findViewById<FloatingActionButton>(R.id.open_file_button).setOnClickListener {
+            openFile.launch(arrayOf("*/*"))
         }
-        Logger.logLevel = LogLevel.Debug
     }
 
-    fun openFile(view: View) {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "*/*"
-        startActivityForResult(intent, OPEN_REQUEST_CODE)
+    private fun observeViewModel() {
+        _viewModel.settings.observe(this, {
+            _alphaTabView.settings = it
+        })
+        _viewModel.tracks.observe(this, {
+            _alphaTabView.tracks = it
+        })
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == OPEN_REQUEST_CODE) {
-                val uri = data!!.data
-                try {
-                    val fileData = readFileData(uri!!)
-                    val score = ScoreLoader.loadScoreFromBytes(fileData, _alphaTabView.settings)
-                    _alphaTabView.tracks = arrayListOf(score.tracks[0])
-                } catch (e: Exception) {
-                    Log.e("AlphaTab", "Failed to load file: $e, ${e.stackTraceToString()}")
-                    Toast.makeText(this, R.string.open_failed, Toast.LENGTH_LONG).show()
-                }
-                return
-            }
+    private val openFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+        val uri = it
+        try {
+            val fileData = readFileData(uri!!)
+            val score = ScoreLoader.loadScoreFromBytes(fileData, _alphaTabView.settings)
+            _viewModel.tracks.value = arrayListOf(score.tracks[0])
+        } catch (e: Exception) {
+            Log.e("AlphaTab", "Failed to load file: $e, ${e.stackTraceToString()}")
+            Toast.makeText(this, R.string.open_failed, Toast.LENGTH_LONG).show()
         }
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun readFileData(uri: Uri): Uint8Array {

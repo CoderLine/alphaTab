@@ -64,23 +64,27 @@ export class ScoreRenderer implements IScoreRenderer {
         return false;
     }
 
-    public renderScore(score: Score, trackIndexes: number[]): void {
+    public renderScore(score: Score | null, trackIndexes: number[] | null): void {
         try {
             this.score = score;
-            let tracks: Track[];
-            if (!trackIndexes) {
-                tracks = score.tracks.slice(0);
-            } else {
-                tracks = [];
-                for (let track of trackIndexes) {
-                    if (track >= 0 && track < score.tracks.length) {
-                        tracks.push(score.tracks[track]);
+            let tracks: Track[] | null = null;
+
+            if (score != null && trackIndexes != null) {
+                if (!trackIndexes) {
+                    tracks = score.tracks.slice(0);
+                } else {
+                    tracks = [];
+                    for (let track of trackIndexes) {
+                        if (track >= 0 && track < score.tracks.length) {
+                            tracks.push(score.tracks[track]);
+                        }
                     }
                 }
+                if (tracks.length === 0 && score.tracks.length > 0) {
+                    tracks.push(score.tracks[0]);
+                }
             }
-            if (tracks.length === 0 && score.tracks.length > 0) {
-                tracks.push(score.tracks[0]);
-            }
+
             this.tracks = tracks;
             this.render();
         } catch (e) {
@@ -112,21 +116,28 @@ export class ScoreRenderer implements IScoreRenderer {
             return;
         }
         this.boundsLookup = new BoundsLookup();
-        if (!this.tracks || this.tracks.length === 0) {
-            return;
-        }
         this.recreateCanvas();
         this.canvas!.lineWidth = this.settings.display.scale;
         this.canvas!.settings = this.settings;
-        Logger.debug('Rendering', 'Rendering ' + this.tracks.length + ' tracks');
-        for (let i: number = 0; i < this.tracks.length; i++) {
-            let track: Track = this.tracks[i];
-            Logger.debug('Rendering', 'Track ' + i + ': ' + track.name);
+
+        if (!this.tracks || this.tracks.length === 0 || !this.score) {
+            Logger.debug('Rendering', 'Clearing rendered tracks because no score or tracks are set');
+            (this.preRender as EventEmitterOfT<boolean>).trigger(false);
+            this._renderedTracks = null;
+            this.onRenderFinished();
+            (this.postRenderFinished as EventEmitter).trigger();
+            Logger.debug('Rendering', 'Clearing finished');
+        } else {
+            Logger.debug('Rendering', 'Rendering ' + this.tracks.length + ' tracks');
+            for (let i: number = 0; i < this.tracks.length; i++) {
+                let track: Track = this.tracks[i];
+                Logger.debug('Rendering', 'Track ' + i + ': ' + track.name);
+            }
+            (this.preRender as EventEmitterOfT<boolean>).trigger(false);
+            this.recreateLayout();
+            this.layoutAndRender();
+            Logger.debug('Rendering', 'Rendering finished');
         }
-        (this.preRender as EventEmitterOfT<boolean>).trigger(false);
-        this.recreateLayout();
-        this.layoutAndRender();
-        Logger.debug('Rendering', 'Rendering finished');
     }
 
     public resizeRender(): void {

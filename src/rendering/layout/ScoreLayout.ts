@@ -42,6 +42,7 @@ export abstract class ScoreLayout {
     }
 
     public abstract get supportsResize(): boolean;
+    public abstract get padding(): number[] | null;
 
     public abstract resize(): void;
 
@@ -151,11 +152,13 @@ export abstract class ScoreLayout {
             let chords: Map<string, Chord> = new Map<string, Chord>();
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
-                    for (const [chordId, chord] of staff.chords) {
-                        if (!chords.has(chordId)) {
-                            if (chord.showDiagram) {
-                                chords.set(chordId, chord);
-                                this.chordDiagrams!.addChord(chord);
+                    if (staff.chords) {
+                        for (const [chordId, chord] of staff.chords) {
+                            if (!chords.has(chordId)) {
+                                if (chord.showDiagram) {
+                                    chords.set(chordId, chord);
+                                    this.chordDiagrams!.addChord(chord);
+                                }
                             }
                         }
                     }
@@ -242,11 +245,18 @@ export abstract class ScoreLayout {
         let size: number = 12 * this.renderer.settings.display.scale;
         let height: number = size * 2;
         this.height += height;
-        let x: number = this.width / 2;
+
+        const centered = Environment.getLayoutEngineFactory(this.renderer.settings.display.layoutMode).vertical;
+
+        const padding = this.padding ?? [0, 0, 0, 0];
+        let x: number = padding[0];
+        if (centered) {
+            x += (this.width - padding[0] - padding[1]);
+        }
         canvas.beginRender(this.width, height);
         canvas.color = resources.mainGlyphColor;
         canvas.font = new Font(resources.copyrightFont.family, size, FontStyle.Plain, FontWeight.Bold);
-        canvas.textAlign = TextAlign.Center;
+        canvas.textAlign = centered ? TextAlign.Center : TextAlign.Left;
         canvas.fillText(msg, x, size);
         let result: unknown = canvas.endRender();
 

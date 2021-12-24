@@ -290,7 +290,7 @@ export class Beat {
      * @json_add addWhammyBarPoint
      * @clone_add addWhammyBarPoint
      */
-    public whammyBarPoints: BendPoint[] = [];
+    public whammyBarPoints: BendPoint[] | null = null;
 
     /**
      * Gets or sets the highest point with for the highest whammy bar value.
@@ -307,7 +307,7 @@ export class Beat {
     public minWhammyPoint: BendPoint | null = null;
 
     public get hasWhammyBar(): boolean {
-        return this.whammyBarType !== WhammyType.None;
+        return this.whammyBarPoints !== null && this.whammyBarType !== WhammyType.None;
     }
 
     /**
@@ -325,7 +325,7 @@ export class Beat {
     }
 
     public get chord(): Chord | null {
-        return this.chordId ? this.voice.bar.staff.chords.get(this.chordId)! : null;
+        return this.chordId ? this.voice.bar.staff.getChord(this.chordId)! : null;
     }
 
     /**
@@ -441,7 +441,12 @@ export class Beat {
     public beamingMode: BeatBeamingMode = BeatBeamingMode.Auto;
 
     public addWhammyBarPoint(point: BendPoint): void {
-        this.whammyBarPoints.push(point);
+        let points = this.whammyBarPoints;
+        if (points === null) {
+            points = [];
+            this.whammyBarPoints = [];
+        }
+        points.push(point);
         if (!this.maxWhammyPoint || point.value > this.maxWhammyPoint.value) {
             this.maxWhammyPoint = point;
         }
@@ -455,18 +460,19 @@ export class Beat {
 
     public removeWhammyBarPoint(index: number): void {
         // check index
-        if (index < 0 || index >= this.whammyBarPoints.length) {
+        const points = this.whammyBarPoints;
+        if (points === null || index < 0 || index >= points.length) {
             return;
         }
 
         // remove point
-        this.whammyBarPoints.splice(index, 1);
-        let point: BendPoint = this.whammyBarPoints[index];
+        points.splice(index, 1);
+        let point: BendPoint = points[index];
 
         // update maxWhammy point if required
         if (point === this.maxWhammyPoint) {
             this.maxWhammyPoint = null;
-            for (let currentPoint of this.whammyBarPoints) {
+            for (let currentPoint of points) {
                 if (!this.maxWhammyPoint || currentPoint.value > this.maxWhammyPoint.value) {
                     this.maxWhammyPoint = currentPoint;
                 }
@@ -475,7 +481,7 @@ export class Beat {
 
         if (point === this.minWhammyPoint) {
             this.minWhammyPoint = null;
-            for (let currentPoint of this.whammyBarPoints) {
+            for (let currentPoint of points) {
                 if (!this.minWhammyPoint || currentPoint.value < this.minWhammyPoint.value) {
                     this.minWhammyPoint = currentPoint;
                 }
@@ -517,7 +523,7 @@ export class Beat {
     }
 
     private calculateDuration(): number {
-        if(this.isFullBarRest) {
+        if (this.isFullBarRest) {
             return this.voice.bar.masterBar.calculateDuration();
         }
         let ticks: number = MidiUtils.toTicks(this.duration);
@@ -708,17 +714,18 @@ export class Beat {
         }
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
-        if (this.whammyBarPoints.length > 0 && this.whammyBarType === WhammyType.Custom) {
+        const points = this.whammyBarPoints;
+        if (points !== null && points.length > 0 && this.whammyBarType === WhammyType.Custom) {
             if (displayMode === NotationMode.SongBook) {
                 this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
             }
             let isContinuedWhammy: boolean = !!this.previousBeat && this.previousBeat.hasWhammyBar;
             this.isContinuedWhammy = isContinuedWhammy;
-            if (this.whammyBarPoints.length === 4) {
-                let origin: BendPoint = this.whammyBarPoints[0];
-                let middle1: BendPoint = this.whammyBarPoints[1];
-                let middle2: BendPoint = this.whammyBarPoints[2];
-                let destination: BendPoint = this.whammyBarPoints[3];
+            if (points.length === 4) {
+                let origin: BendPoint = points[0];
+                let middle1: BendPoint = points[1];
+                let middle2: BendPoint = points[2];
+                let destination: BendPoint = points[3];
                 // the middle points are used for holds, anything else is a new feature we do not support yet
                 if (middle1.value === middle2.value) {
                     // constant decrease or increase
@@ -731,15 +738,15 @@ export class Beat {
                         } else {
                             this.whammyBarType = WhammyType.Dive;
                         }
-                        this.whammyBarPoints.splice(2, 1);
-                        this.whammyBarPoints.splice(1, 1);
+                        points.splice(2, 1);
+                        points.splice(1, 1);
                     } else if (
                         (origin.value > middle1.value && middle1.value < destination.value) ||
                         (origin.value < middle1.value && middle1.value > destination.value)
                     ) {
                         this.whammyBarType = WhammyType.Dip;
                         if (middle1.offset === middle2.offset || displayMode === NotationMode.SongBook) {
-                            this.whammyBarPoints.splice(2, 1);
+                            points.splice(2, 1);
                         }
                     } else if (origin.value === middle1.value && middle1.value === destination.value) {
                         if (origin.value !== 0 && !isContinuedWhammy) {
@@ -747,8 +754,8 @@ export class Beat {
                         } else {
                             this.whammyBarType = WhammyType.Hold;
                         }
-                        this.whammyBarPoints.splice(2, 1);
-                        this.whammyBarPoints.splice(1, 1);
+                        points.splice(2, 1);
+                        points.splice(1, 1);
                     } else {
                         Logger.warning('Model', 'Unsupported whammy type detected, fallback to custom', null);
                     }

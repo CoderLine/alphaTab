@@ -108,7 +108,7 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
         }
     }
 
-    override fun renderScore(score: Score, trackIndexes: DoubleList) {
+    override fun renderScore(score: Score?, trackIndexes: DoubleList?) {
         if (checkAccess()) {
             renderer.renderScore(score, trackIndexes)
         } else {

@@ -52,7 +52,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                             case WhammyType.PrediveDive:
                             case WhammyType.Predive:
                                 this._prebends.addGlyph(
-                                    note.displayValue - ((note.beat.whammyBarPoints[0].value / 2) | 0),
+                                    note.displayValue - ((note.beat.whammyBarPoints![0].value / 2) | 0),
                                     false
                                 );
                                 break;

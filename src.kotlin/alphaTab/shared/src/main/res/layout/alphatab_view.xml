@@ -2,7 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/screenSizeView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -10,5 +10,5 @@
             android:id="@+id/mainContentView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </RelativeLayout>
+    </FrameLayout>
 </merge>

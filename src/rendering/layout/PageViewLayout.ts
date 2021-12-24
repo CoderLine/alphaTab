@@ -25,6 +25,10 @@ export class PageViewLayout extends ScoreLayout {
         return 'PageView';
     }
 
+    public override get padding(): number[] | null {
+        return this._pagePadding;
+    }
+
     public constructor(renderer: ScoreRenderer) {
         super(renderer);
     }
