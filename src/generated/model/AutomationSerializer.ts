@@ -5,10 +5,6 @@
 // </auto-generated>
 import { Automation } from "@src/model/Automation";
 import { JsonHelper } from "@src/io/JsonHelper";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 import { AutomationType } from "@src/model/Automation";
 export class AutomationSerializer {
     public static fromJson(obj: Automation, m: unknown): void {
@@ -28,33 +24,6 @@ export class AutomationSerializer {
         o.set("ratioposition", obj.ratioPosition); 
         o.set("text", obj.text); 
         return o; 
-    }
-    public static fromBinary(o: Automation | null, r: IReadable): Automation | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new Automation(); 
-        obj.isLinear = IOHelper.readBoolean(r); 
-        obj.type = JsonHelper.parseEnum<AutomationType>(IOHelper.readInt32LE(r), AutomationType)!; 
-        obj.value = IOHelper.readNumber(r); 
-        obj.ratioPosition = IOHelper.readNumber(r); 
-        obj.text = IOHelper.readString(r); 
-        return obj; 
-    }
-    public static toBinary(obj: Automation | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        IOHelper.writeBoolean(w, obj.isLinear); 
-        IOHelper.writeInt32LE(w, obj.type as number); 
-        IOHelper.writeNumber(w, obj.value); 
-        IOHelper.writeNumber(w, obj.ratioPosition); 
-        IOHelper.writeString(w, obj.text); 
     }
     public static setProperty(obj: Automation, property: string, v: unknown): boolean {
         switch (property) {

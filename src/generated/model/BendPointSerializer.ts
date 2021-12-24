@@ -5,10 +5,6 @@
 // </auto-generated>
 import { BendPoint } from "@src/model/BendPoint";
 import { JsonHelper } from "@src/io/JsonHelper";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 export class BendPointSerializer {
     public static fromJson(obj: BendPoint, m: unknown): void {
         if (!m) {
@@ -24,27 +20,6 @@ export class BendPointSerializer {
         o.set("offset", obj.offset); 
         o.set("value", obj.value); 
         return o; 
-    }
-    public static fromBinary(o: BendPoint | null, r: IReadable): BendPoint | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new BendPoint(); 
-        obj.offset = IOHelper.readNumber(r); 
-        obj.value = IOHelper.readNumber(r); 
-        return obj; 
-    }
-    public static toBinary(obj: BendPoint | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        IOHelper.writeNumber(w, obj.offset); 
-        IOHelper.writeNumber(w, obj.value); 
     }
     public static setProperty(obj: BendPoint, property: string, v: unknown): boolean {
         switch (property) {

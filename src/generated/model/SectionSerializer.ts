@@ -5,10 +5,6 @@
 // </auto-generated>
 import { Section } from "@src/model/Section";
 import { JsonHelper } from "@src/io/JsonHelper";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 export class SectionSerializer {
     public static fromJson(obj: Section, m: unknown): void {
         if (!m) {
@@ -24,27 +20,6 @@ export class SectionSerializer {
         o.set("marker", obj.marker); 
         o.set("text", obj.text); 
         return o; 
-    }
-    public static fromBinary(o: Section | null, r: IReadable): Section | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new Section(); 
-        obj.marker = IOHelper.readString(r); 
-        obj.text = IOHelper.readString(r); 
-        return obj; 
-    }
-    public static toBinary(obj: Section | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        IOHelper.writeString(w, obj.marker); 
-        IOHelper.writeString(w, obj.text); 
     }
     public static setProperty(obj: Section, property: string, v: unknown): boolean {
         switch (property) {

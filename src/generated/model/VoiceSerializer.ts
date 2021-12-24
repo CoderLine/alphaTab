@@ -6,11 +6,7 @@
 import { Voice } from "@src/model/Voice";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
 import { Beat } from "@src/model/Beat";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 export class VoiceSerializer {
     public static fromJson(obj: Voice, m: unknown): void {
         if (!m) {
@@ -27,40 +23,6 @@ export class VoiceSerializer {
         o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i))); 
         o.set("isempty", obj.isEmpty); 
         return o; 
-    }
-    public static fromBinary(o: Voice | null, r: IReadable): Voice | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new Voice(); 
-        obj.id = IOHelper.readNumber(r); 
-        {
-            obj.beats = [];
-            const length = IOHelper.readInt32LE(r);
-            for (let i = 0;i < length;i++) {
-                const it = new Beat();
-                BeatSerializer.fromBinary(it, r);
-                obj.addBeat(it);
-            }
-        } 
-        obj.isEmpty = IOHelper.readBoolean(r); 
-        return obj; 
-    }
-    public static toBinary(obj: Voice | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        IOHelper.writeNumber(w, obj.id); 
-        IOHelper.writeInt32LE(w, obj.beats.length); 
-        for (const i of obj.beats) {
-            BeatSerializer.toBinary(i, w);
-        } 
-        IOHelper.writeBoolean(w, obj.isEmpty); 
     }
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
         switch (property) {

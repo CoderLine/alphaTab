@@ -7,10 +7,6 @@ import { PlayerSettings } from "@src/PlayerSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { VibratoPlaybackSettingsSerializer } from "@src/generated/VibratoPlaybackSettingsSerializer";
 import { SlidePlaybackSettingsSerializer } from "@src/generated/SlidePlaybackSettingsSerializer";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 import { ScrollMode } from "@src/PlayerSettings";
 export class PlayerSettingsSerializer {
     public static fromJson(obj: PlayerSettings, m: unknown): void {
@@ -43,67 +39,6 @@ export class PlayerSettingsSerializer {
         o.set("slide", SlidePlaybackSettingsSerializer.toJson(obj.slide)); 
         o.set("playtripletfeel", obj.playTripletFeel); 
         return o; 
-    }
-    public static fromBinary(o: PlayerSettings | null, r: IReadable): PlayerSettings | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new PlayerSettings(); 
-        if (!IOHelper.readNull(r)) {
-            obj.soundFont = IOHelper.readString(r);
-        } 
-        obj.scrollElement = IOHelper.readString(r); 
-        obj.enablePlayer = IOHelper.readBoolean(r); 
-        obj.enableCursor = IOHelper.readBoolean(r); 
-        obj.enableAnimatedBeatCursor = IOHelper.readBoolean(r); 
-        obj.enableElementHighlighting = IOHelper.readBoolean(r); 
-        obj.enableUserInteraction = IOHelper.readBoolean(r); 
-        obj.scrollOffsetX = IOHelper.readNumber(r); 
-        obj.scrollOffsetY = IOHelper.readNumber(r); 
-        obj.scrollMode = JsonHelper.parseEnum<ScrollMode>(IOHelper.readInt32LE(r), ScrollMode)!; 
-        obj.scrollSpeed = IOHelper.readNumber(r); 
-        /*@target web*/
-        obj.nativeBrowserSmoothScroll = IOHelper.readBoolean(r); 
-        obj.songBookBendDuration = IOHelper.readNumber(r); 
-        obj.songBookDipDuration = IOHelper.readNumber(r); 
-        VibratoPlaybackSettingsSerializer.fromBinary(obj.vibrato, r); 
-        SlidePlaybackSettingsSerializer.fromBinary(obj.slide, r); 
-        obj.playTripletFeel = IOHelper.readBoolean(r); 
-        return obj; 
-    }
-    public static toBinary(obj: PlayerSettings | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        if (obj.soundFont !== null) {
-            IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.soundFont!);
-        }
-        else {
-            IOHelper.writeNull(w);
-        } 
-        IOHelper.writeString(w, obj.scrollElement); 
-        IOHelper.writeBoolean(w, obj.enablePlayer); 
-        IOHelper.writeBoolean(w, obj.enableCursor); 
-        IOHelper.writeBoolean(w, obj.enableAnimatedBeatCursor); 
-        IOHelper.writeBoolean(w, obj.enableElementHighlighting); 
-        IOHelper.writeBoolean(w, obj.enableUserInteraction); 
-        IOHelper.writeNumber(w, obj.scrollOffsetX); 
-        IOHelper.writeNumber(w, obj.scrollOffsetY); 
-        IOHelper.writeInt32LE(w, obj.scrollMode as number); 
-        IOHelper.writeNumber(w, obj.scrollSpeed); 
-        /*@target web*/
-        IOHelper.writeBoolean(w, obj.nativeBrowserSmoothScroll); 
-        IOHelper.writeNumber(w, obj.songBookBendDuration); 
-        IOHelper.writeNumber(w, obj.songBookDipDuration); 
-        VibratoPlaybackSettingsSerializer.toBinary(obj.vibrato, w); 
-        SlidePlaybackSettingsSerializer.toBinary(obj.slide, w); 
-        IOHelper.writeBoolean(w, obj.playTripletFeel); 
     }
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
         switch (property) {

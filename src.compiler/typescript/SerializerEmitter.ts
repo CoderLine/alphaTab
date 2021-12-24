@@ -10,8 +10,6 @@ import { JsonProperty, toImportPath } from './Serializer.common';
 import { createSetPropertyMethod } from './Serializer.setProperty';
 import { createFromJsonMethod } from './Serializer.fromJson';
 import { createToJsonMethod } from './Serializer.toJson';
-import { createToBinaryMethod } from './Serializer.toBinary';
-import { createFromBinaryMethod } from './Serializer.fromBinary';
 
 
 export default createEmitter('json', (program, input) => {
@@ -84,8 +82,6 @@ export default createEmitter('json', (program, input) => {
             [
                 createFromJsonMethod(input, isStrict, importer),
                 createToJsonMethod(program, input, propertiesToSerialize, importer),
-                createFromBinaryMethod(program, input, propertiesToSerialize, importer),
-                createToBinaryMethod(program, input, propertiesToSerialize, importer),
                 createSetPropertyMethod(program, input, propertiesToSerialize, importer)
             ]
         )

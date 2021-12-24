@@ -6,13 +6,9 @@
 import { Bar } from "@src/model/Bar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
-import { Voice } from "@src/model/Voice";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 import { Clef } from "@src/model/Clef";
 import { Ottavia } from "@src/model/Ottavia";
+import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
 export class BarSerializer {
     public static fromJson(obj: Bar, m: unknown): void {
@@ -32,44 +28,6 @@ export class BarSerializer {
         o.set("voices", obj.voices.map(i => VoiceSerializer.toJson(i))); 
         o.set("similemark", obj.simileMark as number); 
         return o; 
-    }
-    public static fromBinary(o: Bar | null, r: IReadable): Bar | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new Bar(); 
-        obj.id = IOHelper.readNumber(r); 
-        obj.clef = JsonHelper.parseEnum<Clef>(IOHelper.readInt32LE(r), Clef)!; 
-        obj.clefOttava = JsonHelper.parseEnum<Ottavia>(IOHelper.readInt32LE(r), Ottavia)!; 
-        {
-            obj.voices = [];
-            const length = IOHelper.readInt32LE(r);
-            for (let i = 0;i < length;i++) {
-                const it = new Voice();
-                VoiceSerializer.fromBinary(it, r);
-                obj.addVoice(it);
-            }
-        } 
-        obj.simileMark = JsonHelper.parseEnum<SimileMark>(IOHelper.readInt32LE(r), SimileMark)!; 
-        return obj; 
-    }
-    public static toBinary(obj: Bar | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        IOHelper.writeNumber(w, obj.id); 
-        IOHelper.writeInt32LE(w, obj.clef as number); 
-        IOHelper.writeInt32LE(w, obj.clefOttava as number); 
-        IOHelper.writeInt32LE(w, obj.voices.length); 
-        for (const i of obj.voices) {
-            VoiceSerializer.toBinary(i, w);
-        } 
-        IOHelper.writeInt32LE(w, obj.simileMark as number); 
     }
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
         switch (property) {

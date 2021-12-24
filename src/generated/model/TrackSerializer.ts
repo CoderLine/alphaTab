@@ -9,12 +9,8 @@ import { StaffSerializer } from "@src/generated/model/StaffSerializer";
 import { PlaybackInformationSerializer } from "@src/generated/model/PlaybackInformationSerializer";
 import { Color } from "@src/model/Color";
 import { InstrumentArticulationSerializer } from "@src/generated/model/InstrumentArticulationSerializer";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
 import { Staff } from "@src/model/Staff";
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 export class TrackSerializer {
     public static fromJson(obj: Track, m: unknown): void {
         if (!m) {
@@ -34,57 +30,6 @@ export class TrackSerializer {
         o.set("shortname", obj.shortName); 
         o.set("percussionarticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i))); 
         return o; 
-    }
-    public static fromBinary(o: Track | null, r: IReadable): Track | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new Track(); 
-        {
-            obj.staves = [];
-            const length = IOHelper.readInt32LE(r);
-            for (let i = 0;i < length;i++) {
-                const it = new Staff();
-                StaffSerializer.fromBinary(it, r);
-                obj.addStaff(it);
-            }
-        } 
-        PlaybackInformationSerializer.fromBinary(obj.playbackInfo, r); 
-        obj.color = Color.fromBinary(r)!; 
-        obj.name = IOHelper.readString(r); 
-        obj.shortName = IOHelper.readString(r); 
-        {
-            obj.percussionArticulations = [];
-            const length = IOHelper.readInt32LE(r);
-            for (let i = 0;i < length;i++) {
-                const it = new InstrumentArticulation();
-                InstrumentArticulationSerializer.fromBinary(it, r);
-                obj.percussionArticulations.push(it);
-            }
-        } 
-        return obj; 
-    }
-    public static toBinary(obj: Track | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        IOHelper.writeInt32LE(w, obj.staves.length); 
-        for (const i of obj.staves) {
-            StaffSerializer.toBinary(i, w);
-        } 
-        PlaybackInformationSerializer.toBinary(obj.playbackInfo, w); 
-        Color.toBinary(obj.color, w); 
-        IOHelper.writeString(w, obj.name); 
-        IOHelper.writeString(w, obj.shortName); 
-        IOHelper.writeInt32LE(w, obj.percussionArticulations.length); 
-        for (const i of obj.percussionArticulations) {
-            InstrumentArticulationSerializer.toBinary(i, w);
-        } 
     }
     public static setProperty(obj: Track, property: string, v: unknown): boolean {
         switch (property) {

@@ -5,10 +5,6 @@
 // </auto-generated>
 import { PlaybackInformation } from "@src/model/PlaybackInformation";
 import { JsonHelper } from "@src/io/JsonHelper";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 export class PlaybackInformationSerializer {
     public static fromJson(obj: PlaybackInformation, m: unknown): void {
         if (!m) {
@@ -30,39 +26,6 @@ export class PlaybackInformationSerializer {
         o.set("ismute", obj.isMute); 
         o.set("issolo", obj.isSolo); 
         return o; 
-    }
-    public static fromBinary(o: PlaybackInformation | null, r: IReadable): PlaybackInformation | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new PlaybackInformation(); 
-        obj.volume = IOHelper.readNumber(r); 
-        obj.balance = IOHelper.readNumber(r); 
-        obj.port = IOHelper.readNumber(r); 
-        obj.program = IOHelper.readNumber(r); 
-        obj.primaryChannel = IOHelper.readNumber(r); 
-        obj.secondaryChannel = IOHelper.readNumber(r); 
-        obj.isMute = IOHelper.readBoolean(r); 
-        obj.isSolo = IOHelper.readBoolean(r); 
-        return obj; 
-    }
-    public static toBinary(obj: PlaybackInformation | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        IOHelper.writeNumber(w, obj.volume); 
-        IOHelper.writeNumber(w, obj.balance); 
-        IOHelper.writeNumber(w, obj.port); 
-        IOHelper.writeNumber(w, obj.program); 
-        IOHelper.writeNumber(w, obj.primaryChannel); 
-        IOHelper.writeNumber(w, obj.secondaryChannel); 
-        IOHelper.writeBoolean(w, obj.isMute); 
-        IOHelper.writeBoolean(w, obj.isSolo); 
     }
     public static setProperty(obj: PlaybackInformation, property: string, v: unknown): boolean {
         switch (property) {

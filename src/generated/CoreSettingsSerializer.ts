@@ -5,10 +5,6 @@
 // </auto-generated>
 import { CoreSettings } from "@src/CoreSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 import { LogLevel } from "@src/LogLevel";
 export class CoreSettingsSerializer {
     public static fromJson(obj: CoreSettings, m: unknown): void {
@@ -38,77 +34,6 @@ export class CoreSettingsSerializer {
         o.set("useworkers", obj.useWorkers); 
         o.set("includenotebounds", obj.includeNoteBounds); 
         return o; 
-    }
-    public static fromBinary(o: CoreSettings | null, r: IReadable): CoreSettings | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new CoreSettings(); 
-        /*@target web*/
-        if (!IOHelper.readNull(r)) {
-            obj.scriptFile = IOHelper.readString(r);
-        } 
-        /*@target web*/
-        if (!IOHelper.readNull(r)) {
-            obj.fontDirectory = IOHelper.readString(r);
-        } 
-        /*@target web*/
-        if (!IOHelper.readNull(r)) {
-            obj.file = IOHelper.readString(r);
-        } 
-        /*@target web*/
-        obj.tex = IOHelper.readBoolean(r); 
-        /*@target web*/
-        obj.tracks = IOHelper.readUnknown(r); 
-        obj.enableLazyLoading = IOHelper.readBoolean(r); 
-        obj.engine = IOHelper.readString(r); 
-        obj.logLevel = JsonHelper.parseEnum<LogLevel>(IOHelper.readInt32LE(r), LogLevel)!; 
-        obj.useWorkers = IOHelper.readBoolean(r); 
-        obj.includeNoteBounds = IOHelper.readBoolean(r); 
-        return obj; 
-    }
-    public static toBinary(obj: CoreSettings | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        /*@target web*/
-        if (obj.scriptFile !== null) {
-            IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.scriptFile!);
-        }
-        else {
-            IOHelper.writeNull(w);
-        } 
-        /*@target web*/
-        if (obj.fontDirectory !== null) {
-            IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.fontDirectory!);
-        }
-        else {
-            IOHelper.writeNull(w);
-        } 
-        /*@target web*/
-        if (obj.file !== null) {
-            IOHelper.writeNotNull(w);
-            IOHelper.writeString(w, obj.file!);
-        }
-        else {
-            IOHelper.writeNull(w);
-        } 
-        /*@target web*/
-        IOHelper.writeBoolean(w, obj.tex); 
-        /*@target web*/
-        IOHelper.writeUnknown(w, obj.tracks); 
-        IOHelper.writeBoolean(w, obj.enableLazyLoading); 
-        IOHelper.writeString(w, obj.engine); 
-        IOHelper.writeInt32LE(w, obj.logLevel as number); 
-        IOHelper.writeBoolean(w, obj.useWorkers); 
-        IOHelper.writeBoolean(w, obj.includeNoteBounds); 
     }
     public static setProperty(obj: CoreSettings, property: string, v: unknown): boolean {
         switch (property) {

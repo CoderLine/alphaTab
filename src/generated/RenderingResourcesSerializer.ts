@@ -7,10 +7,6 @@ import { RenderingResources } from "@src/RenderingResources";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { Font } from "@src/model/Font";
 import { Color } from "@src/model/Color";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 export class RenderingResourcesSerializer {
     public static fromJson(obj: RenderingResources, m: unknown): void {
         if (!m) {
@@ -41,57 +37,6 @@ export class RenderingResourcesSerializer {
         o.set("secondaryglyphcolor", Color.toJson(obj.secondaryGlyphColor)); 
         o.set("scoreinfocolor", Color.toJson(obj.scoreInfoColor)); 
         return o; 
-    }
-    public static fromBinary(o: RenderingResources | null, r: IReadable): RenderingResources | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new RenderingResources(); 
-        obj.copyrightFont = Font.fromBinary(r)!; 
-        obj.titleFont = Font.fromBinary(r)!; 
-        obj.subTitleFont = Font.fromBinary(r)!; 
-        obj.wordsFont = Font.fromBinary(r)!; 
-        obj.effectFont = Font.fromBinary(r)!; 
-        obj.fretboardNumberFont = Font.fromBinary(r)!; 
-        obj.tablatureFont = Font.fromBinary(r)!; 
-        obj.graceFont = Font.fromBinary(r)!; 
-        obj.staffLineColor = Color.fromBinary(r)!; 
-        obj.barSeparatorColor = Color.fromBinary(r)!; 
-        obj.barNumberFont = Font.fromBinary(r)!; 
-        obj.barNumberColor = Color.fromBinary(r)!; 
-        obj.fingeringFont = Font.fromBinary(r)!; 
-        obj.markerFont = Font.fromBinary(r)!; 
-        obj.mainGlyphColor = Color.fromBinary(r)!; 
-        obj.secondaryGlyphColor = Color.fromBinary(r)!; 
-        obj.scoreInfoColor = Color.fromBinary(r)!; 
-        return obj; 
-    }
-    public static toBinary(obj: RenderingResources | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        Font.toBinary(obj.copyrightFont, w); 
-        Font.toBinary(obj.titleFont, w); 
-        Font.toBinary(obj.subTitleFont, w); 
-        Font.toBinary(obj.wordsFont, w); 
-        Font.toBinary(obj.effectFont, w); 
-        Font.toBinary(obj.fretboardNumberFont, w); 
-        Font.toBinary(obj.tablatureFont, w); 
-        Font.toBinary(obj.graceFont, w); 
-        Color.toBinary(obj.staffLineColor, w); 
-        Color.toBinary(obj.barSeparatorColor, w); 
-        Font.toBinary(obj.barNumberFont, w); 
-        Color.toBinary(obj.barNumberColor, w); 
-        Font.toBinary(obj.fingeringFont, w); 
-        Font.toBinary(obj.markerFont, w); 
-        Color.toBinary(obj.mainGlyphColor, w); 
-        Color.toBinary(obj.secondaryGlyphColor, w); 
-        Color.toBinary(obj.scoreInfoColor, w); 
     }
     public static setProperty(obj: RenderingResources, property: string, v: unknown): boolean {
         switch (property) {

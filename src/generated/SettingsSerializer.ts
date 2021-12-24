@@ -10,10 +10,6 @@ import { DisplaySettingsSerializer } from "@src/generated/DisplaySettingsSeriali
 import { NotationSettingsSerializer } from "@src/generated/NotationSettingsSerializer";
 import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSerializer";
 import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
-import { IReadable } from "@src/io/IReadable";
-import { EndOfReaderError } from "@src/io/IReadable";
-import { IWriteable } from "@src/io/IWriteable";
-import { IOHelper } from "@src/io/IOHelper";
 export class SettingsSerializer {
     public static fromJson(obj: Settings, m: unknown): void {
         if (!m) {
@@ -32,33 +28,6 @@ export class SettingsSerializer {
         o.set("importer", ImporterSettingsSerializer.toJson(obj.importer)); 
         o.set("player", PlayerSettingsSerializer.toJson(obj.player)); 
         return o; 
-    }
-    public static fromBinary(o: Settings | null, r: IReadable): Settings | null {
-        if (IOHelper.isEof(r)) {
-            throw new EndOfReaderError();
-        } 
-        if (IOHelper.readNull(r)) {
-            return null;
-        } 
-        const obj = o != null ? o : new Settings(); 
-        CoreSettingsSerializer.fromBinary(obj.core, r); 
-        DisplaySettingsSerializer.fromBinary(obj.display, r); 
-        NotationSettingsSerializer.fromBinary(obj.notation, r); 
-        ImporterSettingsSerializer.fromBinary(obj.importer, r); 
-        PlayerSettingsSerializer.fromBinary(obj.player, r); 
-        return obj; 
-    }
-    public static toBinary(obj: Settings | null, w: IWriteable): void {
-        if (!obj) {
-            IOHelper.writeNull(w);
-            return;
-        } 
-        IOHelper.writeNotNull(w); 
-        CoreSettingsSerializer.toBinary(obj.core, w); 
-        DisplaySettingsSerializer.toBinary(obj.display, w); 
-        NotationSettingsSerializer.toBinary(obj.notation, w); 
-        ImporterSettingsSerializer.toBinary(obj.importer, w); 
-        PlayerSettingsSerializer.toBinary(obj.player, w); 
     }
     public static setProperty(obj: Settings, property: string, v: unknown): boolean {
         if (["core", ""].indexOf(property) >= 0) {
