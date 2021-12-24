@@ -11,7 +11,7 @@ import {
     isMap,
     isEnumType
 } from '../BuilderHelpers';
-import { findModule, findSerializerModule, isImmutable, JsonProperty } from './Serializer.common';
+import { findModule, findSerializerModule, isImmutable, JsonProperty, JsonSerializable } from './Serializer.common';
 
 function isPrimitiveToJson(type: ts.Type, typeChecker: ts.TypeChecker) {
     if (!type) {
@@ -63,7 +63,7 @@ function isPrimitiveToJson(type: ts.Type, typeChecker: ts.TypeChecker) {
 
 function generateToJsonBody(
     program: ts.Program,
-    propertiesToSerialize: JsonProperty[],
+    serializable: JsonSerializable,
     importer: (name: string, module: string) => void
 ) {
     const statements: ts.Statement[] = [];
@@ -88,7 +88,7 @@ function generateToJsonBody(
         )
     );
 
-    for (let prop of propertiesToSerialize) {
+    for (let prop of serializable.properties) {
         const fieldName = (prop.property.name as ts.Identifier).text;
         const jsonName = prop.jsonNames.filter(n => n !== '')[0];
 
@@ -182,7 +182,7 @@ function generateToJsonBody(
             } else {
                 const itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
                 importer(itemSerializer, findSerializerModule(mapType.typeArguments![1], program.getCompilerOptions()));
-                
+
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                     const m = new Map<string, unknown>();
@@ -190,16 +190,16 @@ function generateToJsonBody(
                     for(const [k, v] of obj.${fieldName}!) {
                         m.set(k.toString(), ${itemSerializer}.toJson(v));
                     }
-                }`, ts.SyntaxKind.Block);            
+                }`, ts.SyntaxKind.Block);
             }
 
-            if(type.isNullable) {
+            if (type.isNullable) {
                 propertyStatements.push(ts.factory.createIfStatement(
                     ts.factory.createBinaryExpression(
                         ts.factory.createPropertyAccessExpression(
                             ts.factory.createIdentifier('obj'),
                             fieldName
-                        ), 
+                        ),
                         ts.SyntaxKind.ExclamationEqualsEqualsToken,
                         ts.factory.createNull()
                     ),
@@ -241,6 +241,13 @@ function generateToJsonBody(
         statements.push(...propertyStatements);
     }
 
+    if(serializable.hasToJsonExtension) {
+        statements.push( createNodeFromSource<ts.ExpressionStatement>(
+            `obj.toJson(o);`,
+            ts.SyntaxKind.ExpressionStatement
+        ));
+    }
+    
     statements.push(ts.factory.createReturnStatement(ts.factory.createIdentifier('o')));
 
     return ts.factory.createBlock(addNewLines(statements));
@@ -249,7 +256,7 @@ function generateToJsonBody(
 export function createToJsonMethod(
     program: ts.Program,
     input: ts.ClassDeclaration,
-    propertiesToSerialize: JsonProperty[],
+    serializable: JsonSerializable,
     importer: (name: string, module: string) => void
 ) {
     const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
@@ -259,5 +266,5 @@ export function createToJsonMethod(
         }`,
         ts.SyntaxKind.MethodDeclaration
     );
-    return setMethodBody(methodDecl, generateToJsonBody(program, propertiesToSerialize, importer));
+    return setMethodBody(methodDecl, generateToJsonBody(program, serializable, importer));
 }

@@ -129,8 +129,9 @@ export class Score {
     }
 
     public finish(settings: Settings): void {
+        const sharedDataBag = new Map<string, unknown>()
         for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
-            this.tracks[i].finish(settings);
+            this.tracks[i].finish(settings, sharedDataBag);
         }
     }
 }

@@ -6,7 +6,7 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import createEmitter from './EmitterBase';
-import { JsonProperty, toImportPath } from './Serializer.common';
+import { JsonProperty, JsonSerializable, toImportPath } from './Serializer.common';
 import { createSetPropertyMethod } from './Serializer.setProperty';
 import { createFromJsonMethod } from './Serializer.fromJson';
 import { createToJsonMethod } from './Serializer.toJson';
@@ -19,9 +19,13 @@ export default createEmitter('json', (program, input) => {
         path.resolve(input.getSourceFile().fileName)
     );
 
-    const isStrict = !!ts.getJSDocTags(input).find(t => t.tagName.text === 'json_strict');
+    const serializable: JsonSerializable = {
+        properties: [],
+        isStrict: !!ts.getJSDocTags(input).find(t => t.tagName.text === 'json_strict'),
+        hasToJsonExtension: false,
+        hasSetPropertyExtension: false
+    };
 
-    let propertiesToSerialize: JsonProperty[] = [];
     input.members.forEach(member => {
         if (ts.isPropertyDeclaration(member)) {
             const propertyDeclaration = member as ts.PropertyDeclaration;
@@ -37,13 +41,23 @@ export default createEmitter('json', (program, input) => {
                 }
 
                 if (!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_ignore')) {
-                    propertiesToSerialize.push({
+                    serializable.properties.push({
                         property: propertyDeclaration,
                         jsonNames: jsonNames,
                         partialNames: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_partial_names'),
                         target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment as string
                     });
                 }
+            }
+        }
+        else if (ts.isMethodDeclaration(member)) {
+            switch ((member.name as ts.Identifier).text) {
+                case 'toJson':
+                    serializable.hasToJsonExtension = true;
+                    break;
+                case 'setProperty':
+                    serializable.hasSetPropertyExtension = true;
+                    break;
             }
         }
     });
@@ -80,9 +94,9 @@ export default createEmitter('json', (program, input) => {
             undefined,
             undefined,
             [
-                createFromJsonMethod(input, isStrict, importer),
-                createToJsonMethod(program, input, propertiesToSerialize, importer),
-                createSetPropertyMethod(program, input, propertiesToSerialize, importer)
+                createFromJsonMethod(input, serializable, importer),
+                createToJsonMethod(program, input, serializable, importer),
+                createSetPropertyMethod(program, input, serializable, importer)
             ]
         )
     );

@@ -1,27 +1,28 @@
 import * as ts from 'typescript';
 import { addNewLines, createNodeFromSource, setMethodBody } from '../BuilderHelpers';
+import { JsonSerializable } from './Serializer.common';
 
-function generateFromJsonBody(isStrict: boolean, importer: (name: string, module: string) => void) {
+function generateFromJsonBody(serializable: JsonSerializable, importer: (name: string, module: string) => void) {
     importer('JsonHelper', '@src/io/JsonHelper');
     return ts.factory.createBlock(addNewLines([
         createNodeFromSource<ts.IfStatement>(`if(!m) { 
             return; 
         }`, ts.SyntaxKind.IfStatement),
-        isStrict
+        serializable.isStrict
             ? createNodeFromSource<ts.ExpressionStatement>(
-                  `JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));`,
-                  ts.SyntaxKind.ExpressionStatement
-              )
+                `JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));`,
+                ts.SyntaxKind.ExpressionStatement
+            )
             : createNodeFromSource<ts.ExpressionStatement>(
-                  `JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));`,
-                  ts.SyntaxKind.ExpressionStatement
-              )
+                `JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));`,
+                ts.SyntaxKind.ExpressionStatement
+            )
     ]));
 }
 
 export function createFromJsonMethod(
     input: ts.ClassDeclaration,
-    isStrict: boolean,
+    serializable: JsonSerializable,
     importer: (name: string, module: string) => void
 ) {
     const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
@@ -31,5 +32,5 @@ export function createFromJsonMethod(
         }`,
         ts.SyntaxKind.MethodDeclaration
     );
-    return setMethodBody(methodDecl, generateFromJsonBody(isStrict, importer));
+    return setMethodBody(methodDecl, generateFromJsonBody(serializable, importer));
 }

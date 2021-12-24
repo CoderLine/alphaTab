@@ -252,7 +252,7 @@ export abstract class ScoreLayout {
         const padding = this.padding ?? [0, 0, 0, 0];
         let x: number = padding[0];
         if (centered) {
-            x += (this.width - padding[0] - padding[1]);
+            x += ((this.width - padding[0] - padding[1]) / 2);
         }
         canvas.beginRender(this.width, height);
         canvas.color = resources.mainGlyphColor;

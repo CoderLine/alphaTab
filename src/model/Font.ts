@@ -1,6 +1,3 @@
-import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
-import { IWriteable } from '@src/io/IWriteable';
 import { JsonHelper } from '@src/io/JsonHelper';
 
 /**
@@ -519,20 +516,5 @@ export class Font {
         o.set('style', font.style as number);
         o.set('weight', font.weight as number);
         return o;
-    }
-
-    public static toBinary(obj: Font, w: IWriteable): void {
-        IOHelper.writeString(w, obj.family);
-        IOHelper.writeNumber(w, obj.size);
-        IOHelper.writeNumber(w, obj.style as number);
-        IOHelper.writeNumber(w, obj.weight as number);
-    }
-
-    public static fromBinary(r: IReadable): Font {
-        let family = IOHelper.readString(r);
-        let size = IOHelper.readNumber(r);
-        let style = JsonHelper.parseEnum<FontStyle>(IOHelper.readNumber(r), FontStyle)!;
-        let weight = JsonHelper.parseEnum<FontWeight>(IOHelper.readNumber(r), FontWeight)!;
-        return new Font(family, size, style, weight);
     }
 }

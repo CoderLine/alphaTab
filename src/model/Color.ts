@@ -1,7 +1,4 @@
 import { FormatError } from '@src/FormatError';
-import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
-import { IWriteable } from '@src/io/IWriteable';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
@@ -143,16 +140,5 @@ export class Color {
 
     public static toJson(obj: Color): number {
         return obj.raw;
-    }
-
-    public static toBinary(obj: Color, w: IWriteable): void {
-        IOHelper.writeInt32LE(w, obj.raw);
-    }
-
-    public static fromBinary(r: IReadable): Color {
-        const obj = new Color(0, 0, 0, 0);
-        obj.raw = IOHelper.readInt32LE(r);
-        obj.updateRgba();
-        return obj;
     }
 }

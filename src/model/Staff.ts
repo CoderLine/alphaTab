@@ -98,10 +98,10 @@ export class Staff {
      */
     public standardNotationLineCount: number = 5;
 
-    public finish(settings: Settings): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
         this.stringTuning.finish();
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
-            this.bars[i].finish(settings);
+            this.bars[i].finish(settings, sharedDataBag);
         }
     }
 

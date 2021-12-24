@@ -444,7 +444,7 @@ export class Beat {
         let points = this.whammyBarPoints;
         if (points === null) {
             points = [];
-            this.whammyBarPoints = [];
+            this.whammyBarPoints = points;
         }
         points.push(point);
         if (!this.maxWhammyPoint || point.value > this.maxWhammyPoint.value) {
@@ -584,7 +584,7 @@ export class Beat {
         }
     }
 
-    public finish(settings: Settings): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
         if (this.getAutomation(AutomationType.Instrument) === null &&
             this.index === 0 &&
             this.voice.index === 0 &&
@@ -624,7 +624,7 @@ export class Beat {
         for (let i: number = 0, j: number = this.notes.length; i < j; i++) {
             let note: Note = this.notes[i];
             note.dynamics = this.dynamics;
-            note.finish(settings);
+            note.finish(settings, sharedDataBag);
             if (note.isLetRing) {
                 this.isLetRing = true;
             }
@@ -860,9 +860,10 @@ export class Beat {
         return null;
     }
 
-    public chain() {
+    public chain(sharedDataBag: Map<string, unknown>) {
         for (const n of this.notes) {
             this.noteValueLookup.set(n.realValue, n);
+            n.chain(sharedDataBag);
         }
     }
 }

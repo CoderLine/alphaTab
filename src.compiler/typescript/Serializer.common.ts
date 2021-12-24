@@ -8,6 +8,13 @@ export interface JsonProperty {
     target?: string;
 }
 
+export interface JsonSerializable {
+    isStrict: boolean;
+    hasToJsonExtension: boolean;
+    hasSetPropertyExtension: boolean;
+    properties: JsonProperty[];
+}
+
 
 export function isImmutable(type: ts.Type | null): boolean {
     if (!type || !type.symbol) {

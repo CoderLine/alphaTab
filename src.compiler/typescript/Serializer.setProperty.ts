@@ -14,7 +14,8 @@ import {
     findModule,
     findSerializerModule,
     isImmutable,
-    JsonProperty
+    JsonProperty,
+    JsonSerializable
 } from './Serializer.common';
 
 function isPrimitiveFromJson(type: ts.Type, typeChecker: ts.TypeChecker) {
@@ -88,14 +89,14 @@ function cloneTypeNode(node: ts.TypeNode): ts.TypeNode {
 
 function generateSetPropertyBody(
     program: ts.Program,
-    propertiesToSerialize: JsonProperty[],
+    serializable: JsonSerializable,
     importer: (name: string, module: string) => void
 ) {
     const statements: ts.Statement[] = [];
     const cases: ts.CaseOrDefaultClause[] = [];
 
     const typeChecker = program.getTypeChecker();
-    for (const prop of propertiesToSerialize) {
+    for (const prop of serializable.properties) {
         const jsonNames = prop.jsonNames.map(j => j.toLowerCase());
         const caseValues: string[] = jsonNames.filter(j => j !== '');
         const fieldName = (prop.property.name as ts.Identifier).text;
@@ -202,8 +203,7 @@ function generateSetPropertyBody(
                 );
                 importer('JsonHelper', '@src/io/JsonHelper');
                 mapKey = createNodeFromSource<ts.NonNullExpression>(
-                    `JsonHelper.parseEnum<${mapType.typeArguments![0].symbol!.name}>(k, ${
-                        mapType.typeArguments![0].symbol!.name
+                    `JsonHelper.parseEnum<${mapType.typeArguments![0].symbol!.name}>(k, ${mapType.typeArguments![0].symbol!.name
                     })!`,
                     ts.SyntaxKind.NonNullExpression
                 );
@@ -270,29 +270,29 @@ function generateSetPropertyBody(
                                     addNewLines(
                                         [
                                             itemSerializer.length > 0 &&
-                                                createNodeFromSource<ts.VariableStatement>(
-                                                    `const i = new ${mapType.typeArguments![1].symbol.name}();`,
-                                                    ts.SyntaxKind.VariableStatement
-                                                ),
+                                            createNodeFromSource<ts.VariableStatement>(
+                                                `const i = new ${mapType.typeArguments![1].symbol.name}();`,
+                                                ts.SyntaxKind.VariableStatement
+                                            ),
                                             itemSerializer.length > 0 &&
-                                                createNodeFromSource<ts.ExpressionStatement>(
-                                                    `${itemSerializer}.fromJson(i, v as Map<string, unknown>)`,
-                                                    ts.SyntaxKind.ExpressionStatement
-                                                ),
+                                            createNodeFromSource<ts.ExpressionStatement>(
+                                                `${itemSerializer}.fromJson(i, v as Map<string, unknown>)`,
+                                                ts.SyntaxKind.ExpressionStatement
+                                            ),
                                             ts.factory.createExpressionStatement(
                                                 ts.factory.createCallExpression(
                                                     collectionAddMethod
                                                         ? ts.factory.createPropertyAccessExpression(
-                                                              ts.factory.createIdentifier('obj'),
-                                                              collectionAddMethod
-                                                          )
+                                                            ts.factory.createIdentifier('obj'),
+                                                            collectionAddMethod
+                                                        )
                                                         : ts.factory.createPropertyAccessExpression(
-                                                              ts.factory.createPropertyAccessExpression(
-                                                                  ts.factory.createIdentifier('obj'),
-                                                                  ts.factory.createIdentifier(fieldName)
-                                                              ),
-                                                              ts.factory.createIdentifier('set')
-                                                          ),
+                                                            ts.factory.createPropertyAccessExpression(
+                                                                ts.factory.createIdentifier('obj'),
+                                                                ts.factory.createIdentifier(fieldName)
+                                                            ),
+                                                            ts.factory.createIdentifier('set')
+                                                        ),
                                                     undefined,
                                                     [mapKey, mapValue]
                                                 )
@@ -355,156 +355,156 @@ function generateSetPropertyBody(
                     ts.factory.createBlock(
                         !type.isNullable
                             ? [
-                                  ts.factory.createExpressionStatement(
-                                      ts.factory.createCallExpression(
-                                          // TypeName.fromJson
-                                          ts.factory.createPropertyAccessExpression(
-                                              ts.factory.createIdentifier(itemSerializer),
-                                              'fromJson'
-                                          ),
-                                          [],
-                                          [
-                                              ts.factory.createPropertyAccessExpression(
-                                                  ts.factory.createIdentifier('obj'),
-                                                  fieldName
-                                              ),
-                                              ts.factory.createAsExpression(
-                                                  ts.factory.createIdentifier('v'),
-                                                  createStringUnknownMapNode()
-                                              )
-                                          ]
-                                      )
-                                  ),
-                                  ts.factory.createReturnStatement(ts.factory.createTrue())
-                              ]
+                                ts.factory.createExpressionStatement(
+                                    ts.factory.createCallExpression(
+                                        // TypeName.fromJson
+                                        ts.factory.createPropertyAccessExpression(
+                                            ts.factory.createIdentifier(itemSerializer),
+                                            'fromJson'
+                                        ),
+                                        [],
+                                        [
+                                            ts.factory.createPropertyAccessExpression(
+                                                ts.factory.createIdentifier('obj'),
+                                                fieldName
+                                            ),
+                                            ts.factory.createAsExpression(
+                                                ts.factory.createIdentifier('v'),
+                                                createStringUnknownMapNode()
+                                            )
+                                        ]
+                                    )
+                                ),
+                                ts.factory.createReturnStatement(ts.factory.createTrue())
+                            ]
                             : [
-                                  ts.factory.createIfStatement(
-                                      ts.factory.createIdentifier('v'),
-                                      ts.factory.createBlock([
-                                          assignField(
-                                              ts.factory.createNewExpression(
-                                                  ts.factory.createIdentifier(type.type.symbol.name),
-                                                  undefined,
-                                                  []
-                                              )
-                                          ),
-                                          ts.factory.createExpressionStatement(
-                                              ts.factory.createCallExpression(
-                                                  // TypeName.fromJson
-                                                  ts.factory.createPropertyAccessExpression(
-                                                      ts.factory.createIdentifier(itemSerializer),
-                                                      'fromJson'
-                                                  ),
-                                                  [],
-                                                  [
-                                                      ts.factory.createPropertyAccessExpression(
-                                                          ts.factory.createIdentifier('obj'),
-                                                          fieldName
-                                                      ),
-                                                      ts.factory.createAsExpression(
-                                                          ts.factory.createIdentifier('v'),
-                                                          createStringUnknownMapNode()
-                                                      )
-                                                  ]
-                                              )
-                                          )
-                                      ]),
-                                      ts.factory.createBlock([assignField(ts.factory.createNull())])
-                                  ),
-                                  ts.factory.createReturnStatement(ts.factory.createTrue())
-                              ]
+                                ts.factory.createIfStatement(
+                                    ts.factory.createIdentifier('v'),
+                                    ts.factory.createBlock([
+                                        assignField(
+                                            ts.factory.createNewExpression(
+                                                ts.factory.createIdentifier(type.type.symbol.name),
+                                                undefined,
+                                                []
+                                            )
+                                        ),
+                                        ts.factory.createExpressionStatement(
+                                            ts.factory.createCallExpression(
+                                                // TypeName.fromJson
+                                                ts.factory.createPropertyAccessExpression(
+                                                    ts.factory.createIdentifier(itemSerializer),
+                                                    'fromJson'
+                                                ),
+                                                [],
+                                                [
+                                                    ts.factory.createPropertyAccessExpression(
+                                                        ts.factory.createIdentifier('obj'),
+                                                        fieldName
+                                                    ),
+                                                    ts.factory.createAsExpression(
+                                                        ts.factory.createIdentifier('v'),
+                                                        createStringUnknownMapNode()
+                                                    )
+                                                ]
+                                            )
+                                        )
+                                    ]),
+                                    ts.factory.createBlock([assignField(ts.factory.createNull())])
+                                ),
+                                ts.factory.createReturnStatement(ts.factory.createTrue())
+                            ]
                     ),
                     !prop.partialNames
                         ? undefined
                         : ts.factory.createBlock([
-                              // for(const candidate of ["", "core"]) {
-                              //   if(candidate.indexOf(property) === 0) {
-                              //     if(!this.field) { this.field = new FieldType(); }
-                              //     if(this.field.setProperty(property.substring(candidate.length), value)) return true;
-                              //   }
-                              // }
-                              ts.factory.createForOfStatement(
-                                  undefined,
-                                  ts.factory.createVariableDeclarationList(
-                                      [ts.factory.createVariableDeclaration('c')],
-                                      ts.NodeFlags.Const
-                                  ),
-                                  jsonNameArray,
-                                  ts.factory.createBlock([
-                                      ts.factory.createIfStatement(
-                                          ts.factory.createBinaryExpression(
-                                              ts.factory.createCallExpression(
-                                                  ts.factory.createPropertyAccessExpression(
-                                                      ts.factory.createIdentifier('property'),
-                                                      'indexOf'
-                                                  ),
-                                                  [],
-                                                  [ts.factory.createIdentifier('c')]
-                                              ),
-                                              ts.SyntaxKind.EqualsEqualsEqualsToken,
-                                              ts.factory.createNumericLiteral('0')
-                                          ),
-                                          ts.factory.createBlock(
-                                              [
-                                                  type.isNullable &&
-                                                      ts.factory.createIfStatement(
-                                                          ts.factory.createPrefixUnaryExpression(
-                                                              ts.SyntaxKind.ExclamationToken,
-                                                              ts.factory.createPropertyAccessExpression(
-                                                                  ts.factory.createIdentifier('obj'),
-                                                                  fieldName
-                                                              )
-                                                          ),
-                                                          ts.factory.createBlock([
-                                                              assignField(
-                                                                  ts.factory.createNewExpression(
-                                                                      ts.factory.createIdentifier(
-                                                                          type.type!.symbol!.name
-                                                                      ),
-                                                                      [],
-                                                                      []
-                                                                  )
-                                                              )
-                                                          ])
-                                                      ),
-                                                  ts.factory.createIfStatement(
-                                                      ts.factory.createCallExpression(
-                                                          ts.factory.createPropertyAccessExpression(
-                                                              ts.factory.createIdentifier(itemSerializer),
-                                                              'setProperty'
-                                                          ),
-                                                          [],
-                                                          [
-                                                              ts.factory.createPropertyAccessExpression(
-                                                                  ts.factory.createIdentifier('obj'),
-                                                                  fieldName
-                                                              ),
-                                                              ts.factory.createCallExpression(
-                                                                  ts.factory.createPropertyAccessExpression(
-                                                                      ts.factory.createIdentifier('property'),
-                                                                      'substring'
-                                                                  ),
-                                                                  [],
-                                                                  [
-                                                                      ts.factory.createPropertyAccessExpression(
-                                                                          ts.factory.createIdentifier('c'),
-                                                                          'length'
-                                                                      )
-                                                                  ]
-                                                              ),
-                                                              ts.factory.createIdentifier('v')
-                                                          ]
-                                                      ),
-                                                      ts.factory.createBlock([
-                                                          ts.factory.createReturnStatement(ts.factory.createTrue())
-                                                      ])
-                                                  )
-                                              ].filter(s => !!s) as ts.Statement[]
-                                          )
-                                      )
-                                  ])
-                              )
-                          ])
+                            // for(const candidate of ["", "core"]) {
+                            //   if(candidate.indexOf(property) === 0) {
+                            //     if(!this.field) { this.field = new FieldType(); }
+                            //     if(this.field.setProperty(property.substring(candidate.length), value)) return true;
+                            //   }
+                            // }
+                            ts.factory.createForOfStatement(
+                                undefined,
+                                ts.factory.createVariableDeclarationList(
+                                    [ts.factory.createVariableDeclaration('c')],
+                                    ts.NodeFlags.Const
+                                ),
+                                jsonNameArray,
+                                ts.factory.createBlock([
+                                    ts.factory.createIfStatement(
+                                        ts.factory.createBinaryExpression(
+                                            ts.factory.createCallExpression(
+                                                ts.factory.createPropertyAccessExpression(
+                                                    ts.factory.createIdentifier('property'),
+                                                    'indexOf'
+                                                ),
+                                                [],
+                                                [ts.factory.createIdentifier('c')]
+                                            ),
+                                            ts.SyntaxKind.EqualsEqualsEqualsToken,
+                                            ts.factory.createNumericLiteral('0')
+                                        ),
+                                        ts.factory.createBlock(
+                                            [
+                                                type.isNullable &&
+                                                ts.factory.createIfStatement(
+                                                    ts.factory.createPrefixUnaryExpression(
+                                                        ts.SyntaxKind.ExclamationToken,
+                                                        ts.factory.createPropertyAccessExpression(
+                                                            ts.factory.createIdentifier('obj'),
+                                                            fieldName
+                                                        )
+                                                    ),
+                                                    ts.factory.createBlock([
+                                                        assignField(
+                                                            ts.factory.createNewExpression(
+                                                                ts.factory.createIdentifier(
+                                                                    type.type!.symbol!.name
+                                                                ),
+                                                                [],
+                                                                []
+                                                            )
+                                                        )
+                                                    ])
+                                                ),
+                                                ts.factory.createIfStatement(
+                                                    ts.factory.createCallExpression(
+                                                        ts.factory.createPropertyAccessExpression(
+                                                            ts.factory.createIdentifier(itemSerializer),
+                                                            'setProperty'
+                                                        ),
+                                                        [],
+                                                        [
+                                                            ts.factory.createPropertyAccessExpression(
+                                                                ts.factory.createIdentifier('obj'),
+                                                                fieldName
+                                                            ),
+                                                            ts.factory.createCallExpression(
+                                                                ts.factory.createPropertyAccessExpression(
+                                                                    ts.factory.createIdentifier('property'),
+                                                                    'substring'
+                                                                ),
+                                                                [],
+                                                                [
+                                                                    ts.factory.createPropertyAccessExpression(
+                                                                        ts.factory.createIdentifier('c'),
+                                                                        'length'
+                                                                    )
+                                                                ]
+                                                            ),
+                                                            ts.factory.createIdentifier('v')
+                                                        ]
+                                                    ),
+                                                    ts.factory.createBlock([
+                                                        ts.factory.createReturnStatement(ts.factory.createTrue())
+                                                    ])
+                                                )
+                                            ].filter(s => !!s) as ts.Statement[]
+                                        )
+                                    )
+                                ])
+                            )
+                        ])
                 )
             );
         }
@@ -537,7 +537,18 @@ function generateSetPropertyBody(
         statements.unshift(switchExpr);
     }
 
-    statements.push(ts.factory.createReturnStatement(ts.factory.createFalse()));
+    if(serializable.hasSetPropertyExtension) {
+        statements.push(ts.factory.createReturnStatement(
+            createNodeFromSource<ts.CallExpression>(
+                `obj.setProperty(property, v);`,
+                ts.SyntaxKind.CallExpression
+            )
+        ));
+    }
+    else {
+        statements.push(ts.factory.createReturnStatement(ts.factory.createFalse()));
+    }
+
 
     return ts.factory.createBlock(addNewLines(statements));
 }
@@ -545,7 +556,7 @@ function generateSetPropertyBody(
 export function createSetPropertyMethod(
     program: ts.Program,
     input: ts.ClassDeclaration,
-    propertiesToSerialize: JsonProperty[],
+    serializable: JsonSerializable,
     importer: (name: string, module: string) => void
 ) {
     const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
@@ -555,5 +566,5 @@ export function createSetPropertyMethod(
         }`,
         ts.SyntaxKind.MethodDeclaration
     );
-    return setMethodBody(methodDecl, generateSetPropertyBody(program, propertiesToSerialize, importer));
+    return setMethodBody(methodDecl, generateSetPropertyBody(program, serializable, importer));
 }
