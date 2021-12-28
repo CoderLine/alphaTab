@@ -279,7 +279,7 @@ export abstract class ScoreLayout {
         let msg: string = 'rendered by alphaTab';
         let resources: RenderingResources = this.renderer.settings.display.resources;
         let size: number = 12 * this.renderer.settings.display.scale;
-        let height: number = size * 2;
+        let height: number = Math.floor(size * 2);
 
         const e = new RenderFinishedEventArgs();
         const font = new Font(resources.copyrightFont.family, size, FontStyle.Plain, FontWeight.Bold);

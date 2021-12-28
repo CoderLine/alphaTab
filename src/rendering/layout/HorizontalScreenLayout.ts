@@ -137,7 +137,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             );
         }
         this._group.finalizeGroup();
-        this.height = this._group.y + this._group.height;
+        this.height = Math.floor(this._group.y + this._group.height);
         this.width = this._group.x + this._group.width + this._pagePadding[2];
         currentBarIndex = 0;
 

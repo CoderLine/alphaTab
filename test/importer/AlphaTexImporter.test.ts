@@ -175,6 +175,7 @@ describe('AlphaTexImporterTest', () => {
         let score: Score = parseTex(tex);
         let settings: Settings = new Settings();
         settings.core.engine = 'svg';
+        settings.core.enableLazyLoading = false;
         settings.display.staveProfile = StaveProfile.ScoreTab;
         let renderer: ScoreRenderer = new ScoreRenderer(settings);
         renderer.width = 970;

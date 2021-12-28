@@ -117,7 +117,7 @@ export class PageViewLayout extends ScoreLayout {
         this.tuningGlyph.width = this.width;
         this.tuningGlyph.doLayout();
 
-        let tuningHeight = this.tuningGlyph.height + 5 * this.scale;
+        let tuningHeight = this.tuningGlyph.height + 11 * this.scale;
 
         const e = new RenderFinishedEventArgs();
         e.x = 0;
@@ -146,7 +146,7 @@ export class PageViewLayout extends ScoreLayout {
         this.chordDiagrams.width = this.width;
         this.chordDiagrams.doLayout();
 
-        const diagramHeight = this.chordDiagrams.height;
+        const diagramHeight = Math.floor(this.chordDiagrams.height);
 
         const e = new RenderFinishedEventArgs();
         e.x = 0;
@@ -216,7 +216,7 @@ export class PageViewLayout extends ScoreLayout {
             infoHeight += musicOrWordsHeight;
         }
 
-        infoHeight += 17 * this.scale;
+        infoHeight = Math.floor(infoHeight + 17 * this.scale);
 
         e.width = this.width;
         e.height = infoHeight;
@@ -317,7 +317,7 @@ export class PageViewLayout extends ScoreLayout {
 
     private paintGroup(group: StaveGroup, totalHeight: number): number {
         // paint into canvas
-        let height: number = group.height + 20 * this.scale;
+        let height: number = Math.floor(group.height + 20 * this.scale);
 
         const args: RenderFinishedEventArgs = new RenderFinishedEventArgs();
         args.x = 0;
