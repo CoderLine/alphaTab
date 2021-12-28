@@ -32,6 +32,26 @@ import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynt
 /**
  * @target web
  */
+enum ResultState {
+    LayoutDone,
+    RenderRequested,
+    RenderDone,
+    Detached
+}
+
+/**
+ * @target web
+ */
+interface ResultPlaceholder extends HTMLElement {
+    layoutResultId?: string;
+    resultState: ResultState;
+    renderedResult?: Element[];
+    renderedResultId?: string;
+}
+
+/**
+ * @target web
+ */
 export class BrowserUiFacade implements IUiFacade<unknown> {
     private _fontCheckers: Map<string, FontLoadingChecker> = new Map();
     private _api!: AlphaTabApiBase<unknown>;
@@ -41,7 +61,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _initialTrackIndexes: number[] | null = null;
     private _intersectionObserver: IntersectionObserver;
     private _barToElementLookup: Map<number, HTMLElement> = new Map<number, HTMLElement>();
-    private _resultIdToElementLookup: Map<string, HTMLElement> = new Map<string, HTMLElement>();
+    private _resultIdToElementLookup: Map<string, ResultPlaceholder> = new Map<string, ResultPlaceholder>();
 
     public rootContainerBecameVisible: IEventEmitter = new EventEmitter();
     public canRenderChanged: IEventEmitter = new EventEmitter();
@@ -105,17 +125,31 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
     private onElementVisibilityChanged(entries: IntersectionObserverEntry[]) {
         for (const e of entries) {
-            if (e.isIntersecting) {
-                const htmlElement = e.target as HTMLElement;
-                if (htmlElement === (this.rootContainer as HtmlElementContainer).element) {
+            const htmlElement = e.target as HTMLElement;
+            if (htmlElement === (this.rootContainer as HtmlElementContainer).element) {
+                if (e.isIntersecting) {
                     (this.rootContainerBecameVisible as EventEmitter).trigger();
                     this._intersectionObserver.unobserve((this.rootContainer as HtmlElementContainer).element);
-                } else if ('resultId' in htmlElement.dataset && this._api.settings.core.enableLazyLoading) {
-                    const resultId = htmlElement.dataset['resultId'] as string;
-                    if (this._resultIdToElementLookup.has(resultId)) {
-                        this._api.renderer.renderResult(resultId);
+                }
+            } else if ('layoutResultId' in htmlElement && this._api.settings.core.enableLazyLoading) {
+                const placeholder = htmlElement as ResultPlaceholder;
+                if (e.isIntersecting) {
+                    // missing result or result not matching layout -> request render
+                    if (placeholder.renderedResultId !== placeholder.layoutResultId) {
+                        if (this._resultIdToElementLookup.has(placeholder.layoutResultId!)) {
+                            this._api.renderer.renderResult(placeholder.layoutResultId!);
+                        } else {
+                            htmlElement.replaceChildren();
+                        }
                     }
-                    this._intersectionObserver.unobserve(htmlElement);
+                    // detached and became visible
+                    else if (placeholder.resultState === ResultState.Detached) {
+                        htmlElement.replaceChildren(...placeholder.renderedResult!);
+                        placeholder.resultState = ResultState.RenderDone;
+                    }
+                } else if (placeholder.resultState === ResultState.RenderDone) {
+                    placeholder.resultState = ResultState.Detached;
+                    placeholder.replaceChildren();
                 }
             }
         }
@@ -390,8 +424,15 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         const placeholder = this._resultIdToElementLookup.get(renderResult.id)!;
 
-        const body: unknown = renderResult.renderResult;
-        this.replacePlaceholder(placeholder, body);
+        const body: any = renderResult.renderResult;
+        if (typeof body === 'string') {
+            placeholder.innerHTML = body;
+        } else if ('nodeType' in body) {
+            placeholder.replaceChildren(body as Node);
+        }
+        placeholder.resultState = ResultState.RenderDone;
+        placeholder.renderedResultId = renderResult.id; 
+        placeholder.renderedResult = Array.from(placeholder.children)
     }
 
     public beginAppendRenderResults(renderResult: RenderFinishedEventArgs | null): void {
@@ -400,14 +441,17 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         if (!renderResult) {
             // so we remove elements that might be from a previous render session
             while (canvasElement.childElementCount > this._totalResultCount) {
+                if (this._api.settings.core.enableLazyLoading) {
+                    this._intersectionObserver.unobserve(canvasElement.lastChild as Element);
+                }
                 canvasElement.removeChild(canvasElement.lastChild!);
             }
         } else {
-            let placeholder: HTMLElement;
+            let placeholder: ResultPlaceholder;
             if (this._totalResultCount < canvasElement.childElementCount) {
-                placeholder = canvasElement.childNodes.item(this._totalResultCount) as HTMLElement;
+                placeholder = canvasElement.childNodes.item(this._totalResultCount) as ResultPlaceholder;
             } else {
-                placeholder = document.createElement('div');
+                placeholder = document.createElement('div') as unknown as ResultPlaceholder;
                 canvasElement.appendChild(placeholder);
             }
             placeholder.style.zIndex = '1';
@@ -417,7 +461,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             placeholder.style.width = renderResult.width + 'px';
             placeholder.style.height = renderResult.height + 'px';
             placeholder.style.display = 'inline-block';
-            placeholder.dataset['resultId'] = renderResult.id;
+            placeholder.layoutResultId = renderResult.id;
+            placeholder.resultState = ResultState.LayoutDone;
+            delete placeholder.renderedResultId;
+            delete placeholder.renderedResult;
 
             this._resultIdToElementLookup.set(renderResult.id, placeholder);
 
@@ -428,17 +475,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             }
 
             if (this._api.settings.core.enableLazyLoading) {
+                // re-observe to fire event
+                this._intersectionObserver.unobserve(placeholder);
                 this._intersectionObserver.observe(placeholder);
             }
-            this._totalResultCount++;
-        }
-    }
 
-    private replacePlaceholder(placeholder: HTMLElement, body: any) {
-        if (typeof body === 'string') {
-            placeholder.innerHTML = body;
-        } else if ('nodeType' in body) {
-            placeholder.replaceChildren(body as Node);
+            this._totalResultCount++;
         }
     }
 

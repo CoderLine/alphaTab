@@ -73,13 +73,13 @@ export class PageViewLayout extends ScoreLayout {
         return true;
     }
 
-    public get padding(): number[]{
+    public get padding(): number[] {
         return this._pagePadding!;
     }
 
-    public get firstBarX(): number{
-        let x=  this._pagePadding![0];
-        if(this._groups.length > 0) {
+    public get firstBarX(): number {
+        let x = this._pagePadding![0];
+        if (this._groups.length > 0) {
             x += this._groups[0].accoladeSpacing;
         }
         return x;
@@ -125,7 +125,7 @@ export class PageViewLayout extends ScoreLayout {
         e.width = this.width;
         e.height = tuningHeight;
         e.totalWidth = this.width;
-        e.totalHeight = totalHeight < 0 ? (y + e.height) : totalHeight;
+        e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
 
@@ -154,7 +154,7 @@ export class PageViewLayout extends ScoreLayout {
         e.width = this.width;
         e.height = diagramHeight;
         e.totalWidth = this.width;
-        e.totalHeight = totalHeight < 0 ? (y + diagramHeight) : totalHeight;
+        e.totalHeight = totalHeight < 0 ? y + diagramHeight : totalHeight;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
 
@@ -221,7 +221,7 @@ export class PageViewLayout extends ScoreLayout {
         e.width = this.width;
         e.height = infoHeight;
         e.totalWidth = this.width;
-        e.totalHeight = totalHeight < 0 ? (y + e.height) : totalHeight;
+        e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
         this.registerPartial(e, (canvas: ICanvas) => {
@@ -317,7 +317,7 @@ export class PageViewLayout extends ScoreLayout {
 
     private paintGroup(group: StaveGroup, totalHeight: number): number {
         // paint into canvas
-        let height: number = group.height + 20 * this.scale;    
+        let height: number = group.height + 20 * this.scale;
 
         const args: RenderFinishedEventArgs = new RenderFinishedEventArgs();
         args.x = 0;
@@ -334,10 +334,11 @@ export class PageViewLayout extends ScoreLayout {
             this.renderer.canvas!.textAlign = TextAlign.Left;
             // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates
             // since we use partial drawing
-            group.paint(0, -group.y, canvas);
-            // calculate coordinates for next group
-            totalHeight += height;
+            group.paint(0, -args.y, canvas);
         });
+
+        // calculate coordinates for next group
+        totalHeight += height;
 
         return height;
     }
@@ -349,7 +350,6 @@ export class PageViewLayout extends ScoreLayout {
         if (group.isFull || group.width > this.maxWidth) {
             group.scaleToWidth(this.maxWidth);
         }
-        this.width = Math.max(this.width, group.width);
     }
 
     private createStaveGroup(currentBarIndex: number, endIndex: number): StaveGroup {
