@@ -7,7 +7,6 @@ import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
-import { EventEmitterOfT } from '@src/EventEmitter';
 import { NotationElement } from '@src/NotationSettings';
 
 /**
@@ -49,13 +48,12 @@ export class PageViewLayout extends ScoreLayout {
                 this._pagePadding[1]
             ];
         }
-        let x: number = this._pagePadding[0];
-        let y: number = this._pagePadding[1];
+        let y: number = 0;
         this.width = this.renderer.width;
         this._allMasterBarRenderers = [];
         //
         // 1. Score Info
-        y = this.layoutAndRenderScoreInfo(x, y, -1);
+        y = this.layoutAndRenderScoreInfo(y, -1);
         //
         // 2. Tunings
         y = this.layoutAndRenderTunings(y, -1);
@@ -64,7 +62,10 @@ export class PageViewLayout extends ScoreLayout {
         y = this.layoutAndRenderChordDiagrams(y, -1);
         //
         // 4. One result per StaveGroup
-        y = this.layoutAndRenderScore(x, y);
+        y = this.layoutAndRenderScore(y);
+
+        y = this.layoutAndRenderAnnotation(y);
+
         this.height = y + this._pagePadding[3];
     }
 
@@ -72,14 +73,25 @@ export class PageViewLayout extends ScoreLayout {
         return true;
     }
 
-    public resize(): void {
-        let x: number = this._pagePadding![0];
-        let y: number = this._pagePadding![1];
+    public get padding(): number[]{
+        return this._pagePadding!;
+    }
+
+    public get firstBarX(): number{
+        let x=  this._pagePadding![0];
+        if(this._groups.length > 0) {
+            x += this._groups[0].accoladeSpacing;
+        }
+        return x;
+    }
+
+    public doResize(): void {
+        let y: number = 0;
         this.width = this.renderer.width;
         let oldHeight: number = this.height;
         //
         // 1. Score Info
-        y = this.layoutAndRenderScoreInfo(x, y, oldHeight);
+        y = this.layoutAndRenderScoreInfo(y, oldHeight);
         //
         // 2. Tunings
         y = this.layoutAndRenderTunings(y, oldHeight);
@@ -88,7 +100,10 @@ export class PageViewLayout extends ScoreLayout {
         y = this.layoutAndRenderChordDiagrams(y, oldHeight);
         //
         // 4. One result per StaveGroup
-        y = this.resizeAndRenderScore(x, y, oldHeight);
+        y = this.resizeAndRenderScore(y, oldHeight);
+
+        y = this.layoutAndRenderAnnotation(y);
+
         this.height = y + this._pagePadding![3];
     }
 
@@ -98,60 +113,69 @@ export class PageViewLayout extends ScoreLayout {
         }
 
         let res: RenderingResources = this.renderer.settings.display.resources;
+        this.tuningGlyph.x = this._pagePadding![0];
         this.tuningGlyph.width = this.width;
         this.tuningGlyph.doLayout();
 
-        let tuningHeight = this.tuningGlyph.height + 11 * this.scale;;
-        y += tuningHeight;
+        let tuningHeight = this.tuningGlyph.height + 5 * this.scale;
 
-        let canvas: ICanvas = this.renderer.canvas!;
-        canvas.beginRender(this.width, tuningHeight);
-        canvas.color = res.scoreInfoColor;
-        canvas.textAlign = TextAlign.Center;
-        this.tuningGlyph.paint(this._pagePadding![0], 0, canvas);
-        let result: unknown = canvas.endRender();
-
-        let e = new RenderFinishedEventArgs();
+        const e = new RenderFinishedEventArgs();
+        e.x = 0;
+        e.y = y;
         e.width = this.width;
         e.height = tuningHeight;
-        e.renderResult = result;
         e.totalWidth = this.width;
-        e.totalHeight = totalHeight < 0 ? y : totalHeight;
+        e.totalHeight = totalHeight < 0 ? (y + e.height) : totalHeight;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
-        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
-        return y;
+
+        this.registerPartial(e, (canvas: ICanvas) => {
+            canvas.color = res.scoreInfoColor;
+            canvas.textAlign = TextAlign.Center;
+            this.tuningGlyph!.paint(0, 0, canvas);
+        });
+
+        return y + tuningHeight;
     }
 
     private layoutAndRenderChordDiagrams(y: number, totalHeight: number = -1): number {
         if (!this.chordDiagrams) {
             return y;
         }
-        let res: RenderingResources = this.renderer.settings.display.resources;
+        const res: RenderingResources = this.renderer.settings.display.resources;
         this.chordDiagrams.width = this.width;
         this.chordDiagrams.doLayout();
-        let canvas: ICanvas = this.renderer.canvas!;
-        canvas.beginRender(this.width, this.chordDiagrams.height);
-        canvas.color = res.scoreInfoColor;
-        canvas.textAlign = TextAlign.Center;
-        this.chordDiagrams.paint(0, 0, canvas);
-        let result: unknown = canvas.endRender();
-        y += this.chordDiagrams.height;
 
-        let e = new RenderFinishedEventArgs();
+        const diagramHeight = this.chordDiagrams.height;
+
+        const e = new RenderFinishedEventArgs();
+        e.x = 0;
+        e.y = y;
         e.width = this.width;
-        e.height = this.chordDiagrams.height;
-        e.renderResult = result;
+        e.height = diagramHeight;
         e.totalWidth = this.width;
-        e.totalHeight = totalHeight < 0 ? y : totalHeight;
+        e.totalHeight = totalHeight < 0 ? (y + diagramHeight) : totalHeight;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
-        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
-        return y;
+
+        this.registerPartial(e, (canvas: ICanvas) => {
+            canvas.color = res.scoreInfoColor;
+            canvas.textAlign = TextAlign.Center;
+            this.chordDiagrams!.paint(0, 0, canvas);
+        });
+
+        return y + diagramHeight;
     }
 
-    private layoutAndRenderScoreInfo(x: number, y: number, totalHeight: number = -1): number {
+    private layoutAndRenderScoreInfo(y: number, totalHeight: number = -1): number {
         Logger.debug(this.name, 'Layouting score info');
+
+        const e = new RenderFinishedEventArgs();
+        e.x = 0;
+        e.y = y;
+
+        let infoHeight = this._pagePadding![1];
+
         let scale: number = this.scale;
         let res: RenderingResources = this.renderer.settings.display.resources;
         let centeredGlyphs: NotationElement[] = [
@@ -165,9 +189,9 @@ export class PageViewLayout extends ScoreLayout {
             if (this.scoreInfoGlyphs.has(centeredGlyphs[i])) {
                 let glyph: TextGlyph = this.scoreInfoGlyphs.get(centeredGlyphs[i])!;
                 glyph.x = this.width / 2;
-                glyph.y = y;
+                glyph.y = infoHeight;
                 glyph.textAlign = TextAlign.Center;
-                y += glyph.font.size * scale;
+                infoHeight += glyph.font.size * scale;
             }
         }
         let musicOrWords: boolean = false;
@@ -175,56 +199,50 @@ export class PageViewLayout extends ScoreLayout {
         if (this.scoreInfoGlyphs.has(NotationElement.ScoreMusic)) {
             let glyph: TextGlyph = this.scoreInfoGlyphs.get(NotationElement.ScoreMusic)!;
             glyph.x = this.width - this._pagePadding![2];
-            glyph.y = y;
+            glyph.y = infoHeight;
             glyph.textAlign = TextAlign.Right;
             musicOrWords = true;
             musicOrWordsHeight = glyph.font.size * scale;
         }
         if (this.scoreInfoGlyphs.has(NotationElement.ScoreWords)) {
             let glyph: TextGlyph = this.scoreInfoGlyphs.get(NotationElement.ScoreWords)!;
-            glyph.x = x;
-            glyph.y = y;
+            glyph.x = this._pagePadding![0];
+            glyph.y = infoHeight;
             glyph.textAlign = TextAlign.Left;
             musicOrWords = true;
             musicOrWordsHeight = glyph.font.size * scale;
         }
         if (musicOrWords) {
-            y += musicOrWordsHeight;
+            infoHeight += musicOrWordsHeight;
         }
-        
-        y += 17 * this.scale;
 
-        let canvas: ICanvas = this.renderer.canvas!;
-        canvas.beginRender(this.width, y);
-        canvas.color = res.scoreInfoColor;
-        canvas.textAlign = TextAlign.Center;
-        for(const g of this.scoreInfoGlyphs.values()) {
-            g.paint(0, 0, canvas);
-        }
-        let result: unknown = canvas.endRender();
+        infoHeight += 17 * this.scale;
 
-        let e = new RenderFinishedEventArgs();
         e.width = this.width;
-        e.height = y;
-        e.renderResult = result;
+        e.height = infoHeight;
         e.totalWidth = this.width;
-        e.totalHeight = totalHeight < 0 ? y : totalHeight;
+        e.totalHeight = totalHeight < 0 ? (y + e.height) : totalHeight;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
+        this.registerPartial(e, (canvas: ICanvas) => {
+            canvas.color = res.scoreInfoColor;
+            canvas.textAlign = TextAlign.Center;
+            for (const g of this.scoreInfoGlyphs.values()) {
+                g.paint(0, 0, canvas);
+            }
+        });
 
-        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
-        return y;
+        return y + infoHeight;
     }
 
-    private resizeAndRenderScore(x: number, y: number, oldHeight: number): number {
-        let canvas: ICanvas = this.renderer.canvas!;
+    private resizeAndRenderScore(y: number, oldHeight: number): number {
         // if we have a fixed number of bars per row, we only need to refit them.
         if (this.renderer.settings.display.barsPerRow !== -1) {
             for (let i: number = 0; i < this._groups.length; i++) {
                 let group: StaveGroup = this._groups[i];
                 this.fitGroup(group);
                 group.finalizeGroup();
-                y += this.paintGroup(group, oldHeight, canvas);
+                y += this.paintGroup(group, oldHeight);
             }
         } else {
             this._groups = [];
@@ -232,7 +250,7 @@ export class PageViewLayout extends ScoreLayout {
             let maxWidth: number = this.maxWidth;
             let group: StaveGroup = this.createEmptyStaveGroup();
             group.index = this._groups.length;
-            group.x = x;
+            group.x = this._pagePadding![0];
             group.y = y;
             while (currentIndex < this._allMasterBarRenderers.length) {
                 // if the current renderer still has space in the current group add it
@@ -255,11 +273,11 @@ export class PageViewLayout extends ScoreLayout {
                     this._groups.push(group);
                     this.fitGroup(group);
                     group.finalizeGroup();
-                    y += this.paintGroup(group, oldHeight, canvas);
+                    y += this.paintGroup(group, oldHeight);
                     // note: we do not increase currentIndex here to have it added to the next group
                     group = this.createEmptyStaveGroup();
                     group.index = this._groups.length;
-                    group.x = x;
+                    group.x = this._pagePadding![0];
                     group.y = y;
                 }
             }
@@ -267,13 +285,12 @@ export class PageViewLayout extends ScoreLayout {
             // don't forget to finish the last group
             this.fitGroup(group);
             group.finalizeGroup();
-            y += this.paintGroup(group, oldHeight, canvas);
+            y += this.paintGroup(group, oldHeight);
         }
         return y;
     }
 
-    private layoutAndRenderScore(x: number, y: number): number {
-        let canvas: ICanvas = this.renderer.canvas!;
+    private layoutAndRenderScore(y: number): number {
         let startIndex: number = this.firstBarIndex;
         let currentBarIndex: number = startIndex;
         let endBarIndex: number = this.lastBarIndex;
@@ -282,7 +299,7 @@ export class PageViewLayout extends ScoreLayout {
             // create group and align set proper coordinates
             let group: StaveGroup = this.createStaveGroup(currentBarIndex, endBarIndex);
             this._groups.push(group);
-            group.x = x;
+            group.x = this._pagePadding![0];
             group.y = y;
             currentBarIndex = group.lastBarIndex + 1;
             // finalize group (sizing etc).
@@ -293,32 +310,35 @@ export class PageViewLayout extends ScoreLayout {
                 'Rendering partial from bar ' + group.firstBarIndex + ' to ' + group.lastBarIndex,
                 null
             );
-            y += this.paintGroup(group, y, canvas);
+            y += this.paintGroup(group, y);
         }
         return y;
     }
 
-    private paintGroup(group: StaveGroup, totalHeight: number, canvas: ICanvas): number {
+    private paintGroup(group: StaveGroup, totalHeight: number): number {
         // paint into canvas
-        let height: number = group.height + 20 * this.scale;
-        canvas.beginRender(this.width, height);
-        this.renderer.canvas!.color = this.renderer.settings.display.resources.mainGlyphColor;
-        this.renderer.canvas!.textAlign = TextAlign.Left;
-        // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates
-        // since we use partial drawing
-        group.paint(0, -group.y, canvas);
-        // calculate coordinates for next group
-        totalHeight += height;
-        let result: unknown = canvas.endRender();
-        let args: RenderFinishedEventArgs = new RenderFinishedEventArgs();
+        let height: number = group.height + 20 * this.scale;    
+
+        const args: RenderFinishedEventArgs = new RenderFinishedEventArgs();
+        args.x = 0;
+        args.y = group.y;
         args.totalWidth = this.width;
         args.totalHeight = totalHeight;
         args.width = this.width;
         args.height = height;
-        args.renderResult = result;
         args.firstMasterBarIndex = group.firstBarIndex;
         args.lastMasterBarIndex = group.lastBarIndex;
-        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
+
+        this.registerPartial(args, canvas => {
+            this.renderer.canvas!.color = this.renderer.settings.display.resources.mainGlyphColor;
+            this.renderer.canvas!.textAlign = TextAlign.Left;
+            // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates
+            // since we use partial drawing
+            group.paint(0, -group.y, canvas);
+            // calculate coordinates for next group
+            totalHeight += height;
+        });
+
         return height;
     }
 
@@ -340,7 +360,7 @@ export class PageViewLayout extends ScoreLayout {
         let end: number = endIndex + 1;
 
         let barIndex = currentBarIndex;
-        while(barIndex < end) {
+        while (barIndex < end) {
             if (this._barsFromPreviousGroup.length > 0) {
                 for (let renderer of this._barsFromPreviousGroup) {
                     group.addMasterBarRenderers(this.renderer.tracks!, renderer);
