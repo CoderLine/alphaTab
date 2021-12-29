@@ -1,4 +1,4 @@
-﻿namespace AlphaTab.Core
+﻿namespace AlphaTab.Util
 {
     public class Lazy<T> where T:class?
     {

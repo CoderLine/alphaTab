@@ -491,10 +491,18 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 break;
             case cs.SyntaxKind.MapTypeNode:
                 const mapType = type as cs.MapTypeNode;
-                if (forNew) {
-                    this.write('AlphaTab.Core.Map<');
+                if (!mapType.valueIsValueType) {
+                    if (forNew) {
+                        this.write('AlphaTab.Core.Map<');
+                    } else {
+                        this.write('AlphaTab.Core.IMap<');
+                    }
                 } else {
-                    this.write('AlphaTab.Core.IMap<');
+                    if (forNew) {
+                        this.write('AlphaTab.Core.ValueTypeMap<');
+                    } else {
+                        this.write('AlphaTab.Core.IValueTypeMap<');
+                    }
                 }
                 this.writeType(mapType.keyType);
                 this.write(', ');

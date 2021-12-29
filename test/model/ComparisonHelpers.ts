@@ -54,18 +54,22 @@ export class ComparisonHelpers {
                             const actualMap = actual as Map<string, unknown>;
 
 
-                            const ignoredKeys: Set<string> = new Set<string>([
+                            const ignoredKeyLookup: Set<string> = new Set<string>([
                                 'id',
                                 'hammerpulloriginnoteid',
                                 'hammerpulldestinationnoteid',
                                 'tieoriginnoteid',
                                 'tiedestinationnoteid',
                                 'sluroriginnoteid',
-                                'slurdestinationnoteid',
-                                ...(ignoreKeys ?? [])
+                                'slurdestinationnoteid'
                             ]);
-                            const expectedKeys = Array.from(expectedMap.keys()).filter(k => !ignoredKeys.has(k));
-                            const actualKeys = Array.from(actualMap.keys()).filter(k => !ignoredKeys.has(k));
+                            if(ignoreKeys) {
+                                for(const k of ignoreKeys) {
+                                    ignoredKeyLookup.add(k)
+                                }
+                            }
+                            const expectedKeys = Array.from(expectedMap.keys()).filter(k => !ignoredKeyLookup.has(k));
+                            const actualKeys = Array.from(actualMap.keys()).filter(k => !ignoredKeyLookup.has(k));
                             expectedKeys.sort();
                             actualKeys.sort();
 

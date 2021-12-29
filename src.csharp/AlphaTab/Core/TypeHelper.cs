@@ -360,5 +360,11 @@ namespace AlphaTab.Core
                     return "object";
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<T> SetInitializer<T>(params T[] items)
+        {
+            return items;
+        }
     }
 }

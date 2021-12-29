@@ -155,7 +155,7 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
-        public void RenderScore(Score score, IList<double> trackIndexes)
+        public void RenderScore(Score? score, IList<double>? trackIndexes)
         {
             if (CheckAccess())
             {
