@@ -49,7 +49,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                api("org.jetbrains.skija:skija-$target:0.91.3")
+                api("org.jetbrains.skija:skija-$target:0.93.6")
             }
         }
         jvmMain.kotlin.srcDirs("src/jvmCommon/kotlin")
