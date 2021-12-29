@@ -104,10 +104,7 @@ public class AndroidCanvas : ICanvas {
     }
 
     override fun endRender(): Any {
-        val bos = ByteArrayOutputStream()
-        _surface.compress(Bitmap.CompressFormat.PNG, 80, bos)
-        _surface.recycle() // clean memory of raw bitmap
-        return bos.toByteArray()
+        return _surface
     }
 
     override fun onRenderFinished(): Any? {

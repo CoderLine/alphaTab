@@ -61,6 +61,9 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
         renderer.partialRenderFinished.on {
             _uiInvoke { onPartialRenderFinished(it) }
         }
+        renderer.partialLayoutFinished.on {
+            _uiInvoke { onPartialLayoutFinished(it) }
+        }
         renderer.renderFinished.on {
             _uiInvoke { onRenderFinished(it) }
         }
@@ -97,6 +100,14 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
             renderer.render()
         } else {
             _workerQueue.add { render() }
+        }
+    }
+
+    override fun renderResult(resultId:String) {
+        if (checkAccess()) {
+            renderer.renderResult(resultId)
+        } else {
+            _workerQueue.add { renderResult(resultId) }
         }
     }
 
@@ -154,6 +165,13 @@ class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
 
     private fun onPartialRenderFinished(args: RenderFinishedEventArgs) {
         (partialRenderFinished as EventEmitterOfT).trigger(args)
+    }
+
+    override val partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+        EventEmitterOfT()
+
+    private fun onPartialLayoutFinished(args: RenderFinishedEventArgs) {
+        (partialLayoutFinished as EventEmitterOfT).trigger(args)
     }
 
     override val postRenderFinished: IEventEmitter = EventEmitter()

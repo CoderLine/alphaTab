@@ -32,15 +32,13 @@ import kotlin.contracts.ExperimentalContracts
 class AndroidUiFacade : IUiFacade<AlphaTabView> {
     private var _screenSizeView: View
     private var _layoutView: RecyclerView
-    private var _renderResultAdapter: AlphaTabRenderResultAdapter
+    private lateinit var _renderResultAdapter: AlphaTabRenderResultAdapter
     private var _handler: Handler
     private var _internalRootContainerBecameVisible: EventEmitter? = EventEmitter()
 
     public constructor(screenSizeView: View, layoutView: RecyclerView) {
         _screenSizeView = screenSizeView
         _layoutView = layoutView
-        _renderResultAdapter = AlphaTabRenderResultAdapter()
-        layoutView.adapter =_renderResultAdapter
 
         rootContainer = AndroidRootViewContainer(_screenSizeView, _layoutView)
         _handler = Handler(layoutView.context.mainLooper)
@@ -103,15 +101,19 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
         api.settings = settings.settings
 
         settings.settingsChanged.on(this::onSettingsChanged)
-        val isVertical = Environment.getLayoutEngineFactory(api.settings.display.layoutMode).vertical
+        val isVertical =
+            Environment.getLayoutEngineFactory(api.settings.display.layoutMode).vertical
         _layoutView.layoutManager = AlphaTabLayoutManager(_layoutView.context).apply {
             this.updateOrientation(isVertical)
         }
+        _renderResultAdapter = AlphaTabRenderResultAdapter(api.renderer)
+        _layoutView.adapter = _renderResultAdapter
     }
 
     private fun onSettingsChanged() {
         api.settings = settingsContainer.settings
-        val isVertical = Environment.getLayoutEngineFactory(api.settings.display.layoutMode).vertical
+        val isVertical =
+            Environment.getLayoutEngineFactory(api.settings.display.layoutMode).vertical
         (_layoutView.layoutManager as AlphaTabLayoutManager).updateOrientation(isVertical)
         api.updateSettings()
         api.render()
@@ -193,6 +195,12 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
             else {
                 _renderResultAdapter.addResult(renderResults)
             }
+        }
+    }
+
+    override fun beginUpdateRenderResults(renderResults: RenderFinishedEventArgs) {
+        _handler.post {
+            _renderResultAdapter.updateResult(renderResults)
         }
     }
 

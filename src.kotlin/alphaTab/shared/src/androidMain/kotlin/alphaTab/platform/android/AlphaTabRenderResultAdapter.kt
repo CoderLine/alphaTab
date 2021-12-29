@@ -1,6 +1,7 @@
 package alphaTab.platform.android
 
-import alphaTab.Environment
+import alphaTab.collections.ObjectDoubleMap
+import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
 import android.content.Context
 import android.graphics.*
@@ -16,11 +17,11 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
-class RenderResultDrawable : Drawable() {
+class RenderResultDrawable(private val _requestRender: ((resultId: String) -> Unit)) : Drawable() {
     private val _alpha: Int = 255
 
-    private var _encoded: ByteArray? = null
-    private var _decodedBitmap: Bitmap? = null
+    private var _currentResult: RenderFinishedEventArgs? = null
+    private var _bitmap: Bitmap? = null
 
     private val _paint: Paint = Paint(Paint.FILTER_BITMAP_FLAG or Paint.DITHER_FLAG)
     private val _dstRect: Rect = Rect()
@@ -31,15 +32,12 @@ class RenderResultDrawable : Drawable() {
 
     public fun updateImage(result: RenderFinishedEventArgs) {
         val renderResult = result.renderResult
-        if (renderResult is ByteArray) {
-            _encoded = renderResult
-            _bitmapWidth = (result.width * Environment.HighDpiFactor).toInt()
-            _bitmapHeight = (result.height * Environment.HighDpiFactor).toInt()
-            resetDecoded()
-        } else if (renderResult is Bitmap) {
-            _encoded = null
-            _decodedBitmap = renderResult
+        if (renderResult is Bitmap) {
+            _bitmap = renderResult
+        } else {
+            _bitmap = null
         }
+        _currentResult = result
         _dstRectAndInsetsDirty = true
         invalidateSelf()
     }
@@ -89,40 +87,37 @@ class RenderResultDrawable : Drawable() {
         val changed = isVisible != visible
         if (changed) {
             if (visible) {
-                ensureDecoded()
+                requestRender()
             } else {
-                resetDecoded()
+                resetBitmap()
             }
         }
         return super.setVisible(visible, restart)
     }
 
-    private fun ensureDecoded(): Bitmap? {
-        var decoded = _decodedBitmap
-        val encoded = _encoded
-        if ((decoded == null || decoded.isRecycled) && encoded != null) {
-            // TODO: try to decode in background and initiate redraw when loaded.
-            decoded = BitmapFactory.decodeByteArray(encoded, 0, encoded.size)
-            _decodedBitmap = decoded
-            Log.i("AlphaTab", "Decoded image image")
+    private fun requestRender() {
+        val decoded = _bitmap
+        val result = _currentResult
+        if (decoded == null && result != null) {
+            _requestRender(result.id)
         }
-        return decoded
     }
 
-    private fun resetDecoded() {
-        val decoded = _decodedBitmap
-        if(decoded != null){
+    private fun resetBitmap() {
+        val decoded = _bitmap
+        if (decoded != null) {
             decoded.recycle()
-            _decodedBitmap = null
+            _bitmap = null
             Log.i("AlphaTab", "Recycled decoded image")
         }
     }
 
     override fun draw(canvas: Canvas) {
-        val decoded = ensureDecoded()
+        requestRender()
         updateDstRectIfDirty()
-        if (decoded != null) {
-            canvas.drawBitmap(_decodedBitmap!!, null, _dstRect, _paint)
+        val bitmap = _bitmap
+        if (bitmap != null) {
+            canvas.drawBitmap(bitmap, null, _dstRect, _paint)
         }
     }
 }
@@ -132,7 +127,7 @@ class RenderResultDrawable : Drawable() {
 class AlphaTabRenderResultViewHolder :
     RecyclerView.ViewHolder {
 
-    constructor(context: Context) : super(ImageView(context)) {
+    constructor(context: Context, renderer: IScoreRenderer) : super(ImageView(context)) {
         val imageView = itemView as ImageView
         imageView.layoutParams = FlexboxLayoutManager.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -141,7 +136,9 @@ class AlphaTabRenderResultViewHolder :
             this.flexGrow = 0f
             this.flexShrink = 0f
         }
-        imageView.setImageDrawable(RenderResultDrawable())
+        imageView.setImageDrawable(RenderResultDrawable {
+            renderer.renderResult(it)
+        })
     }
 
     fun bindTo(result: RenderFinishedEventArgs) {
@@ -156,18 +153,21 @@ class AlphaTabRenderResultViewHolder :
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
-class AlphaTabRenderResultAdapter : RecyclerView.Adapter<AlphaTabRenderResultViewHolder>() {
+class AlphaTabRenderResultAdapter(private val _renderer: IScoreRenderer) :
+    RecyclerView.Adapter<AlphaTabRenderResultViewHolder>() {
     private class Counter {
         public var count: Int = 0
     }
 
     private val _images: ArrayList<RenderFinishedEventArgs> = arrayListOf()
     private var _totalResultCount: ConcurrentLinkedQueue<Counter> = ConcurrentLinkedQueue()
+    private val _resultIdToIndex: ObjectDoubleMap<String> = ObjectDoubleMap()
     private var _totalWidth: Int = 0
     private var _totalHeight: Int = 0
 
     public fun reset() {
         _totalResultCount.add(Counter())
+        _resultIdToIndex.clear()
     }
 
     fun finish() {
@@ -188,12 +188,22 @@ class AlphaTabRenderResultAdapter : RecyclerView.Adapter<AlphaTabRenderResultVie
         if (counter != null) {
             if (counter.count < _images.size) {
                 _images[counter.count] = result
+                _resultIdToIndex.set(result.id, counter.count.toDouble())
                 notifyItemChanged(counter.count)
             } else {
                 _images.add(result)
+                _resultIdToIndex.set(result.id, (_images.size - 1).toDouble())
                 notifyItemInserted(_images.size - 1)
             }
             counter.count++
+        }
+    }
+
+    fun updateResult(result: RenderFinishedEventArgs) {
+        if (_resultIdToIndex.has(result.id)) {
+            val index = _resultIdToIndex.get(result.id);
+            _images[index.toInt()] = result
+            notifyItemChanged(index.toInt())
         }
     }
 
@@ -202,7 +212,7 @@ class AlphaTabRenderResultAdapter : RecyclerView.Adapter<AlphaTabRenderResultVie
         viewType: Int
     ): AlphaTabRenderResultViewHolder {
 
-        return AlphaTabRenderResultViewHolder(parent.context)
+        return AlphaTabRenderResultViewHolder(parent.context, _renderer)
     }
 
     override fun onBindViewHolder(holder: AlphaTabRenderResultViewHolder, position: Int) {

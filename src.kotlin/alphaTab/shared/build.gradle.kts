@@ -47,7 +47,7 @@ kotlin {
             kotlin.srcDirs("src/jvmCommonMain/kotlin")
             dependencies {
                 // TODO: check with Skija devs to have a platform independent lib
-                implementation("org.jetbrains.skija:skija-windows:0.93.4")
+                implementation("org.jetbrains.skija:skija-shared:0.93.6")
             }
             resources.srcDirs("../../../font/").apply {
                 this.filter.include("**/*.ttf")
