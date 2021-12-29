@@ -50,10 +50,8 @@ export abstract class ScoreLayout {
         this.renderer = renderer;
     }
 
-    public abstract get padding(): number[];
     public abstract get firstBarX(): number;
     public abstract get supportsResize(): boolean;
-    public abstract get padding(): number[] | null;
 
     public resize(): void {
         this._lazyPartials.clear();

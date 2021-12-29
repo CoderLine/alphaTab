@@ -25,20 +25,12 @@ export class HorizontalScreenLayout extends ScoreLayout {
         return 'HorizontalScreen';
     }
 
-    public override get padding(): number[] | null {
-        return this._pagePadding;
-    }
-
     public constructor(renderer: ScoreRenderer) {
         super(renderer);
     }
 
     public get supportsResize(): boolean {
         return false;
-    }
-
-    public get padding(): number[] {
-        return this._pagePadding!;
     }
 
     public get firstBarX(): number{

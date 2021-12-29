@@ -24,10 +24,6 @@ export class PageViewLayout extends ScoreLayout {
         return 'PageView';
     }
 
-    public override get padding(): number[] | null {
-        return this._pagePadding;
-    }
-
     public constructor(renderer: ScoreRenderer) {
         super(renderer);
     }
@@ -75,10 +71,6 @@ export class PageViewLayout extends ScoreLayout {
 
     public get supportsResize(): boolean {
         return true;
-    }
-
-    public get padding(): number[] {
-        return this._pagePadding!;
     }
 
     public get firstBarX(): number {
