@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace AlphaTab.Core
+namespace AlphaTab.Collections
 {
     public interface IMap
     {

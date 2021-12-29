@@ -33,7 +33,7 @@ namespace AlphaTab.Core
 
         public static IList<T> Slice<T>(this IList<T> data)
         {
-            return new AlphaTab.Core.List<T>(data);
+            return new AlphaTab.Collections.List<T>(data);
         }
 
         public static void Reverse<T>(this IList<T> data)
@@ -251,9 +251,9 @@ namespace AlphaTab.Core
             return new List<string>(s.Split(new[] {separator}, StringSplitOptions.None));
         }
 
-        public static MapEntry<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
+        public static KeyValuePair<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
         {
-            return new MapEntry<double, TValue>(key, value);
+            return new KeyValuePair<double, TValue>(key, value);
         }
 
         public static KeyValuePair<TKey, double> CreateMapEntry<TKey>(TKey key, int value)

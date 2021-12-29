@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AlphaTab.Core
+namespace AlphaTab.Collections
 {
     public struct MapEntry<TKey, TValue>
     {

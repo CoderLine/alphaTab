@@ -479,7 +479,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                         this.write('System.Collections.IList');
                     } else {
                         if (forNew) {
-                            this.write('AlphaTab.Core.List<');
+                            this.write('AlphaTab.Collections.List<');
                         } else {
                             this.write('System.Collections.Generic.IList<');
                         }
@@ -493,15 +493,15 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 const mapType = type as cs.MapTypeNode;
                 if (!mapType.valueIsValueType) {
                     if (forNew) {
-                        this.write('AlphaTab.Core.Map<');
+                        this.write('AlphaTab.Collections.Map<');
                     } else {
-                        this.write('AlphaTab.Core.IMap<');
+                        this.write('AlphaTab.Collections.IMap<');
                     }
                 } else {
                     if (forNew) {
-                        this.write('AlphaTab.Core.ValueTypeMap<');
+                        this.write('AlphaTab.Collections.ValueTypeMap<');
                     } else {
-                        this.write('AlphaTab.Core.IValueTypeMap<');
+                        this.write('AlphaTab.Collections.IValueTypeMap<');
                     }
                 }
                 this.writeType(mapType.keyType);

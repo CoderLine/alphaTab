@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AlphaTab.Core
+namespace AlphaTab.Collections
 {
     internal class List<T> : System.Collections.Generic.List<T>
     {

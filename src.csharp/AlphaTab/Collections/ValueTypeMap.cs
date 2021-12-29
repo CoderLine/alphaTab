@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace AlphaTab.Core
+namespace AlphaTab.Collections
 {
     public interface IValueTypeMap<TKey, TValue> : IEnumerable<MapEntry<TKey, TValue>>
         where TValue : struct

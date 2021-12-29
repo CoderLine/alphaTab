@@ -167,7 +167,7 @@ class VisualTestHelperPartials {
                 }
             }
 
-            if (waitHandle.tryAcquire(2000, TimeUnit.MILLISECONDS)) {
+            if (waitHandle.tryAcquire(100000, TimeUnit.MILLISECONDS)) {
                 if (error != null) {
                     Assert.fail("Rendering failed with error $error ${error?.stackTraceToString()}")
                 } else {

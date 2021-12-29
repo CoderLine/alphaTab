@@ -771,7 +771,12 @@ export default class CSharpEmitterContext {
 
     protected buildCoreNamespace(aliasSymbol: ts.Symbol) {
         let suffix = '';
-        if (aliasSymbol.name !== 'Map' && aliasSymbol.declarations) {
+        
+        if(aliasSymbol.name === 'Map') {
+            return this.toPascalCase('alphaTab.collections') + suffix + '.';           
+        }
+
+        if (aliasSymbol.declarations) {
             for (const decl of aliasSymbol.declarations) {
                 let fileName = path.basename(decl.getSourceFile().fileName).toLowerCase();
                 if (fileName.startsWith('lib.') && fileName.endsWith('.d.ts')) {
