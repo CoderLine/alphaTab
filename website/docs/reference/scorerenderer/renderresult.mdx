@@ -1,0 +1,33 @@
+---
+title: renderResult
+jQuery: false
+dom: false
+category: Methods
+description: Requests the rendering of a chunk which was layed out before.
+sidebarPath: /docs/reference/scorerenderer
+since: 1.3.0-alpha.139
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+
+## Description
+This method initiates the rendering of a layed out chunk advertised through [`partialLayoutFinished`](/docs/reference/scorerenderer/partiallayoutfinished). 
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="js" name="function renderResult(resultId)" />
+    <TypeRow type="net" name="void RenderResult(string resultId)" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="resultId" type="string">
+        The ID of the result to be rendered.
+    </ParameterRow>
+</ParameterTable>
+
+
+### Returns
+Nothing. The render result is computed asynchronously and can be obtained via events like `partialRenderFinished`.

@@ -93,6 +93,12 @@ let svgChunks = [];
 renderer.preRender.on(isResize => {
     svgChunks = []; // clear on new rendering
 });
+// since 1.3.0-alpha.139 we need to request
+// rendering of each chunk layed out. 
+// you can defer rendering based on your needs. 
+renderer.partialLayoutFinished.on(r => {
+    renderer.renderResult(r.id);
+});
 renderer.partialRenderFinished.on(r => {
     svgChunks.push({
         svg: r.renderResult, // svg string
@@ -127,6 +133,12 @@ renderer.Width = 1200;
 var svgChunks = new List<(string svg, double width, double height)>();
 renderer.PreRender.On(isResize => {
     svgChunks.Clear(); // clear on new rendering
+});
+// since 1.3.0-alpha.139 we need to request
+// rendering of each chunk layed out. 
+// you can defer rendering based on your needs. 
+renderer.PartialLayoutFinished.On(r => {
+    renderer.RenderResult(r.Id);
 });
 renderer.PartialRenderFinished.On(r => {
     svgChunks.Add((

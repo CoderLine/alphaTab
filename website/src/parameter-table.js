@@ -24,7 +24,7 @@ export function ParameterRow({ children, type, platform, name }) {
       <td>
         {Array.isArray(children)
           ? children.map((c) => renderChild(c))
-          : children}
+          : renderChild(children)}
       </td>
     </tr>
   );

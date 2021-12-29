@@ -1,0 +1,45 @@
+---
+title: partialLayoutFinished
+jQuery: false
+dom: false
+category: Events
+description: Occurs whenever a part of the whole music sheet is layed out.
+sidebarPath: /docs/reference/scorerenderer
+since: 1.3.0-alpha.139
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import {RenderFinishedEventArgs} from '../../../src/types/renderfinishedeventargs';
+
+## Description
+AlphaTab does not render the whole music sheet into a single canvas but rather
+splits it down into smaller chunks. This allows faster display of results to the user
+and avoids issues related to browser restrictions (like maximum canvas sizes).
+
+This even is fired whenever one chunk of the music sheet was fully layed out. 
+
+<EventDescription metadata={metadata} />
+    
+## Types
+
+<TypeTable>
+    <TypeRow type="js" name="function(e)" />    
+    <TypeRow type="net" name="Action<AlphaTab.Rendering.RenderFinishedEventArgs>" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="all" name="e" type="alphaTab.rendering.RenderFinishedEventArgs">
+        The object containing the information about the chunk. 
+    </ParameterRow>
+    <ParameterRow platform="all" name="e" type="AlphaTab.Rendering.RenderFinishedEventArgs">
+        The object containing the information about the chunk.
+    </ParameterRow>
+</ParameterTable>
+
+## AlphaTab.Rendering.RenderFinishedEventArgs Properties
+
+<RenderFinishedEventArgs />
