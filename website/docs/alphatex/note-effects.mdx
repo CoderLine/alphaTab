@@ -65,6 +65,14 @@ x.3{psu} 3.3 |
 3.3{g}
 `}</AlphaTexSample>
 
+### Dead Notes
+
+Dead Notes are notated by using `x` as fret. 
+
+<AlphaTexSample>{`
+3.3{x} x.3
+`}</AlphaTexSample>
+
 ### Accentuations
 
 normal `ac` and heavy `hac`
@@ -124,15 +132,6 @@ For stringed instruments the fret simply can be set to `-` and the note will be 
 `}</AlphaTexSample>
 
 For non stringed instrument it can be a bit more tricky as we cannot use the string to identify which note to tie. There are multiple ways to work around this problem. AlphaTab will try to find the start note for the tie via several rules, if this does not match the desired behavior, you can specify the note value as alternative and indicate the tie via a note effect.
-
-# Dead Notes
-
-Dead Notes are notated by using `x` as fret. 
-
-<AlphaTexSample>{`
-3.3{x} x.3
-`}</AlphaTexSample>
-
 
 <AlphaTexSample>{`
 \\tuning piano
