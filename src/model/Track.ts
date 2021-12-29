@@ -11,6 +11,7 @@ import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
  * This public class describes a single track or instrument of score.
  * It is bascially a list of staffs containing individual music notation kinds.
  * @json
+ * @json_strict
  */
 export class Track {
     private static readonly ShortNameMaxLength: number = 10;
@@ -70,7 +71,7 @@ export class Track {
         this.staves.push(staff);
     }
 
-    public finish(settings: Settings): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
         if (!this.shortName) {
             this.shortName = this.name;
             if (this.shortName.length > Track.ShortNameMaxLength) {
@@ -78,7 +79,7 @@ export class Track {
             }
         }
         for (let i: number = 0, j: number = this.staves.length; i < j; i++) {
-            this.staves[i].finish(settings);
+            this.staves[i].finish(settings, sharedDataBag);
         }
     }
 

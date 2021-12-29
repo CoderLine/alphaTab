@@ -8,6 +8,7 @@ import { GraceGroup } from '@src/model/GraceGroup';
  * A voice represents a group of beats
  * that can be played during a bar.
  * @json
+ * @json_strict
  */
 export class Voice {
     private _beatLookup!: Map<number, Beat>;
@@ -62,7 +63,7 @@ export class Voice {
         }
     }
 
-    private chain(beat: Beat): void {
+    private chain(beat: Beat, sharedDataBag: Map<string, unknown>): void {
         if (!this.bar) {
             return;
         }
@@ -79,7 +80,7 @@ export class Voice {
             }
         }
 
-        beat.chain();
+        beat.chain(sharedDataBag);
     }
 
     public addGraceBeat(beat: Beat): void {
@@ -104,13 +105,13 @@ export class Voice {
         return null;
     }
 
-    public finish(settings: Settings): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
         this._beatLookup = new Map<number, Beat>();
         let currentGraceGroup: GraceGroup | null = null;
         for (let index: number = 0; index < this.beats.length; index++) {
             let beat: Beat = this.beats[index];
             beat.index = index;
-            this.chain(beat);
+            this.chain(beat, sharedDataBag);
             if (beat.graceType === GraceType.None) {
                 beat.graceGroup = currentGraceGroup;
                 if (currentGraceGroup) {
@@ -130,7 +131,7 @@ export class Voice {
         for (let i: number = 0; i < this.beats.length; i++) {
             let beat: Beat = this.beats[i];
             beat.index = i;
-            beat.finish(settings);
+            beat.finish(settings, sharedDataBag);
 
             // if this beat is a non-grace but has grace notes
             // we need to first steal the duration from the right beat

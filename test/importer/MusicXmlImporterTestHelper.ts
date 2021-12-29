@@ -224,7 +224,11 @@ export class MusicXmlImporterTestHelper {
         }
     }
 
-    protected expectBendPointsEqual(expected: BendPoint[], actual: BendPoint[]): void {
+    protected expectBendPointsEqual(expected: BendPoint[] | null, actual: BendPoint[] | null): void {
+        if(expected == null || actual == null) {
+            expect(actual).toEqual(expected)
+            return;
+        }
         expect(actual.length).toEqual(expected.length, 'Mismatch on Count');
         for (let i: number = 0; i < expected.length; i++) {
             expect(actual[i].value).toEqual(actual[i].value);

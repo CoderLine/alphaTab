@@ -40,7 +40,7 @@ export class ComparisonHelpers {
                             result = false;
                         } else {
                             for (let i = 0; i < actual.length; i++) {
-                                if(!ComparisonHelpers.expectJsonEqual(expected[i], actual[i], `${path}[${i}]`, ignoreKeys)) {
+                                if (!ComparisonHelpers.expectJsonEqual(expected[i], actual[i], `${path}[${i}]`, ignoreKeys)) {
                                     result = false;
                                 }
                             }
@@ -53,8 +53,19 @@ export class ComparisonHelpers {
                             const expectedMap = expected as Map<string, unknown>;
                             const actualMap = actual as Map<string, unknown>;
 
-                            const expectedKeys = Array.from(expectedMap.keys());
-                            const actualKeys = Array.from(actualMap.keys());
+
+                            const ignoredKeys: Set<string> = new Set<string>([
+                                'id',
+                                'hammerpulloriginnoteid',
+                                'hammerpulldestinationnoteid',
+                                'tieoriginnoteid',
+                                'tiedestinationnoteid',
+                                'sluroriginnoteid',
+                                'slurdestinationnoteid',
+                                ...(ignoreKeys ?? [])
+                            ]);
+                            const expectedKeys = Array.from(expectedMap.keys()).filter(k => !ignoredKeys.has(k));
+                            const actualKeys = Array.from(actualMap.keys()).filter(k => !ignoredKeys.has(k));
                             expectedKeys.sort();
                             actualKeys.sort();
 
@@ -65,21 +76,8 @@ export class ComparisonHelpers {
                                 result = false;
                             } else {
                                 for (const key of actualKeys) {
-                                    switch (key) {
-                                        // some ignored keys
-                                        case 'id':
-                                        case 'hammerPullOriginNoteId':
-                                        case 'hammerPullDestinationNoteId':
-                                        case 'tieOriginNoteId':
-                                        case 'tieDestinationNoteId':
-                                            break;
-                                        default:
-                                            if (!ignoreKeys || ignoreKeys.indexOf(key) === -1) {
-                                                if(!ComparisonHelpers.expectJsonEqual(expectedMap.get(key), actualMap.get(key), `${path}.${key}`, ignoreKeys)) {
-                                                    result = false;
-                                                }
-                                            }
-                                            break;
+                                    if (!ComparisonHelpers.expectJsonEqual(expectedMap.get(key), actualMap.get(key), `${path}.${key}`, ignoreKeys)) {
+                                        result = false;
                                     }
                                 }
 

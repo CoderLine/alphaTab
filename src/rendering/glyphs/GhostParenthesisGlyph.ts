@@ -11,12 +11,12 @@ export class GhostParenthesisGlyph extends Glyph {
         this._isOpen = isOpen;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this.width = GhostParenthesisGlyph.Size * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this._isOpen) {
             TieGlyph.paintTie(
                 canvas,

@@ -12,21 +12,21 @@ export class InstrumentArticulationSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: InstrumentArticulation | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("elementType", obj.elementType); 
-        o.set("staffLine", obj.staffLine); 
-        o.set("noteHeadDefault", obj.noteHeadDefault as number); 
-        o.set("noteHeadHalf", obj.noteHeadHalf as number); 
-        o.set("noteHeadWhole", obj.noteHeadWhole as number); 
-        o.set("techniqueSymbol", obj.techniqueSymbol as number); 
-        o.set("techniqueSymbolPlacement", obj.techniqueSymbolPlacement as number); 
-        o.set("outputMidiNumber", obj.outputMidiNumber); 
+        o.set("elementtype", obj.elementType); 
+        o.set("staffline", obj.staffLine); 
+        o.set("noteheaddefault", obj.noteHeadDefault as number); 
+        o.set("noteheadhalf", obj.noteHeadHalf as number); 
+        o.set("noteheadwhole", obj.noteHeadWhole as number); 
+        o.set("techniquesymbol", obj.techniqueSymbol as number); 
+        o.set("techniquesymbolplacement", obj.techniqueSymbolPlacement as number); 
+        o.set("outputmidinumber", obj.outputMidiNumber); 
         return o; 
     }
     public static setProperty(obj: InstrumentArticulation, property: string, v: unknown): boolean {

@@ -80,7 +80,7 @@ export class AlphaTabWebWorker {
                 break;
             case 'alphaTab.renderScore':
                 this.updateFontSizes(data.fontSizes);
-                let score: any = JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
+                let score: any = data.score == null ? null : JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
                 this.renderMultiple(score, data.trackIndexes);
                 break;
             case 'alphaTab.updateSettings':
@@ -104,7 +104,7 @@ export class AlphaTabWebWorker {
         SettingsSerializer.fromJson(this._renderer.settings, json);
     }
 
-    private renderMultiple(score: Score, trackIndexes: number[]): void {
+    private renderMultiple(score: Score | null, trackIndexes: number[] | null): void {
         try {
             this._renderer.renderScore(score, trackIndexes);
         } catch (e) {

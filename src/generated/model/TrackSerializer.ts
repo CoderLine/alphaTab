@@ -16,7 +16,7 @@ export class TrackSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Track | null): Map<string, unknown> | null {
         if (!obj) {
@@ -24,20 +24,20 @@ export class TrackSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("staves", obj.staves.map(i => StaffSerializer.toJson(i))); 
-        o.set("playbackInfo", PlaybackInformationSerializer.toJson(obj.playbackInfo)); 
+        o.set("playbackinfo", PlaybackInformationSerializer.toJson(obj.playbackInfo)); 
         o.set("color", Color.toJson(obj.color)); 
         o.set("name", obj.name); 
-        o.set("shortName", obj.shortName); 
-        o.set("percussionArticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i))); 
+        o.set("shortname", obj.shortName); 
+        o.set("percussionarticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i))); 
         return o; 
     }
     public static setProperty(obj: Track, property: string, v: unknown): boolean {
         switch (property) {
             case "staves":
                 obj.staves = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Staff();
-                    StaffSerializer.fromJson(i, o)
+                    StaffSerializer.fromJson(i, o);
                     obj.addStaff(i);
                 }
                 return true;
@@ -52,9 +52,9 @@ export class TrackSerializer {
                 return true;
             case "percussionarticulations":
                 obj.percussionArticulations = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new InstrumentArticulation();
-                    InstrumentArticulationSerializer.fromJson(i, o)
+                    InstrumentArticulationSerializer.fromJson(i, o);
                     obj.percussionArticulations.push(i);
                 }
                 return true;

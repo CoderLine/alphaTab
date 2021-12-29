@@ -33,7 +33,14 @@ export interface IScoreRenderer {
      * @param score The score defining the tracks.
      * @param trackIndexes The indexes of the tracks to draw.
      */
-    renderScore(score: Score, trackIndexes: number[]): void;
+    renderScore(score: Score | null, trackIndexes: number[] | null): void;
+
+    /**
+     * Initiates the rendering of a partial render result which the renderer
+     * should have layed out already.
+     * @param resultId the result ID as provided by the {@link partialLayoutFinished} event.
+     */
+    renderResult(resultId: string): void;
 
     /**
      * Initiates the rendering of a partial render result which the renderer

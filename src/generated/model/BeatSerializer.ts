@@ -28,7 +28,7 @@ export class BeatSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Beat | null): Map<string, unknown> | null {
         if (!obj) {
@@ -37,41 +37,43 @@ export class BeatSerializer {
         const o = new Map<string, unknown>(); 
         o.set("id", obj.id); 
         o.set("notes", obj.notes.map(i => NoteSerializer.toJson(i))); 
-        o.set("isEmpty", obj.isEmpty); 
-        o.set("whammyStyle", obj.whammyStyle as number); 
+        o.set("isempty", obj.isEmpty); 
+        o.set("whammystyle", obj.whammyStyle as number); 
         o.set("ottava", obj.ottava as number); 
-        o.set("isLegatoOrigin", obj.isLegatoOrigin); 
+        o.set("islegatoorigin", obj.isLegatoOrigin); 
         o.set("duration", obj.duration as number); 
         o.set("automations", obj.automations.map(i => AutomationSerializer.toJson(i))); 
         o.set("dots", obj.dots); 
-        o.set("fadeIn", obj.fadeIn); 
+        o.set("fadein", obj.fadeIn); 
         o.set("lyrics", obj.lyrics); 
-        o.set("hasRasgueado", obj.hasRasgueado); 
+        o.set("hasrasgueado", obj.hasRasgueado); 
         o.set("pop", obj.pop); 
         o.set("slap", obj.slap); 
         o.set("tap", obj.tap); 
         o.set("text", obj.text); 
-        o.set("brushType", obj.brushType as number); 
-        o.set("brushDuration", obj.brushDuration); 
-        o.set("tupletDenominator", obj.tupletDenominator); 
-        o.set("tupletNumerator", obj.tupletNumerator); 
-        o.set("isContinuedWhammy", obj.isContinuedWhammy); 
-        o.set("whammyBarType", obj.whammyBarType as number); 
-        o.set("whammyBarPoints", obj.whammyBarPoints.map(i => BendPointSerializer.toJson(i))); 
+        o.set("brushtype", obj.brushType as number); 
+        o.set("brushduration", obj.brushDuration); 
+        o.set("tupletdenominator", obj.tupletDenominator); 
+        o.set("tupletnumerator", obj.tupletNumerator); 
+        o.set("iscontinuedwhammy", obj.isContinuedWhammy); 
+        o.set("whammybartype", obj.whammyBarType as number); 
+        if (obj.whammyBarPoints !== null) {
+            o.set("whammybarpoints", obj.whammyBarPoints?.map(i => BendPointSerializer.toJson(i)));
+        } 
         o.set("vibrato", obj.vibrato as number); 
-        o.set("chordId", obj.chordId); 
-        o.set("graceType", obj.graceType as number); 
-        o.set("pickStroke", obj.pickStroke as number); 
-        o.set("tremoloSpeed", obj.tremoloSpeed as number | null); 
+        o.set("chordid", obj.chordId); 
+        o.set("gracetype", obj.graceType as number); 
+        o.set("pickstroke", obj.pickStroke as number); 
+        o.set("tremolospeed", obj.tremoloSpeed as number | null); 
         o.set("crescendo", obj.crescendo as number); 
-        o.set("displayStart", obj.displayStart); 
-        o.set("playbackStart", obj.playbackStart); 
-        o.set("displayDuration", obj.displayDuration); 
-        o.set("playbackDuration", obj.playbackDuration); 
+        o.set("displaystart", obj.displayStart); 
+        o.set("playbackstart", obj.playbackStart); 
+        o.set("displayduration", obj.displayDuration); 
+        o.set("playbackduration", obj.playbackDuration); 
         o.set("dynamics", obj.dynamics as number); 
-        o.set("invertBeamDirection", obj.invertBeamDirection); 
-        o.set("preferredBeamDirection", obj.preferredBeamDirection as number | null); 
-        o.set("beamingMode", obj.beamingMode as number); 
+        o.set("invertbeamdirection", obj.invertBeamDirection); 
+        o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null); 
+        o.set("beamingmode", obj.beamingMode as number); 
         return o; 
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
@@ -81,9 +83,9 @@ export class BeatSerializer {
                 return true;
             case "notes":
                 obj.notes = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Note();
-                    NoteSerializer.fromJson(i, o)
+                    NoteSerializer.fromJson(i, o);
                     obj.addNote(i);
                 }
                 return true;
@@ -104,9 +106,9 @@ export class BeatSerializer {
                 return true;
             case "automations":
                 obj.automations = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Automation();
-                    AutomationSerializer.fromJson(i, o)
+                    AutomationSerializer.fromJson(i, o);
                     obj.automations.push(i);
                 }
                 return true;
@@ -153,11 +155,13 @@ export class BeatSerializer {
                 obj.whammyBarType = JsonHelper.parseEnum<WhammyType>(v, WhammyType)!;
                 return true;
             case "whammybarpoints":
-                obj.whammyBarPoints = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
-                    const i = new BendPoint();
-                    BendPointSerializer.fromJson(i, o)
-                    obj.addWhammyBarPoint(i);
+                if (v) {
+                    obj.whammyBarPoints = [];
+                    for (const o of (v as (Map<string, unknown> | null)[])) {
+                        const i = new BendPoint();
+                        BendPointSerializer.fromJson(i, o);
+                        obj.addWhammyBarPoint(i);
+                    }
                 }
                 return true;
             case "vibrato":

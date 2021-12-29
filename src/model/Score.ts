@@ -3,16 +3,15 @@ import { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { RepeatGroup } from '@src/model/RepeatGroup';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
-import { Note } from '@src/model/Note';
 
 /**
  * The score is the root node of the complete
  * model. It stores the basic information of
  * a song and stores the sub components.
  * @json
+ * @json_strict
  */
 export class Score {
-    private _noteByIdLookup: Map<number, Note> = new Map<number, Note>();
     private _currentRepeatGroup: RepeatGroup = new RepeatGroup();
 
     /**
@@ -130,20 +129,9 @@ export class Score {
     }
 
     public finish(settings: Settings): void {
-        this._noteByIdLookup.clear();
-
+        const sharedDataBag = new Map<string, unknown>()
         for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
-            this.tracks[i].finish(settings);
+            this.tracks[i].finish(settings, sharedDataBag);
         }
-    }
-
-    public registerNote(note: Note) {
-        this._noteByIdLookup.set(note.id, note);
-    }
-
-    public getNoteById(noteId: number): Note | null {
-        return this._noteByIdLookup.has(noteId)
-            ? this._noteByIdLookup.get(noteId)!
-            : null;
     }
 }

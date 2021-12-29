@@ -16,7 +16,7 @@ export class GlyphGroup extends Glyph {
         super(x, y);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         if (!this.glyphs || this.glyphs.length === 0) {
             this.width = 0;
             return;
@@ -41,7 +41,7 @@ export class GlyphGroup extends Glyph {
         this.glyphs.push(g);
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let glyphs = this.glyphs;
         if (!glyphs || glyphs.length === 0) {
             return;

@@ -77,7 +77,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         this.isEmpty = false;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let x: number = 0;
         if (this._showParenthesis) {
             this._preNoteParenthesis!.x = x;
@@ -103,7 +103,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // canvas.Color = Color.Random();
         // canvas.FillRect(cx + X, cy + Y, Width, 10);
         // canvas.Color = Renderer.Resources.MainGlyphColor;

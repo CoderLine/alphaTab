@@ -88,7 +88,7 @@ export class AlphaSynthWebWorklet {
                     }
                 }
 
-                public process(
+                public override process(
                     _inputs: Float32Array[][],
                     outputs: Float32Array[][],
                     _parameters: Record<string, Float32Array>
@@ -158,12 +158,12 @@ export class AlphaSynthWebWorklet {
 export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     private _worklet: AudioWorkletNode | null = null;
 
-    public open() {
+    public override open() {
         super.open();
         this.onReady();
     }
 
-    public play(): void {
+    public override play(): void {
         super.play();
         let ctx = this._context!;
         // create a script processor node which will replace the silence with the generated audio
@@ -198,7 +198,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
         }
     }
 
-    public pause(): void {
+    public override pause(): void {
         super.pause();
         if (this._worklet) {
             this._worklet.port.onmessage = null;

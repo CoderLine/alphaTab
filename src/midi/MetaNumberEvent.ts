@@ -10,7 +10,7 @@ export class MetaNumberEvent extends MetaEvent {
         this.value = value;
     }
 
-    public writeTo(s: IWriteable): void {
+    public override writeTo(s: IWriteable): void {
         s.writeByte(0xff);
         s.writeByte(this.metaStatus as number);
         MidiFile.writeVariableInt(s, 3);

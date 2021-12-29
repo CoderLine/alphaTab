@@ -26,7 +26,7 @@ export class TabBarRendererFactory extends BarRendererFactory {
         this.hideOnPercussionTrack = true;
     }
 
-    public canCreate(track: Track, staff: Staff): boolean {
+    public override canCreate(track: Track, staff: Staff): boolean {
         return staff.tuning.length > 0 && super.canCreate(track, staff);
     }
 

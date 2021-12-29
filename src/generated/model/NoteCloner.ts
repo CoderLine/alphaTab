@@ -13,9 +13,11 @@ export class NoteCloner {
         clone.bendType = original.bendType; 
         clone.bendStyle = original.bendStyle; 
         clone.isContinuedBend = original.isContinuedBend; 
-        clone.bendPoints = []; 
-        for (const i of original.bendPoints) {
-            clone.addBendPoint(BendPointCloner.clone(i));
+        if (original.bendPoints) {
+            clone.bendPoints = [];
+            for (const i of original.bendPoints!) {
+                clone.addBendPoint(BendPointCloner.clone(i));
+            }
         } 
         clone.fret = original.fret; 
         clone.string = original.string; 
@@ -25,11 +27,7 @@ export class NoteCloner {
         clone.isVisible = original.isVisible; 
         clone.isLeftHandTapped = original.isLeftHandTapped; 
         clone.isHammerPullOrigin = original.isHammerPullOrigin; 
-        clone.hammerPullOriginNoteId = original.hammerPullOriginNoteId; 
-        clone.hammerPullDestinationNoteId = original.hammerPullDestinationNoteId; 
         clone.isSlurDestination = original.isSlurDestination; 
-        clone.slurOriginNoteId = original.slurOriginNoteId; 
-        clone.slurDestinationNoteId = original.slurDestinationNoteId; 
         clone.harmonicType = original.harmonicType; 
         clone.harmonicValue = original.harmonicValue; 
         clone.isGhost = original.isGhost; 
@@ -40,8 +38,6 @@ export class NoteCloner {
         clone.slideInType = original.slideInType; 
         clone.slideOutType = original.slideOutType; 
         clone.vibrato = original.vibrato; 
-        clone.tieOriginNoteId = original.tieOriginNoteId; 
-        clone.tieDestinationNoteId = original.tieDestinationNoteId; 
         clone.isTieDestination = original.isTieDestination; 
         clone.leftHandFinger = original.leftHandFinger; 
         clone.rightHandFinger = original.rightHandFinger; 

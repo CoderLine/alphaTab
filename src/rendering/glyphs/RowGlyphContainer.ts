@@ -12,7 +12,7 @@ export class RowGlyphContainer extends GlyphGroup {
         this._align = align;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let x: number = 0;
         switch (this._align) {
             case TextAlign.Left:

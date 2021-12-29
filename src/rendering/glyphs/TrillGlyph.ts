@@ -8,12 +8,12 @@ export class TrillGlyph extends EffectGlyph {
         super(x, y);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this.height = 20 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let res: RenderingResources = this.renderer.resources;
         canvas.font = res.markerFont;
         let textw: number = canvas.measureText('tr');

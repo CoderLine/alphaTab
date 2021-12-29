@@ -15,7 +15,7 @@ export class ClefGlyph extends MusicFontGlyph {
         this._clefOttava = clefOttava;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         switch (this._clef) {
             case Clef.Neutral:
                 this.width = 15 * this.scale;
@@ -46,7 +46,7 @@ export class ClefGlyph extends MusicFontGlyph {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
         let numberGlyph: Glyph;
         let top: boolean = false;

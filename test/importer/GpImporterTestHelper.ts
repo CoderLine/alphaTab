@@ -160,74 +160,74 @@ export class GpImporterTestHelper {
     }
 
     public static checkBend(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).toEqual(3);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).toEqual(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[1].offset).toEqual(15);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[1].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).toEqual(15);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).toEqual(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[2].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints[2].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![2].offset).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![2].value).toEqual(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints.length).toEqual(7);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).toEqual(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].value).toEqual(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[1].offset).toEqual(10);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[1].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).toEqual(10);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].value).toEqual(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[2].offset).toEqual(20);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[2].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![2].offset).toEqual(20);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![2].value).toEqual(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[3].offset).toEqual(30);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[3].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![3].offset).toEqual(30);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![3].value).toEqual(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[4].offset).toEqual(40);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[4].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![4].offset).toEqual(40);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![4].value).toEqual(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[5].offset).toEqual(50);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[5].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![5].offset).toEqual(50);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![5].value).toEqual(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[6].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints[6].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![6].offset).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![6].value).toEqual(4);
     }
 
     public static checkTremolo(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).toEqual(3);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints[0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints[0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).toEqual(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints[1].offset).toEqual(30);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints[1].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).toEqual(30);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).toEqual(-4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints[2].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints[2].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).toEqual(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).toEqual(3);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints[0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints[0].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).toEqual(-4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints[1].offset).toEqual(45);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints[1].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).toEqual(45);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).toEqual(-4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints[2].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints[2].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![2].offset).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![2].value).toEqual(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).toEqual(3);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints[0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints[0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).toEqual(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints[1].offset).toEqual(45);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints[1].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).toEqual(45);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).toEqual(-4);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints[2].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints[2].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).toEqual(-4);
     }
 
     public static checkSlides(score: Score): void {
@@ -477,7 +477,7 @@ export class GpImporterTestHelper {
     public static checkChords(score: Score): void {
         let track: Track = score.tracks[0];
         let staff: Staff = track.staves[0];
-        expect(staff.chords.size).toEqual(8);
+        expect(staff.chords!.size).toEqual(8);
 
         GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('C', 1, [0, 1, 0, 2, 3, -1]),

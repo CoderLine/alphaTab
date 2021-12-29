@@ -2,6 +2,7 @@
  * This public class is used to describe the beginning of a
  * section within a song. It acts like a marker.
  * @json
+ * @json_strict
  */
 export class Section {
     /**

@@ -20,7 +20,7 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         super(new BrowserUiFacade(element), options);
     }
 
-    public tex(tex: string, tracks?: number[]): void {
+    public override tex(tex: string, tracks?: number[]): void {
         let browser: BrowserUiFacade = this.uiFacade as BrowserUiFacade;
         super.tex(tex, browser.parseTracks(tracks));
     }
@@ -104,17 +104,17 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         document.body.removeChild(dlLink);
     }
 
-    public changeTrackMute(tracks: Track[], mute: boolean): void {
+    public override changeTrackMute(tracks: Track[], mute: boolean): void {
         let trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackMute(trackList, mute);
     }
 
-    public changeTrackSolo(tracks: Track[], solo: boolean): void {
+    public override changeTrackSolo(tracks: Track[], solo: boolean): void {
         let trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackSolo(trackList, solo);
     }
 
-    public changeTrackVolume(tracks: Track[], volume: number): void {
+    public override changeTrackVolume(tracks: Track[], volume: number): void {
         let trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackVolume(trackList, volume);
     }

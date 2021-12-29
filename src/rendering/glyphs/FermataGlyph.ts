@@ -21,12 +21,12 @@ export class FermataGlyph extends MusicFontGlyph {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 23 * this.scale;
         this.height = 12 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx - this.width / 2, cy + this.height, canvas);
     }
 }

@@ -258,12 +258,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         if (d.isAbstract) {
             this.write('abstract ');
         }
-
-        if (d.isVirtual) {
+        else if (d.isVirtual) {
             this.write('virtual ');
         }
-
-        if (d.isOverride) {
+        else if (d.isOverride) {
             this.write('override ');
         }
 
@@ -351,12 +349,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
             if (d.isAbstract) {
                 this.write('abstract ');
             }
-
-            if (d.isVirtual) {
+            else if (d.isVirtual) {
                 this.write('virtual ');
             }
-
-            if (d.isOverride) {
+            else if (d.isOverride) {
                 this.write('override ');
             }
         }
@@ -492,6 +488,18 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                     }
                 }
 
+                break;
+            case cs.SyntaxKind.MapTypeNode:
+                const mapType = type as cs.MapTypeNode;
+                if (forNew) {
+                    this.write('AlphaTab.Core.Map<');
+                } else {
+                    this.write('AlphaTab.Core.IMap<');
+                }
+                this.writeType(mapType.keyType);
+                this.write(', ');
+                this.writeType(mapType.valueType);
+                this.write('>');
                 break;
             case cs.SyntaxKind.FunctionTypeNode:
                 const functionType = type as cs.FunctionTypeNode;
@@ -699,7 +707,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeNonNullExpression(expr: cs.NonNullExpression) {
         this.writeExpression(expr.expression);
-        if(!cs.isNonNullExpression(expr)) {
+        if (!cs.isNonNullExpression(expr)) {
             this.write('!');
         }
     }

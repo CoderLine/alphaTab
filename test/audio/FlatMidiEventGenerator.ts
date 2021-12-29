@@ -101,11 +101,11 @@ export class TempoEvent extends FlatMidiEvent {
         this.tempo = tempo;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `Tempo: ${super.toString()} Tempo[${this.tempo}]`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }
@@ -128,11 +128,11 @@ export class TimeSignatureEvent extends FlatMidiEvent {
         this.denominator = denominator;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `TimeSignature: ${super.toString()} Numerator[${this.numerator}] Denominator[${this.denominator}]`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }
@@ -153,11 +153,11 @@ export class TrackMidiEvent extends FlatMidiEvent {
         this.track = track;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `${super.toString()} Track[${this.track}]`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }
@@ -175,7 +175,7 @@ export class TrackEndEvent extends TrackMidiEvent {
         super(tick, track);
     }
 
-    public toString(): string {
+    public override toString(): string {
         return 'End of Track ' + super.toString();
     }
 }
@@ -188,11 +188,11 @@ export class ChannelMidiEvent extends TrackMidiEvent {
         this.channel = channel;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `${super.toString()} Channel[${this.channel}]`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }
@@ -215,11 +215,11 @@ export class ControlChangeEvent extends ChannelMidiEvent {
         this.value = value;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `ControlChange: ${super.toString()} Controller[${this.controller}] Value[${this.value}]`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }
@@ -237,11 +237,11 @@ export class RestEvent extends ChannelMidiEvent {
         super(tick, track, channel);
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `Rest: ${super.toString()}`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }
@@ -261,11 +261,11 @@ export class ProgramChangeEvent extends ChannelMidiEvent {
         this.program = program;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `ProgramChange: ${super.toString()} Program[${this.program}]`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }
@@ -297,11 +297,11 @@ export class NoteEvent extends ChannelMidiEvent {
         this.dynamicValue = dynamicValue;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `Note: ${super.toString()} Length[${this.length}] Key[${this.key}] Dynamic[${this.dynamicValue}]`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }
@@ -322,11 +322,11 @@ export class BendEvent extends ChannelMidiEvent {
         this.value = value;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `Bend: ${super.toString()} Value[${this.value}]`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }
@@ -348,11 +348,11 @@ export class NoteBendEvent extends ChannelMidiEvent {
         this.value = value;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return `NoteBend: ${super.toString()} Key[${this.key}] Value[${this.value}]`;
     }
 
-    public equals(obj: unknown): boolean {
+    public override equals(obj: unknown): boolean {
         if (!super.equals(obj)) {
             return false;
         }

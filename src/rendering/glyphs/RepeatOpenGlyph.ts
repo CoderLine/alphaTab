@@ -13,11 +13,11 @@ export class RepeatOpenGlyph extends Glyph {
         this._circleSize = circleSize;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 13 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let blockWidth: number = 4 * this.scale;
         let top: number = cy + this.y + this.renderer.topPadding;
         let bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;

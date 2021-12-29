@@ -8,7 +8,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         this.noPascalCase = true;
     }
 
-    protected getClassName(type: cs.NamedTypeDeclaration, expr?: cs.Node) {
+    protected override getClassName(type: cs.NamedTypeDeclaration, expr?: cs.Node) {
         let className = super.getClassName(type, expr);
         // partial member access
         if (
@@ -22,7 +22,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return className;
     }
 
-    protected toCoreTypeName(s: string) {
+    protected override toCoreTypeName(s: string) {
         if(s === 'String') {
             return 'CoreString';
         }
@@ -40,10 +40,15 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return !!ts.getJSDocTags(tsSymbol.valueDeclaration).find(t => t.tagName.text === 'partial');
     }
 
-    protected isClassElementOverride(classType: ts.Type, classElement: ts.ClassElement) {
-        if (this.hasAnyBaseTypeClassMember(classType, classElement.name!.getText(), true)) {
-            return true;
-        }
+
+    protected override getOverriddenMembers(classType: ts.InterfaceType, classElement: ts.ClassElement): ts.Symbol[] {
+        const symbols: ts.Symbol[] = [];
+        this.collectOverriddenMembersByName(symbols, classType, classElement.name!.getText(), false, true);
+        return symbols;
+    }
+
+    protected override collectOverriddenMembersByName(symbols: ts.Symbol[], classType: ts.InterfaceType, memberName: string, includeOwnMembers: boolean = false, allowInterfaces: boolean = false) {
+        super.collectOverriddenMembersByName(symbols, classType, memberName, includeOwnMembers, allowInterfaces);
 
         if (
             classType.symbol.valueDeclaration && 
@@ -57,9 +62,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
             if (implementsClause) {
                 for (const typeSyntax of implementsClause.types) {
                     const type = this.typeChecker.getTypeFromTypeNode(typeSyntax);
-                    if (this.hasClassMember(type, classElement.name!.getText())) {
-                        return true;
-                    }
+                    super.collectOverriddenMembersByName(symbols, type as ts.InterfaceType, memberName, true, allowInterfaces);
                 }
             }
         }
@@ -67,7 +70,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return false;
     }
 
-    public isValueTypeNotNullSmartCast(expression: ts.Expression): boolean | undefined {
+    public override isValueTypeNotNullSmartCast(expression: ts.Expression): boolean | undefined {
         return undefined;
     }
 }

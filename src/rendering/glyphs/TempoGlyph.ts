@@ -12,12 +12,12 @@ export class TempoGlyph extends EffectGlyph {
         this._tempo = tempo;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this.height = 25 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let res: RenderingResources = this.renderer.resources;
         canvas.font = res.markerFont;
         canvas.fillMusicFontSymbol(

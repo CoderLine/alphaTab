@@ -50,7 +50,6 @@ export abstract class ScoreLayout {
         this.renderer = renderer;
     }
 
-    public abstract get padding(): number[];
     public abstract get firstBarX(): number;
     public abstract get supportsResize(): boolean;
 
@@ -191,11 +190,14 @@ export abstract class ScoreLayout {
             let chords: Map<string, Chord> = new Map<string, Chord>();
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
-                    for (const [chordId, chord] of staff.chords) {
-                        if (!chords.has(chordId)) {
-                            if (chord.showDiagram) {
-                                chords.set(chordId, chord);
-                                this.chordDiagrams!.addChord(chord);
+                    const sc = staff.chords;
+                    if (sc) {
+                        for (const [chordId, chord] of sc) {
+                            if (!chords.has(chordId)) {
+                                if (chord.showDiagram) {
+                                    chords.set(chordId, chord);
+                                    this.chordDiagrams!.addChord(chord);
+                                }
                             }
                         }
                     }

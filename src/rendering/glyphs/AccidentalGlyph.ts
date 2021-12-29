@@ -35,7 +35,7 @@ export class AccidentalGlyph extends MusicFontGlyph {
         return MusicFontSymbol.None;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         switch (this._accidentalType) {
             case AccidentalType.DoubleFlat:
                 this.width = 18;

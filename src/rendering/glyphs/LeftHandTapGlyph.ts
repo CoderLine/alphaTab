@@ -9,13 +9,13 @@ export class LeftHandTapGlyph extends EffectGlyph {
         super(0, 0);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         const font = this.renderer.resources.effectFont;
         this.height = font.size + LeftHandTapGlyph.Padding * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let res: RenderingResources = this.renderer.resources;
         canvas.font = res.effectFont;
         let old: TextAlign = canvas.textAlign;

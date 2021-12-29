@@ -23,7 +23,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
 
     public accidentals: AccidentalGroupGlyph | null = null;
 
-    public doLayout(): void {
+    public override doLayout(): void {
         if (!this.container.beat.isRest) {
             let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             accidentals.renderer = this.renderer;
@@ -42,7 +42,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                             case BendType.Prebend:
                             case BendType.PrebendRelease:
                                 preBends.addGlyph(
-                                    note.displayValue - ((note.bendPoints[0].value / 2) | 0),
+                                    note.displayValue - ((note.bendPoints![0].value / 2) | 0),
                                     false
                                 );
                                 break;
@@ -52,7 +52,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                             case WhammyType.PrediveDive:
                             case WhammyType.Predive:
                                 this._prebends.addGlyph(
-                                    note.displayValue - ((note.beat.whammyBarPoints[0].value / 2) | 0),
+                                    note.displayValue - ((note.beat.whammyBarPoints![0].value / 2) | 0),
                                     false
                                 );
                                 break;

@@ -21,6 +21,7 @@ export enum SyntaxKind {
     PrimitiveTypeNode,
     EnumMember,
     ArrayTypeNode,
+    MapTypeNode,
 
     Block,
     EmptyStatement,
@@ -138,6 +139,7 @@ export interface NamedTypeDeclaration extends NamedElement, DocumentedElement, N
     typeParameters?: TypeParameterDeclaration[];
     visibility: Visibility;
     partial: boolean;
+    hasVirtualMembersOrSubClasses: boolean;
 }
 
 export interface ClassDeclaration extends NamedTypeDeclaration {
@@ -236,7 +238,7 @@ export interface UnresolvedTypeNode extends TypeNode {
     typeArguments?: UnresolvedTypeNode[];
 }
 
-export type TypeReferenceType = NamedTypeDeclaration | TypeParameterDeclaration | PrimitiveTypeNode | string;
+export type TypeReferenceType = NamedTypeDeclaration | TypeParameterDeclaration | TypeNode | string;
 export interface TypeReference extends TypeNode {
     reference: TypeReferenceType;
     typeArguments?: TypeNode[];
@@ -244,6 +246,13 @@ export interface TypeReference extends TypeNode {
 
 export interface ArrayTypeNode extends TypeNode {
     elementType: TypeNode;
+}
+
+export interface MapTypeNode extends TypeNode {
+    keyType: TypeNode;
+    keyIsValueType: boolean;
+    valueType: TypeNode;
+    valueIsValueType:boolean;
 }
 
 export interface FunctionTypeNode extends TypeNode {
@@ -492,6 +501,7 @@ export interface CatchClause extends Node {
 }
 
 // Node Tests
+export function isNode(node: any): node is Node { return typeof(node) === 'object' && 'nodeType' in node; }
 export function isSourceFile(node: Node): node is SourceFile { return node.nodeType === SyntaxKind.SourceFile; }
 export function isUsingDeclaration(node: Node): node is UsingDeclaration { return node.nodeType === SyntaxKind.UsingDeclaration; }
 export function isNamespaceDeclaration(node: Node): node is NamespaceDeclaration { return node.nodeType === SyntaxKind.NamespaceDeclaration; }
@@ -511,6 +521,7 @@ export function isFunctionTypeNode(node: Node): node is FunctionTypeNode { retur
 export function isPrimitiveTypeNode(node: Node): node is PrimitiveTypeNode { return node.nodeType === SyntaxKind.PrimitiveTypeNode; }
 export function isEnumMember(node: Node): node is EnumMember { return node.nodeType === SyntaxKind.EnumMember; }
 export function isArrayTypeNode(node: Node): node is ArrayTypeNode { return node.nodeType === SyntaxKind.ArrayTypeNode; }
+export function isMapTypeNode(node: Node): node is MapTypeNode { return node.nodeType === SyntaxKind.MapTypeNode; }
 
 export function isBlock(node: Node): node is Block { return node.nodeType === SyntaxKind.Block; }
 export function isEmptyStatement(node: Node): node is EmptyStatement { return node.nodeType === SyntaxKind.EmptyStatement; }

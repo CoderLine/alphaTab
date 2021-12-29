@@ -16,7 +16,7 @@ export class CrescendoGlyph extends GroupedEffectGlyph {
         this.y = y;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this.height = 17 * this.scale;
     }

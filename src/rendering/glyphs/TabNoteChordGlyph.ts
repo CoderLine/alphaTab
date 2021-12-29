@@ -73,7 +73,7 @@ export class TabNoteChordGlyph extends Glyph {
         return 0;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let w: number = 0;
         let noteStringWidth: number = 0;
         for (let i: number = 0, j: number = this._notes.length; i < j; i++) {
@@ -110,7 +110,7 @@ export class TabNoteChordGlyph extends Glyph {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x;
         cy += this.y;
         let res: RenderingResources = this.renderer.resources;

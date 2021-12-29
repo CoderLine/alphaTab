@@ -12,11 +12,11 @@ export class ScoreLegatoGlyph extends TieGlyph {
         super(startBeat, endBeat, forEnd);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
     }
 
-    protected getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
+    protected override getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
         if (beat.isRest) {
             return BeamDirection.Up;
         }
@@ -29,7 +29,7 @@ export class ScoreLegatoGlyph extends TieGlyph {
         }
     }
 
-    protected getStartY(): number {
+    protected override getStartY(): number {
         if (this.startBeat!.isRest) {
             // below all lines
             return (this.startNoteRenderer as ScoreBarRenderer).getScoreY(9);
@@ -43,7 +43,7 @@ export class ScoreLegatoGlyph extends TieGlyph {
         }
     }
 
-    protected getEndY(): number {
+    protected override getEndY(): number {
         const endNoteScoreRenderer = this.endNoteRenderer as ScoreBarRenderer;
         if (this.endBeat!.isRest) {
             switch (this.tieDirection) {
@@ -89,11 +89,11 @@ export class ScoreLegatoGlyph extends TieGlyph {
         }
     }
 
-    protected getStartX(): number {
+    protected override getStartX(): number {
         return this.startNoteRenderer!.getBeatX(this.startBeat!, BeatXPosition.MiddleNotes);
     }
 
-    protected getEndX(): number {
+    protected override getEndX(): number {
         const endBeamDirection = (this.endNoteRenderer as ScoreBarRenderer).getBeatDirection(this.endBeat!);
         return this.endNoteRenderer!.getBeatX(
             this.endBeat!,

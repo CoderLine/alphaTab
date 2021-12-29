@@ -296,10 +296,6 @@ export default class CSharpAstTransformer {
         additionalNestedNonExportsDeclarations?: ts.Declaration[],
         globalStatements?: ts.Statement[]
     ): ts.Node {
-        if (this.shouldSkip(node, false)) {
-            return node;
-        }
-
         if (ts.isClassDeclaration(node)) {
             this.visitClassDeclaration(
                 node,
@@ -330,11 +326,16 @@ export default class CSharpAstTransformer {
         }
         const tags = ts.getJSDocTags(node).filter(t => t.tagName.text === 'target');
         if (tags.length > 0) {
-            return !tags.find(t => t.comment === 'csharp');
+            return !tags.find(t => t.comment === this.targetTag);
         }
 
         return false;
     }
+
+    public get targetTag(): string {
+        return 'csharp';
+    }
+
 
     protected visitEnumDeclaration(node: ts.EnumDeclaration) {
         const csEnum: cs.EnumDeclaration = {
@@ -346,7 +347,8 @@ export default class CSharpAstTransformer {
             tsNode: node,
             partial: false,
             skipEmit: this.shouldSkip(node, false),
-            tsSymbol: this._context.getSymbolForDeclaration(node)
+            tsSymbol: this._context.getSymbolForDeclaration(node),
+            hasVirtualMembersOrSubClasses: false
         };
 
         if (node.name) {
@@ -398,7 +400,8 @@ export default class CSharpAstTransformer {
             tsNode: node,
             skipEmit: this.shouldSkip(node, false),
             partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
-            tsSymbol: this._context.getSymbolForDeclaration(node)
+            tsSymbol: this._context.getSymbolForDeclaration(node),
+            hasVirtualMembersOrSubClasses: false
         };
 
         if (node.name) {
@@ -424,7 +427,9 @@ export default class CSharpAstTransformer {
             });
         }
 
-        node.members.forEach(m => this.visitInterfaceElement(csInterface, m));
+        if(!csInterface.skipEmit){
+            node.members.forEach(m => this.visitInterfaceElement(csInterface, m));
+        }
 
         this._csharpFile.namespace.declarations.push(csInterface);
         this._context.registerSymbol(csInterface);
@@ -499,7 +504,8 @@ export default class CSharpAstTransformer {
             parent: this._csharpFile.namespace,
             isAbstract: false,
             partial: false,
-            members: []
+            members: [],
+            hasVirtualMembersOrSubClasses: false
         };
 
         if (this._testClassAttribute.length > 0) {
@@ -738,7 +744,8 @@ export default class CSharpAstTransformer {
             partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
             members: [],
             skipEmit: this.shouldSkip(node, false),
-            tsSymbol: this._context.getSymbolForDeclaration(node)
+            tsSymbol: this._context.getSymbolForDeclaration(node),
+            hasVirtualMembersOrSubClasses: false
         };
 
         if (node.name) {
@@ -773,32 +780,34 @@ export default class CSharpAstTransformer {
             });
         }
 
-        node.members.forEach(m => this.visitClassElement(csClass, m));
+        if (!csClass.skipEmit) {
+            node.members.forEach(m => this.visitClassElement(csClass, m));
 
-        if (globalStatements && globalStatements.length > 0) {
-            const staticConstructor = {
-                parent: csClass,
-                isStatic: true,
-                name: 'cctor',
-                nodeType: cs.SyntaxKind.ConstructorDeclaration,
-                parameters: [],
-                visibility: cs.Visibility.None,
-                tsNode: node,
-                body: {
-                    parent: null,
-                    nodeType: cs.SyntaxKind.Block,
-                    statements: []
-                } as cs.Block
-            } as cs.ConstructorDeclaration;
+            if (globalStatements && globalStatements.length > 0) {
+                const staticConstructor = {
+                    parent: csClass,
+                    isStatic: true,
+                    name: 'cctor',
+                    nodeType: cs.SyntaxKind.ConstructorDeclaration,
+                    parameters: [],
+                    visibility: cs.Visibility.None,
+                    tsNode: node,
+                    body: {
+                        parent: null,
+                        nodeType: cs.SyntaxKind.Block,
+                        statements: []
+                    } as cs.Block
+                } as cs.ConstructorDeclaration;
 
-            globalStatements.forEach(s => {
-                const st = this.visitStatement(staticConstructor.body!, s)!;
-                if (st) {
-                    (staticConstructor.body as cs.Block).statements.push(st);
-                }
-            });
+                globalStatements.forEach(s => {
+                    const st = this.visitStatement(staticConstructor.body!, s)!;
+                    if (st) {
+                        (staticConstructor.body as cs.Block).statements.push(st);
+                    }
+                });
 
-            csClass.members.push(staticConstructor);
+                csClass.members.push(staticConstructor);
+            }
         }
 
         this._csharpFile.namespace.declarations.push(csClass);
@@ -970,6 +979,10 @@ export default class CSharpAstTransformer {
                 tsNode: classElement,
                 body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
+
+            if (this._context.markOverride(classElement)) {
+                member.isOverride = true;
+            }
         } else {
             const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
             const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
@@ -984,17 +997,13 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 visibility: this.mapVisibility(classElement),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-                skipEmit: this.shouldSkip(classElement, false)
+                skipEmit: this.shouldSkip(classElement, false),
+                tsNode: classElement,
+                tsSymbol: this._context.getSymbolForDeclaration(classElement),
             };
 
-            if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
-                if (this._context.isOverride(classElement)) {
-                    newProperty.isVirtual = false;
-                    newProperty.isOverride = true;
-                } else {
-                    newProperty.isVirtual = true;
-                    newProperty.isOverride = false;
-                }
+            if (this._context.markOverride(classElement)) {
+                newProperty.isOverride = true;
             }
 
             if (classElement.modifiers) {
@@ -1040,6 +1049,11 @@ export default class CSharpAstTransformer {
                 tsNode: classElement,
                 body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
+
+            if (this._context.markOverride(classElement)) {
+                member.isOverride = true;
+            }
+
             return member.setAccessor;
         } else {
             const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
@@ -1055,17 +1069,13 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 visibility: this.mapVisibility(classElement),
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-                skipEmit: this.shouldSkip(classElement, false)
+                skipEmit: this.shouldSkip(classElement, false),
+                tsNode: classElement,
+                tsSymbol: this._context.getSymbolForDeclaration(classElement),
             };
 
-            if (newProperty.visibility === cs.Visibility.Public || newProperty.visibility === cs.Visibility.Protected) {
-                if (this._context.isOverride(classElement)) {
-                    newProperty.isVirtual = false;
-                    newProperty.isOverride = true;
-                } else {
-                    newProperty.isVirtual = true;
-                    newProperty.isOverride = false;
-                }
+            if (this._context.markOverride(classElement)) {
+                newProperty.isOverride = true;
             }
 
             if (classElement.modifiers) {
@@ -1119,21 +1129,16 @@ export default class CSharpAstTransformer {
             type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, type),
             visibility: visibility,
             tsNode: classElement,
+            tsSymbol: this._context.getSymbolForDeclaration(classElement),
             skipEmit: this.shouldSkip(classElement, false)
         };
 
-        if (csProperty.visibility === cs.Visibility.Public || csProperty.visibility === cs.Visibility.Protected) {
-            if (this._context.isOverride(classElement)) {
-                csProperty.isVirtual = false;
-                csProperty.isOverride = true;
-            } else {
-                csProperty.isVirtual = true;
-                csProperty.isOverride = false;
-            }
-        }
-
         if (classElement.name) {
             csProperty.documentation = this.visitDocumentation(classElement.name);
+        }
+
+        if (this._context.markOverride(classElement)) {
+            csProperty.isOverride = true;
         }
 
         let isReadonly = false;
@@ -1220,6 +1225,7 @@ export default class CSharpAstTransformer {
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: this.mapVisibility(classElement),
             tsNode: classElement,
+            tsSymbol: this._context.getSymbolForDeclaration(classElement),
             skipEmit: this.shouldSkip(classElement, false)
         };
 
@@ -1227,14 +1233,8 @@ export default class CSharpAstTransformer {
             csMethod.documentation = this.visitDocumentation(classElement.name);
         }
 
-        if (csMethod.visibility === cs.Visibility.Public || csMethod.visibility === cs.Visibility.Protected) {
-            if (this._context.isOverride(classElement)) {
-                csMethod.isVirtual = false;
-                csMethod.isOverride = true;
-            } else {
-                csMethod.isVirtual = true;
-                csMethod.isOverride = false;
-            }
+        if (this._context.markOverride(classElement)) {
+            csMethod.isOverride = true;
         }
 
         if (classElement.modifiers) {
@@ -2822,28 +2822,7 @@ export default class CSharpAstTransformer {
 
     protected visitArrayLiteralExpression(parent: cs.Node, expression: ts.ArrayLiteralExpression) {
         if (this.isMapInitializer(expression)) {
-            const csExpr = {
-                parent: parent,
-                tsNode: expression,
-                nodeType: cs.SyntaxKind.InvocationExpression,
-                arguments: [],
-                expression: {} as cs.Expression
-            } as cs.InvocationExpression;
-
-            csExpr.expression = this.makeMemberAccess(
-                csExpr,
-                this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                this._context.toPascalCase('createMapEntry')
-            );
-
-            expression.elements.forEach(e => {
-                const ex = this.visitExpression(csExpr, e);
-                if (ex) {
-                    csExpr.arguments.push(ex);
-                }
-            });
-
-            return csExpr;
+            return this.createMapEntry(parent, expression);
         } else if (this.isSetInitializer(expression)) {
             const csExpr = {
                 parent: parent,
@@ -2890,6 +2869,31 @@ export default class CSharpAstTransformer {
             return csExpr;
         }
     }
+    protected createMapEntry(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
+        const csExpr = {
+            parent: parent,
+            tsNode: expression,
+            nodeType: cs.SyntaxKind.InvocationExpression,
+            arguments: [],
+            expression: {} as cs.Expression
+        } as cs.InvocationExpression;
+
+        csExpr.expression = this.makeMemberAccess(
+            csExpr,
+            this._context.makeTypeName('alphaTab.core.TypeHelper'),
+            this._context.toPascalCase('createMapEntry')
+        );
+
+        expression.elements.forEach(e => {
+            const ex = this.visitExpression(csExpr, e);
+            if (ex) {
+                csExpr.arguments.push(ex);
+            }
+        });
+
+        return csExpr;
+    }
+
     protected isMapInitializer(expression: ts.ArrayLiteralExpression) {
         const isCandidate =
             expression.elements.length === 2 &&
@@ -2974,6 +2978,12 @@ export default class CSharpAstTransformer {
                         return 'TrimEnd';
                     case 'trimLeft':
                         return 'TrimStart';
+                }
+                break;
+            case 'Number':
+                switch (symbol.name) {
+                    case 'toString':
+                        return 'ToInvariantString';
                 }
                 break;
         }
@@ -3083,7 +3093,7 @@ export default class CSharpAstTransformer {
         } as cs.InvocationExpression;
         const memberAccess = (callExpr.expression = {
             expression: null!,
-            member: this._context.toPascalCase('toString'),
+            member: this._context.toPascalCase('toInvariantString'),
             parent: callExpr,
             tsNode: expr.tsNode,
             nodeType: cs.SyntaxKind.MemberAccessExpression
@@ -3098,22 +3108,6 @@ export default class CSharpAstTransformer {
         } as cs.ParenthesizedExpression;
         expr.parent = par;
         memberAccess.expression = par;
-
-        const invariantCultureInfo = {
-            parent: callExpr,
-            nodeType: cs.SyntaxKind.MemberAccessExpression,
-            tsNode: expr.tsNode,
-            expression: null!,
-            member: this._context.toPascalCase('invariantCulture')
-        } as cs.MemberAccessExpression;
-
-        invariantCultureInfo.expression = {
-            parent: invariantCultureInfo,
-            tsNode: expr.tsNode,
-            nodeType: cs.SyntaxKind.Identifier,
-            text: this._context.makeTypeName('system.globalization.CultureInfo')
-        } as cs.Identifier;
-        callExpr.arguments.push(invariantCultureInfo);
 
         return callExpr;
     }
@@ -3217,6 +3211,13 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.InvocationExpression
         } as cs.InvocationExpression;
 
+        // number.ToString
+        const isNumberToString =
+            ts.isPropertyAccessExpression(expression.expression) &&
+            this._context.typeChecker.getTypeAtLocation(expression.expression.expression).flags & ts.TypeFlags.Number &&
+            (expression.expression.name as ts.Identifier).text === 'toString' &&
+            expression.arguments.length === 0;
+
         callExpression.expression = this.visitExpression(callExpression, expression.expression)!;
         if (!callExpression.expression) {
             return null;
@@ -3236,31 +3237,6 @@ export default class CSharpAstTransformer {
             }
         });
 
-        // number.ToString
-        const isNumberToString =
-            ts.isPropertyAccessExpression(expression.expression) &&
-            this._context.typeChecker.getTypeAtLocation(expression.expression.expression).flags & ts.TypeFlags.Number &&
-            (expression.expression.name as ts.Identifier).text === 'toString' &&
-            expression.arguments.length === 0;
-
-        if (isNumberToString) {
-            const invariantCultureInfo = {
-                parent: parent,
-                nodeType: cs.SyntaxKind.MemberAccessExpression,
-                tsNode: expression,
-                expression: null!,
-                member: this._context.toPascalCase('invariantCulture')
-            } as cs.MemberAccessExpression;
-
-            invariantCultureInfo.expression = {
-                parent: invariantCultureInfo,
-                tsNode: expression.expression,
-                nodeType: cs.SyntaxKind.Identifier,
-                text: this._context.makeTypeName('system.globalization.CultureInfo')
-            } as cs.Identifier;
-
-            callExpression.arguments.push(invariantCultureInfo);
-        }
 
         if (expression.typeArguments) {
             callExpression.typeArguments = [];
@@ -3448,7 +3424,7 @@ export default class CSharpAstTransformer {
                 (node.tsSymbol.flags & ts.SymbolFlags.Variable) === ts.SymbolFlags.Variable ||
                 (node.tsSymbol.flags & ts.SymbolFlags.EnumMember) === ts.SymbolFlags.EnumMember ||
                 (node.tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable) ===
-                    ts.SymbolFlags.FunctionScopedVariable ||
+                ts.SymbolFlags.FunctionScopedVariable ||
                 (node.tsSymbol.flags & ts.SymbolFlags.BlockScopedVariable) === ts.SymbolFlags.BlockScopedVariable
             ) {
                 let smartCastType = this._context.getSmartCastType(expression);

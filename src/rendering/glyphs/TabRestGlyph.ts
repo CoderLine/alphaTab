@@ -15,7 +15,7 @@ export class TabRestGlyph extends MusicFontGlyph {
         this._duration = duration;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         if (this._isVisibleRest) {
             this.width = ScoreRestGlyph.getSize(this._duration) * this.scale;
         } else {
@@ -33,7 +33,7 @@ export class TabRestGlyph extends MusicFontGlyph {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this._isVisibleRest) {
             super.paint(cx, cy, canvas);
         }

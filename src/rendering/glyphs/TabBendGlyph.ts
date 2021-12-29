@@ -122,7 +122,7 @@ export class TabBendGlyph extends Glyph {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         let bendHeight: number = this._maxBendValue * TabBendGlyph.BendValueHeight * this.scale;
         this.renderer.registerOverflowTop(bendHeight);
@@ -182,14 +182,14 @@ export class TabBendGlyph extends Glyph {
         // though it might not be 100% correct from timing perspective.
         switch (note.bendType) {
             case BendType.Custom:
-                for (let bendPoint of note.bendPoints) {
+                for (let bendPoint of note.bendPoints!) {
                     renderingPoints.push(new TabBendRenderPoint(bendPoint.offset, bendPoint.value));
                 }
                 break;
             case BendType.BendRelease:
-                renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints[0].value));
-                renderingPoints.push(new TabBendRenderPoint((BendPoint.MaxPosition / 2) | 0, note.bendPoints[1].value));
-                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints[3].value));
+                renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints![0].value));
+                renderingPoints.push(new TabBendRenderPoint((BendPoint.MaxPosition / 2) | 0, note.bendPoints![1].value));
+                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints![3].value));
                 break;
             case BendType.Bend:
             case BendType.Hold:
@@ -197,14 +197,14 @@ export class TabBendGlyph extends Glyph {
             case BendType.PrebendBend:
             case BendType.PrebendRelease:
             case BendType.Release:
-                renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints[0].value));
-                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints[1].value));
+                renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints![0].value));
+                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints![1].value));
                 break;
         }
         return renderingPoints;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let color: Color = canvas.color;
         if (this._notes.length > 1) {
             canvas.color = this.renderer.resources.secondaryGlyphColor;

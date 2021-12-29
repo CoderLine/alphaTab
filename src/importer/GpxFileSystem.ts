@@ -1,7 +1,7 @@
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { BitReader, EndOfReaderError } from '@src/io/BitReader';
+import { BitReader } from '@src/io/BitReader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IReadable } from '@src/io/IReadable';
+import { EndOfReaderError, IReadable } from '@src/io/IReadable';
 
 /**
  * this public class represents a file within the GpxFileSystem

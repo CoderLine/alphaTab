@@ -24,7 +24,7 @@ export class NoteNumberGlyph extends Glyph {
         this._note = note;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let n: Note = this._note;
         let fret: number = n.fret - n.beat.voice.bar.staff.transpositionPitch;
         if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
@@ -91,7 +91,7 @@ export class NoteNumberGlyph extends Glyph {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this.isEmpty) {
             return;
         }
