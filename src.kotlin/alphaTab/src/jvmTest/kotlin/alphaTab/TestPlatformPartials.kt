@@ -42,9 +42,12 @@ class TestPlatformPartials {
             }
         }
 
-        public fun listDirectory(path:String): MutableList<String> {
+        public fun listDirectory(path:String): alphaTab.collections.List<String> {
             val dirPath = Path.of(projectRoot, path)
-            return dirPath.toFile().listFiles()?.map { it.name }?.toMutableList() ?: mutableListOf()
+            return alphaTab.collections.List(dirPath.toFile()
+                .listFiles()
+                ?.filter { it.isFile }
+                ?.map { it.name } ?: emptyList())
         }
     }
 }

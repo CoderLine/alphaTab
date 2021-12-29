@@ -11,6 +11,10 @@ class Globals {
         public fun fail(message: Any?) {
             Assert.fail(message.toString())
         }
+
+        public fun fail(message: Throwable) {
+            Assert.fail(message.toString() + message.stackTraceToString())
+        }
     }
 }
 

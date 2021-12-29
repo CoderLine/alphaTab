@@ -12,6 +12,11 @@ expect fun UByteArray.decodeToDoubleArray(): DoubleArray
 @kotlin.ExperimentalUnsignedTypes
 expect fun UByteArray.decodeToString(encoding: String): String
 
+fun <T : Comparable<T> > List<T>.sort(): Unit {
+    this.sort { a,b ->
+        a.compareTo(b).toDouble()
+    }
+}
 fun String.substr(startIndex: Double, length: Double): String {
     return this.substring(startIndex.toInt(), (startIndex + length).toInt())
 }
@@ -20,7 +25,7 @@ fun String.substr(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
 
-fun String.splitBy(separator:String): alphaTab.collections.List<String> {
+fun String.splitBy(separator:String): List<String> {
     return List(this.split(separator))
 }
 
@@ -65,7 +70,7 @@ fun String.charCodeAt(index: Double): Double {
     return this[index.toInt()].code.toDouble()
 }
 
-fun String.split(delimiter: String): alphaTab.collections.List<String> {
+fun String.split(delimiter: String): List<String> {
     @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
     return alphaTab.collections.List(this.split(delimiters = arrayOf(delimiter), ignoreCase = false, limit = 0))
 }

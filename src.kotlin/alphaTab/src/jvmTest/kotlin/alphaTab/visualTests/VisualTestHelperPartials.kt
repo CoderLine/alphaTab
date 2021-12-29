@@ -3,6 +3,7 @@ package alphaTab.visualTests
 import alphaTab.Settings
 import alphaTab.TestPlatform
 import alphaTab.TestPlatformPartials
+import alphaTab.collections.DoubleList
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.core.toInvariantString
 import alphaTab.importer.AlphaTexImporter
@@ -30,7 +31,7 @@ class VisualTestHelperPartials {
         public fun runVisualTest(
             inputFile: String,
             settings: Settings? = null,
-            tracks: MutableList<Double>? = null,
+            tracks: DoubleList? = null,
             message: String? = null,
             tolerancePercent: Double = 1.0,
             triggerResize: Boolean = false
@@ -59,7 +60,7 @@ class VisualTestHelperPartials {
             tex: String,
             referenceFileName: String,
             settings: Settings? = null,
-            tracks: MutableList<Double>? = null,
+            tracks: DoubleList? = null,
             message: String? = null,
             tolerancePercent: Double = 1.0
         ) {
@@ -86,13 +87,13 @@ class VisualTestHelperPartials {
             score: Score,
             referenceFileName: String,
             settings: Settings? = null,
-            tracks: MutableList<Double>? = null,
+            tracks: DoubleList? = null,
             message: String? = null,
             tolerancePercent: Double = 1.0,
             triggerResize: Boolean = false
         ) {
             val actualSettings = settings ?: Settings()
-            val actualTracks = tracks ?: ArrayList()
+            val actualTracks = tracks ?: DoubleList()
 
             actualSettings.core.engine = "skia"
             actualSettings.core.enableLazyLoading = false

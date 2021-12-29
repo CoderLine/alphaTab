@@ -1,12 +1,14 @@
 package alphaTab.collections
 
+import alphaTab.core.toInvariantString
+
 public interface IDoubleIterable : Iterable<Double> {
     override fun iterator(): DoubleIterator
 }
 
 public class DoubleList : IDoubleIterable {
     companion object {
-        private const val DefaultCapacity:Int = 4
+        private const val DefaultCapacity: Int = 4
     }
 
     private var _items: DoubleArray
@@ -20,10 +22,17 @@ public class DoubleList : IDoubleIterable {
 
     public constructor(size: Int) {
         _items = DoubleArray(size)
+        _size = size
     }
 
     public constructor(vararg elements: Double) {
         _items = elements
+        _size = elements.size
+    }
+
+    private constructor(elements: DoubleArray, size: Int) {
+        _items = elements
+        _size = size
     }
 
     public operator fun get(index: Int): Double {
@@ -66,27 +75,27 @@ public class DoubleList : IDoubleIterable {
     }
 
     public fun join(separator: String): String {
-        return _items.joinToString(separator)
+        return this.map<String> { it.toInvariantString() }.joinToString(separator)
     }
 
     public fun <TOut> map(transform: (v: Double) -> TOut): List<TOut> {
         val mapped = List<TOut>()
-        for (el in _items) {
+        for (el in this) {
             mapped.push(transform(el))
         }
         return mapped
     }
 
     public fun map(transform: (v: Double) -> Double): DoubleList {
-        val mapped = DoubleList(_items.size)
-        for (i in _items.indices) {
+        val mapped = DoubleList(_size)
+        for (i in 0 until _size) {
             mapped[i] = transform(_items[i])
         }
         return mapped
     }
 
     public fun reverse(): DoubleList {
-        _items.reverse()
+        _items.reverse(0, _size)
         return this
     }
 
@@ -96,25 +105,28 @@ public class DoubleList : IDoubleIterable {
     }
 
     public fun slice(): DoubleList {
-        return DoubleList(*_items)
+        val copy = DoubleArray(_size) {
+            _items[it]
+        }
+        return DoubleList(copy, _size)
     }
 
     public fun sort() {
-        _items.sort()
+        _items.sort(0, _size)
     }
 
     public override fun iterator(): DoubleIterator {
         return Iterator(this)
     }
 
-    private class Iterator(private val list:DoubleList) : DoubleIterator()  {
+    private class Iterator(private val list: DoubleList) : DoubleIterator() {
         private var _index = 0
         override fun hasNext(): Boolean {
             return _index < list._size
         }
 
         override fun nextDouble(): Double {
-            if(_index >= list._size) {
+            if (_index >= list._size) {
                 throw NoSuchElementException("List has no more elements")
             }
             val value = list[_index]
