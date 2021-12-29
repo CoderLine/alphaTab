@@ -1,12 +1,11 @@
 import { MasterBar } from '@src/model/MasterBar';
 import { Score } from '@src/model/Score';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { TextAlign } from '@src/platform/ICanvas';
 import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { Logger } from '@src/Logger';
-import { EventEmitterOfT } from '@src/EventEmitter';
 
 export class HorizontalScreenLayoutPartialInfo {
     public width: number = 0;
@@ -34,7 +33,21 @@ export class HorizontalScreenLayout extends ScoreLayout {
         return false;
     }
 
-    public resize(): void { }
+    public get padding(): number[] {
+        return this._pagePadding!;
+    }
+
+    public get firstBarX(): number{
+        let x=  this._pagePadding![0];
+        if(this._group) {
+            x += this._group.accoladeSpacing;
+        }
+        return x;
+    }
+
+    public doResize(): void {
+        // not supported
+    }
 
     protected doLayoutAndRender(): void {
         this._pagePadding = this.renderer.settings.display.padding;
@@ -57,7 +70,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
             ];
         }
         let score: Score = this.renderer.score!;
-        let canvas: ICanvas = this.renderer.canvas!;
         let startIndex: number = this.renderer.settings.display.startBar;
         startIndex--; // map to array index
 
@@ -98,9 +110,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
                         Logger.debug(
                             this.name,
                             'Finished partial from bar ' +
-                            currentPartial.masterBars[0].index +
-                            ' to ' +
-                            currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                                currentPartial.masterBars[0].index +
+                                ' to ' +
+                                currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
                             null
                         );
                         currentPartial = new HorizontalScreenLayoutPartialInfo();
@@ -118,52 +130,61 @@ export class HorizontalScreenLayout extends ScoreLayout {
             Logger.debug(
                 this.name,
                 'Finished partial from bar ' +
-                currentPartial.masterBars[0].index +
-                ' to ' +
-                currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                    currentPartial.masterBars[0].index +
+                    ' to ' +
+                    currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
                 null
             );
         }
         this._group.finalizeGroup();
-        this.height = this._group.y + this._group.height + this._pagePadding[3];
+        this.height = Math.floor(this._group.y + this._group.height);
         this.width = this._group.x + this._group.width + this._pagePadding[2];
         currentBarIndex = 0;
+
+        let x = 0;
         for (let i: number = 0; i < partials.length; i++) {
             let partial: HorizontalScreenLayoutPartialInfo = partials[i];
-            canvas.beginRender(partial.width, this.height);
-            canvas.color = this.renderer.settings.display.resources.mainGlyphColor;
-            canvas.textAlign = TextAlign.Left;
-            let renderX: number = this._group.getBarX(partial.masterBars[0].index) + this._group.accoladeSpacing;
-            if (i === 0) {
-                renderX -= this._group.x + this._group.accoladeSpacing;
-            }
-            Logger.debug(
-                this.name,
-                'Rendering partial from bar ' +
-                partial.masterBars[0].index +
-                ' to ' +
-                partial.masterBars[partial.masterBars.length - 1].index,
-                null
-            );
-            this._group.paintPartial(
-                -renderX,
-                this._group.y,
-                this.renderer.canvas!,
-                currentBarIndex,
-                partial.masterBars.length
-            );
-            let result: unknown = canvas.endRender();
 
-            let e = new RenderFinishedEventArgs();
+            const e = new RenderFinishedEventArgs();
+            e.x = x;
+            e.y = 0;
             e.totalWidth = this.width;
             e.totalHeight = this.height;
             e.width = partial.width;
             e.height = this.height;
-            e.renderResult = result;
             e.firstMasterBarIndex = partial.masterBars[0].index;
             e.lastMasterBarIndex = partial.masterBars[partial.masterBars.length - 1].index;
-            (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(e);
+
+            x += partial.width;
+
+            const partialBarIndex = currentBarIndex; 
+            this.registerPartial(e, canvas => {
+                canvas.color = this.renderer.settings.display.resources.mainGlyphColor;
+                canvas.textAlign = TextAlign.Left;
+                let renderX: number = this._group!.getBarX(partial.masterBars[0].index) + this._group!.accoladeSpacing;
+                if (i === 0) {
+                    renderX -= this._group!.x + this._group!.accoladeSpacing;
+                }
+                Logger.debug(
+                    this.name,
+                    'Rendering partial from bar ' +
+                        partial.masterBars[0].index +
+                        ' to ' +
+                        partial.masterBars[partial.masterBars.length - 1].index,
+                    null
+                );
+                this._group!!.paintPartial(
+                    -renderX,
+                    this._group!.y,
+                    canvas,
+                    partialBarIndex,
+                    partial.masterBars.length
+                );
+            });
+
             currentBarIndex += partial.masterBars.length;
         }
+
+        this.height = this.layoutAndRenderAnnotation(this.height) + this._pagePadding[3];
     }
 }

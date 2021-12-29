@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -14,6 +15,10 @@ namespace AlphaTab.WinForms
     internal class WinFormsUiFacade : ManagedUiFacade<AlphaTabControl>
     {
         private readonly AlphaTabLayoutPanel _layoutPanel;
+
+        private readonly Dictionary<string, PictureBox> _resultIdToElementLookup =
+            new Dictionary<string, PictureBox>();
+
         private event Action? InternalRootContainerBecameVisible;
 
         public override IContainer RootContainer { get; }
@@ -67,7 +72,7 @@ namespace AlphaTab.WinForms
         protected override Stream? OpenDefaultSoundFont()
         {
             return typeof(NAudioSynthOutput).Assembly.GetManifestResourceStream(
-                    typeof(NAudioSynthOutput), "default.sf2");
+                typeof(NAudioSynthOutput), "default.sf2");
         }
 
         public override void Initialize(AlphaTabApiBase<AlphaTabControl> api,
@@ -106,14 +111,57 @@ namespace AlphaTab.WinForms
             return new ControlContainer(_layoutPanel);
         }
 
+        public override void InitialRender()
+        {
+            Api.Renderer.PreRender.On(_ => { _resultIdToElementLookup.Clear(); });
+            base.InitialRender();
+        }
+
         public override void TriggerEvent(IContainer container, string eventName,
             object? details = null, IMouseEventArgs? originalEvent = null)
         {
         }
 
+        public override void BeginUpdateRenderResults(RenderFinishedEventArgs? r)
+        {
+            SettingsContainer.BeginInvoke((Action<RenderFinishedEventArgs?>)(renderResult =>
+            {
+
+                if (renderResult == null ||
+                    !_resultIdToElementLookup.TryGetValue(renderResult.Id, out var placeholder))
+                {
+                    return;
+                }
+
+                var body = renderResult.RenderResult;
+
+                Bitmap? source = null;
+                switch (body)
+                {
+                    case string _:
+                        // TODO: svg support
+                        return;
+                    case SKImage skiaImage:
+                        using (skiaImage)
+                        {
+                            source = SkiaUtil.ToBitmap(skiaImage);
+                        }
+
+                        break;
+                    case Bitmap image:
+                        source = image;
+                        break;
+                }
+
+                var oldImage = placeholder.Image;
+                placeholder.Image = source;
+                oldImage?.Dispose();
+            }), r);
+        }
+
         public override void BeginAppendRenderResults(RenderFinishedEventArgs? r)
         {
-            SettingsContainer.BeginInvoke((Action<RenderFinishedEventArgs>) (renderResult =>
+            SettingsContainer.BeginInvoke((Action<RenderFinishedEventArgs?>)(renderResult =>
             {
                 var panel = _layoutPanel;
 
@@ -134,58 +182,35 @@ namespace AlphaTab.WinForms
                 // NOTE: here we try to replace existing children
                 else
                 {
-                    var body = renderResult.RenderResult;
-
-                    Bitmap? source = null;
-                    if (body is string)
+                    if (TotalResultCount.TryPeek(out var counter))
                     {
-                        // TODO: svg support
-                        return;
-                    }
-
-                    if (body is SKImage skiaImage)
-                    {
-                        using (skiaImage)
+                        PictureBox placeholder;
+                        if (counter.Count < panel.Controls.Count)
                         {
-                            source = SkiaUtil.ToBitmap(skiaImage);
+                            placeholder = (PictureBox)panel.Controls[counter.Count];
                         }
-                    }
-                    else if (body is Bitmap image)
-                    {
-                        source = image;
-                    }
-
-                    if (source != null)
-                    {
-                        if (TotalResultCount.TryPeek(out var counter))
+                        else
                         {
-                            if (counter.Count < panel.Controls.Count)
+                            placeholder = new PictureBox
                             {
-                                var img = (PictureBox) panel.Controls[counter.Count];
-                                img.Width = (int) renderResult.Width;
-                                img.Height = (int) renderResult.Height;
-                                var oldImg = img.Image;
-                                img.Image = source;
-                                oldImg?.Dispose();
-                            }
-                            else
-                            {
-                                var img = new PictureBox
-                                {
-                                    AutoSize = false,
-                                    BackColor = _layoutPanel.ForeColor,
-                                    Width = (int) renderResult.Width,
-                                    Height = (int) renderResult.Height,
-                                    Image = source,
-                                    Padding = Padding.Empty,
-                                    Margin = Padding.Empty,
-                                    BorderStyle = BorderStyle.None
-                                };
-                                panel.Controls.Add(img);
-                            }
-
-                            counter.Count++;
+                                AutoSize = false,
+                                BackColor = _layoutPanel.ForeColor,
+                                Padding = Padding.Empty,
+                                Margin = Padding.Empty,
+                                BorderStyle = BorderStyle.None
+                            };
+                            panel.Controls.Add(placeholder);
                         }
+
+                        placeholder.Left = (int)renderResult.X;
+                        placeholder.Top = (int)renderResult.Y;
+                        placeholder.Width = (int)renderResult.Width;
+                        placeholder.Height = (int)renderResult.Height;
+
+                        _resultIdToElementLookup[renderResult.Id] = placeholder;
+                        Api.Renderer.RenderResult(renderResult.Id);
+
+                        counter.Count++;
                     }
                 }
             }), r);
@@ -228,7 +253,7 @@ namespace AlphaTab.WinForms
 
         public override Bounds GetOffset(IContainer? relativeTo, IContainer container)
         {
-            var containerWinForms = ((ControlContainer) container).Control;
+            var containerWinForms = ((ControlContainer)container).Control;
 
             var left = 0;
             var top = 0;
@@ -252,14 +277,14 @@ namespace AlphaTab.WinForms
 
         public override void ScrollToY(IContainer scrollElement, double offset, double speed)
         {
-            var c = ((ControlContainer) scrollElement).Control;
-            c.AutoScrollOffset = new Point(c.AutoScrollOffset.X, (int) offset);
+            var c = ((ControlContainer)scrollElement).Control;
+            c.AutoScrollOffset = new Point(c.AutoScrollOffset.X, (int)offset);
         }
 
         public override void ScrollToX(IContainer scrollElement, double offset, double speed)
         {
-            var c = ((ControlContainer) scrollElement).Control;
-            c.AutoScrollOffset = new Point((int) offset, c.AutoScrollOffset.Y);
+            var c = ((ControlContainer)scrollElement).Control;
+            c.AutoScrollOffset = new Point((int)offset, c.AutoScrollOffset.Y);
         }
     }
 }

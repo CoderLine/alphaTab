@@ -150,7 +150,7 @@ class VisualTestHelperPartials {
                     isResizeRender = true
                     renderer.resizeRender()
                 }
-                
+
             }
             renderer.error.on { e ->
                 error = e
@@ -234,24 +234,10 @@ class VisualTestHelperPartials {
 
             val finalImageSurface = Surface.makeRaster(imageInfo)
             finalImageSurface.use {
-                var x = 0f
-                var y = 0f
-                var rowHeight = 0
                 for (partialResult in result) {
                     val partialCanvas = partialResult.renderResult
                     if (partialCanvas is Image) {
-                        finalImageSurface.canvas.drawImage(partialCanvas, x, y)
-                        if (partialResult.height > rowHeight) {
-                            rowHeight = partialCanvas.height
-                        }
-
-                        x += partialCanvas.width
-
-                        if (x >= totalWidth) {
-                            x = 0f
-                            y += rowHeight
-                            rowHeight = 0
-                        }
+                        finalImageSurface.canvas.drawImage(partialCanvas, partialResult.x.toFloat(), partialResult.y.toFloat())
                     }
                 }
 

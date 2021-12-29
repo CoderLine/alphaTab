@@ -68,10 +68,18 @@ export interface IUiFacade<TSettings> {
     initialRender(): void;
 
     /**
-     * Tells the UI layer to append the given render results to the UI.
+     * Tells the UI layer to append the given render results to the UI. At this point
+     * the partial result is not actually rendered yet, only the layouting process 
+     * completed.
      * @param renderResults The rendered partial that should be added to the UI.
      */
     beginAppendRenderResults(renderResults: RenderFinishedEventArgs | null): void;
+
+    /**
+     * Tells the UI layer to update the given render results within the UI.
+     * @param renderResults The rendered partial that should be updated within the UI.
+     */
+    beginUpdateRenderResults(renderResults: RenderFinishedEventArgs): void;
 
     /**
      * Tells the UI layer to create the worker renderer. This method is the UI layer supports worker rendering and worker rendering is not disabled via setting.
@@ -112,7 +120,7 @@ export interface IUiFacade<TSettings> {
      * @param groupId The group id that identifies the elements to be highlighted.
      * @param masterBarIndex The index of the related masterbar of the highlighted group.
      */
-    highlightElements(groupId: string, masterBarIndex:number): void;
+    highlightElements(groupId: string, masterBarIndex: number): void;
 
     /**
      * Creates a new UI element that is used to display the selection rectangle.

@@ -1,8 +1,24 @@
+import { ModelUtils } from "@src/model/ModelUtils";
+
 /**
  * This eventargs define the details about the rendering and layouting process and are
  * provided whenever a part of of the music sheet is rendered.
  */
 export class RenderFinishedEventArgs {
+    /**
+     * Gets or sets the unique id of this event args.
+     */
+    public id: string = ModelUtils.newGuid();
+    /**
+     * Gets or sets the x position of the current rendering result.
+     */
+    public x: number = 0;
+
+    /**
+     * Gets or sets the y position of the current rendering result.
+     */
+    public y: number = 0;
+
     /**
      * Gets or sets the width of the current rendering result.
      */
