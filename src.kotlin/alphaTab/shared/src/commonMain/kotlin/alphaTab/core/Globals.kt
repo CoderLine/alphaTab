@@ -12,6 +12,11 @@ expect fun UByteArray.decodeToDoubleArray(): DoubleArray
 @kotlin.ExperimentalUnsignedTypes
 expect fun UByteArray.decodeToString(encoding: String): String
 
+fun <T : Comparable<T> > List<T>.sort(): Unit {
+    this.sort { a,b ->
+        a.compareTo(b).toDouble()
+    }
+}
 fun String.substr(startIndex: Double, length: Double): String {
     return this.substring(startIndex.toInt(), (startIndex + length).toInt())
 }

@@ -16,10 +16,22 @@ internal open class JsonHelperPartials {
                     func(kvp.value, (kvp.key!!) as String)
                 }
             }
+
+            if (o is alphaTab.collections.Map<*, *>) {
+                for (kvp in o) {
+                    func(kvp.value, (kvp.key!!) as String)
+                }
+            }
         }
 
         public fun forEach(o: Any?, func: (v: Any?, k: String) -> Unit) {
             if (o is Map<*, *>) {
+                for (kvp in o) {
+                    func(kvp.value, (kvp.key!!) as String)
+                }
+            }
+
+            if (o is alphaTab.collections.Map<*, *>) {
                 for (kvp in o) {
                     func(kvp.value, (kvp.key!!) as String)
                 }

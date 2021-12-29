@@ -6,7 +6,8 @@ class Array {
             return alphaTab.collections.List(x)
         }
         public fun isArray(x:Any?):Boolean {
-            return x is MutableList<*>
+            return x is alphaTab.collections.List<*>
         }
+
     }
 }
