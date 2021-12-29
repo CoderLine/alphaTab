@@ -28,15 +28,13 @@ public class DoubleDoubleMapEntryInternal : DoubleDoubleMapEntry(), IMapEntryInt
 
 public class DoubleDoubleMap : MapBase<DoubleDoubleMapEntry, DoubleDoubleMapEntryInternal>() {
     public fun has(key: Double): Boolean {
-        return findEntryInternal(key.hashCode()) {
-            key == it.key
-        } >= 0
+        return findEntryInternal(key,
+            { entry, k -> entry.key == k }) >= 0
     }
 
     public fun get(key: Double): Double {
-        val i = findEntryInternal(key.hashCode()) {
-            key.equals(it.key)
-        }
+        val i = findEntryInternal(key,
+            { entry, k -> entry.key == k })
         if (i >= 0) {
             return entries[i].value
         }
@@ -50,7 +48,8 @@ public class DoubleDoubleMap : MapBase<DoubleDoubleMapEntry, DoubleDoubleMapEntr
     private fun insert(key: Double, value: Double) {
         insertInternal(key, value,
             { entry, k -> entry.key = k },
-            { entry, v -> entry.value = v }
+            { entry, v -> entry.value = v },
+            { entry, k -> entry.key == k }
         )
     }
 

@@ -55,15 +55,13 @@ public class DoubleObjectMap<TValue> :
     }
 
     public fun has(key: Double): Boolean {
-        return findEntryInternal(key.hashCode())  {
-            key == it.key
-        }>= 0
+        return findEntryInternal(key,
+            { entry, k -> entry.key == k }) >= 0
     }
 
     public fun get(key: Double): TValue {
-        val i = findEntryInternal(key.hashCode()) {
-            key == it.key
-        }
+        val i = findEntryInternal(key,
+            { entry, k -> entry.key == k })
         if (i >= 0) {
             return entries[i].value
         }
@@ -78,7 +76,8 @@ public class DoubleObjectMap<TValue> :
         insertInternal(
             key, value as Any,
             { entry, k -> entry.key = k },
-            { entry, v -> entry.value = v as TValue }
+            { entry, v -> entry.value = v as TValue },
+            { entry, k -> entry.key == k }
         )
     }
 

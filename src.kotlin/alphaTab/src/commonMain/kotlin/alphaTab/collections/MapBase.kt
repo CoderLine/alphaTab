@@ -7,12 +7,35 @@ public interface IMapEntryInternal {
 }
 
 internal inline fun
+    <reified TEntryType, reified TInternalEntryType : IMapEntryInternal, reified TKey>
+    MapBase<TEntryType, TInternalEntryType>.findEntryInternal(
+    key: TKey,
+    keyEquals: (entry: TInternalEntryType, key: TKey) -> Boolean
+): Int {
+    val buckets = _buckets
+    val entries = this.entries
+    if (buckets != null) {
+        val hashCode = key.hashCode() and 0x7FFFFFFF
+        var i = buckets[hashCode % buckets.size]
+        while (i >= 0) {
+            if (entries[i].hashCode == hashCode && keyEquals(entries[i], key)) {
+                return i
+            }
+
+            i = entries[i].next
+        }
+    }
+    return -1
+}
+
+internal inline fun
     <reified TEntryType, reified TInternalEntryType : IMapEntryInternal, reified TKey, reified TValue>
     MapBase<TEntryType, TInternalEntryType>.insertInternal(
     key: TKey,
     value: TValue,
     setKey: (entry: TInternalEntryType, key: TKey) -> Unit,
     setValue: (entry: TInternalEntryType, value: TValue) -> Unit,
+    keyEquals: (entry: TInternalEntryType, key: TKey) -> Boolean
 ) {
     var buckets = _buckets
     if (buckets == null) {
@@ -24,7 +47,7 @@ internal inline fun
 
     var i = buckets[targetBucket]
     while (i >= 0) {
-        if (entries[i].hashCode == hashCode) {
+        if (entries[i].hashCode == hashCode && keyEquals(entries[i], key)) {
             setValue(entries[i], value)
             return
         }
@@ -55,8 +78,8 @@ internal inline fun
 }
 
 
-public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal> : Iterable<TEntryType>
-{
+public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal> :
+    Iterable<TEntryType> {
     internal var _count: Int = 0
     internal var _freeCount: Int = 0
     internal var _buckets: IntArray? = null
@@ -74,30 +97,13 @@ public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal
     }
 
     internal abstract fun createEntries(size: Int): Array<TInternalEntryType>
-    internal abstract fun createEntries(size: Int, old:Array<TInternalEntryType>): Array<TInternalEntryType>
+    internal abstract fun createEntries(
+        size: Int,
+        old: Array<TInternalEntryType>
+    ): Array<TInternalEntryType>
 
     public val size: Double
         get() = (_count - _freeCount).toDouble()
-
-
-    protected fun findEntryInternal(hashCode: Int, keyEquals: (entry:TInternalEntryType) -> Boolean): Int {
-        val buckets = _buckets
-        val entries = this.entries
-        if (buckets != null) {
-            val hashCode = hashCode and 0x7FFFFFFF
-            var i = buckets[hashCode % buckets.size]
-            while (i >= 0) {
-                // TODO: consider reified inline method to optimize the equals call
-                if (entries[i].hashCode == hashCode && keyEquals(entries[i])) {
-                    return i
-                }
-
-                i = entries[i].next
-            }
-        }
-        return -1
-    }
-
 
     internal fun resize(): IntArray {
         return resize(HashHelpers.expandPrime(_count))
@@ -109,7 +115,7 @@ public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal
         }
         val newEntries = createEntries(newSize, entries)
         var i = 0
-        while(i < _count) {
+        while (i < _count) {
             if (newEntries[i].hashCode >= 0) {
                 val bucket = newEntries[i].hashCode % newSize
                 newEntries[i].next = newBuckets[bucket]
@@ -122,7 +128,7 @@ public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal
         return newBuckets
     }
 
-    protected fun deleteInternal(keyHashCode:Int) {
+    protected fun deleteInternal(keyHashCode: Int) {
         val buckets = _buckets
         if (buckets != null) {
             val hashCode = keyHashCode and 0x7FFFFFFF

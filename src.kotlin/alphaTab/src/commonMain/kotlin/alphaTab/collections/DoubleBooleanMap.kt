@@ -28,15 +28,13 @@ internal class DoubleBooleanMapEntryInternal : DoubleBooleanMapEntry(), IMapEntr
 
 internal class DoubleBooleanMap : MapBase<DoubleBooleanMapEntry, DoubleBooleanMapEntryInternal>() {
     public fun has(key: Double): Boolean {
-        return findEntryInternal(key.hashCode()) {
-            key == it.key
-        } >= 0
+        return findEntryInternal(key,
+            { entry, k -> entry.key == k }) >= 0
     }
 
     public fun get(key: Double): Boolean {
-        val i = findEntryInternal(key.hashCode()) {
-            key == it.key
-        }
+        val i = findEntryInternal(key,
+            { entry, k -> entry.key == k })
         if (i >= 0) {
             return entries[i].value
         }
@@ -50,7 +48,8 @@ internal class DoubleBooleanMap : MapBase<DoubleBooleanMapEntry, DoubleBooleanMa
     private fun insert(key: Double, value: Boolean) {
         insertInternal(key, value,
             { entry, k -> entry.key = k },
-            { entry, v -> entry.value = v }
+            { entry, v -> entry.value = v },
+            { entry, k -> entry.key == k }
         )
     }
 
