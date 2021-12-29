@@ -2,6 +2,7 @@ package alphaTab.platform.jvm
 
 import alphaTab.Settings
 import alphaTab.core.BitConverter
+import alphaTab.core.toCharArray
 import alphaTab.model.Color
 import alphaTab.model.Font
 import alphaTab.model.MusicFontSymbol
@@ -413,19 +414,19 @@ public class SkiaCanvas : ICanvas {
         symbol: MusicFontSymbol,
         centerAtPosition: Boolean?
     ) {
-        fillMusicFontSymbols(x, y, scale, mutableListOf(symbol), centerAtPosition)
+        fillMusicFontSymbols(x, y, scale, alphaTab.collections.List(symbol), centerAtPosition)
     }
 
     override fun fillMusicFontSymbols(
         x: Double,
         y: Double,
         scale: Double,
-        symbols: MutableList<MusicFontSymbol>,
+        symbols: alphaTab.collections.List<MusicFontSymbol>,
         centerAtPosition: Boolean?
     ) {
         val s = String(symbols
             .filter { it != MusicFontSymbol.None }
-            .map { it.value.toChar() }
+            .map<Char> { it.value.toChar() }
             .toCharArray()
         )
 
