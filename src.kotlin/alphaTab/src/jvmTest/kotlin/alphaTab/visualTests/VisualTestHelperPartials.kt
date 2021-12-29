@@ -237,7 +237,7 @@ class VisualTestHelperPartials {
                 for (partialResult in result) {
                     val partialCanvas = partialResult.renderResult
                     if (partialCanvas is Image) {
-                        finalImageSurface.canvas.drawImage(partialCanvas, partialCanvas.x.toFloat(), partialCanvas.y.toFloat())
+                        finalImageSurface.canvas.drawImage(partialCanvas, partialResult.x.toFloat(), partialResult.y.toFloat())
                     }
                 }
 
