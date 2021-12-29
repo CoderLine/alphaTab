@@ -325,7 +325,7 @@ export default createEmitter('cloneable', (program, input) => {
                     false,
                     undefined,
                     ts.factory.createNamedImports([
-                        ts.factory.createImportSpecifier(undefined, ts.factory.createIdentifier(name))
+                        ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(name))
                     ])
                 ),
                 ts.factory.createStringLiteral(module)
@@ -353,7 +353,7 @@ export default createEmitter('cloneable', (program, input) => {
                     false,
                     undefined,
                     ts.factory.createNamedImports([
-                        ts.factory.createImportSpecifier(undefined, ts.factory.createIdentifier(input.name!.text))
+                        ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(input.name!.text))
                     ])
                 ),
                 ts.factory.createStringLiteral(toImportPath(sourceFileName))

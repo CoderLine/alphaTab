@@ -5,6 +5,7 @@ on:
       - develop
       - master
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build_web:
@@ -29,7 +30,9 @@ jobs:
           node-version: '12.x'
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '5.0.x'
+          dotnet-version:  |
+            5.0.x
+            6.0.x
       - run: npm install
       - run: npm run build-csharp-ci
       - run: npm run test-csharp-ci

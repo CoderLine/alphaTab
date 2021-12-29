@@ -131,7 +131,7 @@ public class SkiaCanvas : ICanvas {
 
     override fun fillRect(x: Double, y: Double, w: Double, h: Double) {
         createPaint().use {
-            it.blendMode = BlendMode.SRC_OVER
+            it.setBlendMode(BlendMode.SRC_OVER)
             it.mode = PaintMode.FILL
             _surface.canvas.drawRect(
                 Rect(
@@ -154,7 +154,7 @@ public class SkiaCanvas : ICanvas {
 
     override fun strokeRect(x: Double, y: Double, w: Double, h: Double) {
         createPaint().use {
-            it.blendMode = BlendMode.SRC_OVER
+            it.setBlendMode(BlendMode.SRC_OVER)
             it.mode = PaintMode.STROKE
             _surface.canvas.drawRect(
                 Rect(
