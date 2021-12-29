@@ -257,7 +257,6 @@ export class VisualTestHelper {
 
                 // NOTE: on some platforms we serialize/deserialize the score objects
                 // this logic does the same just to ensure we get the right result
-                debugger;
                 const renderScore = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
                 api.renderScore(renderScore, tracks);
             });
