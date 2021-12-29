@@ -56,11 +56,15 @@ public class ObjectBooleanMap<TKey> :
     }
 
     public fun has(key: TKey): Boolean {
-        return findEntryInternal(key.hashCode()) >= 0
+        return findEntryInternal(key.hashCode())  {
+            key?.equals(it.key) ?: false
+        }>= 0
     }
 
     public fun get(key: TKey): Boolean {
-        val i = findEntryInternal(key.hashCode())
+        val i = findEntryInternal(key.hashCode()) {
+            key?.equals(it.key) ?: false
+        }
         if (i >= 0) {
             return entries[i].value
         }

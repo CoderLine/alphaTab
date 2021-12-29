@@ -80,14 +80,15 @@ public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal
         get() = (_count - _freeCount).toDouble()
 
 
-    protected fun findEntryInternal(hashCode: Int): Int {
+    protected fun findEntryInternal(hashCode: Int, keyEquals: (entry:TInternalEntryType) -> Boolean): Int {
         val buckets = _buckets
         val entries = this.entries
         if (buckets != null) {
             val hashCode = hashCode and 0x7FFFFFFF
             var i = buckets[hashCode % buckets.size]
             while (i >= 0) {
-                if (entries[i].hashCode == hashCode) {
+                // TODO: consider reified inline method to optimize the equals call
+                if (entries[i].hashCode == hashCode && keyEquals(entries[i])) {
                     return i
                 }
 

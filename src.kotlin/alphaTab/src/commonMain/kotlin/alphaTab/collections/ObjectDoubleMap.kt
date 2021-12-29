@@ -47,11 +47,15 @@ public class ObjectDoubleMap<TKey> :
     }
 
     public fun has(key: TKey): Boolean {
-        return findEntryInternal(key.hashCode()) >= 0
+        return findEntryInternal(key.hashCode()) {
+            key?.equals(it.key) ?: false
+        } >= 0
     }
 
     public fun get(key: TKey): Double {
-        val i = findEntryInternal(key.hashCode())
+        val i = findEntryInternal(key.hashCode()) {
+            key?.equals(it.key) ?: false
+        }
         if (i >= 0) {
             return entries[i].value
         }
