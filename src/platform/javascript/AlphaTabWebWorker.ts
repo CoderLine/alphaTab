@@ -21,7 +21,9 @@ export class AlphaTabWebWorker {
     }
 
     public static init(): void {
-        (Environment.globalThis as any).alphaTabWebWorker = new AlphaTabWebWorker(Environment.globalThis as IWorkerScope);
+        (Environment.globalThis as any).alphaTabWebWorker = new AlphaTabWebWorker(
+            Environment.globalThis as IWorkerScope
+        );
     }
 
     private handleMessage(e: MessageEvent): void {
@@ -35,6 +37,12 @@ export class AlphaTabWebWorker {
                 this._renderer.partialRenderFinished.on(result => {
                     this._main.postMessage({
                         cmd: 'alphaTab.partialRenderFinished',
+                        result: result
+                    });
+                });
+                this._renderer.partialLayoutFinished.on(result => {
+                    this._main.postMessage({
+                        cmd: 'alphaTab.partialLayoutFinished',
                         result: result
                     });
                 });
@@ -63,6 +71,9 @@ export class AlphaTabWebWorker {
                 break;
             case 'alphaTab.resizeRender':
                 this._renderer.resizeRender();
+                break;
+            case 'alphaTab.renderResult':
+                this._renderer.renderResult(data.resultId);
                 break;
             case 'alphaTab.setWidth':
                 this._renderer.width = data.width;

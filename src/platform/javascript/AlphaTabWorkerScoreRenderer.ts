@@ -76,6 +76,14 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
+    public renderResult(resultId: string): void {
+        this._worker.postMessage({
+            cmd: 'alphaTab.renderResult',
+            resultId: resultId
+        });
+    }
+
+
     public get width(): number {
         return this._width;
     }
@@ -97,6 +105,9 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
                 break;
             case 'alphaTab.partialRenderFinished':
                 (this.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
+                break;
+            case 'alphaTab.partialLayoutFinished':
+                (this.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
                 break;
             case 'alphaTab.renderFinished':
                 (this.renderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
@@ -123,6 +134,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
 
     public preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
     public partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
     public renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
     public postRenderFinished: IEventEmitter = new EventEmitter();
     public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();

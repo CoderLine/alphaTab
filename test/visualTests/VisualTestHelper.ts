@@ -359,12 +359,6 @@ export class VisualTestHelper {
         actual.width = totalWidth;
         actual.height = totalHeight;
         const actualImageContext = actual.getContext('2d')!;
-
-        const point = {
-            x: 0,
-            y: 0
-        };
-        let rowHeight = 0;
         for (const partialResult of result) {
             const partialCanvas = partialResult.renderResult;
 
@@ -376,19 +370,7 @@ export class VisualTestHelper {
             }
 
             if (imageSource) {
-                actualImageContext.drawImage(imageSource, point.x, point.y);
-
-                if (partialResult.height > rowHeight) {
-                    rowHeight = partialResult.height;
-                }
-
-                point.x += partialResult.width;
-
-                if (point.x >= totalWidth) {
-                    point.x = 0;
-                    point.y += rowHeight | 0;
-                    rowHeight = 0;
-                }
+                actualImageContext.drawImage(imageSource, partialResult.x, partialResult.y);
             }
         }
 
@@ -477,13 +459,16 @@ export class VisualTestHelper {
                     let percentDifference = (match.differentPixels / totalPixels) * 100;
                     result.pass = percentDifference < tolerancePercent;
                     // result.pass = match.differentPixels === 0;
+                    result.message = '';
 
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
                         result.message = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
-                        await VisualTestHelper.saveFiles(expectedFileName, expected, oldActual, diff);
-                    } else if (sizeMismatch) {
-                        result.message = `Image sizes do not match: ${expected.width}/${expected.height} vs ${oldActual.width}/${oldActual.height}`;
+                        // await VisualTestHelper.saveFiles(expectedFileName, expected, oldActual, diff);
+                    } 
+                    
+                    if (sizeMismatch) {
+                        result.message += `Image sizes do not match: expected ${expected.width}x${expected.height} but got ${oldActual.width}x${oldActual.height}`;
                         result.pass = false;
                     }
                 } catch (e) {

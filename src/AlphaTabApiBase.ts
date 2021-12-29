@@ -148,7 +148,8 @@ export class AlphaTabApiBase<TSettings> {
         this.renderer.preRender.on(_ => {
             this._startTime = Date.now();
         });
-        this.renderer.partialRenderFinished.on(this.appendRenderResult.bind(this));
+        this.renderer.partialLayoutFinished.on(this.appendRenderResult.bind(this));
+        this.renderer.partialRenderFinished.on(this.updateRenderResult.bind(this));
         this.renderer.renderFinished.on(r => {
             this.appendRenderResult(r);
             this.appendRenderResult(null); // marks last element
@@ -324,8 +325,12 @@ export class AlphaTabApiBase<TSettings> {
                 this._cursorWrapper.height = result.totalHeight;
             }
         }
-        if (!result || result.renderResult) {
-            this.uiFacade.beginAppendRenderResults(result);
+        this.uiFacade.beginAppendRenderResults(result);
+    }
+
+    private updateRenderResult(result: RenderFinishedEventArgs | null): void {
+        if (result && result.renderResult) {
+            this.uiFacade.beginUpdateRenderResults(result);
         }
     }
 
@@ -806,10 +811,7 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * updates the cursors to highlight the specified beat
      */
-    private cursorUpdateBeat(
-        lookupResult: MidiTickLookupFindBeatResult,
-        stop: boolean
-    ): void {
+    private cursorUpdateBeat(lookupResult: MidiTickLookupFindBeatResult, stop: boolean): void {
         const beat: Beat = lookupResult.currentBeat;
         const nextBeat: Beat | null = lookupResult.nextBeat;
         const duration: number = lookupResult.duration;
@@ -837,15 +839,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         this.uiFacade.beginInvoke(() => {
-            this.internalCursorUpdateBeat(
-                beat,
-                nextBeat,
-                duration,
-                stop,
-                beatsToHighlight,
-                cache!,
-                beatBoundings!
-            );
+            this.internalCursorUpdateBeat(beat, nextBeat, duration, stop, beatsToHighlight, cache!, beatBoundings!);
         });
     }
 

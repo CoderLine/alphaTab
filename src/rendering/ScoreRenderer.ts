@@ -110,6 +110,20 @@ export class ScoreRenderer implements IScoreRenderer {
         this.settings = settings;
     }
 
+    public renderResult(resultId: string): void {
+        try {
+            const layout = this.layout;
+            if (layout) {
+                Logger.debug('Rendering', 'Request render of lazy partial ' + resultId);
+                layout.renderLazyPartial(resultId);
+            } else {
+                Logger.warning('Rendering', 'Request render of lazy partial ' + resultId + ' ignored, no layout exists');
+            }
+        } catch (e) {
+            (this.error as EventEmitterOfT<Error>).trigger(e as Error);
+        }
+    }
+
     public render(): void {
         if (this.width === 0) {
             Logger.warning('Rendering', 'AlphaTab skipped rendering because of width=0 (element invisible)', null);
@@ -150,7 +164,6 @@ export class ScoreRenderer implements IScoreRenderer {
             (this.preRender as EventEmitterOfT<boolean>).trigger(true);
             this.canvas!.settings = this.settings;
             this.layout!.resize();
-            this.layout!.renderAnnotation();
             this.onRenderFinished();
             (this.postRenderFinished as EventEmitter).trigger();
         } else {
@@ -166,15 +179,18 @@ export class ScoreRenderer implements IScoreRenderer {
             null
         );
         this.layout!.layoutAndRender();
-        this.layout!.renderAnnotation();
         this._renderedTracks = this.tracks;
         this.onRenderFinished();
         (this.postRenderFinished as EventEmitter).trigger();
     }
 
     public readonly preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
-    public readonly renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
-    public readonly partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public readonly renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
+    public readonly partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
+    public readonly partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
     public readonly postRenderFinished: IEventEmitter = new EventEmitter();
     public readonly error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
 

@@ -31,7 +31,7 @@ export class CoreSettings {
     public tex: boolean = false;
 
     /**
-     * Gets or sets the initial tracks that should be loaded for the score. 
+     * Gets or sets the initial tracks that should be loaded for the score.
      * @target web
      */
     public tracks: unknown = null;
@@ -96,7 +96,7 @@ export class CoreSettings {
      * @target web
      */
     public static ensureFullUrl(relativeUrl: string | null): string {
-        if(!relativeUrl) {
+        if (!relativeUrl) {
             return '';
         }
 
