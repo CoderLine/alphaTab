@@ -1,6 +1,7 @@
 package alphaTab.platform.jvm
 
 import alphaTab.Settings
+import alphaTab.core.toCharArray
 import alphaTab.model.Color
 import alphaTab.model.Font
 import alphaTab.model.MusicFontSymbol
