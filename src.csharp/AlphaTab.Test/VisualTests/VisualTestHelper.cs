@@ -186,27 +186,12 @@ namespace AlphaTab.VisualTests
                 (int) totalHeight,
                 SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
             {
-                var point = new SKPoint();
-                var rowHeight = 0;
                 foreach (var partialResult in result)
                 {
                     var partialCanvas = partialResult.RenderResult;
                     if (partialCanvas is SKImage img)
                     {
-                        finalImageSurface.Canvas.DrawImage(img, point);
-                        if (partialResult.Height > rowHeight)
-                        {
-                            rowHeight = img.Height;
-                        }
-
-                        point.X += img.Width;
-
-                        if (point.X >= totalWidth)
-                        {
-                            point.X = 0;
-                            point.Y += rowHeight;
-                            rowHeight = 0;
-                        }
+                        finalImageSurface.Canvas.DrawImage(img, (float)partialResult.X, (float)partialResult.Y);
                     }
                 }
 
