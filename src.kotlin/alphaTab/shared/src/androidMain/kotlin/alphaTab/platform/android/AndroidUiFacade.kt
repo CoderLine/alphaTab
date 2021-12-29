@@ -106,7 +106,9 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
         _layoutView.layoutManager = AlphaTabLayoutManager(_layoutView.context).apply {
             this.updateOrientation(isVertical)
         }
-        _renderResultAdapter = AlphaTabRenderResultAdapter(api.renderer)
+        _renderResultAdapter = AlphaTabRenderResultAdapter {
+            api.renderer.renderResult(it)
+        }
         _layoutView.adapter = _renderResultAdapter
     }
 

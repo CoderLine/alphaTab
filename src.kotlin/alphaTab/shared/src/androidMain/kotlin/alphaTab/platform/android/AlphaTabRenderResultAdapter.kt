@@ -126,8 +126,7 @@ class RenderResultDrawable(private val _requestRender: ((resultId: String) -> Un
 @ExperimentalUnsignedTypes
 class AlphaTabRenderResultViewHolder :
     RecyclerView.ViewHolder {
-
-    constructor(context: Context, renderer: IScoreRenderer) : super(ImageView(context)) {
+    constructor(context: Context, requestRender: ((resultId: String) -> Unit)) : super(ImageView(context)) {
         val imageView = itemView as ImageView
         imageView.layoutParams = FlexboxLayoutManager.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -136,9 +135,7 @@ class AlphaTabRenderResultViewHolder :
             this.flexGrow = 0f
             this.flexShrink = 0f
         }
-        imageView.setImageDrawable(RenderResultDrawable {
-            renderer.renderResult(it)
-        })
+        imageView.setImageDrawable(RenderResultDrawable(requestRender))
     }
 
     fun bindTo(result: RenderFinishedEventArgs) {
@@ -153,7 +150,7 @@ class AlphaTabRenderResultViewHolder :
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
-class AlphaTabRenderResultAdapter(private val _renderer: IScoreRenderer) :
+class AlphaTabRenderResultAdapter(private val _requestRender: ((resultId: String) -> Unit)) :
     RecyclerView.Adapter<AlphaTabRenderResultViewHolder>() {
     private class Counter {
         public var count: Int = 0
@@ -212,7 +209,7 @@ class AlphaTabRenderResultAdapter(private val _renderer: IScoreRenderer) :
         viewType: Int
     ): AlphaTabRenderResultViewHolder {
 
-        return AlphaTabRenderResultViewHolder(parent.context, _renderer)
+        return AlphaTabRenderResultViewHolder(parent.context, _requestRender)
     }
 
     override fun onBindViewHolder(holder: AlphaTabRenderResultViewHolder, position: Int) {
