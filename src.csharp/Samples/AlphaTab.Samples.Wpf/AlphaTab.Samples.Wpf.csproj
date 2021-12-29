@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
     </ItemGroup>
 
     <ItemGroup>
