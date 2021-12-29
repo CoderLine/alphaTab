@@ -21,7 +21,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         super(beat, voiceContainer);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this._effectSlur = null;
         this._effectEndSlur = null;
         super.doLayout();
@@ -52,7 +52,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
     }
 
-    protected createTies(n: Note): void {
+    protected override createTies(n: Note): void {
         // create a tie if any effect requires it
         if (!n.isVisible) {
             return;

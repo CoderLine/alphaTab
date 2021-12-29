@@ -23,7 +23,7 @@ public class Float32Array : Iterable<Float> {
         data = x
     }
 
-    public constructor(x: List<Double>) {
+    public constructor(x: Iterable<Double>) {
         this.data = x.map { d -> d.toFloat() }.toFloatArray()
     }
 

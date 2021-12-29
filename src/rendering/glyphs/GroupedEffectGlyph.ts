@@ -26,7 +26,7 @@ export abstract class GroupedEffectGlyph extends EffectGlyph {
         );
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // if we are linked with the previous, the first glyph of the group will also render this one.
         if (this.isLinkedWithPrevious) {
             return;

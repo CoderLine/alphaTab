@@ -16,7 +16,7 @@ internal open class JsonHelperPartials {
                 }
             }
 
-            if (o is alphaTab.core.ecmaScript.Map<*, *>) {
+            if (o is alphaTab.collections.Map<*, *>) {
                 for (kvp in o) {
                     func(kvp.value, (kvp.key!!) as String)
                 }
@@ -30,7 +30,7 @@ internal open class JsonHelperPartials {
                 }
             }
 
-            if (o is alphaTab.core.ecmaScript.Map<*, *>) {
+            if (o is alphaTab.collections.Map<*, *>) {
                 for (kvp in o) {
                     func(kvp.value, (kvp.key!!) as String)
                 }

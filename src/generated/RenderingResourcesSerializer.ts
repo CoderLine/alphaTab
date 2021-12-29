@@ -19,23 +19,23 @@ export class RenderingResourcesSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("copyrightFont", Font.toJson(obj.copyrightFont)); 
-        o.set("titleFont", Font.toJson(obj.titleFont)); 
-        o.set("subTitleFont", Font.toJson(obj.subTitleFont)); 
-        o.set("wordsFont", Font.toJson(obj.wordsFont)); 
-        o.set("effectFont", Font.toJson(obj.effectFont)); 
-        o.set("fretboardNumberFont", Font.toJson(obj.fretboardNumberFont)); 
-        o.set("tablatureFont", Font.toJson(obj.tablatureFont)); 
-        o.set("graceFont", Font.toJson(obj.graceFont)); 
-        o.set("staffLineColor", Color.toJson(obj.staffLineColor)); 
-        o.set("barSeparatorColor", Color.toJson(obj.barSeparatorColor)); 
-        o.set("barNumberFont", Font.toJson(obj.barNumberFont)); 
-        o.set("barNumberColor", Color.toJson(obj.barNumberColor)); 
-        o.set("fingeringFont", Font.toJson(obj.fingeringFont)); 
-        o.set("markerFont", Font.toJson(obj.markerFont)); 
-        o.set("mainGlyphColor", Color.toJson(obj.mainGlyphColor)); 
-        o.set("secondaryGlyphColor", Color.toJson(obj.secondaryGlyphColor)); 
-        o.set("scoreInfoColor", Color.toJson(obj.scoreInfoColor)); 
+        o.set("copyrightfont", Font.toJson(obj.copyrightFont)); 
+        o.set("titlefont", Font.toJson(obj.titleFont)); 
+        o.set("subtitlefont", Font.toJson(obj.subTitleFont)); 
+        o.set("wordsfont", Font.toJson(obj.wordsFont)); 
+        o.set("effectfont", Font.toJson(obj.effectFont)); 
+        o.set("fretboardnumberfont", Font.toJson(obj.fretboardNumberFont)); 
+        o.set("tablaturefont", Font.toJson(obj.tablatureFont)); 
+        o.set("gracefont", Font.toJson(obj.graceFont)); 
+        o.set("stafflinecolor", Color.toJson(obj.staffLineColor)); 
+        o.set("barseparatorcolor", Color.toJson(obj.barSeparatorColor)); 
+        o.set("barnumberfont", Font.toJson(obj.barNumberFont)); 
+        o.set("barnumbercolor", Color.toJson(obj.barNumberColor)); 
+        o.set("fingeringfont", Font.toJson(obj.fingeringFont)); 
+        o.set("markerfont", Font.toJson(obj.markerFont)); 
+        o.set("mainglyphcolor", Color.toJson(obj.mainGlyphColor)); 
+        o.set("secondaryglyphcolor", Color.toJson(obj.secondaryGlyphColor)); 
+        o.set("scoreinfocolor", Color.toJson(obj.scoreInfoColor)); 
         return o; 
     }
     public static setProperty(obj: RenderingResources, property: string, v: unknown): boolean {

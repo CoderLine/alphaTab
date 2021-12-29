@@ -21,11 +21,11 @@ export class TieGlyph extends Glyph {
         this.forEnd = forEnd;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 0;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (!this.endBeat) {
             return;
         }

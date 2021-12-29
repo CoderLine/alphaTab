@@ -16,11 +16,11 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
         this._endNote = endNote;
     }
 
-    protected getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
+    protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
         return Math.log2(endX - startX + 1) * this.renderer.settings.notation.slurHeight;
     }
 
-    protected getStartY(): number {
+    protected override getStartY(): number {
         if (this.isStartCentered()) {
             switch (this.tieDirection) {
                 case BeamDirection.Up:
@@ -34,7 +34,7 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
         return this.startNoteRenderer!.getNoteY(this._startNote, NoteYPosition.Center);
     }
 
-    protected getEndY(): number {
+    protected override getEndY(): number {
         if (this.isEndCentered()) {
             if (this.isEndOnStem()) {
                 switch (this.tieDirection) {
@@ -78,13 +78,13 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
         return startBeamDirection !== endBeamDirection && this.startBeat!.graceType === GraceType.None;
     }
 
-    protected getStartX(): number {
+    protected override getStartX(): number {
         return this.isStartCentered()
             ? this.startNoteRenderer!.getBeatX(this._startNote.beat, BeatXPosition.MiddleNotes)
             : this.startNoteRenderer!.getNoteX(this._startNote, NoteXPosition.Right);
     }
 
-    protected getEndX(): number {
+    protected override getEndX(): number {
         if (this.isEndCentered()) {
             if (this.isEndOnStem()) {
                 return this.endNoteRenderer!.getBeatX(this._endNote.beat, BeatXPosition.Stem);

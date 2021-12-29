@@ -73,10 +73,6 @@ export class PageViewLayout extends ScoreLayout {
         return true;
     }
 
-    public get padding(): number[] {
-        return this._pagePadding!;
-    }
-
     public get firstBarX(): number {
         let x = this._pagePadding![0];
         if (this._groups.length > 0) {

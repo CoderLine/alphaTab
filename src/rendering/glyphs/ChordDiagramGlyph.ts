@@ -21,7 +21,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
         this._chord = chord;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         const scale = this.scale;
         let res: RenderingResources = this.renderer.resources;
@@ -43,7 +43,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
             2 * ChordDiagramGlyph.Padding * scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x + ChordDiagramGlyph.Padding * this.scale + this._firstFretSpacing;
         cy += this.y;
         let w: number = this.width - 2 * ChordDiagramGlyph.Padding * this.scale + this.scale - this._firstFretSpacing;

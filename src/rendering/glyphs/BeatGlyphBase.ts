@@ -11,7 +11,7 @@ export class BeatGlyphBase extends GlyphGroup {
         super(0, 0);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         // left to right layout
         let w: number = 0;
         if (this.glyphs) {

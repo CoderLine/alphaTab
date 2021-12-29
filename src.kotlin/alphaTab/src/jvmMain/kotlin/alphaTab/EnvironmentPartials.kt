@@ -5,7 +5,7 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
-internal actual fun createPlatformSpecificRenderEngines(engines: alphaTab.core.ecmaScript.Map<String, RenderEngineFactory>) {
+internal actual fun createPlatformSpecificRenderEngines(engines: alphaTab.collections.Map<String, RenderEngineFactory>) {
     engines.set(
         "skia",
         RenderEngineFactory(true) { SkiaCanvas() }

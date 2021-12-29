@@ -15,7 +15,7 @@ export class TabSlurGlyph extends TabTieGlyph {
         this._forSlide = forSlide;
     }
 
-    protected getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
+    protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
         return Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight;
     }
 
@@ -64,7 +64,7 @@ export class TabSlurGlyph extends TabTieGlyph {
         return true;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.startBeat!.voice.bar

@@ -19,20 +19,20 @@ export class CoreSettingsSerializer {
         } 
         const o = new Map<string, unknown>(); 
         /*@target web*/
-        o.set("scriptFile", obj.scriptFile); 
+        o.set("scriptfile", obj.scriptFile); 
         /*@target web*/
-        o.set("fontDirectory", obj.fontDirectory); 
+        o.set("fontdirectory", obj.fontDirectory); 
         /*@target web*/
         o.set("file", obj.file); 
         /*@target web*/
         o.set("tex", obj.tex); 
         /*@target web*/
         o.set("tracks", obj.tracks); 
-        o.set("enableLazyLoading", obj.enableLazyLoading); 
+        o.set("enablelazyloading", obj.enableLazyLoading); 
         o.set("engine", obj.engine); 
-        o.set("logLevel", obj.logLevel as number); 
-        o.set("useWorkers", obj.useWorkers); 
-        o.set("includeNoteBounds", obj.includeNoteBounds); 
+        o.set("loglevel", obj.logLevel as number); 
+        o.set("useworkers", obj.useWorkers); 
+        o.set("includenotebounds", obj.includeNoteBounds); 
         return o; 
     }
     public static setProperty(obj: CoreSettings, property: string, v: unknown): boolean {

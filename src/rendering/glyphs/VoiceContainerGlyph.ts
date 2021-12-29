@@ -119,7 +119,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
         this.scaleToForce(Math.max(this.renderer.settings.display.stretchForce, info.minStretchForce));
     }
 
-    public addGlyph(g: Glyph): void {
+    public override addGlyph(g: Glyph): void {
         let bg: BeatContainerGlyph = g as BeatContainerGlyph;
         g.x =
             this.beatGlyphs.length === 0
@@ -134,10 +134,10 @@ export class VoiceContainerGlyph extends GlyphGroup {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // canvas.color = Color.random();
         // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
         canvas.color =

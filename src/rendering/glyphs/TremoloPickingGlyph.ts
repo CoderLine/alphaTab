@@ -7,7 +7,7 @@ export class TremoloPickingGlyph extends MusicFontGlyph {
         super(x, y, 1, TremoloPickingGlyph.getSymbol(duration));
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 12 * this.scale;
     }
 

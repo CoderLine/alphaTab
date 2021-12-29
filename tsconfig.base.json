@@ -18,6 +18,7 @@
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
+    "noImplicitOverride": true,
     "sourceMap": true,
     "declaration": true,
     "incremental": true,

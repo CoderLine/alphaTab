@@ -7,14 +7,6 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
 
-actual class LateInitList<T> : java.util.ArrayList<T>, MutableList<T> {
-    @Suppress("UNCHECKED_CAST")
-    public actual constructor(size: Int) : super(arrayOfNulls<Any>(size).toList() as List<T>) {
-
-    }
-}
-
-
 @ExperimentalUnsignedTypes
 actual fun UByteArray.decodeToFloatArray(): FloatArray {
     val fb = ByteBuffer.wrap(this.toByteArray()).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();

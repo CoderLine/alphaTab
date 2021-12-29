@@ -33,7 +33,7 @@ namespace AlphaTab.Core
 
         public static IList<T> Slice<T>(this IList<T> data)
         {
-            return new AlphaTab.Core.List<T>(data);
+            return new AlphaTab.Collections.List<T>(data);
         }
 
         public static void Reverse<T>(this IList<T> data)
@@ -251,22 +251,22 @@ namespace AlphaTab.Core
             return new List<string>(s.Split(new[] {separator}, StringSplitOptions.None));
         }
 
-        public static MapEntry<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
+        public static KeyValuePair<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
         {
-            return new MapEntry<double, TValue>(key, value);
+            return new KeyValuePair<double, TValue>(key, value);
         }
 
-        public static MapEntry<TKey, double> CreateMapEntry<TKey>(TKey key, int value)
+        public static KeyValuePair<TKey, double> CreateMapEntry<TKey>(TKey key, int value)
         {
-            return new MapEntry<TKey, double>(key, value);
+            return new KeyValuePair<TKey, double>(key, value);
         }
 
-        public static MapEntry<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
+        public static KeyValuePair<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
         {
-            return new MapEntry<TKey, TValue>(key, value);
+            return new KeyValuePair<TKey, TValue>(key, value);
         }
 
-        public static string ToString(this double num, int radix)
+        public static string ToInvariantString(this double num, int radix)
         {
             if (radix == 16)
             {
@@ -274,6 +274,21 @@ namespace AlphaTab.Core
             }
 
             return num.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static string ToInvariantString(this double num)
+        {
+            return num.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static string ToInvariantString(this int num)
+        {
+            return num.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static string ToInvariantString(this Enum num)
+        {
+            return ((IConvertible)num).ToInt32(CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -344,6 +359,12 @@ namespace AlphaTab.Core
                 default:
                     return "object";
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<T> SetInitializer<T>(params T[] items)
+        {
+            return items;
         }
     }
 }

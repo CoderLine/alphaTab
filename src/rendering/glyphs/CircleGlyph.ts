@@ -9,11 +9,11 @@ export class CircleGlyph extends Glyph {
         this._size = size;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = this._size + 3 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         canvas.fillCircle(cx + this.x, cy + this.y, this._size);
     }
 }

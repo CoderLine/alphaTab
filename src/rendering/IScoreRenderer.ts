@@ -33,7 +33,7 @@ export interface IScoreRenderer {
      * @param score The score defining the tracks.
      * @param trackIndexes The indexes of the tracks to draw.
      */
-    renderScore(score: Score, trackIndexes: number[]): void;
+    renderScore(score: Score | null, trackIndexes: number[] | null): void;
 
     /**
      * Initiates the rendering of a partial render result which the renderer

@@ -20,7 +20,7 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
         this._partialWaves = partialWaves;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         let symbolHeight: number = 0;
         switch (this._type) {

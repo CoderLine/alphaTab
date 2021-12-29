@@ -23,7 +23,7 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
         TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, scale, slurText);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this.width = 0;
         for (let noteHeads of this.BendNoteHeads) {

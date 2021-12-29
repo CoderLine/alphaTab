@@ -35,7 +35,7 @@ export class XmlDocument extends XmlNode {
         XmlParser.parse(xml, 0, this);
     }
 
-    public toString() {
+    public override toString() {
         return this.toFormattedString();
     }
 

@@ -12,7 +12,7 @@ export class BeatCloner {
         const clone = new Beat(); 
         clone.index = original.index; 
         clone.notes = []; 
-        for (const i of original.notes) {
+        for (const i of original.notes!) {
             clone.addNote(NoteCloner.clone(i));
         } 
         clone.isEmpty = original.isEmpty; 
@@ -23,7 +23,7 @@ export class BeatCloner {
         clone.isLetRing = original.isLetRing; 
         clone.isPalmMute = original.isPalmMute; 
         clone.automations = []; 
-        for (const i of original.automations) {
+        for (const i of original.automations!) {
             clone.automations.push(AutomationCloner.clone(i));
         } 
         clone.dots = original.dots; 
@@ -40,9 +40,11 @@ export class BeatCloner {
         clone.tupletNumerator = original.tupletNumerator; 
         clone.isContinuedWhammy = original.isContinuedWhammy; 
         clone.whammyBarType = original.whammyBarType; 
-        clone.whammyBarPoints = []; 
-        for (const i of original.whammyBarPoints) {
-            clone.addWhammyBarPoint(BendPointCloner.clone(i));
+        if (original.whammyBarPoints) {
+            clone.whammyBarPoints = [];
+            for (const i of original.whammyBarPoints!) {
+                clone.addWhammyBarPoint(BendPointCloner.clone(i));
+            }
         } 
         clone.vibrato = original.vibrato; 
         clone.chordId = original.chordId; 

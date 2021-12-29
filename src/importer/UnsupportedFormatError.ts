@@ -5,10 +5,10 @@ import { AlphaTabError, AlphaTabErrorType } from "@src/AlphaTabError";
  * binary data does not contain a reader compatible structure.
  */
 export class UnsupportedFormatError extends AlphaTabError {
-    public inner: Error | null;
+    public override inner: Error | null;
 
-    public constructor(message: string = 'Unsupported format', inner: Error | null = null) {
-        super(AlphaTabErrorType.Format, message);
+    public constructor(message: string | null = null, inner: Error | null = null) {
+        super(AlphaTabErrorType.Format, message ?? 'Unsupported format');
         this.inner = inner;
         Object.setPrototypeOf(this, UnsupportedFormatError.prototype);
     }

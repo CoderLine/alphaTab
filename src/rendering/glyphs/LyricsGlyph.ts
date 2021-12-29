@@ -15,12 +15,12 @@ export class LyricsGlyph extends EffectGlyph {
         this.textAlign = textAlign;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this.height = this.font.size * this._lines.length;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         canvas.font = this.font;
         let old: TextAlign = canvas.textAlign;
         canvas.textAlign = this.textAlign;

@@ -13,7 +13,7 @@ export class AccidentalGroupGlyph extends GlyphGroup {
         super(0, 0);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         if (!this.glyphs || this.glyphs.length === 0) {
             this.width = 0;
             return;

@@ -154,8 +154,7 @@ class FontParser {
         } else if (parts.length >= 1) {
             this.size = parts[0];
 
-            if (this._currentToken && 
-                this._currentToken.text.indexOf('/') === 0) {
+            if (this._currentToken && this._currentToken.text.indexOf('/') === 0) {
                 // size / line-height (with spaces befor and after slash)
                 if (this._currentToken.text === '/') {
                     this.nextToken();

@@ -33,10 +33,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
         return false;
     }
 
-    public get padding(): number[] {
-        return this._pagePadding!;
-    }
-
     public get firstBarX(): number{
         let x=  this._pagePadding![0];
         if(this._group) {

@@ -38,21 +38,21 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
 
-    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+    public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         return this.noteHeads ? this.noteHeads.getNoteX(note, requestedPosition) : 0;
     }
 
-    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+    public override buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         if (this.noteHeads) {
             this.noteHeads.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
         }
     }
 
-    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return this.noteHeads ? this.noteHeads.getNoteY(note, requestedPosition) : 0;
     }
 
-    public updateBeamingHelper(): void {
+    public override updateBeamingHelper(): void {
         if (this.noteHeads) {
             this.noteHeads.updateBeamingHelper(this.container.x + this.x);
         } else if (this.restGlyph) {
@@ -72,13 +72,13 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (!this._skipPaint) {
             super.paint(cx, cy, canvas);
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         // create glyphs
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         if (!this.container.beat.isEmpty) {

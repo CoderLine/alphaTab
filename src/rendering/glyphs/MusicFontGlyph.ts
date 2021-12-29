@@ -12,7 +12,7 @@ export class MusicFontGlyph extends EffectGlyph {
         this.symbol = symbol;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, this.glyphScale * this.scale, this.symbol, false);
     }
 }

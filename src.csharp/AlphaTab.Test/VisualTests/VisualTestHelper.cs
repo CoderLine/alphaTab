@@ -61,7 +61,7 @@ namespace AlphaTab.VisualTests
             IList<double>? tracks = null, string? message = null, double tolerancePercent = 1, bool triggerResize = false)
         {
             settings ??= new Settings();
-            tracks ??= new Core.List<double> {0};
+            tracks ??= new AlphaTab.Collections.List<double> {0};
 
             settings.Core.Engine = "skia";
             settings.Core.EnableLazyLoading = false;
@@ -89,7 +89,7 @@ namespace AlphaTab.VisualTests
             var referenceFileData =
                 await TestPlatform.LoadFile(referenceFileName);
 
-            var result = new AlphaTab.Core.List<RenderFinishedEventArgs>();
+            var result = new AlphaTab.Collections.List<RenderFinishedEventArgs>();
             var totalWidth = 0.0;
             var totalHeight = 0.0;
             var isResizeRender = false;
@@ -101,7 +101,7 @@ namespace AlphaTab.VisualTests
             };
             renderer.PreRender.On(isResize =>
             {
-                result = new AlphaTab.Core.List<RenderFinishedEventArgs>();
+                result = new AlphaTab.Collections.List<RenderFinishedEventArgs>();
                 totalWidth = 0.0;
                 totalHeight = 0.0;
             });
@@ -177,7 +177,7 @@ namespace AlphaTab.VisualTests
         }
 
         private static void CompareVisualResult(double totalWidth, double totalHeight,
-            AlphaTab.Core.List<RenderFinishedEventArgs> result, string referenceFileName,
+            AlphaTab.Collections.List<RenderFinishedEventArgs> result, string referenceFileName,
             Uint8Array referenceFileData, string? message, double tolerancePercent = 1)
         {
             SKBitmap finalBitmap;

@@ -384,7 +384,7 @@ export class AlphaTabApiBase<TSettings> {
         if (this.uiFacade.canRender) {
             // when font is finally loaded, start rendering
             this.renderer.width = this.container.width;
-            this.renderer.renderScore(this.score!, this._trackIndexes!);
+            this.renderer.renderScore(this.score, this._trackIndexes);
         } else {
             this.uiFacade.canRenderChanged.on(() => this.render());
         }

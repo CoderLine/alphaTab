@@ -258,12 +258,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         if (d.isAbstract) {
             this.write('abstract ');
         }
-
-        if (d.isVirtual) {
+        else if (d.isVirtual) {
             this.write('virtual ');
         }
-
-        if (d.isOverride) {
+        else if (d.isOverride) {
             this.write('override ');
         }
 
@@ -351,12 +349,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
             if (d.isAbstract) {
                 this.write('abstract ');
             }
-
-            if (d.isVirtual) {
+            else if (d.isVirtual) {
                 this.write('virtual ');
             }
-
-            if (d.isOverride) {
+            else if (d.isOverride) {
                 this.write('override ');
             }
         }
@@ -483,7 +479,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                         this.write('System.Collections.IList');
                     } else {
                         if (forNew) {
-                            this.write('AlphaTab.Core.List<');
+                            this.write('AlphaTab.Collections.List<');
                         } else {
                             this.write('System.Collections.Generic.IList<');
                         }
@@ -492,6 +488,26 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                     }
                 }
 
+                break;
+            case cs.SyntaxKind.MapTypeNode:
+                const mapType = type as cs.MapTypeNode;
+                if (!mapType.valueIsValueType) {
+                    if (forNew) {
+                        this.write('AlphaTab.Collections.Map<');
+                    } else {
+                        this.write('AlphaTab.Collections.IMap<');
+                    }
+                } else {
+                    if (forNew) {
+                        this.write('AlphaTab.Collections.ValueTypeMap<');
+                    } else {
+                        this.write('AlphaTab.Collections.IValueTypeMap<');
+                    }
+                }
+                this.writeType(mapType.keyType);
+                this.write(', ');
+                this.writeType(mapType.valueType);
+                this.write('>');
                 break;
             case cs.SyntaxKind.FunctionTypeNode:
                 const functionType = type as cs.FunctionTypeNode;
@@ -699,7 +715,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeNonNullExpression(expr: cs.NonNullExpression) {
         this.writeExpression(expr.expression);
-        if(!cs.isNonNullExpression(expr)) {
+        if (!cs.isNonNullExpression(expr)) {
             this.write('!');
         }
     }

@@ -43,7 +43,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         return !!this.maxNote && this.maxNote.line > 8;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this._infos.sort((a, b) => {
             return b.line - a.line;
         });
@@ -101,7 +101,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         this.width = w;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x;
         cy += this.y;
         // TODO: this method seems to be quite heavy according to the profiler, why?

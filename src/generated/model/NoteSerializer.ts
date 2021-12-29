@@ -23,7 +23,7 @@ export class NoteSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Note | null): Map<string, unknown> | null {
         if (!obj) {
@@ -32,44 +32,41 @@ export class NoteSerializer {
         const o = new Map<string, unknown>(); 
         o.set("id", obj.id); 
         o.set("accentuated", obj.accentuated as number); 
-        o.set("bendType", obj.bendType as number); 
-        o.set("bendStyle", obj.bendStyle as number); 
-        o.set("isContinuedBend", obj.isContinuedBend); 
-        o.set("bendPoints", obj.bendPoints.map(i => BendPointSerializer.toJson(i))); 
+        o.set("bendtype", obj.bendType as number); 
+        o.set("bendstyle", obj.bendStyle as number); 
+        o.set("iscontinuedbend", obj.isContinuedBend); 
+        if (obj.bendPoints !== null) {
+            o.set("bendpoints", obj.bendPoints?.map(i => BendPointSerializer.toJson(i)));
+        } 
         o.set("fret", obj.fret); 
         o.set("string", obj.string); 
         o.set("octave", obj.octave); 
         o.set("tone", obj.tone); 
-        o.set("percussionArticulation", obj.percussionArticulation); 
-        o.set("isVisible", obj.isVisible); 
-        o.set("isLeftHandTapped", obj.isLeftHandTapped); 
-        o.set("isHammerPullOrigin", obj.isHammerPullOrigin); 
-        o.set("hammerPullOriginNoteId", obj.hammerPullOriginNoteId); 
-        o.set("hammerPullDestinationNoteId", obj.hammerPullDestinationNoteId); 
-        o.set("isSlurDestination", obj.isSlurDestination); 
-        o.set("slurOriginNoteId", obj.slurOriginNoteId); 
-        o.set("slurDestinationNoteId", obj.slurDestinationNoteId); 
-        o.set("harmonicType", obj.harmonicType as number); 
-        o.set("harmonicValue", obj.harmonicValue); 
-        o.set("isGhost", obj.isGhost); 
-        o.set("isLetRing", obj.isLetRing); 
-        o.set("isPalmMute", obj.isPalmMute); 
-        o.set("isDead", obj.isDead); 
-        o.set("isStaccato", obj.isStaccato); 
-        o.set("slideInType", obj.slideInType as number); 
-        o.set("slideOutType", obj.slideOutType as number); 
+        o.set("percussionarticulation", obj.percussionArticulation); 
+        o.set("isvisible", obj.isVisible); 
+        o.set("islefthandtapped", obj.isLeftHandTapped); 
+        o.set("ishammerpullorigin", obj.isHammerPullOrigin); 
+        o.set("isslurdestination", obj.isSlurDestination); 
+        o.set("harmonictype", obj.harmonicType as number); 
+        o.set("harmonicvalue", obj.harmonicValue); 
+        o.set("isghost", obj.isGhost); 
+        o.set("isletring", obj.isLetRing); 
+        o.set("ispalmmute", obj.isPalmMute); 
+        o.set("isdead", obj.isDead); 
+        o.set("isstaccato", obj.isStaccato); 
+        o.set("slideintype", obj.slideInType as number); 
+        o.set("slideouttype", obj.slideOutType as number); 
         o.set("vibrato", obj.vibrato as number); 
-        o.set("tieOriginNoteId", obj.tieOriginNoteId); 
-        o.set("tieDestinationNoteId", obj.tieDestinationNoteId); 
-        o.set("isTieDestination", obj.isTieDestination); 
-        o.set("leftHandFinger", obj.leftHandFinger as number); 
-        o.set("rightHandFinger", obj.rightHandFinger as number); 
-        o.set("isFingering", obj.isFingering); 
-        o.set("trillValue", obj.trillValue); 
-        o.set("trillSpeed", obj.trillSpeed as number); 
-        o.set("durationPercent", obj.durationPercent); 
-        o.set("accidentalMode", obj.accidentalMode as number); 
+        o.set("istiedestination", obj.isTieDestination); 
+        o.set("lefthandfinger", obj.leftHandFinger as number); 
+        o.set("righthandfinger", obj.rightHandFinger as number); 
+        o.set("isfingering", obj.isFingering); 
+        o.set("trillvalue", obj.trillValue); 
+        o.set("trillspeed", obj.trillSpeed as number); 
+        o.set("durationpercent", obj.durationPercent); 
+        o.set("accidentalmode", obj.accidentalMode as number); 
         o.set("dynamics", obj.dynamics as number); 
+        obj.toJson(o); 
         return o; 
     }
     public static setProperty(obj: Note, property: string, v: unknown): boolean {
@@ -90,11 +87,13 @@ export class NoteSerializer {
                 obj.isContinuedBend = v! as boolean;
                 return true;
             case "bendpoints":
-                obj.bendPoints = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
-                    const i = new BendPoint();
-                    BendPointSerializer.fromJson(i, o)
-                    obj.addBendPoint(i);
+                if (v) {
+                    obj.bendPoints = [];
+                    for (const o of (v as (Map<string, unknown> | null)[])) {
+                        const i = new BendPoint();
+                        BendPointSerializer.fromJson(i, o);
+                        obj.addBendPoint(i);
+                    }
                 }
                 return true;
             case "fret":
@@ -121,20 +120,8 @@ export class NoteSerializer {
             case "ishammerpullorigin":
                 obj.isHammerPullOrigin = v! as boolean;
                 return true;
-            case "hammerpulloriginnoteid":
-                obj.hammerPullOriginNoteId = v! as number;
-                return true;
-            case "hammerpulldestinationnoteid":
-                obj.hammerPullDestinationNoteId = v! as number;
-                return true;
             case "isslurdestination":
                 obj.isSlurDestination = v! as boolean;
-                return true;
-            case "sluroriginnoteid":
-                obj.slurOriginNoteId = v! as number;
-                return true;
-            case "slurdestinationnoteid":
-                obj.slurDestinationNoteId = v! as number;
                 return true;
             case "harmonictype":
                 obj.harmonicType = JsonHelper.parseEnum<HarmonicType>(v, HarmonicType)!;
@@ -166,12 +153,6 @@ export class NoteSerializer {
             case "vibrato":
                 obj.vibrato = JsonHelper.parseEnum<VibratoType>(v, VibratoType)!;
                 return true;
-            case "tieoriginnoteid":
-                obj.tieOriginNoteId = v! as number;
-                return true;
-            case "tiedestinationnoteid":
-                obj.tieDestinationNoteId = v! as number;
-                return true;
             case "istiedestination":
                 obj.isTieDestination = v! as boolean;
                 return true;
@@ -200,7 +181,7 @@ export class NoteSerializer {
                 obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
                 return true;
         } 
-        return false; 
+        return obj.setProperty(property, v); 
     }
 }
 

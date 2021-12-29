@@ -19,34 +19,34 @@ export class MasterBarSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: MasterBar | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("alternateEndings", obj.alternateEndings); 
-        o.set("keySignature", obj.keySignature as number); 
-        o.set("keySignatureType", obj.keySignatureType as number); 
-        o.set("isDoubleBar", obj.isDoubleBar); 
-        o.set("isRepeatStart", obj.isRepeatStart); 
-        o.set("repeatCount", obj.repeatCount); 
-        o.set("timeSignatureNumerator", obj.timeSignatureNumerator); 
-        o.set("timeSignatureDenominator", obj.timeSignatureDenominator); 
-        o.set("timeSignatureCommon", obj.timeSignatureCommon); 
-        o.set("tripletFeel", obj.tripletFeel as number); 
+        o.set("alternateendings", obj.alternateEndings); 
+        o.set("keysignature", obj.keySignature as number); 
+        o.set("keysignaturetype", obj.keySignatureType as number); 
+        o.set("isdoublebar", obj.isDoubleBar); 
+        o.set("isrepeatstart", obj.isRepeatStart); 
+        o.set("repeatcount", obj.repeatCount); 
+        o.set("timesignaturenumerator", obj.timeSignatureNumerator); 
+        o.set("timesignaturedenominator", obj.timeSignatureDenominator); 
+        o.set("timesignaturecommon", obj.timeSignatureCommon); 
+        o.set("tripletfeel", obj.tripletFeel as number); 
         o.set("section", SectionSerializer.toJson(obj.section)); 
-        o.set("tempoAutomation", AutomationSerializer.toJson(obj.tempoAutomation)); 
-        {
+        o.set("tempoautomation", AutomationSerializer.toJson(obj.tempoAutomation)); 
+        if (obj.fermata !== null) {
             const m = new Map<string, unknown>();
             o.set("fermata", m);
-            for (const [k, v] of obj.fermata) {
+            for (const [k, v] of obj.fermata!) {
                 m.set(k.toString(), FermataSerializer.toJson(v));
             }
         } 
         o.set("start", obj.start); 
-        o.set("isAnacrusis", obj.isAnacrusis); 
+        o.set("isanacrusis", obj.isAnacrusis); 
         return o; 
     }
     public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
@@ -86,7 +86,7 @@ export class MasterBarSerializer {
                 JsonHelper.forEach(v, (v, k) => {
                     const i = new Fermata(); 
                     FermataSerializer.fromJson(i, v as Map<string, unknown>); 
-                    obj.fermata.set(parseInt(k), i); 
+                    obj.addFermata(parseInt(k), i); 
                 });
                 return true;
             case "start":

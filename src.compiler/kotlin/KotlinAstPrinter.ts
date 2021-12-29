@@ -246,7 +246,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         if (d.isAbstract) {
             this.write('abstract ');
-        } else {
+        } else if(d.hasVirtualMembersOrSubClasses) {
             this.write('open ');
         }
 
@@ -343,12 +343,12 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 defaultConstructor.parameters = constructorDeclaration.parameters;
                 defaultConstructor.baseConstructorArguments = constructorDeclaration.parameters.map(
                     p =>
-                        ({
-                            parent: defaultConstructor,
-                            nodeType: cs.SyntaxKind.Identifier,
-                            text: p.name,
-                            tsNode: defaultConstructor.tsNode
-                        } as cs.Identifier)
+                    ({
+                        parent: defaultConstructor,
+                        nodeType: cs.SyntaxKind.Identifier,
+                        text: p.name,
+                        tsNode: defaultConstructor.tsNode
+                    } as cs.Identifier)
                 );
                 this.writeMember(defaultConstructor);
             } else {
@@ -617,22 +617,60 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     this.writeType(arrayType.elementType);
                     this.write('>');
                 } else {
-                    const isDynamicArray =
-                        cs.isPrimitiveTypeNode(arrayType.elementType) &&
-                        arrayType.elementType.type === cs.PrimitiveType.Dynamic;
-                    if (isDynamicArray && !forNew) {
-                        this.write('kotlin.collections.MutableList<*>');
+                    var elementTypeName = this.getContainerTypeName(arrayType.elementType);
+                    if (elementTypeName) {
+                        this.write('alphaTab.collections.');
+                        this.write(elementTypeName);
+                        this.write('List');
                     } else {
-                        if (forNew) {
-                            this.write('alphaTab.core.LateInitList<');
+                        const isDynamicArray =
+                            cs.isPrimitiveTypeNode(arrayType.elementType) &&
+                            arrayType.elementType.type === cs.PrimitiveType.Dynamic;
+                        if (isDynamicArray && !forNew) {
+                            this.write('alphaTab.collections.List<*>');
                         } else {
-                            this.write('kotlin.collections.MutableList<');
+                            if (forNew) {
+                                this.write('alphaTab.collections.List<');
+                            } else {
+                                this.write('alphaTab.collections.List<');
+                            }
+                            this.writeType(arrayType.elementType);
+                            this.write('>');
                         }
-                        this.writeType(arrayType.elementType);
-                        this.write('>');
                     }
                 }
 
+                break;
+            case cs.SyntaxKind.MapTypeNode:
+                const mapType = type as cs.MapTypeNode;
+
+                var keyTypeName = this.getContainerTypeName(mapType.keyType);
+                var valueTypeName = this.getContainerTypeName(mapType.valueType);
+
+                this.write('alphaTab.collections.');
+                if (keyTypeName && valueTypeName) {
+
+                    this.write(keyTypeName);
+                    this.write(valueTypeName);
+                    this.write('Map');
+                } else if (keyTypeName) {
+                    this.write(keyTypeName);
+                    this.write('ObjectMap<');
+                    this.writeType(mapType.valueType);
+                    this.write('>');
+                } else if (valueTypeName) {
+                    this.write('Object');
+                    this.write(valueTypeName);
+                    this.write('Map<');
+                    this.writeType(mapType.keyType);
+                    this.write('>');
+                } else {
+                    this.write('Map<');
+                    this.writeType(mapType.keyType);
+                    this.write(', ');
+                    this.writeType(mapType.valueType);
+                    this.write('>');
+                }
                 break;
             case cs.SyntaxKind.FunctionTypeNode:
                 const functionType = type as cs.FunctionTypeNode;
@@ -680,6 +718,25 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         if ((type.isNullable || type.isOptional) && !forNew && !forTypeConstraint) {
             this.write('?');
         }
+    }
+
+    private getContainerTypeName(type: cs.TypeNode): string | null {
+        switch (type.nodeType) {
+            case cs.SyntaxKind.PrimitiveTypeNode:
+                if (type.isNullable) {
+                    return null;
+                }
+                switch ((type as cs.PrimitiveTypeNode).type) {
+                    case cs.PrimitiveType.Bool:
+                        return 'Boolean';
+                    case cs.PrimitiveType.Int:
+                        return 'Int';
+                    case cs.PrimitiveType.Double:
+                        return 'Double';
+                }
+                break;
+        }
+        return null;
     }
 
     protected writeTypeOfExpression(expr: cs.TypeOfExpression) {
@@ -875,11 +932,26 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     protected writeArrayCreationExpression(expr: cs.ArrayCreationExpression) {
         if (expr.type) {
             if (expr.values) {
-                this.write('arrayListOf');
-                if (expr.type && cs.isArrayTypeNode(expr.type)) {
-                    this.write('<');
-                    this.writeType(expr.type.elementType);
-                    this.write('>');
+                let elementType: cs.TypeNode | null = null;
+                if (cs.isArrayTypeNode(expr.type)) {
+                    elementType = expr.type.elementType;
+                }
+                else if (cs.isTypeReference(expr.type) && typeof (expr.type.reference) !== 'string' && cs.isArrayTypeNode(expr.type.reference)) {
+                    elementType = expr.type.reference.elementType;
+                }
+
+                let type = elementType ? this.getContainerTypeName(elementType) : null;
+                this.write('alphaTab.collections.')
+                if (type) {
+                    this.write(type);
+                    this.write('List')
+                } else {
+                    this.write('List');
+                    if (expr.type && cs.isArrayTypeNode(expr.type)) {
+                        this.write('<');
+                        this.writeType(expr.type.elementType);
+                        this.write('>');
+                    }
                 }
                 this.writeLine('(');
                 this._indent++;
@@ -898,7 +970,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 this.write(')');
             }
         } else if (expr.values && expr.values.length > 0) {
-            this.write('arrayListOf(');
+            // TODO: check for typed array creation
+            this.write('alphaTab.collections.')
+            this.write('List(');
             this.writeCommaSeparated(expr.values, v => {
                 if (expr.values!.length > 10) {
                     this.writeLine();
@@ -1147,7 +1221,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     }
 
     protected writeForStatement(s: cs.ForStatement) {
-        if (!this.tryWriteForRange(s)) {
+        if (/*!this.tryWriteForRange(s)*/ true) {
             this.write('if(true) ');
             this.beginBlock();
 
@@ -1423,7 +1497,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeLine(`import ${using.namespaceOrTypeName}.*`);
     }
 
-    protected writeSemicolon() {
+    protected override writeSemicolon() {
         this.writeLine();
     }
 }

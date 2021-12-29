@@ -15,7 +15,7 @@ export class BarSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Bar | null): Map<string, unknown> | null {
         if (!obj) {
@@ -24,9 +24,9 @@ export class BarSerializer {
         const o = new Map<string, unknown>(); 
         o.set("id", obj.id); 
         o.set("clef", obj.clef as number); 
-        o.set("clefOttava", obj.clefOttava as number); 
+        o.set("clefottava", obj.clefOttava as number); 
         o.set("voices", obj.voices.map(i => VoiceSerializer.toJson(i))); 
-        o.set("simileMark", obj.simileMark as number); 
+        o.set("similemark", obj.simileMark as number); 
         return o; 
     }
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
@@ -42,9 +42,9 @@ export class BarSerializer {
                 return true;
             case "voices":
                 obj.voices = [];
-                for (const o of v as (Map<string, unknown> | null)[]) {
+                for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Voice();
-                    VoiceSerializer.fromJson(i, o)
+                    VoiceSerializer.fromJson(i, o);
                     obj.addVoice(i);
                 }
                 return true;

@@ -2,51 +2,55 @@ package alphaTab.core.ecmaScript
 
 @ExperimentalUnsignedTypes
 class Uint8Array : Iterable<UByte> {
-    private val _data: UByteArray
+    private val _data: ArrayBuffer
 
     public val buffer: ArrayBuffer
         get() {
-            return ArrayBuffer(_data)
+            return _data
         }
 
-    public constructor(x: List<Double>) {
-        this._data = x.map { d -> d.toInt().toUByte() }.toUByteArray()
+    public constructor(x: Iterable<Double>) {
+        this._data = ArrayBuffer(x.map { d -> d.toInt().toUByte() }.toUByteArray())
     }
 
     public constructor(size: Double) {
-        this._data = UByteArray(size.toInt())
+        this._data = ArrayBuffer(UByteArray(size.toInt()))
     }
 
-    internal constructor(data: UByteArray) {
+    public constructor(data: UByteArray) {
+        this._data = ArrayBuffer(data)
+    }
+
+    public constructor(data:ArrayBuffer) {
         this._data = data
     }
 
     public val length: Double
         get() {
-            return _data.size.toDouble()
+            return _data.raw.size.toDouble()
         }
 
     public operator fun get(idx: Int): Double {
-        return _data[idx].toDouble()
+        return _data.raw[idx].toDouble()
     }
 
     public operator fun get(idx: Double): Double {
-        return _data[idx.toInt()].toDouble()
+        return _data.raw[idx.toInt()].toDouble()
     }
 
     public operator fun set(idx: Int, value: Double) {
-        _data[idx] = value.toInt().toUByte()
+        _data.raw[idx] = value.toInt().toUByte()
     }
 
     public fun set(subarray: Uint8Array, pos: Double) {
-        subarray._data.copyInto(_data, pos.toInt(), 0, subarray._data.size)
+        subarray._data.raw.copyInto(_data.raw, pos.toInt(), 0, subarray._data.raw.size)
     }
 
     override fun iterator(): Iterator<UByte> {
-        return _data.iterator()
+        return _data.raw.iterator()
     }
 
     public fun subarray(begin: Double, end: Double): Uint8Array {
-        return Uint8Array(_data.copyOfRange(begin.toInt(), end.toInt()))
+        return Uint8Array(_data.raw.copyOfRange(begin.toInt(), end.toInt()))
     }
 }
