@@ -15,6 +15,14 @@ public open class MapEntry<TKey, TValue> {
             _value = value
         }
 
+    public operator fun component1(): TKey {
+        return _key
+    }
+
+    public operator fun component2(): TValue {
+        return _value
+    }
+
     @Suppress("UNCHECKED_CAST")
     public constructor() {
         _key = null as TKey
