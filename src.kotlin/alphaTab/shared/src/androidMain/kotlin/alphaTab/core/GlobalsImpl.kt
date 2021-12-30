@@ -40,7 +40,7 @@ actual fun Double.toInvariantString(): String {
     // mechanism to convert doubles to string.
     val integerPart = this.toInt();
     val fractionalPart = (this - integerPart)
-    if(fractionalPart > 0.0000001) {
+    if(fractionalPart > 0.0000001 || fractionalPart < -0.0000001) {
         return invariantDoubleFormat.format(this)
     }
     return this.toInt().toString();
