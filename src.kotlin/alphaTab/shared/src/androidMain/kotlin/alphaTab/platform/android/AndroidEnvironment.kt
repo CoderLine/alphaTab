@@ -9,13 +9,13 @@ public class AndroidEnvironment {
         private var _isInitialized: Boolean = false
         @ExperimentalUnsignedTypes
         @ExperimentalContracts
-        public fun initializeAndroid(context:android.content.Context, displayMetrics:DisplayMetrics) {
+        public fun initializeAndroid(context:android.content.Context) {
             if(_isInitialized) {
                 return;
             }
             _isInitialized = true
 
-            Environment.HighDpiFactor = displayMetrics.density.toDouble()
+            Environment.HighDpiFactor = context.resources.displayMetrics.density.toDouble()
 
             AndroidCanvas.initialize(context);
         }

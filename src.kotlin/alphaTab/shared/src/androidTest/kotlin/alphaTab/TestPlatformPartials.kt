@@ -25,6 +25,7 @@ import android.R.attr.data
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.os.Bundle
+import androidx.test.core.app.ApplicationProvider
 
 
 @ExperimentalUnsignedTypes
@@ -104,10 +105,10 @@ public class TestPlatformPartials {
             }
         }
 
-        public fun listDirectory(path: String): MutableList<String> {
+        public fun listDirectory(path: String): alphaTab.collections.List<String> {
             val testContext = InstrumentationRegistry.getInstrumentation().context
             val assets = testContext.assets
-            return assets.list(path)!!.toMutableList()
+            return alphaTab.collections.List(assets.list(path)!!.asIterable())
         }
     }
 }

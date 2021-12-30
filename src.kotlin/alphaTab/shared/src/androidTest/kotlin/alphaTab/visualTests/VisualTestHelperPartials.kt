@@ -3,6 +3,7 @@ package alphaTab.visualTests
 import alphaTab.Settings
 import alphaTab.TestPlatform
 import alphaTab.TestPlatformPartials
+import alphaTab.collections.DoubleList
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.core.toInvariantString
 import alphaTab.importer.AlphaTexImporter
@@ -35,9 +36,10 @@ public class VisualTestHelperPartials {
         public fun runVisualTest(
             inputFile: String,
             settings: Settings? = null,
-            tracks: MutableList<Double>? = null,
+            tracks: DoubleList? = null,
             message: String? = null,
-            tolerancePercent: Double = 1.0
+            tolerancePercent: Double = 1.0,
+            triggerResize: Boolean = false
         ) {
             try {
                 val fullInputFile = "test-data/visual-tests/$inputFile"
@@ -51,7 +53,8 @@ public class VisualTestHelperPartials {
                     settings,
                     tracks,
                     message,
-                    tolerancePercent
+                    tolerancePercent,
+                    triggerResize
                 )
             } catch (e: Throwable) {
                 Assert.fail("Failed to run visual test $e")
@@ -62,9 +65,10 @@ public class VisualTestHelperPartials {
             tex: String,
             referenceFileName: String,
             settings: Settings? = null,
-            tracks: MutableList<Double>? = null,
+            tracks: DoubleList? = null,
             message: String? = null,
-            tolerancePercent: Double = 1.0
+            tolerancePercent: Double = 1.0,
+            triggerResize: Boolean = false
         ) {
             try {
                 val actualSettings = settings ?: Settings()
@@ -78,7 +82,8 @@ public class VisualTestHelperPartials {
                     settings,
                     tracks,
                     message,
-                    tolerancePercent
+                    tolerancePercent,
+                    triggerResize
                 )
             } catch (e: Throwable) {
                 Assert.fail("Failed to run visual test $e")
@@ -89,14 +94,15 @@ public class VisualTestHelperPartials {
             score: Score,
             referenceFileName: String,
             settings: Settings? = null,
-            tracks: MutableList<Double>? = null,
+            tracks: DoubleList? = null,
             message: String? = null,
-            tolerancePercent: Double = 1.0
+            tolerancePercent: Double = 1.0,
+            triggerResize: Boolean = false
         ) {
-            alphaTab.platform.android.AndroidEnvironment.initializeAndroid(InstrumentationRegistry.getInstrumentation().context)
+            alphaTab.platform.android.AndroidEnvironment.initializeAndroid(InstrumentationRegistry.getInstrumentation().context, )
 
             val actualSettings = settings ?: Settings()
-            val actualTracks = tracks ?: ArrayList()
+            val actualTracks = tracks ?: DoubleList()
 
             actualSettings.core.engine = "skia"
             actualSettings.core.enableLazyLoading = false
@@ -126,6 +132,7 @@ public class VisualTestHelperPartials {
             val result = ArrayList<RenderFinishedEventArgs>()
             var totalWidth = 0.0
             var totalHeight = 0.0
+            var isResizeRender = false
 
             val renderer = ScoreRenderer(actualSettings)
             renderer.width = 1300.0
@@ -142,7 +149,12 @@ public class VisualTestHelperPartials {
                 totalWidth = e.totalWidth
                 totalHeight = e.totalHeight
                 result.add(e)
-                waitHandle.release()
+                if(!triggerResize || isResizeRender) {
+                    waitHandle.release()
+                } else {
+                    isResizeRender = true
+                    renderer.resizeRender()
+                }
             }
             renderer.error.on { e ->
                 error = e
