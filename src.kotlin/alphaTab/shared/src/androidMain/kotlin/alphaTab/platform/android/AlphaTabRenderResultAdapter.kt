@@ -1,5 +1,6 @@
 package alphaTab.platform.android
 
+import alphaTab.Environment
 import alphaTab.collections.ObjectDoubleMap
 import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
@@ -35,8 +36,10 @@ class RenderResultDrawable(private val _requestRender: ((resultId: String) -> Un
         if (renderResult is Bitmap) {
             _bitmap = renderResult
         } else {
-            _bitmap = null
+            resetBitmap()
         }
+        _bitmapWidth = (result.width * Environment.HighDpiFactor).toInt()
+        _bitmapHeight = (result.height * Environment.HighDpiFactor).toInt()
         _currentResult = result
         _dstRectAndInsetsDirty = true
         invalidateSelf()
@@ -47,7 +50,7 @@ class RenderResultDrawable(private val _requestRender: ((resultId: String) -> Un
             val bounds = bounds
             val layoutDirection = layoutDirection
             Gravity.apply(
-                Gravity.NO_GRAVITY, _bitmapWidth, _bitmapHeight,
+                Gravity.TOP or Gravity.LEFT, _bitmapWidth, _bitmapHeight,
                 bounds, _dstRect, layoutDirection
             )
         }
@@ -86,9 +89,7 @@ class RenderResultDrawable(private val _requestRender: ((resultId: String) -> Un
     override fun setVisible(visible: Boolean, restart: Boolean): Boolean {
         val changed = isVisible != visible
         if (changed) {
-            if (visible) {
-                requestRender()
-            } else {
+            if (!visible) {
                 resetBitmap()
             }
         }
@@ -99,6 +100,7 @@ class RenderResultDrawable(private val _requestRender: ((resultId: String) -> Un
         val decoded = _bitmap
         val result = _currentResult
         if (decoded == null && result != null) {
+            Log.i("AlphaTab", "Request image ${result.id} (${result.firstMasterBarIndex}-${result.lastMasterBarIndex})")
             _requestRender(result.id)
         }
     }
@@ -108,16 +110,43 @@ class RenderResultDrawable(private val _requestRender: ((resultId: String) -> Un
         if (decoded != null) {
             decoded.recycle()
             _bitmap = null
-            Log.i("AlphaTab", "Recycled decoded image")
+            val result = _currentResult;
+            if(result != null){
+                Log.i("AlphaTab", "Recycled decoded image ${result.id} (${result.firstMasterBarIndex}-${result.lastMasterBarIndex})")
+            }
         }
     }
 
     override fun draw(canvas: Canvas) {
         requestRender()
         updateDstRectIfDirty()
+
+        val result = _currentResult;
+        if(result != null) {
+            val paint = Paint().apply {
+                this.setARGB(255, 0, 255, 0)
+                this.style = Paint.Style.FILL
+                this.strokeWidth = 0f
+            }
+            canvas.drawRect(_dstRect, paint)
+
+            paint.setARGB(255, 0, 0, 0)
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = 3f
+            canvas.drawRect(_dstRect, paint)
+
+            paint.style = Paint.Style.FILL
+            paint.textSize = 28f
+            canvas.drawText("${result.x}/${result.y}, (${result.firstMasterBarIndex}-${result.lastMasterBarIndex}) ${result.id}", _dstRect.left + 50f, _dstRect.top + 50f, paint)
+        }
+
         val bitmap = _bitmap
-        if (bitmap != null) {
-            canvas.drawBitmap(bitmap, null, _dstRect, _paint)
+        if (bitmap != null && !bitmap.isRecycled) {
+            try {
+                canvas.drawBitmap(bitmap, null, _dstRect, _paint)
+            } catch (e: RuntimeException) {
+                // there can be a race on the bitmap recycling and usage.
+            }
         }
     }
 }
@@ -126,7 +155,11 @@ class RenderResultDrawable(private val _requestRender: ((resultId: String) -> Un
 @ExperimentalUnsignedTypes
 class AlphaTabRenderResultViewHolder :
     RecyclerView.ViewHolder {
-    constructor(context: Context, requestRender: ((resultId: String) -> Unit)) : super(ImageView(context)) {
+    constructor(context: Context, requestRender: ((resultId: String) -> Unit)) : super(
+        ImageView(
+            context
+        )
+    ) {
         val imageView = itemView as ImageView
         imageView.layoutParams = FlexboxLayoutManager.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,

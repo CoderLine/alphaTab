@@ -1,6 +1,8 @@
 package net.alphatab.android
 
 import alphaTab.AlphaTabView
+import alphaTab.LogLevel
+import alphaTab.Logger
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.importer.ScoreLoader
 import alphaTab.model.Score
@@ -29,6 +31,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         _alphaTabView = findViewById(R.id.alphatab_view)
         _viewModel = ViewModelProvider(this).get(ViewScoreViewModel::class.java)
+        _viewModel.settings.value!!.core.logLevel = LogLevel.Debug
+        Logger.logLevel = LogLevel.Debug
 
         observeViewModel()
 
