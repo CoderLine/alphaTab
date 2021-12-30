@@ -59,13 +59,13 @@ public class Map<TKey, TValue>:
 
     @Suppress("UNCHECKED_CAST")
     public fun has(key: TKey): Boolean {
-        return findEntryInternal(key as Any,
+        return findEntryInternal(key as Any?,
             { entry, k -> entry.key == (k as TKey) }) >= 0
     }
 
     @Suppress("UNCHECKED_CAST")
     public fun get(key: TKey): TValue {
-        val i = findEntryInternal(key as Any,
+        val i = findEntryInternal(key as Any?,
             { entry, k -> entry.key == (k as TKey) })
         if (i >= 0) {
             return entries[i].value
@@ -80,7 +80,7 @@ public class Map<TKey, TValue>:
     @Suppress("UNCHECKED_CAST")
     private fun insert(key: TKey, value: TValue) {
         insertInternal(
-            key as Any, value as Any,
+            key as Any?, value as Any?,
             { entry, k -> entry.key = k as TKey },
             { entry, v -> entry.value = v as TValue },
             { entry, k -> entry.key == (k as TKey) }
