@@ -47,10 +47,28 @@ kotlin {
                 implementation("com.google.android.flexbox:flexbox:3.0.0")
             }
         }
+
+        val os = System.getProperty("os.name")
+        val target = when {
+            os == "Mac OS X" -> {
+                "macos-x64"
+            }
+            os.startsWith("Win") -> {
+                "windows"
+            }
+            os.startsWith("Linux") -> {
+                "linux"
+            }
+            else -> {
+                throw Error("Unsupported OS: $os")
+            }
+        }
+
         val androidTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation("junit:junit:4.13.2")
+                implementation("org.jetbrains.skija:skija-$target:0.93.6")
             }
         }
 
@@ -84,9 +102,9 @@ android {
         "../../../font/bravura",
         "../../../font/sonivox"
     )
-    sourceSets["androidTest"].manifest.srcFile("src/androidTest/AndroidManifest.xml")
-    sourceSets["androidTest"].assets.srcDirs(
-        "../../../test-data/",
+    sourceSets["test"].manifest.srcFile("src/androidTest/AndroidManifest.xml")
+    sourceSets["test"].assets.srcDirs(
+        "../../../test-data",
         "../../../font/bravura",
         "../../../font/roboto",
         "../../../font/ptserif"
@@ -99,7 +117,8 @@ android {
             "woff",
             "woff2",
             "json",
-            "txt"
+            "txt",
+            "md"
         ).joinToString(":") { "!*.${it}" }
     }
 
@@ -107,6 +126,12 @@ android {
         minSdk = 24
         targetSdk = 31
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
 }
 dependencies {

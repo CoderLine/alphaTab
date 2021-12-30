@@ -1,32 +1,25 @@
 package alphaTab.visualTests
 
-import alphaTab.Settings
+import alphaTab.*
 import alphaTab.TestPlatform
-import alphaTab.TestPlatformPartials
 import alphaTab.collections.DoubleList
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.core.toInvariantString
 import alphaTab.importer.AlphaTexImporter
 import alphaTab.importer.ScoreLoader
 import alphaTab.io.ByteBuffer
-import alphaTab.model.JsonConverter
 import alphaTab.model.Score
-import alphaTab.platform.android.AndroidCanvas
-import alphaTab.platform.android.MusicFont
 import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.ScoreRenderer
-import android.graphics.*
-import android.util.Log
-import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.skija.*
 import org.junit.Assert
 import java.io.ByteArrayOutputStream
-import java.nio.IntBuffer
+import java.nio.file.Paths
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.contracts.ExperimentalContracts
-import java.nio.file.Paths
 
 
 @ExperimentalContracts
@@ -57,7 +50,7 @@ public class VisualTestHelperPartials {
                     triggerResize
                 )
             } catch (e: Throwable) {
-                Assert.fail("Failed to run visual test $e")
+                Assert.fail("Failed to run visual test $e ${e.stackTraceToString()}")
             }
         }
 
@@ -90,6 +83,7 @@ public class VisualTestHelperPartials {
             }
         }
 
+        private var _initialized: Boolean = false
         public fun runVisualTestScore(
             score: Score,
             referenceFileName: String,
@@ -99,7 +93,12 @@ public class VisualTestHelperPartials {
             tolerancePercent: Double = 1.0,
             triggerResize: Boolean = false
         ) {
-            alphaTab.platform.android.AndroidEnvironment.initializeAndroid(InstrumentationRegistry.getInstrumentation().context, )
+            if (!_initialized) {
+                SkiaCanvas.initialize(TestPlatformPartials.loadFile("test-data/../font/bravura/Bravura.ttf"))
+                Environment.renderEngines.set("skia", RenderEngineFactory(true) { SkiaCanvas() })
+                loadFonts()
+                _initialized = true
+            }
 
             val actualSettings = settings ?: Settings()
             val actualTracks = tracks ?: DoubleList()
@@ -120,7 +119,6 @@ public class VisualTestHelperPartials {
             actualSettings.display.resources.fingeringFont.family = "PT Serif"
             actualSettings.display.resources.markerFont.family = "PT Serif"
 
-            loadFonts()
 
             var actualReferenceFileName = referenceFileName
             if (!actualReferenceFileName.startsWith("test-data/")) {
@@ -142,6 +140,9 @@ public class VisualTestHelperPartials {
 
             var error: Throwable? = null
 
+            renderer.preRender.on { _ ->
+                result.clear()
+            }
             renderer.partialRenderFinished.on { e ->
                 result.add(e)
             }
@@ -149,7 +150,7 @@ public class VisualTestHelperPartials {
                 totalWidth = e.totalWidth
                 totalHeight = e.totalHeight
                 result.add(e)
-                if(!triggerResize || isResizeRender) {
+                if (!triggerResize || isResizeRender) {
                     waitHandle.release()
                 } else {
                     isResizeRender = true
@@ -190,47 +191,31 @@ public class VisualTestHelperPartials {
             }
         }
 
-        private var _fontsLoaded = false
-        private fun loadFonts()
-        {
-            if (_fontsLoaded)
-            {
-                return;
-            }
-
-            val context = InstrumentationRegistry.getInstrumentation().context
-            AndroidCanvas.registerCustomFont(
-                "Roboto",
-                Typeface.createFromAsset(context.assets, "Roboto-Regular.ttf")
+        private fun loadFonts() {
+            SkiaCanvas.registerCustomFont(
+                TestPlatformPartials.loadFile("test-data/../font/roboto/Roboto-Regular.ttf")
             )
-            AndroidCanvas.registerCustomFont(
-                "Roboto",
-                Typeface.createFromAsset(context.assets, "Roboto-Italic.ttf")
+            SkiaCanvas.registerCustomFont(
+                TestPlatformPartials.loadFile("test-data/../font/roboto/Roboto-Italic.ttf")
             )
-            AndroidCanvas.registerCustomFont(
-                "Roboto",
-                Typeface.createFromAsset(context.assets, "Roboto-Bold.ttf")
+            SkiaCanvas.registerCustomFont(
+                TestPlatformPartials.loadFile("test-data/../font/roboto/Roboto-Bold.ttf")
             )
-            AndroidCanvas.registerCustomFont(
-                "Roboto",
-                Typeface.createFromAsset(context.assets, "Roboto-BoldItalic.ttf")
+            SkiaCanvas.registerCustomFont(
+                TestPlatformPartials.loadFile("test-data/../font/roboto/Roboto-BoldItalic.ttf")
             )
 
-            AndroidCanvas.registerCustomFont(
-                "PT Serif",
-                Typeface.createFromAsset(context.assets, "PTSerif-Regular.ttf")
+            SkiaCanvas.registerCustomFont(
+                TestPlatformPartials.loadFile("test-data/../font/ptserif/PTSerif-Regular.ttf")
             )
-            AndroidCanvas.registerCustomFont(
-                "PT Serif",
-                Typeface.createFromAsset(context.assets, "PTSerif-Italic.ttf")
+            SkiaCanvas.registerCustomFont(
+                TestPlatformPartials.loadFile("test-data/../font/ptserif/PTSerif-Italic.ttf")
             )
-            AndroidCanvas.registerCustomFont(
-                "PT Serif",
-                Typeface.createFromAsset(context.assets, "PTSerif-Bold.ttf")
+            SkiaCanvas.registerCustomFont(
+                TestPlatformPartials.loadFile("test-data/../font/ptserif/PTSerif-Bold.ttf")
             )
-            AndroidCanvas.registerCustomFont(
-                "PT Serif",
-                Typeface.createFromAsset(context.assets, "PTSerif-BoldItalic.ttf")
+            SkiaCanvas.registerCustomFont(
+                TestPlatformPartials.loadFile("test-data/../font/ptserif/PTSerif-BoldItalic.ttf")
             )
         }
 
@@ -243,40 +228,40 @@ public class VisualTestHelperPartials {
             message: String?,
             tolerancePercent: Double = 1.0
         ) {
-            val finalImage = Bitmap.createBitmap(
+            val finalBitmap: Image
+
+            val imageInfo = ImageInfo(
                 totalWidth.toInt(),
                 totalHeight.toInt(),
-                Bitmap.Config.ARGB_8888,
-                true
+                ColorType.BGRA_8888,
+                ColorAlphaType.PREMUL
             )
-            val finalImageCanvas = Canvas(finalImage)
-            val point = PointF(0f, 0f)
-            var rowHeight = 0f
-            for (partialResult in result) {
-                val partialCanvas = partialResult.renderResult
-                if (partialCanvas is Bitmap) {
-                    finalImageCanvas.drawBitmap(partialCanvas, point.x, point.y, null)
-                    if(partialResult.height > rowHeight) {
-                        rowHeight = partialResult.height.toFloat()
+
+            val finalImageSurface = Surface.makeRaster(imageInfo)
+            finalImageSurface.use {
+                for (partialResult in result) {
+                    val partialCanvas = partialResult.renderResult
+                    if (partialCanvas is Image) {
+                        finalImageSurface.canvas.drawImage(partialCanvas, partialResult.x.toFloat(), partialResult.y.toFloat())
                     }
-                    point.x += partialCanvas.width
-                    if(point.x >= totalWidth) {
-                        point.x = 0f
-                        point.y += rowHeight
-                        rowHeight = 0f
-                    }
-                    partialCanvas.recycle()
                 }
+
+                finalBitmap = finalImageSurface.makeImageSnapshot()
             }
 
-            try {
+            val finalImageFileName =
+                TestPlatform.changeExtension(referenceFileName, ".new.png")
+            finalBitmap.use {
+                val dir = Paths.get(finalImageFileName).parent
+                dir.toFile().mkdirs()
+
                 val referenceBitmap =
-                    BitmapFactory.decodeByteArray(referenceFileData.buffer.raw.asByteArray(), 0, referenceFileData.buffer.raw.size)
+                    Image.makeFromEncoded(referenceFileData.buffer.raw.asByteArray())
 
                 var pass:Boolean
                 var msg:String
                 try {
-                    val finalBitmapRaw = toRawBytes(finalImage)
+                    val finalBitmapRaw = toRawBytes(finalBitmap)
                     val referenceBitmapRaw = toRawBytes(referenceBitmap)
 
                     val diffData = Uint8Array(finalBitmapRaw.size.toDouble())
@@ -305,55 +290,54 @@ public class VisualTestHelperPartials {
                         val diffImageName =
                             TestPlatform.changeExtension(referenceFileName, ".diff.png")
 
-                        val diff = Bitmap.createBitmap(
-                            referenceBitmap.width,
-                            referenceBitmap.height,
-                            Bitmap.Config.ARGB_8888,
-                            true
+                        val diff = Image.makeRaster(
+                            imageInfo,
+                            diffData.buffer.raw.asByteArray(),
+                            imageInfo.minRowBytes
                         )
-
-                        val buffer = java.nio.ByteBuffer.wrap(diffData.buffer.raw.asByteArray())
-                        diff.copyPixelsFromBuffer(buffer)
-                        val diffBos = ByteArrayOutputStream()
-                        diff.compress(Bitmap.CompressFormat.PNG, 100, diffBos)
-                        diff.recycle()
-                        TestPlatformPartials.saveFile(
-                            diffImageName,
-                            Uint8Array(diffBos.toByteArray().asUByteArray())
-                        )
+                        diff.use {
+                            val diffPngData = diff.encodeToData(EncodedImageFormat.PNG)
+                            TestPlatformPartials.saveFile(
+                                diffImageName,
+                                Uint8Array(diffPngData!!.bytes.asUByteArray())
+                            )
+                        }
                     }
+
                 } catch (e: Throwable) {
                     pass = false
                     msg = "Error comparing images:  ${e.message} ${e.stackTraceToString()}, $message"
-                } finally {
-                    referenceBitmap.recycle()
                 }
 
-                val finalImageFileName = TestPlatform.changeExtension(referenceFileName, ".new.png")
-                val bos = ByteArrayOutputStream()
-                finalImage.compress(Bitmap.CompressFormat.PNG, 100, bos)
-                TestPlatformPartials.saveFile(finalImageFileName, Uint8Array(bos.toByteArray().asUByteArray()))
+                if (!pass) {
+                    TestPlatformPartials.saveFile(
+                        referenceFileName,
+                        referenceFileData
+                    )
 
-                // TODO: we need to get access to a raw Skia lib to get equal rendering on tests
+                    val png = finalBitmap.encodeToData(EncodedImageFormat.PNG)
+                    TestPlatformPartials.saveFile(
+                        finalImageFileName,
+                        Uint8Array(png!!.bytes.asUByteArray())
+                    )
 
-//                if (!pass) {
-//                    TestPlatformPartials.saveFile(
-//                        referenceFileName,
-//                        referenceFileData
-//                    )
-//
-//                    Assert.fail(msg)
-//                }
-            }
-            finally {
-                finalImage.recycle()
+                    val newImageName =
+                        TestPlatform.changeExtension(referenceFileName, ".new.png")
+                    val finalBitmapData = finalBitmap.encodeToData(EncodedImageFormat.PNG)
+                    TestPlatformPartials.saveFile(
+                        newImageName,
+                        Uint8Array(finalBitmapData!!.bytes.asUByteArray())
+                    )
+                    Assert.fail(msg)
+                }
             }
         }
 
-        private fun toRawBytes(bitmap: Bitmap): UByteArray {
-            val buffer = java.nio.ByteBuffer.allocate(bitmap.height * bitmap.rowBytes)
-            bitmap.copyPixelsToBuffer(buffer)
-            return buffer.array().asUByteArray()
+        private fun toRawBytes(image: Image): UByteArray {
+            val bitmap = Bitmap.makeFromImage(image)
+            bitmap.use {
+                return bitmap.readPixels()!!.asUByteArray()
+            }
         }
     }
 }
