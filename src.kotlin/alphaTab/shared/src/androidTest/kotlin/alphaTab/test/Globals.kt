@@ -1,7 +1,5 @@
 package alphaTab.test
 
-import org.junit.Assert
-
 public class Globals {
     companion object {
         public fun <T> expect(actual: T): Expector<T> {
@@ -9,7 +7,7 @@ public class Globals {
         }
 
         public fun fail(message: Any?) {
-            Assert.fail(message.toString())
+            kotlin.test.fail(message.toString())
         }
     }
 }
@@ -32,14 +30,14 @@ public class Expector<T> {
         if (exp is Int && _actual is Double) {
             exp = exp.toDouble()
         }
-        Assert.assertEquals(_message + message, exp, _actual)
+        kotlin.test.assertEquals(exp, _actual, _message + message)
     }
 
     public fun toBeCloseTo(expected:Double, message:String? = null) {
         if(_actual is Number) {
-            Assert.assertEquals(_message + message, expected, _actual.toDouble(), 0.001)
+            kotlin.test.assertEquals(expected, _actual.toDouble(), 0.001, _message + message)
         } else {
-            Assert.fail("ToBeCloseTo can only be used with numeric operands")
+            kotlin.test.fail("ToBeCloseTo can only be used with numeric operands")
         }
     }
 
@@ -48,22 +46,22 @@ public class Expector<T> {
         if(exp is Int && _actual is Double) {
             exp = exp.toDouble()
         }
-        Assert.assertEquals(_message, exp, _actual)
+        kotlin.test.assertEquals(exp, _actual, _message)
     }
 
     public fun toBeTruthy() {
-        Assert.assertNotNull(_message, _actual)
+        kotlin.test.assertNotNull(_actual, _message)
     }
 
     public fun toBeTrue() {
         if(_actual is Boolean) {
-            Assert.assertTrue(_message, _actual)
+            kotlin.test.assertTrue(_actual, _message)
         } else {
-            Assert.fail("ToBeTrue can only be used on bools: $_message")
+            kotlin.test.fail("ToBeTrue can only be used on bools: $_message")
         }
     }
 
     public fun toBeFalsy() {
-        Assert.assertNull(_message, _actual)
+        kotlin.test.assertNull(_actual, _message)
     }
 }

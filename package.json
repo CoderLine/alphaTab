@@ -49,8 +49,8 @@
         "test-ci": "npm run generate-typescript && tsc --project tsconfig.json && karma start karma.conf.js --browsers ChromeHeadless --single-run --reporters spec",
         "test-csharp": "cd src.csharp && dotnet test",
         "test-csharp-ci": "cd src.csharp && dotnet test",
-        "test-kotlin": "cd src.kotlin/alphaTab && gradlew jvmTest",
-        "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew jvmTest"
+        "test-kotlin": "cd src.kotlin/alphaTab && gradlew check",
+        "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew check"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^21.0.1",
