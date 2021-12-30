@@ -25,7 +25,7 @@ export default class CSharpAstTransformer {
             path.resolve(this._context.compilerOptions.baseUrl!),
             path.resolve(this._typeScriptFile.fileName)
         );
-        fileName = path.join(context.compilerOptions.outDir!, this.removeExtension(fileName) + this.extension);
+        fileName = this.buildFileName(fileName, context);
 
         this._csharpFile = {
             parent: null,
@@ -51,6 +51,10 @@ export default class CSharpAstTransformer {
             }
         };
         this._csharpFile.namespace.parent = this._csharpFile;
+    }
+    
+    protected buildFileName(fileName: string, context: CSharpEmitterContext): string {
+       return path.join(context.compilerOptions.outDir!, this.removeExtension(fileName) + this.extension);
     }
 
     public transform() {

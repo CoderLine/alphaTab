@@ -23,6 +23,7 @@ public open class DoubleObjectMapEntry<TValue> {
         return _value
     }
 
+    @Suppress("UNCHECKED_CAST")
     public constructor() {
         _key = 0.0
         _value = null as TValue
@@ -39,6 +40,7 @@ public class DoubleObjectMapEntryInternal<TValue> : DoubleObjectMapEntry<TValue>
     public override var hashCode: Int = 0
     public override var next: Int = 0
 
+    @Suppress("UNCHECKED_CAST")
     override fun reset() {
         key = 0.0
         value = null as TValue
@@ -72,6 +74,7 @@ public class DoubleObjectMap<TValue> :
         insert(key, value)
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun insert(key: Double, value: TValue) {
         insertInternal(
             key, value as Any,

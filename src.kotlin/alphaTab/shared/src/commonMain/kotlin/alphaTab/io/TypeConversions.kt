@@ -2,6 +2,7 @@ package alphaTab.io
 
 import alphaTab.core.ecmaScript.Uint8Array
 
+@ExperimentalUnsignedTypes
 expect class TypeConversions {
     companion object {
         public fun float64ToBytes(v: Double): Uint8Array

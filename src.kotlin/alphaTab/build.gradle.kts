@@ -17,3 +17,7 @@ allprojects {
         maven("https://packages.jetbrains.team/maven/p/skija/maven")
     }
 }
+
+tasks.register("clean", Delete::class) {
+    delete(rootProject.buildDir)
+}

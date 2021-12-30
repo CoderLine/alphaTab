@@ -16,6 +16,7 @@ public open class ObjectBooleanMapEntry<TKey> {
         }
 
 
+    @Suppress("UNCHECKED_CAST")
     public constructor() {
         _key = null as TKey
         _value = false
@@ -40,6 +41,7 @@ public class ObjectBooleanMapEntryInternal<TKey> : ObjectBooleanMapEntry<TKey>()
     public override var hashCode: Int = 0
     public override var next: Int = 0
 
+    @Suppress("UNCHECKED_CAST")
     override fun reset() {
         key = null as TKey
         value = false
@@ -55,11 +57,13 @@ public class ObjectBooleanMap<TKey> :
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     public fun has(key: TKey): Boolean {
         return findEntryInternal(key as Any,
             { entry, k -> entry.key == (k as TKey) }) >= 0
     }
 
+    @Suppress("UNCHECKED_CAST")
     public fun get(key: TKey): Boolean {
         val i = findEntryInternal(key as Any,
             { entry, k -> entry.key == (k as TKey) })
@@ -73,6 +77,7 @@ public class ObjectBooleanMap<TKey> :
         insert(key, value)
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun insert(key: TKey, value: Boolean) {
         insertInternal(
             key as Any, value,

@@ -1,7 +1,6 @@
-//import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 plugins {
     kotlin("multiplatform")
+//    kotlin("native.cocoapods")
     id("com.android.library")
 }
 
@@ -10,29 +9,25 @@ version = "1.3-SNAPSHOT"
 
 kotlin {
     android()
-//    ios {
-//        binaries {
-//            framework {
-//                baseName = "alphaTab"
-//            }
+//    iosX64()
+//    iosArm64()
+//    iosSimulatorArm64() sure all ios dependencies support this target
+
+//    cocoapods {
+//        summary = "Some description for the Shared Module"
+//        homepage = "Link to the Shared Module homepage"
+//        ios.deploymentTarget = "14.1"
+//        framework {
+//            baseName = "shared"
 //        }
 //    }
-
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "11"
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnit()
-        }
-    }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             }
-            kotlin.srcDirs("../../../dist/lib.kotlin/src")
+            kotlin.srcDirs("./src/commonMain/generated")
         }
 
         val commonTest by getting {
@@ -40,32 +35,10 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
             }
-            kotlin.srcDirs("../../../dist/lib.kotlin/test")
-        }
-
-        val jvmMain by getting {
-            kotlin.srcDirs("src/jvmCommonMain/kotlin")
-            dependencies {
-                // TODO: check with Skija devs to have a platform independent lib
-                implementation("org.jetbrains.skija:skija-shared:0.93.6")
-            }
-            resources.srcDirs("../../../font/").apply {
-                this.filter.include("**/*.ttf")
-                this.filter.include("**/*.sf2")
-            }
-        }
-
-        val jvmTest by getting {
-            //kotlin.srcDirs("src/jvmCommonTest")
-            dependencies {
-                implementation(kotlin("test"))
-                implementation(kotlin("test-junit"))
-                implementation("junit:junit:4.13.2")
-            }
+            kotlin.srcDirs("./src/commonTest/generated")
         }
 
         val androidMain by getting {
-            kotlin.srcDirs("src/jvmCommonMain/kotlin")
             dependencies {
                 implementation("androidx.core:core-ktx:1.7.0")
                 implementation("androidx.appcompat:appcompat:1.4.0")
@@ -76,14 +49,29 @@ kotlin {
         }
         val androidTest by getting {
             dependencies {
-//                implementation(kotlin("test"))
                 implementation(kotlin("test-junit"))
                 implementation("junit:junit:4.13.2")
             }
         }
 
-//        val iosMain by getting
-//        val iosTest by getting
+//        val iosX64Main by getting
+//        val iosArm64Main by getting
+//        val iosSimulatorArm64Main by getting
+//        val iosMain by creating {
+//            dependsOn(commonMain)
+//            iosX64Main.dependsOn(this)
+//            iosArm64Main.dependsOn(this)
+//            //iosSimulatorArm64Main.dependsOn(this)
+//        }
+//        val iosX64Test by getting
+//        val iosArm64Test by getting
+//        //val iosSimulatorArm64Test by getting
+//        val iosTest by creating {
+//            dependsOn(commonTest)
+//            iosX64Test.dependsOn(this)
+//            iosArm64Test.dependsOn(this)
+//            //iosSimulatorArm64Test.dependsOn(this)
+//        }
 
     }
 }
@@ -150,19 +138,3 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
         )
     }
 }
-
-//val packForXcode by tasks.creating(Sync::class) {
-//    group = "build"
-//    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
-//    val sdkName = System.getenv("SDK_NAME") ?: "iphonesimulator"
-//    val targetName = "ios" + if (sdkName.startsWith("iphoneos")) "Arm64" else "X64"
-//    val framework =
-//        kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
-//    inputs.property("mode", mode)
-//    dependsOn(framework.linkTask)
-//    val targetDir = File(buildDir, "xcode-frameworks")
-//    from({ framework.outputDirectory })
-//    into(targetDir)
-//}
-//
-//tasks.getByName("build").dependsOn(packForXcode)

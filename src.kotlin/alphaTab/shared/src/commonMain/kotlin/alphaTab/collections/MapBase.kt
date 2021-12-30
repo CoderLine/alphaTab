@@ -179,6 +179,7 @@ public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal
             return _index < map.size
         }
 
+        @Suppress("UNCHECKED_CAST")
         override fun next(): TEntryType {
             while (_entryIndex < map._count) {
                 if (map.entries[_entryIndex].hashCode >= 0) {
