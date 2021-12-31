@@ -182,9 +182,7 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
 
     override fun beginAppendRenderResults(renderResults: RenderFinishedEventArgs?) {
         _handler.post {
-            if (renderResults == null) {
-                _renderSurface.trimPlaceholders()
-            } else {
+            if (renderResults != null) {
                 _renderSurface.addPlaceholder(renderResults)
             }
         }
