@@ -3,14 +3,18 @@ package alphaTab
 import alphaTab.collections.DoubleList
 import alphaTab.model.Score
 import alphaTab.model.Track
+import alphaTab.platform.android.AlphaTabRenderSurface
 import alphaTab.platform.android.AndroidEnvironment
 import alphaTab.platform.android.AndroidUiFacade
+import alphaTab.rendering.layout.HorizontalScreenLayout
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.widget.HorizontalScrollView
 import android.widget.RelativeLayout
+import android.widget.ScrollView
 import androidx.recyclerview.widget.RecyclerView
 import net.alphatab.R
 import kotlin.contracts.ExperimentalContracts
@@ -18,8 +22,6 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 class AlphaTabView : RelativeLayout {
-    private lateinit var _layoutView: RecyclerView
-
     private lateinit var _api: AlphaTabApiBase<AlphaTabView>
 
     private var _tracks: Iterable<Track>? = null
@@ -82,9 +84,12 @@ class AlphaTabView : RelativeLayout {
     private fun init(context: Context) {
         AndroidEnvironment.initializeAndroid(context)
         inflate(context, R.layout.alphatab_view, this)
-        _layoutView = findViewById(R.id.mainContentView)
+
+        val outerScroll = findViewById<HorizontalScrollView>(R.id.outerScroll)
+        val innerScroll = findViewById<ScrollView>(R.id.innerScroll)
+        val renderSurface = findViewById<AlphaTabRenderSurface>(R.id.renderSurface)
         _api =
-            AlphaTabApiBase(AndroidUiFacade(findViewById(R.id.screenSizeView), _layoutView), this)
+            AlphaTabApiBase(AndroidUiFacade(outerScroll, innerScroll, renderSurface), this)
     }
 
     public fun renderTracks() {

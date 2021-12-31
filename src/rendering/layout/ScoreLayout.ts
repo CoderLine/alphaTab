@@ -295,8 +295,9 @@ export abstract class ScoreLayout {
         ? (this.width - e.width) / 2
         : this.firstBarX;
         e.y = y;
+        
         e.totalWidth = this.width;
-        e.totalHeight = this.height;
+        e.totalHeight = y + height;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
 

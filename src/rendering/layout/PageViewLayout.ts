@@ -325,6 +325,7 @@ export class PageViewLayout extends ScoreLayout {
         args.firstMasterBarIndex = group.firstBarIndex;
         args.lastMasterBarIndex = group.lastBarIndex;
 
+        group.buildBoundingsLookup(0, -args.y);
         this.registerPartial(args, canvas => {
             this.renderer.canvas!.color = this.renderer.settings.display.resources.mainGlyphColor;
             this.renderer.canvas!.textAlign = TextAlign.Left;

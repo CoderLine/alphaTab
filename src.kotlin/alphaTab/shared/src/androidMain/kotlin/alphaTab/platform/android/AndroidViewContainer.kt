@@ -15,13 +15,12 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
-class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTouchListener {
+class AndroidViewContainer : IContainer, View.OnLayoutChangeListener {
     internal val _view: View
 
     public constructor(view: View) {
         _view = view
         _view.addOnLayoutChangeListener(this)
-//        _view.setOnTouchListener(this)
     }
 
     override fun setBounds(x: Double, y: Double, w: Double, h: Double) {
@@ -33,50 +32,34 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTou
         get() = (_view.measuredWidth / Environment.HighDpiFactor)
         set(value) {
             val scaled = (value * Environment.HighDpiFactor).toInt()
-            if (_view is RecyclerView) {
-                (_view.layoutManager as AlphaTabLayoutManager).setContentWidth(scaled)
-            } else {
-                val params = _view.layoutParams
-                if (params != null) {
-                    params.width = scaled
-                }
-                _view.minimumWidth = scaled
+            val params = _view.layoutParams
+            if (params != null) {
+                params.width = scaled
             }
+            _view.minimumWidth = scaled
         }
     override var height: Double
         get() = _view.measuredHeight.toDouble()
         set(value) {
             val scaled = (value * Environment.HighDpiFactor).toInt()
-            if (_view is RecyclerView) {
-                (_view.layoutManager as AlphaTabLayoutManager).setContentHeight(scaled)
-            } else {
-                val params = _view.layoutParams
-                if (params != null) {
-                    params.height = scaled
-                }
-                _view.minimumHeight = scaled
+            val params = _view.layoutParams
+            if (params != null) {
+                params.height = scaled
             }
+            _view.minimumHeight = scaled
         }
     override val isVisible: Boolean
         get() = _view.visibility == View.VISIBLE && _view.width > 0
     override var scrollLeft: Double
-        get() = if (_view is ScrollView) _view.scrollX.toDouble() else 0.0
+        get() = 0.0
         set(value) {
-            if (_view is ScrollView) _view.scrollX = value.toInt()
         }
     override var scrollTop: Double
-        get() = if (_view is ScrollView) _view.scrollY.toDouble() else 0.0
+        get() = 0.0
         set(value) {
-            if (_view is ScrollView) _view.scrollY = value.toInt()
         }
 
     override fun appendChild(child: IContainer) {
-        // if (_view is ViewGroup) {
-        //     val childView = (child as AndroidViewContainer)._view
-        //     if (!_view.children.any { it == childView }) {
-        //         _view.addView(childView)
-        //     }
-        // }
     }
 
     override fun stopAnimation() {
@@ -86,9 +69,6 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTou
     }
 
     override fun clear() {
-        if (_view is ViewGroup) {
-            _view.removeAllViews()
-        }
     }
 
     override var resize: IEventEmitter = EventEmitter()
@@ -113,20 +93,4 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTou
             (resize as EventEmitter).trigger()
         }
     }
-
-    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-        if (event == null) {
-            return true
-        }
-        // TODO: Decide on interactivity
-//        when(event.action) {
-//           MotionEvent.ACTION_DOWN ->
-//               (mouseDown as EventEmitter).trigger()
-//            MotionEvent.ACTION_UP ->
-//                (mouseUp as EventEmitterOfT).trigger(map)
-//        }
-        return true
-    }
-
-
 }

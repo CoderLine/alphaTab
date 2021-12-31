@@ -16,46 +16,42 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
-class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener, View.OnTouchListener {
-    private val _screenSizeView: View
-    private val _mainContentView: RecyclerView
+class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener {
+    private val _outerScroll: HorizontalScrollView
+    private val _innerScroll: ScrollView
 
-    public constructor(
-        screenSizeView: View,
-        mainContentView: RecyclerView
-    ) {
-        _screenSizeView = screenSizeView
-        _mainContentView = mainContentView
-        screenSizeView.addOnLayoutChangeListener(this)
+    public constructor(outerScroll: HorizontalScrollView, innerScroll: ScrollView) {
+        _innerScroll = innerScroll
+        _outerScroll = outerScroll
+        outerScroll.addOnLayoutChangeListener(this)
     }
 
     override fun setBounds(x: Double, y: Double, w: Double, h: Double) {
-        width = w
-        height = h
     }
 
     override var width: Double
-        get() = (_screenSizeView.measuredWidth / Environment.HighDpiFactor)
+        get() = (_outerScroll.measuredWidth / Environment.HighDpiFactor)
         set(value) {
         }
     override var height: Double
-        get() = (_screenSizeView.measuredHeight / Environment.HighDpiFactor)
+        get() = (_outerScroll.measuredHeight / Environment.HighDpiFactor)
         set(value) {
         }
     override val isVisible: Boolean
-        get() = _screenSizeView.visibility == View.VISIBLE
+        get() = _outerScroll.visibility == View.VISIBLE
 
     override var scrollLeft: Double
-        get() = 0.0
+        get() = _outerScroll.scrollX.toDouble()
         set(value) {
+            _outerScroll.scrollX = value.toInt()
         }
     override var scrollTop: Double
-        get() = 0.0
+        get() = _innerScroll.scrollY.toDouble()
         set(value) {
+            _innerScroll.scrollY = value.toInt()
         }
 
     override fun appendChild(child: IContainer) {
-
     }
 
     override fun stopAnimation() {
@@ -88,19 +84,5 @@ class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener, View.O
         if (widthChanged || heightChanged) {
             (resize as EventEmitter).trigger()
         }
-    }
-
-    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-        if (event == null) {
-            return true
-        }
-        // TODO: Decide on interactivity
-//        when(event.action) {
-//           MotionEvent.ACTION_DOWN ->
-//               (mouseDown as EventEmitter).trigger()
-//            MotionEvent.ACTION_UP ->
-//                (mouseUp as EventEmitterOfT).trigger(map)
-//        }
-        return true
     }
 }

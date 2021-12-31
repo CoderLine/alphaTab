@@ -1,7 +1,6 @@
 package alphaTab.platform.android
 
 import alphaTab.*
-import alphaTab.Environment
 import alphaTab.EventEmitter
 import alphaTab.core.ecmaScript.Error
 import alphaTab.core.ecmaScript.Uint8Array
@@ -16,12 +15,11 @@ import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.utils.Bounds
 import alphaTab.synth.IAlphaSynth
 import alphaTab.synth.ISynthOutput
-import android.graphics.Bitmap
 import android.os.Handler
 import android.view.View
 import android.view.ViewTreeObserver
+import android.widget.HorizontalScrollView
 import android.widget.ScrollView
-import androidx.recyclerview.widget.RecyclerView
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import kotlin.contracts.ExperimentalContracts
@@ -30,26 +28,32 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 class AndroidUiFacade : IUiFacade<AlphaTabView> {
-    private var _screenSizeView: View
-    private var _layoutView: RecyclerView
-    private lateinit var _renderResultAdapter: AlphaTabRenderResultAdapter
     private var _handler: Handler
     private var _internalRootContainerBecameVisible: EventEmitter? = EventEmitter()
+    private val _outerScroll: HorizontalScrollView
+    private val _innerScroll: ScrollView
+    private val _renderSurface: AlphaTabRenderSurface
 
-    public constructor(screenSizeView: View, layoutView: RecyclerView) {
-        _screenSizeView = screenSizeView
-        _layoutView = layoutView
+    public constructor(
+        outerScroll: HorizontalScrollView,
+        innerScroll: ScrollView,
+        renderSurface: AlphaTabRenderSurface
+    ) {
+        _outerScroll = outerScroll
+        _innerScroll = innerScroll
+        _renderSurface = renderSurface
 
-        rootContainer = AndroidRootViewContainer(_screenSizeView, _layoutView)
-        _handler = Handler(layoutView.context.mainLooper)
+        rootContainer = AndroidRootViewContainer(outerScroll, innerScroll)
+        _handler = Handler(outerScroll.context.mainLooper)
+
         rootContainerBecameVisible = object : IEventEmitter,
             ViewTreeObserver.OnGlobalLayoutListener, View.OnLayoutChangeListener {
             override fun on(value: () -> Unit) {
                 if (rootContainer.isVisible) {
                     value()
                 } else {
-                    layoutView.viewTreeObserver.addOnGlobalLayoutListener(this)
-                    layoutView.addOnLayoutChangeListener(this)
+                    outerScroll.viewTreeObserver.addOnGlobalLayoutListener(this)
+                    outerScroll.addOnLayoutChangeListener(this)
                 }
             }
 
@@ -58,8 +62,8 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
             }
 
             override fun onGlobalLayout() {
-                layoutView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                layoutView.removeOnLayoutChangeListener(this)
+                outerScroll.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                outerScroll.removeOnLayoutChangeListener(this)
                 if (rootContainer.isVisible) {
                     _internalRootContainerBecameVisible?.trigger()
                     _internalRootContainerBecameVisible = null
@@ -99,24 +103,14 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
         this.api = api
         settingsContainer = settings
         api.settings = settings.settings
-
-        settings.settingsChanged.on(this::onSettingsChanged)
-        val isVertical =
-            Environment.getLayoutEngineFactory(api.settings.display.layoutMode).vertical
-        _layoutView.layoutManager = AlphaTabLayoutManager(_layoutView.context).apply {
-            this.updateOrientation(isVertical)
-        }
-        _renderResultAdapter = AlphaTabRenderResultAdapter {
+        _renderSurface.requestRender = {
             api.renderer.renderResult(it)
         }
-        _layoutView.adapter = _renderResultAdapter
+        settings.settingsChanged.on(this::onSettingsChanged)
     }
 
     private fun onSettingsChanged() {
         api.settings = settingsContainer.settings
-        val isVertical =
-            Environment.getLayoutEngineFactory(api.settings.display.layoutMode).vertical
-        (_layoutView.layoutManager as AlphaTabLayoutManager).updateOrientation(isVertical)
         api.updateSettings()
         api.render()
     }
@@ -171,14 +165,13 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun initialRender() {
-        api.renderer.preRender.on { resize ->
-            _renderResultAdapter.reset()
+        api.renderer.preRender.on { _ ->
+            _renderSurface.clearPlaceholders()
         }
 
         rootContainerBecameVisible.on {
             api.renderer.width = rootContainer.width
             api.renderer.updateSettings(api.settings)
-
             renderTracks()
         }
     }
@@ -189,20 +182,17 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
 
     override fun beginAppendRenderResults(renderResults: RenderFinishedEventArgs?) {
         _handler.post {
-            // null result indicates that the rendering finished
             if (renderResults == null) {
-                _renderResultAdapter.finish()
-            }
-            // NOTE: here we try to replace existing children
-            else {
-                _renderResultAdapter.addResult(renderResults)
+                _renderSurface.trimPlaceholders()
+            } else {
+                _renderSurface.addPlaceholder(renderResults)
             }
         }
     }
 
     override fun beginUpdateRenderResults(renderResults: RenderFinishedEventArgs) {
         _handler.post {
-            _renderResultAdapter.updateResult(renderResults)
+            _renderSurface.fillPlaceholder(renderResults)
         }
     }
 
@@ -215,7 +205,7 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun createCanvasElement(): IContainer {
-        return AndroidViewContainer(_layoutView)
+        return AndroidViewContainer(_renderSurface)
     }
 
     override fun beginInvoke(action: () -> Unit) {

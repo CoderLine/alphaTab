@@ -2,13 +2,19 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <FrameLayout
-        android:id="@+id/screenSizeView"
+
+    <HorizontalScrollView
+        android:id="@+id/outerScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/mainContentView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
+        <ScrollView
+            android:id="@+id/innerScroll"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <alphaTab.platform.android.AlphaTabRenderSurface
+                android:id="@+id/renderSurface"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </ScrollView>
+    </HorizontalScrollView>
 </merge>
