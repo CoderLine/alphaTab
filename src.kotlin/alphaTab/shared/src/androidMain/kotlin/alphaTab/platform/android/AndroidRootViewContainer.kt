@@ -26,6 +26,7 @@ class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener {
         outerScroll.addOnLayoutChangeListener(this)
     }
 
+
     override fun setBounds(x: Double, y: Double, w: Double, h: Double) {
     }
 
@@ -84,5 +85,19 @@ class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener {
         if (widthChanged || heightChanged) {
             (resize as EventEmitter).trigger()
         }
+    }
+
+    fun scrollToX(offset: Double) {
+        _outerScroll.smoothScrollTo(
+            (offset * Environment.HighDpiFactor).toInt(),
+            _outerScroll.scrollY
+        )
+    }
+
+    fun scrollToY(offset: Double) {
+        _innerScroll.smoothScrollTo(
+            _innerScroll.scrollX,
+            (offset * Environment.HighDpiFactor).toInt()
+        )
     }
 }

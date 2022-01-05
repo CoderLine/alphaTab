@@ -6,6 +6,7 @@ import alphaTab.Logger
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.importer.ScoreLoader
 import alphaTab.model.Score
+import alphaTab.synth.PlayerState
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
@@ -31,6 +32,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         _alphaTabView = findViewById(R.id.alphatab_view)
         _viewModel = ViewModelProvider(this).get(ViewScoreViewModel::class.java)
+        _viewModel.settings.value!!.core.logLevel = LogLevel.Debug
+        Logger.logLevel = LogLevel.Debug
+
+        val playButton = findViewById<FloatingActionButton>(R.id.play_button)
+
+        _alphaTabView.api.playerReady.on {
+            playButton.isEnabled = true
+        }
+
+        _alphaTabView.api.playerStateChanged.on {
+            if (it.state == PlayerState.Playing) {
+                playButton.setImageResource(android.R.drawable.ic_media_pause)
+            } else {
+                playButton.setImageResource(android.R.drawable.ic_media_play)
+            }
+        }
 
         observeViewModel()
 
@@ -40,6 +57,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<FloatingActionButton>(R.id.open_file_button).setOnClickListener {
             openFile.launch(arrayOf("*/*"))
+        }
+
+        playButton.setOnClickListener {
+            _alphaTabView.api.playPause()
         }
     }
 
@@ -53,10 +74,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val openFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
-        val uri = it
+        val uri = it ?: return@registerForActivityResult
         val score: Score
         try {
-            val fileData = readFileData(uri!!)
+            val fileData = readFileData(uri)
             score = ScoreLoader.loadScoreFromBytes(fileData, _alphaTabView.settings)
             Log.i("AlphaTab", "File loaded: ${score.title}")
         } catch (e: Exception) {

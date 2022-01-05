@@ -15,10 +15,13 @@ import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.utils.Bounds
 import alphaTab.synth.IAlphaSynth
 import alphaTab.synth.ISynthOutput
+import android.annotation.SuppressLint
 import android.os.Handler
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.HorizontalScrollView
+import android.widget.RelativeLayout
 import android.widget.ScrollView
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -33,15 +36,18 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
     private val _outerScroll: HorizontalScrollView
     private val _innerScroll: ScrollView
     private val _renderSurface: AlphaTabRenderSurface
+    private val _renderWrapper: RelativeLayout
 
     public constructor(
         outerScroll: HorizontalScrollView,
         innerScroll: ScrollView,
+        renderWrapper: RelativeLayout,
         renderSurface: AlphaTabRenderSurface
     ) {
         _outerScroll = outerScroll
         _innerScroll = innerScroll
         _renderSurface = renderSurface
+        _renderWrapper = renderWrapper
 
         rootContainer = AndroidRootViewContainer(outerScroll, innerScroll)
         _handler = Handler(outerScroll.context.mainLooper)
@@ -107,6 +113,16 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
             api.renderer.renderResult(it)
         }
         settings.settingsChanged.on(this::onSettingsChanged)
+        settingsContainer.barCursorFillColorChanged.on {
+            (this._cursors?.barCursor as AndroidViewContainer?)?._view?.setBackgroundColor(
+                settingsContainer.barCursorFillColor
+            )
+        }
+        settingsContainer.beatCursorFillColorChanged.on {
+            (this._cursors?.beatCursor as AndroidViewContainer?)?._view?.setBackgroundColor(
+                settingsContainer.barCursorFillColor
+            )
+        }
     }
 
     private fun onSettingsChanged() {
@@ -124,27 +140,26 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun createWorkerPlayer(): IAlphaSynth? {
-        return null
-//        val player = AndroidThreadAlphaSynthWorkerPlayer(
-//            createSynthOutput(),
-//            api.settings.core.logLevel, this::beginInvoke
-//        )
-//        player.ready.on {
-//            val soundFont = openDefaultSoundFont()
-//            val bos = ByteArrayOutputStream()
-//            soundFont.use {
-//                soundFont.copyTo(bos)
-//                player.loadSoundFont(Uint8Array(bos.toByteArray().toUByteArray()), false)
-//            }
-//        }
-//        return player
+        var player: AndroidThreadAlphaSynthWorkerPlayer? = null
+        player = AndroidThreadAlphaSynthWorkerPlayer(
+            api.settings.core.logLevel,
+            AndroidSynthOutput {
+                player!!.addToWorker(it)
+            },
+            this::beginInvoke
+        )
+        player.ready.on {
+            val soundFont = openDefaultSoundFont()
+            val bos = ByteArrayOutputStream()
+            soundFont.use {
+                soundFont.copyTo(bos)
+                player.loadSoundFont(Uint8Array(bos.toByteArray().toUByteArray()), false)
+            }
+        }
+        return player
     }
 
-    private fun createSynthOutput(): ISynthOutput {
-        TODO("Not yet implemented")
-    }
-
-    override lateinit var rootContainer: IContainer
+    override var rootContainer: IContainer
 
     private val _canRenderChanged: EventEmitter = EventEmitter()
     override val canRenderChanged: IEventEmitter
@@ -198,8 +213,65 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
     override fun destroyCursors() {
     }
 
+    private var _cursors: Cursors? = null
     override fun createCursors(): Cursors? {
-        return null
+        val cursorWrapper = object : RelativeLayout(_renderWrapper.context) {
+            @SuppressLint("ClickableViewAccessibility")
+            override fun onTouchEvent(event: MotionEvent?): Boolean {
+                return false
+            }
+        }
+        cursorWrapper.layoutParams = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT
+        )
+        _renderWrapper.addView(cursorWrapper)
+
+        val selectionWrapper = object : RelativeLayout(_renderWrapper.context) {
+            @SuppressLint("ClickableViewAccessibility")
+            override fun onTouchEvent(event: MotionEvent?): Boolean {
+                return false
+            }
+        }
+        selectionWrapper.layoutParams = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT
+        )
+        _renderWrapper.addView(selectionWrapper)
+
+        val barCursor = object : View(_renderWrapper.context) {
+            @SuppressLint("ClickableViewAccessibility")
+            override fun onTouchEvent(event: MotionEvent?): Boolean {
+                return false
+            }
+        }
+        barCursor.layoutParams = RelativeLayout.LayoutParams(
+            0,
+            0
+        )
+        barCursor.setBackgroundColor(settingsContainer.barCursorFillColor)
+        cursorWrapper.addView(barCursor)
+
+        val beatCursor = object : View(_renderWrapper.context) {
+            @SuppressLint("ClickableViewAccessibility")
+            override fun onTouchEvent(event: MotionEvent?): Boolean {
+                return false
+            }
+        }
+        beatCursor.layoutParams = RelativeLayout.LayoutParams(
+            (3 * Environment.HighDpiFactor).toInt(),
+            0
+        )
+        beatCursor.setBackgroundColor(settingsContainer.beatCursorFillColor)
+        cursorWrapper.addView(beatCursor)
+
+        _cursors = Cursors(
+            AndroidViewContainer(cursorWrapper),
+            AndroidViewContainer(barCursor),
+            AndroidViewContainer(beatCursor),
+            AndroidViewContainer(selectionWrapper)
+        )
+        return _cursors
     }
 
     override fun createCanvasElement(): IContainer {
@@ -235,17 +307,13 @@ class AndroidUiFacade : IUiFacade<AlphaTabView> {
     }
 
     override fun scrollToX(scrollElement: IContainer, offset: Double, speed: Double) {
-        val view = (scrollElement as AndroidViewContainer)._view
-        if (view is ScrollView) {
-            view.smoothScrollTo(offset.toInt(), view.scrollY)
-        }
+        val view = (scrollElement as AndroidRootViewContainer)
+        view.scrollToX(offset)
     }
 
     override fun scrollToY(scrollElement: IContainer, offset: Double, speed: Double) {
-        val view = (scrollElement as AndroidViewContainer)._view
-        if (view is ScrollView) {
-            view.smoothScrollTo(view.scrollX, offset.toInt())
-        }
+        val view = (scrollElement as AndroidRootViewContainer)
+        view.scrollToY(offset)
     }
 
     override fun load(

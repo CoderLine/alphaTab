@@ -26,6 +26,19 @@
         android:layout_marginBottom="12pt"
         android:contentDescription="@string/open_file"
         android:src="@android:drawable/ic_menu_view"
-    />
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="12pt"
+        android:layout_marginBottom="12pt"
+        android:contentDescription="@string/open_file"
+        android:src="@android:drawable/ic_media_play"
+        android:enabled="false"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

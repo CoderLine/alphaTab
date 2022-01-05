@@ -75,9 +75,9 @@ class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSet) :
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        val verticalScroll = parent as ScrollView
+        val verticalScroll = parent.parent as ScrollView
         verticalScroll.setOnScrollChangeListener(this)
-        val horizontalScroll = parent.parent as HorizontalScrollView
+        val horizontalScroll = parent.parent.parent as HorizontalScrollView
         horizontalScroll.setOnScrollChangeListener(this)
         _visibleRectDirty = true
     }

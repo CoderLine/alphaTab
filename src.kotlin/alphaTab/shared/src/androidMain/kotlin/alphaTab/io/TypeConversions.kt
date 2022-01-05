@@ -34,7 +34,7 @@ actual class TypeConversions {
         }
 
         public actual fun uint16ToInt16(v: Double): Double {
-            return v.toUInt().toUShort().toDouble()
+            return v.toUInt().toShort().toDouble()
         }
 
         public actual fun int16ToUint32(v: Double): Double {

@@ -9,6 +9,7 @@ import alphaTab.platform.IMouseEventArgs
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.ScrollView
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.contracts.ExperimentalContracts
@@ -24,8 +25,19 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener {
     }
 
     override fun setBounds(x: Double, y: Double, w: Double, h: Double) {
-        width = w
-        height = h
+        val params = _view.layoutParams
+        if (params is RelativeLayout.LayoutParams) {
+            params.setMargins(
+                (x * Environment.HighDpiFactor).toInt(),
+                (y * Environment.HighDpiFactor).toInt(),
+                0,
+                0
+            )
+            params.width = (w * Environment.HighDpiFactor).toInt()
+            params.height = (h * Environment.HighDpiFactor).toInt()
+        }
+
+        _view.requestLayout()
     }
 
     override var width: Double
@@ -60,6 +72,11 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener {
         }
 
     override fun appendChild(child: IContainer) {
+        val childView = (child as AndroidViewContainer)._view
+        val group = _view
+        if (group is ViewGroup) {
+            group.addView(childView)
+        }
     }
 
     override fun stopAnimation() {
@@ -69,6 +86,10 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener {
     }
 
     override fun clear() {
+        val group = _view
+        if (group is ViewGroup) {
+            group.removeAllViews()
+        }
     }
 
     override var resize: IEventEmitter = EventEmitter()

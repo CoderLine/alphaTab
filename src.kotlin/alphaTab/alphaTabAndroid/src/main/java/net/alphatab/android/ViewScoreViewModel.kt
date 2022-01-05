@@ -14,7 +14,7 @@ class ViewScoreViewModel : ViewModel() {
     public val settings = MutableLiveData<Settings>().apply {
         value = Settings().apply {
             this.player.enableCursor = true
-            this.player.enableCursor = true
+            this.player.enablePlayer = true
             this.display.barCountPerPartial = 4.0
         }
     }

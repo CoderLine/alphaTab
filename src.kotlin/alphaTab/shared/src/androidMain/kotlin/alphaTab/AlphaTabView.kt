@@ -46,8 +46,8 @@ class AlphaTabView : RelativeLayout {
 
     public var settingsChanged: IEventEmitter = EventEmitter()
 
-    private var _barCursorFillColor: Drawable = ColorDrawable(Color.argb(64, 255, 242, 0))
-    public var barCursorFillColor: Drawable
+    private var _barCursorFillColor: Int = Color.argb(64, 255, 242, 0)
+    public var barCursorFillColor: Int
         get() = _barCursorFillColor
         set(value) {
             _barCursorFillColor = value
@@ -55,8 +55,8 @@ class AlphaTabView : RelativeLayout {
         }
     public val barCursorFillColorChanged: IEventEmitter = EventEmitter()
 
-    private var _beatCursorFillColor: Drawable = ColorDrawable(Color.argb(191, 64, 64, 255))
-    public var beatCursorFillColor: Drawable
+    private var _beatCursorFillColor: Int = Color.argb(191, 64, 64, 255)
+    public var beatCursorFillColor: Int
         get() = _beatCursorFillColor
         set(value) {
             _beatCursorFillColor = value
@@ -88,8 +88,9 @@ class AlphaTabView : RelativeLayout {
         val outerScroll = findViewById<HorizontalScrollView>(R.id.outerScroll)
         val innerScroll = findViewById<ScrollView>(R.id.innerScroll)
         val renderSurface = findViewById<AlphaTabRenderSurface>(R.id.renderSurface)
+        val renderWrapper = findViewById<RelativeLayout>(R.id.renderWrapper)
         _api =
-            AlphaTabApiBase(AndroidUiFacade(outerScroll, innerScroll, renderSurface), this)
+            AlphaTabApiBase(AndroidUiFacade(outerScroll, innerScroll, renderWrapper, renderSurface), this)
     }
 
     public fun renderTracks() {

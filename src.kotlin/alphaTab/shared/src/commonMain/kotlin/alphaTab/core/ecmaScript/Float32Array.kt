@@ -4,7 +4,7 @@ import alphaTab.core.decodeToFloatArray
 
 @ExperimentalUnsignedTypes
 public class Float32Array : Iterable<Float> {
-    private val data: FloatArray
+    public val data: FloatArray
 
     public val length: Double
         get() {
