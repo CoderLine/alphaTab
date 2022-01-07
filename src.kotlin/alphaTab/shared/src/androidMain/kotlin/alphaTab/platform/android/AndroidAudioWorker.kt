@@ -1,7 +1,8 @@
 package alphaTab.platform.android
 
 import android.media.*
-import java.util.concurrent.Semaphore
+import java.util.*
+import java.util.concurrent.*
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -10,15 +11,17 @@ class AndroidAudioWorker(
     private val _output: AndroidSynthOutput,
     sampleRate: Int,
     bufferSizeInSamples: Int
-) : Runnable, AudioTrack.OnPlaybackPositionUpdateListener {
+) {
+    private var _updateSchedule: ScheduledFuture<*>? = null
     private var _track: AudioTrack
     private var _writeThread: Thread? = null
     private var _buffer: FloatArray
     private var _stopped: Boolean = false
     private val _playingSemaphore: Semaphore = Semaphore(1)
+    private val _updateTimer: ScheduledExecutorService
 
     init {
-        val bufferSizeInBytes = bufferSizeInSamples * 4 /*sizeof(float)*/;
+        val bufferSizeInBytes = bufferSizeInSamples * 4 /*sizeof(float)*/
 
         _buffer = FloatArray(bufferSizeInSamples)
         _track = AudioTrack(
@@ -37,11 +40,12 @@ class AndroidAudioWorker(
         )
 
         _track.positionNotificationPeriod = bufferSizeInSamples
-        _track.setPlaybackPositionUpdateListener(this)
         _playingSemaphore.acquire()
+
+        _updateTimer = Executors.newScheduledThreadPool(1)
     }
 
-    override fun run() {
+    private fun writeSamples() {
         while (!_stopped) {
             if (_track.playState == AudioTrack.PLAYSTATE_PLAYING) {
                 _output.read(_buffer, 0, _buffer.size)
@@ -64,31 +68,40 @@ class AndroidAudioWorker(
         _writeThread!!.interrupt()
         _writeThread!!.join()
         _track.release()
+        _updateTimer.shutdown()
     }
 
     fun play() {
         _previousPosition = _track.playbackHeadPosition
         _track.play()
         _stopped = false
-        _writeThread = Thread(this)
+
+        _updateSchedule = _updateTimer.scheduleAtFixedRate(
+            {
+                this@AndroidAudioWorker.onUpdatePlayedSamples()
+            }, 0L, 50L, TimeUnit.MILLISECONDS
+        )
+
+        _writeThread = Thread {
+            this@AndroidAudioWorker.writeSamples()
+        }
         _writeThread!!.name = "alphaTab Audio Worker";
         _writeThread!!.start()
         _playingSemaphore.release() // proceed thread
     }
 
+
     fun pause() {
         _track.pause()
         _playingSemaphore.acquire() // block thread
-    }
-
-    override fun onMarkerReached(track: AudioTrack?) {
+        _updateSchedule?.cancel(true)
     }
 
     private var _previousPosition: Int = -1
     private val _timestamp = AudioTimestamp()
     private val _lastTimestampUpdate: Long = -1L;
 
-    override fun onPeriodicNotification(track: AudioTrack?) {
+    private fun onUpdatePlayedSamples() {
         val sinceUpdateInMillis = (System.nanoTime() - _lastTimestampUpdate) / 10e6
         if (sinceUpdateInMillis >= 10000) {
             if (!_track.getTimestamp(_timestamp)) {
@@ -111,7 +124,7 @@ class AndroidAudioWorker(
         if (playedSamples < 0) {
             return
         }
-        
+
         _previousPosition = samplePosition
         _output.onSamplesPlayed(playedSamples)
     }

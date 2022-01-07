@@ -24,7 +24,7 @@ class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     private val _threadStartedEvent: Semaphore
     private var _isCancelled = false
 
-    private lateinit var player: AlphaSynth
+    private var _player: AlphaSynth? = null
     private val _output: ISynthOutput
     private var _logLevel: LogLevel
 
@@ -75,7 +75,8 @@ class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     }
 
     private fun initialize() {
-        player = AlphaSynth(_output)
+        val player = AlphaSynth(_output)
+        _player = player
         player.positionChanged.on {
             _uiInvoke { onPositionChanged(it) }
         }
@@ -108,75 +109,75 @@ class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     }
 
     override val isReady: Boolean
-        get() = player.isReady
+        get() = _player?.isReady ?: false
 
     override val isReadyForPlayback: Boolean
-        get() = player.isReadyForPlayback
+        get() = _player?.isReadyForPlayback ?: false
 
     override val state: PlayerState
-        get() = player.state
+        get() = _player?.state ?: PlayerState.Paused
 
     override var logLevel: LogLevel
         get() = _logLevel
         set(value) {
             _logLevel = value
-            _workerQueue.add { player.logLevel = value }
+            _workerQueue.add { _player?.logLevel = value }
         }
 
     override var masterVolume: Double
-        get() = player.masterVolume
+        get() = _player?.masterVolume ?: 0.0
         set(value) {
-            _workerQueue.add { player.masterVolume = value }
+            _workerQueue.add { _player?.masterVolume = value }
         }
 
     override var countInVolume: Double
-        get() = player.countInVolume
+        get() = _player?.countInVolume ?: 0.0
         set(value) {
-            _workerQueue.add { player.countInVolume = value }
+            _workerQueue.add { _player?.countInVolume = value }
         }
 
     override var midiEventsPlayedFilter: List<MidiEventType>
-        get() = player.midiEventsPlayedFilter
+        get() = _player?.midiEventsPlayedFilter ?: List()
         set(value) {
-            _workerQueue.add { player.midiEventsPlayedFilter = value }
+            _workerQueue.add { _player?.midiEventsPlayedFilter = value }
         }
 
     override var metronomeVolume: Double
-        get() = player.metronomeVolume
+        get() = _player?.metronomeVolume ?: 0.0
         set(value) {
-            _workerQueue.add { player.metronomeVolume = value }
+            _workerQueue.add { _player?.metronomeVolume = value }
         }
 
     override var playbackSpeed: Double
-        get() = player.playbackSpeed
+        get() = _player?.playbackSpeed ?: 0.0
         set(value) {
-            _workerQueue.add { player.playbackSpeed = value }
+            _workerQueue.add { _player?.playbackSpeed = value }
         }
 
     override var tickPosition: Double
-        get() = player.tickPosition
+        get() = _player?.tickPosition ?: 0.0
         set(value) {
-            _workerQueue.add { player.tickPosition = value }
+            _workerQueue.add { _player?.tickPosition = value }
         }
 
     override var timePosition: Double
-        get() = player.timePosition
+        get() = _player?.timePosition ?: 0.0
         set(value) {
-            _workerQueue.add { player.timePosition = value }
+            _workerQueue.add { _player?.timePosition = value }
         }
 
 
     override var playbackRange: PlaybackRange?
-        get() = player.playbackRange
+        get() = _player?.playbackRange
         set(value) {
-            _workerQueue.add { player.playbackRange = value }
+            _workerQueue.add { _player?.playbackRange = value }
         }
 
 
     override var isLooping: Boolean
-        get() = player.isLooping
+        get() = _player?.isLooping ?: false
         set(value) {
-            _workerQueue.add { player.isLooping = value }
+            _workerQueue.add { _player?.isLooping = value }
         }
 
 
@@ -185,52 +186,52 @@ class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
             return false
         }
 
-        _workerQueue.add { player.play() }
+        _workerQueue.add { _player?.play() }
         return true
     }
 
     override fun pause() {
-        _workerQueue.add { player.pause() }
+        _workerQueue.add { _player?.pause() }
     }
 
     override fun playOneTimeMidiFile(midi: MidiFile) {
-        _workerQueue.add { player.playOneTimeMidiFile(midi) }
+        _workerQueue.add { _player?.playOneTimeMidiFile(midi) }
     }
 
     override fun playPause() {
-        _workerQueue.add { player.playPause() }
+        _workerQueue.add { _player?.playPause() }
     }
 
     override fun stop() {
-        _workerQueue.add { player.stop() }
+        _workerQueue.add { _player?.stop() }
     }
 
     override fun resetSoundFonts() {
-        _workerQueue.add { player.resetSoundFonts() }
+        _workerQueue.add { _player?.resetSoundFonts() }
     }
 
     override fun loadSoundFont(data: Uint8Array, append: Boolean) {
-        _workerQueue.add { player.loadSoundFont(data, append) }
+        _workerQueue.add { _player?.loadSoundFont(data, append) }
     }
 
     override fun loadMidiFile(midi: MidiFile) {
-        _workerQueue.add { player.loadMidiFile(midi) }
+        _workerQueue.add { _player?.loadMidiFile(midi) }
     }
 
     override fun setChannelMute(channel: Double, mute: Boolean) {
-        _workerQueue.add { player.setChannelMute(channel, mute) }
+        _workerQueue.add { _player?.setChannelMute(channel, mute) }
     }
 
     override fun resetChannelStates() {
-        _workerQueue.add { player.resetChannelStates() }
+        _workerQueue.add { _player?.resetChannelStates() }
     }
 
     override fun setChannelSolo(channel: Double, solo: Boolean) {
-        _workerQueue.add { player.setChannelSolo(channel, solo) }
+        _workerQueue.add { _player?.setChannelSolo(channel, solo) }
     }
 
     override fun setChannelVolume(channel: Double, volume: Double) {
-        _workerQueue.add { player.setChannelVolume(channel, volume) }
+        _workerQueue.add { _player?.setChannelVolume(channel, volume) }
     }
 
     override val ready: IEventEmitter = EventEmitter()

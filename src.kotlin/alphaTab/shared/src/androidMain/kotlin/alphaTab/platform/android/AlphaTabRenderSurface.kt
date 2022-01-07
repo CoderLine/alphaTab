@@ -6,7 +6,6 @@ import alphaTab.rendering.RenderFinishedEventArgs
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ScrollView
@@ -213,7 +212,6 @@ class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSet) :
             val topItem = _topVisibleItem
             if (topItem == null) { // no items yet -> do layout
                 anyVisibleItemExceeded = true
-                Log.d("AlphaTab", "No known visible items, request layout")
             } else {
                 val bottomItem = _bottomVisibleItem!!
                 val leftItem = _leftVisibleItem!!
@@ -223,13 +221,11 @@ class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSet) :
                     // scrolling to right (screen goes left)
                     if (_visibleAfterScrollRect.right > rightItem.drawingRect.right) {
                         anyVisibleItemExceeded = true
-                        Log.d("AlphaTab", "Right element exceeded on scroll right, request layout")
                     }
                 } else if (horizontalScroll < 0) {
                     // scrolling to left (scren goes right)
                     if (_visibleAfterScrollRect.left < leftItem.drawingRect.left) {
                         anyVisibleItemExceeded = true
-                        Log.d("AlphaTab", "Left element exceeded on scroll left, request layout")
                     }
                 }
 
@@ -237,13 +233,11 @@ class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSet) :
                     // scrolling down (screen goes up)
                     if (_visibleAfterScrollRect.bottom > bottomItem.drawingRect.bottom) {
                         anyVisibleItemExceeded = true
-                        Log.d("AlphaTab", "Bottom element exceeded on scroll down, request layout")
                     }
                 } else if (verticalScroll < 0) {
                     // scrolling up (screen goes down)
                     if (_visibleAfterScrollRect.top < bottomItem.drawingRect.top) {
                         anyVisibleItemExceeded = true
-                        Log.d("AlphaTab", "Top element exceeded on scroll up, request layout")
                     }
                 }
             }

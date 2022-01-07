@@ -11,6 +11,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,8 +33,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         _alphaTabView = findViewById(R.id.alphatab_view)
         _viewModel = ViewModelProvider(this).get(ViewScoreViewModel::class.java)
-        _viewModel.settings.value!!.core.logLevel = LogLevel.Debug
-        Logger.logLevel = LogLevel.Debug
 
         val playButton = findViewById<FloatingActionButton>(R.id.play_button)
 
@@ -44,8 +43,10 @@ class MainActivity : AppCompatActivity() {
         _alphaTabView.api.playerStateChanged.on {
             if (it.state == PlayerState.Playing) {
                 playButton.setImageResource(android.R.drawable.ic_media_pause)
+                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             } else {
                 playButton.setImageResource(android.R.drawable.ic_media_play)
+                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
         }
 
