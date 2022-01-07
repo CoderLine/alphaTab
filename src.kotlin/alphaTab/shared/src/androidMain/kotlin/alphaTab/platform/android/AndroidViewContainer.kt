@@ -9,6 +9,9 @@ import alphaTab.platform.IMouseEventArgs
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
+import android.view.animation.Transformation
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import androidx.recyclerview.widget.RecyclerView
@@ -79,10 +82,24 @@ class AndroidViewContainer : IContainer, View.OnLayoutChangeListener {
         }
     }
 
+
     override fun stopAnimation() {
+        _view.clearAnimation()
     }
 
     override fun transitionToX(duration: Double, x: Double) {
+        val params = _view.layoutParams as RelativeLayout.LayoutParams
+        val startX = params.leftMargin
+        val endX = x * Environment.HighDpiFactor;
+        val a: Animation = object : Animation() {
+            override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+                params.leftMargin = (startX + ((endX - startX) * interpolatedTime)).toInt()
+                _view.requestLayout()
+            }
+        }
+        a.interpolator = LinearInterpolator()
+        a.duration = duration.toLong()
+        _view.startAnimation(a)
     }
 
     override fun clear() {
