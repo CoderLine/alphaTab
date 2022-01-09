@@ -31,7 +31,7 @@ class LazyPartial {
 }
 
 /**
- * This is the base public class for creating new layouting engines for the score renderer.
+ * This is the base class for creating new layouting engines for the score renderer.
  */
 export abstract class ScoreLayout {
     private _barRendererLookup: Map<string, Map<number, BarRendererBase>> = new Map();
@@ -296,7 +296,7 @@ export abstract class ScoreLayout {
         : this.firstBarX;
         e.y = y;
         e.totalWidth = this.width;
-        e.totalHeight = this.height;
+        e.totalHeight = y + height;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
 

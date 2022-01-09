@@ -8,6 +8,7 @@ import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { MidiUtils } from '@src/midi/MidiUtils';
 
 export class MidiFileSequencerTempoChange {
     public bpm: number;
@@ -27,7 +28,7 @@ class MidiSequencerState {
     public firstTimeSignatureNumerator: number = 0;
     public firstTimeSignatureDenominator: number = 0;
     public synthData: SynthEvent[] = [];
-    public division: number = 0;
+    public division: number = MidiUtils.QuarterTime;
     public eventIndex: number = 0;
     public currentTime: number = 0;
     public playbackRange: PlaybackRange | null = null;
