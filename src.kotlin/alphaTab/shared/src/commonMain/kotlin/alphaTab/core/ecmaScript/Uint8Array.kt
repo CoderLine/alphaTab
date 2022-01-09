@@ -6,47 +6,43 @@ class Uint8Array : Iterable<UByte> {
     public val buffer: ArrayBuffer
 
     public constructor(x: Iterable<Double>) {
-        this.buffer = ArrayBuffer(x.map { d -> d.toInt().toUByte() }.toUByteArray())
+        this.buffer = x.map { d -> d.toInt().toUByte() }.toUByteArray()
     }
 
     public constructor(size: Double) {
-        this.buffer = ArrayBuffer(UByteArray(size.toInt()))
+        this.buffer = UByteArray(size.toInt())
     }
 
     public constructor(data: UByteArray) {
-        this.buffer = ArrayBuffer(data)
-    }
-
-    public constructor(data:ArrayBuffer) {
         this.buffer = data
     }
 
     public val length: Double
         get() {
-            return this.buffer.raw.size.toDouble()
+            return this.buffer.size.toDouble()
         }
 
     public inline operator fun get(idx: Int): Double {
-        return this.buffer.raw[idx].toDouble()
+        return this.buffer[idx].toDouble()
     }
 
     public inline operator fun get(idx: Double): Double {
-        return this.buffer.raw[idx.toInt()].toDouble()
+        return this.buffer[idx.toInt()].toDouble()
     }
 
     public inline operator fun set(idx: Int, value: Double) {
-        this.buffer.raw[idx] = value.toInt().toUByte()
+        this.buffer[idx] = value.toInt().toUByte()
     }
 
     public inline fun set(subarray: Uint8Array, pos: Double) {
-        subarray.buffer.raw.copyInto(buffer.raw, pos.toInt(), 0, subarray.buffer.raw.size)
+        subarray.buffer.copyInto(buffer, pos.toInt(), 0, subarray.buffer.size)
     }
 
     override fun iterator(): Iterator<UByte> {
-        return buffer.raw.iterator()
+        return buffer.iterator()
     }
 
     public fun subarray(begin: Double, end: Double): Uint8Array {
-        return Uint8Array(buffer.raw.copyOfRange(begin.toInt(), end.toInt()))
+        return Uint8Array(buffer.copyOfRange(begin.toInt(), end.toInt()))
     }
 }

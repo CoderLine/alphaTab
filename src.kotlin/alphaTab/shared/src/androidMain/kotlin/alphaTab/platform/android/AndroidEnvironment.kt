@@ -4,7 +4,7 @@ import alphaTab.Environment
 import android.util.DisplayMetrics
 import kotlin.contracts.ExperimentalContracts
 
-public class AndroidEnvironment {
+internal class AndroidEnvironment {
     companion object {
         private var _isInitialized: Boolean = false
         @ExperimentalUnsignedTypes

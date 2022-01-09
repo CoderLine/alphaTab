@@ -26,7 +26,7 @@ val CustomTypeFaces = HashMap<String, Typeface>()
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
-public class AndroidCanvas : ICanvas {
+internal class AndroidCanvas : ICanvas {
     companion object {
         public fun initialize(context: Context) {
             MusicFont = Typeface.createFromAsset(context.assets, "Bravura.ttf")

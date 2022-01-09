@@ -17,7 +17,7 @@ import kotlin.math.abs
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 @SuppressLint("ClickableViewAccessibility")
-class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, IContainer,
+internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, IContainer,
     View.OnLayoutChangeListener, View.OnTouchListener {
     internal val view: View
     private var _horizontalScrollView: SuspendableHorizontalScrollView? = null

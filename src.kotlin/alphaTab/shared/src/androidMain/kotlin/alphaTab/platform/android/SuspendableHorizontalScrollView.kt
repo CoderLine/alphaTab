@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.HorizontalScrollView
 
-class SuspendableHorizontalScrollView(context: Context, attributeSet: AttributeSet) :
+internal class SuspendableHorizontalScrollView(context: Context, attributeSet: AttributeSet) :
     HorizontalScrollView(context, attributeSet) {
     public var isUserScrollingEnabled = true
 

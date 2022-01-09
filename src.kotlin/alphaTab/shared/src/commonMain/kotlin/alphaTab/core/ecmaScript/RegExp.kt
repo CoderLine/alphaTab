@@ -3,7 +3,7 @@ package alphaTab.core.ecmaScript
 private data class RegExpCacheEntry(val pattern: String, val flags: String)
 private val RegexpCache = HashMap<RegExpCacheEntry, RegExp>()
 
-class RegExp {
+internal class RegExp {
     private var _regex: Regex
     private var _global: Boolean
 

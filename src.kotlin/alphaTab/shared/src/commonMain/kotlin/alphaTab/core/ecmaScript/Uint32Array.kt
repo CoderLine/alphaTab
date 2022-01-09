@@ -1,7 +1,7 @@
 package alphaTab.core.ecmaScript
 
 @ExperimentalUnsignedTypes
-class Uint32Array : Iterable<UInt> {
+internal class Uint32Array : Iterable<UInt> {
     private val _data: UIntArray
 
     public val length: Double

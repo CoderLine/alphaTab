@@ -17,7 +17,7 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
-class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
+internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     private val _uiInvoke: (action: (() -> Unit)) -> Unit
 
     private val _workerThread: Thread

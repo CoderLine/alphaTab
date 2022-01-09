@@ -23,6 +23,9 @@ export class ScoreRenderer implements IScoreRenderer {
     public canvas: ICanvas | null = null;
     public score: Score | null = null;
     public tracks: Track[] | null = null;
+    /**
+     * @internal
+     */
     public layout: ScoreLayout | null = null;
     public settings: Settings;
     public boundsLookup: BoundsLookup | null = null;

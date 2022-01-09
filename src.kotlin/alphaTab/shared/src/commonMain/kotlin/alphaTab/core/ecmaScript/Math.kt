@@ -2,7 +2,7 @@ package alphaTab.core.ecmaScript
 
 import kotlin.math.pow
 
-class Math {
+internal class Math {
     companion object {
         public const val PI: Double = kotlin.math.PI
         public fun log10(x: Double): Double {

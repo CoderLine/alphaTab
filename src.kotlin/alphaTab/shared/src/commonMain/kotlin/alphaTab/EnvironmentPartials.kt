@@ -11,7 +11,7 @@ internal expect fun createPlatformSpecificRenderEngines(engines: alphaTab.collec
 @Suppress("UNUSED_PARAMETER")
 @kotlin.contracts.ExperimentalContracts
 @ExperimentalUnsignedTypes
-class EnvironmentPartials {
+internal class EnvironmentPartials {
     companion object {
         internal fun createPlatformSpecificRenderEngines(engines: alphaTab.collections.Map<String, RenderEngineFactory>) {
             alphaTab.createPlatformSpecificRenderEngines(engines)

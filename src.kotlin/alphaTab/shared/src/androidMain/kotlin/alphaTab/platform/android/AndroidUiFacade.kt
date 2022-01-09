@@ -32,7 +32,7 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 @SuppressLint("ClickableViewAccessibility")
-class AndroidUiFacade : IUiFacade<AlphaTabView> {
+internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     private var _handler: Handler
     private var _internalRootContainerBecameVisible: EventEmitter? = EventEmitter()
     private val _outerScroll: SuspendableHorizontalScrollView

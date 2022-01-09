@@ -16,7 +16,7 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
-class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
+internal class AndroidThreadScoreRenderer : IScoreRenderer, Runnable {
     private val _uiInvoke: ( action: (() -> Unit) ) -> Unit
 
     private val _workerThread: Thread

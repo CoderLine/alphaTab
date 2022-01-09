@@ -1,6 +1,6 @@
 package alphaTab.core.ecmaScript
 
-expect class Date {
+internal expect class Date {
     companion object {
         public fun now(): Double
     }

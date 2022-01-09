@@ -4,7 +4,7 @@ import alphaTab.core.ecmaScript.RegExp
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-class TypeHelper {
+internal class TypeHelper {
     companion object {
         public fun createRegex(pattern: String, flags: String): RegExp {
             return RegExp(pattern, flags)

@@ -17,7 +17,7 @@ public class Float32Array : Iterable<Float> {
     }
 
     public constructor(x: ArrayBuffer) {
-        data = x.raw.decodeToFloatArray()
+        data = x.decodeToFloatArray()
     }
 
     internal constructor(x: FloatArray) {

@@ -15,7 +15,7 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
-class RenderPlaceholder(public var result: RenderFinishedEventArgs) : Closeable {
+internal class RenderPlaceholder(public var result: RenderFinishedEventArgs) : Closeable {
     companion object {
         const val STATE_LAYOUT_DONE = 0
         const val STATE_RENDER_REQUESTED = 1
@@ -42,7 +42,7 @@ class RenderPlaceholder(public var result: RenderFinishedEventArgs) : Closeable 
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
-class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSet) :
+internal class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSet) :
     View(context, attributeSet), View.OnScrollChangeListener {
     private val _placeholders: ArrayList<RenderPlaceholder> = arrayListOf()
     private val _resultIdToIndex: ObjectDoubleMap<String> = ObjectDoubleMap()

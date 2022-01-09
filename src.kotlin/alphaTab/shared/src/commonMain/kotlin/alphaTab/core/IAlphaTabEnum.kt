@@ -1,5 +1,5 @@
 package alphaTab.core
 
-interface IAlphaTabEnum {
+public interface IAlphaTabEnum {
     public val value: Int
 }

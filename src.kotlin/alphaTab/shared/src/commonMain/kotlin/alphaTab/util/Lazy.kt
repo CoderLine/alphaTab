@@ -2,7 +2,7 @@ package alphaTab.util
 
 internal object UninitializedValue
 
-class Lazy<T : Any?>(factory: () -> T) {
+internal class Lazy<T : Any?>(factory: () -> T) {
     private val _factory: () -> T = factory
     private var _value:Any? = UninitializedValue
 

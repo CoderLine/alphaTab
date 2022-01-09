@@ -1,6 +1,6 @@
 package alphaTab.core
 
-open class Console {
+internal open class Console {
     public open fun debug(format: String, vararg details: Any?) {
         val message = if (details.isNotEmpty()) "$format,${details.joinToString(",")}" else format
         println("[AlphaTab Debug] $message")

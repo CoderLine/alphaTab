@@ -3,7 +3,7 @@ package alphaTab.platform.svg
 import alphaTab.core.ecmaScript.Uint8Array
 import kotlin.contracts.ExperimentalContracts
 
-class FontSizesPartials {
+internal class FontSizesPartials {
     companion object {
         @ExperimentalUnsignedTypes
         @ExperimentalContracts

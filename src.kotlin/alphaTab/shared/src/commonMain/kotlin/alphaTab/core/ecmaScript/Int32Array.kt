@@ -1,6 +1,6 @@
 package alphaTab.core.ecmaScript
 
-class Int32Array : Iterable<Int> {
+internal class Int32Array : Iterable<Int> {
     private val _data: IntArray
 
     public val length: Double

@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.ScrollView
 
-class SuspendableScrollView(context: Context, attributeSet: AttributeSet) :
+internal class SuspendableScrollView(context: Context, attributeSet: AttributeSet) :
     ScrollView(context, attributeSet) {
 
     public var isUserScrollingEnabled = true

@@ -1,8 +1,8 @@
 package alphaTab.core.ecmaScript
 
-class CoreString {
+internal class CoreString {
     companion object{
-        public fun fromCharCode(code:Double): kotlin.String {
+        public fun fromCharCode(code:Double): String {
             return code.toInt().toChar().toString();
         }
     }

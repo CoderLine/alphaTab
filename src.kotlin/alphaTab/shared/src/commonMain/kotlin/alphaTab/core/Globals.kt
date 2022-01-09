@@ -4,102 +4,88 @@ import alphaTab.collections.List
 import alphaTab.core.ecmaScript.RegExp
 
 @kotlin.ExperimentalUnsignedTypes
-expect fun UByteArray.decodeToFloatArray(): FloatArray
+internal expect fun UByteArray.decodeToFloatArray(): FloatArray
 
 @kotlin.ExperimentalUnsignedTypes
-expect fun UByteArray.decodeToDoubleArray(): DoubleArray
+internal expect fun UByteArray.decodeToDoubleArray(): DoubleArray
 
 @kotlin.ExperimentalUnsignedTypes
-expect fun UByteArray.decodeToString(encoding: String): String
+internal expect fun UByteArray.decodeToString(encoding: String): String
 
-fun <T : Comparable<T> > List<T>.sort(): Unit {
+internal fun <T : Comparable<T> > List<T>.sort() {
     this.sort { a,b ->
         a.compareTo(b).toDouble()
     }
 }
-fun String.substr(startIndex: Double, length: Double): String {
+internal fun String.substr(startIndex: Double, length: Double): String {
     return this.substring(startIndex.toInt(), (startIndex + length).toInt())
 }
 
-fun String.substr(startIndex: Double): String {
+internal fun String.substr(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
 
-fun String.splitBy(separator:String): alphaTab.collections.List<String> {
+internal fun String.splitBy(separator:String): List<String> {
     return List(this.split(separator))
 }
 
-fun String.replace(pattern: RegExp, replacement: String): String {
+internal fun String.replace(pattern: RegExp, replacement: String): String {
     return pattern.replace(this, replacement)
 }
 
-fun Iterable<Char>.toCharArray(): CharArray {
-    return this.toList().toCharArray()
-}
-
-fun String.indexOfInDouble(item: String): Double {
+internal fun String.indexOfInDouble(item: String): Double {
     return this.indexOf(item).toDouble()
 }
 
-fun Double.toInvariantString(base: Double): String {
+internal fun Double.toInvariantString(base: Double): String {
     return this.toInt().toString(base.toInt())
 }
 
-expect fun Double.toInvariantString(): String
-fun IAlphaTabEnum.toInvariantString(): String {
+internal expect fun Double.toInvariantString(): String
+internal fun IAlphaTabEnum.toInvariantString(): String {
     return this.toString()
 }
 
-fun String.lastIndexOfInDouble(item: String): Double {
+internal fun String.lastIndexOfInDouble(item: String): Double {
     return this.lastIndexOf(item).toDouble()
 }
 
-operator fun Double.plus(str: String): String {
-    return this.toString() + str
+internal operator fun Double.plus(str: String): String {
+    return this.toInvariantString() + str
 }
 
-fun String.charAt(index: Double): String {
+internal fun String.charAt(index: Double): String {
     return this.substring(index.toInt(), index.toInt() + 1)
 }
 
-fun String.charCodeAt(index: Int): Double {
+internal fun String.charCodeAt(index: Int): Double {
     return this[index].code.toDouble()
 }
 
-fun String.charCodeAt(index: Double): Double {
+internal fun String.charCodeAt(index: Double): Double {
     return this[index.toInt()].code.toDouble()
 }
 
-fun String.split(delimiter: String): alphaTab.collections.List<String> {
+internal fun String.split(delimiter: String): List<String> {
     @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
-    return alphaTab.collections.List(this.split(delimiters = arrayOf(delimiter), ignoreCase = false, limit = 0))
+    return List(this.split(delimiters = arrayOf(delimiter), ignoreCase = false, limit = 0))
 }
 
-fun String.substring(startIndex: Double, endIndex: Double): String {
+internal fun String.substring(startIndex: Double, endIndex: Double): String {
     return this.substring(startIndex.toInt(), endIndex.toInt())
 }
 
-fun String.substring(startIndex: Double): String {
+internal fun String.substring(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
 
-operator fun Int.rangeTo(d: Double): IntRange {
-    return this.rangeTo(d.toInt())
-}
-
-//fun Any?.toDouble(): Double {
-//    if (this is Double) {
-//        return this
-//    }
-//    return this.toString().toDouble()
-//}
-fun IAlphaTabEnum.toDouble(): Double {
+internal fun IAlphaTabEnum.toDouble(): Double {
     return this.value.toDouble()
 }
-fun IAlphaTabEnum?.toDouble(): Double? {
+internal fun IAlphaTabEnum?.toDouble(): Double? {
     return this?.value.toDouble()
 }
-fun Any?.toDouble(): Double {
+internal fun Any?.toDouble(): Double {
     if(this is Double) {
         return this
     }
@@ -108,14 +94,14 @@ fun Any?.toDouble(): Double {
     }
     throw ClassCastException("Cannot cast ${this::class.simpleName} to double")
 }
-fun Int?.toDouble(): Double? {
+internal fun Int?.toDouble(): Double? {
     return this?.toDouble()
 }
 
-expect fun String.toDoubleOrNaN(): Double;
-expect fun String.toIntOrNaN(): Double;
+internal expect fun String.toDoubleOrNaN(): Double;
+internal expect fun String.toIntOrNaN(): Double;
 
-class Globals {
+internal class Globals {
     companion object {
         const val NaN: Double = Double.NaN
         val console = Console()
@@ -141,7 +127,7 @@ class Globals {
     }
 }
 
-public fun List<Char>.toCharArray(): CharArray {
+internal fun List<Char>.toCharArray(): CharArray {
     val result = CharArray(length.toInt())
     var index = 0
     for (element in this) {

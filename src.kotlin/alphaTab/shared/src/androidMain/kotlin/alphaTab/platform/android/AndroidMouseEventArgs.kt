@@ -9,7 +9,7 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
-class AndroidMouseEventArgs(
+internal class AndroidMouseEventArgs(
     private val _event: MotionEvent
 ) : IMouseEventArgs {
     private var _defaultPrevented = false

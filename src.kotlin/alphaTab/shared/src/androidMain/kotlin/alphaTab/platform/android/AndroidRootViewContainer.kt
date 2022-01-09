@@ -12,7 +12,7 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
 @SuppressLint("ClickableViewAccessibility")
-class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener {
+internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener {
     private val _outerScroll: HorizontalScrollView
     private val _innerScroll: ScrollView
     internal val renderSurface: AlphaTabRenderSurface
