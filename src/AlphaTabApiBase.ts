@@ -42,7 +42,6 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { Note } from '@src/model/Note';
 import { MidiEventType } from '@src/midi/MidiEvent';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { BarBounds } from './rendering';
 
 class SelectionInfo {
     public beat: Beat;
