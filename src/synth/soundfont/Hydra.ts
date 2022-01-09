@@ -149,7 +149,7 @@ export class Hydra {
             let samplesToRead: number = Math.min(samplesLeft, (sampleBuffer.length / 2) | 0);
             reader.read(sampleBuffer, 0, samplesToRead * 2);
             for (let i: number = 0; i < samplesToRead; i++) {
-                const shortSample = (sampleBuffer[i * 2 + 1] << 8) | sampleBuffer[i * 2];
+                const shortSample = TypeConversions.int32ToInt16((sampleBuffer[i * 2 + 1] << 8) | sampleBuffer[i * 2]);
                 samples[samplesPos + i] = shortSample / 32767;
             }
             samplesLeft -= samplesToRead;
