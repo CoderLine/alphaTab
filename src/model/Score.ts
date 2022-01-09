@@ -110,7 +110,12 @@ export class Score {
         if (this.masterBars.length !== 0) {
             bar.previousMasterBar = this.masterBars[this.masterBars.length - 1];
             bar.previousMasterBar.nextMasterBar = bar;
-            bar.start = bar.previousMasterBar.start + bar.previousMasterBar.calculateDuration();
+            // TODO: this will not work on anacrusis. Correct anacrusis durations are only working
+            // when there are beats with playback positions already computed which requires full finish
+            // chicken-egg problem here. temporarily forcing anacrusis length here to 0
+            bar.start =
+                bar.previousMasterBar.start +
+                (bar.previousMasterBar.isAnacrusis ? 0 : bar.previousMasterBar.calculateDuration());
         }
         // if the group is closed only the next upcoming header can
         // reopen the group in case of a repeat alternative, so we
@@ -129,7 +134,7 @@ export class Score {
     }
 
     public finish(settings: Settings): void {
-        const sharedDataBag = new Map<string, unknown>()
+        const sharedDataBag = new Map<string, unknown>();
         for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
             this.tracks[i].finish(settings, sharedDataBag);
         }

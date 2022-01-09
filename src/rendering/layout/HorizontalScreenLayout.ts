@@ -8,6 +8,7 @@ import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { Logger } from '@src/Logger';
 
 export class HorizontalScreenLayoutPartialInfo {
+    public x: number = 0;
     public width: number = 0;
     public masterBars: MasterBar[] = [];
 }
@@ -33,9 +34,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
         return false;
     }
 
-    public get firstBarX(): number{
-        let x=  this._pagePadding![0];
-        if(this._group) {
+    public get firstBarX(): number {
+        let x = this._pagePadding![0];
+        if (this._group) {
             x += this._group.accoladeSpacing;
         }
         return x;
@@ -85,6 +86,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         let countPerPartial: number = this.renderer.settings.display.barCountPerPartial;
         let partials: HorizontalScreenLayoutPartialInfo[] = [];
         let currentPartial: HorizontalScreenLayoutPartialInfo = new HorizontalScreenLayoutPartialInfo();
+        let renderX = 0;
         while (currentBarIndex <= endBarIndex) {
             let result = this._group.addBars(this.renderer.tracks!, currentBarIndex);
             if (result) {
@@ -94,14 +96,18 @@ export class HorizontalScreenLayout extends ScoreLayout {
                     let previousPartial: HorizontalScreenLayoutPartialInfo = partials[partials.length - 1];
                     previousPartial.masterBars.push(score.masterBars[currentBarIndex]);
                     previousPartial.width += result.width;
+                    renderX += result.width;
+                    currentPartial.x += renderX;
                 } else {
                     currentPartial.masterBars.push(score.masterBars[currentBarIndex]);
                     currentPartial.width += result.width;
                     // no targetPartial here because previous partials already handled this code
                     if (currentPartial.masterBars.length >= countPerPartial) {
                         if (partials.length === 0) {
-                            currentPartial.width += this._group.x + this._group.accoladeSpacing;
+                            // respect accolade and on first partial
+                            currentPartial.width += this._group.accoladeSpacing + this._pagePadding[0];
                         }
+                        renderX += currentPartial.width;
                         partials.push(currentPartial);
                         Logger.debug(
                             this.name,
@@ -112,6 +118,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                             null
                         );
                         currentPartial = new HorizontalScreenLayoutPartialInfo();
+                        currentPartial.x = renderX;
                     }
                 }
             }
@@ -120,7 +127,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         // don't miss the last partial if not empty
         if (currentPartial.masterBars.length > 0) {
             if (partials.length === 0) {
-                currentPartial.width += this._group.x + this._group.accoladeSpacing;
+                currentPartial.width += this._group.accoladeSpacing + this._pagePadding[0];
             }
             partials.push(currentPartial);
             Logger.debug(
@@ -139,7 +146,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
         let x = 0;
         for (let i: number = 0; i < partials.length; i++) {
-            let partial: HorizontalScreenLayoutPartialInfo = partials[i];
+            const partial: HorizontalScreenLayoutPartialInfo = partials[i];
 
             const e = new RenderFinishedEventArgs();
             e.x = x;
@@ -153,14 +160,20 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
             x += partial.width;
 
-            const partialBarIndex = currentBarIndex; 
+            // pull to local scope for lambda
+            const partialBarIndex = currentBarIndex;
+            const partialIndex = i;
+            this._group.buildBoundingsLookup(this._group!.x, this._group!.y);
             this.registerPartial(e, canvas => {
                 canvas.color = this.renderer.settings.display.resources.mainGlyphColor;
                 canvas.textAlign = TextAlign.Left;
                 let renderX: number = this._group!.getBarX(partial.masterBars[0].index) + this._group!.accoladeSpacing;
-                if (i === 0) {
+                if (partialIndex === 0) {
                     renderX -= this._group!.x + this._group!.accoladeSpacing;
                 }
+
+                canvas.color = this.renderer.settings.display.resources.mainGlyphColor;
+                canvas.textAlign = TextAlign.Left;
                 Logger.debug(
                     this.name,
                     'Rendering partial from bar ' +

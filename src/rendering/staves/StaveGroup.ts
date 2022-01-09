@@ -215,7 +215,6 @@ export class StaveGroup {
     }
 
     public paintPartial(cx: number, cy: number, canvas: ICanvas, startIndex: number, count: number): void {
-        this.buildBoundingsLookup(cx, cy);
         for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
             this._allStaves[i].paint(cx, cy, canvas, startIndex, count);
         }
@@ -345,7 +344,7 @@ export class StaveGroup {
         }
     }
 
-    private buildBoundingsLookup(cx: number, cy: number): void {
+    public buildBoundingsLookup(cx: number, cy: number): void {
         if (this.layout.renderer.boundsLookup!.isFinished) {
             return;
         }

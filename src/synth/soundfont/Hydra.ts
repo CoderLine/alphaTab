@@ -146,13 +146,12 @@ export class Hydra {
         let samplesPos: number = 0;
         
         const sampleBuffer: Uint8Array = new Uint8Array(2048);
-        const testBuffer: Int16Array = new Int16Array((sampleBuffer.length / 2) | 0);
         while (samplesLeft > 0) {
             let samplesToRead: number = Math.min(samplesLeft, (sampleBuffer.length / 2) | 0);
             reader.read(sampleBuffer, 0, samplesToRead * 2);
             for (let i: number = 0; i < samplesToRead; i++) {
-                testBuffer[i] = (sampleBuffer[i * 2 + 1] << 8) | sampleBuffer[i * 2];
-                samples[samplesPos + i] = testBuffer[i] / 32767;
+                const shortSample = TypeConversions.int32ToInt16((sampleBuffer[i * 2 + 1] << 8) | sampleBuffer[i * 2]);
+                samples[samplesPos + i] = shortSample / 32767;
             }
             samplesLeft -= samplesToRead;
             samplesPos += samplesToRead;
