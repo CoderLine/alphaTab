@@ -10,7 +10,7 @@ import alphaTab.core.ecmaScript.Float32Array
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
-class AndroidSynthOutput(
+internal class AndroidSynthOutput(
     private val synthInvoke: (action: (() -> Unit)) -> Unit
 ) : ISynthOutput {
     companion object {

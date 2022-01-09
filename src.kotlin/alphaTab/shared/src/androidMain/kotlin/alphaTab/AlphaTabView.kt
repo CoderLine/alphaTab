@@ -3,9 +3,7 @@ package alphaTab
 import alphaTab.collections.DoubleList
 import alphaTab.model.Score
 import alphaTab.model.Track
-import alphaTab.platform.android.AlphaTabRenderSurface
-import alphaTab.platform.android.AndroidEnvironment
-import alphaTab.platform.android.AndroidUiFacade
+import alphaTab.platform.android.*
 import alphaTab.rendering.layout.HorizontalScreenLayout
 import android.content.Context
 import android.graphics.Color
@@ -34,7 +32,8 @@ class AlphaTabView : RelativeLayout {
 
     private var _settings: Settings = Settings().apply {
         this.player.enableCursor = true
-        this.player.enableCursor = true
+        this.player.enablePlayer = true
+        this.player.enableUserInteraction = true
     }
 
     public var settings: Settings
@@ -64,6 +63,15 @@ class AlphaTabView : RelativeLayout {
         }
     public val beatCursorFillColorChanged: IEventEmitter = EventEmitter()
 
+    private var _selectionFillColor: Int = Color.argb(25, 64, 64, 255)
+    public var selectionFillColor: Int
+        get() = _selectionFillColor
+        set(value) {
+            _selectionFillColor = value
+            (selectionFillColorChanged as EventEmitter).trigger()
+        }
+    public val selectionFillColorChanged: IEventEmitter = EventEmitter()
+
     public val api: AlphaTabApiBase<AlphaTabView>
         get() = _api
 
@@ -85,12 +93,15 @@ class AlphaTabView : RelativeLayout {
         AndroidEnvironment.initializeAndroid(context)
         inflate(context, R.layout.alphatab_view, this)
 
-        val outerScroll = findViewById<HorizontalScrollView>(R.id.outerScroll)
-        val innerScroll = findViewById<ScrollView>(R.id.innerScroll)
+        val outerScroll = findViewById<SuspendableHorizontalScrollView>(R.id.outerScroll)
+        val innerScroll = findViewById<SuspendableScrollView>(R.id.innerScroll)
         val renderSurface = findViewById<AlphaTabRenderSurface>(R.id.renderSurface)
         val renderWrapper = findViewById<RelativeLayout>(R.id.renderWrapper)
         _api =
-            AlphaTabApiBase(AndroidUiFacade(outerScroll, innerScroll, renderWrapper, renderSurface), this)
+            AlphaTabApiBase(
+                AndroidUiFacade(outerScroll, innerScroll, renderWrapper, renderSurface),
+                this
+            )
     }
 
     public fun renderTracks() {

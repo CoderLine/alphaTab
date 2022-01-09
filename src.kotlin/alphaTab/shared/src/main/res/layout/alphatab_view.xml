@@ -3,11 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <HorizontalScrollView
+    <alphaTab.platform.android.SuspendableHorizontalScrollView
         android:id="@+id/outerScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ScrollView
+        <alphaTab.platform.android.SuspendableScrollView
             android:id="@+id/innerScroll"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
@@ -20,6 +20,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </RelativeLayout>
-        </ScrollView>
-    </HorizontalScrollView>
+        </alphaTab.platform.android.SuspendableScrollView>
+    </alphaTab.platform.android.SuspendableHorizontalScrollView>
 </merge>

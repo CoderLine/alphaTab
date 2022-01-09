@@ -1,18 +1,14 @@
 package net.alphatab.android
 
 import alphaTab.AlphaTabView
-import alphaTab.LogLevel
-import alphaTab.Logger
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.importer.ScoreLoader
 import alphaTab.model.Score
 import alphaTab.synth.PlayerState
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -50,6 +46,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        _alphaTabView.api.playerPositionChanged.on {
+            _viewModel.currentTickPosition.value = it.currentTick.toInt()
+        }
+
         observeViewModel()
 
         val widthDp = resources.displayMetrics.widthPixels /
@@ -72,6 +72,16 @@ class MainActivity : AppCompatActivity() {
         _viewModel.tracks.observe(this, {
             _alphaTabView.tracks = it
         })
+
+        val initialPosition = _viewModel.currentTickPosition.value
+        var shouldSetPosition = true
+        _alphaTabView.api.playerReady.on {
+            if (shouldSetPosition && _alphaTabView.tracks == _viewModel.tracks.value) {
+                _viewModel.currentTickPosition.value = initialPosition
+                _alphaTabView.api.tickPosition = initialPosition!!.toDouble()
+            }
+            shouldSetPosition = false
+        }
     }
 
     private val openFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
@@ -88,6 +98,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
+            _viewModel.currentTickPosition.value = 0
             _viewModel.tracks.value = arrayListOf(score.tracks[0])
         } catch (e: Exception) {
             Log.e("AlphaTab", "Failed to render file: $e, ${e.stackTraceToString()}")

@@ -7,7 +7,7 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
-class AndroidAudioWorker(
+internal class AndroidAudioWorker(
     private val _output: AndroidSynthOutput,
     sampleRate: Int,
     bufferSizeInSamples: Int
@@ -72,29 +72,33 @@ class AndroidAudioWorker(
     }
 
     fun play() {
-        _previousPosition = _track.playbackHeadPosition
-        _track.play()
-        _stopped = false
+        if(_track.playState != AudioTrack.PLAYSTATE_PLAYING) {
+            _previousPosition = _track.playbackHeadPosition
+            _track.play()
+            _stopped = false
 
-        _updateSchedule = _updateTimer.scheduleAtFixedRate(
-            {
-                this@AndroidAudioWorker.onUpdatePlayedSamples()
-            }, 0L, 50L, TimeUnit.MILLISECONDS
-        )
+            _updateSchedule = _updateTimer.scheduleAtFixedRate(
+                {
+                    this@AndroidAudioWorker.onUpdatePlayedSamples()
+                }, 0L, 50L, TimeUnit.MILLISECONDS
+            )
 
-        _writeThread = Thread {
-            this@AndroidAudioWorker.writeSamples()
+            _writeThread = Thread {
+                this@AndroidAudioWorker.writeSamples()
+            }
+            _writeThread!!.name = "alphaTab Audio Worker";
+            _writeThread!!.start()
+            _playingSemaphore.release() // proceed thread
         }
-        _writeThread!!.name = "alphaTab Audio Worker";
-        _writeThread!!.start()
-        _playingSemaphore.release() // proceed thread
     }
 
 
     fun pause() {
-        _track.pause()
-        _playingSemaphore.acquire() // block thread
-        _updateSchedule?.cancel(true)
+        if(_track.playState == AudioTrack.PLAYSTATE_PLAYING) {
+            _track.pause()
+            _playingSemaphore.acquire() // block thread
+            _updateSchedule?.cancel(true)
+        }
     }
 
     private var _previousPosition: Int = -1

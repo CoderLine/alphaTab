@@ -1,31 +1,36 @@
 package alphaTab.platform.android
 
 import alphaTab.*
-import alphaTab.Environment
-import alphaTab.EventEmitter
-import alphaTab.EventEmitterOfT
 import alphaTab.platform.IContainer
 import alphaTab.platform.IMouseEventArgs
-import android.view.MotionEvent
+import android.annotation.SuppressLint
 import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ScrollView
-import androidx.core.view.children
-import androidx.recyclerview.widget.RecyclerView
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @ExperimentalUnsignedTypes
+@SuppressLint("ClickableViewAccessibility")
 class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener {
     private val _outerScroll: HorizontalScrollView
     private val _innerScroll: ScrollView
+    internal val renderSurface: AlphaTabRenderSurface
 
-    public constructor(outerScroll: HorizontalScrollView, innerScroll: ScrollView) {
+    public constructor(
+        outerScroll: HorizontalScrollView,
+        innerScroll: ScrollView,
+        renderSurface: AlphaTabRenderSurface
+    ) {
         _innerScroll = innerScroll
         _outerScroll = outerScroll
+        this.renderSurface = renderSurface
         outerScroll.addOnLayoutChangeListener(this)
     }
 
+    fun destroy() {
+        _outerScroll.removeOnLayoutChangeListener(this)
+    }
 
     override fun setBounds(x: Double, y: Double, w: Double, h: Double) {
     }

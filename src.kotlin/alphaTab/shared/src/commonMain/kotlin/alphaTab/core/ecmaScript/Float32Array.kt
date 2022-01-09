@@ -2,11 +2,12 @@ package alphaTab.core.ecmaScript
 
 import alphaTab.core.decodeToFloatArray
 
+@Suppress("NOTHING_TO_INLINE")
 @ExperimentalUnsignedTypes
 public class Float32Array : Iterable<Float> {
     public val data: FloatArray
 
-    public val length: Double
+    public inline val length: Double
         get() {
             return data.size.toDouble()
         }
@@ -27,11 +28,11 @@ public class Float32Array : Iterable<Float> {
         this.data = x.map { d -> d.toFloat() }.toFloatArray()
     }
 
-    public operator fun get(idx: Int): Double {
+    public inline operator fun get(idx: Int): Double {
         return data[idx].toDouble()
     }
 
-    public operator fun set(idx: Int, value: Double) {
+    public inline operator fun set(idx: Int, value: Double) {
         data[idx] = value.toFloat()
     }
 
@@ -39,7 +40,7 @@ public class Float32Array : Iterable<Float> {
         return data.iterator()
     }
 
-    public fun set(subarray: Float32Array, pos: Double) {
+    public inline fun set(subarray: Float32Array, pos: Double) {
         subarray.data.copyInto(data, pos.toInt(), 0, subarray.data.size)
     }
 

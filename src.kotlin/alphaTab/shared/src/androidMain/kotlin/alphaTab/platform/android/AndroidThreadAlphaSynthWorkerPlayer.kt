@@ -8,6 +8,7 @@ import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.midi.MidiEventType
 import alphaTab.midi.MidiFile
 import alphaTab.synth.*
+import android.util.Log
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.Semaphore
@@ -41,7 +42,7 @@ class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
         _workerQueue = LinkedBlockingQueue()
 
         _workerThread = Thread(this)
-        _workerThread.name = "alphaTabRenderThread"
+        _workerThread.name = "alphaSynthWorkerThread"
         _workerThread.isDaemon = true
         _workerThread.start()
 
@@ -63,6 +64,7 @@ class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     override fun run() {
         _threadStartedEvent.release()
         try {
+            Log.d("AlphaTab", "AlphaSynth worker started")
             do {
                 val item = _workerQueue.poll(500, TimeUnit.MILLISECONDS)
                 if (!_isCancelled && item != null) {
@@ -70,6 +72,7 @@ class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
                 }
             } while (!_isCancelled)
         } catch (e: InterruptedException) {
+            Log.d("AlphaTab", "AlphaSynth worker stopped")
             // finished
         }
     }
