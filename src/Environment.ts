@@ -253,10 +253,7 @@ export class Environment {
         // import * as alphaTab from 'dist/alphaTab.js';
         try {
             // @ts-ignore
-            const meta = import.meta;
-            if ('url' in meta) {
-                return meta.url;
-            }
+            return import.meta.url;
         } catch (e) {
             // ignore potential errors
         }
