@@ -143,7 +143,7 @@ export class Hydra {
         let samplesLeft: number = (chunk.size / 2) | 0;
         const samples: Float32Array = new Float32Array(samplesLeft);
         let samplesPos: number = 0;
-
+        
         const sampleBuffer: Uint8Array = new Uint8Array(16 * 1024);
         while (samplesLeft > 0) {
             let samplesToRead: number = Math.min(samplesLeft, (sampleBuffer.length / 2) | 0);

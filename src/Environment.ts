@@ -1,4 +1,4 @@
-import { LayoutMode} from '@src/LayoutMode';
+import { LayoutMode } from '@src/LayoutMode';
 import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
@@ -243,22 +243,24 @@ export class Environment {
      * @target web
      */
     private static detectScriptFile(): string | null {
-        // normal browser include as <script>
-        if ('document' in Environment.globalThis && document.currentScript) {
-            return (document.currentScript as HTMLScriptElement).src;
-        }
-
         // browser include as ES6 import
         // <script type="module">
         // import * as alphaTab from 'dist/alphaTab.js';
         try {
             // @ts-ignore
-            const meta = import.meta;
-            if ('url' in meta) {
-                return meta.url;
+            const importUrl = import.meta.url;
+            // avoid using file:// urls in case of 
+            // bundlers like webpack
+            if (importUrl && importUrl.indexOf('file://') === -1) {
+                return importUrl;
             }
         } catch (e) {
             // ignore potential errors
+        }
+
+        // normal browser include as <script>
+        if ('document' in Environment.globalThis && document.currentScript) {
+            return (document.currentScript as HTMLScriptElement).src;
         }
 
         return null;
@@ -293,8 +295,8 @@ export class Environment {
     public static layoutEngines: Map<LayoutMode, LayoutEngineFactory> = Environment.createDefaultLayoutEngines();
     public static staveProfiles: Map<StaveProfile, BarRendererFactory[]> = Environment.createDefaultStaveProfiles();
 
-   
-    public static getRenderEngineFactory(engine:string): RenderEngineFactory {
+
+    public static getRenderEngineFactory(engine: string): RenderEngineFactory {
         if (!engine || !Environment.renderEngines.has(engine)) {
             return Environment.renderEngines.get('default')!;
         }
@@ -539,7 +541,8 @@ export class Environment {
 
         try {
             // @ts-ignore
-            if ('url' in import.meta) {
+            const url = import.meta.url;
+            if (url) {
                 return WebPlatform.BrowserModule;
             }
         } catch (e) {

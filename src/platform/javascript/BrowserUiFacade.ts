@@ -220,6 +220,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         canvasElement.style.fontSize = '0';
         canvasElement.style.overflow = 'hidden';
         canvasElement.style.lineHeight = '0';
+        canvasElement.style.position = 'relative';
         return new HtmlElementContainer(canvasElement);
     }
 

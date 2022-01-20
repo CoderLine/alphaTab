@@ -1007,7 +1007,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         // trigger an event for others to indicate which beat/bar is played
-        if(shouldNotifyBeatChange) {
+        if (shouldNotifyBeatChange) {
             this.onPlayedBeatChanged(beat);
         }
     }
