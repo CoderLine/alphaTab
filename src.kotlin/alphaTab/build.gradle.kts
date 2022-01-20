@@ -27,7 +27,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
             }
         }
         commonMain.kotlin.srcDirs("../../dist/lib.kotlin/src")
