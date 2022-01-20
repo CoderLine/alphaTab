@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.5.0"
+    kotlin("multiplatform") version "1.6.10"
 //    id("com.android.library")
 //    id("kotlin-android-extensions")
 }
