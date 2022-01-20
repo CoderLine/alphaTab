@@ -541,7 +541,8 @@ export class Environment {
 
         try {
             // @ts-ignore
-            if ('url' in import.meta) {
+            const url = import.meta.url;
+            if (url) {
                 return WebPlatform.BrowserModule;
             }
         } catch (e) {
