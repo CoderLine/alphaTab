@@ -125,7 +125,7 @@ public class TestPlatformPartials {
         public fun saveFile(name: String, data: Uint8Array) {
             val fs = openFileWrite(name)
             fs.use {
-                fs.write(data.buffer.raw.asByteArray())
+                fs.write(data.buffer.asByteArray())
             }
         }
 

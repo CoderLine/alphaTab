@@ -32,7 +32,7 @@ val CustomTypeFaces = HashMap<String, Typeface>();
 public class SkiaCanvas : ICanvas {
     companion object {
         public fun initialize(bravura: Uint8Array) {
-            val skData = Data.makeFromBytes(bravura.buffer.raw.asByteArray())
+            val skData = Data.makeFromBytes(bravura.buffer.asByteArray())
             skData.use {
                 val face = Typeface.makeFromData(skData)
                 MusicFont = face
@@ -40,7 +40,7 @@ public class SkiaCanvas : ICanvas {
         }
 
         public fun registerCustomFont(data: Uint8Array) {
-            val skData = Data.makeFromBytes(data.buffer.raw.asByteArray())
+            val skData = Data.makeFromBytes(data.buffer.asByteArray())
             skData.use {
                 val face = Typeface.makeFromData(skData)
                 CustomTypeFaces[customTypeFaceKey(face)] = face

@@ -256,7 +256,7 @@ public class VisualTestHelperPartials {
                 dir.toFile().mkdirs()
 
                 val referenceBitmap =
-                    Image.makeFromEncoded(referenceFileData.buffer.raw.asByteArray())
+                    Image.makeFromEncoded(referenceFileData.buffer.asByteArray())
 
                 var pass:Boolean
                 var msg:String
@@ -292,7 +292,7 @@ public class VisualTestHelperPartials {
 
                         val diff = Image.makeRaster(
                             imageInfo,
-                            diffData.buffer.raw.asByteArray(),
+                            diffData.buffer.asByteArray(),
                             imageInfo.minRowBytes
                         )
                         diff.use {
