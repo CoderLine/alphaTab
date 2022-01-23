@@ -32,6 +32,16 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return s;
     }
 
+    public override getDefaultUsings(): string[] {
+        return [
+            this.toPascalCase('alphaTab') + '.' + this.toPascalCase('core')
+        ];
+    }
+
+    public override makeExceptionType(): cs.TypeReferenceType {
+        return this.makeTypeName('kotlin.Throwable')
+    }
+
     private isSymbolPartial(tsSymbol: ts.Symbol): boolean {
         if (!tsSymbol.valueDeclaration) {
             return false;

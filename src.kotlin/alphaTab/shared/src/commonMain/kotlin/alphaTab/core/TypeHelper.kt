@@ -47,12 +47,7 @@ internal class TypeHelper {
             }
         }
 
-        public fun <K, V> createMapEntry(k: K, v: V): Pair<K, V> {
-            return Pair(k, v)
-        }
-
-        public fun <T> setInitializer(vararg values:T) : Iterable<T>
-        {
+        public fun <T> setInitializer(vararg values: T): Iterable<T> {
             return values.map { it }
         }
     }

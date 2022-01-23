@@ -12,7 +12,7 @@ internal class FontSizesPartials {
                 return
             }
 
-            // TODO: maybe allow fallback to GDI/Skia based on availability?
+            // TODO: maybe allow fallback to System Rendering / Skia based on availability?
             FontSizes.FontSizeLookupTables.set(family, Uint8Array(ubyteArrayOf((8).toUByte())))
         }
     }

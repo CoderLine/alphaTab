@@ -32,17 +32,12 @@ export default class CSharpAstTransformer {
             tsNode: this._typeScriptFile,
             nodeType: cs.SyntaxKind.SourceFile,
             fileName: fileName,
-            usings: [
-                {
-                    namespaceOrTypeName: this._context.toPascalCase('system'),
+            usings: this._context.getDefaultUsings().map(u => {
+                return {
+                    namespaceOrTypeName: u,
                     nodeType: cs.SyntaxKind.UsingDeclaration
-                } as cs.UsingDeclaration,
-                {
-                    namespaceOrTypeName:
-                        this._context.toPascalCase('alphaTab') + '.' + this._context.toPascalCase('core'),
-                    nodeType: cs.SyntaxKind.UsingDeclaration
-                } as cs.UsingDeclaration
-            ],
+                } as cs.UsingDeclaration;
+            }),
             namespace: {
                 parent: null,
                 nodeType: cs.SyntaxKind.NamespaceDeclaration,
@@ -52,9 +47,9 @@ export default class CSharpAstTransformer {
         };
         this._csharpFile.namespace.parent = this._csharpFile;
     }
-    
+
     protected buildFileName(fileName: string, context: CSharpEmitterContext): string {
-       return path.join(context.compilerOptions.outDir!, this.removeExtension(fileName) + this.extension);
+        return path.join(context.compilerOptions.outDir!, this.removeExtension(fileName) + this.extension);
     }
 
     public transform() {
@@ -340,7 +335,6 @@ export default class CSharpAstTransformer {
         return 'csharp';
     }
 
-
     protected visitEnumDeclaration(node: ts.EnumDeclaration) {
         const csEnum: cs.EnumDeclaration = {
             visibility: cs.Visibility.Public,
@@ -431,7 +425,7 @@ export default class CSharpAstTransformer {
             });
         }
 
-        if(!csInterface.skipEmit){
+        if (!csInterface.skipEmit) {
             node.members.forEach(m => this.visitInterfaceElement(csInterface, m));
         }
 
@@ -1003,7 +997,7 @@ export default class CSharpAstTransformer {
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
                 skipEmit: this.shouldSkip(classElement, false),
                 tsNode: classElement,
-                tsSymbol: this._context.getSymbolForDeclaration(classElement),
+                tsSymbol: this._context.getSymbolForDeclaration(classElement)
             };
 
             if (this._context.markOverride(classElement)) {
@@ -1075,7 +1069,7 @@ export default class CSharpAstTransformer {
                 type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
                 skipEmit: this.shouldSkip(classElement, false),
                 tsNode: classElement,
-                tsSymbol: this._context.getSymbolForDeclaration(classElement),
+                tsSymbol: this._context.getSymbolForDeclaration(classElement)
             };
 
             if (this._context.markOverride(classElement)) {
@@ -1439,7 +1433,7 @@ export default class CSharpAstTransformer {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: variableStatement,
                     tsNode: s,
-                    reference: this._context.makeTypeName('system.Exception')
+                    reference: this._context.makeExceptionType()
                 } as cs.TypeReference;
             } else {
                 variableStatement.type = this.createUnresolvedTypeNode(variableStatement, s.type ?? s, type);
@@ -3241,7 +3235,6 @@ export default class CSharpAstTransformer {
             }
         });
 
-
         if (expression.typeArguments) {
             callExpression.typeArguments = [];
             expression.typeArguments.forEach(a =>
@@ -3428,7 +3421,7 @@ export default class CSharpAstTransformer {
                 (node.tsSymbol.flags & ts.SymbolFlags.Variable) === ts.SymbolFlags.Variable ||
                 (node.tsSymbol.flags & ts.SymbolFlags.EnumMember) === ts.SymbolFlags.EnumMember ||
                 (node.tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable) ===
-                ts.SymbolFlags.FunctionScopedVariable ||
+                    ts.SymbolFlags.FunctionScopedVariable ||
                 (node.tsSymbol.flags & ts.SymbolFlags.BlockScopedVariable) === ts.SymbolFlags.BlockScopedVariable
             ) {
                 let smartCastType = this._context.getSmartCastType(expression);
