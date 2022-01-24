@@ -249,7 +249,7 @@ export class Environment {
         try {
             // @ts-ignore
             const importUrl = import.meta.url;
-            // avoid using file:// urls in case of 
+            // avoid using file:// urls in case of
             // bundlers like webpack
             if (importUrl && importUrl.indexOf('file://') === -1) {
                 return importUrl;
@@ -294,7 +294,6 @@ export class Environment {
     public static renderEngines: Map<string, RenderEngineFactory> = Environment.createDefaultRenderEngines();
     public static layoutEngines: Map<LayoutMode, LayoutEngineFactory> = Environment.createDefaultLayoutEngines();
     public static staveProfiles: Map<StaveProfile, BarRendererFactory[]> = Environment.createDefaultStaveProfiles();
-
 
     public static getRenderEngineFactory(engine: string): RenderEngineFactory {
         if (!engine || !Environment.renderEngines.has(engine)) {
@@ -541,8 +540,8 @@ export class Environment {
 
         try {
             // @ts-ignore
-            const url = import.meta.url;
-            if (url) {
+            const url: any = import.meta.url;
+            if (url && typeof url === 'string') {
                 return WebPlatform.BrowserModule;
             }
         } catch (e) {
