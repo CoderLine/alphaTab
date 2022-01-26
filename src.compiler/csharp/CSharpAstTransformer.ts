@@ -2819,8 +2819,40 @@ export default class CSharpAstTransformer {
     }
 
     protected visitArrayLiteralExpression(parent: cs.Node, expression: ts.ArrayLiteralExpression) {
-        if (this.isMapInitializer(expression)) {
+        if (this.isMapEntry(expression)) {
             return this.createMapEntry(parent, expression);
+        } else if (this.isMapInitializer(expression)) {
+            const csExpr = {
+                parent: parent,
+                tsNode: expression,
+                nodeType: cs.SyntaxKind.InvocationExpression,
+                arguments: [],
+                expression: {} as cs.Expression
+            } as cs.InvocationExpression;
+
+            csExpr.expression = this.makeMemberAccess(
+                csExpr,
+                this._context.makeTypeName('alphaTab.core.TypeHelper'),
+                this._context.toPascalCase('mapInitializer')
+            );
+
+            expression.elements.forEach(e => {
+                const ex = this.visitExpression(csExpr, e);
+                if (ex) {
+                    csExpr.arguments.push(ex);
+                }
+            });
+
+            // steal generic from inner element
+            if(csExpr.arguments.length > 0 && 
+                cs.isInvocationExpression(csExpr.arguments[0]) &&
+                cs.isTypeReference(csExpr.arguments[0].expression))  {
+                csExpr.typeArguments = [
+                    csExpr.arguments[0].expression
+                ];
+            }
+
+            return csExpr;
         } else if (this.isSetInitializer(expression)) {
             const csExpr = {
                 parent: parent,
@@ -2835,6 +2867,11 @@ export default class CSharpAstTransformer {
                 this._context.makeTypeName('alphaTab.core.TypeHelper'),
                 this._context.toPascalCase('setInitializer')
             );
+
+            const setCreation = expression.parent as ts.NewExpression;
+            if (setCreation.typeArguments) {
+                csExpr.typeArguments = setCreation.typeArguments.map(t => this.createUnresolvedTypeNode(csExpr, t));
+            }
 
             expression.elements.forEach(e => {
                 const ex = this.visitExpression(csExpr, e);
@@ -2893,6 +2930,15 @@ export default class CSharpAstTransformer {
     }
 
     protected isMapInitializer(expression: ts.ArrayLiteralExpression) {
+        const isCandidate = expression.parent.kind === ts.SyntaxKind.NewExpression;
+        if (!isCandidate) {
+            return false;
+        }
+
+        return this._context.typeChecker.getTypeAtLocation(expression.parent).symbol.name === 'Map';
+    }
+
+    protected isMapEntry(expression: ts.ArrayLiteralExpression) {
         const isCandidate =
             expression.elements.length === 2 &&
             expression.parent.kind === ts.SyntaxKind.ArrayLiteralExpression &&
@@ -3268,14 +3314,6 @@ export default class CSharpAstTransformer {
         } as cs.NewExpression;
 
         newExpression.type.parent = newExpression;
-        if (expression.arguments) {
-            expression.arguments.forEach(a => {
-                const e = this.visitExpression(newExpression, a);
-                if (e) {
-                    newExpression.arguments.push(e);
-                }
-            });
-        }
 
         if (expression.typeArguments) {
             csType.typeArguments = [];
@@ -3303,6 +3341,15 @@ export default class CSharpAstTransformer {
                     );
                 }
             }
+        }
+
+        if (expression.arguments) {
+            expression.arguments.forEach(a => {
+                const e = this.visitExpression(newExpression, a);
+                if (e) {
+                    newExpression.arguments.push(e);
+                }
+            });
         }
 
         if (type && type.symbol && type.symbol.name === 'ArrayConstructor' && newExpression.arguments.length === 1) {

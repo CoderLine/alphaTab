@@ -47,8 +47,14 @@ internal class TypeHelper {
             }
         }
 
-        public fun <T> setInitializer(vararg values: T): Iterable<T> {
-            return values.map { it }
+        @Suppress("NOTHING_TO_INLINE")
+        public inline fun <T> setInitializer(vararg values: T): Iterable<T> {
+            return values.asIterable()
+        }
+
+        @Suppress("NOTHING_TO_INLINE")
+        public inline fun <T> mapInitializer(vararg values: T): Iterable<T> {
+            return values.asIterable();
         }
     }
 }

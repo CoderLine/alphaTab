@@ -366,5 +366,11 @@ namespace AlphaTab.Core
         {
             return items;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<T> MapInitializer<T>(params T[] items)
+        {
+            return items;
+        }
     }
 }

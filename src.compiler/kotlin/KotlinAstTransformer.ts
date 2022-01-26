@@ -425,7 +425,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             tsNode: expression
         };
 
-        let mapEntryTypeName = 'MapEntry';
+        type.reference = 'MapEntry';
         if (expression.elements.length === 2) {
             const keyType = this._context.getType(expression.elements[0]);
             let keyTypeContainerName = this.getContainerTypeName(keyType);
@@ -433,32 +433,33 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             const valueType = this._context.getType(expression.elements[1]);
             let valueTypeContainerName = this.getContainerTypeName(valueType);
 
+            
+            if (!keyTypeContainerName) {
+                type.typeArguments = type.typeArguments ?? [];
+                type.typeArguments.push({
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: type,
+                    reference: this.createUnresolvedTypeNode(type, expression.elements[0], keyType)
+                } as cs.TypeReference);
+            }
+            
+            if (!valueTypeContainerName) {
+                type.typeArguments = type.typeArguments ?? [];
+                type.typeArguments.push({
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: type,
+                    reference: this.createUnresolvedTypeNode(type, expression.elements[1], valueType)
+                } as cs.TypeReference);
+            }
+
             if (keyTypeContainerName || valueTypeContainerName) {
                 keyTypeContainerName = keyTypeContainerName || 'Object';
                 valueTypeContainerName = valueTypeContainerName || 'Object';
-                mapEntryTypeName = keyTypeContainerName + valueTypeContainerName + mapEntryTypeName;
-                type.reference = this._context.makeTypeName(`alphaTab.collections.${mapEntryTypeName}`);
-
-                if (keyTypeContainerName === 'Object') {
-                    type.typeArguments = type.typeArguments ?? [];
-                    type.typeArguments.push({
-                        nodeType: cs.SyntaxKind.TypeReference,
-                        parent: type,
-                        reference: this.createUnresolvedTypeNode(type, expression.elements[0], keyType)
-                    } as cs.TypeReference);
-                }
-
-                if (valueTypeContainerName === 'Object') {
-                    type.typeArguments = type.typeArguments ?? [];
-                    type.typeArguments.push({
-                        nodeType: cs.SyntaxKind.TypeReference,
-                        parent: type,
-                        reference: this.createUnresolvedTypeNode(type, expression.elements[1], valueType)
-                    } as cs.TypeReference);
-                }
+                type.reference = keyTypeContainerName + valueTypeContainerName + type.reference;
             }
         }
 
+        type.reference = this._context.makeTypeName(`alphaTab.collections.${type.reference}`);
         csExpr.expression = type;
 
         expression.elements.forEach(e => {

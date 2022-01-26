@@ -72,10 +72,13 @@ export default abstract class AstPrinterBase {
         }
     }
 
-    protected writeCommaSeparated<T>(values: T[], write: (p: T) => void) {
+    protected writeCommaSeparated<T>(values: T[], write: (p: T) => void, newLine:boolean = false) {
         values.forEach((v, i) => {
             if (i > 0) {
                 this.write(', ');
+                if(newLine) {
+                    this.writeLine();
+                }
             }
             write(v);
         });
@@ -202,7 +205,18 @@ export default abstract class AstPrinterBase {
             this.write('>');
         }
         this.write('(');
-        this.writeCommaSeparated(expr.arguments, a => this.writeExpression(a));
+        if (expr.arguments.length > 5) {
+            this.writeLine();
+            this._indent++;
+            this.writeCommaSeparated(expr.arguments, a => {
+                this.writeExpression(a);
+                this.writeLine();
+            }, true);
+            this._indent--;
+            this.writeLine();
+        } else {
+            this.writeCommaSeparated(expr.arguments, a => this.writeExpression(a));
+        }
         this.write(')');
     }
 
