@@ -47,10 +47,10 @@
         "start": "node scripts/setup-playground.js && npm run build && concurrently --kill-others \"tsc --project tsconfig.build.json --watch\" \"rollup -c rollup.config.js -w\"",
         "test": "npm run generate-typescript && tsc --project tsconfig.json && concurrently --kill-others \"tsc --project tsconfig.json -w\" \"karma start karma.conf.js --browsers Chrome --no-single-run --reporters spec,kjhtml\"",
         "test-ci": "npm run generate-typescript && tsc --project tsconfig.json && karma start karma.conf.js --browsers ChromeHeadless --single-run --reporters spec",
-        "test-csharp": "cd src.csharp && dotnet test",
-        "test-csharp-ci": "cd src.csharp && dotnet test",
-        "test-kotlin": "cd src.kotlin/alphaTab && gradlew check",
-        "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew check"
+        "test-csharp": "cd src.csharp && dotnet test -c Release",
+        "test-csharp-ci": "cd src.csharp && dotnet test -c Release",
+        "test-kotlin": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest",
+        "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^21.0.1",
