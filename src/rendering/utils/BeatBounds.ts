@@ -61,7 +61,7 @@ export class BeatBounds {
         for (let note of this.notes) {
             let bottom: number = note.noteHeadBounds.y + note.noteHeadBounds.h;
             let right: number = note.noteHeadBounds.x + note.noteHeadBounds.w;
-            if (note.noteHeadBounds.x >= x && note.noteHeadBounds.y >= y && x <= right && y <= bottom) {
+            if (note.noteHeadBounds.x <= x && note.noteHeadBounds.y <= y && x <= right && y <= bottom) {
                 return note.note;
             }
         }
