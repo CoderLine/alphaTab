@@ -27,7 +27,7 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             }
-            kotlin.srcDirs("./src/commonMain/generated")
+            kotlin.srcDirs("../../../dist/lib.kotlin/commonMain/generated")
         }
 
         val commonTest by getting {
@@ -35,7 +35,7 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
             }
-            kotlin.srcDirs("./src/commonTest/generated")
+            kotlin.srcDirs("../../../dist/lib.kotlin/commonTest/generated")
         }
 
         val androidMain by getting {

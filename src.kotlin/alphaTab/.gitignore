@@ -9,5 +9,3 @@
 .externalNativeBuild
 .cxx
 local.properties
-shared/src/commonMain/generated
-shared/src/commonTest/generated
