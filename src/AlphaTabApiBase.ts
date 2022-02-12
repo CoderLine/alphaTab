@@ -967,6 +967,7 @@ export class AlphaTabApiBase<TSettings> {
         if (this.settings.player.enableElementHighlighting) {
             this.uiFacade.removeHighlights();
         }
+
         // actively playing? -> animate cursor and highlight items
         let shouldNotifyBeatChange = false;
         if (this._playerState === PlayerState.Playing && !stop) {

@@ -1,5 +1,6 @@
 import * as ts from 'typescript';
 import * as cs from '../csharp/CSharpAst';
+import * as path from 'path';
 import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 import CSharpAstTransformer from '../csharp/CSharpAstTransformer';
 
@@ -7,13 +8,12 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
         super(typeScript, context);
         this._testClassAttribute = '';
-        this._testMethodAttribute = 'org.junit.Test';
+        this._testMethodAttribute = 'kotlin.test.Test';
     }
 
     public override get extension(): string {
         return '.kt';
     }
-
 
     public override get targetTag(): string {
         return 'kotlin';
@@ -24,6 +24,22 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
     private getMethodLocalParameterName(name: string) {
         return 'param' + name;
+    }
+
+    protected override buildFileName(fileName: string, context: CSharpEmitterContext): string {
+        let parts = this.removeExtension(fileName).split(path.sep);
+        if (parts.length > 0) {
+            switch (parts[0]) {
+                case 'src':
+                    parts[0] = path.join('commonMain', 'generated');
+                    break;
+                case 'test':
+                    parts[0] = path.join('commonTest', 'generated');
+                    break;
+            }
+        }
+
+        return path.join(context.compilerOptions.outDir!, parts.join(path.sep) + this.extension);
     }
 
     protected override getIdentifierName(identifier: cs.Identifier, expression: ts.Identifier): string {
@@ -199,7 +215,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return el;
     }
 
-    protected override visitConstructorDeclaration(parent: cs.ClassDeclaration, classElement: ts.ConstructorDeclaration) {
+    protected override visitConstructorDeclaration(
+        parent: cs.ClassDeclaration,
+        classElement: ts.ConstructorDeclaration
+    ) {
         this._paramReferences.push(new Map<string, cs.Identifier[]>());
         this._paramsWithAssignment.push(new Set<string>());
 
@@ -264,7 +283,11 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return base;
     }
 
-    protected override getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol, expression: cs.Expression): string | null {
+    protected override getSymbolName(
+        parentSymbol: ts.Symbol,
+        symbol: ts.Symbol,
+        expression: cs.Expression
+    ): string | null {
         switch (parentSymbol.name) {
             case 'String':
                 switch (symbol.name) {
@@ -395,7 +418,14 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             expression: {} as cs.Expression
         } as cs.InvocationExpression;
 
-        let mapEntryTypeName = 'MapEntry';
+        const type: cs.TypeReference = {
+            nodeType: cs.SyntaxKind.TypeReference,
+            parent: csExpr,
+            reference: '',
+            tsNode: expression
+        };
+
+        type.reference = 'MapEntry';
         if (expression.elements.length === 2) {
             const keyType = this._context.getType(expression.elements[0]);
             let keyTypeContainerName = this.getContainerTypeName(keyType);
@@ -403,19 +433,34 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             const valueType = this._context.getType(expression.elements[1]);
             let valueTypeContainerName = this.getContainerTypeName(valueType);
 
+            
+            if (!keyTypeContainerName) {
+                type.typeArguments = type.typeArguments ?? [];
+                type.typeArguments.push({
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: type,
+                    reference: this.createUnresolvedTypeNode(type, expression.elements[0], keyType)
+                } as cs.TypeReference);
+            }
+            
+            if (!valueTypeContainerName) {
+                type.typeArguments = type.typeArguments ?? [];
+                type.typeArguments.push({
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: type,
+                    reference: this.createUnresolvedTypeNode(type, expression.elements[1], valueType)
+                } as cs.TypeReference);
+            }
+
             if (keyTypeContainerName || valueTypeContainerName) {
                 keyTypeContainerName = keyTypeContainerName || 'Object';
                 valueTypeContainerName = valueTypeContainerName || 'Object';
-                mapEntryTypeName = keyTypeContainerName + valueTypeContainerName + mapEntryTypeName;
+                type.reference = keyTypeContainerName + valueTypeContainerName + type.reference;
             }
         }
 
-        csExpr.expression = {
-            nodeType: cs.SyntaxKind.Identifier,
-            text: this._context.makeTypeName(`alphaTab.collections.${mapEntryTypeName}`),
-            parent: csExpr,
-            tsNode: expression
-        } as cs.Identifier;
+        type.reference = this._context.makeTypeName(`alphaTab.collections.${type.reference}`);
+        csExpr.expression = type;
 
         expression.elements.forEach(e => {
             const ex = this.visitExpression(csExpr, e);

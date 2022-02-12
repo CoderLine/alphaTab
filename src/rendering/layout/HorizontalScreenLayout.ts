@@ -165,8 +165,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
             const partialIndex = i;
             this._group.buildBoundingsLookup(this._group!.x, this._group!.y);
             this.registerPartial(e, canvas => {
-                canvas.color = this.renderer.settings.display.resources.mainGlyphColor;
-                canvas.textAlign = TextAlign.Left;
                 let renderX: number = this._group!.getBarX(partial.masterBars[0].index) + this._group!.accoladeSpacing;
                 if (partialIndex === 0) {
                     renderX -= this._group!.x + this._group!.accoladeSpacing;

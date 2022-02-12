@@ -753,6 +753,10 @@ export default class CSharpEmitterContext {
         return null;
     }
 
+    public makeExceptionType(): cs.TypeReferenceType {
+        return this.makeTypeName('system.Exception')
+    }
+
     public makeTypeName(tsName: string): string {
         const parts = tsName.split('.');
         let result = '';
@@ -1489,5 +1493,12 @@ export default class CSharpEmitterContext {
             type = this.typeChecker.getNonNullableType(type);
         }
         return type.flags & ts.TypeFlags.String || type.flags & ts.TypeFlags.StringLiteral;
+    }
+
+    public getDefaultUsings(): string[] {
+        return [
+            this.toPascalCase('system'),
+            this.toPascalCase('alphaTab') + '.' + this.toPascalCase('core')
+        ];
     }
 }

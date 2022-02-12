@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="open_file">Open File</string>
+    <string name="open_failed">Open File failed</string>
+    <string name="alphatab">alphaTab</string>
+</resources>

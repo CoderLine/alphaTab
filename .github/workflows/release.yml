@@ -7,7 +7,7 @@ on:
 jobs:
   release_web:
     name: Web
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       # Checkout the repo
       - uses: actions/checkout@v2
@@ -32,7 +32,7 @@ jobs:
 
   release_csharp:
     name: C#
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1

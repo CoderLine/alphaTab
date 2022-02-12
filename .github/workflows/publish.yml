@@ -7,7 +7,7 @@ on:
 jobs:
   nighty_web:
     name: Web
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - name: Create cache file
         run: |
@@ -52,7 +52,7 @@ jobs:
         
   nightly_csharp:
     name: C#
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - name: Create cache file
         run: |

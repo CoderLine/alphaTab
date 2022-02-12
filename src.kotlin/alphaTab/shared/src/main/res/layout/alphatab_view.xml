@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <alphaTab.platform.android.SuspendableHorizontalScrollView
+        android:id="@+id/outerScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <alphaTab.platform.android.SuspendableScrollView
+            android:id="@+id/innerScroll"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <RelativeLayout
+                android:id="@+id/renderWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <alphaTab.platform.android.AlphaTabRenderSurface
+                    android:id="@+id/renderSurface"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+        </alphaTab.platform.android.SuspendableScrollView>
+    </alphaTab.platform.android.SuspendableHorizontalScrollView>
+</merge>

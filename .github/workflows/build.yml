@@ -10,7 +10,7 @@ on:
 jobs:
   build_web:
     name: Build and Test Web
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -22,7 +22,7 @@ jobs:
 
   build_csharp:
     name: Build and Test C#
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -39,7 +39,7 @@ jobs:
 
   build_kotlin:
     name: Build and Test Kotlin
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -53,9 +53,9 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-cache-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-cache-v2-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-cache-${{ github.job }}-
+            ${{ runner.os }}-gradle-cache-v2-${{ github.job }}-
       - run: npm install
       - run: npm run build-kotlin-ci
       - run: npm run test-kotlin-ci
