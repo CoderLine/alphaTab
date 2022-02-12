@@ -391,6 +391,14 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private _tickCache: MidiTickLookup | null = null;
+
+    /**
+     * Gets the tick cache related to the current score.
+     */
+    public get tickCache(): MidiTickLookup | null {
+        return this._tickCache;
+    }
+
     /**
      * Gets the alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback.
      */
