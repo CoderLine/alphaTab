@@ -55,16 +55,19 @@ export class MidiTickLookup {
     /**
      * Gets a dictionary of all master bars played. The index is the index equals to {@link MasterBar.index}.
      * This lookup only contains the first time a MasterBar is played. For a whole sequence of the song refer to {@link MasterBars}.
+     * @internal
      */
     public readonly masterBarLookup: Map<number, MasterBarTickLookup> = new Map();
 
     /**
      * Gets a list of all {@link MasterBarTickLookup} sorted by time.
+     * @internal
      */
     public readonly masterBars: MasterBarTickLookup[] = [];
 
     /**
      * Performs the neccessary finalization steps after all information was written.
+     * @internal
      */
     public finish(): void {
         let previous: MasterBarTickLookup | null = null;
