@@ -1,0 +1,92 @@
+---
+title: tickCache
+category: Properties - Player
+description: The tick cache allowing lookup of midi ticks to beats.
+sidebarPath: /docs/reference/api
+since:  1.3.0-alpha.171
+---
+
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+
+## Description
+Gets the tick cache allowing lookup of midi ticks to beats. If the player is enabled, a midi file will be generated
+for the loaded `alphaTab.model.Score` for later playback. During this generation this tick cache is filled with the 
+exact midi ticks when beats are played. 
+
+The `MidiTickLookup.findBeat` method allows a lookup of the beat related to a given input midi tick.
+
+## Types
+
+<TypeTable>
+    <TypeRow type="net" name="AlphaTab.Midi.MidiTickLookup" />
+    <TypeRow type="js" name="alphaTab.midi.MidiTickLookup" />
+</TypeTable>
+
+
+## MidiTickLookup.findBeat Signatures
+
+<TypeTable>
+    <TypeRow type="net" name="MidiTickLookupFindBeatResult FindBeat(IList<Track> tracks, int tick, MidiTickLookupFindBeatResult? currentBeatHint = null)">
+        Find the beat played at a given midi tick. 
+    </TypeRow>
+    <TypeRow type="js" name="findBeat(tracks: Track[], tick: number, currentBeatHint: MidiTickLookupFindBeatResult | null): MidiTickLookupFindBeatResult">
+        Find the beat played at a given midi tick. 
+    </TypeRow>
+</TypeTable>
+
+## MidiTickLookup.findBeat Parameters
+
+<ParameterTable>
+    <ParameterRow platform="js" name="tracks" type="alphaTab.model.Track[]">
+        The tracks which should be looked at to find the beat. This allows a filtered search if needed.
+    </ParameterRow>
+    <ParameterRow platform="net" name="tracks" type="IList<AlphaTab.Model.Track>">
+        The tracks which should be looked at to find the beat. This allows a filtered search if needed.
+    </ParameterRow>
+    <ParameterRow platform="js" name="tick" type="int">
+        The midi tick for which the beat should be looked up. 
+    </ParameterRow>
+    <ParameterRow platform="net" name="tick" type="number">
+        The midi tick for which the beat should be looked up. 
+    </ParameterRow>
+    <ParameterRow platform="js" name="currentBeatHint" type="AlphaTab.Midi.MidiTickLookupFindBeatResult">
+        Used for optimized lookup during playback. By passing in a previous result lookup of the next one can be optimized using heuristics. (optional).
+    </ParameterRow>
+    <ParameterRow platform="net" name="currentBeatHint" type="alphaTab.midi.MidiTickLookupFindBeatResult">
+        Used for optimized lookup during playback. By passing in a previous result lookup of the next one can be optimized using heuristics. (optional).
+    </ParameterRow>
+</ParameterTable>
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+var lookupResult = api.tickCache.findBeat(api.tracks, 100);
+var currentBeat = lookupResult?.currentBeat;
+```
+
+</TabItem>
+<TabItem value="jq">
+Not available
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+var lookupResult = api.TickCache.FindBeat(api.Tracks, 100);
+var currentBeat = lookupResult?.CurrentBeat;
+```
+
+</TabItem>
+</Tabs>
