@@ -13,7 +13,6 @@ import android.util.AttributeSet
 import android.widget.HorizontalScrollView
 import android.widget.RelativeLayout
 import android.widget.ScrollView
-import androidx.recyclerview.widget.RecyclerView
 import net.alphatab.R
 import kotlin.contracts.ExperimentalContracts
 
