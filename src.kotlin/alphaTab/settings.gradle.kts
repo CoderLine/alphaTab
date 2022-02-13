@@ -7,5 +7,4 @@ pluginManagement {
 }
 rootProject.name = "alphaTab"
 
-include(":alphaTabAndroid")
 include(":alphaTab")
