@@ -27,26 +27,26 @@ alphaTab mostly focuses on web based platforms allowing music notation to be emb
 
 alphaTab can load music notation from various sources like Guitar Pro 3-7, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using a built in midi synthesizer named alphaSynth the music sheets can also be played in your browser.
 
-* load GuitarPro 3-5, GuitarPro 6, AlphaTex or MusicXML (experimental)
-* render as SVG, HTML5 canvas, GDI+,...
+* load GuitarPro 3-5, GuitarPro 6, Guitar Pro 7, AlphaTex or MusicXML (experimental)
+* render as SVG or Raster Graphics (raster graphics depends on platform: HTML5 canvas, GDI+, SkiaSharp, Android Canvas)...
 * display single or multiple instruments as standard music notation and guitar tablatures consisting of song information, repeats, alternate endings, guitar tunints, clefs, key signatures, time signatures, notes, rests, accidentals, drum tabs, piano grand staff, tied notes, grace notes, dead notes, ghost notes, markers, tempos, lyrics, chords, vibratos, dynamics, tap/slap/pop, fade-in, let-ring, palm-mute, string bends, whammy bar, tremolo picking, strokes, slides, trills, pick strokes, tuplets, fingering, triplet feels,...
 * adapt to your responsive design by dynamic resizing
-* play the music sheet via HTML5 Web Audio API (only if browser supports it)
+* play the music sheet via built-in Midi+SoundFont2 Synthesizer (output depends on platform: HTML5 Web Audio, NAudio, Android AudioTrack)
 
 # Officially Supported Platforms
 
- Platform | Support | Since
-----------|---------|------|
-Browsers using `script` includes (UMD) | Full experience including low level APIs, Background Workers, Audio Playback, SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.0 (released :check:)
-Browsers using ES6 Modules (ESM) | Full experience including low level APIs, Background Workers, Audio Playback, SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.3 ()
-Node.js using `require` (UMD) | Access to all low level APIs and SVG rendering | 1.0
-Node.js using `import` (ESM) | Access to all low level APIs and SVG rendering | 1.3
-.net standard 2.0 | Access to all low level APIs and multiple render engines (SVG, GDI+, SkiaSharp) | 1.0
-.netcoreapp3.1 (WPF) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.0
-.netcoreapp3.1 (WinForms) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.0
-.net6.0-windows (WPF) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.3
-.net6.0-windows (WinForms) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.3
-Android (Kotlin) | Full experience including low level APIs, Background Workers, Audio Playback, Android Canvas and SVG rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.3
+ Platform | Support | Availability |
+----------|---------|-------|
+Browsers using `script` includes (UMD) | Full experience including low level APIs, Background Workers, Audio Playback, SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.0-latest
+Node.js using `require` (UMD) | Access to all low level APIs and SVG rendering | 1.0-latest
+.net standard 2.0 | Access to all low level APIs and multiple render engines (SVG, GDI+, SkiaSharp) | 1.0-latest
+.netcoreapp3.1 (WPF) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.0-1.2.2
+.netcoreapp3.1 (WinForms) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.0-1.2.2
+Browsers using ES6 Modules (ESM) | Full experience including low level APIs, Background Workers, Audio Playback, SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.3 (pre-release :warning:)
+Node.js using `import` (ESM) | Access to all low level APIs and SVG rendering | 1.3 (pre-release :warning:)
+.net6.0-windows (WPF) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.3 (pre-release :warning:)
+.net6.0-windows (WinForms) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.3 (pre-release :warning:)
+Android (Kotlin) | Full experience including low level APIs, Background Workers, Audio Playback, Android Canvas and SVG rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.3 (pre-release :warning:)
 
 # Thanks to...
 
@@ -56,7 +56,7 @@ Android (Kotlin) | Full experience including low level APIs, Background Workers,
 <a href="https://www.browserstack.com" target="_blank"><img src="img/BrowserStack.png?raw=true" width="400" align="center"/></a>
 </p>
 
-... our friends at JetBrains for a Open Source License of ther products. This allows me to develop all the flavors of alphaTab with the latest and createst coding and debugging assistance.
+... our friends at JetBrains for a Open Source License of their products. This allows me to develop all the flavors of alphaTab with the latest and greatest coding and debugging assistance.
 
 <p align="center">
 <a href="https://www.jetbrains.com/" target="_blank"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" width="150" align="center"/></a><br />
