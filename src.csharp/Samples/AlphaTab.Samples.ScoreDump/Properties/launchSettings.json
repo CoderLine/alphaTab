@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "AlphaTab.Samples.ScoreDump": {
-      "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)..\\test-data\\audio\\full-song.gp5"
-    }
-  }
-}
