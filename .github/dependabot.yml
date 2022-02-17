@@ -3,14 +3,14 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
       
   - package-ecosystem: "nuget"
     directory: "/src.csharp"
     schedule:
-      interval: "daily"
+      interval: "weekly"
             
   - package-ecosystem: "gradle"
     directory: "/src.kotlin/alphaTab"
     schedule:
-      interval: "daily"
+      interval: "weekly"
