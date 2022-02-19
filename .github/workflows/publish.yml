@@ -155,5 +155,8 @@ jobs:
         if: steps.check_sha.outputs.cache-hit != 'true'
         run: gradlew closeAndReleaseSonatypeStagingRepository
         working-directory: ./src.kotlin/alphaTab/
-        
-      - run: ./src.kotlin/alphaTab/gradlew --stop
+
+      - name: Stop Gradle Daemon
+        if: steps.check_sha.outputs.cache-hit != 'true'
+        run: gradlew --stop
+        working-directory: ./src.kotlin/alphaTab/
