@@ -15,7 +15,7 @@ if(process.argv.length === 3) {
 
 console.log(`Updating Version to ${version}`);
 
-const buildFile = `${__dirname}/../src.kotlin/alphaTab/shared/build.gradle.kts`;
+const buildFile = `${__dirname}/../src.kotlin/alphaTab/alphaTab/build.gradle.kts`;
 
 let propsSource = fs.readFileSync(buildFile, 'utf-8');
 propsSource = propsSource.replace(/version\s*=.*/g, `version = "${version}"`);
