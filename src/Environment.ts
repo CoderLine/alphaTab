@@ -544,7 +544,7 @@ export class Environment {
     private static detectWebPack(): boolean {
         try {
             // @ts-ignore
-            if (typeof __webpack_require__ !== 'function') {
+            if (typeof __webpack_require__ === 'function') {
                 return true;
             }
         } catch (e) {
