@@ -498,7 +498,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         let player: AlphaSynthWebWorkerApi | null = null;
         let supportsScriptProcessor: boolean = 'ScriptProcessorNode' in window;
-        let supportsAudioWorklets: boolean = window.isSecureContext && 'AudioWorkletNode' in window;
+
+        // Once https://github.com/webpack/webpack/issues/11543 is decided
+        // we can support audio worklets together with WebPack
+        let supportsAudioWorklets: boolean = window.isSecureContext && 'AudioWorkletNode' in window && !Environment.isWebPackBundled;
 
         if (supportsAudioWorklets) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
