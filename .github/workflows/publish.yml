@@ -127,13 +127,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '16'
-        
-      - name: Setup DotNet
+
+      - uses: actions/setup-java@v1
         if: steps.check_sha.outputs.cache-hit != 'true'
-        uses: actions/setup-dotnet@v1
         with:
-          dotnet-version:  |
-            6.0.x
+          java-version: '11'
         
       - run: npm install
         if: steps.check_sha.outputs.cache-hit != 'true'
