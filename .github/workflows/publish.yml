@@ -146,15 +146,15 @@ jobs:
 
       - name: Publish to Maven
         if: steps.check_sha.outputs.cache-hit != 'true'
-        run: gradlew publishAllPublicationsToSonatypeRepository
+        run: .\gradlew.bat publishAllPublicationsToSonatypeRepository
         working-directory: ./src.kotlin/alphaTab/
         
       - name: Release staging
         if: steps.check_sha.outputs.cache-hit != 'true'
-        run: gradlew closeAndReleaseSonatypeStagingRepository
+        run: .\gradlew.bat closeAndReleaseSonatypeStagingRepository
         working-directory: ./src.kotlin/alphaTab/
 
       - name: Stop Gradle Daemon
         if: steps.check_sha.outputs.cache-hit != 'true'
-        run: gradlew --stop
+        run: .\gradlew.bat --stop
         working-directory: ./src.kotlin/alphaTab/
