@@ -191,6 +191,11 @@ export class Environment {
     /**
      * @target web
      */
+    public static isWebPackBundled: boolean = Environment.detectWebPack();
+
+    /**
+     * @target web
+     */
     public static scriptFile: string | null = Environment.detectScriptFile();
 
     /**
@@ -216,13 +221,25 @@ export class Environment {
      * @target web
      */
     public static createAlphaTabWorker(scriptFile: string): Worker {
-        if (Environment.webPlatform === WebPlatform.BrowserModule) {
-            let script: string = `import * as alphaTab from '${scriptFile}'`;
-            let blob: Blob = new Blob([script], { type: 'text/javascript' });
+        if (Environment.isWebPackBundled) {
+            // WebPack currently requires this exact syntax: new Worker(new URL(..., import.meta.url)))
+            // The module `@coderline/alphatab` will be resolved by WebPack to alphaTab consumed as library
+            // this will not work with CDNs because worker start scripts need to have the same origin like
+            // the current browser. 
+
+            // https://github.com/webpack/webpack/discussions/14066
+
+            return new Worker(
+                // @ts-ignore
+                /* webpackChunkName: "alphatab.worker" */ new URL('@coderline/alphatab', import.meta.url)
+            );
+        } else if (Environment.webPlatform === WebPlatform.BrowserModule) {
+            const script: string = `import * as alphaTab from '${scriptFile}'`;
+            const blob: Blob = new Blob([script], { type: 'text/javascript' });
             return new Worker(URL.createObjectURL(blob), { type: 'module' });
         } else {
-            let script: string = `importScripts('${scriptFile}')`;
-            let blob: Blob = new Blob([script]);
+            const script: string = `importScripts('${scriptFile}')`;
+            const blob: Blob = new Blob([script]);
             return new Worker(URL.createObjectURL(blob));
         }
     }
@@ -524,6 +541,21 @@ export class Environment {
     /**
      * @target web
      */
+    private static detectWebPack(): boolean {
+        try {
+            // @ts-ignore
+            if (typeof __webpack_require__ !== 'function') {
+                return true;
+            }
+        } catch (e) {
+            // ignore any errors
+        }
+        return false;
+    }
+
+    /**
+     * @target web
+     */
     private static detectWebPlatform(): WebPlatform {
         try {
             // Credit of the node.js detection goes to
@@ -541,7 +573,7 @@ export class Environment {
         try {
             // @ts-ignore
             const url: any = import.meta.url;
-            if (url && typeof url === 'string') {
+            if (url && typeof url === 'string' && !url.startsWith('file://')) {
                 return WebPlatform.BrowserModule;
             }
         } catch (e) {
