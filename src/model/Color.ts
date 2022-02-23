@@ -27,7 +27,7 @@ export class Color {
                 ModelUtils.toHexString(this.g, 2) +
                 ModelUtils.toHexString(this.b, 2);
         } else {
-            this.rgba = `rgba(${this.r},${this.g},${this.b},${+(this.a / 255.0).toFixed(2)})`;
+            this.rgba = `rgba(${this.r},${this.g},${this.b},${this.a / 255.0})`;
         }
     }
 
