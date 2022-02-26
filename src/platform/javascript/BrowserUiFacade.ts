@@ -159,7 +159,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return new AlphaTabWorkerScoreRenderer<unknown>(this._api, this._api.settings);
     }
 
-    public initialize(api: AlphaTabApiBase<unknown>, raw: unknown): void {
+    public initialize(api: AlphaTabApiBase<unknown>, raw: any | Settings): void {
         this._api = api;
         let settings: Settings;
         if (raw instanceof Settings) {
@@ -432,8 +432,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             placeholder.replaceChildren(body as Node);
         }
         placeholder.resultState = ResultState.RenderDone;
-        placeholder.renderedResultId = renderResult.id; 
-        placeholder.renderedResult = Array.from(placeholder.children)
+        placeholder.renderedResultId = renderResult.id;
+        placeholder.renderedResult = Array.from(placeholder.children);
     }
 
     public beginAppendRenderResults(renderResult: RenderFinishedEventArgs | null): void {
@@ -501,7 +501,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         // Once https://github.com/webpack/webpack/issues/11543 is decided
         // we can support audio worklets together with WebPack
-        let supportsAudioWorklets: boolean = window.isSecureContext && 'AudioWorkletNode' in window && !Environment.isWebPackBundled;
+        let supportsAudioWorklets: boolean =
+            window.isSecureContext && 'AudioWorkletNode' in window && !Environment.isWebPackBundled;
 
         if (supportsAudioWorklets) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');

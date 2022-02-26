@@ -21,7 +21,6 @@ export class PlayerSettingsSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("soundfont", obj.soundFont); 
-        o.set("scrollelement", obj.scrollElement); 
         o.set("enableplayer", obj.enablePlayer); 
         o.set("enablecursor", obj.enableCursor); 
         o.set("enableanimatedbeatcursor", obj.enableAnimatedBeatCursor); 
@@ -45,8 +44,9 @@ export class PlayerSettingsSerializer {
             case "soundfont":
                 obj.soundFont = v as string | null;
                 return true;
+            /*@target web*/
             case "scrollelement":
-                obj.scrollElement = v! as string;
+                obj.scrollElement = v! as string | HTMLElement;
                 return true;
             case "enableplayer":
                 obj.enablePlayer = v! as boolean;

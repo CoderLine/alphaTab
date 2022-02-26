@@ -102,8 +102,10 @@ export class PlayerSettings {
 
     /**
      * Gets or sets the element that should be used for scrolling.
+     * @target web
+     * @json_read_only
      */
-    public scrollElement: string = 'html,body';
+    public scrollElement: string | HTMLElement = 'html,body';
 
     /**
      * Gets or sets whether the player should be enabled.

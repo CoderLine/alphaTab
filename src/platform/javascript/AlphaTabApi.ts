@@ -15,8 +15,8 @@ import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 /**
  * @target web
  */
-export class AlphaTabApi extends AlphaTabApiBase<unknown> {
-    public constructor(element: HTMLElement, options: unknown) {
+export class AlphaTabApi extends AlphaTabApiBase<any|Settings> {
+    public constructor(element: HTMLElement, options: any|Settings) {
         super(new BrowserUiFacade(element), options);
     }
 
@@ -25,7 +25,7 @@ export class AlphaTabApi extends AlphaTabApiBase<unknown> {
         super.tex(tex, browser.parseTracks(tracks));
     }
 
-    public print(width: string, additionalSettings:unknown = null): void {
+    public print(width?: string, additionalSettings:unknown = null): void {
         // prepare a popup window for printing (a4 width, window height, centered)
         let preview: Window = window.open('', '', 'width=0,height=0')!;
         let a4: HTMLElement = preview.document.createElement('div');
