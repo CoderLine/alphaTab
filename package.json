@@ -27,7 +27,9 @@
         ".": {
             "import": "./dist/alphaTab.mjs",
             "require": "./dist/alphaTab.js"
-        }
+        },
+        "./soundfont/*": "./dist/soundfont/*",
+        "./font/*": "./dist/font/*"
     },
     "engines": {
         "node": ">=6.0.0"
