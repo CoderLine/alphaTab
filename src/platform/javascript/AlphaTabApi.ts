@@ -74,7 +74,6 @@ export class AlphaTabApi extends AlphaTabApiBase<any|Settings> {
         SettingsSerializer.fromJson(settings, additionalSettings);
         let alphaTab: AlphaTabApi = new AlphaTabApi(a4, settings);
         alphaTab.renderer.postRenderFinished.on(() => {
-            alphaTab.canvasElement.height = -1;
             preview.print();
         });
         alphaTab.renderTracks(this.tracks);
