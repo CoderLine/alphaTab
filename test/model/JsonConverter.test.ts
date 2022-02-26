@@ -128,6 +128,7 @@ describe('JsonConverterTest', () => {
         expected.importer.mergePartGroupsInMusicXml = false;
 
         expected.player.soundFont = 'soundfont';
+        /**@target web*/
         expected.player.scrollElement = 'scroll';
         expected.player.vibrato.noteSlightAmplitude = 10;
         expected.player.slide.simpleSlideDurationRatio = 8;

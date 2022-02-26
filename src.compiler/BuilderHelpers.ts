@@ -50,15 +50,21 @@ function findNode(node: ts.Node, kind: ts.SyntaxKind): ts.Node | null {
 export function addNewLines(stmts: ts.Statement[]) {
     return stmts.map(stmt => ts.addSyntheticTrailingComment(stmt, ts.SyntaxKind.SingleLineCommentTrivia, '', true));
 }
-export function getTypeWithNullableInfo(checker: ts.TypeChecker, node: ts.TypeNode | undefined) {
+export function getTypeWithNullableInfo(
+    checker: ts.TypeChecker,
+    node: ts.TypeNode | undefined,
+    allowUnionAsPrimitive: boolean
+) {
     if (!node) {
         return {
             isNullable: false,
+            isUnionType: false,
             type: {} as ts.Type
         };
     }
 
     let isNullable = false;
+    let isUnionType = false;
     let type: ts.Type | null = null;
     if (ts.isUnionTypeNode(node)) {
         for (const t of node.types) {
@@ -67,12 +73,18 @@ export function getTypeWithNullableInfo(checker: ts.TypeChecker, node: ts.TypeNo
             } else if (ts.isLiteralTypeNode(t) && t.literal.kind === ts.SyntaxKind.NullKeyword) {
                 isNullable = true;
             } else if (type !== null) {
-                throw new Error(
-                    'Multi union types on JSON settings not supported: ' +
-                        node.getSourceFile().fileName +
-                        ':' +
-                        node.getText()
-                );
+                if (allowUnionAsPrimitive) {
+                    isUnionType = true;
+                    type = checker.getTypeAtLocation(node);
+                    break;
+                } else {
+                    throw new Error(
+                        'Multi union types on JSON settings not supported: ' +
+                            node.getSourceFile().fileName +
+                            ':' +
+                            node.getText()
+                    );
+                }
             } else {
                 type = checker.getTypeAtLocation(t);
             }
@@ -83,6 +95,7 @@ export function getTypeWithNullableInfo(checker: ts.TypeChecker, node: ts.TypeNo
 
     return {
         isNullable,
+        isUnionType,
         type: type as ts.Type
     };
 }
@@ -98,6 +111,9 @@ export function unwrapArrayItemType(type: ts.Type, typeChecker: ts.TypeChecker):
 
     if (type.isUnion()) {
         const nonNullable = typeChecker.getNonNullableType(type);
+        if (type === nonNullable) {
+            return null;
+        }
         return unwrapArrayItemType(nonNullable, typeChecker);
     }
 
@@ -170,7 +186,7 @@ export function isMap(type: ts.Type | null): boolean {
 }
 
 function markNodeSynthesized(node: ts.Node): ts.Node {
-    for(const c of node.getChildren()) {
+    for (const c of node.getChildren()) {
         markNodeSynthesized(c);
     }
     ts.setTextRange(node, {

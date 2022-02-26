@@ -56,7 +56,7 @@ function generateClonePropertyStatements(
     typeChecker: ts.TypeChecker,
     importer: (name: string, module: string) => void
 ): ts.Statement[] {
-    const propertyType = getTypeWithNullableInfo(typeChecker, prop.type!);
+    const propertyType = getTypeWithNullableInfo(typeChecker, prop.type!, true);
 
     const statements: ts.Statement[] = [];
 
