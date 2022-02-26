@@ -18,11 +18,13 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     protected _buffer: AudioBuffer | null = null;
     protected _source: AudioBufferSourceNode | null = null;
 
+    private _resumeHandler?: () => void;
+
     public get sampleRate(): number {
         return this._context ? this._context.sampleRate : AlphaSynthWebAudioOutputBase.PreferredSampleRate;
     }
 
-    public activate(): void {
+    public activate(resumedCallback?: () => void): void {
         if (!this._context) {
             this._context = this.createAudioContext();
         }
@@ -35,9 +37,12 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
                         'WebAudio',
                         `Audio Context resume success: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}`
                     );
+                    if (resumedCallback) {
+                        resumedCallback();
+                    }
                 },
                 reason => {
-                    Logger.debug(
+                    Logger.warning(
                         'WebAudio',
                         `Audio Context resume failed: state=${this._context?.state}, sampleRate:${this._context?.sampleRate}, reason=${reason}`
                     );
@@ -48,7 +53,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
 
     private patchIosSampleRate(): void {
         let ua: string = navigator.userAgent;
-        if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== 0) {
+        if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) {
             let context: AudioContext = this.createAudioContext();
             let buffer: AudioBuffer = context.createBuffer(1, 1, AlphaSynthWebAudioOutputBase.PreferredSampleRate);
             let dummy: AudioBufferSourceNode = context.createBufferSource();
@@ -73,20 +78,27 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     public open(): void {
         this.patchIosSampleRate();
         this._context = this.createAudioContext();
-        // possible fix for Web Audio in iOS 9 (issue #4)
         let ctx: any = this._context;
         if (ctx.state === 'suspended') {
-            let resume = () => {
-                ctx.resume();
-                Environment.globalThis.setTimeout(() => {
-                    if (ctx.state === 'running') {
-                        document.body.removeEventListener('touchend', resume, false);
-                        document.body.removeEventListener('click', resume, false);
-                    }
-                }, 0);
-            };
-            document.body.addEventListener('touchend', resume, false);
-            document.body.addEventListener('click', resume, false);
+            this.registerResumeHandler();
+        }
+    }
+    
+    private registerResumeHandler() {
+        this._resumeHandler = (() => {
+            this.activate(() => {
+                this.unregisterResumeHandler();
+            });
+        }).bind(this);
+        document.body.addEventListener('touchend', this._resumeHandler, false);
+        document.body.addEventListener('click', this._resumeHandler, false);
+    }
+    
+    private unregisterResumeHandler() {
+        const resumeHandler = this._resumeHandler;
+        if (resumeHandler) {
+            document.body.removeEventListener('touchend', resumeHandler, false);
+            document.body.removeEventListener('click', resumeHandler, false);
         }
     }
 
@@ -111,6 +123,8 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     public destroy(): void {
         this.pause();
         this._context?.close();
+        this._context = null;
+        this.unregisterResumeHandler();
     }
 
     public abstract addSamples(f: Float32Array): void;
