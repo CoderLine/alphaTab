@@ -75,6 +75,10 @@ internal fun String.substring(startIndex: Double, endIndex: Double): String {
     return this.substring(startIndex.toInt(), endIndex.toInt())
 }
 
+internal operator fun String.get(index: Double): Char {
+    return this[index.toInt()]
+}
+
 internal fun String.substring(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
@@ -84,6 +88,12 @@ internal fun IAlphaTabEnum.toDouble(): Double {
 }
 internal fun IAlphaTabEnum?.toDouble(): Double? {
     return this?.value.toDouble()
+}
+internal inline fun Double.toTemplate(): String {
+    return this.toInvariantString()
+}
+internal inline fun Any?.toTemplate(): Any? {
+    return this
 }
 internal fun Any?.toDouble(): Double {
     if(this is Double) {
@@ -100,6 +110,7 @@ internal fun Int?.toDouble(): Double? {
 
 internal expect fun String.toDoubleOrNaN(): Double;
 internal expect fun String.toIntOrNaN(): Double;
+internal expect fun String.toIntOrNaN(radix: Double): Double;
 
 internal class Globals {
     companion object {
@@ -119,10 +130,15 @@ internal class Globals {
         }
 
         fun parseInt(s: String, radix: Double): Double {
-            if (radix.toInt() == 16) {
-                return s.toIntOrNaN()
-            }
-            return Double.NaN
+            return s.toIntOrNaN(radix)
+        }
+
+        fun parseInt(s: Char): Double {
+            return parseInt(s.toString())
+        }
+
+        fun parseInt(s: Char, radix: Double): Double {
+            return parseInt(s.toString(), radix);
         }
     }
 }

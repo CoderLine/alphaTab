@@ -75,38 +75,38 @@ export class Color {
                     if (json.length === 4) {
                         // #RGB
                         return new Color(
-                            parseInt(json.substring(1, 1), 16) * 17,
-                            parseInt(json.substring(2, 1), 16) * 17,
-                            parseInt(json.substring(3, 1), 16) * 17
+                            parseInt(json[1], 16) * 17,
+                            parseInt(json[2], 16) * 17,
+                            parseInt(json[3], 16) * 17
                         );
                     }
 
                     if (json.length === 5) {
                         // #RGBA
                         return new Color(
-                            parseInt(json.substring(1, 1), 16) * 17,
-                            parseInt(json.substring(2, 1), 16) * 17,
-                            parseInt(json.substring(3, 1), 16) * 17,
-                            parseInt(json.substring(4, 1), 16) * 17
+                            parseInt(json[1], 16) * 17,
+                            parseInt(json[2], 16) * 17,
+                            parseInt(json[3], 16) * 17,
+                            parseInt(json[4], 16) * 17
                         );
                     }
 
                     if (json.length === 7) {
                         // #RRGGBB
                         return new Color(
-                            parseInt(json.substring(1, 2), 16),
-                            parseInt(json.substring(3, 2), 16),
-                            parseInt(json.substring(5, 2), 16)
+                            parseInt(json.substring(1, 3), 16),
+                            parseInt(json.substring(3, 5), 16),
+                            parseInt(json.substring(5, 7), 16)
                         );
                     }
 
                     if (json.length === 9) {
                         // #RRGGBBAA
                         return new Color(
-                            parseInt(json.substring(1, 2), 16),
-                            parseInt(json.substring(3, 2), 16),
-                            parseInt(json.substring(5, 2), 16),
-                            parseInt(json.substring(7, 2), 16)
+                            parseInt(json.substring(1, 3), 16),
+                            parseInt(json.substring(3, 5), 16),
+                            parseInt(json.substring(5, 7), 16),
+                            parseInt(json.substring(7, 9), 16)
                         );
                     }
                 } else if (json.startsWith('rgba') || json.startsWith('rgb')) {

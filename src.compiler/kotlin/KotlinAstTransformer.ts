@@ -67,8 +67,13 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
     protected override visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {
         const pre = super.visitPrefixUnaryExpression(parent, expression);
-        if (pre) {
-            switch (pre.operator) {
+
+        const preUnwrapped = pre && cs.isCastExpression(pre)
+            ? (pre.expression as cs.PrefixUnaryExpression)
+            : (pre as cs.PrefixUnaryExpression);
+
+        if (preUnwrapped) {
+            switch (preUnwrapped.operator) {
                 case '++':
                 case '--':
                     const op = this._context.typeChecker.getSymbolAtLocation(expression.operand);
@@ -433,7 +438,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             const valueType = this._context.getType(expression.elements[1]);
             let valueTypeContainerName = this.getContainerTypeName(valueType);
 
-            
             if (!keyTypeContainerName) {
                 type.typeArguments = type.typeArguments ?? [];
                 type.typeArguments.push({
@@ -442,7 +446,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                     reference: this.createUnresolvedTypeNode(type, expression.elements[0], keyType)
                 } as cs.TypeReference);
             }
-            
+
             if (!valueTypeContainerName) {
                 type.typeArguments = type.typeArguments ?? [];
                 type.typeArguments.push({

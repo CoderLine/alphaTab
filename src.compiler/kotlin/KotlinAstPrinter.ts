@@ -921,9 +921,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 const escapedText = c.text;
                 this.write(escapedText);
             } else {
-                this.write('${');
+                this.write('${(');
                 this.writeExpression(c);
-                this.write('}');
+                this.write(').toTemplate()}');
             }
         });
         this.write('"""');

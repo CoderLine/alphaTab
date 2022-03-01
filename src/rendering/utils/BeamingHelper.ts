@@ -341,8 +341,8 @@ export class BeamingHelper {
         }
 
         // a note can expand to 2 note heads if it has a harmonic
-        let lowestValueForNote;
-        let highestValueForNote;
+        let lowestValueForNote:number;
+        let highestValueForNote:number;
 
         // For percussion we use the line as value to compare whether it is
         // higher or lower.

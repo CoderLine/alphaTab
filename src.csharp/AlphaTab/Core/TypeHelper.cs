@@ -329,7 +329,13 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Substring(this string s, double startIndex, double endIndex)
+        public static string SubstringIndex(this string s, double startIndex)
+        {
+            return s.Substring((int) startIndex);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string SubstringIndex(this string s, double startIndex, double endIndex)
         {
             return s.Substring((int) startIndex, (int) (endIndex - startIndex));
         }
@@ -366,7 +372,7 @@ namespace AlphaTab.Core
         {
             return items;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<T> MapInitializer<T>(params T[] items)
         {

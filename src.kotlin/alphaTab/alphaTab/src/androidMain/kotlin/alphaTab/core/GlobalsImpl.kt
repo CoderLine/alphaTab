@@ -67,3 +67,11 @@ actual fun String.toIntOrNaN(): Double {
     }
     return Double.NaN
 }
+
+actual fun String.toIntOrNaN(radix: Double): Double {
+    try {
+        return Integer.parseInt(this, radix.toInt()).toDouble();
+    } catch (e: Throwable) {
+    }
+    return Double.NaN
+}

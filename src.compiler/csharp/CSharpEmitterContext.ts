@@ -41,10 +41,12 @@ export default class CSharpEmitterContext {
 
     public toIdentifier(text: string): string {
         return text.replace(/[^a-zA-Z0-9_]/g, m => {
-            return {
-                '#': 'Hash',
-                '@': 'At'
-            }[m] ?? '_';
+            return (
+                {
+                    '#': 'Hash',
+                    '@': 'At'
+                }[m] ?? '_'
+            );
         });
     }
 
@@ -918,6 +920,14 @@ export default class CSharpEmitterContext {
         return symbol;
     }
 
+    public isUnknownSmartCast(expression: ts.Expression) {
+        const smartCastType = this.getSmartCastType(expression);
+        return (
+            smartCastType &&
+            ((smartCastType.flags & ts.TypeFlags.Any) !== 0 || (smartCastType.flags & ts.TypeFlags.Unknown) !== 0)
+        );
+    }
+
     public isBooleanSmartCast(tsNode: ts.Node) {
         let tsParent = tsNode.parent;
         if (!tsParent) {
@@ -1102,6 +1112,15 @@ export default class CSharpEmitterContext {
         // contextual type than the declared type.
         let symbol = this.typeChecker.getSymbolAtLocation(expression);
         if (!symbol) {
+            // smartcast to unknown?
+            let contextualType = this.typeChecker.getContextualType(expression);
+            if (
+                contextualType &&
+                ((contextualType.flags & ts.TypeFlags.Any) !== 0 || (contextualType.flags & ts.TypeFlags.Unknown) !== 0)
+            ) {
+                return contextualType;
+            }
+
             return null;
         }
         const declarations = symbol.declarations;

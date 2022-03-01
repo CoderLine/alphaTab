@@ -2072,7 +2072,28 @@ export default class CSharpAstTransformer {
             csExpr.operand = this.makeInt(csExpr.operand);
         }
 
+        // ensure number literals assigned to any/unknown
+        // are casted explicitly to double (to avoid ending up with ints later expected as doubles)
+        if (this._context.isUnknownSmartCast(expression)) {
+            return this.wrapIntoCastToTargetType(csExpr);
+        }
+
         return csExpr;
+    }
+
+    public wrapIntoCastToTargetType(expression: cs.Expression): cs.Expression {
+        const actualType = this._context.typeChecker.getTypeAtLocation(expression.tsNode!);
+        const cast = {
+            parent: expression.parent,
+            nodeType: cs.SyntaxKind.CastExpression,
+            tsNode: expression.tsNode,
+            expression: expression,
+            type: this.createUnresolvedTypeNode(null, expression.tsNode!, actualType)
+        } as cs.CastExpression;
+
+        cast.expression.parent = cast;
+        cast.type.parent = cast;
+        return cast;
     }
 
     protected visitPostfixUnaryExpression(parent: cs.Node, expression: ts.PostfixUnaryExpression) {
@@ -2729,12 +2750,20 @@ export default class CSharpAstTransformer {
     }
 
     protected visitNumericLiteral(parent: cs.Node, expression: ts.NumericLiteral) {
-        return {
+        const numeric = {
             parent: parent,
             nodeType: cs.SyntaxKind.NumericLiteral,
             tsNode: expression,
             value: expression.text
         } as cs.NumericLiteral;
+
+        // ensure number literals assigned to any/unknown
+        // are casted explicitly to double (to avoid ending up with ints later expected as doubles)
+        if (this._context.isUnknownSmartCast(expression)) {
+            return this.wrapIntoCastToTargetType(numeric);
+        }
+
+        return numeric;
     }
 
     protected visitNoSubstitutionTemplateLiteral(
@@ -2977,7 +3006,7 @@ export default class CSharpAstTransformer {
         if (memberAccess.tsSymbol) {
             if (this._context.isMethodSymbol(memberAccess.tsSymbol)) {
                 memberAccess.member = this._context.toMethodName(expression.name.text);
-            } else if(this._context.isPropertySymbol(memberAccess.tsSymbol)){
+            } else if (this._context.isPropertySymbol(memberAccess.tsSymbol)) {
                 memberAccess.member = this._context.toPropertyName(expression.name.text);
             }
         }
@@ -3030,6 +3059,8 @@ export default class CSharpAstTransformer {
                         return 'TrimEnd';
                     case 'trimLeft':
                         return 'TrimStart';
+                    case 'substring':
+                        return 'SubstringIndex';
                 }
                 break;
             case 'Number':
