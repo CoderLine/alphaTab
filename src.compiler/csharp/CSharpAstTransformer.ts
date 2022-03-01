@@ -597,7 +597,7 @@ export default class CSharpAstTransformer {
             isStatic: false,
             isVirtual: false,
             partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
-            name: this._context.toPascalCase((d.arguments[0] as ts.StringLiteral).text),
+            name: this._context.toMethodName((d.arguments[0] as ts.StringLiteral).text),
             parameters: [],
             returnType: {
                 parent: null,
@@ -1218,7 +1218,7 @@ export default class CSharpAstTransformer {
             isStatic: false,
             isVirtual: false,
             partial: !!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'partial'),
-            name: this._context.toPascalCase((classElement.name as ts.Identifier).text),
+            name: this._context.toMethodName((classElement.name as ts.Identifier).text),
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: this.mapVisibility(classElement),
@@ -1274,13 +1274,13 @@ export default class CSharpAstTransformer {
         }
 
         switch (csMethod.name) {
-            case this._context.toPascalCase('toString'):
+            case this._context.toMethodName('toString'):
                 if (csMethod.parameters.length === 0) {
                     csMethod.isVirtual = false;
                     csMethod.isOverride = true;
                 }
                 break;
-            case this._context.toPascalCase('equals'):
+            case this._context.toMethodName('equals'):
                 if (csMethod.parameters.length === 1) {
                     csMethod.isVirtual = false;
                     csMethod.isOverride = true;
@@ -1826,7 +1826,7 @@ export default class CSharpAstTransformer {
             isStatic: false,
             isVirtual: false,
             partial: !!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'partial'),
-            name: this._context.toPascalCase((classElement.name as ts.Identifier).text),
+            name: this._context.toMethodName((classElement.name as ts.Identifier).text),
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: cs.Visibility.None,
@@ -2158,7 +2158,7 @@ export default class CSharpAstTransformer {
         csExpr.expression = this.makeMemberAccess(
             csExpr,
             this._context.makeTypeName('alphaTab.core.TypeHelper'),
-            this._context.toPascalCase('typeOf')
+            this._context.toMethodName('typeOf')
         );
         const e = this.visitExpression(csExpr, expression.expression);
         if (e) {
@@ -2215,7 +2215,7 @@ export default class CSharpAstTransformer {
             csExpr.expression = this.makeMemberAccess(
                 csExpr,
                 this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                this._context.toPascalCase('in')
+                this._context.toMethodName('in')
             );
 
             let e = this.visitExpression(csExpr, expression.left)!;
@@ -2571,7 +2571,7 @@ export default class CSharpAstTransformer {
             tsNode: expression.tsNode,
             nodeType: cs.SyntaxKind.MemberAccessExpression,
             expression: {} as cs.Expression,
-            member: this._context.toPascalCase('isTruthy')
+            member: this._context.toMethodName('isTruthy')
         } as cs.MemberAccessExpression);
 
         access.expression = {
@@ -2709,7 +2709,7 @@ export default class CSharpAstTransformer {
         csExpr.expression = this.makeMemberAccess(
             csExpr,
             this._context.makeTypeName('alphaTab.core.TypeHelper'),
-            this._context.toPascalCase('createRegex')
+            this._context.toMethodName('createRegex')
         );
         csExpr.arguments.push({
             parent: csExpr,
@@ -2833,7 +2833,7 @@ export default class CSharpAstTransformer {
             csExpr.expression = this.makeMemberAccess(
                 csExpr,
                 this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                this._context.toPascalCase('mapInitializer')
+                this._context.toMethodName('mapInitializer')
             );
 
             expression.elements.forEach(e => {
@@ -2844,12 +2844,12 @@ export default class CSharpAstTransformer {
             });
 
             // steal generic from inner element
-            if(csExpr.arguments.length > 0 && 
+            if (
+                csExpr.arguments.length > 0 &&
                 cs.isInvocationExpression(csExpr.arguments[0]) &&
-                cs.isTypeReference(csExpr.arguments[0].expression))  {
-                csExpr.typeArguments = [
-                    csExpr.arguments[0].expression
-                ];
+                cs.isTypeReference(csExpr.arguments[0].expression)
+            ) {
+                csExpr.typeArguments = [csExpr.arguments[0].expression];
             }
 
             return csExpr;
@@ -2865,7 +2865,7 @@ export default class CSharpAstTransformer {
             csExpr.expression = this.makeMemberAccess(
                 csExpr,
                 this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                this._context.toPascalCase('setInitializer')
+                this._context.toMethodName('setInitializer')
             );
 
             const setCreation = expression.parent as ts.NewExpression;
@@ -2916,7 +2916,7 @@ export default class CSharpAstTransformer {
         csExpr.expression = this.makeMemberAccess(
             csExpr,
             this._context.makeTypeName('alphaTab.core.TypeHelper'),
-            this._context.toPascalCase('createMapEntry')
+            this._context.toMethodName('createMapEntry')
         );
 
         expression.elements.forEach(e => {
@@ -2967,12 +2967,20 @@ export default class CSharpAstTransformer {
     protected visitPropertyAccessExpression(parent: cs.Node, expression: ts.PropertyAccessExpression) {
         const memberAccess = {
             expression: {} as cs.Expression,
-            member: this._context.toPascalCase(expression.name.text),
+            member: this._context.toPropertyName(expression.name.text),
             parent: parent,
             tsNode: expression,
             tsSymbol: this._context.typeChecker.getSymbolAtLocation(expression),
             nodeType: cs.SyntaxKind.MemberAccessExpression
         } as cs.MemberAccessExpression;
+
+        if (memberAccess.tsSymbol) {
+            if (this._context.isMethodSymbol(memberAccess.tsSymbol)) {
+                memberAccess.member = this._context.toMethodName(expression.name.text);
+            } else if(this._context.isPropertySymbol(memberAccess.tsSymbol)){
+                memberAccess.member = this._context.toPropertyName(expression.name.text);
+            }
+        }
 
         if (
             memberAccess.tsSymbol &&

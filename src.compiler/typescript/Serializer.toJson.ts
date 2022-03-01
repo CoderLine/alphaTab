@@ -92,11 +92,11 @@ function generateToJsonBody(
         const fieldName = (prop.property.name as ts.Identifier).text;
         const jsonName = prop.jsonNames.filter(n => n !== '')[0];
 
-        if (!jsonName) {
+        if (!jsonName || prop.isReadOnly) {
             continue;
         }
         const typeChecker = program.getTypeChecker();
-        const type = getTypeWithNullableInfo(typeChecker, prop.property.type!);
+        const type = getTypeWithNullableInfo(typeChecker, prop.property.type!, false);
         const isArray = isTypedArray(type.type!);
 
         let propertyStatements: ts.Statement[] = [];

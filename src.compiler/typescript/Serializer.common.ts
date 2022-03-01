@@ -6,6 +6,7 @@ export interface JsonProperty {
     property: ts.PropertyDeclaration;
     jsonNames: string[];
     target?: string;
+    isReadOnly: boolean;
 }
 
 export interface JsonSerializable {

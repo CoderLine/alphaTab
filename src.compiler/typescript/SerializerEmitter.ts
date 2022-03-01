@@ -45,7 +45,8 @@ export default createEmitter('json', (program, input) => {
                         property: propertyDeclaration,
                         jsonNames: jsonNames,
                         partialNames: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_partial_names'),
-                        target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment as string
+                        target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment as string,
+                        isReadOnly: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_read_only')
                     });
                 }
             }

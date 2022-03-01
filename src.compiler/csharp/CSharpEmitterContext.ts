@@ -31,6 +31,31 @@ export default class CSharpEmitterContext {
         return this.typeChecker.getTypeAtLocation(n);
     }
 
+    public toMethodName(text: string): string {
+        return this.toPascalCase(this.toIdentifier(text));
+    }
+
+    public toPropertyName(text: string): string {
+        return this.toPascalCase(this.toIdentifier(text));
+    }
+
+    public toIdentifier(text: string): string {
+        return text.replace(/[^a-zA-Z0-9_]/g, m => {
+            return {
+                '#': 'Hash',
+                '@': 'At'
+            }[m] ?? '_';
+        });
+    }
+
+    public isMethodSymbol(tsSymbol: ts.Symbol) {
+        return (tsSymbol.flags & ts.SymbolFlags.Method) !== 0;
+    }
+
+    public isPropertySymbol(tsSymbol: ts.Symbol) {
+        return (tsSymbol.flags & ts.SymbolFlags.Property) !== 0;
+    }
+
     public isTypeAssignable(targetType: ts.Type, actualType: ts.Type) {
         if (targetType.flags === ts.TypeFlags.Any || targetType.flags === ts.TypeFlags.Unknown) {
             return true;
@@ -754,7 +779,7 @@ export default class CSharpEmitterContext {
     }
 
     public makeExceptionType(): cs.TypeReferenceType {
-        return this.makeTypeName('system.Exception')
+        return this.makeTypeName('system.Exception');
     }
 
     public makeTypeName(tsName: string): string {
@@ -775,9 +800,9 @@ export default class CSharpEmitterContext {
 
     protected buildCoreNamespace(aliasSymbol: ts.Symbol) {
         let suffix = '';
-        
-        if(aliasSymbol.name === 'Map') {
-            return this.toPascalCase('alphaTab.collections') + suffix + '.';           
+
+        if (aliasSymbol.name === 'Map') {
+            return this.toPascalCase('alphaTab.collections') + suffix + '.';
         }
 
         if (aliasSymbol.declarations) {
@@ -804,7 +829,7 @@ export default class CSharpEmitterContext {
     }
     protected toCoreTypeName(s: string) {
         if (s === 'Map') {
-            return 'IMap'
+            return 'IMap';
         }
         return s;
     }
@@ -872,8 +897,8 @@ export default class CSharpEmitterContext {
         const declaration = symbol.valueDeclaration
             ? symbol.valueDeclaration
             : symbol.declarations && symbol.declarations.length > 0
-                ? symbol.declarations[0]
-                : undefined;
+            ? symbol.declarations[0]
+            : undefined;
 
         if (declaration) {
             return symbol.name + '_' + declaration.getSourceFile().fileName + '_' + declaration.pos;
@@ -1198,7 +1223,7 @@ export default class CSharpEmitterContext {
         const key = this.getSymbolKey(classElement);
         this._virtualSymbols.set(key, true);
     }
-    
+
     public markOverride(classElement: ts.ClassElement): boolean {
         let parent: ts.Node = classElement;
         while (parent.kind !== ts.SyntaxKind.ClassDeclaration) {
@@ -1220,10 +1245,11 @@ export default class CSharpEmitterContext {
             return false;
         }
 
-
         const overridden = this.getOverriddenMembers(classType, classElement);
-        if(overridden.length > 0) {
-            const member = this.typeChecker.getSymbolAtLocation(classElement) ?? this.typeChecker.getSymbolAtLocation(classElement.name!);
+        if (overridden.length > 0) {
+            const member =
+                this.typeChecker.getSymbolAtLocation(classElement) ??
+                this.typeChecker.getSymbolAtLocation(classElement.name!);
             this._virtualSymbols.set(this.getSymbolKey(member), true);
 
             for (const s of overridden) {
@@ -1231,7 +1257,6 @@ export default class CSharpEmitterContext {
                 this._virtualSymbols.set(symbolKey, true);
             }
         }
-     
 
         return overridden.length > 0;
     }
@@ -1242,7 +1267,13 @@ export default class CSharpEmitterContext {
         return symbols;
     }
 
-    protected collectOverriddenMembersByName(symbols: ts.Symbol[], classType: ts.InterfaceType, memberName: string, includeOwnMembers: boolean = false, allowInterfaces: boolean = false) {
+    protected collectOverriddenMembersByName(
+        symbols: ts.Symbol[],
+        classType: ts.InterfaceType,
+        memberName: string,
+        includeOwnMembers: boolean = false,
+        allowInterfaces: boolean = false
+    ) {
         const member = classType.symbol?.members?.get(ts.escapeLeadingUnderscores(memberName));
         if (includeOwnMembers && member) {
             symbols.push(member);
@@ -1251,7 +1282,7 @@ export default class CSharpEmitterContext {
         const baseTypes = classType.getBaseTypes();
         if (baseTypes) {
             for (const baseType of baseTypes) {
-                if (((allowInterfaces && baseType.isClassOrInterface()) || baseType.isClass())) {
+                if ((allowInterfaces && baseType.isClassOrInterface()) || baseType.isClass()) {
                     this.collectOverriddenMembersByName(symbols, baseType, memberName, true, allowInterfaces);
                 }
             }
@@ -1339,16 +1370,16 @@ export default class CSharpEmitterContext {
             case cs.SyntaxKind.ClassDeclaration:
                 const csClass = node as cs.ClassDeclaration;
                 csClass.members.forEach(m => {
-                    if(this.makeVirtual(m, visited)) {
+                    if (this.makeVirtual(m, visited)) {
                         hasVirtualMember = true;
                     }
                 });
 
                 let baseClass = csClass.baseClass;
-                while(baseClass != null) {
-                    if(cs.isTypeReference(baseClass)) {
+                while (baseClass != null) {
+                    if (cs.isTypeReference(baseClass)) {
                         const ref = baseClass.reference;
-                        if(cs.isNode(ref) && cs.isClassDeclaration(ref)) {
+                        if (cs.isNode(ref) && cs.isClassDeclaration(ref)) {
                             ref.hasVirtualMembersOrSubClasses = true;
                             baseClass = ref;
                         } else {
@@ -1363,9 +1394,9 @@ export default class CSharpEmitterContext {
 
             case cs.SyntaxKind.MethodDeclaration:
                 const csMethod = node as cs.MethodDeclaration;
-                
+
                 const methodKey = this.getSymbolKey(csMethod.tsSymbol!);
-                if(!csMethod.isOverride && this._virtualSymbols.has(methodKey)) {
+                if (!csMethod.isOverride && this._virtualSymbols.has(methodKey)) {
                     csMethod.isVirtual = true;
                     hasVirtualMember = true;
                 }
@@ -1376,7 +1407,7 @@ export default class CSharpEmitterContext {
                 const csProperty = node as cs.PropertyDeclaration;
 
                 const propKey = this.getSymbolKey(csProperty.tsSymbol!);
-                if(!csProperty.isOverride && this._virtualSymbols.has(propKey)) {
+                if (!csProperty.isOverride && this._virtualSymbols.has(propKey)) {
                     csProperty.isVirtual = true;
                     hasVirtualMember = true;
                 }
@@ -1388,7 +1419,6 @@ export default class CSharpEmitterContext {
 
         return hasVirtualMember;
     }
-
 
     private makePublic(node: cs.Node, visited: Set<SymbolKey>) {
         if (node.tsSymbol) {
@@ -1496,9 +1526,6 @@ export default class CSharpEmitterContext {
     }
 
     public getDefaultUsings(): string[] {
-        return [
-            this.toPascalCase('system'),
-            this.toPascalCase('alphaTab') + '.' + this.toPascalCase('core')
-        ];
+        return [this.toPascalCase('system'), this.toPascalCase('alphaTab') + '.' + this.toPascalCase('core')];
     }
 }
