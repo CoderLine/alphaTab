@@ -36,21 +36,28 @@ namespace AlphaTab.Platform.CSharp
                 default:
                     var libSkiaSharpPath =
                         Path.GetDirectoryName(typeof(SkiaCanvas).Assembly.Location);
-                    var platformName = IntPtr.Size == 4 ? "win-x86" : "win-x64";
-                    libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", platformName,
-                        "native", "libSkiaSharp.dll");
+                    try
+                    {
+                        var platformName = IntPtr.Size == 4 ? "win-x86" : "win-x64";
+                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", platformName,
+                            "native", "libSkiaSharp.dll");
 
-                    Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "'");
-                    var lib = LoadLibrary(libSkiaSharpPath);
-                    if (lib == IntPtr.Zero)
-                    {
-                        Logger.Warning("Skia",
-                            "Loading native lib from '" + libSkiaSharpPath + "' failed");
+                        Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "'");
+                        var lib = LoadLibrary(libSkiaSharpPath);
+                        if (lib == IntPtr.Zero)
+                        {
+                            Logger.Warning("Skia",
+                                "Loading native lib from '" + libSkiaSharpPath + "' failed");
+                        }
+                        else
+                        {
+                            Logger.Debug("Skia",
+                                "Loading native lib from '" + libSkiaSharpPath + "' successful");
+                        }
                     }
-                    else
+                    catch
                     {
-                        Logger.Debug("Skia",
-                            "Loading native lib from '" + libSkiaSharpPath + "' successful");
+                        Logger.Warning("Skia", $"Loading native lib from '{libSkiaSharpPath}' failed");
                     }
 
                     break;
