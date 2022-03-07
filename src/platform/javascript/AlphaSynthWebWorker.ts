@@ -7,6 +7,7 @@ import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 
 /**
  * This class implements a HTML5 WebWorker based version of alphaSynth
@@ -32,6 +33,7 @@ export class AlphaSynthWebWorker {
         this._player.midiLoadFailed.on(this.onMidiLoadFailed.bind(this));
         this._player.readyForPlayback.on(this.onReadyForPlayback.bind(this));
         this._player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
+        this._player.playbackRangeChanged.on(this.onPlaybackRangeChanged.bind(this));
         this._main.postMessage({
             cmd: 'alphaSynth.ready'
         });
@@ -211,6 +213,13 @@ export class AlphaSynthWebWorker {
         this._main.postMessage({
             cmd: 'alphaSynth.midiEventsPlayed',
             events: args.events.map(JsonConverter.midiEventToJsObject)
+        });
+    }
+
+    public onPlaybackRangeChanged(args: PlaybackRangeChangedEventArgs): void {
+        this._main.postMessage({
+            cmd: 'alphaSynth.playbackRangeChanged',
+            playbackRange: args.playbackRange
         });
     }
 }

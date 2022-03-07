@@ -18,6 +18,7 @@ import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { Queue } from '@src/synth/ds/Queue';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
+import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 
 /**
  * This is the main synthesizer component which can be used to
@@ -139,6 +140,9 @@ export class AlphaSynth implements IAlphaSynth {
         if (value) {
             this.tickPosition = value.startTick;
         }
+        (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(
+            new PlaybackRangeChangedEventArgs(value)
+        );
     }
 
     public get isLooping(): boolean {
@@ -459,4 +463,5 @@ export class AlphaSynth implements IAlphaSynth {
     readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<PlayerStateChangedEventArgs>();
     readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
     readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
+    readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> = new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
 }

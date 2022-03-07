@@ -42,6 +42,7 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { Note } from '@src/model/Note';
 import { MidiEventType } from '@src/midi/MidiEvent';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 
 class SelectionInfo {
     public beat: Beat;
@@ -579,6 +580,7 @@ export class AlphaTabApiBase<TSettings> {
         this.player.stateChanged.on(this.onPlayerStateChanged.bind(this));
         this.player.positionChanged.on(this.onPlayerPositionChanged.bind(this));
         this.player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
+        this.player.playbackRangeChanged.on(this.onPlaybackRangeChanged.bind(this));
         this.player.finished.on(this.onPlayerFinished.bind(this));
         if (this.settings.player.enableCursor) {
             this.setupCursors();
@@ -775,6 +777,7 @@ export class AlphaTabApiBase<TSettings> {
         this._playerState = PlayerState.Paused;
         // we need to update our position caches if we render a tablature
         this.renderer.postRenderFinished.on(() => {
+            debugger;
             this.cursorUpdateTick(this._previousTick, false, this._previousTick > 10);
         });
         if (this.player) {
@@ -1412,5 +1415,15 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'midiEventsPlayed', e);
+    }
+
+    public playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> =
+        new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
+    private onPlaybackRangeChanged(e: PlaybackRangeChangedEventArgs): void {
+        if (this._isDestroyed) {
+            return;
+        }
+        (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(e);
+        this.uiFacade.triggerEvent(this.container, 'playbackRangeChanged', e);
     }
 }

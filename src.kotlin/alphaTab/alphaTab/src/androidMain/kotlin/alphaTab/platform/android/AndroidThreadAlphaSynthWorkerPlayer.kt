@@ -107,6 +107,9 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
         player.midiEventsPlayed.on {
             _uiInvoke { onMidiEventsPlayed(it) }
         }
+        player.playbackRangeChanged.on {
+            _uiInvoke { onPlaybackRangeChanged(it) }
+        }
 
         _uiInvoke { onReady() }
     }
@@ -253,6 +256,8 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
         EventEmitterOfT()
     override val midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
         EventEmitterOfT()
+    override val playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> =
+        EventEmitterOfT()
 
 
     private fun onReady() {
@@ -293,5 +298,9 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
 
     private fun onPositionChanged(obj: PositionChangedEventArgs) {
         _uiInvoke { (positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(obj) }
+    }
+
+    private fun onPlaybackRangeChanged(obj: PlaybackRangeChangedEventArgs) {
+        _uiInvoke { (playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(obj) }
     }
 }
