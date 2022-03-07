@@ -1,0 +1,119 @@
+---
+title: playbackRangeChanged
+category: Events - Player
+description: This event is fired when the playback range changed.
+sidebarPath: /docs/reference/api
+since: 1.3.0-alpha.195
+---
+
+import EventDescription from '../../../src/event-description';
+import {TypeTable, TypeRow} from '../../../src/type-table';
+import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Description
+This event is fired when the playback range changed. 
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="js" name="function(e)" />    
+    <TypeRow type="net" name="Action<PlaybackRangeChangedEventArgs>" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="js" name="args" type="alphaTab.synth.PlaybackRangeChangedEventArgs">
+        The information about the changed playback range. 
+    </ParameterRow>
+    <ParameterRow platform="net" name="args" type="AlphaTab.Synth.PlaybackRangeChangedEventArgs">
+        The information about the changed playback range.
+    </ParameterRow>
+</ParameterTable>
+
+## PlaybackRangeChangedEventArgs Properties
+
+<ParameterTable>
+    <ParameterRow platform="js" name="playbackRange" type="alphaTab.synth.PlaybackRange">
+        The new playback range or null if no range is selected. (see [PlaybackRange](/docs/reference/api/playbackrange))
+    </ParameterRow>
+    <ParameterRow platform="net" name="PlaybackRange" type="AlphaTab.Synth.PlaybackRange">
+        The new playback range or null if no range is selected. (see [PlaybackRange](/docs/reference/api/playbackrange))
+    </ParameterRow>
+</ParameterTable>
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'jQuery', value: 'jq', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.playbackRangeChanged.on((args) => {
+    if (args.playbackRange) {
+        highlightRangeInProgressBar(args.playbackRange.startTick, args.playbackRange.endTick);
+    } else {
+        clearHighlightInProgressBar();
+    }
+});
+```
+
+</TabItem>
+<TabItem value="jq">
+
+```js
+$('#alphaTab').on('alphaTab.playbackRangeChanged', (e, args) => {
+    if (args.playbackRange) {
+        highlightRangeInProgressBar(args.playbackRange.startTick, args.playbackRange.endTick);
+    } else {
+        clearHighlightInProgressBar();
+    }
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.playbackRangeChanged', (e) => {
+    const args = e.detail;
+    if (args.playbackRange) {
+        highlightRangeInProgressBar(args.playbackRange.startTick, args.playbackRange.endTick);
+    } else {
+        clearHighlightInProgressBar();
+    }
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.PlaybackRangeChanged.On(args => 
+{
+    if (args.PlaybackRange != null) 
+    {
+        HighlightRangeInProgressBar(args.PlaybackRange.StartTick, args.PlaybackRange.EndTick);
+    }
+    else 
+    {
+        ClearHighlightInProgressBar();
+    }
+});
+```
+
+</TabItem>
+</Tabs>
