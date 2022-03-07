@@ -36,6 +36,7 @@ namespace AlphaTab.Platform.CSharp
             Player.MidiLoadFailed.On(OnMidiLoadFailed);
             Player.ReadyForPlayback.On(OnReadyForPlayback);
             Player.MidiEventsPlayed.On(OnMidiEventsPlayed);
+            Player.PlaybackRangeChanged.On(OnPlaybackRangeChanged);
 
             DispatchOnUiThread(OnReady);
         }
@@ -186,6 +187,7 @@ namespace AlphaTab.Platform.CSharp
         public IEventEmitterOfT<PlayerStateChangedEventArgs> StateChanged { get; } = new EventEmitterOfT<PlayerStateChangedEventArgs>();
         public IEventEmitterOfT<PositionChangedEventArgs> PositionChanged { get; } = new EventEmitterOfT<PositionChangedEventArgs>();
         public IEventEmitterOfT<MidiEventsPlayedEventArgs> MidiEventsPlayed { get; } = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
+        public IEventEmitterOfT<PlaybackRangeChangedEventArgs> PlaybackRangeChanged { get; } = new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
 
         protected virtual void OnReady()
         {
@@ -235,6 +237,11 @@ namespace AlphaTab.Platform.CSharp
         protected virtual void OnPositionChanged(PositionChangedEventArgs obj)
         {
             DispatchOnUiThread(() => ((EventEmitterOfT<PositionChangedEventArgs>)PositionChanged).Trigger(obj));
+        }
+
+        protected virtual void OnPlaybackRangeChanged(PlaybackRangeChangedEventArgs obj)
+        {
+            DispatchOnUiThread(() => ((EventEmitterOfT<PlaybackRangeChangedEventArgs>)PlaybackRangeChanged).Trigger(obj));
         }
     }
 }
