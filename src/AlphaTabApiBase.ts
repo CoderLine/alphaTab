@@ -42,7 +42,7 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { Note } from '@src/model/Note';
 import { MidiEventType } from '@src/midi/MidiEvent';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { PlaybackRangeChangedEventArgs } from './synth/PlaybackRangeChangedEventArgs';
+import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 
 class SelectionInfo {
     public beat: Beat;

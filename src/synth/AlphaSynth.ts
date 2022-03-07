@@ -18,7 +18,7 @@ import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { Queue } from '@src/synth/ds/Queue';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
-import { PlaybackRangeChangedEventArgs } from './PlaybackRangeChangedEventArgs';
+import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 
 /**
  * This is the main synthesizer component which can be used to
