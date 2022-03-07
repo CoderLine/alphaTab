@@ -16,6 +16,7 @@ import { FileLoadError } from '@src/FileLoadError';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEventType } from '@src/midi/MidiEvent';
 import { Environment } from '@src/Environment';
+import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -375,6 +376,12 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                     new PlayerStateChangedEventArgs(data.state, data.stopped)
                 );
                 break;
+            case 'alphaSynth.playbackRangeChanged':
+                this._playbackRange = (data as PlaybackRangeChangedEventArgs).playbackRange;
+                (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(
+                    new PlaybackRangeChangedEventArgs(this._playbackRange)
+                );
+                break;            
             case 'alphaSynth.finished':
                 (this.finished as EventEmitter).trigger();
                 break;
@@ -441,6 +448,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     >(); 
     readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<
         MidiEventsPlayedEventArgs
+    >();
+    readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> = new EventEmitterOfT<
+        PlaybackRangeChangedEventArgs
     >();
 
     //
