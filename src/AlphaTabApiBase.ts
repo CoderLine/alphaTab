@@ -995,7 +995,7 @@ export class AlphaTabApiBase<TSettings> {
                         if (
                             nextBeatBoundings &&
                             nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                                barBoundings.staveGroupBounds
+                            barBoundings.staveGroupBounds
                         ) {
                             nextBeatX = nextBeatBoundings.visualBounds.x;
                         }
@@ -1033,12 +1033,17 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private _beatMouseDown: boolean = false;
+    private _noteMouseDown: boolean = false;
     private _selectionStart: SelectionInfo | null = null;
     private _selectionEnd: SelectionInfo | null = null;
 
     public beatMouseDown: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
     public beatMouseMove: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
     public beatMouseUp: IEventEmitterOfT<Beat | null> = new EventEmitterOfT<Beat | null>();
+
+    public noteMouseDown: IEventEmitterOfT<Note> = new EventEmitterOfT<Note>();
+    public noteMouseMove: IEventEmitterOfT<Note> = new EventEmitterOfT<Note>();
+    public noteMouseUp: IEventEmitterOfT<Note | null> = new EventEmitterOfT<Note | null>();
 
     private onBeatMouseDown(originalEvent: IMouseEventArgs, beat: Beat): void {
         if (this._isDestroyed) {
@@ -1058,6 +1063,16 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'beatMouseDown', beat, originalEvent);
     }
 
+    private onNoteMouseDown(originalEvent: IMouseEventArgs, note: Note): void {
+        if (this._isDestroyed) {
+            return;
+        }
+
+        this._noteMouseDown = true;
+        (this.noteMouseDown as EventEmitterOfT<Note>).trigger(note);
+        this.uiFacade.triggerEvent(this.container, 'noteMouseDown', note, originalEvent);
+    }
+
     private onBeatMouseMove(originalEvent: IMouseEventArgs, beat: Beat): void {
         if (this._isDestroyed) {
             return;
@@ -1071,6 +1086,15 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.beatMouseMove as EventEmitterOfT<Beat>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'beatMouseMove', beat, originalEvent);
+    }
+
+    private onNoteMouseMove(originalEvent: IMouseEventArgs, note: Note): void {
+        if (this._isDestroyed) {
+            return;
+        }
+
+        (this.noteMouseMove as EventEmitterOfT<Note>).trigger(note);
+        this.uiFacade.triggerEvent(this.container, 'noteMouseMove', note, originalEvent);
     }
 
     private onBeatMouseUp(originalEvent: IMouseEventArgs, beat: Beat | null): void {
@@ -1128,6 +1152,17 @@ export class AlphaTabApiBase<TSettings> {
         this._beatMouseDown = false;
     }
 
+
+    private onNoteMouseUp(originalEvent: IMouseEventArgs, note: Note | null): void {
+        if (this._isDestroyed) {
+            return;
+        }
+
+        (this.noteMouseUp as EventEmitterOfT<Note | null>).trigger(note);
+        this.uiFacade.triggerEvent(this.container, 'noteMouseUp', note, originalEvent);
+        this._noteMouseDown = false;
+    }
+
     private updateSelectionCursor(range: PlaybackRange | null) {
         if (!this._tickCache) {
             return;
@@ -1158,6 +1193,14 @@ export class AlphaTabApiBase<TSettings> {
             let beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
             if (beat) {
                 this.onBeatMouseDown(e, beat);
+
+                if (this.settings.core.includeNoteBounds) {
+                    const note = this.renderer.boundsLookup?.getNoteAtPos(beat, relX, relY);
+                    if (note) {
+                        this.onNoteMouseDown(e, note);
+                    }
+                }
+
             }
         });
         this.canvasElement.mouseMove.on(e => {
@@ -1169,6 +1212,13 @@ export class AlphaTabApiBase<TSettings> {
             let beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
             if (beat) {
                 this.onBeatMouseMove(e, beat);
+
+                if (this._noteMouseDown) {
+                    const note = this.renderer.boundsLookup?.getNoteAtPos(beat, relX, relY);
+                    if (note) {
+                        this.onNoteMouseMove(e, note);
+                    }
+                }
             }
         });
         this.canvasElement.mouseUp.on(e => {
@@ -1182,6 +1232,16 @@ export class AlphaTabApiBase<TSettings> {
             let relY: number = e.getY(this.canvasElement);
             let beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
             this.onBeatMouseUp(e, beat);
+
+            if (this._noteMouseDown) {
+                if (beat) {
+                    const note = this.renderer.boundsLookup?.getNoteAtPos(beat, relX, relY) ?? null;
+                    this.onNoteMouseUp(e, note);
+                }
+                else {
+                    this.onNoteMouseUp(e, null);
+                }
+            }
         });
         this.renderer.postRenderFinished.on(() => {
             if (

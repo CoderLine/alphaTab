@@ -111,7 +111,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set tickPosition(value: number) {
-        this.timePosition = this._sequencer.tickPositionToTimePosition(value);
+        this.timePosition = this._sequencer.mainTickPositionToTimePosition(value);
     }
 
     public get timePosition(): number {
@@ -119,10 +119,10 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set timePosition(value: number) {
-        Logger.debug('AlphaSynth', `Seeking to position ${value}ms`);
+        Logger.debug('AlphaSynth', `Seeking to position ${value}ms (main)`);
 
         // tell the sequencer to jump to the given position
-        this._sequencer.seek(value);
+        this._sequencer.mainSeek(value);
 
         // update the internal position
         this.updateTimePosition(value, true);
@@ -132,11 +132,11 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public get playbackRange(): PlaybackRange | null {
-        return this._sequencer.playbackRange;
+        return this._sequencer.mainPlaybackRange;
     }
 
     public set playbackRange(value: PlaybackRange | null) {
-        this._sequencer.playbackRange = value;
+        this._sequencer.mainPlaybackRange = value;
         if (value) {
             this.tickPosition = value.startTick;
         }
@@ -276,7 +276,7 @@ export class AlphaSynth implements IAlphaSynth {
         this.output.pause();
         this._sequencer.stop();
         this._synthesizer.noteOffAll(true);
-        this.tickPosition = this._sequencer.playbackRange ? this._sequencer.playbackRange.startTick : 0;
+        this.tickPosition = this._sequencer.mainPlaybackRange ? this._sequencer.mainPlaybackRange.startTick : 0;
         (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
             new PlayerStateChangedEventArgs(this.state, true)
         );
@@ -287,10 +287,13 @@ export class AlphaSynth implements IAlphaSynth {
         this.pause();
 
         this._sequencer.loadOneTimeMidi(midi);
-
-        this._sequencer.stop();
         this._synthesizer.noteOffAll(true);
-        this.tickPosition = 0;
+
+        // update the internal position
+        this.updateTimePosition(0, true);
+
+        // tell the output to reset the already synthesized buffers and request data again
+        this.output.resetSamples();
 
         this.output.play();
     }
@@ -341,7 +344,7 @@ export class AlphaSynth implements IAlphaSynth {
             this._sequencer.loadMidi(midi);
             this._isMidiLoaded = true;
             (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                new PositionChangedEventArgs(0, this._sequencer.endTime, 0, this._sequencer.endTick, false)
+                new PositionChangedEventArgs(0, this._sequencer.currentEndTime, 0, this._sequencer.currentEndTick, false)
             );
             Logger.debug('AlphaSynth', 'Midi successfully loaded');
             this.checkReadyForPlayback();
@@ -391,21 +394,23 @@ export class AlphaSynth implements IAlphaSynth {
             startTick = this.playbackRange.startTick;
             endTick = this.playbackRange.endTick;
         } else {
-            endTick = this._sequencer.endTick;
+            endTick = this._sequencer.currentEndTick;
         }
 
         if (this._tickPosition >= endTick) {
-            Logger.debug('AlphaSynth', 'Finished playback');
             if (this._sequencer.isPlayingCountIn) {
+                Logger.debug('AlphaSynth', 'Finished playback (count-in)');
                 this._sequencer.resetCountIn();
                 this.timePosition = this._sequencer.currentTime;
                 this.playInternal();
             } else if (this._sequencer.isPlayingOneTimeMidi) {
+                Logger.debug('AlphaSynth', 'Finished playback (one time)');
                 this._sequencer.resetOneTimeMidi();
                 this.state = PlayerState.Paused;
                 this.output.pause();
                 this._synthesizer.noteOffAll(false);
             } else {
+                Logger.debug('AlphaSynth', 'Finished playback (main)');
                 (this.finished as EventEmitter).trigger();
 
                 if (this.isLooping) {
@@ -421,16 +426,21 @@ export class AlphaSynth implements IAlphaSynth {
         // update the real positions
         const currentTime: number = timePosition;
         this._timePosition = currentTime;
-        const currentTick: number = this._sequencer.timePositionToTickPosition(currentTime);
+        const currentTick: number = this._sequencer.currentTimePositionToTickPosition(currentTime);
         this._tickPosition = currentTick;
-        const endTime: number = this._sequencer.endTime;
-        const endTick: number = this._sequencer.endTick;
 
-        if (!this._sequencer.isPlayingOneTimeMidi && !this._sequencer.isPlayingCountIn) {
-            Logger.debug(
-                'AlphaSynth',
-                `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount}`
-            );
+        const endTime: number = this._sequencer.currentEndTime;
+        const endTick: number = this._sequencer.currentEndTick;
+
+        const mode = this._sequencer.isPlayingMain ? 'main' : this._sequencer.isPlayingCountIn ? 'count-in' : 'one-time';
+
+        Logger.debug(
+            'AlphaSynth',
+            `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount} (${mode})`
+        );
+
+        if (this._sequencer.isPlayingMain) {
+
             (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
                 new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick, isSeek)
             );
