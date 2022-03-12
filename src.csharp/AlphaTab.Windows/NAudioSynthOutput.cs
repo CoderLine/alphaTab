@@ -128,13 +128,14 @@ namespace AlphaTab
         public override int Read(float[] buffer, int offset, int count)
         {
             var read = new Float32Array(count);
-            _circularBuffer.Read(read, 0, System.Math.Min(read.Length, _circularBuffer.Count));
+            
+            var samplesFromBuffer = _circularBuffer.Read(read, 0, System.Math.Min(read.Length, _circularBuffer.Count));
 
             Buffer.BlockCopy(read.Data, 0, buffer, offset * sizeof(float),
                 count * sizeof(float));
 
             var samples = count / 2;
-            ((EventEmitterOfT<double>) SamplesPlayed).Trigger(samples);
+            ((EventEmitterOfT<double>) SamplesPlayed).Trigger(samples / SynthConstants.AudioChannels);
 
             RequestBuffers();
 
