@@ -37,7 +37,7 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
         bufferTimeInMilliseconds: Double
     ) {
         _logLevel = logLevel
-        __bufferTimeInMilliseconds = bufferTimeInMilliseconds
+        _bufferTimeInMilliseconds = bufferTimeInMilliseconds
         _output = output
         _uiInvoke = uiInvoke
         _threadStartedEvent = Semaphore(1)
