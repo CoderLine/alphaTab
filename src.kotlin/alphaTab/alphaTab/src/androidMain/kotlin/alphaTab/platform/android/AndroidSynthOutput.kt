@@ -30,7 +30,7 @@ internal class AndroidSynthOutput(
     override fun activate() {
     }
 
-    override fun open(bufferTimeInMilliseconds: double) {
+    override fun open(bufferTimeInMilliseconds: Double) {
         _bufferCount = (bufferTimeInMilliseconds * PreferredSampleRate /
             1000 /
             BufferSize).toInt()

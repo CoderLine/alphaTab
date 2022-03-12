@@ -28,13 +28,13 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     private var _player: AlphaSynth? = null
     private val _output: ISynthOutput
     private var _logLevel: LogLevel
-    private var _bufferTimeInMilliseconds: double
+    private var _bufferTimeInMilliseconds: Double
 
     constructor(
         logLevel: LogLevel,
         output: ISynthOutput,
         uiInvoke: (action: (() -> Unit)) -> Unit,
-        bufferTimeInMilliseconds: double
+        bufferTimeInMilliseconds: Double
     ) {
         _logLevel = logLevel
         __bufferTimeInMilliseconds = bufferTimeInMilliseconds
