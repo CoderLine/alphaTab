@@ -122,8 +122,6 @@ export class PageViewLayout extends ScoreLayout {
         e.height = tuningHeight;
         e.totalWidth = this.width;
         e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
-        e.firstMasterBarIndex = -1;
-        e.lastMasterBarIndex = -1;
 
         this.registerPartial(e, (canvas: ICanvas) => {
             canvas.color = res.scoreInfoColor;
@@ -151,8 +149,6 @@ export class PageViewLayout extends ScoreLayout {
         e.height = diagramHeight;
         e.totalWidth = this.width;
         e.totalHeight = totalHeight < 0 ? y + diagramHeight : totalHeight;
-        e.firstMasterBarIndex = -1;
-        e.lastMasterBarIndex = -1;
 
         this.registerPartial(e, (canvas: ICanvas) => {
             canvas.color = res.scoreInfoColor;
@@ -218,8 +214,6 @@ export class PageViewLayout extends ScoreLayout {
         e.height = infoHeight;
         e.totalWidth = this.width;
         e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
-        e.firstMasterBarIndex = -1;
-        e.lastMasterBarIndex = -1;
         this.registerPartial(e, (canvas: ICanvas) => {
             canvas.color = res.scoreInfoColor;
             canvas.textAlign = TextAlign.Center;

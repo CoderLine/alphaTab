@@ -42,12 +42,12 @@ export class RenderFinishedEventArgs {
     /**
      * Gets or sets the index of the first masterbar that was rendered in this result.
      */
-    public firstMasterBarIndex: number = 0;
+    public firstMasterBarIndex: number = -1;
 
     /**
      * Gets or sets the index of the last masterbar that was rendered in this result.
      */
-    public lastMasterBarIndex: number = 0;
+    public lastMasterBarIndex: number = -1;
 
     /**
      * Gets or sets the render engine specific result object which contains the rendered music sheet.

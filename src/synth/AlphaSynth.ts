@@ -218,7 +218,6 @@ export class AlphaSynth implements IAlphaSynth {
                     samples = samples.subarray(0, bufferPos);
                 }
                 this._notPlayedSamples += samples.length;
-                Logger.debug('AlphaSynth', `NotPlayedSamples ${this._notPlayedSamples} (+${samples.length})`);
                 this.output.addSamples(samples);
             }
         });
@@ -412,10 +411,6 @@ export class AlphaSynth implements IAlphaSynth {
         }
         let playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
         this._notPlayedSamples -= sampleCount * SynthConstants.AudioChannels;
-        Logger.debug(
-            'AlphaSynth',
-            `NotPlayedSamples ${this._notPlayedSamples} (-${sampleCount * SynthConstants.AudioChannels})`
-        );
         this.updateTimePosition(this._timePosition + playedMillis, false);
         this.checkForFinish();
     }

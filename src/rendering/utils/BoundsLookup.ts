@@ -222,6 +222,11 @@ export class BoundsLookup {
         return all ? all[0] : null;
     }
 
+    /**
+     * Tries to find the bounds of a given beat.
+     * @param beat The beat to find.
+     * @returns The beat bounds if it was rendered, or null if no boundary information is available.
+     */
     public findBeats(beat: Beat): BeatBounds[] | null {
         let id: number = beat.id;
         if (this._beatLookup.has(id)) {
