@@ -1,0 +1,84 @@
+---
+title: noteMouseDown
+description: This event is fired whenever a the user presses the mouse button on a note head/number.
+sidebar_custom_props:
+  category: Events - Player
+  since: 1.3.0-alpha.201
+---
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.3.0-alpha.201" />
+
+import { EventDescription } from '@site/src/components/EventDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Description
+This event is fired whenever a the user presses the mouse button on a note. 
+It is only fired if [`includeNoteBounds`](/docs/reference/settings/core/includenotebounds) was set to true because
+only then this hit detection can be done. A click on a note is considered if the note head or the note number on tabs are clicked as documented in the [`boundsLookup`](/docs/reference/scorerenderer/boundslookup)
+
+<EventDescription metadata={metadata} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="js" name="function(note)" />    
+    <TypeRow type="net" name="Action<AlphaTab.Model.Note>" />    
+</TypeTable>
+
+## Parameters
+
+<ParameterTable>
+    <ParameterRow platform="js" name="note" type="alphaTab.model.Note">
+        The note which was clicked.
+    </ParameterRow>
+    <ParameterRow platform="net" name="note" type="AlphaTab.Model.Note">
+        The note which was clicked.
+    </ParameterRow>
+</ParameterTable>
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'HTML', value: 'html', },
+    { label: 'C#', value: 'cs', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.noteMouseDown.on((note) => {
+    api.playNote(note);
+});
+```
+
+</TabItem>
+<TabItem value="html">
+
+```js
+document.querySelector('#alphaTab').addEventListener('alphaTab.noteMouseDown', (e) => {
+    const note = e.detail;
+    api.playNote(beat);
+}, false);
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.NoteMouseDown.On(note => 
+{
+    api.PlayNote(note);
+});
+```
+
+</TabItem>
+</Tabs>
