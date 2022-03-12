@@ -49,6 +49,10 @@ export class MidiFileSequencer {
     private _oneTimeState: MidiSequencerState | null = null;
     private _countInState: MidiSequencerState | null = null;
 
+    public get isPlayingMain(): boolean {
+        return this._currentState == this._mainState;
+    }
+
     public get isPlayingOneTimeMidi(): boolean {
         return this._currentState == this._oneTimeState;
     }
@@ -63,15 +67,15 @@ export class MidiFileSequencer {
         this._currentState = this._mainState;
     }
 
-    public get playbackRange(): PlaybackRange | null {
-        return this._currentState.playbackRange;
+    public get mainPlaybackRange(): PlaybackRange | null {
+        return this._mainState.playbackRange;
     }
 
-    public set playbackRange(value: PlaybackRange | null) {
-        this._currentState.playbackRange = value;
+    public set mainPlaybackRange(value: PlaybackRange | null) {
+        this._mainState.playbackRange = value;
         if (value) {
-            this._currentState.playbackRangeStartTime = this.tickPositionToTimePositionWithSpeed(value.startTick, 1);
-            this._currentState.playbackRangeEndTime = this.tickPositionToTimePositionWithSpeed(value.endTick, 1);
+            this._mainState.playbackRangeStartTime = this.tickPositionToTimePositionWithSpeed(this._mainState, value.startTick, 1);
+            this._mainState.playbackRangeEndTime = this.tickPositionToTimePositionWithSpeed(this._mainState, value.endTick, 1);
         }
     }
 
@@ -84,11 +88,11 @@ export class MidiFileSequencer {
     /**
      * Gets the duration of the song in ticks.
      */
-    public get endTick() {
+    public get currentEndTick() {
         return this._currentState.endTick;
     }
 
-    public get endTime(): number {
+    public get currentEndTime(): number {
         return this._currentState.endTime / this.playbackSpeed;
     }
 
@@ -97,51 +101,55 @@ export class MidiFileSequencer {
      */
     public playbackSpeed: number = 1;
 
-    public seek(timePosition: number): void {
+    public mainSeek(timePosition: number): void {
         // map to speed=1
         timePosition *= this.playbackSpeed;
 
         // ensure playback range
-        if (this.playbackRange) {
-            if (timePosition < this._currentState.playbackRangeStartTime) {
-                timePosition = this._currentState.playbackRangeStartTime;
-            } else if (timePosition > this._currentState.playbackRangeEndTime) {
-                timePosition = this._currentState.playbackRangeEndTime;
+        if (this.mainPlaybackRange) {
+            if (timePosition < this._mainState.playbackRangeStartTime) {
+                timePosition = this._mainState.playbackRangeStartTime;
+            } else if (timePosition > this._mainState.playbackRangeEndTime) {
+                timePosition = this._mainState.playbackRangeEndTime;
             }
         }
 
-        if (timePosition > this._currentState.currentTime) {
-            this.silentProcess(timePosition - this._currentState.currentTime);
-        } else if (timePosition < this._currentState.currentTime) {
+        if (timePosition > this._mainState.currentTime) {
+            this.mainSilentProcess(timePosition - this._mainState.currentTime);
+        } else if (timePosition < this._mainState.currentTime) {
             // we have to restart the midi to make sure we get the right state: instruments, volume, pan, etc
-            this._currentState.currentTime = 0;
-            this._currentState.eventIndex = 0;
-            let metronomeVolume: number = this._synthesizer.metronomeVolume;
-            this._synthesizer.noteOffAll(true);
-            this._synthesizer.resetSoft();
-            this._synthesizer.setupMetronomeChannel(metronomeVolume);
-            this.silentProcess(timePosition);
+            this._mainState.currentTime = 0;
+            this._mainState.eventIndex = 0;
+            if (this.isPlayingMain) {
+                let metronomeVolume: number = this._synthesizer.metronomeVolume;
+                this._synthesizer.noteOffAll(true);
+                this._synthesizer.resetSoft();
+                this._synthesizer.setupMetronomeChannel(metronomeVolume);
+            }
+            this.mainSilentProcess(timePosition);
         }
     }
 
-    private silentProcess(milliseconds: number): void {
+    private mainSilentProcess(milliseconds: number): void {
         if (milliseconds <= 0) {
             return;
         }
 
         let start: number = Date.now();
-        let finalTime: number = this._currentState.currentTime + milliseconds;
+        let finalTime: number = this._mainState.currentTime + milliseconds;
 
-        while (this._currentState.currentTime < finalTime) {
-            if (this.fillMidiEventQueueLimited(finalTime - this._currentState.currentTime)) {
-                this._synthesizer.synthesizeSilent(SynthConstants.MicroBufferSize);
+        if(this.isPlayingMain) {
+            while (this._mainState.currentTime < finalTime) {
+                if (this.fillMidiEventQueueLimited(finalTime - this._mainState.currentTime)) {
+                    this._synthesizer.synthesizeSilent(SynthConstants.MicroBufferSize);
+                }
             }
         }
-
-        this._currentState.currentTime = finalTime;
+        
+        this._mainState.currentTime = finalTime;
 
         let duration: number = Date.now() - start;
-        Logger.debug('Sequencer', 'Silent seek finished in ' + duration + 'ms');
+        Logger.debug('Sequencer', 'Silent seek finished in ' + duration + 'ms (main)');
     }
 
     public loadOneTimeMidi(midiFile: MidiFile): void {
@@ -272,21 +280,25 @@ export class MidiFileSequencer {
         return anyEventsDispatched;
     }
 
-    public tickPositionToTimePosition(tickPosition: number): number {
-        return this.tickPositionToTimePositionWithSpeed(tickPosition, this.playbackSpeed);
+    public mainTickPositionToTimePosition(tickPosition: number): number {
+        return this.tickPositionToTimePositionWithSpeed(this._mainState, tickPosition, this.playbackSpeed);
     }
 
-    public timePositionToTickPosition(timePosition: number): number {
-        return this.timePositionToTickPositionWithSpeed(timePosition, this.playbackSpeed);
+    public mainTimePositionToTickPosition(timePosition: number): number {
+        return this.timePositionToTickPositionWithSpeed(this._mainState, timePosition, this.playbackSpeed);
+    }
+    
+    public currentTimePositionToTickPosition(timePosition: number): number {
+        return this.timePositionToTickPositionWithSpeed(this._currentState, timePosition, this.playbackSpeed);
     }
 
-    private tickPositionToTimePositionWithSpeed(tickPosition: number, playbackSpeed: number): number {
+    private tickPositionToTimePositionWithSpeed(state: MidiSequencerState, tickPosition: number, playbackSpeed: number): number {
         let timePosition: number = 0.0;
         let bpm: number = 120.0;
         let lastChange: number = 0;
 
         // find start and bpm of last tempo change before time
-        for (const c of this._currentState.tempoChanges) {
+        for (const c of state.tempoChanges) {
             if (tickPosition < c.ticks) {
                 break;
             }
@@ -298,12 +310,12 @@ export class MidiFileSequencer {
 
         // add the missing millis
         tickPosition -= lastChange;
-        timePosition += tickPosition * (60000.0 / (bpm * this._currentState.division));
+        timePosition += tickPosition * (60000.0 / (bpm * state.division));
 
         return timePosition / playbackSpeed;
     }
 
-    private timePositionToTickPositionWithSpeed(timePosition: number, playbackSpeed: number): number {
+    private timePositionToTickPositionWithSpeed(state: MidiSequencerState, timePosition: number, playbackSpeed: number): number {
         timePosition *= playbackSpeed;
 
         let ticks: number = 0;
@@ -311,7 +323,7 @@ export class MidiFileSequencer {
         let lastChange: number = 0;
 
         // find start and bpm of last tempo change before time
-        for (const c of this._currentState.tempoChanges) {
+        for (const c of state.tempoChanges) {
             if (timePosition < c.time) {
                 break;
             }
@@ -322,13 +334,17 @@ export class MidiFileSequencer {
 
         // add the missing ticks
         timePosition -= lastChange;
-        ticks += (timePosition / (60000.0 / (bpm * this._currentState.division))) | 0;
+        ticks += (timePosition / (60000.0 / (bpm * state.division))) | 0;
         // we add 1 for possible rounding errors.(floating point issuses)
         return ticks + 1;
     }
 
     private get internalEndTime(): number {
-        return !this.playbackRange ? this._currentState.endTime : this._currentState.playbackRangeEndTime;
+        if (this.isPlayingMain) {
+            return !this.mainPlaybackRange ? this._currentState.endTime : this._currentState.playbackRangeEndTime;
+        } else {
+            return this._currentState.endTime;
+        }
     }
 
     public get isFinished(): boolean {
@@ -336,13 +352,13 @@ export class MidiFileSequencer {
     }
 
     public stop(): void {
-        if (!this.playbackRange) {
+        if (this.isPlayingMain && this.mainPlaybackRange) {
+            this._currentState.currentTime = this.mainPlaybackRange.startTick;
+        } else {
             this._currentState.currentTime = 0;
-            this._currentState.eventIndex = 0;
-        } else if (this.playbackRange) {
-            this._currentState.currentTime = this.playbackRange.startTick;
-            this._currentState.eventIndex = 0;
         }
+
+        this._currentState.eventIndex = 0;
     }
 
     public resetOneTimeMidi() {

@@ -128,7 +128,7 @@ export class BoundsLookup {
         return json;
     }
 
-    private _beatLookup: Map<number, BeatBounds> = new Map();
+    private _beatLookup: Map<number, BeatBounds[]> = new Map();
     private _masterBarLookup: Map<number, MasterBarBounds> = new Map();
     private _currentStaveGroup: StaveGroupBounds | null = null;
     /**
@@ -149,15 +149,6 @@ export class BoundsLookup {
             t.finish();
         }
         this.isFinished = true;
-    }
-
-    /**
-     * Adds a new note to the lookup.
-     * @param bounds The note bounds to add.
-     */
-    public addNote(bounds: NoteBounds): void {
-        let beat = this.findBeat(bounds.note.beat);
-        beat!.addNote(bounds);
     }
 
     /**
@@ -190,7 +181,10 @@ export class BoundsLookup {
      * @param bounds The beat bounds to add.
      */
     public addBeat(bounds: BeatBounds): void {
-        this._beatLookup.set(bounds.beat.id, bounds);
+        if (!this._beatLookup.has(bounds.beat.id)) {
+            this._beatLookup.set(bounds.beat.id, []);
+        }
+        this._beatLookup.get(bounds.beat.id)?.push(bounds);
     }
 
     /**
@@ -224,6 +218,16 @@ export class BoundsLookup {
      * @returns The beat bounds if it was rendered, or null if no boundary information is available.
      */
     public findBeat(beat: Beat): BeatBounds | null {
+        const all = this.findBeats(beat);
+        return all ? all[0] : null;
+    }
+
+    /**
+     * Tries to find the bounds of a given beat.
+     * @param beat The beat to find.
+     * @returns The beat bounds if it was rendered, or null if no boundary information is available.
+     */
+    public findBeats(beat: Beat): BeatBounds[] | null {
         let id: number = beat.id;
         if (this._beatLookup.has(id)) {
             return this._beatLookup.get(id)!;
@@ -281,10 +285,15 @@ export class BoundsLookup {
      * @returns The note at the given position within the beat.
      */
     public getNoteAtPos(beat: Beat, x: number, y: number): Note | null {
-        let beatBounds: BeatBounds | null = this.findBeat(beat);
-        if (!beatBounds) {
-            return null;
+        const beatBounds = this.findBeats(beat);
+        if (beatBounds) {
+            for (const b of beatBounds) {
+                const note = b.findNoteAtPos(x, y);
+                if (note) {
+                    return note;
+                }
+            }
         }
-        return beatBounds.findNoteAtPos(x, y);
+        return null;
     }
 }

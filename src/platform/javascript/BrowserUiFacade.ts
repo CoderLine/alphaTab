@@ -472,7 +472,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             // remember which bar is contained in which node for faster lookup
             // on highlight/unhighlight
             for (let i = renderResult.firstMasterBarIndex; i <= renderResult.lastMasterBarIndex; i++) {
-                this._barToElementLookup.set(i, placeholder);
+                if(i >= 0) {
+                    this._barToElementLookup.set(i, placeholder);
+                }
             }
 
             if (this._api.settings.core.enableLazyLoading) {

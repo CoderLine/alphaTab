@@ -112,6 +112,6 @@ export class NoteNumberGlyph extends Glyph {
         noteBounds.noteHeadBounds.y = cy + this.y - this.height/2;
         noteBounds.noteHeadBounds.w = this.width;
         noteBounds.noteHeadBounds.h = this.height;
-        this.renderer.scoreRenderer.boundsLookup!.addNote(noteBounds);
+        beatBounds.addNote(noteBounds);
     }
 }

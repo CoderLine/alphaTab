@@ -1,5 +1,6 @@
 import { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 import { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 // tslint:disable: deprecation
 
@@ -86,13 +87,13 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
             buffer = new Float32Array(samples);
             this._outputBuffer = buffer;
         }
-        this._circularBuffer.read(buffer, 0, Math.min(buffer.length, this._circularBuffer.count));
+        const samplesFromBuffer = this._circularBuffer.read(buffer, 0, Math.min(buffer.length, this._circularBuffer.count));
         let s: number = 0;
         for (let i: number = 0; i < left.length; i++) {
             left[i] = buffer[s++];
             right[i] = buffer[s++];
         }
-        this.onSamplesPlayed(left.length);
+        this.onSamplesPlayed(samplesFromBuffer / SynthConstants.AudioChannels);
         this.requestBuffers();
     }
 }

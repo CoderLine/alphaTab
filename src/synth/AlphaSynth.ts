@@ -35,6 +35,7 @@ export class AlphaSynth implements IAlphaSynth {
     private _countInVolume: number = 0;
     private _playedEventsQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
     private _midiEventsPlayedFilter: Set<MidiEventType> = new Set<MidiEventType>();
+    private _notPlayedSamples: number = 0;
 
     /**
      * Gets the {@link ISynthOutput} used for playing the generated samples.
@@ -111,7 +112,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set tickPosition(value: number) {
-        this.timePosition = this._sequencer.tickPositionToTimePosition(value);
+        this.timePosition = this._sequencer.mainTickPositionToTimePosition(value);
     }
 
     public get timePosition(): number {
@@ -119,24 +120,27 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set timePosition(value: number) {
-        Logger.debug('AlphaSynth', `Seeking to position ${value}ms`);
+        Logger.debug('AlphaSynth', `Seeking to position ${value}ms (main)`);
 
         // tell the sequencer to jump to the given position
-        this._sequencer.seek(value);
+        this._sequencer.mainSeek(value);
 
         // update the internal position
         this.updateTimePosition(value, true);
 
         // tell the output to reset the already synthesized buffers and request data again
-        this.output.resetSamples();
+        if(this._sequencer.isPlayingMain) {
+            this._notPlayedSamples = 0;
+            this.output.resetSamples();
+        }
     }
 
     public get playbackRange(): PlaybackRange | null {
-        return this._sequencer.playbackRange;
+        return this._sequencer.mainPlaybackRange;
     }
 
     public set playbackRange(value: PlaybackRange | null) {
-        this._sequencer.playbackRange = value;
+        this._sequencer.mainPlaybackRange = value;
         if (value) {
             this.tickPosition = value.startTick;
         }
@@ -181,38 +185,41 @@ export class AlphaSynth implements IAlphaSynth {
             this.checkReadyForPlayback();
         });
         this.output.sampleRequest.on(() => {
-            let samples: Float32Array = new Float32Array(
-                SynthConstants.MicroBufferSize * SynthConstants.MicroBufferCount * SynthConstants.AudioChannels
-            );
-            let bufferPos: number = 0;
-
-            for (let i = 0; i < SynthConstants.MicroBufferCount; i++) {
-                // synthesize buffer
-                this._sequencer.fillMidiEventQueue();
-                const synthesizedEvents = this._synthesizer.synthesize(
-                    samples,
-                    bufferPos,
-                    SynthConstants.MicroBufferSize
+            if (!this._sequencer.isFinished) {
+                let samples: Float32Array = new Float32Array(
+                    SynthConstants.MicroBufferSize * SynthConstants.MicroBufferCount * SynthConstants.AudioChannels
                 );
-                bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
-                // push all processed events into the queue
-                // for informing users about played events
-                for (const e of synthesizedEvents) {
-                    if (this._midiEventsPlayedFilter.has(e.event.command)) {
-                        this._playedEventsQueue.enqueue(e);
+                let bufferPos: number = 0;
+
+                for (let i = 0; i < SynthConstants.MicroBufferCount; i++) {
+                    // synthesize buffer
+                    this._sequencer.fillMidiEventQueue();
+                    const synthesizedEvents = this._synthesizer.synthesize(
+                        samples,
+                        bufferPos,
+                        SynthConstants.MicroBufferSize
+                    );
+                    bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
+                    // push all processed events into the queue
+                    // for informing users about played events
+                    for (const e of synthesizedEvents) {
+                        if (this._midiEventsPlayedFilter.has(e.event.command)) {
+                            this._playedEventsQueue.enqueue(e);
+                        }
+                    }
+                    // tell sequencer to check whether its work is done
+                    if (this._sequencer.isFinished) {
+                        break;
                     }
                 }
-                // tell sequencer to check whether its work is done
-                if (this._sequencer.isFinished) {
-                    break;
-                }
-            }
 
-            // send it to output
-            if (bufferPos < samples.length) {
-                samples = samples.subarray(0, bufferPos);
+                // send it to output
+                if (bufferPos < samples.length) {
+                    samples = samples.subarray(0, bufferPos);
+                }
+                this._notPlayedSamples += samples.length;
+                this.output.addSamples(samples);
             }
-            this.output.addSamples(samples);
         });
         this.output.samplesPlayed.on(this.onSamplesPlayed.bind(this));
         this.output.open();
@@ -238,6 +245,11 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     private playInternal() {
+        if (this._sequencer.isPlayingOneTimeMidi) {
+            Logger.debug('AlphaSynth', 'Cancelling one time midi');
+            this.stopOneTimeMidi();
+        }
+
         Logger.debug('AlphaSynth', 'Starting playback');
         this._synthesizer.setupMetronomeChannel(this.metronomeVolume);
         this.state = PlayerState.Playing;
@@ -274,27 +286,36 @@ export class AlphaSynth implements IAlphaSynth {
         Logger.debug('AlphaSynth', 'Stopping playback');
         this.state = PlayerState.Paused;
         this.output.pause();
+        this._notPlayedSamples = 0;
         this._sequencer.stop();
         this._synthesizer.noteOffAll(true);
-        this.tickPosition = this._sequencer.playbackRange ? this._sequencer.playbackRange.startTick : 0;
+        this.tickPosition = this._sequencer.mainPlaybackRange ? this._sequencer.mainPlaybackRange.startTick : 0;
         (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
             new PlayerStateChangedEventArgs(this.state, true)
         );
     }
 
     public playOneTimeMidiFile(midi: MidiFile): void {
-        // pause current playback.
-        this.pause();
+        if (this._sequencer.isPlayingOneTimeMidi) {
+            this.stopOneTimeMidi();
+        } else {
+            // pause current playback.
+            this.pause();
+        }
 
         this._sequencer.loadOneTimeMidi(midi);
-
-        this._sequencer.stop();
         this._synthesizer.noteOffAll(true);
-        this.tickPosition = 0;
+
+        // update the internal position
+        this.updateTimePosition(0, true);
+
+        // tell the output to reset the already synthesized buffers and request data again
+        this._notPlayedSamples = 0;
+        this.output.resetSamples();
 
         this.output.play();
     }
-
+  
     public resetSoundFonts(): void {
         this.stop();
         this._synthesizer.resetPresets();
@@ -341,7 +362,13 @@ export class AlphaSynth implements IAlphaSynth {
             this._sequencer.loadMidi(midi);
             this._isMidiLoaded = true;
             (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                new PositionChangedEventArgs(0, this._sequencer.endTime, 0, this._sequencer.endTick, false)
+                new PositionChangedEventArgs(
+                    0,
+                    this._sequencer.currentEndTime,
+                    0,
+                    this._sequencer.currentEndTick,
+                    false
+                )
             );
             Logger.debug('AlphaSynth', 'Midi successfully loaded');
             this.checkReadyForPlayback();
@@ -373,13 +400,17 @@ export class AlphaSynth implements IAlphaSynth {
     }
     private onAudioSettingsUpdate() {
         // seeking to the currently known position, will ensure we
-        // clear all audio buffers and re-generate the audio 
-        // which was not actually played yet. 
+        // clear all audio buffers and re-generate the audio
+        // which was not actually played yet.
         this.timePosition = this.timePosition;
     }
 
     private onSamplesPlayed(sampleCount: number): void {
+        if (sampleCount === 0) {
+            return;
+        }
         let playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
+        this._notPlayedSamples -= sampleCount * SynthConstants.AudioChannels;
         this.updateTimePosition(this._timePosition + playedMillis, false);
         this.checkForFinish();
     }
@@ -391,21 +422,23 @@ export class AlphaSynth implements IAlphaSynth {
             startTick = this.playbackRange.startTick;
             endTick = this.playbackRange.endTick;
         } else {
-            endTick = this._sequencer.endTick;
+            endTick = this._sequencer.currentEndTick;
         }
 
-        if (this._tickPosition >= endTick) {
-            Logger.debug('AlphaSynth', 'Finished playback');
+        if (this._tickPosition >= endTick && this._notPlayedSamples <= 0) {
+            this._notPlayedSamples = 0;
             if (this._sequencer.isPlayingCountIn) {
+                Logger.debug('AlphaSynth', 'Finished playback (count-in)');
                 this._sequencer.resetCountIn();
                 this.timePosition = this._sequencer.currentTime;
                 this.playInternal();
             } else if (this._sequencer.isPlayingOneTimeMidi) {
-                this._sequencer.resetOneTimeMidi();
+                Logger.debug('AlphaSynth', 'Finished playback (one time)');
+                this.output.resetSamples();
                 this.state = PlayerState.Paused;
-                this.output.pause();
-                this._synthesizer.noteOffAll(false);
+                this.stopOneTimeMidi();
             } else {
+                Logger.debug('AlphaSynth', 'Finished playback (main)');
                 (this.finished as EventEmitter).trigger();
 
                 if (this.isLooping) {
@@ -417,20 +450,35 @@ export class AlphaSynth implements IAlphaSynth {
         }
     }
 
+    private stopOneTimeMidi() {
+        this.output.pause();
+        this._synthesizer.noteOffAll(true);
+        this._sequencer.resetOneTimeMidi();
+        this.timePosition = this._sequencer.currentTime;
+    }
+
     private updateTimePosition(timePosition: number, isSeek: boolean): void {
         // update the real positions
         const currentTime: number = timePosition;
         this._timePosition = currentTime;
-        const currentTick: number = this._sequencer.timePositionToTickPosition(currentTime);
+        const currentTick: number = this._sequencer.currentTimePositionToTickPosition(currentTime);
         this._tickPosition = currentTick;
-        const endTime: number = this._sequencer.endTime;
-        const endTick: number = this._sequencer.endTick;
 
-        if (!this._sequencer.isPlayingOneTimeMidi && !this._sequencer.isPlayingCountIn) {
-            Logger.debug(
-                'AlphaSynth',
-                `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount}`
-            );
+        const endTime: number = this._sequencer.currentEndTime;
+        const endTick: number = this._sequencer.currentEndTick;
+
+        const mode = this._sequencer.isPlayingMain
+            ? 'main'
+            : this._sequencer.isPlayingCountIn
+            ? 'count-in'
+            : 'one-time';
+
+        Logger.debug(
+            'AlphaSynth',
+            `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this._synthesizer.activeVoiceCount} (${mode})`
+        );
+
+        if (this._sequencer.isPlayingMain) {
             (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
                 new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick, isSeek)
             );
@@ -460,8 +508,12 @@ export class AlphaSynth implements IAlphaSynth {
     readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
     readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
     readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> = new EventEmitterOfT<PlayerStateChangedEventArgs>();
-    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
-    readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> = new EventEmitterOfT<MidiEventsPlayedEventArgs>();
-    readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> = new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
+    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> =
+        new EventEmitterOfT<PlayerStateChangedEventArgs>();
+    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> =
+        new EventEmitterOfT<PositionChangedEventArgs>();
+    readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
+        new EventEmitterOfT<MidiEventsPlayedEventArgs>();
+    readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> =
+        new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
 }

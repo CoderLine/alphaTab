@@ -1362,7 +1362,7 @@ export class MidiFileGenerator {
         this.prepareSingleBeat(note.beat);
         this.generateNote(
             note,
-            -note.beat.playbackStart,
+            0,
             note.beat.playbackDuration,
             new Int32Array(note.beat.voice.bar.staff.tuning.length)
         );
