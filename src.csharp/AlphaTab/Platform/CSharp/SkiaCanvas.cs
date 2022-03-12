@@ -19,43 +19,8 @@ namespace AlphaTab.Platform.CSharp
         private static readonly SKTypeface MusicFont;
         private const int MusicFontSize = 34;
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr LoadLibrary(string libname);
-
         static SkiaCanvas()
         {
-            // https://github.com/mono/SkiaSharp/issues/713
-            // https://github.com/mono/SkiaSharp/issues/572
-            // manually load skia lib
-            switch (System.Environment.OSVersion.Platform)
-            {
-                case PlatformID.MacOSX:
-                case PlatformID.Unix:
-                    // I think unix platforms should be fine, to be tested
-                    break;
-                default:
-                    var libSkiaSharpPath =
-                        Path.GetDirectoryName(typeof(SkiaCanvas).Assembly.Location);
-                    var platformName = IntPtr.Size == 4 ? "win-x86" : "win-x64";
-                    libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "runtimes", platformName,
-                        "native", "libSkiaSharp.dll");
-
-                    Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "'");
-                    var lib = LoadLibrary(libSkiaSharpPath);
-                    if (lib == IntPtr.Zero)
-                    {
-                        Logger.Warning("Skia",
-                            "Loading native lib from '" + libSkiaSharpPath + "' failed");
-                    }
-                    else
-                    {
-                        Logger.Debug("Skia",
-                            "Loading native lib from '" + libSkiaSharpPath + "' successful");
-                    }
-
-                    break;
-            }
-
             // attempt to load correct skia native lib
             var type = typeof(SkiaCanvas).GetTypeInfo();
             using var bravura =
