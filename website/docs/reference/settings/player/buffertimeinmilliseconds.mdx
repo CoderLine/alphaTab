@@ -1,0 +1,37 @@
+---
+title: player.bufferTimeInMilliseconds
+description: The number of milliseconds the player should buffer.
+sidebar_custom_props:
+  category: Player
+  since: 1.3.0-alpha.201
+---
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.3.0-alpha.201" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+
+## Description
+
+Gets or sets how many milliseconds of audio samples should be buffered in total.
+
+* Larger buffers cause a delay from when audio settings like volumes will be applied. 
+* Smaller buffers can cause audio crackling due to constant buffering that is happening.
+
+This buffer size can be changed whenever needed.
+
+<PropertyDescription metadata={metadata} showJson={true} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="all" name="int">
+        `5000`<br />
+        `1000`
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+
+`500`
