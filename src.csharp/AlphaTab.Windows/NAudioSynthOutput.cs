@@ -14,7 +14,6 @@ namespace AlphaTab
     {
         private const int BufferSize = 4096;
         private const int PreferredSampleRate = 44100;
-        private const int TotalBufferTimeInMilliseconds = 5000;
         
         private DirectSoundOut _context;
         private CircularSampleBuffer _circularBuffer;
@@ -41,10 +40,10 @@ namespace AlphaTab
 
 
         /// <inheritdoc />
-        public void Open()
+        public void Open(double bufferTimeInMilliseconds)
         {
             _bufferCount = (int)(
-                (TotalBufferTimeInMilliseconds * PreferredSampleRate) /
+                (bufferTimeInMilliseconds * PreferredSampleRate) /
                 1000 /
                 BufferSize
             );

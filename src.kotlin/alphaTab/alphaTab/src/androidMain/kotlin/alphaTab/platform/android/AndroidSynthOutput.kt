@@ -16,7 +16,6 @@ internal class AndroidSynthOutput(
     companion object {
         private const val BufferSize = 4096
         private const val PreferredSampleRate = 44100
-        private const val TotalBufferTimeInMilliseconds = 5000
     }
 
     private var _bufferCount = 0
@@ -31,10 +30,10 @@ internal class AndroidSynthOutput(
     override fun activate() {
     }
 
-    override fun open() {
-        _bufferCount = (TotalBufferTimeInMilliseconds * PreferredSampleRate /
+    override fun open(bufferTimeInMilliseconds: double) {
+        _bufferCount = (bufferTimeInMilliseconds * PreferredSampleRate /
             1000 /
-            BufferSize)
+            BufferSize).toInt()
         _circularBuffer = CircularSampleBuffer((BufferSize * _bufferCount).toDouble())
 
         _audioContext = AndroidAudioWorker(

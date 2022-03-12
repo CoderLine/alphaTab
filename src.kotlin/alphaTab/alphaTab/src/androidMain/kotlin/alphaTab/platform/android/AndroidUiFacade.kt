@@ -158,7 +158,8 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
             AndroidSynthOutput {
                 player!!.addToWorker(it)
             },
-            this::beginInvoke
+            this::beginInvoke,
+            api.settings.player.bufferTimeInMilliseconds
         )
         player.ready.on {
             val soundFont = openDefaultSoundFont()

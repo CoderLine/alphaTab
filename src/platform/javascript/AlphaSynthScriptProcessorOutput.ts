@@ -15,12 +15,10 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
     private _bufferCount: number = 0;
     private _requestedBufferCount: number = 0;
 
-    public override open() {
-        super.open();
+    public override open(bufferTimeInMilliseconds: number) {
+        super.open(bufferTimeInMilliseconds);
         this._bufferCount = Math.floor(
-            (AlphaSynthWebAudioOutputBase.TotalBufferTimeInMilliseconds * this.sampleRate) /
-                1000 /
-                AlphaSynthWebAudioOutputBase.BufferSize
+            (bufferTimeInMilliseconds * this.sampleRate) / 1000 / AlphaSynthWebAudioOutputBase.BufferSize
         );
         this._circularBuffer = new CircularSampleBuffer(AlphaSynthWebAudioOutputBase.BufferSize * this._bufferCount);
         this.onReady();
@@ -87,7 +85,11 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
             buffer = new Float32Array(samples);
             this._outputBuffer = buffer;
         }
-        const samplesFromBuffer = this._circularBuffer.read(buffer, 0, Math.min(buffer.length, this._circularBuffer.count));
+        const samplesFromBuffer = this._circularBuffer.read(
+            buffer,
+            0,
+            Math.min(buffer.length, this._circularBuffer.count)
+        );
         let s: number = 0;
         for (let i: number = 0; i < left.length; i++) {
             left[i] = buffer[s++];

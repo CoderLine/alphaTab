@@ -18,11 +18,11 @@ export class AlphaSynthWebWorker {
     private _player: AlphaSynth;
     private _main: IWorkerScope;
 
-    public constructor(main: IWorkerScope) {
+    public constructor(main: IWorkerScope, bufferTimeInMilliseconds:number) {
         this._main = main;
         this._main.addEventListener('message', this.handleMessage.bind(this));
 
-        this._player = new AlphaSynth(new AlphaSynthWorkerSynthOutput());
+        this._player = new AlphaSynth(new AlphaSynthWorkerSynthOutput(), bufferTimeInMilliseconds);
         this._player.positionChanged.on(this.onPositionChanged.bind(this));
         this._player.stateChanged.on(this.onPlayerStateChanged.bind(this));
         this._player.finished.on(this.onFinished.bind(this));
@@ -48,7 +48,7 @@ export class AlphaSynthWebWorker {
                 case 'alphaSynth.initialize':
                     AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
                     Logger.logLevel = data.logLevel;
-                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(main);
+                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(main, data.bufferTimeInMilliseconds);
                     break;
             }
         });

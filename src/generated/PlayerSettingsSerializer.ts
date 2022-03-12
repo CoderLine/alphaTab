@@ -37,6 +37,7 @@ export class PlayerSettingsSerializer {
         o.set("vibrato", VibratoPlaybackSettingsSerializer.toJson(obj.vibrato)); 
         o.set("slide", SlidePlaybackSettingsSerializer.toJson(obj.slide)); 
         o.set("playtripletfeel", obj.playTripletFeel); 
+        o.set("buffertimeinmilliseconds", obj.bufferTimeInMilliseconds); 
         return o; 
     }
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
@@ -87,6 +88,9 @@ export class PlayerSettingsSerializer {
                 return true;
             case "playtripletfeel":
                 obj.playTripletFeel = v! as boolean;
+                return true;
+            case "buffertimeinmilliseconds":
+                obj.bufferTimeInMilliseconds = v! as number;
                 return true;
         } 
         if (["vibrato"].indexOf(property) >= 0) {
