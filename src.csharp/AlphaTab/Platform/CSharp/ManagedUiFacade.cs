@@ -44,7 +44,7 @@ namespace AlphaTab.Platform.CSharp
         public IAlphaSynth CreateWorkerPlayer()
         {
             var player = new ManagedThreadAlphaSynthWorkerApi(CreateSynthOutput(),
-                Api.Settings.Core.LogLevel, BeginInvoke);
+                Api.Settings.Core.LogLevel, BeginInvoke, Api.Settings.Player.BufferTimeInMilliseconds);
             player.Ready.On(() =>
             {
                 using (var sf = OpenDefaultSoundFont())
