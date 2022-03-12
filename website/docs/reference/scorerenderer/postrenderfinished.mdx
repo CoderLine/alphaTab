@@ -1,16 +1,19 @@
 ---
 title: postRenderFinished
-jQuery: false
-dom: false
-category: Events
 description: This event is fired when the rendering of the whole music sheet is finished, and all handlers of RenderFinished ran.
-sidebarPath: /docs/reference/scorerenderer
-since: 0.9.4
+sidebar_custom_props:
+  jQuery: false
+  dom: false
+  category: Events
+  since: 0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import EventDescription from '../../../src/event-description';
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+<SinceBadge since="0.9.4" />
+
+import { EventDescription } from '@site/src/components/EventDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 
 ## Description
 This event is fired when the rendering of the whole music sheet is finished, and all handlers of RenderFinished ran. When this 

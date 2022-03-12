@@ -1,19 +1,22 @@
 ---
 title: player.playTripletFeel
-category: Player
-description: Gets or sets whether the triplet feel should be played or only displayed.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+description: Whether the triplet feel should be played or only displayed.
+sidebar_custom_props:
+  category: Player
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
 If this setting is enabled alphaTab will play the triplet feels accordingly, if it is disabled the triplet feel is only displayed but not played. 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

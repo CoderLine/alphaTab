@@ -1,15 +1,18 @@
 ---
-title: AlphaTabApi
-javaScriptOnly: true
-jQueryName: alphaTab()
-category: Methods - Core
+title: alphaTab()
 description: Initializes AlphaTab.
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  jQueryOnly: true
+  jQueryName: alphaTab()
+  category: Methods - Core
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 
 ## Description
 This jQuery specific function initializes alphaTab. For other systems this is not needed as the API is directly created. 

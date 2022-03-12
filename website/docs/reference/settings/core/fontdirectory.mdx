@@ -1,15 +1,18 @@
 ---
 title: core.fontDirectory
-javaScriptOnly: true
-jsOnParent: true
-category: Core - JavaScript Specific
 description: The full URL to the alphaTab font directory.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  javaScriptOnly: true
+  jsOnParent: true
+  category: Core - JavaScript Specific
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
@@ -18,7 +21,7 @@ where the Web Font files of [Bravura](https://github.com/steinbergmedia/bravura)
 them to be in a `Font` subfolder beside the script file. If this is not the case, this setting must be used to configure the path. 
 Alternatively also a global variable `ALPHATAB_FONT` can be set on the page before initializing alphaTab. 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

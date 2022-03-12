@@ -1,16 +1,24 @@
 ---
 title: isReadyForPlayback
-category: Properties - Player
 description: Whether the player is ready for starting the playback.
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  category: Properties - Player
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 Gets whether the synthesizer is ready for playback. The player is ready for playback when
 all background workers are started, the audio output is initialized, a soundfont is loaded, and a song was loaded into the player as midi file.    
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+
+<PropertyDescription metadata={metadata} />
+
 
 ## Types
 

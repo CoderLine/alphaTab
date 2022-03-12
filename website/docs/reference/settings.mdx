@@ -2,7 +2,7 @@
 title: Settings
 ---
 
-import ReferenceTable from '../../src/reference-table';
+import { ReferenceTable } from '@site/src/components/ReferenceTable';
 
 This section contains a list of all properties that allow configuration of the alphaTab behavior.
 
@@ -12,7 +12,7 @@ due to the lack of type safety and the support of JSON based settings.
 
 Not all settings contain reasonable examples as they often just activate something within alphaTab
 or change the display of some notation.If you have questions on certain settings feel free to open a
-[issue on GitHub](https://github.com/CoderLine/alphaTab/issues/new/choose)
+[Discussion on GitHub](https://github.com/CoderLine/alphaTab/discussions)
 
 The first and most important rule is: when interacting with the settings object directly, the correct structure and data types
 must be followed not to break alphaTab or make the changes useless. In order to simplify things when configuring alphaTab via JavaScript
@@ -30,4 +30,6 @@ Individual settings can be specified on HTML elements.
 
 The following table contains all the properties as they can be set on the general settings object.
 
-<ReferenceTable type="Property" filter="reference/settings/" />
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+
+<ReferenceTable type="Property" currentSidebarCategory={useCurrentSidebarCategory()} showJson={true} />

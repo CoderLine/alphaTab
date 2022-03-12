@@ -1,19 +1,22 @@
 ---
 title: player.scrollSpeed
-category: Player
-description: Gets or sets how fast the scrolling to the new position should happen.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+description: How fast the scrolling to the new position should happen.
+sidebar_custom_props:
+  category: Player
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
 If possible from the platform, alphaTab will try to do a smooth scrolling to the played bar. This setting defines the speed of scrolling in milliseconds. 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

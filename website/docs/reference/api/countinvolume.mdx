@@ -1,15 +1,22 @@
 ---
 title: countInVolume
-category: Properties - Player
 description: The volume of the count-in metronome ticks
-sidebarPath: /docs/reference/api
-since: 1.1.0-alpha.61
+sidebar_custom_props:
+  category: Properties - Player
+  since: 1.1.0
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="1.1.0" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 Gets or sets the volume of the metronome during the count-in of the song. By default the count-in is disabled but can be enabled by setting the volume different.
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+
+<PropertyDescription metadata={metadata} />
 
 ## Types
 

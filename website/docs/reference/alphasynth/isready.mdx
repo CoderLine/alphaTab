@@ -1,14 +1,17 @@
 ---
 title: isReady
-jQuery: false
-dom: false
-category: Properties
 description: If the synthesizer is ready for interaction.
-sidebarPath: /docs/reference/alphasynth
-since: 0.9.6
+sidebar_custom_props:
+  jQuery: false
+  dom: false
+  category: Properties
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../src/property-description';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
 
 ## Description
 The audio synthesis engine is running always asynchronously in some worker or thread. 

@@ -2,11 +2,13 @@
 title: ScoreRenderer
 ---
 
-import ReferenceTable from '../../src/reference-table';
+import { ReferenceTable } from '@site/src/components/ReferenceTable';
 
 The `ScoreRenderer` is one of the low level APIs that can be used if no full alphaTab API object with UI interaction
 can be used or is needed. It is used to render a given score into a visual music sheet.
 
 This page describes all methods, properties and events exposed by this class.
 
-<ReferenceTable type="Name" filter="reference/scorerenderer/" />
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+
+<ReferenceTable type="Name" currentSidebarCategory={useCurrentSidebarCategory()} />

@@ -1,22 +1,37 @@
 ---
 title: width
-jQuery: false
-dom: false
-category: Properties
 description: The width of the rendered score
-sidebarPath: /docs/reference/scorerenderer
-since: 0.9.6
+sidebar_custom_props:
+  jQuery: false
+  dom: false
+  category: Properties
+  since: 0.9.6
 ---
 
-import PropertyDescription from '../../../src/property-description';
+import { SinceBadge } from "@site/src/components/SinceBadge";
+
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from "@site/src/components/PropertyDescription";
 
 ## Description
-For layouts that grow from top to bottom (like `page`), it is required to specify a width for the renderer.
-The renderer will fit then the bars into this area for rendering. The alphaTab API object uses a link to the 
-graphical user interface via a `IUiFacade` to get the available width for rendering. When using the low-level APIs
-this width must be specified manually. 
 
-For layouts that grow from left to right the width and height are usually calculated automatically based on 
+For layouts that grow from top to bottom (like `page`), it is required to specify a width for the renderer.
+The renderer will fit then the bars into this area for rendering. The alphaTab API object uses a link to the
+graphical user interface via a `IUiFacade` to get the available width for rendering. When using the low-level APIs
+this width must be specified manually.
+
+For layouts that grow from left to right the width and height are usually calculated automatically based on
 the contents.
+
+export function Dump() {
+  return ( 
+    <pre>
+{JSON.stringify(metadata, null, 4)}
+      </pre>
+  )
+}
+
+<Dump />
 
 <PropertyDescription metadata={metadata} />

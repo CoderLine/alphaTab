@@ -1,12 +1,15 @@
 ---
 title: play
-category: Methods - Player
 description: Starts the playback of the current song.
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  category: Methods - Player
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 Starts the playback of the current song if possible.Reasons for not starting can be that the player is not ready yet or it is already playing.

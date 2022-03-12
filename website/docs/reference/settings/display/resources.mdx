@@ -1,16 +1,18 @@
 ---
 title: display.resources
-domWildcard: true
-jsOnParent: true
-category: Display
 description: Allows adjusting of the used fonts and colors for rendering.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  domWildcard: true
+  jsOnParent: true
+  category: Display
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="0.9.6" />
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import CodeBadge from '../../../../src/code-badge';
-import getPageList from '../../../../src/page';
+import { CodeBadge } from '@site/src/components/CodeBadge';
 
 export var Resources = {
 	colors: [

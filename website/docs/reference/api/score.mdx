@@ -1,15 +1,23 @@
 ---
 title: score
-category: Properties - Core
 description: The score holding all information about the song being rendered
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  category: Properties - Core
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 Gets access to the underling `AlphaTab.Model.Score` that is currently being displayed. 
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+
+<PropertyDescription metadata={metadata} />
+
 
 ## Types
 

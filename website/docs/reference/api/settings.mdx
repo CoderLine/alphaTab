@@ -1,15 +1,23 @@
 ---
 title: settings
-category: Properties - Core
 description: The settings that are used for rendering the music notation
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  category: Properties - Core
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 Gets access to the underling <code>AlphaTab.Settings</code> object that is currently used by AlphaTab. 
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+
+<PropertyDescription metadata={metadata} />
+
 
 ## Types
 

@@ -1,13 +1,16 @@
 ---
 title: player.songBookBendDuration
-category: Player
 description: The bend duration in milliseconds for songbook bends.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  category: Player
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
@@ -15,7 +18,7 @@ If the display mode `songbook` is enabled, this has an effect on the way bends a
 This setting defines the play duration for those bends in milliseconds. This duration is in milliseconds unlike some other settings which are in midi ticks. The reason is that on songbook bends, 
 the bends should always be played in the same speed, regardless of the song tempo. Midi ticks are tempo dependent. 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

@@ -1,14 +1,17 @@
 ---
 title: changeTrackSolo
-jQueryName: alphaTab('soloTracks')
-category: Methods - Player
 description: Changes the given tracks to be played solo or not.
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  jQueryName: alphaTab('soloTracks')
+  category: Methods - Player
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 
 ## Description
 Changes the given tracks to be played solo or not. If any track is set to solo, all other tracks are muted, unless they are also flagged as solo.

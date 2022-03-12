@@ -1,14 +1,17 @@
 ---
 title: print
-javaScriptOnly: true
-category: Methods - Core
 description: Opens a popup window with the rendered music notation for printing.
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  javaScriptOnly: true
+  category: Methods - Core
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 
 ## Description
 Opens a popup window with the rendered music notation for printing. The default display of alphaTab in the browser is not very 

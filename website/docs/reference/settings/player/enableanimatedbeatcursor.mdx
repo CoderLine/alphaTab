@@ -1,20 +1,23 @@
 ---
 title: player.enableAnimatedBeatCursor
-category: Player
-description: Gets or sets whether the beat cursor should be animated or just ticking.
-sidebarPath: /docs/reference/settings
-since: 1.3.0-alpha.125
+description: Whether the beat cursor should be animated or just ticking.
+sidebar_custom_props:
+  category: Player
+  since: 1.3.0-alpha.125
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="1.3.0-alpha.125" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
 This setting configures whether the beat cursor is animated smoothly or whether it is ticking from beat to beat. 
 The animation of the cursor might not be available on all targets so it might not have any effect.
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

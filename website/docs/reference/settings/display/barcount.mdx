@@ -1,14 +1,17 @@
 ---
 title: display.barCount
-jsOnParent: true
-category: Display
 description: The total number of bars that should be rendered from the song. 
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  jsOnParent: true
+  category: Display
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
@@ -16,7 +19,7 @@ This setting sets the number of bars that should be rendered from the overall so
 achieve a paging system or to only show partial bars of the same file. By this a tutorial alike display can be achieved
 that explains various parts of the song. [Demo](/docs/showcase/layouts)
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

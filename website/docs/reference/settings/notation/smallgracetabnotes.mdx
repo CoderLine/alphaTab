@@ -1,19 +1,22 @@
 ---
 title: notation.smallGraceTabNotes
-category: Notation
 description: If set to true the guitar tabs on grace beats are rendered smaller.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  category: Notation
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
 By default, grace notes are drawn smaller on the guitar tabs than the other numbers. With this setting alphaTab can be configured to show grace tab notes with normal text size. 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 | Enabled                                                            | Disabled                                                             |
 |--------------------------------------------------------------------|----------------------------------------------------------------------|

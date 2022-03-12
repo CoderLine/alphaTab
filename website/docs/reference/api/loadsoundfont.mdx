@@ -1,13 +1,16 @@
 ---
 title: loadSoundFont
-category: Methods - Player
 description: Triggers a load of the soundfont from the given data.
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  category: Methods - Player
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 
 ## Description
 This function initiates a load of the soundfont using the given data. The supported data types is depending on the platform. AlphaTab only supports SoundFont2 encoded soundfonts for loading. To load a soundfont the player must be enabled in advance. 	
@@ -61,7 +64,7 @@ This function initiates a load of the soundfont using the given data. The suppor
     </ParameterRow>
     <ParameterRow platform="all" name="append" type="boolean">
         Whether to append the presets of the new soundfont to the already loaded
-        ones. <span class="badge badge--info">Since: 1.1.0-alpha.34</span>
+        ones. <span class="badge badge--info">Since: 1.1.0</span>
     </ParameterRow>
 </ParameterTable>
 

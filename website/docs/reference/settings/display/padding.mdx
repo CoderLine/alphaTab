@@ -1,21 +1,24 @@
 ---
 title: display.padding
-jsOnParent: true
-category: Display
 description: Adjusts the padding between the music notation and the border
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  jsOnParent: true
+  category: Display
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
 AlphaTab by default has a padding between the border of the control and the start of the content. 
 This setting controls this padding between border and content. 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

@@ -1,19 +1,22 @@
 ---
 title: player.scrollMode
-category: Player
-description: Gets or sets the mode how to scroll.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+description: The mode how to scroll.
+sidebar_custom_props:
+  category: Player
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
 This setting controls how alphaTab behaves for scrolling. It supports 3 modes: 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

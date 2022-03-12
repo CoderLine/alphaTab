@@ -1,14 +1,17 @@
 ---
 title: changeTrackVolume
-jQueryName: alphaTab('trackVolume')
-category: Methods - Player
 description: Changes the volume of the given tracks.
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  jQueryName: alphaTab('trackVolume')
+  category: Methods - Player
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 
 ## Description
 Changes the volume of the given tracks. This will result in a volume change of the primary and secondary midi channel that the track uses for playback. 

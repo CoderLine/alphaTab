@@ -1,15 +1,23 @@
 ---
 title: tracks
-category: Properties - Core
 description: A list of the tracks that should be rendered based on the Score and TrackIndexes properties
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  category: Properties - Core
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 Gets a list of the tracks that are currently being rendered. 
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+
+<PropertyDescription metadata={metadata} />
+
 
 ## Types
 

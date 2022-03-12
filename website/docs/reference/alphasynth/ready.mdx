@@ -1,15 +1,18 @@
 ---
 title: ready
-jQuery: false
-dom: false
-category: Events
 description: Fired when the player is ready to be interacted with.
-sidebarPath: /docs/reference/alphasynth
-since: 0.9.6
+sidebar_custom_props:
+  jQuery: false
+  dom: false
+  category: Events
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { EventDescription } from '@site/src/components/EventDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 This event is when the player is ready to be interacted with.

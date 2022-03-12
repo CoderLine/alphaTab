@@ -1,12 +1,15 @@
 ---
 title: playPause
-category: Methods - Player
 description: Toggles between play/pause depending on the current player state.
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  category: Methods - Player
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 Toggles between play/pause depending on the current player state. if the player was playing, it will pause. If it is paused, it will initiate a play. 

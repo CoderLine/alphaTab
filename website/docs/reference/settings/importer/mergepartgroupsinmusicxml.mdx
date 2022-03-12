@@ -1,19 +1,22 @@
 ---
 title: importer.mergePartGroupsInMusicXml
-category: Importer
 description: If part-groups should be merged into a single track (MusicXML).
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  category: Importer
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
 This setting controls whether multiple `part-group` tags will result into a single track with multiple staves. 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

@@ -1,21 +1,24 @@
 ---
 title: boundsLookup
-jQuery: false
-dom: false
-category: Properties
 description: The lookup which allows fast access to beats at a given position
-sidebarPath: /docs/reference/scorerenderer
-since: 0.9.6
+sidebar_custom_props:
+  jQuery: false
+  dom: false
+  category: Properties
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import BoundsLookupViewer from '../../../src/bounds-lookup-viewer';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import { BoundsLookupViewer } from '@site/src/components/BoundsLookupViewer';
 
 ## Description
 After the rendering completed alphaTab exposes via this lookup the location of the individual
 notation elements. The lookup provides fast access to the bars and beats at a given location.
-If the [`IncludeNoteBounds`](/docs/reference/settings/core/includenoteboudns) option was activated
+If the [`IncludeNoteBounds`](/docs/reference/settings/core/includenotebounds) option was activated
 also the location of the individual notes can be obtained. 
 
 <PropertyDescription metadata={metadata} />

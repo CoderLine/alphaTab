@@ -2,10 +2,12 @@
 title: API
 ---
 
-import ReferenceTable from '../../src/reference-table';
+import { ReferenceTable } from '@site/src/components/ReferenceTable';
 
 On many platforms an alphaTab API object can be used to bootstrap alphaTab within your UI. It takes over 
 all responsibilities of linking your actions to the UI. Namely this object is called `AlphaTabApi` (Web) or `AlphaTabApiBase<>` (.net).
 This page describes all methods, properties and events exposed by this API object. 
 
-<ReferenceTable type="Name" filter="reference/api/" />
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+
+<ReferenceTable type="Name" currentSidebarCategory={useCurrentSidebarCategory()} />

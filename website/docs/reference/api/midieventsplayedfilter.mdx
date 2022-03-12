@@ -1,14 +1,17 @@
 ---
 title: midiEventsPlayedFilter
-category: Properties - Player
 description: The midi events which will trigger the `midiEventsPlayed` event
-sidebarPath: /docs/reference/api
-since: 1.2.0-alpha.100
+sidebar_custom_props:
+  category: Properties - Player
+  since: 1.2.0
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import EventDescription from '../../../src/event-description';
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+<SinceBadge since="1.2.0" />
+
+import { EventDescription } from '@site/src/components/EventDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -18,6 +21,11 @@ that alphaTab will signal any midi events as they are played by the synthesizer.
 audio playback elements like notes/rests played or metronome ticks. 
 
 Refer to the [related guide](/docs/guides/handling-midi-events) to learn more about this feature. 
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+
+<PropertyDescription metadata={metadata} />
+
 
 ## Types
 

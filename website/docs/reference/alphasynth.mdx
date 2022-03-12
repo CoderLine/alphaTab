@@ -2,7 +2,7 @@
 title: AlphaSynth
 ---
 
-import ReferenceTable from '../../src/reference-table';
+import { ReferenceTable } from '@site/src/components/ReferenceTable';
 
 `AlphaSynth` is one of the low level APIs that can be used if no full alphaTab API object with UI interaction
 can be used or is needed. It is the audio synthesis engine of alphaTab which is used to play a midi file
@@ -12,4 +12,6 @@ This page describes all methods, properties and events exposed by this class. Mo
 the `IAlphaSynth` interface are also directly available on the normal API object. That's why many documentation pages
 delegate to the related documentation pages there. 
 
-<ReferenceTable type="Name" filter="reference/alphasynth/" />
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+
+<ReferenceTable type="Name" currentSidebarCategory={useCurrentSidebarCategory()} />

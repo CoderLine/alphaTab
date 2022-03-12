@@ -1,0 +1,28 @@
+---
+title: this
+description: Returns the underlying API object.
+sidebar_custom_props:
+  jQueryOnly: true
+  jQueryName: alphaTab('api')
+  category: Properties - Core
+  since:  0.9.4
+---
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+
+## Description
+This jQuery specific function returns the underlying API object.
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+
+<PropertyDescription metadata={metadata} />
+
+## Example - jQuery
+
+```js
+var api = $('#alphaTab').alphaTab('api');
+api.render();
+```

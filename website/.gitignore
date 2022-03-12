@@ -1,6 +1,5 @@
 # Dependencies
 /node_modules
-/bak
 
 # Production
 /build
@@ -19,5 +18,3 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-static/js/alphaTab

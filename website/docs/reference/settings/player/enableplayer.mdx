@@ -1,13 +1,16 @@
 ---
 title: player.enablePlayer
-category: Player
-description: Gets or sets whether the player should be enabled.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+description: Whether the player should be enabled.
+sidebar_custom_props:
+  category: Player
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
@@ -17,7 +20,7 @@ For .net manually the soundfont must be loaded.
 
 AlphaTab does not ship a default UI for the player. The API must be hooked up to some UI controls to allow the user to interact with the player.
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

@@ -1,15 +1,18 @@
 ---
 title: player.vibrato
-domWildCard: true
-category: Player
 description: The Vibrato settings allow control how the different vibrato types are generated for audio. 
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  domWildCard: true
+  category: Player
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
-import CodeBadge from '../../../../src/code-badge';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import { CodeBadge } from '@site/src/components/CodeBadge';
 
 export var VibratoSettings = [
     {

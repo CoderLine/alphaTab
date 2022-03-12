@@ -1,17 +1,25 @@
 ---
 title: playbackRange
-category: Properties - Player
 description: The range of the song that should be played
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  category: Properties - Player
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import CodeBadge from '../../../src/code-badge';
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+<SinceBadge since="0.9.4" />
+
+import { CodeBadge } from '@site/src/components/CodeBadge';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 
 ## Description
 Gets or sets the range of the song that should be played. The range is defined in midi ticks or the whole song is played if the range is set to null
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+
+<PropertyDescription metadata={metadata} />
+
 
 ## Types
 

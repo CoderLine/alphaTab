@@ -1,15 +1,18 @@
 ---
 title: core.tex
-javaScriptOnly: true
-jsOnParent: true
-category: Core - JavaScript Specific
 description: Whether the contents of the DOM element should be loaded as alphaTex.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  javaScriptOnly: true
+  jsOnParent: true
+  category: Core - JavaScript Specific
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
@@ -23,7 +26,7 @@ const api = new alphaTab.AlphaTabApi(document.getElementById('alphaTab'));
 </script>
 ```
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

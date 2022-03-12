@@ -1,20 +1,20 @@
 ---
 title: core.useWorkers
-jsOnParent: true
-category: Core
-description: Gets or sets whether the rendering should be done in a worker if possible.
-sidebarPath: /docs/reference/settings
-ince: 0.9.6
+description: Whether the rendering should be done in a worker if possible.
+sidebar_custom_props:
+  jsOnParent: true
+  category: Core
+  since: 0.9.6
 ---
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 AlphaTab normally tries to render the music sheet asynchronously in a worker. This reduces the load on the UI side and avoids hanging. However sometimes it might be more desirable to have
 a synchronous rendering behavior. This setting can be set to false to synchronously render the music sheet on the UI side.
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

@@ -1,20 +1,23 @@
 ---
 title: player.soundFont
-javaScriptOnly: true
-category: Player - JavaScript Specific
 description: The sound font file to load for the player.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  javaScriptOnly: true
+  category: Player - JavaScript Specific
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
 When the player is enabled the soundfont from this URL will be loaded automatically after the player is ready.   
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

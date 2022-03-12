@@ -1,14 +1,17 @@
 ---
 title: display.barCountPerPartial
-jsOnParent: true
-category: Display
 description: The number of bars that should be placed within one partial render.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  jsOnParent: true
+  category: Display
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
@@ -16,7 +19,7 @@ AlphaTab renders the whole music sheet in smaller chunks named "partials". This 
 encountering browser performance restrictions and it gives faster visual feedback to the user. This
 setting controls how many bars are placed within such a partial. 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

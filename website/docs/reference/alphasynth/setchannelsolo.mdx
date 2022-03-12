@@ -1,15 +1,18 @@
 ---
 title: setChannelSolo
-jQuery: false
-dom: false
-category: Methods
 description: Flags a single midi channel to e played solo or not.
-sidebarPath: /docs/reference/alphasynth
-since: 0.9.6
+sidebar_custom_props:
+  jQuery: false
+  dom: false
+  category: Methods
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
+<SinceBadge since="0.9.6" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 
 ## Description
 Flags a single midi channel to e played solo or not. As soon as the first channel

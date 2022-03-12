@@ -1,15 +1,18 @@
 ---
 title: core.file
-javaScriptOnly: true
-jsOnParent: true
-category: Core - JavaScript Specific
 description: The full URL to the input file to be loaded.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  javaScriptOnly: true
+  jsOnParent: true
+  category: Core - JavaScript Specific
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
@@ -17,7 +20,7 @@ AlphaTab can automatically load and render a file after initialization. This eli
 one of the load methods which are available. alphaTab will automatically initiate an `XMLHttpRequest` after initialization
 to load and display the provided url of this setting. Note that this setting is only interpreted once on initialization.
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

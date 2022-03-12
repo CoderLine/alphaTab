@@ -1,16 +1,23 @@
 ---
 title: isLooping
-jQueryName: alphaTab('looping')
-category: Properties - Player
 description: Whether the playback should automatically restart after it finished
-sidebarPath: /docs/reference/api
-since:  0.9.4
+sidebar_custom_props:
+  jQueryName: alphaTab('looping')
+  category: Properties - Player
+  since:  0.9.4
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="0.9.4" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 This setting controls whether the playback should automatically restart after it finished to create a playback loop.
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+
+<PropertyDescription metadata={metadata} />
 
 ## Types
 

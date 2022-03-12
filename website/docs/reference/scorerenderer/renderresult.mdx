@@ -1,14 +1,17 @@
 ---
 title: renderResult
-jQuery: false
-dom: false
-category: Methods
 description: Requests the rendering of a chunk which was layed out before.
-sidebarPath: /docs/reference/scorerenderer
-since: 1.3.0-alpha.139
+sidebar_custom_props:
+  jQuery: false
+  dom: false
+  category: Methods
+  since: 1.3.0-alpha.139
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import {TypeTable, TypeRow} from '../../../src/type-table';
+<SinceBadge since="1.3.0-alpha.139" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 This method initiates the rendering of a layed out chunk advertised through [`partialLayoutFinished`](/docs/reference/scorerenderer/partiallayoutfinished). 

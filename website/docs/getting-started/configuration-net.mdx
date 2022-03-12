@@ -40,7 +40,7 @@ available features of display and actual playback everything is there out of the
 
 Just drag an instance of the alphaTab control into your UI via the designer or set it up manually on code. 
 
-```cs
+```csharp
 var control = new AlphaTab.WinForms.AlphaTabControl();
 control.Dock = System.Windows.Forms.DockStyle.Fill;
 this.Controls.Add(control);
@@ -67,7 +67,7 @@ of the `ScoreRenderer` while for the UI controls you would hook up to the events
 Events are subscribed and unsubscribed via `EventName.On(handler)` and `EventName.Off(handler)`. 
 AlphaTab is not using the C# event features in favor of consistency with the web version. 
 
-```cs
+```csharp
 control.Api.PlayedBeatChanged.On(beat=> {
     UpdateFretboard(beat);
 });
@@ -78,6 +78,6 @@ control.Api.PlayedBeatChanged.On(beat=> {
 The main alphaTab API is available only on the UI controls via the `Api` property. It provides a 
 handy set of methods, properties and events to control alphaTab. 
 
-```cs
+```csharp
 cs.Api.Tex("\\title \"Hello AlphaTab\" . 3.3*4");
 ```

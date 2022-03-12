@@ -1,21 +1,24 @@
 ---
 title: display.barsPerRow
-jsOnParent: true
-category: Display
 description: Limit the displayed bars per row.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  jsOnParent: true
+  category: Display
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 
 This setting sets the number of bars that should be put into one row during layouting. This setting is only respected
 when using the layoutMode `page` where bars are aligned in rows. [Demo](/docs/showcase/layouts#page-layout-5-bars)
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 

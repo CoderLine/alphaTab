@@ -1,17 +1,20 @@
 ---
 title: partialLayoutFinished
-jQuery: false
-dom: false
-category: Events
 description: Occurs whenever a part of the whole music sheet is layed out.
-sidebarPath: /docs/reference/scorerenderer
-since: 1.3.0-alpha.139
+sidebar_custom_props:
+  jQuery: false
+  dom: false
+  category: Events
+  since: 1.3.0-alpha.139
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import EventDescription from '../../../src/event-description';
-import {TypeTable, TypeRow} from '../../../src/type-table';
-import {ParameterTable, ParameterRow} from '../../../src/parameter-table';
-import {RenderFinishedEventArgs} from '../../../src/types/renderfinishedeventargs';
+<SinceBadge since="1.3.0-alpha.139" />
+
+import { EventDescription } from '@site/src/components/EventDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
+import {RenderFinishedEventArgs} from '@site/src/types/RenderFinishedEventArgs';
 
 ## Description
 AlphaTab does not render the whole music sheet into a single canvas but rather
@@ -21,7 +24,7 @@ and avoids issues related to browser restrictions (like maximum canvas sizes).
 This even is fired whenever one chunk of the music sheet was fully layed out. 
 
 <EventDescription metadata={metadata} />
-    
+
 ## Types
 
 <TypeTable>

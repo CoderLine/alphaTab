@@ -1,15 +1,18 @@
 ---
 title: core.scriptFile
-jsOnly: true
-jsOnParent: true
-category: Core - JavaScript Specific
 description: The full URL to the alphaTab JavaScript file.
-sidebarPath: /docs/reference/settings
-since: 0.9.6
+sidebar_custom_props:
+  javaScriptOnly: true
+  jsOnParent: true
+  category: Core - JavaScript Specific
+  since: 0.9.6
 ---
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-import PropertyDescription from '../../../../src/property-description';
-import {TypeTable, TypeRow} from '../../../../src/type-table';
+<SinceBadge since="0.9.6" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 
 ## Description
 AlphaTab needs to know the full URL to the script file it is contained in to launch the web workers. AlphaTab will do its best to auto-detect
@@ -18,7 +21,7 @@ be defined before initializing. Please be aware that bundling alphaTab together 
 in case those scripts are not suitable for web workers. e.g. if there is a script bundled together with alphaTab that accesses the DOM,
 this will cause an error when alphaTab starts this script as worker. 
 
-<PropertyDescription metadata={metadata} />
+<PropertyDescription metadata={metadata} showJson={true} />
 
 ## Types
 
