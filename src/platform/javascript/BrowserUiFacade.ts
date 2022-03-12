@@ -472,7 +472,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             // remember which bar is contained in which node for faster lookup
             // on highlight/unhighlight
             for (let i = renderResult.firstMasterBarIndex; i <= renderResult.lastMasterBarIndex; i++) {
-                if(i >= 0) {
+                if (i >= 0) {
                     this._barToElementLookup.set(i, placeholder);
                 }
             }
@@ -511,14 +511,16 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             player = new AlphaSynthWebWorkerApi(
                 new AlphaSynthAudioWorkletOutput(),
                 alphaSynthScriptFile,
-                this._api.settings.core.logLevel
+                this._api.settings.core.logLevel,
+                this._api.settings.player.bufferTimeInMilliseconds
             );
         } else if (supportsScriptProcessor) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api for playback');
             player = new AlphaSynthWebWorkerApi(
                 new AlphaSynthScriptProcessorOutput(),
                 alphaSynthScriptFile,
-                this._api.settings.core.logLevel
+                this._api.settings.core.logLevel,
+                this._api.settings.player.bufferTimeInMilliseconds
             );
         }
 

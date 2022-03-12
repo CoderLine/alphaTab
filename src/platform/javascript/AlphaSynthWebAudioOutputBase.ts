@@ -12,7 +12,6 @@ declare var webkitAudioContext: any;
 export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     protected static readonly BufferSize: number = 4096;
     protected static readonly PreferredSampleRate: number = 44100;
-    protected static readonly TotalBufferTimeInMilliseconds: number = 5000;
 
     protected _context: AudioContext | null = null;
     protected _buffer: AudioBuffer | null = null;
@@ -75,7 +74,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
         throw new AlphaTabError(AlphaTabErrorType.General, 'AudioContext not found');
     }
 
-    public open(): void {
+    public open(bufferTimeInMilliseconds: number): void {
         this.patchIosSampleRate();
         this._context = this.createAudioContext();
         let ctx: any = this._context;
@@ -83,7 +82,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
             this.registerResumeHandler();
         }
     }
-    
+
     private registerResumeHandler() {
         this._resumeHandler = (() => {
             this.activate(() => {
@@ -93,7 +92,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
         document.body.addEventListener('touchend', this._resumeHandler, false);
         document.body.addEventListener('click', this._resumeHandler, false);
     }
-    
+
     private unregisterResumeHandler() {
         const resumeHandler = this._resumeHandler;
         if (resumeHandler) {

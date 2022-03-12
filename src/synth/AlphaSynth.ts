@@ -65,7 +65,6 @@ export class AlphaSynth implements IAlphaSynth {
     public set masterVolume(value: number) {
         value = Math.max(value, SynthConstants.MinVolume);
         this._synthesizer.masterVolume = value;
-        this.onAudioSettingsUpdate();
     }
 
     public get metronomeVolume(): number {
@@ -76,7 +75,6 @@ export class AlphaSynth implements IAlphaSynth {
         value = Math.max(value, SynthConstants.MinVolume);
         this._metronomeVolume = value;
         this._synthesizer.metronomeVolume = value;
-        this.onAudioSettingsUpdate();
     }
 
     public get countInVolume(): number {
@@ -167,7 +165,7 @@ export class AlphaSynth implements IAlphaSynth {
      * Initializes a new instance of the {@link AlphaSynth} class.
      * @param output The output to use for playing the generated samples.
      */
-    public constructor(output: ISynthOutput) {
+    public constructor(output: ISynthOutput, bufferTimeInMilliseconds: number) {
         Logger.debug('AlphaSynth', 'Initializing player');
         this.state = PlayerState.Paused;
 
@@ -222,7 +220,7 @@ export class AlphaSynth implements IAlphaSynth {
             }
         });
         this.output.samplesPlayed.on(this.onSamplesPlayed.bind(this));
-        this.output.open();
+        this.output.open(bufferTimeInMilliseconds);
     }
 
     public play(): boolean {
@@ -315,7 +313,7 @@ export class AlphaSynth implements IAlphaSynth {
 
         this.output.play();
     }
-  
+
     public resetSoundFonts(): void {
         this.stop();
         this._synthesizer.resetPresets();
@@ -381,7 +379,6 @@ export class AlphaSynth implements IAlphaSynth {
 
     public setChannelMute(channel: number, mute: boolean): void {
         this._synthesizer.channelSetMute(channel, mute);
-        this.onAudioSettingsUpdate();
     }
 
     public resetChannelStates(): void {
@@ -390,19 +387,11 @@ export class AlphaSynth implements IAlphaSynth {
 
     public setChannelSolo(channel: number, solo: boolean): void {
         this._synthesizer.channelSetSolo(channel, solo);
-        this.onAudioSettingsUpdate();
     }
 
     public setChannelVolume(channel: number, volume: number): void {
         volume = Math.max(volume, SynthConstants.MinVolume);
         this._synthesizer.channelSetMixVolume(channel, volume);
-        this.onAudioSettingsUpdate();
-    }
-    private onAudioSettingsUpdate() {
-        // seeking to the currently known position, will ensure we
-        // clear all audio buffers and re-generate the audio
-        // which was not actually played yet.
-        this.timePosition = this.timePosition;
     }
 
     private onSamplesPlayed(sampleCount: number): void {

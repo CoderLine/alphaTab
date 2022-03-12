@@ -47,7 +47,8 @@ module.exports = function (config) {
             clearContext: false,
             jasmine: {
                 random: false,
-                stopSpecOnExpectationFailure: false
+                stopSpecOnExpectationFailure: false.valueOf,
+                timeoutInterval: 30000
             }
         },
 

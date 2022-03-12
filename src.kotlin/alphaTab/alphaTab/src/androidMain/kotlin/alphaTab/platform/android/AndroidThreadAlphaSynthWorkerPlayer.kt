@@ -28,13 +28,16 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     private var _player: AlphaSynth? = null
     private val _output: ISynthOutput
     private var _logLevel: LogLevel
+    private var _bufferTimeInMilliseconds: Double
 
     constructor(
         logLevel: LogLevel,
         output: ISynthOutput,
-        uiInvoke: (action: (() -> Unit)) -> Unit
+        uiInvoke: (action: (() -> Unit)) -> Unit,
+        bufferTimeInMilliseconds: Double
     ) {
         _logLevel = logLevel
+        _bufferTimeInMilliseconds = bufferTimeInMilliseconds
         _output = output
         _uiInvoke = uiInvoke
         _threadStartedEvent = Semaphore(1)
@@ -78,7 +81,7 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     }
 
     private fun initialize() {
-        val player = AlphaSynth(_output)
+        val player = AlphaSynth(_output, _bufferTimeInMilliseconds)
         _player = player
         player.positionChanged.on {
             _uiInvoke { onPositionChanged(it) }

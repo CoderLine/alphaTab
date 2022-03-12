@@ -8,7 +8,7 @@ export class TestOutput implements ISynthOutput {
         return 44100;
     }
 
-    public open(): void {
+    public open(bufferTimeInMilliseconds: number): void {
         this.samples = [];
         (this.ready as EventEmitter).trigger();
     }

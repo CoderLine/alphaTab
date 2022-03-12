@@ -10,13 +10,15 @@ namespace AlphaTab.Platform.CSharp
     {
         private readonly ISynthOutput _output;
         private LogLevel _logLevel;
+        private double _bufferTimeInMilliseconds;
 
         protected AlphaSynth Player;
 
-        protected AlphaSynthWorkerApiBase(ISynthOutput output, LogLevel logLevel)
+        protected AlphaSynthWorkerApiBase(ISynthOutput output, LogLevel logLevel, double bufferTimeInMilliseconds)
         {
             _output = output;
             _logLevel = logLevel;
+            _bufferTimeInMilliseconds = bufferTimeInMilliseconds;
             Player = null!;
         }
 
@@ -26,7 +28,7 @@ namespace AlphaTab.Platform.CSharp
 
         protected void Initialize()
         {
-            Player = new AlphaSynth(_output);
+            Player = new AlphaSynth(_output, _bufferTimeInMilliseconds);
             Player.PositionChanged.On(OnPositionChanged);
             Player.StateChanged.On(OnStateChanged);
             Player.Finished.On(OnFinished);

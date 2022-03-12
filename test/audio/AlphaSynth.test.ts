@@ -24,7 +24,7 @@ describe('AlphaSynthTests', () => {
         let gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
         gen.generate();
         let testOutput: TestOutput = new TestOutput();
-        let synth: AlphaSynth = new AlphaSynth(testOutput);
+        let synth: AlphaSynth = new AlphaSynth(testOutput, 500);
         synth.loadSoundFont(data, false);
         synth.loadMidiFile(midi);
         synth.play();
