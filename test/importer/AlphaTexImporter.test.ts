@@ -769,11 +769,58 @@ describe('AlphaTexImporterTest', () => {
         let tex: string =
             '\\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \\rc 2 1.3 2.3 3.3 4.3 | \\ro \\rc 3 1.3 2.3 3.3 4.3 |';
         let score: Score = parseTex(tex);
+        expect(score.masterBars[0].isRepeatStart).toBe(true);
+        expect(score.masterBars[1].isRepeatStart).toBe(false);
+        expect(score.masterBars[2].isRepeatStart).toBe(false);
+        expect(score.masterBars[3].isRepeatStart).toBe(true);
         expect(score.masterBars[0].repeatCount).toEqual(0);
         expect(score.masterBars[1].repeatCount).toEqual(0);
         expect(score.masterBars[2].repeatCount).toEqual(2);
         expect(score.masterBars[3].repeatCount).toEqual(3);
     });
+
+    it('alternate-endings', () => {
+        let tex: string = '\\ro 4.3*4 | \\ae (1 2 3) 6.3*4 | \\ae 4 \\rc 4 6.3 6.3 6.3 5.3 |';
+        let score: Score = parseTex(tex);
+        expect(score.masterBars[0].isRepeatStart).toBe(true);
+        expect(score.masterBars[1].isRepeatStart).toBe(false);
+        expect(score.masterBars[2].isRepeatStart).toBe(false);
+        expect(score.masterBars[0].repeatCount).toEqual(0);
+        expect(score.masterBars[1].repeatCount).toEqual(0);
+        expect(score.masterBars[2].repeatCount).toEqual(4);
+        expect(score.masterBars[0].alternateEndings).toEqual(0b0000);
+        expect(score.masterBars[1].alternateEndings).toEqual(0b0111);
+        expect(score.masterBars[2].alternateEndings).toEqual(0b1000);
+    })
+
+    it('random-alternate-endings', () => {
+        let tex: string = `
+            \\ro \\ae 1 1.1.1 | \\ae 2 2.1 | \\ae 3 3.1 |
+            4.3.4*4 |
+            \\ae 1 1.1.1 | \\ae 2 2.1 | \\ae 3 3.1 |
+            4.3.4*4 |
+            \\ae (1 3) 1.1.1 | \\ae 2 \\rc 3 2.1 |
+        `;
+        let score: Score = parseTex(tex);
+        expect(score.masterBars[0].isRepeatStart).toBe(true);
+        for (let i = 1; i <= 9; i++) {
+            expect(score.masterBars[i].isRepeatStart).toBe(false);
+        }
+        for (let i = 0; i <= 8; i++) {
+            expect(score.masterBars[i].repeatCount).toEqual(0);
+        }
+        expect(score.masterBars[9].repeatCount).toEqual(3);
+        expect(score.masterBars[0].alternateEndings).toEqual(0b001);
+        expect(score.masterBars[1].alternateEndings).toEqual(0b010);
+        expect(score.masterBars[2].alternateEndings).toEqual(0b100);
+        expect(score.masterBars[3].alternateEndings).toEqual(0b000);
+        expect(score.masterBars[4].alternateEndings).toEqual(0b001);
+        expect(score.masterBars[5].alternateEndings).toEqual(0b010);
+        expect(score.masterBars[6].alternateEndings).toEqual(0b100);
+        expect(score.masterBars[7].alternateEndings).toEqual(0b000);
+        expect(score.masterBars[8].alternateEndings).toEqual(0b101);
+        expect(score.masterBars[9].alternateEndings).toEqual(0b010);
+    })
 
     it('default-transposition-on-instruments', () => {
         let tex: string = `
