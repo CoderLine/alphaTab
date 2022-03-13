@@ -76,4 +76,31 @@ describe('MidiPlaybackControllerTest', () => {
 
         expect(playedBars.join(',')).toEqual(expectedBars.join(','));
     });
+
+    it('alternate-endings-with-alphaTex', () => {
+        let tex: string = `
+            \\ro \\ae 1 1.1.1 | \\ae 2 2.1 | \\ae 3 3.1 |
+            4.3.4*4 |
+            \\ae 1 1.1.1 | \\ae 2 2.1 | \\ae 3 3.1 |
+            4.3.4*4 |
+            \\ae (1 3) 1.1.1 | \\ae 2 \\rc 3 2.1
+        `;
+        let importer: AlphaTexImporter = new AlphaTexImporter();
+        importer.initFromString(tex, new Settings());
+        let score: Score = importer.readScore();
+        let playedBars: number[] = [];
+        let controller: MidiPlaybackController = new MidiPlaybackController(score);
+        while (!controller.finished) {
+            let index: number = controller.index;
+            playedBars.push(index);
+            controller.processCurrent();
+            controller.moveNext();
+            if (playedBars.length > 50) {
+                fail('Too many bars generated');
+            }
+        }
+        let expectedBars: number[] = [0, 3, 4, 7, 8, 1, 3, 5, 7, 9, 2, 3, 6, 7, 8];
+
+        expect(playedBars.join(',')).toEqual(expectedBars.join(','));
+    });
 });
