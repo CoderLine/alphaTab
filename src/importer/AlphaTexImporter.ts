@@ -1788,24 +1788,24 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 master.repeatCount = this._syData as number;
                 this._sy = this.newSy();
-            } else if (syData === 're') {
+            } else if (syData === 'ae') {
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.LParensis) {
                     this._sy = this.newSy();
                     if (this._sy !== AlphaTexSymbols.Number) {
-                        this.error('repeatending', AlphaTexSymbols.Number, true)
+                        this.error('alternateending', AlphaTexSymbols.Number, true)
                     }
                     this.applyAlternateEnding(master);
                     while (this._sy === AlphaTexSymbols.Number) {
                         this.applyAlternateEnding(master);
                     }
                     if (this._sy !== AlphaTexSymbols.RParensis) {
-                        this.error('repeatending-list', AlphaTexSymbols.RParensis, true);
+                        this.error('alternateending-list', AlphaTexSymbols.RParensis, true);
                     }
                     this._sy = this.newSy();
                 } else {
                     if (this._sy !== AlphaTexSymbols.Number) {
-                        this.error('repeatending', AlphaTexSymbols.Number, true)
+                        this.error('alternateending', AlphaTexSymbols.Number, true)
                     }
                     this.applyAlternateEnding(master);
                 }
@@ -1906,8 +1906,9 @@ export class AlphaTexImporter extends ScoreImporter {
         let num = this._syData as number;
         if (num < 1) {
             // Repeat numberings start from 1
-            this.error('repeatending', AlphaTexSymbols.Number, true)
+            this.error('alternateending', AlphaTexSymbols.Number, true)
         }
+        // Alternate endings bitflag starts from 0
         master.alternateEndings |= 1 << (num - 1);
         this._sy = this.newSy();
     }
