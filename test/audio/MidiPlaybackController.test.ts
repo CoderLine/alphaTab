@@ -55,9 +55,7 @@ describe('MidiPlaybackControllerTest', () => {
         testRepeat(score, expectedIndexes);
     });
 
-    it('repeat-with-alphaTex', () => {
-        let tex: string =
-            '\\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \\rc 2 1.3 2.3 3.3 4.3 | \\ro \\rc 3 1.3 2.3 3.3 4.3';
+    const testAlphaTexRepeat: ((tex: string, expectedBars: number[], maxBars: number) => void) = (tex: string, expectedBars: number[], maxBars: number): void => {
         let importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
         let score: Score = importer.readScore();
@@ -65,16 +63,23 @@ describe('MidiPlaybackControllerTest', () => {
         let controller: MidiPlaybackController = new MidiPlaybackController(score);
         while (!controller.finished) {
             let index: number = controller.index;
-            playedBars.push(index);
             controller.processCurrent();
+            if (controller.shouldPlay) {
+                playedBars.push(index);
+            }
             controller.moveNext();
-            if (playedBars.length > 50) {
+            if (playedBars.length > maxBars) {
                 fail('Too many bars generated');
             }
         }
-        let expectedBars: number[] = [0, 1, 2, 0, 1, 2, 3, 3, 3];
-
         expect(playedBars.join(',')).toEqual(expectedBars.join(','));
+    }
+
+    it('repeat-with-alphaTex', () => {
+        let tex: string =
+            '\\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \\rc 2 1.3 2.3 3.3 4.3 | \\ro \\rc 3 1.3 2.3 3.3 4.3';
+        let expectedBars: number[] = [0, 1, 2, 0, 1, 2, 3, 3, 3];
+        testAlphaTexRepeat(tex, expectedBars, 50);
     });
 
     it('alternate-endings-with-alphaTex', () => {
@@ -85,22 +90,13 @@ describe('MidiPlaybackControllerTest', () => {
             4.3.4*4 |
             \\ae (1 3) 1.1.1 | \\ae 2 \\rc 3 2.1
         `;
-        let importer: AlphaTexImporter = new AlphaTexImporter();
-        importer.initFromString(tex, new Settings());
-        let score: Score = importer.readScore();
-        let playedBars: number[] = [];
-        let controller: MidiPlaybackController = new MidiPlaybackController(score);
-        while (!controller.finished) {
-            let index: number = controller.index;
-            playedBars.push(index);
-            controller.processCurrent();
-            controller.moveNext();
-            if (playedBars.length > 50) {
-                fail('Too many bars generated');
-            }
-        }
-        let expectedBars: number[] = [0, 3, 4, 7, 8, 1, 3, 5, 7, 9, 2, 3, 6, 7, 8];
-
-        expect(playedBars.join(',')).toEqual(expectedBars.join(','));
+        let expectedBars: number[] = [
+            0, 4, 8, // First round: 1st, 5th and 9th bar which have the ending for 1.
+            1, 5, 9, // Second round: 2nd, 6th and 10th bar which have the ending for 2.
+            2, 3, 6, 7, 8 // Third round: 3rd, 4th, 7th, 8th and 9th which have the ending for 3.
+                            // 4th and 8th bar don't have the ending explicitly
+                            // but extended from the previous bar.
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
     });
 });
