@@ -237,7 +237,7 @@ export class GpifWriter {
     private writeDom(parent: XmlNode, score: Score) {
         const gpif = parent.addElement('GPIF');
 
-        // just some values at the time this was implemented, 
+        // just some values at the time this was implemented,
         gpif.addElement('GPVersion').innerText = '7';
         const gpRevision = gpif.addElement('GPRevision');
         gpRevision.innerText = '7';
@@ -1335,9 +1335,11 @@ export class GpifWriter {
                                 }
 
                                 const line = lines[l];
+                                const beatLyricsLine = beat.lyrics[l] || '';
+
                                 line.text = line.text == '[Empty]'
-                                    ? beat.lyrics[l]
-                                    : line.text + ' ' + beat.lyrics[l].split(' ').join('+');
+                                    ? beatLyricsLine
+                                    : line.text + ' ' + beatLyricsLine.split(' ').join('+');
                             }
                         }
                     }
