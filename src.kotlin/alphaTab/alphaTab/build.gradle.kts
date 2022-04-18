@@ -15,7 +15,7 @@ plugins {
     id("com.android.library")
     `maven-publish`
     signing
-    id("org.jetbrains.dokka") version "1.6.10"
+    id("org.jetbrains.dokka") version "1.6.20"
 
     // iOS
     //    kotlin("native.cocoapods")
@@ -25,7 +25,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
             }
             kotlin.srcDirs("../../../dist/lib.kotlin/commonMain/generated")
         }
