@@ -68,7 +68,7 @@
         "karma-jasmine": "^5.0.0",
         "karma-jasmine-html-reporter": "^1.7.0",
         "karma-rollup-preprocessor": "^7.0.7",
-        "karma-spec-reporter": "0.0.33",
+        "karma-spec-reporter": "0.0.34",
         "lodash": "^4.17.21",
         "multer": "^1.4.4",
         "rimraf": "^3.0.2",
