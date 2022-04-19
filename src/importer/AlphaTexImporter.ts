@@ -1315,7 +1315,7 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         }
         if (syData === 'bu' || syData === 'bd' || syData === 'au' || syData === 'ad') {
-            switch (this._syData) {
+            switch (syData) {
                 case 'bu':
                     beat.brushType = BrushType.BrushUp;
                     break;
@@ -1331,10 +1331,12 @@ export class AlphaTexImporter extends ScoreImporter {
             }
             this._sy = this.newSy();
             if (this._sy === AlphaTexSymbols.Number) {
+                // explicit duration
                 beat.brushDuration = (this._syData as number);
                 this._sy = this.newSy();
                 return true;
             }
+            // default to calcuated duration
             beat.updateDurations();
             if (syData === 'bu' || syData === 'bd') {
                 beat.brushDuration = beat.playbackDuration / (beat.notes.length > 4 ? beat.notes.length : 4);
