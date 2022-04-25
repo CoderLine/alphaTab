@@ -55,7 +55,7 @@
         "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-commonjs": "^22.0.0",
         "@types/css-font-loading-module": "0.0.7",
         "@types/jasmine": "^3.10.2",
         "@types/resize-observer-browser": "^0.1.7",
