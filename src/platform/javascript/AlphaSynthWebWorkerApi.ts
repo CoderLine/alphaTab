@@ -213,13 +213,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         try {
             this._synth = Environment.createAlphaTabWorker(alphaSynthScriptFile);
         } catch (e) {
-            // fallback to direct worker
-            try {
-                this._synth = new Worker(alphaSynthScriptFile);
-            } catch (e2) {
-                Logger.error('AlphaSynth', 'Failed to create WebWorker: ' + e2);
-                return;
-            }
+            Logger.error('AlphaSynth', 'Failed to create WebWorker: ' + e);
         }
         this._synth.addEventListener('message', this.handleWorkerMessage.bind(this), false);
         this._synth.postMessage({

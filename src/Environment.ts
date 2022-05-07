@@ -56,6 +56,7 @@ import { ResizeObserverPolyfill } from '@src/platform/javascript/ResizeObserverP
 import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 import { IntersectionObserverPolyfill } from '@src/platform/javascript/IntersectionObserverPolyfill';
 import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
+import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -220,7 +221,7 @@ export class Environment {
     /**
      * @target web
      */
-    public static createAlphaTabWorker(scriptFile: string): Worker {
+    public static createAlphaTabWorker(scriptFile: string | null): Worker {
         if (Environment.isWebPackBundled) {
             // WebPack currently requires this exact syntax: new Worker(new URL(..., import.meta.url)))
             // The module `@coderline/alphatab` will be resolved by WebPack to alphaTab consumed as library
@@ -233,14 +234,26 @@ export class Environment {
                 // @ts-ignore
                 /* webpackChunkName: "alphatab.worker" */ new URL('@coderline/alphatab', import.meta.url)
             );
-        } else if (Environment.webPlatform === WebPlatform.BrowserModule) {
-            const script: string = `import * as alphaTab from '${scriptFile}'`;
-            const blob: Blob = new Blob([script], { type: 'text/javascript' });
-            return new Worker(URL.createObjectURL(blob), { type: 'module' });
-        } else {
-            const script: string = `importScripts('${scriptFile}')`;
-            const blob: Blob = new Blob([script]);
-            return new Worker(URL.createObjectURL(blob));
+        }
+
+        if (!scriptFile) {
+            throw new AlphaTabError(AlphaTabErrorType.General, "Could not detect alphaTab script file, cannot initialize renderer");
+        }
+
+        try {
+            if (Environment.webPlatform === WebPlatform.BrowserModule) {
+                const script: string = `import * as alphaTab from '${scriptFile}'`;
+                const blob: Blob = new Blob([script], { type: 'text/javascript' });
+                return new Worker(URL.createObjectURL(blob), { type: 'module' });
+            } else {
+                const script: string = `importScripts('${scriptFile}')`;
+                const blob: Blob = new Blob([script]);
+                return new Worker(URL.createObjectURL(blob));
+            }
+        }
+        catch (e) {
+            Logger.warning('Rendering', 'Could not create inline worker, fallback to normal worker');
+            return new Worker(scriptFile);
         }
     }
 
