@@ -23,21 +23,12 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     public constructor(api: AlphaTabApiBase<T>, settings: Settings) {
         this._api = api;
 
-        if (!settings.core.scriptFile) {
-            Logger.error('Rendering', `Could not detect alphaTab script file, cannot initialize renderer`);
-            return;
-        }
-
         // first try blob worker
         try {
             this._worker = Environment.createAlphaTabWorker(settings.core.scriptFile);
         } catch (e) {
-            try {
-                this._worker = new Worker(settings.core.scriptFile);
-            } catch (e2) {
-                Logger.error('Rendering', `Failed to create WebWorker: ${e}`);
-                return;
-            }
+            Logger.error('Rendering', `Failed to create WebWorker: ${e}`);
+            return;
         }
         this._worker.postMessage({
             cmd: 'alphaTab.initialize',
