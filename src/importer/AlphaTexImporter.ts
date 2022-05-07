@@ -1453,7 +1453,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
     }
 
-    private isNoteText(txt: string) {
+    private isNoteText(txt: string): boolean {
         return txt === 'x' || txt === '-' || txt === 'r';
     }
 
@@ -1564,7 +1564,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                 }
                 const points = note.bendPoints;
-                if(points != null){
+                if (points != null) {
                     while (points.length > 60) {
                         points.splice(points.length - 1, 1);
                     }
@@ -1583,7 +1583,6 @@ export class AlphaTexImporter extends ScoreImporter {
                         }
                     }
                 }
-               
                 if (this._sy !== AlphaTexSymbols.RParensis) {
                     this.error('bend-effect', AlphaTexSymbols.RParensis, true);
                 }
@@ -1789,6 +1788,27 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 master.repeatCount = this._syData as number;
                 this._sy = this.newSy();
+            } else if (syData === 'ae') {
+                this._sy = this.newSy();
+                if (this._sy === AlphaTexSymbols.LParensis) {
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.Number) {
+                        this.error('alternateending', AlphaTexSymbols.Number, true)
+                    }
+                    this.applyAlternateEnding(master);
+                    while (this._sy === AlphaTexSymbols.Number) {
+                        this.applyAlternateEnding(master);
+                    }
+                    if (this._sy !== AlphaTexSymbols.RParensis) {
+                        this.error('alternateending-list', AlphaTexSymbols.RParensis, true);
+                    }
+                    this._sy = this.newSy();
+                } else {
+                    if (this._sy !== AlphaTexSymbols.Number) {
+                        this.error('alternateending', AlphaTexSymbols.Number, true)
+                    }
+                    this.applyAlternateEnding(master);
+                }
             } else if (syData === 'ks') {
                 this._sy = this.newSy();
                 if (this._sy !== AlphaTexSymbols.String) {
@@ -1880,5 +1900,16 @@ export class AlphaTexImporter extends ScoreImporter {
             master.tempoAutomation = tempoAutomation;
         }
         return anyMeta;
+    }
+
+    private applyAlternateEnding(master: MasterBar): void {
+        let num = this._syData as number;
+        if (num < 1) {
+            // Repeat numberings start from 1
+            this.error('alternateending', AlphaTexSymbols.Number, true)
+        }
+        // Alternate endings bitflag starts from 0
+        master.alternateEndings |= 1 << (num - 1);
+        this._sy = this.newSy();
     }
 }
