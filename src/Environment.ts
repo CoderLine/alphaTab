@@ -535,6 +535,15 @@ export class Environment {
             if (!('IntersectionObserver' in Environment.globalThis)) {
                 (Environment.globalThis as any).IntersectionObserver = IntersectionObserverPolyfill;
             }
+
+            if(!('replaceChildren' in Element.prototype)) {
+                Element.prototype.replaceChildren = function (...nodes: (Node | string)[]) {
+                    this.innerHTML = '';
+                    this.append(...nodes);
+                };
+                Document.prototype.replaceChildren = Element.prototype.replaceChildren;
+                DocumentFragment.prototype.replaceChildren = Element.prototype.replaceChildren;
+            }
         }
     }
 
