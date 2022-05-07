@@ -15,8 +15,8 @@ import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 /**
  * @target web
  */
-export class AlphaTabApi extends AlphaTabApiBase<any|Settings> {
-    public constructor(element: HTMLElement, options: any|Settings) {
+export class AlphaTabApi extends AlphaTabApiBase<any | Settings> {
+    public constructor(element: HTMLElement, options: any | Settings) {
         super(new BrowserUiFacade(element), options);
     }
 
@@ -25,7 +25,7 @@ export class AlphaTabApi extends AlphaTabApiBase<any|Settings> {
         super.tex(tex, browser.parseTracks(tracks));
     }
 
-    public print(width?: string, additionalSettings:unknown = null): void {
+    public print(width?: string, additionalSettings: unknown = null): void {
         // prepare a popup window for printing (a4 width, window height, centered)
         let preview: Window = window.open('', '', 'width=0,height=0')!;
         let a4: HTMLElement = preview.document.createElement('div');
@@ -38,7 +38,35 @@ export class AlphaTabApi extends AlphaTabApiBase<any|Settings> {
                 a4.style.width = '210mm';
             }
         }
-        preview.document.write('<!DOCTYPE html><html></head><body></body></html>');
+        // the style is a workaround for browser having problems with printing using absolute positions. 
+        preview.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+            .at-surface {
+                width: auto !important;
+                height: auto !important;
+            }
+            .at-surface > div {
+                position: relative!important;
+                left: auto !important;
+                top: auto !important;
+                break-inside: avoid;
+            }
+            </style>
+          </head>
+          <body></body>
+        </html>
+        `);
+        const score = this.score;
+        if (score) {
+            if (score.artist && score.title) {
+                preview.document.title = `${score.title} - ${score.artist}`;
+            } else if (score.title) {
+                preview.document.title = `${score.title}`;
+            }
+        }
         preview.document.body.appendChild(a4);
         let dualScreenLeft: number =
             typeof (window as any)['screenLeft'] !== 'undefined'
@@ -50,14 +78,14 @@ export class AlphaTabApi extends AlphaTabApiBase<any|Settings> {
             "innerWidth" in window
                 ? window.innerWidth
                 : "clientWidth" in document.documentElement
-                ? document.documentElement.clientWidth
-                : window.screen.width;
+                    ? document.documentElement.clientWidth
+                    : window.screen.width;
         let screenHeight: number =
             "innerHeight" in window
                 ? window.innerHeight
                 : "clientHeight" in document.documentElement
-                ? document.documentElement.clientHeight
-                : window.screen.height;
+                    ? document.documentElement.clientHeight
+                    : window.screen.height;
         let w: number = a4.offsetWidth + 50;
         let h: number = window.innerHeight;
         let left: number = ((screenWidth / 2) | 0) - ((w / 2) | 0) + dualScreenLeft;
@@ -68,7 +96,7 @@ export class AlphaTabApi extends AlphaTabApiBase<any|Settings> {
         // render alphaTab
         let settings: Settings = JsonConverter.jsObjectToSettings(JsonConverter.settingsToJsObject(this.settings));
         settings.core.enableLazyLoading = false;
-        settings.core.useWorkers = false;
+        settings.core.useWorkers = true;
         settings.core.file = null;
         settings.core.tracks = null;
         settings.player.enableCursor = false;
@@ -80,17 +108,21 @@ export class AlphaTabApi extends AlphaTabApiBase<any|Settings> {
         settings.display.stretchForce = 0.8;
         SettingsSerializer.fromJson(settings, additionalSettings);
         let alphaTab: AlphaTabApi = new AlphaTabApi(a4, settings);
+        preview.onunload = () => {
+            alphaTab.destroy();
+        };
         alphaTab.renderer.postRenderFinished.on(() => {
             preview.print();
         });
         alphaTab.renderTracks(this.tracks);
+
     }
 
     public downloadMidi(): void {
-        if(!this.score) {
+        if (!this.score) {
             return;
         }
-        
+
         let midiFile: MidiFile = new MidiFile();
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
         let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
