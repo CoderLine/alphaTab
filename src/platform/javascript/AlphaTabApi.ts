@@ -69,6 +69,13 @@ export class AlphaTabApi extends AlphaTabApiBase<any|Settings> {
         let settings: Settings = JsonConverter.jsObjectToSettings(JsonConverter.settingsToJsObject(this.settings));
         settings.core.enableLazyLoading = false;
         settings.core.useWorkers = false;
+        settings.core.file = null;
+        settings.core.tracks = null;
+        settings.player.enableCursor = false;
+        settings.player.enablePlayer = false;
+        settings.player.enableElementHighlighting = false;
+        settings.player.enableUserInteraction = false;
+        settings.player.soundFont = null;
         settings.display.scale = 0.8;
         settings.display.stretchForce = 0.8;
         SettingsSerializer.fromJson(settings, additionalSettings);
