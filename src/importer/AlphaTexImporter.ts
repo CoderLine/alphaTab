@@ -1564,7 +1564,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                 }
                 const points = note.bendPoints;
-                if(points != null){
+                if (points != null) {
                     while (points.length > 60) {
                         points.splice(points.length - 1, 1);
                     }

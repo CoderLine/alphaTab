@@ -951,7 +951,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].name).toEqual("🎸");
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).toEqual("🤘");
     });
-    
+
     it('does-not-hang-on-backslash', () => {
         try {
             parseTex('\\title Test . 3.3 \\')
@@ -961,7 +961,7 @@ describe('AlphaTexImporterTest', () => {
         }
     })
 
-    function runSectionNoteSymbolTest(noteSymbol:string) {
+    function runSectionNoteSymbolTest(noteSymbol: string) {
         const score = parseTex(`1.3.4 * 4 | \\section Verse ${noteSymbol}.1 | 2.3.4*4`);
 
         expect(score.masterBars.length).toEqual(3);
