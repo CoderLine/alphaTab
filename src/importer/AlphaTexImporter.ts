@@ -79,10 +79,10 @@ export class AlphaTexError extends AlphaTabError {
         symbolData: unknown = null
     ): AlphaTexError {
         let message: string;
-        if (!symbolData) {
+        if (expected !== symbol) {
             message = `MalFormed AlphaTex: @${position}: Error on block ${nonTerm}, expected a ${AlphaTexSymbols[expected]} found a ${AlphaTexSymbols[symbol]}: '${symbolData}'`;
         } else {
-            message = `MalFormed AlphaTex: @${position}: Error on block ${nonTerm}, invalid value: ${symbolData}`;
+            message = `MalFormed AlphaTex: @${position}: Error on block ${nonTerm}, invalid value: '${symbolData}'`;
         }
         let exception: AlphaTexError = new AlphaTexError(message);
         exception.position = position;
@@ -94,7 +94,7 @@ export class AlphaTexError extends AlphaTabError {
     }
 
     public static errorMessage(position: number, message: string): AlphaTexError {
-        message = 'MalFormed AlphaTex: @' + position + ': ' + message;
+        message = `MalFormed AlphaTex: @${position}: ${message}`;
         let exception: AlphaTexError = new AlphaTexError(message);
         exception.position = position;
         return exception;
@@ -195,7 +195,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private error(nonterm: string, expected: AlphaTexSymbols, symbolError: boolean = true): void {
         let e: AlphaTexError;
         if (symbolError) {
-            e = AlphaTexError.symbolError(this._curChPos, nonterm, expected, this._sy, null);
+            e = AlphaTexError.symbolError(this._curChPos, nonterm, expected, this._sy, this._syData);
         } else {
             e = AlphaTexError.symbolError(this._curChPos, nonterm, expected, expected, this._syData);
         }
@@ -1785,6 +1785,9 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
                 if (this._sy !== AlphaTexSymbols.Number) {
                     this.error('repeatclose', AlphaTexSymbols.Number, true);
+                }
+                if (this._syData as number > 2048) {
+                    this.error('repeatclose', AlphaTexSymbols.Number, false);
                 }
                 master.repeatCount = this._syData as number;
                 this._sy = this.newSy();
