@@ -315,24 +315,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private parseTripletFeelFromInt(i: number): TripletFeel {
-        switch (i) {
-            case 0:
-                return TripletFeel.NoTripletFeel;
-            case 1:
-                return TripletFeel.Triplet16th;
-            case 2:
-                return TripletFeel.Triplet8th;
-            case 3:
-                return TripletFeel.Dotted16th;
-            case 4:
-                return TripletFeel.Dotted8th;
-            case 5:
-                return TripletFeel.Scottish16th;
-            case 6:
-                return TripletFeel.Scottish8th;
-            default:
-                return TripletFeel.NoTripletFeel;
-        }
+        return i in TripletFeel ? i as TripletFeel : TripletFeel.NoTripletFeel;
     }
 
     /**
@@ -340,40 +323,40 @@ export class AlphaTexImporter extends ScoreImporter {
      * @param str the string to convert
      * @returns the assocciated keysignature value
      */
-    private parseKeySignature(str: string): number {
+    private parseKeySignature(str: string): KeySignature {
         switch (str.toLowerCase()) {
             case 'cb':
-                return -7;
+                return KeySignature.Cb;
             case 'gb':
-                return -6;
+                return KeySignature.Gb;
             case 'db':
-                return -5;
+                return KeySignature.Db;
             case 'ab':
-                return -4;
+                return KeySignature.Ab;
             case 'eb':
-                return -3;
+                return KeySignature.Eb;
             case 'bb':
-                return -2;
+                return KeySignature.Bb;
             case 'f':
-                return -1;
+                return KeySignature.F;
             case 'c':
-                return 0;
+                return KeySignature.C;
             case 'g':
-                return 1;
+                return KeySignature.G;
             case 'd':
-                return 2;
+                return KeySignature.D;
             case 'a':
-                return 3;
+                return KeySignature.A;
             case 'e':
-                return 4;
+                return KeySignature.E;
             case 'b':
-                return 5;
+                return KeySignature.B;
             case 'f#':
-                return 6;
+                return KeySignature.FSharp;
             case 'c#':
-                return 7;
+                return KeySignature.CSharp;
             default:
-                return 0;
+                return KeySignature.C;
             // error("keysignature-value", AlphaTexSymbols.String, false); return 0
         }
     }
@@ -1717,47 +1700,14 @@ export class AlphaTexImporter extends ScoreImporter {
         this._sy = this.newSy();
     }
 
-    private toFinger(syData: number): Fingers {
-        switch (syData) {
-            case 1:
-                return Fingers.Thumb;
-            case 2:
-                return Fingers.IndexFinger;
-            case 3:
-                return Fingers.MiddleFinger;
-            case 4:
-                return Fingers.AnnularFinger;
-            case 5:
-                return Fingers.LittleFinger;
-        }
-        return Fingers.Thumb;
+    private toFinger(num: number): Fingers {
+        // Finger count starts from 1, enum index starts from 0
+        const i = num - 1;
+        return i in Fingers ? i as Fingers : Fingers.Thumb;
     }
 
     private parseDuration(duration: number): Duration {
-        switch (duration) {
-            case -4:
-                return Duration.QuadrupleWhole;
-            case -2:
-                return Duration.DoubleWhole;
-            case 1:
-                return Duration.Whole;
-            case 2:
-                return Duration.Half;
-            case 4:
-                return Duration.Quarter;
-            case 8:
-                return Duration.Eighth;
-            case 16:
-                return Duration.Sixteenth;
-            case 32:
-                return Duration.ThirtySecond;
-            case 64:
-                return Duration.SixtyFourth;
-            case 128:
-                return Duration.OneHundredTwentyEighth;
-            default:
-                return Duration.Quarter;
-        }
+        return duration in Duration ? duration as Duration : Duration.Quarter;
     }
 
     private barMeta(bar: Bar): boolean {
@@ -1817,13 +1767,13 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.String) {
                     this.error('keysignature', AlphaTexSymbols.String, true);
                 }
-                master.keySignature = this.parseKeySignature((this._syData as string).toLowerCase()) as KeySignature;
+                master.keySignature = this.parseKeySignature(this._syData as string);
                 this._sy = this.newSy();
             } else if (syData === 'clef') {
                 this._sy = this.newSy();
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
-                        bar.clef = this.parseClefFromString((this._syData as string).toLowerCase());
+                        bar.clef = this.parseClefFromString(this._syData as string);
                         break;
                     case AlphaTexSymbols.Number:
                         bar.clef = this.parseClefFromInt(this._syData as number);
@@ -1871,7 +1821,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._allowTuning = true;
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
-                        master.tripletFeel = this.parseTripletFeelFromString((this._syData as string).toLowerCase());
+                        master.tripletFeel = this.parseTripletFeelFromString(this._syData as string);
                         break;
                     case AlphaTexSymbols.Number:
                         master.tripletFeel = this.parseTripletFeelFromInt(this._syData as number);
