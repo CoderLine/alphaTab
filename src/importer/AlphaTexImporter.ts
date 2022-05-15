@@ -397,7 +397,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     }
                 } else if (this._ch === 0x2a /* * */) {
                     // multiline comment
-                    while (this._ch !== 0) {
+                    while (this._ch !== AlphaTexImporter.Eof) {
                         if (this._ch === 0x2a /* * */) {
                             this._ch = this.nextChar();
                             if (this._ch === 0x2f /* / */) {
@@ -426,9 +426,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 // negative number
                 // is number?
                 if (this._allowNegatives && this.isDigit(this._ch)) {
-                    let num: number = this.readNumber();
                     this._sy = AlphaTexSymbols.Number;
-                    this._syData = num;
+                    this._syData = this.readNumber();
                 } else {
                     this._sy = AlphaTexSymbols.String;
                     this._syData = this.readName();
@@ -444,9 +443,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._ch = this.nextChar();
             } else if (this._ch === 0x5c /* \ */) {
                 this._ch = this.nextChar();
-                let name: string = this.readName();
                 this._sy = AlphaTexSymbols.MetaCommand;
-                this._syData = name;
+                this._syData = this.readName();
             } else if (this._ch === 0x29 /* ) */) {
                 this._sy = AlphaTexSymbols.RParensis;
                 this._ch = this.nextChar();
@@ -466,9 +464,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = AlphaTexSymbols.LowerThan;
                 this._ch = this.nextChar();
             } else if (this.isDigit(this._ch)) {
-                let num: number = this.readNumber();
                 this._sy = AlphaTexSymbols.Number;
-                this._syData = num;
+                this._syData = this.readNumber();
             } else if (AlphaTexImporter.isLetter(this._ch)) {
                 let name: string = this.readName();
                 let tuning: TuningParseResult | null = this._allowTuning ? ModelUtils.parseTuning(name) : null;
