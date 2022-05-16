@@ -939,7 +939,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         // regualr notes. 
                         // Placement: above staff between two notes.
                         break;
-                    case 'schleifer':                        case 'schleifer':
+                    case 'schleifer':
                         // TODO: set schleifer properties.
                         // A diatonic (current scale) slide between two notes.
                         // Placement: on staff (middle) between two notes.
