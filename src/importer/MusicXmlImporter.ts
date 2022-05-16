@@ -885,6 +885,23 @@ export class MusicXmlImporter extends ScoreImporter {
                                 break;
                         }
                         break;
+                    case 'trill-mark':
+                            let trillStep: string = (c.attributes.get('trill-step') as string).toLowerCase();
+                            switch(trillStep){
+                                case 'unison':
+                                    note.trillValue = 0;
+                                    break;
+                                case 'half':
+                                    note.trillValue = 1;
+                                    break;
+                                case 'whole':
+                                    note.trillValue = 2;
+                                    break;
+                                default:
+                                    note.trillValue = 1;
+                            }
+                            // note.trillSpeed = Duration.ThirtySecond;
+                        break;
                 }
             }
         }
