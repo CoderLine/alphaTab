@@ -886,7 +886,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         }
                         break;
                     case 'trill-mark':
-                            let trillStep: string = (c.attributes.get('trill-step') as string).toLowerCase();
+                            let trillStep: string = (c.attributes.get('trill-step') as string)?.toLowerCase();
                             switch(trillStep){
                                 case 'unison':
                                     note.trillValue = 0;
