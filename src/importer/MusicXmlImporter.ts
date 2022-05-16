@@ -902,6 +902,63 @@ export class MusicXmlImporter extends ScoreImporter {
                             }
                             // note.trillSpeed = Duration.ThirtySecond;
                         break;
+                    case 'mordent':
+                        // TODO: set mordent properties.
+                        // Function:
+                        //  START:unison, trill-step(down), END:unison.
+                        // Placement: above the note.
+                        break;
+                    case 'inverted-mordent':
+                        // TODO: set iverted mordent properties.
+                        // Function:
+                        //  START:unison, trill-step(up), END:unison.
+                        // Placement: above the note.
+                        break;
+                    case 'vertical-turn': // Fallthrough.
+                    case 'turn':
+                        // TODO: set turn properties.
+                        // Function:
+                        //  START:trill-step(up), unison, trill-step(down), END:unison.
+                        // Placement: above the note.
+                        break;
+                    case 'delayed-turn':
+                        // TODO: set delayed-turn properties.
+                        // Can be thought of as an invisible 'turn' ornamented note between two
+                        // regualr notes.
+                        // Placement: above staff between two notes.
+                        break;
+                    case 'inverted-vertical-turn': // Fallthrough.
+                    case 'inverted-turn':
+                        // TODO: set inverted turn properties.
+                        // START:trill-step(down), unison, trill-step(up), END:unison.   
+                        // Placement: above the note.
+                        break;
+                    case 'delayed-inverted-turn':
+                        // TODO: set delayed-inverted-turn properties.
+                        // Can be thought of as an invisible 'inverted-turn' note between two
+                        // regualr notes. 
+                        // Placement: above staff between two notes.
+                        break;
+                    case 'schleifer':                        case 'schleifer':
+                        // TODO: set schleifer properties.
+                        // A diatonic (current scale) slide between two notes.
+                        // Placement: on staff (middle) between two notes.
+                        break;
+                    case 'haydn':
+                        // A turn with different interpretations.
+                        // Page 9 (pdf:10) here can show the different uses:
+                        // https://content.alfred.com/catpages/00-1100.pdf
+                        break;
+                    case 'wavy-line':
+                        // Can be:
+                        //  - Part of a trill symbol.
+                        //  - Alone, could be considered as a vibrato symbol.
+                        break;
+                    case 'other-ornament':
+                        // Ornaments not part of the MusicXML standard.
+                    // TODO: Adapt the importer to most popular musicxml exporters in the wild.
+                    // Ex: Sibelius, Musescore, Noteflight, forte, finale, etc.
+                        break;
                 }
             }
         }
