@@ -890,16 +890,10 @@ export class MusicXmlImporter extends ScoreImporter {
                             // note.trillSpeed = Duration.ThirtySecond;
                         break;
                     case 'mordent':
-                        // TODO: set mordent properties.
-                        // Function:
-                        //  START:unison, trill-step(down), END:unison.
-                        // Placement: above the note.
+                        note.mordentValue = this.parseTrillStep(c);
                         break;
                     case 'inverted-mordent':
-                        // TODO: set iverted mordent properties.
-                        // Function:
-                        //  START:unison, trill-step(up), END:unison.
-                        // Placement: above the note.
+                        note.invertedMordentValue = this.parseTrillStep(c);
                         break;
                     case 'vertical-turn': // Fallthrough.
                     case 'turn':
