@@ -59,6 +59,8 @@ import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWo
 import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
 import { TurnEffectInfo } from './rendering/effects/TurnEffectInfo';
 import { InvertedTurnEffectInfo } from './rendering/effects/InvertedTurnEffectInfo';
+import { MordentEffectInfo } from './rendering/effects/MordentEffectInfo';
+import { InvertedMordentEffectInfo } from './rendering/effects/InvertedMordentEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -398,6 +400,8 @@ export class Environment {
                 new TrillEffectInfo(),
                 new TurnEffectInfo(),
                 new InvertedTurnEffectInfo(),
+                new MordentEffectInfo(),
+                new InvertedMordentEffectInfo(),
                 new OttaviaEffectInfo(true),
                 new WideBeatVibratoEffectInfo(),
                 new SlightBeatVibratoEffectInfo(),
@@ -415,6 +419,8 @@ export class Environment {
                 new TrillEffectInfo(),
                 new TurnEffectInfo(),
                 new InvertedTurnEffectInfo(),
+                new MordentEffectInfo(),
+                new InvertedMordentEffectInfo(),
                 new WideBeatVibratoEffectInfo(),
                 new SlightBeatVibratoEffectInfo(),
                 new WideNoteVibratoEffectInfo(),
@@ -449,6 +455,8 @@ export class Environment {
                 new TrillEffectInfo(),
                 new TurnEffectInfo(),
                 new InvertedTurnEffectInfo(),
+                new MordentEffectInfo(),
+                new InvertedMordentEffectInfo(),
                 new OttaviaEffectInfo(true),
                 new WideBeatVibratoEffectInfo(),
                 new SlightBeatVibratoEffectInfo(),
@@ -480,6 +488,8 @@ export class Environment {
             new TrillEffectInfo(),
             new TurnEffectInfo(),
             new InvertedTurnEffectInfo(),
+            new MordentEffectInfo(),
+            new InvertedMordentEffectInfo(),
             new WideBeatVibratoEffectInfo(),
             new SlightBeatVibratoEffectInfo(),
             new WideNoteVibratoEffectInfo(),

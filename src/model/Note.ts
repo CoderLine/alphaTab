@@ -479,6 +479,44 @@ export class Note {
      */
     public invertedTurnSpeed: Duration = Duration.ThirtySecond;
      
+
+    /**
+     * Gets or sets the target note value for the Mordent ornament effect.
+     */
+    public mordentValue: number = -1;
+
+    public get mordentFret(): number { // Valid?
+        return this.mordentValue - this.stringTuning;
+    }
+
+    public get isMordent(): boolean {
+        return this.mordentValue >= 0;
+    }
+
+    /**
+     * Gets or sets the speed of the mordent ornament effect.
+     */
+    public MordentSpeed: Duration = Duration.ThirtySecond;
+
+    /**
+     * Gets or sets the target note value for the inverted mordent ornament effect.
+     */
+    public invertedMordentValue: number = -1;
+
+    public get invertedMordentFret(): number { // Valid?
+        return this.invertedMordentValue - this.stringTuning;
+    }
+
+    public get isInvertedMordent(): boolean {
+        return this.invertedTurnValue >= 0;
+    }
+
+    /**
+     * Gets or sets the speed of the inverted mordent ornament effect.
+     */
+    public invertedMordentSpeed: Duration = Duration.ThirtySecond;
+     
+         
     /**
      * Gets or sets the percentual duration of the note relative to the overall beat duration .
      */

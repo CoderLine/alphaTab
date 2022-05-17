@@ -118,6 +118,8 @@ export enum MusicFontSymbol {
     OrnamentTrill = 0xe566,
     OrnamentTurn = 0xe567,
     OrnamentInvertedTurn = 0xe568,
+    OrnamentMordent = 0xe56c,
+    OrnamentInvertedMordent = 0xe56d,
 
     StringsDownBow = 0xe610,
     StringsUpBow = 0xe612,
