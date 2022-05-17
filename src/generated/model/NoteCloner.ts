@@ -44,6 +44,8 @@ export class NoteCloner {
         clone.isFingering = original.isFingering; 
         clone.trillValue = original.trillValue; 
         clone.trillSpeed = original.trillSpeed; 
+        clone.turnValue = original.turnValue; 
+        clone.turnSpeed = original.turnSpeed; 
         clone.durationPercent = original.durationPercent; 
         clone.accidentalMode = original.accidentalMode; 
         clone.dynamics = original.dynamics; 

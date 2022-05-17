@@ -886,20 +886,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         }
                         break;
                     case 'trill-mark':
-                            let trillStep: string = (c.attributes.get('trill-step') as string)?.toLowerCase();
-                            switch(trillStep){
-                                case 'unison':
-                                    note.trillValue = 0;
-                                    break;
-                                case 'half':
-                                    note.trillValue = 1;
-                                    break;
-                                case 'whole':
-                                    note.trillValue = 2;
-                                    break;
-                                default:
-                                    note.trillValue = 1;
-                            }
+                            note.trillValue = this.parseTrillStep(c);
                             // note.trillSpeed = Duration.ThirtySecond;
                         break;
                     case 'mordent':
@@ -916,10 +903,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         break;
                     case 'vertical-turn': // Fallthrough.
                     case 'turn':
-                        // TODO: set turn properties.
-                        // Function:
-                        //  START:trill-step(up), unison, trill-step(down), END:unison.
-                        // Placement: above the note.
+                        note.turnValue = this.parseTrillStep(c);
                         break;
                     case 'delayed-turn':
                         // TODO: set delayed-turn properties.
@@ -962,6 +946,20 @@ export class MusicXmlImporter extends ScoreImporter {
                 }
             }
         }
+    }
+
+    private parseTrillStep(element: XmlNode): number{
+        let trillStep: string = (element.attributes.get('trill-step') as string)?.toLowerCase();
+        switch(trillStep){
+            case 'unison':
+                return 0;
+            case 'half':
+                return 1;
+            case 'whole':
+                return 2;
+            default:
+                return 2;
+        }                     
     }
 
     private parseTechnical(element: XmlNode, note: Note): void {

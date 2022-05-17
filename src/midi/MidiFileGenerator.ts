@@ -38,6 +38,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { PercussionMapper } from '@src/model/PercussionMapper';
+import { MelodicMotion } from '@src/model/MelodicMotion';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -459,6 +460,14 @@ export class MidiFileGenerator {
         // Trill
         if (note.isTrill && !staff.isPercussion) {
             this.generateTrill(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
+            // no further generation needed
+            return;
+        }
+
+        //
+        // Turn
+        if (note.isTurn && !staff.isPercussion) {
+            this.generateTurn(note, noteStart, noteDuration, noteKey, dynamicValue, channel, false);
             // no further generation needed
             return;
         }
@@ -1184,6 +1193,36 @@ export class MidiFileGenerator {
             this._handler.addNote(track.index, tick, trillLength, realKey ? trillKey : noteKey, dynamicValue, channel);
             realKey = !realKey;
             tick += trillLength;
+        }
+    }
+
+    private generateTurn(
+        note: Note,
+        noteStart: number,
+        noteDuration: MidiNoteDuration,
+        noteKey: number,
+        dynamicValue: DynamicValue,
+        channel: number,
+        isInverted:boolean
+    ): void {
+        const track: Track = note.beat.voice.bar.staff.track;
+        //const turnKey: number = note.stringTuning + note.turnValue;
+        let turnLength: number = MidiUtils.toTicks(note.turnSpeed);
+        let melodicMotion: MelodicMotion = isInverted? MelodicMotion.Descending: MelodicMotion.Ascending;
+        let tick: number = noteStart;
+        let end: number = noteStart + noteDuration.untilTieOrSlideEnd;
+        let tickDistance: number = (end-tick)/4;
+        for(let count= 1; 
+            tick < end; 
+            tick += tickDistance, count++)
+            {
+            if(count%2){
+                let stepOffset = melodicMotion == MelodicMotion.Ascending ? note.turnValue: -note.turnValue;
+                this._handler.addNote(track.index, tick, turnLength, noteKey + stepOffset, dynamicValue, channel);
+                melodicMotion = melodicMotion == MelodicMotion.Ascending ? MelodicMotion.Descending: MelodicMotion.Ascending;
+            } else {
+                this._handler.addNote(track.index, tick, turnLength, noteKey, dynamicValue, channel);
+            }
         }
     }
 

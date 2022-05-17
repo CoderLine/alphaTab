@@ -7,7 +7,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
  */
 export class EffectGlyph extends Glyph {
     /**
-     * Gets or sets the beat where the glyph belongs to.
+     * Gets or sets the beat wherere the glyph belongs to.
      */
     public beat: Beat | null = null;
 

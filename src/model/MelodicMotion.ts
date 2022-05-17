@@ -1,13 +1,17 @@
 /**
- * Lists all melodic motions of a note.
+ * Lists all Melodic Motion types.
  */
  export enum MelodicMotion {
     /**
-     * Falling melodic motion. 
+     * No melodic motion indicated.
      */
-    Descending,
+    None,
     /**
-     * Rising melodic motion. 
+     * Ascending direction indicated.
      */
     Ascending,
- }
+    /**
+     * Descending direction indicated.
+     */
+    Descending
+}

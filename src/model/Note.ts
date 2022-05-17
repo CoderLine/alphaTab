@@ -20,7 +20,6 @@ import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PickStroke } from '@src/model/PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { MelodicMotion } from './MelodicMotion';
 
 class NoteIdBag {
     public tieDestinationNoteId: number = -1;
@@ -445,13 +444,13 @@ export class Note {
     public trillSpeed: Duration = Duration.ThirtySecond;
 
     /**
-     * Gets or sets the target note value for the turn effect.
+     * Gets or sets the target note value for the turn ornament effect.
      */
     public turnValue: number = -1;
 
-    /*public get trillFret(): number {
-        return this.trillValue - this.stringTuning;
-    }*/
+    public get turnFret(): number { // Plausible?
+        return this.turnValue - this.stringTuning;
+    }
 
     public get isTurn(): boolean {
         return this.turnValue >= 0;
@@ -460,12 +459,7 @@ export class Note {
     /**
      * Gets or sets the speed of the turn ornament effect.
      */
-    public turnSpeed: Duration = Duration.Sixteenth;
-
-    /**
-     * Gets or sets the speed of the turn ornament effect.
-     */
-    public turnDirection: MelodicMotion = MelodicMotion.Ascending;
+    public turnSpeed: Duration = Duration.ThirtySecond;
 
     /**
      * Gets or sets the percentual duration of the note relative to the overall beat duration .
