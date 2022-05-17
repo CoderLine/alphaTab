@@ -913,9 +913,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         break;
                     case 'inverted-vertical-turn': // Fallthrough.
                     case 'inverted-turn':
-                        // TODO: set inverted turn properties.
-                        // START:trill-step(down), unison, trill-step(up), END:unison.   
-                        // Placement: above the note.
+                        note.invertedTurnValue = this.parseTrillStep(c);
                         break;
                     case 'delayed-inverted-turn':
                         // TODO: set delayed-inverted-turn properties.

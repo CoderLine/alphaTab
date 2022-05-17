@@ -448,7 +448,7 @@ export class Note {
      */
     public turnValue: number = -1;
 
-    public get turnFret(): number { // Plausible?
+    public get turnFret(): number { // Valid?
         return this.turnValue - this.stringTuning;
     }
 
@@ -461,6 +461,24 @@ export class Note {
      */
     public turnSpeed: Duration = Duration.ThirtySecond;
 
+    /**
+     * Gets or sets the target note value for the inverted turn ornament effect.
+     */
+    public invertedTurnValue: number = -1;
+
+    public get invertedTurnFret(): number { // Valid?
+        return this.invertedTurnValue - this.stringTuning;
+    }
+
+    public get isInvertedTurn(): boolean {
+        return this.invertedTurnValue >= 0;
+    }
+
+    /**
+     * Gets or sets the speed of the inverted turn ornament effect.
+     */
+    public invertedTurnSpeed: Duration = Duration.ThirtySecond;
+     
     /**
      * Gets or sets the percentual duration of the note relative to the overall beat duration .
      */

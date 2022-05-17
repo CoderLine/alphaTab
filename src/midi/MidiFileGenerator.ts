@@ -472,6 +472,14 @@ export class MidiFileGenerator {
             return;
         }
 
+        //      
+        // Turn
+        if (note.isInvertedTurn && !staff.isPercussion) {
+            this.generateTurn(note, noteStart, noteDuration, noteKey, dynamicValue, channel, true);
+            // no further generation needed
+            return;
+        }
+
         //
         // Tremolo Picking
         if (note.beat.isTremolo) {

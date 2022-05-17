@@ -65,6 +65,8 @@ export class NoteSerializer {
         o.set("trillspeed", obj.trillSpeed as number); 
         o.set("turnvalue", obj.turnValue); 
         o.set("turnspeed", obj.turnSpeed as number); 
+        o.set("invertedturnvalue", obj.invertedTurnValue); 
+        o.set("invertedturnspeed", obj.invertedTurnSpeed as number); 
         o.set("durationpercent", obj.durationPercent); 
         o.set("accidentalmode", obj.accidentalMode as number); 
         o.set("dynamics", obj.dynamics as number); 
@@ -178,6 +180,12 @@ export class NoteSerializer {
                 return true;
             case "turnspeed":
                 obj.turnSpeed = JsonHelper.parseEnum<Duration>(v, Duration)!;
+                return true;
+            case "invertedturnvalue":
+                obj.invertedTurnValue = v! as number;
+                return true;
+            case "invertedturnspeed":
+                obj.invertedTurnSpeed = JsonHelper.parseEnum<Duration>(v, Duration)!;
                 return true;
             case "durationpercent":
                 obj.durationPercent = v! as number;

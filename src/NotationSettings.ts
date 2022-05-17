@@ -269,6 +269,11 @@ export enum NotationElement {
     EffectTurn,
 
     /**
+     * The turn symbol shown above the staff.
+     */
+    EffectInvertedTurn,
+
+    /**
      * The triplet feel symbol shown above the staff.
      */
     EffectTripletFeel,

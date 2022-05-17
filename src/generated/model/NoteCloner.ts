@@ -46,6 +46,8 @@ export class NoteCloner {
         clone.trillSpeed = original.trillSpeed; 
         clone.turnValue = original.turnValue; 
         clone.turnSpeed = original.turnSpeed; 
+        clone.invertedTurnValue = original.invertedTurnValue; 
+        clone.invertedTurnSpeed = original.invertedTurnSpeed; 
         clone.durationPercent = original.durationPercent; 
         clone.accidentalMode = original.accidentalMode; 
         clone.dynamics = original.dynamics; 

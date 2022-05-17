@@ -58,6 +58,7 @@ import { IntersectionObserverPolyfill } from '@src/platform/javascript/Intersect
 import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
 import { TurnEffectInfo } from './rendering/effects/TurnEffectInfo';
+import { InvertedTurnEffectInfo } from './rendering/effects/InvertedTurnEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -396,6 +397,7 @@ export class Environment {
                 new WhammyBarEffectInfo(),
                 new TrillEffectInfo(),
                 new TurnEffectInfo(),
+                new InvertedTurnEffectInfo(),
                 new OttaviaEffectInfo(true),
                 new WideBeatVibratoEffectInfo(),
                 new SlightBeatVibratoEffectInfo(),
@@ -412,6 +414,7 @@ export class Environment {
                 new LyricsEffectInfo(),
                 new TrillEffectInfo(),
                 new TurnEffectInfo(),
+                new InvertedTurnEffectInfo(),
                 new WideBeatVibratoEffectInfo(),
                 new SlightBeatVibratoEffectInfo(),
                 new WideNoteVibratoEffectInfo(),
@@ -445,6 +448,7 @@ export class Environment {
                 new WhammyBarEffectInfo(),
                 new TrillEffectInfo(),
                 new TurnEffectInfo(),
+                new InvertedTurnEffectInfo(),
                 new OttaviaEffectInfo(true),
                 new WideBeatVibratoEffectInfo(),
                 new SlightBeatVibratoEffectInfo(),
@@ -475,6 +479,7 @@ export class Environment {
             new FermataEffectInfo(),
             new TrillEffectInfo(),
             new TurnEffectInfo(),
+            new InvertedTurnEffectInfo(),
             new WideBeatVibratoEffectInfo(),
             new SlightBeatVibratoEffectInfo(),
             new WideNoteVibratoEffectInfo(),
