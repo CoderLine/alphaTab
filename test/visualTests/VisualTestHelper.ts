@@ -393,7 +393,6 @@ export class VisualTestHelper {
      */
     private static toEqualVisually(
         _utils: jasmine.MatchersUtil,
-        _customEqualityTesters: ReadonlyArray<jasmine.CustomEqualityTester>
     ): jasmine.CustomAsyncMatcher {
         return {
             async compare(
