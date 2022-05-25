@@ -1,6 +1,6 @@
 name: 🕷️ Bug Report
 description: Report a bug.
-labels: ":spider: type-bug"
+labels: "state-needs-triage"
 assignees: Danielku15
 body:
 - type: checkboxes
