@@ -315,7 +315,24 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private parseTripletFeelFromInt(i: number): TripletFeel {
-        return i in TripletFeel ? i as TripletFeel : TripletFeel.NoTripletFeel;
+        switch (i) {
+            case 0:
+                return TripletFeel.NoTripletFeel;
+            case 1:
+                return TripletFeel.Triplet16th;
+            case 2:
+                return TripletFeel.Triplet8th;
+            case 3:
+                return TripletFeel.Dotted16th;
+            case 4:
+                return TripletFeel.Dotted8th;
+            case 5:
+                return TripletFeel.Scottish16th;
+            case 6:
+                return TripletFeel.Scottish8th;
+            default:
+                return TripletFeel.NoTripletFeel;
+        }
     }
 
     /**
@@ -1698,13 +1715,48 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private toFinger(num: number): Fingers {
-        // Finger count starts from 1, enum index starts from 0
-        const i = num - 1;
-        return i in Fingers ? i as Fingers : Fingers.Thumb;
+        switch (num) {
+            case 1:
+                return Fingers.Thumb;
+            case 2:
+                return Fingers.IndexFinger;
+            case 3:
+                return Fingers.MiddleFinger;
+            case 4:
+                return Fingers.AnnularFinger;
+            case 5:
+                return Fingers.LittleFinger;
+        }
+        return Fingers.Thumb;
     }
 
     private parseDuration(duration: number): Duration {
-        return duration in Duration ? duration as Duration : Duration.Quarter;
+        switch (duration) {
+            case -4:
+                return Duration.QuadrupleWhole;
+            case -2:
+                return Duration.DoubleWhole;
+            case 1:
+                return Duration.Whole;
+            case 2:
+                return Duration.Half;
+            case 4:
+                return Duration.Quarter;
+            case 8:
+                return Duration.Eighth;
+            case 16:
+                return Duration.Sixteenth;
+            case 32:
+                return Duration.ThirtySecond;
+            case 64:
+                return Duration.SixtyFourth;
+            case 128:
+                return Duration.OneHundredTwentyEighth;
+            case 256:
+                return Duration.TwoHundredFiftySixth;
+            default:
+                return Duration.Quarter;
+        }
     }
 
     private barMeta(bar: Bar): boolean {
