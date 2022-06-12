@@ -43,7 +43,7 @@ import { Note } from '@src/model/Note';
 import { MidiEventType } from '@src/midi/MidiEvent';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
-import { ActiveBeatsChangedEventArgs } from './ActiveBeatsChangedEventArgs';
+import { ActiveBeatsChangedEventArgs } from '@src/synth/ActiveBeatsChangedEventArgs';
 
 class SelectionInfo {
     public beat: Beat;
