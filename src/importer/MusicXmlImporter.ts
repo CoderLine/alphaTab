@@ -69,7 +69,6 @@ export class MusicXmlImporter extends ScoreImporter {
             this.mergePartGroups();
         }
         this._score.finish(this.settings);
-        // the structure of MusicXML does not allow live creation of the groups,
         this._score.rebuildRepeatGroups();
         return this._score;
     }
@@ -857,7 +856,7 @@ export class MusicXmlImporter extends ScoreImporter {
                                     note.isSlurDestination = true;
                                     let slurStart: Note = this._slurStarts.get(slurNumber)!;
                                     slurStart.slurDestination = note;
-                                    note.slurOrigin = note;
+                                    note.slurOrigin = slurStart;
                                 }
                                 break;
                         }
