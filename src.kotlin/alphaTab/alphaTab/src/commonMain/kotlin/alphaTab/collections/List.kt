@@ -59,8 +59,9 @@ public class List<T> : Iterable<T> {
         return _data.removeLast()
     }
 
-    public fun sort(comparison: (a: T, b: T) -> Double) {
+    public fun sort(comparison: (a: T, b: T) -> Double) : List<T> {
         _data.sortWith { a, b -> comparison(a, b).toInt() }
+        return this
     }
 
     public fun <TOut> map(transform: (v: T) -> TOut): List<TOut> {
@@ -71,6 +72,15 @@ public class List<T> : Iterable<T> {
         val mapped = DoubleList(_data.size)
         _data.forEachIndexed { index, item ->
             mapped[index] = transform(item)
+        }
+        return mapped
+    }
+
+    @kotlin.jvm.JvmName("mapIntToDouble")
+    public fun map(transform: (v: T) -> Int): DoubleList {
+        val mapped = DoubleList(_data.size)
+        _data.forEachIndexed { index, item ->
+            mapped[index] = transform(item).toDouble()
         }
         return mapped
     }

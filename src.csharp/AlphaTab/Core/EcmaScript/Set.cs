@@ -49,5 +49,10 @@ namespace AlphaTab.Core.EcmaScript
         {
             return GetEnumerator();
         }
+
+        public void Delete(T item)
+        {
+            _data.Remove(item);
+        }
     }
 }
