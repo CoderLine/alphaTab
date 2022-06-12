@@ -190,6 +190,7 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             this.destroyPlayer();
         }
+        this.onSettingsUpdated();
     }
 
     /**
@@ -546,10 +547,13 @@ export class AlphaTabApiBase<TSettings> {
         }
         this.player.destroy();
         this.player = null;
+        this._previousTick = 0;
+        this._playerState = PlayerState.Paused;
         this.destroyCursors();
     }
 
     private setupPlayer(): void {
+        this.updateCursors();
         if (this.player) {
             return;
         }
@@ -752,25 +756,29 @@ export class AlphaTabApiBase<TSettings> {
         this._barCursor = null;
         this._beatCursor = null;
         this._selectionWrapper = null;
-        this._previousTick = 0;
-        this._playerState = PlayerState.Paused;
     }
 
-    private setupPlayerEvents(): void {
+    private updateCursors() {
         if (this.settings.player.enableCursor && !this._cursorWrapper) {
             //
             // Create cursors
             let cursors = this.uiFacade.createCursors();
-            if (!cursors) {
-                return;
+            if (cursors) {
+                // store options and created elements for fast access
+                this._cursorWrapper = cursors.cursorWrapper;
+                this._barCursor = cursors.barCursor;
+                this._beatCursor = cursors.beatCursor;
+                this._selectionWrapper = cursors.selectionWrapper;
             }
-            // store options and created elements for fast access
-            this._cursorWrapper = cursors.cursorWrapper;
-            this._barCursor = cursors.barCursor;
-            this._beatCursor = cursors.beatCursor;
-            this._selectionWrapper = cursors.selectionWrapper;
+            if (this._currentBeat !== null) {
+                this.cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, true);
+            }
+        } else if (!this.settings.player.enableCursor && this._cursorWrapper) {
+            this.destroyCursors();
         }
+    }
 
+    private setupPlayerEvents(): void {
         //
         // Hook into events
         this._previousTick = 0;
@@ -823,7 +831,12 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * updates the cursors to highlight the specified beat
      */
-    private cursorUpdateBeat(lookupResult: MidiTickLookupFindBeatResult, stop: boolean, shouldScroll: boolean): void {
+    private cursorUpdateBeat(
+        lookupResult: MidiTickLookupFindBeatResult,
+        stop: boolean,
+        shouldScroll: boolean,
+        forceUpdate: boolean = false
+    ): void {
         const beat: Beat = lookupResult.currentBeat;
         const nextBeat: Beat | null = lookupResult.nextBeat;
         const duration: number = lookupResult.duration;
@@ -839,7 +852,12 @@ export class AlphaTabApiBase<TSettings> {
         let previousBeat = this._currentBeat;
         let previousCache: BoundsLookup | null = this._previousCursorCache;
         let previousState: PlayerState | null = this._previousStateForCursor;
-        if (beat === previousBeat?.currentBeat && cache === previousCache && previousState === this._playerState) {
+        if (
+            !forceUpdate &&
+            beat === previousBeat?.currentBeat &&
+            cache === previousCache &&
+            previousState === this._playerState
+        ) {
             return;
         }
         let beatBoundings: BeatBounds | null = cache.findBeat(beat);
@@ -958,7 +976,6 @@ export class AlphaTabApiBase<TSettings> {
 
         this._currentBarBounds = barBoundings;
 
-
         if (barCursor) {
             barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
         }
@@ -970,7 +987,6 @@ export class AlphaTabApiBase<TSettings> {
             }
             beatCursor.setBounds(beatBoundings.visualBounds.x, barBounds.y, 1, barBounds.h);
         }
-
 
         // if playing, animate the cursor to the next beat
         if (this.settings.player.enableElementHighlighting) {
@@ -1001,7 +1017,7 @@ export class AlphaTabApiBase<TSettings> {
                         if (
                             nextBeatBoundings &&
                             nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                            barBoundings.staveGroupBounds
+                                barBoundings.staveGroupBounds
                         ) {
                             nextBeatX = nextBeatBoundings.visualBounds.x;
                         }
@@ -1011,7 +1027,7 @@ export class AlphaTabApiBase<TSettings> {
                 // we need to put the transition to an own animation frame
                 // otherwise the stop animation above is not applied.
                 this.uiFacade.beginInvoke(() => {
-                    if(beatCursor) {
+                    if (beatCursor) {
                         beatCursor.transitionToX(duration / this.playbackSpeed, nextBeatX);
                     }
                 });
@@ -1028,7 +1044,7 @@ export class AlphaTabApiBase<TSettings> {
         // trigger an event for others to indicate which beat/bar is played
         if (shouldNotifyBeatChange) {
             this.onPlayedBeatChanged(beat);
-            this.onActiveBeatsChanged(new ActiveBeatsChangedEventArgs(beatsToHighlight))
+            this.onActiveBeatsChanged(new ActiveBeatsChangedEventArgs(beatsToHighlight));
         }
     }
 
@@ -1041,7 +1057,8 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade.triggerEvent(this.container, 'playedBeatChanged', beat);
     }
 
-    public activeBeatsChanged: IEventEmitterOfT<ActiveBeatsChangedEventArgs> = new EventEmitterOfT<ActiveBeatsChangedEventArgs>();
+    public activeBeatsChanged: IEventEmitterOfT<ActiveBeatsChangedEventArgs> =
+        new EventEmitterOfT<ActiveBeatsChangedEventArgs>();
     private onActiveBeatsChanged(e: ActiveBeatsChangedEventArgs): void {
         if (this._isDestroyed) {
             return;
@@ -1170,7 +1187,6 @@ export class AlphaTabApiBase<TSettings> {
         this._beatMouseDown = false;
     }
 
-
     private onNoteMouseUp(originalEvent: IMouseEventArgs, note: Note | null): void {
         if (this._isDestroyed) {
             return;
@@ -1218,7 +1234,6 @@ export class AlphaTabApiBase<TSettings> {
                         this.onNoteMouseDown(e, note);
                     }
                 }
-
             }
         });
         this.canvasElement.mouseMove.on(e => {
@@ -1255,8 +1270,7 @@ export class AlphaTabApiBase<TSettings> {
                 if (beat) {
                     const note = this.renderer.boundsLookup?.getNoteAtPos(beat, relX, relY) ?? null;
                     this.onNoteMouseUp(e, note);
-                }
-                else {
+                } else {
                     this.onNoteMouseUp(e, null);
                 }
             }
@@ -1503,5 +1517,17 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'playbackRangeChanged', e);
+    }
+
+    /**
+     * @internal
+     */
+    public settingsUpdated: IEventEmitter = new EventEmitter();
+    private onSettingsUpdated(): void {
+        if (this._isDestroyed) {
+            return;
+        }
+        (this.settingsUpdated as EventEmitter).trigger();
+        this.uiFacade.triggerEvent(this.container, 'settingsUpdated', null);
     }
 }
