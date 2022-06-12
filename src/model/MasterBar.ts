@@ -140,9 +140,8 @@ export class MasterBar {
             let duration: number = 0;
             for (let track of this.score.tracks) {
                 for (let staff of track.staves) {
-                    let barDuration: number = this.index < staff.bars.length
-                        ? staff.bars[this.index].calculateDuration()
-                        : 0;
+                    let barDuration: number =
+                        this.index < staff.bars.length ? staff.bars[this.index].calculateDuration() : 0;
                     if (barDuration > duration) {
                         duration = barDuration;
                     }

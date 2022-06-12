@@ -12,9 +12,9 @@ import { Settings } from '@src/Settings';
  * @json_strict
  */
 export class Score {
-    private _openedRepeatGroups: RepeatGroup[] = [];
-    private _closedRepeatGroups: RepeatGroup[] = [];
     private _currentRepeatGroup: RepeatGroup | null = null;
+    private _openedRepeatGroups: RepeatGroup[] = [];
+    private _properlyOpenedRepeatGroups:number = 0;
 
     /**
      * The album of this song.
@@ -94,11 +94,11 @@ export class Score {
     public stylesheet: RenderStylesheet = new RenderStylesheet();
 
     public rebuildRepeatGroups(): void {
-        this._openedRepeatGroups = [];
-        this._closedRepeatGroups = [];
         this._currentRepeatGroup = null;
+        this._openedRepeatGroups = [];
+        this._properlyOpenedRepeatGroups = 0;
         for (const bar of this.masterBars) {
-            this.addMasterBarToRepeatGroups(bar)
+            this.addMasterBarToRepeatGroups(bar);
         }
     }
 
@@ -123,68 +123,50 @@ export class Score {
 
     /**
      * Adds the given bar correctly into the current repeat group setup.
-     * @param bar 
+     * @param bar
      */
     private addMasterBarToRepeatGroups(bar: MasterBar) {
         // handling the repeats is quite tricky due to many invalid combinations a user might define
-        // there are also some complexities due to nested repeats and repeats with multiple endings but only one opening. 
-        // all scenarios are handled below. 
+        // there are also some complexities due to nested repeats and repeats with multiple endings but only one opening.
+        // all scenarios are handled below.
 
         // NOTE: In all paths we need to ensure that the bar is added to some repeat group
 
-        // start a new properly opened repeat group
+        // start a new repeat group if really a repeat is started
+        // or we don't have a group.
         if (bar.isRepeatStart) {
+            // if the current group was already closed (this opening doesn't cause nesting)
+            // we consider the group as completed
+            if(this._currentRepeatGroup?.isClosed) {
+                this._openedRepeatGroups.pop();
+                this._properlyOpenedRepeatGroups--;
+            }
             this._currentRepeatGroup = new RepeatGroup();
             this._openedRepeatGroups.push(this._currentRepeatGroup);
-
-            // if a new group is started, we can drop the group we remembered as closed. 
-            // not that accidentally later on it is picked up by a malformed group.
-            this._closedRepeatGroups.pop();
+            this._properlyOpenedRepeatGroups++;
+        } else if(!this._currentRepeatGroup) {
+            this._currentRepeatGroup = new RepeatGroup();
+            this._openedRepeatGroups.push(this._currentRepeatGroup);
         }
+
+        // close current group if there was one started
+        this._currentRepeatGroup.addMasterBar(bar);
 
         // handle repeat ends
         if (bar.isRepeatEnd) {
-
-            // close current group if there was one started
-            if (this._currentRepeatGroup) {
-                // add current bar to current group..
-                this._currentRepeatGroup.addMasterBar(bar);
-
-                // here we remember the closed groups for scenarios like open, bar, close, close (second close needs to be added to the already closed group)
-                this._closedRepeatGroups.push(this._currentRepeatGroup);
+            // if we have nested repeat groups a repeat end
+            // will treat the group as completed
+            if (this._properlyOpenedRepeatGroups > 1) {
                 this._openedRepeatGroups.pop();
-
-                // and then restore previous repeat group for setups like: open,open,close,close
-                if (this._openedRepeatGroups.length > 0) {
-                    this._currentRepeatGroup = this._openedRepeatGroups[this._openedRepeatGroups.length - 1];
-                } else {
-                    // if no previously opened groups -> just clear the current group, next bar will start a new group then accordingly.
-                    this._currentRepeatGroup = null;
-                }
-            } else {
-                // if setup like: open, bar, close, bar, close 
-                // we need to add the second close to the previously opened bar.
-                if (this._closedRepeatGroups.length > 0) {
-                    this._closedRepeatGroups[this._closedRepeatGroups.length - 1].addMasterBar(bar);
-                }
-
-                // malformed setup where we have a close without ever a group started.
-                // in this case we try to add the ending to the existing repeat on the first bar or create a new repeat group starting there
-                if (this._openedRepeatGroups.length > 0 && this._openedRepeatGroups[0].opening.index === 0) {
-                    this._openedRepeatGroups[0].addMasterBar(bar);
-                } else {
-                    const recoveryGroup = new RepeatGroup();
-                    this._openedRepeatGroups.unshift(recoveryGroup);
-                    recoveryGroup.addMasterBar(bar);
-                }
+                this._properlyOpenedRepeatGroups--;
+                // restore outer group in cases like "open open close close"
+                this._currentRepeatGroup =
+                    this._openedRepeatGroups.length > 0
+                        ? this._openedRepeatGroups[this._openedRepeatGroups.length - 1]
+                        : null;
             }
-        } else {
-            // normal bar, create group if needed and add
-            if (!this._currentRepeatGroup) {
-                this._currentRepeatGroup = new RepeatGroup();
-                this._openedRepeatGroups.push(this._currentRepeatGroup);
-            }
-            this._currentRepeatGroup!.addMasterBar(bar);
+            // else: if only one group is opened, this group stays active for 
+            // scenarios like open close bar close
         }
     }
 
