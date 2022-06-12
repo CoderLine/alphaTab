@@ -43,6 +43,7 @@ import { Note } from '@src/model/Note';
 import { MidiEventType } from '@src/midi/MidiEvent';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import { ActiveBeatsChangedEventArgs } from '@src/synth/ActiveBeatsChangedEventArgs';
 
 class SelectionInfo {
     public beat: Beat;
@@ -582,11 +583,7 @@ export class AlphaTabApiBase<TSettings> {
         this.player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
         this.player.playbackRangeChanged.on(this.onPlaybackRangeChanged.bind(this));
         this.player.finished.on(this.onPlayerFinished.bind(this));
-        if (this.settings.player.enableCursor) {
-            this.setupCursors();
-        } else {
-            this.destroyCursors();
-        }
+        this.setupPlayerEvents();
     }
 
     private loadMidiForScore(): void {
@@ -759,18 +756,21 @@ export class AlphaTabApiBase<TSettings> {
         this._playerState = PlayerState.Paused;
     }
 
-    private setupCursors(): void {
-        //
-        // Create cursors
-        let cursors = this.uiFacade.createCursors();
-        if (!cursors) {
-            return;
+    private setupPlayerEvents(): void {
+        if (this.settings.player.enableCursor && !this._cursorWrapper) {
+            //
+            // Create cursors
+            let cursors = this.uiFacade.createCursors();
+            if (!cursors) {
+                return;
+            }
+            // store options and created elements for fast access
+            this._cursorWrapper = cursors.cursorWrapper;
+            this._barCursor = cursors.barCursor;
+            this._beatCursor = cursors.beatCursor;
+            this._selectionWrapper = cursors.selectionWrapper;
         }
-        // store options and created elements for fast access
-        this._cursorWrapper = cursors.cursorWrapper;
-        this._barCursor = cursors.barCursor;
-        this._beatCursor = cursors.beatCursor;
-        this._selectionWrapper = cursors.selectionWrapper;
+
         //
         // Hook into events
         this._previousTick = 0;
@@ -945,25 +945,32 @@ export class AlphaTabApiBase<TSettings> {
         nextBeat: Beat | null,
         duration: number,
         stop: boolean,
-        beatsToHighlight: Beat[] | null,
+        beatsToHighlight: Beat[],
         cache: BoundsLookup,
         beatBoundings: BeatBounds,
         shouldScroll: boolean
     ) {
-        let barCursor: IContainer = this._barCursor!;
-        let beatCursor: IContainer = this._beatCursor!;
+        const barCursor = this._barCursor;
+        const beatCursor = this._beatCursor;
 
         let barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
         let barBounds: Bounds = barBoundings.visualBounds;
 
         this._currentBarBounds = barBoundings;
-        barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
 
-        // move beat to start position immediately
-        if (this.settings.player.enableAnimatedBeatCursor) {
-            beatCursor.stopAnimation();
+
+        if (barCursor) {
+            barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
         }
-        beatCursor.setBounds(beatBoundings.visualBounds.x, barBounds.y, 1, barBounds.h);
+
+        if (beatCursor) {
+            // move beat to start position immediately
+            if (this.settings.player.enableAnimatedBeatCursor) {
+                beatCursor.stopAnimation();
+            }
+            beatCursor.setBounds(beatBoundings.visualBounds.x, barBounds.y, 1, barBounds.h);
+        }
+
 
         // if playing, animate the cursor to the next beat
         if (this.settings.player.enableElementHighlighting) {
@@ -973,7 +980,7 @@ export class AlphaTabApiBase<TSettings> {
         // actively playing? -> animate cursor and highlight items
         let shouldNotifyBeatChange = false;
         if (this._playerState === PlayerState.Playing && !stop) {
-            if (this.settings.player.enableElementHighlighting && beatsToHighlight) {
+            if (this.settings.player.enableElementHighlighting) {
                 for (let highlight of beatsToHighlight) {
                     let className: string = BeatContainerGlyph.getGroupId(highlight);
                     this.uiFacade.highlightElements(className, beat.voice.bar.index);
@@ -1004,7 +1011,9 @@ export class AlphaTabApiBase<TSettings> {
                 // we need to put the transition to an own animation frame
                 // otherwise the stop animation above is not applied.
                 this.uiFacade.beginInvoke(() => {
-                    beatCursor!.transitionToX(duration / this.playbackSpeed, nextBeatX);
+                    if(beatCursor) {
+                        beatCursor.transitionToX(duration / this.playbackSpeed, nextBeatX);
+                    }
                 });
             }
 
@@ -1019,6 +1028,7 @@ export class AlphaTabApiBase<TSettings> {
         // trigger an event for others to indicate which beat/bar is played
         if (shouldNotifyBeatChange) {
             this.onPlayedBeatChanged(beat);
+            this.onActiveBeatsChanged(new ActiveBeatsChangedEventArgs(beatsToHighlight))
         }
     }
 
@@ -1029,6 +1039,15 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.playedBeatChanged as EventEmitterOfT<Beat>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'playedBeatChanged', beat);
+    }
+
+    public activeBeatsChanged: IEventEmitterOfT<ActiveBeatsChangedEventArgs> = new EventEmitterOfT<ActiveBeatsChangedEventArgs>();
+    private onActiveBeatsChanged(e: ActiveBeatsChangedEventArgs): void {
+        if (this._isDestroyed) {
+            return;
+        }
+        (this.activeBeatsChanged as EventEmitterOfT<ActiveBeatsChangedEventArgs>).trigger(e);
+        this.uiFacade.triggerEvent(this.container, 'activeBeatsChanged', e);
     }
 
     private _beatMouseDown: boolean = false;
