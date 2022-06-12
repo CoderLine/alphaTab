@@ -115,32 +115,31 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
             api.renderer.renderResult(it)
         }
         settings.settingsChanged.on(this::onSettingsChanged)
-        settingsContainer.barCursorFillColorChanged.on {
-            (this._cursors?.barCursor as AndroidViewContainer?)?.view?.setBackgroundColor(
-                settingsContainer.barCursorFillColor
-            )
-        }
-        settingsContainer.beatCursorFillColorChanged.on {
-            (this._cursors?.beatCursor as AndroidViewContainer?)?.view?.setBackgroundColor(
-                settingsContainer.barCursorFillColor
-            )
-        }
-        settingsContainer.selectionFillColorChanged.on {
-            val selectionWrapper = (this._cursors?.selectionWrapper as AndroidViewContainer?)?.view
-            if (selectionWrapper is ViewGroup) {
-                for (c in selectionWrapper.children) {
-                    c.setBackgroundColor(
-                        settingsContainer.selectionFillColor
-                    )
-                }
-            }
-        }
+        api.settingsUpdated.on(this::onSettingsUpdated)
     }
 
     private fun onSettingsChanged() {
         api.settings = settingsContainer.settings
         api.updateSettings()
         api.render()
+    }
+
+    private fun onSettingsUpdated() {
+        (this._cursors?.barCursor as AndroidViewContainer?)?.view?.setBackgroundColor(
+            settingsContainer.barCursorFillColor
+        )
+        (this._cursors?.beatCursor as AndroidViewContainer?)?.view?.setBackgroundColor(
+            settingsContainer.beatCursorFillColor
+        )
+
+        val selectionWrapper = (this._cursors?.selectionWrapper as AndroidViewContainer?)?.view
+        if (selectionWrapper is ViewGroup) {
+            for (c in selectionWrapper.children) {
+                c.setBackgroundColor(
+                    settingsContainer.selectionFillColor
+                )
+            }
+        }
     }
 
     override fun createWorkerRenderer(): IScoreRenderer {
@@ -183,6 +182,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
     override fun destroy() {
         settingsContainer.settingsChanged.off(this::onSettingsChanged)
         (rootContainer as AndroidRootViewContainer).destroy()
+        api.settingsUpdated.off(this::onSettingsUpdated)
     }
 
     override fun triggerEvent(

@@ -190,6 +190,7 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             this.destroyPlayer();
         }
+        this.onSettingsUpdated();
     }
 
     /**
@@ -830,7 +831,12 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * updates the cursors to highlight the specified beat
      */
-    private cursorUpdateBeat(lookupResult: MidiTickLookupFindBeatResult, stop: boolean, shouldScroll: boolean, forceUpdate:boolean = false): void {
+    private cursorUpdateBeat(
+        lookupResult: MidiTickLookupFindBeatResult,
+        stop: boolean,
+        shouldScroll: boolean,
+        forceUpdate: boolean = false
+    ): void {
         const beat: Beat = lookupResult.currentBeat;
         const nextBeat: Beat | null = lookupResult.nextBeat;
         const duration: number = lookupResult.duration;
@@ -846,7 +852,12 @@ export class AlphaTabApiBase<TSettings> {
         let previousBeat = this._currentBeat;
         let previousCache: BoundsLookup | null = this._previousCursorCache;
         let previousState: PlayerState | null = this._previousStateForCursor;
-        if (!forceUpdate && (beat === previousBeat?.currentBeat && cache === previousCache && previousState === this._playerState)) {
+        if (
+            !forceUpdate &&
+            beat === previousBeat?.currentBeat &&
+            cache === previousCache &&
+            previousState === this._playerState
+        ) {
             return;
         }
         let beatBoundings: BeatBounds | null = cache.findBeat(beat);
@@ -1506,5 +1517,17 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'playbackRangeChanged', e);
+    }
+
+    /**
+     * @internal
+     */
+    public settingsUpdated: IEventEmitter = new EventEmitter();
+    private onSettingsUpdated(): void {
+        if (this._isDestroyed) {
+            return;
+        }
+        (this.settingsUpdated as EventEmitter).trigger();
+        this.uiFacade.triggerEvent(this.container, 'settingsUpdated', null);
     }
 }
