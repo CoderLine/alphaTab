@@ -9,6 +9,8 @@ describe('MidiPlaybackControllerTest', () => {
     const testRepeat: ((score: Score, expectedIndexes: number[], maxBars: number) => void) = (score: Score, expectedIndexes: number[], maxBars: number): void => {
         let controller: MidiPlaybackController = new MidiPlaybackController(score);
         let i: number = 0;
+        let errors:number[] = [];
+        let actual:number[] = [];
         while (!controller.finished) {
             let index: number = controller.index;
             controller.processCurrent();
@@ -17,10 +19,17 @@ describe('MidiPlaybackControllerTest', () => {
                     fail('Too many bars generated');
                 }
                 Logger.debug('Test', `Checking index ${i}, expected[${expectedIndexes[i]}]`, i, expectedIndexes[i]);
+                if(index !== expectedIndexes[i]) {
+                    errors.push(i);
+                }
+                actual.push(index);
                 expect(index).toEqual(expectedIndexes[i]);
                 i++;
             }
             controller.moveNext();
+        }
+        if(errors.length > 0) {
+            fail(`Sequence errors: ${errors.join(', ')}, Expected: [${expectedIndexes.join(', ')}], Actual: [${actual.join(', ')}]`)
         }
         expect(i).toEqual(expectedIndexes.length);
         expect(controller.finished).toBe(true);
@@ -42,25 +51,25 @@ describe('MidiPlaybackControllerTest', () => {
     it('repeat-close', async () => {
         let file = 'audio/repeat-close.gp5';
         let expectedIndexes = [0, 1, 0, 1, 2];
-        testGuitarProRepeat(file, expectedIndexes, 20);
+        await testGuitarProRepeat(file, expectedIndexes, 20);
     });
 
     it('repeat-close-multi', async () => {
         let file = 'audio/repeat-close-multi.gp5';
         let expectedIndexes = [0, 1, 0, 1, 0, 1, 0, 1, 2];
-        testGuitarProRepeat(file, expectedIndexes, 20);
+        await testGuitarProRepeat(file, expectedIndexes, 20);
     });
 
     it('repeat-close-without-start-at-beginning', async () => {
         let file = 'audio/repeat-close-without-start-at-beginning.gp5';
         let expectedIndexes = [0, 1, 0, 1];
-        testGuitarProRepeat(file, expectedIndexes, 20);
+        await testGuitarProRepeat(file, expectedIndexes, 20);
     });
 
     it('repeat-close-alternate-endings', async () => {
         let file = 'audio/repeat-close-alternate-endings.gp5';
         let expectedIndexes = [0, 1, 0, 2, 3, 0, 1, 0, 4];
-        testGuitarProRepeat(file, expectedIndexes, 20);
+        await testGuitarProRepeat(file, expectedIndexes, 20);
     });
 
     it('repeat-with-alphaTex', () => {
@@ -84,6 +93,49 @@ describe('MidiPlaybackControllerTest', () => {
             2, 3, 6, 7, 8 // Third round: 3rd, 4th, 7th, 8th and 9th which have the ending for 3.
                             // 4th and 8th bar don't have the ending explicitly
                             // but extended from the previous bar.
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('multiple-closes', () => {
+        let tex: string = `
+            .
+            4.3.4*4 | \\ro 4.3.4*4 | \\rc 2 4.3.4*4 | 4.3.4*4 | 4.3.4*4 | \\rc 2 4.3.4*4 | 4.3.4*4 | 
+            \\ro 4.3.4*4 | \\rc 2 4.3.4*4 | 4.3.4*4 | 4.3.4*4 
+        `;
+        let expectedBars: number[] = [
+            0, // no repeat
+            // First round of outer repeat
+            1, 2, // First round of inner repeat
+            1, 2, // Second round of inner repeat
+            3, 4, 5,
+            // Second round of outer repeat
+            1, 2, // First round of inner repeat
+            1, 2, // Second round of inner repeat
+            3, 4, 5,
+            6,
+            // next repeat
+            7, 8,
+            7, 8,
+            // Second repeat done
+            9, 10 // last two bars
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('nested-repeats', () => {
+        let tex: string = `
+            .
+            \\ro 4.3.4*4 | \\ro 4.3.4*4 | \\rc 2 4.3.4*4  | 4.3.4*4 | \\rc 2 4.3.4*4 |
+            3.3.4*4 |
+            \\ro 4.3.4*4 | \\ro 4.3.4*4 | \\rc 2 4.3.4*4  | 4.3.4*4 | \\rc 2 4.3.4*4 
+        `;
+        let expectedBars: number[] = [
+            0, 1, 2, 1, 2, 3, 4, 
+            0, 1, 2, 1, 2, 3, 4, 
+            5,
+            6, 7, 8, 7, 8, 9, 10, 
+            6, 7, 8, 7, 8, 9, 10
         ];
         testAlphaTexRepeat(tex, expectedBars, 50);
     });

@@ -69,7 +69,6 @@ export class MusicXmlImporter extends ScoreImporter {
             this.mergePartGroups();
         }
         this._score.finish(this.settings);
-        // the structure of MusicXML does not allow live creation of the groups,
         this._score.rebuildRepeatGroups();
         return this._score;
     }
@@ -848,6 +847,13 @@ export class MusicXmlImporter extends ScoreImporter {
                         if (!slurNumber) {
                             slurNumber = '1';
                         }
+
+                        // slur numbers are unique in the way that they have the same ID across 
+                        // staffs/tracks etc. as long they represent the logically same slur. 
+                        // but in our case it must be globally unique to link the correct notes. 
+                        // adding the staff ID should be enough to achieve this
+                        slurNumber = beat.voice.bar.staff.index + '_' + slurNumber;
+
                         switch (c.getAttribute('type')) {
                             case 'start':
                                 this._slurStarts.set(slurNumber, note);
@@ -857,7 +863,7 @@ export class MusicXmlImporter extends ScoreImporter {
                                     note.isSlurDestination = true;
                                     let slurStart: Note = this._slurStarts.get(slurNumber)!;
                                     slurStart.slurDestination = note;
-                                    note.slurOrigin = note;
+                                    note.slurOrigin = slurStart;
                                 }
                                 break;
                         }

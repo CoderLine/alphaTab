@@ -19,6 +19,10 @@ internal class Set<T> : Iterable<T> {
         return _set.contains(item)
     }
 
+    public fun delete(item: T) {
+        _set.remove(item)
+    }
+
     public fun forEach(action: (item: T) -> Unit) {
         for (i in _set) {
             action(i)

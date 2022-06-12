@@ -16,6 +16,8 @@ import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
+import { JsonConverter } from '@src/model/JsonConverter';
+import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 
 export class MusicXmlImporterTestHelper {
     public static prepareImporterWithBytes(buffer: Uint8Array): MusicXmlImporter {
@@ -30,16 +32,30 @@ export class MusicXmlImporterTestHelper {
         renderAllTracks: boolean = false
     ): Promise<Score> {
         const fileData = await TestPlatform.loadFile(file);
+        let score: Score;
         try {
             let importer: MusicXmlImporter = MusicXmlImporterTestHelper.prepareImporterWithBytes(fileData);
-            let score: Score = importer.readScore();
-            return score;
+            score = importer.readScore();
         } catch (e) {
             if (e instanceof UnsupportedFormatError) {
                 fail(`Failed to load file ${file}: ${e}`);
             }
             throw e;
         }
+
+        // send it to serializer once and check equality
+        try {
+            const expectedJson = JsonConverter.scoreToJsObject(score);
+
+            const deserialized = JsonConverter.jsObjectToScore(expectedJson);
+            const actualJson = JsonConverter.scoreToJsObject(deserialized);
+ 
+            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + file + '>', null);
+        } catch(e) {
+            fail(e);
+        }
+
+        return score;
     }
 
     protected static getHierarchy(node: unknown): string {
