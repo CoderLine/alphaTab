@@ -316,6 +316,11 @@ namespace AlphaTab.Core
         {
             return s != null;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsTruthy(bool? b)
+        {
+            return b.GetValueOrDefault();
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsTruthy(double s)
