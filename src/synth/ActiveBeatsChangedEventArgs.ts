@@ -5,7 +5,7 @@ import { Beat } from '@src/model/Beat';
  */
 export class ActiveBeatsChangedEventArgs {
     /**
-     * Gets the size before the resizing happened.
+     * The currently active beats across all tracks and voices.
      */
     public activeBeats: Beat[];
 
