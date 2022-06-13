@@ -33,7 +33,7 @@ public class Expector<T> {
         kotlin.test.assertEquals(exp, _actual, _message + message)
     }
 
-    public fun toBeCloseTo(expected:Double, message:String? = null) {
+    public fun toBeCloseTo(expected: Double, message: String? = null) {
         if(_actual is Number) {
             kotlin.test.assertEquals(expected, _actual.toDouble(), 0.001, _message + message)
         } else {
@@ -41,7 +41,7 @@ public class Expector<T> {
         }
     }
 
-    public fun toBe(expected:Any?) {
+    public fun toBe(expected: Any?) {
         var exp = expected
         if(exp is Int && _actual is Double) {
             exp = exp.toDouble()
@@ -63,5 +63,21 @@ public class Expector<T> {
 
     public fun toBeFalsy() {
         kotlin.test.assertNull(_actual, _message)
+    }
+
+    public fun toThrowError(expected: KClass<out Exception>) {
+        if (_actual is Function<*>) {
+            try {
+                //_actual() // fix
+                throw UnsupportedFormatError() // remove
+                kotlin.test.fail("Did not throw error: $_message")
+            } catch (e: Exception) {
+                if (expected::class.isInstance(e::class)) { // bad
+                    return
+                }
+            }
+            kotlin.test.fail("Exception type didn't match: $_message")
+        }
+        kotlin.test.fail("toThrowError can only be used with an exception: $_message")
     }
 }

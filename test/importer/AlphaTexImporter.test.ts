@@ -924,11 +924,11 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('expect-invalid-format-xml', () => {
-        expect(() => parseTex('<xml>')).toThrowError(UnsupportedFormatError);
+        expect<() => Score>(() => parseTex('<xml>')).toThrowError(UnsupportedFormatError);
     });
 
     it('expect-invalid-format-other-text', () => {
-        expect(() => parseTex('This is not an alphaTex file')).toThrowError(UnsupportedFormatError);
+        expect<() => Score>(() => parseTex('This is not an alphaTex file')).toThrowError(UnsupportedFormatError);
     });
 
     it('auto-detect-tuning-from-instrument', () => {
@@ -963,7 +963,7 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('does-not-hang-on-backslash', () => {
-        expect(() => parseTex('\\title Test . 3.3 \\')).toThrowError(UnsupportedFormatError)
+        expect<() => Score>(() => parseTex('\\title Test . 3.3 \\')).toThrowError(UnsupportedFormatError)
     })
 
     function runSectionNoteSymbolTest(noteSymbol: string) {

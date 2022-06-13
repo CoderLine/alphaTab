@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test
@@ -83,6 +83,27 @@ namespace AlphaTab.Test
         public void ToBeFalsy()
         {
             Assert.AreEqual(default!, _actual, _message);
+        }
+
+        public void ToThrowError(Type expected)
+        {
+            if (_actual is Delegate d)
+            {
+                try
+                {
+                    d.DynamicInvoke();
+                    Assert.Fail("Did not throw error:" + _message);
+                }
+                catch (System.Reflection.TargetInvocationException e)
+                {
+                    if (expected.IsInstanceOfType(e.InnerException)) return;
+                }
+                Assert.Fail("Exception type didn't match:" + _message);
+            }
+            else
+            {
+                Assert.Fail("ToThrowError can only be used with an exception:" + _message);
+            }
         }
     }
 }
