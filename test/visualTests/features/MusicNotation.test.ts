@@ -20,6 +20,36 @@ describe('MusicNotationTests', () => {
         await VisualTestHelper.runVisualTest('music-notation/clefs.gp', settings);
     });
 
+    it('key-signatures-mixed', async () => {
+        let settings: Settings = new Settings();
+        settings.display.staveProfile = StaveProfile.Score;
+        await VisualTestHelper.runVisualTest('music-notation/key-signatures-mixed.gp', settings, [0, 1, 2, 3]);
+    });
+
+    it('key-signatures-c3', async () => {
+        let settings: Settings = new Settings();
+        settings.display.staveProfile = StaveProfile.Score;
+        await VisualTestHelper.runVisualTest('music-notation/key-signatures-c3.gp', settings);
+    });
+
+    it('key-signatures-c4', async () => {
+        let settings: Settings = new Settings();
+        settings.display.staveProfile = StaveProfile.Score;
+        await VisualTestHelper.runVisualTest('music-notation/key-signatures-c4.gp', settings);
+    });
+
+    it('key-signatures-f4', async () => {
+        let settings: Settings = new Settings();
+        settings.display.staveProfile = StaveProfile.Score;
+        await VisualTestHelper.runVisualTest('music-notation/key-signatures-f4.gp', settings);
+    });
+
+    it('key-signatures-g2', async () => {
+        let settings: Settings = new Settings();
+        settings.display.staveProfile = StaveProfile.Score;
+        await VisualTestHelper.runVisualTest('music-notation/key-signatures-g2.gp', settings);
+    });
+
     it('key-signatures', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
@@ -55,7 +85,7 @@ describe('MusicNotationTests', () => {
         settings.display.barsPerRow = 4;
         await VisualTestHelper.runVisualTest('music-notation/beams-advanced.gp', settings);
     });
-    
+
     it('rest-collisions', async () => {
         await VisualTestHelper.runVisualTest('music-notation/rest-collisions.gp');
     });

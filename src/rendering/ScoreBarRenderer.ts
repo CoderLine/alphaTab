@@ -836,13 +836,13 @@ export class ScoreBarRenderer extends BarRendererBase {
                 offsetClef = 1;
                 break;
             case Clef.F4:
-                offsetClef = 2;
+                offsetClef = 3;
                 break;
             case Clef.C3:
-                offsetClef = -1;
+                offsetClef = 2;
                 break;
             case Clef.C4:
-                offsetClef = 1;
+                offsetClef = 0;
                 break;
         }
         let newLines: Map<number, boolean> = new Map<number, boolean>();

@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using AlphaTab.Synth;
 using AlphaTab.Platform;
 using AlphaTab.Platform.CSharp;
@@ -245,18 +247,25 @@ namespace AlphaTab.Wpf
 
             var selectionWrapper = new Canvas();
 
-            var barCursor = new System.Windows.Shapes.Rectangle
+            var barCursor = new Rectangle
             {
-                Fill = SettingsContainer.BarCursorFill,
                 IsHitTestVisible = false
             };
 
-            var beatCursor = new System.Windows.Shapes.Rectangle
+            barCursor.SetBinding(Shape.FillProperty, new Binding(nameof(SettingsContainer.BarCursorFill))
             {
-                Fill = SettingsContainer.BeatCursorFill,
+                Source = SettingsContainer
+            });
+
+            var beatCursor = new Rectangle
+            {
                 IsHitTestVisible = false,
                 Width = 3
             };
+            beatCursor.SetBinding(Shape.FillProperty, new Binding(nameof(SettingsContainer.BeatCursorFill))
+            {
+                Source = SettingsContainer
+            });
 
             cursorWrapper.Children.Add(selectionWrapper);
             cursorWrapper.Children.Add(barCursor);
@@ -289,11 +298,16 @@ namespace AlphaTab.Wpf
 
         public override IContainer CreateSelectionElement()
         {
-            var selection = new System.Windows.Shapes.Rectangle
+            var selection = new Rectangle
             {
                 Fill = SettingsContainer.SelectionFill,
                 IsHitTestVisible = false
             };
+            selection.SetBinding(Shape.FillProperty,
+                new Binding(nameof(SettingsContainer.SelectionFill))
+                {
+                    Source = SettingsContainer
+                });
             return new FrameworkElementContainer(selection);
         }
 
