@@ -13,7 +13,7 @@ import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
-import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
+import { BarSeparatorGlyph } from '@src/rendering/glyphs/BarSeparatorGlyph';
 import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { ClefGlyph } from '@src/rendering/glyphs/ClefGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
@@ -810,7 +810,7 @@ export class ScoreBarRenderer extends BarRendererBase {
                 this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getScoreHeight(-0.5), this.bar.masterBar.repeatCount));
             }
         } else {
-            this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
+            this.addPostBeatGlyph(new BarSeparatorGlyph(0, 0));
         }
     }
 

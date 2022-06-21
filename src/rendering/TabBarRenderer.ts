@@ -8,7 +8,7 @@ import { TabRhythmMode } from '@src/NotationSettings';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
-import { BarSeperatorGlyph } from '@src/rendering/glyphs/BarSeperatorGlyph';
+import { BarSeparatorGlyph } from '@src/rendering/glyphs/BarSeparatorGlyph';
 import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { RepeatCloseGlyph } from '@src/rendering/glyphs/RepeatCloseGlyph';
 import { RepeatCountGlyph } from '@src/rendering/glyphs/RepeatCountGlyph';
@@ -163,7 +163,7 @@ export class TabBarRenderer extends BarRendererBase {
                 this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getTabY(-1), this.bar.masterBar.repeatCount));
             }
         } else {
-            this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
+            this.addPostBeatGlyph(new BarSeparatorGlyph(0, 0));
         }
     }
 

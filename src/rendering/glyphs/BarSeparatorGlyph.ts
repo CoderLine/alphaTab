@@ -1,7 +1,7 @@
 import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 
-export class BarSeperatorGlyph extends Glyph {
+export class BarSeparatorGlyph extends Glyph {
     public constructor(x: number, y: number) {
         super(x, y);
     }
