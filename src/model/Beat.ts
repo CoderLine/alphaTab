@@ -502,6 +502,9 @@ export class Beat {
         let index: number = this.notes.indexOf(note);
         if (index >= 0) {
             this.notes.splice(index, 1);
+            if (note.isStringed) {
+                this.noteStringLookup.delete(note.string);
+            }
         }
     }
 
