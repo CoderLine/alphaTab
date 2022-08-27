@@ -89,4 +89,12 @@ describe('MusicNotationTests', () => {
     it('rest-collisions', async () => {
         await VisualTestHelper.runVisualTest('music-notation/rest-collisions.gp');
     });
+
+    it('brushes', async () => {
+        await VisualTestHelper.runVisualTest('music-notation/brushes.gp');
+    });
+    
+    it('brushes-ukulele', async () => {
+        await VisualTestHelper.runVisualTest('music-notation/brushes-ukulele.gp');
+    });
 });
