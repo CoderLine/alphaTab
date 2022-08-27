@@ -179,7 +179,7 @@ export abstract class SvgCanvas implements ICanvas {
         if (!text) {
             return 0;
         }
-        return FontSizes.measureString(text, this.font.family, this.font.size, this.font.style, this.font.weight);
+        return FontSizes.measureString(text, this.font.families, this.font.size, this.font.style, this.font.weight);
     }
 
     public abstract fillMusicFontSymbol(

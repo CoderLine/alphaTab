@@ -148,7 +148,7 @@ export class TripletFeelGlyph extends EffectGlyph {
     private renderTriplet(cx: number, cy: number, canvas: ICanvas): void {
         cy += 2 * this.scale;
         let font: Font = this.renderer.resources.effectFont;
-        canvas.font = new Font(font.family, font.size * 0.8, font.style);
+        canvas.font = Font.withFamilyList(font.families, font.size * 0.8, font.style);
         let rightX: number = cx + TripletFeelGlyph.NoteSeparation * this.scale + 3 * this.scale;
         canvas.beginPath();
         canvas.moveTo(cx, cy + 3 * this.scale);

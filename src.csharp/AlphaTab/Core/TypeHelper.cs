@@ -354,6 +354,12 @@ namespace AlphaTab.Core
             return s.Substring((int) startIndex, (int) (endIndex - startIndex));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ReplaceAll(this string s, string before, string after)
+        {
+            return s.Replace(before, after);
+        }
+
         public static string TypeOf(object? actual)
         {
             switch (actual)

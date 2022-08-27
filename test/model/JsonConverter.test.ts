@@ -169,7 +169,7 @@ describe('JsonConverterTest', () => {
         expect(settings.display.layoutMode).toEqual(LayoutMode.Horizontal);
         expect(settings.display.scale).toEqual(5);
         expect(settings.notation.rhythmMode).toEqual(TabRhythmMode.ShowWithBars);
-        expect(settings.display.resources.copyrightFont.family).toEqual('Roboto');
+        expect(settings.display.resources.copyrightFont.families[0]).toEqual('Roboto');
         expect(settings.display.resources.copyrightFont.size).toEqual(18);
         expect(settings.display.resources.copyrightFont.style).toEqual(FontStyle.Italic);
     });
@@ -202,7 +202,7 @@ describe('JsonConverterTest', () => {
         expect(settings.display.layoutMode).toEqual(LayoutMode.Horizontal);
         expect(settings.display.scale).toEqual(5);
         expect(settings.notation.rhythmMode).toEqual(TabRhythmMode.ShowWithBars);
-        expect(settings.display.resources.copyrightFont.family).toEqual('Roboto');
+        expect(settings.display.resources.copyrightFont.families[0]).toEqual('Roboto');
         expect(settings.display.resources.copyrightFont.size).toEqual(18);
         expect(settings.display.resources.copyrightFont.style).toEqual(FontStyle.Italic);
     });

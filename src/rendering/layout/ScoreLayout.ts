@@ -284,7 +284,7 @@ export abstract class ScoreLayout {
         let height: number = Math.floor(size * 2);
 
         const e = new RenderFinishedEventArgs();
-        const font = new Font(resources.copyrightFont.family, size, FontStyle.Plain, FontWeight.Bold);
+        const font = Font.withFamilyList(resources.copyrightFont.families, size, FontStyle.Plain, FontWeight.Bold);
 
         this.renderer.canvas!.font = font;
 

@@ -173,17 +173,17 @@ export class VisualTestHelper {
             Environment.HighDpiFactor = 1; // test data is in scale 1
             settings.core.enableLazyLoading = false;
 
-            settings.display.resources.copyrightFont.family = 'Roboto';
-            settings.display.resources.titleFont.family = 'PT Serif';
-            settings.display.resources.subTitleFont.family = 'PT Serif';
-            settings.display.resources.wordsFont.family = 'PT Serif';
-            settings.display.resources.effectFont.family = 'PT Serif';
-            settings.display.resources.fretboardNumberFont.family = 'Roboto';
-            settings.display.resources.tablatureFont.family = 'Roboto';
-            settings.display.resources.graceFont.family = 'Roboto';
-            settings.display.resources.barNumberFont.family = 'Roboto';
-            settings.display.resources.fingeringFont.family = 'PT Serif';
-            settings.display.resources.markerFont.family = 'PT Serif';
+            settings.display.resources.copyrightFont.families = ['Roboto'];
+            settings.display.resources.titleFont.families = ['PT Serif'];
+            settings.display.resources.subTitleFont.families = ['PT Serif'];
+            settings.display.resources.wordsFont.families = ['PT Serif'];
+            settings.display.resources.effectFont.families = ['PT Serif'];
+            settings.display.resources.fretboardNumberFont.families = ['Roboto'];
+            settings.display.resources.tablatureFont.families = ['Roboto'];
+            settings.display.resources.graceFont.families = ['Roboto'];
+            settings.display.resources.barNumberFont.families = ['Roboto'];
+            settings.display.resources.fingeringFont.families = ['PT Serif'];
+            settings.display.resources.markerFont.families = ['PT Serif'];
 
             await VisualTestHelper.loadFonts();
 
@@ -245,7 +245,7 @@ export class VisualTestHelper {
 
                     if (!triggerResize || isResizeRender) {
                         resolve();
-                    } else if(triggerResize) {
+                    } else if (triggerResize) {
                         isResizeRender = true;
                         // @ts-ignore 
                         api.triggerResize();
@@ -463,8 +463,8 @@ export class VisualTestHelper {
                         let percentDifferenceText = percentDifference.toFixed(2);
                         result.message = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
                         // await VisualTestHelper.saveFiles(expectedFileName, expected, oldActual, diff);
-                    } 
-                    
+                    }
+
                     if (sizeMismatch) {
                         result.message += `Image sizes do not match: expected ${expected.width}x${expected.height} but got ${oldActual.width}x${oldActual.height}`;
                         result.pass = false;
