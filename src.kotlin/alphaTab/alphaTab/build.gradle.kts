@@ -99,6 +99,9 @@ android {
         "../../../font/bravura",
         "../../../font/sonivox"
     )
+    sourceSets["main"].kotlin.srcDirs(
+        "../../../dist/lib.kotlin/commonMain/generated"
+    )
     sourceSets["test"].manifest.srcFile("src/androidTest/AndroidManifest.xml")
     sourceSets["test"].assets.srcDirs(
         "../../../test-data",
@@ -106,6 +109,10 @@ android {
         "../../../font/roboto",
         "../../../font/ptserif"
     )
+    sourceSets["test"].kotlin.srcDirs(
+        "../../../dist/lib.kotlin/commonTest/generated"
+    )
+
     androidResources {
         ignoreAssetsPattern = arrayOf(
             "eot",

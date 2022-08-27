@@ -343,34 +343,62 @@ export class AlphaTexImporter extends ScoreImporter {
     private parseKeySignature(str: string): number {
         switch (str.toLowerCase()) {
             case 'cb':
+            case 'cbmajor':
                 return -7;
             case 'gb':
+            case 'gbmajor':
+            case 'd#minor':
                 return -6;
             case 'db':
+            case 'dbmajor':
+            case 'bbminor':
                 return -5;
             case 'ab':
+            case 'abmajor':
+            case 'fminor':
                 return -4;
             case 'eb':
+            case 'ebmajor':
+            case 'cminor':
                 return -3;
             case 'bb':
+            case 'bbmajor':
+            case 'gminor':
                 return -2;
             case 'f':
+            case 'fmajor':
+            case 'dminor':
                 return -1;
             case 'c':
+            case 'cmajor':
+            case 'aminor':
                 return 0;
             case 'g':
+            case 'gmajor':
+            case 'eminor':
                 return 1;
             case 'd':
+            case 'dmajor':
+            case 'bminor':
                 return 2;
             case 'a':
+            case 'amajor':
+            case 'f#minor':
                 return 3;
             case 'e':
+            case 'emajor':
+            case 'c#minor':
                 return 4;
             case 'b':
+            case 'bmajor':
+            case 'g#minor':
                 return 5;
             case 'f#':
+            case 'f#major':
+            case 'ebminor':
                 return 6;
             case 'c#':
+            case 'c#major':
                 return 7;
             default:
                 return 0;
