@@ -79,10 +79,10 @@ export class AlphaTexError extends AlphaTabError {
         symbolData: unknown = null
     ): AlphaTexError {
         let message: string;
-        if (!symbolData) {
+        if (expected !== symbol) {
             message = `MalFormed AlphaTex: @${position}: Error on block ${nonTerm}, expected a ${AlphaTexSymbols[expected]} found a ${AlphaTexSymbols[symbol]}: '${symbolData}'`;
         } else {
-            message = `MalFormed AlphaTex: @${position}: Error on block ${nonTerm}, invalid value: ${symbolData}`;
+            message = `MalFormed AlphaTex: @${position}: Error on block ${nonTerm}, invalid value: '${symbolData}'`;
         }
         let exception: AlphaTexError = new AlphaTexError(message);
         exception.position = position;
@@ -94,7 +94,7 @@ export class AlphaTexError extends AlphaTabError {
     }
 
     public static errorMessage(position: number, message: string): AlphaTexError {
-        message = 'MalFormed AlphaTex: @' + position + ': ' + message;
+        message = `MalFormed AlphaTex: @${position}: ${message}`;
         let exception: AlphaTexError = new AlphaTexError(message);
         exception.position = position;
         return exception;
@@ -195,7 +195,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private error(nonterm: string, expected: AlphaTexSymbols, symbolError: boolean = true): void {
         let e: AlphaTexError;
         if (symbolError) {
-            e = AlphaTexError.symbolError(this._curChPos, nonterm, expected, this._sy, null);
+            e = AlphaTexError.symbolError(this._curChPos, nonterm, expected, this._sy, this._syData);
         } else {
             e = AlphaTexError.symbolError(this._curChPos, nonterm, expected, expected, this._syData);
         }
@@ -340,68 +340,68 @@ export class AlphaTexImporter extends ScoreImporter {
      * @param str the string to convert
      * @returns the assocciated keysignature value
      */
-    private parseKeySignature(str: string): number {
+    private parseKeySignature(str: string): KeySignature {
         switch (str.toLowerCase()) {
             case 'cb':
             case 'cbmajor':
-                return -7;
+                return KeySignature.Cb;
             case 'gb':
             case 'gbmajor':
             case 'd#minor':
-                return -6;
+                return KeySignature.Gb;
             case 'db':
             case 'dbmajor':
             case 'bbminor':
-                return -5;
+                return KeySignature.Db;
             case 'ab':
             case 'abmajor':
             case 'fminor':
-                return -4;
+                return KeySignature.Ab;
             case 'eb':
             case 'ebmajor':
             case 'cminor':
-                return -3;
+                return KeySignature.Eb;
             case 'bb':
             case 'bbmajor':
             case 'gminor':
-                return -2;
+                return KeySignature.Bb;
             case 'f':
             case 'fmajor':
             case 'dminor':
-                return -1;
+                return KeySignature.F;
             case 'c':
             case 'cmajor':
             case 'aminor':
-                return 0;
+                return KeySignature.C;
             case 'g':
             case 'gmajor':
             case 'eminor':
-                return 1;
+                return KeySignature.G;
             case 'd':
             case 'dmajor':
             case 'bminor':
-                return 2;
+                return KeySignature.D;;
             case 'a':
             case 'amajor':
             case 'f#minor':
-                return 3;
+                return KeySignature.A;
             case 'e':
             case 'emajor':
             case 'c#minor':
-                return 4;
+                return KeySignature.E;
             case 'b':
             case 'bmajor':
             case 'g#minor':
-                return 5;
+                return KeySignature.B;
             case 'f#':
             case 'f#major':
             case 'ebminor':
-                return 6;
+                return KeySignature.FSharp;
             case 'c#':
             case 'c#major':
-                return 7;
+                return KeySignature.CSharp;
             default:
-                return 0;
+                return KeySignature.C;
             // error("keysignature-value", AlphaTexSymbols.String, false); return 0
         }
     }
@@ -442,7 +442,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     }
                 } else if (this._ch === 0x2a /* * */) {
                     // multiline comment
-                    while (this._ch !== 0) {
+                    while (this._ch !== AlphaTexImporter.Eof) {
                         if (this._ch === 0x2a /* * */) {
                             this._ch = this.nextChar();
                             if (this._ch === 0x2f /* / */) {
@@ -471,9 +471,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 // negative number
                 // is number?
                 if (this._allowNegatives && this.isDigit(this._ch)) {
-                    let num: number = this.readNumber();
                     this._sy = AlphaTexSymbols.Number;
-                    this._syData = num;
+                    this._syData = this.readNumber();
                 } else {
                     this._sy = AlphaTexSymbols.String;
                     this._syData = this.readName();
@@ -489,9 +488,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._ch = this.nextChar();
             } else if (this._ch === 0x5c /* \ */) {
                 this._ch = this.nextChar();
-                let name: string = this.readName();
                 this._sy = AlphaTexSymbols.MetaCommand;
-                this._syData = name;
+                this._syData = this.readName();
             } else if (this._ch === 0x29 /* ) */) {
                 this._sy = AlphaTexSymbols.RParensis;
                 this._ch = this.nextChar();
@@ -511,9 +509,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = AlphaTexSymbols.LowerThan;
                 this._ch = this.nextChar();
             } else if (this.isDigit(this._ch)) {
-                let num: number = this.readNumber();
                 this._sy = AlphaTexSymbols.Number;
-                this._syData = num;
+                this._syData = this.readNumber();
             } else if (AlphaTexImporter.isLetter(this._ch)) {
                 let name: string = this.readName();
                 let tuning: TuningParseResult | null = this._allowTuning ? ModelUtils.parseTuning(name) : null;
@@ -1745,8 +1742,8 @@ export class AlphaTexImporter extends ScoreImporter {
         this._sy = this.newSy();
     }
 
-    private toFinger(syData: number): Fingers {
-        switch (syData) {
+    private toFinger(num: number): Fingers {
+        switch (num) {
             case 1:
                 return Fingers.Thumb;
             case 2:
@@ -1783,6 +1780,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 return Duration.SixtyFourth;
             case 128:
                 return Duration.OneHundredTwentyEighth;
+            case 256:
+                return Duration.TwoHundredFiftySixth;
             default:
                 return Duration.Quarter;
         }
@@ -1814,6 +1813,9 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.Number) {
                     this.error('repeatclose', AlphaTexSymbols.Number, true);
                 }
+                if (this._syData as number > 2048) {
+                    this.error('repeatclose', AlphaTexSymbols.Number, false);
+                }
                 master.repeatCount = this._syData as number;
                 this._sy = this.newSy();
             } else if (syData === 'ae') {
@@ -1842,13 +1844,13 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.String) {
                     this.error('keysignature', AlphaTexSymbols.String, true);
                 }
-                master.keySignature = this.parseKeySignature((this._syData as string).toLowerCase()) as KeySignature;
+                master.keySignature = this.parseKeySignature(this._syData as string);
                 this._sy = this.newSy();
             } else if (syData === 'clef') {
                 this._sy = this.newSy();
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
-                        bar.clef = this.parseClefFromString((this._syData as string).toLowerCase());
+                        bar.clef = this.parseClefFromString(this._syData as string);
                         break;
                     case AlphaTexSymbols.Number:
                         bar.clef = this.parseClefFromInt(this._syData as number);
@@ -1896,7 +1898,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._allowTuning = true;
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
-                        master.tripletFeel = this.parseTripletFeelFromString((this._syData as string).toLowerCase());
+                        master.tripletFeel = this.parseTripletFeelFromString(this._syData as string);
                         break;
                     case AlphaTexSymbols.Number:
                         master.tripletFeel = this.parseTripletFeelFromInt(this._syData as number);
