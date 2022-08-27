@@ -1,8 +1,14 @@
 package alphaTab.test
 
+import kotlin.reflect.KClass
+
 public class Globals {
     companion object {
         public fun <T> expect(actual: T): Expector<T> {
+            return Expector(actual)
+        }
+
+        public fun expect(actual: () -> Unit): Expector<() -> Unit> {
             return Expector(actual)
         }
 
@@ -66,10 +72,10 @@ public class Expector<T> {
     }
 
     public fun toThrowError(expected: KClass<out Exception>) {
-        if (_actual is Function<*>) {
+        val actual = _actual
+        if (actual is Function0<*>) {
             try {
-                //_actual() // fix
-                throw UnsupportedFormatError() // remove
+                actual()
                 kotlin.test.fail("Did not throw error: $_message")
             } catch (e: Exception) {
                 if (expected::class.isInstance(e::class)) { // bad

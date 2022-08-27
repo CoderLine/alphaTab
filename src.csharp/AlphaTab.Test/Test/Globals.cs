@@ -10,6 +10,11 @@ namespace AlphaTab.Test
             return new Expector<T>(actual);
         }
 
+        public static Expector<Action> Expect(Action actual)
+        {
+            return new Expector<Action>(actual);
+        }
+
         public static void Fail(object? message)
         {
             Assert.Fail(Convert.ToString(message));
@@ -87,16 +92,19 @@ namespace AlphaTab.Test
 
         public void ToThrowError(Type expected)
         {
-            if (_actual is Delegate d)
+            if (_actual is Action d)
             {
                 try
                 {
-                    d.DynamicInvoke();
+                    d();
                     Assert.Fail("Did not throw error:" + _message);
                 }
-                catch (System.Reflection.TargetInvocationException e)
+                catch (Exception e)
                 {
-                    if (expected.IsInstanceOfType(e.InnerException)) return;
+                    if (expected.IsInstanceOfType(e)) 
+					{
+						return;
+					}
                 }
                 Assert.Fail("Exception type didn't match:" + _message);
             }
