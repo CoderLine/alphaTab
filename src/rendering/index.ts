@@ -1,4 +1,5 @@
 export { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+export { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 export { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 
 export { BarBounds } from '@src/rendering/utils/BarBounds';

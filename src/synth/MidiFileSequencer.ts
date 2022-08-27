@@ -82,7 +82,7 @@ export class MidiFileSequencer {
     public isLooping: boolean = false;
 
     public get currentTime() {
-        return this._currentState.currentTime;
+        return this._currentState.currentTime / this.playbackSpeed;
     }
 
     /**

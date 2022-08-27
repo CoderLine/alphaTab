@@ -202,9 +202,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private registerFontChecker(font: Font): void {
-        if (!this._fontCheckers.has(font.family)) {
-            let checker: FontLoadingChecker = new FontLoadingChecker(font.family);
-            this._fontCheckers.set(font.family, checker);
+        if (!this._fontCheckers.has(font.families.join(', '))) {
+            let checker: FontLoadingChecker = new FontLoadingChecker(font.families);
+            this._fontCheckers.set(font.families.join(', '), checker);
             checker.fontLoaded.on(this.onFontLoaded.bind(this));
             checker.checkForFontAvailability();
         }

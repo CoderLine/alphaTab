@@ -15,7 +15,7 @@ plugins {
     id("com.android.library")
     `maven-publish`
     signing
-    id("org.jetbrains.dokka") version "1.6.21"
+    id("org.jetbrains.dokka") version "1.7.10"
 
     // iOS
     //    kotlin("native.cocoapods")
@@ -25,7 +25,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
             kotlin.srcDirs("../../../dist/lib.kotlin/commonMain/generated")
         }
@@ -58,8 +58,8 @@ kotlin {
     sourceSets {
         val androidMain by getting {
             dependencies {
-                implementation("androidx.core:core-ktx:1.7.0")
-                implementation("androidx.appcompat:appcompat:1.4.1")
+                implementation("androidx.core:core-ktx:1.8.0")
+                implementation("androidx.appcompat:appcompat:1.5.0")
             }
         }
 
@@ -92,12 +92,15 @@ kotlin {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 32
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDirs(
         "../../../font/bravura",
         "../../../font/sonivox"
+    )
+    sourceSets["main"].kotlin.srcDirs(
+        "../../../dist/lib.kotlin/commonMain/generated"
     )
     sourceSets["test"].manifest.srcFile("src/androidTest/AndroidManifest.xml")
     sourceSets["test"].assets.srcDirs(
@@ -106,6 +109,10 @@ android {
         "../../../font/roboto",
         "../../../font/ptserif"
     )
+    sourceSets["test"].kotlin.srcDirs(
+        "../../../dist/lib.kotlin/commonTest/generated"
+    )
+
     androidResources {
         ignoreAssetsPattern = arrayOf(
             "eot",
@@ -128,6 +135,13 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+        }
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
         }
     }
 }

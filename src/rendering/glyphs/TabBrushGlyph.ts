@@ -22,9 +22,9 @@ export class TabBrushGlyph extends Glyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let tabBarRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         let startY: number =
-            cy + this.x + (tabBarRenderer.getNoteY(this._beat.maxNote!, NoteYPosition.Top));
+            cy + this.x + (tabBarRenderer.getNoteY(this._beat.maxStringNote!, NoteYPosition.Top));
         let endY: number =
-            cy + this.y + tabBarRenderer.getNoteY(this._beat.minNote!, NoteYPosition.Bottom);
+            cy + this.y + tabBarRenderer.getNoteY(this._beat.minStringNote!, NoteYPosition.Bottom);
         let arrowX: number = (cx + this.x + this.width / 2) | 0;
         let arrowSize: number = 8 * this.scale;
         if (this._beat.brushType !== BrushType.None) {

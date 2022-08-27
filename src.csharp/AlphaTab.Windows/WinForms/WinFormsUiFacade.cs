@@ -81,6 +81,7 @@ namespace AlphaTab.WinForms
             base.Initialize(api, control);
             api.Settings = control.Settings;
             control.SettingsChanged += OnSettingsChanged;
+            api.SettingsUpdated.On(OnSettingsUpdated);
         }
 
         private void OnSettingsChanged(Settings s)
@@ -104,6 +105,7 @@ namespace AlphaTab.WinForms
         {
             SettingsContainer.SettingsChanged -= OnSettingsChanged;
             _layoutPanel.Controls.Clear();
+            Api.SettingsUpdated.Off(OnSettingsUpdated);
         }
 
         public override IContainer CreateCanvasElement()
@@ -214,6 +216,14 @@ namespace AlphaTab.WinForms
                     }
                 }
             }), r);
+        }
+
+        private void OnSettingsUpdated()
+        {
+            foreach (Control control in _layoutPanel.Controls)
+            {
+                control.BackColor = _layoutPanel.ForeColor;
+            }
         }
 
 

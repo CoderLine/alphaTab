@@ -7,14 +7,17 @@ import { Environment } from '@src/Environment';
  * @target web
  */
 export class FontLoadingChecker {
-    private _family: string;
+    private _originalFamilies: string[];
+    private _families: string[];
+
     private _isStarted: boolean = false;
     public isFontLoaded: boolean = false;
 
     public fontLoaded: IEventEmitterOfT<string> = new EventEmitterOfT<string>();
 
-    public constructor(family: string) {
-        this._family = family;
+    public constructor(families: string[]) {
+        this._originalFamilies = families;
+        this._families = families;
     }
 
     public checkForFontAvailability(): void {
@@ -31,40 +34,74 @@ export class FontLoadingChecker {
         this._isStarted = true;
         let failCounter: number = 0;
         let failCounterId: number = window.setInterval(() => {
-            failCounter++;
             Logger.warning(
                 'Rendering',
-                `Could not load font '${this._family}' within ${failCounter * 5} seconds`,
+                `Could not load font '${this._families[0]}' within ${(failCounter + 1) * 5} seconds`,
                 null
             );
+
+            // try loading next font if there are more than 1 left
+            if (this._families.length > 1) {
+                this._families.shift();
+                failCounter = 0;
+            } else {
+                failCounter++;
+            }
+
         }, 5000);
 
-        Logger.debug('Font', `Start checking for font availablility: ${this._family}`);
+        Logger.debug('Font', `Start checking for font availablility: ${this._families.join(', ')}`);
 
-        Logger.debug('Font', `[${this._family}] Font API available`);
+        let errorHandler = () => {
+            if (this._families.length > 1) {
+                Logger.debug('Font', `[${this._families[0]}] Loading Failed, switching to ${this._families[1]}`);
+                this._families.shift();
+                window.setTimeout(() => {
+                    checkFont();
+                }, 0);
+            }
+            else {
+                Logger.error('Font', `[${this._originalFamilies.join(',')}] Loading Failed, rendering cannot start`);
+                window.clearInterval(failCounterId);
+            }
+        };
+
+        let successHandler = (font:string) => {
+            Logger.debug('Rendering', `[${font}] Font API signaled available`);
+            this.isFontLoaded = true;
+            window.clearInterval(failCounterId);
+            (this.fontLoaded as EventEmitterOfT<string>).trigger(this._families[0]);
+        };
 
         let checkFont = () => {
-            (document as any).fonts.load(`1em ${this._family}`).then(() => {
-                Logger.debug('Font', `[${this._family}] Font API signaled loaded`);
-
-                if ((document as any).fonts.check('1em ' + this._family)) {
-                    Logger.debug('Rendering', `[${this._family}] Font API signaled available`);
-                    this.isFontLoaded = true;
-                    window.clearInterval(failCounterId);
-                    (this.fontLoaded as EventEmitterOfT<string>).trigger(this._family);
-                } else {
-                    Logger.debug(
-                        'Font',
-                        `[${this._family}] Font API loaded reported, but font not available, checking later again`,
-                        null
-                    );
-                    window.setTimeout(() => {
-                        checkFont();
-                    }, 250);
+            // Fast Path: check if one of the specified fonts is already available.
+            for (const font of this._families) {
+                if ((document as any).fonts.check('1em ' + font)) {
+                    successHandler(font);
+                    return;
                 }
-                return true;
-            });
+            }
+
+            // Slow path: Wait for fonts to be loaded sequentially
+            const promise: Promise<FontFace[]> = (document as any).fonts.load(`1em ${this._families[0]}`);
+            promise.then(
+                () => {
+                    Logger.debug('Font', `[${this._families[0]}] Font API signaled loaded`);
+                    if ((document as any).fonts.check('1em ' + this._families[0])) {
+                        successHandler(this._families[0]);
+                    } else {
+                        errorHandler();
+                    }
+                    return true;
+                },
+                reason => {
+                    errorHandler();
+                });
         };
-        checkFont();
+
+
+        (document as any).fonts.ready.then(() => {
+            checkFont();
+        });
     }
 }

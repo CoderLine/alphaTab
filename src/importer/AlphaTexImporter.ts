@@ -343,34 +343,62 @@ export class AlphaTexImporter extends ScoreImporter {
     private parseKeySignature(str: string): KeySignature {
         switch (str.toLowerCase()) {
             case 'cb':
+            case 'cbmajor':
                 return KeySignature.Cb;
             case 'gb':
+            case 'gbmajor':
+            case 'd#minor':
                 return KeySignature.Gb;
             case 'db':
+            case 'dbmajor':
+            case 'bbminor':
                 return KeySignature.Db;
             case 'ab':
+            case 'abmajor':
+            case 'fminor':
                 return KeySignature.Ab;
             case 'eb':
+            case 'ebmajor':
+            case 'cminor':
                 return KeySignature.Eb;
             case 'bb':
+            case 'bbmajor':
+            case 'gminor':
                 return KeySignature.Bb;
             case 'f':
+            case 'fmajor':
+            case 'dminor':
                 return KeySignature.F;
             case 'c':
+            case 'cmajor':
+            case 'aminor':
                 return KeySignature.C;
             case 'g':
+            case 'gmajor':
+            case 'eminor':
                 return KeySignature.G;
             case 'd':
-                return KeySignature.D;
+            case 'dmajor':
+            case 'bminor':
+                return KeySignature.D;;
             case 'a':
+            case 'amajor':
+            case 'f#minor':
                 return KeySignature.A;
             case 'e':
+            case 'emajor':
+            case 'c#minor':
                 return KeySignature.E;
             case 'b':
+            case 'bmajor':
+            case 'g#minor':
                 return KeySignature.B;
             case 'f#':
+            case 'f#major':
+            case 'ebminor':
                 return KeySignature.FSharp;
             case 'c#':
+            case 'c#major':
                 return KeySignature.CSharp;
             default:
                 return KeySignature.C;

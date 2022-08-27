@@ -67,9 +67,19 @@ export class FontSizes {
         }
     }
 
-    public static measureString(s: string, family: string, size: number, style: FontStyle, weight:FontWeight): number {
+    public static measureString(s: string, families: string[], size: number, style: FontStyle, weight:FontWeight): number {
         let data: Uint8Array;
         let dataSize: number = 11;
+        let family = families[0]; // default to first font
+
+        // find a font which is maybe registered already
+        for(let i = 0; i < families.length; i++) {
+            if(FontSizes.FontSizeLookupTables.has(families[i])) {
+                family = families[i];
+                break;
+            }
+        }
+
         if (!FontSizes.FontSizeLookupTables.has(family)) {
             FontSizes.generateFontLookup(family);
         }

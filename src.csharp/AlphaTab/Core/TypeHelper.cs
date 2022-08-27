@@ -142,7 +142,7 @@ namespace AlphaTab.Core
             }
         }
 
-        public static void Sort<T>(this IList<T> data, Func<T, T, double> func)
+        public static IList<T> Sort<T>(this IList<T> data, Func<T, T, double> func)
         {
             switch (data)
             {
@@ -156,6 +156,8 @@ namespace AlphaTab.Core
                     throw new NotSupportedException("Cannot sort list of type " +
                                                     data.GetType().FullName);
             }
+
+            return data;
         }
         public static void Sort<T>(this IList<T> data)
         {
@@ -314,6 +316,11 @@ namespace AlphaTab.Core
         {
             return s != null;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsTruthy(bool? b)
+        {
+            return b.GetValueOrDefault();
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsTruthy(double s)
@@ -329,6 +336,13 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<double> Map<TSource>(this IList<TSource> source,
+            Func<TSource, int> func)
+        {
+            return source.Select(i => (double)func(i)).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string SubstringIndex(this string s, double startIndex)
         {
             return s.Substring((int) startIndex);
@@ -338,6 +352,12 @@ namespace AlphaTab.Core
         public static string SubstringIndex(this string s, double startIndex, double endIndex)
         {
             return s.Substring((int) startIndex, (int) (endIndex - startIndex));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ReplaceAll(this string s, string before, string after)
+        {
+            return s.Replace(before, after);
         }
 
         public static string TypeOf(object? actual)

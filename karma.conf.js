@@ -146,6 +146,7 @@ module.exports = function (config) {
             output: {
                 format: 'iife',
                 name: 'alphaTab',
+                file: 'dist/lib.test/test.bundle.js',
                 sourcemap: false
             }
         }

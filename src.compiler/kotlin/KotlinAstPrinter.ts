@@ -246,7 +246,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         if (d.isAbstract) {
             this.write('abstract ');
-        } else if(d.hasVirtualMembersOrSubClasses) {
+        } else if (d.hasVirtualMembersOrSubClasses) {
             this.write('open ');
         }
 
@@ -1136,13 +1136,20 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeLine(')');
         this.beginBlock();
 
+        let hasDefault = false;
+
         s.caseClauses.forEach(c => {
             if (cs.isDefaultClause(c)) {
+                hasDefault = true;
                 this.writeDefaultClause(c as cs.DefaultClause);
             } else {
                 this.writeCaseClause(c as cs.CaseClause);
             }
         });
+
+        if (!hasDefault) {
+            this.writeLine('else -> { }');
+        }
 
         this.endBlock();
     }
@@ -1499,5 +1506,15 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected override writeSemicolon() {
         this.writeLine();
+    }
+
+    protected override writeIsExpression(expr: cs.IsExpression) {
+        if(expr.parent?.nodeType === cs.SyntaxKind.CaseClause) {
+            this.write('(');
+        }
+        super.writeIsExpression(expr);
+        if(expr.parent?.nodeType === cs.SyntaxKind.CaseClause) {
+            this.write(')');
+        }
     }
 }

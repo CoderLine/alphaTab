@@ -9,6 +9,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
+import { KeySignature } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -655,6 +656,29 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[3].section!.marker).toEqual('S');
     });
 
+    it('key-signature', () => {
+        let tex: string = `:1 3.3 | \\ks C 3.3 | \\ks Cmajor 3.3 | \\ks Aminor 3.3 |
+        \\ks F 3.3 | \\ks bbmajor 3.3 | \\ks CMINOR 3.3 | \\ks aB 3.3 | \\ks db 3.3 | \\ks d#minor 3.3 |
+        \\ks g 3.3 | \\ks Dmajor 3.3 | \\ks f#minor 3.3 | \\ks E 3.3 | \\ks Bmajor 3.3 | \\ks Ebminor 3.3`;
+        let score: Score = parseTex(tex);
+        expect(score.masterBars[0].keySignature).toEqual(KeySignature.C)
+        expect(score.masterBars[1].keySignature).toEqual(KeySignature.C)
+        expect(score.masterBars[2].keySignature).toEqual(KeySignature.C)
+        expect(score.masterBars[3].keySignature).toEqual(KeySignature.C)
+        expect(score.masterBars[4].keySignature).toEqual(KeySignature.F)
+        expect(score.masterBars[5].keySignature).toEqual(KeySignature.Bb)
+        expect(score.masterBars[6].keySignature).toEqual(KeySignature.Eb)
+        expect(score.masterBars[7].keySignature).toEqual(KeySignature.Ab)
+        expect(score.masterBars[8].keySignature).toEqual(KeySignature.Db)
+        expect(score.masterBars[9].keySignature).toEqual(KeySignature.Gb)
+        expect(score.masterBars[10].keySignature).toEqual(KeySignature.G)
+        expect(score.masterBars[11].keySignature).toEqual(KeySignature.D)
+        expect(score.masterBars[12].keySignature).toEqual(KeySignature.A)
+        expect(score.masterBars[13].keySignature).toEqual(KeySignature.E)
+        expect(score.masterBars[14].keySignature).toEqual(KeySignature.B)
+        expect(score.masterBars[15].keySignature).toEqual(KeySignature.FSharp)
+    });
+
     it('pop-slap-tap', () => {
         let tex: string = '3.3{p} 3.3{s} 3.3{tt} r';
         let score: Score = parseTex(tex);
@@ -900,25 +924,11 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('expect-invalid-format-xml', () => {
-        try {
-            parseTex('<xml>');
-            fail('Expected error');
-        } catch (e) {
-            if (!(e instanceof UnsupportedFormatError)) {
-                fail(`Expected UnsupportedFormatError got ${e}`);
-            }
-        }
+        expect(() => parseTex('<xml>')).toThrowError(UnsupportedFormatError);
     });
 
     it('expect-invalid-format-other-text', () => {
-        try {
-            parseTex('This is not an alphaTex file');
-            fail('Expected error');
-        } catch (e) {
-            if (!(e instanceof UnsupportedFormatError)) {
-                fail(`Expected UnsupportedFormatError got ${e}`);
-            }
-        }
+        expect(() => parseTex('This is not an alphaTex file')).toThrowError(UnsupportedFormatError);
     });
 
     it('auto-detect-tuning-from-instrument', () => {
@@ -953,12 +963,7 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('does-not-hang-on-backslash', () => {
-        try {
-            parseTex('\\title Test . 3.3 \\')
-            fail('Parsing should fail');
-        } catch (e) {
-            // success
-        }
+        expect(() => parseTex('\\title Test . 3.3 \\')).toThrowError(UnsupportedFormatError)
     })
 
     function runSectionNoteSymbolTest(noteSymbol: string) {
@@ -967,6 +972,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars.length).toEqual(3);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toEqual(4);
         expect(score.masterBars[1].section!.text).toEqual('Verse');
+        expect(score.masterBars[1].section!.marker).toEqual('');
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toEqual(1);
     }
 

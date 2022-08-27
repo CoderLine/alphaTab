@@ -49,27 +49,21 @@ class AlphaTabView : RelativeLayout {
         get() = _barCursorFillColor
         set(value) {
             _barCursorFillColor = value
-            (barCursorFillColorChanged as EventEmitter).trigger()
         }
-    public val barCursorFillColorChanged: IEventEmitter = EventEmitter()
 
     private var _beatCursorFillColor: Int = Color.argb(191, 64, 64, 255)
     public var beatCursorFillColor: Int
         get() = _beatCursorFillColor
         set(value) {
             _beatCursorFillColor = value
-            (beatCursorFillColorChanged as EventEmitter).trigger()
         }
-    public val beatCursorFillColorChanged: IEventEmitter = EventEmitter()
 
     private var _selectionFillColor: Int = Color.argb(25, 64, 64, 255)
     public var selectionFillColor: Int
         get() = _selectionFillColor
         set(value) {
             _selectionFillColor = value
-            (selectionFillColorChanged as EventEmitter).trigger()
         }
-    public val selectionFillColorChanged: IEventEmitter = EventEmitter()
 
     public val api: AlphaTabApiBase<AlphaTabView>
         get() = _api

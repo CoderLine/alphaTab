@@ -202,7 +202,7 @@ export class Environment {
     /**
      * @target web
      */
-    public static bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker('alphaTab');
+    public static bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(['alphaTab']);
 
     /**
      * @target web
@@ -549,13 +549,18 @@ export class Environment {
                 (Environment.globalThis as any).IntersectionObserver = IntersectionObserverPolyfill;
             }
 
-            if(!('replaceChildren' in Element.prototype)) {
+            if (!('replaceChildren' in Element.prototype)) {
                 Element.prototype.replaceChildren = function (...nodes: (Node | string)[]) {
                     this.innerHTML = '';
                     this.append(...nodes);
                 };
                 Document.prototype.replaceChildren = Element.prototype.replaceChildren;
                 DocumentFragment.prototype.replaceChildren = Element.prototype.replaceChildren;
+            }
+            if (!('replaceAll' in String.prototype)) {
+                (String.prototype as any).replaceAll = function (str: string, newStr: string) {
+                    return this.replace(new RegExp(str, 'g'), newStr);
+                };
             }
         }
     }
