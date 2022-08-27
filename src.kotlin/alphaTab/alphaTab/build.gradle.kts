@@ -59,7 +59,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation("androidx.core:core-ktx:1.8.0")
-                implementation("androidx.appcompat:appcompat:1.4.2")
+                implementation("androidx.appcompat:appcompat:1.5.0")
             }
         }
 
@@ -92,7 +92,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 32
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDirs(
@@ -128,6 +128,13 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+        }
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
         }
     }
 }
