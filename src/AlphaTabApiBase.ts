@@ -183,6 +183,10 @@ export class AlphaTabApiBase<TSettings> {
      * Applies any changes that were done to the settings object and informs the {@link renderer} about any new values to consider.
      */
     public updateSettings(): void {
+        const score = this.score;
+        if (score) {
+            ModelUtils.applyPitchOffsets(this.settings, score);
+        }
         this.renderer.updateSettings(this.settings);
         // enable/disable player if needed
         if (this.settings.player.enablePlayer) {
@@ -272,8 +276,8 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private internalRenderTracks(score: Score, tracks: Track[]): void {
+        ModelUtils.applyPitchOffsets(this.settings, score);
         if (score !== this.score) {
-            ModelUtils.applyPitchOffsets(this.settings, score);
             this.score = score;
             this.tracks = tracks;
             this._trackIndexes = [];
@@ -1017,7 +1021,7 @@ export class AlphaTabApiBase<TSettings> {
                         if (
                             nextBeatBoundings &&
                             nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                                barBoundings.staveGroupBounds
+                            barBoundings.staveGroupBounds
                         ) {
                             nextBeatX = nextBeatBoundings.visualBounds.x;
                         }
