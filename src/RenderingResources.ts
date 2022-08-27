@@ -6,8 +6,8 @@ import { Font, FontStyle, FontWeight } from '@src/model/Font';
  * @json
  */
 export class RenderingResources {
-    private static sansFont: string = 'Arial';
-    private static serifFont: string = 'Georgia';
+    private static sansFont: string = 'Arial, sans-serif';
+    private static serifFont: string = 'Georgia, serif';
 
     /**
      * Gets or sets the font to use for displaying the songs copyright information in the header of the music sheet.

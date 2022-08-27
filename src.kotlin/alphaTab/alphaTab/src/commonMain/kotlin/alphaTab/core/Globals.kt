@@ -83,6 +83,10 @@ internal fun String.substring(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
 
+internal fun String.replaceAll(before:String, after:String): String {
+    return this.replace(before, after)
+}
+
 internal fun IAlphaTabEnum.toDouble(): Double {
     return this.value.toDouble()
 }

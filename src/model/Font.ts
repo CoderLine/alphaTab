@@ -23,6 +23,7 @@ class FontParser {
     public lineHeight: string = 'normal';
     public size: string = '1rem';
     public families: string[] = [];
+    public parseOnlyFamilies: boolean = false;
 
     private _tokens: FontParserToken[];
     private _currentTokenIndex: number = -1;
@@ -70,14 +71,27 @@ class FontParser {
             }
         }
 
-        this.fontStyleVariantWeight();
-        this.fontSizeLineHeight();
+        if (!this.parseOnlyFamilies) {
+            this.fontStyleVariantWeight();
+            this.fontSizeLineHeight();
+        }
         this.fontFamily();
+    }
+
+    public static parseFamilies(value: string): string[] {
+        const parser = new FontParser(value);
+        parser.parseOnlyFamilies = true;
+        parser.parse();
+        return parser.families;
     }
 
     private fontFamily() {
         if (!this._currentToken) {
-            throw new Error(`Missing font list`);
+            if(this.parseOnlyFamilies) {
+                return;
+            } else {
+                throw new Error(`Missing font list`);
+            }
         }
 
         const familyListInput = this._input.substr(this._currentToken.startPos).trim();
@@ -263,6 +277,15 @@ class FontParser {
         this._currentTokenIndex = -1;
         this.nextToken();
     }
+
+    public static quoteFont(f: string): string {
+        if(f.indexOf(' ') === -1) {
+            return f;
+        }
+
+        const escapedQuotes =  f.replaceAll('"', '\\"');
+        return `"${escapedQuotes}"`;
+    }
 }
 
 /**
@@ -299,7 +322,7 @@ export enum FontWeight {
 export class Font {
     private _css: string;
     private _cssScale: number = 0.0;
-    private _family: string;
+    private _families: string[];
     private _style: FontStyle;
     private _weight: FontWeight;
     private _size: number;
@@ -310,17 +333,33 @@ export class Font {
     }
 
     /**
-     * Gets the font family name.
+     * Gets the first font family name.
+     * @deprecated Consider using {@link families} for multi font family support.
      */
     public get family(): string {
-        return this._family;
+        return this._families[0];
+    }
+
+    /**
+     * Sets the font family list.
+     * @deprecated Consider using {@link families} for multi font family support.
+     */
+    public set family(value: string) {
+        this.families = FontParser.parseFamilies(value);
+    }
+
+    /**
+     * Gets the font family name.
+     */
+    public get families(): string[] {
+        return this._families;
     }
 
     /**
      * Sets the font family name.
      */
-    public set family(value: string) {
-        this._family = value;
+    public set families(value: string[]) {
+        this._families = value;
         this.reset();
     }
 
@@ -389,11 +428,29 @@ export class Font {
         style: FontStyle = FontStyle.Plain,
         weight: FontWeight = FontWeight.Regular
     ) {
-        this._family = family;
+        this._families = FontParser.parseFamilies(family);
         this._size = size;
         this._style = style;
         this._weight = weight;
         this._css = this.toCssString();
+    }
+
+    /**
+     * Initializes a new instance of the {@link Font} class.
+     * @param families The families.
+     * @param size The size.
+     * @param style The style.
+     * @param weight The weight.
+     */
+    public static withFamilyList(
+        families: string[],
+        size: number,
+        style: FontStyle = FontStyle.Plain,
+        weight: FontWeight = FontWeight.Regular
+    ) {
+        const f = new Font("", size, style, weight);
+        f.families = families;
+        return f;
     }
 
     public toCssString(scale: number = 1): string {
@@ -407,9 +464,7 @@ export class Font {
             }
             buf += this.size * scale;
             buf += 'px ';
-            buf += "'";
-            buf += this.family;
-            buf += "'";
+            buf += this.families.map(f => FontParser.quoteFont(f)).join(', ');
             this._css = buf;
             this._cssScale = scale;
         }
@@ -422,25 +477,18 @@ export class Font {
                 return null;
             case 'object': {
                 const m = v as Map<string, unknown>;
-                let family = m.get('family') as string;
+                let families = m.get('families') as string[];
                 // tslint:disable-next-line: no-unnecessary-type-assertion
                 let size = m.get('size')! as number;
                 let style = JsonHelper.parseEnum<FontStyle>(m.get('style'), FontStyle)!;
                 let weight = JsonHelper.parseEnum<FontWeight>(m.get('weight'), FontWeight)!;
-                return new Font(family, size, style, weight);
+                return Font.withFamilyList(families, size, style, weight);
             }
             case 'string': {
                 const parser = new FontParser(v as string);
                 parser.parse();
 
-                let family: string = parser.families[0];
-                if (
-                    (family.startsWith("'") && family.endsWith("'")) ||
-                    (family.startsWith('"') && family.endsWith('"'))
-                ) {
-                    family = family.substr(1, family.length - 2);
-                }
-
+                let families: string[] = parser.families;
                 let fontSizeString: string = parser.size.toLowerCase();
                 let fontSize: number = 0;
                 // as per https://websemantics.uk/articles/font-size-conversion/
@@ -502,7 +550,7 @@ export class Font {
                         break;
                 }
 
-                return new Font(family, fontSize, fontStyle, fontWeight);
+                return Font.withFamilyList(families, fontSize, fontStyle, fontWeight);
             }
             default:
                 return null;
@@ -511,7 +559,7 @@ export class Font {
 
     public static toJson(font: Font): Map<string, unknown> {
         const o = new Map<string, unknown>();
-        o.set('family', font.family);
+        o.set('families', font.families);
         o.set('size', font.size);
         o.set('style', font.style as number);
         o.set('weight', font.weight as number);
