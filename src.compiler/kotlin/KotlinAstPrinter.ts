@@ -1148,7 +1148,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         });
 
         if (!hasDefault) {
-            this.writeLine('else -> throw IllegalStateException("Unexpected value")');
+            this.writeLine('else -> { }');
         }
 
         this.endBlock();
