@@ -50,57 +50,57 @@ export var Resources = {
 	fonts: [
 		{
 			name: 'barNumberFont',
-			defaultValue: '11px Arial',
+			defaultValue: '11px Arial, sans-serif',
 			description: 'The font to use for displaying the bar numbers above the music sheet.',
 		}, 
 		{
 			name: 'copyrightFont',
-			defaultValue: 'bold 12px Arial',
+			defaultValue: 'bold 12px Arial, sans-serif',
 			description: 'The font to use for displaying the songs copyright information in the header of the music sheet.,',
 		},
 		{
 			name: 'effectFont',
-			defaultValue: 'italic 12px Georgia',
+			defaultValue: 'italic 12px Georgia, serif',
 			description: 'The font to use for displaying certain effect related elements in the music sheet.',
 		},
 		{
 			name: 'fingeringFont',
-			defaultValue: '14px Georgia',
+			defaultValue: '14px Georgia, serif',
 			description: 'The font to use for displaying finger information in the music sheet.',
 		},
 		{
 			name: 'fretboardNumberFont',
-			defaultValue: '11px Arial',
+			defaultValue: '11px Arial, sans-serif',
 			description: 'The font to use for displaying the fretboard numbers in chord diagrams.',
 		},
 		{
 			name: 'graceFont',
-			defaultValue: '11px Arial',
+			defaultValue: '11px Arial, sans-serif',
 			description: 'The font to use for grace notation related texts in the music sheet.',
 		},
 		{
 			name: 'markerFont',
-			defaultValue: 'bold 14px Georgia',
+			defaultValue: 'bold 14px Georgia, serif',
 			description: 'The font to use for section marker labels shown above the music sheet.',
 		},
 		{
 			name: 'subTitleFont',
-			defaultValue: '20px Georgia',
+			defaultValue: '20px Georgia, serif',
 			description: 'The font to use for displaying the songs subtitle in the header of the music sheet.',
 		},
 		{
 			name: 'tablatureFont',
-			defaultValue: '13px Arial',
+			defaultValue: '13px Arial, sans-serif',
 			description: 'The font to use for displaying the guitar tablature numbers in the music sheet.',
 		},
 		{
 			name: 'titleFont',
-			defaultValue: '32px Georgia',
+			defaultValue: '32px Georgia, serif',
 			description: 'The font to use for displaying the songs title in the header of the music sheet.',
 		},
 		{
 			name: 'wordsFont',
-			defaultValue: '15px Arial',
+			defaultValue: '15px Arial, sans-serif',
 			description: 'The font to use for displaying the lyrics information in the header of the music sheet.',
 		}
 	]
@@ -181,6 +181,8 @@ Following resources exist for adjusting the style.
 For the JavaScript platform any font that might be installed on the client machines can be used. 
 Any additional fonts can be added via WebFonts. The rendering of the score will be delayed until it is detected that the font was loaded. 
 Simply use any CSS font property compliant string as configuration. Relative font sizes with percentual values are not supported, remaining values will be considered if supported.
+
+<span class="badge badge--info badge--header">Since 1.2.3</span> Multiple fonts are also supported for the Web version. alphaTab will check if any of the fonts in the list is loaded instead of all. If none is available at the time alphaTab is initialized, it will try to initiate the load of the specified fonts individual through the Browser Font APIs.
 
 For the .net platform any installed font on the system can be used. Simply construct the `Font` object to configure your desired fonts. 
 
