@@ -127,7 +127,7 @@ export class AlphaSynth implements IAlphaSynth {
         this.updateTimePosition(value, true);
 
         // tell the output to reset the already synthesized buffers and request data again
-        if(this._sequencer.isPlayingMain) {
+        if (this._sequencer.isPlayingMain) {
             this._notPlayedSamples = 0;
             this.output.resetSamples();
         }
@@ -217,6 +217,10 @@ export class AlphaSynth implements IAlphaSynth {
                 }
                 this._notPlayedSamples += samples.length;
                 this.output.addSamples(samples);
+            } else {
+                // Tell output that there is no data left for it.
+                let samples: Float32Array = new Float32Array(0);
+                this.output.addSamples(samples);
             }
         });
         this.output.samplesPlayed.on(this.onSamplesPlayed.bind(this));
@@ -235,7 +239,7 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'Starting countin');
             this._sequencer.startCountIn();
             this._synthesizer.setupMetronomeChannel(this._countInVolume);
-            this.tickPosition = 0;
+            this.updateTimePosition(0, true);
         }
 
         this.output.play();
@@ -421,6 +425,7 @@ export class AlphaSynth implements IAlphaSynth {
                 this._sequencer.resetCountIn();
                 this.timePosition = this._sequencer.currentTime;
                 this.playInternal();
+                this.output.resetSamples();
             } else if (this._sequencer.isPlayingOneTimeMidi) {
                 Logger.debug('AlphaSynth', 'Finished playback (one time)');
                 this.output.resetSamples();
@@ -459,8 +464,8 @@ export class AlphaSynth implements IAlphaSynth {
         const mode = this._sequencer.isPlayingMain
             ? 'main'
             : this._sequencer.isPlayingCountIn
-            ? 'count-in'
-            : 'one-time';
+                ? 'count-in'
+                : 'one-time';
 
         Logger.debug(
             'AlphaSynth',
