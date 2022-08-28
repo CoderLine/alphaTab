@@ -58,4 +58,11 @@ export class BarBounds {
         }
         return beat;
     }
+
+    /**
+     * Finishes the lookup object and optimizes itself for fast access.
+     */
+    public finish(): void {
+        this.beats.sort((a, b) => a.realBounds.x - b.realBounds.x);
+    }
 }

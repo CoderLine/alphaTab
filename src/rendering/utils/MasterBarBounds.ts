@@ -60,10 +60,14 @@ export class MasterBarBounds {
      */
     public findBeatAtPos(x: number, y: number): Beat | null {
         let beat: BeatBounds | null = null;
+        let distance = 10000000;
         for (let bar of this.bars) {
             let b = bar.findBeatAtPos(x);
             if (b && (!beat || beat.realBounds.x < b.realBounds.x)) {
-                beat = b;
+                const newDistance = Math.abs(b.realBounds.x - x);
+                if (!beat || newDistance < distance) {
+                    beat = b;
+                }
             }
         }
         return !beat ? null : beat.beat;
@@ -88,6 +92,9 @@ export class MasterBarBounds {
             }
             return 0;
         });
+        for (const bar of this.bars) {
+            bar.finish();
+        }
     }
 
     /**
