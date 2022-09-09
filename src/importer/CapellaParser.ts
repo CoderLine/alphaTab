@@ -259,7 +259,7 @@ export class CapellaParser {
         // track > staff structure for later use
 
         // curly brackets define which staves go together into a track
-        const curlyBrackets = this._brackets.filter(b => b.curly);
+        const curlyBrackets = this._brackets.filter(b => !!b.curly);
         curlyBrackets.sort((a, b) => a.from - b.from);
 
         let currentBracketIndex = 0;

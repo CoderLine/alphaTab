@@ -3,7 +3,6 @@ import * as ts from 'typescript';
 export function setMethodBody(m: ts.MethodDeclaration, body: ts.FunctionBody): ts.MethodDeclaration {
     return ts.factory.updateMethodDeclaration(
         m,
-        m.decorators,
         m.modifiers,
         m.asteriskToken,
         m.name,
