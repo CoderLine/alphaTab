@@ -59,7 +59,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation("androidx.core:core-ktx:1.8.0")
-                implementation("androidx.appcompat:appcompat:1.5.0")
+                implementation("androidx.appcompat:appcompat:1.5.1")
             }
         }
 
