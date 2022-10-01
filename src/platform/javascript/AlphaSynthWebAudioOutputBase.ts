@@ -12,26 +12,10 @@ declare var webkitAudioContext: any;
 export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     protected static readonly BufferSize: number = 4096;
     protected static readonly PreferredSampleRate: number = 44100;
-    private static readonly UserInputEvents: string[] = [
-        'click',
-        'contextmenu',
-        'auxclick',
-        'dblclick',
-        'mousedown',
-        'mouseup',
-        'pointerup',
-        'touchend',
-        'keydown',
-        'keyup'
-    ];
 
     protected _context: AudioContext | null = null;
     protected _buffer: AudioBuffer | null = null;
     protected _source: AudioBufferSourceNode | null = null;
-    private _unlocking: boolean = false;
-    private _unlocked: boolean = false;
-
-    private _resumeContextCallback?: () => void;
 
     public get sampleRate(): number {
         return this._context ? this._context.sampleRate : AlphaSynthWebAudioOutputBase.PreferredSampleRate;
@@ -40,7 +24,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     private patchIosSampleRate(): void {
         let ua: string = navigator.userAgent;
         if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) {
-            let context: AudioContext = this.createAudioContext(false);
+            let context: AudioContext = this.createAudioContext();
             let buffer: AudioBuffer = context.createBuffer(1, 1, AlphaSynthWebAudioOutputBase.PreferredSampleRate);
             let dummy: AudioBufferSourceNode = context.createBufferSource();
             dummy.buffer = buffer;
@@ -52,7 +36,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
         }
     }
 
-    private createAudioContext(fullSetup: boolean): AudioContext {
+    private createAudioContext(): AudioContext {
         let audioContext: AudioContext | null = null;
         if ('AudioContext' in Environment.globalThis) {
             audioContext = new AudioContext();
@@ -64,119 +48,13 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
             throw new AlphaTabError(AlphaTabErrorType.General, 'AudioContext not found');
         }
 
-        if (fullSetup) {
-            this._unlocked = audioContext.state === 'running';
-            if (!this._unlocked) {
-                this.addContextUnlockListeners();
-            }
-
-            // When the browser window loses focus (i.e. switching tab, hiding the app on mobile, etc),
-            // the AudioContext state will be set to 'interrupted' (on iOS Safari) or 'suspended' (on other
-            // browsers), and 'resume' must be expliclty called.
-            audioContext.onstatechange = () => {
-                if (this._unlocked && audioContext!.state !== 'running') {
-                    audioContext!
-                        .resume()
-                        .then(
-                            () => {
-                                // no-op
-                            },
-                            e => {
-                                Logger.error(
-                                    'WebAudio',
-                                    `Attempted to resume the AudioContext on onstatechange, but it was rejected`,
-                                    e
-                                );
-                            }
-                        )
-                        .catch(e => {
-                            Logger.error(
-                                'WebAudio',
-                                `Attempted to resume the AudioContext on onstatechange, but threw an exception`,
-                                e
-                            );
-                        });
-                }
-            };
-        }
-
         return audioContext;
-    }
-
-    private addContextUnlockListeners() {
-        this._unlocking = false;
-
-        // resume AudioContext on user interaction because of autoplay policy
-        if (!this._resumeContextCallback) {
-            this._resumeContextCallback = () => {
-                const context = this._context;
-                if (!context || this._unlocked || this._unlocking) {
-                    return;
-                }
-                this._unlocking = true;
-
-                if ((context.state as string) === 'interrupted') {
-                    // explictly resume() context, and only fire 'resume' event after context has resumed
-                    context
-                        .resume()
-                        .then(
-                            () => {
-                                Logger.debug('WebAudio', 'The AudioContext was resumed');
-                            },
-                            e => {
-                                Logger.debug('WebAudio',
-                                    `Attempted to resume the AudioContext on SoundManager.resume(), but it was rejected`,
-                                    e
-                                );
-                            }
-                        )
-                        .catch(e => {
-                            Logger.debug('WebAudio',
-                                `Attempted to resume the AudioContext on SoundManager.resume(), but threw an exception`,
-                                e
-                            );
-                        });
-                }
-                // Some platforms (mostly iOS) require an additional sound to be played.
-                // This also performs a sanity check and verifies sounds can be played.
-                const buffer = context.createBuffer(1, 1, context.sampleRate);
-                const source = context.createBufferSource();
-                source.buffer = buffer;
-                source.connect(context.destination);
-                source.start(0);
-
-                // onended is only called if everything worked as expected (context is running)
-                source.onended = () => {
-                    source.disconnect(0);
-
-                    // unlocked!
-                    this._unlocked = true;
-                    this._unlocking = false;
-                    this.removeUserInputListeners();
-                };
-            };
-        }
-
-        // attach to all user input events
-        AlphaSynthWebAudioOutputBase.UserInputEvents.forEach(eventName => {
-            window.addEventListener(eventName, this._resumeContextCallback!, false);
-        });
-    }
-
-    private removeUserInputListeners() {
-        if (!this._resumeContextCallback) {
-            return;
-        }
-
-        AlphaSynthWebAudioOutputBase.UserInputEvents.forEach(eventName => {
-            window.removeEventListener(eventName, this._resumeContextCallback!, false);
-        });
-        this._resumeContextCallback = undefined;
     }
 
     public open(bufferTimeInMilliseconds: number): void {
         this.patchIosSampleRate();
-        this._context = this.createAudioContext(true);
+        this._context = this.createAudioContext();
+        this.setupAudioContextUnlocking();
     }
 
     public play(): void {
@@ -220,5 +98,130 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
 
     protected onReady() {
         (this.ready as EventEmitter).trigger();
+    }
+
+    // Credit for handling the unlocking/resume operations properly (especially on Buggy WebKit/iOS versions)
+    // goes to https://github.com/playcanvas/engine Copyright (c) 2011-2022 PlayCanvas Ltd. (MIT)
+
+    private static readonly UserInputEvents: string[] = [
+        'click',
+        'contextmenu',
+        'auxclick',
+        'dblclick',
+        'mousedown',
+        'mouseup',
+        'pointerup',
+        'touchend',
+        'keydown',
+        'keyup'
+    ];
+    private _unlocking: boolean = false;
+    private _unlocked: boolean = false;
+
+    private _resumeContextCallback?: () => void;
+
+    private setupAudioContextUnlocking() {
+        const audioContext = this._context;
+        if (!audioContext) {
+            return;
+        }
+
+        this._unlocked = audioContext.state === 'running';
+        if (!this._unlocked) {
+            this.addContextUnlockListeners();
+        }
+
+        audioContext.onstatechange = () => {
+            if (this._unlocked && audioContext!.state !== 'running') {
+                audioContext!
+                    .resume()
+                    .then(
+                        () => {
+                            Logger.debug('WebAudio', 'Resumed the AudioContext after suspension');
+                        },
+                        e => {
+                            Logger.error(
+                                'WebAudio',
+                                `Attempted to resume the AudioContext on onstatechange, but it was rejected`,
+                                e
+                            );
+                        }
+                    )
+                    .catch(e => {
+                        Logger.error(
+                            'WebAudio',
+                            `Attempted to resume the AudioContext on onstatechange, but threw an exception`,
+                            e
+                        );
+                    });
+            }
+        };
+    }
+
+    private addContextUnlockListeners() {
+        this._unlocking = false;
+
+        if (!this._resumeContextCallback) {
+            this._resumeContextCallback = () => {
+                const context = this._context;
+                if (!context || this._unlocked || this._unlocking) {
+                    return;
+                }
+                this._unlocking = true;
+
+                if ((context.state as string) === 'interrupted') {
+                    context
+                        .resume()
+                        .then(
+                            () => {
+                                Logger.debug('WebAudio', 'The AudioContext was resumed');
+                            },
+                            e => {
+                                Logger.debug(
+                                    'WebAudio',
+                                    `Attempted to resume the AudioContext on SoundManager.resume(), but it was rejected`,
+                                    e
+                                );
+                            }
+                        )
+                        .catch(e => {
+                            Logger.debug(
+                                'WebAudio',
+                                `Attempted to resume the AudioContext on SoundManager.resume(), but threw an exception`,
+                                e
+                            );
+                        });
+                }
+
+                const buffer = context.createBuffer(1, 1, context.sampleRate);
+                const source = context.createBufferSource();
+                source.buffer = buffer;
+                source.connect(context.destination);
+                source.start(0);
+
+                source.onended = () => {
+                    source.disconnect(0);
+                    this._unlocked = true;
+                    this._unlocking = false;
+                    this.removeUserInputListeners();
+                };
+            };
+        }
+
+        // attach to all user input events
+        AlphaSynthWebAudioOutputBase.UserInputEvents.forEach(eventName => {
+            window.addEventListener(eventName, this._resumeContextCallback!, false);
+        });
+    }
+
+    private removeUserInputListeners() {
+        if (!this._resumeContextCallback) {
+            return;
+        }
+
+        AlphaSynthWebAudioOutputBase.UserInputEvents.forEach(eventName => {
+            window.removeEventListener(eventName, this._resumeContextCallback!, false);
+        });
+        this._resumeContextCallback = undefined;
     }
 }
