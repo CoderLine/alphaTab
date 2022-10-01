@@ -82,8 +82,4 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
             cmd: 'alphaSynth.output.resetSamples'
         });
     }
-
-    public activate(): void {
-        // nothing to do
-    }
 }

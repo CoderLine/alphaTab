@@ -236,7 +236,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     //
     // API communicating with the web worker
     public play(): boolean {
-        this._output.activate();
         this._synth.postMessage({
             cmd: 'alphaSynth.play'
         });
@@ -250,7 +249,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public playPause(): void {
-        this._output.activate();
         this._synth.postMessage({
             cmd: 'alphaSynth.playPause'
         });

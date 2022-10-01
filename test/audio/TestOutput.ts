@@ -40,10 +40,6 @@ export class TestOutput implements ISynthOutput {
         // nothing to do
     }
 
-    public activate(): void {
-        // nothing to do
-    }
-
     /**
      * Fired when the output has been successfully opened and is ready to play samples.
      */

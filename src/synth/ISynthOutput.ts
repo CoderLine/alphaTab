@@ -43,11 +43,6 @@ export interface ISynthOutput {
     resetSamples(): void;
 
     /**
-     * Activates the output component.
-     */
-    activate(): void;
-
-    /**
      * Fired when the output has been successfully opened and is ready to play samples.
      */
     readonly ready: IEventEmitter;

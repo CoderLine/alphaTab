@@ -231,7 +231,6 @@ export class AlphaSynth implements IAlphaSynth {
         if (this.state !== PlayerState.Paused || !this._isMidiLoaded) {
             return false;
         }
-        this.output.activate();
 
         this.playInternal();
 

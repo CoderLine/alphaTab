@@ -27,9 +27,6 @@ internal class AndroidSynthOutput(
     override val sampleRate: Double
         get() = PreferredSampleRate.toDouble()
 
-    override fun activate() {
-    }
-
     override fun open(bufferTimeInMilliseconds: Double) {
         _bufferCount = (bufferTimeInMilliseconds * PreferredSampleRate /
             1000 /
