@@ -185,12 +185,12 @@ export class MidiFileGenerator {
         }
 
         // tempo
-        if (!previousMasterBar) {
-            this._handler.addTempo(currentTick, masterBar.score.tempo);
-            this._currentTempo = masterBar.score.tempo;
-        } else if (masterBar.tempoAutomation) {
+        if (masterBar.tempoAutomation) {
             this._handler.addTempo(currentTick, masterBar.tempoAutomation.value);
             this._currentTempo = masterBar.tempoAutomation.value;
+        } else if (!previousMasterBar) {
+            this._handler.addTempo(currentTick, masterBar.score.tempo);
+            this._currentTempo = masterBar.score.tempo;
         }
 
         const masterBarLookup: MasterBarTickLookup = new MasterBarTickLookup();
