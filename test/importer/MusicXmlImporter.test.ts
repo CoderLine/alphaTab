@@ -26,7 +26,6 @@ describe('MusicXmlImporterTests', () => {
         expect(score.tracks[4].playbackInfo.balance).toBe(16);
     });
 
-    
     it('full-bar-rest', async () => {
         let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
             'test-data/musicxml3/full-bar-rest.musicxml'
@@ -35,5 +34,17 @@ describe('MusicXmlImporterTests', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isFullBarRest).toBeTrue();
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].isFullBarRest).toBeTrue();
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].isFullBarRest).toBeTrue();
+    });
+
+    it('first-bar-tempo', async () => {
+        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+            'test-data/musicxml3/first-bar-tempo.musicxml'
+        );
+
+        expect(score.tempo).toBe(60);
+        expect(score.masterBars[0].tempoAutomation).toBeTruthy();
+        expect(score.masterBars[0].tempoAutomation?.value).toBe(60);
+        expect(score.masterBars[1].tempoAutomation).toBeTruthy();
+        expect(score.masterBars[1].tempoAutomation?.value).toBe(60);
     });
 });

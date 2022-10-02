@@ -1065,6 +1065,9 @@ export class MusicXmlImporter extends ScoreImporter {
                             tempoAutomation.type = AutomationType.Tempo;
                             tempoAutomation.value = parseInt(tempo);
                             masterBar.tempoAutomation = tempoAutomation;
+                            if(masterBar.index === 0) {
+                                masterBar.score.tempo = tempoAutomation.value;
+                            }
                         }
                         break;
                     case 'direction-type':
@@ -1102,6 +1105,9 @@ export class MusicXmlImporter extends ScoreImporter {
         tempoAutomation.type = AutomationType.Tempo;
         tempoAutomation.value = perMinute * ((unit / 4) | 0);
         masterBar.tempoAutomation = tempoAutomation;
+        if(masterBar.index === 0) {
+            masterBar.score.tempo = tempoAutomation.value;
+        }
     }
 
     private parseAttributes(element: XmlNode, bars: Bar[], masterBar: MasterBar, track: Track): void {
