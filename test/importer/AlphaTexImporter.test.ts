@@ -2,6 +2,7 @@ import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { Beat } from '@src/model/Beat';
+import { BrushType } from '@src/model/BrushType';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
 import { Duration } from '@src/model/Duration';
@@ -152,6 +153,59 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toEqual(3);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isTremolo).toEqual(true);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tremoloSpeed).toEqual(Duration.Sixteenth);
+    });
+
+    it('brushes-arpeggio', () => {
+        let tex: string = `
+            (1.1 2.2 3.3 4.4).4{bd 60} (1.1 2.2 3.3 4.4).8{bu 60} (1.1 2.2 3.3 4.4).2{ad 60} (1.1 2.2 3.3 4.4).16{au 60} r |
+            (1.1 2.2 3.3 4.4).4{bd 120} (1.1 2.2 3.3 4.4).8{bu 120} (1.1 2.2 3.3 4.4).2{ad 120} (1.1 2.2 3.3 4.4).16{au 120} r |
+            (1.1 2.2 3.3 4.4).4{bd} (1.1 2.2 3.3 4.4).8{bu} (1.1 2.2 3.3 4.4).2{ad} (1.1 2.2 3.3 4.4).16{au} r
+        `;
+        let score: Score = parseTex(tex);
+        expect(score.tracks.length).toEqual(1);
+        expect(score.masterBars.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toEqual(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushType).toEqual(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].playbackDuration).toEqual(960);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushType).toEqual(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].playbackDuration).toEqual(480);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].brushType).toEqual(BrushType.ArpeggioDown);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].playbackDuration).toEqual(1920);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].brushType).toEqual(BrushType.ArpeggioUp);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].playbackDuration).toEqual(240);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].isRest).toEqual(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].brushType).toEqual(BrushType.None);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].playbackDuration).toEqual(240);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].brushDuration).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toEqual(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].brushType).toEqual(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].brushDuration).toEqual(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].brushType).toEqual(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].brushDuration).toEqual(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].brushType).toEqual(BrushType.ArpeggioDown);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].brushDuration).toEqual(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].brushType).toEqual(BrushType.ArpeggioUp);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].brushDuration).toEqual(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].isRest).toEqual(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].brushType).toEqual(BrushType.None);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].brushDuration).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats.length).toEqual(5);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].brushType).toEqual(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].brushType).toEqual(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].brushDuration).toEqual(30);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].brushType).toEqual(BrushType.ArpeggioDown);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].brushDuration).toEqual(480);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].brushType).toEqual(BrushType.ArpeggioUp);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].isRest).toEqual(true);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushType).toEqual(BrushType.None);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushDuration).toEqual(0);
+
     });
 
     it('hamonics-issue79', () => {

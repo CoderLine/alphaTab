@@ -6,6 +6,7 @@ import { Automation, AutomationType } from '@src/model/Automation';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
+import { BrushType } from '@src/model/BrushType';
 import { Chord } from '@src/model/Chord';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
@@ -1336,6 +1337,37 @@ export class AlphaTexImporter extends ScoreImporter {
                 return false;
             }
             this._sy = this.newSy();
+            return true;
+        }
+        if (syData === 'bu' || syData === 'bd' || syData === 'au' || syData === 'ad') {
+            switch (syData) {
+                case 'bu':
+                    beat.brushType = BrushType.BrushUp;
+                    break;
+                case 'bd':
+                    beat.brushType = BrushType.BrushDown;
+                    break;
+                case 'au':
+                    beat.brushType = BrushType.ArpeggioUp;
+                    break;
+                case 'ad':
+                    beat.brushType = BrushType.ArpeggioDown;
+                    break;
+            }
+            this._sy = this.newSy();
+            if (this._sy === AlphaTexSymbols.Number) {
+                // explicit duration
+                beat.brushDuration = (this._syData as number);
+                this._sy = this.newSy();
+                return true;
+            }
+            // default to calcuated duration
+            beat.updateDurations();
+            if (syData === 'bu' || syData === 'bd') {
+                beat.brushDuration = beat.playbackDuration / 4 / beat.notes.length;
+            } else if (syData === 'au' || syData === 'ad') {
+                beat.brushDuration = beat.playbackDuration / beat.notes.length;
+            }
             return true;
         }
         if (syData === 'ch') {
