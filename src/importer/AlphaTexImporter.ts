@@ -1339,7 +1339,7 @@ export class AlphaTexImporter extends ScoreImporter {
             // default to calcuated duration
             beat.updateDurations();
             if (syData === 'bu' || syData === 'bd') {
-                beat.brushDuration = beat.playbackDuration / (beat.notes.length > 4 ? beat.notes.length : 4);
+                beat.brushDuration = beat.playbackDuration / 4 / beat.notes.length;
             } else if (syData === 'au' || syData === 'ad') {
                 beat.brushDuration = beat.playbackDuration / beat.notes.length;
             }
