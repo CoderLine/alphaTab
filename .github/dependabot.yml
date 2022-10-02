@@ -9,8 +9,3 @@ updates:
     directory: "/src.csharp"
     schedule:
       interval: "weekly"
-            
-  - package-ecosystem: "gradle"
-    directory: "/src.kotlin/alphaTab"
-    schedule:
-      interval: "weekly"
