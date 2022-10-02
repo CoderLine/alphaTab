@@ -11,36 +11,36 @@ export class AutomationSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Automation | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("isLinear", obj.isLinear); 
-        o.set("type", (obj.type as number)); 
+        o.set("islinear", obj.isLinear); 
+        o.set("type", obj.type as number); 
         o.set("value", obj.value); 
-        o.set("ratioPosition", obj.ratioPosition); 
+        o.set("ratioposition", obj.ratioPosition); 
         o.set("text", obj.text); 
         return o; 
     }
     public static setProperty(obj: Automation, property: string, v: unknown): boolean {
         switch (property) {
             case "islinear":
-                obj.isLinear = (v as boolean);
+                obj.isLinear = v! as boolean;
                 return true;
             case "type":
-                obj.type = (JsonHelper.parseEnum<AutomationType>(v, AutomationType)!);
+                obj.type = JsonHelper.parseEnum<AutomationType>(v, AutomationType)!;
                 return true;
             case "value":
-                obj.value = (v as number);
+                obj.value = v! as number;
                 return true;
             case "ratioposition":
-                obj.ratioPosition = (v as number);
+                obj.ratioPosition = v! as number;
                 return true;
             case "text":
-                obj.text = (v as string);
+                obj.text = v! as string;
                 return true;
         } 
         return false; 

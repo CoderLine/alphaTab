@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using AlphaTab.Synth;
 using AlphaTab.Platform;
 using AlphaTab.Platform.CSharp;
@@ -18,6 +21,10 @@ namespace AlphaTab.Wpf
     internal class WpfUiFacade : ManagedUiFacade<AlphaTab>
     {
         private readonly ScrollViewer _scrollViewer;
+
+        private readonly Dictionary<string, Image> _resultIdToElementLookup =
+            new Dictionary<string, Image>();
+
         private event Action? InternalRootContainerBecameVisible;
 
         public override IContainer RootContainer { get; }
@@ -78,12 +85,14 @@ namespace AlphaTab.Wpf
         public override void Initialize(AlphaTabApiBase<AlphaTab> api, AlphaTab control)
         {
             base.Initialize(api, control);
+            control.Settings.Core.EnableLazyLoading = false;
             api.Settings = control.Settings;
             control.SettingsChanged += OnSettingsChanged;
         }
 
         private void OnSettingsChanged(Settings s)
         {
+            s.Core.EnableLazyLoading = false;
             Api.Settings = s;
             Api.UpdateSettings();
             Api.Render();
@@ -107,12 +116,17 @@ namespace AlphaTab.Wpf
 
         public override IContainer CreateCanvasElement()
         {
-            var canvas = new WrapPanel
+            var canvas = new Canvas
             {
-                VerticalAlignment = VerticalAlignment.Top,
-                Orientation = Orientation.Horizontal
+                VerticalAlignment = VerticalAlignment.Top
             };
             return new FrameworkElementContainer(canvas);
+        }
+
+        public override void InitialRender()
+        {
+            Api.Renderer.PreRender.On(_ => { _resultIdToElementLookup.Clear(); });
+            base.InitialRender();
         }
 
         public override void TriggerEvent(IContainer container, string eventName,
@@ -120,12 +134,51 @@ namespace AlphaTab.Wpf
         {
         }
 
+        public override void BeginUpdateRenderResults(RenderFinishedEventArgs? r)
+        {
+            SettingsContainer.Dispatcher?.BeginInvoke(
+                (Action<RenderFinishedEventArgs?>)(renderResult =>
+                {
+                    if (renderResult == null ||
+                        !_resultIdToElementLookup.TryGetValue(renderResult.Id, out var placeholder))
+                    {
+                        return;
+                    }
+
+                    var body = renderResult.RenderResult;
+
+                    ImageSource? source = null;
+                    if (body is string)
+                    {
+                        // TODO: svg support
+                        return;
+                    }
+
+                    if (body is SKImage skiaImage)
+                    {
+                        using (skiaImage)
+                        {
+                            source = SkImageSource.Create(skiaImage);
+                        }
+                    }
+                    else if (body is System.Drawing.Bitmap image)
+                    {
+                        using (image)
+                        {
+                            source = GdiImageSource.Create(image);
+                        }
+                    }
+
+                    placeholder.Source = source;
+                }), r);
+        }
+
         public override void BeginAppendRenderResults(RenderFinishedEventArgs? r)
         {
             SettingsContainer.Dispatcher?.BeginInvoke(
-                (Action<RenderFinishedEventArgs>) (renderResult =>
+                (Action<RenderFinishedEventArgs?>)(renderResult =>
                 {
-                    var panel = (WrapPanel) ((FrameworkElementContainer) Api.CanvasElement).Control;
+                    var panel = (Panel)((FrameworkElementContainer)Api.CanvasElement).Control;
 
                     // null result indicates that the rendering finished
                     if (renderResult == null)
@@ -142,56 +195,30 @@ namespace AlphaTab.Wpf
                     // NOTE: here we try to replace existing children
                     else
                     {
-                        var body = renderResult.RenderResult;
-
-                        ImageSource? source = null;
-                        if (body is string)
+                        if (TotalResultCount.TryPeek(out var counter))
                         {
-                            // TODO: svg support
-                            return;
-                        }
-
-                        if (body is SKImage skiaImage)
-                        {
-                            using (skiaImage)
+                            Image placeholder;
+                            if (counter.Count < panel.Children.Count)
                             {
-                                source = SkImageSource.Create(skiaImage);
+                                placeholder = (Image)panel.Children[counter.Count];
                             }
-                        }
-                        else if (body is System.Drawing.Bitmap image)
-                        {
-                            using (image)
+                            else
                             {
-                                source = GdiImageSource.Create(image);
-                            }
-                        }
-
-                        if (source != null)
-                        {
-                            if (TotalResultCount.TryPeek(out var counter))
-                            {
-                                if (counter.Count < panel.Children.Count)
+                                placeholder = new Image
                                 {
-                                    var img = (Image) panel.Children[counter.Count];
-                                    img.Width = renderResult.Width;
-                                    img.Height = renderResult.Height;
-                                    img.Stretch = Stretch.None;
-                                    img.SnapsToDevicePixels = true;
-                                    img.Source = source;
-                                }
-                                else
-                                {
-                                    var img = new Image
-                                    {
-                                        Width = renderResult.Width,
-                                        Height = renderResult.Height,
-                                        Source = source
-                                    };
-                                    panel.Children.Add(img);
-                                }
-
-                                counter.Count++;
+                                    Stretch = Stretch.None,
+                                    SnapsToDevicePixels = true
+                                };
+                                panel.Children.Add(placeholder);
                             }
+
+                            Canvas.SetLeft(placeholder, renderResult.X);
+                            Canvas.SetTop(placeholder, renderResult.Y);
+                            placeholder.Width = renderResult.Width;
+                            placeholder.Height = renderResult.Height;
+                            _resultIdToElementLookup[renderResult.Id] = placeholder;
+
+                            counter.Count++;
                         }
                     }
                 }),
@@ -200,7 +227,7 @@ namespace AlphaTab.Wpf
 
         public override void DestroyCursors()
         {
-            var element = (Panel) ((FrameworkElementContainer) Api.CanvasElement).Control.Parent;
+            var element = (Panel)((FrameworkElementContainer)Api.CanvasElement).Control.Parent;
             var cursors = element.Children.OfType<Canvas>()
                 .FirstOrDefault(c => "at-cursors".Equals(c.Tag));
             if (cursors != null)
@@ -220,25 +247,32 @@ namespace AlphaTab.Wpf
 
             var selectionWrapper = new Canvas();
 
-            var barCursor = new System.Windows.Shapes.Rectangle
+            var barCursor = new Rectangle
             {
-                Fill = SettingsContainer.BarCursorFill,
                 IsHitTestVisible = false
             };
 
-            var beatCursor = new System.Windows.Shapes.Rectangle
+            barCursor.SetBinding(Shape.FillProperty, new Binding(nameof(SettingsContainer.BarCursorFill))
             {
-                Fill = SettingsContainer.BeatCursorFill,
+                Source = SettingsContainer
+            });
+
+            var beatCursor = new Rectangle
+            {
                 IsHitTestVisible = false,
                 Width = 3
             };
+            beatCursor.SetBinding(Shape.FillProperty, new Binding(nameof(SettingsContainer.BeatCursorFill))
+            {
+                Source = SettingsContainer
+            });
 
             cursorWrapper.Children.Add(selectionWrapper);
             cursorWrapper.Children.Add(barCursor);
             cursorWrapper.Children.Add(beatCursor);
 
             // add cursors to UI
-            var element = (Panel) ((FrameworkElementContainer) Api.CanvasElement).Control.Parent;
+            var element = (Panel)((FrameworkElementContainer)Api.CanvasElement).Control.Parent;
             element.Children.Insert(0, cursorWrapper);
 
             return new Cursors(
@@ -258,17 +292,22 @@ namespace AlphaTab.Wpf
         {
         }
 
-        public override void HighlightElements(string groupId)
+        public override void HighlightElements(string groupId, double masterBarIndex)
         {
         }
 
         public override IContainer CreateSelectionElement()
         {
-            var selection = new System.Windows.Shapes.Rectangle
+            var selection = new Rectangle
             {
                 Fill = SettingsContainer.SelectionFill,
                 IsHitTestVisible = false
             };
+            selection.SetBinding(Shape.FillProperty,
+                new Binding(nameof(SettingsContainer.SelectionFill))
+                {
+                    Source = SettingsContainer
+                });
             return new FrameworkElementContainer(selection);
         }
 
@@ -279,13 +318,13 @@ namespace AlphaTab.Wpf
 
         public override Bounds GetOffset(IContainer? relativeTo, IContainer container)
         {
-            var containerWpf = ((FrameworkElementContainer) container).Control;
+            var containerWpf = ((FrameworkElementContainer)container).Control;
 
-            var canvas = ((FrameworkElementContainer) Api.CanvasElement).Control;
+            var canvas = ((FrameworkElementContainer)Api.CanvasElement).Control;
             var position = containerWpf.TranslatePoint(new Point(0, 0), canvas);
 
             if (relativeTo != null &&
-                ((FrameworkElementContainer) relativeTo).Control is ScrollViewer sv)
+                ((FrameworkElementContainer)relativeTo).Control is ScrollViewer sv)
             {
                 position.Y -= sv.VerticalOffset;
                 position.X -= sv.HorizontalOffset;
@@ -293,16 +332,16 @@ namespace AlphaTab.Wpf
 
             return new Bounds
             {
-                X = (float) position.X,
-                Y = (float) position.Y,
-                W = (float) containerWpf.ActualWidth,
-                H = (float) containerWpf.ActualHeight
+                X = (float)position.X,
+                Y = (float)position.Y,
+                W = (float)containerWpf.ActualWidth,
+                H = (float)containerWpf.ActualHeight
             };
         }
 
         public override void ScrollToY(IContainer scrollElement, double offset, double speed)
         {
-            if (((FrameworkElementContainer) scrollElement).Control is ScrollViewer s)
+            if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
             {
                 s.ScrollToVerticalOffset(offset);
             }
@@ -313,7 +352,7 @@ namespace AlphaTab.Wpf
 
         public override void ScrollToX(IContainer scrollElement, double offset, double speed)
         {
-            if (((FrameworkElementContainer) scrollElement).Control is ScrollViewer s)
+            if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
             {
                 s.ScrollToHorizontalOffset(offset);
             }

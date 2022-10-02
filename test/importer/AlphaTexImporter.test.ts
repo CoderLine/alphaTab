@@ -1,7 +1,8 @@
-import { StaveProfile } from '@src/DisplaySettings';
+import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { Beat } from '@src/model/Beat';
+import { BrushType } from '@src/model/BrushType';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
 import { Duration } from '@src/model/Duration';
@@ -9,6 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
+import { KeySignature } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -19,12 +21,11 @@ import { Tuning } from '@src/model/Tuning';
 import { HarmonicsEffectInfo } from '@src/rendering/effects/HarmonicsEffectInfo';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
-import { TestPlatform } from '@test/TestPlatform';
 
 describe('AlphaTexImporterTest', () => {
-    const parseTex: (tex:string) => Score = (tex: string): Score => {
+    const parseTex: (tex: string) => Score = (tex: string): Score => {
         let importer: AlphaTexImporter = new AlphaTexImporter();
-        importer.init(TestPlatform.createStringReader(tex), new Settings());
+        importer.initFromString(tex, new Settings());
         return importer.readScore();
     };
 
@@ -154,6 +155,59 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tremoloSpeed).toEqual(Duration.Sixteenth);
     });
 
+    it('brushes-arpeggio', () => {
+        let tex: string = `
+            (1.1 2.2 3.3 4.4).4{bd 60} (1.1 2.2 3.3 4.4).8{bu 60} (1.1 2.2 3.3 4.4).2{ad 60} (1.1 2.2 3.3 4.4).16{au 60} r |
+            (1.1 2.2 3.3 4.4).4{bd 120} (1.1 2.2 3.3 4.4).8{bu 120} (1.1 2.2 3.3 4.4).2{ad 120} (1.1 2.2 3.3 4.4).16{au 120} r |
+            (1.1 2.2 3.3 4.4).4{bd} (1.1 2.2 3.3 4.4).8{bu} (1.1 2.2 3.3 4.4).2{ad} (1.1 2.2 3.3 4.4).16{au} r
+        `;
+        let score: Score = parseTex(tex);
+        expect(score.tracks.length).toEqual(1);
+        expect(score.masterBars.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toEqual(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushType).toEqual(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].playbackDuration).toEqual(960);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushType).toEqual(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].playbackDuration).toEqual(480);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].brushType).toEqual(BrushType.ArpeggioDown);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].playbackDuration).toEqual(1920);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].brushType).toEqual(BrushType.ArpeggioUp);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].playbackDuration).toEqual(240);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].isRest).toEqual(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].brushType).toEqual(BrushType.None);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].playbackDuration).toEqual(240);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].brushDuration).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toEqual(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].brushType).toEqual(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].brushDuration).toEqual(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].brushType).toEqual(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].brushDuration).toEqual(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].brushType).toEqual(BrushType.ArpeggioDown);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].brushDuration).toEqual(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].brushType).toEqual(BrushType.ArpeggioUp);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].brushDuration).toEqual(120);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].isRest).toEqual(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].brushType).toEqual(BrushType.None);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].brushDuration).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats.length).toEqual(5);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].brushType).toEqual(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].brushType).toEqual(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].brushDuration).toEqual(30);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].brushType).toEqual(BrushType.ArpeggioDown);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].brushDuration).toEqual(480);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].brushType).toEqual(BrushType.ArpeggioUp);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].brushDuration).toEqual(60);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].isRest).toEqual(true);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushType).toEqual(BrushType.None);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushDuration).toEqual(0);
+
+    });
+
     it('hamonics-issue79', () => {
         let tex: string = ':8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}';
         let score: Score = parseTex(tex);
@@ -176,6 +230,7 @@ describe('AlphaTexImporterTest', () => {
         let score: Score = parseTex(tex);
         let settings: Settings = new Settings();
         settings.core.engine = 'svg';
+        settings.core.enableLazyLoading = false;
         settings.display.staveProfile = StaveProfile.ScoreTab;
         let renderer: ScoreRenderer = new ScoreRenderer(settings);
         renderer.width = 970;
@@ -655,6 +710,29 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[3].section!.marker).toEqual('S');
     });
 
+    it('key-signature', () => {
+        let tex: string = `:1 3.3 | \\ks C 3.3 | \\ks Cmajor 3.3 | \\ks Aminor 3.3 |
+        \\ks F 3.3 | \\ks bbmajor 3.3 | \\ks CMINOR 3.3 | \\ks aB 3.3 | \\ks db 3.3 | \\ks d#minor 3.3 |
+        \\ks g 3.3 | \\ks Dmajor 3.3 | \\ks f#minor 3.3 | \\ks E 3.3 | \\ks Bmajor 3.3 | \\ks Ebminor 3.3`;
+        let score: Score = parseTex(tex);
+        expect(score.masterBars[0].keySignature).toEqual(KeySignature.C)
+        expect(score.masterBars[1].keySignature).toEqual(KeySignature.C)
+        expect(score.masterBars[2].keySignature).toEqual(KeySignature.C)
+        expect(score.masterBars[3].keySignature).toEqual(KeySignature.C)
+        expect(score.masterBars[4].keySignature).toEqual(KeySignature.F)
+        expect(score.masterBars[5].keySignature).toEqual(KeySignature.Bb)
+        expect(score.masterBars[6].keySignature).toEqual(KeySignature.Eb)
+        expect(score.masterBars[7].keySignature).toEqual(KeySignature.Ab)
+        expect(score.masterBars[8].keySignature).toEqual(KeySignature.Db)
+        expect(score.masterBars[9].keySignature).toEqual(KeySignature.Gb)
+        expect(score.masterBars[10].keySignature).toEqual(KeySignature.G)
+        expect(score.masterBars[11].keySignature).toEqual(KeySignature.D)
+        expect(score.masterBars[12].keySignature).toEqual(KeySignature.A)
+        expect(score.masterBars[13].keySignature).toEqual(KeySignature.E)
+        expect(score.masterBars[14].keySignature).toEqual(KeySignature.B)
+        expect(score.masterBars[15].keySignature).toEqual(KeySignature.FSharp)
+    });
+
     it('pop-slap-tap', () => {
         let tex: string = '3.3{p} 3.3{s} 3.3{tt} r';
         let score: Score = parseTex(tex);
@@ -769,11 +847,58 @@ describe('AlphaTexImporterTest', () => {
         let tex: string =
             '\\ro 1.3 2.3 3.3 4.3 | 5.3 6.3 7.3 8.3 | \\rc 2 1.3 2.3 3.3 4.3 | \\ro \\rc 3 1.3 2.3 3.3 4.3 |';
         let score: Score = parseTex(tex);
+        expect(score.masterBars[0].isRepeatStart).toBe(true);
+        expect(score.masterBars[1].isRepeatStart).toBe(false);
+        expect(score.masterBars[2].isRepeatStart).toBe(false);
+        expect(score.masterBars[3].isRepeatStart).toBe(true);
         expect(score.masterBars[0].repeatCount).toEqual(0);
         expect(score.masterBars[1].repeatCount).toEqual(0);
         expect(score.masterBars[2].repeatCount).toEqual(2);
         expect(score.masterBars[3].repeatCount).toEqual(3);
     });
+
+    it('alternate-endings', () => {
+        let tex: string = '\\ro 4.3*4 | \\ae (1 2 3) 6.3*4 | \\ae 4 \\rc 4 6.3 6.3 6.3 5.3 |';
+        let score: Score = parseTex(tex);
+        expect(score.masterBars[0].isRepeatStart).toBe(true);
+        expect(score.masterBars[1].isRepeatStart).toBe(false);
+        expect(score.masterBars[2].isRepeatStart).toBe(false);
+        expect(score.masterBars[0].repeatCount).toEqual(0);
+        expect(score.masterBars[1].repeatCount).toEqual(0);
+        expect(score.masterBars[2].repeatCount).toEqual(4);
+        expect(score.masterBars[0].alternateEndings).toEqual(0b0000);
+        expect(score.masterBars[1].alternateEndings).toEqual(0b0111);
+        expect(score.masterBars[2].alternateEndings).toEqual(0b1000);
+    })
+
+    it('random-alternate-endings', () => {
+        let tex: string = `
+            \\ro \\ae 1 1.1.1 | \\ae 2 2.1 | \\ae 3 3.1 |
+            4.3.4*4 |
+            \\ae 1 1.1.1 | \\ae 2 2.1 | \\ae 3 3.1 |
+            4.3.4*4 |
+            \\ae (1 3) 1.1.1 | \\ae 2 \\rc 3 2.1 |
+        `;
+        let score: Score = parseTex(tex);
+        expect(score.masterBars[0].isRepeatStart).toBe(true);
+        for (let i = 1; i <= 9; i++) {
+            expect(score.masterBars[i].isRepeatStart).toBe(false);
+        }
+        for (let i = 0; i <= 8; i++) {
+            expect(score.masterBars[i].repeatCount).toEqual(0);
+        }
+        expect(score.masterBars[9].repeatCount).toEqual(3);
+        expect(score.masterBars[0].alternateEndings).toEqual(0b001);
+        expect(score.masterBars[1].alternateEndings).toEqual(0b010);
+        expect(score.masterBars[2].alternateEndings).toEqual(0b100);
+        expect(score.masterBars[3].alternateEndings).toEqual(0b000);
+        expect(score.masterBars[4].alternateEndings).toEqual(0b001);
+        expect(score.masterBars[5].alternateEndings).toEqual(0b010);
+        expect(score.masterBars[6].alternateEndings).toEqual(0b100);
+        expect(score.masterBars[7].alternateEndings).toEqual(0b000);
+        expect(score.masterBars[8].alternateEndings).toEqual(0b101);
+        expect(score.masterBars[9].alternateEndings).toEqual(0b010);
+    })
 
     it('default-transposition-on-instruments', () => {
         let tex: string = `
@@ -853,25 +978,11 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('expect-invalid-format-xml', () => {
-        try {
-            parseTex('<xml>');
-            fail('Expected error');
-        } catch(e) {
-            if(!(e instanceof UnsupportedFormatError)) {
-                fail(`Expected UnsupportedFormatError got ${e}`);
-            }
-        }
+        expect(() => parseTex('<xml>')).toThrowError(UnsupportedFormatError);
     });
-    
+
     it('expect-invalid-format-other-text', () => {
-        try {
-            parseTex('This is not an alphaTex file');
-            fail('Expected error');
-        } catch(e) {
-            if(!(e instanceof UnsupportedFormatError)) {
-                fail(`Expected UnsupportedFormatError got ${e}`);
-            }
-        }
+        expect(() => parseTex('This is not an alphaTex file')).toThrowError(UnsupportedFormatError);
     });
 
     it('auto-detect-tuning-from-instrument', () => {
@@ -891,4 +1002,37 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].tuning.length).toEqual(0);
         expect(score.tracks[0].staves[0].displayTranspositionPitch).toEqual(0);
     });
+
+    it('multibyte-encoding', () => {
+        const multiByteChars = '爱你ÖÄÜ🎸🎵🎶';
+        const score = parseTex(`\\title "${multiByteChars}"
+        .
+        \\track "🎸"
+        \\lyrics "Test Lyrics 🤘"
+        (1.2 1.1).4 x.2.8 0.1 1.1 | 1.2 3.2 0.1 1.1`);
+
+        expect(score.title).toEqual(multiByteChars);
+        expect(score.tracks[0].name).toEqual("🎸");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).toEqual("🤘");
+    });
+
+    it('does-not-hang-on-backslash', () => {
+        expect(() => parseTex('\\title Test . 3.3 \\')).toThrowError(UnsupportedFormatError)
+    })
+
+    function runSectionNoteSymbolTest(noteSymbol: string) {
+        const score = parseTex(`1.3.4 * 4 | \\section Verse ${noteSymbol}.1 | 2.3.4*4`);
+
+        expect(score.masterBars.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toEqual(4);
+        expect(score.masterBars[1].section!.text).toEqual('Verse');
+        expect(score.masterBars[1].section!.marker).toEqual('');
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toEqual(1);
+    }
+
+    it('does-not-interpret-note-symbols-on-section', () => {
+        runSectionNoteSymbolTest('r');
+        runSectionNoteSymbolTest('-');
+        runSectionNoteSymbolTest('x');
+    })
 });

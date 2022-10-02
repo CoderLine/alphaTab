@@ -20,6 +20,7 @@ namespace AlphaTab.Wpf
             }
             bitmap.AddDirtyRect(new Int32Rect(0, 0, info.Width, info.Height));
             bitmap.Unlock();
+            bitmap.Freeze();
             return bitmap;
         }
     }

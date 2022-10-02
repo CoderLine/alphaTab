@@ -1,11 +1,11 @@
-import { Logger } from '@src/alphatab';
+import { Logger } from '@src/Logger';
 import { Score } from '@src/model/Score';
 import { ZipEntry } from '@src/zip/ZipEntry';
-import { ScoreExporter } from './ScoreExporter';
+import { ScoreExporter } from '@src/exporter/ScoreExporter';
+import { GpifWriter } from '@src/exporter//GpifWriter';
 import { IOHelper } from '@src/io/IOHelper';
 import { BinaryStylesheet } from '@src/importer/BinaryStylesheet';
 import { PartConfiguration } from '@src/importer/PartConfiguration';
-import { GpifWriter } from './GpifWriter';
 import { ZipWriter } from '@src/zip/ZipWriter';
 /**
  * This ScoreExporter can write Guitar Pro 7 (gp) files.

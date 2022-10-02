@@ -69,14 +69,13 @@ export class MusicXmlImporter extends ScoreImporter {
             this.mergePartGroups();
         }
         this._score.finish(this.settings);
-        // the structure of MusicXML does not allow live creation of the groups,
         this._score.rebuildRepeatGroups();
         return this._score;
     }
 
     private mergePartGroups(): void {
         let anyMerged: boolean = false;
-        for(const tracks of this._partGroups.values()) {
+        for (const tracks of this._partGroups.values()) {
             if (tracks.length > 1) {
                 this.mergeGroup(tracks);
                 anyMerged = true;
@@ -161,7 +160,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let id: string = element.getAttribute('id');
         if (!this._trackById.has(id)) {
             if (this._trackById.size === 1) {
-                for(const [x,t] of this._trackById) {
+                for (const [x, t] of this._trackById) {
                     if (t.staves.length === 0 || t.staves[0].bars.length === 0) {
                         id = x;
                     }
@@ -203,7 +202,7 @@ export class MusicXmlImporter extends ScoreImporter {
         if (isFirstMeasure) {
             this._divisionsPerQuarterNote = 0;
             this._trackFirstMeasureNumber = parseInt(element.getAttribute('number'));
-            if(!this._trackFirstMeasureNumber) {
+            if (!this._trackFirstMeasureNumber) {
                 this._trackFirstMeasureNumber = 0;
             }
             barIndex = 0;
@@ -230,7 +229,8 @@ export class MusicXmlImporter extends ScoreImporter {
         let masterBar: MasterBar | null = null;
         for (let b: number = track.staves[0].bars.length; b <= barIndex; b++) {
             for (let s: number = 0; s < track.staves.length; s++) {
-                let bar: Bar = (bars[s] = new Bar());
+                let bar: Bar = new Bar();
+                bars[s] = bar;
                 if (track.staves[s].bars.length > 0) {
                     let previousBar: Bar = track.staves[s].bars[track.staves[s].bars.length - 1];
                     bar.clef = previousBar.clef;
@@ -240,34 +240,37 @@ export class MusicXmlImporter extends ScoreImporter {
                 this.ensureVoices(bar);
             }
         }
-        let attributesParsed: boolean = false;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'note':
-                        this.parseNoteBeat(c, bars);
-                        break;
-                    case 'forward':
-                        this.parseForward(c, bars);
-                        break;
-                    case 'direction':
-                        this.parseDirection(c, masterBar!);
-                        break;
-                    case 'attributes':
-                        if (!attributesParsed) {
-                            this.parseAttributes(c, bars, masterBar!, track);
-                            attributesParsed = true;
-                        }
-                        break;
-                    case 'harmony':
-                        this.parseHarmony(c, track);
-                        break;
-                    case 'sound':
-                        // TODO
-                        break;
-                    case 'barline':
-                        this.parseBarline(c, masterBar!);
-                        break;
+
+        if (masterBar) {
+            let attributesParsed: boolean = false;
+            for (let c of element.childNodes) {
+                if (c.nodeType === XmlNodeType.Element) {
+                    switch (c.localName) {
+                        case 'note':
+                            this.parseNoteBeat(c, bars);
+                            break;
+                        case 'forward':
+                            this.parseForward(c, bars);
+                            break;
+                        case 'direction':
+                            this.parseDirection(c, masterBar);
+                            break;
+                        case 'attributes':
+                            if (!attributesParsed) {
+                                this.parseAttributes(c, bars, masterBar, track);
+                                attributesParsed = true;
+                            }
+                            break;
+                        case 'harmony':
+                            this.parseHarmony(c, track);
+                            break;
+                        case 'sound':
+                            // TODO
+                            break;
+                        case 'barline':
+                            this.parseBarline(c, masterBar);
+                            break;
+                    }
                 }
             }
         }
@@ -576,7 +579,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let num: number = parseInt(element.getAttribute('number'));
         if (num > 0) {
             --num;
-            masterBar.alternateEndings |= (0x01 << num) & 0xff;
+            masterBar.alternateEndings = masterBar.alternateEndings | ((0x01 << num) & 0xff);
         }
     }
 
@@ -808,7 +811,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         } else if (element.getAttribute('type') === 'stop' && this._tieStarts.length > 0 && !note.isTieDestination) {
             note.isTieDestination = true;
-            note.tieOriginNoteId = this._tieStarts[0].id;
+            note.tieOrigin = this._tieStarts[0];
             this._tieStarts.splice(0, 1);
             this._tieStartIds.delete(note.id);
         }
@@ -844,6 +847,13 @@ export class MusicXmlImporter extends ScoreImporter {
                         if (!slurNumber) {
                             slurNumber = '1';
                         }
+
+                        // slur numbers are unique in the way that they have the same ID across 
+                        // staffs/tracks etc. as long they represent the logically same slur. 
+                        // but in our case it must be globally unique to link the correct notes. 
+                        // adding the staff ID should be enough to achieve this
+                        slurNumber = beat.voice.bar.staff.index + '_' + slurNumber;
+
                         switch (c.getAttribute('type')) {
                             case 'start':
                                 this._slurStarts.set(slurNumber, note);
@@ -852,8 +862,8 @@ export class MusicXmlImporter extends ScoreImporter {
                                 if (this._slurStarts.has(slurNumber)) {
                                     note.isSlurDestination = true;
                                     let slurStart: Note = this._slurStarts.get(slurNumber)!;
-                                    slurStart.slurDestinationNoteId = note.id;
-                                    note.slurOriginNoteId = note.id;
+                                    slurStart.slurDestination = note;
+                                    note.slurOrigin = slurStart;
                                 }
                                 break;
                         }
@@ -1055,6 +1065,9 @@ export class MusicXmlImporter extends ScoreImporter {
                             tempoAutomation.type = AutomationType.Tempo;
                             tempoAutomation.value = parseInt(tempo);
                             masterBar.tempoAutomation = tempoAutomation;
+                            if(masterBar.index === 0) {
+                                masterBar.score.tempo = tempoAutomation.value;
+                            }
                         }
                         break;
                     case 'direction-type':
@@ -1088,9 +1101,13 @@ export class MusicXmlImporter extends ScoreImporter {
                 }
             }
         }
-        let tempoAutomation: Automation = (masterBar.tempoAutomation = new Automation());
+        let tempoAutomation: Automation = new Automation();
         tempoAutomation.type = AutomationType.Tempo;
         tempoAutomation.value = perMinute * ((unit / 4) | 0);
+        masterBar.tempoAutomation = tempoAutomation;
+        if(masterBar.index === 0) {
+            masterBar.score.tempo = tempoAutomation.value;
+        }
     }
 
     private parseAttributes(element: XmlNode, bars: Bar[], masterBar: MasterBar, track: Track): void {
@@ -1403,7 +1420,10 @@ export class MusicXmlImporter extends ScoreImporter {
                         track.playbackInfo.volume = Math.floor((parseInt(c.innerText) / 100) * 16);
                         break;
                     case 'pan':
-                        track.playbackInfo.balance = Math.max(0, Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16)));
+                        track.playbackInfo.balance = Math.max(
+                            0,
+                            Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16))
+                        );
                         break;
                 }
             }

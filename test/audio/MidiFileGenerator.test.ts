@@ -1,5 +1,5 @@
 import { ControllerType } from '@src/midi/ControllerType';
-import { MidiEvent } from '@src/midi/MidiEvent';
+import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
@@ -19,7 +19,7 @@ import {
     NoteBendEvent,
     ControlChangeEvent,
     FlatMidiEventGenerator,
-    MidiEvent as FlatMidiEvent,
+    FlatMidiEvent as FlatMidiEvent,
     NoteEvent,
     ProgramChangeEvent,
     TempoEvent,
@@ -28,11 +28,14 @@ import {
     RestEvent
 } from '@test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from '@test/TestPlatform';
+import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
+import { MetaEventType } from '@src/midi/MetaEvent';
+import { MetaDataEvent } from '@src/midi/MetaDataEvent';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
         let importer: AlphaTexImporter = new AlphaTexImporter();
-        importer.init(TestPlatform.createStringReader(tex), new Settings());
+        importer.initFromString(tex, new Settings());
         return importer.readScore();
     };
 
@@ -140,9 +143,7 @@ describe('MidiFileGeneratorTest', () => {
             if (i < expectedEvents.length) {
                 expect(expectedEvents[i].equals(handler.midiEvents[i]))
                     .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(
-                        true,
-                    );
+                    .toEqual(true);
             }
         }
         expect(handler.midiEvents.length).toEqual(expectedEvents.length);
@@ -362,9 +363,7 @@ describe('MidiFileGeneratorTest', () => {
             if (i < expectedEvents.length) {
                 expect(expectedEvents[i].equals(handler.midiEvents[i]))
                     .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(
-                        true
-                    );
+                    .toEqual(true);
             }
         }
         expect(handler.midiEvents.length).toEqual(expectedEvents.length);
@@ -450,9 +449,7 @@ describe('MidiFileGeneratorTest', () => {
             if (i < expectedEvents.length) {
                 expect(expectedEvents[i].equals(handler.midiEvents[i]))
                     .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(
-                        true
-                    );
+                    .toEqual(true);
             }
         }
         expect(handler.midiEvents.length).toEqual(expectedEvents.length);
@@ -523,9 +520,7 @@ describe('MidiFileGeneratorTest', () => {
             if (i < expectedEvents.length) {
                 expect(expectedEvents[i].equals(handler.midiEvents[i]))
                     .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(
-                        true
-                    );
+                    .toEqual(true);
             }
         }
         expect(handler.midiEvents.length).toEqual(expectedEvents.length);
@@ -598,9 +593,7 @@ describe('MidiFileGeneratorTest', () => {
             if (i < expectedEvents.length) {
                 expect(expectedEvents[i].equals(handler.midiEvents[i]))
                     .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(
-                        true
-                    );
+                    .toEqual(true);
             }
         }
         expect(handler.midiEvents.length).toEqual(expectedEvents.length);
@@ -791,9 +784,7 @@ describe('MidiFileGeneratorTest', () => {
             if (i < expectedEvents.length) {
                 expect(expectedEvents[i].equals(handler.midiEvents[i]))
                     .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(
-                        true,
-                    );
+                    .toEqual(true);
             }
         }
         expect(handler.midiEvents.length).toEqual(expectedEvents.length);
@@ -804,16 +795,16 @@ describe('MidiFileGeneratorTest', () => {
         let score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].isFullBarRest).toBeTrue();
 
-        let expectedNoteOnTimes:number[] = [
+        let expectedNoteOnTimes: number[] = [
             0 * MidiUtils.QuarterTime, // note 1
             1 * MidiUtils.QuarterTime, // note 2
             2 * MidiUtils.QuarterTime, // note 3
-            3 * MidiUtils.QuarterTime, // 3/4 rest 
+            3 * MidiUtils.QuarterTime, // 3/4 rest
             6 * MidiUtils.QuarterTime, // note 4
             7 * MidiUtils.QuarterTime, // note 5
-            8 * MidiUtils.QuarterTime, // note 6
+            8 * MidiUtils.QuarterTime // note 6
         ];
-        let noteOnTimes:number[] = [];
+        let noteOnTimes: number[] = [];
         let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
         while (beat != null) {
             noteOnTimes.push(beat.absolutePlaybackStart);
@@ -826,14 +817,61 @@ describe('MidiFileGeneratorTest', () => {
         let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
         noteOnTimes = [];
-        for(const evt of handler.midiEvents) {
-            if(evt instanceof NoteEvent) {
+        for (const evt of handler.midiEvents) {
+            if (evt instanceof NoteEvent) {
                 noteOnTimes.push(evt.tick);
-            } else if(evt instanceof RestEvent) {
+            } else if (evt instanceof RestEvent) {
                 noteOnTimes.push(evt.tick);
             }
         }
         expect(noteOnTimes.join(',')).toEqual(expectedNoteOnTimes.join(','));
     });
 
+    it('time-signature', () => {
+        let tex: string = '\\ts 3 4 3.3.4 3.3.4 3.3.4';
+        let score: Score = parseTex(tex);
+
+        let file = new MidiFile();
+        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(file);
+        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        let timeSignature: MidiEvent | null = null;
+        for (const evt of file.events) {
+            if (evt.command === MidiEventType.Meta && evt.data1 === MetaEventType.TimeSignature) {
+                timeSignature = evt;
+                break;
+            }
+        }
+
+        expect(timeSignature).toBeTruthy();
+        const meta: MetaDataEvent = timeSignature as MetaDataEvent;
+        const timeSignatureNumerator: number = meta.data[0];
+        const timeSignatureDenominator: number = Math.pow(2, meta.data[1]);
+        expect(timeSignatureNumerator).toEqual(3);
+        expect(timeSignatureDenominator).toEqual(4);
+    });
+
+    it('first-bar-tempo', () => {
+        let tex: string = '\\tempo 120 . \\tempo 60 3.3*4 | \\tempo 80 3.3*4';
+        let score: Score = parseTex(tex);
+
+        expect(score.tempo).toBe(120);
+        expect(score.masterBars[0].tempoAutomation).toBeTruthy();
+        expect(score.masterBars[0].tempoAutomation!.value).toBe(60);
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const tempoChanges: TempoEvent[] = [];
+        for (const evt of handler.midiEvents) {
+            if (evt instanceof TempoEvent) {
+                tempoChanges.push(evt as TempoEvent);
+            }
+        }
+
+        expect(tempoChanges.map(t=>t.tick).join(',')).toBe('0,3840');
+        expect(tempoChanges.map(t=>t.tempo).join(',')).toBe('60,80');
+    });
 });

@@ -102,8 +102,10 @@ export class PlayerSettings {
 
     /**
      * Gets or sets the element that should be used for scrolling.
+     * @target web
+     * @json_read_only
      */
-    public scrollElement: string = 'html,body';
+    public scrollElement: string | HTMLElement = 'html,body';
 
     /**
      * Gets or sets whether the player should be enabled.
@@ -114,6 +116,17 @@ export class PlayerSettings {
      * Gets or sets whether playback cursors should be displayed.
      */
     public enableCursor: boolean = true;
+
+    /**
+     * Gets or sets whether the beat cursor should be animated or just ticking.
+     */
+    public enableAnimatedBeatCursor: boolean = true;
+
+    /**
+     * Gets or sets whether the notation elements of the currently played beat should be
+     * highlighted.
+     */
+    public enableElementHighlighting: boolean = true;
 
     /**
      * Gets or sets alphaTab should provide user interaction features to
@@ -142,6 +155,12 @@ export class PlayerSettings {
     public scrollSpeed: number = 300;
 
     /**
+     * Gets or sets whether the native browser smooth scroll mechanism should be used over a custom animation.
+     * @target web
+     */
+    public nativeBrowserSmoothScroll: boolean = true;
+
+    /**
      * Gets or sets the bend duration in milliseconds for songbook bends.
      */
     public songBookBendDuration: number = 75;
@@ -167,4 +186,11 @@ export class PlayerSettings {
      * Gets or sets whether the triplet feel should be applied/played during audio playback.
      */
     public playTripletFeel: boolean = true;
+
+    /**
+     * Gets or sets how many milliseconds of audio samples should be buffered in total. 
+     * Larger buffers cause a delay from when audio settings like volumes will be applied. 
+     * Smaller buffers can cause audio crackling due to constant buffering that is happening.
+     */
+    public bufferTimeInMilliseconds:number = 500;
 }

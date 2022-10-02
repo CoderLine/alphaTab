@@ -5,7 +5,7 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { NoteYPosition } from '../BarRendererBase';
+import { NoteYPosition } from '@src/rendering/BarRendererBase';
 
 export class TabBrushGlyph extends Glyph {
     private _beat: Beat;
@@ -15,16 +15,16 @@ export class TabBrushGlyph extends Glyph {
         this._beat = beat;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 10 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let tabBarRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         let startY: number =
-            cy + this.x + (tabBarRenderer.getNoteY(this._beat.maxNote!, NoteYPosition.Top));
+            cy + this.x + (tabBarRenderer.getNoteY(this._beat.maxStringNote!, NoteYPosition.Top));
         let endY: number =
-            cy + this.y + tabBarRenderer.getNoteY(this._beat.minNote!, NoteYPosition.Bottom);
+            cy + this.y + tabBarRenderer.getNoteY(this._beat.minStringNote!, NoteYPosition.Bottom);
         let arrowX: number = (cx + this.x + this.width / 2) | 0;
         let arrowSize: number = 8 * this.scale;
         if (this._beat.brushType !== BrushType.None) {

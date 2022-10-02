@@ -15,7 +15,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { RenderingResources } from '@src/RenderingResources';
 import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { NoteYPosition } from '../BarRendererBase';
+import { NoteYPosition } from '@src/rendering/BarRendererBase';
 
 export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     public static readonly SimpleDipHeight: number = TabWhammyBarGlyph.PerHalfSize * 2;
@@ -27,7 +27,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         this._beat = beat;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let whammyMode: NotationMode = this.renderer.settings.notation.notationMode;
         switch (this._beat.whammyBarType) {
             case WhammyType.None:
@@ -39,7 +39,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                 {
                     let endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                     endGlyphs.renderer = this.renderer;
-                    let lastWhammyPoint: BendPoint = this._beat.whammyBarPoints[this._beat.whammyBarPoints.length - 1];
+                    let lastWhammyPoint: BendPoint = this._beat.whammyBarPoints![this._beat.whammyBarPoints!.length - 1];
                     for (let note of this._beat.notes) {
                         if (!note.isTieOrigin) {
                             endGlyphs.addGlyph(
@@ -64,10 +64,10 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         let middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         middleGlyphs.renderer = this.renderer;
                         if (this.renderer.settings.notation.notationMode === NotationMode.GuitarPro) {
-                            let middleBendPoint: BendPoint = this._beat.whammyBarPoints[1];
+                            let middleBendPoint: BendPoint = this._beat.whammyBarPoints![1];
                             for (let note of this._beat.notes) {
                                 middleGlyphs.addGlyph(
-                                    this.getBendNoteValue(note, this._beat.whammyBarPoints[1]),
+                                    this.getBendNoteValue(note, this._beat.whammyBarPoints![1]),
                                     middleBendPoint.value % 2 !== 0
                                 );
                             }
@@ -77,8 +77,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         let endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         endGlyphs.renderer = this.renderer;
                         if (this.renderer.settings.notation.notationMode === NotationMode.GuitarPro) {
-                            let lastBendPoint: BendPoint = this._beat.whammyBarPoints[
-                                this._beat.whammyBarPoints.length - 1
+                            let lastBendPoint: BendPoint = this._beat.whammyBarPoints![
+                                this._beat.whammyBarPoints!.length - 1
                             ];
                             for (let note of this._beat.notes) {
                                 endGlyphs.addGlyph(
@@ -98,7 +98,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         super.doLayout();
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let beat: Beat = this._beat;
         switch (beat.whammyBarType) {
             case WhammyType.None:
@@ -154,8 +154,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             if (direction === BeamDirection.Up) {
                 heightOffset = -heightOffset;
             }
-            let endValue: number = beat.whammyBarPoints.length > 0 
-                ? this.getBendNoteValue(note, beat.whammyBarPoints[beat.whammyBarPoints.length - 1])
+            let endValue: number = beat.whammyBarPoints!.length > 0 
+                ? this.getBendNoteValue(note, beat.whammyBarPoints![beat.whammyBarPoints!.length - 1])
                 : 0;
             let endY: number = 0;
             let bendTie: boolean = false;
@@ -248,14 +248,14 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                                 2 * this.scale;
                             let middleX: number = (simpleStartX + simpleEndX) / 2;
                             let text: string = (
-                                ((this._beat.whammyBarPoints[1].value - this._beat.whammyBarPoints[0].value) / 4) |
+                                ((this._beat.whammyBarPoints![1].value - this._beat.whammyBarPoints![0].value) / 4) |
                                 0
                             ).toString();
                             canvas.font = this.renderer.resources.tablatureFont;
                             canvas.fillText(text, middleX, cy + this.y);
                             let simpleStartY: number = cy + this.y + canvas.font.size + 2 * this.scale;
                             let simpleEndY: number = simpleStartY + ScoreWhammyBarGlyph.SimpleDipHeight * this.scale;
-                            if (this._beat.whammyBarPoints[1].value > this._beat.whammyBarPoints[0].value) {
+                            if (this._beat.whammyBarPoints![1].value > this._beat.whammyBarPoints![0].value) {
                                 canvas.moveTo(simpleStartX, simpleEndY);
                                 canvas.lineTo(middleX, simpleStartY);
                                 canvas.lineTo(simpleEndX, simpleEndY);
@@ -284,7 +284,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         this.BendNoteHeads[0].x = middleX - this.BendNoteHeads[0].noteHeadOffset;
                         this.BendNoteHeads[0].y = cy + startNoteRenderer.y;
                         this.BendNoteHeads[0].paint(0, 0, canvas);
-                        let middleValue: number = this.getBendNoteValue(note, beat.whammyBarPoints[1]);
+                        let middleValue: number = this.getBendNoteValue(note, beat.whammyBarPoints![1]);
                         let middleY: number = this.BendNoteHeads[0].getNoteValueY(middleValue) + heightOffset;
                         this.drawBendSlur(
                             canvas,
@@ -323,7 +323,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         startNoteRenderer.y +
                         startNoteRenderer.getScoreY(
                             startNoteRenderer.accidentalHelper.getNoteLineForValue(
-                                note.displayValue - ((note.beat.whammyBarPoints[0].value / 2) | 0),
+                                note.displayValue - ((note.beat.whammyBarPoints![0].value / 2) | 0),
                                 false
                             )
                         ) +

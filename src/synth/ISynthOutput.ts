@@ -14,12 +14,17 @@ export interface ISynthOutput {
     /**
      * Called when the output should be opened.
      */
-    open(): void;
+    open(bufferTimeInMilliseconds: number): void;
 
     /**
      * Called when the output should start the playback.
      */
     play(): void;
+
+    /**
+     * Requests the output to destroy itself.
+     */
+    destroy(): void;
 
     /**
      * Called when the output should stop the playback.

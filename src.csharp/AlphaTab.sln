@@ -9,18 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.Test", "AlphaTab.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Windows", "AlphaTab.Windows\AlphaTab.Windows.csproj", "{FAF5C549-DDAA-4254-B9E4-BB487C433626}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Samples.Player", "Samples\AlphaTab.Samples.Player\AlphaTab.Samples.Player.csproj", "{30B7CFE6-FC7B-40F7-9D3C-BC27DE4911E8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Samples.PngDump", "Samples\AlphaTab.Samples.PngDump\AlphaTab.Samples.PngDump.csproj", "{461D19B0-AD20-4427-8569-FAF78311DA26}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Samples.ScoreDump", "Samples\AlphaTab.Samples.ScoreDump\AlphaTab.Samples.ScoreDump.csproj", "{6A365654-90EE-4726-BD99-4CA5358AB258}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Samples.WinForms", "Samples\AlphaTab.Samples.WinForms\AlphaTab.Samples.WinForms.csproj", "{479765C9-F70E-45EE-984D-A97A33758F32}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Samples.Wpf", "Samples\AlphaTab.Samples.Wpf\AlphaTab.Samples.Wpf.csproj", "{48677CA2-2131-4F70-9D56-E7A272DE26B8}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{6ED0C3C1-5142-4D44-AB33-0D9DAFDCEE77}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,26 +27,6 @@ Global
 		{FAF5C549-DDAA-4254-B9E4-BB487C433626}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAF5C549-DDAA-4254-B9E4-BB487C433626}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAF5C549-DDAA-4254-B9E4-BB487C433626}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30B7CFE6-FC7B-40F7-9D3C-BC27DE4911E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30B7CFE6-FC7B-40F7-9D3C-BC27DE4911E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30B7CFE6-FC7B-40F7-9D3C-BC27DE4911E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30B7CFE6-FC7B-40F7-9D3C-BC27DE4911E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{461D19B0-AD20-4427-8569-FAF78311DA26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{461D19B0-AD20-4427-8569-FAF78311DA26}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{461D19B0-AD20-4427-8569-FAF78311DA26}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{461D19B0-AD20-4427-8569-FAF78311DA26}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A365654-90EE-4726-BD99-4CA5358AB258}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A365654-90EE-4726-BD99-4CA5358AB258}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A365654-90EE-4726-BD99-4CA5358AB258}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A365654-90EE-4726-BD99-4CA5358AB258}.Release|Any CPU.Build.0 = Release|Any CPU
-		{479765C9-F70E-45EE-984D-A97A33758F32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{479765C9-F70E-45EE-984D-A97A33758F32}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{479765C9-F70E-45EE-984D-A97A33758F32}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{479765C9-F70E-45EE-984D-A97A33758F32}.Release|Any CPU.Build.0 = Release|Any CPU
-		{48677CA2-2131-4F70-9D56-E7A272DE26B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48677CA2-2131-4F70-9D56-E7A272DE26B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48677CA2-2131-4F70-9D56-E7A272DE26B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48677CA2-2131-4F70-9D56-E7A272DE26B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,10 +35,5 @@ Global
 		SolutionGuid = {CDCE91E9-ED42-4D67-8B9D-13E73BBA1225}
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{30B7CFE6-FC7B-40F7-9D3C-BC27DE4911E8} = {6ED0C3C1-5142-4D44-AB33-0D9DAFDCEE77}
-		{461D19B0-AD20-4427-8569-FAF78311DA26} = {6ED0C3C1-5142-4D44-AB33-0D9DAFDCEE77}
-		{6A365654-90EE-4726-BD99-4CA5358AB258} = {6ED0C3C1-5142-4D44-AB33-0D9DAFDCEE77}
-		{479765C9-F70E-45EE-984D-A97A33758F32} = {6ED0C3C1-5142-4D44-AB33-0D9DAFDCEE77}
-		{48677CA2-2131-4F70-9D56-E7A272DE26B8} = {6ED0C3C1-5142-4D44-AB33-0D9DAFDCEE77}
 	EndGlobalSection
 EndGlobal

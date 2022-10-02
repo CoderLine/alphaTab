@@ -21,7 +21,7 @@ import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TextAlign } from '@src/platform/ICanvas';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { Logger } from '@src/alphatab';
+import { Logger } from '@src/Logger';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { Ottavia } from '@src/model/Ottavia';
@@ -126,7 +126,7 @@ export class CapellaParser {
         try {
             dom.parse(xml);
         } catch (e) {
-            throw new UnsupportedFormatError('Could not parse XML', e);
+            throw new UnsupportedFormatError('Could not parse XML', e as Error);
         }
 
         this.parseDom(dom);
@@ -207,7 +207,7 @@ export class CapellaParser {
     private parseDom(dom: XmlDocument): void {
         let root: XmlNode | null = dom.firstElement;
         if (!root) {
-            return;
+            throw new UnsupportedFormatError('No valid XML');
         }
         if (root.localName === 'score') {
             this.score = new Score();
@@ -236,7 +236,7 @@ export class CapellaParser {
                 }
             }
         } else {
-            throw new UnsupportedFormatError('Root node of XML was not GPIF');
+            throw new UnsupportedFormatError('Root node of XML was not "score"');
         }
     }
 
@@ -259,7 +259,7 @@ export class CapellaParser {
         // track > staff structure for later use
 
         // curly brackets define which staves go together into a track
-        const curlyBrackets = this._brackets.filter(b => b.curly);
+        const curlyBrackets = this._brackets.filter(b => !!b.curly);
         curlyBrackets.sort((a, b) => a.from - b.from);
 
         let currentBracketIndex = 0;
@@ -699,7 +699,7 @@ export class CapellaParser {
                                     }
                                     this._currentVoiceState.currentBarComplete = true;
                                     break;
-                                case 'single':
+                                // case 'single':
                                 default:
                                     if (!this._currentVoiceState.currentBarComplete) {
                                         this._currentBar.masterBar.isAnacrusis = true;
@@ -994,7 +994,7 @@ export class CapellaParser {
         if (obj.lastNumber > 0 && obj.firstNumber > 0) {
             let alternateEndings = 0;
             for (let i = obj.firstNumber; i <= obj.lastNumber; i++) {
-                alternateEndings |= 0x01 << (i - 1);
+                alternateEndings = alternateEndings |  (0x01 << (i - 1));
             }
             this._currentBar.masterBar.alternateEndings = alternateEndings;
         } else if (obj.lastNumber > 0) {
@@ -1191,7 +1191,7 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseTrill(_: XmlNode): DrawObject | null {
+    private parseTrill(_unused: XmlNode): DrawObject | null {
         const obj = new TrillDrawObject();
         return obj;
     }
@@ -1238,12 +1238,12 @@ export class CapellaParser {
         return obj;
     }
 
-    private parseWavyLine(_: XmlNode): WavyLineDrawObject {
+    private parseWavyLine(_unused: XmlNode): WavyLineDrawObject {
         const obj = new WavyLineDrawObject();
         return obj;
     }
 
-    private parseSlur(_: XmlNode): SlurDrawObject {
+    private parseSlur(_unused: XmlNode): SlurDrawObject {
         const obj = new SlurDrawObject();
         return obj;
     }

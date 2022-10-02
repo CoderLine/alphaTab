@@ -2,12 +2,12 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export class FadeInGlyph extends EffectGlyph {
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         this.height = 17 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let size: number = 6 * this.scale;
         let width: number = Math.max(this.width, 14 * this.scale);
         let offset: number = this.height / 2;

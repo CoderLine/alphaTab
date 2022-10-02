@@ -1,4 +1,5 @@
-﻿using AlphaTab.Core.EcmaScript;
+﻿using AlphaTab.Core;
+using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab.Platform.Svg
 {

@@ -1,3 +1,5 @@
+import { AlphaTabError, AlphaTabErrorType } from "@src/AlphaTabError";
+
 /**
  * Represents a stream of binary data that can be read from.
  */
@@ -43,4 +45,11 @@ export interface IReadable {
      * @returns
      */
     readAll(): Uint8Array;
+}
+
+export class EndOfReaderError extends AlphaTabError {
+    public constructor() {
+        super(AlphaTabErrorType.Format, 'Unexpected end of data within reader');
+        Object.setPrototypeOf(this, EndOfReaderError.prototype);
+    }
 }

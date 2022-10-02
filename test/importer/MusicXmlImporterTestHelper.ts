@@ -1,4 +1,4 @@
-import { LayoutMode } from '@src/DisplaySettings';
+import { LayoutMode } from '@src/LayoutMode';
 import { MusicXmlImporter } from '@src/importer/MusicXmlImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@src/io/ByteBuffer';
@@ -16,6 +16,8 @@ import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
+import { JsonConverter } from '@src/model/JsonConverter';
+import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 
 export class MusicXmlImporterTestHelper {
     public static prepareImporterWithBytes(buffer: Uint8Array): MusicXmlImporter {
@@ -30,16 +32,30 @@ export class MusicXmlImporterTestHelper {
         renderAllTracks: boolean = false
     ): Promise<Score> {
         const fileData = await TestPlatform.loadFile(file);
+        let score: Score;
         try {
             let importer: MusicXmlImporter = MusicXmlImporterTestHelper.prepareImporterWithBytes(fileData);
-            let score: Score = importer.readScore();
-            return score;
+            score = importer.readScore();
         } catch (e) {
             if (e instanceof UnsupportedFormatError) {
                 fail(`Failed to load file ${file}: ${e}`);
             }
             throw e;
         }
+
+        // send it to serializer once and check equality
+        try {
+            const expectedJson = JsonConverter.scoreToJsObject(score);
+
+            const deserialized = JsonConverter.jsObjectToScore(expectedJson);
+            const actualJson = JsonConverter.scoreToJsObject(deserialized);
+ 
+            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + file + '>', null);
+        } catch(e) {
+            fail(e);
+        }
+
+        return score;
     }
 
     protected static getHierarchy(node: unknown): string {
@@ -224,7 +240,11 @@ export class MusicXmlImporterTestHelper {
         }
     }
 
-    protected expectBendPointsEqual(expected: BendPoint[], actual: BendPoint[]): void {
+    protected expectBendPointsEqual(expected: BendPoint[] | null, actual: BendPoint[] | null): void {
+        if(expected == null || actual == null) {
+            expect(actual).toEqual(expected)
+            return;
+        }
         expect(actual.length).toEqual(expected.length, 'Mismatch on Count');
         for (let i: number = 0; i < expected.length; i++) {
             expect(actual[i].value).toEqual(actual[i].value);

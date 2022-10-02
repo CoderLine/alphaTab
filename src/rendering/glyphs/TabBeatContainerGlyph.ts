@@ -18,7 +18,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         super(beat, voiceContainer);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this._effectSlurs = [];
         super.doLayout();
         if (this._bend) {
@@ -28,7 +28,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
     }
 
-    protected createTies(n: Note): void {
+    protected override createTies(n: Note): void {
         if (!n.isVisible) {
             return;
         }
@@ -81,9 +81,10 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
         if (n.hasBend) {
             if (!this._bend) {
-                this._bend = new TabBendGlyph();
-                this._bend.renderer = this.renderer;
-                this.ties.push(this._bend);
+                const bend = new TabBendGlyph();
+                this._bend = bend;
+                bend.renderer = this.renderer;
+                this.ties.push(bend);
             }
             this._bend.addBends(n);
         }

@@ -21,24 +21,26 @@ export class TieGlyph extends Glyph {
         this.forEnd = forEnd;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 0;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (!this.endBeat) {
             return;
         }
 
         // TODO fix nullability of start/end beat,
-        let startNoteRenderer = (this.startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+        let startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.startBeat!.voice.bar
-        ));
-        let endNoteRenderer = (this.endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+        );
+        this.startNoteRenderer = startNoteRenderer;
+        let endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.endBeat.voice.bar
-        ));
+        );
+        this.endNoteRenderer = endNoteRenderer;
 
         let startX: number = 0;
         let endX: number = 0;

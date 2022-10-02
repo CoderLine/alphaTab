@@ -2,10 +2,11 @@ import { MidiFile } from '@src/midi/MidiFile';
 import { PlaybackRange } from '@src/synth/PlaybackRange';
 import { PlayerState } from '@src/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { LogLevel } from '@src/LogLevel';
-import { MidiEventsPlayedEventArgs } from './MidiEventsPlayedEventArgs';
+import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEventType } from '@src/midi/MidiEvent';
 
 /**
@@ -204,4 +205,9 @@ export interface IAlphaSynth {
      * The event is fired when certain midi events were sent to the audio output device for playback.
      */
     readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs>;
+
+    /**
+     * The event is fired when the playback range within the player was updated.
+     */
+    readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs>;
 }

@@ -10,14 +10,14 @@ export class TuningSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Tuning | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("isStandard", obj.isStandard); 
+        o.set("isstandard", obj.isStandard); 
         o.set("name", obj.name); 
         o.set("tunings", obj.tunings); 
         return o; 
@@ -25,13 +25,13 @@ export class TuningSerializer {
     public static setProperty(obj: Tuning, property: string, v: unknown): boolean {
         switch (property) {
             case "isstandard":
-                obj.isStandard = (v as boolean);
+                obj.isStandard = v! as boolean;
                 return true;
             case "name":
-                obj.name = (v as string);
+                obj.name = v! as string;
                 return true;
             case "tunings":
-                obj.tunings = (v as number[]);
+                obj.tunings = v! as number[];
                 return true;
         } 
         return false; 

@@ -10,9 +10,18 @@ export class RepeatGroup {
     public masterBars: MasterBar[] = [];
 
     /**
-     * a list of masterbars which open the group.
+     * the masterbars which opens the group.
      */
-    public openings: MasterBar[] = [];
+    public opening: MasterBar|null = null;
+
+    /**
+     * a list of masterbars which open the group.
+     * @deprecated There can only be one opening, use the opening property instead
+     */
+    public get openings(): MasterBar[] {
+        const opening = this.opening;
+        return opening ? [opening] : [];
+    }
 
     /**
      * a list of masterbars which close the group.
@@ -20,9 +29,9 @@ export class RepeatGroup {
     public closings: MasterBar[] = [];
 
     /**
-     * true if the repeat group was opened well
+     * Gets whether this repeat group is really opened as a repeat. 
      */
-    public isOpened: boolean = false;
+    public get isOpened():boolean { return this.opening?.isRepeatStart === true; }
 
     /**
      * true if the repeat group was closed well
@@ -30,21 +39,14 @@ export class RepeatGroup {
     public isClosed: boolean = false;
 
     public addMasterBar(masterBar: MasterBar): void {
-        if (this.openings.length === 0) {
-            this.openings.push(masterBar);
+        if (this.opening === null) {
+            this.opening = masterBar;
         }
         this.masterBars.push(masterBar);
         masterBar.repeatGroup = this;
         if (masterBar.isRepeatEnd) {
             this.closings.push(masterBar);
             this.isClosed = true;
-            if (!this.isOpened) {
-                this.masterBars[0].isRepeatStart = true;
-                this.isOpened = true;
-            }
-        } else if (this.isClosed) {
-            this.isClosed = false;
-            this.openings.push(masterBar);
         }
     }
 }

@@ -2,12 +2,13 @@ import { Bar } from '@src/model/Bar';
 import { Chord } from '@src/model/Chord';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
-import { Tuning } from './Tuning';
+import { Tuning } from '@src/model/Tuning';
 
 /**
  * This class describes a single staff within a track. There are instruments like pianos
  * where a single track can contain multiple staffs.
  * @json
+ * @json_strict
  */
 export class Staff {
     /**
@@ -32,7 +33,7 @@ export class Staff {
      * Gets or sets a list of all chords defined for this staff. {@link Beat.chordId} refers to entries in this lookup.
      * @json_add addChord
      */
-    public chords: Map<string, Chord> = new Map<string, Chord>();
+    public chords: Map<string, Chord> | null = null;
 
     /**
      * Gets or sets the fret on which a capo is set.
@@ -97,17 +98,31 @@ export class Staff {
      */
     public standardNotationLineCount: number = 5;
 
-    public finish(settings: Settings): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
         this.stringTuning.finish();
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
-            this.bars[i].finish(settings);
+            this.bars[i].finish(settings, sharedDataBag);
         }
     }
 
     public addChord(chordId: string, chord: Chord): void {
         chord.staff = this;
-        this.chords.set(chordId, chord);
+        let chordMap = this.chords;
+        if (chordMap === null) {
+            chordMap = new Map<string, Chord>();
+            this.chords = chordMap;
+        }
+        chordMap.set(chordId, chord);
     }
+
+    public hasChord(chordId: string): boolean {
+        return this.chords?.has(chordId) ?? false
+    }
+
+    public getChord(chordId: string): Chord | null {
+        return this.chords?.get(chordId) ?? null
+    }
+    
 
     public addBar(bar: Bar): void {
         let bars: Bar[] = this.bars;

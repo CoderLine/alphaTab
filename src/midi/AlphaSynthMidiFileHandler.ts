@@ -9,7 +9,7 @@ import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { Midi20PerNotePitchBendEvent } from './Midi20PerNotePitchBendEvent';
+import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 
 /**
  * This implementation of the {@link IMidiFileHandler}
@@ -28,9 +28,13 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
 
     public addTimeSignature(tick: number, timeSignatureNumerator: number, timeSignatureDenominator: number): void {
         let denominatorIndex: number = 0;
-        // tslint:disable-next-line: no-conditional-assignment
-        while ((timeSignatureDenominator = timeSignatureDenominator >> 1) > 0) {
-            denominatorIndex++;
+        while(true) {
+            timeSignatureDenominator = timeSignatureDenominator >> 1;
+            if(timeSignatureDenominator > 0) {
+                denominatorIndex++;
+            } else {
+                break;
+            }
         }
         const message: MetaDataEvent = new MetaDataEvent(
             0,

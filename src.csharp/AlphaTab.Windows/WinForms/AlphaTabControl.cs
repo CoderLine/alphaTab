@@ -143,7 +143,7 @@ namespace AlphaTab.WinForms
             }
         }
 
-        private void OnTracksChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnTracksChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             RenderTracks();
         }

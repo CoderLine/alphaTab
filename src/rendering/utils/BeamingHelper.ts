@@ -10,8 +10,8 @@ import { Voice } from '@src/model/Voice';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { AccidentalHelper } from './AccidentalHelper';
-import { BarRendererBase, NoteYPosition } from '../BarRendererBase';
+import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
+import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 
 class BeatLinePositions {
     public staffId: string = '';
@@ -239,11 +239,13 @@ export class BeamingHelper {
         const offsets = BeamingHelper.computeLineHeightsForRest(beat.duration);
         aboveRest -= offsets[0];
         belowRest += offsets[1];
-        if (this.minRestLine === null || this.minRestLine > aboveRest) {
+        const minRestLine = this.minRestLine;
+        const maxRestLine = this.maxRestLine;
+        if (minRestLine === null || minRestLine > aboveRest) {
             this.minRestLine = aboveRest;
             this.beatOfMinRestLine = beat;
         }
-        if (this.maxRestLine === null || this.maxRestLine < belowRest) {
+        if (maxRestLine === null || maxRestLine < belowRest) {
             this.maxRestLine = belowRest;
             this.beatOfMaxRestLine = beat;
         }
@@ -256,7 +258,7 @@ export class BeamingHelper {
         switch (direction) {
             case BeamDirection.Down:
                 return BeamDirection.Up;
-            case BeamDirection.Up:
+            // case BeamDirection.Up:
             default:
                 return BeamDirection.Down;
         }
@@ -339,8 +341,8 @@ export class BeamingHelper {
         }
 
         // a note can expand to 2 note heads if it has a harmonic
-        let lowestValueForNote;
-        let highestValueForNote;
+        let lowestValueForNote:number;
+        let highestValueForNote:number;
 
         // For percussion we use the line as value to compare whether it is
         // higher or lower.

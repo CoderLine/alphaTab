@@ -10,7 +10,7 @@ export class PlaybackInformationSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: PlaybackInformation | null): Map<string, unknown> | null {
         if (!obj) {
@@ -21,37 +21,37 @@ export class PlaybackInformationSerializer {
         o.set("balance", obj.balance); 
         o.set("port", obj.port); 
         o.set("program", obj.program); 
-        o.set("primaryChannel", obj.primaryChannel); 
-        o.set("secondaryChannel", obj.secondaryChannel); 
-        o.set("isMute", obj.isMute); 
-        o.set("isSolo", obj.isSolo); 
+        o.set("primarychannel", obj.primaryChannel); 
+        o.set("secondarychannel", obj.secondaryChannel); 
+        o.set("ismute", obj.isMute); 
+        o.set("issolo", obj.isSolo); 
         return o; 
     }
     public static setProperty(obj: PlaybackInformation, property: string, v: unknown): boolean {
         switch (property) {
             case "volume":
-                obj.volume = (v as number);
+                obj.volume = v! as number;
                 return true;
             case "balance":
-                obj.balance = (v as number);
+                obj.balance = v! as number;
                 return true;
             case "port":
-                obj.port = (v as number);
+                obj.port = v! as number;
                 return true;
             case "program":
-                obj.program = (v as number);
+                obj.program = v! as number;
                 return true;
             case "primarychannel":
-                obj.primaryChannel = (v as number);
+                obj.primaryChannel = v! as number;
                 return true;
             case "secondarychannel":
-                obj.secondaryChannel = (v as number);
+                obj.secondaryChannel = v! as number;
                 return true;
             case "ismute":
-                obj.isMute = (v as boolean);
+                obj.isMute = v! as boolean;
                 return true;
             case "issolo":
-                obj.isSolo = (v as boolean);
+                obj.isSolo = v! as boolean;
                 return true;
         } 
         return false; 

@@ -9,7 +9,7 @@ export class EffectGlyph extends Glyph {
     /**
      * Gets or sets the beat where the glyph belongs to.
      */
-    public beat!: Beat;
+    public beat: Beat | null = null;
 
     /**
      * Gets or sets the next glyph of the same type in case
@@ -22,7 +22,6 @@ export class EffectGlyph extends Glyph {
      * the effect glyph is expanded when using {@link EffectBarGlyphSizing.groupedOnBeat}.
      */
     public previousGlyph: EffectGlyph | null = null;
-
 
     public constructor(x: number = 0, y: number = 0) {
         super(x, y);

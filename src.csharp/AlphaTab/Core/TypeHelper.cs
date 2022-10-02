@@ -33,7 +33,7 @@ namespace AlphaTab.Core
 
         public static IList<T> Slice<T>(this IList<T> data)
         {
-            return new List<T>(new System.Collections.Generic.List<T>(data));
+            return new AlphaTab.Collections.List<T>(data);
         }
 
         public static void Reverse<T>(this IList<T> data)
@@ -142,7 +142,7 @@ namespace AlphaTab.Core
             }
         }
 
-        public static void Sort<T>(this IList<T> data, Func<T, T, double> func)
+        public static IList<T> Sort<T>(this IList<T> data, Func<T, T, double> func)
         {
             switch (data)
             {
@@ -156,12 +156,14 @@ namespace AlphaTab.Core
                     throw new NotSupportedException("Cannot sort list of type " +
                                                     data.GetType().FullName);
             }
+
+            return data;
         }
         public static void Sort<T>(this IList<T> data)
         {
             switch (data)
             {
-                case List<T> l:
+                case System.Collections.Generic.List<T> l:
                     l.Sort();
                     break;
                 case T[] array:
@@ -186,9 +188,15 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<TInput> Reversed<TInput>(this IEnumerable<TInput> source)
+        public static IList<TInput> Reversed<TInput>(this IList<TInput> source)
         {
-            return source.Reverse();
+            if (source is List<TInput> list)
+            {
+                list.Reverse();
+                return list;
+            }
+
+            throw new ArgumentException("Unsupported type for in-place reversing");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -245,22 +253,22 @@ namespace AlphaTab.Core
             return new List<string>(s.Split(new[] {separator}, StringSplitOptions.None));
         }
 
-        public static MapEntry<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
+        public static KeyValuePair<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
         {
-            return new MapEntry<double, TValue>(key, value);
+            return new KeyValuePair<double, TValue>(key, value);
         }
 
-        public static MapEntry<TKey, double> CreateMapEntry<TKey>(TKey key, int value)
+        public static KeyValuePair<TKey, double> CreateMapEntry<TKey>(TKey key, int value)
         {
-            return new MapEntry<TKey, double>(key, value);
+            return new KeyValuePair<TKey, double>(key, value);
         }
 
-        public static MapEntry<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
+        public static KeyValuePair<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
         {
-            return new MapEntry<TKey, TValue>(key, value);
+            return new KeyValuePair<TKey, TValue>(key, value);
         }
 
-        public static string ToString(this double num, int radix)
+        public static string ToInvariantString(this double num, int radix)
         {
             if (radix == 16)
             {
@@ -268,6 +276,21 @@ namespace AlphaTab.Core
             }
 
             return num.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static string ToInvariantString(this double num)
+        {
+            return num.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static string ToInvariantString(this int num)
+        {
+            return num.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static string ToInvariantString(this Enum num)
+        {
+            return ((IConvertible)num).ToInt32(CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -293,6 +316,11 @@ namespace AlphaTab.Core
         {
             return s != null;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsTruthy(bool? b)
+        {
+            return b.GetValueOrDefault();
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsTruthy(double s)
@@ -308,9 +336,28 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Substring(this string s, double startIndex, double endIndex)
+        public static IList<double> Map<TSource>(this IList<TSource> source,
+            Func<TSource, int> func)
+        {
+            return source.Select(i => (double)func(i)).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string SubstringIndex(this string s, double startIndex)
+        {
+            return s.Substring((int) startIndex);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string SubstringIndex(this string s, double startIndex, double endIndex)
         {
             return s.Substring((int) startIndex, (int) (endIndex - startIndex));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ReplaceAll(this string s, string before, string after)
+        {
+            return s.Replace(before, after);
         }
 
         public static string TypeOf(object? actual)
@@ -338,6 +385,18 @@ namespace AlphaTab.Core
                 default:
                     return "object";
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<T> SetInitializer<T>(params T[] items)
+        {
+            return items;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<T> MapInitializer<T>(params T[] items)
+        {
+            return items;
         }
     }
 }

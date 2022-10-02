@@ -23,7 +23,7 @@ export class DiamondNoteHeadGlyph extends MusicFontGlyph {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 9 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
         this.height = NoteHeadGlyph.NoteHeadHeight * this.scale;
     }

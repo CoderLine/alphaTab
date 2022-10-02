@@ -117,7 +117,7 @@ export class Lyrics {
                     }
                     break;
             }
-            p++;
+            p += 1;
         }
 
         if (state === LyricsState.Text) {

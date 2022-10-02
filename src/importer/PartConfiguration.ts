@@ -110,13 +110,13 @@ export class PartConfiguration {
             for(const track of part.tracks) {
                 let flags = 0;
                 if(track.showStandardNotation) {
-                    flags |= 0x01;
+                    flags = flags | 0x01;
                 }
                 if(track.showTablature) {
-                    flags |= 0x02;
+                    flags = flags | 0x02;
                 }
                 if(track.showSlash) {
-                    flags |= 0x04;
+                    flags = flags | 0x04;
                 }
                 writer.writeByte(flags);
             }

@@ -6,7 +6,7 @@ export class BarSeperatorGlyph extends Glyph {
         super(x, y);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         if (this.renderer.isLast) {
             this.width = 15 * this.scale;
         } else if (
@@ -23,7 +23,7 @@ export class BarSeperatorGlyph extends Glyph {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let blockWidth: number = 4 * this.scale;
         let top: number = cy + this.y + this.renderer.topPadding;
         let bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;

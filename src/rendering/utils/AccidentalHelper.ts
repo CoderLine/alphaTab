@@ -1,12 +1,11 @@
 import { AccidentalType } from '@src/model/AccidentalType';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
-import { Clef } from '@src/model/Clef';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { PercussionMapper } from '../../model/PercussionMapper';
-import { ScoreBarRenderer } from '../ScoreBarRenderer';
+import { PercussionMapper } from '@src/model/PercussionMapper';
+import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 
 
 class BeatLines {
@@ -289,7 +288,7 @@ export class AccidentalHelper {
                         }
 
                         // register the new accidental on the line if any.
-                        if (accidentalToSet != AccidentalType.None) {
+                        if (accidentalToSet !== AccidentalType.None) {
                             this._registeredAccidentals.set(line, accidentalToSet);
                         }
                     } else {
@@ -366,7 +365,7 @@ export class AccidentalHelper {
     private static calculateNoteLine(bar: Bar, noteValue: number, mode: NoteAccidentalMode): number {
         let value: number = noteValue;
         let ks: number = bar.masterBar.keySignature;
-        let clef: Clef = bar.clef;
+        let clef: number = bar.clef as number;
         let index: number = value % 12;
         let octave: number = ((value / 12) | 0) - 1;
 
@@ -380,12 +379,12 @@ export class AccidentalHelper {
                 ? AccidentalHelper.SharpNoteSteps
                 : AccidentalHelper.FlatNoteSteps;
         // Add offset for note itself
-        switch (mode) {
-            default:
-                // normal behavior: simply use the position where
-                // the keysignature defines the position
-                break;
-        }
+        // switch (mode) {
+        //     default:
+        //         // normal behavior: simply use the position where
+        //         // the keysignature defines the position
+        //         break;
+        // }
         steps -= stepList[index];
 
         return steps;

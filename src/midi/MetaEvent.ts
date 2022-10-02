@@ -22,11 +22,11 @@ export enum MetaEventType {
 }
 
 export class MetaEvent extends MidiEvent {
-    public get channel(): number {
+    public override get channel(): number {
         return -1;
     }
 
-    public get command(): MidiEventType {
+    public override get command(): MidiEventType {
         return (this.message & 0x00000ff) as MidiEventType;
     }
 

@@ -1,17 +1,12 @@
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IReadable } from '@src/io/IReadable';
 import { IOHelper } from '@src/io/IOHelper';
   
 /**
  * @partial
  */
 export class TestPlatform {
-    public static createStringReader(tex: string): IReadable {
-        return ByteBuffer.fromString(tex);
-    }
-
     /**
      * @target web
+     * @partial
      */
     public static saveFile(name: string, data: Uint8Array): Promise<void> {
         return new Promise<void>((resolve, reject) => {
@@ -31,6 +26,7 @@ export class TestPlatform {
 
     /**
      * @target web
+     * @partial
      */
     public static loadFile(path: string): Promise<Uint8Array> {
         return new Promise<Uint8Array>((resolve, reject) => {
@@ -55,6 +51,7 @@ export class TestPlatform {
 
     /**
      * @target web
+     * @partial
      */
     public static listDirectory(path: string): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {

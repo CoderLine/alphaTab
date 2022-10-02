@@ -13,7 +13,7 @@ export class HarmonicsEffectInfo extends NoteEffectInfoBase {
     private _beat: Beat | null = null;
     private _effectId: string;
 
-    public get effectId(): string {
+    public override get effectId(): string {
         return this._effectId;
     }
 
@@ -23,7 +23,6 @@ export class HarmonicsEffectInfo extends NoteEffectInfoBase {
 
     public constructor(harmonicType: HarmonicType) {
         super();
-        this._harmonicType = HarmonicType.None;
         this._harmonicType = harmonicType;
         switch (harmonicType) {
             case HarmonicType.None:
@@ -46,6 +45,9 @@ export class HarmonicsEffectInfo extends NoteEffectInfoBase {
                 break;
             case HarmonicType.Feedback:
                 this._effectId = 'harmonics-feedback';
+                break;
+            default:
+                this._effectId = '';
                 break;
         }
     }

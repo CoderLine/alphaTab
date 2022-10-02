@@ -11,7 +11,7 @@ import { NotationElement } from '@src/NotationSettings';
 export class OttaviaEffectInfo extends EffectBarRendererInfo {
     private _aboveStaff: boolean;
 
-    public get effectId(): string {
+    public override get effectId(): string {
         return 'ottavia-' + (this._aboveStaff ? 'above' : 'below');
     }
 

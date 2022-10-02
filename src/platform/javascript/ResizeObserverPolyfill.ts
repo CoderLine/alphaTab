@@ -33,7 +33,8 @@ export class ResizeObserverPolyfill {
                 // not used by alphaTab
                 contentRect: undefined!,
                 borderBoxSize: undefined!,
-                contentBoxSize: []
+                contentBoxSize: [],
+                devicePixelContentBoxSize: []
             });
         }
         this._callback(entries, this);

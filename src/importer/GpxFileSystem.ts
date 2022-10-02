@@ -1,7 +1,7 @@
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { BitReader, EndOfReaderError } from '@src/io/BitReader';
+import { BitReader } from '@src/io/BitReader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IReadable } from '@src/io/IReadable';
+import { EndOfReaderError, IReadable } from '@src/io/IReadable';
 
 /**
  * this public class represents a file within the GpxFileSystem
@@ -176,16 +176,21 @@ export class GpxFileSystem {
                 // we're keeping count so we can calculate the offset of the array item
                 // as long we have data blocks we need to iterate them,
                 let fileData: ByteBuffer | null = storeFile ? ByteBuffer.withCapacity(file.fileSize) : null;
-                // tslint:disable-next-line: no-conditional-assignment
-                while ((sector = this.getInteger(data, dataPointerOffset + 4 * sectorCount++)) !== 0) {
-                    // the next file entry starts after the last data sector so we
-                    // move the offset along
-                    offset = sector * sectorSize;
-                    // write data only if needed
-                    if (storeFile) {
-                        fileData!.write(data, offset, sectorSize);
+                while (true) {
+                    sector = this.getInteger(data, dataPointerOffset + 4 * sectorCount++);
+                    if (sector !== 0) {
+                        // the next file entry starts after the last data sector so we
+                        // move the offset along
+                        offset = sector * sectorSize;
+                        // write data only if needed
+                        if (storeFile) {
+                            fileData!.write(data, offset, sectorSize);
+                        }
+                    } else {
+                        break;
                     }
                 }
+
                 if (storeFile) {
                     // trim data to filesize if needed
                     file.data = new Uint8Array(Math.min(file.fileSize, fileData!.length));

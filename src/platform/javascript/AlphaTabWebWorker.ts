@@ -21,7 +21,9 @@ export class AlphaTabWebWorker {
     }
 
     public static init(): void {
-        Environment.globalThis.alphaTabWebWorker = new AlphaTabWebWorker(Environment.globalThis as IWorkerScope);
+        (Environment.globalThis as any).alphaTabWebWorker = new AlphaTabWebWorker(
+            Environment.globalThis as IWorkerScope
+        );
     }
 
     private handleMessage(e: MessageEvent): void {
@@ -35,6 +37,12 @@ export class AlphaTabWebWorker {
                 this._renderer.partialRenderFinished.on(result => {
                     this._main.postMessage({
                         cmd: 'alphaTab.partialRenderFinished',
+                        result: result
+                    });
+                });
+                this._renderer.partialLayoutFinished.on(result => {
+                    this._main.postMessage({
+                        cmd: 'alphaTab.partialLayoutFinished',
                         result: result
                     });
                 });
@@ -64,12 +72,15 @@ export class AlphaTabWebWorker {
             case 'alphaTab.resizeRender':
                 this._renderer.resizeRender();
                 break;
+            case 'alphaTab.renderResult':
+                this._renderer.renderResult(data.resultId);
+                break;
             case 'alphaTab.setWidth':
                 this._renderer.width = data.width;
                 break;
             case 'alphaTab.renderScore':
                 this.updateFontSizes(data.fontSizes);
-                let score: any = JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
+                let score: any = data.score == null ? null : JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
                 this.renderMultiple(score, data.trackIndexes);
                 break;
             case 'alphaTab.updateSettings':
@@ -93,11 +104,11 @@ export class AlphaTabWebWorker {
         SettingsSerializer.fromJson(this._renderer.settings, json);
     }
 
-    private renderMultiple(score: Score, trackIndexes: number[]): void {
+    private renderMultiple(score: Score | null, trackIndexes: number[] | null): void {
         try {
             this._renderer.renderScore(score, trackIndexes);
         } catch (e) {
-            this.error(e);
+            this.error(e as Error);
         }
     }
 

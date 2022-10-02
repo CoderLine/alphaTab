@@ -9,6 +9,7 @@ import { Settings } from '@src/Settings';
 /**
  * A bar is a single block within a track, also known as Measure.
  * @json
+ * @json_strict
  */
 export class Bar {
     private static _globalBarId: number = 0;
@@ -89,11 +90,11 @@ export class Bar {
         this.voices.push(voice);
     }
 
-    public finish(settings: Settings): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
         this.isMultiVoice = false;
         for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
             let voice: Voice = this.voices[i];
-            voice.finish(settings);
+            voice.finish(settings, sharedDataBag);
             if(i > 0 && !voice.isEmpty) {
                 this.isMultiVoice = true;
             }

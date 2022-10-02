@@ -21,12 +21,12 @@ export class AccentuationGlyph extends MusicFontGlyph {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 9 * this.scale;
         this.height = 9 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx - 2 * this.scale, cy + this.height, canvas);
     }
 }

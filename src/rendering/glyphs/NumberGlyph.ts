@@ -14,7 +14,7 @@ export class NumberGlyph extends GlyphGroup {
         this._scale = scale;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let i: number = this._number;
         while (i > 0) {
             let num: number = i % 10;

@@ -16,12 +16,12 @@ export class NoteHeadGlyph extends MusicFontGlyph {
         this._duration = duration;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let offset: number = this._isGrace ? this.scale : 0;
         canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale * this.scale, this.symbol, false);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let scale: number = (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
         switch (this._duration) {
             case Duration.QuadrupleWhole:

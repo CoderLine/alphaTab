@@ -10,7 +10,7 @@ export class DeadNoteHeadGlyph extends MusicFontGlyph {
         this._isGrace = isGrace;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 9 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
         this.height = NoteHeadGlyph.NoteHeadHeight * this.scale;
     }

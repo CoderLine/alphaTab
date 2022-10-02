@@ -11,6 +11,7 @@ namespace AlphaTab.Core.EcmaScript
         private ArraySegment<byte> _data;
 
         public double Length => _data.Count;
+        public double ByteOffset => _data.Offset;
 
         public ArrayBuffer Buffer => new ArrayBuffer(_data);
 

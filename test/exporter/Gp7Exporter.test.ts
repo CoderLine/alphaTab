@@ -99,17 +99,17 @@ describe('Gp7ExporterTest', () => {
 
     it('gp5-to-gp7', async () => {
         await testRoundTripEqual(`conversion/full-song.gp5`, [
-            'accidentalMode', // gets upgraded from default
-            'percussionArticulations', // gets added
+            'accidentalmode', // gets upgraded from default
+            'percussionarticulations', // gets added
             'automations' // volume automations are not yet supported in gpif
         ]);
     });
 
     it('gp6-to-gp7', async () => {
         await testRoundTripEqual(`conversion/full-song.gpx`, [
-            'accidentalMode', // gets upgraded from default
-            'percussionArticulations', // gets added
-            'percussionArticulation', // gets added
+            'accidentalmode', // gets upgraded from default
+            'percussionarticulations', // gets added
+            'percussionarticulation', // gets added
         ]);
     });
 
@@ -129,7 +129,7 @@ describe('Gp7ExporterTest', () => {
         `;
 
         const importer = new AlphaTexImporter();
-        importer.init(TestPlatform.createStringReader(tex), new Settings());
+        importer.initFromString(tex, new Settings());
         const expected = importer.readScore();
         const exported = exportGp7(expected);
 
@@ -138,6 +138,6 @@ describe('Gp7ExporterTest', () => {
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual)
 
-        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalMode']);
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
     });
 });

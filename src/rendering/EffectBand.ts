@@ -18,7 +18,7 @@ export class EffectBand extends Glyph {
     public isLinkedToPrevious: boolean = false;
     public firstBeat: Beat | null = null;
     public lastBeat: Beat | null = null;
-    public height: number = 0;
+    public override height: number = 0;
     public voice: Voice;
     public info: EffectBarRendererInfo;
     public slot: EffectBandSlot | null = null;
@@ -29,7 +29,7 @@ export class EffectBand extends Glyph {
         this.info = info;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         for (let i: number = 0; i < this.renderer.bar.voices.length; i++) {
             this._effectGlyphs.push(new Map<number, EffectGlyph>());
@@ -139,7 +139,7 @@ export class EffectBand extends Glyph {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
         // canvas.LineWidth = 1;
         // canvas.StrokeRect(cx + X, cy + Y, Renderer.Width, Slot.Shared.Height);

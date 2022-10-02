@@ -15,7 +15,7 @@ export class TabRestGlyph extends MusicFontGlyph {
         this._duration = duration;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         if (this._isVisibleRest) {
             this.width = ScoreRestGlyph.getSize(this._duration) * this.scale;
         } else {
@@ -24,16 +24,16 @@ export class TabRestGlyph extends MusicFontGlyph {
     }
 
     public updateBeamingHelper(cx: number): void {
-        if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat)) {
+        if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat!)) {
             this.beamingHelper.registerBeatLineX('tab',
-                this.beat,
+                this.beat!,
                 cx + this.x + this.width / 2,
                 cx + this.x + this.width / 2
             );
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this._isVisibleRest) {
             super.paint(cx, cy, canvas);
         }

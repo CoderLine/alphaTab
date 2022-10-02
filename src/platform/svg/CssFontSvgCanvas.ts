@@ -15,7 +15,7 @@ export class CssFontSvgCanvas extends SvgCanvas {
         y: number,
         scale: number,
         symbol: MusicFontSymbol,
-        centerAtPosition: boolean = false
+        centerAtPosition?: boolean
     ): void {
         if (symbol === MusicFontSymbol.None) {
             return;
@@ -28,7 +28,7 @@ export class CssFontSvgCanvas extends SvgCanvas {
         y: number,
         scale: number,
         symbols: MusicFontSymbol[],
-        centerAtPosition: boolean = false
+        centerAtPosition?: boolean
     ): void {
         let s: string = '';
         for (let symbol of symbols) {
@@ -44,7 +44,7 @@ export class CssFontSvgCanvas extends SvgCanvas {
         y: number,
         scale: number,
         symbols: string,
-        centerAtPosition: boolean = false
+        centerAtPosition?: boolean
     ): void {
         this.buffer += `<g transform="translate(${x} ${y})" class="at" ><text`;
         if (scale !== 1) {

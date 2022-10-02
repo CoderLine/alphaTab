@@ -13,8 +13,8 @@ namespace AlphaTab.Platform.CSharp
         private CancellationTokenSource _workerCancellationToken;
         private readonly ManualResetEventSlim? _threadStartedEvent;
 
-        public ManagedThreadAlphaSynthWorkerApi(ISynthOutput output, LogLevel logLevel, Action<Action> uiInvoke)
-            : base(output, logLevel)
+        public ManagedThreadAlphaSynthWorkerApi(ISynthOutput output, LogLevel logLevel, Action<Action> uiInvoke, double bufferTimeInMilliseconds)
+            : base(output, logLevel, bufferTimeInMilliseconds)
         {
             _uiInvoke = uiInvoke;
 

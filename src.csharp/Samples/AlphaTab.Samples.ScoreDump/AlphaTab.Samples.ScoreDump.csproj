@@ -1,9 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-        <OutputType>Exe</OutputType>
-    </PropertyGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\..\AlphaTab.Windows\AlphaTab.Windows.csproj" />
-    </ItemGroup>
-</Project>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test
@@ -8,6 +8,11 @@ namespace AlphaTab.Test
         public static Expector<T> Expect<T>(T actual)
         {
             return new Expector<T>(actual);
+        }
+
+        public static Expector<Action> Expect(Action actual)
+        {
+            return new Expector<Action>(actual);
         }
 
         public static void Fail(object? message)
@@ -83,6 +88,30 @@ namespace AlphaTab.Test
         public void ToBeFalsy()
         {
             Assert.AreEqual(default!, _actual, _message);
+        }
+
+        public void ToThrowError(Type expected)
+        {
+            if (_actual is Action d)
+            {
+                try
+                {
+                    d();
+                    Assert.Fail("Did not throw error:" + _message);
+                }
+                catch (Exception e)
+                {
+                    if (expected.IsInstanceOfType(e)) 
+					{
+						return;
+					}
+                }
+                Assert.Fail("Exception type didn't match:" + _message);
+            }
+            else
+            {
+                Assert.Fail("ToThrowError can only be used with an exception:" + _message);
+            }
         }
     }
 }

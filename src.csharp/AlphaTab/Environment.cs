@@ -1,8 +1,10 @@
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using AlphaTab.Core.EcmaScript;
+using AlphaTab.Core;
+using AlphaTab.Collections;
 using AlphaTab.Platform.CSharp;
 
 namespace AlphaTab
@@ -12,7 +14,7 @@ namespace AlphaTab
         public const bool SupportsTextDecoder = true;
         public static void PlatformInit()
         {
-            
+
         }
 
 
@@ -33,7 +35,7 @@ namespace AlphaTab
             };
         }
 
-        private static void CreatePlatformSpecificRenderEngines(Map<string, RenderEngineFactory> renderEngines)
+        private static void CreatePlatformSpecificRenderEngines(IMap<string, RenderEngineFactory> renderEngines)
         {
             renderEngines.Set(
                 "skia",

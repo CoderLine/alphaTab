@@ -1,6 +1,6 @@
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { AccidentalGlyph } from './AccidentalGlyph';
+import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 
 class AccidentalColumnInfo {
     public x: number = 0;
@@ -13,7 +13,7 @@ export class AccidentalGroupGlyph extends GlyphGroup {
         super(0, 0);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         if (!this.glyphs || this.glyphs.length === 0) {
             this.width = 0;
             return;
