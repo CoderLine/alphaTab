@@ -50,6 +50,39 @@ export class VisualTestHelper {
      * @target web
      * @partial
      */
+    public static async runVisualTestWithResize(
+        inputFile: string,
+        widths: number[],
+        referenceImages: string[],
+        settings?: Settings,
+        tracks?: number[],
+        message?: string,
+        tolerancePercent: number = 1,
+        triggerResize: boolean = false
+    ): Promise<void> {
+        try {
+            const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
+            let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
+
+            await VisualTestHelper.runVisualTestScoreWithResize(
+                score,
+                widths,
+                referenceImages,
+                settings,
+                tracks,
+                message,
+                tolerancePercent,
+                triggerResize
+            );
+        } catch (e) {
+            fail(`Failed to run visual test ${e}`);
+        }
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
     public static async runVisualTestTex(
         tex: string,
         referenceFileName: string,
@@ -168,24 +201,7 @@ export class VisualTestHelper {
                 tracks = [0];
             }
 
-            settings.core.fontDirectory = CoreSettings.ensureFullUrl('/base/font/bravura/');
-            settings.core.engine = 'html5';
-            Environment.HighDpiFactor = 1; // test data is in scale 1
-            settings.core.enableLazyLoading = false;
-
-            settings.display.resources.copyrightFont.families = ['Roboto'];
-            settings.display.resources.titleFont.families = ['PT Serif'];
-            settings.display.resources.subTitleFont.families = ['PT Serif'];
-            settings.display.resources.wordsFont.families = ['PT Serif'];
-            settings.display.resources.effectFont.families = ['PT Serif'];
-            settings.display.resources.fretboardNumberFont.families = ['Roboto'];
-            settings.display.resources.tablatureFont.families = ['Roboto'];
-            settings.display.resources.graceFont.families = ['Roboto'];
-            settings.display.resources.barNumberFont.families = ['Roboto'];
-            settings.display.resources.fingeringFont.families = ['PT Serif'];
-            settings.display.resources.markerFont.families = ['PT Serif'];
-
-            await VisualTestHelper.loadFonts();
+            await VisualTestHelper.prepareSettingsForTest(settings);
 
             let referenceFileData: Uint8Array;
             try {
@@ -199,28 +215,6 @@ export class VisualTestHelper {
             renderElement.style.position = 'absolute';
             renderElement.style.visibility = 'hidden';
             document.body.appendChild(renderElement);
-
-            // here we need to trick a little bit, normally SVG does not require the font to be loaded
-            // before rendering starts, but in our case we need it to convert it later for diffing to raster.
-            // so we initiate the bravura load and wait for it before proceeding with rendering.
-            Environment.createStyleElement(document, settings.core.fontDirectory);
-            await Promise.race([
-                new Promise<void>((resolve, reject) => {
-                    if (Environment.bravuraFontChecker.isFontLoaded) {
-                        resolve();
-                    } else {
-                        Environment.bravuraFontChecker.fontLoaded.on(() => {
-                            resolve();
-                        });
-                        Environment.bravuraFontChecker.checkForFontAvailability();
-                    }
-                }),
-                new Promise<void>((_, reject) => {
-                    setTimeout(() => {
-                        reject(new Error('Font loading did not complete in time'));
-                    }, 2000);
-                })
-            ]);
 
             let result: RenderFinishedEventArgs[] = [];
             let totalWidth: number = 0;
@@ -247,7 +241,7 @@ export class VisualTestHelper {
                         resolve();
                     } else if (triggerResize) {
                         isResizeRender = true;
-                        // @ts-ignore 
+                        // @ts-ignore
                         api.triggerResize();
                     }
                 });
@@ -282,6 +276,166 @@ export class VisualTestHelper {
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
         }
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static async runVisualTestScoreWithResize(
+        score: Score,
+        widths: number[],
+        referenceImages: string[],
+        settings?: Settings,
+        tracks?: number[],
+        message?: string,
+        tolerancePercent: number = 1,
+        triggerResize: boolean = false
+    ): Promise<void> {
+        try {
+            if (!settings) {
+                settings = new Settings();
+            }
+            if (!tracks) {
+                tracks = [0];
+            }
+
+            await VisualTestHelper.prepareSettingsForTest(settings);
+
+            let referenceFileData: Uint8Array[] = [];
+            for (const img of referenceImages) {
+                try {
+                    referenceFileData.push(await TestPlatform.loadFile(`test-data/visual-tests/${img}`));
+                } catch (e) {
+                    referenceFileData.push(new Uint8Array(0));
+                }
+            }
+
+            const renderElement = document.createElement('div');
+            renderElement.style.width = `${widths.shift()}px`;
+            renderElement.style.position = 'absolute';
+            renderElement.style.visibility = 'hidden';
+            document.body.appendChild(renderElement);
+
+            let results: RenderFinishedEventArgs[][] = [];
+            let totalWidths: number[] = [];
+            let totalHeights: number[] = [];
+            let render = new Promise<void>((resolve, reject) => {
+                const api = new AlphaTabApi(renderElement, settings);
+                api.renderStarted.on(_ => {
+                    results.push([]);
+                    totalWidths.push(0);
+                    totalHeights.push(0);
+                });
+                api.renderer.partialRenderFinished.on(e => {
+                    if (e) {
+                        results[results.length - 1].push(e);
+                    }
+                });
+                api.renderer.renderFinished.on(e => {
+                    totalWidths[totalWidths.length - 1] = e.totalWidth;
+                    totalHeights[totalHeights.length - 1] = e.totalHeight;
+                    results[results.length - 1].push(e);
+
+                    if (widths.length > 0) {
+                        renderElement.style.width = `${widths.shift()}px`;
+                        // @ts-ignore
+                        api.triggerResize();
+                    } else {
+                        resolve();
+                    }
+                });
+                api.error.on(e => {
+                    reject(`Failed to render image: ${e}`);
+                });
+
+                // NOTE: on some platforms we serialize/deserialize the score objects
+                // this logic does the same just to ensure we get the right result
+                const renderScore = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
+                api.renderScore(renderScore, tracks);
+            });
+
+            await Promise.race([
+                render,
+                new Promise<void>((_, reject) => {
+                    setTimeout(() => {
+                        reject(new Error('Rendering did not complete in time'));
+                    }, 2000 * widths.length);
+                })
+            ]);
+
+            for (let i = 0; i < results.length; i++) {
+                await VisualTestHelper.compareVisualResult(
+                    totalWidths[i],
+                    totalHeights[i],
+                    results[i],
+                    referenceImages[i],
+                    referenceFileData[i],
+                    message,
+                    tolerancePercent
+                );
+            }
+        } catch (e) {
+            fail(`Failed to run visual test ${e}`);
+        }
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    static async waitForFonts(settings: Settings) {
+        // here we need to trick a little bit, normally SVG does not require the font to be loaded
+        // before rendering starts, but in our case we need it to convert it later for diffing to raster.
+        // so we initiate the bravura load and wait for it before proceeding with rendering.
+        Environment.createStyleElement(document, settings.core.fontDirectory);
+        await Promise.race([
+            new Promise<void>((resolve, reject) => {
+                if (Environment.bravuraFontChecker.isFontLoaded) {
+                    resolve();
+                } else {
+                    Environment.bravuraFontChecker.fontLoaded.on(() => {
+                        resolve();
+                    });
+                    Environment.bravuraFontChecker.checkForFontAvailability();
+                }
+            }),
+            new Promise<void>((_, reject) => {
+                setTimeout(() => {
+                    reject(new Error('Font loading did not complete in time'));
+                }, 2000);
+            })
+        ]);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    static async prepareSettingsForTest(settings: Settings) {
+        settings.core.fontDirectory = CoreSettings.ensureFullUrl('/base/font/bravura/');
+        settings.core.engine = 'html5';
+        Environment.HighDpiFactor = 1; // test data is in scale 1
+        settings.core.enableLazyLoading = false;
+
+        settings.display.resources.copyrightFont.families = ['Roboto'];
+        settings.display.resources.titleFont.families = ['PT Serif'];
+        settings.display.resources.subTitleFont.families = ['PT Serif'];
+        settings.display.resources.wordsFont.families = ['PT Serif'];
+        settings.display.resources.effectFont.families = ['PT Serif'];
+        settings.display.resources.fretboardNumberFont.families = ['Roboto'];
+        settings.display.resources.tablatureFont.families = ['Roboto'];
+        settings.display.resources.graceFont.families = ['Roboto'];
+        settings.display.resources.barNumberFont.families = ['Roboto'];
+        settings.display.resources.fingeringFont.families = ['PT Serif'];
+        settings.display.resources.markerFont.families = ['PT Serif'];
+
+        await VisualTestHelper.loadFonts();
+
+        // here we need to trick a little bit, normally SVG does not require the font to be loaded
+        // before rendering starts, but in our case we need it to convert it later for diffing to raster.
+        // so we initiate the bravura load and wait for it before proceeding with rendering.
+        await VisualTestHelper.waitForFonts(settings);
     }
 
     /**
@@ -391,9 +545,7 @@ export class VisualTestHelper {
      * @target web
      * @partial
      */
-    private static toEqualVisually(
-        _utils: jasmine.MatchersUtil,
-    ): jasmine.CustomAsyncMatcher {
+    private static toEqualVisually(_utils: jasmine.MatchersUtil): jasmine.CustomAsyncMatcher {
         return {
             async compare(
                 actual: HTMLCanvasElement,
