@@ -231,7 +231,6 @@ export class PageViewLayout extends ScoreLayout {
             for (let i: number = 0; i < this._groups.length; i++) {
                 let group: StaveGroup = this._groups[i];
                 this.fitGroup(group);
-                group.finalizeGroup();
                 y += this.paintGroup(group, oldHeight);
             }
         } else {
@@ -262,7 +261,6 @@ export class PageViewLayout extends ScoreLayout {
                     group.isLast = this.lastBarIndex === group.lastBarIndex;
                     this._groups.push(group);
                     this.fitGroup(group);
-                    group.finalizeGroup();
                     y += this.paintGroup(group, oldHeight);
                     // note: we do not increase currentIndex here to have it added to the next group
                     group = this.createEmptyStaveGroup();
@@ -274,7 +272,6 @@ export class PageViewLayout extends ScoreLayout {
             group.isLast = this.lastBarIndex === group.lastBarIndex;
             // don't forget to finish the last group
             this.fitGroup(group);
-            group.finalizeGroup();
             y += this.paintGroup(group, oldHeight);
         }
         return y;
@@ -294,7 +291,6 @@ export class PageViewLayout extends ScoreLayout {
             currentBarIndex = group.lastBarIndex + 1;
             // finalize group (sizing etc).
             this.fitGroup(group);
-            group.finalizeGroup();
             Logger.debug(
                 this.name,
                 'Rendering partial from bar ' + group.firstBarIndex + ' to ' + group.lastBarIndex,
@@ -341,6 +337,10 @@ export class PageViewLayout extends ScoreLayout {
         if (group.isFull || group.width > this.maxWidth) {
             group.scaleToWidth(this.maxWidth);
         }
+        else {
+            group.scaleToWidth(group.width);
+        }
+        group.finalizeGroup();
     }
 
     private createStaveGroup(currentBarIndex: number, endIndex: number): StaveGroup {

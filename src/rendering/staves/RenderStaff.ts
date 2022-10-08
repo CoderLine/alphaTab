@@ -129,8 +129,15 @@ export class RenderStaff {
         // the space over the bar renderers, for now we evenly apply the space to all bars
         let difference: number = width - this.staveGroup.width;
         let spacePerBar: number = difference / this.barRenderers.length;
+        let x = 0;
+        let topOverflow: number = this.topOverflow;
         for (let i: number = 0, j: number = this.barRenderers.length; i < j; i++) {
-            this.barRenderers[i].scaleToWidth(this.barRenderers[i].width + spacePerBar);
+            this.barRenderers[i].x = x;
+            this.barRenderers[i].y = this.topSpacing + topOverflow;
+            if(difference !== 0) {
+                this.barRenderers[i].scaleToWidth(this.barRenderers[i].width + spacePerBar);
+            }
+            x += this.barRenderers[i].width;
         }
     }
 
@@ -157,19 +164,32 @@ export class RenderStaff {
     }
 
     public finalizeStaff(): void {
-        let x: number = 0;
         this.height = 0;
+
+        // 1st pass: let all renderers finalize themselves, this might cause
+        // changes in the overflows
+        let needsSecondPass = false;
         let topOverflow: number = this.topOverflow;
-        let bottomOverflow: number = this.bottomOverflow;
         for (let i: number = 0; i < this.barRenderers.length; i++) {
-            this.barRenderers[i].x = x;
             this.barRenderers[i].y = this.topSpacing + topOverflow;
             this.height = Math.max(this.height, this.barRenderers[i].height);
-            this.barRenderers[i].finalizeRenderer();
-            x += this.barRenderers[i].width;
+            if (this.barRenderers[i].finalizeRenderer()) {
+                needsSecondPass = true;
+            }
         }
+
+        // 2nd pass: move renderers to correct position respecting the new overflows
+        if (needsSecondPass) {
+            topOverflow = this.topOverflow;
+            for (let i: number = 0; i < this.barRenderers.length; i++) {
+                this.barRenderers[i].y = this.topSpacing + topOverflow;
+                this.height = Math.max(this.height, this.barRenderers[i].height);
+                this.barRenderers[i].finalizeRenderer();
+            }
+        }
+
         if (this.height > 0) {
-            this.height += this.topSpacing + topOverflow + bottomOverflow + this.bottomSpacing;
+            this.height += this.topSpacing + topOverflow + this.bottomOverflow + this.bottomSpacing;
         }
     }
 

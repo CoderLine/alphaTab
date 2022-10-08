@@ -3,6 +3,7 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { Bounds } from '../utils/Bounds';
 
 export class TieGlyph extends Glyph {
     protected startBeat: Beat | null;
@@ -21,16 +22,21 @@ export class TieGlyph extends Glyph {
         this.forEnd = forEnd;
     }
 
+    private _startX: number = 0;
+    private _startY: number = 0;
+    private _endX: number = 0;
+    private _endY: number = 0;
+    private _tieHeight: number = 0;
+    private _shouldDraw: boolean = false;
+
     public override doLayout(): void {
         this.width = 0;
-    }
-
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        // TODO fix nullability of start/end beat,
         if (!this.endBeat) {
+            this._shouldDraw = false;
             return;
         }
 
-        // TODO fix nullability of start/end beat,
         let startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.startBeat!.voice.bar
@@ -42,11 +48,12 @@ export class TieGlyph extends Glyph {
         );
         this.endNoteRenderer = endNoteRenderer;
 
-        let startX: number = 0;
-        let endX: number = 0;
-        let startY: number = 0;
-        let endY: number = 0;
-        let shouldDraw: boolean = false;
+        this._startX = 0;
+        this._endX = 0;
+        this._startY = 0;
+        this._endY = 0;
+        this.height = 0;
+        this._shouldDraw = false;
         // if we are on the tie start, we check if we
         // either can draw till the end note, or we just can draw till the bar end
         this.tieDirection = !startNoteRenderer
@@ -55,52 +62,77 @@ export class TieGlyph extends Glyph {
         if (!this.forEnd && startNoteRenderer) {
             // line break or bar break
             if (startNoteRenderer !== endNoteRenderer) {
-                startX = cx + startNoteRenderer.x + this.getStartX();
-                startY = cy + startNoteRenderer.y + this.getStartY() + this.yOffset;
+                this._startX = startNoteRenderer.x + this.getStartX();
+                this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
                 // line break: to bar end
                 if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
-                    endX = cx + startNoteRenderer.x + startNoteRenderer.width;
-                    endY = startY;
+                    this._endX = startNoteRenderer.x + startNoteRenderer.width;
+                    this._endY = this._startY;
                 } else {
-                    endX = cx + endNoteRenderer.x + this.getEndX();
-                    endY = cy + endNoteRenderer.y + this.getEndY() + this.yOffset;
+                    this._endX = endNoteRenderer.x + this.getEndX();
+                    this._endY = endNoteRenderer.y + this.getEndY() + this.yOffset;
                 }
             } else {
-                startX = cx + startNoteRenderer.x + this.getStartX();
-                endX = cx + endNoteRenderer.x + this.getEndX();
-                startY = cy + startNoteRenderer.y + this.getStartY() + this.yOffset;
-                endY = cy + endNoteRenderer.y + this.getEndY() + this.yOffset;
+                this._startX = startNoteRenderer.x + this.getStartX();
+                this._endX = endNoteRenderer.x + this.getEndX();
+                this._startY = startNoteRenderer.y + this.getStartY() + this.yOffset;
+                this._endY = endNoteRenderer.y + this.getEndY() + this.yOffset;
             }
-            shouldDraw = true;
+            this._shouldDraw = true;
         } else if (!startNoteRenderer || startNoteRenderer.staff !== endNoteRenderer!.staff) {
-            startX = cx + endNoteRenderer!.x;
-            endX = cx + endNoteRenderer!.x + this.getEndX();
-            startY = cy + endNoteRenderer!.y + this.getEndY() + this.yOffset;
-            endY = startY;
-            shouldDraw = true;
+            this._startX = endNoteRenderer!.x;
+            this._endX = endNoteRenderer!.x + this.getEndX();
+            this._startY = endNoteRenderer!.y + this.getEndY() + this.yOffset;
+            this._endY = this._startY;
+            this._shouldDraw = true;
         }
-        if (shouldDraw) {
-            if(this.shouldDrawBendSlur()) {
+
+        if (this._shouldDraw) {
+            this.y = Math.min(this._startY, this._endY);
+            if (this.shouldDrawBendSlur()) {
+                this._tieHeight = 0; // TODO: Bend slur height to be considered?
+            } else {
+                this._tieHeight = this.getTieHeight(this._startX, this._startY, this._endX, this._endY);
+                this.height = TieGlyph.calculateActualTieHeight(
+                    this.renderer.scale,
+                    this._startX,
+                    this._startY,
+                    this._endX,
+                    this._endY,
+                    this.tieDirection === BeamDirection.Down,
+                    this._tieHeight,
+                    4
+                ).h;
+            }
+
+            if (this.tieDirection === BeamDirection.Up) {
+                this.y -= this.height;
+            }
+        }
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        if (this._shouldDraw) {
+            if (this.shouldDrawBendSlur()) {
                 TieGlyph.drawBendSlur(
                     canvas,
-                    startX,
-                    startY,
-                    endX,
-                    endY,
+                    cx + this._startX,
+                    cy + this._startY,
+                    cx + this._endX,
+                    cy + this._endY,
                     this.tieDirection === BeamDirection.Down,
                     this.scale
                 );
-            }
-            else {
+            } else {
                 TieGlyph.paintTie(
                     canvas,
                     this.scale,
-                    startX,
-                    startY,
-                    endX,
-                    endY,
+                    cx + this._startX,
+                    cy + this._startY,
+                    cx + this._endX,
+                    cy + this._endY,
                     this.tieDirection === BeamDirection.Down,
-                    this.getTieHeight(startX, startY, endX, endY),
+                    this._tieHeight,
                     4
                 );
             }
@@ -135,19 +167,77 @@ export class TieGlyph extends Glyph {
         return 0;
     }
 
-    public static paintTie(
-        canvas: ICanvas,
+    public static calculateActualTieHeight(
         scale: number,
         x1: number,
         y1: number,
         x2: number,
         y2: number,
-        down: boolean = false,
-        offset: number = 22,
-        size: number = 4
-    ): void {
+        down: boolean,
+        offset: number,
+        size: number
+    ): Bounds {
+        const cp = TieGlyph.computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
+
+        x1 = cp[0];
+        y1 = cp[1];
+        const cpx = cp[2];
+        const cpy = cp[3];
+        x2 = cp[6];
+        y2 = cp[7];
+
+        const tx = (x1 - cpx) / (x1 - 2 * cpx + x2);
+        const ex = TieGlyph.calculateExtrema(x1, y1, cpx, cpy, x2, y2, tx);
+        const xMin = ex.length > 0 ? Math.min(x1, x2, ex[0]) : Math.min(x1, x2);
+        const xMax = ex.length > 0 ? Math.max(x1, x2, ex[0]) : Math.max(x1, x2);
+
+        const ty = (y1 - cpy) / (y1 - 2 * cpy + y2);
+        const ey = TieGlyph.calculateExtrema(x1, y1, cpx, cpy, x2, y2, ty);
+        const yMin = ey.length > 0 ? Math.min(y1, y2, ey[1]) : Math.min(y1, y2);
+        const yMax = ey.length > 0 ? Math.max(y1, y2, ey[1]) : Math.max(y1, y2);
+
+        const b = new Bounds();
+        b.x = xMin;
+        b.y = yMin;
+        b.w = xMax - xMin;
+        b.h = yMax - yMin;
+        return b;
+    }
+
+    private static calculateExtrema(
+        x1: number,
+        y1: number,
+        cpx: number,
+        cpy: number,
+        x2: number,
+        y2: number,
+        t: number
+    ): number[] {
+        if (t <= 0 || 1 <= t) {
+            return [];
+        }
+
+        const c1x = x1 + (cpx - x1) * t;
+        const c1y = y1 + (cpy - y1) * t;
+
+        const c2x = cpx + (x2 - cpx) * t;
+        const c2y = cpy + (y2 - cpy) * t;
+
+        return [c1x + (c2x - c1x) * t, c1y + (c2y - c1y) * t];
+    }
+
+    private static computeBezierControlPoints(
+        scale: number,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean,
+        offset: number,
+        size: number
+    ): number[] {
         if (x1 === x2 && y1 === y2) {
-            return;
+            return [];
         }
 
         // ensure endX > startX
@@ -185,12 +275,44 @@ export class TieGlyph extends Glyph {
         let cp1Y: number = centerY + offset * normalVectorY;
         let cp2X: number = centerX + (offset - size) * normalVectorX;
         let cp2Y: number = centerY + (offset - size) * normalVectorY;
+
+        return [x1, y1, cp1X, cp1Y, cp2X, cp2Y, x2, y2];
+    }
+
+    public static paintTie(
+        canvas: ICanvas,
+        scale: number,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean = false,
+        offset: number = 22,
+        size: number = 4
+    ): void {
+        const cps = TieGlyph.computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
+
         canvas.beginPath();
-        canvas.moveTo(x1, y1);
-        canvas.quadraticCurveTo(cp1X, cp1Y, x2, y2);
-        canvas.quadraticCurveTo(cp2X, cp2Y, x1, y1);
+        canvas.moveTo(cps[0], cps[1]);
+        canvas.quadraticCurveTo(cps[2], cps[3], cps[6], cps[7]);
+        canvas.quadraticCurveTo(cps[4], cps[5], cps[0], cps[1]);
         canvas.closePath();
         canvas.fill();
+
+        // const c = canvas.color;
+        // canvas.color = Color.random(100);
+        // canvas.fillCircle(cps[0], cps[1], 4);
+        // canvas.fillCircle(cps[2], cps[3], 4);
+        // canvas.fillCircle(cps[4], cps[5], 4);
+        // canvas.fillCircle(cps[7], cps[6], 4);
+
+        // canvas.color = Color.random(100);
+
+        // const bbox = TieGlyph.calculateActualTieHeight(scale, x1, y1, x2, y2, down, offset, size);
+
+        // canvas.fillRect(bbox.x, bbox.y, bbox.w, bbox.h);
+
+        // canvas.color = c;
     }
 
     private static readonly BendSlurHeight: number = 11;

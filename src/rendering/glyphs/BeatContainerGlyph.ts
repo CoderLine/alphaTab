@@ -15,7 +15,7 @@ import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class BeatContainerGlyph extends Glyph {
-    public static readonly GraceBeatPadding:number = 3;
+    public static readonly GraceBeatPadding: number = 3;
     public voiceContainer: VoiceContainerGlyph;
     public beat: Beat;
     public preNotes!: BeatGlyphBase;
@@ -34,24 +34,32 @@ export class BeatContainerGlyph extends Glyph {
         this.voiceContainer = voiceContainer;
     }
 
+    public addTie(tie: Glyph) {
+        tie.renderer = this.renderer;
+        this.ties.push(tie);
+    }
+
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
         let preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
-        if(this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
+        if (this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
             preBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
         }
 
         let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.centerX;
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
-        if(helper && helper.hasFlag || this.beat.graceType !== GraceType.None) {
-            postBeatStretch += (FlagGlyph.FlagWidth * this.scale * (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1));
+        if ((helper && helper.hasFlag) || this.beat.graceType !== GraceType.None) {
+            postBeatStretch +=
+                FlagGlyph.FlagWidth *
+                this.scale *
+                (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
         }
-        for(const tie of this.ties) {
+        for (const tie of this.ties) {
             postBeatStretch += tie.width;
         }
 
         // Add some further spacing to grace notes
-        if(this.beat.graceType !== GraceType.None) {
+        if (this.beat.graceType !== GraceType.None) {
             postBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
         }
 
@@ -64,7 +72,7 @@ export class BeatContainerGlyph extends Glyph {
 
     public applyLayoutingInfo(info: BarLayoutingInfo): void {
         let offset: number = info.getBeatCenterX(this.beat) - this.onNotes.centerX;
-        if(this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
+        if (this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
             offset += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
         }
 
@@ -89,6 +97,7 @@ export class BeatContainerGlyph extends Glyph {
         while (i >= 0) {
             this.createTies(this.beat.notes[i--]);
         }
+        this.renderer.registerTies(this.ties);
         this.updateWidth();
     }
 
@@ -121,9 +130,6 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public scaleToWidth(beatWidth: number): void {
-        for (let tie of this.ties) {
-            tie.doLayout();
-        }
         this.onNotes.updateBeamingHelper();
         this.width = beatWidth;
     }
