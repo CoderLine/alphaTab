@@ -99,6 +99,21 @@ describe('NotationLegend', () => {
     it('tied-note-accidentals-default', async () => { await runNotationLegendTest(`tied-note-accidentals-default.png`, 1, -1, false, 'tied-note-accidentals.gp'); });
     it('tied-note-accidentals-songbook', async () => { await runNotationLegendTest(`tied-note-accidentals-songbook.png`, 1, -1, true, 'tied-note-accidentals.gp'); });
 
+    it('resize-sequence', async () => { 
+        let settings: Settings = new Settings();
+        await VisualTestHelper.runVisualTestWithResize(
+            'notation-legend/notation-legend.gp', 
+            [1300, 800, 1500, 500],
+            [
+                'notation-legend/resize-sequence-1300.png',
+                'notation-legend/resize-sequence-800.png',
+                'notation-legend/resize-sequence-1500.png',
+                'notation-legend/resize-sequence-500.png'
+            ],
+            settings,
+            [0]);
+    });
+
     async function runNotationLegendTest(referenceFileName: string, startBar: number, barCount: number, songBook: boolean, fileName: string = 'notation-legend.gp', tolerance:number=1): Promise<void> {
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;

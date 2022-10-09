@@ -33,7 +33,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
                 while (destination.nextBeat && destination.nextBeat.isLegatoDestination) {
                     destination = destination.nextBeat;
                 }
-                this.ties.push(new ScoreLegatoGlyph(this.beat, destination, false));
+                this.addTie(new ScoreLegatoGlyph(this.beat, destination, false));
             }
         } else if (this.beat.isLegatoDestination) {
             // only create slur for last destination of "group"
@@ -42,7 +42,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
                 while (origin.previousBeat && origin.previousBeat.isLegatoOrigin) {
                     origin = origin.previousBeat;
                 }
-                this.ties.push(new ScoreLegatoGlyph(origin, this.beat, true));
+                this.addTie(new ScoreLegatoGlyph(origin, this.beat, true));
             }
         }
         if (this._bend) {
@@ -69,32 +69,32 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         ) {
             // tslint:disable-next-line: no-unnecessary-type-assertion
             let tie: ScoreTieGlyph = new ScoreTieGlyph(n, n.tieDestination!, false);
-            this.ties.push(tie);
+            this.addTie(tie);
         }
         if (n.isTieDestination && !n.tieOrigin!.hasBend && !n.beat.hasWhammyBar) {
             let tie: ScoreTieGlyph = new ScoreTieGlyph(n.tieOrigin!, n, true);
-            this.ties.push(tie);
+            this.addTie(tie);
         }
         // TODO: depending on the type we have other positioning
         // we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
         if (n.slideInType !== SlideInType.None || n.slideOutType !== SlideOutType.None) {
             let l: ScoreSlideLineGlyph = new ScoreSlideLineGlyph(n.slideInType, n.slideOutType, n, this);
-            this.ties.push(l);
+            this.addTie(l);
         }
         if (n.isSlurOrigin && n.slurDestination && n.slurDestination.isVisible) {
             // tslint:disable-next-line: no-unnecessary-type-assertion
             let tie: ScoreSlurGlyph = new ScoreSlurGlyph(n, n.slurDestination!, false);
-            this.ties.push(tie);
+            this.addTie(tie);
         }
         if (n.isSlurDestination) {
             let tie: ScoreSlurGlyph = new ScoreSlurGlyph(n.slurOrigin!, n, true);
-            this.ties.push(tie);
+            this.addTie(tie);
         }
         // start effect slur on first beat
         if (!this._effectSlur && n.isEffectSlurOrigin && n.effectSlurDestination) {
             const effectSlur = new ScoreSlurGlyph(n, n.effectSlurDestination, false);
             this._effectSlur = effectSlur;
-            this.ties.push(effectSlur);
+            this.addTie(effectSlur);
         }
         // end effect slur on last beat
         if (!this._effectEndSlur && n.beat.isEffectSlurDestination && n.beat.effectSlurOrigin) {
@@ -104,14 +104,14 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             let endNote: Note = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
             const effectEndSlur = new ScoreSlurGlyph(startNote, endNote, true);
             this._effectEndSlur = effectEndSlur;
-            this.ties.push(effectEndSlur);
+            this.addTie(effectEndSlur);
         }
         if (n.hasBend) {
             if (!this._bend) {
                 const bend = new ScoreBendGlyph(n.beat);
                 this._bend = bend;
                 bend.renderer = this.renderer;
-                this.ties.push(bend);
+                this.addTie(bend);
             }
             // tslint:disable-next-line: no-unnecessary-type-assertion
             this._bend!.addBends(n);

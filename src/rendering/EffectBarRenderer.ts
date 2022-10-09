@@ -34,14 +34,17 @@ export class EffectBarRenderer extends BarRendererBase {
         super.updateSizes();
     }
 
-    public override finalizeRenderer(): void {
-        super.finalizeRenderer();
-        this.updateHeight();
+    public override finalizeRenderer(): boolean {
+        let didChange = super.finalizeRenderer();
+        if (this.updateHeight()) {
+            didChange = true;
+        }
+        return didChange;
     }
 
-    private updateHeight(): void {
+    private updateHeight(): boolean {
         if (!this.sizingInfo) {
-            return;
+            return false;
         }
         let y: number = 0;
         for (let slot of this.sizingInfo.slots) {
@@ -52,7 +55,11 @@ export class EffectBarRenderer extends BarRendererBase {
             }
             y += slot.shared.height;
         }
-        this.height = y;
+        if (y !== this.height) {
+            this.height = y;
+            return true;
+        }
+        return false;
     }
 
     public override applyLayoutingInfo(): boolean {

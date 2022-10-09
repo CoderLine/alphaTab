@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace AlphaTab.Core.EcmaScript
 {
@@ -15,6 +16,16 @@ namespace AlphaTab.Core.EcmaScript
         public static double Abs(double v)
         {
             return System.Math.Abs(v);
+        }
+
+        public static double Max(params double[] items)
+        {
+            return items.Max();
+        }
+
+        public static double Min(params double[] items)
+        {
+            return items.Min();
         }
 
         public static double Max(double a, double b)

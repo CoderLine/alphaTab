@@ -82,6 +82,8 @@ export class BarRendererBase {
     private _voiceContainers: Map<number, VoiceContainerGlyph> = new Map();
     private _postBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
 
+    private _ties: Glyph[] = [];
+
     public get nextRenderer(): BarRendererBase | null {
         if (!this.bar || !this.bar.nextBar) {
             return null;
@@ -131,20 +133,28 @@ export class BarRendererBase {
         }
     }
 
+    public registerTies(ties: Glyph[]) {
+        this._ties.push(...ties);
+    }
+
     public get middleYPosition(): number {
         return 0;
     }
 
-    public registerOverflowTop(topOverflow: number): void {
+    public registerOverflowTop(topOverflow: number): boolean {
         if (topOverflow > this.topOverflow) {
             this.topOverflow = topOverflow;
+            return true;
         }
+        return false;
     }
 
-    public registerOverflowBottom(bottomOverflow: number): void {
+    public registerOverflowBottom(bottomOverflow: number): boolean {
         if (bottomOverflow > this.bottomOverflow) {
             this.bottomOverflow = bottomOverflow;
+            return true;
         }
+        return false;
     }
 
     public scaleToWidth(width: number): void {
@@ -223,8 +233,32 @@ export class BarRendererBase {
 
     public isFinalized: boolean = false;
 
-    public finalizeRenderer(): void {
+    public finalizeRenderer(): boolean {
         this.isFinalized = true;
+
+        let didChangeOverflows = false;
+        // allow spacing to be used for tie overflows
+        const barTop = this.y - this.staff.topSpacing;
+        const barBottom = this.y + this.height + this.staff.bottomSpacing;
+        for (const tie of this._ties) {
+            tie.doLayout();
+            if (tie.height > 0) {
+                const bottomOverflow = tie.y + tie.height - barBottom;
+                if (bottomOverflow > 0) {
+                    if (this.registerOverflowBottom(bottomOverflow)) {
+                        didChangeOverflows = true;
+                    }
+                }
+                const topOverflow = tie.y - barTop;
+                if (topOverflow < 0) {
+                    if (this.registerOverflowTop(topOverflow * -1)) {
+                        didChangeOverflows = true;
+                    }
+                }
+            }
+        }
+
+        return didChangeOverflows;
     }
 
     /**
@@ -245,6 +279,7 @@ export class BarRendererBase {
             return;
         }
         this.helpers.initialize();
+        this._ties = [];
         this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
         this._preBeatGlyphs.renderer = this;
         this._voiceContainers.clear();
@@ -345,7 +380,7 @@ export class BarRendererBase {
             canvas
         );
         // canvas.color = Color.random();
-        // canvas.fillRect(cx + this.x + this._preBeatGlyphs.x, cy + this.y, this._preBeatGlyphs.width, this.height);
+        // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
     }
 
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {

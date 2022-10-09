@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using AlphaTab.Core;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Importer;
 using AlphaTab.Io;
@@ -15,54 +17,94 @@ namespace AlphaTab.VisualTests
 {
     partial class VisualTestHelper
     {
-        public static async Task RunVisualTest(string inputFile, Settings? settings = null,
-            IList<double>? tracks = null, string? message = null, double tolerancePercent = 1, bool triggerResize = false)
+        private static async Task RunVisualTestScoreWithResize(Score score, IList<double> widths,
+            IList<string?> referenceImages, Settings? settings, IList<double>? tracks, string? message,
+            double tolerancePercent)
         {
-            try
-            {
-                inputFile = $"test-data/visual-tests/{inputFile}";
-                var inputFileData =
-                    await TestPlatform.LoadFile(inputFile);
-                var referenceFileName = TestPlatform.ChangeExtension(inputFile, ".png");
-                var score = ScoreLoader.LoadScoreFromBytes(inputFileData, settings);
+            tracks ??= new List<double> { 0 };
+            PrepareSettingsForTest(ref settings);
 
-                await RunVisualTestScore(score, referenceFileName, settings,
-                    tracks, message, tolerancePercent, triggerResize);
-            }
-            catch (Exception e)
+            var referenceFileData = new List<Uint8Array?>();
+            foreach (var referenceFileName in referenceImages)
             {
-                Assert.Fail($"Failed to run visual test {e}");
+                if (referenceFileName == null)
+                {
+                    referenceFileData.Add(null);
+                }
+                else
+                {
+                    referenceFileData.Add(await TestPlatform.LoadFile(Path.Combine("test-data", "visual-tests", referenceFileName)));
+                }
+            }
+
+            var results = new AlphaTab.Collections.List<AlphaTab.Collections.List<RenderFinishedEventArgs>>();
+            var totalWidths = new AlphaTab.Collections.List<double>();
+            var totalHeights =  new AlphaTab.Collections.List<double>();
+
+            var task = new TaskCompletionSource<object?>();
+            var renderer = new ScoreRenderer(settings)
+            {
+                Width = widths.Shift()
+            };
+            renderer.PreRender.On(isResize =>
+            {
+                results.Add(new AlphaTab.Collections.List<RenderFinishedEventArgs>());
+                totalWidths.Add(0);
+                totalHeights.Add(0);
+            });
+            renderer.PartialRenderFinished.On(e =>
+            {
+                if (e != null)
+                {
+                    results[^1].Add(e);
+                }
+            });
+            renderer.RenderFinished.On(e =>
+            {
+                totalWidths[^1] = e.TotalWidth;
+                totalHeights[^1] = e.TotalHeight;
+                results[^1].Add(e);
+                if (widths.Count > 0)
+                {
+                    renderer.Width = widths.Shift();
+                    renderer.ResizeRender();
+                }
+                else
+                {
+                    task.SetResult(null);
+                }
+            });
+            renderer.Error.On((e) => { task.SetException(e); });
+
+            renderer.RenderScore(score, tracks);
+
+            if (await Task.WhenAny(task.Task, Task.Delay(2000 * referenceImages.Count)) == task.Task)
+            {
+                for (var i = 0; i < results.Count; i++)
+                {
+                    if (referenceImages[i] != null)
+                    {
+                        CompareVisualResult(
+                            totalWidths[i],
+                            totalHeights[i],
+                            results[i],
+                            referenceImages[i]!,
+                            referenceFileData[i]!,
+                            message,
+                            tolerancePercent
+                        );
+                    }
+                }
+            }
+            else
+            {
+                Assert.Fail("Rendering did not complete within timeout");
             }
         }
 
-        public static async Task RunVisualTestTex(string tex, string referenceFileName,
-            Settings? settings = null,
-            IList<double>? tracks = null, string? message = null)
-        {
-            try
-            {
-                settings ??= new Settings();
-
-                var importer = new AlphaTexImporter();
-                importer.Init(ByteBuffer.FromString(tex), settings);
-                var score = importer.ReadScore();
-
-                await RunVisualTestScore(score, referenceFileName, settings,
-                    tracks, message);
-            }
-            catch (Exception e)
-            {
-                Assert.Fail($"Failed to run visual test {e}");
-            }
-        }
-
-        public static async Task RunVisualTestScore(Score score, string referenceFileName,
-            Settings? settings = null,
-            IList<double>? tracks = null, string? message = null, double tolerancePercent = 1, bool triggerResize = false)
+        private static void PrepareSettingsForTest(ref Settings? settings)
         {
             settings ??= new Settings();
-            tracks ??= new AlphaTab.Collections.List<double> {0};
-
             settings.Core.Engine = "skia";
             settings.Core.EnableLazyLoading = false;
             settings.Core.UseWorkers = false;
@@ -80,73 +122,6 @@ namespace AlphaTab.VisualTests
             settings.Display.Resources.MarkerFont.Family = "PT Serif";
 
             LoadFonts();
-
-            if (!referenceFileName.StartsWith("test-data/"))
-            {
-                referenceFileName = $"test-data/visual-tests/{referenceFileName}";
-            }
-
-            var referenceFileData =
-                await TestPlatform.LoadFile(referenceFileName);
-
-            var result = new AlphaTab.Collections.List<RenderFinishedEventArgs>();
-            var totalWidth = 0.0;
-            var totalHeight = 0.0;
-            var isResizeRender = false;
-
-            var task = new TaskCompletionSource<object?>();
-            var renderer = new ScoreRenderer(settings)
-            {
-                Width = 1300
-            };
-            renderer.PreRender.On(isResize =>
-            {
-                result = new AlphaTab.Collections.List<RenderFinishedEventArgs>();
-                totalWidth = 0.0;
-                totalHeight = 0.0;
-            });
-            renderer.PartialRenderFinished.On(e =>
-            {
-                if (e != null)
-                {
-                    result.Add(e);
-                }
-            });
-            renderer.RenderFinished.On(e =>
-            {
-                totalWidth = e.TotalWidth;
-                totalHeight = e.TotalHeight;
-                result.Add(e);
-                if(!triggerResize || isResizeRender)
-                {
-                    task.SetResult(null);
-                }
-                else if(triggerResize)
-                {
-                    isResizeRender = true;
-                    renderer.ResizeRender();
-                }
-            });
-            renderer.Error.On((e) => { task.SetException(e); });
-
-            renderer.RenderScore(score, tracks);
-
-            if (await Task.WhenAny(task.Task, Task.Delay(2000)) == task.Task)
-            {
-                CompareVisualResult(
-                    totalWidth,
-                    totalHeight,
-                    result,
-                    referenceFileName,
-                    referenceFileData,
-                    message,
-                    tolerancePercent
-                );
-            }
-            else
-            {
-                Assert.Fail("Rendering did not complete within timeout");
-            }
         }
 
         private static bool _fontsLoaded;
@@ -220,6 +195,10 @@ namespace AlphaTab.VisualTests
                 {
                     try
                     {
+                        Assert.AreEqual(totalWidth, referenceBitmap.Width,
+                            "Width of images does not match");
+                        Assert.AreEqual(totalHeight, referenceBitmap.Height,
+                            "Height of images does not match");
                         var diffData = new Uint8Array(finalBitmap.Bytes.Length);
                         var match = PixelMatch.Match(
                             new Uint8Array(referenceBitmap.Bytes),
@@ -266,6 +245,10 @@ namespace AlphaTab.VisualTests
 
                             Assert.Fail(msg);
                         }
+                    }
+                    catch (AssertFailedException)
+                    {
+                        throw;
                     }
                     catch (Exception e)
                     {
