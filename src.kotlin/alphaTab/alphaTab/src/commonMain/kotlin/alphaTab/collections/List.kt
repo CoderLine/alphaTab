@@ -39,6 +39,10 @@ public class List<T> : Iterable<T> {
         _data.add(item)
     }
 
+    public fun push(items: List<T>) {
+        _data.addAll(items._data)
+    }
+
     public operator fun get(index: Int): T {
         return _data[index]
     }
@@ -57,6 +61,10 @@ public class List<T> : Iterable<T> {
 
     public fun pop(): T {
         return _data.removeLast()
+    }
+
+    public fun unshift(item:T) {
+        _data.add(0, item)
     }
 
     public fun sort(comparison: (a: T, b: T) -> Double) : List<T> {

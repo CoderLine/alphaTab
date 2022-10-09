@@ -61,8 +61,16 @@ internal class Math {
             return kotlin.math.min(a, b)
         }
 
+        public fun min(a: Double, b: Double, c:Double): Double {
+            return kotlin.math.min(kotlin.math.min(a, b), c);
+        }
+
         public fun max(a: Double, b: Double): Double {
             return kotlin.math.max(a, b)
+        }
+
+        public fun max(a: Double, b: Double, c:Double): Double {
+            return kotlin.math.max(kotlin.math.max(a, b), c);
         }
 
         public fun random(): Double {

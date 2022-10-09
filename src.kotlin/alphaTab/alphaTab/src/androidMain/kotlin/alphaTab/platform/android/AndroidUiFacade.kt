@@ -359,11 +359,11 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         error: (arg1: Error) -> Unit
     ): Boolean {
         when (data) {
-            data is Score -> {
+            (data is Score) -> {
                 success(data as Score)
                 return true
             }
-            data is ByteArray -> {
+            (data is ByteArray) -> {
                 success(
                     ScoreLoader.loadScoreFromBytes(
                         Uint8Array((data as ByteArray).asUByteArray()),
@@ -372,7 +372,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 )
                 return true
             }
-            data is UByteArray -> {
+            (data is UByteArray) -> {
                 success(
                     ScoreLoader.loadScoreFromBytes(
                         Uint8Array((data as UByteArray)),
@@ -381,7 +381,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 )
                 return true
             }
-            data is InputStream -> {
+            (data is InputStream) -> {
                 val bos = ByteArrayOutputStream()
                 (data as InputStream).copyTo(bos)
                 success(
@@ -402,15 +402,15 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         val player = api.player ?: return false
 
         when (data) {
-            data is ByteArray -> {
+            (data is ByteArray) -> {
                 player.loadSoundFont(Uint8Array((data as ByteArray).asUByteArray()), append)
                 return true
             }
-            data is UByteArray -> {
+            (data is UByteArray) -> {
                 player.loadSoundFont(Uint8Array((data as UByteArray)), append)
                 return true
             }
-            data is InputStream -> {
+            (data is InputStream) -> {
                 val bos = ByteArrayOutputStream()
                 (data as InputStream).copyTo(bos)
                 player.loadSoundFont(Uint8Array(bos.toByteArray().asUByteArray()), append)

@@ -35,15 +35,15 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         let renderer: TabBarRenderer = this.renderer as TabBarRenderer;
         if (n.isTieOrigin && renderer.showTiedNotes && n.tieDestination!.isVisible) {
             let tie: TabTieGlyph = new TabTieGlyph(n, n.tieDestination!, false);
-            this.ties.push(tie);
+            this.addTie(tie);
         }
         if (n.isTieDestination && renderer.showTiedNotes) {
             let tie: TabTieGlyph = new TabTieGlyph(n.tieOrigin!, n, true);
-            this.ties.push(tie);
+            this.addTie(tie);
         }
         if (n.isLeftHandTapped && !n.isHammerPullDestination) {
             let tapSlur: TabTieGlyph = new TabTieGlyph(n, n, false);
-            this.ties.push(tapSlur);
+            this.addTie(tapSlur);
         }
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
@@ -57,7 +57,7 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
             if (!expanded) {
                 let effectSlur: TabSlurGlyph = new TabSlurGlyph(n, n.effectSlurDestination, false, false);
                 this._effectSlurs.push(effectSlur);
-                this.ties.push(effectSlur);
+                this.addTie(effectSlur);
             }
         }
         // end effect slur on last beat
@@ -72,19 +72,19 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
             if (!expanded) {
                 let effectSlur: TabSlurGlyph = new TabSlurGlyph(n.effectSlurOrigin, n, false, true);
                 this._effectSlurs.push(effectSlur);
-                this.ties.push(effectSlur);
+                this.addTie(effectSlur);
             }
         }
         if (n.slideInType !== SlideInType.None || n.slideOutType !== SlideOutType.None) {
             let l: TabSlideLineGlyph = new TabSlideLineGlyph(n.slideInType, n.slideOutType, n, this);
-            this.ties.push(l);
+            this.addTie(l);
         }
         if (n.hasBend) {
             if (!this._bend) {
                 const bend = new TabBendGlyph();
                 this._bend = bend;
                 bend.renderer = this.renderer;
-                this.ties.push(bend);
+                this.addTie(bend);
             }
             this._bend.addBends(n);
         }
