@@ -13,11 +13,9 @@ export class NoteCloner {
         clone.bendType = original.bendType; 
         clone.bendStyle = original.bendStyle; 
         clone.isContinuedBend = original.isContinuedBend; 
-        if (original.bendPoints) {
-            clone.bendPoints = [];
-            for (const i of original.bendPoints!) {
-                clone.addBendPoint(BendPointCloner.clone(i));
-            }
+        clone.bendPoints = []; 
+        for (const i of original.bendPoints!) {
+            clone.addBendPoint(BendPointCloner.clone(i));
         } 
         clone.fret = original.fret; 
         clone.string = original.string; 

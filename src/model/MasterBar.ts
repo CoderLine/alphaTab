@@ -120,7 +120,7 @@ export class MasterBar {
      * Gets or sets the fermatas for this bar. The key is the offset of the fermata in midi ticks.
      * @json_add addFermata
      */
-    public fermata: Map<number, Fermata> | null = null;
+    public fermata: Map<number, Fermata> = new Map<number, Fermata>();
 
     /**
      * The timeline position of the voice within the whole score. (unit: midi ticks)
@@ -158,12 +158,7 @@ export class MasterBar {
      * @param fermata The fermata.
      */
     public addFermata(offset: number, fermata: Fermata): void {
-        let fermataMap = this.fermata;
-        if (fermataMap === null) {
-            fermataMap = new Map<number, Fermata>();
-            this.fermata = fermataMap;
-        }
-        fermataMap.set(offset, fermata);
+        this.fermata.set(offset, fermata);
     }
 
     /**
@@ -173,9 +168,6 @@ export class MasterBar {
      */
     public getFermata(beat: Beat): Fermata | null {
         const fermataMap = this.fermata;
-        if (fermataMap === null) {
-            return null;
-        }
         if (fermataMap.has(beat.playbackStart)) {
             return fermataMap.get(beat.playbackStart)!;
         }

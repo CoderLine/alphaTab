@@ -433,9 +433,9 @@ export class MidiFileGenerator {
         let initialBend: number = 0;
 
         if (note.hasBend) {
-            initialBend = MidiFileGenerator.getPitchWheel(note.bendPoints![0].value);
+            initialBend = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
         } else if (note.beat.hasWhammyBar) {
-            initialBend = MidiFileGenerator.getPitchWheel(note.beat.whammyBarPoints![0].value);
+            initialBend = MidiFileGenerator.getPitchWheel(note.beat.whammyBarPoints[0].value);
         } else if (
             note.isTieDestination ||
             (note.slideOrigin && note.slideOrigin.slideOutType === SlideOutType.Legato)
@@ -815,7 +815,7 @@ export class MidiFileGenerator {
         noteKey: number,
         channel: number
     ): void {
-        let bendPoints: BendPoint[] = note.bendPoints!;
+        let bendPoints: BendPoint[] = note.bendPoints;
         let track: Track = note.beat.voice.bar.staff.track;
 
         const addBend: (tick: number, value: number) => void = (tick, value) => {
@@ -840,11 +840,11 @@ export class MidiFileGenerator {
                 case BendType.Bend:
                 case BendType.BendRelease:
                 case BendType.PrebendBend:
-                    finalBendValue = note.tieDestination!.bendPoints![1].value;
+                    finalBendValue = note.tieDestination!.bendPoints[1].value;
                     break;
                 case BendType.Prebend:
                 case BendType.PrebendRelease:
-                    finalBendValue = note.tieDestination!.bendPoints![0].value;
+                    finalBendValue = note.tieDestination!.bendPoints[0].value;
                     break;
             }
             duration = Math.max(
@@ -874,22 +874,22 @@ export class MidiFileGenerator {
                         playedBendPoints = bendPoints;
                         break;
                     case BendStyle.Gradual:
-                        playedBendPoints.push(new BendPoint(0, note.bendPoints![0].value));
-                        if (!finalBendValue || finalBendValue < note.bendPoints![1].value) {
-                            finalBendValue = note.bendPoints![1].value;
+                        playedBendPoints.push(new BendPoint(0, note.bendPoints[0].value));
+                        if (!finalBendValue || finalBendValue < note.bendPoints[1].value) {
+                            finalBendValue = note.bendPoints[1].value;
                         }
                         playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, finalBendValue));
                         break;
                     case BendStyle.Fast:
-                        if (!finalBendValue || finalBendValue < note.bendPoints![1].value) {
-                            finalBendValue = note.bendPoints![1].value;
+                        if (!finalBendValue || finalBendValue < note.bendPoints[1].value) {
+                            finalBendValue = note.bendPoints[1].value;
                         }
                         if (note.beat.graceType === GraceType.BendGrace) {
                             this.generateSongBookWhammyOrBend(
                                 noteStart,
                                 duration,
                                 true,
-                                [note.bendPoints![0].value, finalBendValue],
+                                [note.bendPoints[0].value, finalBendValue],
                                 bendDuration,
                                 addBend
                             );
@@ -898,7 +898,7 @@ export class MidiFileGenerator {
                                 noteStart,
                                 duration,
                                 false,
-                                [note.bendPoints![0].value, finalBendValue],
+                                [note.bendPoints[0].value, finalBendValue],
                                 bendDuration,
                                 addBend
                             );
@@ -912,16 +912,16 @@ export class MidiFileGenerator {
                         playedBendPoints = bendPoints;
                         break;
                     case BendStyle.Gradual:
-                        playedBendPoints.push(new BendPoint(0, note.bendPoints![0].value));
-                        playedBendPoints.push(new BendPoint((BendPoint.MaxPosition / 2) | 0, note.bendPoints![1].value));
-                        playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, note.bendPoints![2].value));
+                        playedBendPoints.push(new BendPoint(0, note.bendPoints[0].value));
+                        playedBendPoints.push(new BendPoint((BendPoint.MaxPosition / 2) | 0, note.bendPoints[1].value));
+                        playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, note.bendPoints[2].value));
                         break;
                     case BendStyle.Fast:
                         this.generateSongBookWhammyOrBend(
                             noteStart,
                             duration,
                             false,
-                            [note.bendPoints![0].value, note.bendPoints![1].value, note.bendPoints![2].value],
+                            [note.bendPoints[0].value, note.bendPoints[1].value, note.bendPoints[2].value],
                             bendDuration,
                             addBend
                         );
@@ -940,20 +940,20 @@ export class MidiFileGenerator {
                         playedBendPoints = bendPoints;
                         break;
                     case BendStyle.Gradual:
-                        playedBendPoints.push(new BendPoint(0, note.bendPoints![0].value));
-                        playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, note.bendPoints![1].value));
+                        playedBendPoints.push(new BendPoint(0, note.bendPoints[0].value));
+                        playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, note.bendPoints[1].value));
                         break;
                     case BendStyle.Fast:
-                        const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints![0].value);
+                        const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
                         addBend(noteStart, preBendValue | 0);
-                        if (!finalBendValue || finalBendValue < note.bendPoints![1].value) {
-                            finalBendValue = note.bendPoints![1].value;
+                        if (!finalBendValue || finalBendValue < note.bendPoints[1].value) {
+                            finalBendValue = note.bendPoints[1].value;
                         }
                         this.generateSongBookWhammyOrBend(
                             noteStart,
                             duration,
                             false,
-                            [note.bendPoints![0].value, finalBendValue],
+                            [note.bendPoints[0].value, finalBendValue],
                             bendDuration,
                             addBend
                         );
@@ -966,17 +966,17 @@ export class MidiFileGenerator {
                         playedBendPoints = bendPoints;
                         break;
                     case BendStyle.Gradual:
-                        playedBendPoints.push(new BendPoint(0, note.bendPoints![0].value));
-                        playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, note.bendPoints![1].value));
+                        playedBendPoints.push(new BendPoint(0, note.bendPoints[0].value));
+                        playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, note.bendPoints[1].value));
                         break;
                     case BendStyle.Fast:
-                        const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints![0].value);
+                        const preBendValue: number = MidiFileGenerator.getPitchWheel(note.bendPoints[0].value);
                         addBend(noteStart, preBendValue | 0);
                         this.generateSongBookWhammyOrBend(
                             noteStart,
                             duration,
                             false,
-                            [note.bendPoints![0].value, note.bendPoints![1].value],
+                            [note.bendPoints[0].value, note.bendPoints[1].value],
                             bendDuration,
                             addBend
                         );
@@ -1006,7 +1006,7 @@ export class MidiFileGenerator {
     }
 
     private generateWhammy(beat: Beat, noteStart: number, noteDuration: MidiNoteDuration, channel: number): void {
-        const bendPoints: BendPoint[] = beat.whammyBarPoints!;
+        const bendPoints: BendPoint[] = beat.whammyBarPoints;
         const track: Track = beat.voice.bar.staff.track;
         const duration: number = noteDuration.noteOnly;
         // ensure prebends are slightly before the actual note.

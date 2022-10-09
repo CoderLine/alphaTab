@@ -38,7 +38,7 @@ export class MasterBarSerializer {
         o.set("tripletfeel", obj.tripletFeel as number); 
         o.set("section", SectionSerializer.toJson(obj.section)); 
         o.set("tempoautomation", AutomationSerializer.toJson(obj.tempoAutomation)); 
-        if (obj.fermata !== null) {
+        {
             const m = new Map<string, unknown>();
             o.set("fermata", m);
             for (const [k, v] of obj.fermata!) {

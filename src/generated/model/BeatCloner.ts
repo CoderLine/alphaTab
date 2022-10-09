@@ -40,11 +40,9 @@ export class BeatCloner {
         clone.tupletNumerator = original.tupletNumerator; 
         clone.isContinuedWhammy = original.isContinuedWhammy; 
         clone.whammyBarType = original.whammyBarType; 
-        if (original.whammyBarPoints) {
-            clone.whammyBarPoints = [];
-            for (const i of original.whammyBarPoints!) {
-                clone.addWhammyBarPoint(BendPointCloner.clone(i));
-            }
+        clone.whammyBarPoints = []; 
+        for (const i of original.whammyBarPoints!) {
+            clone.addWhammyBarPoint(BendPointCloner.clone(i));
         } 
         clone.vibrato = original.vibrato; 
         clone.chordId = original.chordId; 

@@ -290,7 +290,7 @@ export class Beat {
      * @json_add addWhammyBarPoint
      * @clone_add addWhammyBarPoint
      */
-    public whammyBarPoints: BendPoint[] | null = null;
+    public whammyBarPoints: BendPoint[] = [];
 
     /**
      * Gets or sets the highest point with for the highest whammy bar value.
@@ -307,7 +307,7 @@ export class Beat {
     public minWhammyPoint: BendPoint | null = null;
 
     public get hasWhammyBar(): boolean {
-        return this.whammyBarPoints !== null && this.whammyBarType !== WhammyType.None;
+        return this.whammyBarType !== WhammyType.None;
     }
 
     /**
@@ -441,12 +441,7 @@ export class Beat {
     public beamingMode: BeatBeamingMode = BeatBeamingMode.Auto;
 
     public addWhammyBarPoint(point: BendPoint): void {
-        let points = this.whammyBarPoints;
-        if (points === null) {
-            points = [];
-            this.whammyBarPoints = points;
-        }
-        points.push(point);
+        this.whammyBarPoints.push(point);
         if (!this.maxWhammyPoint || point.value > this.maxWhammyPoint.value) {
             this.maxWhammyPoint = point;
         }
@@ -461,7 +456,7 @@ export class Beat {
     public removeWhammyBarPoint(index: number): void {
         // check index
         const points = this.whammyBarPoints;
-        if (points === null || index < 0 || index >= points.length) {
+        if (index < 0 || index >= points.length) {
             return;
         }
 
@@ -718,7 +713,7 @@ export class Beat {
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
         const points = this.whammyBarPoints;
-        if (points !== null && points.length > 0 && this.whammyBarType === WhammyType.Custom) {
+        if (points.length > 0 && this.whammyBarType === WhammyType.Custom) {
             if (displayMode === NotationMode.SongBook) {
                 this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
             }
@@ -781,7 +776,7 @@ export class Beat {
                 // remove bend on cloned note
                 cloneNote.bendType = BendType.None;
                 cloneNote.maxBendPoint = null;
-                cloneNote.bendPoints = null;
+                cloneNote.bendPoints = [];
                 cloneNote.bendStyle = BendStyle.Default;
                 cloneNote.id = Note.GlobalNoteId++;
 
@@ -801,7 +796,7 @@ export class Beat {
                     let tieDestination: Note | null = Note.findTieOrigin(note);
                     if (tieDestination && tieDestination.hasBend) {
                         cloneNote.bendType = BendType.Hold;
-                        let lastPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
+                        let lastPoint: BendPoint = note.bendPoints[note.bendPoints.length - 1];
                         cloneNote.addBendPoint(new BendPoint(0, lastPoint.value));
                         cloneNote.addBendPoint(new BendPoint(BendPoint.MaxPosition, lastPoint.value));
                     }

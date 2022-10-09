@@ -57,9 +57,7 @@ export class BeatSerializer {
         o.set("tupletnumerator", obj.tupletNumerator); 
         o.set("iscontinuedwhammy", obj.isContinuedWhammy); 
         o.set("whammybartype", obj.whammyBarType as number); 
-        if (obj.whammyBarPoints !== null) {
-            o.set("whammybarpoints", obj.whammyBarPoints?.map(i => BendPointSerializer.toJson(i)));
-        } 
+        o.set("whammybarpoints", obj.whammyBarPoints.map(i => BendPointSerializer.toJson(i))); 
         o.set("vibrato", obj.vibrato as number); 
         o.set("chordid", obj.chordId); 
         o.set("gracetype", obj.graceType as number); 
@@ -155,13 +153,11 @@ export class BeatSerializer {
                 obj.whammyBarType = JsonHelper.parseEnum<WhammyType>(v, WhammyType)!;
                 return true;
             case "whammybarpoints":
-                if (v) {
-                    obj.whammyBarPoints = [];
-                    for (const o of (v as (Map<string, unknown> | null)[])) {
-                        const i = new BendPoint();
-                        BendPointSerializer.fromJson(i, o);
-                        obj.addWhammyBarPoint(i);
-                    }
+                obj.whammyBarPoints = [];
+                for (const o of (v as (Map<string, unknown> | null)[])) {
+                    const i = new BendPoint();
+                    BendPointSerializer.fromJson(i, o);
+                    obj.addWhammyBarPoint(i);
                 }
                 return true;
             case "vibrato":

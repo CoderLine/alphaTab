@@ -1312,24 +1312,22 @@ export class AlphaTexImporter extends ScoreImporter {
                 beat.addWhammyBarPoint(new BendPoint(offset, value));
                 this._sy = this.newSy();
             }
-            if (beat.whammyBarPoints != null) {
-                while (beat.whammyBarPoints.length > 60) {
-                    beat.removeWhammyBarPoint(beat.whammyBarPoints.length - 1);
+            while (beat.whammyBarPoints.length > 60) {
+                beat.removeWhammyBarPoint(beat.whammyBarPoints.length - 1);
+            }
+            // set positions
+            if (!exact) {
+                let count: number = beat.whammyBarPoints.length;
+                let step: number = (60 / count) | 0;
+                let i: number = 0;
+                while (i < count) {
+                    beat.whammyBarPoints[i].offset = Math.min(60, i * step);
+                    i++;
                 }
-                // set positions
-                if (!exact) {
-                    let count: number = beat.whammyBarPoints.length;
-                    let step: number = (60 / count) | 0;
-                    let i: number = 0;
-                    while (i < count) {
-                        beat.whammyBarPoints[i].offset = Math.min(60, i * step);
-                        i++;
-                    }
-                } else {
-                    beat.whammyBarPoints.sort((a, b) => {
-                        return a.offset - b.offset;
-                    });
-                }
+            } else {
+                beat.whammyBarPoints.sort((a, b) => {
+                    return a.offset - b.offset;
+                });
             }
             this._allowNegatives = false;
             if (this._sy !== AlphaTexSymbols.RParensis) {
@@ -1621,23 +1619,21 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                 }
                 const points = note.bendPoints;
-                if (points != null) {
-                    while (points.length > 60) {
-                        points.splice(points.length - 1, 1);
-                    }
-                    // set positions
-                    if (exact) {
-                        points.sort((a, b) => {
-                            return a.offset - b.offset;
-                        });
-                    } else {
-                        let count: number = points.length;
-                        let step: number = (60 / (count - 1)) | 0;
-                        let i: number = 0;
-                        while (i < count) {
-                            points[i].offset = Math.min(60, i * step);
-                            i++;
-                        }
+                while (points.length > 60) {
+                    points.splice(points.length - 1, 1);
+                }
+                // set positions
+                if (exact) {
+                    points.sort((a, b) => {
+                        return a.offset - b.offset;
+                    });
+                } else {
+                    let count: number = points.length;
+                    let step: number = (60 / (count - 1)) | 0;
+                    let i: number = 0;
+                    while (i < count) {
+                        points[i].offset = Math.min(60, i * step);
+                        i++;
                     }
                 }
                 if (this._sy !== AlphaTexSymbols.RParensis) {

@@ -571,8 +571,8 @@ export class GpifWriter {
     }
 
     private writeBend(properties: XmlNode, note: Note) {
-        if (note.hasBend && note.bendPoints!.length <= 4) {
-            this.writeStandardBend(properties, note.bendPoints!);
+        if (note.hasBend && note.bendPoints.length <= 4) {
+            this.writeStandardBend(properties, note.bendPoints);
         }
     }
 
@@ -830,8 +830,8 @@ export class GpifWriter {
     }
 
     private writeWhammyNode(parent: XmlNode, beat: Beat) {
-        if (beat.hasWhammyBar && beat.whammyBarPoints!.length <= 4) {
-            this.writeStandardWhammy(parent, beat.whammyBarPoints!);
+        if (beat.hasWhammyBar && beat.whammyBarPoints.length <= 4) {
+            this.writeStandardWhammy(parent, beat.whammyBarPoints);
         }
     }
 
@@ -1534,14 +1534,14 @@ export class GpifWriter {
     }
 
     private writeFermatas(parent: XmlNode, masterBar: MasterBar) {
-        const fermataCount = (masterBar.fermata?.size ?? 0);
+        const fermataCount = masterBar.fermata.size;
         if (fermataCount === 0) {
             return;
         }
 
         if (fermataCount > 0) {
             const fermatas = parent.addElement('Fermatas');
-            for (const [offset, fermata] of masterBar.fermata!) {
+            for (const [offset, fermata] of masterBar.fermata) {
                 this.writeFermata(fermatas, offset, fermata);
             }
         }

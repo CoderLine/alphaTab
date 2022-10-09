@@ -35,9 +35,7 @@ export class NoteSerializer {
         o.set("bendtype", obj.bendType as number); 
         o.set("bendstyle", obj.bendStyle as number); 
         o.set("iscontinuedbend", obj.isContinuedBend); 
-        if (obj.bendPoints !== null) {
-            o.set("bendpoints", obj.bendPoints?.map(i => BendPointSerializer.toJson(i)));
-        } 
+        o.set("bendpoints", obj.bendPoints.map(i => BendPointSerializer.toJson(i))); 
         o.set("fret", obj.fret); 
         o.set("string", obj.string); 
         o.set("octave", obj.octave); 
@@ -87,13 +85,11 @@ export class NoteSerializer {
                 obj.isContinuedBend = v! as boolean;
                 return true;
             case "bendpoints":
-                if (v) {
-                    obj.bendPoints = [];
-                    for (const o of (v as (Map<string, unknown> | null)[])) {
-                        const i = new BendPoint();
-                        BendPointSerializer.fromJson(i, o);
-                        obj.addBendPoint(i);
-                    }
+                obj.bendPoints = [];
+                for (const o of (v as (Map<string, unknown> | null)[])) {
+                    const i = new BendPoint();
+                    BendPointSerializer.fromJson(i, o);
+                    obj.addBendPoint(i);
                 }
                 return true;
             case "fret":

@@ -28,7 +28,7 @@ export class TabWhammyBarGlyph extends Glyph {
     private createRenderingPoints(beat: Beat): BendPoint[] {
         // advanced rendering
         if (beat.whammyBarType === WhammyType.Custom) {
-            return beat.whammyBarPoints!;
+            return beat.whammyBarPoints;
         }
         let renderingPoints: BendPoint[] = [];
         // Guitar Pro Rendering Note:
@@ -39,14 +39,14 @@ export class TabWhammyBarGlyph extends Glyph {
             case WhammyType.Hold:
             case WhammyType.PrediveDive:
             case WhammyType.Predive:
-                renderingPoints.push(new BendPoint(0, beat.whammyBarPoints![0].value));
-                renderingPoints.push(new BendPoint(BendPoint.MaxPosition, beat.whammyBarPoints![1].value));
+                renderingPoints.push(new BendPoint(0, beat.whammyBarPoints[0].value));
+                renderingPoints.push(new BendPoint(BendPoint.MaxPosition, beat.whammyBarPoints[1].value));
                 break;
             case WhammyType.Dip:
-                renderingPoints.push(new BendPoint(0, beat.whammyBarPoints![0].value));
-                renderingPoints.push(new BendPoint((BendPoint.MaxPosition / 2) | 0, beat.whammyBarPoints![1].value));
+                renderingPoints.push(new BendPoint(0, beat.whammyBarPoints[0].value));
+                renderingPoints.push(new BendPoint((BendPoint.MaxPosition / 2) | 0, beat.whammyBarPoints[1].value));
                 renderingPoints.push(
-                    new BendPoint(BendPoint.MaxPosition, beat.whammyBarPoints![beat.whammyBarPoints!.length - 1].value)
+                    new BendPoint(BendPoint.MaxPosition, beat.whammyBarPoints[beat.whammyBarPoints.length - 1].value)
                 );
                 break;
         }
@@ -75,7 +75,7 @@ export class TabWhammyBarGlyph extends Glyph {
         let topOffset: number = maxValue!.value > 0 ? Math.abs(this.getOffset(maxValue!.value)) : 0;
         if (
             topOffset > 0 ||
-            this._beat.whammyBarPoints![0].value !== 0 ||
+            this._beat.whammyBarPoints[0].value !== 0 ||
             this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys)
         ) {
             topOffset += this.renderer.resources.tablatureFont.size * 2;
