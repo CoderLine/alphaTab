@@ -803,10 +803,6 @@ export default class CSharpEmitterContext {
     protected buildCoreNamespace(aliasSymbol: ts.Symbol) {
         let suffix = '';
 
-        if (aliasSymbol.name === 'Map') {
-            return this.toPascalCase('alphaTab.collections') + suffix + '.';
-        }
-
         if (aliasSymbol.declarations) {
             for (const decl of aliasSymbol.declarations) {
                 let fileName = path.basename(decl.getSourceFile().fileName).toLowerCase();
@@ -830,9 +826,6 @@ export default class CSharpEmitterContext {
         return this.toPascalCase('alphaTab.core') + suffix + '.';
     }
     protected toCoreTypeName(s: string) {
-        if (s === 'Map') {
-            return 'IMap';
-        }
         return s;
     }
 
