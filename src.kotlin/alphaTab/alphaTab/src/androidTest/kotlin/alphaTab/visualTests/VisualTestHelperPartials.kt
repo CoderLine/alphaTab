@@ -26,73 +26,9 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalUnsignedTypes
 public class VisualTestHelperPartials {
     companion object {
-        public fun runVisualTest(
-            inputFile: String,
-            settings: Settings? = null,
-            tracks: DoubleList? = null,
-            message: String? = null,
-            tolerancePercent: Double = 1.0,
-            triggerResize: Boolean = false
-        ) {
-            try {
-                val fullInputFile = "test-data/visual-tests/$inputFile"
-                val inputFileData = TestPlatformPartials.loadFile(fullInputFile)
-                val referenceFileName = TestPlatform.changeExtension(fullInputFile, ".png")
-                val score = ScoreLoader.loadScoreFromBytes(inputFileData, settings)
-
-                runVisualTestScore(
-                    score,
-                    referenceFileName,
-                    settings,
-                    tracks,
-                    message,
-                    tolerancePercent,
-                    triggerResize
-                )
-            } catch (e: Throwable) {
-                Assert.fail("Failed to run visual test $e ${e.stackTraceToString()}")
-            }
-        }
-
-        public fun runVisualTestTex(
-            tex: String,
-            referenceFileName: String,
-            settings: Settings? = null,
-            tracks: DoubleList? = null,
-            message: String? = null,
-            tolerancePercent: Double = 1.0,
-            triggerResize: Boolean = false
-        ) {
-            try {
-                val actualSettings = settings ?: Settings()
-                val importer = AlphaTexImporter()
-                importer.init(ByteBuffer.fromString(tex), actualSettings)
-                val score = importer.readScore()
-
-                runVisualTestScore(
-                    score,
-                    referenceFileName,
-                    settings,
-                    tracks,
-                    message,
-                    tolerancePercent,
-                    triggerResize
-                )
-            } catch (e: Throwable) {
-                Assert.fail("Failed to run visual test $e")
-            }
-        }
-
         private var _initialized: Boolean = false
-        public fun runVisualTestScore(
-            score: Score,
-            referenceFileName: String,
-            settings: Settings? = null,
-            tracks: DoubleList? = null,
-            message: String? = null,
-            tolerancePercent: Double = 1.0,
-            triggerResize: Boolean = false
-        ) {
+
+        private fun prepareSettingsForTest(settings:Settings?) : Settings {
             if (!_initialized) {
                 SkiaCanvas.initialize(TestPlatformPartials.loadFile("test-data/../font/bravura/Bravura.ttf"))
                 Environment.renderEngines.set("skia", RenderEngineFactory(true) { SkiaCanvas() })
@@ -101,8 +37,6 @@ public class VisualTestHelperPartials {
             }
 
             val actualSettings = settings ?: Settings()
-            val actualTracks = tracks ?: DoubleList()
-
             actualSettings.core.engine = "skia"
             actualSettings.core.enableLazyLoading = false
             actualSettings.core.useWorkers = false
@@ -119,21 +53,36 @@ public class VisualTestHelperPartials {
             actualSettings.display.resources.fingeringFont.family = "PT Serif"
             actualSettings.display.resources.markerFont.family = "PT Serif"
 
+            return actualSettings
+        }
 
-            var actualReferenceFileName = referenceFileName
-            if (!actualReferenceFileName.startsWith("test-data/")) {
-                actualReferenceFileName = "test-data/visual-tests/$actualReferenceFileName"
+        public fun runVisualTestScoreWithResize(
+            score: Score,
+            widths: DoubleList,
+            referenceImages: alphaTab.collections.List<String?>,
+            settings: Settings? = null,
+            tracks: DoubleList? = null,
+            message: String? = null,
+            tolerancePercent: Double = 1.0
+        ) {
+            val actualSettings = prepareSettingsForTest(settings)
+            val actualTracks = tracks ?: DoubleList(0.0)
+
+            val referenceFileData = ArrayList<Uint8Array?>()
+            for (referenceFileName in referenceImages) {
+                if(referenceFileName == null) {
+                    referenceFileData.add(null)
+                } else {
+                    referenceFileData.add(TestPlatformPartials.loadFile("test-data/visual-tests/$referenceFileName"))
+                }
             }
 
-            val referenceFileData = TestPlatformPartials.loadFile(actualReferenceFileName)
-
-            val result = ArrayList<RenderFinishedEventArgs>()
-            var totalWidth = 0.0
-            var totalHeight = 0.0
-            var isResizeRender = false
+            val results = ArrayList<ArrayList<RenderFinishedEventArgs>>()
+            var totalWidths = DoubleList()
+            var totalHeights = DoubleList()
 
             val renderer = ScoreRenderer(actualSettings)
-            renderer.width = 1300.0
+            renderer.width = widths.shift()
 
             val waitHandle = Semaphore(1)
             waitHandle.acquire()
@@ -141,20 +90,22 @@ public class VisualTestHelperPartials {
             var error: Throwable? = null
 
             renderer.preRender.on { _ ->
-                result.clear()
+                results.add(ArrayList<RenderFinishedEventArgs>())
+                totalWidths.push(0.0)
+                totalHeights.push(0.0)
             }
             renderer.partialRenderFinished.on { e ->
-                result.add(e)
+                results.last().add(e)
             }
             renderer.renderFinished.on { e ->
-                totalWidth = e.totalWidth
-                totalHeight = e.totalHeight
-                result.add(e)
-                if (!triggerResize || isResizeRender) {
-                    waitHandle.release()
-                } else {
-                    isResizeRender = true
+                totalWidths[totalWidths.length.toInt() - 1] = e.totalWidth
+                totalHeights[totalHeights.length.toInt() - 1] = e.totalHeight
+                results.last().add(e)
+                if (widths.length > 0) {
+                    renderer.width = widths.shift()
                     renderer.resizeRender()
+                } else {
+                    waitHandle.release()
                 }
             }
             renderer.error.on { e ->
@@ -171,19 +122,23 @@ public class VisualTestHelperPartials {
                 }
             }
 
-            if (waitHandle.tryAcquire(2000, TimeUnit.MILLISECONDS)) {
+            if (waitHandle.tryAcquire(2000 * referenceImages.length.toLong(), TimeUnit.MILLISECONDS)) {
                 if (error != null) {
                     Assert.fail("Rendering failed with error $error ${error?.stackTraceToString()}")
                 } else {
-                    compareVisualResult(
-                        totalWidth,
-                        totalHeight,
-                        result,
-                        referenceFileName,
-                        referenceFileData,
-                        message,
-                        tolerancePercent
-                    )
+                    for((i,r) in results.withIndex()) {
+                        if(referenceImages[i] != null) {
+                            compareVisualResult(
+                                totalWidths[i],
+                                totalHeights[i],
+                                r,
+                                referenceImages[i]!!,
+                                referenceFileData[i]!!,
+                                message,
+                                tolerancePercent
+                            )
+                        }
+                    }
                 }
             } else {
                 job.cancel()

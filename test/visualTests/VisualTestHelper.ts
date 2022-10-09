@@ -15,10 +15,6 @@ import { JsonConverter } from '@src/model/JsonConverter';
  * @partial
  */
 export class VisualTestHelper {
-    /**
-     * @target web
-     * @partial
-     */
     public static async runVisualTest(
         inputFile: string,
         settings?: Settings,
@@ -46,10 +42,6 @@ export class VisualTestHelper {
         }
     }
 
-    /**
-     * @target web
-     * @partial
-     */
     public static async runVisualTestWithResize(
         inputFile: string,
         widths: number[],
@@ -57,8 +49,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1,
-        triggerResize: boolean = false
+        tolerancePercent: number = 1
     ): Promise<void> {
         try {
             const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
@@ -71,18 +62,13 @@ export class VisualTestHelper {
                 settings,
                 tracks,
                 message,
-                tolerancePercent,
-                triggerResize
+                tolerancePercent
             );
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
         }
     }
 
-    /**
-     * @target web
-     * @partial
-     */
     public static async runVisualTestTex(
         tex: string,
         referenceFileName: string,
@@ -100,7 +86,7 @@ export class VisualTestHelper {
             importer.init(ByteBuffer.fromString(tex), settings);
             let score: Score = importer.readScore();
 
-            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message);
+            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message, tolerancePercent);
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
         }
@@ -180,10 +166,6 @@ export class VisualTestHelper {
         }
     }
 
-    /**
-     * @target web
-     * @partial
-     */
     public static async runVisualTestScore(
         score: Score,
         referenceFileName: string,
@@ -193,89 +175,25 @@ export class VisualTestHelper {
         tolerancePercent: number = 1,
         triggerResize: boolean = false
     ): Promise<void> {
-        try {
-            if (!settings) {
-                settings = new Settings();
-            }
-            if (!tracks) {
-                tracks = [0];
-            }
-
-            await VisualTestHelper.prepareSettingsForTest(settings);
-
-            let referenceFileData: Uint8Array;
-            try {
-                referenceFileData = await TestPlatform.loadFile(`test-data/visual-tests/${referenceFileName}`);
-            } catch (e) {
-                referenceFileData = new Uint8Array(0);
-            }
-
-            const renderElement = document.createElement('div');
-            renderElement.style.width = '1300px';
-            renderElement.style.position = 'absolute';
-            renderElement.style.visibility = 'hidden';
-            document.body.appendChild(renderElement);
-
-            let result: RenderFinishedEventArgs[] = [];
-            let totalWidth: number = 0;
-            let totalHeight: number = 0;
-            let isResizeRender = false;
-            let render = new Promise<void>((resolve, reject) => {
-                const api = new AlphaTabApi(renderElement, settings);
-                api.renderStarted.on(isResize => {
-                    result = [];
-                    totalWidth = 0;
-                    totalHeight = 0;
-                });
-                api.renderer.partialRenderFinished.on(e => {
-                    if (e) {
-                        result.push(e);
-                    }
-                });
-                api.renderer.renderFinished.on(e => {
-                    totalWidth = e.totalWidth;
-                    totalHeight = e.totalHeight;
-                    result.push(e);
-
-                    if (!triggerResize || isResizeRender) {
-                        resolve();
-                    } else if (triggerResize) {
-                        isResizeRender = true;
-                        // @ts-ignore
-                        api.triggerResize();
-                    }
-                });
-                api.error.on(e => {
-                    reject(`Failed to render image: ${e}`);
-                });
-
-                // NOTE: on some platforms we serialize/deserialize the score objects
-                // this logic does the same just to ensure we get the right result
-                const renderScore = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
-                api.renderScore(renderScore, tracks);
-            });
-
-            await Promise.race([
-                render,
-                new Promise<void>((_, reject) => {
-                    setTimeout(() => {
-                        reject(new Error('Rendering did not complete in time'));
-                    }, 2000);
-                })
-            ]);
-
-            await VisualTestHelper.compareVisualResult(
-                totalWidth,
-                totalHeight,
-                result,
-                referenceFileName,
-                referenceFileData,
-                message,
-                tolerancePercent
-            );
-        } catch (e) {
-            fail(`Failed to run visual test ${e}`);
+        const widths = [1300];
+        if (triggerResize) {
+            widths.push(widths[0]);
         }
+
+        const referenceImages: (string | null)[] = [referenceFileName];
+        if (triggerResize) {
+            referenceImages.unshift(null);
+        }
+
+        await VisualTestHelper.runVisualTestScoreWithResize(
+            score,
+            widths,
+            referenceImages,
+            settings,
+            tracks,
+            message,
+            tolerancePercent
+        );
     }
 
     /**
@@ -285,12 +203,11 @@ export class VisualTestHelper {
     public static async runVisualTestScoreWithResize(
         score: Score,
         widths: number[],
-        referenceImages: string[],
+        referenceImages: (string | null)[],
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1,
-        triggerResize: boolean = false
+        tolerancePercent: number = 1
     ): Promise<void> {
         try {
             if (!settings) {
@@ -302,10 +219,14 @@ export class VisualTestHelper {
 
             await VisualTestHelper.prepareSettingsForTest(settings);
 
-            let referenceFileData: Uint8Array[] = [];
+            let referenceFileData: (Uint8Array | null)[] = [];
             for (const img of referenceImages) {
                 try {
-                    referenceFileData.push(await TestPlatform.loadFile(`test-data/visual-tests/${img}`));
+                    if (img !== null) {
+                        referenceFileData.push(await TestPlatform.loadFile(`test-data/visual-tests/${img}`));
+                    } else {
+                        referenceFileData.push(null);
+                    }
                 } catch (e) {
                     referenceFileData.push(new Uint8Array(0));
                 }
@@ -365,15 +286,17 @@ export class VisualTestHelper {
             ]);
 
             for (let i = 0; i < results.length; i++) {
-                await VisualTestHelper.compareVisualResult(
-                    totalWidths[i],
-                    totalHeights[i],
-                    results[i],
-                    referenceImages[i],
-                    referenceFileData[i],
-                    message,
-                    tolerancePercent
-                );
+                if (referenceImages[i] !== null) {
+                    await VisualTestHelper.compareVisualResult(
+                        totalWidths[i],
+                        totalHeights[i],
+                        results[i],
+                        referenceImages[i]!,
+                        referenceFileData[i]!,
+                        message,
+                        tolerancePercent
+                    );
+                }
             }
         } catch (e) {
             fail(`Failed to run visual test ${e}`);

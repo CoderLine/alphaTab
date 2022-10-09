@@ -115,6 +115,17 @@ public class DoubleList : IDoubleIterable {
         _items.sort(0, _size)
     }
 
+    public fun shift(): Double {
+        val d = _items[0]
+        if (_items.size > 1) {
+            _items = _items.copyOfRange(1, _items.size)
+        } else {
+            _items = DoubleArray(0)
+        }
+        _size--
+        return d
+    }
+
     public override fun iterator(): DoubleIterator {
         return Iterator(this)
     }

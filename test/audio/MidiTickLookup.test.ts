@@ -5,7 +5,7 @@ import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 
 describe('MidiTickLookupTest', () => {
-    async function buildLookup(score:Score, settings:Settings): Promise<MidiTickLookup> {
+    function buildLookup(score:Score, settings:Settings): MidiTickLookup {
         const midiFile = new MidiFile();
         const handler = new AlphaSynthMidiFileHandler(midiFile);
         const midiFileGenerator = new MidiFileGenerator(score, settings, handler);
@@ -17,7 +17,7 @@ describe('MidiTickLookupTest', () => {
         const buffer = await TestPlatform.loadFile('test-data/audio/cursor-snapping.gp');
         const settings = new Settings();
         const score = ScoreLoader.loadScoreFromBytes(buffer, settings);
-        const lookup = await buildLookup(score, settings);
+        const lookup = buildLookup(score, settings);
 
         // initial lookup should detect correctly first rest on first voice 
         // with the quarter rest on the second voice as next beat

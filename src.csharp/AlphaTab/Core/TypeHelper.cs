@@ -14,6 +14,21 @@ namespace AlphaTab.Core
             return new List<T>(values);
         }
 
+        public static void Add<T>(this IList<T> list, IList<T> newItems)
+        {
+            if(list is List<T> l)
+            {
+                l.AddRange(newItems);
+            }
+            else
+            {
+                foreach (var i in newItems)
+                {
+                    list.Add(i);
+                }
+            }
+        }
+
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
         {
             var items = data.GetRange((int) start, (int) deleteCount);
@@ -99,6 +114,13 @@ namespace AlphaTab.Core
         public static void Unshift<T>(this IList<T> data, T item)
         {
             data.Insert(0, item);
+        }
+
+        public static T Shift<T>(this IList<T> data)
+        {
+            var i = data[0];
+            data.RemoveAt(0);
+            return i;
         }
 
         public static T Pop<T>(this IList<T> data)
