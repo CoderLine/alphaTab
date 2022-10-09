@@ -28,6 +28,7 @@ import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
+import { ScalableHtmlElementContainer } from './ScalableHtmlElementContainer';
 
 /**
  * @target web
@@ -577,9 +578,13 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         cursorWrapper.classList.add('at-cursors');
         let selectionWrapper: HTMLElement = document.createElement('div');
         selectionWrapper.classList.add('at-selection');
-        let barCursor: HTMLElement = document.createElement('div');
+
+        const barCursorContainer = this.createScalingElement();
+        const beatCursorContainer = this.createScalingElement();
+
+        let barCursor: HTMLElement = barCursorContainer.element;
         barCursor.classList.add('at-cursor-bar');
-        let beatCursor: HTMLElement = document.createElement('div');
+        let beatCursor: HTMLElement = beatCursorContainer.element;
         beatCursor.classList.add('at-cursor-beat');
         // required css styles
         element.style.position = 'relative';
@@ -596,16 +601,18 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         barCursor.style.left = '0';
         barCursor.style.top = '0';
         barCursor.style.willChange = 'transform';
-        barCursor.style.width = '1px';
-        barCursor.style.height = '1px';
+        barCursorContainer.width = 1;
+        barCursorContainer.height = 1;
+        barCursorContainer.setBounds(0, 0, 1, 1);
 
         beatCursor.style.position = 'absolute';
         beatCursor.style.transition = 'all 0s linear';
         beatCursor.style.left = '0';
         beatCursor.style.top = '0';
         beatCursor.style.willChange = 'transform';
-        beatCursor.style.width = '3px';
-        beatCursor.style.height = '1px';
+        beatCursorContainer.width = 3;
+        beatCursorContainer.height = 1;
+        beatCursorContainer.setBounds(0, 0, 1, 1);
 
         // add cursors to UI
         element.insertBefore(cursorWrapper, element.firstChild);
@@ -614,8 +621,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         cursorWrapper.appendChild(beatCursor);
         return new Cursors(
             new HtmlElementContainer(cursorWrapper),
-            new HtmlElementContainer(barCursor),
-            new HtmlElementContainer(beatCursor),
+            barCursorContainer,
+            beatCursorContainer,
             new HtmlElementContainer(selectionWrapper)
         );
     }
@@ -676,11 +683,24 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public createSelectionElement(): IContainer | null {
-        let element: HTMLElement = document.createElement('div');
+        return this.createScalingElement();
+    }
+
+    public createScalingElement(): ScalableHtmlElementContainer {
+        const element = document.createElement('div');
         element.style.position = 'absolute';
-        element.style.width = '1px';
-        element.style.height = '1px';
-        return new HtmlElementContainer(element);
+
+        // to typical browser zoom levels are:
+        // Chromium: 25,33,50,67,75,80,90, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500
+        // Firefox: 30, 50, 67, 80, 90, 100, 110, 120, 133, 150, 170, 200, 240, 300, 400, 500
+
+        // with having a 100x100 scaling container we should be able to provide appropriate scaling
+
+        const container = new ScalableHtmlElementContainer(element, 100, 100);
+        container.width = 1;
+        container.height = 1;
+        container.setBounds(0, 0, 1, 1);
+        return container;
     }
 
     public scrollToY(element: IContainer, scrollTargetY: number, speed: number): void {
