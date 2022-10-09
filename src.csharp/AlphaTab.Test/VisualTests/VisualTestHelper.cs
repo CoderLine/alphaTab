@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using AlphaTab.Core;
 using AlphaTab.Core.EcmaScript;
-using AlphaTab.Importer;
-using AlphaTab.Io;
 using AlphaTab.Model;
 using AlphaTab.Platform.CSharp;
 using AlphaTab.Rendering;
@@ -37,9 +34,9 @@ namespace AlphaTab.VisualTests
                 }
             }
 
-            var results = new AlphaTab.Collections.List<AlphaTab.Collections.List<RenderFinishedEventArgs>>();
-            var totalWidths = new AlphaTab.Collections.List<double>();
-            var totalHeights =  new AlphaTab.Collections.List<double>();
+            var results = new List<List<RenderFinishedEventArgs>>();
+            var totalWidths = new List<double>();
+            var totalHeights =  new List<double>();
 
             var task = new TaskCompletionSource<object?>();
             var renderer = new ScoreRenderer(settings)
@@ -48,7 +45,7 @@ namespace AlphaTab.VisualTests
             };
             renderer.PreRender.On(isResize =>
             {
-                results.Add(new AlphaTab.Collections.List<RenderFinishedEventArgs>());
+                results.Add(new List<RenderFinishedEventArgs>());
                 totalWidths.Add(0);
                 totalHeights.Add(0);
             });
@@ -152,7 +149,7 @@ namespace AlphaTab.VisualTests
         }
 
         private static void CompareVisualResult(double totalWidth, double totalHeight,
-            AlphaTab.Collections.List<RenderFinishedEventArgs> result, string referenceFileName,
+            List<RenderFinishedEventArgs> result, string referenceFileName,
             Uint8Array referenceFileData, string? message, double tolerancePercent = 1)
         {
             SKBitmap finalBitmap;

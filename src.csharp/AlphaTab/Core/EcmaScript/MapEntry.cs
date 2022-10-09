@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace AlphaTab.Collections
+namespace AlphaTab.Core.EcmaScript
 {
-    public struct MapEntry<TKey, TValue>
+    public class MapEntry<TKey, TValue>
     {
         public TKey Key { get; set; }
         public TValue Value { get; set; }
@@ -11,12 +9,6 @@ namespace AlphaTab.Collections
         {
             Key = key;
             Value = value;
-        }
-
-        public MapEntry(KeyValuePair<TKey, TValue> kvp)
-        {
-            Key = kvp.Key;
-            Value = kvp.Value;
         }
 
         public void Deconstruct(out TKey key, out TValue value)

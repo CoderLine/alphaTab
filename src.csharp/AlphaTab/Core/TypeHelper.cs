@@ -48,7 +48,7 @@ namespace AlphaTab.Core
 
         public static IList<T> Slice<T>(this IList<T> data)
         {
-            return new AlphaTab.Collections.List<T>(data);
+            return new List<T>(data);
         }
 
         public static void Reverse<T>(this IList<T> data)
@@ -150,7 +150,7 @@ namespace AlphaTab.Core
 
         public static void InsertRange<T>(this IList<T> data, int index, IEnumerable<T> newItems)
         {
-            if (data is System.Collections.Generic.List<T> l)
+            if (data is List<T> l)
             {
                 l.InsertRange(index, newItems);
             }
@@ -168,7 +168,7 @@ namespace AlphaTab.Core
         {
             switch (data)
             {
-                case System.Collections.Generic.List<T> l:
+                case List<T> l:
                     l.Sort((a, b) => (int) func(a, b));
                     break;
                 case T[] array:
@@ -185,7 +185,7 @@ namespace AlphaTab.Core
         {
             switch (data)
             {
-                case System.Collections.Generic.List<T> l:
+                case List<T> l:
                     l.Sort();
                     break;
                 case T[] array:
@@ -275,19 +275,19 @@ namespace AlphaTab.Core
             return new List<string>(s.Split(new[] {separator}, StringSplitOptions.None));
         }
 
-        public static KeyValuePair<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
+        public static MapEntry<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
         {
-            return new KeyValuePair<double, TValue>(key, value);
+            return new MapEntry<double, TValue>(key, value);
         }
 
-        public static KeyValuePair<TKey, double> CreateMapEntry<TKey>(TKey key, int value)
+        public static MapEntry<TKey, double> CreateMapEntry<TKey>(TKey key, int value)
         {
-            return new KeyValuePair<TKey, double>(key, value);
+            return new MapEntry<TKey, double>(key, value);
         }
 
-        public static KeyValuePair<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
+        public static MapEntry<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
         {
-            return new KeyValuePair<TKey, TValue>(key, value);
+            return new MapEntry<TKey, TValue>(key, value);
         }
 
         public static string ToInvariantString(this double num, int radix)
