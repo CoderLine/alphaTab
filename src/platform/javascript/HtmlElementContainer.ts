@@ -141,27 +141,27 @@ export class HtmlElementContainer implements IContainer {
         this.setBounds(x, NaN, NaN, NaN);
     }
 
-    private _lastBounds: Bounds = new Bounds();
+    protected lastBounds: Bounds = new Bounds();
 
     public setBounds(x: number, y: number, w: number, h: number) {
         if (isNaN(x)) {
-            x = this._lastBounds.x;
+            x = this.lastBounds.x;
         }
         if (isNaN(y)) {
-            y = this._lastBounds.y;
+            y = this.lastBounds.y;
         }
         if (isNaN(w)) {
-            w = this._lastBounds.w;
+            w = this.lastBounds.w;
         }
         if (isNaN(h)) {
-            h = this._lastBounds.h;
+            h = this.lastBounds.h;
         }
         this.element.style.transform = `translate(${x}px, ${y}px) scale(${w}, ${h})`;
         this.element.style.transformOrigin = 'top left';
-        this._lastBounds.x = x;
-        this._lastBounds.y = y;
-        this._lastBounds.w = w;
-        this._lastBounds.h = h;
+        this.lastBounds.x = x;
+        this.lastBounds.y = y;
+        this.lastBounds.w = w;
+        this.lastBounds.h = h;
     }
 
     /**
