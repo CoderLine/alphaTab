@@ -33,7 +33,7 @@ export class Staff {
      * Gets or sets a list of all chords defined for this staff. {@link Beat.chordId} refers to entries in this lookup.
      * @json_add addChord
      */
-    public chords: Map<string, Chord> | null = null;
+    public chords: Map<string, Chord> = new Map<string, Chord>();
 
     /**
      * Gets or sets the fret on which a capo is set.
@@ -57,7 +57,7 @@ export class Staff {
      * guitar tablature. Unlike the {@link Note.string} property this array directly represents
      * the order of the tracks shown in the tablature. The first item is the most top tablature line.
      */
-    public stringTuning: Tuning = new Tuning("", [], false);
+    public stringTuning: Tuning = new Tuning('', [], false);
 
     /**
      * Get or set the values of the related guitar tuning.
@@ -93,12 +93,12 @@ export class Staff {
     public isPercussion: boolean = false;
 
     /**
-     * The number of lines shown for the standard notation. 
-     * For some percussion instruments this number might vary. 
+     * The number of lines shown for the standard notation.
+     * For some percussion instruments this number might vary.
      */
     public standardNotationLineCount: number = 5;
 
-    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         this.stringTuning.finish();
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
             this.bars[i].finish(settings, sharedDataBag);
@@ -107,22 +107,16 @@ export class Staff {
 
     public addChord(chordId: string, chord: Chord): void {
         chord.staff = this;
-        let chordMap = this.chords;
-        if (chordMap === null) {
-            chordMap = new Map<string, Chord>();
-            this.chords = chordMap;
-        }
-        chordMap.set(chordId, chord);
+        this.chords.set(chordId, chord);
     }
 
     public hasChord(chordId: string): boolean {
-        return this.chords?.has(chordId) ?? false
+        return this.chords.has(chordId);
     }
 
     public getChord(chordId: string): Chord | null {
-        return this.chords?.get(chordId) ?? null
+        return this.chords.get(chordId)!;
     }
-    
 
     public addBar(bar: Bar): void {
         let bars: Bar[] = this.bars;

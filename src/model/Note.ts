@@ -396,7 +396,7 @@ export class Note {
     /**
      * Gets the desination of the tie.
      * @clone_ignore
-     * @json_ignore 
+     * @json_ignore
      */
     public tieDestination: Note | null = null;
 
@@ -614,11 +614,15 @@ export class Note {
         } else if (this.bendOrigin) {
             return Math.floor(this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2);
         } else if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
-            return Math.floor(this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2);
+            return Math.floor(
+                this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2
+            );
         } else if (this.beat.hasWhammyBar) {
             return Math.floor(this.beat.whammyBarPoints[0].value / 2);
         } else if (this.beat.isContinuedWhammy) {
-            return Math.floor(this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value / 2);
+            return Math.floor(
+                this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value / 2
+            );
         }
         return 0;
     }
@@ -680,7 +684,7 @@ export class Note {
         if (this.beat.isContinuedWhammy) {
             return (
                 this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value %
-                2 !==
+                    2 !==
                 0
             );
         }
@@ -697,7 +701,7 @@ export class Note {
         }
     }
 
-    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         let nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
         let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
 
@@ -948,11 +952,16 @@ export class Note {
         return null;
     }
 
-    private static NoteIdLookupKey = "NoteIdLookup";
+    private static NoteIdLookupKey = 'NoteIdLookup';
 
     private _noteIdBag: NoteIdBag | null = null;
-    public chain(sharedDataBag: Map<string, unknown>) {
-        // if we have some IDs from a serialization flow, 
+    public chain(sharedDataBag: Map<string, unknown> | null = null) {
+        // mainly for backwards compat in case we reach this code from somewhere outside.
+        if (sharedDataBag === null) {
+            return;
+        }
+
+        // if we have some IDs from a serialization flow,
         // we need to lookup/register the notes correctly
         if (this._noteIdBag !== null) {
             // get or create lookup
@@ -966,13 +975,15 @@ export class Note {
 
             // if this note is a source note for any effect, remember it for later
             // the destination note will look it up for linking
-            if (this._noteIdBag.hammerPullDestinationNoteId !== -1 ||
+            if (
+                this._noteIdBag.hammerPullDestinationNoteId !== -1 ||
                 this._noteIdBag.tieDestinationNoteId !== -1 ||
-                this._noteIdBag.slurDestinationNoteId !== -1) {
+                this._noteIdBag.slurDestinationNoteId !== -1
+            ) {
                 noteIdLookup.set(this.id, this);
             }
 
-            // on any effect destiniation, lookup the origin which should already be 
+            // on any effect destiniation, lookup the origin which should already be
             // registered
             if (this._noteIdBag.hammerPullOriginNoteId !== -1) {
                 this.hammerPullOrigin = noteIdLookup.get(this._noteIdBag.hammerPullOriginNoteId)!;
@@ -1015,22 +1026,22 @@ export class Note {
     public toJson(o: Map<string, unknown>) {
         // inject linked note ids into JSON
         if (this.tieDestination !== null) {
-            o.set("tiedestinationnoteid", this.tieDestination.id)
+            o.set('tiedestinationnoteid', this.tieDestination.id);
         }
         if (this.tieOrigin !== null) {
-            o.set("tieoriginnoteid", this.tieOrigin.id)
+            o.set('tieoriginnoteid', this.tieOrigin.id);
         }
         if (this.slurDestination !== null) {
-            o.set("slurdestinationnoteid", this.slurDestination.id)
+            o.set('slurdestinationnoteid', this.slurDestination.id);
         }
         if (this.slurOrigin !== null) {
-            o.set("sluroriginnoteid", this.slurOrigin.id)
+            o.set('sluroriginnoteid', this.slurOrigin.id);
         }
         if (this.hammerPullOrigin !== null) {
-            o.set("hammerpulloriginnoteid", this.hammerPullOrigin.id)
+            o.set('hammerpulloriginnoteid', this.hammerPullOrigin.id);
         }
         if (this.hammerPullDestination !== null) {
-            o.set("hammerpulldestinationnoteid", this.hammerPullDestination.id)
+            o.set('hammerpulldestinationnoteid', this.hammerPullDestination.id);
         }
     }
 
@@ -1039,39 +1050,39 @@ export class Note {
      */
     public setProperty(property: string, v: unknown): boolean {
         switch (property) {
-            case "tiedestinationnoteid":
+            case 'tiedestinationnoteid':
                 if (this._noteIdBag === null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.tieDestinationNoteId = v as number;
                 return true;
-            case "tieoriginnoteid":
+            case 'tieoriginnoteid':
                 if (this._noteIdBag === null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.tieOriginNoteId = v as number;
                 return true;
 
-            case "slurdestinationnoteid":
+            case 'slurdestinationnoteid':
                 if (this._noteIdBag === null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.slurDestinationNoteId = v as number;
                 return true;
-            case "sluroriginnoteid":
+            case 'sluroriginnoteid':
                 if (this._noteIdBag === null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.slurOriginNoteId = v as number;
                 return true;
 
-            case "hammerpulloriginnoteid":
+            case 'hammerpulloriginnoteid':
                 if (this._noteIdBag === null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.hammerPullOriginNoteId = v as number;
                 return true;
-            case "hammerpulldestinationnoteid":
+            case 'hammerpulldestinationnoteid':
                 if (this._noteIdBag === null) {
                     this._noteIdBag = new NoteIdBag();
                 }

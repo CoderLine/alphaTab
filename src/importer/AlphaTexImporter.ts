@@ -763,7 +763,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('tuning', AlphaTexSymbols.Tuning, true);
                         break;
                 }
-                if (strings !== this._currentStaff.tuning.length && (this._currentStaff.chords?.size ?? 0) > 0) {
+                if (strings !== this._currentStaff.tuning.length && this._currentStaff.chords.size > 0) {
                     this.errorMessage('Tuning must be defined before any chord');
                 }
                 return true;

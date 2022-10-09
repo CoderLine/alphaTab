@@ -191,13 +191,11 @@ export abstract class ScoreLayout {
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
                     const sc = staff.chords;
-                    if (sc) {
-                        for (const [chordId, chord] of sc) {
-                            if (!chords.has(chordId)) {
-                                if (chord.showDiagram) {
-                                    chords.set(chordId, chord);
-                                    this.chordDiagrams!.addChord(chord);
-                                }
+                    for (const [chordId, chord] of sc) {
+                        if (!chords.has(chordId)) {
+                            if (chord.showDiagram) {
+                                chords.set(chordId, chord);
+                                this.chordDiagrams!.addChord(chord);
                             }
                         }
                     }

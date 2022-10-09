@@ -477,7 +477,7 @@ export class GpImporterTestHelper {
     public static checkChords(score: Score): void {
         let track: Track = score.tracks[0];
         let staff: Staff = track.staves[0];
-        expect(staff.chords!.size).toEqual(8);
+        expect(staff.chords.size).toEqual(8);
 
         GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('C', 1, [0, 1, 0, 2, 3, -1]),

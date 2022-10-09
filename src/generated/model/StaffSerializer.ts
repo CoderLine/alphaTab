@@ -23,7 +23,7 @@ export class StaffSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("bars", obj.bars.map(i => BarSerializer.toJson(i))); 
-        if (obj.chords !== null) {
+        {
             const m = new Map<string, unknown>();
             o.set("chords", m);
             for (const [k, v] of obj.chords!) {

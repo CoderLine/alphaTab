@@ -71,7 +71,7 @@ export class Track {
         this.staves.push(staff);
     }
 
-    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         if (!this.shortName) {
             this.shortName = this.name;
             if (this.shortName.length > Track.ShortNameMaxLength) {

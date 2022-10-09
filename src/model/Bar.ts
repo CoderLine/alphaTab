@@ -65,11 +65,10 @@ export class Bar {
     public simileMark: SimileMark = SimileMark.None;
 
     /**
-     * Gets a value indicating whether this bar contains multiple voices with notes. 
+     * Gets a value indicating whether this bar contains multiple voices with notes.
      * @json_ignore
      */
     public isMultiVoice: boolean = false;
-
 
     public get masterBar(): MasterBar {
         return this.staff.track.score.masterBars[this.index];
@@ -90,12 +89,12 @@ export class Bar {
         this.voices.push(voice);
     }
 
-    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         this.isMultiVoice = false;
         for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
             let voice: Voice = this.voices[i];
             voice.finish(settings, sharedDataBag);
-            if(i > 0 && !voice.isEmpty) {
+            if (i > 0 && !voice.isEmpty) {
                 this.isMultiVoice = true;
             }
         }
