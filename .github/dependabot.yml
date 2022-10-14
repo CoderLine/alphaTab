@@ -2,15 +2,24 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
+    labels:
+      - area-dependencies
+      - platform-javascript
     schedule:
       interval: "weekly"
       
   - package-ecosystem: "nuget"
     directory: "/src.csharp"
+    labels:
+      - area-dependencies
+      - platform-net
     schedule:
       interval: "weekly"
             
   - package-ecosystem: "gradle"
     directory: "/src.kotlin/alphaTab"
+    labels:
+      - area-dependencies
+      - platform-java
     schedule:
       interval: "weekly"
