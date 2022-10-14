@@ -10,7 +10,7 @@
     <Product>AlphaTab</Product>
     <NeutralLanguage>en</NeutralLanguage>
     <Description>alphaTab is a cross platform music notation and guitar tablature rendering library.</Description>
-    <Copyright>Copyright © 2021, Daniel Kuschny and Contributors</Copyright>
+    <Copyright>Copyright © 2022, Daniel Kuschny and Contributors</Copyright>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://www.alphatab.net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/CoderLine/alphaTab</RepositoryUrl>
