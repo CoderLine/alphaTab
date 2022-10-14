@@ -15,7 +15,7 @@ plugins {
     id("com.android.library")
     `maven-publish`
     signing
-    id("org.jetbrains.dokka") version "1.7.10"
+    id("org.jetbrains.dokka") version "1.7.20"
 
     // iOS
     //    kotlin("native.cocoapods")
@@ -90,7 +90,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 32
+    compileSdk = 33
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDirs(
@@ -126,7 +126,7 @@ android {
 
     defaultConfig {
         minSdk = 24
-        targetSdk = 31
+        targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
