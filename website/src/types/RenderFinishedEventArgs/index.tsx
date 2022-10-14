@@ -6,15 +6,15 @@ export function RenderFinishedEventArgs() {
         <ParameterTable>
             <ParameterRow platform="all" name="id" type="string">
                 The unique id of the chunk to request rendering through [`renderResult`](/docs/reference/scorerenderer/renderresult)
-                Since <span className="badge badge--info">1.3.0-alpha.139</span>
+                Since <span className="badge badge--info">1.2.3</span>
             </ParameterRow>
             <ParameterRow platform="all" name="x" type="int">
                 The absolute x-position of the chunk within the overall music sheet.
-                Since <span className="badge badge--info">1.3.0-alpha.139</span>
+                Since <span className="badge badge--info">1.2.3</span>
             </ParameterRow>
             <ParameterRow platform="all" name="y" type="int">
                 The absolute y-position of the chunk within the overall music sheet.
-                Since <span className="badge badge--info">1.3.0-alpha.139</span>
+                Since <span className="badge badge--info">1.2.3</span>
             </ParameterRow>
             <ParameterRow platform="all" name="width" type="int">
                 The width of the current rendering result.

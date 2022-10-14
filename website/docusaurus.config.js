@@ -126,6 +126,13 @@ const config = {
   plugins: [
     "docusaurus-plugin-sass",
     require.resolve("@cmfcmf/docusaurus-search-local"),
+    // [
+    //   require.resolve("./plugins/tsdoc"),
+    //   {
+    //     in: './node_modules/@coderline/alphatab/dist/alphaTab.d.ts',
+    //     out: path.resolve('docs', "tsdoc")
+    //   }
+    // ],
     () => ({
       name: "docusaurus-customization",
       injectHtmlTags() {
