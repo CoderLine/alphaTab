@@ -479,7 +479,7 @@ export class MidiFileGenerator {
             this.generateWhammy(note.beat, noteStart, noteDuration, channel);
         } else if (note.slideInType !== SlideInType.None || note.slideOutType !== SlideOutType.None) {
             this.generateSlide(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
-        } else if (note.vibrato !== VibratoType.None) {
+        } else if (note.vibrato !== VibratoType.None ||  (note.isTieDestination && note.tieOrigin!.vibrato !== VibratoType.None)) {
             this.generateVibrato(note, noteStart, noteDuration, noteKey, channel);
         }
 
@@ -673,7 +673,11 @@ export class MidiFileGenerator {
     ): void {
         let phaseLength: number = 0;
         let bendAmplitude: number = 0;
-        switch (note.vibrato) {
+        const vibratoType = note.vibrato !== VibratoType.None ? note.vibrato : (
+            note.isTieDestination ? note.tieOrigin!.vibrato : 
+            VibratoType.Slight /* should never happen unless called wrongly */
+        );
+        switch (vibratoType) {
             case VibratoType.Slight:
                 phaseLength = this._settings.player.vibrato.noteSlightLength;
                 bendAmplitude = this._settings.player.vibrato.noteSlightAmplitude;
@@ -691,6 +695,8 @@ export class MidiFileGenerator {
         });
     }
 
+
+    public vibratoResolution:number = 16;
     private generateVibratorWithParams(
         noteStart: number,
         noteDuration: number,
@@ -698,7 +704,7 @@ export class MidiFileGenerator {
         bendAmplitude: number,
         addBend: (tick: number, value: number) => void
     ): void {
-        const resolution: number = 16;
+        const resolution: number = this.vibratoResolution;
         const phaseHalf: number = (phaseLength / 2) | 0;
         // 1st Phase stays at bend 0,
         // then we have a sine wave with the given amplitude and phase length
