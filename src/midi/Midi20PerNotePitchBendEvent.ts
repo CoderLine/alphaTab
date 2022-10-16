@@ -19,7 +19,7 @@ export class Midi20PerNotePitchBendEvent extends MidiEvent {
      * Writes the midi event as binary into the given stream.
      * @param s The stream to write to.
      */
-    public writeTo(s: IWriteable): void {
+    public override writeTo(s: IWriteable): void {
         let b: Uint8Array = new Uint8Array([
             0x40,
             this.message & 0xff,

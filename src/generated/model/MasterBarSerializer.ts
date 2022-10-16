@@ -19,87 +19,87 @@ export class MasterBarSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: MasterBar | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("alternateEndings", obj.alternateEndings); 
-        o.set("keySignature", (obj.keySignature as number)); 
-        o.set("keySignatureType", (obj.keySignatureType as number)); 
-        o.set("isDoubleBar", obj.isDoubleBar); 
-        o.set("isRepeatStart", obj.isRepeatStart); 
-        o.set("repeatCount", obj.repeatCount); 
-        o.set("timeSignatureNumerator", obj.timeSignatureNumerator); 
-        o.set("timeSignatureDenominator", obj.timeSignatureDenominator); 
-        o.set("timeSignatureCommon", obj.timeSignatureCommon); 
-        o.set("tripletFeel", (obj.tripletFeel as number)); 
+        o.set("alternateendings", obj.alternateEndings); 
+        o.set("keysignature", obj.keySignature as number); 
+        o.set("keysignaturetype", obj.keySignatureType as number); 
+        o.set("isdoublebar", obj.isDoubleBar); 
+        o.set("isrepeatstart", obj.isRepeatStart); 
+        o.set("repeatcount", obj.repeatCount); 
+        o.set("timesignaturenumerator", obj.timeSignatureNumerator); 
+        o.set("timesignaturedenominator", obj.timeSignatureDenominator); 
+        o.set("timesignaturecommon", obj.timeSignatureCommon); 
+        o.set("tripletfeel", obj.tripletFeel as number); 
         o.set("section", SectionSerializer.toJson(obj.section)); 
-        o.set("tempoAutomation", AutomationSerializer.toJson(obj.tempoAutomation)); 
+        o.set("tempoautomation", AutomationSerializer.toJson(obj.tempoAutomation)); 
         {
             const m = new Map<string, unknown>();
             o.set("fermata", m);
-            for (const [k, v] of obj.fermata) {
+            for (const [k, v] of obj.fermata!) {
                 m.set(k.toString(), FermataSerializer.toJson(v));
             }
         } 
         o.set("start", obj.start); 
-        o.set("isAnacrusis", obj.isAnacrusis); 
+        o.set("isanacrusis", obj.isAnacrusis); 
         return o; 
     }
     public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
         switch (property) {
             case "alternateendings":
-                obj.alternateEndings = (v as number);
+                obj.alternateEndings = v! as number;
                 return true;
             case "keysignature":
-                obj.keySignature = (JsonHelper.parseEnum<KeySignature>(v, KeySignature)!);
+                obj.keySignature = JsonHelper.parseEnum<KeySignature>(v, KeySignature)!;
                 return true;
             case "keysignaturetype":
-                obj.keySignatureType = (JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!);
+                obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!;
                 return true;
             case "isdoublebar":
-                obj.isDoubleBar = (v as boolean);
+                obj.isDoubleBar = v! as boolean;
                 return true;
             case "isrepeatstart":
-                obj.isRepeatStart = (v as boolean);
+                obj.isRepeatStart = v! as boolean;
                 return true;
             case "repeatcount":
-                obj.repeatCount = (v as number);
+                obj.repeatCount = v! as number;
                 return true;
             case "timesignaturenumerator":
-                obj.timeSignatureNumerator = (v as number);
+                obj.timeSignatureNumerator = v! as number;
                 return true;
             case "timesignaturedenominator":
-                obj.timeSignatureDenominator = (v as number);
+                obj.timeSignatureDenominator = v! as number;
                 return true;
             case "timesignaturecommon":
-                obj.timeSignatureCommon = (v as boolean);
+                obj.timeSignatureCommon = v! as boolean;
                 return true;
             case "tripletfeel":
-                obj.tripletFeel = (JsonHelper.parseEnum<TripletFeel>(v, TripletFeel)!);
+                obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(v, TripletFeel)!;
                 return true;
             case "fermata":
                 obj.fermata = new Map<number, Fermata>();
                 JsonHelper.forEach(v, (v, k) => {
                     const i = new Fermata(); 
-                    FermataSerializer.fromJson(i, (v as Map<string, unknown>)); 
-                    obj.fermata.set(parseInt(k), i); 
+                    FermataSerializer.fromJson(i, v as Map<string, unknown>); 
+                    obj.addFermata(parseInt(k), i); 
                 });
                 return true;
             case "start":
-                obj.start = (v as number);
+                obj.start = v! as number;
                 return true;
             case "isanacrusis":
-                obj.isAnacrusis = (v as boolean);
+                obj.isAnacrusis = v! as boolean;
                 return true;
         } 
         if (["section"].indexOf(property) >= 0) {
             if (v) {
                 obj.section = new Section();
-                SectionSerializer.fromJson(obj.section, (v as Map<string, unknown>));
+                SectionSerializer.fromJson(obj.section, v as Map<string, unknown>);
             }
             else {
                 obj.section = null;
@@ -109,7 +109,7 @@ export class MasterBarSerializer {
         if (["tempoautomation"].indexOf(property) >= 0) {
             if (v) {
                 obj.tempoAutomation = new Automation();
-                AutomationSerializer.fromJson(obj.tempoAutomation, (v as Map<string, unknown>));
+                AutomationSerializer.fromJson(obj.tempoAutomation, v as Map<string, unknown>);
             }
             else {
                 obj.tempoAutomation = null;

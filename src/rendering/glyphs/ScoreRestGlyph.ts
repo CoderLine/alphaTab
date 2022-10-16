@@ -62,7 +62,7 @@ export class ScoreRestGlyph extends MusicFontGlyph {
         return 10;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = ScoreRestGlyph.getSize(this._duration) * this.scale;
     }
 
@@ -70,7 +70,7 @@ export class ScoreRestGlyph extends MusicFontGlyph {
         if (this.beamingHelper) {
             this.beamingHelper.registerBeatLineX(
                 'score',
-                this.beat,
+                this.beat!,
                 cx + this.x + this.width / 2,
                 cx + this.x + this.width / 2
             );

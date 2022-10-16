@@ -5,12 +5,13 @@ import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 
 export class BeatGlyphBase extends GlyphGroup {
     public container!: BeatContainerGlyph;
+    public computedWidth: number = 0;
 
     public constructor() {
         super(0, 0);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         // left to right layout
         let w: number = 0;
         if (this.glyphs) {
@@ -23,6 +24,7 @@ export class BeatGlyphBase extends GlyphGroup {
             }
         }
         this.width = w;
+        this.computedWidth = w;
     }
 
     protected noteLoop(action: (note: Note) => void): void {

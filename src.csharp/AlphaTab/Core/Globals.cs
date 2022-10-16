@@ -7,6 +7,11 @@ namespace AlphaTab.Core
         public const double NaN = double.NaN;
         public static Console Console { get; } = new Console();
 
+        public static double ParseInt(char c)
+        {
+            return ParseInt(c.ToString());
+        }
+
         public static double ParseInt(string s)
         {
             if (double.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d))
@@ -15,6 +20,11 @@ namespace AlphaTab.Core
             }
 
             return double.NaN;
+        }
+
+        public static double ParseInt(char c, int radix)
+        {
+            return ParseInt(c.ToString(), radix);
         }
 
         public static double ParseInt(string s, int radix)

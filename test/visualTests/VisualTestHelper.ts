@@ -8,26 +8,62 @@ import { Environment } from '@src/Environment';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { PixelMatch } from './PixelMatch';
+import { PixelMatch, PixelMatchOptions } from '@test/visualTests/PixelMatch';
 import { JsonConverter } from '@src/model/JsonConverter';
 
 /**
  * @partial
- * @target web
  */
 export class VisualTestHelper {
     public static async runVisualTest(
         inputFile: string,
         settings?: Settings,
         tracks?: number[],
-        message?: string
+        message?: string,
+        tolerancePercent: number = 1,
+        triggerResize: boolean = false
     ): Promise<void> {
         try {
             const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
             const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
             let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
-            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message);
+            await VisualTestHelper.runVisualTestScore(
+                score,
+                referenceFileName,
+                settings,
+                tracks,
+                message,
+                tolerancePercent,
+                triggerResize
+            );
+        } catch (e) {
+            fail(`Failed to run visual test ${e}`);
+        }
+    }
+
+    public static async runVisualTestWithResize(
+        inputFile: string,
+        widths: number[],
+        referenceImages: string[],
+        settings?: Settings,
+        tracks?: number[],
+        message?: string,
+        tolerancePercent: number = 1
+    ): Promise<void> {
+        try {
+            const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
+            let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
+
+            await VisualTestHelper.runVisualTestScoreWithResize(
+                score,
+                widths,
+                referenceImages,
+                settings,
+                tracks,
+                message,
+                tolerancePercent
+            );
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
         }
@@ -38,7 +74,8 @@ export class VisualTestHelper {
         referenceFileName: string,
         settings?: Settings,
         tracks?: number[],
-        message?: string
+        message?: string,
+        tolerancePercent: number = 1
     ): Promise<void> {
         try {
             if (!settings) {
@@ -49,9 +86,83 @@ export class VisualTestHelper {
             importer.init(ByteBuffer.fromString(tex), settings);
             let score: Score = importer.readScore();
 
-            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message);
+            await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings, tracks, message, tolerancePercent);
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
+        }
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    private static _fontsLoaded = false;
+
+    /**
+     * @target web
+     * @partial
+     */
+    private static async loadFonts(): Promise<void> {
+        if (VisualTestHelper._fontsLoaded) {
+            return;
+        }
+        VisualTestHelper._fontsLoaded = true;
+        const allFonts: FontFace[] = [];
+
+        const robotoRegular = new FontFace('Roboto', 'url(/base/font/roboto/Roboto-Regular.ttf)', {
+            weight: '400',
+            style: 'normal'
+        });
+        allFonts.push(robotoRegular);
+
+        const robotoItalic = new FontFace('Roboto', 'url(/base/font/roboto/Roboto-Italic.ttf)', {
+            weight: '400',
+            style: 'italic'
+        });
+        allFonts.push(robotoItalic);
+
+        const robotoBold = new FontFace('Roboto', 'url(/base/font/roboto/Roboto-Bold.ttf)', {
+            weight: '700',
+            style: 'normal'
+        });
+        allFonts.push(robotoBold);
+
+        const robotoBoldItalic = new FontFace('Roboto', 'url(/base/font/roboto/Roboto-BoldItalic.ttf)', {
+            weight: '700',
+            style: 'italic'
+        });
+        allFonts.push(robotoBoldItalic);
+
+        const ptserifRegular = new FontFace('PT Serif', 'url(/base/font/ptserif/PTSerif-Regular.ttf)', {
+            weight: '400',
+            style: 'normal'
+        });
+        allFonts.push(ptserifRegular);
+
+        const ptserifItalic = new FontFace('PT Serif', 'url(/base/font/ptserif/PTSerif-Italic.ttf)', {
+            weight: '400',
+            style: 'italic'
+        });
+        allFonts.push(ptserifItalic);
+
+        const ptserifBold = new FontFace('PT Serif', 'url(/base/font/ptserif/PTSerif-Bold.ttf)', {
+            weight: '700',
+            style: 'normal'
+        });
+        allFonts.push(ptserifBold);
+
+        const ptserifBoldItalic = new FontFace('PT Serif', 'url(/base/font/ptserif/PTSerif-BoldItalic.ttf)', {
+            weight: '700',
+            style: 'italic'
+        });
+        allFonts.push(ptserifBoldItalic);
+
+        const promises = allFonts.map(f => f.load());
+
+        await Promise.all(promises);
+
+        for (const font of allFonts) {
+            (document.fonts as any).add(font);
         }
     }
 
@@ -60,7 +171,43 @@ export class VisualTestHelper {
         referenceFileName: string,
         settings?: Settings,
         tracks?: number[],
-        message?: string
+        message?: string,
+        tolerancePercent: number = 1,
+        triggerResize: boolean = false
+    ): Promise<void> {
+        const widths = [1300];
+        if (triggerResize) {
+            widths.push(widths[0]);
+        }
+
+        const referenceImages: (string | null)[] = [referenceFileName];
+        if (triggerResize) {
+            referenceImages.unshift(null);
+        }
+
+        await VisualTestHelper.runVisualTestScoreWithResize(
+            score,
+            widths,
+            referenceImages,
+            settings,
+            tracks,
+            message,
+            tolerancePercent
+        );
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static async runVisualTestScoreWithResize(
+        score: Score,
+        widths: number[],
+        referenceImages: (string | null)[],
+        settings?: Settings,
+        tracks?: number[],
+        message?: string,
+        tolerancePercent: number = 1
     ): Promise<void> {
         try {
             if (!settings) {
@@ -70,61 +217,54 @@ export class VisualTestHelper {
                 tracks = [0];
             }
 
-            settings.core.fontDirectory = CoreSettings.ensureFullUrl('/base/font/bravura/');
-            settings.core.engine = 'html5';
-            Environment.HighDpiFactor = 1; // test data is in scale 1
-            settings.core.enableLazyLoading = false;
+            await VisualTestHelper.prepareSettingsForTest(settings);
 
-            let referenceFileData: Uint8Array;
-            try {
-                referenceFileData = await TestPlatform.loadFile(`test-data/visual-tests/${referenceFileName}`);
-            } catch (e) {
-                referenceFileData = new Uint8Array(0);
+            let referenceFileData: (Uint8Array | null)[] = [];
+            for (const img of referenceImages) {
+                try {
+                    if (img !== null) {
+                        referenceFileData.push(await TestPlatform.loadFile(`test-data/visual-tests/${img}`));
+                    } else {
+                        referenceFileData.push(null);
+                    }
+                } catch (e) {
+                    referenceFileData.push(new Uint8Array(0));
+                }
             }
 
             const renderElement = document.createElement('div');
-            renderElement.style.width = '1300px';
+            renderElement.style.width = `${widths.shift()}px`;
             renderElement.style.position = 'absolute';
             renderElement.style.visibility = 'hidden';
             document.body.appendChild(renderElement);
 
-            // here we need to trick a little bit, normally SVG does not require the font to be loaded
-            // before rendering starts, but in our case we need it to convert it later for diffing to raster.
-            // so we initiate the bravura load and wait for it before proceeding with rendering.
-            Environment.createStyleElement(document, settings.core.fontDirectory);
-            await Promise.race([
-                new Promise<void>((resolve, reject) => {
-                    if (Environment.bravuraFontChecker.isFontLoaded) {
-                        resolve();
-                    } else {
-                        Environment.bravuraFontChecker.fontLoaded.on(() => {
-                            resolve();
-                        });
-                        Environment.bravuraFontChecker.checkForFontAvailability();
-                    }
-                }),
-                new Promise<void>((_, reject) => {
-                    setTimeout(() => {
-                        reject(new Error('Font loading did not complete in time'));
-                    }, 2000);
-                })
-            ]);
-
-            let result: RenderFinishedEventArgs[] = [];
-            let totalWidth: number = 0;
-            let totalHeight: number = 0;
+            let results: RenderFinishedEventArgs[][] = [];
+            let totalWidths: number[] = [];
+            let totalHeights: number[] = [];
             let render = new Promise<void>((resolve, reject) => {
                 const api = new AlphaTabApi(renderElement, settings);
+                api.renderStarted.on(_ => {
+                    results.push([]);
+                    totalWidths.push(0);
+                    totalHeights.push(0);
+                });
                 api.renderer.partialRenderFinished.on(e => {
                     if (e) {
-                        result.push(e);
+                        results[results.length - 1].push(e);
                     }
                 });
                 api.renderer.renderFinished.on(e => {
-                    totalWidth = e.totalWidth;
-                    totalHeight = e.totalHeight;
-                    result.push(e);
-                    resolve();
+                    totalWidths[totalWidths.length - 1] = e.totalWidth;
+                    totalHeights[totalHeights.length - 1] = e.totalHeight;
+                    results[results.length - 1].push(e);
+
+                    if (widths.length > 0) {
+                        renderElement.style.width = `${widths.shift()}px`;
+                        // @ts-ignore
+                        api.triggerResize();
+                    } else {
+                        resolve();
+                    }
                 });
                 api.error.on(e => {
                     reject(`Failed to render image: ${e}`);
@@ -141,23 +281,90 @@ export class VisualTestHelper {
                 new Promise<void>((_, reject) => {
                     setTimeout(() => {
                         reject(new Error('Rendering did not complete in time'));
-                    }, 2000);
+                    }, 2000 * widths.length);
                 })
             ]);
 
-            await VisualTestHelper.compareVisualResult(
-                totalWidth,
-                totalHeight,
-                result,
-                referenceFileName,
-                referenceFileData,
-                message
-            );
+            for (let i = 0; i < results.length; i++) {
+                if (referenceImages[i] !== null) {
+                    await VisualTestHelper.compareVisualResult(
+                        totalWidths[i],
+                        totalHeights[i],
+                        results[i],
+                        referenceImages[i]!,
+                        referenceFileData[i]!,
+                        message,
+                        tolerancePercent
+                    );
+                }
+            }
         } catch (e) {
             fail(`Failed to run visual test ${e}`);
         }
     }
 
+    /**
+     * @target web
+     * @partial
+     */
+    static async waitForFonts(settings: Settings) {
+        // here we need to trick a little bit, normally SVG does not require the font to be loaded
+        // before rendering starts, but in our case we need it to convert it later for diffing to raster.
+        // so we initiate the bravura load and wait for it before proceeding with rendering.
+        Environment.createStyleElement(document, settings.core.fontDirectory);
+        await Promise.race([
+            new Promise<void>((resolve, reject) => {
+                if (Environment.bravuraFontChecker.isFontLoaded) {
+                    resolve();
+                } else {
+                    Environment.bravuraFontChecker.fontLoaded.on(() => {
+                        resolve();
+                    });
+                    Environment.bravuraFontChecker.checkForFontAvailability();
+                }
+            }),
+            new Promise<void>((_, reject) => {
+                setTimeout(() => {
+                    reject(new Error('Font loading did not complete in time'));
+                }, 2000);
+            })
+        ]);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    static async prepareSettingsForTest(settings: Settings) {
+        settings.core.fontDirectory = CoreSettings.ensureFullUrl('/base/font/bravura/');
+        settings.core.engine = 'html5';
+        Environment.HighDpiFactor = 1; // test data is in scale 1
+        settings.core.enableLazyLoading = false;
+
+        settings.display.resources.copyrightFont.families = ['Roboto'];
+        settings.display.resources.titleFont.families = ['PT Serif'];
+        settings.display.resources.subTitleFont.families = ['PT Serif'];
+        settings.display.resources.wordsFont.families = ['PT Serif'];
+        settings.display.resources.effectFont.families = ['PT Serif'];
+        settings.display.resources.fretboardNumberFont.families = ['Roboto'];
+        settings.display.resources.tablatureFont.families = ['Roboto'];
+        settings.display.resources.graceFont.families = ['Roboto'];
+        settings.display.resources.barNumberFont.families = ['Roboto'];
+        settings.display.resources.fingeringFont.families = ['PT Serif'];
+        settings.display.resources.markerFont.families = ['PT Serif'];
+
+        await VisualTestHelper.loadFonts();
+
+        // here we need to trick a little bit, normally SVG does not require the font to be loaded
+        // before rendering starts, but in our case we need it to convert it later for diffing to raster.
+        // so we initiate the bravura load and wait for it before proceeding with rendering.
+        await VisualTestHelper.waitForFonts(settings);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
     private static convertPngToCanvas(
         data: Uint8Array,
         filename: string,
@@ -192,6 +399,10 @@ export class VisualTestHelper {
         });
     }
 
+    /**
+     * @target web
+     * @partial
+     */
     private static convertSvgToImage(svg: string): Promise<HTMLImageElement> {
         return new Promise<HTMLImageElement>((resolve, reject) => {
             const img = new Image();
@@ -205,13 +416,18 @@ export class VisualTestHelper {
         });
     }
 
+    /**
+     * @target web
+     * @partial
+     */
     public static async compareVisualResult(
         totalWidth: number,
         totalHeight: number,
         result: RenderFinishedEventArgs[],
         referenceFileName: string,
         referenceFileData: Uint8Array,
-        message?: string
+        message?: string,
+        tolerancePercent: number = 1
     ): Promise<void> {
         // create final full image
         const actual = document.createElement('canvas');
@@ -219,12 +435,6 @@ export class VisualTestHelper {
         actual.width = totalWidth;
         actual.height = totalHeight;
         const actualImageContext = actual.getContext('2d')!;
-
-        const point = {
-            x: 0,
-            y: 0
-        };
-        let rowHeight = 0;
         for (const partialResult of result) {
             const partialCanvas = partialResult.renderResult;
 
@@ -236,19 +446,7 @@ export class VisualTestHelper {
             }
 
             if (imageSource) {
-                actualImageContext.drawImage(imageSource, point.x, point.y);
-
-                if (partialResult.height > rowHeight) {
-                    rowHeight = partialResult.height;
-                }
-
-                point.x += partialResult.width;
-
-                if (point.x >= totalWidth) {
-                    point.x = 0;
-                    point.y += rowHeight | 0;
-                    rowHeight = 0;
-                }
+                actualImageContext.drawImage(imageSource, partialResult.x, partialResult.y);
             }
         }
 
@@ -263,19 +461,21 @@ export class VisualTestHelper {
             toEqualVisually: VisualTestHelper.toEqualVisually
         });
 
-        await (expectAsync(actual) as any).toEqualVisually(expected, referenceFileName, message);
+        await (expectAsync(actual) as any).toEqualVisually(expected, referenceFileName, message, tolerancePercent);
     }
 
-    private static toEqualVisually(
-        _utils: jasmine.MatchersUtil,
-        _customEqualityTesters: ReadonlyArray<jasmine.CustomEqualityTester>
-    ): jasmine.CustomAsyncMatcher {
+    /**
+     * @target web
+     * @partial
+     */
+    private static toEqualVisually(_utils: jasmine.MatchersUtil): jasmine.CustomAsyncMatcher {
         return {
             async compare(
                 actual: HTMLCanvasElement,
                 expected: HTMLCanvasElement,
                 expectedFileName: string,
-                message?: string
+                message?: string,
+                tolerancePercent: number = 1
             ): Promise<jasmine.CustomMatcherResult> {
                 const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
                 const oldActual = actual;
@@ -322,7 +522,7 @@ export class VisualTestHelper {
                             includeAA: false,
                             diffMask: true,
                             alpha: 1
-                        }
+                        } as PixelMatchOptions
                     );
 
                     diffContext.putImageData(diffImageData, 0, 0);
@@ -330,15 +530,18 @@ export class VisualTestHelper {
                     // only pixels that are not transparent are relevant for the diff-ratio
                     let totalPixels = match.totalPixels - match.transparentPixels;
                     let percentDifference = (match.differentPixels / totalPixels) * 100;
-                    result.pass = percentDifference < 1;
-                    // result.pass = match.differentPixels < 5;
+                    result.pass = percentDifference < tolerancePercent;
+                    // result.pass = match.differentPixels === 0;
+                    result.message = '';
 
                     if (!result.pass) {
                         let percentDifferenceText = percentDifference.toFixed(2);
                         result.message = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
-                        await VisualTestHelper.saveFiles(expectedFileName, expected, oldActual, diff);
-                    } else if (sizeMismatch) {
-                        result.message = `Image sizes do not match: ${expected.width}/${expected.height} vs ${oldActual.width}/${oldActual.height}`;
+                        // await VisualTestHelper.saveFiles(expectedFileName, expected, oldActual, diff);
+                    }
+
+                    if (sizeMismatch) {
+                        result.message += `Image sizes do not match: expected ${expected.width}x${expected.height} but got ${oldActual.width}x${oldActual.height}`;
                         result.pass = false;
                     }
                 } catch (e) {
@@ -374,7 +577,7 @@ export class VisualTestHelper {
                     (dom as any).toString = function () {
                         return errorMessage;
                     };
-                    (dom as any)[Symbol.toPrimitive] = function() { 
+                    (dom as any)[Symbol.toPrimitive] = function () {
                         return errorMessage;
                     };
 
@@ -386,6 +589,10 @@ export class VisualTestHelper {
         };
     }
 
+    /**
+     * @target web
+     * @partial
+     */
     private static initComparer(el: HTMLElement | null) {
         if (!el) {
             return;
@@ -468,6 +675,10 @@ export class VisualTestHelper {
         el.appendChild(diffToggleLabel);
     }
 
+    /**
+     * @target web
+     * @partial
+     */
     static async saveFiles(
         name: string,
         expected: HTMLCanvasElement,
@@ -496,6 +707,9 @@ export class VisualTestHelper {
         });
     }
 
+    /**
+     * @target web
+     */
     static async toPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
         return new Promise((resolve, reject) => {
             canvas.toBlob(blob => {
@@ -526,59 +740,5 @@ export class VisualTestHelper {
             oldName += part;
         }
         return oldName;
-    }
-
-    static base64ArrayBuffer(bytes: Uint8Array) {
-        let base64 = '';
-        const encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-        const byteLength = bytes.byteLength;
-        const byteRemainder = byteLength % 3;
-        const mainLength = byteLength - byteRemainder;
-
-        let a;
-        let b;
-        let c;
-        let d;
-        let chunk;
-
-        // Main loop deals with bytes in chunks of 3
-        for (let i = 0; i < mainLength; i += 3) {
-            // Combine the three bytes into a single integer
-            chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
-
-            // Use bitmasks to extract 6-bit segments from the triplet
-            a = (chunk & 16515072) >> 18; // 16515072 = (2^6 - 1) << 18
-            b = (chunk & 258048) >> 12; // 258048   = (2^6 - 1) << 12
-            c = (chunk & 4032) >> 6; // 4032     = (2^6 - 1) << 6
-            d = chunk & 63; // 63       = 2^6 - 1
-
-            // Convert the raw binary segments to the appropriate ASCII encoding
-            base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d];
-        }
-
-        // Deal with the remaining bytes and padding
-        if (byteRemainder === 1) {
-            chunk = bytes[mainLength];
-
-            a = (chunk & 252) >> 2; // 252 = (2^6 - 1) << 2
-
-            // Set the 4 least significant bits to zero
-            b = (chunk & 3) << 4; // 3   = 2^2 - 1
-
-            base64 += `${encodings[a]}${encodings[b]}==`;
-        } else if (byteRemainder === 2) {
-            chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1];
-
-            a = (chunk & 64512) >> 10; // 64512 = (2^6 - 1) << 10
-            b = (chunk & 1008) >> 4; // 1008  = (2^6 - 1) << 4
-
-            // Set the 2 least significant bits to zero
-            c = (chunk & 15) << 2; // 15    = 2^4 - 1
-
-            base64 += `${encodings[a]}${encodings[b]}${encodings[c]}=`;
-        }
-
-        return base64;
     }
 }

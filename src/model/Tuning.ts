@@ -1,6 +1,7 @@
 /**
  * This public class represents a predefined string tuning.
  * @json
+ * @json_strict
  */
 export class Tuning {
     private static _sevenStrings: Tuning[] = [];

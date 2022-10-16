@@ -8,12 +8,12 @@ export class ArticStaccatoAboveGlyph extends MusicFontGlyph {
         super(x, y, NoteHeadGlyph.GraceScale, MusicFontSymbol.ArticStaccatoAbove);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = NoteHeadGlyph.QuarterNoteHeadWidth * this.scale;
         this.height = 7 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx + 3 * this.scale, cy + 5 * this.scale, canvas);
     }
 }

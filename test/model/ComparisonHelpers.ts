@@ -1,6 +1,13 @@
-
+/**
+ * @partial
+ */
 export class ComparisonHelpers {
-    public static expectJsonEqual(expected: unknown, actual: unknown, path: string, ignoreKeys: string[] | null): boolean {
+    public static expectJsonEqual(
+        expected: unknown,
+        actual: unknown,
+        path: string,
+        ignoreKeys: string[] | null
+    ): boolean {
         const expectedType = typeof expected;
         const actualType = typeof actual;
 
@@ -40,7 +47,14 @@ export class ComparisonHelpers {
                             result = false;
                         } else {
                             for (let i = 0; i < actual.length; i++) {
-                                if(!ComparisonHelpers.expectJsonEqual(expected[i], actual[i], `${path}[${i}]`, ignoreKeys)) {
+                                if (
+                                    !ComparisonHelpers.expectJsonEqual(
+                                        expected[i],
+                                        actual[i],
+                                        `${path}[${i}]`,
+                                        ignoreKeys
+                                    )
+                                ) {
                                     result = false;
                                 }
                             }
@@ -53,46 +67,54 @@ export class ComparisonHelpers {
                             const expectedMap = expected as Map<string, unknown>;
                             const actualMap = actual as Map<string, unknown>;
 
-                            const expectedKeys = Array.from(expectedMap.keys());
-                            const actualKeys = Array.from(actualMap.keys());
+                            const ignoredKeyLookup: Set<string> = new Set<string>([
+                                'id',
+                                'hammerpulloriginnoteid',
+                                'hammerpulldestinationnoteid',
+                                'tieoriginnoteid',
+                                'tiedestinationnoteid',
+                                'sluroriginnoteid',
+                                'slurdestinationnoteid'
+                            ]);
+                            if (ignoreKeys) {
+                                for (const k of ignoreKeys) {
+                                    ignoredKeyLookup.add(k);
+                                }
+                            }
+                            const expectedKeys = Array.from(expectedMap.keys()).filter(k => !ignoredKeyLookup.has(k));
+                            const actualKeys = Array.from(actualMap.keys()).filter(k => !ignoredKeyLookup.has(k));
                             expectedKeys.sort();
                             actualKeys.sort();
 
                             const actualKeyList = actualKeys.join(',');
                             const expectedKeyList = expectedKeys.join(',');
                             if (actualKeyList !== expectedKeyList) {
-                                fail(`Object Keys mismatch on hierarchy: ${path}, '${actualKeyList}' != '${expectedKeyList}'`);
+                                fail(
+                                    `Object Keys mismatch on hierarchy: ${path}, '${actualKeyList}' != '${expectedKeyList}'`
+                                );
                                 result = false;
                             } else {
                                 for (const key of actualKeys) {
-                                    switch (key) {
-                                        // some ignored keys
-                                        case 'id':
-                                        case 'hammerPullOriginNoteId':
-                                        case 'hammerPullDestinationNoteId':
-                                        case 'tieOriginNoteId':
-                                        case 'tieDestinationNoteId':
-                                            break;
-                                        default:
-                                            if (!ignoreKeys || ignoreKeys.indexOf(key) === -1) {
-                                                if(!ComparisonHelpers.expectJsonEqual(expectedMap.get(key), actualMap.get(key), `${path}.${key}`, ignoreKeys)) {
-                                                    result = false;
-                                                }
-                                            }
-                                            break;
+                                    if (
+                                        !ComparisonHelpers.expectJsonEqual(
+                                            expectedMap.get(key),
+                                            actualMap.get(key),
+                                            `${path}.${key}`,
+                                            ignoreKeys
+                                        )
+                                    ) {
+                                        result = false;
                                     }
                                 }
-
                             }
                         }
-                    } else {
-                        fail('Need Map serialization for comparing json objects');
+                    } else if (!ComparisonHelpers.compareObjects(expected, actual, path, ignoreKeys)) {
                         result = false;
                     }
                 }
                 break;
             case 'string':
-                if ((actual as string) != (expected as string)) {
+                if ((actual as string) !== (expected as string)) {
                     fail(`String mismatch on hierarchy: ${path}, '${actual}' != '${expected}'`);
                     result = false;
                 }
@@ -108,5 +130,17 @@ export class ComparisonHelpers {
         return result;
     }
 
-
+    /**
+     * @target web
+     * @partial
+     */
+    public static compareObjects(
+        expected: unknown,
+        actual: unknown,
+        path: string,
+        ignoreKeys: string[] | null
+    ): boolean {
+        fail(`Cannot compare unknown object types on path ${path}`);
+        return false;
+    }
 }

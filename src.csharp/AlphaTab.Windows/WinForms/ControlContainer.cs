@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.WinForms
 {
@@ -40,18 +41,6 @@ namespace AlphaTab.WinForms
                 },
                 value => { }
             );
-        }
-
-        public double Top
-        {
-            get => Control.Top;
-            set => Control.Top = (int)value;
-        }
-
-        public double Left
-        {
-            get => Control.Left;
-            set => Control.Left = (int)value;
         }
 
         public double Width
@@ -114,6 +103,14 @@ namespace AlphaTab.WinForms
         public void Clear()
         {
             Control.Controls.Clear();
+        }
+
+        public void SetBounds(double x, double y, double w, double h)
+        {
+            Control.Left = (int)x;
+            Control.Top = (int)y;
+            Control.Width = (int)w;
+            Control.Height = (int)h;
         }
 
         public IEventEmitter Resize { get; set; }

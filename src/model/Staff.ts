@@ -2,12 +2,13 @@ import { Bar } from '@src/model/Bar';
 import { Chord } from '@src/model/Chord';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
-import { Tuning } from './Tuning';
+import { Tuning } from '@src/model/Tuning';
 
 /**
  * This class describes a single staff within a track. There are instruments like pianos
  * where a single track can contain multiple staffs.
  * @json
+ * @json_strict
  */
 export class Staff {
     /**
@@ -56,7 +57,7 @@ export class Staff {
      * guitar tablature. Unlike the {@link Note.string} property this array directly represents
      * the order of the tracks shown in the tablature. The first item is the most top tablature line.
      */
-    public stringTuning: Tuning = new Tuning("", [], false);
+    public stringTuning: Tuning = new Tuning('', [], false);
 
     /**
      * Get or set the values of the related guitar tuning.
@@ -92,21 +93,29 @@ export class Staff {
     public isPercussion: boolean = false;
 
     /**
-     * The number of lines shown for the standard notation. 
-     * For some percussion instruments this number might vary. 
+     * The number of lines shown for the standard notation.
+     * For some percussion instruments this number might vary.
      */
     public standardNotationLineCount: number = 5;
 
-    public finish(settings: Settings): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         this.stringTuning.finish();
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
-            this.bars[i].finish(settings);
+            this.bars[i].finish(settings, sharedDataBag);
         }
     }
 
     public addChord(chordId: string, chord: Chord): void {
         chord.staff = this;
         this.chords.set(chordId, chord);
+    }
+
+    public hasChord(chordId: string): boolean {
+        return this.chords.has(chordId);
+    }
+
+    public getChord(chordId: string): Chord | null {
+        return this.chords.get(chordId)!;
     }
 
     public addBar(bar: Bar): void {

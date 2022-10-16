@@ -3,17 +3,18 @@ import { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { RepeatGroup } from '@src/model/RepeatGroup';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
-import { Note } from './Note';
 
 /**
  * The score is the root node of the complete
  * model. It stores the basic information of
  * a song and stores the sub components.
  * @json
+ * @json_strict
  */
 export class Score {
-    private _noteByIdLookup: Map<number, Note> = new Map<number, Note>();
-    private _currentRepeatGroup: RepeatGroup = new RepeatGroup();
+    private _currentRepeatGroup: RepeatGroup | null = null;
+    private _openedRepeatGroups: RepeatGroup[] = [];
+    private _properlyOpenedRepeatGroups:number = 0;
 
     /**
      * The album of this song.
@@ -93,15 +94,11 @@ export class Score {
     public stylesheet: RenderStylesheet = new RenderStylesheet();
 
     public rebuildRepeatGroups(): void {
-        let currentGroup: RepeatGroup = new RepeatGroup();
-        for (let bar of this.masterBars) {
-            // if the group is closed only the next upcoming header can
-            // reopen the group in case of a repeat alternative, so we
-            // remove the current group
-            if (bar.isRepeatStart || (this._currentRepeatGroup.isClosed && bar.alternateEndings <= 0)) {
-                currentGroup = new RepeatGroup();
-            }
-            currentGroup.addMasterBar(bar);
+        this._currentRepeatGroup = null;
+        this._openedRepeatGroups = [];
+        this._properlyOpenedRepeatGroups = 0;
+        for (const bar of this.masterBars) {
+            this.addMasterBarToRepeatGroups(bar);
         }
     }
 
@@ -111,16 +108,66 @@ export class Score {
         if (this.masterBars.length !== 0) {
             bar.previousMasterBar = this.masterBars[this.masterBars.length - 1];
             bar.previousMasterBar.nextMasterBar = bar;
-            bar.start = bar.previousMasterBar.start + bar.previousMasterBar.calculateDuration();
+            // TODO: this will not work on anacrusis. Correct anacrusis durations are only working
+            // when there are beats with playback positions already computed which requires full finish
+            // chicken-egg problem here. temporarily forcing anacrusis length here to 0
+            bar.start =
+                bar.previousMasterBar.start +
+                (bar.previousMasterBar.isAnacrusis ? 0 : bar.previousMasterBar.calculateDuration());
         }
-        // if the group is closed only the next upcoming header can
-        // reopen the group in case of a repeat alternative, so we
-        // remove the current group
-        if (bar.isRepeatStart || (this._currentRepeatGroup.isClosed && bar.alternateEndings <= 0)) {
-            this._currentRepeatGroup = new RepeatGroup();
-        }
-        this._currentRepeatGroup.addMasterBar(bar);
+
+        this.addMasterBarToRepeatGroups(bar);
+
         this.masterBars.push(bar);
+    }
+
+    /**
+     * Adds the given bar correctly into the current repeat group setup.
+     * @param bar
+     */
+    private addMasterBarToRepeatGroups(bar: MasterBar) {
+        // handling the repeats is quite tricky due to many invalid combinations a user might define
+        // there are also some complexities due to nested repeats and repeats with multiple endings but only one opening.
+        // all scenarios are handled below.
+
+        // NOTE: In all paths we need to ensure that the bar is added to some repeat group
+
+        // start a new repeat group if really a repeat is started
+        // or we don't have a group.
+        if (bar.isRepeatStart) {
+            // if the current group was already closed (this opening doesn't cause nesting)
+            // we consider the group as completed
+            if(this._currentRepeatGroup?.isClosed) {
+                this._openedRepeatGroups.pop();
+                this._properlyOpenedRepeatGroups--;
+            }
+            this._currentRepeatGroup = new RepeatGroup();
+            this._openedRepeatGroups.push(this._currentRepeatGroup);
+            this._properlyOpenedRepeatGroups++;
+        } else if(!this._currentRepeatGroup) {
+            this._currentRepeatGroup = new RepeatGroup();
+            this._openedRepeatGroups.push(this._currentRepeatGroup);
+        }
+
+        // close current group if there was one started
+        this._currentRepeatGroup.addMasterBar(bar);
+
+        // handle repeat ends
+        if (bar.isRepeatEnd) {
+            // if we have nested repeat groups a repeat end
+            // will treat the group as completed
+            if (this._properlyOpenedRepeatGroups > 1) {
+                this._openedRepeatGroups.pop();
+                this._properlyOpenedRepeatGroups--;
+                // restore outer group in cases like "open open close close"
+                this._currentRepeatGroup =
+                    this._openedRepeatGroups.length > 0
+                        ? this._openedRepeatGroups[this._openedRepeatGroups.length - 1]
+                        : null;
+            }
+            // else: if only one group is opened, this group stays active for 
+            // scenarios like open close bar close
+        }
     }
 
     public addTrack(track: Track): void {
@@ -130,20 +177,9 @@ export class Score {
     }
 
     public finish(settings: Settings): void {
-        this._noteByIdLookup.clear();
-
+        const sharedDataBag = new Map<string, unknown>();
         for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
-            this.tracks[i].finish(settings);
+            this.tracks[i].finish(settings, sharedDataBag);
         }
-    }
-
-    public registerNote(note: Note) {
-        this._noteByIdLookup.set(note.id, note);
-    }
-
-    public getNoteById(noteId: number): Note | null {
-        return this._noteByIdLookup.has(noteId)
-            ? this._noteByIdLookup.get(noteId)!
-            : null;
     }
 }

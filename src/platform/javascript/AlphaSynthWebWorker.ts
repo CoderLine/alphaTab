@@ -7,6 +7,7 @@ import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 
 /**
  * This class implements a HTML5 WebWorker based version of alphaSynth
@@ -17,11 +18,11 @@ export class AlphaSynthWebWorker {
     private _player: AlphaSynth;
     private _main: IWorkerScope;
 
-    public constructor(main: IWorkerScope) {
+    public constructor(main: IWorkerScope, bufferTimeInMilliseconds:number) {
         this._main = main;
         this._main.addEventListener('message', this.handleMessage.bind(this));
 
-        this._player = new AlphaSynth(new AlphaSynthWorkerSynthOutput());
+        this._player = new AlphaSynth(new AlphaSynthWorkerSynthOutput(), bufferTimeInMilliseconds);
         this._player.positionChanged.on(this.onPositionChanged.bind(this));
         this._player.stateChanged.on(this.onPlayerStateChanged.bind(this));
         this._player.finished.on(this.onFinished.bind(this));
@@ -32,6 +33,7 @@ export class AlphaSynthWebWorker {
         this._player.midiLoadFailed.on(this.onMidiLoadFailed.bind(this));
         this._player.readyForPlayback.on(this.onReadyForPlayback.bind(this));
         this._player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
+        this._player.playbackRangeChanged.on(this.onPlaybackRangeChanged.bind(this));
         this._main.postMessage({
             cmd: 'alphaSynth.ready'
         });
@@ -46,7 +48,7 @@ export class AlphaSynthWebWorker {
                 case 'alphaSynth.initialize':
                     AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
                     Logger.logLevel = data.logLevel;
-                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(main);
+                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(main, data.bufferTimeInMilliseconds);
                     break;
             }
         });
@@ -121,6 +123,12 @@ export class AlphaSynthWebWorker {
                 break;
             case 'alphaSynth.resetChannelStates':
                 this._player.resetChannelStates();
+                break;
+            case 'alphaSynth.destroy':
+                this._player.destroy();
+                this._main.postMessage({
+                    cmd: 'alphaSynth.destroyed'
+                });
                 break;
         }
     }
@@ -205,6 +213,13 @@ export class AlphaSynthWebWorker {
         this._main.postMessage({
             cmd: 'alphaSynth.midiEventsPlayed',
             events: args.events.map(JsonConverter.midiEventToJsObject)
+        });
+    }
+
+    public onPlaybackRangeChanged(args: PlaybackRangeChangedEventArgs): void {
+        this._main.postMessage({
+            cmd: 'alphaSynth.playbackRangeChanged',
+            playbackRange: args.playbackRange
         });
     }
 }

@@ -1,6 +1,6 @@
 import { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
-import { IWriteable } from './IWriteable';
+import { IWriteable } from '@src/io/IWriteable';
 
 export class IOHelper {
     public static readInt32BE(input: IReadable): number {
@@ -157,26 +157,26 @@ export class IOHelper {
     }
 
     public static writeInt32BE(o: IWriteable, v: number) {
-        o.writeByte((v >> 24) & 0xFF);
-        o.writeByte((v >> 16) & 0xFF);
-        o.writeByte((v >> 8) & 0xFF);
-        o.writeByte((v >> 0) & 0xFF);
+        o.writeByte((v >> 24) & 0xff);
+        o.writeByte((v >> 16) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
+        o.writeByte((v >> 0) & 0xff);
     }
 
     public static writeInt32LE(o: IWriteable, v: number) {
-        o.writeByte((v >> 0) & 0xFF);
-        o.writeByte((v >> 8) & 0xFF);
-        o.writeByte((v >> 16) & 0xFF);
-        o.writeByte((v >> 24) & 0xFF);
+        o.writeByte((v >> 0) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
+        o.writeByte((v >> 16) & 0xff);
+        o.writeByte((v >> 24) & 0xff);
     }
 
     public static writeUInt16LE(o: IWriteable, v: number) {
-        o.writeByte((v >> 0) & 0xFF);
-        o.writeByte((v >> 8) & 0xFF);
+        o.writeByte((v >> 0) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
     }
 
     public static writeInt16LE(o: IWriteable, v: number) {
-        o.writeByte((v >> 0) & 0xFF);
-        o.writeByte((v >> 8) & 0xFF);
+        o.writeByte((v >> 0) & 0xff);
+        o.writeByte((v >> 8) & 0xff);
     }
 }

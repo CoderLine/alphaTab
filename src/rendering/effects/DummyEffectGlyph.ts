@@ -12,12 +12,12 @@ export class DummyEffectGlyph extends EffectGlyph {
         this._h = h;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = this._w * this.scale;
         this.height = this._h * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let c = canvas.color; 
         canvas.color = Color.random();
         canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);

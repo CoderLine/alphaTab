@@ -50,6 +50,8 @@ export class MasterBarTickLookup {
      * @param beat
      */
     public addBeat(beat: BeatTickLookup): void {
+        beat.masterBar = this;
+        beat.index = this.beats.length;
         this.beats.push(beat);
     }
 }

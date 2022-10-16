@@ -1,9 +1,9 @@
-import { ByteBuffer } from "@src/io/ByteBuffer";
-import { IOHelper } from "@src/io/IOHelper";
-import { ZipEntry } from "@src/zip/ZipEntry";
-import { ZipReader } from "@src/zip/ZipReader";
-import { ZipWriter } from "@src/zip/ZipWriter";
-import { TestPlatform } from "@test/TestPlatform";
+import { ByteBuffer } from '@src/io/ByteBuffer';
+import { IOHelper } from '@src/io/IOHelper';
+import { ZipEntry } from '@src/zip/ZipEntry';
+import { ZipReader } from '@src/zip/ZipReader';
+import { ZipWriter } from '@src/zip/ZipWriter';
+import { TestPlatform } from '@test/TestPlatform';
 
 describe('ZipReaderWriter', () => {
     it('simple-read', async () => {
@@ -11,8 +11,15 @@ describe('ZipReaderWriter', () => {
         const reader = new ZipReader(ByteBuffer.fromBuffer(data));
         const entries = reader.read();
 
-        expect(entries.map(e => e.fileName).join(',')).toEqual('Content/,BinaryStylesheet,LayoutConfiguration,PartConfiguration,Preferences.json,score.gpif,VERSION');
-        expect(entries.map(e => e.data.length).join(',')).toEqual('0,19651,14,27,192,22998,3');
+        expect(entries.map(e => e.fileName).join(',')).toEqual(
+            'Content/,BinaryStylesheet,LayoutConfiguration,PartConfiguration,Preferences.json,score.gpif,VERSION'
+        );
+        expect(
+            entries
+                .map(e => e.data.length)
+                .map(i => i.toString())
+                .join(',')
+        ).toEqual('0,19651,14,27,192,22998,3');
     });
 
     it('simple-roundtrip', () => {
@@ -23,13 +30,10 @@ describe('ZipReaderWriter', () => {
         const entry2 = new ZipEntry('Folder/', new Uint8Array(0));
         const entry3 = new ZipEntry('Folder/File02.txt', IOHelper.stringToBytes('File02'));
 
-        const textParts = [
-            '<Test>', 'Text', 'Hello World', 'alphaTab', 'Deflate',
-            'Lorem ipsum dolor sit amet'
-        ];
+        const textParts = ['<Test>', 'Text', 'Hello World', 'alphaTab', 'Deflate', 'Lorem ipsum dolor sit amet'];
 
         let text = '';
-        while(text.length < 8 * 1024) {
+        while (text.length < 8 * 1024) {
             text += textParts[Math.floor(Math.random() * textParts.length)];
         }
         const entry4 = new ZipEntry('LargeFile', IOHelper.stringToBytes(text));

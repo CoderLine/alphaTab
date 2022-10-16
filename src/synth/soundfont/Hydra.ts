@@ -28,11 +28,10 @@ export class Hydra {
         const chunkHead: RiffChunk = new RiffChunk();
         const chunkFastList: RiffChunk = new RiffChunk();
         if (!RiffChunk.load(null, chunkHead, readable) || chunkHead.id !== 'sfbk') {
-            throw new FormatError("Soundfont is not a valid Soundfont2 file")
+            throw new FormatError('Soundfont is not a valid Soundfont2 file');
         }
 
         while (RiffChunk.load(chunkHead, chunkFastList, readable)) {
-
             let chunk: RiffChunk = new RiffChunk();
             if (chunkFastList.id === 'pdta') {
                 while (RiffChunk.load(chunkFastList, chunk, readable)) {
@@ -145,14 +144,13 @@ export class Hydra {
         const samples: Float32Array = new Float32Array(samplesLeft);
         let samplesPos: number = 0;
         
-        const sampleBuffer: Uint8Array = new Uint8Array(2048);
-        const testBuffer: Int16Array = new Int16Array((sampleBuffer.length / 2) | 0);
+        const sampleBuffer: Uint8Array = new Uint8Array(16 * 1024);
         while (samplesLeft > 0) {
             let samplesToRead: number = Math.min(samplesLeft, (sampleBuffer.length / 2) | 0);
             reader.read(sampleBuffer, 0, samplesToRead * 2);
             for (let i: number = 0; i < samplesToRead; i++) {
-                testBuffer[i] = (sampleBuffer[i * 2 + 1] << 8) | sampleBuffer[i * 2];
-                samples[samplesPos + i] = testBuffer[i] / 32767;
+                const shortSample = TypeConversions.int32ToInt16((sampleBuffer[i * 2 + 1] << 8) | sampleBuffer[i * 2]);
+                samples[samplesPos + i] = shortSample / 32767;
             }
             samplesLeft -= samplesToRead;
             samplesPos += samplesToRead;

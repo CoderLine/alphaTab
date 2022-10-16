@@ -24,11 +24,11 @@ export class TabSlideLineGlyph extends Glyph {
         this._parent = parent;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 0;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         this.paintSlideIn(cx, cy, canvas);
         this.paintSlideOut(cx, cy, canvas);
     }

@@ -13,6 +13,7 @@ import { TripletFeel } from '@src/model/TripletFeel';
  * The MasterBar stores information about a bar which affects
  * all tracks.
  * @json
+ * @json_strict
  */
 export class MasterBar {
     public static readonly MaxAlternateEndings: number = 8;
@@ -117,6 +118,7 @@ export class MasterBar {
 
     /**
      * Gets or sets the fermatas for this bar. The key is the offset of the fermata in midi ticks.
+     * @json_add addFermata
      */
     public fermata: Map<number, Fermata> = new Map<number, Fermata>();
 
@@ -133,14 +135,13 @@ export class MasterBar {
     /**
      * Calculates the time spent in this bar. (unit: midi ticks)
      */
-    public calculateDuration(respectAnacrusis:boolean = true): number {
+    public calculateDuration(respectAnacrusis: boolean = true): number {
         if (this.isAnacrusis && respectAnacrusis) {
             let duration: number = 0;
             for (let track of this.score.tracks) {
                 for (let staff of track.staves) {
-                    let barDuration: number = this.index < staff.bars.length
-                        ? staff.bars[this.index].calculateDuration()
-                        : 0;
+                    let barDuration: number =
+                        this.index < staff.bars.length ? staff.bars[this.index].calculateDuration() : 0;
                     if (barDuration > duration) {
                         duration = barDuration;
                     }
@@ -166,8 +167,9 @@ export class MasterBar {
      * @returns
      */
     public getFermata(beat: Beat): Fermata | null {
-        if (this.fermata.has(beat.playbackStart)) {
-            return this.fermata.get(beat.playbackStart)!;
+        const fermataMap = this.fermata;
+        if (fermataMap.has(beat.playbackStart)) {
+            return fermataMap.get(beat.playbackStart)!;
         }
         return null;
     }

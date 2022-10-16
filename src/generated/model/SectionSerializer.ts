@@ -10,7 +10,7 @@ export class SectionSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Section | null): Map<string, unknown> | null {
         if (!obj) {
@@ -24,10 +24,10 @@ export class SectionSerializer {
     public static setProperty(obj: Section, property: string, v: unknown): boolean {
         switch (property) {
             case "marker":
-                obj.marker = (v as string);
+                obj.marker = v! as string;
                 return true;
             case "text":
-                obj.text = (v as string);
+                obj.text = v! as string;
                 return true;
         } 
         return false; 

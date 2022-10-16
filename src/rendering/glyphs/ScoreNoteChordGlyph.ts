@@ -12,8 +12,8 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
-import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
-import { BeatBounds } from '../utils/BeatBounds';
+import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
+import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();
@@ -97,7 +97,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
         let direction: BeamDirection = this.direction;
         for (const effect of this.aboveBeatEffects.values()) {
@@ -150,7 +150,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // TODO: this method seems to be quite heavy according to the profiler, why?
         let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         //

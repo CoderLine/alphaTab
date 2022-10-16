@@ -1,6 +1,21 @@
+/**
+ * @target web
+ */
 export class TypeConversions {
+
     private static _conversionBuffer: ArrayBuffer = new ArrayBuffer(8);
+    private static _conversionByteArray: Uint8Array = new Uint8Array(TypeConversions._conversionBuffer);
     private static _dataView = new DataView(TypeConversions._conversionBuffer);
+
+    public static float64ToBytes(v: number): Uint8Array {
+        TypeConversions._dataView.setFloat64(0, v, true);
+        return this._conversionByteArray;
+    }
+    
+    public static bytesToFloat64(bytes: Uint8Array): number {
+        TypeConversions._conversionByteArray.set(bytes, 0);
+        throw TypeConversions._dataView.getFloat64(0, true);
+    }
 
     public static uint16ToInt16(v: number): number {
         TypeConversions._dataView.setUint16(0, v, true);

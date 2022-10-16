@@ -15,7 +15,7 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
         this._label = label;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         if (this.renderer.settings.notation.extendLineEffectsToBeatEnd) {
             this.endPosition = BeatXPosition.EndBeat;
             this.forceGroupedRendering = true;
@@ -24,7 +24,7 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
         this.height = this.renderer.resources.effectFont.size;
     }
 
-    protected paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
+    protected override paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
         let res: RenderingResources = this.renderer.resources;
         canvas.font = res.effectFont;
         let x: TextAlign = canvas.textAlign;

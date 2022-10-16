@@ -19,58 +19,58 @@ export class CoreSettingsSerializer {
         } 
         const o = new Map<string, unknown>(); 
         /*@target web*/
-        o.set("scriptFile", obj.scriptFile); 
+        o.set("scriptfile", obj.scriptFile); 
         /*@target web*/
-        o.set("fontDirectory", obj.fontDirectory); 
+        o.set("fontdirectory", obj.fontDirectory); 
         /*@target web*/
         o.set("file", obj.file); 
         /*@target web*/
         o.set("tex", obj.tex); 
         /*@target web*/
         o.set("tracks", obj.tracks); 
-        o.set("enableLazyLoading", obj.enableLazyLoading); 
+        o.set("enablelazyloading", obj.enableLazyLoading); 
         o.set("engine", obj.engine); 
-        o.set("logLevel", (obj.logLevel as number)); 
-        o.set("useWorkers", obj.useWorkers); 
-        o.set("includeNoteBounds", obj.includeNoteBounds); 
+        o.set("loglevel", obj.logLevel as number); 
+        o.set("useworkers", obj.useWorkers); 
+        o.set("includenotebounds", obj.includeNoteBounds); 
         return o; 
     }
     public static setProperty(obj: CoreSettings, property: string, v: unknown): boolean {
         switch (property) {
             /*@target web*/
             case "scriptfile":
-                obj.scriptFile = (v as string | null);
+                obj.scriptFile = v as string | null;
                 return true;
             /*@target web*/
             case "fontdirectory":
-                obj.fontDirectory = (v as string | null);
+                obj.fontDirectory = v as string | null;
                 return true;
             /*@target web*/
             case "file":
-                obj.file = (v as string | null);
+                obj.file = v as string | null;
                 return true;
             /*@target web*/
             case "tex":
-                obj.tex = (v as boolean);
+                obj.tex = v! as boolean;
                 return true;
             /*@target web*/
             case "tracks":
-                obj.tracks = (v as unknown);
+                obj.tracks = v! as unknown;
                 return true;
             case "enablelazyloading":
-                obj.enableLazyLoading = (v as boolean);
+                obj.enableLazyLoading = v! as boolean;
                 return true;
             case "engine":
-                obj.engine = (v as string);
+                obj.engine = v! as string;
                 return true;
             case "loglevel":
-                obj.logLevel = (JsonHelper.parseEnum<LogLevel>(v, LogLevel)!);
+                obj.logLevel = JsonHelper.parseEnum<LogLevel>(v, LogLevel)!;
                 return true;
             case "useworkers":
-                obj.useWorkers = (v as boolean);
+                obj.useWorkers = v! as boolean;
                 return true;
             case "includenotebounds":
-                obj.includeNoteBounds = (v as boolean);
+                obj.includeNoteBounds = v! as boolean;
                 return true;
         } 
         return false; 

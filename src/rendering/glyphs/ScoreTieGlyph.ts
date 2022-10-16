@@ -4,7 +4,7 @@ import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeatXPosition } from '../BeatXPosition';
+import { BeatXPosition } from '@src/rendering/BeatXPosition';
 
 export class ScoreTieGlyph extends TieGlyph {
     protected startNote: Note;
@@ -16,15 +16,15 @@ export class ScoreTieGlyph extends TieGlyph {
         this.endNote = endNote;
     }
 
-    protected shouldDrawBendSlur() {
+    protected override shouldDrawBendSlur() {
         return this.renderer.settings.notation.extendBendArrowsOnTiedNotes && !!this.startNote.bendOrigin && this.startNote.isTieOrigin;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         super.doLayout();
     }
 
-    protected getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
+    protected override getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
         // invert direction (if stems go up, ties go down to not cross them)
         switch ((noteRenderer as ScoreBarRenderer).getBeatDirection(beat)) {
             case BeamDirection.Up:
@@ -34,7 +34,7 @@ export class ScoreTieGlyph extends TieGlyph {
         }
     }
 
-    protected getStartY(): number {
+    protected override getStartY(): number {
         if (this.startBeat!.isRest) {
             // below all lines
             return (this.startNoteRenderer as ScoreBarRenderer).getScoreY(9);
@@ -48,7 +48,7 @@ export class ScoreTieGlyph extends TieGlyph {
         }
     }
 
-    protected getEndY(): number {
+    protected override getEndY(): number {
         const endNoteScoreRenderer = this.endNoteRenderer as ScoreBarRenderer;
         if (this.endBeat!.isRest) {
             switch (this.tieDirection) {
@@ -67,11 +67,11 @@ export class ScoreTieGlyph extends TieGlyph {
         }
     }
 
-    protected getStartX(): number {
+    protected override getStartX(): number {
         return this.startNoteRenderer!.getBeatX(this.startNote.beat, BeatXPosition.PostNotes);
     }
 
-    protected getEndX(): number {
+    protected override getEndX(): number {
         return this.endNoteRenderer!.getBeatX(this.endNote.beat, BeatXPosition.PreNotes);
     }
 }

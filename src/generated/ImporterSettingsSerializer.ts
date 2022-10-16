@@ -18,20 +18,20 @@ export class ImporterSettingsSerializer {
         } 
         const o = new Map<string, unknown>(); 
         o.set("encoding", obj.encoding); 
-        o.set("mergePartGroupsInMusicXml", obj.mergePartGroupsInMusicXml); 
-        o.set("beatTextAsLyrics", obj.beatTextAsLyrics); 
+        o.set("mergepartgroupsinmusicxml", obj.mergePartGroupsInMusicXml); 
+        o.set("beattextaslyrics", obj.beatTextAsLyrics); 
         return o; 
     }
     public static setProperty(obj: ImporterSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "encoding":
-                obj.encoding = (v as string);
+                obj.encoding = v! as string;
                 return true;
             case "mergepartgroupsinmusicxml":
-                obj.mergePartGroupsInMusicXml = (v as boolean);
+                obj.mergePartGroupsInMusicXml = v! as boolean;
                 return true;
             case "beattextaslyrics":
-                obj.beatTextAsLyrics = (v as boolean);
+                obj.beatTextAsLyrics = v! as boolean;
                 return true;
         } 
         return false; 

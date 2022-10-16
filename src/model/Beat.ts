@@ -22,14 +22,14 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
-import { GraceGroup } from './GraceGroup';
+import { GraceGroup } from '@src/model/GraceGroup';
 
 /**
- * Lists the different modes on how beaming for a beat should be done. 
+ * Lists the different modes on how beaming for a beat should be done.
  */
 export enum BeatBeamingMode {
     /**
-     * Automatic beaming based on the timing rules. 
+     * Automatic beaming based on the timing rules.
      */
     Auto,
     /**
@@ -37,7 +37,7 @@ export enum BeatBeamingMode {
      */
     ForceSplitToNext,
     /**
-     * Force a merge with the next beat. 
+     * Force a merge with the next beat.
      */
     ForceMergeWithNext
 }
@@ -46,6 +46,7 @@ export enum BeatBeamingMode {
  * A beat is a single block within a bar. A beat is a combination
  * of several notes played at the same time.
  * @json
+ * @json_strict
  * @cloneable
  */
 export class Beat {
@@ -324,7 +325,7 @@ export class Beat {
     }
 
     public get chord(): Chord | null {
-        return this.chordId ? this.voice.bar.staff.chords.get(this.chordId)! : null;
+        return this.chordId ? this.voice.bar.staff.getChord(this.chordId)! : null;
     }
 
     /**
@@ -334,7 +335,7 @@ export class Beat {
 
     /**
      * Gets or sets the grace group this beat belongs to.
-     * If this beat is not a grace note, it holds the group which belongs to this beat.  
+     * If this beat is not a grace note, it holds the group which belongs to this beat.
      * @json_ignore
      * @clone_ignore
      */
@@ -342,7 +343,7 @@ export class Beat {
 
     /**
      * Gets or sets the index of this beat within the grace group if
-     * this is a grace beat. 
+     * this is a grace beat.
      * @json_ignore
      * @clone_ignore
      */
@@ -454,18 +455,19 @@ export class Beat {
 
     public removeWhammyBarPoint(index: number): void {
         // check index
-        if (index < 0 || index >= this.whammyBarPoints.length) {
+        const points = this.whammyBarPoints;
+        if (index < 0 || index >= points.length) {
             return;
         }
 
         // remove point
-        this.whammyBarPoints.splice(index, 1);
-        let point: BendPoint = this.whammyBarPoints[index];
+        points.splice(index, 1);
+        let point: BendPoint = points[index];
 
         // update maxWhammy point if required
         if (point === this.maxWhammyPoint) {
             this.maxWhammyPoint = null;
-            for (let currentPoint of this.whammyBarPoints) {
+            for (let currentPoint of points) {
                 if (!this.maxWhammyPoint || currentPoint.value > this.maxWhammyPoint.value) {
                     this.maxWhammyPoint = currentPoint;
                 }
@@ -474,7 +476,7 @@ export class Beat {
 
         if (point === this.minWhammyPoint) {
             this.minWhammyPoint = null;
-            for (let currentPoint of this.whammyBarPoints) {
+            for (let currentPoint of points) {
                 if (!this.minWhammyPoint || currentPoint.value < this.minWhammyPoint.value) {
                     this.minWhammyPoint = currentPoint;
                 }
@@ -495,6 +497,9 @@ export class Beat {
         let index: number = this.notes.indexOf(note);
         if (index >= 0) {
             this.notes.splice(index, 1);
+            if (note.isStringed) {
+                this.noteStringLookup.delete(note.string);
+            }
         }
     }
 
@@ -516,7 +521,7 @@ export class Beat {
     }
 
     private calculateDuration(): number {
-        if(this.isFullBarRest) {
+        if (this.isFullBarRest) {
             return this.voice.bar.masterBar.calculateDuration();
         }
         let ticks: number = MidiUtils.toTicks(this.duration);
@@ -577,13 +582,17 @@ export class Beat {
         }
     }
 
-    public finish(settings: Settings): void {
-        if (this.getAutomation(AutomationType.Instrument) === null &&
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
+        if (
+            this.getAutomation(AutomationType.Instrument) === null &&
             this.index === 0 &&
             this.voice.index === 0 &&
             this.voice.bar.index === 0 &&
-            this.voice.bar.staff.index === 0) {
-            this.automations.push(Automation.buildInstrumentAutomation(false, 0, this.voice.bar.staff.track.playbackInfo.program));
+            this.voice.bar.staff.index === 0
+        ) {
+            this.automations.push(
+                Automation.buildInstrumentAutomation(false, 0, this.voice.bar.staff.track.playbackInfo.program)
+            );
         }
 
         switch (this.graceType) {
@@ -601,7 +610,6 @@ export class Beat {
                 break;
         }
 
-
         let displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
         let isGradual: boolean = this.text === 'grad' || this.text === 'grad.';
         if (isGradual && displayMode === NotationMode.SongBook) {
@@ -617,7 +625,7 @@ export class Beat {
         for (let i: number = 0, j: number = this.notes.length; i < j; i++) {
             let note: Note = this.notes[i];
             note.dynamics = this.dynamics;
-            note.finish(settings);
+            note.finish(settings, sharedDataBag);
             if (note.isLetRing) {
                 this.isLetRing = true;
             }
@@ -707,17 +715,18 @@ export class Beat {
         }
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
-        if (this.whammyBarPoints.length > 0 && this.whammyBarType === WhammyType.Custom) {
+        const points = this.whammyBarPoints;
+        if (points.length > 0 && this.whammyBarType === WhammyType.Custom) {
             if (displayMode === NotationMode.SongBook) {
                 this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
             }
             let isContinuedWhammy: boolean = !!this.previousBeat && this.previousBeat.hasWhammyBar;
             this.isContinuedWhammy = isContinuedWhammy;
-            if (this.whammyBarPoints.length === 4) {
-                let origin: BendPoint = this.whammyBarPoints[0];
-                let middle1: BendPoint = this.whammyBarPoints[1];
-                let middle2: BendPoint = this.whammyBarPoints[2];
-                let destination: BendPoint = this.whammyBarPoints[3];
+            if (points.length === 4) {
+                let origin: BendPoint = points[0];
+                let middle1: BendPoint = points[1];
+                let middle2: BendPoint = points[2];
+                let destination: BendPoint = points[3];
                 // the middle points are used for holds, anything else is a new feature we do not support yet
                 if (middle1.value === middle2.value) {
                     // constant decrease or increase
@@ -730,15 +739,15 @@ export class Beat {
                         } else {
                             this.whammyBarType = WhammyType.Dive;
                         }
-                        this.whammyBarPoints.splice(2, 1);
-                        this.whammyBarPoints.splice(1, 1);
+                        points.splice(2, 1);
+                        points.splice(1, 1);
                     } else if (
                         (origin.value > middle1.value && middle1.value < destination.value) ||
                         (origin.value < middle1.value && middle1.value > destination.value)
                     ) {
                         this.whammyBarType = WhammyType.Dip;
                         if (middle1.offset === middle2.offset || displayMode === NotationMode.SongBook) {
-                            this.whammyBarPoints.splice(2, 1);
+                            points.splice(2, 1);
                         }
                     } else if (origin.value === middle1.value && middle1.value === destination.value) {
                         if (origin.value !== 0 && !isContinuedWhammy) {
@@ -746,8 +755,8 @@ export class Beat {
                         } else {
                             this.whammyBarType = WhammyType.Hold;
                         }
-                        this.whammyBarPoints.splice(2, 1);
-                        this.whammyBarPoints.splice(1, 1);
+                        points.splice(2, 1);
+                        points.splice(1, 1);
                     } else {
                         Logger.warning('Model', 'Unsupported whammy type detected, fallback to custom', null);
                     }
@@ -776,12 +785,12 @@ export class Beat {
 
                 // fix ties
                 if (note.isTieOrigin) {
-                    cloneNote.tieDestinationNoteId = note.tieDestination!.id;
-                    note.tieDestination!.tieOriginNoteId = cloneNote.id;
+                    cloneNote.tieDestination = note.tieDestination!;
+                    note.tieDestination!.tieOrigin = cloneNote;
                 }
                 if (note.isTieDestination) {
-                    cloneNote.tieOriginNoteId = note.tieOrigin ? note.tieOrigin.id : -1;
-                    note.tieOrigin!.tieDestinationNoteId = cloneNote.id;
+                    cloneNote.tieOrigin = note.tieOrigin ? note.tieOrigin : null;
+                    note.tieOrigin!.tieDestination = cloneNote;
                 }
 
                 // if the note has a bend which is continued on the next note
@@ -802,8 +811,17 @@ export class Beat {
             this.graceGroup = new GraceGroup();
             this.graceGroup.addBeat(this);
             this.graceGroup.isComplete = true;
+            this.graceGroup.finish();
             this.updateDurations();
             this.voice.insertBeat(this, cloneBeat);
+
+            // ensure cloned beat has also a grace simple grace group for itself
+            // (see Voice.finish where every beat gets one)
+            // this ensures later that grace rods are assigned correctly to this beat.
+            cloneBeat.graceGroup = new GraceGroup();
+            cloneBeat.graceGroup.addBeat(this);
+            cloneBeat.graceGroup.isComplete = true;
+            cloneBeat.graceGroup.finish();
         }
     }
 
@@ -835,6 +853,7 @@ export class Beat {
         return this.noteStringLookup.has(noteString);
     }
 
+    // TODO: can be likely eliminated
     public getNoteWithRealValue(noteRealValue: number): Note | null {
         if (this.noteValueLookup.has(noteRealValue)) {
             return this.noteValueLookup.get(noteRealValue)!;
@@ -842,10 +861,10 @@ export class Beat {
         return null;
     }
 
-    public chain() {
+    public chain(sharedDataBag: Map<string, unknown> | null = null) {
         for (const n of this.notes) {
             this.noteValueLookup.set(n.realValue, n);
-            n.chain();
+            n.chain(sharedDataBag);
         }
     }
 }

@@ -12,43 +12,44 @@ import { TabRestGlyph } from '@src/rendering/glyphs/TabRestGlyph';
 import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
 import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
-import { BeatBounds } from '../utils/BeatBounds';
+import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
+import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 
 export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public noteNumbers: TabNoteChordGlyph | null = null;
     public restGlyph: TabRestGlyph | null = null;
 
-    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+    public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         return this.noteNumbers ? this.noteNumbers.getNoteX(note, requestedPosition) : 0;
     }
     
-    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return this.noteNumbers ? this.noteNumbers.getNoteY(note, requestedPosition) : 0;
     }
 
-    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
+    public override buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
         if(this.noteNumbers) {
             this.noteNumbers.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
         if (!this.container.beat.isRest) {
             //
             // Note numbers
             let isGrace: boolean =
                 this.renderer.settings.notation.smallGraceTabNotes && this.container.beat.graceType !== GraceType.None;
-            this.noteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
-            this.noteNumbers.beat = this.container.beat;
-            this.noteNumbers.beamingHelper = this.beamingHelper;
+            const noteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
+            this.noteNumbers = noteNumbers;
+            noteNumbers.beat = this.container.beat;
+            noteNumbers.beamingHelper = this.beamingHelper;
             for (let note of this.container.beat.notes) {
                 if (note.isVisible) {
                     this.createNoteGlyph(note);
                 }
             }
-            this.addGlyph(this.noteNumbers);
+            this.addGlyph(noteNumbers);
             //
             // Whammy Bar
             if (this.container.beat.hasWhammyBar) {
@@ -97,10 +98,11 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         } else {
             let line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2) ;
             let y: number = tabRenderer.getTabY(line);
-            this.restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
-            this.restGlyph.beat = this.container.beat;
-            this.restGlyph.beamingHelper = this.beamingHelper;
-            this.addGlyph(this.restGlyph);
+            const restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
+            this.restGlyph = restGlyph;
+            restGlyph.beat = this.container.beat;
+            restGlyph.beamingHelper = this.beamingHelper;
+            this.addGlyph(restGlyph);
             //
             // Note dots
             //
@@ -124,6 +126,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             w += g.width;
         }
         this.width = w;
+        this.computedWidth = w;
         if (this.container.beat.isEmpty) {
             this.centerX = this.width / 2;
         } else if (this.container.beat.isRest) {
@@ -133,7 +136,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    public updateBeamingHelper(): void {
+    public override updateBeamingHelper(): void {
         if (!this.container.beat.isRest) {
             this.noteNumbers!.updateBeamingHelper(this.container.x + this.x);
         } else {

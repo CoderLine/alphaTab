@@ -1,5 +1,5 @@
 import { FormatError } from '@src/FormatError';
-import { ModelUtils } from './ModelUtils';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
  * @json_immutable
@@ -15,7 +15,6 @@ export class Color {
      * @param a The alpha component.
      */
     public constructor(r: number, g: number, b: number, a: number = 0xff) {
-        this.raw = 0;
         this.raw = ((a & 0xff) << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
         this.updateRgba();
     }
@@ -64,77 +63,76 @@ export class Color {
 
     public static fromJson(v: unknown): Color | null {
         switch (typeof v) {
-            case 'number':
-                {
-                    const c = new Color(0, 0, 0, 0);
-                    c.raw = v as number;
-                    c.updateRgba();
-                    return c;
-                }
-            case 'string':
-                {
-                    const json = v as string;
-                    if (json.startsWith('#')) {
-                        if (json.length === 4) {
-                            // #RGB
-                            return new Color(
-                                parseInt(json.substring(1, 1), 16) * 17,
-                                parseInt(json.substring(2, 1), 16) * 17,
-                                parseInt(json.substring(3, 1), 16) * 17
-                            );
-                        }
-
-                        if (json.length === 5) {
-                            // #RGBA
-                            return new Color(
-                                parseInt(json.substring(1, 1), 16) * 17,
-                                parseInt(json.substring(2, 1), 16) * 17,
-                                parseInt(json.substring(3, 1), 16) * 17,
-                                parseInt(json.substring(4, 1), 16) * 17
-                            );
-                        }
-
-                        if (json.length === 7) {
-                            // #RRGGBB
-                            return new Color(
-                                parseInt(json.substring(1, 2), 16),
-                                parseInt(json.substring(3, 2), 16),
-                                parseInt(json.substring(5, 2), 16)
-                            );
-                        }
-
-                        if (json.length === 9) {
-                            // #RRGGBBAA
-                            return new Color(
-                                parseInt(json.substring(1, 2), 16),
-                                parseInt(json.substring(3, 2), 16),
-                                parseInt(json.substring(5, 2), 16),
-                                parseInt(json.substring(7, 2), 16)
-                            );
-                        }
-                    } else if (json.startsWith('rgba') || json.startsWith('rgb')) {
-                        const start = json.indexOf('(');
-                        const end = json.lastIndexOf(')');
-                        if (start === -1 || end === -1) {
-                            throw new FormatError('No values specified for rgb/rgba function');
-                        }
-
-                        const numbers = json.substring(start + 1, end - start - 1).split(',');
-                        if (numbers.length === 3) {
-                            return new Color(parseInt(numbers[0]), parseInt(numbers[1]), parseInt(numbers[2]));
-                        }
-
-                        if (numbers.length === 4) {
-                            return new Color(
-                                parseInt(numbers[0]),
-                                parseInt(numbers[1]),
-                                parseInt(numbers[2]),
-                                parseFloat(numbers[3]) * 255
-                            );
-                        }
+            case 'number': {
+                const c = new Color(0, 0, 0, 0);
+                c.raw = v! as number;
+                c.updateRgba();
+                return c;
+            }
+            case 'string': {
+                const json = v as string;
+                if (json.startsWith('#')) {
+                    if (json.length === 4) {
+                        // #RGB
+                        return new Color(
+                            parseInt(json[1], 16) * 17,
+                            parseInt(json[2], 16) * 17,
+                            parseInt(json[3], 16) * 17
+                        );
                     }
-                    return null;
+
+                    if (json.length === 5) {
+                        // #RGBA
+                        return new Color(
+                            parseInt(json[1], 16) * 17,
+                            parseInt(json[2], 16) * 17,
+                            parseInt(json[3], 16) * 17,
+                            parseInt(json[4], 16) * 17
+                        );
+                    }
+
+                    if (json.length === 7) {
+                        // #RRGGBB
+                        return new Color(
+                            parseInt(json.substring(1, 3), 16),
+                            parseInt(json.substring(3, 5), 16),
+                            parseInt(json.substring(5, 7), 16)
+                        );
+                    }
+
+                    if (json.length === 9) {
+                        // #RRGGBBAA
+                        return new Color(
+                            parseInt(json.substring(1, 3), 16),
+                            parseInt(json.substring(3, 5), 16),
+                            parseInt(json.substring(5, 7), 16),
+                            parseInt(json.substring(7, 9), 16)
+                        );
+                    }
+                } else if (json.startsWith('rgba') || json.startsWith('rgb')) {
+                    const start = json.indexOf('(');
+                    const end = json.lastIndexOf(')');
+                    if (start === -1 || end === -1) {
+                        throw new FormatError('No values specified for rgb/rgba function');
+                    }
+
+                    const numbers = json.substring(start + 1, end).split(',');
+
+                    if (numbers.length === 3) {
+                        return new Color(parseInt(numbers[0]), parseInt(numbers[1]), parseInt(numbers[2]));
+                    }
+
+                    if (numbers.length === 4) {
+                        return new Color(
+                            parseInt(numbers[0]),
+                            parseInt(numbers[1]),
+                            parseInt(numbers[2]),
+                            parseFloat(numbers[3]) * 255
+                        );
+                    }
                 }
+                return null;
+            }
         }
 
         throw new FormatError('Unsupported format for color');

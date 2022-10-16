@@ -17,7 +17,7 @@ import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
 import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { IUiFacade } from '@src/platform/IUiFacade';
-import { AlphaSynthWebAudioOutput } from '@src/platform/javascript/AlphaSynthWebAudioOutput';
+import { AlphaSynthScriptProcessorOutput } from '@src/platform/javascript/AlphaSynthScriptProcessorOutput';
 import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';
 import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWorkerScoreRenderer';
@@ -25,6 +25,30 @@ import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEven
 import { Cursors } from '@src/platform/Cursors';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
+import { WebPlatform } from '@src/platform/javascript/WebPlatform';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
+import { ScalableHtmlElementContainer } from './ScalableHtmlElementContainer';
+
+/**
+ * @target web
+ */
+enum ResultState {
+    LayoutDone,
+    RenderRequested,
+    RenderDone,
+    Detached
+}
+
+/**
+ * @target web
+ */
+interface ResultPlaceholder extends HTMLElement {
+    layoutResultId?: string;
+    resultState: ResultState;
+    renderedResult?: Element[];
+    renderedResultId?: string;
+}
 
 /**
  * @target web
@@ -37,6 +61,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _totalResultCount: number = 0;
     private _initialTrackIndexes: number[] | null = null;
     private _intersectionObserver: IntersectionObserver;
+    private _barToElementLookup: Map<number, HTMLElement> = new Map<number, HTMLElement>();
+    private _resultIdToElementLookup: Map<string, ResultPlaceholder> = new Map<string, ResultPlaceholder>();
 
     public rootContainerBecameVisible: IEventEmitter = new EventEmitter();
     public canRenderChanged: IEventEmitter = new EventEmitter();
@@ -81,6 +107,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public constructor(rootElement: HTMLElement) {
+        if (Environment.webPlatform !== WebPlatform.Browser && Environment.webPlatform !== WebPlatform.BrowserModule) {
+            throw new AlphaTabError(
+                AlphaTabErrorType.General,
+                'Usage of AlphaTabApi is only possible in browser environments. For usage in node use the Low Level APIs'
+            );
+        }
         rootElement.classList.add('alphaTab');
         this.rootContainer = new HtmlElementContainer(rootElement);
         this.areWorkersSupported = 'Worker' in window;
@@ -94,14 +126,31 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
     private onElementVisibilityChanged(entries: IntersectionObserverEntry[]) {
         for (const e of entries) {
-            if (e.isIntersecting) {
-                const htmlElement = e.target as HTMLElement;
-                if (htmlElement === (this.rootContainer as HtmlElementContainer).element) {
+            const htmlElement = e.target as HTMLElement;
+            if (htmlElement === (this.rootContainer as HtmlElementContainer).element) {
+                if (e.isIntersecting) {
                     (this.rootContainerBecameVisible as EventEmitter).trigger();
                     this._intersectionObserver.unobserve((this.rootContainer as HtmlElementContainer).element);
-                } else if ('svg' in htmlElement.dataset) {
-                    this.replacePlaceholder(htmlElement, htmlElement.dataset['svg'] as string);
-                    this._intersectionObserver.unobserve(htmlElement);
+                }
+            } else if ('layoutResultId' in htmlElement && this._api.settings.core.enableLazyLoading) {
+                const placeholder = htmlElement as ResultPlaceholder;
+                if (e.isIntersecting) {
+                    // missing result or result not matching layout -> request render
+                    if (placeholder.renderedResultId !== placeholder.layoutResultId) {
+                        if (this._resultIdToElementLookup.has(placeholder.layoutResultId!)) {
+                            this._api.renderer.renderResult(placeholder.layoutResultId!);
+                        } else {
+                            htmlElement.replaceChildren();
+                        }
+                    }
+                    // detached and became visible
+                    else if (placeholder.resultState === ResultState.Detached) {
+                        htmlElement.replaceChildren(...placeholder.renderedResult!);
+                        placeholder.resultState = ResultState.RenderDone;
+                    }
+                } else if (placeholder.resultState === ResultState.RenderDone) {
+                    placeholder.resultState = ResultState.Detached;
+                    placeholder.replaceChildren();
                 }
             }
         }
@@ -111,7 +160,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return new AlphaTabWorkerScoreRenderer<unknown>(this._api, this._api.settings);
     }
 
-    public initialize(api: AlphaTabApiBase<unknown>, raw: unknown): void {
+    public initialize(api: AlphaTabApiBase<unknown>, raw: any | Settings): void {
         this._api = api;
         let settings: Settings;
         if (raw instanceof Settings) {
@@ -154,9 +203,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private registerFontChecker(font: Font): void {
-        if (!this._fontCheckers.has(font.family)) {
-            let checker: FontLoadingChecker = new FontLoadingChecker(font.family);
-            this._fontCheckers.set(font.family, checker);
+        if (!this._fontCheckers.has(font.families.join(', '))) {
+            let checker: FontLoadingChecker = new FontLoadingChecker(font.families);
+            this._fontCheckers.set(font.families.join(', '), checker);
             checker.fontLoaded.on(this.onFontLoaded.bind(this));
             checker.checkForFontAvailability();
         }
@@ -172,6 +221,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         canvasElement.style.fontSize = '0';
         canvasElement.style.overflow = 'hidden';
         canvasElement.style.lineHeight = '0';
+        canvasElement.style.position = 'relative';
         return new HtmlElementContainer(canvasElement);
     }
 
@@ -247,6 +297,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     public initialRender(): void {
         this._api.renderer.preRender.on((_: boolean) => {
             this._totalResultCount = 0;
+            this._resultIdToElementLookup.clear();
+            this._barToElementLookup.clear();
         });
 
         const initialRender = () => {
@@ -367,54 +419,72 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return dataAttributes;
     }
 
-    public beginAppendRenderResults(renderResult: RenderFinishedEventArgs): void {
-        let canvasElement: HTMLElement = (this._api.canvasElement as HtmlElementContainer).element;
+    public beginUpdateRenderResults(renderResult: RenderFinishedEventArgs): void {
+        if (!this._resultIdToElementLookup.has(renderResult.id)) {
+            return;
+        }
+
+        const placeholder = this._resultIdToElementLookup.get(renderResult.id)!;
+
+        const body: any = renderResult.renderResult;
+        if (typeof body === 'string') {
+            placeholder.innerHTML = body;
+        } else if ('nodeType' in body) {
+            placeholder.replaceChildren(body as Node);
+        }
+        placeholder.resultState = ResultState.RenderDone;
+        placeholder.renderedResultId = renderResult.id;
+        placeholder.renderedResult = Array.from(placeholder.children);
+    }
+
+    public beginAppendRenderResults(renderResult: RenderFinishedEventArgs | null): void {
+        const canvasElement: HTMLElement = (this._api.canvasElement as HtmlElementContainer).element;
         // null result indicates that the rendering finished
         if (!renderResult) {
             // so we remove elements that might be from a previous render session
             while (canvasElement.childElementCount > this._totalResultCount) {
-                canvasElement.removeChild(canvasElement.lastChild!);
+                if (this._api.settings.core.enableLazyLoading) {
+                    this._intersectionObserver.unobserve(canvasElement.lastChild as Element);
+                }
+                canvasElement.removeChild(canvasElement.lastElementChild!);
             }
         } else {
-            let body: unknown = renderResult.renderResult;
-            if (typeof body === 'string') {
-                let placeholder: HTMLElement;
-                if (this._totalResultCount < canvasElement.childElementCount) {
-                    placeholder = canvasElement.childNodes.item(this._totalResultCount) as HTMLElement;
-                } else {
-                    placeholder = document.createElement('div');
-                    canvasElement.appendChild(placeholder);
-                }
-                placeholder.style.width = renderResult.width + 'px';
-                placeholder.style.height = renderResult.height + 'px';
-                placeholder.style.display = 'inline-block';
-                if (!this._api.settings.core.enableLazyLoading) {
-                    this.replacePlaceholder(placeholder, body);
-                } else {
-                    placeholder.dataset['svg'] = body;
-                    this._intersectionObserver.observe(placeholder);
-                }
+            let placeholder: ResultPlaceholder;
+            if (this._totalResultCount < canvasElement.childElementCount) {
+                placeholder = canvasElement.childNodes.item(this._totalResultCount) as ResultPlaceholder;
             } else {
-                if (this._totalResultCount < canvasElement.childElementCount) {
-                    canvasElement.replaceChild(
-                        renderResult.renderResult as Node,
-                        canvasElement.childNodes.item(this._totalResultCount)
-                    );
-                } else {
-                    canvasElement.appendChild(renderResult.renderResult as Node);
+                placeholder = document.createElement('div') as unknown as ResultPlaceholder;
+                canvasElement.appendChild(placeholder);
+            }
+            placeholder.style.zIndex = '1';
+            placeholder.style.position = 'absolute';
+            placeholder.style.left = renderResult.x + 'px';
+            placeholder.style.top = renderResult.y + 'px';
+            placeholder.style.width = renderResult.width + 'px';
+            placeholder.style.height = renderResult.height + 'px';
+            placeholder.style.display = 'inline-block';
+            placeholder.layoutResultId = renderResult.id;
+            placeholder.resultState = ResultState.LayoutDone;
+            delete placeholder.renderedResultId;
+            delete placeholder.renderedResult;
+
+            this._resultIdToElementLookup.set(renderResult.id, placeholder);
+
+            // remember which bar is contained in which node for faster lookup
+            // on highlight/unhighlight
+            for (let i = renderResult.firstMasterBarIndex; i <= renderResult.lastMasterBarIndex; i++) {
+                if (i >= 0) {
+                    this._barToElementLookup.set(i, placeholder);
                 }
             }
-            this._totalResultCount++;
-        }
-    }
 
-    private replacePlaceholder(placeholder: HTMLElement, body: any) {
-        if (typeof placeholder.outerHTML === 'string') {
-            placeholder.outerHTML = body;
-        } else {
-            const display = document.createElement('div');
-            display.innerHTML = body;
-            placeholder.parentNode?.replaceChild(display.firstChild!, placeholder);
+            if (this._api.settings.core.enableLazyLoading) {
+                // re-observe to fire event
+                this._intersectionObserver.unobserve(placeholder);
+                this._intersectionObserver.observe(placeholder);
+            }
+
+            this._totalResultCount++;
         }
     }
 
@@ -423,7 +493,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
      * initializes a alphaSynth version for the client.
      */
     public createWorkerPlayer(): IAlphaSynth | null {
-        let supportsWebAudio: boolean = 'ScriptProcessorNode' in window;
         let alphaSynthScriptFile: string | null = Environment.scriptFile;
         if (!alphaSynthScriptFile) {
             Logger.error('Player', 'alphaTab script file could not be detected, player cannot initialize');
@@ -431,12 +500,28 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
 
         let player: AlphaSynthWebWorkerApi | null = null;
-        if (supportsWebAudio) {
+        let supportsScriptProcessor: boolean = 'ScriptProcessorNode' in window;
+
+        // Once https://github.com/webpack/webpack/issues/11543 is decided
+        // we can support audio worklets together with WebPack
+        let supportsAudioWorklets: boolean =
+            window.isSecureContext && 'AudioWorkletNode' in window && !Environment.isWebPackBundled;
+
+        if (supportsAudioWorklets) {
+            Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
+            player = new AlphaSynthWebWorkerApi(
+                new AlphaSynthAudioWorkletOutput(),
+                alphaSynthScriptFile,
+                this._api.settings.core.logLevel,
+                this._api.settings.player.bufferTimeInMilliseconds
+            );
+        } else if (supportsScriptProcessor) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api for playback');
             player = new AlphaSynthWebWorkerApi(
-                new AlphaSynthWebAudioOutput(),
+                new AlphaSynthScriptProcessorOutput(),
                 alphaSynthScriptFile,
-                this._api.settings.core.logLevel
+                this._api.settings.core.logLevel,
+                this._api.settings.player.bufferTimeInMilliseconds
             );
         }
 
@@ -458,20 +543,27 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         });
     }
 
-    public highlightElements(groupId: string): void {
-        let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
-        let elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
-        for (let i: number = 0; i < elementsToHighlight.length; i++) {
-            elementsToHighlight.item(i)!.classList.add('at-highlight');
+    private _highlightedElements: HTMLElement[] = [];
+    public highlightElements(groupId: string, masterBarIndex: number): void {
+        const element = this._barToElementLookup.get(masterBarIndex);
+        if (element) {
+            let elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
+            for (let i: number = 0; i < elementsToHighlight.length; i++) {
+                elementsToHighlight.item(i)!.classList.add('at-highlight');
+                this._highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
+            }
         }
     }
 
     public removeHighlights(): void {
-        let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
-        let elements: HTMLCollection = element.getElementsByClassName('at-highlight');
-        while (elements.length > 0) {
-            elements.item(0)!.classList.remove('at-highlight');
+        const highlightedElements = this._highlightedElements;
+        if (!highlightedElements) {
+            return;
         }
+        for (const element of highlightedElements) {
+            element.classList.remove('at-highlight');
+        }
+        this._highlightedElements = [];
     }
 
     public destroyCursors(): void {
@@ -486,21 +578,42 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         cursorWrapper.classList.add('at-cursors');
         let selectionWrapper: HTMLElement = document.createElement('div');
         selectionWrapper.classList.add('at-selection');
-        let barCursor: HTMLElement = document.createElement('div');
+
+        const barCursorContainer = this.createScalingElement();
+        const beatCursorContainer = this.createScalingElement();
+
+        let barCursor: HTMLElement = barCursorContainer.element;
         barCursor.classList.add('at-cursor-bar');
-        let beatCursor: HTMLElement = document.createElement('div');
+        let beatCursor: HTMLElement = beatCursorContainer.element;
         beatCursor.classList.add('at-cursor-beat');
         // required css styles
         element.style.position = 'relative';
         element.style.textAlign = 'left';
+
         cursorWrapper.style.position = 'absolute';
         cursorWrapper.style.zIndex = '1000';
         cursorWrapper.style.display = 'inline';
         cursorWrapper.style.pointerEvents = 'none';
+
         selectionWrapper.style.position = 'absolute';
+
         barCursor.style.position = 'absolute';
+        barCursor.style.left = '0';
+        barCursor.style.top = '0';
+        barCursor.style.willChange = 'transform';
+        barCursorContainer.width = 1;
+        barCursorContainer.height = 1;
+        barCursorContainer.setBounds(0, 0, 1, 1);
+
         beatCursor.style.position = 'absolute';
         beatCursor.style.transition = 'all 0s linear';
+        beatCursor.style.left = '0';
+        beatCursor.style.top = '0';
+        beatCursor.style.willChange = 'transform';
+        beatCursorContainer.width = 3;
+        beatCursorContainer.height = 1;
+        beatCursorContainer.setBounds(0, 0, 1, 1);
+
         // add cursors to UI
         element.insertBefore(cursorWrapper, element.firstChild);
         cursorWrapper.appendChild(selectionWrapper);
@@ -508,8 +621,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         cursorWrapper.appendChild(beatCursor);
         return new Cursors(
             new HtmlElementContainer(cursorWrapper),
-            new HtmlElementContainer(barCursor),
-            new HtmlElementContainer(beatCursor),
+            barCursorContainer,
+            beatCursorContainer,
             new HtmlElementContainer(selectionWrapper)
         );
     }
@@ -537,7 +650,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return b;
     }
 
+    private _scrollContainer: IContainer | null = null;
     public getScrollContainer(): IContainer {
+        if (this._scrollContainer) {
+            return this._scrollContainer;
+        }
+
         let scrollElement: HTMLElement =
             // tslint:disable-next-line: strict-type-predicates
             typeof this._api.settings.player.scrollElement === 'string'
@@ -559,13 +677,30 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 }
             }
         }
-        return new HtmlElementContainer(scrollElement);
+
+        this._scrollContainer = new HtmlElementContainer(scrollElement);
+        return this._scrollContainer;
     }
 
     public createSelectionElement(): IContainer | null {
-        let element: HTMLElement = document.createElement('div');
+        return this.createScalingElement();
+    }
+
+    public createScalingElement(): ScalableHtmlElementContainer {
+        const element = document.createElement('div');
         element.style.position = 'absolute';
-        return new HtmlElementContainer(element);
+
+        // to typical browser zoom levels are:
+        // Chromium: 25,33,50,67,75,80,90, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500
+        // Firefox: 30, 50, 67, 80, 90, 100, 110, 120, 133, 150, 170, 200, 240, 300, 400, 500
+
+        // with having a 100x100 scaling container we should be able to provide appropriate scaling
+
+        const container = new ScalableHtmlElementContainer(element, 100, 100);
+        container.width = 1;
+        container.height = 1;
+        container.setBounds(0, 0, 1, 1);
+        return container;
     }
 
     public scrollToY(element: IContainer, scrollTargetY: number, speed: number): void {
@@ -577,38 +712,53 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private internalScrollToY(element: HTMLElement, scrollTargetY: number, speed: number): void {
-        let startY: number = element.scrollTop;
-        let diff: number = scrollTargetY - startY;
-        let start: number = 0;
-        let step = (x: number) => {
-            if (start === 0) {
-                start = x;
-            }
-            let time: number = x - start;
-            let percent: number = Math.min(time / speed, 1);
-            element.scrollTop = (startY + diff * percent) | 0;
-            if (time < speed) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
+        if (this._api.settings.player.nativeBrowserSmoothScroll) {
+            element.scrollTo({
+                top: scrollTargetY,
+                behavior: 'smooth'
+            });
+        } else {
+            let startY: number = element.scrollTop;
+            let diff: number = scrollTargetY - startY;
+
+            let start: number = 0;
+            let step = (x: number) => {
+                if (start === 0) {
+                    start = x;
+                }
+                let time: number = x - start;
+                let percent: number = Math.min(time / speed, 1);
+                element.scrollTop = (startY + diff * percent) | 0;
+                if (time < speed) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
     }
 
     private internalScrollToX(element: HTMLElement, scrollTargetX: number, speed: number): void {
-        let startX: number = element.scrollLeft;
-        let diff: number = scrollTargetX - startX;
-        let start: number = 0;
-        let step = (t: number) => {
-            if (start === 0) {
-                start = t;
-            }
-            let time: number = t - start;
-            let percent: number = Math.min(time / speed, 1);
-            element.scrollLeft = (startX + diff * percent) | 0;
-            if (time < speed) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
+        if (this._api.settings.player.nativeBrowserSmoothScroll) {
+            element.scrollTo({
+                left: scrollTargetX,
+                behavior: 'smooth'
+            });
+        } else {
+            let startX: number = element.scrollLeft;
+            let diff: number = scrollTargetX - startX;
+            let start: number = 0;
+            let step = (t: number) => {
+                if (start === 0) {
+                    start = t;
+                }
+                let time: number = t - start;
+                let percent: number = Math.min(time / speed, 1);
+                element.scrollLeft = (startX + diff * percent) | 0;
+                if (time < speed) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
     }
 }

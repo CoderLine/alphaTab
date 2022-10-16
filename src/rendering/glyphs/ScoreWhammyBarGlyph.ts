@@ -15,7 +15,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { RenderingResources } from '@src/RenderingResources';
 import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { NoteYPosition } from '../BarRendererBase';
+import { NoteYPosition } from '@src/rendering/BarRendererBase';
 
 export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     public static readonly SimpleDipHeight: number = TabWhammyBarGlyph.PerHalfSize * 2;
@@ -27,7 +27,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         this._beat = beat;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let whammyMode: NotationMode = this.renderer.settings.notation.notationMode;
         switch (this._beat.whammyBarType) {
             case WhammyType.None:
@@ -98,7 +98,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         super.doLayout();
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let beat: Beat = this._beat;
         switch (beat.whammyBarType) {
             case WhammyType.None:

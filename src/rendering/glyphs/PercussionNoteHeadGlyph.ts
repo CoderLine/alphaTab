@@ -1,7 +1,7 @@
 import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { Duration } from '@src/model/Duration';
 import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 
@@ -15,7 +15,7 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
         this._articulation = articulation;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let offset: number = this._isGrace ? this.scale : 0;
         canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale * this.scale, this.symbol, false);
 
@@ -24,7 +24,7 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
         }
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let scale: number = (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
         switch (this.symbol) {
             case MusicFontSymbol.NoteheadWhole:

@@ -8,12 +8,12 @@ export class GuitarGolpeGlyph extends MusicFontGlyph {
         super(x, y, NoteHeadGlyph.GraceScale, MusicFontSymbol.GuitarGolpe);
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 9 * this.scale;
         this.height = 10 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy + this.height, canvas);
     }
 }

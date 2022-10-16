@@ -12,7 +12,7 @@ export class VoiceSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Voice | null): Map<string, unknown> | null {
         if (!obj) {
@@ -21,24 +21,24 @@ export class VoiceSerializer {
         const o = new Map<string, unknown>(); 
         o.set("id", obj.id); 
         o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i))); 
-        o.set("isEmpty", obj.isEmpty); 
+        o.set("isempty", obj.isEmpty); 
         return o; 
     }
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
         switch (property) {
             case "id":
-                obj.id = (v as number);
+                obj.id = v! as number;
                 return true;
             case "beats":
                 obj.beats = [];
                 for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Beat();
-                    BeatSerializer.fromJson(i, o)
+                    BeatSerializer.fromJson(i, o);
                     obj.addBeat(i);
                 }
                 return true;
             case "isempty":
-                obj.isEmpty = (v as boolean);
+                obj.isEmpty = v! as boolean;
                 return true;
         } 
         return false; 

@@ -1,6 +1,6 @@
 import { Note } from '@src/model/Note';
 import { Bounds } from '@src/rendering/utils/Bounds';
-import { BeatBounds } from './BeatBounds';
+import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 
 /**
  * Represents the bounds of a single note

@@ -24,13 +24,12 @@ import { Voice } from '@src/synth/synthesis/Voice';
 import { VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceEnvelope';
 import { SynthHelper } from '@src/synth/SynthHelper';
 import { TypeConversions } from '@src/io/TypeConversions';
-import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 import { MetaEventType } from '@src/midi/MetaEvent';
 import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
 import { MetaDataEvent } from '@src/midi/MetaDataEvent';
-import { Queue } from '../ds/Queue';
+import { Queue } from '@src/synth/ds/Queue';
 
 /**
  * This is a tiny soundfont based synthesizer.
@@ -145,7 +144,6 @@ export class TinySoundFont {
     }
 
     private processMidiMessage(e: MidiEvent): void {
-        Logger.debug('Midi', 'Processing midi ' + e.command);
         const command: MidiEventType = e.command;
         const channel: number = e.channel;
         const data1: number = e.data1;
@@ -244,10 +242,13 @@ export class TinySoundFont {
 
         if (this._channels) {
             for (const c of this._channels.channelList) {
-                c.presetIndex = c.bank = 0;
-                c.pitchWheel = c.midiPan = 8192;
+                c.presetIndex = 0;
+                c.bank = 0;
+                c.pitchWheel = 8192;
+                c.midiPan = 8192;
                 c.perNotePitchWheel.clear();
-                c.midiVolume = c.midiExpression = 16383;
+                c.midiVolume = 16383;
+                c.midiExpression = 16383;
                 c.midiRpn = 0xffff;
                 c.midiData = 0;
                 c.panOffset = 0.0;
@@ -397,7 +398,8 @@ export class TinySoundFont {
             // Setup lowpass filter.
             const filterQDB: number = region.initialFilterQ / 10.0;
             voice.lowPass.qInv = 1.0 / Math.pow(10.0, filterQDB / 20.0);
-            voice.lowPass.z1 = voice.lowPass.z2 = 0;
+            voice.lowPass.z1 = 0;
+            voice.lowPass.z2 = 0;
             voice.lowPass.active = region.initialFilterFc <= 13500;
             if (voice.lowPass.active) {
                 voice.lowPass.setup(SynthHelper.cents2Hertz(region.initialFilterFc) / this.outSampleRate);
@@ -518,9 +520,12 @@ export class TinySoundFont {
 
         for (let i: number = this._channels.channelList.length; i <= channel; i++) {
             let c: Channel = new Channel();
-            c.presetIndex = c.bank = 0;
-            c.pitchWheel = c.midiPan = 8192;
-            c.midiVolume = c.midiExpression = 16383;
+            c.presetIndex = 0;
+            c.bank = 0;
+            c.pitchWheel = 8192;
+            c.midiPan = 8192;
+            c.midiVolume = 16383;
+            c.midiExpression = 16383;
             c.midiRpn = 0xffff;
             c.midiData = 0;
             c.panOffset = 0.0;
@@ -606,7 +611,8 @@ export class TinySoundFont {
             }
 
             if (!matchFirst || v.playIndex < matchFirst.playIndex) {
-                matchFirst = matchLast = v;
+                matchFirst = v;
+                matchLast = v;
                 matches.push(v);
             } else if (v.playIndex === matchFirst.playIndex) {
                 matchLast = v;
@@ -955,7 +961,8 @@ export class TinySoundFont {
                 this.channelNoteOffAll(channel);
                 return;
             case 121 /*ALL_CTRL_OFF*/:
-                c.midiVolume = c.midiExpression = 16383;
+                c.midiVolume = 16383;
+                c.midiExpression = 16383;
                 c.midiPan = 8192;
                 c.bank = 0;
                 this.channelSetVolume(channel, 1);
@@ -1048,12 +1055,13 @@ export class TinySoundFont {
     }
 
     public loadPresets(hydra: Hydra, append: boolean): void {
-        const newPresets = new Array<Preset>(hydra.phdrs.length - 1);
+        const newPresets:Preset[] = [];
         for (let phdrIndex: number = 0; phdrIndex < hydra.phdrs.length - 1; phdrIndex++) {
             const phdr: HydraPhdr = hydra.phdrs[phdrIndex];
             let regionIndex: number = 0;
 
-            const preset: Preset = (newPresets[phdrIndex] = new Preset());
+            const preset: Preset = new Preset();
+            newPresets.push(preset);
             preset.name = phdr.presetName;
             preset.bank = phdr.bank;
             preset.presetNumber = phdr.preset;

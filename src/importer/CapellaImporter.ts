@@ -8,7 +8,7 @@ import { Logger } from '@src/Logger';
 import { ZipReader } from '@src/zip/ZipReader';
 import { ZipEntry } from "@src/zip/ZipEntry";
 import { IOHelper } from '@src/io/IOHelper';
-import { CapellaParser } from './CapellaParser';
+import { CapellaParser } from '@src/importer/CapellaParser';
 
 /**
  * This ScoreImporter can read Capella (cap/capx) files.
@@ -55,7 +55,7 @@ export class CapellaImporter extends ScoreImporter {
             let score: Score = capellaParser.score;
             return score;
         } catch (e) {
-            throw new UnsupportedFormatError('Failed to parse CapXML', e);
+            throw new UnsupportedFormatError('Failed to parse CapXML', e as Error);
         }
     }
 }

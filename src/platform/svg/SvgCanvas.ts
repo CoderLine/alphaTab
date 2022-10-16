@@ -168,7 +168,7 @@ export abstract class SvgCanvas implements ICanvas {
                 return `dominant-baseline="hanging"`;
             case TextBaseline.Bottom:
                 return `dominant-baseline="bottom"`;
-            case TextBaseline.Middle:
+            // case TextBaseline.Middle:
             default:
                 // middle is set as default on the SVG tag via css
                 return '';
@@ -179,7 +179,7 @@ export abstract class SvgCanvas implements ICanvas {
         if (!text) {
             return 0;
         }
-        return FontSizes.measureString(text, this.font.family, this.font.size, this.font.style);
+        return FontSizes.measureString(text, this.font.families, this.font.size, this.font.style, this.font.weight);
     }
 
     public abstract fillMusicFontSymbol(

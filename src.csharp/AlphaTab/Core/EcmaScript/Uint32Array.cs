@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Core.EcmaScript
@@ -25,7 +27,7 @@ namespace AlphaTab.Core.EcmaScript
 
         public IEnumerator<uint> GetEnumerator()
         {
-            return ((IEnumerable<uint>)_data).GetEnumerator();
+			return ((IEnumerable<uint>) _data).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

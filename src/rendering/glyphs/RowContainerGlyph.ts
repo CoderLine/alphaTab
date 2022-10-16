@@ -14,7 +14,7 @@ export class RowContainerGlyph extends GlyphGroup {
         this._align = align;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let x: number = 0;
         let y: number = 0;
         let padding: number = 2 * RowContainerGlyph.Padding * this.scale;
@@ -46,7 +46,7 @@ export class RowContainerGlyph extends GlyphGroup {
         this.height = y + padding;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         for (let row of this._rows) {
             row.paint(cx + this.x, cy + this.y + RowContainerGlyph.Padding * this.scale, canvas);
         }

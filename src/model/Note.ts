@@ -18,8 +18,17 @@ import { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { PickStroke } from './PickStroke';
+import { PickStroke } from '@src/model/PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
+
+class NoteIdBag {
+    public tieDestinationNoteId: number = -1;
+    public tieOriginNoteId: number = -1;
+    public slurDestinationNoteId: number = -1;
+    public slurOriginNoteId: number = -1;
+    public hammerPullDestinationNoteId: number = -1;
+    public hammerPullOriginNoteId: number = -1;
+}
 
 /**
  * A note is a single played sound on a fretted instrument.
@@ -27,6 +36,7 @@ import { PercussionMapper } from '@src/model/PercussionMapper';
  * It also can be modified by a lot of different effects.
  * @cloneable
  * @json
+ * @json_strict
  */
 export class Note {
     public static GlobalNoteId: number = 0;
@@ -258,28 +268,18 @@ export class Note {
     }
 
     /**
-     * Gets the origin note id of the hammeron/pull-off of this note.
-     */
-    public hammerPullOriginNoteId: number = -1;
-
-    /**
      * Gets the origin of the hammeron/pulloff of this note.
+     * @clone_ignore
+     * @json_ignore
      */
-    public get hammerPullOrigin(): Note | null {
-        return this.hammerPullOriginNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.hammerPullOriginNoteId);
-    }
-
-    /**
-     * Gets the destination note id of the hammeron/pull-off of this note.
-     */
-    public hammerPullDestinationNoteId: number = -1;
+    public hammerPullOrigin: Note | null = null;
 
     /**
      * Gets the destination for the hammeron/pullof started by this note.
+     * @clone_ignore
+     * @json_ignore
      */
-    public get hammerPullDestination(): Note | null {
-        return this.hammerPullDestinationNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.hammerPullDestinationNoteId);
-    }
+    public hammerPullDestination: Note | null = null;
 
     public get isSlurOrigin(): boolean {
         return !!this.slurDestination;
@@ -290,30 +290,19 @@ export class Note {
      */
     public isSlurDestination: boolean = false;
 
-
-    /**
-     * Gets the note id where the slur of this note starts.
-     */
-    public slurOriginNoteId: number = -1;
-
     /**
      * Gets or sets the note where the slur of this note starts.
+     * @clone_ignore
+     * @json_ignore
      */
-    public get slurOrigin(): Note | null {
-        return this.slurOriginNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.slurOriginNoteId);
-    }
-
-    /**
-     * Gets or sets the note id where the slur of this note ends.
-     */
-    public slurDestinationNoteId: number = -1;
+    public slurOrigin: Note | null = null;
 
     /**
      * Gets or sets the note where the slur of this note ends.
+     * @clone_ignore
+     * @json_ignore
      */
-    public get slurDestination(): Note | null {
-        return this.slurDestinationNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.slurDestinationNoteId);
-    }
+    public slurDestination: Note | null = null;
 
     public get isHarmonic(): boolean {
         return this.harmonicType !== HarmonicType.None;
@@ -397,30 +386,19 @@ export class Note {
      */
     public vibrato: VibratoType = VibratoType.None;
 
-
-    /**
-     * Gets the origin note id of the tied if this note is tied.
-     */
-    public tieOriginNoteId: number = -1;
-
     /**
      * Gets the origin of the tied if this note is tied.
+     * @clone_ignore
+     * @json_ignore
      */
-    public get tieOrigin(): Note | null {
-        return this.tieOriginNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.tieOriginNoteId);
-    }
-
-    /**
-     * Gets the desination note id of the tie.
-     */
-    public tieDestinationNoteId: number = -1;
+    public tieOrigin: Note | null = null;
 
     /**
      * Gets the desination of the tie.
+     * @clone_ignore
+     * @json_ignore
      */
-    public get tieDestination(): Note | null {
-        return this.tieDestinationNoteId === -1 ? null : this.beat.voice.bar.staff.track.score.getNoteById(this.tieDestinationNoteId);
-    }
+    public tieDestination: Note | null = null;
 
     /**
      * Gets or sets whether this note is ends a tied note.
@@ -428,7 +406,7 @@ export class Note {
     public isTieDestination: boolean = false;
 
     public get isTieOrigin(): boolean {
-        return this.tieDestinationNoteId !== -1;
+        return this.tieDestination !== null;
     }
 
     /**
@@ -632,15 +610,19 @@ export class Note {
 
     public get initialBendValue(): number {
         if (this.hasBend) {
-            return (this.bendPoints[0].value / 2) | 0;
+            return Math.floor(this.bendPoints[0].value / 2);
         } else if (this.bendOrigin) {
-            return (this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2) | 0;
+            return Math.floor(this.bendOrigin.bendPoints[this.bendOrigin.bendPoints.length - 1].value / 2);
         } else if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
-            return (this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2) | 0;
+            return Math.floor(
+                this.tieOrigin!.bendOrigin.bendPoints[this.tieOrigin!.bendOrigin.bendPoints.length - 1].value / 2
+            );
         } else if (this.beat.hasWhammyBar) {
-            return (this.beat.whammyBarPoints[0].value / 2) | 0;
+            return Math.floor(this.beat.whammyBarPoints[0].value / 2);
         } else if (this.beat.isContinuedWhammy) {
-            return (this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value / 2) | 0;
+            return Math.floor(
+                this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value / 2
+            );
         }
         return 0;
     }
@@ -702,7 +684,7 @@ export class Note {
         if (this.beat.isContinuedWhammy) {
             return (
                 this.beat.previousBeat!.whammyBarPoints[this.beat.previousBeat!.whammyBarPoints.length - 1].value %
-                2 !==
+                    2 !==
                 0
             );
         }
@@ -719,13 +701,13 @@ export class Note {
         }
     }
 
-    public finish(settings: Settings): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         let nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
         let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
 
         // connect ties
         if (this.isTieDestination) {
-            this.chain();
+            this.chain(sharedDataBag);
             // implicit let ring
             if (isSongBook && this.tieOrigin && this.tieOrigin.isLetRing) {
                 this.isLetRing = true;
@@ -756,8 +738,8 @@ export class Note {
             if (!hammerPullDestination) {
                 this.isHammerPullOrigin = false;
             } else {
-                this.hammerPullDestinationNoteId = hammerPullDestination.id;
-                hammerPullDestination.hammerPullOriginNoteId = this.id;
+                this.hammerPullDestination = hammerPullDestination;
+                hammerPullDestination.hammerPullOrigin = this;
             }
         }
         // set slides
@@ -792,13 +774,15 @@ export class Note {
         }
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all bends
-        if (this.bendPoints.length > 0 && this.bendType === BendType.Custom) {
-            let isContinuedBend: boolean = (this.isContinuedBend = this.isTieDestination && this.tieOrigin!.hasBend);
-            if (this.bendPoints.length === 4) {
-                let origin: BendPoint = this.bendPoints[0];
-                let middle1: BendPoint = this.bendPoints[1];
-                let middle2: BendPoint = this.bendPoints[2];
-                let destination: BendPoint = this.bendPoints[3];
+        const points = this.bendPoints;
+        if (points.length > 0 && this.bendType === BendType.Custom) {
+            let isContinuedBend: boolean = this.isTieDestination && this.tieOrigin!.hasBend;
+            this.isContinuedBend = isContinuedBend;
+            if (points.length === 4) {
+                let origin: BendPoint = points[0];
+                let middle1: BendPoint = points[1];
+                let middle2: BendPoint = points[2];
+                let destination: BendPoint = points[3];
                 // the middle points are used for holds, anything else is a new feature we do not support yet
                 if (middle1.value === middle2.value) {
                     // bend higher?
@@ -807,43 +791,43 @@ export class Note {
                             this.bendType = BendType.BendRelease;
                         } else if (!isContinuedBend && origin.value > 0) {
                             this.bendType = BendType.PrebendBend;
-                            this.bendPoints.splice(2, 1);
-                            this.bendPoints.splice(1, 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         } else {
                             this.bendType = BendType.Bend;
-                            this.bendPoints.splice(2, 1);
-                            this.bendPoints.splice(1, 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         }
                     } else if (destination.value < origin.value) {
                         // origin must be > 0 otherwise it's no release, we cannot bend negative
                         if (isContinuedBend) {
                             this.bendType = BendType.Release;
-                            this.bendPoints.splice(2, 1);
-                            this.bendPoints.splice(1, 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         } else {
                             this.bendType = BendType.PrebendRelease;
-                            this.bendPoints.splice(2, 1);
-                            this.bendPoints.splice(1, 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         }
                     } else {
                         if (middle1.value > origin.value) {
                             this.bendType = BendType.BendRelease;
                         } else if (origin.value > 0 && !isContinuedBend) {
                             this.bendType = BendType.Prebend;
-                            this.bendPoints.splice(2, 1);
-                            this.bendPoints.splice(1, 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         } else {
                             this.bendType = BendType.Hold;
-                            this.bendPoints.splice(2, 1);
-                            this.bendPoints.splice(1, 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         }
                     }
                 } else {
                     Logger.warning('Model', 'Unsupported bend type detected, fallback to custom', null);
                 }
-            } else if (this.bendPoints.length === 2) {
-                let origin: BendPoint = this.bendPoints[0];
-                let destination: BendPoint = this.bendPoints[1];
+            } else if (points.length === 2) {
+                let origin: BendPoint = points[0];
+                let destination: BendPoint = points[1];
                 // bend higher?
                 if (destination.value > origin.value) {
                     if (!isContinuedBend && origin.value > 0) {
@@ -862,7 +846,7 @@ export class Note {
                     this.bendType = BendType.Hold;
                 }
             }
-        } else if (this.bendPoints.length === 0) {
+        } else if (points.length === 0) {
             this.bendType = BendType.None;
         }
 
@@ -968,30 +952,143 @@ export class Note {
         return null;
     }
 
-    public chain() {
-        this.beat.voice.bar.staff.track.score.registerNote(this);
-        if (!this.isTieDestination) {
+    private static NoteIdLookupKey = 'NoteIdLookup';
+
+    private _noteIdBag: NoteIdBag | null = null;
+    public chain(sharedDataBag: Map<string, unknown> | null = null) {
+        // mainly for backwards compat in case we reach this code from somewhere outside.
+        if (sharedDataBag === null) {
             return;
         }
 
-        let tieOrigin: Note | null;
-        if (this.tieOriginNoteId === -1) {
-            tieOrigin = Note.findTieOrigin(this);
-            this.tieOriginNoteId = tieOrigin ? tieOrigin.id : -1;
-        } else {
-            tieOrigin = this.tieOrigin;
-        }
+        // if we have some IDs from a serialization flow,
+        // we need to lookup/register the notes correctly
+        if (this._noteIdBag !== null) {
+            // get or create lookup
+            let noteIdLookup: Map<number, Note>;
+            if (sharedDataBag.has(Note.NoteIdLookupKey)) {
+                noteIdLookup = sharedDataBag.get(Note.NoteIdLookupKey) as Map<number, Note>;
+            } else {
+                noteIdLookup = new Map<number, Note>();
+                sharedDataBag.set(Note.NoteIdLookupKey, noteIdLookup);
+            }
 
-        if (!tieOrigin) {
-            this.isTieDestination = false;
+            // if this note is a source note for any effect, remember it for later
+            // the destination note will look it up for linking
+            if (
+                this._noteIdBag.hammerPullDestinationNoteId !== -1 ||
+                this._noteIdBag.tieDestinationNoteId !== -1 ||
+                this._noteIdBag.slurDestinationNoteId !== -1
+            ) {
+                noteIdLookup.set(this.id, this);
+            }
+
+            // on any effect destiniation, lookup the origin which should already be
+            // registered
+            if (this._noteIdBag.hammerPullOriginNoteId !== -1) {
+                this.hammerPullOrigin = noteIdLookup.get(this._noteIdBag.hammerPullOriginNoteId)!;
+                this.hammerPullOrigin.hammerPullDestination = this;
+            }
+            if (this._noteIdBag.tieOriginNoteId !== -1) {
+                this.tieOrigin = noteIdLookup.get(this._noteIdBag.tieOriginNoteId)!;
+                this.tieOrigin.tieDestination = this;
+            }
+            if (this._noteIdBag.slurOriginNoteId !== -1) {
+                this.slurOrigin = noteIdLookup.get(this._noteIdBag.slurOriginNoteId)!;
+                this.slurOrigin.slurDestination = this;
+            }
+
+            this._noteIdBag = null; // not needed anymore
         } else {
-            tieOrigin.tieDestinationNoteId = this.id;
-            this.fret = tieOrigin.fret;
-            this.octave = tieOrigin.octave;
-            this.tone = tieOrigin.tone;
-            if (tieOrigin.hasBend) {
-                this.bendOrigin = this.tieOrigin;
+            if (!this.isTieDestination && this.tieOrigin === null) {
+                return;
+            }
+
+            let tieOrigin = Note.findTieOrigin(this);
+            if (!tieOrigin) {
+                this.isTieDestination = false;
+            } else {
+                tieOrigin.tieDestination = this;
+                this.tieOrigin = tieOrigin;
+                this.fret = tieOrigin.fret;
+                this.octave = tieOrigin.octave;
+                this.tone = tieOrigin.tone;
+                if (tieOrigin.hasBend) {
+                    this.bendOrigin = this.tieOrigin;
+                }
             }
         }
+    }
+
+    /**
+     * @internal
+     */
+    public toJson(o: Map<string, unknown>) {
+        // inject linked note ids into JSON
+        if (this.tieDestination !== null) {
+            o.set('tiedestinationnoteid', this.tieDestination.id);
+        }
+        if (this.tieOrigin !== null) {
+            o.set('tieoriginnoteid', this.tieOrigin.id);
+        }
+        if (this.slurDestination !== null) {
+            o.set('slurdestinationnoteid', this.slurDestination.id);
+        }
+        if (this.slurOrigin !== null) {
+            o.set('sluroriginnoteid', this.slurOrigin.id);
+        }
+        if (this.hammerPullOrigin !== null) {
+            o.set('hammerpulloriginnoteid', this.hammerPullOrigin.id);
+        }
+        if (this.hammerPullDestination !== null) {
+            o.set('hammerpulldestinationnoteid', this.hammerPullDestination.id);
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public setProperty(property: string, v: unknown): boolean {
+        switch (property) {
+            case 'tiedestinationnoteid':
+                if (this._noteIdBag === null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.tieDestinationNoteId = v as number;
+                return true;
+            case 'tieoriginnoteid':
+                if (this._noteIdBag === null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.tieOriginNoteId = v as number;
+                return true;
+
+            case 'slurdestinationnoteid':
+                if (this._noteIdBag === null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.slurDestinationNoteId = v as number;
+                return true;
+            case 'sluroriginnoteid':
+                if (this._noteIdBag === null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.slurOriginNoteId = v as number;
+                return true;
+
+            case 'hammerpulloriginnoteid':
+                if (this._noteIdBag === null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.hammerPullOriginNoteId = v as number;
+                return true;
+            case 'hammerpulldestinationnoteid':
+                if (this._noteIdBag === null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.hammerPullDestinationNoteId = v as number;
+                return true;
+        }
+        return false;
     }
 }

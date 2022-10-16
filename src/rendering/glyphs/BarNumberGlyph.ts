@@ -11,12 +11,12 @@ export class BarNumberGlyph extends Glyph {
         this._number = num;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.barNumberFont;
         this.width = this.renderer.scoreRenderer.canvas!.measureText(this._number.toString()) + 5 * this.scale;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (!this.renderer.staff.isFirstInAccolade) {
             return;
         }

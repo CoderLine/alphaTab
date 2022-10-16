@@ -9,7 +9,8 @@ namespace AlphaTab.Wpf
     {
         public static BitmapSource Create(Bitmap image)
         {
-            var bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly,
+            var bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
+                ImageLockMode.ReadOnly,
                 image.PixelFormat);
 
             var bitmapSource = BitmapSource.Create(
@@ -17,7 +18,7 @@ namespace AlphaTab.Wpf
                 bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
             image.UnlockBits(bitmapData);
-
+            bitmapSource.Freeze();
             return bitmapSource;
         }
     }

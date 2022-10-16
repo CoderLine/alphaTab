@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using AlphaTab.Core;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
@@ -15,9 +14,9 @@ namespace AlphaTab.Platform.CSharp
         private readonly Action<Action> _uiInvoke;
 
         private readonly Thread _workerThread;
-        private BlockingCollection<Action> _workerQueue;
-        private ManualResetEventSlim? _threadStartedEvent;
-        private CancellationTokenSource _workerCancellationToken;
+        private readonly BlockingCollection<Action> _workerQueue;
+        private readonly ManualResetEventSlim? _threadStartedEvent;
+        private readonly CancellationTokenSource _workerCancellationToken;
         private ScoreRenderer _renderer;
         private double _width;
 
@@ -31,8 +30,10 @@ namespace AlphaTab.Platform.CSharp
             _workerQueue = new BlockingCollection<Action>();
             _workerCancellationToken = new CancellationTokenSource();
 
-            _workerThread = new Thread(DoWork);
-            _workerThread.IsBackground = true;
+            _workerThread = new Thread(DoWork)
+            {
+                IsBackground = true
+            };
             _workerThread.Start();
 
             _threadStartedEvent.Wait();
@@ -47,7 +48,7 @@ namespace AlphaTab.Platform.CSharp
         {
             _threadStartedEvent.Set();
             while (_workerQueue.TryTake(out var action, Timeout.Infinite,
-                _workerCancellationToken.Token))
+                       _workerCancellationToken.Token))
             {
                 if (_workerCancellationToken.IsCancellationRequested)
                 {
@@ -63,6 +64,8 @@ namespace AlphaTab.Platform.CSharp
             _renderer = new ScoreRenderer(settings);
             _renderer.PartialRenderFinished.On(result =>
                 _uiInvoke(() => OnPartialRenderFinished(result)));
+            _renderer.PartialLayoutFinished.On(result =>
+                _uiInvoke(() => OnPartialLayoutFinished(result)));
             _renderer.RenderFinished.On(result => _uiInvoke(() => OnRenderFinished(result)));
             _renderer.PostRenderFinished.On(() =>
                 _uiInvoke(() => OnPostFinished(_renderer.BoundsLookup)));
@@ -111,6 +114,18 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
+        public void RenderResult(string resultId)
+        {
+            if (CheckAccess())
+            {
+                _renderer.RenderResult(resultId);
+            }
+            else
+            {
+                _workerQueue.Add(() => RenderResult(resultId));
+            }
+        }
+
         public double Width
         {
             get => _width;
@@ -140,7 +155,7 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
-        public void RenderScore(Score score, IList<double> trackIndexes)
+        public void RenderScore(Score? score, IList<double>? trackIndexes)
         {
             if (CheckAccess())
             {
@@ -148,7 +163,9 @@ namespace AlphaTab.Platform.CSharp
             }
             else
             {
-                _workerQueue.Add(() => RenderScore(score, trackIndexes));
+                _workerQueue.Add(() =>
+                    RenderScore(score,
+                        trackIndexes));
             }
         }
 
@@ -156,7 +173,7 @@ namespace AlphaTab.Platform.CSharp
 
         protected virtual void OnPreRender(bool isResize)
         {
-            ((EventEmitterOfT<bool>) PreRender).Trigger(isResize);
+            ((EventEmitterOfT<bool>)PreRender).Trigger(isResize);
         }
 
         public IEventEmitterOfT<RenderFinishedEventArgs> PartialRenderFinished { get; } =
@@ -164,7 +181,15 @@ namespace AlphaTab.Platform.CSharp
 
         protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs obj)
         {
-            ((EventEmitterOfT<RenderFinishedEventArgs>) PartialRenderFinished).Trigger(obj);
+            ((EventEmitterOfT<RenderFinishedEventArgs>)PartialRenderFinished).Trigger(obj);
+        }
+
+        public IEventEmitterOfT<RenderFinishedEventArgs> PartialLayoutFinished { get; } =
+            new EventEmitterOfT<RenderFinishedEventArgs>();
+
+        protected virtual void OnPartialLayoutFinished(RenderFinishedEventArgs obj)
+        {
+            ((EventEmitterOfT<RenderFinishedEventArgs>)PartialLayoutFinished).Trigger(obj);
         }
 
         public IEventEmitterOfT<RenderFinishedEventArgs> RenderFinished { get; } =
@@ -172,21 +197,21 @@ namespace AlphaTab.Platform.CSharp
 
         protected virtual void OnRenderFinished(RenderFinishedEventArgs obj)
         {
-            ((EventEmitterOfT<RenderFinishedEventArgs>) RenderFinished).Trigger(obj);
+            ((EventEmitterOfT<RenderFinishedEventArgs>)RenderFinished).Trigger(obj);
         }
 
         public IEventEmitterOfT<Error> Error { get; } = new EventEmitterOfT<Error>();
 
         protected virtual void OnError(Error details)
         {
-            ((EventEmitterOfT<Error>) Error).Trigger(details);
+            ((EventEmitterOfT<Error>)Error).Trigger(details);
         }
 
         public IEventEmitter PostRenderFinished { get; } = new EventEmitter();
 
         protected virtual void OnPostRenderFinished()
         {
-            ((EventEmitter) PostRenderFinished).Trigger();
+            ((EventEmitter)PostRenderFinished).Trigger();
         }
     }
 }

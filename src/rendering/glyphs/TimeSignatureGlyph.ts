@@ -19,7 +19,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
     protected abstract get commonScale(): number;
     protected abstract get numberScale(): number;
 
-    public doLayout(): void {
+    public override doLayout(): void {
         if (this._isCommon && this._numerator === 2 && this._denominator === 2) {
             let common: MusicFontGlyph = new MusicFontGlyph(
                 0,

@@ -15,7 +15,7 @@ export class StaffSerializer {
         if (!m) {
             return;
         } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
     }
     public static toJson(obj: Staff | null): Map<string, unknown> | null {
         if (!obj) {
@@ -26,18 +26,18 @@ export class StaffSerializer {
         {
             const m = new Map<string, unknown>();
             o.set("chords", m);
-            for (const [k, v] of obj.chords) {
+            for (const [k, v] of obj.chords!) {
                 m.set(k.toString(), ChordSerializer.toJson(v));
             }
         } 
         o.set("capo", obj.capo); 
-        o.set("transpositionPitch", obj.transpositionPitch); 
-        o.set("displayTranspositionPitch", obj.displayTranspositionPitch); 
-        o.set("stringTuning", TuningSerializer.toJson(obj.stringTuning)); 
-        o.set("showTablature", obj.showTablature); 
-        o.set("showStandardNotation", obj.showStandardNotation); 
-        o.set("isPercussion", obj.isPercussion); 
-        o.set("standardNotationLineCount", obj.standardNotationLineCount); 
+        o.set("transpositionpitch", obj.transpositionPitch); 
+        o.set("displaytranspositionpitch", obj.displayTranspositionPitch); 
+        o.set("stringtuning", TuningSerializer.toJson(obj.stringTuning)); 
+        o.set("showtablature", obj.showTablature); 
+        o.set("showstandardnotation", obj.showStandardNotation); 
+        o.set("ispercussion", obj.isPercussion); 
+        o.set("standardnotationlinecount", obj.standardNotationLineCount); 
         return o; 
     }
     public static setProperty(obj: Staff, property: string, v: unknown): boolean {
@@ -46,7 +46,7 @@ export class StaffSerializer {
                 obj.bars = [];
                 for (const o of (v as (Map<string, unknown> | null)[])) {
                     const i = new Bar();
-                    BarSerializer.fromJson(i, o)
+                    BarSerializer.fromJson(i, o);
                     obj.addBar(i);
                 }
                 return true;
@@ -54,34 +54,34 @@ export class StaffSerializer {
                 obj.chords = new Map<string, Chord>();
                 JsonHelper.forEach(v, (v, k) => {
                     const i = new Chord(); 
-                    ChordSerializer.fromJson(i, (v as Map<string, unknown>)); 
+                    ChordSerializer.fromJson(i, v as Map<string, unknown>); 
                     obj.addChord(k, i); 
                 });
                 return true;
             case "capo":
-                obj.capo = (v as number);
+                obj.capo = v! as number;
                 return true;
             case "transpositionpitch":
-                obj.transpositionPitch = (v as number);
+                obj.transpositionPitch = v! as number;
                 return true;
             case "displaytranspositionpitch":
-                obj.displayTranspositionPitch = (v as number);
+                obj.displayTranspositionPitch = v! as number;
                 return true;
             case "showtablature":
-                obj.showTablature = (v as boolean);
+                obj.showTablature = v! as boolean;
                 return true;
             case "showstandardnotation":
-                obj.showStandardNotation = (v as boolean);
+                obj.showStandardNotation = v! as boolean;
                 return true;
             case "ispercussion":
-                obj.isPercussion = (v as boolean);
+                obj.isPercussion = v! as boolean;
                 return true;
             case "standardnotationlinecount":
-                obj.standardNotationLineCount = (v as number);
+                obj.standardNotationLineCount = v! as number;
                 return true;
         } 
         if (["stringtuning"].indexOf(property) >= 0) {
-            TuningSerializer.fromJson(obj.stringTuning, (v as Map<string, unknown>));
+            TuningSerializer.fromJson(obj.stringTuning, v as Map<string, unknown>);
             return true;
         } 
         return false; 

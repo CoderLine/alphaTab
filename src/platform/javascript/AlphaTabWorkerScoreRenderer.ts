@@ -8,6 +8,7 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
+import { Environment } from '@src/Environment';
 
 /**
  * @target web
@@ -22,23 +23,12 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     public constructor(api: AlphaTabApiBase<T>, settings: Settings) {
         this._api = api;
 
-        if (!settings.core.scriptFile) {
-            Logger.error('Rendering', `Could not detect alphaTab script file, cannot initialize renderer`);
-            return;
-        }
-
         // first try blob worker
         try {
-            let script: string = `importScripts('${settings.core.scriptFile}')`;
-            let blob: Blob = new Blob([script]);
-            this._worker = new Worker(URL.createObjectURL(blob));
+            this._worker = Environment.createAlphaTabWorker(settings.core.scriptFile);
         } catch (e) {
-            try {
-                this._worker = new Worker(settings.core.scriptFile);
-            } catch (e2) {
-                Logger.error('Rendering', `Failed to create WebWorker: ${e}`);
-                return;
-            }
+            Logger.error('Rendering', `Failed to create WebWorker: ${e}`);
+            return;
         }
         this._worker.postMessage({
             cmd: 'alphaTab.initialize',
@@ -77,6 +67,14 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
+    public renderResult(resultId: string): void {
+        this._worker.postMessage({
+            cmd: 'alphaTab.renderResult',
+            resultId: resultId
+        });
+    }
+
+
     public get width(): number {
         return this._width;
     }
@@ -99,11 +97,15 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
             case 'alphaTab.partialRenderFinished':
                 (this.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
                 break;
+            case 'alphaTab.partialLayoutFinished':
+                (this.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
+                break;
             case 'alphaTab.renderFinished':
                 (this.renderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
                 break;
             case 'alphaTab.postRenderFinished':
                 this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, this._api.score!);
+                this.boundsLookup.finish();
                 (this.postRenderFinished as EventEmitter).trigger();
                 break;
             case 'alphaTab.error':
@@ -112,8 +114,8 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         }
     }
 
-    public renderScore(score: Score, trackIndexes: number[]): void {
-        let jsObject: unknown = JsonConverter.scoreToJsObject(score);
+    public renderScore(score: Score | null, trackIndexes: number[] | null): void {
+        let jsObject: unknown = score == null ? null : JsonConverter.scoreToJsObject(score);
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
             score: jsObject,
@@ -124,6 +126,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
 
     public preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
     public partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
     public renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
     public postRenderFinished: IEventEmitter = new EventEmitter();
     public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();

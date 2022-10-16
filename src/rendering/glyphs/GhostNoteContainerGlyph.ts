@@ -52,7 +52,7 @@ export class GhostNoteContainerGlyph extends Glyph {
         return false;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         this._infos.sort((a, b) => {
             return a.line - b.line;
@@ -79,7 +79,7 @@ export class GhostNoteContainerGlyph extends Glyph {
         this.width = this._glyphs.length > 0 ? this._glyphs[0].width : 0;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
         for (let g of this._glyphs) {
             g.paint(cx + this.x, cy + this.y, canvas);

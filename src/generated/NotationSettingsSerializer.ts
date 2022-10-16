@@ -21,62 +21,62 @@ export class NotationSettingsSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("notationMode", (obj.notationMode as number)); 
-        o.set("fingeringMode", (obj.fingeringMode as number)); 
+        o.set("notationmode", obj.notationMode as number); 
+        o.set("fingeringmode", obj.fingeringMode as number); 
         {
             const m = new Map<string, unknown>();
             o.set("elements", m);
-            for (const [k, v] of obj.elements) {
+            for (const [k, v] of obj.elements!) {
                 m.set(k.toString(), v);
             }
         } 
-        o.set("rhythmMode", (obj.rhythmMode as number)); 
-        o.set("rhythmHeight", obj.rhythmHeight); 
-        o.set("transpositionPitches", obj.transpositionPitches); 
-        o.set("displayTranspositionPitches", obj.displayTranspositionPitches); 
-        o.set("smallGraceTabNotes", obj.smallGraceTabNotes); 
-        o.set("extendBendArrowsOnTiedNotes", obj.extendBendArrowsOnTiedNotes); 
-        o.set("extendLineEffectsToBeatEnd", obj.extendLineEffectsToBeatEnd); 
-        o.set("slurHeight", obj.slurHeight); 
+        o.set("rhythmmode", obj.rhythmMode as number); 
+        o.set("rhythmheight", obj.rhythmHeight); 
+        o.set("transpositionpitches", obj.transpositionPitches); 
+        o.set("displaytranspositionpitches", obj.displayTranspositionPitches); 
+        o.set("smallgracetabnotes", obj.smallGraceTabNotes); 
+        o.set("extendbendarrowsontiednotes", obj.extendBendArrowsOnTiedNotes); 
+        o.set("extendlineeffectstobeatend", obj.extendLineEffectsToBeatEnd); 
+        o.set("slurheight", obj.slurHeight); 
         return o; 
     }
     public static setProperty(obj: NotationSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "notationmode":
-                obj.notationMode = (JsonHelper.parseEnum<NotationMode>(v, NotationMode)!);
+                obj.notationMode = JsonHelper.parseEnum<NotationMode>(v, NotationMode)!;
                 return true;
             case "fingeringmode":
-                obj.fingeringMode = (JsonHelper.parseEnum<FingeringMode>(v, FingeringMode)!);
+                obj.fingeringMode = JsonHelper.parseEnum<FingeringMode>(v, FingeringMode)!;
                 return true;
             case "elements":
                 obj.elements = new Map<NotationElement, boolean>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.elements.set((JsonHelper.parseEnum<NotationElement>(k, NotationElement)!), (v as boolean)); 
+                    obj.elements.set(JsonHelper.parseEnum<NotationElement>(k, NotationElement)!, v as boolean); 
                 });
                 return true;
             case "rhythmmode":
-                obj.rhythmMode = (JsonHelper.parseEnum<TabRhythmMode>(v, TabRhythmMode)!);
+                obj.rhythmMode = JsonHelper.parseEnum<TabRhythmMode>(v, TabRhythmMode)!;
                 return true;
             case "rhythmheight":
-                obj.rhythmHeight = (v as number);
+                obj.rhythmHeight = v! as number;
                 return true;
             case "transpositionpitches":
-                obj.transpositionPitches = (v as number[]);
+                obj.transpositionPitches = v! as number[];
                 return true;
             case "displaytranspositionpitches":
-                obj.displayTranspositionPitches = (v as number[]);
+                obj.displayTranspositionPitches = v! as number[];
                 return true;
             case "smallgracetabnotes":
-                obj.smallGraceTabNotes = (v as boolean);
+                obj.smallGraceTabNotes = v! as boolean;
                 return true;
             case "extendbendarrowsontiednotes":
-                obj.extendBendArrowsOnTiedNotes = (v as boolean);
+                obj.extendBendArrowsOnTiedNotes = v! as boolean;
                 return true;
             case "extendlineeffectstobeatend":
-                obj.extendLineEffectsToBeatEnd = (v as boolean);
+                obj.extendLineEffectsToBeatEnd = v! as boolean;
                 return true;
             case "slurheight":
-                obj.slurHeight = (v as number);
+                obj.slurHeight = v! as number;
                 return true;
         } 
         return false; 

@@ -25,7 +25,7 @@ export class EffectBarRenderer extends BarRendererBase {
         this._infos = infos;
     }
 
-    protected updateSizes(): void {
+    protected override updateSizes(): void {
         this.topOverflow = 0;
         this.bottomOverflow = 0;
         this.topPadding = 0;
@@ -34,14 +34,17 @@ export class EffectBarRenderer extends BarRendererBase {
         super.updateSizes();
     }
 
-    public finalizeRenderer(): void {
-        super.finalizeRenderer();
-        this.updateHeight();
+    public override finalizeRenderer(): boolean {
+        let didChange = super.finalizeRenderer();
+        if (this.updateHeight()) {
+            didChange = true;
+        }
+        return didChange;
     }
 
-    private updateHeight(): void {
+    private updateHeight(): boolean {
         if (!this.sizingInfo) {
-            return;
+            return false;
         }
         let y: number = 0;
         for (let slot of this.sizingInfo.slots) {
@@ -52,10 +55,14 @@ export class EffectBarRenderer extends BarRendererBase {
             }
             y += slot.shared.height;
         }
-        this.height = y;
+        if (y !== this.height) {
+            this.height = y;
+            return true;
+        }
+        return false;
     }
 
-    public applyLayoutingInfo(): boolean {
+    public override applyLayoutingInfo(): boolean {
         if (!super.applyLayoutingInfo()) {
             return false;
         }
@@ -77,14 +84,14 @@ export class EffectBarRenderer extends BarRendererBase {
         return true;
     }
 
-    public scaleToWidth(width: number): void {
+    public override scaleToWidth(width: number): void {
         super.scaleToWidth(width);
         for (let effectBand of this._bands) {
             effectBand.alignGlyphs();
         }
     }
 
-    protected createBeatGlyphs(): void {
+    protected override createBeatGlyphs(): void {
         this._bands = [];
         this._bandLookup = new Map<string, EffectBand>();
         for (let voice of this.bar.voices) {
@@ -110,7 +117,7 @@ export class EffectBarRenderer extends BarRendererBase {
         }
     }
 
-    protected createVoiceGlyphs(v: Voice): void {
+    protected override createVoiceGlyphs(v: Voice): void {
         for (let b of v.beats) {
             // we create empty glyphs as alignment references and to get the
             // effect bar sized
@@ -124,7 +131,7 @@ export class EffectBarRenderer extends BarRendererBase {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         this.paintBackground(cx, cy, canvas);
         // canvas.color = new Color(255, 0, 0, 100);
         // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);

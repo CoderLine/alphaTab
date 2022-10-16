@@ -1,4 +1,4 @@
-﻿namespace AlphaTab.Core.EcmaScript
+namespace AlphaTab.Core.EcmaScript
 {
     public class MapEntry<TKey, TValue>
     {

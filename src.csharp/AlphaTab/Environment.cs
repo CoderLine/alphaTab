@@ -1,4 +1,3 @@
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,9 +11,7 @@ namespace AlphaTab
         public const bool SupportsTextDecoder = true;
         public static void PlatformInit()
         {
-            
         }
-
 
         public static Action Throttle(Action action, double delay)
         {
@@ -37,15 +34,11 @@ namespace AlphaTab
         {
             renderEngines.Set(
                 "skia",
-                new RenderEngineFactory(true, () => {
-                    return new SkiaCanvas();
-                })
+                new RenderEngineFactory(true, () => new SkiaCanvas())
             );
             renderEngines.Set(
                 "gdi",
-                new RenderEngineFactory(true, () => {
-                    return new GdiCanvas();
-                })
+                new RenderEngineFactory(true, () => new GdiCanvas())
             );
             renderEngines.Set("default", renderEngines.Get("skia")!);
         }

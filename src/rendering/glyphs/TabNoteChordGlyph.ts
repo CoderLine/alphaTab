@@ -5,8 +5,8 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { RenderingResources } from '@src/RenderingResources';
-import { NoteXPosition, NoteYPosition } from '../BarRendererBase';
-import { BeatBounds } from '../utils/BeatBounds';
+import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
+import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 
 export class TabNoteChordGlyph extends Glyph {
     private _notes: NoteNumberGlyph[] = [];
@@ -73,7 +73,7 @@ export class TabNoteChordGlyph extends Glyph {
         return 0;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         let w: number = 0;
         let noteStringWidth: number = 0;
         for (let i: number = 0, j: number = this._notes.length; i < j; i++) {
@@ -110,7 +110,7 @@ export class TabNoteChordGlyph extends Glyph {
         }
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x;
         cy += this.y;
         let res: RenderingResources = this.renderer.resources;

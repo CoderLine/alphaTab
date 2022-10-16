@@ -33,7 +33,14 @@ export interface IScoreRenderer {
      * @param score The score defining the tracks.
      * @param trackIndexes The indexes of the tracks to draw.
      */
-    renderScore(score: Score, trackIndexes: number[]): void;
+    renderScore(score: Score | null, trackIndexes: number[] | null): void;
+
+    /**
+     * Initiates the rendering of a partial render result which the renderer
+     * should have layed out already.
+     * @param resultId the result ID as provided by the {@link partialLayoutFinished} event.
+     */
+    renderResult(resultId: string): void;
 
     /**
      * Updates the settings to the given object.
@@ -60,6 +67,11 @@ export interface IScoreRenderer {
      * Occurs whenever a part of the whole music sheet is rendered and can be displayed.
      */
     readonly partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs>;
+
+    /**
+     * Occurs whenever a part of the whole music sheet is layed out but not yet rendered.
+     */
+    readonly partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs>;
 
     /**
      * Occurs when the whole rendering and layout process finished.

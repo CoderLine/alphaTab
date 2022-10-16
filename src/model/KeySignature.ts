@@ -59,7 +59,7 @@ export enum KeySignature {
      */
     FSharp = 6,
     /**
-     * C# (8 sharp)
+     * C# (7 sharp)
      */
     CSharp = 7
 }

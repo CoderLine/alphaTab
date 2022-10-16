@@ -141,7 +141,7 @@ export class Region {
     }
 
     public clear(forRelative: boolean): void {
-        this.loopMode = 0;
+        this.loopMode = LoopMode.None;
         this.sampleRate = 0;
         this.loKey = 0;
         this.hiKey = 0;
@@ -173,7 +173,8 @@ export class Region {
         this.freqVibLFO = 0;
         this.vibLfoToPitch = 0;
 
-        this.hiKey = this.hiVel = 127;
+        this.hiKey = 127;
+        this.hiVel = 127;
         this.pitchKeyCenter = 60; // C4
 
         if (forRelative) {
@@ -185,8 +186,16 @@ export class Region {
         this.pitchKeyCenter = -1;
         
         // SF2 defaults in timecents.
-        this.ampEnv.delay = this.ampEnv.attack = this.ampEnv.hold = this.ampEnv.decay = this.ampEnv.release = -12000.0;
-        this.modEnv.delay = this.modEnv.attack = this.modEnv.hold = this.modEnv.decay = this.modEnv.release = -12000.0;
+        this.ampEnv.delay = -12000.0;
+        this.ampEnv.attack = -12000.0;
+        this.ampEnv.hold = -12000.0;
+        this.ampEnv.decay = -12000.0;
+        this.ampEnv.release = -12000.0;
+        this.modEnv.delay = -12000.0;
+        this.modEnv.attack = -12000.0;
+        this.modEnv.hold = -12000.0;
+        this.modEnv.decay = -12000.0;
+        this.modEnv.release = -12000.0;
         
         this.initialFilterFc = 13500;
         

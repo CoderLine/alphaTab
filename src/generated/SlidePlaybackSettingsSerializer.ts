@@ -17,21 +17,21 @@ export class SlidePlaybackSettingsSerializer {
             return null;
         } 
         const o = new Map<string, unknown>(); 
-        o.set("simpleSlidePitchOffset", obj.simpleSlidePitchOffset); 
-        o.set("simpleSlideDurationRatio", obj.simpleSlideDurationRatio); 
-        o.set("shiftSlideDurationRatio", obj.shiftSlideDurationRatio); 
+        o.set("simpleslidepitchoffset", obj.simpleSlidePitchOffset); 
+        o.set("simpleslidedurationratio", obj.simpleSlideDurationRatio); 
+        o.set("shiftslidedurationratio", obj.shiftSlideDurationRatio); 
         return o; 
     }
     public static setProperty(obj: SlidePlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "simpleslidepitchoffset":
-                obj.simpleSlidePitchOffset = (v as number);
+                obj.simpleSlidePitchOffset = v! as number;
                 return true;
             case "simpleslidedurationratio":
-                obj.simpleSlideDurationRatio = (v as number);
+                obj.simpleSlideDurationRatio = v! as number;
                 return true;
             case "shiftslidedurationratio":
-                obj.shiftSlideDurationRatio = (v as number);
+                obj.shiftSlideDurationRatio = v! as number;
                 return true;
         } 
         return false; 

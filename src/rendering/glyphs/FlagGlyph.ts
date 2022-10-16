@@ -11,7 +11,7 @@ export class FlagGlyph extends MusicFontGlyph {
         super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, FlagGlyph.getSymbol(duration, direction, isGrace));
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 0;
     }
 

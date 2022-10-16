@@ -35,6 +35,12 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
         (this.ready as EventEmitter).trigger();
     }
 
+    public destroy(): void {
+        this._worker.postMessage({
+            cmd: 'alphaSynth.output.destroy'
+        });
+    }
+
     private handleMessage(e: MessageEvent): void {
         let data: any = e.data;
         let cmd: any = data.cmd;

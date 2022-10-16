@@ -7,6 +7,7 @@
       "es2015",
       "es2016",
       "es2017",
+      "es2021",
       "dom"
     ],
     "strict": true,
@@ -18,6 +19,7 @@
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
+    "noImplicitOverride": true,
     "sourceMap": true,
     "declaration": true,
     "incremental": true,

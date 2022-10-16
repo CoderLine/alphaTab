@@ -11,11 +11,11 @@ export class RepeatCountGlyph extends Glyph {
         this._count = count;
     }
 
-    public doLayout(): void {
+    public override doLayout(): void {
         this.width = 0;
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let res: RenderingResources = this.renderer.resources;
         let oldAlign: TextAlign = canvas.textAlign;
         canvas.font = res.barNumberFont;

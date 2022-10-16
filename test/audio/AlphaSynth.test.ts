@@ -18,13 +18,13 @@ describe('AlphaSynthTests', () => {
             ' (0.4 0.3).8 r.8(3.4 3.3).8 r.8(5.4 5.3).4 r.8(3.4 3.3).8 | ' +
             'r.8(0.4 0.3).8(-.3 - .4).2 { d } | ';
         let importer: AlphaTexImporter = new AlphaTexImporter();
-        importer.init(TestPlatform.createStringReader(tex), new Settings());
+        importer.initFromString(tex, new Settings());
         let score: Score = importer.readScore();
         let midi: MidiFile = new MidiFile();
         let gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
         gen.generate();
         let testOutput: TestOutput = new TestOutput();
-        let synth: AlphaSynth = new AlphaSynth(testOutput);
+        let synth: AlphaSynth = new AlphaSynth(testOutput, 500);
         synth.loadSoundFont(data, false);
         synth.loadMidiFile(midi);
         synth.play();
