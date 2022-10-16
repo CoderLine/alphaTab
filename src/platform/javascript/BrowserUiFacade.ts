@@ -446,7 +446,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 if (this._api.settings.core.enableLazyLoading) {
                     this._intersectionObserver.unobserve(canvasElement.lastChild as Element);
                 }
-                canvasElement.removeChild(canvasElement.lastChild!);
+                canvasElement.removeChild(canvasElement.lastElementChild!);
             }
         } else {
             let placeholder: ResultPlaceholder;
