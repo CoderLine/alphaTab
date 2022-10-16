@@ -4,7 +4,22 @@
 const lightCodeTheme = require("prism-react-renderer/themes/github");
 const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const path = require("path");
+const fs = require("fs");
 const CopyPlugin = require("copy-webpack-plugin");
+
+const alphaTabVersionFull = JSON.parse(
+  fs.readFileSync(
+    path.join("node_modules", "@coderline", "alphatab", "package.json"),
+    "utf8"
+  )
+).version;
+const isPreRelease = alphaTabVersionFull.indexOf("-") >= 0;
+let alphaTabVersion;
+if (isPreRelease) {
+  alphaTabVersion = alphaTabVersionFull.substring(0, alphaTabVersionFull.indexOf("-"));
+} else {
+  alphaTabVersion = alphaTabVersionFull;
+}
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -17,6 +32,11 @@ const config = {
   favicon: "img/favicon.ico",
   organizationName: "CoderLine",
   projectName: "alphaTab",
+  customFields: {
+    isPreRelease: isPreRelease,
+    alphaTabVersion: alphaTabVersion,
+    alphaTabVersionFull: alphaTabVersionFull
+  },
 
   presets: [
     [
@@ -37,7 +57,11 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      hideableSidebar: true,
+      docs: {
+        sidebar: {
+          hideable: true
+        }
+      },
       navbar: {
         title: "alphaTab",
         logo: {
@@ -69,10 +93,26 @@ const config = {
             position: "left",
             label: "Showcase",
           },
+          // Right
+          {
+            type: "dropdown",
+            position: "right",
+            label: isPreRelease ? `${alphaTabVersion} 🚧` : alphaTabVersion,
+            items: [
+              {
+                href: "https://next.alphatab.net",
+                label: "Next Version 🚧",
+              },
+              {
+                href: "https://alphatab.net",
+                label: "Stable Version",
+              }
+            ],
+          },
           {
             href: "https://github.com/CoderLine/alphaTab",
             label: "GitHub",
-            className: 'header-github-link',
+            className: "header-github-link",
             position: "right",
           },
         ],
@@ -125,7 +165,7 @@ const config = {
 
   plugins: [
     "docusaurus-plugin-sass",
-    require.resolve("@cmfcmf/docusaurus-search-local"),
+    require.resolve('docusaurus-lunr-search'),
     // [
     //   require.resolve("./plugins/tsdoc"),
     //   {
@@ -171,13 +211,13 @@ const config = {
               crypto: false,
               constants: false,
               child_process: false,
-              module: false
+              module: false,
             },
           },
         };
       },
     }),
-  ]
+  ],
 };
 
 module.exports = config;

@@ -6,7 +6,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron:  '0 1 * * 0'
- 
           
 jobs:
   build:
@@ -19,7 +18,7 @@ jobs:
       with:
         node-version: '16'
     - run: npm install
-    - run: npm install @coderline/alphatab@alpha
+    - run: npm install @coderline/alphatab@latest
     - run: npm run build
     - run: cp web.config ./build
     - name: Package Zip

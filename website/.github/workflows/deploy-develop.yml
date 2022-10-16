@@ -1,0 +1,33 @@
+name: Deploy Develop
+on: 
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 1 * * 0'
+          
+jobs:
+  build:
+    runs-on: ubuntu-latest
+      
+    steps:
+    - uses: actions/checkout@v2
+    - uses: montudor/action-zip@v0.1.0
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+    - run: npm install
+    - run: npm install @coderline/alphatab@alpha
+    - run: npm run build
+    - run: cp web.config ./build
+    - name: Package Zip
+      run: zip -qq -r ./website.zip ./build
+    - name: Push Zip To Server
+      run: |
+        curl --request POST \
+        --url https://docs.alphaTab.net/deploy-zip.php \
+        --header 'authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}' \
+        --header 'branch: next' \
+        -F 'website=@./website.zip' \
+        --fail

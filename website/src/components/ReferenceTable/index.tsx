@@ -3,7 +3,7 @@ import { Page } from '@site/src/page';
 import { buildNames } from '@site/src/names';
 import { CodeBadge } from '../CodeBadge';
 import { PropSidebarItem, PropSidebarItemCategory } from '@docusaurus/plugin-content-docs/src/sidebars/types';
-import { useDocById } from '@docusaurus/theme-common';
+import { useDocById } from '@docusaurus/theme-common/internal';
 
 function buildPropertyUrl(property: Page) {
     let url = '';
