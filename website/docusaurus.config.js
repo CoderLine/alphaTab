@@ -165,14 +165,7 @@ const config = {
 
   plugins: [
     "docusaurus-plugin-sass",
-    require.resolve('docusaurus-lunr-search'),
-    // [
-    //   require.resolve("./plugins/tsdoc"),
-    //   {
-    //     in: './node_modules/@coderline/alphatab/dist/alphaTab.d.ts',
-    //     out: path.resolve('docs', "tsdoc")
-    //   }
-    // ],
+    require.resolve('./plugins/docusaurus-lunr-search'),
     () => ({
       name: "docusaurus-customization",
       injectHtmlTags() {

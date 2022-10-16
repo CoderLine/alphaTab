@@ -63,8 +63,9 @@ li.reference-item ul {
   display: none !important;
 }
 
-.header-github-link {
+.navbar__item.header-github-link {
   display: flex;
+  align-items: center;
 }
 
 .header-github-link::before {
