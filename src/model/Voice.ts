@@ -63,7 +63,7 @@ export class Voice {
         }
     }
 
-    private chain(beat: Beat, sharedDataBag: Map<string, unknown>): void {
+    private chain(beat: Beat, sharedDataBag: Map<string, unknown> | null = null): void {
         if (!this.bar) {
             return;
         }
@@ -105,7 +105,7 @@ export class Voice {
         return null;
     }
 
-    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         this._beatLookup = new Map<number, Beat>();
         let currentGraceGroup: GraceGroup | null = null;
         for (let index: number = 0; index < this.beats.length; index++) {
@@ -188,7 +188,7 @@ export class Voice {
                 }
 
                 beat.displayStart = currentDisplayTick;
-                beat.playbackStart = currentPlaybackTick;   
+                beat.playbackStart = currentPlaybackTick;
 
                 if (beat.fermata) {
                     this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
@@ -199,7 +199,7 @@ export class Voice {
                 this._beatLookup.set(beat.playbackStart, beat);
             } else {
                 beat.displayStart = currentDisplayTick;
-                beat.playbackStart = currentPlaybackTick;    
+                beat.playbackStart = currentPlaybackTick;
             }
 
             beat.finishTuplet();

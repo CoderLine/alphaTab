@@ -150,7 +150,7 @@ namespace AlphaTab.Core
 
         public static void InsertRange<T>(this IList<T> data, int index, IEnumerable<T> newItems)
         {
-            if (data is System.Collections.Generic.List<T> l)
+            if (data is List<T> l)
             {
                 l.InsertRange(index, newItems);
             }
@@ -168,7 +168,7 @@ namespace AlphaTab.Core
         {
             switch (data)
             {
-                case System.Collections.Generic.List<T> l:
+                case List<T> l:
                     l.Sort((a, b) => (int) func(a, b));
                     break;
                 case T[] array:

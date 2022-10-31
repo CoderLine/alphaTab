@@ -702,7 +702,7 @@ export class Note {
         }
     }
 
-    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         let nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
         let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
 
@@ -953,13 +953,18 @@ export class Note {
         return null;
     }
 
-    private static NoteIdLookupKey = "NoteIdLookup";
+    private static NoteIdLookupKey = 'NoteIdLookup';
 
     private _noteIdBag: NoteIdBag | null = null;
-    public chain(sharedDataBag: Map<string, unknown>) {
-        // if we have some IDs from a serialization flow, 
+    public chain(sharedDataBag: Map<string, unknown> | null = null) {
+        // mainly for backwards compat in case we reach this code from somewhere outside.
+        if (sharedDataBag === null) {
+            return;
+        }
+
+        // if we have some IDs from a serialization flow,
         // we need to lookup/register the notes correctly
-        if (this._noteIdBag != null) {
+        if (this._noteIdBag !== null) {
             // get or create lookup
             let noteIdLookup: Map<number, Note>;
             if (sharedDataBag.has(Note.NoteIdLookupKey)) {
@@ -1020,22 +1025,22 @@ export class Note {
     public toJson(o: Map<string, unknown>) {
         // inject linked note ids into JSON
         if (this.tieDestination !== null) {
-            o.set("tiedestinationnoteid", this.tieDestination.id)
+            o.set('tiedestinationnoteid', this.tieDestination.id);
         }
         if (this.tieOrigin !== null) {
-            o.set("tieoriginnoteid", this.tieOrigin.id)
+            o.set('tieoriginnoteid', this.tieOrigin.id);
         }
         if (this.slurDestination !== null) {
-            o.set("slurdestinationnoteid", this.slurDestination.id)
+            o.set('slurdestinationnoteid', this.slurDestination.id);
         }
         if (this.slurOrigin !== null) {
-            o.set("sluroriginnoteid", this.slurOrigin.id)
+            o.set('sluroriginnoteid', this.slurOrigin.id);
         }
         if (this.hammerPullOrigin !== null) {
-            o.set("hammerpulloriginnoteid", this.hammerPullOrigin.id)
+            o.set('hammerpulloriginnoteid', this.hammerPullOrigin.id);
         }
         if (this.hammerPullDestination !== null) {
-            o.set("hammerpulldestinationnoteid", this.hammerPullDestination.id)
+            o.set('hammerpulldestinationnoteid', this.hammerPullDestination.id);
         }
     }
 

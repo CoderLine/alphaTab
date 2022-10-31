@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,7 +15,6 @@ namespace AlphaTab
         {
 
         }
-
 
         public static Action Throttle(Action action, double delay)
         {
@@ -39,15 +37,11 @@ namespace AlphaTab
         {
             renderEngines.Set(
                 "skia",
-                new RenderEngineFactory(true, () => {
-                    return new SkiaCanvas();
-                })
+                new RenderEngineFactory(true, () => new SkiaCanvas())
             );
             renderEngines.Set(
                 "gdi",
-                new RenderEngineFactory(true, () => {
-                    return new GdiCanvas();
-                })
+                new RenderEngineFactory(true, () => new GdiCanvas())
             );
             renderEngines.Set("default", renderEngines.Get("skia")!);
         }

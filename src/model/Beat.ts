@@ -25,11 +25,11 @@ import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { GraceGroup } from '@src/model/GraceGroup';
 
 /**
- * Lists the different modes on how beaming for a beat should be done. 
+ * Lists the different modes on how beaming for a beat should be done.
  */
 export enum BeatBeamingMode {
     /**
-     * Automatic beaming based on the timing rules. 
+     * Automatic beaming based on the timing rules.
      */
     Auto,
     /**
@@ -37,7 +37,7 @@ export enum BeatBeamingMode {
      */
     ForceSplitToNext,
     /**
-     * Force a merge with the next beat. 
+     * Force a merge with the next beat.
      */
     ForceMergeWithNext
 }
@@ -335,7 +335,7 @@ export class Beat {
 
     /**
      * Gets or sets the grace group this beat belongs to.
-     * If this beat is not a grace note, it holds the group which belongs to this beat.  
+     * If this beat is not a grace note, it holds the group which belongs to this beat.
      * @json_ignore
      * @clone_ignore
      */
@@ -343,7 +343,7 @@ export class Beat {
 
     /**
      * Gets or sets the index of this beat within the grace group if
-     * this is a grace beat. 
+     * this is a grace beat.
      * @json_ignore
      * @clone_ignore
      */
@@ -587,13 +587,16 @@ export class Beat {
         }
     }
 
-    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         if (this.getAutomation(AutomationType.Instrument) === null &&
             this.index === 0 &&
             this.voice.index === 0 &&
             this.voice.bar.index === 0 &&
-            this.voice.bar.staff.index === 0) {
-            this.automations.push(Automation.buildInstrumentAutomation(false, 0, this.voice.bar.staff.track.playbackInfo.program));
+            this.voice.bar.staff.index === 0
+        ) {
+            this.automations.push(
+                Automation.buildInstrumentAutomation(false, 0, this.voice.bar.staff.track.playbackInfo.program)
+            );
         }
 
         switch (this.graceType) {
@@ -610,7 +613,6 @@ export class Beat {
                 }
                 break;
         }
-
 
         let displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
         let isGradual: boolean = this.text === 'grad' || this.text === 'grad.';
@@ -863,7 +865,7 @@ export class Beat {
         return null;
     }
 
-    public chain(sharedDataBag: Map<string, unknown>) {
+    public chain(sharedDataBag: Map<string, unknown> | null = null) {
         for (const n of this.notes) {
             this.noteValueLookup.set(n.realValue, n);
             n.chain(sharedDataBag);

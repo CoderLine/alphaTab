@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using AlphaTab.Core;
 using AlphaTab.Core.EcmaScript;
-using AlphaTab.Importer;
-using AlphaTab.Io;
 using AlphaTab.Model;
 using AlphaTab.Platform.CSharp;
 using AlphaTab.Rendering;

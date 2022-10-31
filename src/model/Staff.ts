@@ -57,7 +57,7 @@ export class Staff {
      * guitar tablature. Unlike the {@link Note.string} property this array directly represents
      * the order of the tracks shown in the tablature. The first item is the most top tablature line.
      */
-    public stringTuning: Tuning = new Tuning("", [], false);
+    public stringTuning: Tuning = new Tuning('', [], false);
 
     /**
      * Get or set the values of the related guitar tuning.
@@ -93,12 +93,12 @@ export class Staff {
     public isPercussion: boolean = false;
 
     /**
-     * The number of lines shown for the standard notation. 
-     * For some percussion instruments this number might vary. 
+     * The number of lines shown for the standard notation.
+     * For some percussion instruments this number might vary.
      */
     public standardNotationLineCount: number = 5;
 
-    public finish(settings: Settings, sharedDataBag: Map<string, unknown>): void {
+    public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         this.stringTuning.finish();
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
             this.bars[i].finish(settings, sharedDataBag);
