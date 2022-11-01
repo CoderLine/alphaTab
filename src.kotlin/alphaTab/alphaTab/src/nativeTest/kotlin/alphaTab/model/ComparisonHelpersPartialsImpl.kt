@@ -30,8 +30,7 @@ actual class ComparisonHelpersPartials {
 
                 return true
             }
-
-            Globals.fail("cannot compare unknown object types expected[${actual?.javaClass?.packageName}.${actual?.javaClass?.name}] expected[${expected?.javaClass?.packageName}.${expected?.javaClass?.name}]');            }")
+            Globals.fail("cannot compare unknown object types")
             return false
         }
     }

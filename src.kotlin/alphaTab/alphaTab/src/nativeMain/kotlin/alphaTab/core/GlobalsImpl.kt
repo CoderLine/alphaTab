@@ -1,5 +1,11 @@
 package alphaTab.core
 
+import alphaTab.io.ByteBuffer
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.toKString
+import kotlinx.cinterop.usePinned
+import platform.posix.sprintf
+
 // workaround for https://youtrack.jetbrains.com/issue/KT-36878
 public fun exposeByteArray(): ByteArray = ByteArray(2)
 
@@ -20,7 +26,7 @@ actual fun UByteArray.decodeToDoubleArray(): DoubleArray {
     var i = 0
     while(i < this.size) {
         da[i] = this.asByteArray().getDoubleAt(i)
-        i += 4
+        i += 8
     }
     return da
 }
@@ -30,8 +36,12 @@ actual fun UByteArray.decodeToString(encoding: String): String {
     return this.asByteArray().decodeToString()
 }
 
+val doubleToStringBuffer = ByteArray(100)
 actual fun Double.toInvariantString(): String {
-    return this.toString()
+    doubleToStringBuffer.usePinned {
+        sprintf(it.addressOf(0), "%g", this)
+    }
+    return doubleToStringBuffer.toKString()
 }
 
 actual fun String.toDoubleOrNaN(): Double {
@@ -39,9 +49,9 @@ actual fun String.toDoubleOrNaN(): Double {
 }
 
 actual fun String.toIntOrNaN(): Double {
-    val number = this.toIntOrNull()
+    val number = this.toDoubleOrNull()
     if (number != null) {
-        return number.toDouble()
+        return number.toInt().toDouble()
     }
     return Double.NaN
 }

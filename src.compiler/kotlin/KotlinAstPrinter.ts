@@ -378,7 +378,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         this.writeAttributes(d);
         if (d.isStatic) {
-            this.writeLine('@kotlin.jvm.JvmStatic');
+            // this.writeLine('@kotlin.jvm.JvmStatic');
         }
         this.writeVisibility(d.visibility);
 
@@ -449,7 +449,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeDocumentation(d);
 
         if (d.isStatic) {
-            this.writeLine('@kotlin.jvm.JvmStatic');
+            // this.writeLine('@kotlin.jvm.JvmStatic');
         }
 
         this.writeVisibility(d.visibility);

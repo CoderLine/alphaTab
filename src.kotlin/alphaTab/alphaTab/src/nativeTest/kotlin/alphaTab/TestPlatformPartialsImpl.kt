@@ -1,17 +1,9 @@
 package alphaTab
 
 import alphaTab.core.ecmaScript.Uint8Array
-import android.content.ContentResolver
-import android.content.ContentUris
-import android.content.ContentValues
-import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
-import androidx.test.platform.app.InstrumentationRegistry
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import java.io.OutputStream
-import java.nio.file.Paths
+import alphaTab.io.ByteBuffer
+import kotlinx.cinterop.*
+import platform.posix.*
 import kotlin.contracts.ExperimentalContracts
 
 
@@ -21,127 +13,105 @@ public class TestPlatformPartials {
     companion object {
         public fun loadFile(path: String): Uint8Array {
             val fs = openFileRead(path)
-            val ms = ByteArrayOutputStream()
-            fs.use {
-                fs.copyTo(ms)
-            }
-            return Uint8Array(ms.toByteArray().asUByteArray())
-        }
-
-        private val isInstrumented: Boolean by lazy {
+                ?: throw AlphaTabError(AlphaTabErrorType.General, "File '$path' not found")
             try {
-                InstrumentationRegistry.getInstrumentation().context.toString()
-                true
-            } catch (e: IllegalStateException) {
-                false
+                val buffer = ByteBuffer.withCapacity(1024.0)
+                val readBuffer = ByteArray(1024)
+                val readArray = Uint8Array(readBuffer.asUByteArray())
+                readBuffer.usePinned {
+                    var count = 1UL
+                    while (count > 0UL) {
+                        count = fread(it.addressOf(0), 1, readBuffer.size.toULong(), fs)
+                        if (count > 0UL) {
+                            buffer.write(readArray, 0.0, count.toDouble())
+                        }
+                    }
+                }
+                return buffer.toArray()
+            } finally {
+                fclose(fs)
             }
         }
 
         public val projectRoot: String by lazy {
-            var path = Paths.get("").toAbsolutePath()
-            while(!Paths.get(path.toString(), "package.json").toFile().exists()) {
-                path = path.parent
-                    ?: throw AlphaTabError(AlphaTabErrorType.General, "Could not find project root")
+            val cwdPtr = ByteArray(1024)
+            cwdPtr.usePinned {
+                getcwd(it.addressOf(0), 1024)
             }
-            println(path.toString())
-            path.toString()
+            var cwd = cwdPtr.toKString().trimEnd('/', '\\')
+
+            val x = alphaTab.collections.List<String>()
+
+            while (!fileExists("$cwd/package.json") && x.length < 10) {
+                cwd = getParent(cwd).trimEnd('/', '\\')
+                x.push(cwd)
+            }
+
+            cwd
         }
 
-        private fun openFileRead(path: String): InputStream {
-            var subpath = Paths.get(path)
-            subpath = subpath.subpath(1, subpath.nameCount)
+        private fun getParent(cwd: String): String {
+            val parent = dirname(cwd.cstr)!!.toKString()
+            if (parent.length == 3 && parent[1] == ':' || parent == "/") {
+                throw AlphaTabError(AlphaTabErrorType.General, "Could not find project root")
+            }
+            return parent
+        }
 
-            return if (isInstrumented) {
-                val testContext = InstrumentationRegistry.getInstrumentation().context
-                val assets = testContext.assets
-                assets.open(subpath.toString())
-            } else {
-                val filePath = Paths.get(projectRoot, path)
-                filePath.toFile().inputStream()
+        private fun fileExists(path: String): Boolean {
+            return memScoped {
+                val stat = alloc<stat>()
+                val ret = stat(path, stat.ptr)
+                return@memScoped ret == 0 && stat.st_size > 0
             }
         }
 
-        private fun openFileWrite(path: String): OutputStream {
-            val subpath = Paths.get("test-results", path)
+        private fun openFileRead(path: String): CPointer<FILE>? {
+            val absolutePath = "$projectRoot/$path"
+            return fopen(absolutePath, "rb")
+        }
 
-            return if (isInstrumented) {
-                val testContext = InstrumentationRegistry.getInstrumentation().context
-                val values = ContentValues()
+        private fun openFileWrite(path: String): CPointer<FILE>? {
+            val absolutePath = "$projectRoot/test-results/$path"
+            Logger.info("Test", "Saving file '$path' to '$absolutePath'")
 
-                values.put(
-                    MediaStore.Files.FileColumns.DISPLAY_NAME,
-                    subpath.fileName.toString()
-                )
-
-                values.put(
-                    MediaStore.Files.FileColumns.MIME_TYPE,
-                    "image/png"
-                )
-
-                values.put(
-                    MediaStore.Files.FileColumns.RELATIVE_PATH,
-                    "${Environment.DIRECTORY_DOCUMENTS}/${subpath.parent}"
-                )
-
-                val existing = testContext.contentResolver.query(
-                    MediaStore.Files.getContentUri("external"),
-                    arrayOf(MediaStore.Files.FileColumns._ID),
-                    Bundle().apply {
-                        putString(
-                            ContentResolver.QUERY_ARG_SQL_SELECTION,
-                            "${MediaStore.Files.FileColumns.RELATIVE_PATH}=? AND ${MediaStore.Files.FileColumns.DISPLAY_NAME}=?"
-                        )
-                        putStringArray(
-                            ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, arrayOf(
-                                values.getAsString(MediaStore.Files.FileColumns.RELATIVE_PATH),
-                                values.getAsString(MediaStore.Files.FileColumns.DISPLAY_NAME)
-                            )
-                        )
-                    },
-                    null
-                )
-
-                val uri = if (existing != null && existing.count > 0 && existing.moveToFirst()) {
-                    ContentUris.withAppendedId(
-                        MediaStore.Files.getContentUri("external"),
-                        existing.getLong(0)
-                    )
-                } else {
-                    testContext.contentResolver.insert(
-                        MediaStore.Files.getContentUri("external"), values
-                    )!!
-                }
-
-                Logger.info("Test", "Saving file '$path' to '$uri'")
-                testContext.contentResolver.openOutputStream(uri)!!
-            } else {
-                val fullPath = Paths.get(projectRoot, subpath.toString())
-                Logger.info("Test", "Saving file '$path' to '$fullPath'")
-                fullPath.parent.toFile().mkdirs()
-                fullPath.toFile().outputStream()
-            }
+            val parent = getParent(absolutePath)
+            mkdir(parent)
+            return fopen(absolutePath, "wb")
         }
 
         public fun saveFile(name: String, data: Uint8Array) {
-            val fs = openFileWrite(name)
-            fs.use {
-                fs.write(data.buffer.asByteArray())
+            val fs = openFileWrite(name) ?: throw AlphaTabError(
+                AlphaTabErrorType.General,
+                "Could not open file for writing '$name'"
+            )
+            try {
+                data.buffer.usePinned {
+                    fwrite(it.addressOf(0), 1, data.length.toULong(), fs)
+                }
+            } finally {
+                fclose(fs)
             }
         }
 
         public fun listDirectory(path: String): alphaTab.collections.List<String> {
-            return if (isInstrumented) {
-                val testContext = InstrumentationRegistry.getInstrumentation().context
-                val assets = testContext.assets
-                alphaTab.collections.List(assets.list(path)!!.asIterable())
-            } else {
-                val dirPath = Paths.get(projectRoot, path)
-                alphaTab.collections.List(dirPath.toFile()
-                    .listFiles()
-                    ?.filter { it.isFile }
-                    ?.map { it.name } ?: emptyList())
-            }
+            val withSlash = if (path.endsWith('/')) path else "$path/"
+            val items = alphaTab.collections.List<String>()
 
+            val dir = opendir(path)
+            try {
+                var sub = readdir(dir)
+                while (sub != null) {
+                    val d = sub.pointed.d_name.toKString()
+                    if (fileExists(withSlash + d)) {
+                        items.push(d)
+                    }
+                    sub = readdir(dir)
+                }
+            } finally {
+                closedir(dir)
+            }
+            return items
         }
     }
 }
