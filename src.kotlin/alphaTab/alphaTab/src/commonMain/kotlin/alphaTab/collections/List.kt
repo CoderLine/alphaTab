@@ -39,6 +39,10 @@ public class List<T> : Iterable<T> {
         _data.add(item)
     }
 
+    public fun fill(item: T) {
+        _data.fill(item)
+    }
+
     public fun push(items: List<T>) {
         _data.addAll(items._data)
     }

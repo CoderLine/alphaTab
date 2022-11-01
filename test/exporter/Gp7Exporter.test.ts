@@ -14,8 +14,7 @@ describe('Gp7ExporterTest', () => {
         const data = await TestPlatform.loadFile('test-data/' + name);
         try {
             return ScoreLoader.loadScoreFromBytes(data);
-        }
-        catch (e) {
+        } catch (e) {
             return null;
         }
     };
@@ -30,7 +29,10 @@ describe('Gp7ExporterTest', () => {
         return new Gp7Exporter().export(score, null);
     };
 
-    const testRoundTripEqual: (name: string, ignoreKeys: string[] | null) => Promise<void> = async (name: string, ignoreKeys: string[] | null = null): Promise<void> => {
+    const testRoundTripEqual: (name: string, ignoreKeys: string[] | null) => Promise<void> = async (
+        name: string,
+        ignoreKeys: string[] | null = null
+    ): Promise<void> => {
         try {
             const expected = await loadScore(name);
             if (!expected) {
@@ -42,7 +44,7 @@ describe('Gp7ExporterTest', () => {
             const actual = prepareGp7ImporterWithBytes(exported).readScore();
 
             const expectedJson = JsonConverter.scoreToJsObject(expected);
-            const actualJson = JsonConverter.scoreToJsObject(actual)
+            const actualJson = JsonConverter.scoreToJsObject(actual);
 
             if (!ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys)) {
                 await TestPlatform.saveFile(fileName, exported);
@@ -109,7 +111,7 @@ describe('Gp7ExporterTest', () => {
         await testRoundTripEqual(`conversion/full-song.gpx`, [
             'accidentalmode', // gets upgraded from default
             'percussionarticulations', // gets added
-            'percussionarticulation', // gets added
+            'percussionarticulation' // gets added
         ]);
     });
 
@@ -136,8 +138,12 @@ describe('Gp7ExporterTest', () => {
         const actual = prepareGp7ImporterWithBytes(exported).readScore();
 
         const expectedJson = JsonConverter.scoreToJsObject(expected);
-        const actualJson = JsonConverter.scoreToJsObject(actual)
+        const actualJson = JsonConverter.scoreToJsObject(actual);
 
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
+    });
+
+    it('gp7-lyrics-null', async () => {
+        await testRoundTripEqual('guitarpro7/lyrics-null.gp', null);
     });
 });

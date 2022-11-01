@@ -68,7 +68,12 @@ public class Expector<T> {
     }
 
     public fun toBeFalsy() {
-        kotlin.test.assertNull(_actual, _message)
+        val actual = _actual;
+        if(actual is String){
+            kotlin.test.assertTrue(actual.isEmpty(), _message)
+        } else {
+            kotlin.test.assertNull(_actual, _message)
+        }
     }
 
     public fun toThrowError(expected: KClass<out Exception>) {
