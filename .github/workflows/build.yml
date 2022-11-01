@@ -10,7 +10,7 @@ on:
 jobs:
   build_web:
     name: Build and Test Web
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -22,7 +22,7 @@ jobs:
 
   build_csharp:
     name: Build and Test C#
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -37,7 +37,7 @@ jobs:
 
   build_kotlin:
     name: Build and Test Kotlin
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3

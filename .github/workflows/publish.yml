@@ -7,7 +7,7 @@ on:
 jobs:
   nighty_web:
     name: Web
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - run: |
           mkdir check-sha
@@ -49,7 +49,7 @@ jobs:
         
   nightly_csharp:
     name: C#
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - run: |
           mkdir check-sha
@@ -91,7 +91,7 @@ jobs:
 
   nightly_kotlin_android:
     name: Kotlin (Android)
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
       OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
