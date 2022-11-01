@@ -161,6 +161,15 @@ describe('Gp5ImporterTest', () => {
         GpImporterTestHelper.checkColors(score);
     });
 
+    it('alternate-endings-section-error', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/alternate-endings-section-error.gp5');
+        const score: Score = reader.readScore();
+        expect(score.masterBars.length).toBe(2);
+        expect(score.masterBars[1].alternateEndings).toBe(4);
+        expect(score.masterBars[1].section).toBeTruthy();
+        expect(score.masterBars[1].section?.text).toBe("Outro");
+    });
+
     it('canon', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/canon.gp5');
         let score: Score = reader.readScore();
