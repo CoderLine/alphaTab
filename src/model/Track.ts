@@ -102,6 +102,7 @@ export class Track {
                         // initialize lyrics list for beat if required
                         if (!beat.lyrics) {
                             beat.lyrics = new Array<string>(lyrics.length);
+                            beat.lyrics.fill("");
                         }
                         // assign chunk
                         beat.lyrics[li] = lyric.chunks[ci];
