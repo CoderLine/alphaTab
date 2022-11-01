@@ -261,38 +261,34 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((flags & 0x08) !== 0) {
             newMasterBar.repeatCount = this.data.readByte() + (this._versionNumber >= 500 ? 0 : 1);
         }
-        // alternate endings
-        if ((flags & 0x10) !== 0) {
-            if (this._versionNumber < 500) {
-                let currentMasterBar: MasterBar | null = previousMasterBar;
-                // get the already existing alternatives to ignore them
-                let existentAlternatives: number = 0;
-                while (currentMasterBar) {
-                    // found another repeat ending?
-                    if (currentMasterBar.isRepeatEnd && currentMasterBar !== previousMasterBar) {
-                        break;
-                    }
-                    // found the opening?
-                    if (currentMasterBar.isRepeatStart) {
-                        break;
-                    }
-                    existentAlternatives = existentAlternatives | currentMasterBar.alternateEndings;
-                    currentMasterBar = currentMasterBar.previousMasterBar;
+        // alternate endings (pre GP5)
+        if ((flags & 0x10) !== 0 && this._versionNumber < 500) {
+            let currentMasterBar: MasterBar | null = previousMasterBar;
+            // get the already existing alternatives to ignore them
+            let existentAlternatives: number = 0;
+            while (currentMasterBar) {
+                // found another repeat ending?
+                if (currentMasterBar.isRepeatEnd && currentMasterBar !== previousMasterBar) {
+                    break;
                 }
-                // now calculate the alternative for this bar
-                let repeatAlternative: number = 0;
-                let repeatMask: number = this.data.readByte();
-                for (let i: number = 0; i < 8; i++) {
-                    // only add the repeating if it is not existing
-                    let repeating: number = 1 << i;
-                    if (repeatMask > i && (existentAlternatives & repeating) === 0) {
-                        repeatAlternative = repeatAlternative | repeating;
-                    }
+                // found the opening?
+                if (currentMasterBar.isRepeatStart) {
+                    break;
                 }
-                newMasterBar.alternateEndings = repeatAlternative;
-            } else {
-                newMasterBar.alternateEndings = this.data.readByte();
+                existentAlternatives = existentAlternatives | currentMasterBar.alternateEndings;
+                currentMasterBar = currentMasterBar.previousMasterBar;
             }
+            // now calculate the alternative for this bar
+            let repeatAlternative: number = 0;
+            let repeatMask: number = this.data.readByte();
+            for (let i: number = 0; i < 8; i++) {
+                // only add the repeating if it is not existing
+                let repeating: number = 1 << i;
+                if (repeatMask > i && (existentAlternatives & repeating) === 0) {
+                    repeatAlternative = repeatAlternative | repeating;
+                }
+            }
+            newMasterBar.alternateEndings = repeatAlternative;
         }
         // marker
         if ((flags & 0x20) !== 0) {
@@ -314,7 +310,7 @@ export class Gp3To5Importer extends ScoreImporter {
             this.data.skip(4);
         }
         // better alternate ending mask in GP5
-        if (this._versionNumber >= 500 && (flags & 0x10) === 0) {
+        if (this._versionNumber >= 500) {
             newMasterBar.alternateEndings = this.data.readByte();
         }
         // tripletfeel
