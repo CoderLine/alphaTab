@@ -7,41 +7,35 @@ on:
 jobs:
   release_web:
     name: Web
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     steps:
-      # Checkout the repo
-      - uses: actions/checkout@v2
-        
-      # Build Project
-      - uses: actions/setup-node@v2
-      - name: Build Project
-        run: |
-            npm install
-            node ./scripts/update-version.js ${{github.run_number}}
-            npm run build-ci
-
-      # Publish to GitHub Package Registry
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '12.x'
+          node-version: 'latest'
+      - run: npm install
+      - run: node ./scripts/update-version.js ${{github.run_number}}
+      - run: npm run build-ci
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 'latest'
           registry-url: https://registry.npmjs.org/
-      - name: Publish to GitHub Package Registry (release)
+      - name: Publish to NPM (release)
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 
   release_csharp:
     name: C#
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
-      - uses: actions/setup-dotnet@v1
+          node-version: 'latest'
+      - uses: actions/setup-dotnet@v3
         with:
-          dotnet-version:  |
-            6.0.x
+          dotnet-version: '6'
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
       - run: npm install

@@ -10,51 +10,51 @@ on:
 jobs:
   build_web:
     name: Build and Test Web
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '12.x'
+          node-version: 'latest'
       - run: npm install
       - run: npm run build-ci
       - run: npm run test-ci
 
   build_csharp:
     name: Build and Test C#
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '12.x'
-      - uses: actions/setup-dotnet@v1
+          node-version: 'latest'
+      - uses: actions/setup-dotnet@v3
         with:
-          dotnet-version:  |
-            6.0.x
+          dotnet-version: '6'
       - run: npm install
       - run: npm run build-csharp-ci
       - run: npm run test-csharp-ci
 
   build_kotlin:
     name: Build and Test Kotlin
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '12.x'
-      - uses: actions/setup-java@v1
+          node-version: 'latest'
+      - uses: actions/setup-java@v3
         with:
-          java-version: '11'
-      - uses: actions/cache@v2
+          java-version: '19'
+          distribution: 'temurin'
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-cache-v2-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-cache-v3-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-cache-v2-${{ github.job }}-
+            ${{ runner.os }}-gradle-cache-v3-${{ github.job }}-
       - run: npm install
       - run: npm run build-kotlin-ci
       - run: npm run test-kotlin-ci
