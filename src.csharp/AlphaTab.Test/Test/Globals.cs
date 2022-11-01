@@ -87,7 +87,14 @@ namespace AlphaTab.Test
 
         public void ToBeFalsy()
         {
-            Assert.AreEqual(default!, _actual, _message);
+            if (_actual is string s) 
+            {
+                Assert.IsTrue(string.IsNullOrEmpty(s), _message);
+            }
+            else 
+            {
+                Assert.AreEqual(default!, _actual, _message);
+            }
         }
 
         public void ToThrowError(Type expected)
