@@ -5,19 +5,18 @@ title: Note Effects
 import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
 Just like beat effects, there are also effects for single notes like harmonics,
-bends, accentuations etc. The syntax is 
-`Fret.String{NoteEffects}`
+bends, accentuations etc. The syntax is `Fret.String{NoteEffects}`.
 
 ## Simple Effects
 
-Please find the list of support effects in the examples below. 
+Please find the list of supported effects in the examples below.
 
 ### Harmonics
 
-natural `nh`, artificial `ah`, pinch `ph` and semi `sh`
+Natural `nh`, artificial `ah`, pinch `ph`, tap `th` and semi `sh`.
 
 <AlphaTexSample>{`
-:8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}
+:8 3.3{nh} 3.3{ah} 3.3{ph} 3.3{th} 3.3{sh}
 `}</AlphaTexSample>
 
 ### Trill
@@ -36,8 +35,8 @@ natural `nh`, artificial `ah`, pinch `ph` and semi `sh`
 
 ### Slide
 
-legato `sl`, shift `ss`, into-from-below `sib`, into-from-above `sia`,
-out-up `sou`, out-down `sod`, pick-slide-down `psd`, pick-slide-up `psu`
+Legato `sl`, shift `ss`, into-from-below `sib`, into-from-above `sia`,
+out-up `sou`, out-down `sod`, pick-slide-down `psd` and pick-slide-up `psu`.
 
 <AlphaTexSample>{`
 3.3{sl} 4.3 3.3{ss} 4.3 |
@@ -50,7 +49,7 @@ x.3{psu} 3.3 |
 ### Hammer-On / Pull-Off
 
 <AlphaTexSample>{`
-3.3{h} 4.3{h}
+3.3{h} 4.3 4.3{h} 3.3 | 3.3{h} 4.3{h} 3.3{h} 4.3
 `}</AlphaTexSample>
 
 ### Left Hand Tapping
@@ -67,15 +66,15 @@ x.3{psu} 3.3 |
 
 ### Dead Notes
 
-Dead Notes are notated by using `x` as fret. 
+Dead Notes are notated by using `x` as fret, or with the note effect `x`.
 
 <AlphaTexSample>{`
-3.3{x} x.3
+x.3 3.3{x}
 `}</AlphaTexSample>
 
 ### Accentuations
 
-normal `ac` and heavy `hac`
+Normal `ac` and heavy `hac`.
 
 <AlphaTexSample>{`
 3.3{ac} 3.3{hac}
@@ -96,14 +95,14 @@ normal `ac` and heavy `hac`
 ### Let Ring
 
 <AlphaTexSample>{`
-3.3{lr} 3.3{lr} 3.3{lr} 3.3{lr}
+3.4{lr} 3.3{lr} 3.2{lr} 3.1{lr}
 `}</AlphaTexSample>
 
 ### Fingering
 
-left hand `lf` and right hand `rf` where the fingers are: 
+Left hand `lf` and right hand `rf` where the fingers are:
 
-`1` for Thumb, `2` for Index, `3` for Middle, `4` for Annual, `5` for Little
+`1` for Thumb, `2` for Index, `3` for Middle, `4` for Annual, `5` for Little.
 
 <AlphaTexSample>{`
 :8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5} (2.2{lf 4} 2.3{lf 3} 2.4{lf 2}) |
@@ -112,13 +111,13 @@ left hand `lf` and right hand `rf` where the fingers are:
 
 ## Bends
 
-The bend effect works like the tremolo/whammy bar effect.  
-You can specify a number of values which are evenly distributed over the
-time when the note is played. The values indicate the number of quarter notes
-increased bend up upon playing. `b (value1 value2 ...)`
+The bend effect works like the tremolo/whammy bar effect.
+You can specify a number of non-negative values which are evenly distributed over the
+time when the note is played with the format `b (value1 value2 ...)`.
+The values indicate the number of quarter notes increased bend up while playing.
 
 <AlphaTexSample>{`
-3.3{b (0 4 )} |
+3.3{b (0 4)} |
 3.3{b (0 4 0 8)} |
 `}</AlphaTexSample>
 

@@ -11,15 +11,15 @@ will allow them to:
 * See the song title and artist
 * Enable/Disable the count-in
 * Enable/Disable the metronome
-* Enable/Disable the looping
+* Enable/Disable looping
 * Print the music sheet
 * Change the zoom level 
 * Change the layout of the music sheet
 
 ## Extend footer
 
-As a start we will build the DOM of our footer which will act as toolbar. As this is again
-just usual web development we will go through this rather quick: 
+As a start we will build the DOM of our footer which will act as toolbar.
+This is once again just some regular web development, so we will go through this rather quickly:
 
 <Tabs
   defaultValue="dom"
@@ -142,8 +142,8 @@ just usual web development we will go through this rather quick:
 </TabItem>
 </Tabs>
 
-So basically the code above just creates some placeholder elements, buttons and selects
-for the user to interact with. As a next step we will add some listeners to the user interaction
+The code above creates some placeholder elements, buttons and selections
+for the user to interact with. The next step is to add some listeners to the user interaction
 and tell alphaTab what to do. 
 
 <img src="/img/tutorial-web/controls.png" height="400" />
@@ -151,8 +151,8 @@ and tell alphaTab what to do.
 ## Song Info
 
 To fill the song info we will again subscribe to the [`scoreLoaded`](/docs/reference/api/scoreloaded) event which we used
-to fill the track selector. Then we just fetch the placeholder elements and fill them with 
-the corresponding values from the data model: 
+to fill the track selector. Then we just select the placeholder elements and fill them with
+the appropriate values from the data model:
 
 ```js
 api.scoreLoaded.on((score)=>{
@@ -161,10 +161,10 @@ api.scoreLoaded.on((score)=>{
 });
 ```
 
-## Count-In
+## Count-In and Metronome
 
-The count-in will become relevant when we activate the player in the next step, but we
-can already create the control which will set the volume based on the toggle button state:
+The count-in and metronome will become relevant when we activate the player in the next step, but we
+can already create the controls which will set their volumes based on their toggle button states:
 
 ```js
 const countIn = wrapper.querySelector('.at-controls .at-count-in');
@@ -176,18 +176,7 @@ countIn.onclick = () => {
     api.countInVolume = 0;
   }
 };
-```
 
-We toggle the `active` CSS class as visual indication whether the feature is active or not. 
-Then we check for the visual state to really tell alphaTab whether the count-in should be 
-active or not by setting the [`countInVolume`](/docs/reference/api/countInVolume).
-
-## Metronome
-
-The metronome will become relevant when we activate the player in the next step, but we
-can already create the control which will set the metronome volume based on the toggle button state:
-
-```js
 const metronome = wrapper.querySelector('.at-controls .at-metronome');
 metronome.onclick = () => {
   metronome.classList.toggle('active');
@@ -199,15 +188,15 @@ metronome.onclick = () => {
 };
 ```
 
-We toggle the `active` CSS class as visual indication whether the feature is active or not. 
-Then we check for the visual state to really tell alphaTab whether the metronome should be 
-active or not by setting the [`metronomeValue`](/docs/reference/api/metronomevolume).
+We toggle the `active` CSS class as a visual indication whether the feature is active or not.
+We then check the visual state to tell alphaTab whether the feature should be active or not by setting the
+[`countInVolume`](/docs/reference/api/countinvolume) and [`metronomeVolume`](/docs/reference/api/metronomevolume) values respectively.
 
 ## Looping
 
-The looping is similar to the metronome. We will use the `active` class to decide whether
-the looping should be active using the [`isLooping`](/docs/reference/api/islooping) option. 
-It also will only be relevant once we have the player feature enabled:
+Similar to the count-in and metronome, we use the `active` class to decide whether
+the looping should be active using the [`isLooping`](/docs/reference/api/islooping) option.
+This will also only be relevant once we have the player feature enabled:
 
 ```js
 const loop = wrapper.querySelector('.at-controls .at-loop');
@@ -219,14 +208,13 @@ loop.onclick = () => {
 
 ## Printing
 
-Sometimes users might want to print out the music sheet or save it as PDF.
+Sometimes users might want to print out the music sheet or save it as a PDF.
 Due to the dynamic rendering that alphaTab performs a simple CTRL+P in the browser might not 
-bring the desired results. The whole music sheet is usually rendered in the background. And 
-there are special features that only the portions that are visible in the viewport are actually displayed.
+bring the desired results. The whole music sheet is usually rendered in the background, and
+there are special features that only show the visible portions in the viewport.
 
-When using the default browser printing you might just see an empty space. For this alphaTab has
-an own `print` function on the API which optimized the rendering for printing and opens it in 
-an own popup window. 
+When using the default browser printing you might just see an empty space. The alphaTab API provides
+a `print` function which optimizes the rendering for printing and opens it in a popup window.
 
 ```js
 wrapper.querySelector('.at-controls .at-print').onclick = () => {
@@ -250,16 +238,16 @@ zoom.onchange = ()=>{
 ```
 
 Updating the zoom level is a bit more effort than the previous tasks but still not very complicated:  
-First we fill the settings with the new scale. Then we tell alphaTab to read this updated settings 
+First we fill the settings with the new scale. Then we tell alphaTab to load in these updated settings
 and re-render the music sheet.
 
 ## Layout
 
 alphaTab can either render the music sheet in a page-like fashion that grows from top to bottom
-along the available with. Or it can show the music sheet in a horizontal scrolling fashion. 
+along the available width, or it can show the music sheet in a horizontal scrolling fashion.
 
-These options are also offered to the user via a select box. To actually apply the user selection 
-we will again just fill the user input into the settings object and trigger an update just like for 
+These options are also offered to the user via a select box. To apply the user selection
+we forward the user input to the settings object and trigger an update, just like we did for
 the zoom level: 
 
 ```js

@@ -8,8 +8,8 @@ import TabItem from '@theme/TabItem';
 ## Basic structure
 
 As our component will grow in this tutorial with new UI elements, we already prepare
-the rough DOM structure according to the final control. Also we want our control to fit 80% of
-the width and height of the page and scroll within this area so lets change our file to the following source:
+the rough DOM structure for the controls. We also want our component to fit 80% of
+the width and height of the page and scroll within this area, so let's change our file to the following:
 
 ```html
 <!DOCTYPE html>
@@ -84,24 +84,24 @@ the width and height of the page and scroll within this area so lets change our 
 </html>
 ```
 
-You can already see a bit the structure of the control. 
+You can already see a bit the structure of the controls.
 This step is not really specific to alphaTab but important to understand from a structural perspective. 
 We are building a layout with a sidebar, main viewport and a footer. This structure is put together
 with a combination of flexbox and absolute positioning. CSS grid might be more suitable here but for better
 browser support we stick to these technologies. 
 
-The absolute positioning in the content will allow us later to build a sidebar that expands dynamically 
-as an overlay to the music sheet.
-On the main viewport we also added a bit a padding to reserve a bit space for the browser scrollbar. 
+The absolute positioning in the content will allow us to later build a sidebar that expands dynamically
+as an overlay on the music sheet.
+On the main viewport we also added a bit of padding to reserve some space for the browser scrollbar.
 
 For your project your development and design skills will be be needed to structure the elements right. 
 You need to think where you want to have the scrolling (full page or within an element) which controls
-should go where (overlays, sidebars,..) and build your planned structure based on this. 
+should go where (overlays, sidebars, ...) and build your planned structure based on this. 
 
 :::note
 
-From now on the tutorial might only list small code snippets depending on the changes added to the component. 
-The final file with all changes applied, will be added at the bottom of each tutorial section.
+From now on, the tutorial might only list small code snippets depending on the changes added.
+The complete file with all changes applied will be added at the bottom of each tutorial section.
 
 :::
 
@@ -109,10 +109,10 @@ The final file with all changes applied, will be added at the bottom of each tut
 
 Now let's finally bring alphaTab into the game. But before we can initialize alphaTab we need to get some input 
 data ready. In most cases you will have some website backend that will know which input file to load for display. 
-This input file might be of any supported format like Guitar Pro files or alphaTex. 
-In this tutorial we will use the demo file hosted by alphaTab at `https://www.alphatab.net/files/canon.gp`
+The input can be of any supported format like Guitar Pro files or alphaTex.
+In this tutorial we will use a demo file hosted by alphaTab at `https://www.alphatab.net/files/canon.gp`.
 
-In the script tag below the wrapper element we fill in the following code. 
+In the script tag below the wrapper element we fill in the following code.
 ```html
 <script type="text/javascript">
     // load elements
@@ -129,21 +129,21 @@ In the script tag below the wrapper element we fill in the following code.
 
 There is not much special about this snippet:
 
-1. First we get load the DOM element into which we want to initialize alphaTab.
+1. First we select the DOM element into which we want to initialize alphaTab.
 2. Then we create a settings object specifying the file we want to display. 
 3. Then we create a new alphaTab API object.
 
-The last part will directly trigger of the load of the file and will display the music sheet in the viewport: 
+The last part will directly trigger the loading of the file and will display the music sheet in the viewport:
 
 <img src="/img/tutorial-web/viewport.png" height="400" />
 
 ## Loading indicator
 
-Depending on the size of the music sheet it might take a while until the file is downloaded and rendered. 
-We want to show a loading indicator until this is the case. This way the user will visually see 
+Depending on the size of the music sheet, it might take a while until the file is downloaded and rendered.
+We want to show a loading indicator until this is done. This way, the user will visually see
 that the file is being loaded and rendered.
 
-To do this we will first extend the DOM with an overlay that we will dynamically show/hide depending on 
+To do this, we will first extend the DOM with an overlay that we will dynamically show and hide depending on
 some alphaTab events. 
 
 <Tabs
@@ -212,11 +212,9 @@ some alphaTab events.
 
 <img src="/img/tutorial-web/loading-indicator.png" height="400" />
 
-But until now the overlay is always visible. So we listen to two of the main events of alphaTab
-for rendering to show the overlay if the rendering started, and hide it as soon the rendering finished:
-
-[`renderStarted`](/docs/reference/api/renderstarted) will tell us when the rendering of the music sheet started. 
-[`renderFinished`](/docs/reference/api/renderfinished) will tell us when the rendering of the music sheet finished.
+Currently, the overlay is always visible. So let's listen to two of the main rendering events of alphaTab,
+[`renderStarted`](/docs/reference/api/renderstarted) and [`renderFinished`](/docs/reference/api/renderfinished),
+to show the overlay when rendering starts, and hide it as soon the rendering finishes:
 
 ```js
 // overlay logic
@@ -229,15 +227,15 @@ api.renderFinished.on(() => {
 });
 ```
 
-Now we got our alphaTab control, displaying an input file and showing
+Now we have our alphaTab controls, displaying an input file and showing
 an indicator to the end-user while it is loading. alphaTab 
 takes care of all needed bits to load the file via Ajax, render
-the music sheet and listen on certain events like resizes to scale
-the music sheet. There is a huge list of settings where you can adjust
-the display of alphaTab which can be found in the [reference docs](/docs/reference/settings)
+the music sheet and listen on certain events, such as resizes to scale
+the music sheet.
 
-This will allow to adjust which elements are shown, how the music sheet is layed out, 
-which tracks to display and other internals. 
+There is a huge list of settings that allow you to adjust the display of alphaTab,
+such as adjusting which elements are shown, how the music sheet is laid out, which tracks to display and other internals.
+It can be found in the [reference docs](/docs/reference/settings).
 
 ## Final File
 

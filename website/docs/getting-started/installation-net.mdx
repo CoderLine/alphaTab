@@ -22,7 +22,7 @@ Install packages like usual:
 
 ### Local Copy
 
-While not recommended you can grab the latest DLLs by downloading the Nupkg and unzipping it to your local folder. 
+While not recommended, you can grab the latest DLLs by downloading the Nupkg and unzipping it to your local folder. 
 Afterwards you can reference the DLLs from this folder. 
 
 ## Initializing alphaTab
@@ -30,8 +30,8 @@ Afterwards you can reference the DLLs from this folder.
 ### Console
 
 For console applications you would start using the low level API of alphaTab like the `ScoreLoader` and `ScoreRenderer`.
-Usually alphaTab provides controls UI platforms based on the `AlphaTabApi`. But for platforms on which no UI is available,
-just start using the normal classes that alphaTab provides. You can refer to the samples in the GitHub repository for some kick-starter. 
+Usually, alphaTab provides controls UI platforms based on the `AlphaTabApi`. But for platforms where no UI is available,
+just start using the normal classes that alphaTab provides. You can refer to the samples in the GitHub repository for some kick-starter code.
 
 ```cs
 // load score
@@ -77,7 +77,7 @@ public IEnumerable<AlphaTab.Model.Track> TracksToDisplay { get; }
 
 ### WinForms
 
-For WinForms also a control exists that you can start using: 
+There is also a WinForms control that you can start using:
 
 ```cs
 var control = new AlphaTab.WinForms.AlphaTabControl();
@@ -86,17 +86,17 @@ this.Controls.Add(control);
 control.Tracks = new []{ score.Tracks[0] };
 ```
 
-## Additional Notes
+### Additional Notes
 
-You might want to check out the samples at https://github.com/CoderLine/alphaTab/tree/develop/src.csharp/Samples to get a small impression
-how to hook up things. 
+You might want to check out the samples at https://github.com/CoderLine/alphaTabSamplesDotNet to get a small impression
+how to hook up things.
 
-### Dependencies
+## Dependencies
 
 For the .net Version alphaTab needs to rely on some 3rd party libraries to do certain operations. 
 
-1. For rendering either the built-in graphics library GDI+ can be used or alphaTab comes with a dependency to SkiaSharp for modern
-cross platform rendering of images. Skia is the graphics engine used in Chrome and is proofen to be fast and reliable. 
+1. For rendering, either the built-in graphics library GDI+ can be used or alphaTab comes with a dependency to SkiaSharp for modern
+cross platform rendering of images. Skia is the graphics engine used in Chrome and is proven to be fast and reliable.
 We recommend using Skia as rendering engine over GDI+. 
 
 2. For audio playback alphaTab comes with a dependency to NAudio which is used to play the synthesized sound. 

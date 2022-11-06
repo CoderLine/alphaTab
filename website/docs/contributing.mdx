@@ -10,7 +10,7 @@ You can report bugs, request features or actually start contributing to the alph
 If you are using alphaTab in your project, you might encounter easter eggs (aka. bugs) or have the need for 
 new features that do not exist yet in alphaTab. 
 
-For bugs create an issue on our repository at [GitHub](https://github.com/CoderLine/alphaTab/issues/new/choose). 
+For bugs, create an issue on our repository at [GitHub](https://github.com/CoderLine/alphaTab/issues/new/choose).
 In case you want to request a feature, improvement or need general assistance, [GitHub Discussions](https://github.com/CoderLine/alphaTab/discussions) can be used as forum to reach out to the community.
 
 :::important
@@ -41,7 +41,7 @@ A primary goal is to keep alphaTab a free an open source library for anyone to i
 You're still here? That sounds very promising. You have made your fork, you cloned the repo and now you would be ready to start developing. 
 But how is the big question. Before we actually touch the code it is helpful to understand the toolchain we have in alphaTab.
 
-AlphaTab has a long history on the language it uses for developing. After all this years alphaTab ended up using TypeScript as the main language 
+AlphaTab has a long history on the language it uses for developing. After all these years alphaTab ended up using TypeScript as the main language
 it is developed in. This change happend in April 2020. Before that AlphaTab was developed in C# with a special toolchain that ended up with JavaScript code via Haxe. 
 
 The .net version of alphaTab is still provided via a special Compiler based on the TypeScript compiler. It translates the TypeScript source code to C# 
@@ -64,7 +64,7 @@ Beside the IDE you will need following tools:
 * [Node.js](https://nodejs.org/)
 * [.net Core SDK](https://dotnet.microsoft.com/download)
 
-After that you can run the following commands and should have already a compiled version of alphaTab in the output folder: 
+After that you can run the following commands to get a compiled version of alphaTab in the output folder:
 
 ```
 > npm install
@@ -75,14 +75,20 @@ After that you can run the following commands and should have already a compiled
 
 The repository has a set of NPM scripts that take over actions like compiling and testing. Execute them via 
 `npm run <scriptname>`. Refer to the [npm documentation](https://docs.npmjs.com/cli/run-script) for more details. 
- 
+
 * `clean` - cleans all output
 * `lint` - checks the source code for style violations
-* `build` - compiles a web version of alphaTab using the current code state 
-* `build-ci` - usedcompiles a web version of alphaTab using the current code state (used by GitHub Actions)
+
+#### Web
+
+* `build` - compiles a web version of alphaTab using the current code state
+* `build-ci` - compiles a web version of alphaTab using the current code state (used by GitHub Actions)
 * `start` - used during development time to build alphaTab quickly via watchers and incremental compilation
-* `test` - Runs the unit test suite in Chrome 
+* `test` - Runs the unit test suite in Chrome
 * `test-ci` - Runs the unit test suite in Chrome Headless (used by GitHub Actions)
+
+#### C#/.net
+
 * `generate-csharp` - Translates the TypeScript codebase to C#
 * `build-csharp` - compiles a C#/.net version of alphaTab using the current code state
 * `build-csharp-ci` - compiles a C#/.net version of alphaTab using the current code state (used by GitHub Actions)
@@ -109,7 +115,7 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
 - **playground/**
 
-  Contains atemplate for the local playground to use during development time. It contains some sample files which 
+  Contains a template for the local playground to use during development time. It contains some sample files which 
   can be opened in the browser for testing. 
 
 - **scripts/**
