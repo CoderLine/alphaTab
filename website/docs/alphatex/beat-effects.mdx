@@ -80,6 +80,18 @@ increased or decreased on playing. `tb (value1 value2 ...)`
 3.3.1{tb (0 -4 0 -8)} |
 `}</AlphaTexSample>
 
+## Brushes / Arpeggio
+
+Brush stroke effetcs are: brush down `bd`, brush up `bu`, arpeggio down `ad`, and arpeggio up `au`.
+By default, the duration between notes is calculated based on the number of notes in the beat (the chord).
+A custom duration (in MIDI ticks) can also be specified with, for example `bd 120`.
+
+<AlphaTexSample>{`
+:2 (0.1 0.2 0.3 2.4 2.5 0.6){bd} (0.1 0.2 0.3 2.4 2.5 0.6){bu} |
+(0.1 0.2 0.3 2.4 2.5 0.6){ad} (0.1 0.2 0.3 2.4 2.5 0.6){au} |
+(0.1 0.2 0.3 2.4 2.5 0.6){bd 360} (0.1 0.2 0.3 2.4 2.5 0.6){bu 60}
+`}</AlphaTexSample>
+
 ## Chords
 
 If you want to specify chords on top of your beats this can be done via the `ch "ChordName"` effect. This will annotate on the beat the chord name.  
