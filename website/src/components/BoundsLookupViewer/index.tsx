@@ -20,17 +20,28 @@ export interface BoundsLookupViewerProps {
     children: string | React.ReactElement
 }
 
-export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps> {
+export interface BoundsLookupViewersState {
+    selectedType: GuideType,
+    selectedElements: GuideElements
+}
+
+export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps, BoundsLookupViewersState> {
     private _api: alphaTab.AlphaTabApi;
     private _element: React.RefObject<HTMLDivElement> = React.createRef();
-    private _type: GuideType;
-    private _elements: GuideElements;
     constructor(props) {
         super(props);
-        this._type = GuideType.VisualBounds;
-        this._elements = GuideElements.StaveGroups;
+        this.state = {
+            selectedType: GuideType.VisualBounds,
+            selectedElements: GuideElements.StaveGroups
+        };
         this.setElements = this.setElements.bind(this);
         this.setType = this.setType.bind(this);
+        this.typeClass = this.typeClass.bind(this);
+        this.elementClass = this.elementClass.bind(this);
+        this.createStaveGroupGuides = this.createStaveGroupGuides.bind(this);
+        this.createMasterBarGuides = this.createMasterBarGuides.bind(this);
+        this.createBarGuides = this.createBarGuides.bind(this);
+        this.createBeatGuides = this.createBeatGuides.bind(this);
     }
 
     componentDidMount() {
@@ -75,7 +86,7 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps>
 
     createStaveGroupGuides(wrapper: HTMLDivElement, lookup: alphaTab.rendering.BoundsLookup) {
         for (const staveGroup of lookup.staveGroups) {
-            if (this._elements === GuideElements.StaveGroups) {
+            if (this.state.selectedElements === GuideElements.StaveGroups) {
                 this.createGuide(wrapper, staveGroup, "#1976d2");
             } else {
                 this.createMasterBarGuides(wrapper, staveGroup);
@@ -85,7 +96,7 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps>
 
     createMasterBarGuides(wrapper: HTMLDivElement, staveGroup: alphaTab.rendering.StaveGroupBounds) {
         for (const masterBar of staveGroup.bars) {
-            if (this._elements === GuideElements.MasterBars) {
+            if (this.state.selectedElements === GuideElements.MasterBars) {
                 this.createGuide(wrapper, masterBar, "#388e3c");
             } else {
                 this.createBarGuides(wrapper, masterBar);
@@ -95,7 +106,7 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps>
 
     createBarGuides(wrapper: HTMLDivElement, masterBar: alphaTab.rendering.MasterBarBounds) {
         for (const bar of masterBar.bars) {
-            if (this._elements === GuideElements.Bars) {
+            if (this.state.selectedElements === GuideElements.Bars) {
                 this.createGuide(wrapper, bar, "#fdd835");
             } else {
                 this.createBeatGuides(wrapper, bar);
@@ -105,7 +116,7 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps>
 
     createBeatGuides(wrapper: HTMLDivElement, bar: alphaTab.rendering.BarBounds) {
         for (const beat of bar.beats) {
-            if (this._elements === GuideElements.Beats) {
+            if (this.state.selectedElements === GuideElements.Beats) {
                 this.createGuide(wrapper, beat, "#e64a19");
             } else {
                 this.createNoteGuides(wrapper, beat);
@@ -130,7 +141,7 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps>
         const rect =
             "x" in bounds
                 ? bounds
-                : this._type === GuideType.VisualBounds
+                : this.state.selectedType === GuideType.VisualBounds
                     ? bounds.visualBounds
                     : bounds.realBounds;
         guide.style.left = rect.x + "px";
@@ -156,21 +167,27 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps>
     }
 
     setType(type: GuideType) {
-        this._type = type;
-        this.updateVisualGuides();
+        this.setState({
+            selectedType: type
+        }, () => {
+            this.updateVisualGuides();
+        });
     }
 
     setElements(elements: GuideElements) {
-        this._elements = elements;
-        this.updateVisualGuides();
+        this.setState({
+            selectedElements: elements
+        }, () => {
+            this.updateVisualGuides();
+        });
     }
 
-    typeClass(ownType) {
-        return ownType === this._type ? " pills__item--active" : "";
+    typeClass(ownType: GuideType) {
+        return ownType === this.state.selectedType ? " pills__item--active" : "";
     }
 
-    elementClass(ownElements) {
-        return ownElements === this._elements ? " pills__item--active" : "";
+    elementClass(ownElements: GuideElements) {
+        return ownElements === this.state.selectedElements ? " pills__item--active" : "";
     }
 
     render() {
