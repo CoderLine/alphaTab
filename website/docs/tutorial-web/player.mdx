@@ -8,15 +8,15 @@ import TabItem from '@theme/TabItem';
 
 ## Basic setup
 
-Now as we have the basic component ready, it is time to add some sound. 
+Now that we have the basic component ready, it is time to add some sound.
 AlphaTab comes with an audio synthesis engine named AlphaSynth to play the songs
-via Midi and a SoundFont2 file. 
+via MIDI and a SoundFont2 file.
 
 To get the player configured is also quite easy: 
 
 1. We tell alphaTab that we want the player active and where to find the SoundFont2 file that should be used. 
 alphaTab ships a free SoundFont2 file for usage on your website. 
-2. We tell alphaTab which element to scroll when the cursor moves. 
+2. We tell alphaTab which DOM element to scroll when the cursor moves.
 3. We tell alphaTab how the cursors should look like
 4. We add some UI elements for the user to start/pause the playback and show the current position.
 
@@ -77,13 +77,11 @@ Especially the SoundFonts can become quite big and might need some time to load.
 add a small loading indicator to our footer so that the user will know once the player is ready
 for usage. 
 
-It is better to have an own loading indicator for the player to allow users already having a view
-at the music notation. From a typical user behavior they will first start looking a bit 
-through the music sheet before pressing play. If we keep the main loading indicator for the music
-sheet visible until the player is ready, the users to not get the chance to have a look.
+It is better to have a separate loading indicator for the player.
+A typical user will look at the music sheet for a bit before pressing play.
+If we keep the main loading indicator for the music sheet visible until the player is ready, the user does not get the chance to have a look.
 
-To keep the tutorial simple we will just show a percentage value but you might want to show some more
-nice looking progress indicator on your site. 
+To keep the tutorial simple we will just show a percentage value but you might want to show a nice looking progress indicator on your site.
 
 <Tabs
   defaultValue="dom"
@@ -94,21 +92,14 @@ nice looking progress indicator on your site.
 }>
 <TabItem value="dom">
 
-We add a new container to the controls section and add a placeholder 
-in which we will show the percentage value.
-
 ```html
 <div class="at-controls">
   <div class="at-controls-left">
     <span class="at-player-progress">0%</span>
 ...
 ```
-
 </TabItem>
 <TabItem value="js">
-
-We will use the [`soundFontLoad`](/docs/reference/api/soundfontload) event to indicate the load progress of the (usually larger) SoundFont.
-The [`playerReady`](/docs/reference/api/readyforplayback) will tell us when to hide the whole indicator.  
 
 ```js
 const playerIndicator = wrapper.querySelector(
@@ -125,15 +116,19 @@ api.playerReady.on(()=>{
 </TabItem>
 </Tabs>
 
+First we add a placeholder in which we will show the percentage value.
+Then we will use the [`soundFontLoad`](/docs/reference/api/soundfontload) event to indicate the load progress of the (usually larger) SoundFont.
+The [`playerReady`](/docs/reference/api/readyforplayback) will tell us when to hide the indicator.
+
 ## Main player controls
 
 Now we need to add the required controls for the users to play and pause the audio. 
-We will add one button for play/pause which will change the icon depending on the current playback state. 
-And we will also add one button which stops the playback and moves the cursor back to start.
+We add one button for play/pause which will change the icon depending on the current playback state.
+We also add one button which stops the playback and moves the cursor back to the start.
 
-We will use the [`playPause()`](/docs/reference/api/playpause) and [`stop()`](/docs/reference/api/stop) to send the right signals to alphaTab and we use the 
+We use [`playPause()`](/docs/reference/api/playpause) and [`stop()`](/docs/reference/api/stop) to send the right signals to alphaTab and we use the
 [`playerStateChanged`](/docs/reference/api/playerstatechanged) event to update the button icon. To ensure that the user does not interact with the player
-before it is ready, we will keep the buttons disabled until the player is ready. 
+before it is ready, we keep the buttons disabled until the player is ready.
 
 <Tabs
   defaultValue="dom"
@@ -145,7 +140,7 @@ before it is ready, we will keep the buttons disabled until the player is ready.
 }>
 <TabItem value="dom">
 
-Here we have the 2 new buttons:
+Here we have the two new buttons:
 
 ```html
 <div class="at-controls">
@@ -164,7 +159,7 @@ Here we have the 2 new buttons:
 
 <TabItem value="css">
 
-We need some styles for the disabled buttons. In our case just make them 
+We need some styles for the disabled buttons. In our case we just make them
 semi-transparent and change the cursor.
 
 ```css
@@ -219,12 +214,12 @@ The result looks like this:
 
 ## Showing the current time
 
-In this step we will add a textual indicator the current position of the playback. 
-You might use the provided information to also build a progress bar indicator for the users
-which could be even interactive with seeking. This tutorial will skip this part. 
+In this step we will add a textual indicator of the current position of the playback.
+You could use the provided information to build a progress bar indicator for the users
+which could even be interactive with seeking, but this tutorial will not cover that.
 
 As in most other steps we will add some new DOM elements, corresponding CSS and then
-hook it up with some the alphaTab event `playerPositionChanged` providing the necessary data.
+hook it up with the alphaTab event, [`playerPositionChanged`](/docs/reference/api/playerpositionchanged), providing the necessary data.
 
 <Tabs
   defaultValue="dom"
@@ -249,8 +244,8 @@ hook it up with some the alphaTab event `playerPositionChanged` providing the ne
 
 <TabItem value="js">
 
-The `playerPositionChanged` event is fired quite high frequently and to reduce stress for the browser
-we will throttle the number of updates to only change on second base.  
+The `playerPositionChanged` event is fired quite frequently. To reduce stress for the browser
+we throttle the number of updates to only change once per second.
 
 ```js
 function formatDuration(milliseconds) {

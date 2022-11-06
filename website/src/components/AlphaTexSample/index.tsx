@@ -3,7 +3,7 @@ import CodeBlock from '@theme/CodeBlock';
 import { AlphaTab } from '../AlphaTab';
 
 export interface AlphaTexSampleProps {
-    tracks: number[],
+    tracks?: number[] | string;
     children: string | React.ReactElement;
 }
 
@@ -17,7 +17,7 @@ export class AlphaTexSample extends React.Component<AlphaTexSampleProps>
         return (
             <>
                 <AlphaTab tex={true} tracks={this.props.tracks}>{this.props.children}</AlphaTab>
-                <CodeBlock>{this.props.children}</CodeBlock>
+                <CodeBlock>{typeof this.props.children === 'string' ? this.props.children.trim() : this.props.children}</CodeBlock>
             </>
         );
     }

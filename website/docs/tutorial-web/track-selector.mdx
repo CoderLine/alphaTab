@@ -7,12 +7,12 @@ import TabItem from '@theme/TabItem';
 
 ## Build the track selector
 
-In many files that alphaTab supports, there might be more than just one instrument contained. 
-There can be vocals, guitars, drums or other instruments where the notation is available. 
-Users would like to switch between the individual tracks. 
+Many input file formats that alphaTab supports can contain more than just one instrument.
+There can be vocals, guitars, drums or other instruments where the notation is available,
+and users would like to switch between the individual tracks.
 
-The track selector will go into the sidebar, so let's extend our `index.html` with a template that we will use for all items in the track selector and
-lets add some place in the sidebar where the items will go.
+The track selector will be put in the sidebar, so let's extend our `index.html` with a template
+that we will use for all items in the track selector and some place in the sidebar where the items will go.
 
 <Tabs
   defaultValue="dom"
@@ -120,16 +120,16 @@ lets add some place in the sidebar where the items will go.
 </Tabs>
 
 Let's take a closer look at the new UI element. We have one column for the icon of the track and another one for the details of the track. 
-In the details we show the name and other future controls for volume and muting could go there. 
-In this tutorial we will use FontAwesome to have some icons.
+In the details we still only show the name of the track. Other controls for volume and muting will be added later.
+In this tutorial, we use Font Awesome to display some icons.
 
 :::caution
-Do not use this FontAwesome CDN link from this tutorial. Head over to https://fontawesome.com/
+Do not use this Font Awesome CDN link from this tutorial. Head over to https://fontawesome.com/
 to create your own personal kit for usage on your website. 
 :::
 
-Now the real magic happens as we will hook this up with alphaTab. We will listen again to some events and fill the UI accordingly. 
-This will be also the first time that we signal based on some UI interaction that alphaTab should do something. 
+Now the real magic happens as we will hook this up with alphaTab. We will once again listen to some events and fill the UI accordingly.
+This will also be the first time we use UI interaction to tell alphaTab to do something.
 When a user clicks on an item, we want to render the selected track.
 
 ```js
@@ -181,16 +181,16 @@ api.renderStarted.on(() => {
 });
 ```
 
-The code above should be easy understandable but let's have a closer look on what happens there. 
+The code above should be easy understandable but let's have a closer look at what happens here.
 
-We have a small helper function which creates the DOM element for a given track. It will use the template 
-tag to create this element and then we just fill some data in. Upon click we tell alphaTab to render the given track. 
+We have a small helper function which creates the DOM element for a given track. It uses the `<template>`
+element from before to create this element, and then we just fill in the name. Upon click we tell alphaTab to render the given track.
 
-Below that helper function we listen to the [`scoreLoaded`](/docs/reference/api/scoreloaded) event which is fired once the data model for the song is loaded. 
-There we iterate all tracks, create a item for the selector and fill it into the sidebar. 
+Below that helper function, we listen to the [`scoreLoaded`](/docs/reference/api/scoreloaded) event which is fired once the data model for the song is loaded. 
+There we iterate through each track and create an item for the track selector and place it in the sidebar.
 
-Last but not least we add another listener to the [`renderStarted`](/docs/reference/api/renderstarted) event which will mark the currently rendered
-tracks as active in the sidebar via CSS class.
+Last but not least, we add another listener to the [`renderStarted`](/docs/reference/api/renderstarted) event that marks the currently rendered
+tracks as active in the sidebar with a CSS class.
 
 <img src="/img/tutorial-web/track-selector.png" height="400" />
 

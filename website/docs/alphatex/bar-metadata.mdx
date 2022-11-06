@@ -11,7 +11,7 @@ mix the score metadata and the bar metadata of the first bar.
 
 ## Time Signatures
 
-Time signatures have the format `\ts Numerator Denominator`
+Time signatures have the format `\ts Numerator Denominator`.
 
 <AlphaTexSample>{`
 \\ts 3 4 | \\ts 4 4 | \\ts 6 8
@@ -87,8 +87,14 @@ To change the triplet feel of a bar, specify `\tf TripletFeel`, where `TripletFe
 | Scottish 8th      | scottish-8th, s8, 6   |
 
 <AlphaTexSample>{`
-\\tf none 3.3*4 | \\tf triplet-16th 3.3*4 | \\tf triplet-8th 3.3*4 | \\tf dotted-16th 3.3*4 | \\tf dotted-8th 3.3*4 | \\tf scottish-16th 3.3*4 | \\tf scottish-8th 3.3*4 |
-\\tf no 1.1*4 | \\tf t16 1.1*4 | \\tf t8 1.1*4 | \\tf d16 1.1*4 | \\tf d8 1.1*4 | \\tf s16 1.1*4 | \\tf s8 1.1*4
+\\tf none 3.3*4 |
+\\tf triplet-16th 3.3*4 | \\tf triplet-8th 3.3*4 |
+\\tf dotted-16th 3.3*4 | \\tf dotted-8th 3.3*4 |
+\\tf scottish-16th 3.3*4 | \\tf scottish-8th 3.3*4 |
+\\tf no 1.1*4 |
+\\tf t16 1.1*4 | \\tf t8 1.1*4 |
+\\tf d16 1.1*4 | \\tf d8 1.1*4 |
+\\tf s16 1.1*4 | \\tf s8 1.1*4
 `}</AlphaTexSample>
 
 ## Anacrusis
@@ -102,8 +108,9 @@ The length of those bars is defined by the actual beats/notes in the bar. Bars c
 
 ## Sections
 
-To split your song into individual sections (e.g. intro, chorus, solo etc.), you can mark a bar as a section start by using `\section` followed by the section name.
-If you want to also specify a marker beside the text, use the format `\section Marker Text`
+To split your song into individual sections (e.g. intro, chorus, solo etc.)
+you can mark a bar as a section start by using `\section` followed by the section name.
+If you want to also specify a marker beside the text, use the format `\section Marker Text`.
 
 <AlphaTexSample>{`
 \\section Intro // simple section

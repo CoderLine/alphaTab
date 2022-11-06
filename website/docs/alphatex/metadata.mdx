@@ -6,7 +6,7 @@ import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
 Metadata is specified using `\tagname value value` at the beginning of the score. 
 It can be used to specify global information like title, tempo or track tuning.
-Metadata is optional, but if specified, it must be followed by a dot do indicate the end
+Metadata is optional, but if specified, it must be followed by a dot to indicate the end
 of the metadata. 
 
 Some of the metadata tags can also be specified when starting a new staff or track. Please refer to the [Tracks and Staves](/docs/alphatex/tracks-staves) or details on how to start new tracks and staves. 
@@ -39,7 +39,7 @@ Some of the metadata tags can also be specified when starting a new staff or tra
 ## Instrument
 As indicated above the instrument can be changed via the `\instrument` metadata. 
 Refer to the table below for all possible values and names. The list represents the general midi instrument list.
-You can either leave out the spaces or put the names into quotes e.g. `AcousticBass` vs `"Acoustic Bass"`
+You can either leave out the spaces or put the names into quotes e.g. `AcousticBass` vs `"Acoustic Bass"`.
 
 export function GeneralMidiList() {
     const items = [
@@ -198,13 +198,13 @@ export function GeneralMidiList() {
 
 ## Tuning
 
-The tuning of the instrument is defined by `\tuning` tag. For stringed instruments like the Guitar
-each tuning value defines one string. The format of the tuning value is `{note}{octave}` 
-`{note}` is one value of the following values in the given order C, C# or Db, D, D# or Eb, E, F, F# or Gb, G, G# or Ab, A, A# or Bb, B. 
-`{octave}` is just a number defining the octvate. 
+The tuning of the instrument is defined by the `\tuning` tag. For stringed instruments like the Guitar,
+each tuning value defines one string. The format of the tuning value is `{note}{octave}`.
+`{note}` is one value of the following values in the given order: C, C# or Db, D, D# or Eb, E, F, F# or Gb, G, G# or Ab, A, A# or Bb, B.
+`{octave}` is a number defining the octvate.
 
-A standard guitar tuning would be `\tuning E4 B3 G3 D3 A2 E2`
+For example, a standard guitar tuning is `\tuning E4 B3 G3 D3 A2 E2`. A 5 string bass would be `\tuning G2 D2 A1 E1 B0`.
 
-For non-stringed instruments one of the following values can be used: `piano`, `none` or `voice` depending on preference.
+For non-stringed instruments, the values `piano`, `none` or `voice` can be used depending on preference.
 
-If `\instrument` is specified without `\tuning` alphaTab will try to make a guess and apply the right default tuning. 
+If `\instrument` is specified without `\tuning`, alphaTab will try to make a guess and apply the right default tuning.
