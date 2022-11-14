@@ -148,7 +148,7 @@ dependencies {
     // To use the androidx.test.core APIs
     androidTestImplementation("androidx.test:core:1.4.0")
     // Kotlin extensions for androidx.test.core
-    androidTestImplementation("androidx.test:core-ktx:1.4.0")
+    androidTestImplementation("androidx.test:core-ktx:1.5.0")
 }
 
 val fetchTestResultsTask by tasks.registering {
