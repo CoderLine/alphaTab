@@ -35,7 +35,6 @@ export default abstract class AstPrinterBase {
     }
 
     protected writeLine(txt?: string) {
-        this.writeIndent();
         if (txt) {
             this.write(txt);
         }

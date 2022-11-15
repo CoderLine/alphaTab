@@ -41,7 +41,7 @@ export class GeneralMidi {
         if (!GeneralMidi._values) {
             GeneralMidi._values = new Map<string, number>();
         }
-        name = name.toLowerCase().split(' ').join('');
+        name = name.toLowerCase().replaceAll(' ', '');
         return GeneralMidi._values.has(name) ? GeneralMidi._values.get(name)! : 0;
     }
 
