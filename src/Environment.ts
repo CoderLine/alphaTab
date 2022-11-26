@@ -550,12 +550,12 @@ export class Environment {
             }
 
             if (!('replaceChildren' in Element.prototype)) {
-                Element.prototype.replaceChildren = function (...nodes: (Node | string)[]) {
+                (Element.prototype as Element).replaceChildren = function (...nodes: (Node | string)[]) {
                     this.innerHTML = '';
                     this.append(...nodes);
                 };
-                Document.prototype.replaceChildren = Element.prototype.replaceChildren;
-                DocumentFragment.prototype.replaceChildren = Element.prototype.replaceChildren;
+                (Document.prototype as Document).replaceChildren = (Element.prototype as Element).replaceChildren;
+                (DocumentFragment.prototype as DocumentFragment).replaceChildren = (Element.prototype as Element).replaceChildren;
             }
             if (!('replaceAll' in String.prototype)) {
                 (String.prototype as any).replaceAll = function (str: string, newStr: string) {
