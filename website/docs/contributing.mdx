@@ -16,7 +16,7 @@ In case you want to request a feature, improvement or need general assistance, [
 :::important
 Please follow the templates and do not just delete all information and drop in a 1 liner question. It is very important
 to get all the information asked in the template to judge the importance and content of the request. 2 minutes effort
-on your side, reduces heavily the effor on our side. We will close any issue not following the templates. 
+on your side, reduces heavily the effort on our side. We will close any issue not following the templates. 
 :::
 
 
@@ -26,7 +26,7 @@ You're a developer? You want to contribute code to alphaTab? Awesome! alphaTab i
 
 The main new development happens on `develop` and new features are usually developed on `feature/{feature or issue name}`. To get started 
 you can fork alphaTab into your account, and start preparing a fix/feature there in the style you prefer. Then just open a pull request. 
-If you're not new to Git and GitHub you know the drill ;) 
+If you're experienced with Git and GitHub you know the drill ;)
 
 ### License
 
@@ -42,7 +42,7 @@ You're still here? That sounds very promising. You have made your fork, you clon
 But how is the big question. Before we actually touch the code it is helpful to understand the toolchain we have in alphaTab.
 
 AlphaTab has a long history on the language it uses for developing. After all these years alphaTab ended up using TypeScript as the main language
-it is developed in. This change happend in April 2020. Before that AlphaTab was developed in C# with a special toolchain that ended up with JavaScript code via Haxe. 
+it is developed in. This change happened in April 2020. Before that AlphaTab was developed in C# with a special toolchain that ended up with JavaScript code via Haxe. 
 
 The .net version of alphaTab is still provided via a special Compiler based on the TypeScript compiler. It translates the TypeScript source code to C# 
 from where it is compiled further. 
@@ -74,7 +74,7 @@ After that you can run the following commands to get a compiled version of alpha
 ### NPM Scripts
 
 The repository has a set of NPM scripts that take over actions like compiling and testing. Execute them via 
-`npm run <scriptname>`. Refer to the [npm documentation](https://docs.npmjs.com/cli/run-script) for more details. 
+`npm run <script name>`. Refer to the [npm documentation](https://docs.npmjs.com/cli/run-script) for more details. 
 
 * `clean` - cleans all output
 * `lint` - checks the source code for style violations
@@ -111,7 +111,7 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
 - **font/**
 
-  Contains the text and soundfounts that alphaTab needs for operation. 
+  Contains the text and sound fonts that alphaTab needs for operation.
 
 - **img/**
 
@@ -145,7 +145,7 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
 - **test/**
 
-  Contains the source code related to automated tests (unit tests, integration tests, visual regression tests,...).
+  Contains the source code related to automated tests (unit tests, integration tests, visual regression tests, ...).
 
 - **test-data/**
 
@@ -165,7 +165,7 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
 - **tsconfig.base.json**
 
- The main tsconfig valid for all compilations. 
+  The main tsconfig valid for all compilations.
 
 - **tsconfig.build.json**
 
@@ -175,9 +175,13 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
   The tsconfig used when compiling TypeScript to C#.
 
+- **tsconfig.build-kotlin.json**
+
+  The tsconfig used when compiling TypeScript to Kotlin.
+
 - **tsconfig.json**
 
-  The tsconfig used during development containing the main sources and tests.
+  The tsconfig used during development and testing containing the main sources and tests.
 
 - **tslint.json**
 

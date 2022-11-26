@@ -34,28 +34,28 @@ By default both notation systems are shown.
 
 <AlphaTexSample tracks="all">{`
 \\track "Piano with Grand Staff" "pno."
-    \\staff{score} \\tuning piano \\instrument acousticgrandpiano 
+    \\staff{score} \\tuning piano \\instrument acousticgrandpiano
     c4 d4 e4 f4 |
     \\staff{score} \\tuning piano \\clef F4
     c2 c2 c2 c2 |
 \\track "Guitar"
     \\staff{tabs} \\capo 5
-    1.2 3.2 0.1 1.1 
+    1.2 3.2 0.1 1.1
 `}</AlphaTexSample>
 
 ## Automatic Bars
 
-The staff with the largest number of bars defines how long the overall song is. There is no need to 
-manually ensure that all staves have the correct number of bars. AlphaTab will create missing empty bars automatically. 
+The staff with the largest number of bars defines how long the overall song is.
+There is no need to manually ensure that all staves have the correct number of bars.
+AlphaTab will create missing empty bars automatically.
 
 <AlphaTexSample tracks="all">{`
 \\track "Piano with Grand Staff" "pno."
-    \\staff{score} \\tuning piano \\instrument acousticgrandpiano 
+    \\staff{score} \\tuning piano \\instrument acousticgrandpiano
     c4 d4 e4 f4 |
     \\staff{score} \\tuning piano \\clef F4
     c2 c2 c2 c2 | c2 c2 c2 c2 | c2 c2 c2 c2 |
 \\track "Guitar"
     \\staff{tabs} \\capo 5
-    1.2 3.2 0.1 1.1 | 1.2 3.2 0.1 1.1  
+    1.2 3.2 0.1 1.1 | 1.2 3.2 0.1 1.1
 `}</AlphaTexSample>
-
