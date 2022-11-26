@@ -81,12 +81,12 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes);
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 if (this._startNote.slideTarget) {
-                    let endNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
+                    let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
                         this.renderer.staff.staveId,
                         this._startNote.slideTarget.beat.voice.bar
-                    )!;
+                    );
                     if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
-                        endX = cx + startNoteRenderer.x + this._parent.x;
+                        endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                         endY = startY;
                     } else {
                         endX =

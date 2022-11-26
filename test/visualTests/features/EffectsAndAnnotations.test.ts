@@ -1,3 +1,6 @@
+import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { ByteBuffer } from '@src/io/ByteBuffer';
+import { Settings } from '@src/Settings';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 
 describe('EffectsAndAnnotationsTests', () => {
@@ -62,6 +65,22 @@ describe('EffectsAndAnnotationsTests', () => {
 
     it('slides', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/slides.gp');
+    });
+
+    it('slides-line-break', async () => {
+        const tex = `14.1.2 :8 17.2 15.1 14.1{h} 17.2{ss} | 18.2`;
+        const settings = new Settings();
+        settings.display.barsPerRow = 1;
+
+        const importer = new AlphaTexImporter();
+        importer.init(ByteBuffer.fromString(tex), settings);
+        let score = importer.readScore();
+
+        await VisualTestHelper.runVisualTestScoreWithResize(score,
+            [400], 
+            ['effects-and-annotations/slides-line-break.png'],
+            settings
+        );
     });
 
     it('trill', async () => {

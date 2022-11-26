@@ -71,7 +71,6 @@ export class ScoreSlideLineGlyph extends Glyph {
     private drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let sizeX: number = 12 * this.scale;
-        let startOffsetX: number = 3 * this.scale;
         let endOffsetX: number = 1 * this.scale;
         let offsetY: number = 2 * this.scale;
         let startX: number = 0;
@@ -85,16 +84,15 @@ export class ScoreSlideLineGlyph extends Glyph {
                 startX =
                     cx +
                     startNoteRenderer.x +
-                    startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes) +
-                    startOffsetX;
+                    startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes);
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 if (this._startNote.slideTarget) {
                     let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
                         this.renderer.staff.staveId,
                         this._startNote.slideTarget.beat.voice.bar
-                    ) as BarRendererBase;
+                    );
                     if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
-                        endX = cx + startNoteRenderer.x + this._parent.x;
+                        endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                         endY = startY;
                     } else {
                         endX =
@@ -130,7 +128,7 @@ export class ScoreSlideLineGlyph extends Glyph {
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
                 break;
             case SlideOutType.PickSlideUp:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + startOffsetX;
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right);
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Top);
                 endX = cx + startNoteRenderer.x + startNoteRenderer.width;
@@ -146,7 +144,7 @@ export class ScoreSlideLineGlyph extends Glyph {
                 waves = true;
                 break;
             case SlideOutType.PickSlideDown:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + startOffsetX;
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right);
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
                 endX = cx + startNoteRenderer.x + startNoteRenderer.width;
