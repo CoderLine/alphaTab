@@ -86,7 +86,7 @@ export class TabSlideLineGlyph extends Glyph {
                         this._startNote.slideTarget.beat.voice.bar
                     )!;
                     if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
-                        endX = cx + startNoteRenderer.x + this._parent.x;
+                        endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                         endY = startY;
                     } else {
                         endX =
