@@ -278,6 +278,20 @@ export class MidiTickLookup {
         return this.masterBarLookup.get(bar.index)!.start;
     }
 
+
+    /**
+     * Gets the start time in midi ticks for a given beat at which the masterbar is played the first time.
+     * @param beat The beat to find the time period for.
+     * @returns The time in midi ticks at which the beat is played the first time or 0 if the beat is not contained
+     */
+    public getBeatStart(beat:Beat): number {
+        if (!this.masterBarLookup.has(beat.voice.bar.index)) {
+            return 0;
+        }
+
+        return this.masterBarLookup.get(beat.voice.bar.index)!.start + beat.playbackStart;
+    }
+
     /**
      * Adds a new {@link MasterBarTickLookup} to the lookup table.
      * @param masterBar The item to add.

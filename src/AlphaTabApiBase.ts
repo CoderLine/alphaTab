@@ -805,9 +805,7 @@ export class AlphaTabApiBase<TSettings> {
                     let currentBeat = this._currentBeat;
                     let tickCache = this._tickCache;
                     if (currentBeat && tickCache) {
-                        this.player!.tickPosition =
-                            tickCache.getMasterBarStart(currentBeat.currentBeat.voice.bar.masterBar) +
-                            currentBeat.currentBeat.playbackStart;
+                        this.player!.tickPosition = tickCache.getBeatStart(currentBeat.currentBeat);
                     }
                 }
             });
@@ -1145,8 +1143,8 @@ export class AlphaTabApiBase<TSettings> {
         if (this.settings.player.enableUserInteraction) {
             // for the selection ensure start < end
             if (this._selectionEnd) {
-                let startTick: number = this._selectionStart!.beat.absolutePlaybackStart;
-                let endTick: number = this._selectionEnd!.beat.absolutePlaybackStart;
+                let startTick: number = this._tickCache?.getBeatStart(this._selectionStart!.beat) ?? this._selectionStart!.beat.absolutePlaybackStart;
+                let endTick: number = this._tickCache?.getBeatStart(this._selectionEnd!.beat) ?? this._selectionEnd!.beat.absolutePlaybackStart;
                 if (endTick < startTick) {
                     let t: SelectionInfo = this._selectionStart!;
                     this._selectionStart = this._selectionEnd;
@@ -1162,7 +1160,7 @@ export class AlphaTabApiBase<TSettings> {
                 // move to selection start
                 this._currentBeat = null; // reset current beat so it is updating the cursor
                 if (this._playerState === PlayerState.Paused) {
-                    this.cursorUpdateTick(this._selectionStart.beat.absolutePlaybackStart, false);
+                    this.cursorUpdateTick(this._tickCache.getBeatStart(this._selectionStart.beat), false);
                 }
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
                 // set playback range
@@ -1314,8 +1312,8 @@ export class AlphaTabApiBase<TSettings> {
         if (!endBeat.bounds) {
             endBeat.bounds = cache.findBeat(endBeat.beat);
         }
-        let startTick: number = startBeat.beat.absolutePlaybackStart;
-        let endTick: number = endBeat.beat.absolutePlaybackStart;
+        let startTick: number = this._tickCache?.getBeatStart(startBeat.beat) ?? startBeat.beat.absolutePlaybackStart;
+        let endTick: number = this._tickCache?.getBeatStart(endBeat.beat) ?? endBeat.beat.absolutePlaybackStart;
         if (endTick < startTick) {
             let t: SelectionInfo = startBeat;
             startBeat = endBeat;
