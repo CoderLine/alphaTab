@@ -139,4 +139,19 @@ describe('MidiPlaybackControllerTest', () => {
         ];
         testAlphaTexRepeat(tex, expectedBars, 50);
     });
+
+    it('alternate-endings-1046', () => {
+        let tex: string = `
+        \\tempo 175
+        .
+        \\ro :1 r | \\ae 1 r | \\ae 2 \\rc 2 r | \\ro r | \\ae 1 r | \\ae (2 3 4) \\rc 4 r |       
+        `;
+        let expectedBars: number[] = [
+            0, 1, 0, 2,
+            3, 4,
+            3, 5, 3, 5, 3, 5,
+            6
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
 });
