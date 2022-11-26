@@ -79,13 +79,13 @@ export class AlphaTabApi extends AlphaTabApiBase<any | Settings> {
                 ? window.innerWidth
                 : "clientWidth" in document.documentElement
                     ? document.documentElement.clientWidth
-                    : window.screen.width;
+                    : (window as Window).screen.width;
         let screenHeight: number =
             "innerHeight" in window
                 ? window.innerHeight
                 : "clientHeight" in document.documentElement
                     ? document.documentElement.clientHeight
-                    : window.screen.height;
+                    :  (window as Window).screen.height;
         let w: number = a4.offsetWidth + 50;
         let h: number = window.innerHeight;
         let left: number = ((screenWidth / 2) | 0) - ((w / 2) | 0) + dualScreenLeft;
