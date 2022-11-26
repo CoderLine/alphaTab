@@ -14,7 +14,7 @@ namespace AlphaTab.VisualTests
 {
     partial class VisualTestHelper
     {
-        private static async Task RunVisualTestScoreWithResize(Score score, IList<double> widths,
+        public static async Task RunVisualTestScoreWithResize(Score score, IList<double> widths,
             IList<string?> referenceImages, Settings? settings, IList<double>? tracks, string? message,
             double tolerancePercent)
         {
