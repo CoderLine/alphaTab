@@ -570,7 +570,7 @@ export class AlphaTexImporter extends ScoreImporter {
      * @returns true if the given character is a digit, otherwise false.
      */
     private isDigit(code: number): boolean {
-        return (code >= 0x30 && code <= 0x39) /*0-9*/ || (code === 0x2d /* - */ && this._allowNegatives); // allow - if negatives
+        return (code >= 0x30 && code <= 0x39) /* 0-9 */ || (code === 0x2d /* - */ && this._allowNegatives); // allow - if negatives
     }
 
     /**
@@ -582,7 +582,7 @@ export class AlphaTexImporter extends ScoreImporter {
         do {
             str += String.fromCharCode(this._ch);
             this._ch = this.nextChar();
-        } while (AlphaTexImporter.isLetter(this._ch) || this.isDigit(this._ch) || this._ch === 0x23);
+        } while (AlphaTexImporter.isLetter(this._ch) || this.isDigit(this._ch) || this._ch === 0x23 /* # */);
         return str;
     }
 
@@ -614,74 +614,44 @@ export class AlphaTexImporter extends ScoreImporter {
         let anyMeta: boolean = false;
         let continueReading: boolean = true;
         while (this._sy === AlphaTexSymbols.MetaCommand && continueReading) {
-            let syData: string = (this._syData as string).toLowerCase();
-            switch (syData) {
+            let metadataTag: string = (this._syData as string).toLowerCase();
+            switch (metadataTag) {
                 case 'title':
-                    this._sy = this.newSy();
-                    if (this._sy === AlphaTexSymbols.String) {
-                        this._score.title = (this._syData as string);
-                    } else {
-                        this.error('title', AlphaTexSymbols.String, true);
-                    }
-                    this._sy = this.newSy();
-                    anyMeta = true;
-                    break;
                 case 'subtitle':
-                    this._sy = this.newSy();
-                    if (this._sy === AlphaTexSymbols.String) {
-                        this._score.subTitle = (this._syData as string);
-                    } else {
-                        this.error('subtitle', AlphaTexSymbols.String, true);
-                    }
-                    this._sy = this.newSy();
-                    anyMeta = true;
-                    break;
                 case 'artist':
-                    this._sy = this.newSy();
-                    if (this._sy === AlphaTexSymbols.String) {
-                        this._score.artist = (this._syData as string);
-                    } else {
-                        this.error('artist', AlphaTexSymbols.String, true);
-                    }
-                    this._sy = this.newSy();
-                    anyMeta = true;
-                    break;
                 case 'album':
-                    this._sy = this.newSy();
-                    if (this._sy === AlphaTexSymbols.String) {
-                        this._score.album = (this._syData as string);
-                    } else {
-                        this.error('album', AlphaTexSymbols.String, true);
-                    }
-                    this._sy = this.newSy();
-                    anyMeta = true;
-                    break;
                 case 'words':
-                    this._sy = this.newSy();
-                    if (this._sy === AlphaTexSymbols.String) {
-                        this._score.words = (this._syData as string);
-                    } else {
-                        this.error('words', AlphaTexSymbols.String, true);
-                    }
-                    this._sy = this.newSy();
-                    anyMeta = true;
-                    break;
                 case 'music':
-                    this._sy = this.newSy();
-                    if (this._sy === AlphaTexSymbols.String) {
-                        this._score.music = (this._syData as string);
-                    } else {
-                        this.error('music', AlphaTexSymbols.String, true);
-                    }
-                    this._sy = this.newSy();
-                    anyMeta = true;
-                    break;
                 case 'copyright':
                     this._sy = this.newSy();
-                    if (this._sy === AlphaTexSymbols.String) {
-                        this._score.copyright = (this._syData as string);
-                    } else {
-                        this.error('copyright', AlphaTexSymbols.String, true);
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        // Known issue: Strings that happen to be parsed as valid Tunings or positive Numbers will not pass this.
+                        // Need to use quotes in that case, or rewrite parsing logic.
+                        this.error(metadataTag, AlphaTexSymbols.String, true);
+                    }
+                    let metadataValue: string = (this._syData as string);
+                    switch (metadataTag) {
+                        case 'title':
+                            this._score.title = metadataValue;
+                            break;
+                        case 'subtitle':
+                            this._score.subTitle = metadataValue;
+                            break;
+                        case 'artist':
+                            this._score.artist = metadataValue;
+                            break;
+                        case 'album':
+                            this._score.album = metadataValue;
+                            break;
+                        case 'words':
+                            this._score.words = metadataValue;
+                            break;
+                        case 'music':
+                            this._score.music = metadataValue;
+                            break;
+                        case 'copyright':
+                            this._score.copyright = metadataValue;
+                            break;
                     }
                     this._sy = this.newSy();
                     anyMeta = true;
@@ -722,8 +692,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private handleStaffMeta(): boolean {
-        let syData: string = (this._syData as string).toLowerCase();
-        switch (syData) {
+        switch ((this._syData as string).toLowerCase()) {
             case 'capo':
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.Number) {
@@ -772,7 +741,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._staffTuningApplied = false;
                 if (this._sy === AlphaTexSymbols.Number) {
                     let instrument: number = this._syData as number;
-                    if (instrument >= 0 && instrument <= 128) {
+                    if (instrument >= 0 && instrument <= 127) {
                         this._currentTrack.playbackInfo.program = this._syData as number;
                     } else {
                         this.error('instrument', AlphaTexSymbols.Number, false);
@@ -1223,66 +1192,35 @@ export class AlphaTexImporter extends ScoreImporter {
         let syData: string = (this._syData as string).toLowerCase();
         if (syData === 'f') {
             beat.fadeIn = true;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'v') {
+        } else if (syData === 'v') {
             beat.vibrato = VibratoType.Slight;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 's') {
+        } else if (syData === 's') {
             beat.slap = true;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'p') {
+        } else if (syData === 'p') {
             beat.pop = true;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'tt') {
+        } else if (syData === 'tt') {
             beat.tap = true;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'dd') {
+        } else if (syData === 'dd') {
             beat.dots = 2;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'd') {
+        } else if (syData === 'd') {
             beat.dots = 1;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'su') {
+        } else if (syData === 'su') {
             beat.pickStroke = PickStroke.Up;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'sd') {
+        } else if (syData === 'sd') {
             beat.pickStroke = PickStroke.Down;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'tu') {
+        } else if (syData === 'tu') {
             this._sy = this.newSy();
             if (this._sy !== AlphaTexSymbols.Number) {
                 this.error('tuplet', AlphaTexSymbols.Number, true);
                 return false;
             }
             this.applyTuplet(beat, this._syData as number);
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'tb' || syData === 'tbe') {
+        } else if (syData === 'tb' || syData === 'tbe') {
             let exact: boolean = syData === 'tbe';
             // read points
             this._sy = this.newSy();
             if (this._sy !== AlphaTexSymbols.LParensis) {
                 this.error('tremolobar-effect', AlphaTexSymbols.LParensis, true);
-                return false;
             }
             this._allowNegatives = true;
             this._sy = this.newSy();
@@ -1292,19 +1230,16 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (exact) {
                     if (this._sy !== AlphaTexSymbols.Number) {
                         this.error('tremolobar-effect', AlphaTexSymbols.Number, true);
-                        return false;
                     }
                     offset = this._syData as number;
                     this._sy = this.newSy();
                     if (this._sy !== AlphaTexSymbols.Number) {
                         this.error('tremolobar-effect', AlphaTexSymbols.Number, true);
-                        return false;
                     }
                     value = this._syData as number;
                 } else {
                     if (this._sy !== AlphaTexSymbols.Number) {
                         this.error('tremolobar-effect', AlphaTexSymbols.Number, true);
-                        return false;
                     }
                     offset = 0;
                     value = this._syData as number;
@@ -1326,20 +1261,14 @@ export class AlphaTexImporter extends ScoreImporter {
                         i++;
                     }
                 } else {
-                    beat.whammyBarPoints.sort((a, b) => {
-                        return a.offset - b.offset;
-                    });
+                    beat.whammyBarPoints.sort((a, b) => a.offset - b.offset);
                 }
             }
             this._allowNegatives = false;
             if (this._sy !== AlphaTexSymbols.RParensis) {
                 this.error('tremolobar-effect', AlphaTexSymbols.RParensis, true);
-                return false;
             }
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'bu' || syData === 'bd' || syData === 'au' || syData === 'ad') {
+        } else if (syData === 'bu' || syData === 'bd' || syData === 'au' || syData === 'ad') {
             switch (syData) {
                 case 'bu':
                     beat.brushType = BrushType.BrushUp;
@@ -1369,8 +1298,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 beat.brushDuration = beat.playbackDuration / beat.notes.length;
             }
             return true;
-        }
-        if (syData === 'ch') {
+        } else if (syData === 'ch') {
             this._sy = this.newSy();
             let chordName: string = (this._syData as string);
             let chordId: string = this.getChordId(this._currentStaff, chordName);
@@ -1381,10 +1309,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._currentStaff.addChord(chordId, chord);
             }
             beat.chordId = chordId;
-            this._sy = this.newSy();
-            return true;
-        }
-        if (syData === 'gr') {
+        } else if (syData === 'gr') {
             this._sy = this.newSy();
             if ((this._syData as string).toLowerCase() === 'ob') {
                 beat.graceType = GraceType.OnBeat;
@@ -1396,9 +1321,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 beat.graceType = GraceType.BeforeBeat;
             }
             return true;
-        }
-        if (syData === 'dy') {
-            this.newSy();
+        } else if (syData === 'dy') {
+            this._sy = this.newSy();
             switch ((this._syData as string).toLowerCase()) {
                 case 'ppp':
                     beat.dynamics = DynamicValue.PPP;
@@ -1426,43 +1350,39 @@ export class AlphaTexImporter extends ScoreImporter {
                     break;
             }
             this._currentDynamics = beat.dynamics;
-            this.newSy();
-            return true;
-        }
-        if (syData === 'cre') {
+        } else if (syData === 'cre') {
             beat.crescendo = CrescendoType.Crescendo;
-            this.newSy();
-            return true;
-        }
-        if (syData === 'dec') {
+        } else if (syData === 'dec') {
             beat.crescendo = CrescendoType.Decrescendo;
-            this.newSy();
-            return true;
-        }
-        if (syData === 'tp') {
+        } else if (syData === 'tp') {
             this._sy = this.newSy();
-            let duration: Duration = Duration.Eighth;
+            beat.tremoloSpeed = Duration.Eighth;
             if (this._sy === AlphaTexSymbols.Number) {
                 switch (this._syData as number) {
                     case 8:
-                        duration = Duration.Eighth;
+                        beat.tremoloSpeed = Duration.Eighth;
                         break;
                     case 16:
-                        duration = Duration.Sixteenth;
+                        beat.tremoloSpeed = Duration.Sixteenth;
                         break;
                     case 32:
-                        duration = Duration.ThirtySecond;
+                        beat.tremoloSpeed = Duration.ThirtySecond;
                         break;
                     default:
-                        duration = Duration.Eighth;
+                        beat.tremoloSpeed = Duration.Eighth;
                         break;
                 }
                 this._sy = this.newSy();
             }
-            beat.tremoloSpeed = duration;
             return true;
+        } else {
+            // string didn't match any beat effect syntax
+            return false;
         }
-        return false;
+        // default behaviour when a beat effect above
+        // does not handle new symbol + return on its own
+        this._sy = this.newSy();
+        return true;
     }
 
     private getChordId(currentStaff: Staff, chordName: string): string {

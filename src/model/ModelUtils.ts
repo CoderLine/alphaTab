@@ -121,7 +121,6 @@ export class ModelUtils {
     /**
      * Checks if the given string is a tuning inticator.
      * @param name
-     * @returns
      */
     public static isTuning(name: string): boolean {
         return !!ModelUtils.parseTuning(name);
@@ -132,13 +131,13 @@ export class ModelUtils {
         let octave: string = '';
         for (let i: number = 0; i < name.length; i++) {
             let c: number = name.charCodeAt(i);
-            if (c >= 0x30 && c <= 0x39) {
+            if (c >= 0x30 && c <= 0x39 /* 0-9 */) {
                 // number without note?
                 if (!note) {
                     return null;
                 }
                 octave += String.fromCharCode(c);
-            } else if ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) || c === 0x23) {
+            } else if ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) || c === 0x23) /* A-Za-Z# */ {
                 note += String.fromCharCode(c);
             } else {
                 return null;
@@ -163,53 +162,39 @@ export class ModelUtils {
     }
 
     public static getToneForText(note: string): number {
-        let b: number = 0;
         switch (note.toLowerCase()) {
             case 'c':
-                b = 0;
-                break;
+                return 0;
             case 'c#':
             case 'db':
-                b = 1;
-                break;
+                return 1;
             case 'd':
-                b = 2;
-                break;
+                return 2;
             case 'd#':
             case 'eb':
-                b = 3;
-                break;
+                return 3;
             case 'e':
-                b = 4;
-                break;
+                return 4;
             case 'f':
-                b = 5;
-                break;
+                return 5;
             case 'f#':
             case 'gb':
-                b = 6;
-                break;
+                return 6;
             case 'g':
-                b = 7;
-                break;
+                return 7;
             case 'g#':
             case 'ab':
-                b = 8;
-                break;
+                return 8;
             case 'a':
-                b = 9;
-                break;
+                return 9;
             case 'a#':
             case 'bb':
-                b = 10;
-                break;
+                return 10;
             case 'b':
-                b = 11;
-                break;
+                return 11;
             default:
                 return 0;
         }
-        return b;
     }
 
     public static newGuid(): string {
