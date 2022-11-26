@@ -90,7 +90,7 @@ export class ScoreSlideLineGlyph extends Glyph {
                     let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
                         this.renderer.staff.staveId,
                         this._startNote.slideTarget.beat.voice.bar
-                    ) as BarRendererBase;
+                    );
                     if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                         endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                         endY = startY;
