@@ -110,12 +110,7 @@ export class AlphaTexError extends AlphaTabError {
         return new AlphaTexError(message, position, line, col, nonTerm, expected, symbol, symbolData);
     }
 
-    public static errorMessage(
-        message: string,
-        position: number,
-        line: number,
-        col: number,
-    ): AlphaTexError {
+    public static errorMessage(message: string, position: number, line: number, col: number): AlphaTexError {
         message = `MalFormed AlphaTex: @${position} (line ${line}, col ${col}): ${message}`;
         return new AlphaTexError(message, position, line, col, null, null, null, null);
     }
@@ -261,7 +256,12 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private errorMessage(message: string): void {
-        let e: AlphaTexError = AlphaTexError.errorMessage(message, this._lastValidSpot[0], this._lastValidSpot[1], this._lastValidSpot[2]);
+        let e: AlphaTexError = AlphaTexError.errorMessage(
+            message,
+            this._lastValidSpot[0],
+            this._lastValidSpot[1],
+            this._lastValidSpot[2]
+        );
         if (this.logErrors) {
             Logger.error(this.name, e.message!);
         }
@@ -435,7 +435,7 @@ export class AlphaTexImporter extends ScoreImporter {
             case 'd':
             case 'dmajor':
             case 'bminor':
-                return KeySignature.D;;
+                return KeySignature.D;
             case 'a':
             case 'amajor':
             case 'f#minor':
@@ -466,7 +466,7 @@ export class AlphaTexImporter extends ScoreImporter {
      */
     private nextChar(): number {
         if (this._curChPos < this._input.length) {
-            this._ch = this._input.charCodeAt(this._curChPos++)
+            this._ch = this._input.charCodeAt(this._curChPos++);
             // line/col counting
             if (this._ch === 0x0a /* \n */) {
                 this._line++;
@@ -541,7 +541,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._ch = this.nextChar();
                 }
                 if (this._ch === AlphaTexImporter.Eof) {
-                    this.errorMessage("String opened but never closed");
+                    this.errorMessage('String opened but never closed');
                 }
                 this._syData = s;
                 this._ch = this.nextChar();
@@ -698,7 +698,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         // Need to use quotes in that case, or rewrite parsing logic.
                         this.error(metadataTag, AlphaTexSymbols.String, true);
                     }
-                    let metadataValue: string = (this._syData as string);
+                    let metadataValue: string = this._syData as string;
                     switch (metadataTag) {
                         case 'title':
                             this._score.title = metadataValue;
@@ -978,12 +978,12 @@ export class AlphaTexImporter extends ScoreImporter {
             }
             // name
             if (this._sy === AlphaTexSymbols.String) {
-                this._currentTrack.name = (this._syData as string);
+                this._currentTrack.name = this._syData as string;
                 this._sy = this.newSy();
             }
             // short name
             if (this._sy === AlphaTexSymbols.String) {
-                this._currentTrack.shortName = (this._syData as string);
+                this._currentTrack.shortName = this._syData as string;
                 this._sy = this.newSy();
             }
         }
@@ -1058,8 +1058,7 @@ export class AlphaTexImporter extends ScoreImporter {
             this._currentStaff.displayTranspositionPitch = 0;
             this._currentStaff.stringTuning.tunings = [];
 
-
-            if (program == 15 || program >= 24 && program <= 31) {
+            if (program == 15 || (program >= 24 && program <= 31)) {
                 // dulcimer+guitar E4 B3 G3 D3 A2 E2
                 this._currentStaff.displayTranspositionPitch = -12;
                 this._currentStaff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
@@ -1349,7 +1348,7 @@ export class AlphaTexImporter extends ScoreImporter {
             this._sy = this.newSy();
             if (this._sy === AlphaTexSymbols.Number) {
                 // explicit duration
-                beat.brushDuration = (this._syData as number);
+                beat.brushDuration = this._syData as number;
                 this._sy = this.newSy();
                 return true;
             }
@@ -1363,7 +1362,7 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         } else if (syData === 'ch') {
             this._sy = this.newSy();
-            let chordName: string = (this._syData as string);
+            let chordName: string = this._syData as string;
             let chordId: string = this.getChordId(this._currentStaff, chordName);
             if (!this._currentStaff.hasChord(chordId)) {
                 let chord: Chord = new Chord();
@@ -1449,7 +1448,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private getChordId(currentStaff: Staff, chordName: string): string {
-        return chordName.toLowerCase() + currentStaff.index + currentStaff.track.index
+        return chordName.toLowerCase() + currentStaff.index + currentStaff.track.index;
     }
 
     private static applyTuplet(beat: Beat, tuplet: number): void {
@@ -1827,7 +1826,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.Number) {
                     this.error('repeatclose', AlphaTexSymbols.Number, true);
                 }
-                if (this._syData as number > 2048) {
+                if ((this._syData as number) > 2048) {
                     this.error('repeatclose', AlphaTexSymbols.Number, false);
                 }
                 master.repeatCount = this._syData as number;
@@ -1837,7 +1836,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy === AlphaTexSymbols.LParensis) {
                     this._sy = this.newSy();
                     if (this._sy !== AlphaTexSymbols.Number) {
-                        this.error('alternateending', AlphaTexSymbols.Number, true)
+                        this.error('alternateending', AlphaTexSymbols.Number, true);
                     }
                     this.applyAlternateEnding(master);
                     while (this._sy === AlphaTexSymbols.Number) {
@@ -1849,7 +1848,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                 } else {
                     if (this._sy !== AlphaTexSymbols.Number) {
-                        this.error('alternateending', AlphaTexSymbols.Number, true)
+                        this.error('alternateending', AlphaTexSymbols.Number, true);
                     }
                     this.applyAlternateEnding(master);
                 }
@@ -1950,7 +1949,7 @@ export class AlphaTexImporter extends ScoreImporter {
         let num = this._syData as number;
         if (num < 1) {
             // Repeat numberings start from 1
-            this.error('alternateending', AlphaTexSymbols.Number, true)
+            this.error('alternateending', AlphaTexSymbols.Number, true);
         }
         // Alternate endings bitflag starts from 0
         master.alternateEndings |= 1 << (num - 1);
