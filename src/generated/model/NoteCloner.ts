@@ -7,47 +7,46 @@ import { Note } from "@src/model/Note";
 import { BendPointCloner } from "./BendPointCloner";
 export class NoteCloner {
     public static clone(original: Note): Note {
-        const clone = new Note(); 
-        clone.index = original.index; 
-        clone.accentuated = original.accentuated; 
-        clone.bendType = original.bendType; 
-        clone.bendStyle = original.bendStyle; 
-        clone.isContinuedBend = original.isContinuedBend; 
+        const clone = new Note();
+        clone.index = original.index;
+        clone.accentuated = original.accentuated;
+        clone.bendType = original.bendType;
+        clone.bendStyle = original.bendStyle;
+        clone.isContinuedBend = original.isContinuedBend;
         if (original.bendPoints) {
             clone.bendPoints = [];
             for (const i of original.bendPoints!) {
                 clone.addBendPoint(BendPointCloner.clone(i));
             }
-        } 
-        clone.fret = original.fret; 
-        clone.string = original.string; 
-        clone.octave = original.octave; 
-        clone.tone = original.tone; 
-        clone.percussionArticulation = original.percussionArticulation; 
-        clone.isVisible = original.isVisible; 
-        clone.isLeftHandTapped = original.isLeftHandTapped; 
-        clone.isHammerPullOrigin = original.isHammerPullOrigin; 
-        clone.isSlurDestination = original.isSlurDestination; 
-        clone.harmonicType = original.harmonicType; 
-        clone.harmonicValue = original.harmonicValue; 
-        clone.isGhost = original.isGhost; 
-        clone.isLetRing = original.isLetRing; 
-        clone.isPalmMute = original.isPalmMute; 
-        clone.isDead = original.isDead; 
-        clone.isStaccato = original.isStaccato; 
-        clone.slideInType = original.slideInType; 
-        clone.slideOutType = original.slideOutType; 
-        clone.vibrato = original.vibrato; 
-        clone.isTieDestination = original.isTieDestination; 
-        clone.leftHandFinger = original.leftHandFinger; 
-        clone.rightHandFinger = original.rightHandFinger; 
-        clone.isFingering = original.isFingering; 
-        clone.trillValue = original.trillValue; 
-        clone.trillSpeed = original.trillSpeed; 
-        clone.durationPercent = original.durationPercent; 
-        clone.accidentalMode = original.accidentalMode; 
-        clone.dynamics = original.dynamics; 
-        return clone; 
+        }
+        clone.fret = original.fret;
+        clone.string = original.string;
+        clone.octave = original.octave;
+        clone.tone = original.tone;
+        clone.percussionArticulation = original.percussionArticulation;
+        clone.isVisible = original.isVisible;
+        clone.isLeftHandTapped = original.isLeftHandTapped;
+        clone.isHammerPullOrigin = original.isHammerPullOrigin;
+        clone.isSlurDestination = original.isSlurDestination;
+        clone.harmonicType = original.harmonicType;
+        clone.harmonicValue = original.harmonicValue;
+        clone.isGhost = original.isGhost;
+        clone.isLetRing = original.isLetRing;
+        clone.isPalmMute = original.isPalmMute;
+        clone.isDead = original.isDead;
+        clone.isStaccato = original.isStaccato;
+        clone.slideInType = original.slideInType;
+        clone.slideOutType = original.slideOutType;
+        clone.vibrato = original.vibrato;
+        clone.isTieDestination = original.isTieDestination;
+        clone.leftHandFinger = original.leftHandFinger;
+        clone.rightHandFinger = original.rightHandFinger;
+        clone.isFingering = original.isFingering;
+        clone.trillValue = original.trillValue;
+        clone.trillSpeed = original.trillSpeed;
+        clone.durationPercent = original.durationPercent;
+        clone.accidentalMode = original.accidentalMode;
+        clone.dynamics = original.dynamics;
+        return clone;
     }
 }
-

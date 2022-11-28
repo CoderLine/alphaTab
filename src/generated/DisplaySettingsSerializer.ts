@@ -12,25 +12,25 @@ export class DisplaySettingsSerializer {
     public static fromJson(obj: DisplaySettings, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: DisplaySettings | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("scale", obj.scale); 
-        o.set("stretchforce", obj.stretchForce); 
-        o.set("layoutmode", obj.layoutMode as number); 
-        o.set("staveprofile", obj.staveProfile as number); 
-        o.set("barsperrow", obj.barsPerRow); 
-        o.set("startbar", obj.startBar); 
-        o.set("barcount", obj.barCount); 
-        o.set("barcountperpartial", obj.barCountPerPartial); 
-        o.set("resources", RenderingResourcesSerializer.toJson(obj.resources)); 
-        o.set("padding", obj.padding); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("scale", obj.scale);
+        o.set("stretchforce", obj.stretchForce);
+        o.set("layoutmode", obj.layoutMode as number);
+        o.set("staveprofile", obj.staveProfile as number);
+        o.set("barsperrow", obj.barsPerRow);
+        o.set("startbar", obj.startBar);
+        o.set("barcount", obj.barCount);
+        o.set("barcountperpartial", obj.barCountPerPartial);
+        o.set("resources", RenderingResourcesSerializer.toJson(obj.resources));
+        o.set("padding", obj.padding);
+        return o;
     }
     public static setProperty(obj: DisplaySettings, property: string, v: unknown): boolean {
         switch (property) {
@@ -61,7 +61,7 @@ export class DisplaySettingsSerializer {
             case "padding":
                 obj.padding = v as number[] | null;
                 return true;
-        } 
+        }
         if (["resources"].indexOf(property) >= 0) {
             RenderingResourcesSerializer.fromJson(obj.resources, v as Map<string, unknown>);
             return true;
@@ -74,8 +74,7 @@ export class DisplaySettingsSerializer {
                     }
                 }
             }
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

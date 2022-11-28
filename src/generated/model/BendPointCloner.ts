@@ -6,10 +6,9 @@
 import { BendPoint } from "@src/model/BendPoint";
 export class BendPointCloner {
     public static clone(original: BendPoint): BendPoint {
-        const clone = new BendPoint(); 
-        clone.offset = original.offset; 
-        clone.value = original.value; 
-        return clone; 
+        const clone = new BendPoint();
+        clone.offset = original.offset;
+        clone.value = original.value;
+        return clone;
     }
 }
-

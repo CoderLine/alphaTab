@@ -39,7 +39,7 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
     };
 
     const parsedCommandLine = ts.getParsedCommandLineOfConfigFile(commandLine.options.project!, commandLine.options, parseConfigFileHost, /*extendedConfigCache*/ undefined, commandLine.watchOptions)!;
-    const pretty = !!ts.sys.writeOutputIsTTY && ts.sys.writeOutputIsTTY();
+    const pretty = !!ts.sys.writeOutputIsTTY?.();
     if (pretty) {
         reportDiagnostic = createDiagnosticReporter(true);
     }
@@ -51,14 +51,17 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
         host: ts.createCompilerHost(parsedCommandLine.options),
     });
 
-    const allDiagnostics = program.getConfigFileParsingDiagnostics().slice();
-    const configFileParsingDiagnosticsLength = allDiagnostics.length;
-    allDiagnostics.push(...program.getSyntacticDiagnostics());
-
-    if (allDiagnostics.length === configFileParsingDiagnosticsLength) {
-        allDiagnostics.push(...program.getOptionsDiagnostics());
-        allDiagnostics.push(...program.getGlobalDiagnostics());
-        allDiagnostics.push(...program.getSemanticDiagnostics());
+    let allDiagnostics: ts.Diagnostic[] = [];
+    if (handleErrors) {
+        allDiagnostics = program.getConfigFileParsingDiagnostics().slice();
+        const syntacticDiagnostics = program.getSyntacticDiagnostics();
+        if (syntacticDiagnostics.length) {
+            allDiagnostics.push(...syntacticDiagnostics);
+        } else {
+            allDiagnostics.push(...program.getOptionsDiagnostics());
+            allDiagnostics.push(...program.getGlobalDiagnostics());
+            allDiagnostics.push(...program.getSemanticDiagnostics());
+        }
     }
 
     program.getTypeChecker();

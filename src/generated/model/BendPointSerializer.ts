@@ -9,17 +9,17 @@ export class BendPointSerializer {
     public static fromJson(obj: BendPoint, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: BendPoint | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("offset", obj.offset); 
-        o.set("value", obj.value); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("offset", obj.offset);
+        o.set("value", obj.value);
+        return o;
     }
     public static setProperty(obj: BendPoint, property: string, v: unknown): boolean {
         switch (property) {
@@ -29,8 +29,7 @@ export class BendPointSerializer {
             case "value":
                 obj.value = v! as number;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

@@ -9,18 +9,18 @@ export class SlidePlaybackSettingsSerializer {
     public static fromJson(obj: SlidePlaybackSettings, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: SlidePlaybackSettings | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("simpleslidepitchoffset", obj.simpleSlidePitchOffset); 
-        o.set("simpleslidedurationratio", obj.simpleSlideDurationRatio); 
-        o.set("shiftslidedurationratio", obj.shiftSlideDurationRatio); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("simpleslidepitchoffset", obj.simpleSlidePitchOffset);
+        o.set("simpleslidedurationratio", obj.simpleSlideDurationRatio);
+        o.set("shiftslidedurationratio", obj.shiftSlideDurationRatio);
+        return o;
     }
     public static setProperty(obj: SlidePlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {
@@ -33,8 +33,7 @@ export class SlidePlaybackSettingsSerializer {
             case "shiftslidedurationratio":
                 obj.shiftSlideDurationRatio = v! as number;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

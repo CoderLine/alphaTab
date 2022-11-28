@@ -10,17 +10,17 @@ export class FermataSerializer {
     public static fromJson(obj: Fermata, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: Fermata | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("type", obj.type as number); 
-        o.set("length", obj.length); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("type", obj.type as number);
+        o.set("length", obj.length);
+        return o;
     }
     public static setProperty(obj: Fermata, property: string, v: unknown): boolean {
         switch (property) {
@@ -30,8 +30,7 @@ export class FermataSerializer {
             case "length":
                 obj.length = v! as number;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

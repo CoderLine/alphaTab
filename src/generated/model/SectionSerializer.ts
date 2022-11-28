@@ -9,17 +9,17 @@ export class SectionSerializer {
     public static fromJson(obj: Section, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: Section | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("marker", obj.marker); 
-        o.set("text", obj.text); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("marker", obj.marker);
+        o.set("text", obj.text);
+        return o;
     }
     public static setProperty(obj: Section, property: string, v: unknown): boolean {
         switch (property) {
@@ -29,8 +29,7 @@ export class SectionSerializer {
             case "text":
                 obj.text = v! as string;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

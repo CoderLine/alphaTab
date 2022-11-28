@@ -14,30 +14,30 @@ export class ScoreSerializer {
     public static fromJson(obj: Score, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: Score | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("album", obj.album); 
-        o.set("artist", obj.artist); 
-        o.set("copyright", obj.copyright); 
-        o.set("instructions", obj.instructions); 
-        o.set("music", obj.music); 
-        o.set("notices", obj.notices); 
-        o.set("subtitle", obj.subTitle); 
-        o.set("title", obj.title); 
-        o.set("words", obj.words); 
-        o.set("tab", obj.tab); 
-        o.set("tempo", obj.tempo); 
-        o.set("tempolabel", obj.tempoLabel); 
-        o.set("masterbars", obj.masterBars.map(i => MasterBarSerializer.toJson(i))); 
-        o.set("tracks", obj.tracks.map(i => TrackSerializer.toJson(i))); 
-        o.set("stylesheet", RenderStylesheetSerializer.toJson(obj.stylesheet)); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("album", obj.album);
+        o.set("artist", obj.artist);
+        o.set("copyright", obj.copyright);
+        o.set("instructions", obj.instructions);
+        o.set("music", obj.music);
+        o.set("notices", obj.notices);
+        o.set("subtitle", obj.subTitle);
+        o.set("title", obj.title);
+        o.set("words", obj.words);
+        o.set("tab", obj.tab);
+        o.set("tempo", obj.tempo);
+        o.set("tempolabel", obj.tempoLabel);
+        o.set("masterbars", obj.masterBars.map(i => MasterBarSerializer.toJson(i)));
+        o.set("tracks", obj.tracks.map(i => TrackSerializer.toJson(i)));
+        o.set("stylesheet", RenderStylesheetSerializer.toJson(obj.stylesheet));
+        return o;
     }
     public static setProperty(obj: Score, property: string, v: unknown): boolean {
         switch (property) {
@@ -93,12 +93,11 @@ export class ScoreSerializer {
                     obj.addTrack(i);
                 }
                 return true;
-        } 
+        }
         if (["stylesheet"].indexOf(property) >= 0) {
             RenderStylesheetSerializer.fromJson(obj.stylesheet, v as Map<string, unknown>);
             return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

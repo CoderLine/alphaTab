@@ -6,13 +6,12 @@
 import { Automation } from "@src/model/Automation";
 export class AutomationCloner {
     public static clone(original: Automation): Automation {
-        const clone = new Automation(); 
-        clone.isLinear = original.isLinear; 
-        clone.type = original.type; 
-        clone.value = original.value; 
-        clone.ratioPosition = original.ratioPosition; 
-        clone.text = original.text; 
-        return clone; 
+        const clone = new Automation();
+        clone.isLinear = original.isLinear;
+        clone.type = original.type;
+        clone.value = original.value;
+        clone.ratioPosition = original.ratioPosition;
+        clone.text = original.text;
+        return clone;
     }
 }
-
