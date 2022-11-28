@@ -140,7 +140,7 @@ describe('MidiFileGeneratorTest', () => {
             new TrackEndEvent(3840, 0) // 3840 = end of bar
         ];
         for (let i: number = 0; i < handler.midiEvents.length; i++) {
-            Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
+            // Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
             if (i < expectedEvents.length) {
                 expect(expectedEvents[i].equals(handler.midiEvents[i]))
                     .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
