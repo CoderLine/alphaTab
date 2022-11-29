@@ -3,5 +3,6 @@
         "dist/lib.csharp/**": true,
         "src.csharp/**": true,
         "node_modules/**": true
-    }
+    },
+    "files.eol": "\n"
 }
