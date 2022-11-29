@@ -198,7 +198,7 @@ export class AlphaTexImporter extends ScoreImporter {
             return this._score;
         } catch (e) {
             if (e instanceof AlphaTexError) {
-                throw new UnsupportedFormatError(e.message);
+                throw new UnsupportedFormatError(e.message, e);
             } else {
                 throw e;
             }
