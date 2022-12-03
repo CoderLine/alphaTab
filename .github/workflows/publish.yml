@@ -127,10 +127,10 @@ jobs:
       - run: npm install
         if: steps.check_sha.outputs.cache-hit != 'true'
         
-      - name: node ./scripts/update-kotlin-version.js SNAPSHOT
+      - run: node ./scripts/update-kotlin-version.js SNAPSHOT
         if: steps.check_sha.outputs.cache-hit != 'true'
         
-      - name: npm run build-kotlin-ci
+      - run: npm run build-kotlin-ci
         if: steps.check_sha.outputs.cache-hit != 'true'
 
       - run: .\gradlew.bat publishAllPublicationsToSonatypeRepository
