@@ -7,10 +7,12 @@ export const GENERATED_FILE_HEADER = `\
 // This code was auto-generated.
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
-// </auto-generated>`
+// </auto-generated>`;
 
-export default function createEmitter(jsDocMarker: string, generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration) => ts.SourceFile) {
-
+export default function createEmitter(
+    jsDocMarker: string,
+    generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration) => ts.SourceFile
+) {
     function generateClass(program: ts.Program, classDeclaration: ts.ClassDeclaration) {
         const sourceFileName = path.relative(
             path.resolve(program.getCompilerOptions().baseUrl!, 'src'),
@@ -18,8 +20,8 @@ export default function createEmitter(jsDocMarker: string, generate: (program: t
         );
 
         const result = generate(program, classDeclaration);
-        const defaultClass = result.statements.find(stmt => ts.isClassDeclaration(stmt) &&
-            stmt.modifiers!.find(m => m.kind === ts.SyntaxKind.ExportKeyword)
+        const defaultClass = result.statements.find(
+            stmt => ts.isClassDeclaration(stmt) && stmt.modifiers!.find(m => m.kind === ts.SyntaxKind.ExportKeyword)
         ) as ts.ClassDeclaration;
 
         const targetFileName = path.join(
@@ -33,10 +35,7 @@ export default function createEmitter(jsDocMarker: string, generate: (program: t
 
         const fileHandle = fs.openSync(targetFileName, 'w');
 
-        fs.writeSync(
-            fileHandle,
-            `${GENERATED_FILE_HEADER}\n`
-        );
+        fs.writeSync(fileHandle, `${GENERATED_FILE_HEADER}\n`);
 
         const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
         const source = printer.printNode(ts.EmitHint.Unspecified, result, result);
@@ -49,10 +48,10 @@ export default function createEmitter(jsDocMarker: string, generate: (program: t
             getCompilationSettings: () => program.getCompilerOptions(),
             getDefaultLibFileName: options => ts.getDefaultLibFilePath(options),
             fileExists: fileName => fileName === targetFileName,
-            readFile: fileName => fileName === targetFileName ? source : "",
+            readFile: fileName => (fileName === targetFileName ? source : ''),
             readDirectory: ts.sys.readDirectory,
             directoryExists: ts.sys.directoryExists,
-            getDirectories: ts.sys.getDirectories,
+            getDirectories: ts.sys.getDirectories
         };
 
         const languageService = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
@@ -61,16 +60,16 @@ export default function createEmitter(jsDocMarker: string, generate: (program: t
             insertSpaceAfterCommaDelimiter: true,
             insertSpaceAfterKeywordsInControlFlowStatements: true,
             insertSpaceBeforeAndAfterBinaryOperators: true,
-            newLineCharacter: "\n",
+            newLineCharacter: '\n',
             indentStyle: ts.IndentStyle.Smart,
             indentSize: 4,
-            tabSize: 4,
+            tabSize: 4
         } as ts.FormatCodeSettings);
         formattingChanges.sort((a, b) => b.span.start - a.span.start);
 
         let finalText = source;
-        for (const { span, newText } of formattingChanges) {
-            finalText = `${finalText.slice(0, span.start)}${newText}${finalText.slice(span.start + span.length)}`;
+        for (const { span: { start, length }, newText } of formattingChanges) {
+            finalText = `${finalText.slice(0, start)}${newText}${finalText.slice(start + length)}`;
         }
         finalText = finalText.replace(/\/\/ */g, '').replace(/ +$/gm, '');
 
@@ -80,8 +79,9 @@ export default function createEmitter(jsDocMarker: string, generate: (program: t
 
     function scanSourceFile(program: ts.Program, sourceFile: ts.SourceFile) {
         sourceFile.statements.forEach(stmt => {
-            if (ts.isClassDeclaration(stmt) && ts.getJSDocTags(stmt).some(t => t.tagName.text === jsDocMarker))
+            if (ts.isClassDeclaration(stmt) && ts.getJSDocTags(stmt).some(t => t.tagName.text === jsDocMarker)) {
                 generateClass(program, stmt);
+            }
         });
     }
 
@@ -89,5 +89,5 @@ export default function createEmitter(jsDocMarker: string, generate: (program: t
         program.getRootFileNames().forEach(file => {
             scanSourceFile(program, program.getSourceFile(file)!);
         });
-    }
+    };
 }
