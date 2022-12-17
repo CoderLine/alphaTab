@@ -1052,7 +1052,7 @@ describe('AlphaTexImporterTest', () => {
         .
         0.5.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2`;
         const importer: AlphaTexImporter = new AlphaTexImporter();
-        for (const _ in [1, 2]) {
+        for (const _ of [1, 2]) {
             importer.initFromString(tex, new Settings());
             const score = importer.readScore();
             expect(score.title).toEqual('Test');
@@ -1112,14 +1112,14 @@ describe('AlphaTexImporterTest', () => {
             parseTex(tex);
         } catch (e) {
             if(!(e instanceof UnsupportedFormatError)) {
-                fail();
+                fail('Did not throw correct error');
                 return;
             }
             if(!(e.inner instanceof AlphaTexError)) {
-                fail();
+                fail('Did not contain an AlphaTexError');
                 return;
             }
-            const i = e.inner;
+            const i = e.inner as AlphaTexError;
             expect(i.expected).toEqual(AlphaTexSymbols.Number);
             expect(i.message.includes('Number')).toBeTrue();
             expect(i.symbol).toEqual(AlphaTexSymbols.String);

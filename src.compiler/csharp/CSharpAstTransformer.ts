@@ -3055,6 +3055,8 @@ export default class CSharpAstTransformer {
                 break;
             case 'String':
                 switch (symbol.name) {
+                    case 'includes':
+                        return 'Contains';
                     case 'trimRight':
                         return 'TrimEnd';
                     case 'trimLeft':
