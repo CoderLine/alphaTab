@@ -297,16 +297,9 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             case 'String':
                 switch (symbol.name) {
                     case 'length':
-                        if (
-                            expression.parent &&
-                            (cs.isReturnStatement(expression.parent) ||
-                                cs.isVariableDeclaration(expression.parent) ||
-                                (cs.isBinaryExpression(expression.parent) && expression.parent.operator === '='))
-                        ) {
-                            return 'length.toDouble()';
-                        }
-
                         return 'length.toDouble()';
+                    case 'includes':
+                        return 'contains';
                     case 'indexOf':
                         return 'indexOfInDouble';
                     case 'lastIndexOf':
