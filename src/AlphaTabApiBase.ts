@@ -331,8 +331,13 @@ export class AlphaTabApiBase<TSettings> {
                 this._cursorWrapper.width = result.totalWidth;
                 this._cursorWrapper.height = result.totalHeight;
             }
+            
+            if(result.width > 0 || result.height > 0) {
+                this.uiFacade.beginAppendRenderResults(result);
+            }
+        } else {
+            this.uiFacade.beginAppendRenderResults(result);
         }
-        this.uiFacade.beginAppendRenderResults(result);
     }
 
     private updateRenderResult(result: RenderFinishedEventArgs | null): void {
