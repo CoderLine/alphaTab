@@ -170,7 +170,7 @@ export class ScoreRenderer implements IScoreRenderer {
             this.onRenderFinished();
             (this.postRenderFinished as EventEmitter).trigger();
         } else {
-            Logger.warning('Rendering', 'Current layout does not support dynamic resizing, nothing was done', null);
+            Logger.debug('Rendering', 'Current layout does not support dynamic resizing, nothing was done', null);
         }
         Logger.debug('Rendering', 'Resize finished');
     }
