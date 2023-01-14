@@ -20,6 +20,10 @@ describe('SpecialNotesTests', () => {
         await VisualTestHelper.runVisualTest('special-notes/grace-notes-advanced.gp', undefined, [0, 1], undefined, 1, true);
     });
 
+    it('grace-alignment', async () => {
+        await VisualTestHelper.runVisualTest('special-notes/grace-notes-alignment.gp', undefined, [0, 1]);
+    });
+
     it('dead-notes', async () => {
         await VisualTestHelper.runVisualTest('special-notes/dead-notes.gp');
     });
