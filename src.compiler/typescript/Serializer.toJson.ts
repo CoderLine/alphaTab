@@ -1,6 +1,5 @@
 import * as ts from 'typescript';
 import {
-    addNewLines,
     createNodeFromSource,
     setMethodBody,
     isPrimitiveType,
@@ -250,7 +249,7 @@ function generateToJsonBody(
     
     statements.push(ts.factory.createReturnStatement(ts.factory.createIdentifier('o')));
 
-    return ts.factory.createBlock(addNewLines(statements));
+    return ts.factory.createBlock(statements, true);
 }
 
 export function createToJsonMethod(

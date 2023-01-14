@@ -5,7 +5,6 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import createEmitter from './EmitterBase';
-import { addNewLines } from '../BuilderHelpers';
 import { getTypeWithNullableInfo, unwrapArrayItemType } from '../BuilderHelpers';
 
 function removeExtension(fileName: string) {
@@ -137,7 +136,7 @@ function generateClonePropertyStatements(
                                       ]
                                   )
                         )
-                    ])
+                    ], true)
                 )
             ];
 
@@ -154,7 +153,7 @@ function generateClonePropertyStatements(
                             ts.factory.createIdentifier('original'),
                             propertyName
                         ),
-                        ts.factory.createBlock(loopItems),
+                        ts.factory.createBlock(loopItems, true),
                         undefined
                     )
                 );
@@ -255,7 +254,7 @@ function generateCloneBody(
     }, new Array<ts.Statement>());
 
     return ts.factory.createBlock(
-        addNewLines([
+        [
             // const clone = new Type();
             ts.factory.createVariableStatement(
                 undefined,
@@ -274,8 +273,7 @@ function generateCloneBody(
             ...bodyStatements,
             // return json;
             ts.factory.createReturnStatement(ts.factory.createIdentifier('clone'))
-        ])
-    );
+        ], true);
 }
 
 function createCloneMethod(

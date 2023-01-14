@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { addNewLines, createNodeFromSource, setMethodBody } from '../BuilderHelpers';
+import { createNodeFromSource, setMethodBody } from '../BuilderHelpers';
 import { isPrimitiveType } from '../BuilderHelpers';
 import { hasFlag } from '../BuilderHelpers';
 import { getTypeWithNullableInfo } from '../BuilderHelpers';
@@ -205,7 +205,7 @@ function generateSetPropertyBody(
 
             if (type.isNullable) {
                 caseStatements.push(
-                    ts.factory.createIfStatement(ts.factory.createIdentifier('v'), ts.factory.createBlock(loopItems))
+                    ts.factory.createIfStatement(ts.factory.createIdentifier('v'), ts.factory.createBlock(loopItems, true))
                 );
             } else {
                 caseStatements.push(...loopItems);
@@ -291,8 +291,7 @@ function generateSetPropertyBody(
                                 undefined,
                                 ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                                 ts.factory.createBlock(
-                                    addNewLines(
-                                        [
+                                    [
                                             itemSerializer.length > 0 &&
                                                 createNodeFromSource<ts.VariableStatement>(
                                                     `const i = new ${mapType.typeArguments![1].symbol.name}();`,
@@ -321,8 +320,8 @@ function generateSetPropertyBody(
                                                     [mapKey, mapValue]
                                                 )
                                             )
-                                        ].filter(s => !!s) as ts.Statement[]
-                                    )
+                                        ].filter(s => !!s) as ts.Statement[],
+                                        true
                                 )
                             )
                         ]
@@ -429,11 +428,12 @@ function generateSetPropertyBody(
                                                   ]
                                               )
                                           )
-                                      ]),
-                                      ts.factory.createBlock([assignField(ts.factory.createNull())])
+                                      ], true),
+                                      ts.factory.createBlock([assignField(ts.factory.createNull())], true)
                                   ),
                                   ts.factory.createReturnStatement(ts.factory.createTrue())
-                              ]
+                              ],
+                              true
                     ),
                     !prop.partialNames
                         ? undefined
@@ -518,14 +518,15 @@ function generateSetPropertyBody(
                                                       ),
                                                       ts.factory.createBlock([
                                                           ts.factory.createReturnStatement(ts.factory.createTrue())
-                                                      ])
+                                                      ], true)
                                                   )
-                                              ].filter(s => !!s) as ts.Statement[]
+                                              ].filter(s => !!s) as ts.Statement[],
+                                              true
                                           )
                                       )
-                                  ])
+                                  ], true)
                               )
-                          ])
+                          ], true)
                 )
             );
         }
@@ -568,7 +569,7 @@ function generateSetPropertyBody(
         statements.push(ts.factory.createReturnStatement(ts.factory.createFalse()));
     }
 
-    return ts.factory.createBlock(addNewLines(statements));
+    return ts.factory.createBlock(statements, true);
 }
 
 export function createSetPropertyMethod(

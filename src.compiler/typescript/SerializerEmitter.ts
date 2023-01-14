@@ -74,7 +74,6 @@ export default createEmitter('json', (program, input) => {
         statements.push(
             ts.factory.createImportDeclaration(
                 undefined,
-                undefined,
                 ts.factory.createImportClause(
                     false,
                     undefined,
@@ -89,7 +88,6 @@ export default createEmitter('json', (program, input) => {
 
     statements.push(
         ts.factory.createClassDeclaration(
-            [],
             [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
             input.name!.text + 'Serializer',
             undefined,
@@ -105,7 +103,6 @@ export default createEmitter('json', (program, input) => {
     const sourceFile = ts.factory.createSourceFile(
         [
             ts.factory.createImportDeclaration(
-                undefined,
                 undefined,
                 ts.factory.createImportClause(
                     false,

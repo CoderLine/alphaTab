@@ -37,7 +37,7 @@ export default function createEmitter(
 
         fs.writeSync(fileHandle, `${GENERATED_FILE_HEADER}\n`);
 
-        const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+        const printer = ts.createPrinter();
         const source = printer.printNode(ts.EmitHint.Unspecified, result, result);
         const servicesHost: ts.LanguageServiceHost = {
             getScriptFileNames: () => [targetFileName],
@@ -60,10 +60,10 @@ export default function createEmitter(
             insertSpaceAfterCommaDelimiter: true,
             insertSpaceAfterKeywordsInControlFlowStatements: true,
             insertSpaceBeforeAndAfterBinaryOperators: true,
-            newLineCharacter: '\n',
             indentStyle: ts.IndentStyle.Smart,
             indentSize: 4,
-            tabSize: 4
+            tabSize: 4,
+            trimTrailingWhitespace: true
         } as ts.FormatCodeSettings);
         formattingChanges.sort((a, b) => b.span.start - a.span.start);
 
@@ -71,7 +71,6 @@ export default function createEmitter(
         for (const { span: { start, length }, newText } of formattingChanges) {
             finalText = `${finalText.slice(0, start)}${newText}${finalText.slice(start + length)}`;
         }
-        finalText = finalText.replace(/\/\/ */g, '').replace(/ +$/gm, '');
 
         fs.writeSync(fileHandle, finalText);
         fs.closeSync(fileHandle);
