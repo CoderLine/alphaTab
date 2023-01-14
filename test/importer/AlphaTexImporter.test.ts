@@ -1,5 +1,5 @@
 import { StaveProfile } from '@src/StaveProfile';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { AlphaTexError, AlphaTexImporter, AlphaTexSymbols } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { Beat } from '@src/model/Beat';
 import { BrushType } from '@src/model/BrushType';
@@ -1017,8 +1017,12 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('does-not-hang-on-backslash', () => {
-        expect(() => parseTex('\\title Test . 3.3 \\')).toThrowError(UnsupportedFormatError)
-    })
+        expect(() => parseTex('\\title Test . 3.3 \\')).toThrowError(UnsupportedFormatError);
+    });
+
+    it('disallows-unclosed-string', () => {
+        expect(() => parseTex('\\title "Test . 3.3')).toThrowError(UnsupportedFormatError);
+    });
 
     function runSectionNoteSymbolTest(noteSymbol: string) {
         const score = parseTex(`1.3.4 * 4 | \\section Verse ${noteSymbol}.1 | 2.3.4*4`);
@@ -1034,5 +1038,94 @@ describe('AlphaTexImporterTest', () => {
         runSectionNoteSymbolTest('r');
         runSectionNoteSymbolTest('-');
         runSectionNoteSymbolTest('x');
-    })
+    });
+
+    it('loads-score-twice-without-hickups', () => {
+        const tex = `\\title Test
+        \\words test
+        \\music alphaTab
+        \\copyright test
+        \\tempo 200
+        \\instrument 30
+        \\capo 2
+        \\tuning G3 D2 G2 B2 D3 A4
+        .
+        0.5.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2`;
+        const importer: AlphaTexImporter = new AlphaTexImporter();
+        for (const _i of [1, 2]) {
+            importer.initFromString(tex, new Settings());
+            const score = importer.readScore();
+            expect(score.title).toEqual('Test');
+            expect(score.words).toEqual('test');
+            expect(score.music).toEqual('alphaTab');
+            expect(score.copyright).toEqual('test');
+            expect(score.tempo).toEqual(200);
+            expect(score.tracks.length).toEqual(1);
+            expect(score.tracks[0].playbackInfo.program).toEqual(30);
+            expect(score.tracks[0].staves[0].capo).toEqual(2);
+            expect(score.tracks[0].staves[0].tuning.join(',')).toEqual('55,38,43,47,50,69');
+            expect(score.masterBars.length).toEqual(2);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).toEqual(3);
+            {
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).toEqual(1);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].duration).toEqual(Duration.Half);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toEqual(0);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).toEqual(2);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes.length).toEqual(1);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].duration).toEqual(Duration.Quarter);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).toEqual(1);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).toEqual(2);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes.length).toEqual(1);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].duration).toEqual(Duration.Quarter);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].fret).toEqual(3);
+                expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].string).toEqual(3);
+            }
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats.length).toEqual(5);
+            {
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes.length).toEqual(1);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].duration).toEqual(Duration.Eighth);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].fret).toEqual(5);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].string).toEqual(4);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes.length).toEqual(1);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].duration).toEqual(Duration.Eighth);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].fret).toEqual(5);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].string).toEqual(4);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes.length).toEqual(1);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].duration).toEqual(Duration.Eighth);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].fret).toEqual(5);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].string).toEqual(4);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes.length).toEqual(1);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].duration).toEqual(Duration.Eighth);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].fret).toEqual(5);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].string).toEqual(4);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].notes.length).toEqual(0);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].duration).toEqual(Duration.Half);
+                expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].isRest).toEqual(true);
+            }
+        }
+    });
+
+    it('error-shows-symbol-data', () => {
+        const tex = '3.3.ABC';
+        expect(() => parseTex(tex)).toThrowError(UnsupportedFormatError);
+        try {
+            parseTex(tex);
+        } catch (e) {
+            if(!(e instanceof UnsupportedFormatError)) {
+                fail('Did not throw correct error');
+                return;
+            }
+            if(!(e.inner instanceof AlphaTexError)) {
+                fail('Did not contain an AlphaTexError');
+                return;
+            }
+            const i = e.inner as AlphaTexError;
+            expect(i.expected).toEqual(AlphaTexSymbols.Number);
+            expect(i.message?.includes('Number')).toBeTrue();
+            expect(i.symbol).toEqual(AlphaTexSymbols.String);
+            expect(i.message?.includes('String')).toBeTrue();
+            expect(i.symbolData).toEqual('ABC');
+            expect(i.message?.includes('ABC')).toBeTrue();
+        }
+    });
 });
