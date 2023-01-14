@@ -11,18 +11,18 @@ export class VoiceSerializer {
     public static fromJson(obj: Voice, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: Voice | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("id", obj.id); 
-        o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i))); 
-        o.set("isempty", obj.isEmpty); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("id", obj.id);
+        o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i)));
+        o.set("isempty", obj.isEmpty);
+        return o;
     }
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
         switch (property) {
@@ -40,8 +40,7 @@ export class VoiceSerializer {
             case "isempty":
                 obj.isEmpty = v! as boolean;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

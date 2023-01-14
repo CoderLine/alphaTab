@@ -4,7 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "name": "Launch C# Compiler",
             "type": "node",
@@ -20,14 +19,12 @@
                 "ts-node/register"
             ],
             "cwd": "${workspaceRoot}",
-            "protocol": "inspector",
             "smartStep": false,
             "internalConsoleOptions": "openOnSessionStart",
             "env": {
                 "TS_NODE_PROJECT": "tsconfig.build-csharp.json"
             }
         },
-
         {
             "name": "Launch Kotlin Compiler",
             "type": "node",
@@ -43,14 +40,12 @@
                 "ts-node/register"
             ],
             "cwd": "${workspaceRoot}",
-            "protocol": "inspector",
             "smartStep": false,
             "internalConsoleOptions": "openOnSessionStart",
             "env": {
                 "TS_NODE_PROJECT": "tsconfig.build-kotlin.json"
             }
         },
-
         {
             "name": "Launch TypeScript Generator",
             "type": "node",
@@ -66,14 +61,12 @@
                 "ts-node/register"
             ],
             "cwd": "${workspaceRoot}",
-            "protocol": "inspector",
             "smartStep": false,
             "internalConsoleOptions": "openOnSessionStart",
             "env": {
                 "TS_NODE_PROJECT": "tsconfig.build-csharp.json"
             }
         },
-        
         {
             "name": "Launch JavaScript Compiler",
             "type": "node",
@@ -83,11 +76,9 @@
                 "runtimeExecutable": "npm.cmd"
             },
             "runtimeArgs": [
-                "run-script",
-                "build",
-                "--inspect-brk=5858"
-            ],
-            "port": 5858
+                "run",
+                "build"
+            ]
         }
     ]
 }

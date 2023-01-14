@@ -10,20 +10,20 @@ export class AutomationSerializer {
     public static fromJson(obj: Automation, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: Automation | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("islinear", obj.isLinear); 
-        o.set("type", obj.type as number); 
-        o.set("value", obj.value); 
-        o.set("ratioposition", obj.ratioPosition); 
-        o.set("text", obj.text); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("islinear", obj.isLinear);
+        o.set("type", obj.type as number);
+        o.set("value", obj.value);
+        o.set("ratioposition", obj.ratioPosition);
+        o.set("text", obj.text);
+        return o;
     }
     public static setProperty(obj: Automation, property: string, v: unknown): boolean {
         switch (property) {
@@ -42,8 +42,7 @@ export class AutomationSerializer {
             case "text":
                 obj.text = v! as string;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

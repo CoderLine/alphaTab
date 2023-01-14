@@ -22,52 +22,52 @@ export class NoteSerializer {
     public static fromJson(obj: Note, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: Note | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("id", obj.id); 
-        o.set("accentuated", obj.accentuated as number); 
-        o.set("bendtype", obj.bendType as number); 
-        o.set("bendstyle", obj.bendStyle as number); 
-        o.set("iscontinuedbend", obj.isContinuedBend); 
+        }
+        const o = new Map<string, unknown>();
+        o.set("id", obj.id);
+        o.set("accentuated", obj.accentuated as number);
+        o.set("bendtype", obj.bendType as number);
+        o.set("bendstyle", obj.bendStyle as number);
+        o.set("iscontinuedbend", obj.isContinuedBend);
         if (obj.bendPoints !== null) {
             o.set("bendpoints", obj.bendPoints?.map(i => BendPointSerializer.toJson(i)));
-        } 
-        o.set("fret", obj.fret); 
-        o.set("string", obj.string); 
-        o.set("octave", obj.octave); 
-        o.set("tone", obj.tone); 
-        o.set("percussionarticulation", obj.percussionArticulation); 
-        o.set("isvisible", obj.isVisible); 
-        o.set("islefthandtapped", obj.isLeftHandTapped); 
-        o.set("ishammerpullorigin", obj.isHammerPullOrigin); 
-        o.set("isslurdestination", obj.isSlurDestination); 
-        o.set("harmonictype", obj.harmonicType as number); 
-        o.set("harmonicvalue", obj.harmonicValue); 
-        o.set("isghost", obj.isGhost); 
-        o.set("isletring", obj.isLetRing); 
-        o.set("ispalmmute", obj.isPalmMute); 
-        o.set("isdead", obj.isDead); 
-        o.set("isstaccato", obj.isStaccato); 
-        o.set("slideintype", obj.slideInType as number); 
-        o.set("slideouttype", obj.slideOutType as number); 
-        o.set("vibrato", obj.vibrato as number); 
-        o.set("istiedestination", obj.isTieDestination); 
-        o.set("lefthandfinger", obj.leftHandFinger as number); 
-        o.set("righthandfinger", obj.rightHandFinger as number); 
-        o.set("isfingering", obj.isFingering); 
-        o.set("trillvalue", obj.trillValue); 
-        o.set("trillspeed", obj.trillSpeed as number); 
-        o.set("durationpercent", obj.durationPercent); 
-        o.set("accidentalmode", obj.accidentalMode as number); 
-        o.set("dynamics", obj.dynamics as number); 
-        obj.toJson(o); 
-        return o; 
+        }
+        o.set("fret", obj.fret);
+        o.set("string", obj.string);
+        o.set("octave", obj.octave);
+        o.set("tone", obj.tone);
+        o.set("percussionarticulation", obj.percussionArticulation);
+        o.set("isvisible", obj.isVisible);
+        o.set("islefthandtapped", obj.isLeftHandTapped);
+        o.set("ishammerpullorigin", obj.isHammerPullOrigin);
+        o.set("isslurdestination", obj.isSlurDestination);
+        o.set("harmonictype", obj.harmonicType as number);
+        o.set("harmonicvalue", obj.harmonicValue);
+        o.set("isghost", obj.isGhost);
+        o.set("isletring", obj.isLetRing);
+        o.set("ispalmmute", obj.isPalmMute);
+        o.set("isdead", obj.isDead);
+        o.set("isstaccato", obj.isStaccato);
+        o.set("slideintype", obj.slideInType as number);
+        o.set("slideouttype", obj.slideOutType as number);
+        o.set("vibrato", obj.vibrato as number);
+        o.set("istiedestination", obj.isTieDestination);
+        o.set("lefthandfinger", obj.leftHandFinger as number);
+        o.set("righthandfinger", obj.rightHandFinger as number);
+        o.set("isfingering", obj.isFingering);
+        o.set("trillvalue", obj.trillValue);
+        o.set("trillspeed", obj.trillSpeed as number);
+        o.set("durationpercent", obj.durationPercent);
+        o.set("accidentalmode", obj.accidentalMode as number);
+        o.set("dynamics", obj.dynamics as number);
+        obj.toJson(o);
+        return o;
     }
     public static setProperty(obj: Note, property: string, v: unknown): boolean {
         switch (property) {
@@ -180,8 +180,7 @@ export class NoteSerializer {
             case "dynamics":
                 obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
                 return true;
-        } 
-        return obj.setProperty(property, v); 
+        }
+        return obj.setProperty(property, v);
     }
 }
-

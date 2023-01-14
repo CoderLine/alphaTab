@@ -762,10 +762,10 @@ export class Beat {
                         points.splice(2, 1);
                         points.splice(1, 1);
                     } else {
-                        Logger.warning('Model', 'Unsupported whammy type detected, fallback to custom', null);
+                        Logger.warning('Model', 'Unsupported whammy type detected, fallback to custom');
                     }
                 } else {
-                    Logger.warning('Model', 'Unsupported whammy type detected, fallback to custom', null);
+                    Logger.warning('Model', 'Unsupported whammy type detected, fallback to custom');
                 }
             }
         }

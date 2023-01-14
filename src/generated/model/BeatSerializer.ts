@@ -27,54 +27,54 @@ export class BeatSerializer {
     public static fromJson(obj: Beat, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: Beat | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("id", obj.id); 
-        o.set("notes", obj.notes.map(i => NoteSerializer.toJson(i))); 
-        o.set("isempty", obj.isEmpty); 
-        o.set("whammystyle", obj.whammyStyle as number); 
-        o.set("ottava", obj.ottava as number); 
-        o.set("islegatoorigin", obj.isLegatoOrigin); 
-        o.set("duration", obj.duration as number); 
-        o.set("automations", obj.automations.map(i => AutomationSerializer.toJson(i))); 
-        o.set("dots", obj.dots); 
-        o.set("fadein", obj.fadeIn); 
-        o.set("lyrics", obj.lyrics); 
-        o.set("hasrasgueado", obj.hasRasgueado); 
-        o.set("pop", obj.pop); 
-        o.set("slap", obj.slap); 
-        o.set("tap", obj.tap); 
-        o.set("text", obj.text); 
-        o.set("brushtype", obj.brushType as number); 
-        o.set("brushduration", obj.brushDuration); 
-        o.set("tupletdenominator", obj.tupletDenominator); 
-        o.set("tupletnumerator", obj.tupletNumerator); 
-        o.set("iscontinuedwhammy", obj.isContinuedWhammy); 
-        o.set("whammybartype", obj.whammyBarType as number); 
+        }
+        const o = new Map<string, unknown>();
+        o.set("id", obj.id);
+        o.set("notes", obj.notes.map(i => NoteSerializer.toJson(i)));
+        o.set("isempty", obj.isEmpty);
+        o.set("whammystyle", obj.whammyStyle as number);
+        o.set("ottava", obj.ottava as number);
+        o.set("islegatoorigin", obj.isLegatoOrigin);
+        o.set("duration", obj.duration as number);
+        o.set("automations", obj.automations.map(i => AutomationSerializer.toJson(i)));
+        o.set("dots", obj.dots);
+        o.set("fadein", obj.fadeIn);
+        o.set("lyrics", obj.lyrics);
+        o.set("hasrasgueado", obj.hasRasgueado);
+        o.set("pop", obj.pop);
+        o.set("slap", obj.slap);
+        o.set("tap", obj.tap);
+        o.set("text", obj.text);
+        o.set("brushtype", obj.brushType as number);
+        o.set("brushduration", obj.brushDuration);
+        o.set("tupletdenominator", obj.tupletDenominator);
+        o.set("tupletnumerator", obj.tupletNumerator);
+        o.set("iscontinuedwhammy", obj.isContinuedWhammy);
+        o.set("whammybartype", obj.whammyBarType as number);
         if (obj.whammyBarPoints !== null) {
             o.set("whammybarpoints", obj.whammyBarPoints?.map(i => BendPointSerializer.toJson(i)));
-        } 
-        o.set("vibrato", obj.vibrato as number); 
-        o.set("chordid", obj.chordId); 
-        o.set("gracetype", obj.graceType as number); 
-        o.set("pickstroke", obj.pickStroke as number); 
-        o.set("tremolospeed", obj.tremoloSpeed as number | null); 
-        o.set("crescendo", obj.crescendo as number); 
-        o.set("displaystart", obj.displayStart); 
-        o.set("playbackstart", obj.playbackStart); 
-        o.set("displayduration", obj.displayDuration); 
-        o.set("playbackduration", obj.playbackDuration); 
-        o.set("dynamics", obj.dynamics as number); 
-        o.set("invertbeamdirection", obj.invertBeamDirection); 
-        o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null); 
-        o.set("beamingmode", obj.beamingMode as number); 
-        return o; 
+        }
+        o.set("vibrato", obj.vibrato as number);
+        o.set("chordid", obj.chordId);
+        o.set("gracetype", obj.graceType as number);
+        o.set("pickstroke", obj.pickStroke as number);
+        o.set("tremolospeed", obj.tremoloSpeed as number | null);
+        o.set("crescendo", obj.crescendo as number);
+        o.set("displaystart", obj.displayStart);
+        o.set("playbackstart", obj.playbackStart);
+        o.set("displayduration", obj.displayDuration);
+        o.set("playbackduration", obj.playbackDuration);
+        o.set("dynamics", obj.dynamics as number);
+        o.set("invertbeamdirection", obj.invertBeamDirection);
+        o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null);
+        o.set("beamingmode", obj.beamingMode as number);
+        return o;
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
         switch (property) {
@@ -206,8 +206,7 @@ export class BeatSerializer {
             case "beamingmode":
                 obj.beamingMode = JsonHelper.parseEnum<BeatBeamingMode>(v, BeatBeamingMode)!;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

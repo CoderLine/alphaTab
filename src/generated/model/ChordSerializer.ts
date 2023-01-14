@@ -9,22 +9,22 @@ export class ChordSerializer {
     public static fromJson(obj: Chord, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: Chord | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("name", obj.name); 
-        o.set("firstfret", obj.firstFret); 
-        o.set("strings", obj.strings); 
-        o.set("barrefrets", obj.barreFrets); 
-        o.set("showname", obj.showName); 
-        o.set("showdiagram", obj.showDiagram); 
-        o.set("showfingering", obj.showFingering); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("name", obj.name);
+        o.set("firstfret", obj.firstFret);
+        o.set("strings", obj.strings);
+        o.set("barrefrets", obj.barreFrets);
+        o.set("showname", obj.showName);
+        o.set("showdiagram", obj.showDiagram);
+        o.set("showfingering", obj.showFingering);
+        return o;
     }
     public static setProperty(obj: Chord, property: string, v: unknown): boolean {
         switch (property) {
@@ -49,8 +49,7 @@ export class ChordSerializer {
             case "showfingering":
                 obj.showFingering = v! as boolean;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

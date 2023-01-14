@@ -1,10 +1,10 @@
 import * as ts from 'typescript';
-import { addNewLines, createNodeFromSource, setMethodBody } from '../BuilderHelpers';
+import { createNodeFromSource, setMethodBody } from '../BuilderHelpers';
 import { JsonSerializable } from './Serializer.common';
 
 function generateFromJsonBody(serializable: JsonSerializable, importer: (name: string, module: string) => void) {
     importer('JsonHelper', '@src/io/JsonHelper');
-    return ts.factory.createBlock(addNewLines([
+    return ts.factory.createBlock([
         createNodeFromSource<ts.IfStatement>(`if(!m) { 
             return; 
         }`, ts.SyntaxKind.IfStatement),
@@ -17,7 +17,7 @@ function generateFromJsonBody(serializable: JsonSerializable, importer: (name: s
                 `JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));`,
                 ts.SyntaxKind.ExpressionStatement
             )
-    ]));
+    ], true);
 }
 
 export function createFromJsonMethod(

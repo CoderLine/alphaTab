@@ -14,20 +14,20 @@ export class SettingsSerializer {
     public static fromJson(obj: Settings, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: Settings | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("core", CoreSettingsSerializer.toJson(obj.core)); 
-        o.set("display", DisplaySettingsSerializer.toJson(obj.display)); 
-        o.set("notation", NotationSettingsSerializer.toJson(obj.notation)); 
-        o.set("importer", ImporterSettingsSerializer.toJson(obj.importer)); 
-        o.set("player", PlayerSettingsSerializer.toJson(obj.player)); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("core", CoreSettingsSerializer.toJson(obj.core));
+        o.set("display", DisplaySettingsSerializer.toJson(obj.display));
+        o.set("notation", NotationSettingsSerializer.toJson(obj.notation));
+        o.set("importer", ImporterSettingsSerializer.toJson(obj.importer));
+        o.set("player", PlayerSettingsSerializer.toJson(obj.player));
+        return o;
     }
     public static setProperty(obj: Settings, property: string, v: unknown): boolean {
         if (["core", ""].indexOf(property) >= 0) {
@@ -42,7 +42,7 @@ export class SettingsSerializer {
                     }
                 }
             }
-        } 
+        }
         if (["display", ""].indexOf(property) >= 0) {
             DisplaySettingsSerializer.fromJson(obj.display, v as Map<string, unknown>);
             return true;
@@ -55,7 +55,7 @@ export class SettingsSerializer {
                     }
                 }
             }
-        } 
+        }
         if (["notation"].indexOf(property) >= 0) {
             NotationSettingsSerializer.fromJson(obj.notation, v as Map<string, unknown>);
             return true;
@@ -68,7 +68,7 @@ export class SettingsSerializer {
                     }
                 }
             }
-        } 
+        }
         if (["importer"].indexOf(property) >= 0) {
             ImporterSettingsSerializer.fromJson(obj.importer, v as Map<string, unknown>);
             return true;
@@ -81,7 +81,7 @@ export class SettingsSerializer {
                     }
                 }
             }
-        } 
+        }
         if (["player"].indexOf(property) >= 0) {
             PlayerSettingsSerializer.fromJson(obj.player, v as Map<string, unknown>);
             return true;
@@ -94,8 +94,7 @@ export class SettingsSerializer {
                     }
                 }
             }
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-
