@@ -44,43 +44,43 @@ export class BarLayoutingInfo {
     }
 
     public setPreBeatSize(beat: Beat, size: number): void {
-        if (!this.preBeatSizes.has(beat.index) || this.preBeatSizes.get(beat.index)! < size) {
-            this.preBeatSizes.set(beat.index, size);
+        if (!this.preBeatSizes.has(beat.id) || this.preBeatSizes.get(beat.id)! < size) {
+            this.preBeatSizes.set(beat.id, size);
             this.version++;
         }
     }
 
     public getPreBeatSize(beat: Beat): number {
-        if (this.preBeatSizes.has(beat.index)) {
-            return this.preBeatSizes.get(beat.index)!;
+        if (this.preBeatSizes.has(beat.id)) {
+            return this.preBeatSizes.get(beat.id)!;
         }
         return 0;
     }
 
     public setOnBeatSize(beat: Beat, size: number): void {
-        if (!this.onBeatSizes.has(beat.index) || this.onBeatSizes.get(beat.index)! < size) {
-            this.onBeatSizes.set(beat.index, size);
+        if (!this.onBeatSizes.has(beat.id) || this.onBeatSizes.get(beat.id)! < size) {
+            this.onBeatSizes.set(beat.id, size);
             this.version++;
         }
     }
 
     public getOnBeatSize(beat: Beat): number {
-        if (this.onBeatSizes.has(beat.index)) {
-            return this.onBeatSizes.get(beat.index)!;
+        if (this.onBeatSizes.has(beat.id)) {
+            return this.onBeatSizes.get(beat.id)!;
         }
         return 0;
     }
 
     public getBeatCenterX(beat: Beat): number {
-        if (this.onBeatCenterX.has(beat.index)) {
-            return this.onBeatCenterX.get(beat.index)!;
+        if (this.onBeatCenterX.has(beat.id)) {
+            return this.onBeatCenterX.get(beat.id)!;
         }
         return 0;
     }
 
     public setBeatCenterX(beat: Beat, x: number): void {
-        if (!this.onBeatCenterX.has(beat.index) || this.onBeatCenterX.get(beat.index)! < x) {
-            this.onBeatCenterX.set(beat.index, x);
+        if (!this.onBeatCenterX.has(beat.id) || this.onBeatCenterX.get(beat.id)! < x) {
+            this.onBeatCenterX.set(beat.id, x);
             this.version++;
         }
     }
