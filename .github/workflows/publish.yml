@@ -11,7 +11,7 @@ jobs:
     steps:
       - run: |
           mkdir check-sha
-          echo ${{ github.sha }} >> github-sha.txt
+          echo ${{ github.sha }} >> check-sha/github-sha.txt
         
       - uses: actions/cache@v3
         id: check_sha
@@ -53,7 +53,7 @@ jobs:
     steps:
       - run: |
           mkdir check-sha
-          echo ${{ github.sha }} >> github-sha.txt
+          echo ${{ github.sha }} >> check-sha/github-sha.txt
         
       - uses: actions/cache@v3
         id: check_sha
@@ -102,7 +102,7 @@ jobs:
     steps:
       - run: |
           mkdir check-sha
-          echo ${{ github.sha }} >> github-sha.txt
+          echo ${{ github.sha }} >> check-sha/github-sha.txt
         
       - uses: actions/cache@v3
         id: check_sha
