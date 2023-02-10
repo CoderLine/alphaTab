@@ -1,96 +1,79 @@
 name: Publish
-on: 
+
+on:
   schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:    
-    
+    - cron: "10 0 * * *"
+  workflow_dispatch:
+
 jobs:
+  check_sha:
+    name: check_sha
+    runs-on: ubuntu-latest
+    outputs:
+      hit: ${{ steps.cache.outputs.cache-hit == 'true' }}
+    steps:
+      - run: touch dummy.txt
+
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: dummy.txt
+          key: check-sha-${{ github.sha }}
+
   nighty_web:
     name: Web
+    needs: check_sha
+    if: needs.check_sha.outputs.hit == 'false'
     runs-on: windows-latest
     steps:
-      - run: |
-          mkdir check-sha
-          echo ${{ github.sha }} >> check-sha/github-sha.txt
-        
-      - uses: actions/cache@v3
-        id: check_sha
-        with:
-          path: check-sha
-          key: check-sha-${{ github.sha }}
-        
       - uses: actions/checkout@v3
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
+
       - uses: actions/setup-node@v3
-        if: steps.check_sha.outputs.cache-hit != 'true'
         with:
-          node-version: 'latest'
-        
+          node-version: "latest"
+          cache: 'npm'
+
       - run: npm install
-        if: steps.check_sha.outputs.cache-hit != 'true'
-
       - run: node ./scripts/update-version.js alpha ${{github.run_number}}
-        if: steps.check_sha.outputs.cache-hit != 'true'
-
       - run: npm run build-ci
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
+
       - uses: actions/setup-node@v3
-        if: steps.check_sha.outputs.cache-hit != 'true'
         with:
-          node-version: 'latest'
+          node-version: "latest"
           registry-url: https://registry.npmjs.org/
-        
+
       - run: npm publish --access public --tag alpha
-        if: steps.check_sha.outputs.cache-hit != 'true'
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
-        
+
   nightly_csharp:
     name: C#
+    needs: check_sha
+    if: needs.check_sha.outputs.hit == 'false'
     runs-on: windows-latest
     steps:
-      - run: |
-          mkdir check-sha
-          echo ${{ github.sha }} >> check-sha/github-sha.txt
-        
-      - uses: actions/cache@v3
-        id: check_sha
-        with:
-          path: check-sha
-          key: check-sha-${{ github.sha }}
-        
       - uses: actions/checkout@v3
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
+
       - uses: actions/setup-node@v3
-        if: steps.check_sha.outputs.cache-hit != 'true'
         with:
-          node-version: 'latest'
-        
+          node-version: "latest"
+          cache: 'npm'
+
       - uses: actions/setup-dotnet@v3
-        if: steps.check_sha.outputs.cache-hit != 'true'
         with:
-          dotnet-version: '6'
-        
+          dotnet-version: "6"
+
       - run: npm install
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
       - run: node ./scripts/update-csharp-version.js alpha ${{github.run_number}}
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
       - run: npm run build-csharp-ci
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
+
       - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
       - run: dotnet nuget push src.csharp\AlphaTab.Windows\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
-        if: steps.check_sha.outputs.cache-hit != 'true'
 
   nightly_kotlin_android:
     name: Kotlin (Android)
+    needs: check_sha
+    if: needs.check_sha.outputs.hit == 'false'
     runs-on: windows-latest
     env:
       OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
@@ -100,47 +83,23 @@ jobs:
       SONATYPE_SIGNING_PASSWORD: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
       SONATYPE_SIGNING_KEY: ${{secrets.SONATYPE_SIGNING_KEY}}
     steps:
-      - run: |
-          mkdir check-sha
-          echo ${{ github.sha }} >> check-sha/github-sha.txt
-        
-      - uses: actions/cache@v3
-        id: check_sha
-        with:
-          path: check-sha
-          key: check-sha-${{ github.sha }}
-        
       - uses: actions/checkout@v3
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
+
       - uses: actions/setup-node@v3
-        if: steps.check_sha.outputs.cache-hit != 'true'
         with:
-          node-version: 'latest'
+          node-version: "latest"
+          cache: 'npm'
 
-      - uses: actions/setup-java@v1
-        if: steps.check_sha.outputs.cache-hit != 'true'
+      - uses: actions/setup-java@v3
         with:
-          java-version: '19'
-          distribution: 'temurin'
-        
+          java-version: "19"
+          distribution: "temurin"
+
       - run: npm install
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
       - run: node ./scripts/update-kotlin-version.js SNAPSHOT
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        
       - run: npm run build-kotlin-ci
-        if: steps.check_sha.outputs.cache-hit != 'true'
 
+      - run: cd ./src.kotlin/alphaTab/
       - run: .\gradlew.bat publishAllPublicationsToSonatypeRepository
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        working-directory: ./src.kotlin/alphaTab/
-        
       - run: .\gradlew.bat closeAndReleaseSonatypeStagingRepository
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        working-directory: ./src.kotlin/alphaTab/
-
       - run: .\gradlew.bat --stop
-        if: steps.check_sha.outputs.cache-hit != 'true'
-        working-directory: ./src.kotlin/alphaTab/
