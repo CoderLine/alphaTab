@@ -1,6 +1,5 @@
 import { ControllerType } from '@src/midi/ControllerType';
 import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
-import { DynamicValue } from '@src/model/DynamicValue';
 
 export class FlatMidiEventGenerator implements IMidiFileHandler {
     public midiEvents: FlatMidiEvent[];
@@ -24,10 +23,10 @@ export class FlatMidiEventGenerator implements IMidiFileHandler {
         start: number,
         length: number,
         key: number,
-        dynamicValue: DynamicValue,
+        velocity: number,
         channel: number
     ): void {
-        let e = new NoteEvent(start, track, channel, length, key, dynamicValue);
+        let e = new NoteEvent(start, track, channel, length, key, velocity);
         this.midiEvents.push(e);
     }
 
@@ -281,7 +280,7 @@ export class ProgramChangeEvent extends ChannelMidiEvent {
 export class NoteEvent extends ChannelMidiEvent {
     public length: number = 0;
     public key: number = 0;
-    public dynamicValue: DynamicValue;
+    public velocity: number;
 
     public constructor(
         tick: number,
@@ -289,16 +288,16 @@ export class NoteEvent extends ChannelMidiEvent {
         channel: number,
         length: number,
         key: number,
-        dynamicValue: DynamicValue
+        velocity: number
     ) {
         super(tick, track, channel);
         this.length = length;
         this.key = key;
-        this.dynamicValue = dynamicValue;
+        this.velocity = velocity;
     }
 
     public override toString(): string {
-        return `Note: ${super.toString()} Length[${this.length}] Key[${this.key}] Dynamic[${this.dynamicValue}]`;
+        return `Note: ${super.toString()} Length[${this.length}] Key[${this.key}] Velocity[${this.velocity}]`;
     }
 
     public override equals(obj: unknown): boolean {
@@ -307,7 +306,7 @@ export class NoteEvent extends ChannelMidiEvent {
         }
 
         if (obj instanceof NoteEvent) {
-            return this.length === obj.length && this.key === obj.key && this.dynamicValue === obj.dynamicValue;
+            return this.length === obj.length && this.key === obj.key && this.velocity === obj.velocity;
         }
 
         return false;

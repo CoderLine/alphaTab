@@ -134,7 +134,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             // reset bend
@@ -145,7 +145,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             // end of track
@@ -203,6 +203,7 @@ describe('MidiFileGeneratorTest', () => {
         ticks.push(tick);
         tick += score.tracks[0].staves[0].bars[4].voices[0].beats[1].playbackDuration;
         let info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const mfVelocity = MidiUtils.dynamicToVelocity(DynamicValue.MF as number);
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 96),
@@ -228,23 +229,23 @@ describe('MidiFileGeneratorTest', () => {
 
             // on beat
             new NoteBendEvent(ticks[0], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[0], 0, info.primaryChannel, 3840, 67, DynamicValue.MF),
+            new NoteEvent(ticks[0], 0, info.primaryChannel, 3840, 67, mfVelocity),
 
             new NoteBendEvent(ticks[1], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[1], 0, info.primaryChannel, 120, 67, DynamicValue.MF),
+            new NoteEvent(ticks[1], 0, info.primaryChannel, 120, 67, mfVelocity),
 
             new NoteBendEvent(ticks[2], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[2], 0, info.primaryChannel, 3720, 67, DynamicValue.MF),
+            new NoteEvent(ticks[2], 0, info.primaryChannel, 3720, 67, mfVelocity),
 
             // before beat
             new NoteBendEvent(ticks[3], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[3], 0, info.primaryChannel, 3720, 67, DynamicValue.MF),
+            new NoteEvent(ticks[3], 0, info.primaryChannel, 3720, 67, mfVelocity),
 
             new NoteBendEvent(ticks[4], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[4], 0, info.primaryChannel, 120, 67, DynamicValue.MF),
+            new NoteEvent(ticks[4], 0, info.primaryChannel, 120, 67, mfVelocity),
 
             new NoteBendEvent(ticks[5], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[5], 0, info.primaryChannel, 3840, 67, DynamicValue.MF),
+            new NoteEvent(ticks[5], 0, info.primaryChannel, 3840, 67, mfVelocity),
 
             // bend beat
             new NoteBendEvent(ticks[6], 0, info.secondaryChannel, 67, 8192),
@@ -260,7 +261,7 @@ describe('MidiFileGeneratorTest', () => {
             new NoteBendEvent(ticks[6] + 12 * 9, 0, info.secondaryChannel, 67, 8960),
             new NoteBendEvent(ticks[6] + 12 * 10, 0, info.secondaryChannel, 67, 9045),
             new NoteBendEvent(ticks[6] + 12 * 11, 0, info.secondaryChannel, 67, 9131),
-            new NoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, DynamicValue.MF),
+            new NoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, mfVelocity),
 
             // end of track
             new TrackEndEvent(19200, 0) // 3840 = end of bar
@@ -341,7 +342,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             // reset bend
@@ -352,7 +353,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ), // end of track
             new TrackEndEvent(3840, 0) // 3840 = end of bar
         ];
@@ -414,7 +415,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration) * 2,
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             // release on tied note
@@ -494,7 +495,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration) * 2,
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             new TrackEndEvent(3840, 0) // 3840 = end of bar
@@ -560,7 +561,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration) * 2,
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             new TrackEndEvent(3840, 0) // 3840 = end of bar
@@ -695,7 +696,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note1.beat.duration),
                 note1.realValue,
-                note1.dynamics
+                MidiUtils.dynamicToVelocity(note1.dynamics as number)
             ),
 
             // bend effect (note 2)
@@ -732,7 +733,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note2.beat.duration),
                 note2.realValue,
-                note2.dynamics
+                MidiUtils.dynamicToVelocity(note2.dynamics as number)
             ),
 
             // reset bend
@@ -743,7 +744,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 MidiUtils.toTicks(note1.beat.duration),
                 note1.realValue,
-                note1.dynamics
+                MidiUtils.dynamicToVelocity(note1.dynamics as number)
             ),
 
             // end of track
@@ -805,7 +806,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 1920,
                 note1.realValue,
-                note1.dynamics
+                MidiUtils.dynamicToVelocity(note1.dynamics as number)
             ),
 
             new NoteBendEvent(1440, 0, info.primaryChannel, note1.realValue, 8192),
@@ -954,7 +955,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 1920,
                 note1.realValue,
-                8 as DynamicValue
+                MidiUtils.dynamicToVelocity((note1.dynamics as number) + 1)
             ),
 
             new NoteBendEvent(1920, 0, info.primaryChannel, note2.realValue, 8192),
@@ -964,7 +965,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 1920,
                 note2.realValue,
-                0 as DynamicValue
+                MidiUtils.dynamicToVelocity((note2.dynamics as number) - 1)
             ),
 
             // end of track

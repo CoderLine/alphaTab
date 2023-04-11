@@ -1,5 +1,4 @@
 import { Duration } from '@src/model/Duration';
-import { DynamicValue } from '@src/model/DynamicValue';
 
 export class MidiUtils {
     public static readonly QuarterTime: number = 960;
@@ -60,7 +59,7 @@ export class MidiUtils {
         return ((ticks * numerator) / denominator) | 0;
     }
 
-    public static dynamicToVelocity(dyn: DynamicValue): number {
-        return MidiUtils.MinVelocity + dyn * MidiUtils.VelocityIncrement;
+    public static dynamicToVelocity(dynamicsSteps: number): number {
+        return MidiUtils.MinVelocity + dynamicsSteps * MidiUtils.VelocityIncrement;
     }
 }
