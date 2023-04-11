@@ -411,13 +411,14 @@ export class AlphaSynth implements IAlphaSynth {
     private checkForFinish() {
         let startTick = 0;
         let endTick = 0;
-        if (this.playbackRange) {
+
+        if (this.playbackRange && this._sequencer.isPlayingMain) {
             startTick = this.playbackRange.startTick;
             endTick = this.playbackRange.endTick;
         } else {
             endTick = this._sequencer.currentEndTick;
         }
-
+     
         if (this._tickPosition >= endTick && this._notPlayedSamples <= 0) {
             this._notPlayedSamples = 0;
             if (this._sequencer.isPlayingCountIn) {
