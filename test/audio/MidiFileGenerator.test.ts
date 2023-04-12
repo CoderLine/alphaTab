@@ -31,13 +31,25 @@ import { TestPlatform } from '@test/TestPlatform';
 import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { MetaEventType } from '@src/midi/MetaEvent';
 import { MetaDataEvent } from '@src/midi/MetaDataEvent';
-import { VibratoType } from '@src/model';
+import { AccentuationType, VibratoType } from '@src/model';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
         let importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
         return importer.readScore();
+    };
+
+    const assertEvents: (actualEvents:FlatMidiEvent[], expectedEvents:FlatMidiEvent[]) => void = (actualEvents:FlatMidiEvent[], expectedEvents:FlatMidiEvent[]) => {
+        for (let i: number = 0; i < actualEvents.length; i++) {
+            Logger.info('Test', `i[${i}] ${actualEvents[i]}`);
+            if (i < expectedEvents.length) {
+                expect(expectedEvents[i].equals(actualEvents[i]))
+                    .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${actualEvents[i]}]`)
+                    .toEqual(true);
+            }
+        }
+        expect(actualEvents.length).toEqual(expectedEvents.length);
     };
 
     it('full-song', async () => {
@@ -122,7 +134,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             // reset bend
@@ -133,18 +145,14 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             // end of track
             new TrackEndEvent(3840, 0) // 3840 = end of bar
         ];
-        expect(handler.midiEvents.length).toEqual(expectedEvents.length);
-        for (let i: number = 0; i < expectedEvents.length; i++) {
-            expect(expectedEvents[i].equals(handler.midiEvents[i]))
-                .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                .toEqual(true);
-        }
+
+        assertEvents(handler.midiEvents, expectedEvents);
     });
 
     it('grace-beats', async () => {
@@ -195,6 +203,7 @@ describe('MidiFileGeneratorTest', () => {
         ticks.push(tick);
         tick += score.tracks[0].staves[0].bars[4].voices[0].beats[1].playbackDuration;
         let info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const mfVelocity = MidiUtils.dynamicToVelocity(DynamicValue.MF as number);
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
             new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 96),
@@ -220,23 +229,23 @@ describe('MidiFileGeneratorTest', () => {
 
             // on beat
             new NoteBendEvent(ticks[0], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[0], 0, info.primaryChannel, 3840, 67, DynamicValue.MF),
+            new NoteEvent(ticks[0], 0, info.primaryChannel, 3840, 67, mfVelocity),
 
             new NoteBendEvent(ticks[1], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[1], 0, info.primaryChannel, 120, 67, DynamicValue.MF),
+            new NoteEvent(ticks[1], 0, info.primaryChannel, 120, 67, mfVelocity),
 
             new NoteBendEvent(ticks[2], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[2], 0, info.primaryChannel, 3720, 67, DynamicValue.MF),
+            new NoteEvent(ticks[2], 0, info.primaryChannel, 3720, 67, mfVelocity),
 
             // before beat
             new NoteBendEvent(ticks[3], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[3], 0, info.primaryChannel, 3720, 67, DynamicValue.MF),
+            new NoteEvent(ticks[3], 0, info.primaryChannel, 3720, 67, mfVelocity),
 
             new NoteBendEvent(ticks[4], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[4], 0, info.primaryChannel, 120, 67, DynamicValue.MF),
+            new NoteEvent(ticks[4], 0, info.primaryChannel, 120, 67, mfVelocity),
 
             new NoteBendEvent(ticks[5], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[5], 0, info.primaryChannel, 3840, 67, DynamicValue.MF),
+            new NoteEvent(ticks[5], 0, info.primaryChannel, 3840, 67, mfVelocity),
 
             // bend beat
             new NoteBendEvent(ticks[6], 0, info.secondaryChannel, 67, 8192),
@@ -252,21 +261,13 @@ describe('MidiFileGeneratorTest', () => {
             new NoteBendEvent(ticks[6] + 12 * 9, 0, info.secondaryChannel, 67, 8960),
             new NoteBendEvent(ticks[6] + 12 * 10, 0, info.secondaryChannel, 67, 9045),
             new NoteBendEvent(ticks[6] + 12 * 11, 0, info.secondaryChannel, 67, 9131),
-            new NoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, DynamicValue.MF),
+            new NoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, mfVelocity),
 
             // end of track
             new TrackEndEvent(19200, 0) // 3840 = end of bar
         ];
 
-        for (let i: number = 0; i < handler.midiEvents.length; i++) {
-            Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
-            if (i < expectedEvents.length) {
-                expect(handler.midiEvents[i].equals(expectedEvents[i]))
-                    .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(true);
-            }
-        }
-        expect(handler.midiEvents.length).toEqual(expectedEvents.length);
+        assertEvents(handler.midiEvents, expectedEvents);
     });
 
     it('bend-multi-point', () => {
@@ -341,7 +342,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             // reset bend
@@ -352,19 +353,12 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ), // end of track
             new TrackEndEvent(3840, 0) // 3840 = end of bar
         ];
-        for (let i: number = 0; i < handler.midiEvents.length; i++) {
-            Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
-            if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(handler.midiEvents[i]))
-                    .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(true);
-            }
-        }
-        expect(handler.midiEvents.length).toEqual(expectedEvents.length);
+
+        assertEvents(handler.midiEvents, expectedEvents);
     });
 
     it('bend-continued', () => {
@@ -421,7 +415,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration) * 2,
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             // release on tied note
@@ -442,15 +436,8 @@ describe('MidiFileGeneratorTest', () => {
 
             new TrackEndEvent(3840, 0) // 3840 = end of bar
         ];
-        for (let i: number = 0; i < handler.midiEvents.length; i++) {
-            Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
-            if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(handler.midiEvents[i]))
-                    .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(true);
-            }
-        }
-        expect(handler.midiEvents.length).toEqual(expectedEvents.length);
+
+        assertEvents(handler.midiEvents, expectedEvents);
     });
 
     it('pre-bend-release-continued', () => {
@@ -508,20 +495,13 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration) * 2,
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             new TrackEndEvent(3840, 0) // 3840 = end of bar
         ];
-        for (let i: number = 0; i < handler.midiEvents.length; i++) {
-            Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
-            if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(handler.midiEvents[i]))
-                    .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(true);
-            }
-        }
-        expect(handler.midiEvents.length).toEqual(expectedEvents.length);
+
+        assertEvents(handler.midiEvents, expectedEvents);
     });
 
     it('pre-bend-release-continued-songbook', () => {
@@ -581,20 +561,13 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration) * 2,
                 note.realValue,
-                note.dynamics
+                MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
             new TrackEndEvent(3840, 0) // 3840 = end of bar
         ];
-        for (let i: number = 0; i < handler.midiEvents.length; i++) {
-            Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
-            if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(handler.midiEvents[i]))
-                    .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(true);
-            }
-        }
-        expect(handler.midiEvents.length).toEqual(expectedEvents.length);
+
+        assertEvents(handler.midiEvents, expectedEvents);
     });
 
     it('triplet-feel', () => {
@@ -723,7 +696,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note1.beat.duration),
                 note1.realValue,
-                note1.dynamics
+                MidiUtils.dynamicToVelocity(note1.dynamics as number)
             ),
 
             // bend effect (note 2)
@@ -760,7 +733,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note2.beat.duration),
                 note2.realValue,
-                note2.dynamics
+                MidiUtils.dynamicToVelocity(note2.dynamics as number)
             ),
 
             // reset bend
@@ -771,21 +744,14 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 MidiUtils.toTicks(note1.beat.duration),
                 note1.realValue,
-                note1.dynamics
+                MidiUtils.dynamicToVelocity(note1.dynamics as number)
             ),
 
             // end of track
             new TrackEndEvent(3840, 0) // 3840 = end of bar
         ];
-        for (let i: number = 0; i < handler.midiEvents.length; i++) {
-            Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
-            if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(handler.midiEvents[i]))
-                    .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(true);
-            }
-        }
-        expect(handler.midiEvents.length).toEqual(expectedEvents.length);
+
+        assertEvents(handler.midiEvents, expectedEvents);
     });
 
     it('tied-vibrato', () => {
@@ -840,7 +806,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 1920,
                 note1.realValue,
-                note1.dynamics
+                MidiUtils.dynamicToVelocity(note1.dynamics as number)
             ),
 
             new NoteBendEvent(1440, 0, info.primaryChannel, note1.realValue, 8192),
@@ -855,15 +821,8 @@ describe('MidiFileGeneratorTest', () => {
             // end of track
             new TrackEndEvent(3840, 0) // 3840 = end of bar
         ];
-        for (let i: number = 0; i < handler.midiEvents.length; i++) {
-            Logger.info('Test', `i[${i}] ${handler.midiEvents[i]}`);
-            if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(handler.midiEvents[i]))
-                    .withContext(`i[${i}] expected[${expectedEvents[i]}] !== actual[${handler.midiEvents[i]}]`)
-                    .toEqual(true);
-            }
-        }
-        expect(handler.midiEvents.length).toEqual(expectedEvents.length);
+
+        assertEvents(handler.midiEvents, expectedEvents);
     });
 
     it('full-bar-rest', () => {
@@ -950,4 +909,72 @@ describe('MidiFileGeneratorTest', () => {
         expect(tempoChanges.map(t=>t.tick).join(',')).toBe('0,3840');
         expect(tempoChanges.map(t=>t.tempo).join(',')).toBe('60,80');
     });
+
+    it('has-valid-dynamics', () => {
+        let tex: string = ':2 1.1{dy fff ac} 1.1{dy ppp g}';
+        let score: Score = parseTex(tex);
+
+        let info: PlaybackInformation = score.tracks[0].playbackInfo;
+        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        let note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0];
+        // First note has already highest dynamics which is increased due to accentuation
+        expect(note1.dynamics).toBe(DynamicValue.FFF);
+        expect(note1.accentuated).toBe(AccentuationType.Normal);
+
+        // Second note has lowest dynamics which is decreased due to ghost note
+        expect(note2.dynamics).toBe(DynamicValue.PPP);
+        expect(note2.isGhost).toBeTrue();
+
+        let expectedEvents: FlatMidiEvent[] = [
+            // channel init
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+
+            new TimeSignatureEvent(0, 4, 4),
+            new TempoEvent(0, 120),
+
+            new NoteBendEvent(0, 0, info.primaryChannel, note1.realValue, 8192),
+            new NoteEvent(
+                0,
+                0,
+                info.primaryChannel,
+                1920,
+                note1.realValue,
+                MidiUtils.dynamicToVelocity((note1.dynamics as number) + 1)
+            ),
+
+            new NoteBendEvent(1920, 0, info.primaryChannel, note2.realValue, 8192),
+            new NoteEvent(
+                1920,
+                0,
+                info.primaryChannel,
+                1920,
+                note2.realValue,
+                MidiUtils.dynamicToVelocity((note2.dynamics as number) - 1)
+            ),
+
+            // end of track
+            new TrackEndEvent(3840, 0) // 3840 = end of bar
+        ];
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+        assertEvents(handler.midiEvents, expectedEvents);
+    })
 });

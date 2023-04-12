@@ -6,8 +6,6 @@ import { SystemCommonType } from '@src/midi/SystemCommonEvent';
 import { AlphaTabSystemExclusiveEvents, SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
 import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 import { MidiFile } from '@src/midi/MidiFile';
-import { MidiUtils } from '@src/midi/MidiUtils';
-import { DynamicValue } from '@src/model/DynamicValue';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 
@@ -62,10 +60,9 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         start: number,
         length: number,
         key: number,
-        dynamicValue: DynamicValue,
+        velocity: number,
         channel: number
     ): void {
-        const velocity: number = MidiUtils.dynamicToVelocity(dynamicValue);
         const noteOn: MidiEvent = new MidiEvent(
             track,
             start,

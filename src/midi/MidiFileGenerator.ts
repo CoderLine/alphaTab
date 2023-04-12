@@ -17,7 +17,6 @@ import { BendStyle } from '@src/model/BendStyle';
 import { BendType } from '@src/model/BendType';
 import { BrushType } from '@src/model/BrushType';
 import { Duration } from '@src/model/Duration';
-import { DynamicValue } from '@src/model/DynamicValue';
 import { GraceType } from '@src/model/GraceType';
 import { MasterBar } from '@src/model/MasterBar';
 import { Note } from '@src/model/Note';
@@ -425,7 +424,7 @@ export class MidiFileGenerator {
         noteDuration.untilTieOrSlideEnd -= brushOffset;
         noteDuration.noteOnly -= brushOffset;
         noteDuration.letRingEnd -= brushOffset;
-        const dynamicValue: DynamicValue = MidiFileGenerator.getDynamicValue(note);
+        const velocity: number = MidiFileGenerator.getNoteVelocity(note);
         const channel: number =
             note.hasBend || note.beat.hasWhammyBar || note.beat.vibrato !== VibratoType.None
                 ? track.playbackInfo.secondaryChannel
@@ -458,7 +457,7 @@ export class MidiFileGenerator {
         //
         // Trill
         if (note.isTrill && !staff.isPercussion) {
-            this.generateTrill(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
+            this.generateTrill(note, noteStart, noteDuration, noteKey, velocity, channel);
             // no further generation needed
             return;
         }
@@ -466,7 +465,7 @@ export class MidiFileGenerator {
         //
         // Tremolo Picking
         if (note.beat.isTremolo) {
-            this.generateTremoloPicking(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
+            this.generateTremoloPicking(note, noteStart, noteDuration, noteKey, velocity, channel);
             // no further generation needed
             return;
         }
@@ -478,7 +477,7 @@ export class MidiFileGenerator {
         } else if (note.beat.hasWhammyBar && note.index === 0) {
             this.generateWhammy(note.beat, noteStart, noteDuration, channel);
         } else if (note.slideInType !== SlideInType.None || note.slideOutType !== SlideOutType.None) {
-            this.generateSlide(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
+            this.generateSlide(note, noteStart, noteDuration, noteKey, channel);
         } else if (note.vibrato !== VibratoType.None ||  (note.isTieDestination && note.tieOrigin!.vibrato !== VibratoType.None)) {
             this.generateVibrato(note, noteStart, noteDuration, noteKey, channel);
         }
@@ -487,7 +486,7 @@ export class MidiFileGenerator {
         // the previous one is extended
         if (!note.isTieDestination && (!note.slideOrigin || note.slideOrigin.slideOutType !== SlideOutType.Legato)) {
             let noteSoundDuration: number = Math.max(noteDuration.untilTieOrSlideEnd, noteDuration.letRingEnd);
-            this._handler.addNote(track.index, noteStart, noteSoundDuration, noteKey, dynamicValue, channel);
+            this._handler.addNote(track.index, noteStart, noteSoundDuration, noteKey, velocity, channel);
         }
     }
 
@@ -594,7 +593,7 @@ export class MidiFileGenerator {
         return Math.min(value, maximum);
     }
 
-    private static getDynamicValue(note: Note): DynamicValue {
+    private static getNoteVelocity(note: Note): number {
         let dynamicValue: number = note.dynamics as number;
         // more silent on hammer destination
         if (!note.beat.voice.bar.staff.isPercussion && note.hammerPullOrigin) {
@@ -614,11 +613,7 @@ export class MidiFileGenerator {
                 break;
         }
 
-        if (dynamicValue < 0) {
-            dynamicValue = 0;
-        }
-
-        return dynamicValue as DynamicValue;
+        return MidiUtils.dynamicToVelocity(dynamicValue);
     }
 
     private generateFadeIn(note: Note, noteStart: number, noteDuration: MidiNoteDuration): void {
@@ -756,7 +751,6 @@ export class MidiFileGenerator {
         noteStart: number,
         noteDuration: MidiNoteDuration,
         noteKey: number,
-        dynamicValue: DynamicValue,
         channel: number
     ) {
         let duration: number =
@@ -1173,7 +1167,7 @@ export class MidiFileGenerator {
         noteStart: number,
         noteDuration: MidiNoteDuration,
         noteKey: number,
-        dynamicValue: DynamicValue,
+        dynamicValue: number,
         channel: number
     ): void {
         const track: Track = note.beat.voice.bar.staff.track;
@@ -1198,7 +1192,7 @@ export class MidiFileGenerator {
         noteStart: number,
         noteDuration: MidiNoteDuration,
         noteKey: number,
-        dynamicValue: DynamicValue,
+        dynamicValue: number,
         channel: number
     ): void {
         const track: Track = note.beat.voice.bar.staff.track;
