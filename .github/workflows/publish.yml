@@ -99,7 +99,12 @@ jobs:
       - run: node ./scripts/update-kotlin-version.js SNAPSHOT
       - run: npm run build-kotlin-ci
 
-      - run: cd ./src.kotlin/alphaTab/
       - run: .\gradlew.bat publishAllPublicationsToSonatypeRepository
+        working-directory: ./src.kotlin/alphaTab/
+
       - run: .\gradlew.bat closeAndReleaseSonatypeStagingRepository
+        working-directory: ./src.kotlin/alphaTab/
+
       - run: .\gradlew.bat --stop
+        working-directory: ./src.kotlin/alphaTab/
+
