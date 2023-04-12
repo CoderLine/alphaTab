@@ -4,7 +4,7 @@
         <RootNamespace>AlphaTab</RootNamespace>
         <AssemblyName>AlphaTab.Windows</AssemblyName>
         <PackageId>AlphaTab.Windows</PackageId>
-		<PackageReadmeFile>..\..\README.md</PackageReadmeFile>		
+		<PackageReadmeFile>README.md</PackageReadmeFile>		
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <TargetFrameworks>net6.0-windows</TargetFrameworks>
@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\"/>
         <EmbeddedResource Include="..\..\font\sonivox\sonivox.sf2" Link="default.sf2" />
     </ItemGroup>
 

@@ -6,7 +6,7 @@
         <PackageId>AlphaTab</PackageId>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<PackageReadmeFile>..\..\README.md</PackageReadmeFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
         <NoWarn>$(NoWarn);0162;1591;1573;NU5105;0168</NoWarn>
         <NoWarn>$(NoWarn);8600;8601;8602;8603;8604;8605</NoWarn>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\"/>	
         <EmbeddedResource Include="..\..\font\bravura\Bravura.ttf" Link="Platform\CSharp\Bravura.ttf" />
     </ItemGroup>
 
