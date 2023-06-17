@@ -116,7 +116,7 @@ export class RenderStaff {
         // to have correct partials splitting
         const barDisplayWidth = renderer.barDisplayWidth;
         if (barDisplayWidth > 0 && this.staveGroup.layout.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths) {
-            renderer.scaleToWidth(barDisplayWidth);
+            renderer.width = barDisplayWidth;
         }
 
         this.barRenderers.push(renderer);
