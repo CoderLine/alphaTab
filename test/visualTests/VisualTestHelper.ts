@@ -530,7 +530,7 @@ export class VisualTestHelper {
                     // only pixels that are not transparent are relevant for the diff-ratio
                     let totalPixels = match.totalPixels - match.transparentPixels;
                     let percentDifference = (match.differentPixels / totalPixels) * 100;
-                    result.pass = percentDifference < 0.1;
+                    result.pass = percentDifference < tolerancePercent;
                     // result.pass = match.differentPixels === 0;
                     result.message = '';
 
