@@ -107,7 +107,7 @@ export class BarLayoutingInfo {
             if (this._timeSortedSprings.length > 0) {
                 let smallestDuration: number = duration;
                 let previousSpring: Spring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
-                for(const prevDuration of previousSpring.allDurations) {
+                for (const prevDuration of previousSpring.allDurations) {
                     let end: number = previousSpring.timePosition + prevDuration;
                     if (end >= start && prevDuration < smallestDuration) {
                         smallestDuration = prevDuration;
@@ -197,7 +197,7 @@ export class BarLayoutingInfo {
     }
 
     public finish(): void {
-        for(const [k,s] of this.allGraceRods) {
+        for (const [k, s] of this.allGraceRods) {
             let offset = 0;
             if (this.incompleteGraceRods.has(k)) {
                 for (const sp of s) {
@@ -216,7 +216,7 @@ export class BarLayoutingInfo {
             }
         }
         this._incompleteGraceRodsWidth = 0;
-        for(const s of this.incompleteGraceRods.values()) {
+        for (const s of this.incompleteGraceRods.values()) {
             for (const sp of s) {
                 this._incompleteGraceRodsWidth += sp.preBeatWidth + sp.postSpringWidth;
             }
@@ -229,7 +229,7 @@ export class BarLayoutingInfo {
     private calculateSpringConstants(): void {
         this._xMin = 0;
         let springs: Map<number, Spring> = this.springs;
-        for(const spring of springs.values()){
+        for (const spring of springs.values()) {
             if (spring.springWidth < this._xMin) {
                 this._xMin = spring.springWidth;
             }

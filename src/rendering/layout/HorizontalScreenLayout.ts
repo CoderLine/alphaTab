@@ -1,11 +1,12 @@
 import { MasterBar } from '@src/model/MasterBar';
 import { Score } from '@src/model/Score';
 import { TextAlign } from '@src/platform/ICanvas';
-import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
+import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { Logger } from '@src/Logger';
+import { SystemsLayoutMode } from '@src/DisplaySettings';
 
 export class HorizontalScreenLayoutPartialInfo {
     public x: number = 0;
@@ -48,6 +49,16 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
     protected doLayoutAndRender(): void {
         this._pagePadding = this.renderer.settings.display.padding;
+
+        switch (this.renderer.settings.display.systemsLayoutMode) {
+            case SystemsLayoutMode.Automatic:
+                this.systemsLayoutMode = InternalSystemsLayoutMode.Automatic;
+                break;
+            case SystemsLayoutMode.UseModelLayout:
+                this.systemsLayoutMode = InternalSystemsLayoutMode.FromModelWithWidths;
+                break;
+        }
+
         if (!this._pagePadding) {
             this._pagePadding = HorizontalScreenLayout.PagePadding;
         }
@@ -67,6 +78,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             ];
         }
         let score: Score = this.renderer.score!;
+
         let startIndex: number = this.renderer.settings.display.startBar;
         startIndex--; // map to array index
 
@@ -89,6 +101,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         let renderX = 0;
         while (currentBarIndex <= endBarIndex) {
             let result = this._group.addBars(this.renderer.tracks!, currentBarIndex);
+
             if (result) {
                 // if we detect that the new renderer is linked to the previous
                 // renderer, we need to put it into the previous partial
@@ -112,9 +125,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
                         Logger.debug(
                             this.name,
                             'Finished partial from bar ' +
-                                currentPartial.masterBars[0].index +
-                                ' to ' +
-                                currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                            currentPartial.masterBars[0].index +
+                            ' to ' +
+                            currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
                             null
                         );
                         currentPartial = new HorizontalScreenLayoutPartialInfo();
@@ -133,9 +146,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
             Logger.debug(
                 this.name,
                 'Finished partial from bar ' +
-                    currentPartial.masterBars[0].index +
-                    ' to ' +
-                    currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                currentPartial.masterBars[0].index +
+                ' to ' +
+                currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
                 null
             );
         }
@@ -175,9 +188,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 Logger.debug(
                     this.name,
                     'Rendering partial from bar ' +
-                        partial.masterBars[0].index +
-                        ' to ' +
-                        partial.masterBars[partial.masterBars.length - 1].index,
+                    partial.masterBars[0].index +
+                    ' to ' +
+                    partial.masterBars[partial.masterBars.length - 1].index,
                     null
                 );
                 this._group!!.paintPartial(

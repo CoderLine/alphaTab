@@ -27,6 +27,8 @@ export class BarSerializer {
         o.set("clefottava", obj.clefOttava as number);
         o.set("voices", obj.voices.map(i => VoiceSerializer.toJson(i)));
         o.set("similemark", obj.simileMark as number);
+        o.set("displayscale", obj.displayScale);
+        o.set("displaywidth", obj.displayWidth);
         return o;
     }
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
@@ -50,6 +52,12 @@ export class BarSerializer {
                 return true;
             case "similemark":
                 obj.simileMark = JsonHelper.parseEnum<SimileMark>(v, SimileMark)!;
+                return true;
+            case "displayscale":
+                obj.displayScale = v! as number;
+                return true;
+            case "displaywidth":
+                obj.displayWidth = v! as number;
                 return true;
         }
         return false;

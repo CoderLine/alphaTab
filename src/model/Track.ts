@@ -54,6 +54,18 @@ export class Track {
     public shortName: string = '';
 
     /**
+     * Defines how many bars are placed into the systems (rows) when displaying
+     * the track unless a value is set in the systemsLayout.
+     */
+    public defaultSystemsLayout: number = 3;
+
+    /**
+     * Defines how many bars are placed into the systems (rows) when displaying
+     * the track.
+     */
+    public systemsLayout: number[] = [];
+
+    /**
      * Gets or sets a mapping on which staff liens particular percussion instruments
      * should be shown.
      */

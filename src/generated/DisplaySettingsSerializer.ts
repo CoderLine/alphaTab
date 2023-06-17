@@ -8,6 +8,7 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesSerializer";
 import { LayoutMode } from "@src/LayoutMode";
 import { StaveProfile } from "@src/StaveProfile";
+import { SystemsLayoutMode } from "@src/DisplaySettings";
 export class DisplaySettingsSerializer {
     public static fromJson(obj: DisplaySettings, m: unknown): void {
         if (!m) {
@@ -30,6 +31,7 @@ export class DisplaySettingsSerializer {
         o.set("barcountperpartial", obj.barCountPerPartial);
         o.set("resources", RenderingResourcesSerializer.toJson(obj.resources));
         o.set("padding", obj.padding);
+        o.set("systemslayoutmode", obj.systemsLayoutMode as number);
         return o;
     }
     public static setProperty(obj: DisplaySettings, property: string, v: unknown): boolean {
@@ -60,6 +62,9 @@ export class DisplaySettingsSerializer {
                 return true;
             case "padding":
                 obj.padding = v as number[] | null;
+                return true;
+            case "systemslayoutmode":
+                obj.systemsLayoutMode = JsonHelper.parseEnum<SystemsLayoutMode>(v, SystemsLayoutMode)!;
                 return true;
         }
         if (["resources"].indexOf(property) >= 0) {

@@ -924,8 +924,8 @@ export class GpifWriter {
         scoreNode.addElement('PageHeader').setCData('');
         scoreNode.addElement('PageFooter').setCData('');
 
-        scoreNode.addElement('ScoreSystemsDefaultLayout').setCData('4');
-        scoreNode.addElement('ScoreSystemsLayout').setCData('4');
+        scoreNode.addElement('ScoreSystemsDefaultLayout').setCData(score.defaultSystemsLayout.toString());
+        scoreNode.addElement('ScoreSystemsLayout').setCData(score.systemsLayout.join(' '));
 
         scoreNode.addElement('ScoreZoomPolicy').innerText = 'Value';
         scoreNode.addElement('ScoreZoom').innerText = '1';
@@ -991,9 +991,8 @@ export class GpifWriter {
         trackNode.addElement('ShortName').setCData(track.shortName);
         trackNode.addElement('Color').innerText = `${track.color.r} ${track.color.g} ${track.color.b}`;
 
-        // Note: unclear what these values mean, various combinations in GP7 lead to these values
-        trackNode.addElement('SystemsDefautLayout').innerText = '3';
-        trackNode.addElement('SystemsLayout').innerText = '1';
+        trackNode.addElement('SystemsDefautLayout').innerText = track.defaultSystemsLayout.toString();
+        trackNode.addElement('SystemsLayout').innerText = track.systemsLayout.join(' ');
 
         trackNode.addElement('AutoBrush');
         trackNode.addElement('PalmMute').innerText = '0';

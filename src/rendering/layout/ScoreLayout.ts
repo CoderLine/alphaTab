@@ -31,6 +31,26 @@ class LazyPartial {
 }
 
 /**
+ * Lists the different modes in which the staves and systems are arranged.
+ */
+export enum InternalSystemsLayoutMode {
+    /**
+     * Use the automatic alignment system provided by alphaTab (default)
+     */
+    Automatic,
+
+    /**
+     * Use the relative scaling information stored in the score model.
+     */
+    FromModelWithScale,
+
+    /**
+     * Use the absolute size information stored in the score model.
+     */
+    FromModelWithWidths
+}
+
+/**
  * This is the base class for creating new layouting engines for the score renderer.
  */
 export abstract class ScoreLayout {
@@ -45,6 +65,8 @@ export abstract class ScoreLayout {
     protected scoreInfoGlyphs: Map<NotationElement, TextGlyph> = new Map();
     protected chordDiagrams: ChordDiagramContainerGlyph | null = null;
     protected tuningGlyph: TuningContainerGlyph | null = null;
+
+    public systemsLayoutMode: InternalSystemsLayoutMode = InternalSystemsLayoutMode.Automatic;
 
     protected constructor(renderer: ScoreRenderer) {
         this.renderer = renderer;
@@ -291,11 +313,11 @@ export abstract class ScoreLayout {
         const centered = Environment.getLayoutEngineFactory(this.renderer.settings.display.layoutMode).vertical;
         e.width = this.renderer.canvas!.measureText(msg);
         e.height = height;
-        e.x = centered 
-        ? (this.width - e.width) / 2
-        : this.firstBarX;
+        e.x = centered
+            ? (this.width - e.width) / 2
+            : this.firstBarX;
         e.y = y;
-        
+
         e.totalWidth = this.width;
         e.totalHeight = y + height;
         e.firstMasterBarIndex = -1;

@@ -36,6 +36,8 @@ export class ScoreSerializer {
         o.set("tempolabel", obj.tempoLabel);
         o.set("masterbars", obj.masterBars.map(i => MasterBarSerializer.toJson(i)));
         o.set("tracks", obj.tracks.map(i => TrackSerializer.toJson(i)));
+        o.set("defaultsystemslayout", obj.defaultSystemsLayout);
+        o.set("systemslayout", obj.systemsLayout);
         o.set("stylesheet", RenderStylesheetSerializer.toJson(obj.stylesheet));
         return o;
     }
@@ -92,6 +94,12 @@ export class ScoreSerializer {
                     TrackSerializer.fromJson(i, o);
                     obj.addTrack(i);
                 }
+                return true;
+            case "defaultsystemslayout":
+                obj.defaultSystemsLayout = v! as number;
+                return true;
+            case "systemslayout":
+                obj.systemsLayout = v! as number[];
                 return true;
         }
         if (["stylesheet"].indexOf(property) >= 0) {
