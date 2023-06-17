@@ -139,7 +139,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                     if (placeholder.renderedResultId !== placeholder.layoutResultId) {
                         if (this._resultIdToElementLookup.has(placeholder.layoutResultId!)) {
                             if(placeholder.resultState !== ResultState.RenderRequested) {
-                                Logger.warning('Rendering', 'Outside Request render of lazy partial ' + placeholder.layoutResultId!);
                                 placeholder.resultState = ResultState.RenderRequested;
                                 this._api.renderer.renderResult(placeholder.layoutResultId!);
                             } else {

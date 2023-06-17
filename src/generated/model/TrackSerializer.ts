@@ -28,6 +28,8 @@ export class TrackSerializer {
         o.set("color", Color.toJson(obj.color));
         o.set("name", obj.name);
         o.set("shortname", obj.shortName);
+        o.set("defaultsystemslayout", obj.defaultSystemsLayout);
+        o.set("systemslayout", obj.systemsLayout);
         o.set("percussionarticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i)));
         return o;
     }
@@ -49,6 +51,12 @@ export class TrackSerializer {
                 return true;
             case "shortname":
                 obj.shortName = v! as string;
+                return true;
+            case "defaultsystemslayout":
+                obj.defaultSystemsLayout = v! as number;
+                return true;
+            case "systemslayout":
+                obj.systemsLayout = v! as number[];
                 return true;
             case "percussionarticulations":
                 obj.percussionArticulations = [];

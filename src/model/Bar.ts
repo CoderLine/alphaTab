@@ -70,6 +70,18 @@ export class Bar {
      */
     public isMultiVoice: boolean = false;
 
+    /**
+     * A relative scale for the size of the bar when displayed. The scale is relative 
+     * within a single line (system/stave group). The sum of all scales in one line make the total width,
+     * and then this individual scale gives the relative size.
+     */
+    public displayScale:number = 1;
+
+    /**
+     * An absolute width of the bar to use when displaying in single track display scenarios.
+     */
+    public displayWidth:number = -1;
+
     public get masterBar(): MasterBar {
         return this.staff.track.score.masterBars[this.index];
     }

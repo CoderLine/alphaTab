@@ -47,6 +47,8 @@ export class MasterBarSerializer {
         }
         o.set("start", obj.start);
         o.set("isanacrusis", obj.isAnacrusis);
+        o.set("displayscale", obj.displayScale);
+        o.set("displaywidth", obj.displayWidth);
         return o;
     }
     public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
@@ -94,6 +96,12 @@ export class MasterBarSerializer {
                 return true;
             case "isanacrusis":
                 obj.isAnacrusis = v! as boolean;
+                return true;
+            case "displayscale":
+                obj.displayScale = v! as number;
+                return true;
+            case "displaywidth":
+                obj.displayWidth = v! as number;
                 return true;
         }
         if (["section"].indexOf(property) >= 0) {

@@ -74,7 +74,10 @@ export class ComparisonHelpers {
                                 'tieoriginnoteid',
                                 'tiedestinationnoteid',
                                 'sluroriginnoteid',
-                                'slurdestinationnoteid'
+                                'slurdestinationnoteid',
+                                'systemslayout',
+                                'defaultsystemslayout',
+                                'displayscale'
                             ]);
                             if (ignoreKeys) {
                                 for (const k of ignoreKeys) {

@@ -133,6 +133,16 @@ export class MasterBar {
     public isAnacrusis: boolean = false;
 
     /**
+     * Gets a percentual scale for the size of the bars when displayed in a multi-track layout.
+     */
+    public displayScale: number = 1;
+
+    /**
+     * An absolute width of the bar to use when displaying in a multi-track layout.
+     */
+    public displayWidth:number = -1;    
+
+    /**
      * Calculates the time spent in this bar. (unit: midi ticks)
      */
     public calculateDuration(respectAnacrusis: boolean = true): number {
