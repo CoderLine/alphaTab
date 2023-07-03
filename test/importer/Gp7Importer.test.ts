@@ -906,4 +906,13 @@ describe('Gp7ImporterTest', () => {
             expect(automation.value).toBe(29);
         }
     });
+
+    it('chord-no-diagram', async () =>{
+        const reader = await prepareGp7ImporterWithFile('guitarpro7/chord-no-diagram.gp');
+        let score: Score = reader.readScore();
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord).toBeTruthy();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).toBe("C");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings.length).toBe(0);
+    })
 });
