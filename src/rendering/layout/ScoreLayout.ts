@@ -1,7 +1,6 @@
 import { StaveProfile } from '@src/StaveProfile';
 import { Environment } from '@src/Environment';
 import { Bar } from '@src/model/Bar';
-import { Chord } from '@src/model/Chord';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
@@ -209,23 +208,24 @@ export abstract class ScoreLayout {
         if (notation.isNotationElementVisible(NotationElement.ChordDiagrams)) {
             this.chordDiagrams = new ChordDiagramContainerGlyph(0, 0);
             this.chordDiagrams.renderer = fakeBarRenderer;
-            let chords: Map<string, Chord> = new Map<string, Chord>();
+            let chordNames: Set<string> = new Set<string>();
+
             for (let track of this.renderer.tracks!) {
-                for (let staff of track.staves) {
-                    const sc = staff.chords;
-                    if (sc) {
-                        for (const [chordId, chord] of sc) {
-                            if (!chords.has(chordId)) {
-                                if (chord.showDiagram) {
-                                    chords.set(chordId, chord);
-                                    this.chordDiagrams!.addChord(chord);
-                                }
-                            }
-                        }
+              for (let staff of track.staves) {
+                const sc = staff.chords;
+                if (sc) {
+                  for (const [, chord] of sc) {
+                    if (!chordNames.has(chord.name)) {
+                      if (chord.showDiagram) {
+                        chordNames.add(chord.name);
+                        this.chordDiagrams!.addChord(chord);
+                      }
                     }
+                  }
                 }
+              }
             }
-        }
+          }
     }
 
     public get scale(): number {
