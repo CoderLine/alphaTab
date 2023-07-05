@@ -208,24 +208,24 @@ export abstract class ScoreLayout {
         if (notation.isNotationElementVisible(NotationElement.ChordDiagrams)) {
             this.chordDiagrams = new ChordDiagramContainerGlyph(0, 0);
             this.chordDiagrams.renderer = fakeBarRenderer;
-            let chordNames: Set<string> = new Set<string>();
+            let chordIds: Set<string> = new Set<string>();
 
             for (let track of this.renderer.tracks!) {
-              for (let staff of track.staves) {
-                const sc = staff.chords;
-                if (sc) {
-                  for (const [, chord] of sc) {
-                    if (!chordNames.has(chord.name)) {
-                      if (chord.showDiagram) {
-                        chordNames.add(chord.name);
-                        this.chordDiagrams!.addChord(chord);
-                      }
+                for (let staff of track.staves) {
+                    const sc = staff.chords;
+                    if (sc) {
+                        for (const [, chord] of sc) {
+                            if (!chordIds.has(chord.uniqueId)) {
+                                if (chord.showDiagram) {
+                                    chordIds.add(chord.uniqueId);
+                                    this.chordDiagrams!.addChord(chord);
+                                }
+                            }
+                        }
                     }
-                  }
                 }
-              }
             }
-          }
+        }
     }
 
     public get scale(): number {
