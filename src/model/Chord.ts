@@ -1,7 +1,7 @@
 import { Staff } from '@src/model/Staff';
 
-// TODO: rework model to specify for each finger 
-// on which frets they are placed. 
+// TODO: rework model to specify for each finger
+// on which frets they are placed.
 
 /**
  * A chord definition.
@@ -51,4 +51,16 @@ export class Chord {
      * Gets or sets whether the fingering is shown below the chord diagram.
      */
     public showFingering: boolean = true;
+    /**
+     * Gets a unique id for this chord based on its properties.
+     */
+    public get uniqueId(): string {
+        const properties = [
+            this.name,
+            this.firstFret,
+            JSON.stringify(this.strings),
+            JSON.stringify(this.barreFrets)
+        ];
+        return properties.join('|');
+    }
 }
