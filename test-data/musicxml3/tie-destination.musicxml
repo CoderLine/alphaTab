@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.0">
+ <part-list>
+  <score-part id="P1">
+   <part-name>Acoustic Guitar</part-name>
+   <part-name-display>
+    <display-text>Acoustic Guitar</display-text>
+   </part-name-display>
+   <part-abbreviation>A. Gtr.</part-abbreviation>
+   <part-abbreviation-display>
+    <display-text>A. Gtr.</display-text>
+   </part-abbreviation-display>
+   <score-instrument id="P2-I1">
+    <instrument-name>Acoustic Guitar</instrument-name>
+    <instrument-sound>pluck.guitar.steel-string</instrument-sound>
+    <solo />
+    <virtual-instrument>
+     <virtual-library>General MIDI</virtual-library>
+     <virtual-name>Acoustic Guitar (steel)</virtual-name>
+    </virtual-instrument>
+   </score-instrument>
+  </score-part>
+ </part-list>
+ <part id="P1">
+  <measure number="1" width="227">
+   <attributes>
+    <divisions>256</divisions>
+    <key color="#000000">
+     <fifths>0</fifths>
+     <mode>major</mode>
+    </key>
+    <time color="#000000">
+     <beats>4</beats>
+     <beat-type>4</beat-type>
+    </time>
+    <staves>1</staves>
+    <clef number="1" color="#000000">
+     <sign>TAB</sign>
+     <line>2</line>
+    </clef>
+    <staff-details number="1" print-object="yes">
+     <staff-lines>6</staff-lines>
+     <staff-tuning line="1">
+      <tuning-step>E</tuning-step>
+      <tuning-octave>2</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="2">
+      <tuning-step>A</tuning-step>
+      <tuning-octave>2</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="3">
+      <tuning-step>D</tuning-step>
+      <tuning-octave>3</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="4">
+      <tuning-step>G</tuning-step>
+      <tuning-octave>3</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="5">
+      <tuning-step>B</tuning-step>
+      <tuning-octave>3</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="6">
+      <tuning-step>E</tuning-step>
+      <tuning-octave>4</tuning-octave>
+     </staff-tuning>
+    </staff-details>
+   </attributes>
+   <harmony color="#000000" default-y="45">
+    <root>
+     <root-step>F</root-step>
+     <root-alter>1</root-alter>
+    </root>
+    <kind>minor</kind>
+    <staff>1</staff>
+   </harmony>
+   <note color="#000000" default-x="60" default-y="43">
+    <pitch>
+     <step>C</step>
+     <alter>1</alter>
+     <octave>5</octave>
+    </pitch>
+    <duration>384</duration>
+    <instrument id="P2-I1" />
+    <voice>1</voice>
+    <type>quarter</type>
+    <dot />
+    <stem>up</stem>
+    <staff>1</staff>
+    <notations>
+     <technical>
+      <fret>9</fret>
+      <string>1</string>
+     </technical>
+    </notations>
+   </note>
+   <note color="#000000" default-x="115" default-y="44">
+    <pitch>
+     <step>A</step>
+     <octave>4</octave>
+    </pitch>
+    <duration>128</duration>
+    <tie type="start" />
+    <instrument id="P2-I1" />
+    <voice>1</voice>
+    <type>eighth</type>
+    <stem>up</stem>
+    <staff>1</staff>
+    <notations>
+     <tied type="start" orientation="over" />
+     <technical>
+      <fret>5</fret>
+      <string>1</string>
+     </technical>
+    </notations>
+   </note>
+   <note color="#000000" default-x="146" default-y="43">
+    <pitch>
+     <step>A</step>
+     <octave>4</octave>
+    </pitch>
+    <duration>256</duration>
+    <tie type="stop" />
+    <instrument id="P2-I1" />
+    <voice>1</voice>
+    <type>quarter</type>
+    <stem>up</stem>
+    <staff>1</staff>
+    <notations>
+     <tied type="stop" orientation="over" />
+     <technical>
+      <fret>5</fret>
+      <string>1</string>
+     </technical>
+    </notations>
+   </note>
+   <note color="#000000" default-x="187" default-y="43">
+    <pitch>
+     <step>G</step>
+     <octave>4</octave>
+    </pitch>
+    <duration>256</duration>
+    <instrument id="P2-I1" />
+    <voice>1</voice>
+    <type>quarter</type>
+    <stem>up</stem>
+    <staff>1</staff>
+    <notations>
+     <technical>
+      <fret>3</fret>
+      <string>1</string>
+     </technical>
+    </notations>
+   </note>
+  </measure>
+ </part>
+</score-partwise>

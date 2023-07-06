@@ -810,8 +810,15 @@ export class MusicXmlImporter extends ScoreImporter {
                 this._tieStarts.push(note);
             }
         } else if (element.getAttribute('type') === 'stop' && this._tieStarts.length > 0 && !note.isTieDestination) {
-            note.isTieDestination = true;
-            note.tieOrigin = this._tieStarts[0];
+            const tieOrigin = this._tieStarts[0];
+            // no cross track/staff or voice ties supported for now
+            if(tieOrigin.beat.voice.index === note.beat.voice.index && 
+               tieOrigin.beat.voice.bar.staff.index === note.beat.voice.bar.staff.index &&
+               tieOrigin.beat.voice.bar.staff.track.index === note.beat.voice.bar.staff.track.index) {
+                note.isTieDestination = true;
+                note.tieOrigin = this._tieStarts[0];
+            }
+
             this._tieStarts.splice(0, 1);
             this._tieStartIds.delete(note.id);
         }
