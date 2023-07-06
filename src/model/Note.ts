@@ -999,11 +999,12 @@ export class Note {
 
             this._noteIdBag = null; // not needed anymore
         } else {
-            if (!this.isTieDestination && this.tieOrigin == null) {
+            // no tie destination at all?
+            if (!this.isTieDestination && this.tieOrigin === null) {
                 return;
             }
 
-            let tieOrigin = Note.findTieOrigin(this);
+            let tieOrigin = this.tieOrigin ?? Note.findTieOrigin(this);
             if (!tieOrigin) {
                 this.isTieDestination = false;
             } else {

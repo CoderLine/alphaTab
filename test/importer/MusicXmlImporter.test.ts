@@ -1,5 +1,6 @@
 import { MusicXmlImporterTestHelper } from '@test/importer/MusicXmlImporterTestHelper';
 import { Score } from '@src/model/Score';
+import { JsonConverter } from '@src/model';
 
 describe('MusicXmlImporterTests', () => {
     it('track-volume', async () => {
@@ -46,5 +47,24 @@ describe('MusicXmlImporterTests', () => {
         expect(score.masterBars[0].tempoAutomation?.value).toBe(60);
         expect(score.masterBars[1].tempoAutomation).toBeTruthy();
         expect(score.masterBars[1].tempoAutomation?.value).toBe(60);
+    });
+    it('tie-destination', async () => {
+        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+            'test-data/musicxml3/tie-destination.musicxml'
+        );
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isTieOrigin).toBeTrue();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].tieDestination).toBeTruthy();
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isTieDestination).toBeTrue();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].tieOrigin).toBeTruthy();
+
+        score = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score));
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isTieOrigin).toBeTrue();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].tieDestination).toBeTruthy();
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isTieDestination).toBeTrue();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].tieOrigin).toBeTruthy();
     });
 });
