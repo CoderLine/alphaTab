@@ -862,7 +862,7 @@ export class GpifParser {
     private parseDiagramItemForChord(chord: Chord, node: XmlNode): void {
         chord.name = node.getAttribute('name');
         
-        let diagram = node.findChildElement('Diagram')!;
+        let diagram = node.findChildElement('Diagram');
         if(!diagram) {
             chord.showDiagram = false;
             chord.showFingering = false;
