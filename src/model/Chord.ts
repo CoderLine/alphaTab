@@ -58,8 +58,8 @@ export class Chord {
         const properties = [
             this.name,
             this.firstFret,
-            JSON.stringify(this.strings),
-            JSON.stringify(this.barreFrets)
+            this.strings.join(','),
+            this.barreFrets.join(',')
         ];
         return properties.join('|');
     }
