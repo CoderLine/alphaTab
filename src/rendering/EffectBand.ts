@@ -110,14 +110,14 @@ export class EffectBand extends Glyph {
                             // load the effect from the previous renderer if possible.
                             let previousRenderer: EffectBarRenderer = this.renderer
                                 .previousRenderer as EffectBarRenderer;
-                            let previousBand = previousRenderer.getBand(prevBeat.voice.index, this.info.effectId);
+                            let previousBand = previousRenderer.getBand(prevBeat.voice, this.info.effectId);
                             // it can happen that we have an empty voice and then we don't have an effect band 
                             if(previousBand) {
                                 let voiceGlyphs: Map<number, EffectGlyph> = previousBand._effectGlyphs[prevBeat.voice.index];
                                 if (voiceGlyphs.has(prevBeat.index)) {
                                     prevEffect = voiceGlyphs.get(prevBeat.index)!;
                                 }
-                            }                            
+                            }
                         }
                         // if the effect cannot be expanded, create a new glyph
                         // in case of expansion also create a new glyph, but also link the glyphs together
