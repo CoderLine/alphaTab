@@ -57,9 +57,12 @@ export class Chord {
     public get uniqueId(): string {
         const properties = [
             this.name,
-            this.firstFret,
+            this.firstFret.toString(),
             this.strings.join(','),
-            this.barreFrets.join(',')
+            this.barreFrets.join(','),
+            this.showDiagram.toString(),
+            this.showFingering.toString(),
+            this.showName.toString()
         ];
         return properties.join('|');
     }
