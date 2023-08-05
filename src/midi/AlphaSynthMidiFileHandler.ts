@@ -45,7 +45,9 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public addRest(track: number, tick: number, channel: number): void {
-        this._midiFile.addEvent(new AlphaTabRestEvent(track, tick, channel));
+        if(!this._smf1Mode) {
+            this._midiFile.addEvent(new AlphaTabRestEvent(track, tick, channel));
+        }
     }
 
     public addNote(
@@ -123,6 +125,9 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public finishTrack(track: number, tick: number): void {
-        this._midiFile.addEvent(new EndOfTrackEvent(track, tick));
+        // for alphaSynth we only use single end of track (type 0 SMF). 
+        if (track == 0) {
+            this._midiFile.addEvent(new EndOfTrackEvent(track, tick));
+        }
     }
 }

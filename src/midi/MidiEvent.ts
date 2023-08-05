@@ -65,20 +65,20 @@ export class TimeSignatureEvent extends MidiEvent {
     public numerator: number;
     public denominatorIndex: number;
     public midiClocksPerMetronomeClick: number;
-    public thirdySecondNodesInQuarter: number;
+    public thirtySecondNodesInQuarter: number;
 
     public constructor(track: number, tick: number,
         numerator: number,
         denominatorIndex: number,
         midiClocksPerMetronomeClick: number,
-        thirdySecondNodesInQuarter: number) {
+        thirtySecondNodesInQuarter: number) {
         super(track, tick, MidiEventType.TimeSignature);
         this.track = track;
         this.tick = tick;
         this.numerator = numerator;
         this.denominatorIndex = denominatorIndex;
         this.midiClocksPerMetronomeClick = midiClocksPerMetronomeClick;
-        this.thirdySecondNodesInQuarter = thirdySecondNodesInQuarter;
+        this.thirtySecondNodesInQuarter = thirtySecondNodesInQuarter;
     }
 
     public override writeTo(s: IWriteable): void {
@@ -86,10 +86,13 @@ export class TimeSignatureEvent extends MidiEvent {
         s.writeByte(0xFF);
         // time signature
         s.writeByte(0x58);
+        // size
+        MidiFile.writeVariableInt(s, 4);
+        // Data
         s.writeByte(this.numerator & 0xFF);
         s.writeByte(this.denominatorIndex & 0xFF);
         s.writeByte(this.midiClocksPerMetronomeClick & 0xFF);
-        s.writeByte(this.thirdySecondNodesInQuarter & 0xFF);
+        s.writeByte(this.thirtySecondNodesInQuarter & 0xFF);
     }
 }
 
@@ -160,7 +163,7 @@ export class AlphaTabRestEvent extends AlphaTabSysExEvent {
 }
 
 
-export class NoteEvent extends MidiEvent {
+export abstract class NoteEvent extends MidiEvent {
     public channel: number;
     public noteKey: number;
     public noteVelocity: number;
@@ -177,14 +180,6 @@ export class NoteEvent extends MidiEvent {
         this.noteKey = noteKey;
         this.noteVelocity = noteVelocity;
     }
-
-
-    public override writeTo(s: IWriteable): void {
-        // status byte
-        s.writeByte((this.channel & 0x0F) | 0x90)
-        s.writeByte(this.noteKey & 0xFF);
-        s.writeByte(this.noteVelocity & 0xFF);
-    }
 }
 
 export class NoteOnEvent extends NoteEvent {
@@ -195,6 +190,13 @@ export class NoteOnEvent extends NoteEvent {
         noteVelocity: number) {
         super(track, tick, MidiEventType.NoteOn, channel, noteKey, noteVelocity);
     }
+
+    public override writeTo(s: IWriteable): void {
+        // status byte
+        s.writeByte((this.channel & 0x0F) | 0x90)
+        s.writeByte(this.noteKey & 0xFF);
+        s.writeByte(this.noteVelocity & 0xFF);
+    }
 }
 
 
@@ -204,6 +206,13 @@ export class NoteOffEvent extends NoteEvent {
         noteKey: number,
         noteVelocity: number) {
         super(track, tick, MidiEventType.NoteOff, channel, noteKey, noteVelocity);
+    }
+    
+    public override writeTo(s: IWriteable): void {
+        // status byte
+        s.writeByte((this.channel & 0x0F) | 0x80)
+        s.writeByte(this.noteKey & 0xFF);
+        s.writeByte(this.noteVelocity & 0xFF);
     }
 }
 

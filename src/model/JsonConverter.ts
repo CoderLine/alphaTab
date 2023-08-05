@@ -251,7 +251,7 @@ export class JsonConverter {
                 o.set('numerator', (midiEvent as TimeSignatureEvent).numerator);
                 o.set('denominatorIndex', (midiEvent as TimeSignatureEvent).denominatorIndex);
                 o.set('midiClocksPerMetronomeClick', (midiEvent as TimeSignatureEvent).midiClocksPerMetronomeClick);
-                o.set('thirdySecondNodesInQuarter', (midiEvent as TimeSignatureEvent).thirdySecondNodesInQuarter);
+                o.set('thirdySecondNodesInQuarter', (midiEvent as TimeSignatureEvent).thirtySecondNodesInQuarter);
                 break;
             case MidiEventType.AlphaTabRest:
                 o.set('channel', (midiEvent as AlphaTabRestEvent).channel);

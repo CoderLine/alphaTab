@@ -1,7 +1,7 @@
 export { BeatTickLookup } from '@src/midi/BeatTickLookup';
 export { MasterBarTickLookup } from '@src/midi/MasterBarTickLookup';
 export { MidiTickLookup, MidiTickLookupFindBeatResult } from '@src/midi/MidiTickLookup';
-export { MidiFile } from '@src/midi/MidiFile';
+export { MidiFile, MidiFileFormat} from '@src/midi/MidiFile';
 export { ControllerType } from '@src/midi/ControllerType';
 export {
     MidiEvent, MidiEventType, TimeSignatureEvent,
