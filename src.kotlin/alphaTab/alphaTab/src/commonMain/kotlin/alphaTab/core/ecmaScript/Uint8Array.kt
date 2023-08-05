@@ -13,6 +13,10 @@ class Uint8Array : Iterable<UByte> {
         this.buffer = UByteArray(size.toInt())
     }
 
+    public constructor() {
+        this.buffer = UByteArray(0)
+    }
+
     public constructor(data: UByteArray) {
         this.buffer = data
     }
