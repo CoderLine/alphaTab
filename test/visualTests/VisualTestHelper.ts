@@ -249,9 +249,7 @@ export class VisualTestHelper {
                     totalHeights.push(0);
                 });
                 api.renderer.partialRenderFinished.on(e => {
-                    if (e) {
-                        results[results.length - 1].push(e);
-                    }
+                    results[results.length - 1].push(e);
                 });
                 api.renderer.renderFinished.on(e => {
                     totalWidths[totalWidths.length - 1] = e.totalWidth;

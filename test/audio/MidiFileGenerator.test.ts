@@ -1,5 +1,5 @@
 import { ControllerType } from '@src/midi/ControllerType';
-import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
+import { MidiEvent, MidiEventType, NoteOnEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
@@ -16,21 +16,19 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import {
-    NoteBendEvent,
-    ControlChangeEvent,
+    FlatNoteBendEvent,
+    FlatControlChangeEvent,
     FlatMidiEventGenerator,
-    FlatMidiEvent as FlatMidiEvent,
-    NoteEvent,
-    ProgramChangeEvent,
-    TempoEvent,
-    TimeSignatureEvent,
-    TrackEndEvent,
-    RestEvent
+    FlatMidiEvent,
+    FlatNoteEvent,
+    FlatProgramChangeEvent,
+    FlatTempoEvent,
+    FlatTimeSignatureEvent,
+    FlatTrackEndEvent,
+    FlatRestEvent
 } from '@test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from '@test/TestPlatform';
 import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
-import { MetaEventType } from '@src/midi/MetaEvent';
-import { MetaDataEvent } from '@src/midi/MetaDataEvent';
 import { AccentuationType, VibratoType } from '@src/model';
 
 describe('MidiFileGeneratorTest', () => {
@@ -40,7 +38,7 @@ describe('MidiFileGeneratorTest', () => {
         return importer.readScore();
     };
 
-    const assertEvents: (actualEvents:FlatMidiEvent[], expectedEvents:FlatMidiEvent[]) => void = (actualEvents:FlatMidiEvent[], expectedEvents:FlatMidiEvent[]) => {
+    const assertEvents: (actualEvents: FlatMidiEvent[], expectedEvents: FlatMidiEvent[]) => void = (actualEvents: FlatMidiEvent[], expectedEvents: FlatMidiEvent[]) => {
         for (let i: number = 0; i < actualEvents.length; i++) {
             Logger.info('Test', `i[${i}] ${actualEvents[i]}`);
             if (i < expectedEvents.length) {
@@ -63,16 +61,16 @@ describe('MidiFileGeneratorTest', () => {
 
     it('midi-order', () => {
         let midiFile: MidiFile = new MidiFile();
-        midiFile.addEvent(new MidiEvent(0, 0, 0, 0, 0));
-        midiFile.addEvent(new MidiEvent(0, 0, 0, 1, 0));
-        midiFile.addEvent(new MidiEvent(0, 100, 0, 2, 0));
-        midiFile.addEvent(new MidiEvent(0, 50, 0, 3, 0));
-        midiFile.addEvent(new MidiEvent(0, 50, 0, 4, 0));
-        expect(midiFile.events[0].data1).toEqual(0);
-        expect(midiFile.events[1].data1).toEqual(1);
-        expect(midiFile.events[2].data1).toEqual(3);
-        expect(midiFile.events[3].data1).toEqual(4);
-        expect(midiFile.events[4].data1).toEqual(2);
+        midiFile.addEvent(new NoteOnEvent(0, 0, 0, 0, 0));
+        midiFile.addEvent(new NoteOnEvent(0, 0, 0, 1, 0));
+        midiFile.addEvent(new NoteOnEvent(0, 100, 0, 2, 0));
+        midiFile.addEvent(new NoteOnEvent(0, 50, 0, 3, 0));
+        midiFile.addEvent(new NoteOnEvent(0, 50, 0, 4, 0));
+        expect((midiFile.tracks[0].events[0] as NoteOnEvent).noteKey).toEqual(0);
+        expect((midiFile.tracks[0].events[1] as NoteOnEvent).noteKey).toEqual(1);
+        expect((midiFile.tracks[0].events[2] as NoteOnEvent).noteKey).toEqual(3);
+        expect((midiFile.tracks[0].events[3] as NoteOnEvent).noteKey).toEqual(4);
+        expect((midiFile.tracks[0].events[4] as NoteOnEvent).noteKey).toEqual(2);
     });
 
     it('bend', () => {
@@ -91,44 +89,44 @@ describe('MidiFileGeneratorTest', () => {
         let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
-            new TimeSignatureEvent(0, 4, 4),
-            new TempoEvent(0, 120),
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
 
             // bend effect
-            new NoteBendEvent(0, 0, info.secondaryChannel, note.realValue, 8192), // no bend
-            new NoteBendEvent(0, 0, info.secondaryChannel, note.realValue, 8192),
-            new NoteBendEvent(1 * 80, 0, info.secondaryChannel, note.realValue, 8277),
-            new NoteBendEvent(2 * 80, 0, info.secondaryChannel, note.realValue, 8363),
-            new NoteBendEvent(3 * 80, 0, info.secondaryChannel, note.realValue, 8448),
-            new NoteBendEvent(4 * 80, 0, info.secondaryChannel, note.realValue, 8533),
-            new NoteBendEvent(5 * 80, 0, info.secondaryChannel, note.realValue, 8619),
-            new NoteBendEvent(6 * 80, 0, info.secondaryChannel, note.realValue, 8704),
-            new NoteBendEvent(7 * 80, 0, info.secondaryChannel, note.realValue, 8789),
-            new NoteBendEvent(8 * 80, 0, info.secondaryChannel, note.realValue, 8875),
-            new NoteBendEvent(9 * 80, 0, info.secondaryChannel, note.realValue, 8960),
-            new NoteBendEvent(10 * 80, 0, info.secondaryChannel, note.realValue, 9045),
-            new NoteBendEvent(11 * 80, 0, info.secondaryChannel, note.realValue, 9131),
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, note.realValue, 8192), // no bend
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, note.realValue, 8192),
+            new FlatNoteBendEvent(1 * 80, 0, info.secondaryChannel, note.realValue, 8277),
+            new FlatNoteBendEvent(2 * 80, 0, info.secondaryChannel, note.realValue, 8363),
+            new FlatNoteBendEvent(3 * 80, 0, info.secondaryChannel, note.realValue, 8448),
+            new FlatNoteBendEvent(4 * 80, 0, info.secondaryChannel, note.realValue, 8533),
+            new FlatNoteBendEvent(5 * 80, 0, info.secondaryChannel, note.realValue, 8619),
+            new FlatNoteBendEvent(6 * 80, 0, info.secondaryChannel, note.realValue, 8704),
+            new FlatNoteBendEvent(7 * 80, 0, info.secondaryChannel, note.realValue, 8789),
+            new FlatNoteBendEvent(8 * 80, 0, info.secondaryChannel, note.realValue, 8875),
+            new FlatNoteBendEvent(9 * 80, 0, info.secondaryChannel, note.realValue, 8960),
+            new FlatNoteBendEvent(10 * 80, 0, info.secondaryChannel, note.realValue, 9045),
+            new FlatNoteBendEvent(11 * 80, 0, info.secondaryChannel, note.realValue, 9131),
 
             // note itself
-            new NoteEvent(
+            new FlatNoteEvent(
                 0,
                 0,
                 info.secondaryChannel,
@@ -138,8 +136,8 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // reset bend
-            new NoteBendEvent(960, 0, info.primaryChannel, note.realValue, 8192),
-            new NoteEvent(
+            new FlatNoteBendEvent(960, 0, info.primaryChannel, note.realValue, 8192),
+            new FlatNoteEvent(
                 960,
                 0,
                 info.primaryChannel,
@@ -149,7 +147,7 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // end of track
-            new TrackEndEvent(3840, 0) // 3840 = end of bar
+            new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
         ];
 
         assertEvents(handler.midiEvents, expectedEvents);
@@ -206,65 +204,65 @@ describe('MidiFileGeneratorTest', () => {
         const mfVelocity = MidiUtils.dynamicToVelocity(DynamicValue.MF as number);
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 96),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 96),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 96),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 96),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
-            new TimeSignatureEvent(0, 4, 4),
-            new TempoEvent(0, 120),
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
 
             // on beat
-            new NoteBendEvent(ticks[0], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[0], 0, info.primaryChannel, 3840, 67, mfVelocity),
+            new FlatNoteBendEvent(ticks[0], 0, info.primaryChannel, 67, 8192),
+            new FlatNoteEvent(ticks[0], 0, info.primaryChannel, 3840, 67, mfVelocity),
 
-            new NoteBendEvent(ticks[1], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[1], 0, info.primaryChannel, 120, 67, mfVelocity),
+            new FlatNoteBendEvent(ticks[1], 0, info.primaryChannel, 67, 8192),
+            new FlatNoteEvent(ticks[1], 0, info.primaryChannel, 120, 67, mfVelocity),
 
-            new NoteBendEvent(ticks[2], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[2], 0, info.primaryChannel, 3720, 67, mfVelocity),
+            new FlatNoteBendEvent(ticks[2], 0, info.primaryChannel, 67, 8192),
+            new FlatNoteEvent(ticks[2], 0, info.primaryChannel, 3720, 67, mfVelocity),
 
             // before beat
-            new NoteBendEvent(ticks[3], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[3], 0, info.primaryChannel, 3720, 67, mfVelocity),
+            new FlatNoteBendEvent(ticks[3], 0, info.primaryChannel, 67, 8192),
+            new FlatNoteEvent(ticks[3], 0, info.primaryChannel, 3720, 67, mfVelocity),
 
-            new NoteBendEvent(ticks[4], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[4], 0, info.primaryChannel, 120, 67, mfVelocity),
+            new FlatNoteBendEvent(ticks[4], 0, info.primaryChannel, 67, 8192),
+            new FlatNoteEvent(ticks[4], 0, info.primaryChannel, 120, 67, mfVelocity),
 
-            new NoteBendEvent(ticks[5], 0, info.primaryChannel, 67, 8192),
-            new NoteEvent(ticks[5], 0, info.primaryChannel, 3840, 67, mfVelocity),
+            new FlatNoteBendEvent(ticks[5], 0, info.primaryChannel, 67, 8192),
+            new FlatNoteEvent(ticks[5], 0, info.primaryChannel, 3840, 67, mfVelocity),
 
             // bend beat
-            new NoteBendEvent(ticks[6], 0, info.secondaryChannel, 67, 8192),
-            new NoteBendEvent(ticks[6] + 12 * 0, 0, info.secondaryChannel, 67, 8192),
-            new NoteBendEvent(ticks[6] + 12 * 1, 0, info.secondaryChannel, 67, 8277),
-            new NoteBendEvent(ticks[6] + 12 * 2, 0, info.secondaryChannel, 67, 8363),
-            new NoteBendEvent(ticks[6] + 12 * 3, 0, info.secondaryChannel, 67, 8448),
-            new NoteBendEvent(ticks[6] + 12 * 4, 0, info.secondaryChannel, 67, 8533),
-            new NoteBendEvent(ticks[6] + 12 * 5, 0, info.secondaryChannel, 67, 8619),
-            new NoteBendEvent(ticks[6] + 12 * 6, 0, info.secondaryChannel, 67, 8704),
-            new NoteBendEvent(ticks[6] + 12 * 7, 0, info.secondaryChannel, 67, 8789),
-            new NoteBendEvent(ticks[6] + 12 * 8, 0, info.secondaryChannel, 67, 8875),
-            new NoteBendEvent(ticks[6] + 12 * 9, 0, info.secondaryChannel, 67, 8960),
-            new NoteBendEvent(ticks[6] + 12 * 10, 0, info.secondaryChannel, 67, 9045),
-            new NoteBendEvent(ticks[6] + 12 * 11, 0, info.secondaryChannel, 67, 9131),
-            new NoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, mfVelocity),
+            new FlatNoteBendEvent(ticks[6], 0, info.secondaryChannel, 67, 8192),
+            new FlatNoteBendEvent(ticks[6] + 12 * 0, 0, info.secondaryChannel, 67, 8192),
+            new FlatNoteBendEvent(ticks[6] + 12 * 1, 0, info.secondaryChannel, 67, 8277),
+            new FlatNoteBendEvent(ticks[6] + 12 * 2, 0, info.secondaryChannel, 67, 8363),
+            new FlatNoteBendEvent(ticks[6] + 12 * 3, 0, info.secondaryChannel, 67, 8448),
+            new FlatNoteBendEvent(ticks[6] + 12 * 4, 0, info.secondaryChannel, 67, 8533),
+            new FlatNoteBendEvent(ticks[6] + 12 * 5, 0, info.secondaryChannel, 67, 8619),
+            new FlatNoteBendEvent(ticks[6] + 12 * 6, 0, info.secondaryChannel, 67, 8704),
+            new FlatNoteBendEvent(ticks[6] + 12 * 7, 0, info.secondaryChannel, 67, 8789),
+            new FlatNoteBendEvent(ticks[6] + 12 * 8, 0, info.secondaryChannel, 67, 8875),
+            new FlatNoteBendEvent(ticks[6] + 12 * 9, 0, info.secondaryChannel, 67, 8960),
+            new FlatNoteBendEvent(ticks[6] + 12 * 10, 0, info.secondaryChannel, 67, 9045),
+            new FlatNoteBendEvent(ticks[6] + 12 * 11, 0, info.secondaryChannel, 67, 9131),
+            new FlatNoteEvent(ticks[6], 0, info.secondaryChannel, 3840, 67, mfVelocity),
 
             // end of track
-            new TrackEndEvent(19200, 0) // 3840 = end of bar
+            new FlatTrackEndEvent(19200, 0) // 3840 = end of bar
         ];
 
         assertEvents(handler.midiEvents, expectedEvents);
@@ -286,57 +284,57 @@ describe('MidiFileGeneratorTest', () => {
         let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
-            new TimeSignatureEvent(0, 4, 4),
-            new TempoEvent(0, 120),
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
 
             // bend effect
-            new NoteBendEvent(0, 0, info.secondaryChannel, note.realValue, 8192),
-            new NoteBendEvent(0 * 40, 0, info.secondaryChannel, note.realValue, 8192), // no bend
-            new NoteBendEvent(1 * 40, 0, info.secondaryChannel, note.realValue, 8277),
-            new NoteBendEvent(2 * 40, 0, info.secondaryChannel, note.realValue, 8363),
-            new NoteBendEvent(3 * 40, 0, info.secondaryChannel, note.realValue, 8448),
-            new NoteBendEvent(4 * 40, 0, info.secondaryChannel, note.realValue, 8533),
-            new NoteBendEvent(5 * 40, 0, info.secondaryChannel, note.realValue, 8619),
-            new NoteBendEvent(6 * 40, 0, info.secondaryChannel, note.realValue, 8704),
-            new NoteBendEvent(7 * 40, 0, info.secondaryChannel, note.realValue, 8789),
-            new NoteBendEvent(8 * 40, 0, info.secondaryChannel, note.realValue, 8875),
-            new NoteBendEvent(9 * 40, 0, info.secondaryChannel, note.realValue, 8960),
-            new NoteBendEvent(10 * 40, 0, info.secondaryChannel, note.realValue, 9045),
-            new NoteBendEvent(11 * 40, 0, info.secondaryChannel, note.realValue, 9131),
-            new NoteBendEvent(12 * 40, 0, info.secondaryChannel, note.realValue, 9216), // full bend
-            new NoteBendEvent(13 * 40, 0, info.secondaryChannel, note.realValue, 9131),
-            new NoteBendEvent(14 * 40, 0, info.secondaryChannel, note.realValue, 9045),
-            new NoteBendEvent(15 * 40, 0, info.secondaryChannel, note.realValue, 8960),
-            new NoteBendEvent(16 * 40, 0, info.secondaryChannel, note.realValue, 8875),
-            new NoteBendEvent(17 * 40, 0, info.secondaryChannel, note.realValue, 8789),
-            new NoteBendEvent(18 * 40, 0, info.secondaryChannel, note.realValue, 8704),
-            new NoteBendEvent(19 * 40, 0, info.secondaryChannel, note.realValue, 8619),
-            new NoteBendEvent(20 * 40, 0, info.secondaryChannel, note.realValue, 8533),
-            new NoteBendEvent(21 * 40, 0, info.secondaryChannel, note.realValue, 8448),
-            new NoteBendEvent(22 * 40, 0, info.secondaryChannel, note.realValue, 8363),
-            new NoteBendEvent(23 * 40, 0, info.secondaryChannel, note.realValue, 8277),
-            new NoteBendEvent(24 * 40, 0, info.secondaryChannel, note.realValue, 8192), // no bend
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, note.realValue, 8192),
+            new FlatNoteBendEvent(0 * 40, 0, info.secondaryChannel, note.realValue, 8192), // no bend
+            new FlatNoteBendEvent(1 * 40, 0, info.secondaryChannel, note.realValue, 8277),
+            new FlatNoteBendEvent(2 * 40, 0, info.secondaryChannel, note.realValue, 8363),
+            new FlatNoteBendEvent(3 * 40, 0, info.secondaryChannel, note.realValue, 8448),
+            new FlatNoteBendEvent(4 * 40, 0, info.secondaryChannel, note.realValue, 8533),
+            new FlatNoteBendEvent(5 * 40, 0, info.secondaryChannel, note.realValue, 8619),
+            new FlatNoteBendEvent(6 * 40, 0, info.secondaryChannel, note.realValue, 8704),
+            new FlatNoteBendEvent(7 * 40, 0, info.secondaryChannel, note.realValue, 8789),
+            new FlatNoteBendEvent(8 * 40, 0, info.secondaryChannel, note.realValue, 8875),
+            new FlatNoteBendEvent(9 * 40, 0, info.secondaryChannel, note.realValue, 8960),
+            new FlatNoteBendEvent(10 * 40, 0, info.secondaryChannel, note.realValue, 9045),
+            new FlatNoteBendEvent(11 * 40, 0, info.secondaryChannel, note.realValue, 9131),
+            new FlatNoteBendEvent(12 * 40, 0, info.secondaryChannel, note.realValue, 9216), // full bend
+            new FlatNoteBendEvent(13 * 40, 0, info.secondaryChannel, note.realValue, 9131),
+            new FlatNoteBendEvent(14 * 40, 0, info.secondaryChannel, note.realValue, 9045),
+            new FlatNoteBendEvent(15 * 40, 0, info.secondaryChannel, note.realValue, 8960),
+            new FlatNoteBendEvent(16 * 40, 0, info.secondaryChannel, note.realValue, 8875),
+            new FlatNoteBendEvent(17 * 40, 0, info.secondaryChannel, note.realValue, 8789),
+            new FlatNoteBendEvent(18 * 40, 0, info.secondaryChannel, note.realValue, 8704),
+            new FlatNoteBendEvent(19 * 40, 0, info.secondaryChannel, note.realValue, 8619),
+            new FlatNoteBendEvent(20 * 40, 0, info.secondaryChannel, note.realValue, 8533),
+            new FlatNoteBendEvent(21 * 40, 0, info.secondaryChannel, note.realValue, 8448),
+            new FlatNoteBendEvent(22 * 40, 0, info.secondaryChannel, note.realValue, 8363),
+            new FlatNoteBendEvent(23 * 40, 0, info.secondaryChannel, note.realValue, 8277),
+            new FlatNoteBendEvent(24 * 40, 0, info.secondaryChannel, note.realValue, 8192), // no bend
 
             // note itself
-            new NoteEvent(
+            new FlatNoteEvent(
                 0,
                 0,
                 info.secondaryChannel,
@@ -346,8 +344,8 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // reset bend
-            new NoteBendEvent(960, 0, info.primaryChannel, note.realValue, 8192), // finish
-            new NoteEvent(
+            new FlatNoteBendEvent(960, 0, info.primaryChannel, note.realValue, 8192), // finish
+            new FlatNoteEvent(
                 960,
                 0,
                 info.primaryChannel,
@@ -355,7 +353,7 @@ describe('MidiFileGeneratorTest', () => {
                 note.realValue,
                 MidiUtils.dynamicToVelocity(note.dynamics as number)
             ), // end of track
-            new TrackEndEvent(3840, 0) // 3840 = end of bar
+            new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
         ];
 
         assertEvents(handler.midiEvents, expectedEvents);
@@ -372,44 +370,44 @@ describe('MidiFileGeneratorTest', () => {
         let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
-            new TimeSignatureEvent(0, 4, 4),
-            new TempoEvent(0, 120),
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
 
             // bend up
-            new NoteBendEvent(0, 0, info.secondaryChannel, 62, 8192),
-            new NoteBendEvent(0 * 80, 0, info.secondaryChannel, 62, 8192), // no bend
-            new NoteBendEvent(1 * 80, 0, info.secondaryChannel, 62, 8277),
-            new NoteBendEvent(2 * 80, 0, info.secondaryChannel, 62, 8363),
-            new NoteBendEvent(3 * 80, 0, info.secondaryChannel, 62, 8448),
-            new NoteBendEvent(4 * 80, 0, info.secondaryChannel, 62, 8533),
-            new NoteBendEvent(5 * 80, 0, info.secondaryChannel, 62, 8619),
-            new NoteBendEvent(6 * 80, 0, info.secondaryChannel, 62, 8704),
-            new NoteBendEvent(7 * 80, 0, info.secondaryChannel, 62, 8789),
-            new NoteBendEvent(8 * 80, 0, info.secondaryChannel, 62, 8875),
-            new NoteBendEvent(9 * 80, 0, info.secondaryChannel, 62, 8960),
-            new NoteBendEvent(10 * 80, 0, info.secondaryChannel, 62, 9045),
-            new NoteBendEvent(11 * 80, 0, info.secondaryChannel, 62, 9131),
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, 62, 8192),
+            new FlatNoteBendEvent(0 * 80, 0, info.secondaryChannel, 62, 8192), // no bend
+            new FlatNoteBendEvent(1 * 80, 0, info.secondaryChannel, 62, 8277),
+            new FlatNoteBendEvent(2 * 80, 0, info.secondaryChannel, 62, 8363),
+            new FlatNoteBendEvent(3 * 80, 0, info.secondaryChannel, 62, 8448),
+            new FlatNoteBendEvent(4 * 80, 0, info.secondaryChannel, 62, 8533),
+            new FlatNoteBendEvent(5 * 80, 0, info.secondaryChannel, 62, 8619),
+            new FlatNoteBendEvent(6 * 80, 0, info.secondaryChannel, 62, 8704),
+            new FlatNoteBendEvent(7 * 80, 0, info.secondaryChannel, 62, 8789),
+            new FlatNoteBendEvent(8 * 80, 0, info.secondaryChannel, 62, 8875),
+            new FlatNoteBendEvent(9 * 80, 0, info.secondaryChannel, 62, 8960),
+            new FlatNoteBendEvent(10 * 80, 0, info.secondaryChannel, 62, 9045),
+            new FlatNoteBendEvent(11 * 80, 0, info.secondaryChannel, 62, 9131),
 
             // note itself
-            new NoteEvent(
+            new FlatNoteEvent(
                 0,
                 0,
                 info.secondaryChannel,
@@ -419,22 +417,22 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // release on tied note
-            new NoteBendEvent(12 * 80, 0, info.secondaryChannel, 62, 9216), // reset bend for tied note
-            new NoteBendEvent(12 * 80, 0, info.secondaryChannel, 62, 9216), // full bend
-            new NoteBendEvent(13 * 80, 0, info.secondaryChannel, 62, 9131),
-            new NoteBendEvent(14 * 80, 0, info.secondaryChannel, 62, 9045),
-            new NoteBendEvent(15 * 80, 0, info.secondaryChannel, 62, 8960),
-            new NoteBendEvent(16 * 80, 0, info.secondaryChannel, 62, 8875),
-            new NoteBendEvent(17 * 80, 0, info.secondaryChannel, 62, 8789),
-            new NoteBendEvent(18 * 80, 0, info.secondaryChannel, 62, 8704),
-            new NoteBendEvent(19 * 80, 0, info.secondaryChannel, 62, 8619),
-            new NoteBendEvent(20 * 80, 0, info.secondaryChannel, 62, 8533),
-            new NoteBendEvent(21 * 80, 0, info.secondaryChannel, 62, 8448),
-            new NoteBendEvent(22 * 80, 0, info.secondaryChannel, 62, 8363),
-            new NoteBendEvent(23 * 80, 0, info.secondaryChannel, 62, 8277),
-            new NoteBendEvent(24 * 80, 0, info.secondaryChannel, 62, 8192), // no bend
+            new FlatNoteBendEvent(12 * 80, 0, info.secondaryChannel, 62, 9216), // reset bend for tied note
+            new FlatNoteBendEvent(12 * 80, 0, info.secondaryChannel, 62, 9216), // full bend
+            new FlatNoteBendEvent(13 * 80, 0, info.secondaryChannel, 62, 9131),
+            new FlatNoteBendEvent(14 * 80, 0, info.secondaryChannel, 62, 9045),
+            new FlatNoteBendEvent(15 * 80, 0, info.secondaryChannel, 62, 8960),
+            new FlatNoteBendEvent(16 * 80, 0, info.secondaryChannel, 62, 8875),
+            new FlatNoteBendEvent(17 * 80, 0, info.secondaryChannel, 62, 8789),
+            new FlatNoteBendEvent(18 * 80, 0, info.secondaryChannel, 62, 8704),
+            new FlatNoteBendEvent(19 * 80, 0, info.secondaryChannel, 62, 8619),
+            new FlatNoteBendEvent(20 * 80, 0, info.secondaryChannel, 62, 8533),
+            new FlatNoteBendEvent(21 * 80, 0, info.secondaryChannel, 62, 8448),
+            new FlatNoteBendEvent(22 * 80, 0, info.secondaryChannel, 62, 8363),
+            new FlatNoteBendEvent(23 * 80, 0, info.secondaryChannel, 62, 8277),
+            new FlatNoteBendEvent(24 * 80, 0, info.secondaryChannel, 62, 8192), // no bend
 
-            new TrackEndEvent(3840, 0) // 3840 = end of bar
+            new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
         ];
 
         assertEvents(handler.midiEvents, expectedEvents);
@@ -451,45 +449,45 @@ describe('MidiFileGeneratorTest', () => {
         let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
-            new TimeSignatureEvent(0, 4, 4),
-            new TempoEvent(0, 120),
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
 
             // bend up
-            new NoteBendEvent(0 * 80, 0, info.secondaryChannel, 62, 9216), // pre-bend
-            new NoteBendEvent(0 * 160, 0, info.secondaryChannel, 62, 9216), // bend start
-            new NoteBendEvent(1 * 160, 0, info.secondaryChannel, 62, 9131),
-            new NoteBendEvent(2 * 160, 0, info.secondaryChannel, 62, 9045),
-            new NoteBendEvent(3 * 160, 0, info.secondaryChannel, 62, 8960),
-            new NoteBendEvent(4 * 160, 0, info.secondaryChannel, 62, 8875),
-            new NoteBendEvent(5 * 160, 0, info.secondaryChannel, 62, 8789),
-            new NoteBendEvent(6 * 160, 0, info.secondaryChannel, 62, 8704),
-            new NoteBendEvent(7 * 160, 0, info.secondaryChannel, 62, 8619),
-            new NoteBendEvent(8 * 160, 0, info.secondaryChannel, 62, 8533),
-            new NoteBendEvent(9 * 160, 0, info.secondaryChannel, 62, 8448),
-            new NoteBendEvent(10 * 160, 0, info.secondaryChannel, 62, 8363),
-            new NoteBendEvent(11 * 160, 0, info.secondaryChannel, 62, 8277),
-            new NoteBendEvent(12 * 160, 0, info.secondaryChannel, 62, 8192),
+            new FlatNoteBendEvent(0 * 80, 0, info.secondaryChannel, 62, 9216), // pre-bend
+            new FlatNoteBendEvent(0 * 160, 0, info.secondaryChannel, 62, 9216), // bend start
+            new FlatNoteBendEvent(1 * 160, 0, info.secondaryChannel, 62, 9131),
+            new FlatNoteBendEvent(2 * 160, 0, info.secondaryChannel, 62, 9045),
+            new FlatNoteBendEvent(3 * 160, 0, info.secondaryChannel, 62, 8960),
+            new FlatNoteBendEvent(4 * 160, 0, info.secondaryChannel, 62, 8875),
+            new FlatNoteBendEvent(5 * 160, 0, info.secondaryChannel, 62, 8789),
+            new FlatNoteBendEvent(6 * 160, 0, info.secondaryChannel, 62, 8704),
+            new FlatNoteBendEvent(7 * 160, 0, info.secondaryChannel, 62, 8619),
+            new FlatNoteBendEvent(8 * 160, 0, info.secondaryChannel, 62, 8533),
+            new FlatNoteBendEvent(9 * 160, 0, info.secondaryChannel, 62, 8448),
+            new FlatNoteBendEvent(10 * 160, 0, info.secondaryChannel, 62, 8363),
+            new FlatNoteBendEvent(11 * 160, 0, info.secondaryChannel, 62, 8277),
+            new FlatNoteBendEvent(12 * 160, 0, info.secondaryChannel, 62, 8192),
 
             // note itself
-            new NoteEvent(
+            new FlatNoteEvent(
                 0,
                 0,
                 info.secondaryChannel,
@@ -498,7 +496,7 @@ describe('MidiFileGeneratorTest', () => {
                 MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
-            new TrackEndEvent(3840, 0) // 3840 = end of bar
+            new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
         ];
 
         assertEvents(handler.midiEvents, expectedEvents);
@@ -517,45 +515,45 @@ describe('MidiFileGeneratorTest', () => {
         let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
-            new TimeSignatureEvent(0, 4, 4),
-            new TempoEvent(0, 120),
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
 
             // bend up
-            new NoteBendEvent(0 * 80, 0, info.secondaryChannel, 62, 9216), // pre-bend
-            new NoteBendEvent(0 * 80, 0, info.secondaryChannel, 62, 9216), // bend start
-            new NoteBendEvent(1 * 80, 0, info.secondaryChannel, 62, 9131),
-            new NoteBendEvent(2 * 80, 0, info.secondaryChannel, 62, 9045),
-            new NoteBendEvent(3 * 80, 0, info.secondaryChannel, 62, 8960),
-            new NoteBendEvent(4 * 80, 0, info.secondaryChannel, 62, 8875),
-            new NoteBendEvent(5 * 80, 0, info.secondaryChannel, 62, 8789),
-            new NoteBendEvent(6 * 80, 0, info.secondaryChannel, 62, 8704),
-            new NoteBendEvent(7 * 80, 0, info.secondaryChannel, 62, 8619),
-            new NoteBendEvent(8 * 80, 0, info.secondaryChannel, 62, 8533),
-            new NoteBendEvent(9 * 80, 0, info.secondaryChannel, 62, 8448),
-            new NoteBendEvent(10 * 80, 0, info.secondaryChannel, 62, 8363),
-            new NoteBendEvent(11 * 80, 0, info.secondaryChannel, 62, 8277),
-            new NoteBendEvent(12 * 80, 0, info.secondaryChannel, 62, 8192),
+            new FlatNoteBendEvent(0 * 80, 0, info.secondaryChannel, 62, 9216), // pre-bend
+            new FlatNoteBendEvent(0 * 80, 0, info.secondaryChannel, 62, 9216), // bend start
+            new FlatNoteBendEvent(1 * 80, 0, info.secondaryChannel, 62, 9131),
+            new FlatNoteBendEvent(2 * 80, 0, info.secondaryChannel, 62, 9045),
+            new FlatNoteBendEvent(3 * 80, 0, info.secondaryChannel, 62, 8960),
+            new FlatNoteBendEvent(4 * 80, 0, info.secondaryChannel, 62, 8875),
+            new FlatNoteBendEvent(5 * 80, 0, info.secondaryChannel, 62, 8789),
+            new FlatNoteBendEvent(6 * 80, 0, info.secondaryChannel, 62, 8704),
+            new FlatNoteBendEvent(7 * 80, 0, info.secondaryChannel, 62, 8619),
+            new FlatNoteBendEvent(8 * 80, 0, info.secondaryChannel, 62, 8533),
+            new FlatNoteBendEvent(9 * 80, 0, info.secondaryChannel, 62, 8448),
+            new FlatNoteBendEvent(10 * 80, 0, info.secondaryChannel, 62, 8363),
+            new FlatNoteBendEvent(11 * 80, 0, info.secondaryChannel, 62, 8277),
+            new FlatNoteBendEvent(12 * 80, 0, info.secondaryChannel, 62, 8192),
 
             // note itself
-            new NoteEvent(
+            new FlatNoteEvent(
                 0,
                 0,
                 info.secondaryChannel,
@@ -564,7 +562,7 @@ describe('MidiFileGeneratorTest', () => {
                 MidiUtils.dynamicToVelocity(note.dynamics as number)
             ),
 
-            new TrackEndEvent(3840, 0) // 3840 = end of bar
+            new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
         ];
 
         assertEvents(handler.midiEvents, expectedEvents);
@@ -627,7 +625,7 @@ describe('MidiFileGeneratorTest', () => {
         let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
         for (let midiEvent of handler.midiEvents) {
-            if (midiEvent instanceof NoteEvent) {
+            if (midiEvent instanceof FlatNoteEvent) {
                 actualMidiStartTimes.push(midiEvent.tick);
                 actualMidiDurations.push(midiEvent.length);
             }
@@ -653,44 +651,44 @@ describe('MidiFileGeneratorTest', () => {
         let note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1];
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
-            new TimeSignatureEvent(0, 4, 4),
-            new TempoEvent(0, 120),
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
 
             // bend effect (note 1)
-            new NoteBendEvent(0, 0, info.secondaryChannel, note1.realValue, 8192), // no bend
-            new NoteBendEvent(0, 0, info.secondaryChannel, note1.realValue, 8192),
-            new NoteBendEvent(1 * 80, 0, info.secondaryChannel, note1.realValue, 8277),
-            new NoteBendEvent(2 * 80, 0, info.secondaryChannel, note1.realValue, 8363),
-            new NoteBendEvent(3 * 80, 0, info.secondaryChannel, note1.realValue, 8448),
-            new NoteBendEvent(4 * 80, 0, info.secondaryChannel, note1.realValue, 8533),
-            new NoteBendEvent(5 * 80, 0, info.secondaryChannel, note1.realValue, 8619),
-            new NoteBendEvent(6 * 80, 0, info.secondaryChannel, note1.realValue, 8704),
-            new NoteBendEvent(7 * 80, 0, info.secondaryChannel, note1.realValue, 8789),
-            new NoteBendEvent(8 * 80, 0, info.secondaryChannel, note1.realValue, 8875),
-            new NoteBendEvent(9 * 80, 0, info.secondaryChannel, note1.realValue, 8960),
-            new NoteBendEvent(10 * 80, 0, info.secondaryChannel, note1.realValue, 9045),
-            new NoteBendEvent(11 * 80, 0, info.secondaryChannel, note1.realValue, 9131),
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, note1.realValue, 8192), // no bend
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, note1.realValue, 8192),
+            new FlatNoteBendEvent(1 * 80, 0, info.secondaryChannel, note1.realValue, 8277),
+            new FlatNoteBendEvent(2 * 80, 0, info.secondaryChannel, note1.realValue, 8363),
+            new FlatNoteBendEvent(3 * 80, 0, info.secondaryChannel, note1.realValue, 8448),
+            new FlatNoteBendEvent(4 * 80, 0, info.secondaryChannel, note1.realValue, 8533),
+            new FlatNoteBendEvent(5 * 80, 0, info.secondaryChannel, note1.realValue, 8619),
+            new FlatNoteBendEvent(6 * 80, 0, info.secondaryChannel, note1.realValue, 8704),
+            new FlatNoteBendEvent(7 * 80, 0, info.secondaryChannel, note1.realValue, 8789),
+            new FlatNoteBendEvent(8 * 80, 0, info.secondaryChannel, note1.realValue, 8875),
+            new FlatNoteBendEvent(9 * 80, 0, info.secondaryChannel, note1.realValue, 8960),
+            new FlatNoteBendEvent(10 * 80, 0, info.secondaryChannel, note1.realValue, 9045),
+            new FlatNoteBendEvent(11 * 80, 0, info.secondaryChannel, note1.realValue, 9131),
 
             // note itself
-            new NoteEvent(
+            new FlatNoteEvent(
                 0,
                 0,
                 info.secondaryChannel,
@@ -700,34 +698,34 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // bend effect (note 2)
-            new NoteBendEvent(0, 0, info.secondaryChannel, note2.realValue, 8192), // no bend
-            new NoteBendEvent(0, 0, info.secondaryChannel, note2.realValue, 8192),
-            new NoteBendEvent(1 * 40, 0, info.secondaryChannel, note2.realValue, 8277),
-            new NoteBendEvent(2 * 40, 0, info.secondaryChannel, note2.realValue, 8363),
-            new NoteBendEvent(3 * 40, 0, info.secondaryChannel, note2.realValue, 8448),
-            new NoteBendEvent(4 * 40, 0, info.secondaryChannel, note2.realValue, 8533),
-            new NoteBendEvent(5 * 40, 0, info.secondaryChannel, note2.realValue, 8619),
-            new NoteBendEvent(6 * 40, 0, info.secondaryChannel, note2.realValue, 8704),
-            new NoteBendEvent(7 * 40, 0, info.secondaryChannel, note2.realValue, 8789),
-            new NoteBendEvent(8 * 40, 0, info.secondaryChannel, note2.realValue, 8875),
-            new NoteBendEvent(9 * 40, 0, info.secondaryChannel, note2.realValue, 8960),
-            new NoteBendEvent(10 * 40, 0, info.secondaryChannel, note2.realValue, 9045),
-            new NoteBendEvent(11 * 40, 0, info.secondaryChannel, note2.realValue, 9131),
-            new NoteBendEvent(12 * 40, 0, info.secondaryChannel, note2.realValue, 9216),
-            new NoteBendEvent(13 * 40, 0, info.secondaryChannel, note2.realValue, 9301),
-            new NoteBendEvent(14 * 40, 0, info.secondaryChannel, note2.realValue, 9387),
-            new NoteBendEvent(15 * 40, 0, info.secondaryChannel, note2.realValue, 9472),
-            new NoteBendEvent(16 * 40, 0, info.secondaryChannel, note2.realValue, 9557),
-            new NoteBendEvent(17 * 40, 0, info.secondaryChannel, note2.realValue, 9643),
-            new NoteBendEvent(18 * 40, 0, info.secondaryChannel, note2.realValue, 9728),
-            new NoteBendEvent(19 * 40, 0, info.secondaryChannel, note2.realValue, 9813),
-            new NoteBendEvent(20 * 40, 0, info.secondaryChannel, note2.realValue, 9899),
-            new NoteBendEvent(21 * 40, 0, info.secondaryChannel, note2.realValue, 9984),
-            new NoteBendEvent(22 * 40, 0, info.secondaryChannel, note2.realValue, 10069),
-            new NoteBendEvent(23 * 40, 0, info.secondaryChannel, note2.realValue, 10155),
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, note2.realValue, 8192), // no bend
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, note2.realValue, 8192),
+            new FlatNoteBendEvent(1 * 40, 0, info.secondaryChannel, note2.realValue, 8277),
+            new FlatNoteBendEvent(2 * 40, 0, info.secondaryChannel, note2.realValue, 8363),
+            new FlatNoteBendEvent(3 * 40, 0, info.secondaryChannel, note2.realValue, 8448),
+            new FlatNoteBendEvent(4 * 40, 0, info.secondaryChannel, note2.realValue, 8533),
+            new FlatNoteBendEvent(5 * 40, 0, info.secondaryChannel, note2.realValue, 8619),
+            new FlatNoteBendEvent(6 * 40, 0, info.secondaryChannel, note2.realValue, 8704),
+            new FlatNoteBendEvent(7 * 40, 0, info.secondaryChannel, note2.realValue, 8789),
+            new FlatNoteBendEvent(8 * 40, 0, info.secondaryChannel, note2.realValue, 8875),
+            new FlatNoteBendEvent(9 * 40, 0, info.secondaryChannel, note2.realValue, 8960),
+            new FlatNoteBendEvent(10 * 40, 0, info.secondaryChannel, note2.realValue, 9045),
+            new FlatNoteBendEvent(11 * 40, 0, info.secondaryChannel, note2.realValue, 9131),
+            new FlatNoteBendEvent(12 * 40, 0, info.secondaryChannel, note2.realValue, 9216),
+            new FlatNoteBendEvent(13 * 40, 0, info.secondaryChannel, note2.realValue, 9301),
+            new FlatNoteBendEvent(14 * 40, 0, info.secondaryChannel, note2.realValue, 9387),
+            new FlatNoteBendEvent(15 * 40, 0, info.secondaryChannel, note2.realValue, 9472),
+            new FlatNoteBendEvent(16 * 40, 0, info.secondaryChannel, note2.realValue, 9557),
+            new FlatNoteBendEvent(17 * 40, 0, info.secondaryChannel, note2.realValue, 9643),
+            new FlatNoteBendEvent(18 * 40, 0, info.secondaryChannel, note2.realValue, 9728),
+            new FlatNoteBendEvent(19 * 40, 0, info.secondaryChannel, note2.realValue, 9813),
+            new FlatNoteBendEvent(20 * 40, 0, info.secondaryChannel, note2.realValue, 9899),
+            new FlatNoteBendEvent(21 * 40, 0, info.secondaryChannel, note2.realValue, 9984),
+            new FlatNoteBendEvent(22 * 40, 0, info.secondaryChannel, note2.realValue, 10069),
+            new FlatNoteBendEvent(23 * 40, 0, info.secondaryChannel, note2.realValue, 10155),
 
             // note itself
-            new NoteEvent(
+            new FlatNoteEvent(
                 0,
                 0,
                 info.secondaryChannel,
@@ -737,8 +735,8 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // reset bend
-            new NoteBendEvent(960, 0, info.primaryChannel, note1.realValue, 8192),
-            new NoteEvent(
+            new FlatNoteBendEvent(960, 0, info.primaryChannel, note1.realValue, 8192),
+            new FlatNoteEvent(
                 960,
                 0,
                 info.primaryChannel,
@@ -748,7 +746,7 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // end of track
-            new TrackEndEvent(3840, 0) // 3840 = end of bar
+            new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
         ];
 
         assertEvents(handler.midiEvents, expectedEvents);
@@ -764,43 +762,43 @@ describe('MidiFileGeneratorTest', () => {
         const settings = new Settings();
         settings.player.vibrato.noteSlightLength = MidiUtils.QuarterTime / 2; // to reduce the number of vibrato events
         let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
-        generator.vibratoResolution =  settings.player.vibrato.noteSlightLength / 4;
+        generator.vibratoResolution = settings.player.vibrato.noteSlightLength / 4;
         generator.generate();
         let info: PlaybackInformation = score.tracks[0].playbackInfo;
         let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
-            new TimeSignatureEvent(0, 4, 4),
-            new TempoEvent(0, 120),
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
 
-            new NoteBendEvent(0, 0, info.primaryChannel, note1.realValue, 8192), // no bend
-            new NoteBendEvent(480, 0, info.primaryChannel, note1.realValue, 8192), // vibrato main note
-            new NoteBendEvent(600, 0, info.primaryChannel, note1.realValue, 8704),
-            new NoteBendEvent(720, 0, info.primaryChannel, note1.realValue, 8192),
-            new NoteBendEvent(840, 0, info.primaryChannel, note1.realValue, 7680),
-            new NoteBendEvent(960, 0, info.primaryChannel, note1.realValue, 8192),
-            new NoteBendEvent(1080, 0, info.primaryChannel, note1.realValue, 8704),
-            new NoteBendEvent(1200, 0, info.primaryChannel, note1.realValue, 8192),
-            new NoteBendEvent(1320, 0, info.primaryChannel, note1.realValue, 7680),
-            new NoteEvent(
+            new FlatNoteBendEvent(0, 0, info.primaryChannel, note1.realValue, 8192), // no bend
+            new FlatNoteBendEvent(480, 0, info.primaryChannel, note1.realValue, 8192), // vibrato main note
+            new FlatNoteBendEvent(600, 0, info.primaryChannel, note1.realValue, 8704),
+            new FlatNoteBendEvent(720, 0, info.primaryChannel, note1.realValue, 8192),
+            new FlatNoteBendEvent(840, 0, info.primaryChannel, note1.realValue, 7680),
+            new FlatNoteBendEvent(960, 0, info.primaryChannel, note1.realValue, 8192),
+            new FlatNoteBendEvent(1080, 0, info.primaryChannel, note1.realValue, 8704),
+            new FlatNoteBendEvent(1200, 0, info.primaryChannel, note1.realValue, 8192),
+            new FlatNoteBendEvent(1320, 0, info.primaryChannel, note1.realValue, 7680),
+            new FlatNoteEvent(
                 0,
                 0,
                 info.primaryChannel,
@@ -809,17 +807,17 @@ describe('MidiFileGeneratorTest', () => {
                 MidiUtils.dynamicToVelocity(note1.dynamics as number)
             ),
 
-            new NoteBendEvent(1440, 0, info.primaryChannel, note1.realValue, 8192),
-            new NoteBendEvent(1560, 0, info.primaryChannel, note1.realValue, 8704),
-            new NoteBendEvent(1680, 0, info.primaryChannel, note1.realValue, 8192),
-            new NoteBendEvent(1800, 0, info.primaryChannel, note1.realValue, 7680),
-            new NoteBendEvent(1920, 0, info.primaryChannel, note1.realValue, 8192),
-            new NoteBendEvent(2040, 0, info.primaryChannel, note1.realValue, 8704),
-            new NoteBendEvent(2160, 0, info.primaryChannel, note1.realValue, 8192),
-            new NoteBendEvent(2280, 0, info.primaryChannel, note1.realValue, 7680),
+            new FlatNoteBendEvent(1440, 0, info.primaryChannel, note1.realValue, 8192),
+            new FlatNoteBendEvent(1560, 0, info.primaryChannel, note1.realValue, 8704),
+            new FlatNoteBendEvent(1680, 0, info.primaryChannel, note1.realValue, 8192),
+            new FlatNoteBendEvent(1800, 0, info.primaryChannel, note1.realValue, 7680),
+            new FlatNoteBendEvent(1920, 0, info.primaryChannel, note1.realValue, 8192),
+            new FlatNoteBendEvent(2040, 0, info.primaryChannel, note1.realValue, 8704),
+            new FlatNoteBendEvent(2160, 0, info.primaryChannel, note1.realValue, 8192),
+            new FlatNoteBendEvent(2280, 0, info.primaryChannel, note1.realValue, 7680),
 
             // end of track
-            new TrackEndEvent(3840, 0) // 3840 = end of bar
+            new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
         ];
 
         assertEvents(handler.midiEvents, expectedEvents);
@@ -853,9 +851,9 @@ describe('MidiFileGeneratorTest', () => {
         generator.generate();
         noteOnTimes = [];
         for (const evt of handler.midiEvents) {
-            if (evt instanceof NoteEvent) {
+            if (evt instanceof FlatNoteEvent) {
                 noteOnTimes.push(evt.tick);
-            } else if (evt instanceof RestEvent) {
+            } else if (evt instanceof FlatRestEvent) {
                 noteOnTimes.push(evt.tick);
             }
         }
@@ -873,16 +871,16 @@ describe('MidiFileGeneratorTest', () => {
 
         let timeSignature: MidiEvent | null = null;
         for (const evt of file.events) {
-            if (evt.command === MidiEventType.Meta && evt.data1 === MetaEventType.TimeSignature) {
+            if (evt.type === MidiEventType.TimeSignature) {
                 timeSignature = evt;
                 break;
             }
         }
 
         expect(timeSignature).toBeTruthy();
-        const meta: MetaDataEvent = timeSignature as MetaDataEvent;
-        const timeSignatureNumerator: number = meta.data[0];
-        const timeSignatureDenominator: number = Math.pow(2, meta.data[1]);
+        const meta: TimeSignatureEvent = timeSignature as TimeSignatureEvent;
+        const timeSignatureNumerator: number = meta.numerator;
+        const timeSignatureDenominator: number = Math.pow(2, meta.denominatorIndex);
         expect(timeSignatureNumerator).toEqual(3);
         expect(timeSignatureDenominator).toEqual(4);
     });
@@ -899,15 +897,15 @@ describe('MidiFileGeneratorTest', () => {
         const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
 
-        const tempoChanges: TempoEvent[] = [];
+        const tempoChanges: FlatTempoEvent[] = [];
         for (const evt of handler.midiEvents) {
-            if (evt instanceof TempoEvent) {
-                tempoChanges.push(evt as TempoEvent);
+            if (evt instanceof FlatTempoEvent) {
+                tempoChanges.push(evt as FlatTempoEvent);
             }
         }
 
-        expect(tempoChanges.map(t=>t.tick).join(',')).toBe('0,3840');
-        expect(tempoChanges.map(t=>t.tempo).join(',')).toBe('60,80');
+        expect(tempoChanges.map(t => t.tick).join(',')).toBe('0,3840');
+        expect(tempoChanges.map(t => t.tempo).join(',')).toBe('60,80');
     });
 
     it('has-valid-dynamics', () => {
@@ -927,29 +925,29 @@ describe('MidiFileGeneratorTest', () => {
 
         let expectedEvents: FlatMidiEvent[] = [
             // channel init
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
-            new ControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
-            new ProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
-            new TimeSignatureEvent(0, 4, 4),
-            new TempoEvent(0, 120),
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
 
-            new NoteBendEvent(0, 0, info.primaryChannel, note1.realValue, 8192),
-            new NoteEvent(
+            new FlatNoteBendEvent(0, 0, info.primaryChannel, note1.realValue, 8192),
+            new FlatNoteEvent(
                 0,
                 0,
                 info.primaryChannel,
@@ -958,8 +956,8 @@ describe('MidiFileGeneratorTest', () => {
                 MidiUtils.dynamicToVelocity((note1.dynamics as number) + 1)
             ),
 
-            new NoteBendEvent(1920, 0, info.primaryChannel, note2.realValue, 8192),
-            new NoteEvent(
+            new FlatNoteBendEvent(1920, 0, info.primaryChannel, note2.realValue, 8192),
+            new FlatNoteEvent(
                 1920,
                 0,
                 info.primaryChannel,
@@ -969,7 +967,7 @@ describe('MidiFileGeneratorTest', () => {
             ),
 
             // end of track
-            new TrackEndEvent(3840, 0) // 3840 = end of bar
+            new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
         ];
 
         const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();

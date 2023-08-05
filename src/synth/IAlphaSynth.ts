@@ -76,7 +76,6 @@ export interface IAlphaSynth {
 
     /**
      * Gets or sets the midi events which will trigger the `midiEventsPlayed` event.
-     * To subscribe to Metronome events use the `SystemExclusiveEvent2` event type and check against `event.isMetronome` 
      */
     midiEventsPlayedFilter: MidiEventType[];
 

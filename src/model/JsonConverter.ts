@@ -1,13 +1,12 @@
-import { MetaDataEvent } from '@src/midi/MetaDataEvent';
-import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
-import { MidiEvent } from '@src/midi/MidiEvent';
-import { SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
+import { AlphaTabMetronomeEvent, AlphaTabRestEvent, ControlChangeEvent, EndOfTrackEvent, MidiEvent, MidiEventType, NoteBendEvent, NoteEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
 import { MidiFile } from '@src/midi/MidiFile';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
-import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
 import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { ControllerType } from '@src/midi';
+import { JsonHelper } from '@src/io/JsonHelper';
 
 /**
  * This class can convert a full {@link Score} instance to a simple JavaScript object and back for further
@@ -120,88 +119,196 @@ export class JsonConverter {
     }
 
     /**
-     * @target web
+     * Converts the given JavaScript object into a MidiFile object.
+     * @param jsObject The javascript object to deserialize. 
+     * @returns The converted MidiFile.
      */
-    public static jsObjectToMidiFile(midi: any): MidiFile {
+    public static jsObjectToMidiFile(jsObject: unknown): MidiFile {
         let midi2: MidiFile = new MidiFile();
-        midi2.division = midi.division;
-        let midiEvents: any[] = midi.events;
-        for (let midiEvent of midiEvents) {
-            let midiEvent2: MidiEvent = JsonConverter.jsObjectToMidiEvent(midiEvent);
-            midi2.events.push(midiEvent2);
-        }
+
+        JsonHelper.forEach(jsObject, (v, k) => {
+            switch (k) {
+                case 'division':
+                    midi2.division = v as number;
+                    break;
+                case 'events':
+                    for (let midiEvent of (v as unknown[])) {
+                        let midiEvent2: MidiEvent = JsonConverter.jsObjectToMidiEvent(midiEvent);
+                        midi2.events.push(midiEvent2);
+                    }
+                    break;
+            }
+        });
+
         return midi2;
     }
 
     /**
-     * @target web
+     * Converts the given JavaScript object into a MidiEvent object.
+     * @param jsObject The javascript object to deserialize. 
+     * @returns The converted MidiEvent.
      */
-    public static jsObjectToMidiEvent(midiEvent: any): MidiEvent {
-        let track: number = midiEvent.track;
-        let tick: number = midiEvent.tick;
-        let message: number = midiEvent.message;
-        let midiEvent2: MidiEvent;
-        switch (midiEvent.type) {
-            case 'SystemExclusiveEvent':
-                midiEvent2 = new SystemExclusiveEvent(track, tick, 0, 0, midiEvent.data);
-                midiEvent2.message = message;
-                break;
-            case 'MetaDataEvent':
-                midiEvent2 = new MetaDataEvent(track, tick, 0, 0, midiEvent.data);
-                midiEvent2.message = message;
-                break;
-            case 'MetaNumberEvent':
-                midiEvent2 = new MetaNumberEvent(track, tick, 0, 0, midiEvent.value);
-                midiEvent2.message = message;
-                break;
-            case 'Midi20PerNotePitchBendEvent':
-                midiEvent2 = new Midi20PerNotePitchBendEvent(track, tick, 0, midiEvent.noteKey, midiEvent.pitch);
-                midiEvent2.message = message;
-                break;
-            default:
-                midiEvent2 = new MidiEvent(track, tick, 0, 0, 0);
-                midiEvent2.message = message;
-                break;
+    public static jsObjectToMidiEvent(midiEvent: unknown): MidiEvent {
+        let track: number = JsonHelper.getValue(midiEvent, 'track') as number;
+        let tick: number = JsonHelper.getValue(midiEvent, 'tick') as number;
+        let type: MidiEventType = JsonHelper.getValue(midiEvent, 'type') as number as MidiEventType;
+
+        switch (type) {
+            case MidiEventType.TimeSignature:
+                return new TimeSignatureEvent(
+                    track,
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'numerator') as number,
+                    JsonHelper.getValue(midiEvent, 'denominatorIndex') as number,
+                    JsonHelper.getValue(midiEvent, 'midiClocksPerMetronomeClick') as number,
+                    JsonHelper.getValue(midiEvent, 'thirdySecondNodesInQuarter') as number
+                );
+            case MidiEventType.AlphaTabRest:
+                return new AlphaTabRestEvent(
+                    track,
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'channel') as number
+                );
+            case MidiEventType.AlphaTabMetronome:
+                return new AlphaTabMetronomeEvent(
+                    track,
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'counter') as number,
+                    JsonHelper.getValue(midiEvent, 'durationInTicks') as number,
+                    JsonHelper.getValue(midiEvent, 'durationInMillis') as number
+                );
+            case MidiEventType.NoteOn:
+                return new NoteOnEvent(
+                    track,
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'channel') as number,
+                    JsonHelper.getValue(midiEvent, 'noteKey') as number,
+                    JsonHelper.getValue(midiEvent, 'noteVelocity') as number
+                );
+            case MidiEventType.NoteOff:
+                return new NoteOffEvent(
+                    track,
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'channel') as number,
+                    JsonHelper.getValue(midiEvent, 'noteKey') as number,
+                    JsonHelper.getValue(midiEvent, 'noteVelocity') as number
+                );
+            case MidiEventType.ControlChange:
+                return new ControlChangeEvent(
+                    track,
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'channel') as number,
+                    JsonHelper.getValue(midiEvent, 'controller') as number as ControllerType,
+                    JsonHelper.getValue(midiEvent, 'value') as number
+                );
+            case MidiEventType.ProgramChange:
+                return new ProgramChangeEvent(
+                    track,
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'channel') as number,
+                    JsonHelper.getValue(midiEvent, 'program') as number
+                );
+            case MidiEventType.TempoChange:
+                return new TempoChangeEvent(
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'microSecondsPerQuarterNote') as number
+                );
+            case MidiEventType.PitchBend:
+                return new PitchBendEvent(
+                    track,
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'channel') as number,
+                    JsonHelper.getValue(midiEvent, 'value') as number
+                );
+            case MidiEventType.PerNotePitchBend:
+                return new NoteBendEvent(
+                    track,
+                    tick,
+                    JsonHelper.getValue(midiEvent, 'channel') as number,
+                    JsonHelper.getValue(midiEvent, 'noteKey') as number,
+                    JsonHelper.getValue(midiEvent, 'value') as number
+                );
+            case MidiEventType.EndOfTrack:
+                return new EndOfTrackEvent(track, tick);
         }
-        return midiEvent2;
+
+        throw new AlphaTabError(AlphaTabErrorType.Format, 'Unknown Midi Event type: ' + type);
     }
 
     /**
-     * @target web
+     * Converts the given MidiFile object into a serialized JavaScript object.
+     * @param midi The midi file to convert. 
+     * @returns A serialized MidiFile object without ciruclar dependencies that can be used for further serializations.
      */
-    public static midiFileToJsObject(midi: MidiFile): unknown {
-        let midi2: any = {} as any;
-        midi2.division = midi.division;
-        let midiEvents: unknown[] = [];
-        midi2.events = midiEvents;
+    public static midiFileToJsObject(midi: MidiFile): Map<string, unknown> {
+        const o = new Map<string, unknown>();
+        o.set('division', midi.division);
+
+        const midiEvents: Map<string, unknown>[] = [];
         for (let midiEvent of midi.events) {
             midiEvents.push(JsonConverter.midiEventToJsObject(midiEvent));
         }
-        return midi2;
+        o.set('events', midiEvents);
+
+        return o;
     }
 
     /**
-     * @target web
+     * Converts the given MidiEvent object into a serialized JavaScript object.
+     * @param midi The midi file to convert. 
+     * @returns A serialized MidiEvent object without ciruclar dependencies that can be used for further serializations.
      */
-    public static midiEventToJsObject(midiEvent: MidiEvent): unknown {
-        let midiEvent2: any = {} as any;
-        midiEvent2.track = midiEvent.track;
-        midiEvent2.tick = midiEvent.tick;
-        midiEvent2.message = midiEvent.message;
-        if (midiEvent instanceof SystemExclusiveEvent) {
-            midiEvent2.type = 'SystemExclusiveEvent';
-            midiEvent2.data = midiEvent.data;
-        } else if (midiEvent instanceof MetaDataEvent) {
-            midiEvent2.type = 'MetaDataEvent';
-            midiEvent2.data = midiEvent.data;
-        } else if (midiEvent instanceof MetaNumberEvent) {
-            midiEvent2.type = 'MetaNumberEvent';
-            midiEvent2.value = midiEvent.value;
-        } else if (midiEvent instanceof Midi20PerNotePitchBendEvent) {
-            midiEvent2.type = 'Midi20PerNotePitchBendEvent';
-            midiEvent2.noteKey = midiEvent.noteKey;
-            midiEvent2.pitch = midiEvent.pitch;
+    public static midiEventToJsObject(midiEvent: MidiEvent): Map<string, unknown> {
+        const o = new Map<string, unknown>();
+        o.set('track', midiEvent.track);
+        o.set('tick', midiEvent.tick);
+        o.set('type', midiEvent.type as number);
+        switch (midiEvent.type) {
+            case MidiEventType.TimeSignature:
+                o.set('numerator', (midiEvent as TimeSignatureEvent).numerator);
+                o.set('denominatorIndex', (midiEvent as TimeSignatureEvent).denominatorIndex);
+                o.set('midiClocksPerMetronomeClick', (midiEvent as TimeSignatureEvent).midiClocksPerMetronomeClick);
+                o.set('thirdySecondNodesInQuarter', (midiEvent as TimeSignatureEvent).thirtySecondNodesInQuarter);
+                break;
+            case MidiEventType.AlphaTabRest:
+                o.set('channel', (midiEvent as AlphaTabRestEvent).channel);
+                break;
+            case MidiEventType.AlphaTabMetronome:
+                o.set('channel', (midiEvent as AlphaTabMetronomeEvent).counter);
+                o.set('durationInMillis', (midiEvent as AlphaTabMetronomeEvent).durationInMillis);
+                o.set('durationInTicks', (midiEvent as AlphaTabMetronomeEvent).durationInTicks);
+                break;
+            case MidiEventType.NoteOn:
+            case MidiEventType.NoteOff:
+                o.set('channel', (midiEvent as NoteEvent).channel);
+                o.set('noteKey', (midiEvent as NoteEvent).noteKey);
+                o.set('noteVelocity', (midiEvent as NoteEvent).noteVelocity);
+                break;
+            case MidiEventType.ControlChange:
+                o.set('channel', (midiEvent as ControlChangeEvent).channel);
+                o.set('controller', (midiEvent as ControlChangeEvent).controller as number);
+                o.set('value', (midiEvent as ControlChangeEvent).value);
+                break;
+            case MidiEventType.ProgramChange:
+                o.set('channel', (midiEvent as ProgramChangeEvent).channel);
+                o.set('program', (midiEvent as ProgramChangeEvent).program);
+                break;
+            case MidiEventType.TempoChange:
+                o.set('microSecondsPerQuarterNote', (midiEvent as TempoChangeEvent).microSecondsPerQuarterNote);
+                break;
+            case MidiEventType.PitchBend:
+                o.set('channel', (midiEvent as PitchBendEvent).channel);
+                o.set('value', (midiEvent as PitchBendEvent).value);
+                break;
+            case MidiEventType.PerNotePitchBend:
+                o.set('channel', (midiEvent as NoteBendEvent).channel);
+                o.set('noteKey', (midiEvent as NoteBendEvent).noteKey);
+                o.set('value', (midiEvent as NoteBendEvent).value);
+                break;
+            case MidiEventType.EndOfTrack:
+                break;
         }
-        return midiEvent2;
+
+        return o;
     }
 }

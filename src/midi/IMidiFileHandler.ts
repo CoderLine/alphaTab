@@ -1,3 +1,5 @@
+import { ControllerType } from "./ControllerType";
+
 /**
  * A handler is responsible for writing midi events to a custom structure
  */
@@ -44,7 +46,7 @@ export interface IMidiFileHandler {
      * @param controller The midi controller that should change.
      * @param value The value to which the midi controller should change
      */
-    addControlChange(track: number, tick: number, channel: number, controller: number, value: number): void;
+    addControlChange(track: number, tick: number, channel: number, controller: ControllerType, value: number): void;
 
     /**
      * Add a program change to the generated midi file

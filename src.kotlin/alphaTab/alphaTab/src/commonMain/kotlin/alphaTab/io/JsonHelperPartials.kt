@@ -16,12 +16,6 @@ internal open class JsonHelperPartials {
                     func(kvp.value, (kvp.key!!) as String)
                 }
             }
-
-            if (o is alphaTab.collections.Map<*, *>) {
-                for (kvp in o) {
-                    func(kvp.value, (kvp.key!!) as String)
-                }
-            }
         }
 
         public fun forEach(o: Any?, func: (v: Any?, k: String) -> Unit) {
@@ -30,12 +24,17 @@ internal open class JsonHelperPartials {
                     func(kvp.value, (kvp.key!!) as String)
                 }
             }
+        }
 
-            if (o is alphaTab.collections.Map<*, *>) {
-                for (kvp in o) {
-                    func(kvp.value, (kvp.key!!) as String)
-                }
+        public fun getValue(o: Any?, k: String): Any? {
+            if (o is Map<*, *>) {
+                // NOTE: We know that we only have Map<String, Any?> in our serialization
+                // handling. we need this cast to satisfy Kotlin type checks.
+                @Suppress("UNCHECKED_CAST") val unsafeMap = o as Map<String, Any?>
+				return if (unsafeMap.has(k)) unsafeMap.get(k) else null
             }
+
+			return null
         }
 
 

@@ -201,7 +201,7 @@ export class AlphaSynth implements IAlphaSynth {
                     // push all processed events into the queue
                     // for informing users about played events
                     for (const e of synthesizedEvents) {
-                        if (this._midiEventsPlayedFilter.has(e.event.command)) {
+                        if (this._midiEventsPlayedFilter.has(e.event.type)) {
                             this._playedEventsQueue.enqueue(e);
                         }
                     }

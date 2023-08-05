@@ -26,6 +26,24 @@ namespace AlphaTab.Io
             throw new AlphaTabError(AlphaTabErrorType.Format, $"Could not parse enum value '{o}' [({o.GetType()}]");
         }
 
+        public static object? GetValue(object o, string key)
+        {
+            switch (o)
+            {
+                case IDictionary<string, object> d:
+                    d.TryGetValue(key, out var v);
+                    return v;
+                case IDictionary d:
+                    if (d.Contains(key))
+                    {
+                        return d[key];
+                    }
+                    return null;
+            }
+
+            return null;
+        }
+
         public static void ForEach(object o, Action<object, string> func)
         {
             switch (o)

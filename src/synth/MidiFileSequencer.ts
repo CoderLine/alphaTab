@@ -1,7 +1,4 @@
-import { MetaDataEvent } from '@src/midi/MetaDataEvent';
-import { MetaEventType } from '@src/midi/MetaEvent';
-import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
-import { MidiEventType } from '@src/midi/MidiEvent';
+import { MidiEventType, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
 import { MidiFile } from '@src/midi/MidiFile';
 import { PlaybackRange } from '@src/synth/PlaybackRange';
 import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
@@ -211,23 +208,23 @@ export class MidiFileSequencer {
                 }
             }
 
-            if (mEvent.command === MidiEventType.Meta && mEvent.data1 === MetaEventType.Tempo) {
-                let meta: MetaNumberEvent = mEvent as MetaNumberEvent;
-                bpm = 60000000 / meta.value;
+            if (mEvent.type === MidiEventType.TempoChange) {
+                let meta: TempoChangeEvent = mEvent as TempoChangeEvent;
+                bpm = 60000000 / meta.microSecondsPerQuarterNote;
                 state.tempoChanges.push(new MidiFileSequencerTempoChange(bpm, absTick, absTime));
                 metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division))
-            } else if (mEvent.command === MidiEventType.Meta && mEvent.data1 === MetaEventType.TimeSignature) {
-                let meta: MetaDataEvent = mEvent as MetaDataEvent;
-                let timeSignatureDenominator: number = Math.pow(2, meta.data[1]);
-                metronomeCount = meta.data[0];
+            } else if (mEvent.type === MidiEventType.TimeSignature) {
+                let meta: TimeSignatureEvent = mEvent as TimeSignatureEvent;
+                let timeSignatureDenominator: number = Math.pow(2, meta.denominatorIndex);
+                metronomeCount = meta.numerator;
                 metronomeLengthInTicks = (state.division * (4.0 / timeSignatureDenominator)) | 0;
                 metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division))
                 if (state.firstTimeSignatureDenominator === 0) {
-                    state.firstTimeSignatureNumerator = meta.data[0];
+                    state.firstTimeSignatureNumerator = meta.numerator
                     state.firstTimeSignatureDenominator = timeSignatureDenominator;
                 }
-            } else if (mEvent.command === MidiEventType.ProgramChange) {
-                let channel: number = mEvent.channel;
+            } else if (mEvent.type === MidiEventType.ProgramChange) {
+                let channel: number = (mEvent as ProgramChangeEvent).channel;
                 if (!state.firstProgramEventPerChannel.has(channel)) {
                     state.firstProgramEventPerChannel.set(channel, synthData);
                 }
