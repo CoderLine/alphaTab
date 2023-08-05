@@ -20,6 +20,11 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/chords.gp');
     });
 
+    it('chords-duplicates', async () => {
+        // This file was manually modified to contain 2 separate chords with the same details. 
+        await VisualTestHelper.runVisualTest('effects-and-annotations/chords-duplicates.gp');
+    });
+
     it('vibrato', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/vibrato.gp');
     });

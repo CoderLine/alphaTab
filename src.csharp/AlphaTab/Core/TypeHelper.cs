@@ -377,6 +377,12 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Join(this IList<string> s, string separator)
+        {
+            return string.Join(separator, s);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReplaceAll(this string s, string before, string after)
         {
             return s.Replace(before, after);
