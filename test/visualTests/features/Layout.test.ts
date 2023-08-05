@@ -1,10 +1,21 @@
 import { LayoutMode } from '@src/LayoutMode';
 import { Settings } from '@src/Settings';
+import { ScoreLoader } from '@src/importer';
+import { TestPlatform } from '@test/TestPlatform';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 
 describe('LayoutTests', () => {
-    it('pageLayout', async () => {
+    it('page-layout', async () => {
         await VisualTestHelper.runVisualTest('layout/page-layout.gp');
+    });
+
+    it('page-layout-justify-last-row', async () => {
+        const settings = new Settings();
+        settings.display.justifyLastSystem = true;
+
+        const inputFileData = await TestPlatform.loadFile('test-data/visual-tests/layout/page-layout.gp');
+        const score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
+        await VisualTestHelper.runVisualTestScore(score, 'layout/page-layout-justify-last-row.png', settings);
     });
 
     it('multi-track', async () => {

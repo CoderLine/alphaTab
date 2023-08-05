@@ -62,6 +62,11 @@ export class DisplaySettings {
      */
     public barCountPerPartial: number = 10;
 
+    /**
+     * Whether the last system (row) should be also justified to the whole width of the music sheet. 
+     * (applies only for page layout).
+     */
+    public justifyLastSystem: boolean = false;
 
     /**
      * Gets or sets the resources used during rendering. This defines all fonts and colors used.
