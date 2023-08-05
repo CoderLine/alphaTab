@@ -163,7 +163,7 @@ document.getElementById('playPause').onclick = () => {
 };
 
 const counterSpan = document.getElementById('counter');
-api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.SystemExclusive2];
+api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.AlphaTabMetronome];
 api.playerStateChanged.on(e => {
     // reset to 1 when stopped
     if(e.stopped) {
@@ -201,7 +201,7 @@ document.getElementById('playPause').onclick = () => {
 const counterSpan = document.getElementById('counter');
 const andSpan = document.getElementById('and');
 
-api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.SystemExclusive2];
+api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.AlphaTabMetronome];
 
 andSpan.style.display = 'none'; // hide 'and' at start
 api.playerStateChanged.on(e => {

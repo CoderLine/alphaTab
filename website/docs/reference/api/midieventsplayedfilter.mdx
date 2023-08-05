@@ -52,7 +52,7 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
 
 ```js
 var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.SystemExclusive2];
+api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.AlphaTabMetronome];
 api.midiEventsPlayed.on(function(e) {
   for(const midi of e.events) {
     if(midi.isMetronome) {
@@ -67,7 +67,7 @@ api.midiEventsPlayed.on(function(e) {
 
 ```js
 $('#alphaTab')
-  .alphaTab('midiEventsPlayedFilter', [alphaTab.midi.MidiEventType.SystemExclusive2])
+  .alphaTab('midiEventsPlayedFilter', [alphaTab.midi.MidiEventType.AlphaTabMetronome])
   .on('alphaTab.midiEventsPlayed', (e, args) => {
     for(const midi of args.events) {
       if(midi.isMetronome) {
@@ -82,14 +82,14 @@ $('#alphaTab')
 
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
-api.MidiEventsPlayedFilter = new MidiEventType[] { AlphaTab.Midi.MidiEventType.SystemExclusive2 };
+api.MidiEventsPlayedFilter = new MidiEventType[] { AlphaTab.Midi.MidiEventType.AlphaTabMetronome };
 api.MidiEventsPlayed.On(e => 
 {
   foreach(var midi of e.events) 
   {
-    if(midi is AlphaTab.Midi.SystemExclusiveEvent sysex && sysex.IsMetronome) 
+    if(midi is AlphaTab.Midi.AlphaTabMetronomeEvent metronome) 
     {
-      Console.WriteLine("Metronome tick " + midi.MetronomeNumerator); 
+      Console.WriteLine("Metronome tick " + metronome.MetronomeNumerator); 
     }
   }
 });
