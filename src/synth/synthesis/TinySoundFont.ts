@@ -174,7 +174,7 @@ export class TinySoundFont {
                 const pitchBend = e as PitchBendEvent;
                 this.channelSetPitchWheel(pitchBend.channel, pitchBend.value);
                 break;
-            case MidiEventType.NoteBend:
+            case MidiEventType.PerNotePitchBend:
                 const noteBend = e as NoteBendEvent;
                 let perNotePitchWheel = noteBend.value;
                 // midi 2.0 -> midi 1.0
@@ -903,7 +903,7 @@ export class TinySoundFont {
                     this.channelSetPitchRange(channel, (c.midiData >> 7) + 0.01 * (c.midiData & 0x7f));
                 } else if (c.midiRpn === 1) {
                     this.channelSetTuning(channel, (c.tuning | 0) + (c.midiData - 8192.0) / 8192.0); // fine tune
-                } else if (c.midiRpn === 2 && controller === 6) {
+                } else if (c.midiRpn === 2 && controller === ControllerType.DataEntryCoarse) {
                     this.channelSetTuning(channel, controlValue - 64.0 + (c.tuning - (c.tuning | 0))); // coarse tune
                 }
                 return;

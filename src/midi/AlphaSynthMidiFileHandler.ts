@@ -1,6 +1,6 @@
 import { AlphaTabRestEvent, ControlChangeEvent, EndOfTrackEvent, NoteBendEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
 import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
-import { MidiFile } from '@src/midi/MidiFile';
+import { MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { ControllerType } from './ControllerType';
 
@@ -125,8 +125,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public finishTrack(track: number, tick: number): void {
-        // for alphaSynth we only use single end of track (type 0 SMF). 
-        if (track == 0) {
+        if (this._midiFile.format == MidiFileFormat.MultiTrack || track == 0) {
             this._midiFile.addEvent(new EndOfTrackEvent(track, tick));
         }
     }

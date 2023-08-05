@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using AlphaTab.Core;
@@ -51,10 +52,7 @@ namespace AlphaTab.VisualTests
             });
             renderer.PartialRenderFinished.On(e =>
             {
-                if (e != null)
-                {
-                    results[^1].Add(e);
-                }
+                results[^1].Add(e);
             });
             renderer.RenderFinished.On(e =>
             {
@@ -99,7 +97,7 @@ namespace AlphaTab.VisualTests
             }
         }
 
-        private static void PrepareSettingsForTest(ref Settings? settings)
+        private static void PrepareSettingsForTest([NotNull] ref Settings? settings)
         {
             settings ??= new Settings();
             settings.Core.Engine = "skia";

@@ -118,10 +118,15 @@ export class JsonConverter {
         return settings;
     }
 
-    public static jsObjectToMidiFile(midi: unknown): MidiFile {
+    /**
+     * Converts the given JavaScript object into a MidiFile object.
+     * @param jsObject The javascript object to deserialize. 
+     * @returns The converted MidiFile.
+     */
+    public static jsObjectToMidiFile(jsObject: unknown): MidiFile {
         let midi2: MidiFile = new MidiFile();
 
-        JsonHelper.forEach(midi, (v, k) => {
+        JsonHelper.forEach(jsObject, (v, k) => {
             switch (k) {
                 case 'division':
                     midi2.division = v as number;
@@ -139,7 +144,9 @@ export class JsonConverter {
     }
 
     /**
-     * @target web
+     * Converts the given JavaScript object into a MidiEvent object.
+     * @param jsObject The javascript object to deserialize. 
+     * @returns The converted MidiEvent.
      */
     public static jsObjectToMidiEvent(midiEvent: unknown): MidiEvent {
         let track: number = JsonHelper.getValue(midiEvent, 'track') as number;
@@ -213,7 +220,7 @@ export class JsonConverter {
                     JsonHelper.getValue(midiEvent, 'channel') as number,
                     JsonHelper.getValue(midiEvent, 'value') as number
                 );
-            case MidiEventType.NoteBend:
+            case MidiEventType.PerNotePitchBend:
                 return new NoteBendEvent(
                     track,
                     tick,
@@ -228,6 +235,11 @@ export class JsonConverter {
         throw new AlphaTabError(AlphaTabErrorType.Format, 'Unknown Midi Event type: ' + type);
     }
 
+    /**
+     * Converts the given MidiFile object into a serialized JavaScript object.
+     * @param midi The midi file to convert. 
+     * @returns A serialized MidiFile object without ciruclar dependencies that can be used for further serializations.
+     */
     public static midiFileToJsObject(midi: MidiFile): Map<string, unknown> {
         const o = new Map<string, unknown>();
         o.set('division', midi.division);
@@ -241,6 +253,11 @@ export class JsonConverter {
         return o;
     }
 
+    /**
+     * Converts the given MidiEvent object into a serialized JavaScript object.
+     * @param midi The midi file to convert. 
+     * @returns A serialized MidiEvent object without ciruclar dependencies that can be used for further serializations.
+     */
     public static midiEventToJsObject(midiEvent: MidiEvent): Map<string, unknown> {
         const o = new Map<string, unknown>();
         o.set('track', midiEvent.track);
@@ -283,7 +300,7 @@ export class JsonConverter {
                 o.set('channel', (midiEvent as PitchBendEvent).channel);
                 o.set('value', (midiEvent as PitchBendEvent).value);
                 break;
-            case MidiEventType.NoteBend:
+            case MidiEventType.PerNotePitchBend:
                 o.set('channel', (midiEvent as NoteBendEvent).channel);
                 o.set('noteKey', (midiEvent as NoteBendEvent).noteKey);
                 o.set('value', (midiEvent as NoteBendEvent).value);

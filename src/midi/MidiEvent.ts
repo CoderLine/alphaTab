@@ -6,20 +6,39 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
 
 /**
- * Lists all midi events.
+ * Lists all midi event types. Based on the type the instance is a specific subclass.
  */
 export enum MidiEventType {
-    TimeSignature = 0,
-    NoteOn,
-    NoteOff,
-    ControlChange,
-    ProgramChange,
-    TempoChange,
-    PitchBend,
-    NoteBend,
-    EndOfTrack,
-    AlphaTabRest,
-    AlphaTabMetronome
+    // NOTE: the values try to be backwards compatible with alphaTab 1.2. 
+    // Some values are aligned with the MIDI1.0 bytes while some others
+    // try to resemble the kind (e.g. 0xF1 -> 0xF0 as system exclusive, and +1 for the first event we define)
+    // For the custom values we try to not overlap with real MIDI values.
+
+    TimeSignature = 0x58, // 0xFF _0x58_ in Midi 1.0
+    NoteOn = 0x80, // Aligned with Midi 1.0
+    NoteOff = 0x90, // Aligned with Midi 1.0
+    ControlChange = 0xB0, // Aligned with Midi 1.0
+    ProgramChange = 0xC0, // Aligned with Midi 1.0
+    TempoChange = 0x51, // 0xFF _0x51_ in Midi 1.0 
+    PitchBend = 0xE0, // Aligned with Midi 1.0
+    PerNotePitchBend = 0x60, // Aligned with Midi 2.0
+    EndOfTrack = 0x2F, // 0xFF _0x2F_ in Midi 1.0
+    AlphaTabRest = 0xF1, // SystemExclusive + 1 
+    AlphaTabMetronome = 0xF2, // SystemExclusive + 2
+
+    // deprecated events
+    /**
+     * @deprecated Not used anymore internally. move to the other concrete types.
+     */
+    SystemExclusive = 0xF0, // Aligned with Midi 1.0
+    /**
+     * @deprecated Not used anymore internally. move to the other concrete types.
+     */
+    SystemExclusive2 = 0xF7, // Aligned with Midi 1.0
+    /**
+     * @deprecated Not used anymore internally. move to the other concrete types.
+     */
+    Meta = 0xFF // Aligned with Midi 1.0
 }
 
 /**
@@ -53,6 +72,34 @@ export abstract class MidiEvent {
         this.type = command;
     }
 
+    // for backwards compatibility
+    /**
+     * @deprecated Change to `type`
+     */
+    public get command(): MidiEventType {
+        return this.type;
+    }
+
+    /**
+     * @deprecated Use individual properties to access data.
+     */
+    public get message(): number {
+        return 0;
+    }
+
+    /**
+     * @deprecated Use individual properties to access data.
+     */
+    public get data1(): number {
+        return 0;
+    }
+    /**
+     * @deprecated Use individual properties to access data.
+     */
+    public get data2(): number {
+        return 0;
+    }
+
     /**
      * Writes the midi event as binary into the given stream.
      * @param s The stream to write to.
@@ -60,11 +107,29 @@ export abstract class MidiEvent {
     public abstract writeTo(s: IWriteable): void;
 }
 
-
+/**
+ * Represents a time signature change event. 
+ */
 export class TimeSignatureEvent extends MidiEvent {
+    /**
+     * The time signature numerator. 
+     */
     public numerator: number;
+
+    /**
+     * The denominator index is a negative power of two: 2 represents a quarter-note, 3 represents an eighth-note, etc.
+     * Denominator = 2^(index)
+     */
     public denominatorIndex: number;
+
+    /**
+     * The number of MIDI clocks in a metronome click
+     */
     public midiClocksPerMetronomeClick: number;
+
+    /**
+     * The number of notated 32nd-notes in what MIDI thinks of as a quarter-note (24 MIDI Clocks).
+     */
     public thirtySecondNodesInQuarter: number;
 
     public constructor(track: number, tick: number,
@@ -96,7 +161,9 @@ export class TimeSignatureEvent extends MidiEvent {
     }
 }
 
-
+/**
+ * The base class for alphaTab specific midi events (like metronomes and rests).
+ */
 export abstract class AlphaTabSysExEvent extends MidiEvent {
     public static readonly AlphaTabManufacturerId = 0x7D;
     public static readonly MetronomeEventId = 0x00;
@@ -124,10 +191,32 @@ export abstract class AlphaTabSysExEvent extends MidiEvent {
     protected abstract writeEventData(s: IWriteable): void;
 }
 
+/**
+ * Represents a metronome event. This event is emitted by the synthesizer only during playback and 
+ * is typically not part of the midi file itself.
+ */
 export class AlphaTabMetronomeEvent extends AlphaTabSysExEvent {
+    /**
+     * The metronome counter as per current time signature.
+     */
     public counter: number;
+
+    /**
+     * The duration of the metronome tick in MIDI ticks. 
+     */
     public durationInTicks: number;
+
+    /**
+     * The duration of the metronome tick in milliseconds. 
+     */
     public durationInMillis: number;
+
+    // for backwards compatibility.
+
+    /**
+     * Gets a value indicating whether the current event is a metronome event.
+     */
+    public readonly isMetronome: boolean = true;
 
     public constructor(track: number, tick: number,
         counter: number,
@@ -148,6 +237,9 @@ export class AlphaTabMetronomeEvent extends AlphaTabSysExEvent {
     }
 }
 
+/**
+ * Represents a REST beat being 'played'. This event supports alphaTab in placing the cursor. 
+ */
 export class AlphaTabRestEvent extends AlphaTabSysExEvent {
     public channel: number;
 
@@ -162,10 +254,23 @@ export class AlphaTabRestEvent extends AlphaTabSysExEvent {
     }
 }
 
-
+/**
+ * The base class for note related events.
+ */
 export abstract class NoteEvent extends MidiEvent {
+    /**
+     * The channel on which the note is played.
+     */
     public channel: number;
+
+    /**
+     * The key of the note being played (aka. the note height). 
+     */
     public noteKey: number;
+
+    /**
+     * The velocity in which the 'key' of the note is pressed (aka. the loudness/intensity of the note).
+     */
     public noteVelocity: number;
 
     public constructor(track: number,
@@ -180,8 +285,19 @@ export abstract class NoteEvent extends MidiEvent {
         this.noteKey = noteKey;
         this.noteVelocity = noteVelocity;
     }
+
+    public override get data1(): number {
+        return this.noteKey;
+    }
+
+    public override get data2(): number {
+        return this.noteVelocity;
+    }
 }
 
+/**
+ * Represents a note being played
+ */
 export class NoteOnEvent extends NoteEvent {
     public constructor(track: number,
         tick: number,
@@ -199,7 +315,9 @@ export class NoteOnEvent extends NoteEvent {
     }
 }
 
-
+/**
+ * Represents a note stop being played.
+ */
 export class NoteOffEvent extends NoteEvent {
     public constructor(track: number, tick: number,
         channel: number,
@@ -207,7 +325,7 @@ export class NoteOffEvent extends NoteEvent {
         noteVelocity: number) {
         super(track, tick, MidiEventType.NoteOff, channel, noteKey, noteVelocity);
     }
-    
+
     public override writeTo(s: IWriteable): void {
         // status byte
         s.writeByte((this.channel & 0x0F) | 0x80)
@@ -216,9 +334,23 @@ export class NoteOffEvent extends NoteEvent {
     }
 }
 
+/**
+ * Represents the change of a value on a midi controller. 
+ */
 export class ControlChangeEvent extends MidiEvent {
+    /**
+     * The channel for which the controller is changing. 
+     */
     public channel: number;
+
+    /**
+     * The type of the controller which is changing. 
+     */
     public controller: ControllerType;
+
+    /**
+     * The new value of the controller. The meaning is depending on the controller type.
+     */
     public value: number;
 
     public constructor(track: number,
@@ -237,10 +369,28 @@ export class ControlChangeEvent extends MidiEvent {
         s.writeByte((this.controller as number) & 0xFF);
         s.writeByte(this.value & 0xFF);
     }
+
+    public override get data1(): number {
+        return this.controller as number;
+    }
+
+    public override get data2(): number {
+        return this.value;
+    }
 }
 
+/**
+ * Represents the change of the midi program on a channel. 
+ */
 export class ProgramChangeEvent extends MidiEvent {
+    /**
+     * The midi channel for which the program changes. 
+     */
     public channel: number;
+
+    /**
+     * The numeric value of the program indicating the instrument bank to choose. 
+     */
     public program: number;
 
     public constructor(track: number,
@@ -256,9 +406,19 @@ export class ProgramChangeEvent extends MidiEvent {
         s.writeByte((this.channel & 0x0F) | 0xC0)
         s.writeByte(this.program & 0xFF);
     }
+
+    public override get data1(): number {
+        return this.program;
+    }
 }
 
+/**
+ * Represents a change of the tempo in the song. 
+ */
 export class TempoChangeEvent extends MidiEvent {
+    /**
+     * The tempo in microseconds per quarter note (aka USQ). A time format typically for midi. 
+     */
     public microSecondsPerQuarterNote: number;
 
     public constructor(tick: number, microSecondsPerQuarterNote: number) {
@@ -280,8 +440,18 @@ export class TempoChangeEvent extends MidiEvent {
     }
 }
 
+/**
+ * Represents a change of the pitch bend (aka. pitch wheel) on a specific channel. 
+ */
 export class PitchBendEvent extends MidiEvent {
+    /**
+     * The channel for which the pitch bend changes.
+     */
     public channel: number;
+
+    /**
+     * The value to which the pitch changes. This value is according to the MIDI specification.
+     */
     public value: number;
 
     public constructor(track: number,
@@ -298,11 +468,34 @@ export class PitchBendEvent extends MidiEvent {
         s.writeByte(this.value & 0x7F);
         s.writeByte((this.value >> 7) & 0x7F);
     }
+
+    public override get data1(): number {
+        return this.value & 0x7F;
+    }
+
+    public override get data2(): number {
+        return (this.value >> 7) & 0x7F;
+    }
 }
 
+
+/**
+ * Represents a single note pitch bend change. 
+ */
 export class NoteBendEvent extends MidiEvent {
+    /**
+     * The channel on which the note is played for which the pitch changes. 
+     */
     public channel: number;
+
+    /**
+     * The key of the note for which the pitch changes. 
+     */
     public noteKey: number;
+
+    /**
+     * The value to which the pitch changes. This value is according to the MIDI specification.
+     */
     public value: number;
 
     public constructor(track: number,
@@ -310,7 +503,7 @@ export class NoteBendEvent extends MidiEvent {
         channel: number,
         noteKey: number,
         value: number) {
-        super(track, tick, MidiEventType.NoteBend);
+        super(track, tick, MidiEventType.PerNotePitchBend);
         this.channel = channel;
         this.noteKey = noteKey;
         this.value = value;
@@ -321,6 +514,9 @@ export class NoteBendEvent extends MidiEvent {
     }
 }
 
+/**
+ * Represents the end of the track indicating that no more events for this track follow.
+ */
 export class EndOfTrackEvent extends MidiEvent {
     public constructor(track: number, tick: number) {
         super(track, tick, MidiEventType.EndOfTrack);
