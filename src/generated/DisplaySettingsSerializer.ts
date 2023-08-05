@@ -29,6 +29,7 @@ export class DisplaySettingsSerializer {
         o.set("startbar", obj.startBar);
         o.set("barcount", obj.barCount);
         o.set("barcountperpartial", obj.barCountPerPartial);
+        o.set("justifylastsystem", obj.justifyLastSystem);
         o.set("resources", RenderingResourcesSerializer.toJson(obj.resources));
         o.set("padding", obj.padding);
         o.set("systemslayoutmode", obj.systemsLayoutMode as number);
@@ -59,6 +60,9 @@ export class DisplaySettingsSerializer {
                 return true;
             case "barcountperpartial":
                 obj.barCountPerPartial = v! as number;
+                return true;
+            case "justifylastsystem":
+                obj.justifyLastSystem = v! as boolean;
                 return true;
             case "padding":
                 obj.padding = v as number[] | null;

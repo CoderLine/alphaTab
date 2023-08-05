@@ -346,7 +346,7 @@ export class PageViewLayout extends ScoreLayout {
      * Realignes the bars in this line according to the available space
      */
     private fitGroup(group: StaveGroup): void {
-        if (group.isFull || group.width > this.maxWidth) {
+        if (group.isFull || group.width > this.maxWidth || this.renderer.settings.display.justifyLastSystem) {
             group.scaleToWidth(this.maxWidth);
         }
         else {
