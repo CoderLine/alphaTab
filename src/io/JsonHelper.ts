@@ -31,11 +31,24 @@ export class JsonHelper {
     public static forEach(s: unknown, func: (v: unknown, k: string) => void): void {
         if (s instanceof Map) {
             (s as Map<string, unknown>).forEach(func);
-        }else if (typeof s === 'object') {
+        } else if (typeof s === 'object') {
             for (const k in s) {
                 func((s as any)[k], k)
             }
         }
         // skip
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static getValue(s: unknown, key: string): unknown {
+        if (s instanceof Map) {
+            return (s as Map<string, unknown>).get(key);
+        } else if (typeof s === 'object') {
+            return (s as any)[key];
+        }
+        return null;
     }
 }

@@ -1,13 +1,8 @@
-import { MetaDataEvent } from '@src/midi/MetaDataEvent';
-import { MetaEventType } from '@src/midi/MetaEvent';
-import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
-import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
-import { SystemCommonType } from '@src/midi/SystemCommonEvent';
-import { AlphaTabSystemExclusiveEvents, SystemExclusiveEvent } from '@src/midi/SystemExclusiveEvent';
+import { AlphaTabRestEvent, ControlChangeEvent, EndOfTrackEvent, NoteBendEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
 import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 import { MidiFile } from '@src/midi/MidiFile';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
+import { ControllerType } from './ControllerType';
 
 /**
  * This implementation of the {@link IMidiFileHandler}
@@ -15,44 +10,42 @@ import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEve
  */
 export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     private _midiFile: MidiFile;
+    private _smf1Mode: boolean;
 
     /**
      * Initializes a new instance of the {@link AlphaSynthMidiFileHandler} class.
      * @param midiFile The midi file.
+     * @param smf1Mode Whether to generate a SMF1 compatible midi file. This might break multi note bends.
      */
-    public constructor(midiFile: MidiFile) {
+    public constructor(midiFile: MidiFile, smf1Mode: boolean = false) {
         this._midiFile = midiFile;
+        this._smf1Mode = smf1Mode;
     }
 
     public addTimeSignature(tick: number, timeSignatureNumerator: number, timeSignatureDenominator: number): void {
         let denominatorIndex: number = 0;
-        while(true) {
-            timeSignatureDenominator = timeSignatureDenominator >> 1;
-            if(timeSignatureDenominator > 0) {
+        let denominator = timeSignatureDenominator;
+        while (true) {
+            denominator = denominator >> 1;
+            if (denominator > 0) {
                 denominatorIndex++;
             } else {
                 break;
             }
         }
-        const message: MetaDataEvent = new MetaDataEvent(
+
+        this._midiFile.addEvent(new TimeSignatureEvent(
             0,
             tick,
-            0xff,
-            MetaEventType.TimeSignature,
-            new Uint8Array([timeSignatureNumerator & 0xff, denominatorIndex & 0xff, 48, 8])
-        );
-        this._midiFile.addEvent(message);
+            timeSignatureNumerator,
+            denominatorIndex,
+            48,
+            8
+        ));
     }
 
     public addRest(track: number, tick: number, channel: number): void {
-        const message: SystemExclusiveEvent = new SystemExclusiveEvent(
-            track,
-            tick,
-            SystemCommonType.SystemExclusive,
-            SystemExclusiveEvent.AlphaTabManufacturerId,
-            new Uint8Array([AlphaTabSystemExclusiveEvents.Rest])
-        );
-        this._midiFile.addEvent(message);
+        this._midiFile.addEvent(new AlphaTabRestEvent(track, tick, channel));
     }
 
     public addNote(
@@ -63,26 +56,13 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         velocity: number,
         channel: number
     ): void {
-        const noteOn: MidiEvent = new MidiEvent(
-            track,
-            start,
-            this.makeCommand(MidiEventType.NoteOn, channel),
+        this._midiFile.addEvent(new NoteOnEvent(track, start, channel,
             AlphaSynthMidiFileHandler.fixValue(key),
-            AlphaSynthMidiFileHandler.fixValue(velocity)
-        );
-        this._midiFile.addEvent(noteOn);
-        const noteOff: MidiEvent = new MidiEvent(
-            track,
-            start + length,
-            this.makeCommand(MidiEventType.NoteOff, channel),
-            AlphaSynthMidiFileHandler.fixValue(key),
-            AlphaSynthMidiFileHandler.fixValue(velocity)
-        );
-        this._midiFile.addEvent(noteOff);
-    }
+            AlphaSynthMidiFileHandler.fixValue(velocity)));
 
-    private makeCommand(command: number, channel: number): number {
-        return (command & 0xf0) | (channel & 0x0f);
+        this._midiFile.addEvent(new NoteOffEvent(track, start + length, channel,
+            AlphaSynthMidiFileHandler.fixValue(key),
+            AlphaSynthMidiFileHandler.fixValue(velocity)));
     }
 
     private static fixValue(value: number): number {
@@ -95,33 +75,24 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         return value;
     }
 
-    public addControlChange(track: number, tick: number, channel: number, controller: number, value: number): void {
-        const message: MidiEvent = new MidiEvent(
+    public addControlChange(track: number, tick: number, channel: number, controller: ControllerType, value: number): void {
+        this._midiFile.addEvent(new ControlChangeEvent(
             track,
             tick,
-            this.makeCommand(MidiEventType.Controller, channel),
-            AlphaSynthMidiFileHandler.fixValue(controller),
+            channel,
+            controller,
             AlphaSynthMidiFileHandler.fixValue(value)
-        );
-        this._midiFile.addEvent(message);
+        ));
     }
 
     public addProgramChange(track: number, tick: number, channel: number, program: number): void {
-        const message: MidiEvent = new MidiEvent(
-            track,
-            tick,
-            this.makeCommand(MidiEventType.ProgramChange, channel),
-            AlphaSynthMidiFileHandler.fixValue(program),
-            0
-        );
-        this._midiFile.addEvent(message);
+        this._midiFile.addEvent(new ProgramChangeEvent(track, tick, channel, program));
     }
 
     public addTempo(tick: number, tempo: number): void {
         // bpm -> microsecond per quarter note
         const tempoInUsq: number = (60000000 / tempo) | 0;
-        const message: MetaNumberEvent = new MetaNumberEvent(0, tick, 0xff, MetaEventType.Tempo, tempoInUsq);
-        this._midiFile.addEvent(message);
+        this._midiFile.addEvent(new TempoChangeEvent(tick, tempoInUsq));
     }
 
     public addBend(track: number, tick: number, channel: number, value: number): void {
@@ -130,40 +101,28 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         } else {
             value = Math.floor(value);
         }
-
-        const message: MidiEvent = new MidiEvent(
-            track,
-            tick,
-            this.makeCommand(MidiEventType.PitchBend, channel),
-            value & 0x7F,
-            (value >> 7) & 0x7F
-        );
-        this._midiFile.addEvent(message);
+        this._midiFile.addEvent(new PitchBendEvent(track, tick, channel, value));
     }
 
     public addNoteBend(track: number, tick: number, channel: number, key: number, value: number): void {
-        if (value >= SynthConstants.MaxPitchWheel) {
-            value = SynthConstants.MaxPitchWheel;
+        if (this._smf1Mode) {
+            this.addBend(track, tick, channel, value);
         } else {
-            value = Math.floor(value);
+            // map midi 1.0 range of 0-16384     (0x4000)
+            // to midi 2.0 range of 0-4294967296 (0x100000000)
+            value = value * SynthConstants.MaxPitchWheel20 / SynthConstants.MaxPitchWheel
+
+            this._midiFile.addEvent(new NoteBendEvent(
+                track,
+                tick,
+                channel,
+                key,
+                value
+            ));
         }
-
-        // map midi 1.0 range of 0-16384     (0x4000)
-        // to midi 2.0 range of 0-4294967296 (0x100000000)
-        value = value * SynthConstants.MaxPitchWheel20 / SynthConstants.MaxPitchWheel
-
-        const message = new Midi20PerNotePitchBendEvent(
-            track,
-            tick,
-            this.makeCommand(MidiEventType.PerNotePitchBend, channel),
-            key,
-            value
-        );
-        this._midiFile.addEvent(message);
     }
 
     public finishTrack(track: number, tick: number): void {
-        const message: MetaDataEvent = new MetaDataEvent(track, tick, 0xff, MetaEventType.EndOfTrack, new Uint8Array(0));
-        this._midiFile.addEvent(message);
+        this._midiFile.addEvent(new EndOfTrackEvent(track, tick));
     }
 }

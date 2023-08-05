@@ -873,7 +873,7 @@ describe('MidiFileGeneratorTest', () => {
 
         let timeSignature: MidiEvent | null = null;
         for (const evt of file.events) {
-            if (evt.command === MidiEventType.Meta && evt.data1 === MetaEventType.TimeSignature) {
+            if (evt.type === MidiEventType.Meta && evt.data1 === MetaEventType.TimeSignature) {
                 timeSignature = evt;
                 break;
             }

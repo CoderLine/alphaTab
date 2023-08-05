@@ -42,7 +42,7 @@ export enum ControllerType {
     //GeneralPurposeSlider2 = 0x11,
     //GeneralPurposeSlider3 = 0x12,
     //GeneralPurposeSlider4 = 0x13,
-    //BankSelectFine = 0x20,
+    BankSelectFine = 0x20,
     /**
      * Modulation wheel or level LSB
      */
@@ -129,7 +129,7 @@ export enum ControllerType {
      */
     RegisteredParameterCourse = 0x65,
 
-    //AllSoundOff = 0x78,
+    AllSoundOff = 0x78,
     /**
      * Reset all controllers
      */

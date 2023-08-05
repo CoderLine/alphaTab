@@ -124,7 +124,7 @@ export class AlphaTabApi extends AlphaTabApiBase<any | Settings> {
         }
 
         let midiFile: MidiFile = new MidiFile();
-        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile, true);
         let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
         generator.generate();
         let binary: Uint8Array = midiFile.toBinary();

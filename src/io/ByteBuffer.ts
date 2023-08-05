@@ -117,4 +117,8 @@ export class ByteBuffer implements IWriteable, IReadable {
         copy.set(this._buffer.subarray(0, 0 + this.length), 0);
         return copy;
     }
+
+    public copyTo(destination:IWriteable) {
+        destination.write(this._buffer, 0, this.length);
+    }
 }
