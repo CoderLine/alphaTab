@@ -173,9 +173,9 @@ export class JsonConverter {
                 return new AlphaTabMetronomeEvent(
                     track,
                     tick,
-                    JsonHelper.getValue(midiEvent, 'counter') as number,
-                    JsonHelper.getValue(midiEvent, 'durationInTicks') as number,
-                    JsonHelper.getValue(midiEvent, 'durationInMillis') as number
+                    JsonHelper.getValue(midiEvent, 'metronomeNumerator') as number,
+                    JsonHelper.getValue(midiEvent, 'metronomeDurationInTicks') as number,
+                    JsonHelper.getValue(midiEvent, 'metronomeDurationInMilliseconds') as number
                 );
             case MidiEventType.NoteOn:
                 return new NoteOnEvent(
@@ -274,9 +274,9 @@ export class JsonConverter {
                 o.set('channel', (midiEvent as AlphaTabRestEvent).channel);
                 break;
             case MidiEventType.AlphaTabMetronome:
-                o.set('channel', (midiEvent as AlphaTabMetronomeEvent).counter);
-                o.set('durationInMillis', (midiEvent as AlphaTabMetronomeEvent).durationInMillis);
-                o.set('durationInTicks', (midiEvent as AlphaTabMetronomeEvent).durationInTicks);
+                o.set('metronomeNumerator', (midiEvent as AlphaTabMetronomeEvent).metronomeNumerator);
+                o.set('metronomeDurationInMilliseconds', (midiEvent as AlphaTabMetronomeEvent).metronomeDurationInMilliseconds);
+                o.set('metronomeDurationInTicks', (midiEvent as AlphaTabMetronomeEvent).metronomeDurationInTicks);
                 break;
             case MidiEventType.NoteOn:
             case MidiEventType.NoteOff:

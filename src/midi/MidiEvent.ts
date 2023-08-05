@@ -199,17 +199,18 @@ export class AlphaTabMetronomeEvent extends AlphaTabSysExEvent {
     /**
      * The metronome counter as per current time signature.
      */
-    public counter: number;
+    public metronomeNumerator: number;
 
     /**
      * The duration of the metronome tick in MIDI ticks. 
      */
-    public durationInTicks: number;
+    public metronomeDurationInTicks: number;
 
     /**
      * The duration of the metronome tick in milliseconds. 
      */
-    public durationInMillis: number;
+    public metronomeDurationInMilliseconds: number;
+
 
     // for backwards compatibility.
 
@@ -224,16 +225,16 @@ export class AlphaTabMetronomeEvent extends AlphaTabSysExEvent {
         durationInMillis: number
     ) {
         super(track, tick, MidiEventType.AlphaTabMetronome);
-        this.counter = counter;
-        this.durationInMillis = durationInMillis;
-        this.durationInTicks = durationInTicks;
+        this.metronomeNumerator = counter;
+        this.metronomeDurationInMilliseconds = durationInMillis;
+        this.metronomeDurationInTicks = durationInTicks;
     }
 
     protected override writeEventData(s: IWriteable) {
         s.writeByte(AlphaTabSysExEvent.MetronomeEventId);
-        s.writeByte(this.counter);
-        IOHelper.writeInt32LE(s, this.durationInTicks);
-        IOHelper.writeInt32LE(s, this.durationInMillis);
+        s.writeByte(this.metronomeNumerator);
+        IOHelper.writeInt32LE(s, this.metronomeDurationInTicks);
+        IOHelper.writeInt32LE(s, this.metronomeDurationInMilliseconds);
     }
 }
 
