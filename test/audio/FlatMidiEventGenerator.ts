@@ -30,8 +30,8 @@ export class FlatMidiEventGenerator implements IMidiFileHandler {
         this.midiEvents.push(e);
     }
 
-    public addControlChange(track: number, tick: number, channel: number, controller: number, value: number): void {
-        let e = new FlatControlChangeEvent(tick, track, channel, controller as ControllerType, value);
+    public addControlChange(track: number, tick: number, channel: number, controller: ControllerType, value: number): void {
+        let e = new FlatControlChangeEvent(tick, track, channel, controller, value);
         this.midiEvents.push(e);
     }
 
