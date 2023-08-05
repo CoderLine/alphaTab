@@ -2,79 +2,95 @@ import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
 import { Score } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 
-export class TrackConfiguration {
+
+// PartConfiguration File Format Notes.
+// Based off Guitar Pro 8
+// The file contains a serialized "Score View Collection" filled like this: 
+// There is always 1 ScoreView holding a TrackViewGroup for each Track contained in the file. This is the multi-track layout.
+// Additionally there is 1 ScoreView individually for each track with only 1 TrackViewGroup of this Group.
+
+// The Guitar Pro UI seem to update both the multi-track and the single-track layouts when changin the displayed staves.
+// But technically it would support showing tracks different in multi-track.
+
+
+// File:
+//    int32 (big endian) | Number of Score Views 
+//    ScoreView[]        | The individual score views
+//    int32 (big endian) | The index to the currently active view
+
+// ScoreView:
+//    1 byte (boolean)   | "Multi Rest" - Whether multiple bars with rests should be combined (Bar > Multi Rest option)
+//    int32 (big endian) | Number of following tems
+//    TrackViewGroup[]   | The individual track view groups
+
+// TrackViewGroup:
+//    1 byte             | Track View Group Type Bitflag
+//                       | 0th bit: showStandardNotation 
+//                       | 1th bit: showTablature 
+//                       | 2nd bit: showSlash
+//                       | 3rd bit: numberedNotation (GP8 feature - jiǎnpǔ  aka Chinese Number Notation)
+//                       | if no bits set -> activate standard notation
+//  
+
+
+export class ScoreView {
+    public isMultiRest: boolean = false;
+    public trackViewGroups: TrackViewGroup[] = [];
+}
+
+export class TrackViewGroup {
     public showSlash: boolean = false;
     public showStandardNotation: boolean = false;
     public showTablature: boolean = false;
 }
 
-export class Part {
-    public isMultiRest: boolean = false;
-    public tracks: TrackConfiguration[] = [];
-}
-
 export class PartConfiguration {
-    public parts: Part[] = [];
-    public zoomLevel: number = 0;
-    public layout: number = 0;
+    public scoreViews: ScoreView[] = [];
 
     public apply(score: Score): void {
-        let staffIndex: number = 0;
-        let trackIndex: number = 0;
-        // the PartConfiguration is really twisted compared to how the score structure looks like.
-        // the first part typically contains the settings for the first staff of all tracks.
-        // but then there is 1 part with 1 track for each other staff of the tracks.
-        // So the structure in the PartConfig appears to be:
-        // Parts[0].Tracks = { Track1-Staff1, Track2-Staff1, Track3-Staff1, Track4-Staff1, .. }
-        // Parts[1].Tracks = { Track1-Staff2 }
-        // Parts[2].Tracks = { Track2-Staff2 }
-        // Parts[3].Tracks = { Track3-Staff2 }
-        // Parts[4].Tracks = { Track4-Staff2 }
-        //
-        // even if a track has only 1 staff, there are 2 staff configurations stored.
-        // I hope Arobas never changes this in the format as the PartConfiguration is not versionized.
-        for (let part of this.parts) {
-            for (let trackConfig of part.tracks) {
+        // for now we only look at the first score view which seem to hold
+        // the config for all tracks. 
+        if(this.scoreViews.length > 0) {
+            let trackIndex = 0;
+            for (let trackConfig of this.scoreViews[0].trackViewGroups) {
                 if (trackIndex < score.tracks.length) {
-                    let track: Track = score.tracks[trackIndex];
-                    if (staffIndex < track.staves.length) {
-                        let staff: Staff = track.staves[staffIndex];
+                    const track: Track = score.tracks[trackIndex];
+                    for(const staff of track.staves) {
                         staff.showTablature = trackConfig.showTablature;
                         staff.showStandardNotation = trackConfig.showStandardNotation;
                     }
                 }
                 trackIndex++;
-                if (trackIndex >= score.tracks.length) {
-                    staffIndex++;
-                    trackIndex = 0;
-                }
             }
         }
     }
 
     public constructor(partConfigurationData: Uint8Array) {
         let readable: ByteBuffer = ByteBuffer.fromBuffer(partConfigurationData);
-        let entryCount: number = IOHelper.readInt32BE(readable);
+        
+        const scoreViewCount: number = IOHelper.readInt32BE(readable);
 
-        for (let i: number = 0; i < entryCount; i++) {
-            let part = new Part();
-            this.parts.push(part);
-            part.isMultiRest = GpBinaryHelpers.gpReadBool(readable);
-            let groupCount: number = IOHelper.readInt32BE(readable);
-            for (let j: number = 0; j < groupCount; j++) {
+        for (let i: number = 0; i < scoreViewCount; i++) {
+            
+            const scoreView = new ScoreView();
+            this.scoreViews.push(scoreView);
+
+            scoreView.isMultiRest = GpBinaryHelpers.gpReadBool(readable);
+
+            const trackViewGroupCount: number = IOHelper.readInt32BE(readable);
+            for (let j: number = 0; j < trackViewGroupCount; j++) {
                 let flags: number = readable.readByte();
                 // enable at least standard notation
                 if (flags === 0) {
                     flags = 1;
                 }
-                let trackConfiguration = new TrackConfiguration();
+                let trackConfiguration = new TrackViewGroup();
                 trackConfiguration.showStandardNotation = (flags & 0x01) !== 0;
                 trackConfiguration.showTablature = (flags & 0x02) !== 0;
                 trackConfiguration.showSlash = (flags & 0x04) !== 0;
-                part.tracks.push(trackConfiguration);
+                scoreView.trackViewGroups.push(trackConfiguration);
             }
         }
     }
@@ -82,32 +98,29 @@ export class PartConfiguration {
     public static writeForScore(score: Score): Uint8Array {
         const writer = ByteBuffer.withCapacity(128);
 
-        const parts: Part[] = [
-            new Part() // default part always exists
+        const scoreViews: ScoreView[] = [
+            new ScoreView() // Multi Track Score View
         ];
 
         for (const track of score.tracks) {
-            for (const staff of track.staves) {
+            const trackConfiguration = new TrackViewGroup();
+            // NOTE: unclear how multi staff settings are meant in this format
+            // in the Guitar Pro UI there is no individual staff config
+            trackConfiguration.showStandardNotation = track.staves[0].showStandardNotation;
+            trackConfiguration.showTablature = track.staves[0].showTablature;
 
-                const trackConfiguration = new TrackConfiguration();
-                trackConfiguration.showStandardNotation = staff.showStandardNotation;
-                trackConfiguration.showTablature = staff.showTablature;
+            scoreViews[0].trackViewGroups.push(trackConfiguration);
 
-                if (staff.index === 0) {
-                    parts[0].tracks.push(trackConfiguration);
-                } else {
-                    let part = new Part();
-                    part.tracks.push(trackConfiguration);
-                    parts.push(part);
-                }
-            }
+            const singleTrackScoreView = new ScoreView();
+            singleTrackScoreView.trackViewGroups.push(trackConfiguration);
+            scoreViews.push(singleTrackScoreView);
         }
 
-        IOHelper.writeInt32BE(writer, parts.length);
-        for (const part of parts) {
+        IOHelper.writeInt32BE(writer, scoreViews.length);
+        for (const part of scoreViews) {
             writer.writeByte(part.isMultiRest ? 1 : 0);
-            IOHelper.writeInt32BE(writer, part.tracks.length);
-            for(const track of part.tracks) {
+            IOHelper.writeInt32BE(writer, part.trackViewGroups.length);
+            for(const track of part.trackViewGroups) {
                 let flags = 0;
                 if(track.showStandardNotation) {
                     flags = flags | 0x01;
@@ -121,6 +134,8 @@ export class PartConfiguration {
                 writer.writeByte(flags);
             }
         }
+
+        IOHelper.writeInt32BE(writer, 1 /* First Single Track Layout */);
 
         return writer.toArray();
     }
