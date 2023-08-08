@@ -1,5 +1,5 @@
 import { AlphaTabMetronomeEvent, AlphaTabRestEvent, ControlChangeEvent, EndOfTrackEvent, MidiEvent, MidiEventType, NoteBendEvent, NoteEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
-import { MidiFile } from '@src/midi/MidiFile';
+import { MidiFile, MidiTrack } from '@src/midi/MidiFile';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
@@ -108,10 +108,10 @@ export class JsonConverter {
     }
 
     /**
-    * Converts the given JavaScript object into a settings object.
-    * @param jsObject The javascript object created via {@link Settings}
-    * @returns The converted Settings object.
-    */
+     * Converts the given JavaScript object into a settings object.
+     * @param jsObject The javascript object created via {@link Settings}
+     * @returns The converted Settings object.
+     */
     public static jsObjectToSettings(jsObject: unknown): Settings {
         let settings: Settings = new Settings();
         SettingsSerializer.fromJson(settings, jsObject);
@@ -131,6 +131,23 @@ export class JsonConverter {
                 case 'division':
                     midi2.division = v as number;
                     break;
+                case 'tracks':
+                    for (let midiTrack of (v as unknown[])) {
+                        let midiTrack2: MidiTrack = JsonConverter.jsObjectToMidiTrack(midiTrack);
+                        midi2.tracks.push(midiTrack2);
+                    }
+                    break;
+            }
+        });
+
+        return midi2;
+    }
+
+    private static jsObjectToMidiTrack(jsObject:unknown): MidiTrack {
+        let midi2: MidiTrack = new MidiTrack();
+
+        JsonHelper.forEach(jsObject, (v, k) => {
+            switch (k) {
                 case 'events':
                     for (let midiEvent of (v as unknown[])) {
                         let midiEvent2: MidiEvent = JsonConverter.jsObjectToMidiEvent(midiEvent);
@@ -244,11 +261,23 @@ export class JsonConverter {
         const o = new Map<string, unknown>();
         o.set('division', midi.division);
 
-        const midiEvents: Map<string, unknown>[] = [];
-        for (let midiEvent of midi.events) {
-            midiEvents.push(JsonConverter.midiEventToJsObject(midiEvent));
+        const tracks: Map<string, unknown>[] = [];
+        for (let track of midi.tracks) {
+            tracks.push(JsonConverter.midiTrackToJsObject(track));
         }
-        o.set('events', midiEvents);
+        o.set('tracks', tracks);
+
+        return o;
+    }
+
+    private static midiTrackToJsObject(midi: MidiTrack): Map<string, unknown> {
+        const o = new Map<string, unknown>();
+
+        const events: Map<string, unknown>[] = [];
+        for (let track of midi.events) {
+            events.push(JsonConverter.midiEventToJsObject(track));
+        }
+        o.set('events', events);
 
         return o;
     }
