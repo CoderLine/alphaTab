@@ -1158,7 +1158,7 @@ export class GpifWriter {
         const properties = staffNode.addElement('Properties');
 
         this.writeSimplePropertyNode(properties, 'CapoFret', 'Fret', staff.capo.toString());
-        this.writeSimplePropertyNode(properties, 'FretCount', 'Fret', '24');
+        this.writeSimplePropertyNode(properties, 'FretCount', 'Number', '24');
 
         if (staff.tuning.length > 0) {
             const tuningProperty = properties.addElement('Property');
