@@ -1616,7 +1616,8 @@ export class GpifParser {
                         const id: string = c.getAttribute('id');
                         switch (id) {
                             case '1124139520':
-                                bar.displayScale = parseFloat(c.findChildElement('Double')!.innerText);
+                                const childNode = c.findChildElement('Double') ?? c.findChildElement('Float');
+                                bar.displayScale = parseFloat(childNode!.innerText);
                                 break;
                         }
                         break;
