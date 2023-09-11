@@ -58,7 +58,7 @@ kotlin {
     sourceSets {
         val androidMain by getting {
             dependencies {
-                implementation("androidx.core:core-ktx:1.10.1")
+                implementation("androidx.core:core-ktx:1.12.0")
                 implementation("androidx.appcompat:appcompat:1.6.1")
             }
         }
