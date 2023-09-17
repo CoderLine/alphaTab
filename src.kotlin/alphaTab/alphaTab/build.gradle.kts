@@ -22,6 +22,8 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(11)
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -53,7 +55,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 //
 // Android
 kotlin {
-    android()
+    androidTarget()
 
     sourceSets {
         val androidMain by getting {
@@ -79,7 +81,7 @@ kotlin {
             }
         }
 
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation("junit:junit:4.13.2")
@@ -91,6 +93,7 @@ kotlin {
 
 android {
     compileSdk = 33
+    namespace = "net.alphatab"
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDirs(
@@ -111,7 +114,10 @@ android {
         "../../../dist/lib.kotlin/commonTest/generated"
     )
 
-    androidResources {
+    // https://issuetracker.google.com/issues/294771624
+    // https://stackoverflow.com/questions/76460539/error-adding-androidresources-no-compress-option-to-android-library-gradle
+    @Suppress("DEPRECATION")
+    aaptOptions {
         ignoreAssetsPattern = arrayOf(
             "eot",
             "otf",
@@ -126,7 +132,6 @@ android {
 
     defaultConfig {
         minSdk = 24
-        targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -159,7 +164,7 @@ val fetchTestResultsTask by tasks.registering {
             args = listOf(
                 "pull",
                 "/storage/emulated/0/Documents/test-results",
-                "$buildDir/reports/androidTests/connected/"
+                "${layout.buildDirectory}/reports/androidTests/connected/"
             )
         }
     }
@@ -182,17 +187,16 @@ val props = Properties()
 val propsFile = project.rootProject.file("local.properties")
 if (propsFile.exists()) {
     FileInputStream(propsFile).use {
-        props.load(it);
+        props.load(it)
     }
 }
 
 fun loadSetting(envKey: String, propKey: String, setter: (value: String) -> Unit) {
     if (props.containsKey(propKey)) {
-        setter(props.getProperty(propKey));
+        setter(props.getProperty(propKey))
     } else {
         val env = providers
             .environmentVariable(envKey)
-            .forUseAtConfigurationTime()
         if (env.isPresent) {
             setter(env.get())
         }
@@ -207,13 +211,13 @@ loadSetting("SONATYPE_SIGNING_PASSWORD", "sonatypeSigningPassword") { sonatypeSi
 loadSetting("SONATYPE_SIGNING_KEY", "sonatypeSigningKey") { sonatypeSigningKey = it }
 
 kotlin {
-    android {
+    androidTarget {
         publishLibraryVariants("release")
     }
 }
 tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
     // custom output directory
-    outputDirectory.set(buildDir.resolve("dokka"))
+    outputDirectory.set(layout.buildDirectory.dir("dokka"))
 
     dokkaSourceSets {
         named("androidMain") { }

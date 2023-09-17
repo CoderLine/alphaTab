@@ -73,7 +73,6 @@ export default createEmitter('json', (program, input) => {
         importedNames.add(name);
         statements.push(
             ts.factory.createImportDeclaration(
-                undefined,
                 ts.factory.createImportClause(
                     false,
                     undefined,
@@ -103,7 +102,6 @@ export default createEmitter('json', (program, input) => {
     const sourceFile = ts.factory.createSourceFile(
         [
             ts.factory.createImportDeclaration(
-                undefined,
                 ts.factory.createImportClause(
                     false,
                     undefined,
