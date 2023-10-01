@@ -62,7 +62,6 @@ export class FontLoadingChecker {
             } else {
                 Logger.error('Font', `[${this._originalFamilies.join(',')}] Loading Failed, rendering cannot start`, e);
                 window.clearInterval(failCounterId);
-                debugger;
             }
         };
 

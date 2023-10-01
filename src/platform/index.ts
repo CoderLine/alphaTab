@@ -1,5 +1,5 @@
 export { Cursors } from '@src/platform/Cursors';
-export { ICanvas } from '@src/platform/ICanvas';
+export { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 export { IContainer } from '@src/platform/IContainer';
 export { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 export { IUiFacade } from '@src/platform/IUiFacade';
