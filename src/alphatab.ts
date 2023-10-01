@@ -14,6 +14,7 @@ export { FormatError } from '@src/FormatError';
 export { LogLevel } from '@src/LogLevel';
 export { Logger } from '@src/Logger';
 export { FileLoadError } from '@src/FileLoadError';
+export { Environment } from '@src/Environment';
 
 export { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 
