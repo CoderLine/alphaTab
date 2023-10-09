@@ -71,7 +71,7 @@
         "rimraf": "^5.0.0",
         "rollup": "^2.75.1",
         "rollup-plugin-copy": "^3.4.0",
-        "rollup-plugin-dts": "^4.2.2",
+        "rollup-plugin-dts": "^6.1.0",
         "rollup-plugin-license": "^3.0.0",
         "rollup-plugin-serve": "^2.0.0",
         "rollup-plugin-terser": "^7.0.2",
