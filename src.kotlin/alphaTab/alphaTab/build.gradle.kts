@@ -15,7 +15,7 @@ plugins {
     id("com.android.library")
     `maven-publish`
     signing
-    id("org.jetbrains.dokka") version "1.9.0"
+    id("org.jetbrains.dokka") version "1.9.10"
 
     // iOS
     //    kotlin("native.cocoapods")
