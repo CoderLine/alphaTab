@@ -11,9 +11,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
-        <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2"/>
+        <PackageReference Include="MSTest.TestAdapter" Version="3.1.1"/>
+        <PackageReference Include="MSTest.TestFramework" Version="3.1.1"/>
+        <PackageReference Include="AlphaSkia" Version="1.0.117-*"/>
+        <PackageReference Include="AlphaSkia.Native.Windows" Version="1.0.117-*" Condition="$([MSBuild]::IsOsPlatform('Windows'))"/>
+        <PackageReference Include="AlphaSkia.Native.Linux" Version="1.0.117-*" Condition="$([MSBuild]::IsOsPlatform('Linux'))"/>
+        <PackageReference Include="AlphaSkia.Native.MacOs" Version="1.0.117-*" Condition="$([MSBuild]::IsOsPlatform('OSX'))"/>
+
     </ItemGroup>
 
     <ItemGroup>
@@ -31,7 +36,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AlphaTab\AlphaTab.csproj" />
+        <ProjectReference Include="..\AlphaTab\AlphaTab.csproj"/>
     </ItemGroup>
 
 

@@ -4,6 +4,7 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
+import { assert, expect } from 'chai';
 
 describe('MidiPlaybackControllerTest', () => {
     const testRepeat: ((score: Score, expectedIndexes: number[], maxBars: number) => void) = (score: Score, expectedIndexes: number[], maxBars: number): void => {
@@ -16,23 +17,23 @@ describe('MidiPlaybackControllerTest', () => {
             controller.processCurrent();
             if (controller.shouldPlay) {
                 if (i > maxBars) {
-                    fail('Too many bars generated');
+                    assert.fail('Too many bars generated');
                 }
                 Logger.debug('Test', `Checking index ${i}, expected[${expectedIndexes[i]}]`, i, expectedIndexes[i]);
                 if(index !== expectedIndexes[i]) {
                     errors.push(i);
                 }
                 actual.push(index);
-                expect(index).toEqual(expectedIndexes[i]);
+                expect(index).to.equal(expectedIndexes[i]);
                 i++;
             }
             controller.moveNext();
         }
         if(errors.length > 0) {
-            fail(`Sequence errors: ${errors.join(', ')}, Expected: [${expectedIndexes.join(', ')}], Actual: [${actual.join(', ')}]`)
+            assert.fail(`Sequence errors: ${errors.join(', ')}, Expected: [${expectedIndexes.join(', ')}], Actual: [${actual.join(', ')}]`)
         }
-        expect(i).toEqual(expectedIndexes.length);
-        expect(controller.finished).toBe(true);
+        expect(i).to.equal(expectedIndexes.length);
+        expect(controller.finished).to.be.equal(true);
     };
 
     const testGuitarProRepeat: ((file: string, expectedBars: number[], maxBars: number) => Promise<void>) = async (file: string, expectedBars: number[], maxBars: number): Promise<void> => {

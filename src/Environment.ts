@@ -57,6 +57,8 @@ import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 import { IntersectionObserverPolyfill } from '@src/platform/javascript/IntersectionObserverPolyfill';
 import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
+import { SkiaCanvas } from './platform/skia/SkiaCanvas';
+import { Font } from './model';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -368,6 +370,32 @@ export class Environment {
     }
 
     /**
+     * Enables the usage of alphaSkia as rendering backend.
+     * @param musicFontData The raw binary data of the music font. 
+     * @param musicFontSize The font size to use for the music font.
+     * @param alphaSkia The alphaSkia module.
+     * @target web
+     */
+    public static enableAlphaSkia(musicFontData: ArrayBuffer,
+        musicFontSize: number,
+        alphaSkia: any) {
+        SkiaCanvas.enable(musicFontData, musicFontSize, alphaSkia)
+    }
+
+    /**
+     * Registers a new custom font for the usage in the alphaSkia rendering backend using
+     * provided font information.
+     * @param fontData The raw binary data of the font.
+     * @param fontInfo If provided the font info provided overrules
+     * @returns The font info under which the font was registered.
+     */
+    public static registerAlphaSkiaCustomFont(
+        fontData: ArrayBuffer,
+        fontInfo?: Font | undefined) : Font {
+        return SkiaCanvas.registerFont(fontData, fontInfo);
+    }
+
+    /**
      * @target web
      * @partial
      */
@@ -376,6 +404,12 @@ export class Environment {
             'html5',
             new RenderEngineFactory(false, () => {
                 return new Html5Canvas();
+            })
+        );
+        renderEngines.set(
+            'skia',
+            new RenderEngineFactory(false, () => {
+                return new SkiaCanvas();
             })
         );
     }

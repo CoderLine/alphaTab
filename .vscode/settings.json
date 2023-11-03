@@ -1,7 +1,12 @@
 {
     "files.exclude": {
         "dist/lib.csharp/**": true,
-        "src.csharp/**": true,
-        "node_modules/**": true
-    }
+        "src.csharp/**": true
+    },
+    "mochaExplorer.files": "test/**/*.test.ts",
+    "mochaExplorer.nodeArgv": [
+        "--experimental-specifier-resolution=node",
+        "--loader=tsx"
+    ],
+    "mochaExplorer.logpanel": true
 }

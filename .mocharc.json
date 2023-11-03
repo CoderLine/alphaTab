@@ -1,0 +1,12 @@
+{
+    "extension": [
+        "ts"
+    ],
+    "node-option": [
+        "experimental-specifier-resolution=node",
+        "loader=tsx",
+        "no-warnings"
+    ],
+    "spec": "test/**/*.test.ts",
+    "timeout": "10000"
+}

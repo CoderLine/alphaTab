@@ -21,14 +21,13 @@
     </ItemGroup>
 
     <ItemGroup>
-		<None Include="..\..\README.md" Pack="true" PackagePath="\"/>	
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
         <EmbeddedResource Include="..\..\font\bravura\Bravura.ttf" Link="Platform\CSharp\Bravura.ttf" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AlphaSkia" Version="1.0.117-*" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-      <PackageReference Include="SkiaSharp" Version="2.88.6" />
-      <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.6" />
       <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     </ItemGroup>
 </Project>

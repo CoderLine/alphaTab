@@ -1,24 +1,19 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using SkiaSharp;
+using AlphaSkia;
 
 namespace AlphaTab.Wpf
 {
     internal static class SkImageSource
     {
-        public static BitmapSource Create(object data)
+        public static BitmapSource Create(AlphaSkiaImage image)
         {
-            var image = (SKImage) data;
-            var info = new SKImageInfo(image.Width, image.Height);
             var bitmap = new WriteableBitmap(image.Width, image.Height, 96, 96, PixelFormats.Pbgra32, null);
             bitmap.Lock();
             // copy
-            using (var pixmap = new SKPixmap(info, bitmap.BackBuffer, bitmap.BackBufferStride))
-            {
-                image.ReadPixels(pixmap, 0, 0);
-            }
-            bitmap.AddDirtyRect(new Int32Rect(0, 0, info.Width, info.Height));
+            image.ReadPixels(bitmap.BackBuffer, (ulong)bitmap.BackBufferStride);
+            bitmap.AddDirtyRect(new Int32Rect(0, 0, image.Width, image.Height));
             bitmap.Unlock();
             bitmap.Freeze();
             return bitmap;

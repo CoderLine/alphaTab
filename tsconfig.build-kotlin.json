@@ -2,7 +2,6 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist/lib.kotlin",
-    "module": "commonjs",
     "resolveJsonModule": true,
     "declaration": false,
     "declarationDir": null,

@@ -285,8 +285,8 @@ function generateSetPropertyBody(
                                 undefined,
                                 undefined,
                                 [
-                                    ts.factory.createParameterDeclaration(undefined, undefined, undefined, 'v'),
-                                    ts.factory.createParameterDeclaration(undefined, undefined, undefined, 'k')
+                                    ts.factory.createParameterDeclaration(undefined, undefined, 'v'),
+                                    ts.factory.createParameterDeclaration(undefined, undefined, 'k')
                                 ],
                                 undefined,
                                 ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),

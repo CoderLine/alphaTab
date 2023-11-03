@@ -39,7 +39,7 @@ public class Expector<T> {
         kotlin.test.assertEquals(exp, _actual, _message + message)
     }
 
-    public fun toBeCloseTo(expected: Double, message: String? = null) {
+    public fun to.be.closeTo(expected: Double, message: String? = null, 0.001) {
         if(_actual is Number) {
             kotlin.test.assertEquals(expected, _actual.toDouble(), 0.001, _message + message)
         } else {
@@ -55,11 +55,11 @@ public class Expector<T> {
         kotlin.test.assertEquals(exp, _actual, _message)
     }
 
-    public fun toBeTruthy() {
+    public fun to.be.ok {
         kotlin.test.assertNotNull(_actual, _message)
     }
 
-    public fun toBeTrue() {
+    public fun to.be.true {
         if(_actual is Boolean) {
             kotlin.test.assertTrue(_actual, _message)
         } else {
@@ -67,7 +67,7 @@ public class Expector<T> {
         }
     }
 
-    public fun toBeFalsy() {
+    public fun to.not.be.ok {
         val actual = _actual;
         if(actual is String){
             kotlin.test.assertTrue(actual.isEmpty(), _message)
@@ -76,7 +76,7 @@ public class Expector<T> {
         }
     }
 
-    public fun toThrowError(expected: KClass<out Exception>) {
+    public fun .to.throw(expected: KClass<out Exception>) {
         val actual = _actual
         if (actual is Function0<*>) {
             try {
@@ -89,6 +89,6 @@ public class Expector<T> {
             }
             kotlin.test.fail("Exception type didn't match: $_message")
         }
-        kotlin.test.fail("toThrowError can only be used with an exception: $_message")
+        kotlin.test.fail(".to.throw can only be used with an exception: $_message")
     }
 }

@@ -14,7 +14,8 @@ transpiler([{
 }], false);
 
 // Write version file
-import { version } from '../../package.json';
+const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+const { version } = packageJson;
 const fileHandle = fs.openSync('src/generated/VersionInfo.ts', 'w');
 fs.writeSync(fileHandle, `\
 ${GENERATED_FILE_HEADER}

@@ -8,11 +8,12 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { assert } from 'chai';
 
 describe('Gp7ExporterTest', () => {
     const loadScore: (name: string) => Promise<Score | null> = async (name: string): Promise<Score | null> => {
-        const data = await TestPlatform.loadFile('test-data/' + name);
         try {
+            const data = await TestPlatform.loadFile('test-data/' + name);
             return ScoreLoader.loadScoreFromBytes(data);
         } catch (e) {
             return null;
@@ -50,7 +51,7 @@ describe('Gp7ExporterTest', () => {
                 await TestPlatform.saveFile(fileName, exported);
             }
         } catch (e) {
-            fail(e);
+            assert.fail(String(e));
         }
     };
 

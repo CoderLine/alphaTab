@@ -4,6 +4,7 @@ import { Lyrics } from '@src/model/Lyrics';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
+import { expect } from 'chai';
 
 describe('LyricsTests', () => {
     const loadLyricsTemplateFile: () => Promise<Score> = async (): Promise<Score> => {
@@ -19,7 +20,7 @@ describe('LyricsTests', () => {
         let lyrics: Lyrics = new Lyrics();
         lyrics.text = text;
         lyrics.finish();
-        expect(lyrics.chunks.join(',')).toEqual(chunks.join(','));
+        expect(lyrics.chunks.join(',')).to.equal(chunks.join(','));
     };
 
     it('apply-single-line-first-bar', async () => {
@@ -28,14 +29,14 @@ describe('LyricsTests', () => {
         lyrics.text = 'AAA BBB CCC DDD EEE';
         lyrics.startBar = 0;
         score.tracks[0].applyLyrics([lyrics]);
-        expect(1).toEqual(1);
-        expect('AAA').toEqual('AAA');
-        expect('BBB').toEqual('BBB');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics).toBeFalsy();
-        expect('CCC').toEqual('CCC');
-        expect(1).toEqual(1);
-        expect('DDD').toEqual('DDD');
-        expect('EEE').toEqual('EEE');
+        expect(1).to.equal(1);
+        expect('AAA').to.equal('AAA');
+        expect('BBB').to.equal('BBB');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics).to.not.be.ok;
+        expect('CCC').to.equal('CCC');
+        expect(1).to.equal(1);
+        expect('DDD').to.equal('DDD');
+        expect('EEE').to.equal('EEE');
     });
 
     it('apply-single-line-bar-offset', async () => {
@@ -45,14 +46,14 @@ describe('LyricsTests', () => {
         lyrics.startBar = 2;
         score.tracks[0].applyLyrics([lyrics]);
 
-        expect(1).toEqual(1);
-        expect('AAA').toEqual('AAA');
-        expect('BBB').toEqual('BBB');
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].lyrics).toBeFalsy();
-        expect('CCC').toEqual('CCC');
-        expect(1).toEqual(1);
-        expect('DDD').toEqual('DDD');
-        expect('EEE').toEqual('EEE');
+        expect(1).to.equal(1);
+        expect('AAA').to.equal('AAA');
+        expect('BBB').to.equal('BBB');
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].lyrics).to.not.be.ok;
+        expect('CCC').to.equal('CCC');
+        expect(1).to.equal(1);
+        expect('DDD').to.equal('DDD');
+        expect('EEE').to.equal('EEE');
     });
 
     it('apply-multi-line-first-bar', async () => {
@@ -66,19 +67,19 @@ describe('LyricsTests', () => {
         lyrics2.startBar = 0;
 
         score.tracks[0].applyLyrics([lyrics1, lyrics2]);
-        expect(2).toEqual(2);
-        expect('AAA').toEqual('AAA');
-        expect('111').toEqual('111');
-        expect('BBB').toEqual('BBB');
-        expect('222').toEqual('222');
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics).toBeFalsy();
-        expect('CCC').toEqual('CCC');
-        expect('333').toEqual('333');
-        expect(2).toEqual(2);
-        expect('DDD').toEqual('DDD');
-        expect('444').toEqual('444');
-        expect('EEE').toEqual('EEE');
-        expect('555').toEqual('555');
+        expect(2).to.equal(2);
+        expect('AAA').to.equal('AAA');
+        expect('111').to.equal('111');
+        expect('BBB').to.equal('BBB');
+        expect('222').to.equal('222');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics).to.not.be.ok;
+        expect('CCC').to.equal('CCC');
+        expect('333').to.equal('333');
+        expect(2).to.equal(2);
+        expect('DDD').to.equal('DDD');
+        expect('444').to.equal('444');
+        expect('EEE').to.equal('EEE');
+        expect('555').to.equal('555');
     });
 
     it('apply-multi-line-bar-offset', async () => {
@@ -92,22 +93,22 @@ describe('LyricsTests', () => {
         lyrics2.startBar = 1;
 
         score.tracks[0].applyLyrics([lyrics1, lyrics2]);
-        expect(2).toEqual(2);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].lyrics![0]).toBeFalsy();
-        expect('111').toEqual('111');
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].lyrics![0]).toBeFalsy();
-        expect('222').toEqual('222');
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].lyrics).toBeFalsy();
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].lyrics![0]).toBeFalsy();
-        expect('333').toEqual('333');
-        expect(2).toEqual(2);
-        expect('AAA').toEqual('AAA');
-        expect('444').toEqual('444');
-        expect('BBB').toEqual('BBB');
-        expect('555').toEqual('555');
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].lyrics).toBeFalsy();
-        expect('CCC').toEqual('CCC');
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].lyrics![1]).toBeFalsy();
+        expect(2).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].lyrics![0]).to.not.be.ok;
+        expect('111').to.equal('111');
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].lyrics![0]).to.not.be.ok;
+        expect('222').to.equal('222');
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].lyrics).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].lyrics![0]).to.not.be.ok;
+        expect('333').to.equal('333');
+        expect(2).to.equal(2);
+        expect('AAA').to.equal('AAA');
+        expect('444').to.equal('444');
+        expect('BBB').to.equal('BBB');
+        expect('555').to.equal('555');
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].lyrics).to.not.be.ok;
+        expect('CCC').to.equal('CCC');
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].lyrics![1]).to.not.be.ok;
     });
 
     it('spaces', () => {

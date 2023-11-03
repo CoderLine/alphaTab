@@ -608,7 +608,21 @@ export default class CSharpEmitterContext {
         if (!actualType) {
             return null;
         }
-        const type = this.getTypeFromTsType(parent, actualType, undefined, typeArguments);
+
+
+        let type: cs.TypeNode | null;
+        if (actualType == tsType) {
+            type = {
+                nodeType: cs.SyntaxKind.TypeReference,
+                parent: parent,
+                reference: tsType.symbol.name,
+                isNullable: isNullable,
+                isOptional: isOptional
+            } as cs.TypeReference
+        } else {
+            type = this.getTypeFromTsType(parent, actualType, undefined, typeArguments)
+        }
+
         return {
             nodeType: cs.SyntaxKind.TypeReference,
             parent: parent,
@@ -899,8 +913,8 @@ export default class CSharpEmitterContext {
         const declaration = symbol.valueDeclaration
             ? symbol.valueDeclaration
             : symbol.declarations && symbol.declarations.length > 0
-            ? symbol.declarations[0]
-            : undefined;
+                ? symbol.declarations[0]
+                : undefined;
 
         if (declaration) {
             return symbol.name + '_' + declaration.getSourceFile().fileName + '_' + declaration.pos;
@@ -1532,7 +1546,7 @@ export default class CSharpEmitterContext {
         return (
             (tsSymbol.flags & ts.SymbolFlags.EnumMember) !== 0 ||
             !!tsSymbol.declarations?.find(
-                d => d.modifiers && !!d.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)
+                d => 'modifiers' in d && d.modifiers && !!(d.modifiers as ts.NodeArray<ts.Modifier>).find(m => m.kind === ts.SyntaxKind.StaticKeyword)
             )
         );
     }

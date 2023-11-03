@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
+using AlphaSkia;
 using AlphaTab.Core;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Model;
 using AlphaTab.Platform.CSharp;
 using AlphaTab.Rendering;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SkiaSharp;
 
 namespace AlphaTab.VisualTests
 {
     partial class VisualTestHelper
     {
         public static async Task RunVisualTestScoreWithResize(Score score, IList<double> widths,
-            IList<string?> referenceImages, Settings? settings = null, IList<double>? tracks = null, string? message = null,
+            IList<string?> referenceImages, Settings? settings = null, IList<double>? tracks = null,
+            string? message = null,
             double tolerancePercent = 1.0)
         {
             tracks ??= new List<double> { 0 };
@@ -31,13 +32,15 @@ namespace AlphaTab.VisualTests
                 }
                 else
                 {
-                    referenceFileData.Add(await TestPlatform.LoadFile(Path.Combine("test-data", "visual-tests", referenceFileName)));
+                    referenceFileData.Add(await TestPlatform.LoadFile(Path.Combine("test-data",
+                        "visual-tests", referenceFileName)));
                 }
             }
 
-            var results = new AlphaTab.Collections.List<AlphaTab.Collections.List<RenderFinishedEventArgs>>();
+            var results =
+                new AlphaTab.Collections.List<AlphaTab.Collections.List<RenderFinishedEventArgs>>();
             var totalWidths = new AlphaTab.Collections.List<double>();
-            var totalHeights =  new AlphaTab.Collections.List<double>();
+            var totalHeights = new AlphaTab.Collections.List<double>();
 
             var task = new TaskCompletionSource<object?>();
             var renderer = new ScoreRenderer(settings)
@@ -50,10 +53,7 @@ namespace AlphaTab.VisualTests
                 totalWidths.Add(0);
                 totalHeights.Add(0);
             });
-            renderer.PartialRenderFinished.On(e =>
-            {
-                results[^1].Add(e);
-            });
+            renderer.PartialRenderFinished.On(e => { results[^1].Add(e); });
             renderer.RenderFinished.On(e =>
             {
                 totalWidths[^1] = e.TotalWidth;
@@ -73,7 +73,8 @@ namespace AlphaTab.VisualTests
 
             renderer.RenderScore(score, tracks);
 
-            if (await Task.WhenAny(task.Task, Task.Delay(2000 * referenceImages.Count)) == task.Task)
+            if (await Task.WhenAny(task.Task, Task.Delay(2000 * referenceImages.Count)) ==
+                task.Task)
             {
                 for (var i = 0; i < results.Count; i++)
                 {
@@ -120,6 +121,7 @@ namespace AlphaTab.VisualTests
         }
 
         private static bool _fontsLoaded;
+
         private static void LoadFonts()
         {
             if (_fontsLoaded)
@@ -150,24 +152,21 @@ namespace AlphaTab.VisualTests
             AlphaTab.Collections.List<RenderFinishedEventArgs> result, string referenceFileName,
             Uint8Array referenceFileData, string? message, double tolerancePercent = 1)
         {
-            SKBitmap finalBitmap;
+            using var finalBitmap = new AlphaSkiaCanvas();
+            finalBitmap.BeginRender((int)totalWidth, (int)totalHeight);
 
-            using (var finalImageSurface = SKSurface.Create(new SKImageInfo((int) totalWidth,
-                (int) totalHeight,
-                SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
+            foreach (var partialResult in result)
             {
-                foreach (var partialResult in result)
+                var partialCanvas = partialResult.RenderResult;
+                if (partialCanvas is AlphaSkiaImage img)
                 {
-                    var partialCanvas = partialResult.RenderResult;
-                    if (partialCanvas is SKImage img)
-                    {
-                        finalImageSurface.Canvas.DrawImage(img, (float)partialResult.X, (float)partialResult.Y);
-                    }
+                    finalBitmap.DrawImage(img, (float)partialResult.X, (float)partialResult.Y,
+                        (float)partialResult.Width, (float)partialResult.Height);
+                    img.Dispose();
                 }
-
-                using var finalImage = finalImageSurface.Snapshot();
-                finalBitmap = SKBitmap.FromImage(finalImage);
             }
+
+            using var finalImage = finalBitmap.EndRender()!;
 
             var finalImageFileName = Path.ChangeExtension(referenceFileName, ".new.png");
             using (finalBitmap)
@@ -175,80 +174,68 @@ namespace AlphaTab.VisualTests
                 var dir = Path.GetDirectoryName(finalImageFileName)!;
                 Directory.CreateDirectory(dir);
 
-                using (var fileStream = new SKFileWStream(finalImageFileName))
-                {
-                    finalBitmap.Encode(fileStream, SKEncodedImageFormat.Png, 100);
-                }
+                var png = finalImage.ToPng()!;
+                File.WriteAllBytes(finalImageFileName, png);
 
-                SKBitmap referenceBitmap;
-                using (var data = SKData.CreateCopy(referenceFileData.Buffer.Raw))
+                using var referenceBitmap =
+                    AlphaSkiaImage.Decode(referenceFileData.Buffer.Raw.Array!)!;
+                try
                 {
-                    referenceBitmap = SKBitmap.Decode(data);
-                }
+                    Assert.AreEqual(totalWidth, referenceBitmap.Width,
+                        "Width of images does not match");
+                    Assert.AreEqual(totalHeight, referenceBitmap.Height,
+                        "Height of images does not match");
 
-                using (referenceBitmap)
-                {
-                    try
-                    {
-                        Assert.AreEqual(totalWidth, referenceBitmap.Width,
-                            "Width of images does not match");
-                        Assert.AreEqual(totalHeight, referenceBitmap.Height,
-                            "Height of images does not match");
-                        var diffData = new Uint8Array(finalBitmap.Bytes.Length);
-                        var match = PixelMatch.Match(
-                            new Uint8Array(referenceBitmap.Bytes),
-                            new Uint8Array(finalBitmap.Bytes),
-                            diffData,
-                            referenceBitmap.Width,
-                            referenceBitmap.Height,
-                            new PixelMatchOptions
-                            {
-                                Threshold = 0.3,
-                                IncludeAA = false,
-                                DiffMask = true,
-                                Alpha = 1
-                            });
+                    var referencePixels = new Uint8Array(referenceBitmap.ReadPixels()!);
+                    var actualPixels = new Uint8Array(finalImage.ReadPixels()!);
+                    var diffPixels = new Uint8Array(actualPixels.Length);
 
-                        var totalPixels = match.TotalPixels - match.TransparentPixels;
-                        var percentDifference = (match.DifferentPixels / totalPixels) * 100;
-                        var pass = percentDifference < tolerancePercent;
-                        if (!pass)
+                    var match = PixelMatch.Match(
+                        referencePixels,
+                        actualPixels,
+                        diffPixels,
+                        referenceBitmap.Width,
+                        referenceBitmap.Height,
+                        new PixelMatchOptions
                         {
-                            var percentDifferenceText = percentDifference.ToString("0.00");
-                            var msg =
-                                $"Difference between original and new image is too big: {match.DifferentPixels}/${totalPixels} ({percentDifferenceText}%) ${message}";
+                            Threshold = 0.3,
+                            IncludeAA = false,
+                            DiffMask = true,
+                            Alpha = 1
+                        });
 
-                            var diffImageName =
-                                Path.ChangeExtension(referenceFileName, ".diff.png");
-                            using (var fileStream = new SKFileWStream(diffImageName))
-                            {
-                                var diff = SKBitmap.FromImage(
-                                    SKImage.FromPixels(referenceBitmap.Info,
-                                        SKData.Create(new MemoryStream(diffData.Data.Array!)))
-                                );
-                                diff?.Encode(fileStream,
-                                    SKEncodedImageFormat.Png, 100);
-                            }
-
-                            var newImageName =
-                                Path.ChangeExtension(referenceFileName, ".new.png");
-                            using (var fileStream = new SKFileWStream(newImageName))
-                            {
-                                finalBitmap.Encode(fileStream,
-                                    SKEncodedImageFormat.Png, 100);
-                            }
-
-                            Assert.Fail(msg);
-                        }
-                    }
-                    catch (AssertFailedException)
+                    var totalPixels = match.TotalPixels - match.TransparentPixels;
+                    var percentDifference = (match.DifferentPixels / totalPixels) * 100;
+                    var pass = percentDifference < tolerancePercent;
+                    if (!pass)
                     {
-                        throw;
+                        var percentDifferenceText = percentDifference.ToString("0.00");
+                        var msg =
+                            $"Difference between original and new image is too big: {match.DifferentPixels}/${totalPixels} ({percentDifferenceText}%) ${message}";
+
+                        var diffImageName =
+                            Path.ChangeExtension(referenceFileName, ".diff.png");
+
+                        using var diffImage = AlphaSkiaImage.FromPixels(finalImage.Width,
+                            finalImage.Height,
+                            diffPixels.Data.Array!
+                        )!;
+                        File.WriteAllBytes(diffImageName, diffImage.ToPng()!);
+
+                        var newImageName =
+                            Path.ChangeExtension(referenceFileName, ".new.png");
+                        File.WriteAllBytes(newImageName, finalImage.ToPng()!);
+
+                        Assert.Fail(msg);
                     }
-                    catch (Exception e)
-                    {
-                        Assert.Fail($"Error comparing images: {e}, ${message}");
-                    }
+                }
+                catch (AssertFailedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Assert.Fail($"Error comparing images: {e}, ${message}");
                 }
             }
 
