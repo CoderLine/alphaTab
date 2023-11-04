@@ -11,8 +11,8 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { assert } from 'chai';
 import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
 import { TestUiFacade } from './TestUiFacade';
-import * as path from 'path';
-import * as alphaSkia from '@coderline/alphaskia';
+import * as alphaSkiaModule from '@coderline/alphaskia';
+import { AlphaSkiaCanvas, AlphaSkiaImage } from '@coderline/alphaskia';
 
 export class VisualTestHelper {
     public static async runVisualTest(
@@ -135,7 +135,7 @@ export class VisualTestHelper {
         }
 
         await VisualTestHelper.prepareAlphaSkia();
-        await VisualTestHelper.prepareSettingsForTest(settings);
+        VisualTestHelper.prepareSettingsForTest(settings);
 
         let referenceFileData: (Uint8Array | null)[] = [];
         for (const img of referenceImages) {
@@ -200,7 +200,7 @@ export class VisualTestHelper {
                     reject(new Error('Rendering did not complete in time'));
                 }, 2000 * widths.length);
             })
-        ]);
+        ] as Promise<void>[]);
 
         api.destroy();
 
@@ -227,13 +227,11 @@ export class VisualTestHelper {
             return;
         }
 
-        /**
-         * @target web
-         */
+        /**@target web*/
         Environment.enableAlphaSkia(
             (await TestPlatform.loadFile('font/bravura/Bravura.ttf')).buffer,
             Environment.MusicFontSize,
-            alphaSkia
+            alphaSkiaModule
         );
 
         const fonts = [
@@ -254,10 +252,8 @@ export class VisualTestHelper {
         VisualTestHelper._alphaSkiaPrepared = true;
     }
 
-    static async prepareSettingsForTest(settings: Settings) {
-        /**
-         * @target web
-         */
+    static prepareSettingsForTest(settings: Settings) {
+        /**@target web*/
         settings.core.fontDirectory = 'font/bravura/';
         settings.core.engine = 'skia';
         Environment.HighDpiFactor = 1; // test data is in scale 1
@@ -286,23 +282,23 @@ export class VisualTestHelper {
         tolerancePercent: number = 1
     ): Promise<void> {
         // create final full image
-        using actual = new alphaSkia.AlphaSkiaCanvas();
+        using actual = new AlphaSkiaCanvas();
         actual.beginRender(totalWidth, totalHeight);
         for (const partialResult of result) {
             if (partialResult.renderResult) {
-                const partialCanvas = partialResult.renderResult as alphaSkia.AlphaSkiaImage;
+                const partialCanvas = partialResult.renderResult as AlphaSkiaImage;
                 actual.drawImage(partialCanvas, partialResult.x, partialResult.y, partialResult.width, partialResult.height);
             }
         }
 
         // convert reference image to canvas
-        using expected = alphaSkia.AlphaSkiaImage.decode(referenceFileData.buffer);
+        using expected = AlphaSkiaImage.decode(referenceFileData.buffer);
         await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, expected!, referenceFileName, message, tolerancePercent);
     }
 
     private static async expectToEqualVisuallyAsync(
-        actual: alphaSkia.AlphaSkiaImage,
-        expected: alphaSkia.AlphaSkiaImage,
+        actual: AlphaSkiaImage,
+        expected: AlphaSkiaImage,
         expectedFileName: string,
         message?: string,
         tolerancePercent: number = 1
@@ -310,10 +306,10 @@ export class VisualTestHelper {
         const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
         const oldActual = actual;
         if (sizeMismatch) {
-            using newActual = new alphaSkia.AlphaSkiaCanvas();
+            using newActual = new AlphaSkiaCanvas();
             newActual.beginRender(expected.width, expected.height);
             newActual.drawImage(actual, 0, 0, expected.width, expected.height);
-            newActual.color = alphaSkia.AlphaSkiaCanvas.rgbaToColor(255, 0, 0, 255);
+            newActual.color = AlphaSkiaCanvas.rgbaToColor(255, 0, 0, 255);
             newActual.lineWidth = 2;
             newActual.strokeRect(0, 0, expected.width, expected.height);
 
@@ -325,38 +321,37 @@ export class VisualTestHelper {
 
         // do visual comparison
         const diffImageData = new ArrayBuffer(actualImageData.byteLength);
-        const result = {
-            pass: true,
-            message: ''
-        };
+        let pass = true;
+        let errorMessage = "";
 
         try {
+            const options = new PixelMatchOptions();
+            options.threshold = 0.3;
+            options.includeAA = false;
+            options.diffMask = true;
+            options.alpha = 1;
+
             let match = PixelMatch.match(
                 new Uint8Array(expectedImageData),
                 new Uint8Array(actualImageData),
                 new Uint8Array(diffImageData),
                 expected.width,
                 expected.height,
-                {
-                    threshold: 0.3,
-                    includeAA: false,
-                    diffMask: true,
-                    alpha: 1
-                } as PixelMatchOptions
+                options
             );
 
             // only pixels that are not transparent are relevant for the diff-ratio
             let totalPixels = match.totalPixels - match.transparentPixels;
             let percentDifference = (match.differentPixels / totalPixels) * 100;
-            result.pass = percentDifference < tolerancePercent;
+            pass = percentDifference < tolerancePercent;
             // result.pass = match.differentPixels === 0;
-            result.message = '';
+            errorMessage = '';
 
-            if (!result.pass) {
+            if (!pass) {
                 let percentDifferenceText = percentDifference.toFixed(2);
-                result.message = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
+                errorMessage = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
 
-                using diffPng = alphaSkia.AlphaSkiaImage.fromPixels(
+                using diffPng = AlphaSkiaImage.fromPixels(
                     actual.width,
                     actual.height,
                     diffImageData)!;
@@ -365,16 +360,16 @@ export class VisualTestHelper {
             }
 
             if (sizeMismatch) {
-                result.message += `Image sizes do not match: expected ${expected.width}x${expected.height} but got ${oldActual.width}x${oldActual.height}`;
-                result.pass = false;
+                errorMessage += `Image sizes do not match: expected ${expected.width}x${expected.height} but got ${oldActual.width}x${oldActual.height}`;
+                pass = false;
             }
         } catch (e) {
-            result.pass = false;
-            result.message = `Error comparing images: ${e}, ${message}`;
+            pass = false;
+            errorMessage = `Error comparing images: ${e}, ${message}`;
         }
 
-        if (!result.pass) {
-            throw new Error(result.message);
+        if (!pass) {
+            throw new Error(errorMessage);
         } else {
             await VisualTestHelper.deleteFiles(expectedFileName);
         }
@@ -382,36 +377,36 @@ export class VisualTestHelper {
 
     static async saveFiles(
         expectedFilePath: string,
-        actual: alphaSkia.AlphaSkiaImage,
-        diff: alphaSkia.AlphaSkiaImage
+        actual: AlphaSkiaImage,
+        diff: AlphaSkiaImage
     ): Promise<void> {
-        expectedFilePath = path.join(
+        expectedFilePath = TestPlatform.joinPath(
             'test-data',
             'visual-tests',
-            ...expectedFilePath.split(/[\\\/]/)
+            expectedFilePath
         );
 
         const actualData = actual.toPng()!;
         const diffData = diff.toPng()!;
 
-        const diffFileName = path.format({ ...path.parse(expectedFilePath), base: '', ext: '.diff.png' });
+        const diffFileName = TestPlatform.changeExtension(expectedFilePath, '.diff.png');
         await TestPlatform.saveFile(diffFileName, new Uint8Array(diffData));
 
-        const actualFile = path.format({ ...path.parse(expectedFilePath), base: '', ext: '.new.png' });
+        const actualFile = TestPlatform.changeExtension(expectedFilePath, '.new.png');
         await TestPlatform.saveFile(actualFile, new Uint8Array(actualData));
     }
 
     static async deleteFiles(expectedFilePath: string): Promise<void> {
-        expectedFilePath = path.join(
+        expectedFilePath = TestPlatform.joinPath(
             'test-data',
             'visual-tests',
-            ...expectedFilePath.split(/[\\\/]/)
+            expectedFilePath
         );
 
-        const diffFileName = path.format({ ...path.parse(expectedFilePath), base: '', ext: '.diff.png' });
+        const diffFileName = TestPlatform.changeExtension(expectedFilePath, '.diff.png');
         await TestPlatform.deleteFile(diffFileName);
 
-        const actualFile = path.format({ ...path.parse(expectedFilePath), base: '', ext: '.new.png' });
+        const actualFile = TestPlatform.changeExtension(expectedFilePath, '.new.png');
         await TestPlatform.deleteFile(actualFile);
     }
 

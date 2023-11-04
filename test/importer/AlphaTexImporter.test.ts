@@ -24,11 +24,11 @@ import { Settings } from '@src/Settings';
 import { assert, expect } from 'chai';
 
 describe('AlphaTexImporterTest', () => {
-    const parseTex: (tex: string) => Score = (tex: string): Score => {
+    function parseTex(tex: string): Score {
         let importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
         return importer.readScore();
-    };
+    }
 
     it('ensure-metadata-parsing-issue73', () => {
         const tex = `\\title Test
@@ -1112,11 +1112,11 @@ describe('AlphaTexImporterTest', () => {
         try {
             parseTex(tex);
         } catch (e) {
-            if(!(e instanceof UnsupportedFormatError)) {
+            if (!(e instanceof UnsupportedFormatError)) {
                 assert.fail('Did not throw correct error');
                 return;
             }
-            if(!(e.inner instanceof AlphaTexError)) {
+            if (!(e.inner instanceof AlphaTexError)) {
                 assert.fail('Did not contain an AlphaTexError');
                 return;
             }

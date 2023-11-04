@@ -20,16 +20,16 @@ import { AutomationType } from '@src/model/Automation';
 import { expect } from 'chai';
 
 describe('Gp7ImporterTest', () => {
-    const prepareGp7ImporterWithFile:(name:string) => Promise<Gp7Importer> = async (name: string): Promise<Gp7Importer> => {
+    async function prepareGp7ImporterWithFile(name: string): Promise<Gp7Importer> {
         const data = await TestPlatform.loadFile('test-data/' + name);
         return prepareGp7ImporterWithBytes(data);
-    };
+    }
 
-    const prepareGp7ImporterWithBytes: (buffer: Uint8Array) => Gp7Importer = (buffer: Uint8Array): Gp7Importer => {
+    function prepareGp7ImporterWithBytes(buffer: Uint8Array) {
         let readerBase: Gp7Importer = new Gp7Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
-    };
+    }
 
     it('score-info', async () => {
         const reader = await prepareGp7ImporterWithFile('guitarpro7/score-info.gp');
@@ -752,7 +752,7 @@ describe('Gp7ImporterTest', () => {
         expect(score.masterBars[0].calculateDuration()).to.equal(1920);
         expect(score.masterBars[1].calculateDuration()).to.equal(3840);
     });
-    
+
     it('left-hand-tap', async () => {
         const reader = await prepareGp7ImporterWithFile('guitarpro7/left-hand-tap.gp');
         let score: Score = reader.readScore();
@@ -895,7 +895,7 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[3].playbackInfo.balance).to.be.equal(12);
         expect(score.tracks[4].playbackInfo.balance).to.be.equal(16);
     });
-    
+
     it('program-change', async () => {
         const reader = await prepareGp7ImporterWithFile('guitarpro7/program-change.gp');
         let score: Score = reader.readScore();
@@ -903,12 +903,12 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].playbackInfo.program).to.be.equal(25);
         const automation = score.tracks[0].staves[0].bars[2].voices[0].beats[0].getAutomation(AutomationType.Instrument);
         expect(automation).to.be.ok;
-        if(automation) {
+        if (automation) {
             expect(automation.value).to.be.equal(29);
         }
     });
 
-    it('chord-no-diagram', async () =>{
+    it('chord-no-diagram', async () => {
         const reader = await prepareGp7ImporterWithFile('guitarpro7/chord-no-diagram.gp');
         let score: Score = reader.readScore();
 

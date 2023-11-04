@@ -11,29 +11,26 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { assert } from 'chai';
 
 describe('Gp7ExporterTest', () => {
-    const loadScore: (name: string) => Promise<Score | null> = async (name: string): Promise<Score | null> => {
+    async function loadScore(name: string): Promise<Score | null> {
         try {
             const data = await TestPlatform.loadFile('test-data/' + name);
             return ScoreLoader.loadScoreFromBytes(data);
         } catch (e) {
             return null;
         }
-    };
+    }
 
-    const prepareGp7ImporterWithBytes: (buffer: Uint8Array) => Gp7Importer = (buffer: Uint8Array): Gp7Importer => {
+    function prepareGp7ImporterWithBytes(buffer: Uint8Array): Gp7Importer {
         let readerBase: Gp7Importer = new Gp7Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
-    };
+    }
 
-    const exportGp7: (score: Score) => Uint8Array = (score: Score): Uint8Array => {
+    function exportGp7(score: Score): Uint8Array {
         return new Gp7Exporter().export(score, null);
-    };
+    }
 
-    const testRoundTripEqual: (name: string, ignoreKeys: string[] | null) => Promise<void> = async (
-        name: string,
-        ignoreKeys: string[] | null = null
-    ): Promise<void> => {
+    async function testRoundTripEqual(name: string, ignoreKeys: string[] | null): Promise<void> {
         try {
             const expected = await loadScore(name);
             if (!expected) {
@@ -53,14 +50,14 @@ describe('Gp7ExporterTest', () => {
         } catch (e) {
             assert.fail(String(e));
         }
-    };
+    }
 
-    const testRoundTripFolderEqual: (name: string) => Promise<void> = async (name: string): Promise<void> => {
+    async function testRoundTripFolderEqual(name: string): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
         for (const file of files) {
             await testRoundTripEqual(`${name}/${file}`, null);
         }
-    };
+    }
 
     // Note: we just test all our importer and visual tests to cover all features
 

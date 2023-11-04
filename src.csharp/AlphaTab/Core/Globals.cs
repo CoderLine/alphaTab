@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.Threading.Tasks;
 
 namespace AlphaTab.Core
 {
@@ -10,6 +12,10 @@ namespace AlphaTab.Core
         public static double ParseInt(char c)
         {
             return ParseInt(c.ToString());
+        }
+        public static void SetImmediate(Action action)
+        {
+            action();
         }
 
         public static double ParseInt(string s)
@@ -52,6 +58,15 @@ namespace AlphaTab.Core
         public static bool IsNaN(double d)
         {
             return double.IsNaN(d);
+        }
+
+        public static void SetTimeout(Action action, int timeout)
+        {
+            Task.Run(async () =>
+            {
+                await Task.Delay(timeout);
+                action();
+            });
         }
     }
 }

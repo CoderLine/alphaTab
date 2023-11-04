@@ -264,6 +264,15 @@ namespace AlphaTab.Platform.CSharp
             RecreateImage();
         }
 
+
+        public void Destroy()
+        {
+            _image?.Dispose();
+            _graphics?.Dispose();
+            _brush?.Dispose();
+            _pen?.Dispose();
+        }
+
         public void BeginRender(double width, double height)
         {
             _width = width;

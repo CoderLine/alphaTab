@@ -7,21 +7,21 @@ import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 
 describe('LyricsTests', () => {
-    const loadLyricsTemplateFile: () => Promise<Score> = async (): Promise<Score> => {
+    async function loadLyricsTemplateFile(): Promise<Score> {
         const path: string = 'test-data/lyrics/template.gpx';
         const data = await TestPlatform.loadFile(path);
         let buffer: ByteBuffer = ByteBuffer.fromBuffer(data);
         let importer: GpxImporter = new GpxImporter();
         importer.init(buffer, new Settings());
         return importer.readScore();
-    };
+    }
 
-    const testLyrics: ((text: string, chunks: string[])=> void) = (text: string, chunks: string[]): void => {
+    function testLyrics(text: string, chunks: string[]): void {
         let lyrics: Lyrics = new Lyrics();
         lyrics.text = text;
         lyrics.finish();
         expect(lyrics.chunks.join(',')).to.equal(chunks.join(','));
-    };
+    }
 
     it('apply-single-line-first-bar', async () => {
         const score = await loadLyricsTemplateFile();

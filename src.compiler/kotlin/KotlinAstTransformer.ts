@@ -282,12 +282,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return method;
     }
 
-    protected override visitPropertyAccessExpression(parent: cs.Node, expression: ts.PropertyAccessExpression) {
-        const base = super.visitPropertyAccessExpression(parent, expression);
-
-        return base;
-    }
-
     protected override getSymbolName(
         parentSymbol: ts.Symbol,
         symbol: ts.Symbol,

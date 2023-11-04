@@ -8,13 +8,13 @@ import { Color } from "@src/model/Color";
 import { Font, FontStyle } from "@src/model/Font";
 import { JsonConverter } from "@src/model/JsonConverter";
 import { Score } from "@src/model/Score";
-import { NotationElement, TabRhythmMode, NotationMode, FingeringMode} from "@src/NotationSettings";
+import { NotationElement, TabRhythmMode, NotationMode, FingeringMode } from "@src/NotationSettings";
 import { TestPlatform } from "@test/TestPlatform";
 import { ComparisonHelpers } from "./ComparisonHelpers";
 import { assert, expect } from 'chai';
 
 describe('JsonConverterTest', () => {
-    const loadScore: (name: string) => Promise<Score | null> = async (name: string): Promise<Score | null> => {
+    async function loadScore(name: string): Promise<Score | null> {
         try {
             const data = await TestPlatform.loadFile('test-data/' + name);
             return ScoreLoader.loadScoreFromBytes(data);
@@ -22,9 +22,9 @@ describe('JsonConverterTest', () => {
         catch (e) {
             return null;
         }
-    };
+    }
 
-    const testRoundTripEqual: (name: string) => Promise<void> = async (name: string): Promise<void> => {
+    async function testRoundTripEqual(name: string): Promise<void> {
         try {
             const expected = await loadScore(name);
             if (!expected) {
@@ -39,14 +39,14 @@ describe('JsonConverterTest', () => {
         } catch (e) {
             assert.fail(String(e));
         }
-    };
+    }
 
-    const testRoundTripFolderEqual: (name: string) => Promise<void> = async (name: string): Promise<void> => {
+    async function testRoundTripFolderEqual(name: string): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
         for (const file of files) {
             await testRoundTripEqual(`${name}/${file}`);
         }
-    };
+    }
 
     it('importer', async () => {
         await testRoundTripFolderEqual('guitarpro7');

@@ -30,5 +30,19 @@ namespace AlphaTab
                 .Select(Path.GetFileName)
                 .ToList());
         }
+
+        public static string JoinPath(string path1, string path2, string path3)
+        {
+            return Path.Join(path1, path2, path3);
+        }
+
+        public static Task DeleteFile(string path)
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            return Task.CompletedTask;
+        }
     }
 }

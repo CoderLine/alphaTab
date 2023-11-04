@@ -1,5 +1,5 @@
 import { AlphaTabApiBase } from "@src/AlphaTabApiBase";
-import { EventEmitter, EventEmitterOfT, IEventEmitter } from "@src/EventEmitter";
+import { EventEmitter, EventEmitterOfT, IEventEmitter, IEventEmitterOfT } from "@src/EventEmitter";
 import { Settings } from "@src/Settings";
 import { ScoreLoader } from "@src/importer";
 import { Score } from "@src/model";
@@ -99,9 +99,9 @@ class TestUiContainer implements IContainer {
 
     public resize: IEventEmitter = new EventEmitter();
 
-    public mouseDown: EventEmitterOfT<IMouseEventArgs> = new EventEmitterOfT<IMouseEventArgs>();
-    public mouseMove: EventEmitterOfT<IMouseEventArgs> = new EventEmitterOfT<IMouseEventArgs>();
-    public mouseUp: EventEmitterOfT<IMouseEventArgs> = new EventEmitterOfT<IMouseEventArgs>();
+    public mouseDown: IEventEmitterOfT<IMouseEventArgs> = new EventEmitterOfT<IMouseEventArgs>();
+    public mouseMove: IEventEmitterOfT<IMouseEventArgs> = new EventEmitterOfT<IMouseEventArgs>();
+    public mouseUp: IEventEmitterOfT<IMouseEventArgs> = new EventEmitterOfT<IMouseEventArgs>();
 }
 
 export class TestUiFacade implements IUiFacade<unknown> {
@@ -261,7 +261,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
             return true;
         }
         if (data instanceof ArrayBuffer) {
-            let byteArray: Uint8Array = new Uint8Array(data);
+            let byteArray: Uint8Array = new Uint8Array(data as ArrayBuffer);
             success(ScoreLoader.loadScoreFromBytes(byteArray, this._api.settings));
             return true;
         }
@@ -287,7 +287,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
         }
 
         if (data instanceof ArrayBuffer) {
-            this._api.player.loadSoundFont(new Uint8Array(data), append);
+            this._api.player.loadSoundFont(new Uint8Array(data as ArrayBuffer), append);
             return true;
         }
         if (data instanceof Uint8Array) {

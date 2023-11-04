@@ -23,6 +23,11 @@ export interface AlphaSkiaModule {
  * @partial
  */
 export class SkiaCanvas implements ICanvas {
+    /**
+     * @target web
+     * @delegated csharp AlphaSkiaBridge
+     * @delegated kotlin AlphaSkiaBridge
+     */
     private static alphaSkia: AlphaSkiaModule;
 
     private static musicFont: alphaSkia.AlphaSkiaTypeface;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AlphaTab.Core;
 using AlphaTab.Collections;
 using AlphaTab.Platform.CSharp;
+using AlphaTab.Platform.Skia;
 
 namespace AlphaTab
 {

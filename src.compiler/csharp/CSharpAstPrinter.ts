@@ -265,17 +265,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
             this.write('override ');
         }
 
-        if (d.isAsync) {
-            if (cs.isPrimitiveTypeNode(d.returnType) && d.returnType.type === cs.PrimitiveType.Void) {
-                this.write('System.Threading.Tasks.Task');
-            } else {
-                this.write('System.Threading.Tasks.Task<');
-                this.writeType(d.returnType);
-                this.write('>');
-            }
-        } else {
-            this.writeType(d.returnType);
-        }
+        this.writeType(d.returnType);
 
         this.write(` ${d.name}`);
         this.writeTypeParameters(d.typeParameters);
@@ -474,7 +464,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 } else {
                     const isDynamicArray =
                         cs.isPrimitiveTypeNode(arrayType.elementType) &&
-                        arrayType.elementType.type === cs.PrimitiveType.Dynamic;
+                        arrayType.elementType.type === cs.PrimitiveType.Object;
                     if (isDynamicArray && !forNew) {
                         this.write('System.Collections.IList');
                     } else {

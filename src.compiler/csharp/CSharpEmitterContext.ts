@@ -324,12 +324,27 @@ export default class CSharpEmitterContext {
         switch (tsSymbol.name) {
             case 'Promise':
                 const promiseType = tsType as ts.TypeReference;
+
+                let promiseReturnType: cs.TypeNode | null = null;
+
                 if (typeArguments) {
-                    return typeArguments[0];
+                    promiseReturnType = typeArguments[0];
                 } else if (promiseType.typeArguments) {
-                    return this.getTypeFromTsType(node, promiseType.typeArguments[0]);
+                    promiseReturnType = this.getTypeFromTsType(node, promiseType.typeArguments[0]);
                 }
-                return null;
+
+                if (promiseReturnType != null && cs.isPrimitiveTypeNode(promiseReturnType) &&
+                    promiseReturnType.type == cs.PrimitiveType.Void) {
+                    promiseReturnType = null;
+                }
+
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: node.parent,
+                    tsNode: node.tsNode,
+                    reference: "System.Threading.Tasks.Task",
+                    typeArguments: promiseReturnType != null ? [promiseReturnType] : undefined
+                } as cs.TypeReference;
             case 'Map':
                 const mapType = tsType as ts.TypeReference;
                 let mapKeyType: cs.TypeNode | null = null;
@@ -374,7 +389,7 @@ export default class CSharpEmitterContext {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: node.parent,
                     tsNode: node.tsNode,
-                    reference: this.buildCoreNamespace(tsSymbol) + tsSymbol.name,
+                    reference: tsSymbol.name,
                     typeArguments: typeArguments
                 } as cs.TypeReference;
         }
@@ -582,7 +597,7 @@ export default class CSharpEmitterContext {
                 actualType = t;
             } else if (actualType != null && actualType.flags !== t.flags) {
                 let isEmitted = this.isNodeEmitted(parent);
-                if (isEmitted) {
+                if (isEmitted && t.symbol.name !== 'PromiseLike') {
                     this.addCsNodeDiagnostics(
                         parent,
                         'Union type covering multiple types detected, fallback to dynamic',
@@ -599,7 +614,7 @@ export default class CSharpEmitterContext {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
                 parent: parent,
-                type: cs.PrimitiveType.Dynamic,
+                type: cs.PrimitiveType.Object,
                 isNullable: isNullable,
                 isOptional: isOptional
             } as cs.PrimitiveTypeNode;
@@ -681,7 +696,7 @@ export default class CSharpEmitterContext {
 
         // any -> dynamic
         if ((tsType.flags & ts.TypeFlags.Any) !== 0) {
-            return handleNullablePrimitive(cs.PrimitiveType.Dynamic);
+            return handleNullablePrimitive(cs.PrimitiveType.Object);
         }
 
         // object -> object
@@ -1357,6 +1372,25 @@ export default class CSharpEmitterContext {
 
     public isInternal(node: ts.Node) {
         return !!ts.getJSDocTags(node).find(t => t.tagName.text === 'internal');
+    }
+
+    public getDelegatedName(tsSymbol: ts.Symbol | undefined): string | null {
+        if (!tsSymbol || !tsSymbol.declarations) {
+            return null;
+        }
+
+        for (const declaration of tsSymbol.declarations) {
+            const delegation = ts.getJSDocTags(declaration).find(t => t.tagName.text === 'delegated');
+            if (delegation) {
+                return (delegation.comment as string).substring(this.targetTag.length + 1);
+            }
+        }
+
+        return null;
+    }
+
+    public get targetTag(): string {
+        return 'csharp';
     }
 
     public rewriteVisibilities() {

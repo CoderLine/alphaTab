@@ -53,4 +53,12 @@ export class TestPlatform {
             return file.substr(0, lastDot) + extension;
         }
     }
+    
+    /**
+     * @target web
+     * @partial
+     */
+    public static joinPath(...parts: string[]): string {
+        return path.join(...parts);
+    }
 }

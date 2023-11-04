@@ -9,18 +9,16 @@ import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 
 describe('GpxImporterTest', () => {
-    const prepareGpxImporterWithFile: (name: string) => Promise<GpxImporter> = async (
-        name: string
-    ): Promise<GpxImporter> => {
+    async function prepareGpxImporterWithFile(name: string): Promise<GpxImporter> {
         const data = await TestPlatform.loadFile('test-data/' + name);
         return prepareGpxImporterWithBytes(data);
-    };
+    }
 
-    const prepareGpxImporterWithBytes: (buffer: Uint8Array) => GpxImporter = (buffer: Uint8Array): GpxImporter => {
+    function prepareGpxImporterWithBytes(buffer: Uint8Array) {
         let readerBase: GpxImporter = new GpxImporter();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
-    };
+    }
 
     it('file-system-compressed', async () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro6/file-system-compressed.gpx');
