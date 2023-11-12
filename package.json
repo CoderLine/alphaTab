@@ -73,6 +73,7 @@
         "fs-extra": "^11.1.1",
         "mocha": "^10.2.0",
         "multer": "^1.4.5-lts.1",
+        "opener": "^1.5.2",
         "rimraf": "^5.0.5",
         "rollup": "^4.3.0",
         "rollup-plugin-copy": "^3.5.0",
