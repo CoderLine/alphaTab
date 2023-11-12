@@ -14,6 +14,9 @@ import { TestUiFacade } from './TestUiFacade';
 import * as alphaSkiaModule from '@coderline/alphaskia';
 import { AlphaSkiaCanvas, AlphaSkiaImage } from '@coderline/alphaskia';
 
+/**
+ * @partial
+ */
 export class VisualTestHelper {
     public static async runVisualTest(
         inputFile: string,
