@@ -4,8 +4,96 @@ import CSharpEmitterContext from './CSharpEmitterContext';
 import AstPrinterBase from '../AstPrinterBase';
 
 export default class CSharpAstPrinter extends AstPrinterBase {
+
     public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
         super(sourceFile, context);
+    }
+
+    private keywords: Set<string> = new Set<string>([
+        "abstract",
+        "as",
+        "base",
+        "bool",
+        "break",
+        "byte",
+        "case",
+        "catch",
+        "char",
+        "checked",
+        "class",
+        "const",
+        "continue",
+        "decimal",
+        "default",
+        "delegate",
+        "do",
+        "double",
+        "else",
+        "enum",
+        "event",
+        "explicit",
+        "extern",
+        "false",
+        "finally",
+        "fixed",
+        "float",
+        "for",
+        "foreach",
+        "goto",
+        "if",
+        "implicit",
+        "in",
+        "int",
+        "interface",
+        "internal",
+        "is",
+        "lock",
+        "long",
+        "namespace",
+        "new",
+        "null",
+        "object",
+        "operator",
+        "out",
+        "override",
+        "params",
+        "private",
+        "protected",
+        "public",
+        "readonly",
+        "ref",
+        "return",
+        "sbyte",
+        "sealed",
+        "short",
+        "sizeof",
+        "stackalloc",
+        "static",
+        "string",
+        "struct",
+        "switch",
+        "this",
+        "throw",
+        "true",
+        "try",
+        "typeof",
+        "uint",
+        "ulong",
+        "unchecked",
+        "unsafe",
+        "ushort",
+        "using",
+        "virtual",
+        "void",
+        "volatile",
+        "while"
+    ]);
+
+    protected override escapeIdentifier(identifier: string): string {
+        if (this.keywords.has(identifier)) {
+            return '@' + identifier;
+        }
+        return identifier;
     }
 
     protected writeSourceFile(sourceFile: cs.SourceFile) {
@@ -215,12 +303,12 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 defaultConstructor.parameters = constructorDeclaration.parameters;
                 defaultConstructor.baseConstructorArguments = constructorDeclaration.parameters.map(
                     p =>
-                        ({
-                            parent: defaultConstructor,
-                            nodeType: cs.SyntaxKind.Identifier,
-                            text: p.name,
-                            tsNode: defaultConstructor.tsNode
-                        } as cs.Identifier)
+                    ({
+                        parent: defaultConstructor,
+                        nodeType: cs.SyntaxKind.Identifier,
+                        text: p.name,
+                        tsNode: defaultConstructor.tsNode
+                    } as cs.Identifier)
                 );
                 this.writeMember(defaultConstructor);
             }
@@ -526,18 +614,38 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 break;
             case cs.SyntaxKind.TypeReference:
                 const typeReference = type as cs.TypeReference;
+                let isAsyncVoid = false;
+
                 const targetType = (type as cs.TypeReference).reference;
                 if (typeof targetType === 'string') {
                     this.write(targetType);
                 } else {
-                    this.writeType(targetType, forNew);
+                    if (typeReference.isAsync) {
+                        this.write("System.Threading.Tasks.Task");
+                        if (!cs.isPrimitiveTypeNode(targetType) || targetType.type != cs.PrimitiveType.Void) {
+                            this.write('<');
+                            this.writeType(targetType, forNew);
+
+                        } else {
+                            isAsyncVoid = true;
+                        }
+                    } else {
+                        this.writeType(targetType, forNew);
+                    }
                 }
 
-                if (typeReference.typeArguments && typeReference.typeArguments.length > 0) {
-                    this.write('<');
-                    this.writeCommaSeparated(typeReference.typeArguments, p => this.writeType(p));
-                    this.write('>');
+                if (!isAsyncVoid) {
+                    if (typeReference.typeArguments && typeReference.typeArguments.length > 0) {
+                        this.write('<');
+                        this.writeCommaSeparated(typeReference.typeArguments, p => this.writeType(p));
+                        this.write('>');
+                    }
+
+                    if (typeReference.isAsync) {
+                        this.write(">");
+                    }
                 }
+
                 break;
             case cs.SyntaxKind.ClassDeclaration:
             case cs.SyntaxKind.InterfaceDeclaration:
@@ -672,10 +780,13 @@ export default class CSharpAstPrinter extends AstPrinterBase {
     }
 
     protected writeMemberAccessExpression(expr: cs.MemberAccessExpression) {
-        this.writeExpression(expr.expression);
-        this.write(expr.nullSafe ? '?.' : '.');
+        const isEmpty = cs.isIdentifier(expr.expression) && expr.expression.text.length === 0;
+        if (!isEmpty) {
+            this.writeExpression(expr.expression);
+            this.write(expr.nullSafe ? '?.' : '.');
+        }
         const name = this._context.getSymbolName(expr) ?? expr.member;
-        this.write(name);
+        this.writeIdentifier(name);
     }
 
     protected writeElementAccessExpression(expr: cs.ElementAccessExpression) {
@@ -802,7 +913,25 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         }
     }
 
+    protected writeVariableStatement(s: cs.VariableStatement) {
+        switch (s.variableStatementKind) {
+            case cs.VariableStatementKind.Normal:
+            case cs.VariableStatementKind.Const:
+                // nothing special in c#
+                break;
+            case cs.VariableStatementKind.Using:
+                this.write('using ');
+                break;
+            case cs.VariableStatementKind.AwaitUsing:
+                this.write('await using ');
+                break;
+        }
+        this.writeVariableDeclarationList(s.declarationList);
+        this.writeSemicolon();
+    }
+
     protected writeVariableDeclarationList(declarationList: cs.VariableDeclarationList) {
+
         this.writeType(declarationList.declarations[0].type);
 
         declarationList.declarations.forEach((d, i) => {

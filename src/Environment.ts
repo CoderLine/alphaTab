@@ -390,7 +390,7 @@ export class Environment {
      * @returns The font info under which the font was registered.
      */
     public static registerAlphaSkiaCustomFont(
-        fontData: ArrayBuffer,
+        fontData: Uint8Array,
         fontInfo?: Font | undefined) : Font {
         return SkiaCanvas.registerFont(fontData, fontInfo);
     }

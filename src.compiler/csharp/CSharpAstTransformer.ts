@@ -592,6 +592,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
+            isTestMethod: true,
             partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
             name: this._context.toMethodName((d.arguments[0] as ts.StringLiteral).text),
             parameters: [],
@@ -631,7 +632,11 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: csMethod,
                 tsNode: d.arguments[1],
-                reference: "System.Threading.Tasks.Task",
+                isAsync: true, 
+                reference: {
+                    nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                    type: cs.PrimitiveType.Void
+                } as cs.PrimitiveTypeNode,
                 typeArguments: []
             } as cs.TypeReference
         }
@@ -652,6 +657,7 @@ export default class CSharpAstTransformer {
                     isOverride: false,
                     isStatic: false,
                     isVirtual: false,
+                    isTestMethod: false,
                     partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
                     name: this._context.toPascalCase(d.name.getText()),
                     returnType: {} as cs.TypeNode,
@@ -1223,6 +1229,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
+            isTestMethod: false,
             partial: !!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'partial'),
             name: this._context.toMethodName((classElement.name as ts.Identifier).text),
             parameters: [],
@@ -1398,10 +1405,19 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.VariableStatement,
             parent: parent,
             tsNode: s,
-            declarationList: {} as cs.VariableDeclarationList
+            declarationList: {} as cs.VariableDeclarationList,
+            variableStatementKind: cs.VariableStatementKind.Normal
         } as cs.VariableStatement;
 
         variableStatement.declarationList = this.visitVariableDeclarationList(variableStatement, s.declarationList);
+
+        if ((s.declarationList.flags & ts.NodeFlags.Const) != 0) {
+            variableStatement.variableStatementKind = cs.VariableStatementKind.Const;
+        } else if ((s.declarationList.flags & ts.NodeFlags.Using) != 0) {
+            variableStatement.variableStatementKind = cs.VariableStatementKind.Using;
+        } else if ((s.declarationList.flags & ts.NodeFlags.AwaitUsing) != 0) {
+            variableStatement.variableStatementKind = cs.VariableStatementKind.AwaitUsing;
+        } 
 
         return variableStatement;
     }
@@ -1411,7 +1427,8 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.VariableDeclarationList,
             parent: parent,
             tsNode: s,
-            declarations: []
+            declarations: [],
+            isConst: (s.flags & ts.NodeFlags.Const) != 0
         } as cs.VariableDeclarationList;
 
         s.declarations.forEach(d =>
@@ -1439,7 +1456,8 @@ export default class CSharpAstTransformer {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: variableStatement,
                     tsNode: s,
-                    reference: this._context.makeExceptionType()
+                    reference: this._context.makeExceptionType(),
+                    isAsync: false
                 } as cs.TypeReference;
             } else {
                 variableStatement.type = this.createUnresolvedTypeNode(variableStatement, s.type ?? s, type);
@@ -1852,6 +1870,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
+            isTestMethod: false,
             partial: !!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'partial'),
             name: this._context.toMethodName((classElement.name as ts.Identifier).text),
             parameters: [],
@@ -3025,10 +3044,9 @@ export default class CSharpAstTransformer {
 
         // check if member is delegated
         const delegation = this._context.getDelegatedName(tsSymbol);
-        if (delegation) {
+        if (delegation != null) {
             return {
                 parent: parent,
-                tsNode: expression,
                 nodeType: cs.SyntaxKind.Identifier,
                 text: delegation
             } as cs.Identifier;

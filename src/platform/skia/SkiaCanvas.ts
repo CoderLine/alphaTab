@@ -5,6 +5,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { Settings } from '@src/Settings';
 import type * as alphaSkia from '@coderline/alphaskia';
+import type { AlphaSkiaTypeface }  from '@coderline/alphaskia';
 
 /**
  * Describes the members of the alphaSkia module.
@@ -25,13 +26,13 @@ export interface AlphaSkiaModule {
 export class SkiaCanvas implements ICanvas {
     /**
      * @target web
-     * @delegated csharp AlphaSkiaBridge
-     * @delegated kotlin AlphaSkiaBridge
+     * @delegated csharp
+     * @delegated kotlin
      */
     private static alphaSkia: AlphaSkiaModule;
 
-    private static musicFont: alphaSkia.AlphaSkiaTypeface;
-    private static musicFontSize: number;
+    private static musicFont: AlphaSkiaTypeface | null = null;
+    private static musicFontSize: number = 0;
 
     private static readonly customTypeFaces = new Map<string, alphaSkia.AlphaSkiaTypeface>();
 
@@ -46,8 +47,8 @@ export class SkiaCanvas implements ICanvas {
         SkiaCanvas.musicFontSize = musicFontSize;
     }
 
-    public static registerFont(fontData: ArrayBuffer, fontInfo?: Font | undefined): Font {
-        const typeface = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.register(fontData)!;
+    public static registerFont(fontData: Uint8Array, fontInfo?: Font | undefined): Font {
+        const typeface = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.register(fontData.buffer)!;
         if (!fontInfo) {
             fontInfo = Font.withFamilyList([typeface.familyName], 12, typeface.isItalic ? FontStyle.Italic : FontStyle.Plain,
                 typeface.isBold ? FontWeight.Bold : FontWeight.Regular);
@@ -64,7 +65,7 @@ export class SkiaCanvas implements ICanvas {
         return fontFamily.toLowerCase() + "_" + isBold + "_" + isItalic;
     }
 
-    private _canvas!: alphaSkia.AlphaSkiaCanvas;
+    private _canvas: alphaSkia.AlphaSkiaCanvas;
     private _color: Color = new Color(0, 0, 0, 0);
     private _lineWidth: number = 0;
     private _typeFaceCache: string = "";
@@ -173,8 +174,8 @@ export class SkiaCanvas implements ICanvas {
         this._canvas.quadraticCurveTo(cpx, cpy, x, y);
     }
 
-    public bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void {
-        this._canvas.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+    public bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void {
+        this._canvas.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, x, y);
     }
 
     public fillCircle(x: number, y: number, radius: number): void {
@@ -205,7 +206,7 @@ export class SkiaCanvas implements ICanvas {
     public textAlign: TextAlign = TextAlign.Left;
     public textBaseline: TextBaseline = TextBaseline.Top;
 
-    public beginGroup(_: string): void {
+    public beginGroup(_identifier: string): void {
         // not supported
     }
 
@@ -257,7 +258,7 @@ export class SkiaCanvas implements ICanvas {
         y: number,
         scale: number,
         symbol: MusicFontSymbol,
-        centerAtPosition: boolean = false
+        centerAtPosition?: boolean
     ): void {
         if (symbol === MusicFontSymbol.None) {
             return;
@@ -270,7 +271,7 @@ export class SkiaCanvas implements ICanvas {
         y: number,
         scale: number,
         symbols: MusicFontSymbol[],
-        centerAtPosition: boolean = false
+        centerAtPosition?: boolean
     ): void {
         let s: string = '';
         for (let symbol of symbols) {
@@ -286,11 +287,11 @@ export class SkiaCanvas implements ICanvas {
         y: number,
         scale: number,
         symbols: string,
-        centerAtPosition: boolean = false
+        centerAtPosition?: boolean
     ): void {
         this._canvas.fillText(
             symbols,
-            SkiaCanvas.musicFont,
+            SkiaCanvas.musicFont!,
             SkiaCanvas.musicFontSize * this.settings.display.scale * scale,
             x, y,
             centerAtPosition ? SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Center : SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Left,

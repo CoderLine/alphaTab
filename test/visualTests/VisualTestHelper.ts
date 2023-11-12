@@ -227,12 +227,8 @@ export class VisualTestHelper {
             return;
         }
 
-        /**@target web*/
-        Environment.enableAlphaSkia(
-            (await TestPlatform.loadFile('font/bravura/Bravura.ttf')).buffer,
-            Environment.MusicFontSize,
-            alphaSkiaModule
-        );
+        const bravura:ArrayBuffer = (await TestPlatform.loadFile('font/bravura/Bravura.ttf')).buffer;
+        VisualTestHelper.enableAlphaSkia(bravura);
 
         const fonts = [
             'font/roboto/Roboto-Regular.ttf',
@@ -246,10 +242,21 @@ export class VisualTestHelper {
         ];
 
         for (const font of fonts) {
-            Environment.registerAlphaSkiaCustomFont((await TestPlatform.loadFile(font)).buffer);
+            Environment.registerAlphaSkiaCustomFont((await TestPlatform.loadFile(font)));
         }
 
         VisualTestHelper._alphaSkiaPrepared = true;
+    }
+    /**
+     * @target web
+     * @partial
+     */
+    static enableAlphaSkia(bravura:ArrayBuffer) {
+        Environment.enableAlphaSkia(
+            bravura,
+            Environment.MusicFontSize,
+            alphaSkiaModule
+        );    
     }
 
     static prepareSettingsForTest(settings: Settings) {

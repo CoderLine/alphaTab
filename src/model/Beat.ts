@@ -19,7 +19,6 @@ import { Voice } from '@src/model/Voice';
 import { WhammyType } from '@src/model/WhammyType';
 import { NotationMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { GraceGroup } from '@src/model/GraceGroup';

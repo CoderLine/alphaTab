@@ -159,14 +159,16 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.VariableStatement,
                 parent: block,
                 tsNode: block.tsNode,
-                declarationList: {} as cs.VariableDeclarationList
+                declarationList: {} as cs.VariableDeclarationList,
+                variableStatementKind: cs.VariableStatementKind.Normal
             } as cs.VariableStatement;
 
             variableStatement.declarationList = {
                 nodeType: cs.SyntaxKind.VariableDeclarationList,
                 parent: variableStatement,
                 tsNode: block.tsNode,
-                declarations: []
+                declarations: [],
+                isConst: false
             } as cs.VariableDeclarationList;
 
             let declaration = {
@@ -219,6 +221,51 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
         return el;
     }
+
+    override visitCallExpression(parent: cs.Node, expression: ts.CallExpression) {
+        const invocation = super.visitCallExpression(parent, expression);
+
+        // For Kotlin we generate async functions as "suspend" functions
+        // and await expressions are normal method calls.
+        // this is a problem when we want to use the raw Promise like  asyncFunction().then().catch()
+        // The following code wraps the code to a "alphaTab.core.TypeHelper.suspendToDeferred({ asyncFunction() }).then().catch()
+        if (invocation && cs.isInvocationExpression(invocation)) {
+            const returnType = this._context.typeChecker.getTypeAtLocation(expression);
+            const method = this._context.typeChecker.getSymbolAtLocation(expression.expression);
+
+            if (returnType?.symbol?.name === "Promise" 
+                && (method as any)?.parent?.name !== 'Promise'
+                && !ts.isAwaitExpression(expression.parent)) {
+                const suspendToDeferred = {
+                    nodeType: cs.SyntaxKind.InvocationExpression,
+                } as cs.InvocationExpression;
+
+                suspendToDeferred.expression = this.makeMemberAccess(
+                    suspendToDeferred,
+                    this._context.makeTypeName('alphaTab.core.TypeHelper'),
+                    this._context.toMethodName('suspendToDeferred')
+                );
+
+                suspendToDeferred.arguments = [
+                    {
+                        nodeType: cs.SyntaxKind.LambdaExpression,
+                        parameters: [] as cs.ParameterDeclaration[],
+                        body: invocation,
+                        parent: suspendToDeferred,
+                        returnType: {
+                            nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                            type: cs.PrimitiveType.Void
+                        } as cs.PrimitiveTypeNode
+                    } as cs.LambdaExpression
+                ];
+
+                return suspendToDeferred;
+            }
+        }
+
+        return invocation;
+    }
+
 
     protected override visitConstructorDeclaration(
         parent: cs.ClassDeclaration,
@@ -414,6 +461,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             nodeType: cs.SyntaxKind.TypeReference,
             parent: csExpr,
             reference: '',
+            isAsync: false,
             tsNode: expression
         };
 
@@ -429,6 +477,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 type.typeArguments = type.typeArguments ?? [];
                 type.typeArguments.push({
                     nodeType: cs.SyntaxKind.TypeReference,
+                    isAsync: false,
                     parent: type,
                     reference: this.createUnresolvedTypeNode(type, expression.elements[0], keyType)
                 } as cs.TypeReference);
@@ -438,6 +487,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 type.typeArguments = type.typeArguments ?? [];
                 type.typeArguments.push({
                     nodeType: cs.SyntaxKind.TypeReference,
+                    isAsync: false,
                     parent: type,
                     reference: this.createUnresolvedTypeNode(type, expression.elements[1], valueType)
                 } as cs.TypeReference);
@@ -461,6 +511,15 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         });
 
         return csExpr;
+    }
+
+    override visitTestClass(d: ts.CallExpression): void {
+        this._csharpFile.usings.push({
+            nodeType: cs.SyntaxKind.UsingDeclaration,
+            namespaceOrTypeName: 'kotlinx.coroutines.test',
+            parent: this._csharpFile
+        } as cs.UsingDeclaration);
+        super.visitTestClass(d);
     }
 
     private getContainerTypeName(tsType: ts.Type): string | null {

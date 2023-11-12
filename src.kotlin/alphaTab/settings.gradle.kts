@@ -5,6 +5,13 @@ pluginManagement {
         mavenCentral()
     }
 }
-rootProject.name = "alphaTab"
 
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "alphaTab"
 include(":alphaTab")

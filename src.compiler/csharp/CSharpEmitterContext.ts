@@ -104,6 +104,11 @@ export default class CSharpEmitterContext {
                 (expr.tsSymbol.flags & ts.SymbolFlags.NamespaceModule && this.isKnownModule(expr.tsSymbol))
             ) {
                 return this.toPascalCase('alphaTab.core') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
+            } else if(expr.tsSymbol) {
+                let externalModule = this.resolveExternalModuleOfType(expr.tsSymbol);
+                if (externalModule) {
+                    return externalModule + this.toPascalCase(expr.tsSymbol.name);
+                }
             }
         }
         return undefined;
@@ -342,8 +347,11 @@ export default class CSharpEmitterContext {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: node.parent,
                     tsNode: node.tsNode,
-                    reference: "System.Threading.Tasks.Task",
-                    typeArguments: promiseReturnType != null ? [promiseReturnType] : undefined
+                    isAsync: true,
+                    reference: promiseReturnType != null ? promiseReturnType : {
+                        nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                        type: cs.PrimitiveType.Void
+                    } as cs.PrimitiveTypeNode
                 } as cs.TypeReference;
             case 'Map':
                 const mapType = tsType as ts.TypeReference;
@@ -385,14 +393,41 @@ export default class CSharpEmitterContext {
                 return csType;
 
             default:
+                let externalModule = this.resolveExternalModuleOfType(tsSymbol);
+                if (!externalModule) {
+                    externalModule = this.buildCoreNamespace(tsSymbol);
+                }
+
                 return {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: node.parent,
                     tsNode: node.tsNode,
-                    reference: tsSymbol.name,
+                    reference: externalModule + tsSymbol.name,
                     typeArguments: typeArguments
                 } as cs.TypeReference;
         }
+    }
+
+    private resolveExternalModuleOfType(tsSymbol: ts.Symbol): string | undefined {
+        // TODO: the future goal here is to find the import statement which brought the type into the current module
+        // and then do a semi-automatic mapping of external libraries 
+        // unfortunately we haven't found yet a good TS Compiler API to do so, hence we map manually some specific symbols we know
+        // check if the type as imported from an external module/package and then map the name accordingly. 
+
+        switch (tsSymbol.name) {
+            case 'AlphaSkiaCanvas':
+            case 'AlphaSkiaImage':
+            case 'AlphaSkiaTextAlign':
+            case 'AlphaSkiaTextBaseline':
+            case 'AlphaSkiaTypeface':
+                return this.alphaSkiaModule() + '.'
+        }
+
+        return undefined;
+    }
+
+    protected alphaSkiaModule(): string {
+        return 'AlphaTab.Platform.Skia.AlphaSkiaBridge';
     }
 
     protected createArrayListType(tsSymbol: ts.Symbol, node: cs.Node, arrayElementType: cs.TypeNode): cs.TypeNode {
@@ -1380,7 +1415,7 @@ export default class CSharpEmitterContext {
         }
 
         for (const declaration of tsSymbol.declarations) {
-            const delegation = ts.getJSDocTags(declaration).find(t => t.tagName.text === 'delegated');
+            const delegation = ts.getJSDocTags(declaration).find(t => t.tagName.text === 'delegated' && (t.comment as string)?.indexOf(this.targetTag) >= 0 );
             if (delegation) {
                 return (delegation.comment as string).substring(this.targetTag.length + 1);
             }

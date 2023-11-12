@@ -13,6 +13,6 @@ internal actual fun createPlatformSpecificRenderEngines(engines: Map<String, Ren
     )
     engines.set(
         "default",
-        engines.get("android")!!
+        engines.get("android")
     )
 }

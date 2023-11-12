@@ -9,31 +9,44 @@ group = "net.alphatab"
 version = "1.3.0-SNAPSHOT"
 plugins {
     // Common
-    kotlin("multiplatform")
+    alias(libs.plugins.kotlinMultiplatform)
 
     // Android
-    id("com.android.library")
+    alias(libs.plugins.androidLibrary)
     `maven-publish`
     signing
-    id("org.jetbrains.dokka") version "1.9.0"
+    alias(libs.plugins.dokka)
 
     // iOS
-    //    kotlin("native.cocoapods")
+//    alias(libs.plugins.kotlinCocoapods)
 }
+
+repositories{
+    google()
+    mavenCentral()
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+}
+
+val jvmTarget = 17
+val alphaTabDescription = "alphaTab is a cross platform music notation and guitar tablature rendering library."
+val alphaTabWebsite = "https://alphatab.net"
 
 kotlin {
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.alphaskia)
             }
             kotlin.srcDirs("../../../dist/lib.kotlin/commonMain/generated")
         }
-
-        val commonTest by getting {
+        commonTest {
             dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
+                implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.alphaskia.macos)
+                implementation(libs.alphaskia.linux)
+                implementation(libs.alphaskia.windows)
             }
             kotlin.srcDirs("../../../dist/lib.kotlin/commonTest/generated")
         }
@@ -42,10 +55,12 @@ kotlin {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
+        jvmTarget = this@Build_gradle.jvmTarget.toString()
         freeCompilerArgs += listOf(
             "-Xno-call-assertions",
             "-Xno-receiver-assertions",
-            "-Xno-param-assertions"
+            "-Xno-param-assertions",
+            "-Xmulti-platform"
         )
     }
 }
@@ -53,62 +68,35 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 //
 // Android
 kotlin {
-    android()
+    androidTarget {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = this@Build_gradle.jvmTarget.toString()
+            }
+        }
+    }
 
     sourceSets {
-        val androidMain by getting {
-            dependencies {
-                implementation("androidx.core:core-ktx:1.10.1")
-                implementation("androidx.appcompat:appcompat:1.6.1")
-            }
-        }
-
-        val os = System.getProperty("os.name")
-        val target = when {
-            os == "Mac OS X" -> {
-                "macos-x64"
-            }
-            os.startsWith("Win") -> {
-                "windows"
-            }
-            os.startsWith("Linux") -> {
-                "linux"
-            }
-            else -> {
-                throw Error("Unsupported OS: $os")
-            }
-        }
-
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-                implementation("junit:junit:4.13.2")
-                implementation("org.jetbrains.skija:skija-$target:0.93.6")
-            }
+        androidMain.dependencies {
+            implementation(libs.androidx.appcompat)
         }
     }
 }
 
 android {
     compileSdk = 33
+    namespace = project.group.toString()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDirs(
         "../../../font/bravura",
         "../../../font/sonivox"
     )
-    sourceSets["main"].kotlin.srcDirs(
-        "../../../dist/lib.kotlin/commonMain/generated"
-    )
     sourceSets["test"].manifest.srcFile("src/androidTest/AndroidManifest.xml")
     sourceSets["test"].assets.srcDirs(
         "../../../test-data",
-        "../../../font/bravura",
         "../../../font/roboto",
         "../../../font/ptserif"
-    )
-    sourceSets["test"].kotlin.srcDirs(
-        "../../../dist/lib.kotlin/commonTest/generated"
     )
 
     androidResources {
@@ -126,8 +114,12 @@ android {
 
     defaultConfig {
         minSdk = 24
-        targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     testOptions {
@@ -145,10 +137,8 @@ android {
 }
 
 dependencies {
-    // To use the androidx.test.core APIs
-    androidTestImplementation("androidx.test:core:1.5.0")
-    // Kotlin extensions for androidx.test.core
-    androidTestImplementation("androidx.test:core-ktx:1.5.0")
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.core.ktx)
 }
 
 val fetchTestResultsTask by tasks.registering {
@@ -159,7 +149,7 @@ val fetchTestResultsTask by tasks.registering {
             args = listOf(
                 "pull",
                 "/storage/emulated/0/Documents/test-results",
-                "$buildDir/reports/androidTests/connected/"
+                layout.buildDirectory.dir("reports/androidTests/connected/").toString()
             )
         }
     }
@@ -182,17 +172,15 @@ val props = Properties()
 val propsFile = project.rootProject.file("local.properties")
 if (propsFile.exists()) {
     FileInputStream(propsFile).use {
-        props.load(it);
+        props.load(it)
     }
 }
 
 fun loadSetting(envKey: String, propKey: String, setter: (value: String) -> Unit) {
     if (props.containsKey(propKey)) {
-        setter(props.getProperty(propKey));
+        setter(props.getProperty(propKey))
     } else {
-        val env = providers
-            .environmentVariable(envKey)
-            .forUseAtConfigurationTime()
+        val env = providers.environmentVariable(envKey)
         if (env.isPresent) {
             setter(env.get())
         }
@@ -201,19 +189,21 @@ fun loadSetting(envKey: String, propKey: String, setter: (value: String) -> Unit
 
 loadSetting("OSSRH_USERNAME", "ossrhUsername") { ossrhUsername = it }
 loadSetting("OSSRH_PASSWORD", "ossrhPassword") { ossrhPassword = it }
-loadSetting("SONATYPE_STAGING_PROFILE_ID", "sonatypeStagingProfileId") { sonatypeStagingProfileId = it }
+loadSetting("SONATYPE_STAGING_PROFILE_ID", "sonatypeStagingProfileId") {
+    sonatypeStagingProfileId = it
+}
 loadSetting("SONATYPE_SIGNING_KEY_ID", "sonatypeSigningKeyId") { sonatypeSigningKeyId = it }
 loadSetting("SONATYPE_SIGNING_PASSWORD", "sonatypeSigningPassword") { sonatypeSigningPassword = it }
 loadSetting("SONATYPE_SIGNING_KEY", "sonatypeSigningKey") { sonatypeSigningKey = it }
 
 kotlin {
-    android {
+    androidTarget {
         publishLibraryVariants("release")
     }
 }
 tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
     // custom output directory
-    outputDirectory.set(buildDir.resolve("dokka"))
+    outputDirectory.set(layout.buildDirectory.dir("dokka"))
 
     dokkaSourceSets {
         named("androidMain") { }
@@ -246,7 +236,7 @@ publishing {
     publications.withType<MavenPublication> {
         artifact(javadocJar)
         pom {
-            description.set("alphaTab is a cross platform music notation and guitar tablature rendering library.")
+            description.set(alphaTabDescription)
             url.set("https://github.com/CoderLine/alphaTab")
             licenses {
                 license {
@@ -305,38 +295,17 @@ signing {
 //
 // iOS
 
-//kotlin {
+kotlin {
 //    iosX64()
 //    iosArm64()
-//    iosSimulatorArm64() sure all ios dependencies support this target
+//    iosSimulatorArm64()
 //
 //    cocoapods {
-//        summary = "Some description for the Shared Module"
-//        homepage = "Link to the Shared Module homepage"
-//        ios.deploymentTarget = "14.1"
+//        summary = alphaTabDescription
+//        homepage = alphaTabWebsite
+//        ios.deploymentTarget = "16.0"
 //        framework {
-//            baseName = "shared"
+//            baseName = "alphaTab"
 //        }
 //    }
-//
-//    sourceSets {
-//        val iosX64Main by getting
-//        val iosArm64Main by getting
-//        val iosSimulatorArm64Main by getting
-//        val iosMain by creating {
-//            dependsOn(commonMain)
-//            iosX64Main.dependsOn(this)
-//            iosArm64Main.dependsOn(this)
-//            //iosSimulatorArm64Main.dependsOn(this)
-//        }
-//        val iosX64Test by getting
-//        val iosArm64Test by getting
-//        //val iosSimulatorArm64Test by getting
-//        val iosTest by creating {
-//            dependsOn(commonTest)
-//            iosX64Test.dependsOn(this)
-//            iosArm64Test.dependsOn(this)
-//            //iosSimulatorArm64Test.dependsOn(this)
-//        }
-//    }
-//}
+}

@@ -17,7 +17,7 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
     private val _innerScroll: ScrollView
     internal val renderSurface: AlphaTabRenderSurface
 
-    public constructor(
+    constructor(
         outerScroll: HorizontalScrollView,
         innerScroll: ScrollView,
         renderSurface: AlphaTabRenderSurface
@@ -37,11 +37,11 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
 
     override var width: Double
         get() = (_outerScroll.measuredWidth / Environment.HighDpiFactor)
-        set(value) {
+        set(@Suppress("UNUSED_PARAMETER") value) {
         }
     override var height: Double
         get() = (_outerScroll.measuredHeight / Environment.HighDpiFactor)
-        set(value) {
+        set(@Suppress("UNUSED_PARAMETER") value) {
         }
     override val isVisible: Boolean
         get() = _outerScroll.visibility == View.VISIBLE

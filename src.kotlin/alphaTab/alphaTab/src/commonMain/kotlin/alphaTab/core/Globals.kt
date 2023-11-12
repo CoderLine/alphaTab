@@ -1,22 +1,35 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package alphaTab.core
 
 import alphaTab.collections.List
+import alphaTab.core.ecmaScript.ArrayBuffer
 import alphaTab.core.ecmaScript.RegExp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.suspendCoroutine
 
-@kotlin.ExperimentalUnsignedTypes
+@ExperimentalUnsignedTypes
 internal expect fun UByteArray.decodeToFloatArray(): FloatArray
 
-@kotlin.ExperimentalUnsignedTypes
+@ExperimentalUnsignedTypes
 internal expect fun UByteArray.decodeToDoubleArray(): DoubleArray
 
-@kotlin.ExperimentalUnsignedTypes
+@ExperimentalUnsignedTypes
 internal expect fun UByteArray.decodeToString(encoding: String): String
 
-internal fun <T : Comparable<T> > List<T>.sort() {
-    this.sort { a,b ->
+internal fun <T : Comparable<T>> List<T>.sort() {
+    this.sort { a, b ->
         a.compareTo(b).toDouble()
     }
 }
+
 internal fun String.substr(startIndex: Double, length: Double): String {
     return this.substring(startIndex.toInt(), (startIndex + length).toInt())
 }
@@ -25,7 +38,7 @@ internal fun String.substr(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
 
-internal fun String.splitBy(separator:String): List<String> {
+internal fun String.splitBy(separator: String): List<String> {
     return List(this.split(separator))
 }
 
@@ -45,6 +58,7 @@ internal expect fun Double.toInvariantString(): String
 internal fun IAlphaTabEnum.toInvariantString(): String {
     return this.toString()
 }
+internal expect fun Double.toFixed(decimals:Double): String
 
 internal fun String.lastIndexOfInDouble(item: String): Double {
     return this.lastIndexOf(item).toDouble()
@@ -83,31 +97,36 @@ internal fun String.substring(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
 
-internal fun String.replaceAll(before:String, after:String): String {
+internal fun String.replaceAll(before: String, after: String): String {
     return this.replace(before, after)
 }
 
 internal fun IAlphaTabEnum.toDouble(): Double {
     return this.value.toDouble()
 }
+
 internal fun IAlphaTabEnum?.toDouble(): Double? {
     return this?.value.toDouble()
 }
+
 internal inline fun Double.toTemplate(): String {
     return this.toInvariantString()
 }
+
 internal inline fun Any?.toTemplate(): Any? {
     return this
 }
+
 internal fun Any?.toDouble(): Double {
-    if(this is Double) {
+    if (this is Double) {
         return this
     }
-    if(this == null) {
+    if (this == null) {
         throw ClassCastException("Cannot cast null to double")
     }
     throw ClassCastException("Cannot cast ${this::class.simpleName} to double")
 }
+
 internal fun Int?.toDouble(): Double? {
     return this?.toDouble()
 }
@@ -144,6 +163,17 @@ internal class Globals {
         fun parseInt(s: Char, radix: Double): Double {
             return parseInt(s.toString(), radix);
         }
+
+        fun setImmediate(action: () -> Unit) {
+            action()
+        }
+
+        fun setTimeout(action: () -> Unit, millis: Double): Deferred<Unit> {
+            return GlobalScope.async {
+                delay(millis.toLong())
+                action()
+            }
+        }
     }
 }
 
@@ -155,3 +185,30 @@ internal fun List<Char>.toCharArray(): CharArray {
     }
     return result
 }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal fun <T> Deferred<T>.then(callback: (T) -> Unit): Deferred<T> {
+    this.invokeOnCompletion {
+        if (it == null) {
+            callback(this.getCompleted())
+        }
+    }
+    return this
+}
+
+internal fun <T> Deferred<T>.catch(callback: (alphaTab.core.ecmaScript.Error) -> Unit): Deferred<T> {
+    this.invokeOnCompletion {
+        if (it != null) {
+            if (it is alphaTab.core.ecmaScript.Error) {
+                callback(it)
+            } else {
+                callback(alphaTab.core.ecmaScript.Error(it.message, it))
+            }
+        }
+    }
+    return this
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+internal val ArrayBuffer.byteLength: Int
+    get() = this.size
