@@ -6,7 +6,7 @@
     "mochaExplorer.files": "test/**/*.test.ts",
     "mochaExplorer.nodeArgv": [
         "--experimental-specifier-resolution=node",
-        "--loader=tsx"
+        "--import=tsx"
     ],
     "mochaExplorer.logpanel": true
 }
