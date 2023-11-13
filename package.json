@@ -56,7 +56,7 @@
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^25.0.0",
-        "@types/jasmine": "^4.0.3",
+        "@types/jasmine": "^5.1.2",
         "concurrently": "^8.0.1",
         "cors": "^2.8.5",
         "fs-extra": "^11.1.0",
