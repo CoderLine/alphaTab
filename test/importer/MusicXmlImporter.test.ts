@@ -67,4 +67,28 @@ describe('MusicXmlImporterTests', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isTieDestination).toBeTrue();
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].tieOrigin).toBeTruthy();
     });
+    it('chord-diagram', async () => {
+        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+            'test-data/musicxml3/chord-diagram.musicxml'
+        );
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.name).toBe("C");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[0]).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[1]).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[2]).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[3]).toBe(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[4]).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[5]).toBe(-1);
+
+
+        score = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score));
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.name).toBe("C");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[0]).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[1]).toBe(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[2]).toBe(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[3]).toBe(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[4]).toBe(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord?.strings[5]).toBe(-1);
+    });
 });
