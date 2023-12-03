@@ -9,7 +9,7 @@ androidx-appcompat = "1.6.1"
 androidx-test = "1.5.0"
 
 junit = "4.13.2"
-alphaskia = "1.0.117-SNAPSHOT"
+alphaskia = "1.0.117"
 
 
 [libraries]
