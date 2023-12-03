@@ -16,7 +16,7 @@ Install packages like usual:
 
 > https://www.nuget.org/packages/AlphaTab/
 
-**Windows Package (.net core 3.1 - WPF/WinForms)**
+**Windows Package (.net core 6.0 - WPF/WinForms)**
 
 > https://www.nuget.org/packages/AlphaTab.Windows/
 
@@ -88,14 +88,14 @@ control.Tracks = new []{ score.Tracks[0] };
 
 ### Additional Notes
 
-You might want to check out the samples at https://github.com/CoderLine/alphaTab/tree/develop/src.csharp/ to get a small impression
+You might want to check out the samples at https://github.com/CoderLine/alphaTabSamplesDotNet/ to get a small impression
 how to hook up things. 
 
 ## Dependencies
 
 For the .net Version alphaTab needs to rely on some 3rd party libraries to do certain operations. 
 
-1. For rendering, either the built-in graphics library GDI+ can be used or alphaTab comes with a dependency to SkiaSharp for modern
+1. For rendering, either the built-in graphics library GDI+ can be used or alphaTab comes with a dependency to AlphaSkia for modern
 cross platform rendering of images. Skia is the graphics engine used in Chrome and is proven to be fast and reliable.
 We recommend using Skia as rendering engine over GDI+. 
 
