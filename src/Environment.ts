@@ -365,6 +365,14 @@ export class Environment {
             })
         );
         renderEngines.set('default', renderEngines.get('svg')!);
+
+        renderEngines.set(
+            'skia',
+            new RenderEngineFactory(false, () => {
+                return new SkiaCanvas();
+            })
+        );
+
         Environment.createPlatformSpecificRenderEngines(renderEngines);
         return renderEngines;
     }
@@ -404,12 +412,6 @@ export class Environment {
             'html5',
             new RenderEngineFactory(false, () => {
                 return new Html5Canvas();
-            })
-        );
-        renderEngines.set(
-            'skia',
-            new RenderEngineFactory(false, () => {
-                return new SkiaCanvas();
             })
         );
     }

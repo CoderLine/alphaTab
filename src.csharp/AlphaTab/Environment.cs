@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AlphaTab.Core;
 using AlphaTab.Collections;
 using AlphaTab.Platform.CSharp;
-using AlphaTab.Platform.Skia;
 
 namespace AlphaTab
 {
@@ -36,10 +35,6 @@ namespace AlphaTab
 
         private static void CreatePlatformSpecificRenderEngines(IMap<string, RenderEngineFactory> renderEngines)
         {
-            renderEngines.Set(
-                "skia",
-                new RenderEngineFactory(true, () => new SkiaCanvas())
-            );
             renderEngines.Set(
                 "gdi",
                 new RenderEngineFactory(true, () => new GdiCanvas())
