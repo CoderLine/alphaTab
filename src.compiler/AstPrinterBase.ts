@@ -71,11 +71,11 @@ export default abstract class AstPrinterBase {
         }
     }
 
-    protected writeCommaSeparated<T>(values: T[], write: (p: T) => void, newLine:boolean = false) {
+    protected writeCommaSeparated<T>(values: T[], write: (p: T) => void, newLine: boolean = false) {
         values.forEach((v, i) => {
             if (i > 0) {
                 this.write(', ');
-                if(newLine) {
+                if (newLine) {
                     this.writeLine();
                 }
             }
@@ -186,10 +186,17 @@ export default abstract class AstPrinterBase {
         this.write('/* TODO */');
     }
 
-    protected writeIdentifier(expr: cs.Identifier) {
-        const name = this._context.getSymbolName(expr) ?? expr.text;
-        this.write(name);
+    protected writeIdentifier(expr: cs.Identifier | string) {
+        let name;
+        if (typeof expr !== "string") {
+            name = this._context.getSymbolName(expr) ?? expr.text;
+        } else {
+            name = expr;
+        }
+        this.write(this.escapeIdentifier(name));
     }
+
+    protected abstract escapeIdentifier(identifier:string) : string;
 
     protected writeNullSafeExpression(expr: cs.NullSafeExpression) {
         this.writeExpression(expr.expression);
@@ -248,7 +255,7 @@ export default abstract class AstPrinterBase {
     }
 
     protected writeTypeParameter(p: cs.TypeParameterDeclaration) {
-        this.write(p.name);
+        this.writeIdentifier(p.name);
     }
 
     protected writeTypeParameterConstraints(typeParameters: cs.TypeParameterDeclaration[] | undefined) {
@@ -258,7 +265,7 @@ export default abstract class AstPrinterBase {
                 if (p.constraint) {
                     this.writeLine();
                     this.write('where ');
-                    this.write(p.name);
+                    this.writeIdentifier(p.name);
                     this.write(' : ');
                     this.writeType(p.constraint, false, false, true);
                 }
@@ -528,10 +535,7 @@ export default abstract class AstPrinterBase {
         this.writeSemicolon();
     }
 
-    protected writeVariableStatement(v: cs.VariableStatement) {
-        this.writeVariableDeclarationList(v.declarationList);
-        this.writeSemicolon();
-    }
+    protected abstract writeVariableStatement(v: cs.VariableStatement);
 
     protected writeEmptyStatement(_: cs.EmptyStatement) {
         this.writeSemicolon();

@@ -4,7 +4,7 @@
         <RootNamespace>AlphaTab</RootNamespace>
         <AssemblyName>AlphaTab.Windows</AssemblyName>
         <PackageId>AlphaTab.Windows</PackageId>
-		<PackageReadmeFile>README.md</PackageReadmeFile>		
+		<PackageReadmeFile>README.md</PackageReadmeFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <TargetFrameworks>net6.0-windows</TargetFrameworks>
@@ -26,6 +26,7 @@
 
     <ItemGroup>
       <PackageReference Include="NAudio.Core" Version="2.2.1" />
+      <PackageReference Include="AlphaSkia.Native.Windows" Version="1.0.117" />
     </ItemGroup>
 
 </Project>

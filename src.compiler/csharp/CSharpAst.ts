@@ -186,6 +186,7 @@ export interface MethodDeclaration extends MethodDeclarationBase, AttributedElem
     isVirtual: boolean;
     isOverride: boolean;
     isAbstract: boolean;
+    isTestMethod: boolean;
     partial: boolean;
     returnType: TypeNode;
     parameters: ParameterDeclaration[];
@@ -241,6 +242,7 @@ export interface UnresolvedTypeNode extends TypeNode {
 export type TypeReferenceType = NamedTypeDeclaration | TypeParameterDeclaration | TypeNode | string;
 export interface TypeReference extends TypeNode {
     reference: TypeReferenceType;
+    isAsync: boolean;
     typeArguments?: TypeNode[];
 }
 
@@ -252,7 +254,7 @@ export interface MapTypeNode extends TypeNode {
     keyType: TypeNode;
     keyIsValueType: boolean;
     valueType: TypeNode;
-    valueIsValueType:boolean;
+    valueIsValueType: boolean;
 }
 
 export interface FunctionTypeNode extends TypeNode {
@@ -277,7 +279,7 @@ export interface PrimitiveTypeNode extends TypeNode {
 
 // Expressions
 
-export interface Expression extends Node {}
+export interface Expression extends Node { }
 
 export interface PrefixUnaryExpression extends Node {
     operand: Expression;
@@ -289,13 +291,13 @@ export interface PostfixUnaryExpression extends Node {
     operator: string;
 }
 
-export interface NullLiteral extends Node {}
+export interface NullLiteral extends Node { }
 
-export interface BooleanLiteral extends Node {}
+export interface BooleanLiteral extends Node { }
 
-export interface ThisLiteral extends Node {}
+export interface ThisLiteral extends Node { }
 
-export interface BaseLiteralExpression extends Node {}
+export interface BaseLiteralExpression extends Node { }
 
 export interface StringLiteral extends Node {
     text: string;
@@ -399,20 +401,28 @@ export interface Identifier extends Expression {
     text: string;
 }
 
-export interface ToDoExpression extends Node {}
+export interface ToDoExpression extends Node { }
 
 // Statements
 
-export interface Statement extends Node {}
+export interface Statement extends Node { }
 
 export interface Block extends Statement {
     statements: Statement[];
 }
 
-export interface EmptyStatement extends Statement {}
+export interface EmptyStatement extends Statement { }
+
+export enum VariableStatementKind {
+    Normal,
+    Const,
+    Using,
+    AwaitUsing
+}
 
 export interface VariableStatement extends Statement {
     declarationList: VariableDeclarationList;
+    variableStatementKind: VariableStatementKind;
 }
 
 export interface ExpressionStatement extends Statement {
@@ -437,6 +447,7 @@ export interface WhileStatement extends Statement {
 
 export interface VariableDeclarationList extends Node {
     declarations: VariableDeclaration[];
+    isConst: boolean;
 }
 
 export interface VariableDeclaration extends Node {
@@ -463,9 +474,9 @@ export interface ForEachStatement extends Statement {
     statement: Statement;
 }
 
-export interface BreakStatement extends Statement {}
+export interface BreakStatement extends Statement { }
 
-export interface ContinueStatement extends Statement {}
+export interface ContinueStatement extends Statement { }
 
 export interface ReturnStatement extends Statement {
     expression?: Expression;
@@ -501,7 +512,7 @@ export interface CatchClause extends Node {
 }
 
 // Node Tests
-export function isNode(node: any): node is Node { return typeof(node) === 'object' && 'nodeType' in node; }
+export function isNode(node: any): node is Node { return typeof (node) === 'object' && 'nodeType' in node; }
 export function isSourceFile(node: Node): node is SourceFile { return node.nodeType === SyntaxKind.SourceFile; }
 export function isUsingDeclaration(node: Node): node is UsingDeclaration { return node.nodeType === SyntaxKind.UsingDeclaration; }
 export function isNamespaceDeclaration(node: Node): node is NamespaceDeclaration { return node.nodeType === SyntaxKind.NamespaceDeclaration; }

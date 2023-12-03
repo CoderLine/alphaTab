@@ -21,6 +21,9 @@ export abstract class SvgCanvas implements ICanvas {
     public textBaseline: TextBaseline = TextBaseline.Top;
     public settings!: Settings;
 
+    public destroy() {
+    }
+
     public beginRender(width: number, height: number): void {
         this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${height | 0
             }px" class="at-surface-svg">\n`;

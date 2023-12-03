@@ -19,6 +19,7 @@ import { Track } from '@src/model/Track';
 import { VibratoType } from '@src/model/VibratoType';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
+import { expect } from 'chai';
 
 export class GpImporterTestHelper {
     public static async prepareImporterWithFile(name: string, settings: Settings | null = null): Promise<Gp3To5Importer> {
@@ -46,421 +47,421 @@ export class GpImporterTestHelper {
             Duration.SixtyFourth
         ];
         for (let duration of durationsInFile) {
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).toEqual(1);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).toEqual(1);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).toEqual(duration);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).to.equal(1);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).to.equal(1);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).to.equal(duration);
             beat++;
 
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).toEqual(2);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).toEqual(1);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).toEqual(duration);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).to.equal(2);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).to.equal(1);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).to.equal(duration);
             beat++;
 
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).toEqual(3);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).toEqual(1);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).toEqual(duration);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).to.equal(3);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).to.equal(1);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).to.equal(duration);
             beat++;
 
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).toEqual(4);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).toEqual(1);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).toEqual(duration);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).to.equal(4);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).to.equal(1);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).to.equal(duration);
             beat++;
 
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].isRest).toBe(true);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).toEqual(duration);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].isRest).to.be.equal(true);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).to.equal(duration);
             beat++;
         }
     }
 
     public static checkTimeSignatures(score: Score): void {
-        expect(score.masterBars[0].timeSignatureNumerator).toEqual(4);
-        expect(score.masterBars[0].timeSignatureDenominator).toEqual(4);
+        expect(score.masterBars[0].timeSignatureNumerator).to.equal(4);
+        expect(score.masterBars[0].timeSignatureDenominator).to.equal(4);
 
-        expect(score.masterBars[1].timeSignatureNumerator).toEqual(3);
-        expect(score.masterBars[1].timeSignatureDenominator).toEqual(4);
+        expect(score.masterBars[1].timeSignatureNumerator).to.equal(3);
+        expect(score.masterBars[1].timeSignatureDenominator).to.equal(4);
 
-        expect(score.masterBars[2].timeSignatureNumerator).toEqual(2);
-        expect(score.masterBars[2].timeSignatureDenominator).toEqual(4);
+        expect(score.masterBars[2].timeSignatureNumerator).to.equal(2);
+        expect(score.masterBars[2].timeSignatureDenominator).to.equal(4);
 
-        expect(score.masterBars[3].timeSignatureNumerator).toEqual(1);
-        expect(score.masterBars[3].timeSignatureDenominator).toEqual(4);
+        expect(score.masterBars[3].timeSignatureNumerator).to.equal(1);
+        expect(score.masterBars[3].timeSignatureDenominator).to.equal(4);
 
-        expect(score.masterBars[4].timeSignatureNumerator).toEqual(20);
-        expect(score.masterBars[4].timeSignatureDenominator).toEqual(32);
+        expect(score.masterBars[4].timeSignatureNumerator).to.equal(20);
+        expect(score.masterBars[4].timeSignatureDenominator).to.equal(32);
     }
 
     public static checkDead(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).toEqual(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].string).to.equal(1);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isDead).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).toEqual(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isDead).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].string).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isDead).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].string).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isDead).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].string).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isDead).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].string).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isDead).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].string).to.equal(4);
     }
 
     public static checkGrace(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].graceType).toEqual(GraceType.BeforeBeat);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toEqual(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].duration).toEqual(Duration.Eighth);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).toEqual(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].duration).toEqual(Duration.Quarter);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].graceType).to.equal(GraceType.BeforeBeat);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].duration).to.equal(Duration.Eighth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].fret).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].duration).to.equal(Duration.Quarter);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].graceType).toEqual(GraceType.BeforeBeat);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].fret).toEqual(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].duration).toEqual(Duration.Eighth);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].fret).toEqual(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].duration).toEqual(Duration.Quarter);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].graceType).to.equal(GraceType.BeforeBeat);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].fret).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].duration).to.equal(Duration.Eighth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].fret).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].duration).to.equal(Duration.Quarter);
     }
 
     public static checkAccentuations(score: Score, includeHeavy: boolean): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isGhost).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].accentuated).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isGhost).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].accentuated).to.equal(
             AccentuationType.Normal
         );
         if (includeHeavy) {
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].accentuated).toEqual(
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].accentuated).to.equal(
                 AccentuationType.Heavy
             );
         }
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLetRing).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLetRing).to.be.equal(true);
     }
 
     public static checkHarmonics(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).to.equal(
             HarmonicType.Natural
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).to.equal(
             HarmonicType.Artificial
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).toEqual(HarmonicType.Tap);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).toEqual(HarmonicType.Semi);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).toEqual(HarmonicType.Pinch);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).to.equal(HarmonicType.Tap);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).to.equal(HarmonicType.Semi);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).to.equal(HarmonicType.Pinch);
         // TODO: Harmonic Values
     }
 
     public static checkHammer(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isHammerPullOrigin).toEqual(false);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1].isHammerPullOrigin).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[2].isHammerPullOrigin).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[3].isHammerPullOrigin).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isHammerPullOrigin).to.equal(false);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1].isHammerPullOrigin).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[2].isHammerPullOrigin).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[3].isHammerPullOrigin).to.be.equal(true);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].hammerPullOrigin).toBeFalsy();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[1].hammerPullOrigin).toBeTruthy();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[2].hammerPullOrigin).toBeTruthy();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[3].hammerPullOrigin).toBeTruthy();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].hammerPullOrigin).to.not.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[1].hammerPullOrigin).to.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[2].hammerPullOrigin).to.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[3].hammerPullOrigin).to.be.ok;
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isHammerPullOrigin).toBe(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].isHammerPullOrigin).toBe(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].hammerPullOrigin).toBeTruthy();
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isHammerPullOrigin).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].isHammerPullOrigin).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].hammerPullOrigin).to.be.ok;
     }
 
     public static checkBend(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).toEqual(15);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).to.equal(15);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).to.equal(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![2].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![2].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![2].offset).to.equal(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![2].value).to.equal(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).toEqual(7);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).to.equal(7);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).toEqual(10);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).to.equal(10);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].value).to.equal(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![2].offset).toEqual(20);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![2].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![2].offset).to.equal(20);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![2].value).to.equal(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![3].offset).toEqual(30);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![3].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![3].offset).to.equal(30);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![3].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![4].offset).toEqual(40);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![4].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![4].offset).to.equal(40);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![4].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![5].offset).toEqual(50);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![5].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![5].offset).to.equal(50);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![5].value).to.equal(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![6].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![6].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![6].offset).to.equal(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![6].value).to.equal(4);
     }
 
     public static checkTremolo(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).toEqual(30);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).to.equal(30);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).to.equal(60);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).toEqual(45);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).to.equal(45);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![2].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![2].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![2].offset).to.equal(60);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![2].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).toEqual(0);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).toEqual(45);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).to.equal(45);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).toEqual(60);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).to.equal(60);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-4);
     }
 
     public static checkSlides(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(5)!.slideOutType).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(5)!.slideOutType).to.equal(
             SlideOutType.Legato
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].getNoteOnString(2)!.slideOutType).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].getNoteOnString(2)!.slideOutType).to.equal(
             SlideOutType.Shift
         );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getNoteOnString(5)!.slideInType).toEqual(
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getNoteOnString(5)!.slideInType).to.equal(
             SlideInType.IntoFromBelow
         );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].getNoteOnString(5)!.slideInType).toEqual(
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].getNoteOnString(5)!.slideInType).to.equal(
             SlideInType.IntoFromAbove
         );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].getNoteOnString(5)!.slideOutType).toEqual(
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].getNoteOnString(5)!.slideOutType).to.equal(
             SlideOutType.OutDown
         );
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].getNoteOnString(5)!.slideOutType).toEqual(
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].getNoteOnString(5)!.slideOutType).to.equal(
             SlideOutType.OutUp
         );
     }
 
     public static checkStrings(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).toEqual(6);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(1)!.fret).toEqual(6);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(2)!.fret).toEqual(5);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(3)!.fret).toEqual(4);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(4)!.fret).toEqual(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(5)!.fret).toEqual(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(6)!.fret).toEqual(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(6);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(1)!.fret).to.equal(6);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(2)!.fret).to.equal(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(3)!.fret).to.equal(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(4)!.fret).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(5)!.fret).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getNoteOnString(6)!.fret).to.equal(1);
     }
 
     public static checkVibrato(score: Score, checkNotes: boolean): void {
         if (checkNotes) {
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].vibrato).toEqual(VibratoType.Slight);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].vibrato).toEqual(VibratoType.Slight);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].vibrato).to.equal(VibratoType.Slight);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].vibrato).to.equal(VibratoType.Slight);
         }
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].vibrato).toEqual(VibratoType.Slight);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].vibrato).toEqual(VibratoType.Slight);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].vibrato).to.equal(VibratoType.Slight);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].vibrato).to.equal(VibratoType.Slight);
     }
 
     public static checkTrills(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillFret).toEqual(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillSpeed).toEqual(Duration.Sixteenth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillFret).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].trillSpeed).to.equal(Duration.Sixteenth);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].isTremolo).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].tremoloSpeed).toEqual(Duration.ThirtySecond);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].isTremolo).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].tremoloSpeed).to.equal(Duration.ThirtySecond);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].isTremolo).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tremoloSpeed).toEqual(Duration.Sixteenth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].isTremolo).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tremoloSpeed).to.equal(Duration.Sixteenth);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].isTremolo).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].tremoloSpeed).toEqual(Duration.Eighth);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].isTremolo).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].tremoloSpeed).to.equal(Duration.Eighth);
     }
 
     public static checkOtherEffects(score: Score, skipInstrumentCheck: boolean = false): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPalmMute).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isStaccato).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tap).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].slap).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPalmMute).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isStaccato).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tap).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].slap).to.be.equal(true);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].pop).toBe(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].fadeIn).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].pop).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].fadeIn).to.be.equal(true);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].hasChord).toBe(true);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].chord!.name).toEqual('C');
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].text).toEqual('Text');
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].hasChord).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].chord!.name).to.equal('C');
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].text).to.equal('Text');
 
-        expect(score.masterBars[4].isDoubleBar).toBe(true);
-        expect(score.masterBars[4].tempoAutomation).toBeTruthy();
-        expect(score.masterBars[4].tempoAutomation!.value).toEqual(120.0);
+        expect(score.masterBars[4].isDoubleBar).to.be.equal(true);
+        expect(score.masterBars[4].tempoAutomation).to.be.ok;
+        expect(score.masterBars[4].tempoAutomation!.value).to.equal(120.0);
         if (!skipInstrumentCheck) {
             expect(
                 score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)
-            ).toBeTruthy();
+            ).to.be.ok;
             expect(
                 score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)!.value
-            ).toEqual(25);
+            ).to.equal(25);
         }
     }
 
     public static checkFingering(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isFingering).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].leftHandFinger).toEqual(Fingers.Thumb);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].leftHandFinger).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isFingering).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].leftHandFinger).to.equal(Fingers.Thumb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].leftHandFinger).to.equal(
             Fingers.IndexFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].leftHandFinger).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].leftHandFinger).to.equal(
             Fingers.MiddleFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].leftHandFinger).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].leftHandFinger).to.equal(
             Fingers.AnnularFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].leftHandFinger).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].leftHandFinger).to.equal(
             Fingers.LittleFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].notes[0].rightHandFinger).toEqual(Fingers.Thumb);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].notes[0].rightHandFinger).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].notes[0].rightHandFinger).to.equal(Fingers.Thumb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].notes[0].rightHandFinger).to.equal(
             Fingers.IndexFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].notes[0].rightHandFinger).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].notes[0].rightHandFinger).to.equal(
             Fingers.MiddleFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[8].notes[0].rightHandFinger).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[8].notes[0].rightHandFinger).to.equal(
             Fingers.AnnularFinger
         );
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].rightHandFinger).toEqual(
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].rightHandFinger).to.equal(
             Fingers.LittleFinger
         );
     }
 
     public static checkStroke(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushType).toEqual(BrushType.BrushDown);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushType).toEqual(BrushType.BrushUp);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].pickStroke).toEqual(PickStroke.Up);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].pickStroke).toEqual(PickStroke.Down);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].brushType).to.equal(BrushType.BrushDown);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].brushType).to.equal(BrushType.BrushUp);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].pickStroke).to.equal(PickStroke.Up);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].pickStroke).to.equal(PickStroke.Down);
     }
 
     public static checkTuplets(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tupletNumerator).toEqual(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].tupletNumerator).toEqual(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tupletNumerator).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].tupletNumerator).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].tupletNumerator).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tupletNumerator).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].tupletNumerator).toEqual(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].tupletNumerator).toEqual(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].tupletNumerator).toEqual(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].tupletNumerator).toEqual(5);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].tupletNumerator).toEqual(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].tupletNumerator).to.equal(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].tupletNumerator).to.equal(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].tupletNumerator).to.equal(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].tupletNumerator).to.equal(5);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[4].tupletNumerator).to.equal(5);
     }
 
     public static checkRanges(score: Score): void {
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPalmMute).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isPalmMute).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isPalmMute).toBe(true);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isPalmMute).toBe(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPalmMute).toBe(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPalmMute).toBe(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPalmMute).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isPalmMute).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isPalmMute).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isPalmMute).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPalmMute).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPalmMute).to.be.equal(true);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].isLetRing).toBe(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].isLetRing).toBe(true);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].isLetRing).toBe(true);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].notes[0].isLetRing).toBe(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].isLetRing).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].isLetRing).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].isLetRing).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].notes[0].isLetRing).to.be.equal(true);
     }
 
     public static checkEffects(score: Score): void {
         // just check if reading works
-        expect(true).toBe(true);
+        expect(true).to.be.equal(true);
     }
 
     public static checkKeySignatures(score: Score): void {
         // major - flats
-        expect(score.masterBars[0].keySignature).toEqual(KeySignature.C);
-        expect(score.masterBars[0].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[1].keySignature).toEqual(KeySignature.F);
-        expect(score.masterBars[1].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[2].keySignature).toEqual(KeySignature.Bb);
-        expect(score.masterBars[2].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[3].keySignature).toEqual(KeySignature.Eb);
-        expect(score.masterBars[3].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[4].keySignature).toEqual(KeySignature.Ab);
-        expect(score.masterBars[4].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[5].keySignature).toEqual(KeySignature.Db);
-        expect(score.masterBars[5].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[6].keySignature).toEqual(KeySignature.Gb);
-        expect(score.masterBars[6].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[7].keySignature).toEqual(KeySignature.Cb);
-        expect(score.masterBars[7].keySignatureType).toEqual(KeySignatureType.Major);
+        expect(score.masterBars[0].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[0].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[1].keySignature).to.equal(KeySignature.F);
+        expect(score.masterBars[1].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[2].keySignature).to.equal(KeySignature.Bb);
+        expect(score.masterBars[2].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[3].keySignature).to.equal(KeySignature.Eb);
+        expect(score.masterBars[3].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[4].keySignature).to.equal(KeySignature.Ab);
+        expect(score.masterBars[4].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[5].keySignature).to.equal(KeySignature.Db);
+        expect(score.masterBars[5].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[6].keySignature).to.equal(KeySignature.Gb);
+        expect(score.masterBars[6].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[7].keySignature).to.equal(KeySignature.Cb);
+        expect(score.masterBars[7].keySignatureType).to.equal(KeySignatureType.Major);
 
         // major - sharps
-        expect(score.masterBars[8].keySignature).toEqual(KeySignature.C);
-        expect(score.masterBars[8].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[9].keySignature).toEqual(KeySignature.G);
-        expect(score.masterBars[9].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[10].keySignature).toEqual(KeySignature.D);
-        expect(score.masterBars[10].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[11].keySignature).toEqual(KeySignature.A);
-        expect(score.masterBars[11].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[12].keySignature).toEqual(KeySignature.E);
-        expect(score.masterBars[12].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[13].keySignature).toEqual(KeySignature.B);
-        expect(score.masterBars[13].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[14].keySignature).toEqual(KeySignature.FSharp);
-        expect(score.masterBars[14].keySignatureType).toEqual(KeySignatureType.Major);
-        expect(score.masterBars[15].keySignature).toEqual(KeySignature.CSharp);
-        expect(score.masterBars[15].keySignatureType).toEqual(KeySignatureType.Major);
+        expect(score.masterBars[8].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[8].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[9].keySignature).to.equal(KeySignature.G);
+        expect(score.masterBars[9].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[10].keySignature).to.equal(KeySignature.D);
+        expect(score.masterBars[10].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[11].keySignature).to.equal(KeySignature.A);
+        expect(score.masterBars[11].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[12].keySignature).to.equal(KeySignature.E);
+        expect(score.masterBars[12].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[13].keySignature).to.equal(KeySignature.B);
+        expect(score.masterBars[13].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[14].keySignature).to.equal(KeySignature.FSharp);
+        expect(score.masterBars[14].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(score.masterBars[15].keySignature).to.equal(KeySignature.CSharp);
+        expect(score.masterBars[15].keySignatureType).to.equal(KeySignatureType.Major);
 
         // minor flats
-        expect(score.masterBars[16].keySignature).toEqual(KeySignature.C);
-        expect(score.masterBars[16].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[17].keySignature).toEqual(KeySignature.F);
-        expect(score.masterBars[17].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[18].keySignature).toEqual(KeySignature.Bb);
-        expect(score.masterBars[18].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[19].keySignature).toEqual(KeySignature.Eb);
-        expect(score.masterBars[19].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[20].keySignature).toEqual(KeySignature.Ab);
-        expect(score.masterBars[20].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[21].keySignature).toEqual(KeySignature.Db);
-        expect(score.masterBars[21].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[22].keySignature).toEqual(KeySignature.Gb);
-        expect(score.masterBars[22].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[23].keySignature).toEqual(KeySignature.Cb);
-        expect(score.masterBars[23].keySignatureType).toEqual(KeySignatureType.Minor);
+        expect(score.masterBars[16].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[16].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[17].keySignature).to.equal(KeySignature.F);
+        expect(score.masterBars[17].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[18].keySignature).to.equal(KeySignature.Bb);
+        expect(score.masterBars[18].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[19].keySignature).to.equal(KeySignature.Eb);
+        expect(score.masterBars[19].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[20].keySignature).to.equal(KeySignature.Ab);
+        expect(score.masterBars[20].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[21].keySignature).to.equal(KeySignature.Db);
+        expect(score.masterBars[21].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[22].keySignature).to.equal(KeySignature.Gb);
+        expect(score.masterBars[22].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[23].keySignature).to.equal(KeySignature.Cb);
+        expect(score.masterBars[23].keySignatureType).to.equal(KeySignatureType.Minor);
 
         // minor sharps
-        expect(score.masterBars[24].keySignature).toEqual(KeySignature.C);
-        expect(score.masterBars[24].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[25].keySignature).toEqual(KeySignature.G);
-        expect(score.masterBars[25].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[26].keySignature).toEqual(KeySignature.D);
-        expect(score.masterBars[26].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[27].keySignature).toEqual(KeySignature.A);
-        expect(score.masterBars[27].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[28].keySignature).toEqual(KeySignature.E);
-        expect(score.masterBars[28].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[29].keySignature).toEqual(KeySignature.B);
-        expect(score.masterBars[29].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[30].keySignature).toEqual(KeySignature.FSharp);
-        expect(score.masterBars[30].keySignatureType).toEqual(KeySignatureType.Minor);
-        expect(score.masterBars[31].keySignature).toEqual(KeySignature.CSharp);
-        expect(score.masterBars[31].keySignatureType).toEqual(KeySignatureType.Minor);
+        expect(score.masterBars[24].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[24].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[25].keySignature).to.equal(KeySignature.G);
+        expect(score.masterBars[25].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[26].keySignature).to.equal(KeySignature.D);
+        expect(score.masterBars[26].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[27].keySignature).to.equal(KeySignature.A);
+        expect(score.masterBars[27].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[28].keySignature).to.equal(KeySignature.E);
+        expect(score.masterBars[28].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[29].keySignature).to.equal(KeySignature.B);
+        expect(score.masterBars[29].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[30].keySignature).to.equal(KeySignature.FSharp);
+        expect(score.masterBars[30].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(score.masterBars[31].keySignature).to.equal(KeySignature.CSharp);
+        expect(score.masterBars[31].keySignatureType).to.equal(KeySignatureType.Minor);
     }
 
     public static checkColors(score: Score): void {
-        expect(score.tracks[0].name).toEqual('Red');
-        expect(score.tracks[0].color.rgba).toEqual('#FF0000');
-        expect(score.tracks[1].name).toEqual('Green');
-        expect(score.tracks[1].color.rgba).toEqual('#00FF00');
-        expect(score.tracks[2].name).toEqual('Yellow');
-        expect(score.tracks[2].color.rgba).toEqual('#FFFF00');
-        expect(score.tracks[3].name).toEqual('Blue');
-        expect(score.tracks[3].color.rgba).toEqual('#0000FF');
+        expect(score.tracks[0].name).to.equal('Red');
+        expect(score.tracks[0].color.rgba).to.equal('#FF0000');
+        expect(score.tracks[1].name).to.equal('Green');
+        expect(score.tracks[1].color.rgba).to.equal('#00FF00');
+        expect(score.tracks[2].name).to.equal('Yellow');
+        expect(score.tracks[2].color.rgba).to.equal('#FFFF00');
+        expect(score.tracks[3].name).to.equal('Blue');
+        expect(score.tracks[3].color.rgba).to.equal('#0000FF');
     }
 
     private static createChord(name: string, firstFret: number, strings: number[], barreFrets?: number[]) {
@@ -477,7 +478,7 @@ export class GpImporterTestHelper {
     public static checkChords(score: Score): void {
         let track: Track = score.tracks[0];
         let staff: Staff = track.staves[0];
-        expect(staff.chords!.size).toEqual(8);
+        expect(staff.chords!.size).to.equal(8);
 
         GpImporterTestHelper.checkChord(
             GpImporterTestHelper.createChord('C', 1, [0, 1, 0, 2, 3, -1]),
@@ -515,13 +516,13 @@ export class GpImporterTestHelper {
     }
 
     public static checkChord(expected: Chord | null, actual: Chord | null): void {
-        expect(actual === null).toEqual(expected === null);
+        expect(actual === null).to.equal(expected === null);
         if (expected && actual) {
-            expect(actual.name).toEqual(expected.name);
-            expect(actual.firstFret).toEqual(expected.firstFret);
-            expect(actual.strings.length).toEqual(expected.strings.length);
-            expect(actual.strings.join(',')).toEqual(expected.strings.join(','));
-            expect(actual.barreFrets.join(',')).toEqual(expected.barreFrets.join(','));
+            expect(actual.name).to.equal(expected.name);
+            expect(actual.firstFret).to.equal(expected.firstFret);
+            expect(actual.strings.length).to.equal(expected.strings.length);
+            expect(actual.strings.join(',')).to.equal(expected.strings.join(','));
+            expect(actual.barreFrets.join(',')).to.equal(expected.barreFrets.join(','));
         }
     }
 }

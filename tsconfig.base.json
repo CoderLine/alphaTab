@@ -29,6 +29,9 @@
     "paths": {
       "@src/*": [
         "src/*"
+      ],
+      "@test*": [
+        "test*"
       ]
     },
     "typeRoots": [
@@ -37,7 +40,7 @@
     ]
   },
   "include": [
-    "src",
+    "src"
   ],
   "exclude": [
     "**/node_modules",

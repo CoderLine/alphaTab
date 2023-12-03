@@ -1,5 +1,7 @@
 import { IOHelper } from '@src/io/IOHelper';
-  
+import * as fs from 'fs';
+import * as path from 'path';
+
 /**
  * @partial
  */
@@ -8,20 +10,18 @@ export class TestPlatform {
      * @target web
      * @partial
      */
-    public static saveFile(name: string, data: Uint8Array): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            let x: XMLHttpRequest = new XMLHttpRequest();
-            x.open('POST', 'http://localhost:8090/save-file/', true);
-            x.onload = () => {
-                resolve();
-            };
-            x.onerror = () => {
-                reject();
-            };
-            const form = new FormData();
-            form.append('file', new Blob([data]), name);
-            x.send(form);
-        });
+    public static async saveFile(name: string, data: Uint8Array): Promise<void> {
+        const directory = path.dirname(name);
+        await fs.promises.mkdir(directory, { recursive: true })
+        await fs.promises.writeFile(name, data);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static async deleteFile(name: string): Promise<void> {
+        await fs.promises.rm(name, { force: true })
     }
 
     /**
@@ -29,46 +29,15 @@ export class TestPlatform {
      * @partial
      */
     public static loadFile(path: string): Promise<Uint8Array> {
-        return new Promise<Uint8Array>((resolve, reject) => {
-            let x: XMLHttpRequest = new XMLHttpRequest();
-            x.open('GET', '/base/' + path, true, null, null);
-            x.responseType = 'arraybuffer';
-            x.onreadystatechange = () => {
-                if (x.readyState === XMLHttpRequest.DONE) {
-                    if (x.status === 200) {
-                        let ab: ArrayBuffer = x.response;
-                        let data: Uint8Array = new Uint8Array(ab);
-                        resolve(data);
-                    } else {
-                        let response: string = x.response;
-                        reject('Could not find file: ' + path + ', received:' + response);
-                    }
-                }
-            };
-            x.send();
-        });
+        return fs.promises.readFile(path);
     }
 
     /**
      * @target web
      * @partial
      */
-    public static listDirectory(path: string): Promise<string[]> {
-        return new Promise<string[]>((resolve, reject) => {
-            let x: XMLHttpRequest = new XMLHttpRequest();
-            x.open('GET', 'http://localhost:8090/list-files?dir=' + path, true, null, null);
-            x.responseType = 'text';
-            x.onreadystatechange = () => {
-                if (x.readyState === XMLHttpRequest.DONE) {
-                    if (x.status === 200) {
-                        resolve(JSON.parse(x.responseText));
-                    } else {
-                        reject('Could not find path: ' + path + ', received:' + x.responseText);
-                    }
-                }
-            };
-            x.send();
-        });
+    public static async listDirectory(path: string): Promise<string[]> {
+        return await fs.promises.readdir(path);
     }
 
     public static async loadFileAsString(path: string): Promise<string> {
@@ -83,5 +52,13 @@ export class TestPlatform {
         } else {
             return file.substr(0, lastDot) + extension;
         }
+    }
+    
+    /**
+     * @target web
+     * @partial
+     */
+    public static joinPath(...parts: string[]): string {
+        return path.join(...parts);
     }
 }

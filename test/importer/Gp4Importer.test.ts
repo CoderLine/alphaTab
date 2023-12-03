@@ -1,24 +1,25 @@
 import { Score } from '@src/model/Score';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
+import { expect } from 'chai';
 
 describe('Gp4ImporterTest', () => {
     it('score-info', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro4/score-info.gp4');
         let score: Score = reader.readScore();
-        expect(score.title).toEqual('Title');
-        expect(score.subTitle).toEqual('Subtitle');
-        expect(score.artist).toEqual('Artist');
-        expect(score.album).toEqual('Album');
-        expect(score.words).toEqual('Music'); // no words in gp4
+        expect(score.title).to.equal('Title');
+        expect(score.subTitle).to.equal('Subtitle');
+        expect(score.artist).to.equal('Artist');
+        expect(score.album).to.equal('Album');
+        expect(score.words).to.equal('Music'); // no words in gp4
 
-        expect(score.music).toEqual('Music');
-        expect(score.copyright).toEqual('Copyright');
-        expect(score.tab).toEqual('Tab');
-        expect(score.instructions).toEqual('Instructions');
-        expect(score.notices).toEqual('Notice1\r\nNotice2');
-        expect(score.masterBars.length).toEqual(5);
-        expect(score.tracks.length).toEqual(1);
-        expect(score.tracks[0].name).toEqual('Track 1');
+        expect(score.music).to.equal('Music');
+        expect(score.copyright).to.equal('Copyright');
+        expect(score.tab).to.equal('Tab');
+        expect(score.instructions).to.equal('Instructions');
+        expect(score.notices).to.equal('Notice1\r\nNotice2');
+        expect(score.masterBars.length).to.equal(5);
+        expect(score.tracks.length).to.equal(1);
+        expect(score.tracks[0].name).to.equal('Track 1');
     });
 
     it('notes', async () => {

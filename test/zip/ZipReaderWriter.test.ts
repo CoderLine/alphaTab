@@ -4,6 +4,7 @@ import { ZipEntry } from '@src/zip/ZipEntry';
 import { ZipReader } from '@src/zip/ZipReader';
 import { ZipWriter } from '@src/zip/ZipWriter';
 import { TestPlatform } from '@test/TestPlatform';
+import { expect } from 'chai';
 
 describe('ZipReaderWriter', () => {
     it('simple-read', async () => {
@@ -11,7 +12,7 @@ describe('ZipReaderWriter', () => {
         const reader = new ZipReader(ByteBuffer.fromBuffer(data));
         const entries = reader.read();
 
-        expect(entries.map(e => e.fileName).join(',')).toEqual(
+        expect(entries.map(e => e.fileName).join(',')).to.equal(
             'Content/,BinaryStylesheet,LayoutConfiguration,PartConfiguration,Preferences.json,score.gpif,VERSION'
         );
         expect(
@@ -19,7 +20,7 @@ describe('ZipReaderWriter', () => {
                 .map(e => e.data.length)
                 .map(i => i.toString())
                 .join(',')
-        ).toEqual('0,19651,14,27,192,22998,3');
+        ).to.equal('0,19651,14,27,192,22998,3');
     });
 
     it('simple-roundtrip', () => {
@@ -48,13 +49,13 @@ describe('ZipReaderWriter', () => {
         const reader = new ZipReader(data);
         const entries = reader.read();
 
-        expect(entries[0].fileName).toEqual('File01.txt');
-        expect(IOHelper.toString(entries[0].data, 'utf-8')).toEqual('File01');
+        expect(entries[0].fileName).to.equal('File01.txt');
+        expect(IOHelper.toString(entries[0].data, 'utf-8')).to.equal('File01');
 
-        expect(entries[2].fileName).toEqual('File02.txt');
-        expect(IOHelper.toString(entries[2].data, 'utf-8')).toEqual('File02');
+        expect(entries[2].fileName).to.equal('File02.txt');
+        expect(IOHelper.toString(entries[2].data, 'utf-8')).to.equal('File02');
 
-        expect(entries[3].fileName).toEqual('LargeFile');
-        expect(IOHelper.toString(entries[3].data, 'utf-8')).toEqual(text);
+        expect(entries[3].fileName).to.equal('LargeFile');
+        expect(IOHelper.toString(entries[3].data, 'utf-8')).to.equal(text);
     });
 });
