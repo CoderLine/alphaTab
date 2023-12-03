@@ -37,9 +37,9 @@
     "scripts": {
         "clean": "rimraf dist",
         "lint": "eslint .",
-        "generate-typescript": "rimraf src/generated && tsx --experimental-specifier-resolution=node --tsconfig tsconfig.build-csharp.json src.compiler/typescript/AlphaTabGenerator.ts --project tsconfig.build-csharp.json",
-        "generate-csharp": "npm run generate-typescript && tsx --experimental-specifier-resolution=node --tsconfig tsconfig.build-csharp.json src.compiler/csharp/CSharpTranspiler.ts --project tsconfig.build-csharp.json",
-        "generate-kotlin": "npm run generate-typescript && tsx --experimental-specifier-resolution=node --tsconfig tsconfig.build-kotlin.json src.compiler/kotlin/KotlinTranspiler.ts --project tsconfig.build-kotlin.json",
+        "generate-typescript": "rimraf src/generated && tsx src.compiler/typescript/AlphaTabGenerator.ts",
+        "generate-csharp": "npm run generate-typescript && tsx src.compiler/csharp/CSharpTranspiler.ts --outDir dist/lib.csharp",
+        "generate-kotlin": "npm run generate-typescript && tsx src.compiler/kotlin/KotlinTranspiler.ts --outDir dist/lib.kotlin",
         "build": "npm run generate-typescript && tsc --project tsconfig.build.json && rollup -c rollup.config.js",
         "build-ci": "npm run clean && npm run build && npm pack",
         "build-csharp": "npm run generate-csharp && cd src.csharp && dotnet build -c Release",

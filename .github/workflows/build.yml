@@ -59,9 +59,3 @@ jobs:
       - run: npm run build-kotlin-ci
       - run: npm run test-kotlin-ci
       - run: ./src.kotlin/alphaTab/gradlew --stop
-      - uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: dumps
-          path: |
-            **/*.mdmp
