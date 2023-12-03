@@ -380,14 +380,10 @@ export class Environment {
     /**
      * Enables the usage of alphaSkia as rendering backend.
      * @param musicFontData The raw binary data of the music font. 
-     * @param musicFontSize The font size to use for the music font.
      * @param alphaSkia The alphaSkia module.
-     * @target web
      */
-    public static enableAlphaSkia(musicFontData: ArrayBuffer,
-        musicFontSize: number,
-        alphaSkia: any) {
-        SkiaCanvas.enable(musicFontData, musicFontSize, alphaSkia)
+    public static enableAlphaSkia(musicFontData: ArrayBuffer, alphaSkia: unknown) {
+        SkiaCanvas.enable(musicFontData, alphaSkia)
     }
 
     /**

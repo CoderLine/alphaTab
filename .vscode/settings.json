@@ -1,8 +1,4 @@
 {
-    "files.exclude": {
-        "dist/lib.csharp/**": true,
-        "src.csharp/**": true
-    },
     "mochaExplorer.files": "test/**/*.test.ts",
     "mochaExplorer.nodeArgv": [
         "--experimental-specifier-resolution=node",

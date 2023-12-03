@@ -632,7 +632,7 @@ export default class CSharpAstTransformer {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: csMethod,
                 tsNode: d.arguments[1],
-                isAsync: true, 
+                isAsync: true,
                 reference: {
                     nodeType: cs.SyntaxKind.PrimitiveTypeNode,
                     type: cs.PrimitiveType.Void
@@ -1417,7 +1417,7 @@ export default class CSharpAstTransformer {
             variableStatement.variableStatementKind = cs.VariableStatementKind.Using;
         } else if ((s.declarationList.flags & ts.NodeFlags.AwaitUsing) != 0) {
             variableStatement.variableStatementKind = cs.VariableStatementKind.AwaitUsing;
-        } 
+        }
 
         return variableStatement;
     }
@@ -1998,6 +1998,13 @@ export default class CSharpAstTransformer {
                     (block.statements[0] as cs.ExpressionStatement).expression as cs.InvocationExpression
                 ).arguments;
                 block.statements.shift();
+
+                // subclassing errors with cause forwarding
+                if (csConstructor.baseConstructorArguments.length === 2 &&
+                    cs.isAnonymousObjectCreationExpression(csConstructor.baseConstructorArguments[1]) &&
+                    !!csConstructor.baseConstructorArguments[1].properties.find(p => p.name === 'cause')) {
+                    csConstructor.baseConstructorArguments[1] = csConstructor.baseConstructorArguments[1].properties.find(p => p.name === 'cause')!.value
+                }
             }
         }
 

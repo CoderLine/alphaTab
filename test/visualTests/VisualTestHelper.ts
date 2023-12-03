@@ -13,6 +13,7 @@ import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
 import { TestUiFacade } from './TestUiFacade';
 import * as alphaSkiaModule from '@coderline/alphaskia';
 import { AlphaSkiaCanvas, AlphaSkiaImage } from '@coderline/alphaskia';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**
  * @partial
@@ -157,6 +158,7 @@ export class VisualTestHelper {
         let totalWidths: number[] = [];
         let totalHeights: number[] = [];
         const uiFacade = new TestUiFacade();
+        const widthCount = widths.length;
         uiFacade.rootContainer.width = widths.shift()!;
 
         const api = new AlphaTabApiBase<unknown>(uiFacade, settings);
@@ -187,7 +189,7 @@ export class VisualTestHelper {
                 }
             });
             api.error.on(e => {
-                reject(`Failed to render image: ${e}`);
+                reject(new AlphaTabError(AlphaTabErrorType.General, 'Failed to render image', e));
             });
 
             // NOTE: on some platforms we serialize/deserialize the score objects
@@ -196,12 +198,13 @@ export class VisualTestHelper {
             api.renderScore(renderScore, tracks);
         });
 
+        const timeout = 2000 * widthCount;
         await Promise.race([
             render,
             new Promise<void>((_, reject) => {
                 setTimeout(() => {
-                    reject(new Error('Rendering did not complete in time'));
-                }, 2000 * widths.length);
+                    reject(new Error(`Rendering did not complete after ${timeout}ms`));
+                }, timeout);
             })
         ] as Promise<void>[]);
 
@@ -230,7 +233,7 @@ export class VisualTestHelper {
             return;
         }
 
-        const bravura:ArrayBuffer = (await TestPlatform.loadFile('font/bravura/Bravura.ttf')).buffer;
+        const bravura: ArrayBuffer = (await TestPlatform.loadFile('font/bravura/Bravura.ttf')).buffer;
         VisualTestHelper.enableAlphaSkia(bravura);
 
         const fonts = [
@@ -250,16 +253,16 @@ export class VisualTestHelper {
 
         VisualTestHelper._alphaSkiaPrepared = true;
     }
+
     /**
      * @target web
      * @partial
      */
-    static enableAlphaSkia(bravura:ArrayBuffer) {
+    static enableAlphaSkia(bravura: ArrayBuffer) {
         Environment.enableAlphaSkia(
             bravura,
-            Environment.MusicFontSize,
             alphaSkiaModule
-        );    
+        );
     }
 
     static prepareSettingsForTest(settings: Settings) {

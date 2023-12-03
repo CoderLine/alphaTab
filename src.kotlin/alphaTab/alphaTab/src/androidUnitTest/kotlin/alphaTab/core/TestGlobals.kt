@@ -100,13 +100,13 @@ class Expector<T>(private val actual: T) {
     }
 
 
-    fun `throw`(expected: KClass<out Exception>) {
+    fun `throw`(expected: KClass<out Throwable>) {
         val actual = actual
         if (actual is Function0<*>) {
             try {
                 actual()
                 kotlin.test.fail("Did not throw error " + expected.qualifiedName);
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 if (expected::class.isInstance(e::class)) {
                     return;
                 }

@@ -32,19 +32,21 @@ export class SkiaCanvas implements ICanvas {
     private static alphaSkia: AlphaSkiaModule;
 
     private static musicFont: AlphaSkiaTypeface | null = null;
-    private static musicFontSize: number = 0;
 
     private static readonly customTypeFaces = new Map<string, alphaSkia.AlphaSkiaTypeface>();
 
     /**
      * @target web
+     * @partial
      */
     public static enable(musicFontData: ArrayBuffer,
-        musicFontSize: number,
-        alphaSkia: AlphaSkiaModule) {
-        SkiaCanvas.alphaSkia = alphaSkia;
-        SkiaCanvas.musicFont = alphaSkia.AlphaSkiaTypeface.register(musicFontData)!;
-        SkiaCanvas.musicFontSize = musicFontSize;
+        alphaSkia: unknown) {
+        SkiaCanvas.alphaSkia = alphaSkia as AlphaSkiaModule;
+        SkiaCanvas.initializeMusicFont(SkiaCanvas.alphaSkia.AlphaSkiaTypeface.register(musicFontData)!);
+    }
+
+    public static initializeMusicFont(musicFont: AlphaSkiaTypeface) {
+        SkiaCanvas.musicFont = musicFont;
     }
 
     public static registerFont(fontData: Uint8Array, fontInfo?: Font | undefined): Font {
@@ -292,7 +294,7 @@ export class SkiaCanvas implements ICanvas {
         this._canvas.fillText(
             symbols,
             SkiaCanvas.musicFont!,
-            SkiaCanvas.musicFontSize * this.settings.display.scale * scale,
+            Environment.MusicFontSize * this.settings.display.scale * scale,
             x, y,
             centerAtPosition ? SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Center : SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Left,
             SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Alphabetic

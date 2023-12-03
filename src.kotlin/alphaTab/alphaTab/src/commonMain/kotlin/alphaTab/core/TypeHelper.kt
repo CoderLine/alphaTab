@@ -105,10 +105,6 @@ internal class TypeHelper {
                                 d.completeExceptionally(it)
                             }
 
-                            is Throwable -> {
-                                d.completeExceptionally(alphaTab.core.ecmaScript.Error(it.message, it))
-                            }
-
                             else -> {
                                 d.completeExceptionally(alphaTab.core.ecmaScript.Error("Promise rejected with: $it"))
                             }

@@ -14,6 +14,11 @@ partial class SkiaCanvas
         var bravuraData = new MemoryStream((int)bravura.Length);
         bravura.CopyTo(bravuraData);
         MusicFont = AlphaSkiaTypeface.Register(new ArrayBuffer(bravuraData.ToArray()))!;
-        MusicFontSize = Environment.MusicFontSize;
+    }
+
+    internal static void Enable(ArrayBuffer bravura, object? unused)
+    {
+        MusicFont?.Dispose();
+        MusicFont = AlphaSkiaTypeface.Register(bravura);
     }
 }

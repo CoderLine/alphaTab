@@ -60,11 +60,11 @@ namespace AlphaTab.Core
             return double.IsNaN(d);
         }
 
-        public static void SetTimeout(Action action, int timeout)
+        public static void SetTimeout(Action action, double timeout)
         {
             Task.Run(async () =>
             {
-                await Task.Delay(timeout);
+                await Task.Delay((int)timeout);
                 action();
             });
         }
