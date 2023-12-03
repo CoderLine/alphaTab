@@ -29,6 +29,7 @@ alphaskia = { group = "net.alphatab", name="alphaSkia", version.ref = "alphaskia
 alphaskia-windows = { group = "net.alphatab", name="alphaSkia-windows", version.ref = "alphaskia" }
 alphaskia-linux = { group = "net.alphatab", name="alphaSkia-linux", version.ref = "alphaskia" }
 alphaskia-macos = { group = "net.alphatab", name="alphaSkia-macos", version.ref = "alphaskia" }
+alphaskia-android = { group = "net.alphatab", name="alphaSkia-android", version.ref = "alphaskia" }
 
 
 [plugins]

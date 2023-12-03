@@ -50,6 +50,12 @@ kotlin {
             }
             kotlin.srcDirs("../../../dist/lib.kotlin/commonTest/generated")
         }
+
+        androidMain {
+            dependencies {
+                implementation(libs.alphaskia.android)
+            }
+        }
     }
 }
 
