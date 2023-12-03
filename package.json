@@ -52,8 +52,8 @@
         "test-ci": "npm run test",
         "test-csharp": "cd src.csharp && dotnet test -c Release",
         "test-csharp-ci": "cd src.csharp && dotnet test -c Release",
-        "test-kotlin": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest",
-        "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest"
+        "test-kotlin": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info",
+        "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info"
     },
     "devDependencies": {
         "@coderline/alphaskia": "^1.0.117-alpha.5",
