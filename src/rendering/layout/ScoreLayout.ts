@@ -104,11 +104,14 @@ export abstract class ScoreLayout {
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
-        (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
         if (!this.renderer.settings.core.enableLazyLoading) {
+            // in case of no lazy loading -> first notify about layout, then directly render
+            (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
             this.internalRenderLazyPartial(args, callback);
         } else {
+            // in case of lazy loading -> first register lazy, then notify
             this._lazyPartials.set(args.id, new LazyPartial(args, callback));
+            (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
         }
     }
 
