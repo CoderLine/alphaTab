@@ -312,6 +312,13 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
+    public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
+        this._synth.postMessage({
+            cmd: 'alphaSynth.applyTranspositionPitches',
+            transpositionPitches: JSON.stringify(Array.from(transpositionPitches.entries()))
+        });
+    }
+
     public setChannelMute(channel: number, mute: boolean): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.setChannelMute',
