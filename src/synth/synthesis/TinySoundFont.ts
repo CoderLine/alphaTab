@@ -117,6 +117,10 @@ export class TinySoundFont {
                 }
 
                 voice.playingKey += pitchDifference;
+
+                if(this._channels) {
+                    voice.updatePitchRatio(this._channels!.channelList[voice.playingChannel], this.outSampleRate);
+                }
             }
         }
 
