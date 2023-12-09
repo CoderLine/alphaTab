@@ -381,6 +381,10 @@ export class AlphaSynth implements IAlphaSynth {
         }
     }
 
+    public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
+        this._synthesizer.applyTranspositionPitches(transpositionPitches);
+    }
+
     public setChannelMute(channel: number, mute: boolean): void {
         this._synthesizer.channelSetMute(channel, mute);
     }
@@ -418,7 +422,7 @@ export class AlphaSynth implements IAlphaSynth {
         } else {
             endTick = this._sequencer.currentEndTick;
         }
-     
+
         if (this._tickPosition >= endTick && this._notPlayedSamples <= 0) {
             this._notPlayedSamples = 0;
             if (this._sequencer.isPlayingCountIn) {

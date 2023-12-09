@@ -130,6 +130,12 @@ export interface IAlphaSynth {
     loadMidiFile(midi: MidiFile): void;
 
     /**
+     * Applies the given transposition pitches to be used during playback.
+     * @param transpositionPitches a map defining the transposition pitches for midi channel.
+     */
+    applyTranspositionPitches(transpositionPitches: Map<number, number>): void;
+
+    /**
      * Sets the mute state of a channel.
      * @param channel The channel number
      * @param mute true if the channel should be muted, otherwise false.

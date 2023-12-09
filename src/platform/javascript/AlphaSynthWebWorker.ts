@@ -18,7 +18,7 @@ export class AlphaSynthWebWorker {
     private _player: AlphaSynth;
     private _main: IWorkerScope;
 
-    public constructor(main: IWorkerScope, bufferTimeInMilliseconds:number) {
+    public constructor(main: IWorkerScope, bufferTimeInMilliseconds: number) {
         this._main = main;
         this._main.addEventListener('message', this.handleMessage.bind(this));
 
@@ -84,7 +84,7 @@ export class AlphaSynthWebWorker {
                 break;
             case 'alphaSynth.setCountInVolume':
                 this._player.countInVolume = data.value;
-                break;           
+                break;
             case 'alphaSynth.setMidiEventsPlayedFilter':
                 this._player.midiEventsPlayedFilter = data.value;
                 break;
@@ -129,6 +129,9 @@ export class AlphaSynthWebWorker {
                 this._main.postMessage({
                     cmd: 'alphaSynth.destroyed'
                 });
+                break;
+            case 'alphaSynth.applyTranspositionPitches':
+                this._player.applyTranspositionPitches(new Map<number, number>(JSON.parse(data.transpositionPitches)));
                 break;
         }
     }

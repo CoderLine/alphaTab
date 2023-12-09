@@ -191,9 +191,13 @@ export class AlphaTabApiBase<TSettings> {
         // enable/disable player if needed
         if (this.settings.player.enablePlayer) {
             this.setupPlayer();
+            if (score) {
+                this.player?.applyTranspositionPitches(MidiFileGenerator.buildTranspositionPitches(score, this.settings));
+            }
         } else {
             this.destroyPlayer();
         }
+
         this.onSettingsUpdated();
     }
 
@@ -331,8 +335,8 @@ export class AlphaTabApiBase<TSettings> {
                 this._cursorWrapper.width = result.totalWidth;
                 this._cursorWrapper.height = result.totalHeight;
             }
-            
-            if(result.width > 0 || result.height > 0) {
+
+            if (result.width > 0 || result.height > 0) {
                 this.uiFacade.beginAppendRenderResults(result);
             }
         } else {
@@ -607,10 +611,15 @@ export class AlphaTabApiBase<TSettings> {
         let midiFile: MidiFile = new MidiFile();
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
         let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
+
+        // we pass the transposition pitches separately to alphaSynth.
+        generator.applyTranspositionPitches = false;
+
         generator.generate();
         this._tickCache = generator.tickLookup;
         this.onMidiLoad(midiFile);
         this.player.loadMidiFile(midiFile);
+        this.player.applyTranspositionPitches(generator.transpositionPitches);
     }
 
     /**
