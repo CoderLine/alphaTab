@@ -1,8 +1,0 @@
-{
-    "extends": ["tslint-config-standard", "tslint-config-prettier"],
-    "rules": {
-        "one-variable-per-declaration": [true, "ignore-for-loop"],
-        "no-unnecessary-type-assertion": false,
-        "radix": false
-    }
-}

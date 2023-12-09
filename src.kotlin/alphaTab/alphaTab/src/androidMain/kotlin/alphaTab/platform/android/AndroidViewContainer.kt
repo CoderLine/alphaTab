@@ -24,12 +24,12 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
     private var _verticalScrollView: SuspendableScrollView? = null
     private var _gestureDetector: GestureDetector? = null
 
-    public constructor(view: View) {
+    constructor(view: View) {
         this.view = view
         this.view.addOnLayoutChangeListener(this)
     }
 
-    public fun enableUserInteraction(
+    fun enableUserInteraction(
         horizontalScrollView: SuspendableHorizontalScrollView,
         verticalScrollView: SuspendableScrollView
     ) {
@@ -132,11 +132,11 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
         get() = view.visibility == View.VISIBLE && view.width > 0
     override var scrollLeft: Double
         get() = 0.0
-        set(value) {
+        set(@Suppress("UNUSED_PARAMETER") value) {
         }
     override var scrollTop: Double
         get() = 0.0
-        set(value) {
+        set(@Suppress("UNUSED_PARAMETER") value) {
         }
 
     override fun appendChild(child: IContainer) {

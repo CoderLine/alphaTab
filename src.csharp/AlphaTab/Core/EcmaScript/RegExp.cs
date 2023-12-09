@@ -53,5 +53,10 @@ namespace AlphaTab.Core.EcmaScript
                 ? _regex.Replace(input, replacement)
                 : _regex.Replace(input, replacement, 1);
         }
+
+        public string[] Split(string value)
+        {
+            return _regex.Split(value);
+        }
     }
 }

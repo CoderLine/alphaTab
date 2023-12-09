@@ -3,7 +3,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test
 {
-    public static class Globals
+    public static class assert
+    {
+        public static void Fail(string message)
+        {
+            Assert.Fail(message);
+        }
+    }
+
+    public static class TestGlobals
     {
         public static Expector<T> Expect<T>(T actual)
         {
@@ -21,37 +29,62 @@ namespace AlphaTab.Test
         }
     }
 
+    public class NotExpector<T>
+    {
+        private readonly T _actual;
+        public NotExpector<T> Be => this;
+
+        public NotExpector(T actual)
+        {
+            _actual = actual;
+        }
+
+        public void Ok()
+        {
+            if (_actual is string s)
+            {
+                Assert.IsTrue(string.IsNullOrEmpty(s));
+            }
+            else
+            {
+                Assert.AreEqual(default!, _actual);
+            }
+        }
+    }
+
     public class Expector<T>
     {
         private readonly T _actual;
-        private string _message;
 
         public Expector(T actual)
         {
             _actual = actual;
-            _message = string.Empty;
         }
 
-        public Expector<T> WithContext(string message)
-        {
-            _message = message;
-            return this;
-        }
+        public Expector<T> To => this;
+        public NotExpector<T> Not => new(_actual);
+        public Expector<T> Be => this;
 
-        public void ToEqual(object expected, string? message = null)
+        public void Equal(object expected, string? message = null)
         {
             if (expected is int i && _actual is double)
             {
                 expected = (double)i;
             }
-            Assert.AreEqual(expected, _actual, _message + message);
+            if (expected is double d && _actual is int)
+            {
+                expected = (int)d;
+            }
+
+            Assert.AreEqual(expected, _actual, message);
         }
 
-        public void ToBeCloseTo(double expected, string? message = null)
+        public void CloseTo(double expected, double delta, string? message = null)
         {
             if (_actual is IConvertible c)
             {
-                Assert.AreEqual(expected, c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), 0.001, _message + message);
+                Assert.AreEqual(expected,
+                    c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), delta, message);
             }
             else
             {
@@ -65,59 +98,51 @@ namespace AlphaTab.Test
             {
                 expected = (double)i;
             }
-            Assert.AreEqual(expected, _actual, _message);
+
+            Assert.AreEqual(expected, _actual);
         }
 
-        public void ToBeTruthy()
+        public void Ok()
         {
-            Assert.AreNotEqual(default!, _actual, _message);
+            Assert.AreNotEqual(default!, _actual);
         }
 
-        public void ToBeTrue()
+        public void True()
         {
             if (_actual is bool b)
             {
-                Assert.IsTrue(b, _message);
+                Assert.IsTrue(b);
             }
             else
             {
-                Assert.Fail("ToBeTrue can only be used on bools:" + _message);
+                Assert.Fail("ToBeTrue can only be used on bools:");
             }
         }
 
-        public void ToBeFalsy()
-        {
-            if (_actual is string s) 
-            {
-                Assert.IsTrue(string.IsNullOrEmpty(s), _message);
-            }
-            else 
-            {
-                Assert.AreEqual(default!, _actual, _message);
-            }
-        }
 
-        public void ToThrowError(Type expected)
+
+        public void Throw(Type expected)
         {
             if (_actual is Action d)
             {
                 try
                 {
                     d();
-                    Assert.Fail("Did not throw error:" + _message);
+                    Assert.Fail("Did not throw error");
                 }
                 catch (Exception e)
                 {
-                    if (expected.IsInstanceOfType(e)) 
-					{
-						return;
-					}
+                    if (expected.IsInstanceOfType(e))
+                    {
+                        return;
+                    }
                 }
-                Assert.Fail("Exception type didn't match:" + _message);
+
+                Assert.Fail("Exception type didn't match");
             }
             else
             {
-                Assert.Fail("ToThrowError can only be used with an exception:" + _message);
+                Assert.Fail("ToThrowError can only be used with an exception");
             }
         }
     }

@@ -18,7 +18,7 @@ export default function emit(program: ts.Program, diagnostics: ts.Diagnostic[]) 
     context.rewriteVisibilities();
 
     if (!context.hasErrors) {
-        console.log('[C#] Writing Result');
+        console.log(`[C#] Writing Result to ${context.compilerOptions.outDir!} (${context.csharpFiles.length} files)`);
         context.csharpFiles.forEach(file => {
             const printer = new CSharpAstPrinter(file, context);
             printer.print();

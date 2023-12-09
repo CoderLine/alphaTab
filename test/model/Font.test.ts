@@ -1,14 +1,15 @@
 import { Font, FontStyle, FontWeight } from "@src/model/Font";
+import { expect } from 'chai';
 
 describe('FontTests', () => {
     function parseText(text: string, expected: Font) {
         const font = Font.fromJson(text);
-        expect(font!.families.join(', ')).toEqual(expected.families.join(', '));
-        expect(font!.isBold).toEqual(expected.isBold);
-        expect(font!.isItalic).toEqual(expected.isItalic);
-        expect(font!.size).toEqual(expected.size);
-        expect(font!.style).toEqual(expected.style);
-        expect(font!.weight).toEqual(expected.weight);
+        expect(font!.families.join(', ')).to.equal(expected.families.join(', '));
+        expect(font!.isBold).to.equal(expected.isBold);
+        expect(font!.isItalic).to.equal(expected.isItalic);
+        expect(font!.size).to.equal(expected.size);
+        expect(font!.style).to.equal(expected.style);
+        expect(font!.weight).to.equal(expected.weight);
     }
 
     it('parses-full', function () {
@@ -52,7 +53,7 @@ describe('FontTests', () => {
     });
 
     function toCssStringTest(f:Font, expected:string){
-        expect(f.toCssString()).toEqual(expected)
+        expect(f.toCssString()).to.equal(expected)
     }
 
     it('css-string-tests', function () {

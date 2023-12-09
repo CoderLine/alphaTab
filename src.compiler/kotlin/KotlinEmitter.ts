@@ -20,6 +20,7 @@ export default function emit(program: ts.Program, diagnostics: ts.Diagnostic[]) 
     if (!context.hasErrors) {
         console.log('[Kotlin] Writing Result');
         context.csharpFiles.forEach(file => {
+            // console.log(`[Kotlin] ${file.fileName} ${file.namespace.declarations.map(d=>d.name).join(', ')}`)
             const printer = new KotlinAstPrinter(file, context);
             printer.print();
             diagnostics.push(...printer.diagnostics);

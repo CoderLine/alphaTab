@@ -282,7 +282,6 @@ function createCloneMethod(
     importer: (name: string, module: string) => void
 ) {
     return ts.factory.createMethodDeclaration(
-        undefined,
         [
             ts.factory.createModifier(ts.SyntaxKind.PublicKeyword),
             ts.factory.createModifier(ts.SyntaxKind.StaticKeyword)
@@ -293,7 +292,6 @@ function createCloneMethod(
         undefined,
         [
             ts.factory.createParameterDeclaration(
-                undefined,
                 undefined,
                 undefined,
                 'original',
@@ -320,7 +318,6 @@ export default createEmitter('cloneable', (program, input) => {
         statements.push(
             ts.factory.createImportDeclaration(
                 undefined,
-                undefined,
                 ts.factory.createImportClause(
                     false,
                     undefined,
@@ -335,7 +332,6 @@ export default createEmitter('cloneable', (program, input) => {
 
     statements.push(
         ts.factory.createClassDeclaration(
-            [],
             [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
             input.name!.text + 'Cloner',
             undefined,
@@ -347,7 +343,6 @@ export default createEmitter('cloneable', (program, input) => {
     const sourceFile = ts.factory.createSourceFile(
         [
             ts.factory.createImportDeclaration(
-                undefined,
                 undefined,
                 ts.factory.createImportClause(
                     false,

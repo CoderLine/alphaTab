@@ -100,7 +100,6 @@ export class ScoreLoader {
         if (score) {
             return score;
         }
-        Logger.error('ScoreLoader', 'No compatible importer found for file');
         throw new UnsupportedFormatError('No compatible importer found for file');
     }
 }
