@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE score-partwise PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN' 'http://www.musicxml.org/dtds/2.0/partwise.dtd'>
+<score-partwise version="2.0">
+ <work>
+  <work-title>雅俗共赏</work-title>
+ </work>
+ <identification>
+  <creator type="lyricist">许嵩</creator>
+  <creator type="arranger">许嵩</creator>
+  <encoding>
+   <encoding-date>2021-09-28</encoding-date>
+   <software>Guitar Pro 7.5.2</software>
+  </encoding>
+ </identification>
+ <defaults>
+  <scaling>
+   <millimeters>6.4</millimeters>
+   <tenths>40</tenths>
+  </scaling>
+  <page-layout>
+   <page-height>1850</page-height>
+   <page-width>1310</page-width>
+  </page-layout>
+ </defaults>
+ <credit>
+  <credit-words valign="top" font-size="24" justify="center">雅俗共赏</credit-words>
+ </credit>
+ <credit>
+  <credit-words valign="top" font-size="14" justify="center">许嵩</credit-words>
+ </credit>
+ <credit>
+  <credit-words valign="bottom" font-size="12" justify="right">许嵩</credit-words>
+ </credit>
+ <credit>
+  <credit-words valign="bottom" font-size="12" justify="left">许嵩</credit-words>
+ </credit>
+ <part-list>
+  <score-part id="P1">
+   <part-name>伴奏</part-name>
+   <part-abbreviation>s.guit.</part-abbreviation>
+   <midi-instrument id="P1">
+    <midi-channel>1</midi-channel>
+    <midi-bank>1</midi-bank>
+    <midi-program>26</midi-program>
+    <volume>80</volume>
+    <pan>0</pan>
+   </midi-instrument>
+  </score-part>
+ </part-list>
+ <part id="P1">
+  <measure number="1">
+   <attributes>
+    <divisions>2</divisions>
+    <key>
+     <fifths>0</fifths>
+     <mode>major</mode>
+    </key>
+    <time>
+     <beats>4</beats>
+     <beat-type>4</beat-type>
+    </time>
+    <clef number="1">
+     <sign>TAB</sign>
+     <line>5</line>
+    </clef>
+    <staff-details number="1">
+     <staff-lines>6</staff-lines>
+     <staff-tuning line="1">
+      <tuning-step>E</tuning-step>
+      <tuning-octave>2</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="2">
+      <tuning-step>A</tuning-step>
+      <tuning-octave>2</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="3">
+      <tuning-step>D</tuning-step>
+      <tuning-octave>3</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="4">
+      <tuning-step>G</tuning-step>
+      <tuning-octave>3</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="5">
+      <tuning-step>B</tuning-step>
+      <tuning-octave>3</tuning-octave>
+     </staff-tuning>
+     <staff-tuning line="6">
+      <tuning-step>E</tuning-step>
+      <tuning-octave>4</tuning-octave>
+     </staff-tuning>
+    </staff-details>
+   </attributes>
+   <harmony>
+    <root>
+     <root-step>C</root-step>
+     <root-alter>0</root-alter>
+    </root>
+    <kind>major</kind>
+    <frame>
+     <frame-strings>6</frame-strings>
+     <frame-frets>5</frame-frets>
+     <first-fret>1</first-fret>
+     <frame-note>
+      <string>5</string>
+      <fret>3</fret>
+     </frame-note>
+     <frame-note>
+      <string>4</string>
+      <fret>2</fret>
+     </frame-note>
+     <frame-note>
+      <string>3</string>
+      <fret>0</fret>
+     </frame-note>
+     <frame-note>
+      <string>2</string>
+      <fret>1</fret>
+     </frame-note>
+     <frame-note>
+      <string>1</string>
+      <fret>0</fret>
+     </frame-note>
+    </frame>
+   </harmony>
+   <direction directive="yes">
+    <direction-type>
+     <metronome parentheses="yes" default-y="40">
+      <beat-unit>quarter</beat-unit>
+      <per-minute>65</per-minute>
+     </metronome>
+    </direction-type>
+    <sound tempo="65"/>
+   </direction>
+   <note>
+    <pitch>
+     <step>C</step>
+     <octave>3</octave>
+    </pitch>
+    <duration>1</duration>
+    <voice>1</voice>
+    <type>eighth</type>
+    <stem>up</stem>
+    <beam number="1">begin</beam>
+    <notations>
+     <dynamics>
+      <mf/>
+     </dynamics>
+     <technical>
+      <string>5</string>
+      <fret>3</fret>
+     </technical>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>E</step>
+     <octave>3</octave>
+    </pitch>
+    <duration>1</duration>
+    <voice>1</voice>
+    <type>eighth</type>
+    <stem>up</stem>
+    <beam number="1">end</beam>
+    <notations>
+     <dynamics>
+      <mf/>
+     </dynamics>
+     <technical>
+      <string>4</string>
+      <fret>2</fret>
+     </technical>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>G</step>
+     <octave>3</octave>
+    </pitch>
+    <duration>1</duration>
+    <voice>1</voice>
+    <type>eighth</type>
+    <stem>up</stem>
+    <beam number="1">begin</beam>
+    <notations>
+     <dynamics>
+      <mf/>
+     </dynamics>
+     <technical>
+      <string>3</string>
+      <fret>0</fret>
+     </technical>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>C</step>
+     <octave>4</octave>
+    </pitch>
+    <duration>1</duration>
+    <voice>1</voice>
+    <type>eighth</type>
+    <stem>up</stem>
+    <beam number="1">end</beam>
+    <notations>
+     <dynamics>
+      <mf/>
+     </dynamics>
+     <technical>
+      <string>2</string>
+      <fret>1</fret>
+     </technical>
+    </notations>
+   </note>
+   <harmony>
+    <root>
+     <root-step>F</root-step>
+     <root-alter>0</root-alter>
+    </root>
+    <kind>minor</kind>
+    <frame>
+     <frame-strings>6</frame-strings>
+     <frame-frets>5</frame-frets>
+     <first-fret>1</first-fret>
+     <frame-note>
+      <string>6</string>
+      <fret>1</fret>
+     </frame-note>
+     <frame-note>
+      <string>5</string>
+      <fret>3</fret>
+     </frame-note>
+     <frame-note>
+      <string>4</string>
+      <fret>3</fret>
+     </frame-note>
+     <frame-note>
+      <string>3</string>
+      <fret>1</fret>
+     </frame-note>
+     <frame-note>
+      <string>2</string>
+      <fret>1</fret>
+     </frame-note>
+     <frame-note>
+      <string>1</string>
+      <fret>1</fret>
+     </frame-note>
+    </frame>
+   </harmony>
+   <note>
+    <pitch>
+     <step>F</step>
+     <octave>2</octave>
+    </pitch>
+    <duration>1</duration>
+    <voice>1</voice>
+    <type>eighth</type>
+    <stem>up</stem>
+    <beam number="1">begin</beam>
+    <notations>
+     <dynamics>
+      <mf/>
+     </dynamics>
+     <technical>
+      <string>6</string>
+      <fret>1</fret>
+     </technical>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>G</step>
+     <alter>1</alter>
+     <octave>3</octave>
+    </pitch>
+    <duration>1</duration>
+    <voice>1</voice>
+    <type>eighth</type>
+    <accidental>sharp</accidental>
+    <stem>up</stem>
+    <beam number="1">end</beam>
+    <notations>
+     <dynamics>
+      <mf/>
+     </dynamics>
+     <technical>
+      <string>3</string>
+      <fret>1</fret>
+     </technical>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>C</step>
+     <octave>4</octave>
+    </pitch>
+    <duration>2</duration>
+    <voice>1</voice>
+    <type>quarter</type>
+    <stem>up</stem>
+    <notations>
+     <dynamics>
+      <mf/>
+     </dynamics>
+     <technical>
+      <string>2</string>
+      <fret>1</fret>
+     </technical>
+    </notations>
+   </note>
+  </measure>
+  <measure number="2">
+   <attributes>
+    <divisions>4</divisions>
+   </attributes>
+   <harmony>
+    <root>
+     <root-step>G</root-step>
+     <root-alter>0</root-alter>
+    </root>
+    <kind>major</kind>
+    <frame>
+     <frame-strings>6</frame-strings>
+     <frame-frets>5</frame-frets>
+     <first-fret>2</first-fret>
+     <frame-note>
+      <string>6</string>
+      <fret>3</fret>
+     </frame-note>
+     <frame-note>
+      <string>5</string>
+      <fret>2</fret>
+     </frame-note>
+     <frame-note>
+      <string>4</string>
+      <fret>0</fret>
+     </frame-note>
+     <frame-note>
+      <string>3</string>
+      <fret>0</fret>
+     </frame-note>
+     <frame-note>
+      <string>2</string>
+      <fret>0</fret>
+     </frame-note>
+     <frame-note>
+      <string>1</string>
+      <fret>3</fret>
+     </frame-note>
+    </frame>
+   </harmony>
+   <note>
+    <pitch>
+     <step>G</step>
+     <octave>2</octave>
+    </pitch>
+    <duration>2</duration>
+    <voice>1</voice>
+    <type>eighth</type>
+    <stem>up</stem>
+    <beam number="1">begin</beam>
+    <notations>
+     <technical>
+      <string>6</string>
+      <fret>3</fret>
+     </technical>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>D</step>
+     <octave>3</octave>
+    </pitch>
+    <duration>2</duration>
+    <voice>1</voice>
+    <type>eighth</type>
+    <stem>up</stem>
+    <beam number="1">end</beam>
+    <notations>
+     <technical>
+      <string>4</string>
+      <fret>0</fret>
+     </technical>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>B</step>
+     <octave>3</octave>
+    </pitch>
+    <duration>1</duration>
+    <voice>1</voice>
+    <type>16th</type>
+    <stem>up</stem>
+    <beam number="1">begin</beam>
+    <beam number="2">begin</beam>
+    <notations>
+     <technical>
+      <hammer-on number="1" type="start">H</hammer-on>
+      <string>2</string>
+      <fret>0</fret>
+     </technical>
+     <slur type="start"/>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>C</step>
+     <octave>4</octave>
+    </pitch>
+    <duration>1</duration>
+    <voice>1</voice>
+    <type>16th</type>
+    <stem>up</stem>
+    <beam number="1">continue</beam>
+    <beam number="2">end</beam>
+    <notations>
+     <technical>
+      <hammer-on number="1" type="stop"/>
+      <string>2</string>
+      <fret>1</fret>
+     </technical>
+     <slur type="stop"/>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>G</step>
+     <octave>4</octave>
+    </pitch>
+    <duration>2</duration>
+    <tie type="start"/>
+    <voice>1</voice>
+    <type>eighth</type>
+    <stem>up</stem>
+    <beam number="1">end</beam>
+    <notations>
+     <technical>
+      <string>1</string>
+      <fret>3</fret>
+     </technical>
+     <tied type="start"/>
+    </notations>
+   </note>
+   <note>
+    <pitch>
+     <step>G</step>
+     <octave>4</octave>
+    </pitch>
+    <duration>8</duration>
+    <tie type="stop"/>
+    <voice>1</voice>
+    <type>half</type>
+    <stem>up</stem>
+    <notations>
+     <technical>
+      <string>1</string>
+      <fret>3</fret>
+     </technical>
+     <tied type="stop"/>
+    </notations>
+   </note>
+  </measure>
+ </part>
+</score-partwise>

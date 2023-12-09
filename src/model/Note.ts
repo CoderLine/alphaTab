@@ -103,6 +103,7 @@ export class Note {
 
     /**
      * Gets or sets the fret on which this note is played on the instrument.
+     * 0 is the nut.
      */
     public fret: number = -1;
 
