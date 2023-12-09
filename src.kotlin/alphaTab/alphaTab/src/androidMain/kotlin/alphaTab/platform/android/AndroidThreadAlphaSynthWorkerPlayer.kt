@@ -227,6 +227,10 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
         _workerQueue.add { _player?.loadMidiFile(midi) }
     }
 
+    override fun applyTranspositionPitches(transpositionPitches: DoubleDoubleMap) {
+        _workerQueue.add { _player?.applyTranspositionPitches(transpositionPitches) }
+    }
+
     override fun setChannelMute(channel: Double, mute: Boolean) {
         _workerQueue.add { _player?.setChannelMute(channel, mute) }
     }

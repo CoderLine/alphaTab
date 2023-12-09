@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Core.EcmaScript;
 using AlphaTab.Midi;
 using AlphaTab.Synth;
@@ -156,6 +157,11 @@ namespace AlphaTab.Platform.CSharp
         public void LoadMidiFile(MidiFile midi)
         {
             DispatchOnWorkerThread(() => { Player.LoadMidiFile(midi); });
+        }
+
+        public void ApplyTranspositionPitches(IValueTypeMap<double, double> transpositionPitches)
+        {
+            DispatchOnWorkerThread(() => { Player.ApplyTranspositionPitches(transpositionPitches); });
         }
 
         public void SetChannelMute(double channel, bool mute)
