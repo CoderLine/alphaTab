@@ -227,7 +227,7 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
         _workerQueue.add { _player?.loadMidiFile(midi) }
     }
 
-    override fun applyTranspositionPitches(transpositionPitches: DoubleDoubleMap) {
+    override fun applyTranspositionPitches(transpositionPitches: alphaTab.collections.DoubleDoubleMap) {
         _workerQueue.add { _player?.applyTranspositionPitches(transpositionPitches) }
     }
 
