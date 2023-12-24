@@ -10,11 +10,14 @@ import alphaTab.platform.Cursors
 import alphaTab.platform.IContainer
 import alphaTab.platform.IMouseEventArgs
 import alphaTab.platform.IUiFacade
+import alphaTab.platform.skia.AlphaSkiaCanvas
+import alphaTab.platform.skia.AlphaSkiaImage
 import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.utils.Bounds
 import alphaTab.synth.IAlphaSynth
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
@@ -26,6 +29,8 @@ import android.widget.ScrollView
 import androidx.core.view.children
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.nio.Buffer
+import java.nio.ByteBuffer
 import kotlin.contracts.ExperimentalContracts
 
 
@@ -219,7 +224,25 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
 
     override fun beginUpdateRenderResults(renderResults: RenderFinishedEventArgs) {
         _handler.post {
+            // convert AlphaSkia image to Android Bitmap
+            val renderResult = renderResults.renderResult
+            if (renderResult is AlphaSkiaImage)
+            {
+                renderResults.renderResult = convertAlphaSkiaImageToAndroidBitmap(renderResult)
+            }
+
             _renderSurface.fillPlaceholder(renderResults)
+        }
+    }
+
+    private fun convertAlphaSkiaImageToAndroidBitmap(renderResult: AlphaSkiaImage): Bitmap {
+        renderResult.use {
+            val bitmap = Bitmap.createBitmap(renderResult.width.toInt(), renderResult.height.toInt(),
+                Bitmap.Config.ARGB_8888
+            )
+            val pixels = renderResult.readPixels()!!
+            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(pixels.asByteArray()))
+            return bitmap
         }
     }
 
