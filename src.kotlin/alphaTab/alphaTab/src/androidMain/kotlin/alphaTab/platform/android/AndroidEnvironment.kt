@@ -28,7 +28,7 @@ internal class AndroidEnvironment {
                 bravuraBytes = it.readBytes()
             }
 
-            alphaTab.alphaSkia.AlphaSkiaPlatform.loadLibrary(AlphaSkiaAndroid::class.java)
+            AlphaSkiaAndroid.INSTANCE.inititalize()
             Environment.enableAlphaSkia(bravuraBytes.asUByteArray(), null)
         }
     }
