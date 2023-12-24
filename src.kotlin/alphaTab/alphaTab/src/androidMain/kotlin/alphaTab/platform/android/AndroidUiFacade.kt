@@ -51,7 +51,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         _renderSurface = renderSurface
         _renderWrapper = renderWrapper
 
-        rootContainer = AndroidRootViewContainer(outerScroll, innerScroll, renderSurface)
+        rootContainer = AndroidRootViewContainer(outerScroll, innerScroll, renderSurface, this::beginInvoke)
         _handler = Handler(outerScroll.context.mainLooper)
 
         rootContainerBecameVisible = object : IEventEmitter,
@@ -290,16 +290,16 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         cursorWrapper.addView(beatCursor)
 
         _cursors = Cursors(
-            AndroidViewContainer(cursorWrapper),
-            AndroidViewContainer(barCursor),
-            AndroidViewContainer(beatCursor),
-            AndroidViewContainer(selectionWrapper)
+            AndroidViewContainer(cursorWrapper, this::beginInvoke),
+            AndroidViewContainer(barCursor, this::beginInvoke),
+            AndroidViewContainer(beatCursor, this::beginInvoke),
+            AndroidViewContainer(selectionWrapper, this::beginInvoke)
         )
         return _cursors
     }
 
     override fun createCanvasElement(): IContainer {
-        val c = AndroidViewContainer(_renderSurface)
+        val c = AndroidViewContainer(_renderSurface, this::beginInvoke)
         c.enableUserInteraction(_outerScroll, _innerScroll)
         return c
     }
@@ -323,7 +323,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         )
         selection.setBackgroundColor(settingsContainer.selectionFillColor)
 
-        return AndroidViewContainer(selection)
+        return AndroidViewContainer(selection, this::beginInvoke)
     }
 
     override fun highlightElements(groupId: String, masterBarIndex: Double) {

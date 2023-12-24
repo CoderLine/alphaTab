@@ -23,8 +23,13 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
     private var _horizontalScrollView: SuspendableHorizontalScrollView? = null
     private var _verticalScrollView: SuspendableScrollView? = null
     private var _gestureDetector: GestureDetector? = null
+    private val _uiInvoke: (action: (() -> Unit)) -> Unit
 
-    constructor(view: View) {
+    constructor(
+        view: View,
+        uiInvoke: (action: (() -> Unit)) -> Unit
+    ) {
+        _uiInvoke = uiInvoke
         this.view = view
         this.view.addOnLayoutChangeListener(this)
     }
@@ -76,6 +81,7 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
                     (this.mouseMove as EventEmitterOfT<IMouseEventArgs>).trigger(args)
                 }
             }
+
             MotionEvent.ACTION_UP -> {
                 _horizontalScrollView!!.isUserScrollingEnabled = true
                 _verticalScrollView!!.isUserScrollingEnabled = true
@@ -93,40 +99,46 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
     }
 
     override fun setBounds(x: Double, y: Double, w: Double, h: Double) {
-        val params = view.layoutParams
-        if (params is RelativeLayout.LayoutParams) {
-            params.setMargins(
-                (x * Environment.HighDpiFactor).toInt(),
-                (y * Environment.HighDpiFactor).toInt(),
-                0,
-                0
-            )
-            params.width = (w * Environment.HighDpiFactor).toInt()
-            params.height = (h * Environment.HighDpiFactor).toInt()
-        }
+        _uiInvoke {
+            val params = view.layoutParams
+            if (params is RelativeLayout.LayoutParams) {
+                params.setMargins(
+                    (x * Environment.HighDpiFactor).toInt(),
+                    (y * Environment.HighDpiFactor).toInt(),
+                    0,
+                    0
+                )
+                params.width = (w * Environment.HighDpiFactor).toInt()
+                params.height = (h * Environment.HighDpiFactor).toInt()
+            }
 
-        view.requestLayout()
+            view.requestLayout()
+        }
     }
 
     override var width: Double
         get() = (view.measuredWidth / Environment.HighDpiFactor)
         set(value) {
-            val scaled = (value * Environment.HighDpiFactor).toInt()
-            val params = view.layoutParams
-            if (params != null) {
-                params.width = scaled
+            _uiInvoke {
+                val scaled = (value * Environment.HighDpiFactor).toInt()
+                val params = view.layoutParams
+                if (params != null) {
+                    params.width = scaled
+                }
+                view.minimumWidth = scaled
             }
-            view.minimumWidth = scaled
         }
     override var height: Double
         get() = view.measuredHeight.toDouble()
         set(value) {
-            val scaled = (value * Environment.HighDpiFactor).toInt()
-            val params = view.layoutParams
-            if (params != null) {
-                params.height = scaled
+            _uiInvoke {
+                val scaled = (value * Environment.HighDpiFactor).toInt()
+                val params = view.layoutParams
+                if (params != null) {
+                    params.height = scaled
+                }
+                view.minimumHeight = scaled
             }
-            view.minimumHeight = scaled
         }
     override val isVisible: Boolean
         get() = view.visibility == View.VISIBLE && view.width > 0
@@ -140,36 +152,44 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
         }
 
     override fun appendChild(child: IContainer) {
-        val childView = (child as AndroidViewContainer).view
-        val group = view
-        if (group is ViewGroup) {
-            group.addView(childView)
+        _uiInvoke {
+            val childView = (child as AndroidViewContainer).view
+            val group = view
+            if (group is ViewGroup) {
+                group.addView(childView)
+            }
         }
     }
 
     override fun stopAnimation() {
-        view.clearAnimation()
+        _uiInvoke {
+            view.clearAnimation()
+        }
     }
 
     override fun transitionToX(duration: Double, x: Double) {
-        val params = view.layoutParams as RelativeLayout.LayoutParams
-        val startX = params.leftMargin
-        val endX = x * Environment.HighDpiFactor
-        val a: Animation = object : Animation() {
-            override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-                params.leftMargin = (startX + ((endX - startX) * interpolatedTime)).toInt()
-                view.requestLayout()
+        _uiInvoke {
+            val params = view.layoutParams as RelativeLayout.LayoutParams
+            val startX = params.leftMargin
+            val endX = x * Environment.HighDpiFactor
+            val a: Animation = object : Animation() {
+                override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+                    params.leftMargin = (startX + ((endX - startX) * interpolatedTime)).toInt()
+                    view.requestLayout()
+                }
             }
+            a.interpolator = LinearInterpolator()
+            a.duration = duration.toLong()
+            view.startAnimation(a)
         }
-        a.interpolator = LinearInterpolator()
-        a.duration = duration.toLong()
-        view.startAnimation(a)
     }
 
     override fun clear() {
-        val group = view
-        if (group is ViewGroup) {
-            group.removeAllViews()
+        _uiInvoke {
+            val group = view
+            if (group is ViewGroup) {
+                group.removeAllViews()
+            }
         }
     }
 
