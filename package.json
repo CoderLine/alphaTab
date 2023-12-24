@@ -56,8 +56,8 @@
         "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info"
     },
     "devDependencies": {
-        "@coderline/alphaskia": "^1.0.117",
-        "@coderline/alphaskia-windows": "^1.0.117",
+        "@coderline/alphaskia": "^2.0.120",
+        "@coderline/alphaskia-windows": "^2.0.120",
         "@rollup/plugin-commonjs": "^25.0.7",
         "@rollup/plugin-terser": "^0.4.4",
         "@types/chai": "^4.3.9",
