@@ -28,7 +28,7 @@ internal class AndroidEnvironment {
                 bravuraBytes = it.readBytes()
             }
 
-            AlphaSkiaAndroid.INSTANCE.inititalize()
+            AlphaSkiaAndroid.INSTANCE.initialize()
             Environment.enableAlphaSkia(bravuraBytes.asUByteArray(), null)
         }
     }

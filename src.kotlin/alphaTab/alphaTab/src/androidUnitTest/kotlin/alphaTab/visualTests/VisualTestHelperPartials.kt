@@ -16,15 +16,15 @@ actual class VisualTestHelperPartials {
             val os = System.getProperty("os.name")
             when {
                 os == "Mac OS X" -> {
-                    AlphaSkiaMacOs.INSTANCE.inititalize()
+                    AlphaSkiaMacOs.INSTANCE.initialize()
                 }
 
                 os.startsWith("Win") -> {
-                    AlphaSkiaWindows.INSTANCE.inititalize()
+                    AlphaSkiaWindows.INSTANCE.initialize()
                 }
 
                 os.startsWith("Linux") -> {
-                    AlphaSkiaLinux.INSTANCE.inititalize()
+                    AlphaSkiaLinux.INSTANCE.initialize()
                 }
 
                 else -> {
