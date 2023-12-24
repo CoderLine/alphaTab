@@ -1,7 +1,6 @@
 package alphaTab.platform.android
 
 import android.media.*
-import java.util.*
 import java.util.concurrent.*
 import kotlin.contracts.ExperimentalContracts
 
@@ -43,6 +42,12 @@ internal class AndroidAudioWorker(
         _playingSemaphore.acquire()
 
         _updateTimer = Executors.newScheduledThreadPool(1)
+
+        _writeThread = Thread {
+            this@AndroidAudioWorker.writeSamples()
+        }
+        _writeThread!!.name = "alphaTab Audio Worker";
+        _writeThread!!.start()
     }
 
     private fun writeSamples() {
@@ -72,7 +77,7 @@ internal class AndroidAudioWorker(
     }
 
     fun play() {
-        if(_track.playState != AudioTrack.PLAYSTATE_PLAYING) {
+        if (_track.playState != AudioTrack.PLAYSTATE_PLAYING) {
             _previousPosition = _track.playbackHeadPosition
             _track.play()
             _stopped = false
@@ -83,18 +88,13 @@ internal class AndroidAudioWorker(
                 }, 0L, 50L, TimeUnit.MILLISECONDS
             )
 
-            _writeThread = Thread {
-                this@AndroidAudioWorker.writeSamples()
-            }
-            _writeThread!!.name = "alphaTab Audio Worker";
-            _writeThread!!.start()
             _playingSemaphore.release() // proceed thread
         }
     }
 
 
     fun pause() {
-        if(_track.playState == AudioTrack.PLAYSTATE_PLAYING) {
+        if (_track.playState == AudioTrack.PLAYSTATE_PLAYING) {
             _track.pause()
             _playingSemaphore.acquire() // block thread
             _updateSchedule?.cancel(true)
