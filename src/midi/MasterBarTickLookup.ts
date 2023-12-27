@@ -1,4 +1,6 @@
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { BeatTickLookup } from '@src/midi/BeatTickLookup';
+import { Beat } from '@src/model/Beat';
 import { MasterBar } from '@src/model/MasterBar';
 
 /**
@@ -25,11 +27,62 @@ export class MasterBarTickLookup {
      */
     public masterBar!: MasterBar;
 
+    public firstBeat: BeatTickLookup | null = null;
+    public lastBeat: BeatTickLookup | null = null;
+
+
     /**
-     * Gets or sets the list of {@link BeatTickLookup} object which define the durations
-     * for all {@link Beats} played within the period of this MasterBar.
+     * Inserts `newNextBeat` after `currentBeat` in the linked list of items and updates.
+     * the `firstBeat` and `lastBeat` respectively too.
+     * @param currentBeat The item in which to insert the new item afterwards
+     * @param newBeat The new item to insert
      */
-    public beats: BeatTickLookup[] = [];
+    private insertAfter(currentBeat: BeatTickLookup | null, newBeat: BeatTickLookup) {
+        if (this.firstBeat == null || currentBeat == null || this.lastBeat == null) {
+            this.firstBeat = newBeat;
+            this.lastBeat = newBeat;
+        } else {
+            // link new node into sequence
+            newBeat.nextBeat = currentBeat.nextBeat;
+            newBeat.previousBeat = currentBeat;
+
+            // update this node accordinly
+            if (currentBeat.nextBeat) {
+                currentBeat.nextBeat.previousBeat = newBeat;
+            }
+            currentBeat.nextBeat = newBeat;
+
+            if (currentBeat == this.lastBeat) {
+                this.lastBeat = newBeat;
+            }
+        }
+    }
+
+    /**
+       * Inserts `newNextBeat` before `currentBeat` in the linked list of items and updates.
+       * the `firstBeat` and `lastBeat` respectively too.
+       * @param currentBeat The item in which to insert the new item afterwards
+       * @param newBeat The new item to insert
+       */
+    private insertBefore(currentBeat: BeatTickLookup | null, newBeat: BeatTickLookup) {
+        if (this.firstBeat == null || currentBeat == null || this.lastBeat == null) {
+            this.firstBeat = newBeat;
+            this.lastBeat = newBeat;
+        } else {
+            // link new node into sequence
+            newBeat.previousBeat = currentBeat.previousBeat;
+            newBeat.nextBeat = currentBeat;
+
+            // update this node accordingly
+            if (currentBeat.previousBeat) {
+                currentBeat.previousBeat.nextBeat = newBeat;
+            }
+            currentBeat.previousBeat = newBeat;
+            if (currentBeat == this.firstBeat) {
+                this.firstBeat = newBeat;
+            }
+        }
+    }
 
     /**
      * Gets or sets the {@link MasterBarTickLookup} of the next masterbar in the {@link Score}
@@ -37,21 +90,269 @@ export class MasterBarTickLookup {
     public nextMasterBar: MasterBarTickLookup | null = null;
 
     /**
-     * Performs the neccessary finalization steps after all information was written.
+     * Adds a new beat to this masterbar following the slicing logic required by the MidiTickLookup.
+     * @returns The first item of the chain which was affected.
      */
-    public finish(): void {
-        this.beats.sort((a, b) => {
-            return a.start - b.start;
-        });
-    }
+    public addBeat(beat: Beat, start: number, duration: number) {
+        const end = start + duration;
 
-    /**
-     * Adds a new {@link BeatTickLookup} to the list of played beats during this MasterBar period.
-     * @param beat
-     */
-    public addBeat(beat: BeatTickLookup): void {
-        beat.masterBar = this;
-        beat.index = this.beats.length;
-        this.beats.push(beat);
+        // We have following scenarios we cover overall on inserts
+        // Technically it would be possible to merge some code paths and work with loops
+        // to handle all scenarios in a shorter piece of code. 
+        // but this would make the core a lot harder to understand an less readable 
+        // and maintainable for the different scenarios. 
+        // we keep them separate here for that purpose and sacrifice some bytes of code for that.
+
+        // Variant A (initial Insert)
+        //              |    New     |
+        // Result A
+        //              |    New     |
+
+        // Variant B (insert at end, start matches)
+        //              |     L1     |    L2     |
+        //                                       |   New   |
+        // Result B
+        //              |     L1     |    L2     |   N1    |
+
+        // Variant C (insert at end, with gap)
+        //              |     L1     |    L2     |
+        //                                             |   New   |
+        // Result C
+        //              |     L1     |    L2     |       N1      |
+
+
+        // Variant D (Starts before, ends exactly):
+        //              |     L1     |    L2     |
+        //      |  New  |
+        // Result D:
+        //      |  N1   |     L1     |    L2     |
+
+        // Variant E (Starts before, with gap):
+        //              |     L1     |    L2     |
+        //    |  New  |   
+        // Result E:
+        //    |  N1     |     L1     |    L2     |
+
+        // Variant F (starts before, overlaps partially):
+        //              |     L1     |    L2     |
+        //      |      New      | 
+        // Result F:
+        //      |  N1   | N2    | L1 |    L2     |
+
+        // Variant G (starts before, ends the same):
+        //              |     L1     |    L2     |
+        //      |      New           | 
+        // Result G:
+        //      |  N1   | L1         |    L2     |
+
+        // Variant H (starts before, ends after L1):
+        //              |     L1     |    L2     |        
+        //      |      New                  | 
+        // Result H:
+        //      Step 1 (only slice L1): 
+        //      |  N1   | L1          |    L2     |
+        //      Step 2 (call recursively with start time of 'new' adjusted): 
+        //                            | New  |
+        //      |  N1   | L1          |  N2  | L2 |
+
+
+        // Variant I (starts in the middle, ends exactly)
+        //              |     L1     |    L2     |
+        //                    | New  |
+        // Result I
+        //              | N1  |  L1  |    L2     |
+
+        // Variant J (starts in the middle, ends before)
+        //              |     L1     |    L2     |
+        //                 | New |  
+        // Result J
+        //              |N1| N2  |L1 |    L2     |
+
+        // Variant K (starts in the middle, ends after L1)
+        //              |     L1     |    L2     |
+        //                     | New       |
+        // Result K
+        //      Step 1 (only slice L1): 
+        //              |  N1  | L1  |    L2     |
+        //      Step 2 (call recursively with start time of 'new' adjusted): 
+        //                           | New  |
+        //              |  N1  | L1  |    L2     |
+
+        // Variant L (starts exactly, ends exactly)
+        //              |     L1     |    L2     |
+        //              |    New     |
+        // Result L
+        //              |     L1     |    L2     |
+
+        // Variant M (starts exactly, ends before)
+        //              |     L1     |    L2     |
+        //              |  New |  
+        // Result M
+        //              | N1   | L1  |    L2     |
+
+        // Variant N (starts exactly, ends after L1)
+        //              |     L1     |    L2     |
+        //              | New              |
+        // Result N
+        //      Step 1 (only update L1): 
+        //              |      L1    |    L2     |
+        //      Step 2 (call recursively with start time of 'new' adjusted): 
+        //                           | New |
+        //              |     L 1    |    L2     |
+
+        // Variant A
+        if (this.firstBeat == null) {
+            const n1 = new BeatTickLookup(start, end);
+            n1.highlightBeat(beat);
+
+            this.insertAfter(this.firstBeat, n1);
+        }
+        // Variant B
+        // Variant C
+        else if (start >= this.lastBeat!.end) {
+            // using the end here allows merge of B & C
+            const n1 = new BeatTickLookup(this.lastBeat!.end, end);
+            n1.highlightBeat(beat);
+
+            this.insertAfter(this.lastBeat, n1);
+        }
+        else {
+            let l1: BeatTickLookup | null = null;
+            if (start < this.firstBeat.start) {
+                l1 = this.firstBeat!;
+            } else {
+                let current: BeatTickLookup | null = this.firstBeat;
+                while (current != null) {
+                    // find item where we fall into
+                    if (start >= current.start && start < current.end) {
+                        l1 = current;
+                        break;
+                    }
+                    current = current.nextBeat;
+                }
+
+                if (l1 === null) {
+                    // should not be possible
+                    throw new AlphaTabError(AlphaTabErrorType.General, "Error on building lookup, unknown variant");
+                }
+            }
+
+            // those scenarios should only happen if we insert before the 
+            // first item (e.g. for grace notes starting < 0)
+            if (start < l1.start) {
+                // Variant D
+                // Variant E
+                if (end == l1.start) {
+                    // using firstBeat.start here allows merge of D & E
+                    const n1 = new BeatTickLookup(start, l1.start);
+                    n1.highlightBeat(beat);
+
+                    this.insertBefore(this.firstBeat, n1);
+                }
+                // Variant F
+                else if (end < l1.end) {
+                    const n1 = new BeatTickLookup(start, l1.start);
+                    n1.highlightBeat(beat);
+                    this.insertBefore(l1, n1);
+
+                    const n2 = new BeatTickLookup(l1.start, end);
+                    for (const b of l1.highlightedBeats) {
+                        n2.highlightBeat(b);
+                    }
+                    n2.highlightBeat(beat);
+                    this.insertBefore(l1, n2);
+
+                    l1.start = end;
+                }
+                // Variant G
+                else if (end == l1.end) {
+                    const n1 = new BeatTickLookup(start, l1.start);
+                    n1.highlightBeat(beat);
+
+                    l1.highlightBeat(beat);
+
+                    this.insertBefore(l1, n1);
+                }
+                // Variant H
+                else /* end > this.firstBeat.end */ {
+
+                    const n1 = new BeatTickLookup(start, l1.start);
+                    n1.highlightBeat(beat);
+
+                    l1.highlightBeat(beat);
+
+                    this.insertBefore(l1, n1);
+
+                    this.addBeat(beat, l1.end, end - l1.end);
+                }
+            }
+            else if (start > l1.start) {
+                // variant I
+                if (end == l1.end) {
+                    const n1 = new BeatTickLookup(l1.start, start);
+                    for (const b of l1.highlightedBeats) {
+                        n1.highlightBeat(b);
+                    }
+
+                    l1.start = start;
+                    l1.highlightBeat(beat);
+
+                    this.insertBefore(l1, n1)
+                }
+                // Variant J
+                else if (end < l1.end) {
+                    const n1 = new BeatTickLookup(l1.start, start);
+                    this.insertBefore(l1, n1)
+
+                    const n2 = new BeatTickLookup(start, end);
+                    this.insertBefore(l1, n2)
+
+                    for (const b of l1.highlightedBeats) {
+                        n1.highlightBeat(b)
+                        n2.highlightBeat(b)
+                    }
+                    n2.highlightBeat(beat);
+
+                    l1.start = end;
+                }
+                // Variant K
+                else /* end > l1.end */ {
+                    const n1 = new BeatTickLookup(l1.start, start);
+                    for (const b of l1.highlightedBeats) {
+                        n1.highlightBeat(b);
+                    }
+
+                    l1.start = start;
+                    l1.highlightBeat(beat);
+
+                    this.insertBefore(l1, n1);
+                    
+                    this.addBeat(beat, l1.end, end - l1.end);
+                }
+            }
+            else /* start == l1.start */ {
+                // Variant L
+                if (end === l1.end) {
+                    l1.highlightBeat(beat);
+                }
+                // Variant M
+                else if (end < l1.end) {
+                    const n1 = new BeatTickLookup(l1.start, end);
+                    for (const b of l1.highlightedBeats) {
+                        n1.highlightBeat(b);
+                    }
+                    n1.highlightBeat(beat);
+
+                    l1.start = end;
+
+                    this.insertBefore(l1, n1);
+                }
+                // variant N
+                else /* end > l1.end */ {
+                    l1.highlightBeat(beat);
+                    this.addBeat(beat, l1.end, end - l1.end);
+                }
+            }
+        }
     }
 }

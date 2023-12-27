@@ -14,6 +14,8 @@ namespace AlphaTab.Core.EcmaScript
             _data = new HashSet<T>();
         }
 
+        public double Size => _data.Count;
+
         public Set(IEnumerable<T> values)
         {
             _data = new HashSet<T>(values);

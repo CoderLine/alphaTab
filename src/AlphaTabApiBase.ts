@@ -63,6 +63,7 @@ class SelectionInfo {
 export class AlphaTabApiBase<TSettings> {
     private _startTime: number = 0;
     private _trackIndexes: number[] | null = null;
+    private _trackIndexLookup: Set<number> | null = null;
     private _isDestroyed: boolean = false;
     /**
      * Gets the UI facade to use for interacting with the user interface.
@@ -288,6 +289,7 @@ export class AlphaTabApiBase<TSettings> {
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
             }
+            this._trackIndexLookup = new Set<number>(this._trackIndexes)
             this.onScoreLoaded(score);
             this.loadMidiForScore();
             this.render();
@@ -297,6 +299,7 @@ export class AlphaTabApiBase<TSettings> {
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
             }
+            this._trackIndexLookup = new Set<number>(this._trackIndexes)
             this.render();
         }
     }
@@ -819,7 +822,7 @@ export class AlphaTabApiBase<TSettings> {
                     let currentBeat = this._currentBeat;
                     let tickCache = this._tickCache;
                     if (currentBeat && tickCache) {
-                        this.player!.tickPosition = tickCache.getBeatStart(currentBeat.currentBeat);
+                        this.player!.tickPosition = tickCache.getBeatStart(currentBeat.beat);
                     }
                 }
             });
@@ -835,8 +838,8 @@ export class AlphaTabApiBase<TSettings> {
     private cursorUpdateTick(tick: number, stop: boolean, shouldScroll: boolean = false): void {
         let cache: MidiTickLookup | null = this._tickCache;
         if (cache) {
-            let tracks: Track[] = this.tracks;
-            if (tracks.length > 0) {
+            let tracks = this._trackIndexLookup;
+            if (tracks != null && tracks.size > 0) {
                 let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
                 if (beat) {
                     this.cursorUpdateBeat(beat, stop, shouldScroll);
@@ -854,10 +857,10 @@ export class AlphaTabApiBase<TSettings> {
         shouldScroll: boolean,
         forceUpdate: boolean = false
     ): void {
-        const beat: Beat = lookupResult.currentBeat;
-        const nextBeat: Beat | null = lookupResult.nextBeat;
+        const beat: Beat = lookupResult.beat;
+        const nextBeat: Beat | null = lookupResult.nextBeat?.beat ?? null;
         const duration: number = lookupResult.duration;
-        const beatsToHighlight = lookupResult.beatsToHighlight;
+        const beatsToHighlight = lookupResult.beatLookup.highlightedBeats;
 
         if (!beat) {
             return;
@@ -871,7 +874,7 @@ export class AlphaTabApiBase<TSettings> {
         let previousState: PlayerState | null = this._previousStateForCursor;
         if (
             !forceUpdate &&
-            beat === previousBeat?.currentBeat &&
+            beat === previousBeat?.beat &&
             cache === previousCache &&
             previousState === this._playerState
         ) {
@@ -1026,21 +1029,15 @@ export class AlphaTabApiBase<TSettings> {
                 if (nextBeat) {
                     // if we are moving within the same bar or to the next bar
                     // transition to the next beat, otherwise transition to the end of the bar.
+                    let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
                     if (
-                        (nextBeat.voice.bar.index === beat.voice.bar.index && nextBeat.index > beat.index) ||
-                        nextBeat.voice.bar.index === beat.voice.bar.index + 1
+                        nextBeatBoundings &&
+                        nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
+                        barBoundings.staveGroupBounds
                     ) {
-                        let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
-                        if (
-                            nextBeatBoundings &&
-                            nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                            barBoundings.staveGroupBounds
-                        ) {
-                            nextBeatX = nextBeatBoundings.visualBounds.x;
-                        }
+                        nextBeatX = nextBeatBoundings.visualBounds.x;
                     }
                 }
-
                 // we need to put the transition to an own animation frame
                 // otherwise the stop animation above is not applied.
                 this.uiFacade.beginInvoke(() => {
@@ -1219,11 +1216,11 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
         if (range) {
-            const startBeat = this._tickCache.findBeat(this.tracks, range.startTick);
-            const endBeat = this._tickCache.findBeat(this.tracks, range.endTick);
+            const startBeat = this._tickCache.findBeat(this._trackIndexLookup!, range.startTick);
+            const endBeat = this._tickCache.findBeat(this._trackIndexLookup!, range.endTick);
             if (startBeat && endBeat) {
-                const selectionStart = new SelectionInfo(startBeat.currentBeat);
-                const selectionEnd = new SelectionInfo(endBeat.currentBeat);
+                const selectionStart = new SelectionInfo(startBeat.beat);
+                const selectionEnd = new SelectionInfo(endBeat.beat);
                 this.cursorSelectRange(selectionStart, selectionEnd);
             }
         } else {

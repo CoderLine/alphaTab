@@ -1,5 +1,3 @@
-import { BeatTickLookup } from '@src/midi/BeatTickLookup';
-
 import { ControllerType } from '@src/midi/ControllerType';
 import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 
@@ -61,7 +59,6 @@ export class MidiFileGenerator {
     private _settings: Settings;
     private _handler: IMidiFileHandler;
     private _currentTempo: number = 0;
-    private _currentBarRepeatLookup: BeatTickLookup | null = null;
     private _programsPerChannel: Map<number, number> = new Map<number, number>();
 
     /**
@@ -135,7 +132,6 @@ export class MidiFileGenerator {
             this._handler.finishTrack(track.index, controller.currentTick);
         }
 
-        this.tickLookup.finish();
         Logger.debug('Midi', 'Midi generation done');
     }
 
@@ -232,7 +228,6 @@ export class MidiFileGenerator {
 
     private generateBar(bar: Bar, barStartTick: number): void {
         let playbackBar: Bar = this.getPlaybackBar(bar);
-        this._currentBarRepeatLookup = null;
 
         for (const v of playbackBar.voices) {
             this.generateVoice(v, barStartTick, bar);
@@ -294,29 +289,15 @@ export class MidiFileGenerator {
             }
         }
 
-        const beatLookup: BeatTickLookup = new BeatTickLookup();
-        beatLookup.start = barStartTick + beatStart;
-
         const realTickOffset: number = !beat.nextBeat
             ? audioDuration
             : beat.nextBeat.absolutePlaybackStart - beat.absolutePlaybackStart;
-        beatLookup.end = barStartTick + beatStart;
-        beatLookup.highlightBeat(beat);
-        beatLookup.end += realTickOffset > audioDuration ? realTickOffset : audioDuration;
-
         // in case of normal playback register playback
         if (realBar === beat.voice.bar) {
-            beatLookup.beat = beat;
-            this.tickLookup.addBeat(beatLookup);
+            this.tickLookup.addBeat(beat, beatStart, realTickOffset > audioDuration ? realTickOffset : audioDuration);
         } else {
-            beatLookup.isEmptyBar = true;
-            beatLookup.beat = realBar.voices[0].beats[0];
-            if (!this._currentBarRepeatLookup) {
-                this._currentBarRepeatLookup = beatLookup;
-                this.tickLookup.addBeat(this._currentBarRepeatLookup);
-            } else {
-                this._currentBarRepeatLookup.end = beatLookup.end;
-            }
+            // in case of simile marks where we repeat we also register 
+            this.tickLookup.addBeat(beat, 0, realTickOffset > audioDuration ? realTickOffset : audioDuration);
         }
 
         const track: Track = beat.voice.bar.staff.track;
