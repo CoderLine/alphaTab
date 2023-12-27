@@ -65,7 +65,7 @@ namespace AlphaTab.Test
         public NotExpector<T> Not => new(_actual);
         public Expector<T> Be => this;
 
-        public void Equal(object expected, string? message = null)
+        public void Equal(object? expected, string? message = null)
         {
             if (expected is int i && _actual is double)
             {

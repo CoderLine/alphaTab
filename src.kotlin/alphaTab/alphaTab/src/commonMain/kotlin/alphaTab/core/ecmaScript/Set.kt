@@ -7,6 +7,9 @@ public class Set<T> : Iterable<T> {
         _set = HashSet()
     }
 
+    public val size : Double
+        get() = _set.size.toDouble()
+
     public constructor(values: Iterable<T>?) {
         _set = values?.toHashSet() ?: HashSet()
     }
