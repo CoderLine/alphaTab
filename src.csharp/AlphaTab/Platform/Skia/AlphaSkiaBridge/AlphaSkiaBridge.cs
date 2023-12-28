@@ -18,13 +18,19 @@ internal enum AlphaSkiaTextBaseline
     Bottom = AlphaSkia.AlphaSkiaTextBaseline.Bottom
 }
 
-internal class AlphaSkiaImage : IDisposable
+/// <summary>
+/// Bridge between alphaTab and <see cref="AlphaSkia.AlphaSkiaImage"/>
+/// </summary>
+public class AlphaSkiaImageBridge : IDisposable
 {
-    internal AlphaSkia.AlphaSkiaImage Image { get; }
-    public double Width => Image.Width;
-    public double Height => Image.Height;
+    /// <summary>
+    /// Gets the target <see cref="AlphaSkia.AlphaSkiaImage"/>.
+    /// </summary>
+    public AlphaSkia.AlphaSkiaImage Image { get; }
+    internal double Width => Image.Width;
+    internal double Height => Image.Height;
 
-    internal AlphaSkiaImage(AlphaSkia.AlphaSkiaImage image)
+    internal AlphaSkiaImageBridge(AlphaSkia.AlphaSkiaImage image)
     {
         Image = image;
     }
@@ -34,7 +40,7 @@ internal class AlphaSkiaImage : IDisposable
         Image.Dispose();
     }
 
-    public ArrayBuffer? ReadPixels()
+    internal ArrayBuffer? ReadPixels()
     {
         var data = Image.ReadPixels();
         if (data == null)
@@ -45,7 +51,7 @@ internal class AlphaSkiaImage : IDisposable
         return new ArrayBuffer(new ArraySegment<byte>(data, 0, data.Length));
     }
 
-    public ArrayBuffer? ToPng()
+    internal ArrayBuffer? ToPng()
     {
         var data = Image.ToPng();
         if (data == null)
@@ -56,21 +62,24 @@ internal class AlphaSkiaImage : IDisposable
         return new ArrayBuffer(new ArraySegment<byte>(data, 0, data.Length));
     }
 
-    public static AlphaSkiaImage? Decode(ArrayBuffer buffer)
+    internal static AlphaSkiaImageBridge? Decode(ArrayBuffer buffer)
     {
         var underlying = AlphaSkia.AlphaSkiaImage.Decode(buffer.Raw.Array!);
-        return underlying == null ? null : new AlphaSkiaImage(underlying);
+        return underlying == null ? null : new AlphaSkiaImageBridge(underlying);
     }
 
-    public static AlphaSkiaImage? FromPixels(double width, double height, ArrayBuffer pixels)
+    internal static AlphaSkiaImageBridge? FromPixels(double width, double height, ArrayBuffer pixels)
     {
         var underlying =
             AlphaSkia.AlphaSkiaImage.FromPixels((int)width, (int)height, pixels.Raw.Array!);
-        return underlying == null ? null : new AlphaSkiaImage(underlying);
+        return underlying == null ? null : new AlphaSkiaImageBridge(underlying);
     }
 }
 
-internal class AlphaSkiaCanvas : IDisposable
+/// <summary>
+/// Bridge between alphaTab and <see cref="AlphaSkia.AlphaSkiaCanvas"/>
+/// </summary>
+internal class AlphaSkiaCanvasBridge : IDisposable
 {
     private readonly AlphaSkia.AlphaSkiaCanvas _canvas = new();
 
@@ -177,10 +186,10 @@ internal class AlphaSkiaCanvas : IDisposable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void FillText(string text, AlphaSkiaTypeface typeface, double fontSize, double x,
         double y,
-        AlphaSkiaTextAlign textAlign, AlphaSkiaTextBaseline baseline)
+        AlphaSkiaTextAlign textAlign, AlphaSkiaTextBaseline baselineBridge)
     {
         _canvas.FillText(text, typeface.Typeface, (float)fontSize, (float)x, (float)y,
-            (AlphaSkia.AlphaSkiaTextAlign)textAlign, (AlphaSkia.AlphaSkiaTextBaseline)baseline);
+            (AlphaSkia.AlphaSkiaTextAlign)textAlign, (AlphaSkia.AlphaSkiaTextBaseline)baselineBridge);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -202,12 +211,12 @@ internal class AlphaSkiaCanvas : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public AlphaSkiaImage? EndRender()
+    public AlphaSkiaImageBridge? EndRender()
     {
         var underlying = _canvas.EndRender();
         return underlying == null
             ? null
-            : new AlphaSkiaImage(underlying);
+            : new AlphaSkiaImageBridge(underlying);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -222,7 +231,7 @@ internal class AlphaSkiaCanvas : IDisposable
         _canvas.EndRotate();
     }
 
-    public void DrawImage(AlphaSkiaImage image, double x, double y, double width, double height)
+    public void DrawImage(AlphaSkiaImageBridge image, double x, double y, double width, double height)
     {
         _canvas.DrawImage(image.Image, (float)x, (float)y, (float)width, (float)height);
     }

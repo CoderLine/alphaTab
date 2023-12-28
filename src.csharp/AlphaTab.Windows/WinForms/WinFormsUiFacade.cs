@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using AlphaSkia;
 using AlphaTab.Synth;
 using AlphaTab.Platform;
 using AlphaTab.Platform.CSharp;
+using AlphaTab.Platform.Skia.AlphaSkiaBridge;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 
@@ -143,10 +143,10 @@ namespace AlphaTab.WinForms
                     case string _:
                         // TODO: svg support
                         return;
-                    case AlphaSkiaImage skiaImage:
+                    case AlphaSkiaImageBridge skiaImage:
                         using (skiaImage)
                         {
-                            source = SkiaUtil.ToBitmap(skiaImage);
+                            source = AlphaSkiaUtil.ToBitmap(skiaImage);
                         }
 
                         break;

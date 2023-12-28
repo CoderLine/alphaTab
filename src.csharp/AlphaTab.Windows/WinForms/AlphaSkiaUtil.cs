@@ -1,13 +1,14 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
-using AlphaSkia;
+using AlphaTab.Platform.Skia.AlphaSkiaBridge;
 
 namespace AlphaTab.WinForms
 {
-    internal static class SkiaUtil
+    internal static class AlphaSkiaUtil
     {
-        public static Bitmap ToBitmap(AlphaSkiaImage image)
+        public static Bitmap ToBitmap(AlphaSkiaImageBridge imageBridge)
         {
+            var image = imageBridge.Image;
             var bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format32bppPArgb);
             var bitmapData =
                 bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly,

@@ -7,10 +7,10 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using AlphaSkia;
 using AlphaTab.Synth;
 using AlphaTab.Platform;
 using AlphaTab.Platform.CSharp;
+using AlphaTab.Platform.Skia.AlphaSkiaBridge;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using Point = System.Windows.Point;
@@ -154,11 +154,11 @@ namespace AlphaTab.Wpf
                         return;
                     }
 
-                    if (body is AlphaSkiaImage skiaImage)
+                    if (body is AlphaSkiaImageBridge skiaImage)
                     {
                         using (skiaImage)
                         {
-                            source = SkImageSource.Create(skiaImage);
+                            source = AlphaSkiaImageSource.Create(skiaImage);
                         }
                     }
                     else if (body is System.Drawing.Bitmap image)
