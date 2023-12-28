@@ -14,7 +14,7 @@ namespace AlphaTab
     {
         private const int BufferSize = 4096;
         private const int PreferredSampleRate = 44100;
-        
+
         private DirectSoundOut _context;
         private CircularSampleBuffer _circularBuffer;
         private int _bufferCount = 0;
@@ -27,7 +27,7 @@ namespace AlphaTab
         /// Initializes a new instance of the <see cref="NAudioSynthOutput"/> class.
         /// </summary>
         public NAudioSynthOutput()
-            : base(PreferredSampleRate, 2)
+            : base(PreferredSampleRate, (int)SynthConstants.AudioChannels)
         {
             _context = null!;
             _circularBuffer = null!;
@@ -42,16 +42,21 @@ namespace AlphaTab
         /// <inheritdoc />
         public void Open(double bufferTimeInMilliseconds)
         {
+            var latency = 40;
+            _context = new DirectSoundOut(latency);
+            _context.Init(this);
+
+            // NAudio introduces another level of buffering and latency
+            // we've seen that this can cause our buffers to deplete
+            // as a mitigation we buffer a lot more
             _bufferCount = (int)(
                 (bufferTimeInMilliseconds * PreferredSampleRate) /
                 1000 /
                 BufferSize
-            );
+            ) * 4;
             _circularBuffer = new CircularSampleBuffer(BufferSize * _bufferCount);
-            _context = new DirectSoundOut(100);
-            _context.Init(this);
 
-            ((EventEmitter) Ready).Trigger();
+            ((EventEmitter)Ready).Trigger();
         }
 
         /// <inheritdoc />
@@ -112,12 +117,12 @@ namespace AlphaTab
             // before we already get samples via addSamples, therefore we need to
             // remember how many buffers have been requested, and consider them as available.
             var bufferedSamples = _circularBuffer.Count + _requestedBufferCount * BufferSize;
- 
+
             if (bufferedSamples < halfSamples)
             {
                 for (var i = 0; i < halfBufferCount; i++)
                 {
-                    ((EventEmitter) SampleRequest).Trigger();
+                    ((EventEmitter)SampleRequest).Trigger();
                     _requestedBufferCount++;
                 }
             }
@@ -127,16 +132,18 @@ namespace AlphaTab
         public override int Read(float[] buffer, int offset, int count)
         {
             var read = new Float32Array(count);
-            
-            var samplesFromBuffer = _circularBuffer.Read(read, 0, System.Math.Min(read.Length, _circularBuffer.Count));
+
+            var samplesFromBuffer = (int)_circularBuffer.Read(read, 0,
+                System.Math.Min(read.Length, _circularBuffer.Count));
 
             Buffer.BlockCopy(read.Data, 0, buffer, offset * sizeof(float),
-                count * sizeof(float));
+                samplesFromBuffer * sizeof(float));
 
-            var samples = count / 2;
-            ((EventEmitterOfT<double>) SamplesPlayed).Trigger(samples / SynthConstants.AudioChannels);
+            ((EventEmitterOfT<double>)SamplesPlayed).Trigger(samplesFromBuffer /
+                                                             SynthConstants.AudioChannels);
 
             RequestBuffers();
+
 
             return count;
         }
