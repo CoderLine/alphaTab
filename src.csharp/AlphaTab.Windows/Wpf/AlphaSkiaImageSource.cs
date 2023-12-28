@@ -7,7 +7,7 @@ namespace AlphaTab.Wpf
 {
     internal static class AlphaSkiaImageSource
     {
-        public static BitmapSource Create(AlphaSkiaImageBridge imageBridge)
+        public static BitmapSource Create(AlphaSkiaImage imageBridge)
         {
             var image = imageBridge.Image;
             var bitmap = new WriteableBitmap(image.Width, image.Height, 96, 96, PixelFormats.Pbgra32, null);

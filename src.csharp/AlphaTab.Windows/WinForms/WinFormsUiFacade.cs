@@ -143,7 +143,7 @@ namespace AlphaTab.WinForms
                     case string _:
                         // TODO: svg support
                         return;
-                    case AlphaSkiaImageBridge skiaImage:
+                    case AlphaSkiaImage skiaImage:
                         using (skiaImage)
                         {
                             source = AlphaSkiaUtil.ToBitmap(skiaImage);

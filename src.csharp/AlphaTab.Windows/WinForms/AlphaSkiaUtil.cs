@@ -6,7 +6,7 @@ namespace AlphaTab.WinForms
 {
     internal static class AlphaSkiaUtil
     {
-        public static Bitmap ToBitmap(AlphaSkiaImageBridge imageBridge)
+        public static Bitmap ToBitmap(AlphaSkiaImage imageBridge)
         {
             var image = imageBridge.Image;
             var bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format32bppPArgb);

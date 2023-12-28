@@ -21,7 +21,7 @@ internal enum AlphaSkiaTextBaseline
 /// <summary>
 /// Bridge between alphaTab and <see cref="AlphaSkia.AlphaSkiaImage"/>
 /// </summary>
-public class AlphaSkiaImageBridge : IDisposable
+public class AlphaSkiaImage : IDisposable
 {
     /// <summary>
     /// Gets the target <see cref="AlphaSkia.AlphaSkiaImage"/>.
@@ -30,7 +30,7 @@ public class AlphaSkiaImageBridge : IDisposable
     internal double Width => Image.Width;
     internal double Height => Image.Height;
 
-    internal AlphaSkiaImageBridge(AlphaSkia.AlphaSkiaImage image)
+    internal AlphaSkiaImage(AlphaSkia.AlphaSkiaImage image)
     {
         Image = image;
     }
@@ -62,24 +62,24 @@ public class AlphaSkiaImageBridge : IDisposable
         return new ArrayBuffer(new ArraySegment<byte>(data, 0, data.Length));
     }
 
-    internal static AlphaSkiaImageBridge? Decode(ArrayBuffer buffer)
+    internal static AlphaSkiaImage? Decode(ArrayBuffer buffer)
     {
         var underlying = AlphaSkia.AlphaSkiaImage.Decode(buffer.Raw.Array!);
-        return underlying == null ? null : new AlphaSkiaImageBridge(underlying);
+        return underlying == null ? null : new AlphaSkiaImage(underlying);
     }
 
-    internal static AlphaSkiaImageBridge? FromPixels(double width, double height, ArrayBuffer pixels)
+    internal static AlphaSkiaImage? FromPixels(double width, double height, ArrayBuffer pixels)
     {
         var underlying =
             AlphaSkia.AlphaSkiaImage.FromPixels((int)width, (int)height, pixels.Raw.Array!);
-        return underlying == null ? null : new AlphaSkiaImageBridge(underlying);
+        return underlying == null ? null : new AlphaSkiaImage(underlying);
     }
 }
 
 /// <summary>
 /// Bridge between alphaTab and <see cref="AlphaSkia.AlphaSkiaCanvas"/>
 /// </summary>
-internal class AlphaSkiaCanvasBridge : IDisposable
+internal class AlphaSkiaCanvas : IDisposable
 {
     private readonly AlphaSkia.AlphaSkiaCanvas _canvas = new();
 
@@ -211,12 +211,12 @@ internal class AlphaSkiaCanvasBridge : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public AlphaSkiaImageBridge? EndRender()
+    public AlphaSkiaImage? EndRender()
     {
         var underlying = _canvas.EndRender();
         return underlying == null
             ? null
-            : new AlphaSkiaImageBridge(underlying);
+            : new AlphaSkiaImage(underlying);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -231,7 +231,7 @@ internal class AlphaSkiaCanvasBridge : IDisposable
         _canvas.EndRotate();
     }
 
-    public void DrawImage(AlphaSkiaImageBridge image, double x, double y, double width, double height)
+    public void DrawImage(AlphaSkiaImage image, double x, double y, double width, double height)
     {
         _canvas.DrawImage(image.Image, (float)x, (float)y, (float)width, (float)height);
     }

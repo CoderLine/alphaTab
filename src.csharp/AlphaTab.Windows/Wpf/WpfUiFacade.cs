@@ -154,7 +154,7 @@ namespace AlphaTab.Wpf
                         return;
                     }
 
-                    if (body is AlphaSkiaImageBridge skiaImage)
+                    if (body is AlphaSkiaImage skiaImage)
                     {
                         using (skiaImage)
                         {
