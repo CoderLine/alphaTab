@@ -183,7 +183,7 @@ export class AlphaSynth implements IAlphaSynth {
             this.checkReadyForPlayback();
         });
         this.output.sampleRequest.on(() => {
-            if (!this._sequencer.isFinished) {
+            if (this.state == PlayerState.Playing && !this._sequencer.isFinished) {
                 let samples: Float32Array = new Float32Array(
                     SynthConstants.MicroBufferSize * SynthConstants.MicroBufferCount * SynthConstants.AudioChannels
                 );
