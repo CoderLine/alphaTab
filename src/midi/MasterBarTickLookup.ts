@@ -203,7 +203,7 @@ export class MasterBarTickLookup {
         // Variant A
         if (this.firstBeat == null) {
             const n1 = new BeatTickLookup(start, end);
-            n1.highlightBeat(beat);
+            n1.highlightBeat(beat, start, duration);
 
             this.insertAfter(this.firstBeat, n1);
         }
@@ -212,7 +212,7 @@ export class MasterBarTickLookup {
         else if (start >= this.lastBeat!.end) {
             // using the end here allows merge of B & C
             const n1 = new BeatTickLookup(this.lastBeat!.end, end);
-            n1.highlightBeat(beat);
+            n1.highlightBeat(beat, start, duration);
 
             this.insertAfter(this.lastBeat, n1);
         }
@@ -245,21 +245,21 @@ export class MasterBarTickLookup {
                 if (end == l1.start) {
                     // using firstBeat.start here allows merge of D & E
                     const n1 = new BeatTickLookup(start, l1.start);
-                    n1.highlightBeat(beat);
+                    n1.highlightBeat(beat, start, duration);
 
                     this.insertBefore(this.firstBeat, n1);
                 }
                 // Variant F
                 else if (end < l1.end) {
                     const n1 = new BeatTickLookup(start, l1.start);
-                    n1.highlightBeat(beat);
+                    n1.highlightBeat(beat, start, duration);
                     this.insertBefore(l1, n1);
 
                     const n2 = new BeatTickLookup(l1.start, end);
                     for (const b of l1.highlightedBeats) {
-                        n2.highlightBeat(b);
+                        n2.highlightBeat(b.beat, b.playbackStart, b.playbackDuration);
                     }
-                    n2.highlightBeat(beat);
+                    n2.highlightBeat(beat, start, duration);
                     this.insertBefore(l1, n2);
 
                     l1.start = end;
@@ -267,9 +267,9 @@ export class MasterBarTickLookup {
                 // Variant G
                 else if (end == l1.end) {
                     const n1 = new BeatTickLookup(start, l1.start);
-                    n1.highlightBeat(beat);
+                    n1.highlightBeat(beat, start, duration);
 
-                    l1.highlightBeat(beat);
+                    l1.highlightBeat(beat, start, duration);
 
                     this.insertBefore(l1, n1);
                 }
@@ -277,9 +277,9 @@ export class MasterBarTickLookup {
                 else /* end > this.firstBeat.end */ {
 
                     const n1 = new BeatTickLookup(start, l1.start);
-                    n1.highlightBeat(beat);
+                    n1.highlightBeat(beat, start, duration);
 
-                    l1.highlightBeat(beat);
+                    l1.highlightBeat(beat, start, duration);
 
                     this.insertBefore(l1, n1);
 
@@ -291,11 +291,11 @@ export class MasterBarTickLookup {
                 if (end == l1.end) {
                     const n1 = new BeatTickLookup(l1.start, start);
                     for (const b of l1.highlightedBeats) {
-                        n1.highlightBeat(b);
+                        n1.highlightBeat(b.beat, b.playbackStart, b.playbackDuration);
                     }
 
                     l1.start = start;
-                    l1.highlightBeat(beat);
+                    l1.highlightBeat(beat, start, duration);
 
                     this.insertBefore(l1, n1)
                 }
@@ -308,10 +308,10 @@ export class MasterBarTickLookup {
                     this.insertBefore(l1, n2)
 
                     for (const b of l1.highlightedBeats) {
-                        n1.highlightBeat(b)
-                        n2.highlightBeat(b)
+                        n1.highlightBeat(b.beat, b.playbackStart, b.playbackDuration)
+                        n2.highlightBeat(b.beat, b.playbackStart, b.playbackDuration)
                     }
-                    n2.highlightBeat(beat);
+                    n2.highlightBeat(beat, start, duration);
 
                     l1.start = end;
                 }
@@ -319,29 +319,29 @@ export class MasterBarTickLookup {
                 else /* end > l1.end */ {
                     const n1 = new BeatTickLookup(l1.start, start);
                     for (const b of l1.highlightedBeats) {
-                        n1.highlightBeat(b);
+                        n1.highlightBeat(b.beat, b.playbackStart, b.playbackDuration);
                     }
 
                     l1.start = start;
-                    l1.highlightBeat(beat);
+                    l1.highlightBeat(beat, start, duration);
 
                     this.insertBefore(l1, n1);
-                    
+
                     this.addBeat(beat, l1.end, end - l1.end);
                 }
             }
             else /* start == l1.start */ {
                 // Variant L
                 if (end === l1.end) {
-                    l1.highlightBeat(beat);
+                    l1.highlightBeat(beat, start, end);
                 }
                 // Variant M
                 else if (end < l1.end) {
                     const n1 = new BeatTickLookup(l1.start, end);
                     for (const b of l1.highlightedBeats) {
-                        n1.highlightBeat(b);
+                        n1.highlightBeat(b.beat, b.playbackStart, b.playbackDuration);
                     }
-                    n1.highlightBeat(beat);
+                    n1.highlightBeat(beat, start, duration);
 
                     l1.start = end;
 
@@ -349,7 +349,7 @@ export class MasterBarTickLookup {
                 }
                 // variant N
                 else /* end > l1.end */ {
-                    l1.highlightBeat(beat);
+                    l1.highlightBeat(beat, start, duration);
                     this.addBeat(beat, l1.end, end - l1.end);
                 }
             }

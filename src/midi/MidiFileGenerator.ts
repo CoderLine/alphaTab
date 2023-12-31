@@ -289,15 +289,12 @@ export class MidiFileGenerator {
             }
         }
 
-        const realTickOffset: number = !beat.nextBeat
-            ? audioDuration
-            : beat.nextBeat.absolutePlaybackStart - beat.absolutePlaybackStart;
         // in case of normal playback register playback
         if (realBar === beat.voice.bar) {
-            this.tickLookup.addBeat(beat, beatStart, realTickOffset > audioDuration ? realTickOffset : audioDuration);
+            this.tickLookup.addBeat(beat, beatStart, audioDuration);
         } else {
             // in case of simile marks where we repeat we also register 
-            this.tickLookup.addBeat(beat, 0, realTickOffset > audioDuration ? realTickOffset : audioDuration);
+            this.tickLookup.addBeat(beat, 0, audioDuration);
         }
 
         const track: Track = beat.voice.bar.staff.track;

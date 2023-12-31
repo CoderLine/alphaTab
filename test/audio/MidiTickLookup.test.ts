@@ -488,46 +488,83 @@ describe('MidiTickLookupTest', () => {
         expect(secondBeat!.beatLookup.duration).to.equal(960);
     });
 
-    function nextBeatSearchTest(trackIndexes: number[],
+
+    function lookupTest(
+        tex: string,
+        ticks: number[],
+        trackIndexes: number[],
         durations: number[],
         currentBeatFrets: number[],
         nextBeatFrets: (number | null)[]
     ) {
-        const buffer = ByteBuffer.fromString(`
-        \\tempo 67
-        .
-        \\track "T01"
-        \\ts 1 4 1.1.8 2.1.8 | 6.1.8 7.1.8 | 
-        \\track "T02"
-        3.1.16 4.1.16 5.1.8 | 8.1.16 9.1.16 10.1.8
-    `);
+        const buffer = ByteBuffer.fromString(tex);
         const settings = new Settings();
         const score = ScoreLoader.loadScoreFromBytes(buffer.getBuffer(), settings);
         const lookup = buildLookup(score, settings);
 
         const tracks = new Set<number>(trackIndexes);
 
-        const ticks = [
-            0, 120, 240, 360, 480, 600, 720, 840, 960,
-            1080, 1200, 1320, 1440, 1560, 1680, 1800
-        ];
-
         let currentLookup: MidiTickLookupFindBeatResult | null = null;
+
+        const actualIncrementalFrets: number[] = [];
+        const actualIncrementalNextFrets: (number|null)[] = [];
+        const actualIncrementalTickDurations: number[] = [];
+        
+        const actualCleanFrets: number[] = [];
+        const actualCleanNextFrets: (number|null)[] = [];
+        const actualCleanTickDurations: number[] = [];
+        
         for (let i = 0; i < ticks.length; i++) {
             currentLookup = lookup.findBeat(tracks, ticks[i], currentLookup);
 
             Logger.debug("Test", `Checking index ${i} with tick ${ticks[i]}`)
             expect(currentLookup).to.be.ok;
-            expect(currentLookup!.beat.notes[0].fret).to.equal(currentBeatFrets[i]);
-            expect(currentLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null).to.equal(nextBeatFrets[i]);
-            expect(currentLookup!.tickDuration).to.equal(durations[i]);
+            actualIncrementalFrets.push(currentLookup!.beat.notes[0].fret);
+            actualIncrementalNextFrets.push(currentLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
+            actualIncrementalTickDurations.push(currentLookup!.tickDuration)
 
+            
             const cleanLookup = lookup.findBeat(tracks, ticks[i], null);
-            expect(cleanLookup).to.be.ok;
-            expect(cleanLookup!.beat.notes[0].fret).to.equal(currentBeatFrets[i]);
-            expect(cleanLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null).to.equal(nextBeatFrets[i]);
-            expect(cleanLookup!.tickDuration).to.equal(durations[i]);
+
+            actualCleanFrets.push(cleanLookup!.beat.notes[0].fret);
+            actualCleanNextFrets.push(cleanLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
+            actualCleanTickDurations.push(cleanLookup!.tickDuration)
         }
+
+        expect(actualIncrementalFrets.join(',')).to.equal(currentBeatFrets.join(','));
+        expect(actualIncrementalNextFrets.join(',')).to.equal(nextBeatFrets.join(','));
+        expect(actualIncrementalTickDurations.join(',')).to.equal(durations.join(','));
+
+        expect(actualCleanFrets.join(',')).to.equal(currentBeatFrets.join(','));
+        expect(actualCleanNextFrets.join(',')).to.equal(nextBeatFrets.join(','));
+        expect(actualCleanTickDurations.join(',')).to.equal(durations.join(','));
+    }
+
+
+
+    function nextBeatSearchTest(trackIndexes: number[],
+        durations: number[],
+        currentBeatFrets: number[],
+        nextBeatFrets: (number | null)[]
+    ) {
+        lookupTest(
+            `
+            \\tempo 67
+            .
+            \\track "T01"
+            \\ts 1 4 1.1.8 2.1.8 | 6.1.8 7.1.8 | 
+            \\track "T02"
+            3.1.16 4.1.16 5.1.8 | 8.1.16 9.1.16 10.1.8
+        `,
+            [
+                0, 120, 240, 360, 480, 600, 720, 840, 960,
+                1080, 1200, 1320, 1440, 1560, 1680, 1800
+            ],
+            trackIndexes,
+            durations,
+            currentBeatFrets,
+            nextBeatFrets
+        )
     }
 
 
@@ -563,6 +600,55 @@ describe('MidiTickLookupTest', () => {
             [
                 2, 2, 2, 2, 6, 6, 6, 6,
                 7, 7, 7, 7, null, null, null, null
+            ]
+        )
+    });
+
+    it('lookup-triplet-feel-reference', () => {
+        lookupTest(
+            `\\ts 2 4
+            1.1.4{tu 3} 2.1.8{tu 3} 3.1.4{tu 3} 4.1.8{tu 3} | 5.1.4{tu 3} 6.1.8{tu 3} 7.1.4{tu 3} 8.1.8{tu 3}`,
+            [
+                0, 640, 960, 1600, 
+                1920, 2560, 2880, 3520
+            ],
+            [0],
+            [
+                640, 320, 640, 320,
+                640, 320, 640, 320
+            ],
+            [
+                1, 2, 3, 4,
+                5, 6, 7, 8
+            ],
+            [
+                2, 3, 4, 5,
+                6, 7, 8, null
+            ]
+        )
+    });
+
+    
+    it('lookup-triplet-feel-test', () => {
+        lookupTest(
+            `\\tf triplet-8th \\ts 2 4
+            1.1.8 2.1.8 3.1.8 4.1.8 | 5.1.8 6.1.8 7.1.8 8.1.8`,
+            [
+                0, 640, 960, 1600, 
+                1920, 2560, 2880, 3520
+            ],
+            [0],
+            [
+                640, 320, 640, 320,
+                640, 320, 640, 320
+            ],
+            [
+                1, 2, 3, 4,
+                5, 6, 7, 8
+            ],
+            [
+                2, 3, 4, 5,
+                6, 7, 8, null
             ]
         )
     });

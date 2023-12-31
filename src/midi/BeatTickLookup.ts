@@ -1,6 +1,36 @@
 import { Beat } from '@src/model/Beat';
 
 /**
+ * Represents a beat and when it is actually played according to the generated audio.
+ */
+export class BeatTickLookupItem {
+    /**
+     * Gets the beat represented by this item.
+     */
+    public readonly beat: Beat;
+
+    /**
+     * Gets the playback start of the beat according to the generated audio.
+     */
+    public readonly playbackStart: number;
+
+    /**
+     * Gets the playback start of the beat duration according to the generated audio.
+     */
+    public readonly playbackDuration: number;
+
+    public constructor(
+        beat: Beat,
+        playbackStart: number,
+        playbackDuration: number
+    ) {
+        this.beat = beat;
+        this.playbackStart = playbackStart;
+        this.playbackDuration = playbackDuration;
+    }
+}
+
+/**
  * Represents the time period, for which one or multiple {@link Beat}s are played
  */
 export class BeatTickLookup {
@@ -21,7 +51,7 @@ export class BeatTickLookup {
      * the beat of this lookup starts playing. This might not mean 
      * the beats start at this position.
      */
-    public highlightedBeats: Beat[] = [];
+    public highlightedBeats: BeatTickLookupItem[] = [];
 
     /**
      * Gets the next BeatTickLookup which comes after this one and is in the same
@@ -42,7 +72,7 @@ export class BeatTickLookup {
         return this.end - this.start;
     }
 
-    public constructor(start:number, end:number) {
+    public constructor(start: number, end: number) {
         this.start = start;
         this.end = end;
     }
@@ -51,13 +81,13 @@ export class BeatTickLookup {
      * Marks the given beat as highlighed as part of this lookup.
      * @param beat The beat to add.
      */
-    public highlightBeat(beat: Beat): void {
-        if(beat.isEmpty) {
+    public highlightBeat(beat: Beat, playbackStart: number, playbackDuration: number): void {
+        if (beat.isEmpty) {
             return;
         }
         if (!this._highlightedBeats.has(beat.id)) {
             this._highlightedBeats.set(beat.id, true);
-            this.highlightedBeats.push(beat);
+            this.highlightedBeats.push(new BeatTickLookupItem(beat, playbackStart, playbackDuration));
         }
     }
 
@@ -68,8 +98,8 @@ export class BeatTickLookup {
      */
     public getVisibleBeatAtStart(visibleTracks: Set<number>): Beat | null {
         for (const b of this.highlightedBeats) {
-            if (b.playbackStart == this.start && visibleTracks.has(b.voice.bar.staff.track.index)) {
-                return b;
+            if (b.playbackStart == this.start && visibleTracks.has(b.beat.voice.bar.staff.track.index)) {
+                return b.beat;
             }
         }
         return null;
