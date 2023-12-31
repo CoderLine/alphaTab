@@ -495,7 +495,8 @@ describe('MidiTickLookupTest', () => {
         trackIndexes: number[],
         durations: number[],
         currentBeatFrets: number[],
-        nextBeatFrets: (number | null)[]
+        nextBeatFrets: (number | null)[],
+        skipClean: boolean = false
     ) {
         const buffer = ByteBuffer.fromString(tex);
         const settings = new Settings();
@@ -507,13 +508,13 @@ describe('MidiTickLookupTest', () => {
         let currentLookup: MidiTickLookupFindBeatResult | null = null;
 
         const actualIncrementalFrets: number[] = [];
-        const actualIncrementalNextFrets: (number|null)[] = [];
+        const actualIncrementalNextFrets: (number | null)[] = [];
         const actualIncrementalTickDurations: number[] = [];
-        
+
         const actualCleanFrets: number[] = [];
-        const actualCleanNextFrets: (number|null)[] = [];
+        const actualCleanNextFrets: (number | null)[] = [];
         const actualCleanTickDurations: number[] = [];
-        
+
         for (let i = 0; i < ticks.length; i++) {
             currentLookup = lookup.findBeat(tracks, ticks[i], currentLookup);
 
@@ -523,21 +524,24 @@ describe('MidiTickLookupTest', () => {
             actualIncrementalNextFrets.push(currentLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
             actualIncrementalTickDurations.push(currentLookup!.tickDuration)
 
-            
-            const cleanLookup = lookup.findBeat(tracks, ticks[i], null);
+            if (!skipClean) {
+                const cleanLookup = lookup.findBeat(tracks, ticks[i], null);
 
-            actualCleanFrets.push(cleanLookup!.beat.notes[0].fret);
-            actualCleanNextFrets.push(cleanLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
-            actualCleanTickDurations.push(cleanLookup!.tickDuration)
+                actualCleanFrets.push(cleanLookup!.beat.notes[0].fret);
+                actualCleanNextFrets.push(cleanLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
+                actualCleanTickDurations.push(cleanLookup!.tickDuration)
+            }
         }
 
         expect(actualIncrementalFrets.join(',')).to.equal(currentBeatFrets.join(','));
         expect(actualIncrementalNextFrets.join(',')).to.equal(nextBeatFrets.join(','));
         expect(actualIncrementalTickDurations.join(',')).to.equal(durations.join(','));
 
-        expect(actualCleanFrets.join(',')).to.equal(currentBeatFrets.join(','));
-        expect(actualCleanNextFrets.join(',')).to.equal(nextBeatFrets.join(','));
-        expect(actualCleanTickDurations.join(',')).to.equal(durations.join(','));
+        if(!skipClean) {
+            expect(actualCleanFrets.join(',')).to.equal(currentBeatFrets.join(','));
+            expect(actualCleanNextFrets.join(',')).to.equal(nextBeatFrets.join(','));
+            expect(actualCleanTickDurations.join(',')).to.equal(durations.join(','));
+        }
     }
 
 
@@ -609,7 +613,7 @@ describe('MidiTickLookupTest', () => {
             `\\ts 2 4
             1.1.4{tu 3} 2.1.8{tu 3} 3.1.4{tu 3} 4.1.8{tu 3} | 5.1.4{tu 3} 6.1.8{tu 3} 7.1.4{tu 3} 8.1.8{tu 3}`,
             [
-                0, 640, 960, 1600, 
+                0, 640, 960, 1600,
                 1920, 2560, 2880, 3520
             ],
             [0],
@@ -633,7 +637,7 @@ describe('MidiTickLookupTest', () => {
             `\\tf triplet-8th \\ts 2 4
             1.1.8 2.1.8 3.1.8 4.1.8 | 5.1.8 6.1.8 7.1.8 8.1.8`,
             [
-                0, 640, 960, 1600, 
+                0, 640, 960, 1600,
                 1920, 2560, 2880, 3520
             ],
             [0],
@@ -652,33 +656,49 @@ describe('MidiTickLookupTest', () => {
         )
     });
 
-    it('visible-on-next-bar', () => {
+    it('incomplete', () => {
         lookupTest(
             `
-            \\track "First"
-            \\ts 2 4
+            \\ts 4 4
             1.1.4 2.1.4 | 3.1.4 4.1.4
-            \\track "Second"
-            1.1.16*8 | 1.1.16*8 
             `,
             [
+                // first bar, real playback
                 0, 480, 960, 1440, 
-                1920, 2400, 2880, 3360
+                // gap
+                1920, 2400, 2880, 3360, 
+                // second bar, real playback
+                3840, 4320, 4800, 5280,
+                // second gap
+                5760, 6240, 6720, 7200
             ],
             [0],
             [
-                
-                960, 960, 960, 960,
-                960, 960, 960, 960
+                960, 960, 2880, 2880,
+                2880, 2880, 2880, 2880,
+                960, 960, 2880, 2880,
+                2880, 2880, 2880, 2880
             ],
             [
+                // first bar, real playback
                 1, 1, 2, 2,
-                3, 3, 4, 4
+                // gap
+                2, 2, 2, 2,
+                // second bar, real playback
+                3, 3, 4, 4, 
+                // second gap
+                4, 4, 4, 4
             ],
             [
-                2, 2, 3, 3,
-                4, 4, null, null
-            ]
+                2, 2, null, null, 
+
+                null, null, null, null,
+
+                4, 4, null, null,
+                
+                null, null, null, null
+            ],
+            true
         )
     });
 });

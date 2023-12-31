@@ -155,6 +155,7 @@ export class MidiTickLookup {
             current.masterBar,
             current.beatLookup.nextBeat,
             current.end, trackLookup, false, true);
+
         if (current.nextBeat == null) {
             current.nextBeat = this.findBeatSlow(trackLookup, current, current.end, true);
         }
@@ -162,6 +163,12 @@ export class MidiTickLookup {
         // if we have the next beat take the difference between the times as duration
         if (current.nextBeat) {
             current.tickDuration = current.nextBeat.start - current.start;
+            current.duration = MidiUtils.ticksToMillis(current.tickDuration, current.masterBar.tempo);
+        }
+
+        // no next beat, animate to the end of the bar (could be an incomplete bar)
+        if (!current.nextBeat) {
+            current.tickDuration = current.masterBar.end - current.start;
             current.duration = MidiUtils.ticksToMillis(current.tickDuration, current.masterBar.tempo);
         }
     }
@@ -401,7 +408,7 @@ export class MidiTickLookup {
         this.masterBars.push(masterBar);
         if (this._currentMasterBar) {
             masterBar.previousMasterBar = this._currentMasterBar;
-            this._currentMasterBar.nextMasterBar = masterBar;            
+            this._currentMasterBar.nextMasterBar = masterBar;
         }
         this._currentMasterBar = masterBar;
         if (!this.masterBarLookup.has(masterBar.masterBar.index)) {
