@@ -9,8 +9,7 @@ androidx-appcompat = "1.6.1"
 androidx-test = "1.5.0"
 
 junit = "4.13.2"
-alphaskia = "2.0.120"
-
+alphaskia = "1.0.120-LOCAL"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -26,10 +25,11 @@ kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name="kotlinx-corou
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 
 alphaskia = { group = "net.alphatab", name="alphaSkia", version.ref = "alphaskia" }
-alphaskia-windows = { group = "net.alphatab", name="alphaSkia-windows", version.ref = "alphaskia" }
-alphaskia-linux = { group = "net.alphatab", name="alphaSkia-linux", version.ref = "alphaskia" }
-alphaskia-macos = { group = "net.alphatab", name="alphaSkia-macos", version.ref = "alphaskia" }
+alphaskia-windows = { group = "net.alphatab", name="alphaSkia-jvm-windows", version.ref = "alphaskia" }
+alphaskia-linux = { group = "net.alphatab", name="alphaSkia-jvm-linux", version.ref = "alphaskia" }
+alphaskia-macos = { group = "net.alphatab", name="alphaSkia-jvm-macos", version.ref = "alphaskia" }
 alphaskia-android = { group = "net.alphatab", name="alphaSkia-android", version.ref = "alphaskia" }
+alphaskia-native-mingwx64 = { module = "net.alphatab:alphaSkia-native-mingwX64", version.ref = "alphaskia" }
 
 
 [plugins]

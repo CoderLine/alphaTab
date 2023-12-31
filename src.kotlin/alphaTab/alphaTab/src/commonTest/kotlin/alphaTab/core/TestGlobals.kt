@@ -5,7 +5,7 @@ import kotlin.reflect.KClass
 class assert {
     companion object {
         fun fail(message: Any?) {
-            kotlin.test.fail(message?.toString())
+            kotlin.test.fail(message?.toString(), message as Throwable)
         }
     }
 }

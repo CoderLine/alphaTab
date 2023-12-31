@@ -68,7 +68,7 @@ internal class TypeHelper {
             }
         }
 
-        @JvmName("createPromiseWithValue")
+        @kotlin.jvm.JvmName("createPromiseWithValue")
         public fun <T> createPromise(action: (resolve: (T) -> Unit, reject: (Any) -> Unit) -> Unit): kotlinx.coroutines.Deferred<T> {
             val d = CompletableDeferred<T>()
             GlobalScope.async {

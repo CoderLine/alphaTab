@@ -14,6 +14,7 @@ import { TestUiFacade } from './TestUiFacade';
 import * as alphaSkiaModule from '@coderline/alphaskia';
 import { AlphaSkiaCanvas, AlphaSkiaImage } from '@coderline/alphaskia';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { Logger } from '@src/Logger';
 
 /**
  * @partial
@@ -248,7 +249,8 @@ export class VisualTestHelper {
         ];
 
         for (const font of fonts) {
-            Environment.registerAlphaSkiaCustomFont((await TestPlatform.loadFile(font)));
+            const fontInfo = Environment.registerAlphaSkiaCustomFont((await TestPlatform.loadFile(font)));
+            Logger.info("Test", `Registered '${font}' as ${fontInfo.families.join(',')}, ${fontInfo.isBold} , ${fontInfo.isItalic}`)
         }
 
         VisualTestHelper._alphaSkiaPrepared = true;

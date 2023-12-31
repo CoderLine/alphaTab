@@ -42,7 +42,7 @@ actual class TestPlatformPartials {
         }
 
         private fun openFileWrite(path: String): OutputStream {
-            val subpath = Paths.get("test-results", path)
+            val subpath = Paths.get(path)
             val fullPath = Paths.get(projectRoot, subpath.toString())
             Logger.info("Test", "Saving file '$path' to '$fullPath'")
             fullPath.parent.toFile().mkdirs()

@@ -21,22 +21,61 @@ plugins {
 //    alias(libs.plugins.kotlinCocoapods)
 }
 
-repositories{
+repositories {
     google()
     mavenCentral()
+    maven {
+        url = File("""D:\Dev\AlphaTab\AlphaSkia\dist\maven""").toURI()
+    }
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 val jvmTarget = 17
-val alphaTabDescription = "alphaTab is a cross platform music notation and guitar tablature rendering library."
+val alphaTabDescription =
+    "alphaTab is a cross platform music notation and guitar tablature rendering library."
 val alphaTabWebsite = "https://alphatab.net"
 
 kotlin {
+    // For whatever reason we cannot move this block down to the native section
+    // it will lead to gradle errors.
+    val hostOs = System.getProperty("os.name")
+    val isMingwX64 = hostOs.startsWith("Windows")
+    val nativeTargets = when {
+        hostOs == "Mac OS X" -> arrayOf(
+            macosX64(),
+            macosArm64(),
+            iosSimulatorArm64(),
+            iosX64(),
+            iosArm64()
+        )
+
+        hostOs == "Linux" -> arrayOf(linuxX64())
+        isMingwX64 -> arrayOf(mingwX64())
+
+        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
+    }
+
+    for (nativeTarget in nativeTargets) {
+        nativeTarget.apply {
+            binaries {
+                sharedLib {
+                    baseName = "alphatab"
+                }
+            }
+        }
+    }
+
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
+        all {
+            languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            languageSettings.optIn("kotlin.experimental.ExperimentalNativeApi")
+            languageSettings.optIn("kotlin.ExperimentalStdlibApi")
+        }
         commonMain {
             dependencies {
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.alphaskia)
             }
             kotlin.srcDirs("../../../dist/lib.kotlin/commonMain/generated")
         }
@@ -44,17 +83,8 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
-                implementation(libs.alphaskia.macos)
-                implementation(libs.alphaskia.linux)
-                implementation(libs.alphaskia.windows)
             }
             kotlin.srcDirs("../../../dist/lib.kotlin/commonTest/generated")
-        }
-
-        androidMain {
-            dependencies {
-                implementation(libs.alphaskia.android)
-            }
         }
     }
 }
@@ -66,7 +96,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
             "-Xno-call-assertions",
             "-Xno-receiver-assertions",
             "-Xno-param-assertions",
-            "-Xmulti-platform"
+            "-Xmulti-platform",
+            "-Xexpect-actual-classes"
         )
     }
 }
@@ -85,6 +116,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.appcompat)
+            implementation(libs.alphaskia.android)
         }
     }
 }
@@ -145,6 +177,9 @@ android {
 dependencies {
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.core.ktx)
+    androidTestImplementation(libs.alphaskia.macos)
+    androidTestImplementation(libs.alphaskia.linux)
+    androidTestImplementation(libs.alphaskia.windows)
 }
 
 val fetchTestResultsTask by tasks.registering {
@@ -299,9 +334,38 @@ signing {
 }
 
 //
-// iOS
+// Native
 
 kotlin {
+    sourceSets {
+        val commonNative by creating {
+            dependsOn(commonMain.get())
+
+            kotlin.srcDir("src/commonNative/kotlin")
+
+        }
+
+        val commonNativeTest by creating {
+            dependsOn(commonTest.get())
+
+            kotlin.srcDir("src/commonNative/kotlin")
+        }
+
+        mingwMain {
+            dependsOn(commonNative)
+            dependencies {
+                implementation(libs.alphaskia.native.mingwx64)
+            }
+        }
+        macosMain.get().dependsOn(commonNative)
+        iosMain.get().dependsOn(commonNative)
+        linuxMain.get().dependsOn(commonNative)
+
+        mingwTest.get().dependsOn(commonNativeTest)
+        macosTest.get().dependsOn(commonNativeTest)
+        iosTest.get().dependsOn(commonNativeTest)
+        linuxTest.get().dependsOn(commonNativeTest)
+    }
 //    iosX64()
 //    iosArm64()
 //    iosSimulatorArm64()

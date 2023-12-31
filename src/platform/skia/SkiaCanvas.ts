@@ -5,7 +5,8 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { Settings } from '@src/Settings';
 import type * as alphaSkia from '@coderline/alphaskia';
-import type { AlphaSkiaTypeface }  from '@coderline/alphaskia';
+import type { AlphaSkiaTypeface } from '@coderline/alphaskia';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**
  * Describes the members of the alphaSkia module.
@@ -50,7 +51,12 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public static registerFont(fontData: Uint8Array, fontInfo?: Font | undefined): Font {
-        const typeface = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.register(fontData.buffer)!;
+        const typeface = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.register(fontData.buffer);
+        if (!typeface) {
+            const familyName = fontInfo?.families?.join(',') ?? 'unknown font';
+            throw new AlphaTabError(AlphaTabErrorType.General, `Failed to register custom font '${familyName}' with ${fontData.length} bytes`)
+        }
+
         if (!fontInfo) {
             fontInfo = Font.withFamilyList([typeface.familyName], 12, typeface.isItalic ? FontStyle.Italic : FontStyle.Plain,
                 typeface.isBold ? FontWeight.Bold : FontWeight.Regular);
