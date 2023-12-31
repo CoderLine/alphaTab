@@ -34,7 +34,7 @@ describe('MidiTickLookupTest', () => {
         expect(masterBarLookup.firstBeat!.start).to.equal(0);
         expect(masterBarLookup.firstBeat!.end).to.equal(MidiUtils.QuarterTime);
         expect(masterBarLookup.firstBeat!.highlightedBeats.length).to.equal(1);
-        expect(masterBarLookup.firstBeat!.highlightedBeats[0]).to.equal(nb);
+        expect(masterBarLookup.firstBeat!.highlightedBeats[0].beat).to.equal(nb);
     })
 
     function prepareVariantTest(): MidiTickLookup {
@@ -77,7 +77,7 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.lastBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(nb);
+        expect(n1.highlightedBeats[0].beat).to.equal(nb);
         expect(n1.start).to.equal(MidiUtils.QuarterTime * 2);
         expect(n1.end).to.equal(MidiUtils.QuarterTime * 3);
 
@@ -98,7 +98,7 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.lastBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(nb);
+        expect(n1.highlightedBeats[0].beat).to.equal(nb);
         expect(n1.start).to.equal(MidiUtils.QuarterTime * 2);
         expect(n1.end).to.equal(MidiUtils.QuarterTime * 4);
 
@@ -121,7 +121,7 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(nb);
+        expect(n1.highlightedBeats[0].beat).to.equal(nb);
         expect(n1.start).to.equal(-MidiUtils.QuarterTime);
         expect(n1.end).to.equal(0);
 
@@ -143,7 +143,7 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(nb);
+        expect(n1.highlightedBeats[0].beat).to.equal(nb);
         expect(n1.start).to.equal(-MidiUtils.QuarterTime * 2);
         expect(n1.end).to.equal(0);
 
@@ -166,13 +166,13 @@ describe('MidiTickLookupTest', () => {
         const n2 = n1.nextBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(nb);
+        expect(n1.highlightedBeats[0].beat).to.equal(nb);
         expect(n1.start).to.equal(-MidiUtils.QuarterTime * 0.5);
         expect(n1.end).to.equal(0);
 
         expect(n2.highlightedBeats.length).to.equal(2);
-        expect(n2.highlightedBeats[0]).to.equal(l1.highlightedBeats[0]);
-        expect(n2.highlightedBeats[1]).to.equal(nb);
+        expect(n2.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
+        expect(n2.highlightedBeats[1].beat).to.equal(nb);
         expect(n2.start).to.equal(0);
         expect(n2.end).to.equal(MidiUtils.QuarterTime * 0.5);
 
@@ -199,12 +199,12 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(nb);
+        expect(n1.highlightedBeats[0].beat).to.equal(nb);
         expect(n1.start).to.equal(-MidiUtils.QuarterTime);
         expect(n1.end).to.equal(0);
 
         expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1]).to.equal(nb);
+        expect(l1.highlightedBeats[1].beat).to.equal(nb);
         expect(l1.start).to.equal(0);
         expect(l1.end).to.equal(MidiUtils.QuarterTime);
 
@@ -227,18 +227,18 @@ describe('MidiTickLookupTest', () => {
         const n2 = l1.nextBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(nb);
+        expect(n1.highlightedBeats[0].beat).to.equal(nb);
         expect(n1.start).to.equal(-MidiUtils.QuarterTime);
         expect(n1.end).to.equal(0);
 
         expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1]).to.equal(nb);
+        expect(l1.highlightedBeats[1].beat).to.equal(nb);
         expect(l1.start).to.equal(0);
         expect(l1.end).to.equal(MidiUtils.QuarterTime);
 
         expect(n2.highlightedBeats.length).to.equal(2);
-        expect(n2.highlightedBeats[0]).to.equal(l2.highlightedBeats[0]);
-        expect(n2.highlightedBeats[1]).to.equal(nb);
+        expect(n2.highlightedBeats[0].beat).to.equal(l2.highlightedBeats[0].beat);
+        expect(n2.highlightedBeats[1].beat).to.equal(nb);
         expect(n2.start).to.equal(MidiUtils.QuarterTime);
         expect(n2.end).to.equal(MidiUtils.QuarterTime * 1.5);
 
@@ -265,12 +265,12 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(l1.highlightedBeats[0]);
+        expect(n1.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
         expect(n1.start).to.equal(0);
         expect(n1.end).to.equal(MidiUtils.QuarterTime * 0.5);
 
         expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1]).to.equal(nb);
+        expect(l1.highlightedBeats[1].beat).to.equal(nb);
         expect(l1.start).to.equal(MidiUtils.QuarterTime * 0.5);
         expect(l1.end).to.equal(MidiUtils.QuarterTime);
 
@@ -298,13 +298,13 @@ describe('MidiTickLookupTest', () => {
         const n2 = n1.nextBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(l1.highlightedBeats[0]);
+        expect(n1.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
         expect(n1.start).to.equal(0);
         expect(n1.end).to.equal(MidiUtils.QuarterTime * 0.25);
 
         expect(n2.highlightedBeats.length).to.equal(2);
-        expect(n2.highlightedBeats[0]).to.equal(l1.highlightedBeats[0]);
-        expect(n2.highlightedBeats[1]).to.equal(nb);
+        expect(n2.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
+        expect(n2.highlightedBeats[1].beat).to.equal(nb);
         expect(n2.start).to.equal(MidiUtils.QuarterTime * 0.25);
         expect(n2.end).to.equal(MidiUtils.QuarterTime * 0.75);
 
@@ -336,13 +336,13 @@ describe('MidiTickLookupTest', () => {
         const n2 = n1.nextBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(l1.highlightedBeats[0]);
+        expect(n1.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
         expect(n1.start).to.equal(0);
         expect(n1.end).to.equal(MidiUtils.QuarterTime * 0.25);
 
         expect(n2.highlightedBeats.length).to.equal(2);
-        expect(n2.highlightedBeats[0]).to.equal(l1.highlightedBeats[0]);
-        expect(n2.highlightedBeats[1]).to.equal(nb);
+        expect(n2.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
+        expect(n2.highlightedBeats[1].beat).to.equal(nb);
         expect(n2.start).to.equal(MidiUtils.QuarterTime * 0.25);
         expect(n2.end).to.equal(MidiUtils.QuarterTime * 0.75);
 
@@ -371,7 +371,7 @@ describe('MidiTickLookupTest', () => {
         lookup.addBeat(nb, l1.start, MidiUtils.QuarterTime);
 
         expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1]).to.equal(nb);
+        expect(l1.highlightedBeats[1].beat).to.equal(nb);
 
         expect(l1).to.equal(masterBar.firstBeat!);
         expect(l1.nextBeat).to.equal(l2);
@@ -390,8 +390,8 @@ describe('MidiTickLookupTest', () => {
         const n1 = masterBar.firstBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(2);
-        expect(n1.highlightedBeats[0]).to.equal(l1.highlightedBeats[0]);
-        expect(n1.highlightedBeats[1]).to.equal(nb);
+        expect(n1.highlightedBeats[0].beat).to.equal(l1.highlightedBeats[0].beat);
+        expect(n1.highlightedBeats[1].beat).to.equal(nb);
         expect(n1.start).to.equal(0);
         expect(n1.end).to.equal(MidiUtils.QuarterTime * 0.5);
 
@@ -422,22 +422,22 @@ describe('MidiTickLookupTest', () => {
         const n2 = l2.nextBeat!;
 
         expect(n1.highlightedBeats.length).to.equal(1);
-        expect(n1.highlightedBeats[0]).to.equal(nb);
+        expect(n1.highlightedBeats[0].beat).to.equal(nb);
         expect(n1.start).to.equal(-MidiUtils.QuarterTime);
         expect(n1.end).to.equal(0);
 
         expect(l1.highlightedBeats.length).to.equal(2);
-        expect(l1.highlightedBeats[1]).to.equal(nb);
+        expect(l1.highlightedBeats[1].beat).to.equal(nb);
         expect(l1.start).to.equal(0);
         expect(l1.end).to.equal(MidiUtils.QuarterTime);
 
         expect(l2.highlightedBeats.length).to.equal(2);
-        expect(l2.highlightedBeats[1]).to.equal(nb);
+        expect(l2.highlightedBeats[1].beat).to.equal(nb);
         expect(l2.start).to.equal(MidiUtils.QuarterTime * 1);
         expect(l2.end).to.equal(MidiUtils.QuarterTime * 2);
 
         expect(n2.highlightedBeats.length).to.equal(1);
-        expect(n2.highlightedBeats[0]).to.equal(nb);
+        expect(n2.highlightedBeats[0].beat).to.equal(nb);
         expect(n2.start).to.equal(MidiUtils.QuarterTime * 2);
         expect(n2.end).to.equal(MidiUtils.QuarterTime * 3);
 
