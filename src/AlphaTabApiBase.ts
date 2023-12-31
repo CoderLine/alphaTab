@@ -44,6 +44,7 @@ import { MidiEventType } from '@src/midi/MidiEvent';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { ActiveBeatsChangedEventArgs } from '@src/synth/ActiveBeatsChangedEventArgs';
+import { BeatTickLookupItem } from './midi/BeatTickLookup';
 
 class SelectionInfo {
     public beat: Beat;
@@ -983,7 +984,7 @@ export class AlphaTabApiBase<TSettings> {
         nextBeat: Beat | null,
         duration: number,
         stop: boolean,
-        beatsToHighlight: Beat[],
+        beatsToHighlight: BeatTickLookupItem[],
         cache: BoundsLookup,
         beatBoundings: BeatBounds,
         shouldScroll: boolean
@@ -1018,7 +1019,7 @@ export class AlphaTabApiBase<TSettings> {
         if (this._playerState === PlayerState.Playing && !stop) {
             if (this.settings.player.enableElementHighlighting) {
                 for (let highlight of beatsToHighlight) {
-                    let className: string = BeatContainerGlyph.getGroupId(highlight);
+                    let className: string = BeatContainerGlyph.getGroupId(highlight.beat);
                     this.uiFacade.highlightElements(className, beat.voice.bar.index);
                 }
             }
@@ -1058,7 +1059,7 @@ export class AlphaTabApiBase<TSettings> {
         // trigger an event for others to indicate which beat/bar is played
         if (shouldNotifyBeatChange) {
             this.onPlayedBeatChanged(beat);
-            this.onActiveBeatsChanged(new ActiveBeatsChangedEventArgs(beatsToHighlight));
+            this.onActiveBeatsChanged(new ActiveBeatsChangedEventArgs(beatsToHighlight.map(i => i.beat)));
         }
     }
 
