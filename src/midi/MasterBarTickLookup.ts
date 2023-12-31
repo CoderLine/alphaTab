@@ -89,6 +89,12 @@ export class MasterBarTickLookup {
      */
     public nextMasterBar: MasterBarTickLookup | null = null;
 
+
+    /**
+     * Gets or sets the {@link MasterBarTickLookup} of the previous masterbar in the {@link Score}
+     */
+    public previousMasterBar: MasterBarTickLookup | null = null;
+
     /**
      * Adds a new beat to this masterbar following the slicing logic required by the MidiTickLookup.
      * @returns The first item of the chain which was affected.

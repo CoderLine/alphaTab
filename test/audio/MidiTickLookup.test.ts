@@ -628,7 +628,6 @@ describe('MidiTickLookupTest', () => {
         )
     });
 
-    
     it('lookup-triplet-feel-test', () => {
         lookupTest(
             `\\tf triplet-8th \\ts 2 4
@@ -649,6 +648,36 @@ describe('MidiTickLookupTest', () => {
             [
                 2, 3, 4, 5,
                 6, 7, 8, null
+            ]
+        )
+    });
+
+    it('visible-on-next-bar', () => {
+        lookupTest(
+            `
+            \\track "First"
+            \\ts 2 4
+            1.1.4 2.1.4 | 3.1.4 4.1.4
+            \\track "Second"
+            1.1.16*8 | 1.1.16*8 
+            `,
+            [
+                0, 480, 960, 1440, 
+                1920, 2400, 2880, 3360
+            ],
+            [0],
+            [
+                
+                960, 960, 960, 960,
+                960, 960, 960, 960
+            ],
+            [
+                1, 1, 2, 2,
+                3, 3, 4, 4
+            ],
+            [
+                2, 2, 3, 3,
+                4, 4, null, null
             ]
         )
     });

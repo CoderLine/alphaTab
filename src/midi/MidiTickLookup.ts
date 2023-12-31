@@ -252,29 +252,47 @@ export class MidiTickLookup {
                 if (!startBeat) {
 
                     if (isNextSeach) {
-                        while (currentStartLookup != null) {
-                            startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
+                        let currentMasterBar: MasterBarTickLookup | null = masterBar;
+                        while (currentMasterBar != null && startBeat == null) {
+                            while (currentStartLookup != null) {
+                                startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
 
-                            if (startBeat) {
-                                startBeatLookup = currentStartLookup;
-                                break;
+                                if (startBeat) {
+                                    startBeatLookup = currentStartLookup;
+                                    masterBar = currentMasterBar;
+                                    break;
+                                }
+
+                                currentStartLookup = currentStartLookup.nextBeat;
                             }
 
-                            currentStartLookup = currentStartLookup.nextBeat;
+                            if (!startBeat || !startBeatLookup) {
+                                currentMasterBar = currentMasterBar.nextMasterBar;
+                                currentStartLookup = currentMasterBar?.firstBeat ?? null;
+                            }
                         }
-                    } else {
-                        while (currentStartLookup != null) {
-                            startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
 
-                            if (startBeat) {
-                                startBeatLookup = currentStartLookup;
-                                break;
+                    } else {
+                        let currentMasterBar: MasterBarTickLookup | null = masterBar;
+                        while (currentMasterBar != null && startBeat == null) {
+                            while (currentStartLookup != null) {
+                                startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
+
+                                if (startBeat) {
+                                    startBeatLookup = currentStartLookup;
+                                    masterBar = currentMasterBar;
+                                    break;
+                                }
+
+                                currentStartLookup = currentStartLookup.previousBeat;
                             }
 
-                            currentStartLookup = currentStartLookup.previousBeat;
+                            if (!startBeat || !startBeatLookup) {
+                                currentMasterBar = currentMasterBar.previousMasterBar;
+                                currentStartLookup = currentMasterBar?.firstBeat ?? null;
+                            }
                         }
                     }
-
                 }
             } else if (currentStartLookup.end > relativeTick) {
                 break;
@@ -382,7 +400,8 @@ export class MidiTickLookup {
     public addMasterBar(masterBar: MasterBarTickLookup): void {
         this.masterBars.push(masterBar);
         if (this._currentMasterBar) {
-            this._currentMasterBar.nextMasterBar = masterBar;
+            masterBar.previousMasterBar = this._currentMasterBar;
+            this._currentMasterBar.nextMasterBar = masterBar;            
         }
         this._currentMasterBar = masterBar;
         if (!this.masterBarLookup.has(masterBar.masterBar.index)) {
