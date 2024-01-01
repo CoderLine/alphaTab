@@ -65,7 +65,7 @@
         "@typescript-eslint/eslint-plugin": "^6.9.1",
         "@typescript-eslint/parser": "^6.9.1",
         "assert": "^2.1.0",
-        "chai": "^4.3.10",
+        "chai": "^5.0.0",
         "concurrently": "^8.2.2",
         "cors": "^2.8.5",
         "eslint": "^8.52.0",
