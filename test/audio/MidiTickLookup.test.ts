@@ -3,7 +3,7 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
 import { AlphaSynthMidiFileHandler, MasterBarTickLookup, MidiFile, MidiFileGenerator, MidiTickLookup, MidiTickLookupFindBeatResult } from '@src/midi';
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Beat, Duration, MasterBar, Score } from '@src/model';
+import { Beat, Duration, MasterBar, Note, Score } from '@src/model';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
@@ -448,6 +448,134 @@ describe('MidiTickLookupTest', () => {
         expect(n2).to.equal(masterBar.lastBeat!);
     })
 
+
+
+    function beatWithFret(fret: number) {
+        const b = new Beat();
+        b.notes.push(new Note());
+        b.notes[0].fret = fret;
+        return b;
+    }
+
+    function fretOfBeat(beat: Beat | null) {
+        return beat && beat.notes.length > 0 ? beat.notes[0].fret : -1;
+    }
+
+    function prepareGraceMultiVoice(graceNoteOverlap: number, graceNoteDuration: number): MidiTickLookup {
+        const lookup = new MidiTickLookup();
+
+        const masterBar1Lookup = new MasterBarTickLookup();
+        masterBar1Lookup.masterBar = new MasterBar();
+        masterBar1Lookup.masterBar!.timeSignatureNumerator = 3;
+        masterBar1Lookup.masterBar!.timeSignatureDenominator = 4;
+        masterBar1Lookup.start = 0;
+        masterBar1Lookup.tempo = 120;
+        masterBar1Lookup.end = masterBar1Lookup.start + masterBar1Lookup.masterBar.calculateDuration();
+        lookup.addMasterBar(masterBar1Lookup);
+
+        // voice 0
+        // - normal
+        lookup.addBeat(beatWithFret(0), MidiUtils.QuarterTime * 0, MidiUtils.QuarterTime * 2);
+        // - shortened due to grace
+        lookup.addBeat(beatWithFret(1), MidiUtils.QuarterTime * 2, MidiUtils.QuarterTime - graceNoteOverlap);
+
+        // voice 1
+        // - normal
+        lookup.addBeat(beatWithFret(2), MidiUtils.QuarterTime * 0, MidiUtils.QuarterTime * 3);
+
+        const masterBar2Lookup = new MasterBarTickLookup();
+        masterBar2Lookup.masterBar = new MasterBar();
+        masterBar2Lookup.masterBar!.timeSignatureNumerator = 3;
+        masterBar2Lookup.masterBar!.timeSignatureDenominator = 4;
+        masterBar2Lookup.start = masterBar2Lookup.end;
+        masterBar2Lookup.tempo = 120;
+        masterBar2Lookup.end = masterBar2Lookup.start + masterBar2Lookup.masterBar.calculateDuration();
+        lookup.addMasterBar(masterBar2Lookup);
+
+        // grace note
+        lookup.addBeat(beatWithFret(3), -graceNoteOverlap, graceNoteDuration);
+        // normal note
+        const onNoteSteal = (-graceNoteOverlap) + graceNoteDuration;
+        lookup.addBeat(beatWithFret(4), onNoteSteal, MidiUtils.QuarterTime - onNoteSteal);
+
+        return lookup;
+    }
+
+    it('grace-multivoice-full-in-previous-bar', () => {
+        const lookup = prepareGraceMultiVoice(120, 120);
+
+        //
+        // validate first bar
+        let current = lookup.masterBars[0].firstBeat!;
+
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("0,2");
+        expect(current.start).to.equal(0);
+        expect(current.duration).to.equal(1920);
+
+        current = current.nextBeat!;
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("1,2");
+        expect(current.start).to.equal(1920);
+        // quarter note ends earlier due to grace note
+        expect(current.duration).to.equal(840);
+
+        current = current.nextBeat!;
+        // on last slice we have the grace note but not the quarter note
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("2,3");
+        expect(current.start).to.equal(2760);
+        expect(current.duration).to.equal(120);
+
+        //
+        // validate second bar
+        current = lookup.masterBars[1].firstBeat!;
+
+        // no grace note, normal quarter note
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("4");
+        expect(current.start).to.equal(0);
+        expect(current.duration).to.equal(960);
+    })
+
+    it('grace-multivoice-with-overlap', () => {
+        const lookup = prepareGraceMultiVoice(120, 240);
+
+        //
+        // validate first bar
+        let current = lookup.masterBars[0].firstBeat!;
+
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("0,2");
+        expect(current.start).to.equal(0);
+        expect(current.duration).to.equal(1920);
+
+        current = current.nextBeat!;
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("1,2");
+        expect(current.start).to.equal(1920);
+        // quarter note ends earlier due to grace note
+        expect(current.duration).to.equal(840);
+
+        current = current.nextBeat!;
+        // on last slice we have the grace note but not the quarter note
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("2,3");
+        expect(current.start).to.equal(2760);
+        expect(current.duration).to.equal(120);
+
+        //
+        // validate second bar
+        current = lookup.masterBars[1].firstBeat!;
+
+        // half the grace note
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("3");
+        expect(current.start).to.equal(0);
+        expect(current.duration).to.equal(120);
+
+        // no grace note, normal quarter note
+        current = current.nextBeat!;
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("4");
+        expect(current.start).to.equal(120);
+        expect(current.duration).to.equal(840);
+    })
+
+
+
+
     it('cursor-snapping', async () => {
         const buffer = await TestPlatform.loadFile('test-data/audio/cursor-snapping.gp');
         const settings = new Settings();
@@ -495,7 +623,7 @@ describe('MidiTickLookupTest', () => {
         trackIndexes: number[],
         durations: number[],
         currentBeatFrets: number[],
-        nextBeatFrets: (number | null)[],
+        nextBeatFrets: number[],
         skipClean: boolean = false
     ) {
         const buffer = ByteBuffer.fromString(tex);
@@ -508,11 +636,11 @@ describe('MidiTickLookupTest', () => {
         let currentLookup: MidiTickLookupFindBeatResult | null = null;
 
         const actualIncrementalFrets: number[] = [];
-        const actualIncrementalNextFrets: (number | null)[] = [];
+        const actualIncrementalNextFrets: number[] = [];
         const actualIncrementalTickDurations: number[] = [];
 
         const actualCleanFrets: number[] = [];
-        const actualCleanNextFrets: (number | null)[] = [];
+        const actualCleanNextFrets: number[] = [];
         const actualCleanTickDurations: number[] = [];
 
         for (let i = 0; i < ticks.length; i++) {
@@ -520,15 +648,15 @@ describe('MidiTickLookupTest', () => {
 
             Logger.debug("Test", `Checking index ${i} with tick ${ticks[i]}`)
             expect(currentLookup).to.be.ok;
-            actualIncrementalFrets.push(currentLookup!.beat.notes[0].fret);
-            actualIncrementalNextFrets.push(currentLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
+            actualIncrementalFrets.push(fretOfBeat(currentLookup!.beat));
+            actualIncrementalNextFrets.push(fretOfBeat(currentLookup!.nextBeat?.beat ?? null))
             actualIncrementalTickDurations.push(currentLookup!.tickDuration)
 
             if (!skipClean) {
                 const cleanLookup = lookup.findBeat(tracks, ticks[i], null);
 
-                actualCleanFrets.push(cleanLookup!.beat.notes[0].fret);
-                actualCleanNextFrets.push(cleanLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
+                actualCleanFrets.push(fretOfBeat(cleanLookup!.beat));
+                actualCleanNextFrets.push(fretOfBeat(cleanLookup!.nextBeat?.beat ?? null))
                 actualCleanTickDurations.push(cleanLookup!.tickDuration)
             }
         }
@@ -537,7 +665,7 @@ describe('MidiTickLookupTest', () => {
         expect(actualIncrementalNextFrets.join(',')).to.equal(nextBeatFrets.join(','));
         expect(actualIncrementalTickDurations.join(',')).to.equal(durations.join(','));
 
-        if(!skipClean) {
+        if (!skipClean) {
             expect(actualCleanFrets.join(',')).to.equal(currentBeatFrets.join(','));
             expect(actualCleanNextFrets.join(',')).to.equal(nextBeatFrets.join(','));
             expect(actualCleanTickDurations.join(',')).to.equal(durations.join(','));
@@ -549,7 +677,7 @@ describe('MidiTickLookupTest', () => {
     function nextBeatSearchTest(trackIndexes: number[],
         durations: number[],
         currentBeatFrets: number[],
-        nextBeatFrets: (number | null)[]
+        nextBeatFrets: number[]
     ) {
         lookupTest(
             `
@@ -585,7 +713,7 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 4, 4, 2, 2, 6, 6, 6, 6,
-                9, 9, 7, 7, null, null, null, null
+                9, 9, 7, 7, -1, -1, -1, -1
             ]
         )
     });
@@ -603,7 +731,7 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 2, 2, 2, 2, 6, 6, 6, 6,
-                7, 7, 7, 7, null, null, null, null
+                7, 7, 7, 7, -1, -1, -1, -1
             ]
         )
     });
@@ -627,7 +755,7 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 2, 3, 4, 5,
-                6, 7, 8, null
+                6, 7, 8, -1
             ]
         )
     });
@@ -651,7 +779,7 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 2, 3, 4, 5,
-                6, 7, 8, null
+                6, 7, 8, -1
             ]
         )
     });
@@ -664,9 +792,9 @@ describe('MidiTickLookupTest', () => {
             `,
             [
                 // first bar, real playback
-                0, 480, 960, 1440, 
+                0, 480, 960, 1440,
                 // gap
-                1920, 2400, 2880, 3360, 
+                1920, 2400, 2880, 3360,
                 // second bar, real playback
                 3840, 4320, 4800, 5280,
                 // second gap
@@ -685,20 +813,50 @@ describe('MidiTickLookupTest', () => {
                 // gap
                 2, 2, 2, 2,
                 // second bar, real playback
-                3, 3, 4, 4, 
+                3, 3, 4, 4,
                 // second gap
                 4, 4, 4, 4
             ],
             [
-                2, 2, null, null, 
+                2, 2, -1, -1,
 
-                null, null, null, null,
+                -1, -1, -1, -1,
 
-                4, 4, null, null,
-                
-                null, null, null, null
+                4, 4, -1, -1,
+
+                -1, -1, -1, -1
             ],
             true
+        )
+    });
+
+    it('empty-bar', () => {
+        lookupTest(
+            `
+            \\ts 2 4
+             | 1.1.1
+            `,
+            [
+                // first bar (empty)
+                0, 480, 960, 1440,
+                // second bar, real playback
+                1920, 2400, 2880, 3360
+            ],
+            [0],
+            [
+                1920, 1920, 1920, 1920,
+                1920, 1920, 1920, 1920
+            ],
+            [
+                // first bar (empty)
+                -1, -1, -1, -1,
+                // second bar, real playback
+                1, 1, 1, 1
+            ],
+            [
+                1, 1, 1, 1,
+                -1, -1, -1, -1
+            ]
         )
     });
 });

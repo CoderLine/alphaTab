@@ -417,6 +417,25 @@ export class MidiTickLookup {
     }
 
     public addBeat(beat: Beat, start: number, duration: number): void {
-        this._currentMasterBar?.addBeat(beat, start, duration);
+        const currentMasterBar = this._currentMasterBar;
+        if (currentMasterBar) {
+            // pre-beat grace notes at the start of the bar we also add the beat to the previous bar
+            if (start < 0 && currentMasterBar.previousMasterBar) {
+                const previousStart = currentMasterBar.previousMasterBar!.end + start;
+                const previousEnd = previousStart + duration;
+
+                // add to previous bar 
+                currentMasterBar.previousMasterBar!.addBeat(beat, previousStart, previousStart, currentMasterBar.previousMasterBar!.end - previousStart);
+
+                // overlap to current bar?
+                if(previousEnd > currentMasterBar.previousMasterBar!.end) {
+                    // the start is negative and representing the overlap to the previous bar.
+                    const overlapDuration = duration + start;
+                    currentMasterBar.addBeat(beat, start, 0, overlapDuration);
+                }
+            } else {
+                currentMasterBar.addBeat(beat, start, start, duration);
+            }
+        }
     }
 }
