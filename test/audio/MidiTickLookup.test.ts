@@ -457,6 +457,10 @@ describe('MidiTickLookupTest', () => {
         return b;
     }
 
+    function fretOfBeat(beat: Beat | null) {
+        return beat && beat.notes.length > 0 ? beat.notes[0].fret : -1;
+    }
+
     function prepareGraceMultiVoice(graceNoteOverlap: number, graceNoteDuration: number): MidiTickLookup {
         const lookup = new MidiTickLookup();
 
@@ -619,7 +623,7 @@ describe('MidiTickLookupTest', () => {
         trackIndexes: number[],
         durations: number[],
         currentBeatFrets: number[],
-        nextBeatFrets: (number | null)[],
+        nextBeatFrets: number[],
         skipClean: boolean = false
     ) {
         const buffer = ByteBuffer.fromString(tex);
@@ -644,15 +648,15 @@ describe('MidiTickLookupTest', () => {
 
             Logger.debug("Test", `Checking index ${i} with tick ${ticks[i]}`)
             expect(currentLookup).to.be.ok;
-            actualIncrementalFrets.push(currentLookup!.beat.notes.length > 0 ? currentLookup!.beat.notes[0].fret : -1);
-            actualIncrementalNextFrets.push(currentLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
+            actualIncrementalFrets.push(fretOfBeat(currentLookup!.beat));
+            actualIncrementalNextFrets.push(fretOfBeat(currentLookup!.nextBeat?.beat ?? null))
             actualIncrementalTickDurations.push(currentLookup!.tickDuration)
 
             if (!skipClean) {
                 const cleanLookup = lookup.findBeat(tracks, ticks[i], null);
 
-                actualCleanFrets.push(cleanLookup!.beat.notes.length > 0 ? cleanLookup!.beat.notes[0].fret : -1);
-                actualCleanNextFrets.push(cleanLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
+                actualCleanFrets.push(fretOfBeat(cleanLookup!.beat));
+                actualCleanNextFrets.push(fretOfBeat(cleanLookup!.nextBeat?.beat ?? null))
                 actualCleanTickDurations.push(cleanLookup!.tickDuration)
             }
         }
@@ -673,7 +677,7 @@ describe('MidiTickLookupTest', () => {
     function nextBeatSearchTest(trackIndexes: number[],
         durations: number[],
         currentBeatFrets: number[],
-        nextBeatFrets: (number | null)[]
+        nextBeatFrets: number[]
     ) {
         lookupTest(
             `
@@ -709,7 +713,7 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 4, 4, 2, 2, 6, 6, 6, 6,
-                9, 9, 7, 7, null, null, null, null
+                9, 9, 7, 7, -1, -1, -1, -1
             ]
         )
     });
@@ -727,7 +731,7 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 2, 2, 2, 2, 6, 6, 6, 6,
-                7, 7, 7, 7, null, null, null, null
+                7, 7, 7, 7, -1, -1, -1, -1
             ]
         )
     });
@@ -751,7 +755,7 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 2, 3, 4, 5,
-                6, 7, 8, null
+                6, 7, 8, -1
             ]
         )
     });
@@ -775,7 +779,7 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 2, 3, 4, 5,
-                6, 7, 8, null
+                6, 7, 8, -1
             ]
         )
     });
@@ -814,13 +818,13 @@ describe('MidiTickLookupTest', () => {
                 4, 4, 4, 4
             ],
             [
-                2, 2, null, null,
+                2, 2, -1, -1,
 
-                null, null, null, null,
+                -1, -1, -1, -1,
 
-                4, 4, null, null,
+                4, 4, -1, -1,
 
-                null, null, null, null
+                -1, -1, -1, -1
             ],
             true
         )
@@ -830,7 +834,7 @@ describe('MidiTickLookupTest', () => {
         lookupTest(
             `
             \\ts 2 4
-             | 1.1.1 |
+             | 1.1.1
             `,
             [
                 // first bar (empty)
@@ -851,7 +855,7 @@ describe('MidiTickLookupTest', () => {
             ],
             [
                 1, 1, 1, 1,
-                null, null, null, null
+                -1, -1, -1, -1
             ]
         )
     });
