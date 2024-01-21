@@ -636,11 +636,11 @@ describe('MidiTickLookupTest', () => {
         let currentLookup: MidiTickLookupFindBeatResult | null = null;
 
         const actualIncrementalFrets: number[] = [];
-        const actualIncrementalNextFrets: (number | null)[] = [];
+        const actualIncrementalNextFrets: number[] = [];
         const actualIncrementalTickDurations: number[] = [];
 
         const actualCleanFrets: number[] = [];
-        const actualCleanNextFrets: (number | null)[] = [];
+        const actualCleanNextFrets: number[] = [];
         const actualCleanTickDurations: number[] = [];
 
         for (let i = 0; i < ticks.length; i++) {
