@@ -13,6 +13,7 @@ module.exports = function (options) {
 
     const exposedFolders = [
         'dist',
+        'src',
         'font',
         'img',
         'playground',

@@ -3,7 +3,9 @@ const terser = require('@rollup/plugin-terser');
 const dts = require('rollup-plugin-dts').default;
 const copy = require('rollup-plugin-copy');
 const license = require('rollup-plugin-license');
-const server = require('./rollup.server');const fs = require('fs');
+const server = require('./rollup.server');
+const fs = require('fs');
+const typescript = require('@rollup/plugin-typescript');
 
 function getGitBranch() {
     const filepath = '.git/HEAD';
@@ -33,32 +35,47 @@ const isWatch = process.env.ROLLUP_WATCH;
 
 module.exports = [
     {
-        input: `dist/lib/alphatab.js`,
-        output: [
-            {
-                file: 'dist/alphaTab.js',
-                plugins: [importMetaPlugin]
-            },
-            {
-                file: 'dist/alphaTab.min.js',
-                plugins: [terser(), importMetaPlugin]
-            },
-            {
-                file: 'dist/alphaTab.mjs',
-                format: 'es'
-            },
-            {
-                file: 'dist/alphaTab.min.mjs',
-                format: 'es',
-                plugins: [terser()]
-            }
-        ].map(o => ({ ...commonOutput, ...o })),
+        input: `src/alphatab.ts`,
+        output: isWatch
+            ? [
+                {
+                    file: 'dist/alphaTab.mjs',
+                    format: 'es',
+                    sourcemap: true
+                }
+            ]
+            : [
+                {
+                    file: 'dist/alphaTab.js',
+                    plugins: [importMetaPlugin],
+                    sourcemap: true
+                },
+                {
+                    file: 'dist/alphaTab.min.js',
+                    plugins: [terser(), importMetaPlugin],
+                    sourcemap: false
+                },
+                {
+                    file: 'dist/alphaTab.mjs',
+                    format: 'es',
+                    sourcemap: true
+                },
+                {
+                    file: 'dist/alphaTab.min.mjs',
+                    format: 'es',
+                    plugins: [terser()],
+                    sourcemap: false
+                }
+            ].map(o => ({ ...commonOutput, ...o })),
         external: [],
         watch: {
-            include: 'dist/lib/**',
+            include: ['src/**', 'test/**'],
             exclude: 'node_modules/**'
         },
         plugins: [
+            typescript({
+                tsconfig: "./tsconfig.build.json"
+            }),
             license({
                 banner: {
                     content: {
@@ -88,10 +105,10 @@ module.exports = [
             }),
 
             isWatch &&
-                server({
-                    openPage: '/playground/control.html',
-                    port: 8080
-                })
+            server({
+                openPage: '/playground/control.html',
+                port: 8080
+            })
         ]
     },
     {

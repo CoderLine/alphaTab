@@ -20,3 +20,4 @@ gradle-app.setting
 .gradletasknamecache
 **/build/
 local.properties
+.rollup.cache
