@@ -82,7 +82,7 @@ export class BeatTickLookup {
      * @param beat The beat to add.
      */
     public highlightBeat(beat: Beat, playbackStart: number, playbackDuration: number): void {
-        if (beat.isEmpty) {
+        if (beat.isEmpty && !beat.voice.isEmpty) {
             return;
         }
         if (!this._highlightedBeats.has(beat.id)) {

@@ -520,14 +520,14 @@ describe('MidiTickLookupTest', () => {
 
             Logger.debug("Test", `Checking index ${i} with tick ${ticks[i]}`)
             expect(currentLookup).to.be.ok;
-            actualIncrementalFrets.push(currentLookup!.beat.notes[0].fret);
+            actualIncrementalFrets.push(currentLookup!.beat.notes.length > 0 ? currentLookup!.beat.notes[0].fret : -1);
             actualIncrementalNextFrets.push(currentLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
             actualIncrementalTickDurations.push(currentLookup!.tickDuration)
 
             if (!skipClean) {
                 const cleanLookup = lookup.findBeat(tracks, ticks[i], null);
 
-                actualCleanFrets.push(cleanLookup!.beat.notes[0].fret);
+                actualCleanFrets.push(cleanLookup!.beat.notes.length > 0 ? cleanLookup!.beat.notes[0].fret : -1);
                 actualCleanNextFrets.push(cleanLookup!.nextBeat?.beat?.notes?.[0]?.fret ?? null)
                 actualCleanTickDurations.push(cleanLookup!.tickDuration)
             }
@@ -699,6 +699,36 @@ describe('MidiTickLookupTest', () => {
                 null, null, null, null
             ],
             true
+        )
+    });
+
+    it('empty-bar', () => {
+        lookupTest(
+            `
+            \\ts 2 4
+             | 1.1.1 |
+            `,
+            [
+                // first bar (empty)
+                0, 480, 960, 1440, 
+                // second bar, real playback
+                1920, 2400, 2880, 3360
+            ],
+            [0],
+            [
+                1920, 1920, 1920, 1920,
+                1920, 1920, 1920, 1920
+            ],
+            [
+                // first bar (empty)
+                -1, -1, -1, -1,
+                // second bar, real playback
+                1, 1, 1, 1
+            ],
+            [
+                1, 1, 1, 1, 
+                null, null, null, null
+            ]
         )
     });
 });
