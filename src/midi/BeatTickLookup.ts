@@ -14,19 +14,12 @@ export class BeatTickLookupItem {
      */
     public readonly playbackStart: number;
 
-    /**
-     * Gets the playback start of the beat duration according to the generated audio.
-     */
-    public readonly playbackDuration: number;
-
     public constructor(
         beat: Beat,
-        playbackStart: number,
-        playbackDuration: number
+        playbackStart: number
     ) {
         this.beat = beat;
         this.playbackStart = playbackStart;
-        this.playbackDuration = playbackDuration;
     }
 }
 
@@ -81,13 +74,13 @@ export class BeatTickLookup {
      * Marks the given beat as highlighed as part of this lookup.
      * @param beat The beat to add.
      */
-    public highlightBeat(beat: Beat, playbackStart: number, playbackDuration: number): void {
+    public highlightBeat(beat: Beat, playbackStart: number): void {
         if (beat.isEmpty && !beat.voice.isEmpty) {
             return;
         }
         if (!this._highlightedBeats.has(beat.id)) {
             this._highlightedBeats.set(beat.id, true);
-            this.highlightedBeats.push(new BeatTickLookupItem(beat, playbackStart, playbackDuration));
+            this.highlightedBeats.push(new BeatTickLookupItem(beat, playbackStart));
         }
     }
 
