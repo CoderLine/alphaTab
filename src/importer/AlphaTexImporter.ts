@@ -727,8 +727,16 @@ export class AlphaTexImporter extends ScoreImporter {
                     break;
                 case 'tempo':
                     this._sy = this.newSy();
-                    if (this._sy === AlphaTexSymbols.Number) {
-                        this._score.tempo = this._syData as number;
+                    if (this._sy === AlphaTexSymbols.Number || this._sy === AlphaTexSymbols.String) {
+                        if (this._sy === AlphaTexSymbols.Number) {
+                            this._score.tempo = this._syData as number;
+                        } else if (this._sy === AlphaTexSymbols.String) {
+                            let f: number = parseFloat(this._syData as string);
+                            if (isNaN(f)) {
+                                this.errorMessage('invalid temp string');
+                            }
+                            this._score.tempo = f;
+                        }
                     } else {
                         this.error('tempo', AlphaTexSymbols.Number, true);
                     }
@@ -1879,13 +1887,24 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
             } else if (syData === 'tempo') {
                 this._sy = this.newSy();
-                if (this._sy !== AlphaTexSymbols.Number) {
+                let value: number = 0;
+                if (this._sy === AlphaTexSymbols.Number || this._sy === AlphaTexSymbols.String) {
+                    if (this._sy === AlphaTexSymbols.Number) {
+                        value = this._syData as number;
+                    } else if (this._sy === AlphaTexSymbols.String) {
+                        let f: number = parseFloat(this._syData as string);
+                        if (isNaN(f)) {
+                            this.errorMessage('invalid temp string');
+                        }
+                        value = f;
+                    }
+                } else {
                     this.error('tempo', AlphaTexSymbols.Number, true);
                 }
                 let tempoAutomation: Automation = new Automation();
                 tempoAutomation.isLinear = false;
                 tempoAutomation.type = AutomationType.Tempo;
-                tempoAutomation.value = this._syData as number;
+                tempoAutomation.value = value;
                 master.tempoAutomation = tempoAutomation;
                 this._sy = this.newSy();
             } else if (syData === 'section') {
