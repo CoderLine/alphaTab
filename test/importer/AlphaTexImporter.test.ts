@@ -1130,18 +1130,18 @@ describe('AlphaTexImporterTest', () => {
         }
     });
 
-    it('tempo-as-float-string', () => {
-        const score = parseTex('\\tempo "112.5" .');
+    it('tempo-as-float', () => {
+        const score = parseTex('\\tempo 112.5 .');
         expect(score.tempo).to.equal(112.5);
     });
 
-    it('tempo-as-float-string-in-bar', () => {
-        const score = parseTex('\\tempo 112 . 3.3.1 | \\tempo "333.3" 3.3');
+    it('tempo-as-float-in-bar', () => {
+        const score = parseTex('\\tempo 112 . 3.3.1 | \\tempo 333.3 3.3');
         expect(score.tempo).to.equal(112);
         expect(score.tracks[0].staves[0].bars[1].masterBar.tempoAutomation?.value).to.equal(333.3);
     });
 
-    it('tempo-invalid-float-string', () => {
-        expect(() => parseTex('\\tempo "a a 112" .')).to.throw(UnsupportedFormatError);
+    it('tempo-invalid-float', () => {
+        expect(() => parseTex('\\tempo 112.Q .')).to.throw(UnsupportedFormatError);
     });
 });
