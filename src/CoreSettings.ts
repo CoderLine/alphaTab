@@ -70,76 +70,7 @@ export class CoreSettings {
      * @target web
      */
     public constructor() {
-        if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_ROOT) {
-            this.scriptFile = Environment.globalThis.ALPHATAB_ROOT;
-            this.scriptFile = CoreSettings.ensureFullUrl(this.scriptFile);
-            this.scriptFile = CoreSettings.appendScriptName(this.scriptFile);
-        } else {
-            this.scriptFile = Environment.scriptFile;
-        }
-
-        if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_FONT) {
-            this.fontDirectory = Environment.globalThis['ALPHATAB_FONT'];
-            this.fontDirectory = CoreSettings.ensureFullUrl(this.fontDirectory);
-        } else {
-            this.fontDirectory = this.scriptFile;
-            if (this.fontDirectory) {
-                let lastSlash: number = this.fontDirectory.lastIndexOf(String.fromCharCode(47));
-                if (lastSlash >= 0) {
-                    this.fontDirectory = this.fontDirectory.substr(0, lastSlash) + '/font/';
-                }
-            }
-        }
-    }
-
-    /**
-     * @target web
-     */
-    public static ensureFullUrl(relativeUrl: string | null): string {
-        if (!relativeUrl) {
-            return '';
-        }
-
-        if (!relativeUrl.startsWith('http') && !relativeUrl.startsWith('https') && !relativeUrl.startsWith('file')) {
-            let root: string = '';
-            let location: Location = Environment.globalThis['location'];
-            root += location.protocol?.toString();
-            root += '//'?.toString();
-            if (location.hostname) {
-                root += location.hostname?.toString();
-            }
-            if (location.port) {
-                root += ':'?.toString();
-                root += location.port?.toString();
-            }
-            // as it is not clearly defined how slashes are treated in the location object
-            // better be safe than sorry here
-            if (!relativeUrl.startsWith('/')) {
-                let directory: string = location.pathname.split('/').slice(0, -1).join('/');
-                if (directory.length > 0) {
-                    if (!directory.startsWith('/')) {
-                        root += '/'?.toString();
-                    }
-                    root += directory?.toString();
-                }
-            }
-            if (!relativeUrl.startsWith('/')) {
-                root += '/'?.toString();
-            }
-            root += relativeUrl?.toString();
-            return root;
-        }
-        return relativeUrl;
-    }
-
-    private static appendScriptName(url: string): string {
-        // append script name
-        if (url && !url.endsWith('.js')) {
-            if (!url.endsWith('/')) {
-                url += '/';
-            }
-            url += 'alphaTab.js';
-        }
-        return url;
+        this.scriptFile = Environment.scriptFile;
+        this.fontDirectory = Environment.fontDirectory;
     }
 }

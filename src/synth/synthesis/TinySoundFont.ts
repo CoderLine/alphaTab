@@ -26,7 +26,7 @@ import { SynthHelper } from '@src/synth/SynthHelper';
 import { TypeConversions } from '@src/io/TypeConversions';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { Queue } from '@src/synth/ds/Queue';
-import { ControllerType } from '@src/midi';
+import { ControllerType } from '@src/midi/ControllerType';
 import { Logger } from '@src/Logger';
 
 /**

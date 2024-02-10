@@ -31,66 +31,62 @@ const importMetaPlugin = {
     }
 };
 
+const bundlePlugins = [
+    typescript({
+        tsconfig: "./tsconfig.build.json",
+        outputToFilesystem: true
+    }),
+    license({
+        banner: {
+            content: {
+                file: 'LICENSE.header'
+            },
+            data() {
+                let buildNumber = process.env.GITHUB_RUN_NUMBER || 0;
+                let gitBranch = getGitBranch();
+                return {
+                    branch: gitBranch,
+                    build: buildNumber
+                };
+            }
+        }
+    }),
+    resolve({
+        mappings: {
+            '@src': 'dist/lib'
+        }
+    })
+];
+
 const isWatch = process.env.ROLLUP_WATCH;
 
-module.exports = [
+const settings = [
+    //
+    // ESM Flavor 
+
+    // Core Bundle
     {
-        input: `src/alphatab.ts`,
-        output: isWatch
-            ? [
-                {
-                    file: 'dist/alphaTab.mjs',
-                    format: 'es',
-                    sourcemap: true
-                }
-            ]
-            : [
-                {
-                    file: 'dist/alphaTab.js',
-                    plugins: [importMetaPlugin],
-                    sourcemap: true
-                },
-                {
-                    file: 'dist/alphaTab.min.js',
-                    plugins: [terser(), importMetaPlugin],
-                    sourcemap: false
-                },
-                {
-                    file: 'dist/alphaTab.mjs',
-                    format: 'es',
-                    sourcemap: true
-                },
-                {
-                    file: 'dist/alphaTab.min.mjs',
-                    format: 'es',
-                    plugins: [terser()],
-                    sourcemap: false
-                }
-            ].map(o => ({ ...commonOutput, ...o })),
+        input: `src/alphaTab.core.ts`,
+        output: [
+            {
+                file: 'dist/alphaTab.core.mjs',
+                format: 'es',
+                sourcemap: false
+            },
+            !isWatch && {
+                file: 'dist/alphaTab.core.min.mjs',
+                format: 'es',
+                plugins: [terser()],
+                sourcemap: false
+            }
+        ].filter(e => typeof e == "object").map(o => ({ ...commonOutput, ...o })),
         external: [],
         watch: {
-            include: ['src/**', 'test/**'],
+            include: ['src/**'],
             exclude: 'node_modules/**'
         },
         plugins: [
-            typescript({
-                tsconfig: "./tsconfig.build.json"
-            }),
-            license({
-                banner: {
-                    content: {
-                        file: 'LICENSE.header'
-                    },
-                    data() {
-                        let buildNumber = process.env.GITHUB_RUN_NUMBER || 0;
-                        let gitBranch = getGitBranch();
-                        return {
-                            branch: gitBranch,
-                            build: buildNumber
-                        };
-                    }
-                }
-            }),
+            ...bundlePlugins,
 
             copy({
                 targets: [
@@ -98,21 +94,116 @@ module.exports = [
                     { src: 'font/sonivox/*', dest: 'dist/soundfont' }
                 ]
             }),
-            resolve({
-                mappings: {
-                    '@src': 'dist/lib'
-                }
-            }),
-
-            isWatch &&
-            server({
+            isWatch && server({
                 openPage: '/playground/control.html',
                 port: 8080
             })
         ]
     },
+
+    // Entry points
+    ...[
+        { input: "alphaTab.main", output: "alphaTab" },
+        { input: "alphaTab.worker", output: "alphaTab.worker" },
+        { input: "alphaTab.worklet", output: "alphaTab.worklet" }
+    ].map(x => {
+        return {
+            input: `src/${x.input}.ts`,
+            output: [
+                {
+                    file: `dist/${x.output}.mjs`,
+                    format: 'es',
+                    sourcemap: false,
+                    plugins: [
+                        {
+                            name: 'adjust-script-paths',
+                            renderChunk(code) {
+                                return code
+                                    .replaceAll('alphaTab.core\'', 'alphaTab.core.mjs\'')
+                                    .replaceAll('alphaTab.worker\'', 'alphaTab.worker.mjs\'')
+                                    .replaceAll('alphaTab.worklet\'', 'alphaTab.worklet.mjs\'');
+                            }
+                        }
+                    ],
+                },
+                {
+                    file: `dist/${x.output}.min.mjs`,
+                    format: 'es',
+                    plugins: [
+                        {
+                            name: 'adjust-script-paths',
+                            renderChunk(code) {
+                                return code
+                                    .replaceAll('alphaTab.core\'', 'alphaTab.core.min.mjs\'')
+                                    .replaceAll('alphaTab.worker\'', 'alphaTab.worker.min.mjs\'')
+                                    .replaceAll('alphaTab.worklet\'', 'alphaTab.worklet.mjs\'');
+                            }
+                        },
+                        terser()
+                    ],
+                    sourcemap: false
+                }
+            ],
+            external: [
+                './alphaTab.core'
+            ],
+            watch: {
+                include: [`src/${x.input}.ts`],
+                exclude: 'node_modules/**'
+            },
+            plugins: [
+                typescript({
+                    tsconfig: "./tsconfig.build.json",
+                    outputToFilesystem: true
+                }),
+                license({
+                    banner: {
+                        content: {
+                            file: 'LICENSE.header'
+                        },
+                        data() {
+                            let buildNumber = process.env.GITHUB_RUN_NUMBER || 0;
+                            let gitBranch = getGitBranch();
+                            return {
+                                branch: gitBranch,
+                                build: buildNumber
+                            };
+                        }
+                    }
+                })
+            ]
+        }
+    }),
+
+    //
+    // UMD Flavor
+    !isWatch && {
+        input: `src/alphaTab.main.ts`,
+        output: [
+            {
+                file: 'dist/alphaTab.js',
+                plugins: [importMetaPlugin],
+                sourcemap: false
+            },
+            {
+                file: 'dist/alphaTab.min.js',
+                plugins: [terser(), importMetaPlugin],
+                sourcemap: false
+            }
+        ].map(o => ({ ...commonOutput, ...o })),
+        watch: {
+            include: ['src/**'],
+            exclude: 'node_modules/**'
+        },
+        plugins: [
+            ...bundlePlugins,
+        ]
+    },
+
+    //
+    // typescript type declarations
     {
-        input: 'dist/types/alphatab.d.ts',
+        input: 'dist/types/alphaTab.main.d.ts',
         output: [
             {
                 file: 'dist/alphaTab.d.ts',
@@ -120,13 +211,15 @@ module.exports = [
             }
         ],
         plugins: [
+            dts(),
             resolve({
                 mappings: {
                     '@src': 'dist/types'
                 },
                 types: true
-            }),
-            dts()
+            })
         ]
     }
-];
+].filter(x => x);
+
+module.exports = settings;

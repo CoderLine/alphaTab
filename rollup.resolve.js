@@ -5,6 +5,7 @@ const fs = require('fs');
 module.exports = function (options) {
     const mappings = options.mappings;
     const types = options.types;
+
     return {
         name: 'resolve-typescript-paths',
         resolveId: function (importee, importer) {
@@ -22,7 +23,12 @@ module.exports = function (options) {
                 const importerDir = path.dirname(importer);
                 let resolved = importee;
 
-                const match = Object.entries(mappings).filter(m => importee.startsWith(m[0]));
+                let match = Object.entries(mappings).filter(m => importee.startsWith(m[0]));
+
+                if (typeof match === "function") {
+                    match = match(m[0]);
+                }
+
                 if (match && match.length > 0) {
                     if (match[0][1].endsWith(extension)) {
                         resolved = path.join(process.cwd(), match[0][1]);
