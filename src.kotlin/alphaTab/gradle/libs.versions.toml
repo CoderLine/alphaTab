@@ -1,15 +1,15 @@
 [versions]
-agp = "8.1.3"
+agp = "8.2.2"
 kotlin = "1.9.22"
 
-kotlinx-coroutines = "1.7.3"
+kotlinx-coroutines = "1.8.0"
 dokka = "1.9.10"
 
 androidx-appcompat = "1.6.1"
 androidx-test = "1.5.0"
 
 junit = "4.13.2"
-alphaskia = "2.0.120"
+alphaskia = "2.1.120"
 
 
 [libraries]
