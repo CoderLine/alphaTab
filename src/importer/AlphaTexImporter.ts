@@ -136,6 +136,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _sy: AlphaTexSymbols = AlphaTexSymbols.No;
     private _syData: unknown = "";
     private _allowNegatives: boolean = false;
+    private _allowFloat: boolean = false;
     private _allowTuning: boolean = false;
     private _currentDuration: Duration = Duration.QuadrupleWhole;
     private _currentDynamics: DynamicValue = DynamicValue.PPP;
@@ -548,7 +549,7 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (this._ch === 0x2d /* - */) {
                 // negative number
                 // is number?
-                if (this._allowNegatives && this.isDigit(this._ch)) {
+                if (this._allowNegatives) {
                     this._sy = AlphaTexSymbols.Number;
                     this._syData = this.readNumber();
                 } else {
@@ -649,7 +650,8 @@ export class AlphaTexImporter extends ScoreImporter {
     private isDigit(ch: number): boolean {
         return (
             (ch >= 0x30 && ch <= 0x39) /* 0-9 */ ||
-            (this._allowNegatives && ch === 0x2d /* - */) // allow minus sign if negatives
+            (this._allowNegatives && ch === 0x2d /* - */) || // allow minus sign if negatives
+            (this._allowFloat && ch === 0x2e /* . */) // allow dot if float
         );
     }
 
@@ -676,7 +678,7 @@ export class AlphaTexImporter extends ScoreImporter {
             str += String.fromCharCode(this._ch);
             this._ch = this.nextChar();
         } while (this.isDigit(this._ch));
-        return parseInt(str);
+        return this._allowFloat ? parseFloat(str) : parseInt(str);
     }
 
     private metaData(): boolean {
@@ -726,7 +728,9 @@ export class AlphaTexImporter extends ScoreImporter {
                     anyMeta = true;
                     break;
                 case 'tempo':
+                    this._allowFloat = true;
                     this._sy = this.newSy();
+                    this._allowFloat = false;
                     if (this._sy === AlphaTexSymbols.Number) {
                         this._score.tempo = this._syData as number;
                     } else {
@@ -1878,7 +1882,9 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 this._sy = this.newSy();
             } else if (syData === 'tempo') {
+                this._allowFloat = true;
                 this._sy = this.newSy();
+                this._allowFloat = false;
                 if (this._sy !== AlphaTexSymbols.Number) {
                     this.error('tempo', AlphaTexSymbols.Number, true);
                 }
