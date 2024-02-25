@@ -20,7 +20,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noImplicitOverride": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "declaration": true,
     "incremental": true,
     "declarationDir": "dist/types",
@@ -35,6 +35,7 @@
       ]
     },
     "typeRoots": [
+      "./types/",
       "./node_modules/@types"
     ]
   },
