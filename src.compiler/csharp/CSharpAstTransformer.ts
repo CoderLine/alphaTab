@@ -137,7 +137,7 @@ export default class CSharpAstTransformer {
         });
 
         // TODO: Introduce setting for main library name.
-        if (path.basename(this._typeScriptFile.fileName).toLowerCase() === 'alphatab.ts') {
+        if (path.basename(this._typeScriptFile.fileName).toLowerCase() === 'alphatab.core.ts') {
             globalExports.forEach(x => {
                 if (!x.name && x.exportClause) {
                     if (ts.isNamespaceExport(x.exportClause)) {

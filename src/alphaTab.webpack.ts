@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import * as webpack from 'webpack'
+import webpack from 'webpack'
 
 import {
     JAVASCRIPT_MODULE_TYPE_AUTO,
