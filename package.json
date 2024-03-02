@@ -29,6 +29,11 @@
             "require": "./dist/alphaTab.js",
             "types": "./dist/alphaTab.d.ts"
         },
+        "./webpack": {
+            "import": "./dist/alphaTab.webpack.mjs",
+            "require": "./dist/alphaTab.webpack.js",
+            "types": "./dist/alphaTab.webpack.d.ts"
+        },
         "./soundfont/*": "./dist/soundfont/*",
         "./font/*": "./dist/font/*"
     },

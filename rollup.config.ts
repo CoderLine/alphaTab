@@ -89,7 +89,28 @@ export default [
 
     //
     // WebPack plugin
-    {
+    !isWatch && {
+        input: 'dist/types/alphaTab.webpack.d.ts',
+        output: [
+            {
+                file: 'dist/alphaTab.webpack.d.ts',
+                format: 'es'
+            }
+        ],
+        external: [
+            "webpack",
+        ],
+        plugins: [
+            dts(),
+            resolve({
+                mappings: {
+                    '@src': 'dist/types'
+                },
+                types: true
+            })
+        ]
+    },
+    !isWatch && {
         input: 'src/alphaTab.webpack.ts',
         output: [
             {
@@ -113,6 +134,30 @@ export default [
         plugins: [
             ...bundlePlugins,
             commonjs()
+        ]
+    },
+    !isWatch && {
+        input: 'src/alphaTab.webpack.ts',
+        output: [
+            {
+                file: 'dist/alphaTab.webpack.mjs',
+                plugins: [],
+                sourcemap: true,
+                format: 'cjs'
+            }
+        ],
+        external: [
+            "webpack",
+            "webpack/lib/ModuleTypeConstants",
+            "fs",
+            "path"
+        ],
+        watch: {
+            include: ['src/alphaTab.webpack.ts'],
+            exclude: 'node_modules/**'
+        },
+        plugins: [
+            ...bundlePlugins
         ]
     }
 
