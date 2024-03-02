@@ -1,3 +1,4 @@
+import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
@@ -574,8 +575,6 @@ describe('MidiTickLookupTest', () => {
     })
 
 
-
-
     it('cursor-snapping', async () => {
         const buffer = await TestPlatform.loadFile('test-data/audio/cursor-snapping.gp');
         const settings = new Settings();
@@ -614,6 +613,38 @@ describe('MidiTickLookupTest', () => {
         expect(secondBeat!.nextBeat!.beat.duration).to.equal(Duration.Quarter);
         expect(secondBeat!.duration).to.equal(750);
         expect(secondBeat!.beatLookup.duration).to.equal(960);
+    });
+
+    
+    it('before-beat-grace-later-bars', () => {
+        const settings = new Settings();
+        const importer = new AlphaTexImporter();
+        importer.initFromString(`\\ts 2 4 1.1.2 | 2.1.4 3.1 | 4.1{gr} 5.1{gr} 6.1.2 | 7.1.4 8.1`, settings);
+        const score = importer.readScore();
+        const lookup = buildLookup(score, settings);
+
+        // bar 2 contains the grace notes which stole duration from fret 3 beat. 
+        const bar2 = lookup.masterBars[1];
+        
+        let current = bar2.firstBeat;
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("2");
+        expect(current!.start).to.equal(0);
+        expect(current!.duration).to.equal(960);
+
+        current = current!.nextBeat;
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("3");
+        expect(current!.start).to.equal(960);
+        expect(current!.duration).to.equal(840); // 120 ticks stolen by grace beats 
+        
+        current = current!.nextBeat;
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("4");
+        expect(current!.start).to.equal(960 + 840);
+        expect(current!.duration).to.equal(60);
+
+        current = current!.nextBeat;
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("5");
+        expect(current!.start).to.equal(960 + 840 + 60);
+        expect(current!.duration).to.equal(60);
     });
 
 
