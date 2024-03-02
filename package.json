@@ -26,7 +26,8 @@
     "exports": {
         ".": {
             "import": "./dist/alphaTab.mjs",
-            "require": "./dist/alphaTab.js"
+            "require": "./dist/alphaTab.js",
+            "types": "./dist/alphaTab.d.ts"
         },
         "./soundfont/*": "./dist/soundfont/*",
         "./font/*": "./dist/font/*"
@@ -37,61 +38,61 @@
     "scripts": {
         "clean": "rimraf dist",
         "lint": "eslint .",
+        "start": "node scripts/setup-playground.js && npm run generate-typescript && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript -w",
         "generate-typescript": "rimraf src/generated && tsx src.compiler/typescript/AlphaTabGenerator.ts",
         "generate-csharp": "npm run generate-typescript && tsx src.compiler/csharp/CSharpTranspiler.ts --outDir dist/lib.csharp",
         "generate-kotlin": "npm run generate-typescript && tsx src.compiler/kotlin/KotlinTranspiler.ts --outDir dist/lib.kotlin",
-        "build": "npm run generate-typescript && tsc --project tsconfig.build.json && rollup -c rollup.config.js",
-        "build-ci": "npm run clean && npm run build && npm pack",
+        "build": "npm run generate-typescript && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
         "build-csharp": "npm run generate-csharp && cd src.csharp && dotnet build -c Release",
-        "build-csharp-ci": "npm run clean && npm run build-csharp",
         "build-kotlin": "npm run generate-kotlin && cd src.kotlin/alphaTab && gradlew assembleRelease",
-        "build-kotlin-ci": "npm run clean && npm run build-kotlin",
-        "start": "node scripts/setup-playground.js && npm run build && concurrently --kill-others \"tsc --project tsconfig.build.json -w\" \"rollup -c rollup.config.js -w\"",
-        "test-execute": "mocha",
-        "test": "npm run generate-typescript && npm run test-execute",
-        "test-ci": "npm run test",
+        "test": "mocha",
         "test-csharp": "cd src.csharp && dotnet test -c Release",
-        "test-csharp-ci": "cd src.csharp && dotnet test -c Release",
-        "test-kotlin": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info",
-        "test-kotlin-ci": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info"
+        "test-kotlin": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info"
     },
     "devDependencies": {
-        "@coderline/alphaskia": "^2.0.120",
-        "@coderline/alphaskia-windows": "^2.0.120",
+        "@coderline/alphaskia": "^2.1.120",
+        "@coderline/alphaskia-windows": "^2.1.120",
         "@rollup/plugin-commonjs": "^25.0.7",
+        "@rollup/plugin-replace": "^5.0.5",
         "@rollup/plugin-terser": "^0.4.4",
-        "@types/chai": "^4.3.9",
-        "@types/mocha": "^10.0.3",
-        "@typescript-eslint/eslint-plugin": "^7.0.0",
-        "@typescript-eslint/parser": "^6.9.1",
+        "@rollup/plugin-typescript": "^11.1.6",
+        "@types/chai": "^4.3.12",
+        "@types/mocha": "^10.0.6",
+        "@typescript-eslint/eslint-plugin": "^7.0.2",
+        "@typescript-eslint/parser": "^7.0.2",
         "assert": "^2.1.0",
-        "chai": "^5.0.0",
+        "chai": "^5.1.0",
         "concurrently": "^8.2.2",
         "cors": "^2.8.5",
-        "eslint": "^8.52.0",
+        "eslint": "^8.57.0",
         "express": "^4.18.2",
-        "fs-extra": "^11.1.1",
-        "mocha": "^10.2.0",
+        "fs-extra": "^11.2.0",
+        "html-webpack-plugin": "^5.6.0",
+        "mocha": "^10.3.0",
         "multer": "^1.4.5-lts.1",
         "opener": "^1.5.2",
         "rimraf": "^5.0.5",
-        "rollup": "^4.3.0",
+        "rollup": "^4.12.0",
         "rollup-plugin-copy": "^3.5.0",
         "rollup-plugin-dts": "^6.1.0",
         "rollup-plugin-license": "^3.2.0",
-        "terser": "^5.24.0",
-        "tsx": "^4.6.2",
-        "typescript": "^5.2.2"
+        "terser": "^5.28.1",
+        "tslib": "^2.6.2",
+        "tsx": "^4.7.1",
+        "typescript": "^5.3.3",
+        "webpack": "^5.90.3",
+        "webpack-cli": "^5.1.4"
     },
     "files": [
-        "/dist/alphaTab.js",
-        "/dist/alphaTab.mjs",
-        "/dist/alphaTab.min.js",
-        "/dist/alphaTab.min.mjs",
-        "/dist/alphaTab.d.ts",
+        "/dist/alphaTab*",
         "/dist/font/Bravura.*",
+        "/dist/font/Bravura*.txt",
         "/dist/font/*.txt",
         "/dist/soundfont/*",
         "LICENSE.header"
-    ]
+    ],
+    "dependencies": {
+        "@types/express": "^4.17.21",
+        "@types/opener": "^1.4.3"
+    }
 }

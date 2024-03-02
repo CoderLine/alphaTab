@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>
+        <%= htmlWebpackPlugin.options.title %>
+    </title>
+    <style>
+        .at-cursor-bar {
+            /* Defines the color of the bar background when a bar is played */
+            background: rgba(255, 242, 0, 0.25);
+        }
+
+        .at-selection div {
+            /* Defines the color of the selection background */
+            background: rgba(64, 64, 255, 0.2);
+        }
+
+        .at-cursor-beat {
+            /* Defines the beat cursor */
+            background: rgba(64, 64, 255, 0.75);
+            width: 3px;
+        }
+
+        .at-highlight * {
+            /* Defines the color of the music symbols when they are being played (svg) */
+            fill: #0078ff;
+            stroke: #0078ff;
+        }
+
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 5px;
+            z-index:100;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toolbar">
+        <button id="playPause">Play/Pause</button>
+    </div>
+    <div id="alphaTab"></div>
+</body>
+
+</html>

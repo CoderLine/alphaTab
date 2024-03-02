@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "target": "es2019",
-    "module": "es6",
+    "moduleResolution": "Bundler",
+    "target": "ES2020",
+    "module": "ES2020",
     "lib": [
-      "es2015",
-      "es2016",
-      "es2017",
-      "es2021",
+      "ES2015",
+      "ES2016",
+      "ES2017",
+      "ES2021",
       "dom"
     ],
     "strict": true,
@@ -35,8 +35,8 @@
       ]
     },
     "typeRoots": [
-      "types",
-      "node_modules/@types"
+      "./types/",
+      "./node_modules/@types"
     ]
   },
   "include": [

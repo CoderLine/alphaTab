@@ -6,6 +6,11 @@
   },
   "include": [
     "src",
-    "test"
+    "test",
+    "rollup.config.ts",
+    "rollup.config.cjs.ts",
+    "rollup.config.esm.ts",
+    "rollup.plugin.server.ts",
+    "rollup.plugin.resolve.ts",
   ]
 }

@@ -20,3 +20,5 @@ gradle-app.setting
 .gradletasknamecache
 **/build/
 local.properties
+.rollup.cache
+test-data/bundler/webpack/out/

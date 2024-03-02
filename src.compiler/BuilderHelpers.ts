@@ -1,4 +1,23 @@
 import * as ts from 'typescript';
+import * as path from 'path'
+
+const ignoredFiles = new Set([
+    "alphaTab.webpack.ts",
+    "rollup.config.ts",
+    "rollup.config.cjs.ts",
+    "rollup.config.esm.ts",
+    "rollup.plugin.resolve.ts",
+    "rollup.plugin.server.ts",
+    "alphaTab.main.ts",
+    "alphaTab.worker.ts",
+    "alphaTab.worklet.ts",
+    "WebPack.test.ts"
+])
+
+export function transpileFilter(file: string): boolean {
+    const fileName = path.basename(file);
+    return !ignoredFiles.has(fileName);
+}
 
 export function setMethodBody(m: ts.MethodDeclaration, body: ts.FunctionBody): ts.MethodDeclaration {
     return ts.factory.updateMethodDeclaration(
@@ -76,9 +95,9 @@ export function getTypeWithNullableInfo(
                 } else {
                     throw new Error(
                         'Multi union types on JSON settings not supported: ' +
-                            node.getSourceFile().fileName +
-                            ':' +
-                            node.getText()
+                        node.getSourceFile().fileName +
+                        ':' +
+                        node.getText()
                     );
                 }
             } else {

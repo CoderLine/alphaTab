@@ -17,6 +17,7 @@ export { FileLoadError } from '@src/FileLoadError';
 export { Environment } from '@src/Environment';
 
 export { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
+export { WebPlatform } from '@src/platform/javascript/WebPlatform';
 
 export { VersionInfo as meta } from '@src/generated/VersionInfo';
 
@@ -27,3 +28,4 @@ export * as model from "./model";
 export * as rendering from "./rendering";
 export * as platform from "./platform";
 export * as synth from "./synth";
+

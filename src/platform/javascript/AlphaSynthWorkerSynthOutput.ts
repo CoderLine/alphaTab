@@ -29,7 +29,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     }
 
     public open(): void {
-        Logger.debug('AlphaSynth', 'Initializing webworker worker');
+        Logger.debug('AlphaSynth', 'Initializing synth worker');
         this._worker = Environment.globalThis as IWorkerScope;
         this._worker.addEventListener('message', this.handleMessage.bind(this));
         (this.ready as EventEmitter).trigger();

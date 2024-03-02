@@ -1,3 +1,5 @@
+import * as alphaTab from '../dist/alphaTab.mjs'
+
 const toDomElement = (function () {
     const parser = document.createElement('div');
     return function (html) {
@@ -6,7 +8,22 @@ const toDomElement = (function () {
     };
 })();
 
-function createTrackItem(track) {
+const params = new URL(window.location.href).searchParams;
+
+
+const defaultSettings = {
+    core: {
+        logLevel: params.get('loglevel') ?? 'info'
+    },
+    file: "/test-data/audio/full-song.gp5",
+    player: {
+        enablePlayer: true,
+        scrollOffsetX: -10,
+        soundFont: "/font/sonivox/sonivox.sf2"
+    }
+}
+
+function createTrackItem(track, trackSelection) {
     const trackTemplate = Handlebars.compile(document.querySelector('#at-track-template').innerHTML);
     const trackItem = toDomElement(trackTemplate(track));
 
@@ -41,7 +58,15 @@ function createTrackItem(track) {
 
     trackItem.onclick = function (e) {
         e.stopPropagation();
-        at.renderTracks([track]);
+        if (!e.ctrlKey) {
+            trackSelection.clear();
+            trackSelection.set(track.index, track);
+        } else if (trackSelection.has(track.index)) {
+            trackSelection.delete(track.index);
+        } else {
+            trackSelection.set(track.index, track);
+        }
+        at.renderTracks(Array.from(trackSelection.values()).sort(t => t.index));
     };
 
     muteButton.value = track.playbackInfo.isMute;
@@ -52,18 +77,21 @@ function createTrackItem(track) {
     return trackItem;
 }
 
-function setupControl(selector) {
+export function setupControl(selector, settings) {
     const el = document.querySelector(selector);
     const control = el.closest('.at-wrap');
 
     const viewPort =
         'playerScrollelement' in el.dataset ? el.dataset.playerScrollelement : control.querySelector('.at-viewport');
     const at = new alphaTab.AlphaTabApi(el, {
+        ...defaultSettings,
         player: {
+            ...defaultSettings.player,
             scrollElement: viewPort
-        }
+        },
+        ...settings
     });
-    at.error.on(function(e) {
+    at.error.on(function (e) {
         console.error('alphaTab error', e);
     });
 
@@ -87,12 +115,14 @@ function setupControl(selector) {
         console.log('drop', files);
     };
 
+    const tracks = new Map();
     const trackItems = [];
     at.renderStarted.on(function (isResize) {
         if (!isResize) {
             control.classList.add('loading');
         }
-        const tracks = new Map();
+
+        tracks.clear();
         at.tracks.forEach(function (t) {
             tracks.set(t.index, t);
         });
@@ -125,16 +155,14 @@ function setupControl(selector) {
         const trackList = control.querySelector('.at-track-list');
         trackList.innerHTML = '';
 
+
         score.tracks.forEach(function (track) {
-            const trackItem = createTrackItem(track);
+            const trackItem = createTrackItem(track, tracks);
             trackItems.push(trackItem);
             trackList.appendChild(trackItem);
         });
-
-        currentTempo = score.tempo;
     });
 
-    let currentTempo = 0;
     const timePositionLabel = control.querySelector('.at-time-position');
     const timeSliderValue = control.querySelector('.at-time-slider-value');
 

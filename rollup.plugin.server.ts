@@ -1,18 +1,24 @@
-const express = require('express')
-const opener = require('opener');
-const fs = require('fs');
-const path = require('path');
+import express from 'express';
+import opener from 'opener';
+import fs from 'fs';
+import path from 'path';
 
-let app = null;
-module.exports = function (options) {
+export interface ServerOptions {
+    port: number,
+    openPage: string
+}
+
+let app: express.Express;
+export default function server(options: ServerOptions) {
     if (app) {
-        app.close();
+        (app as any).close();
     }
 
     app = express();
 
     const exposedFolders = [
         'dist',
+        'src',
         'font',
         'img',
         'playground',
@@ -26,9 +32,9 @@ module.exports = function (options) {
 
     app.get('/test-results', async (req, res) => {
         try {
-            const response = [];
+            const response: any = [];
 
-            async function crawl(d, name) {
+            async function crawl(d: string, name: string) {
                 console.log('Crawling ', d);
                 const dir = await fs.promises.opendir(d);
                 try {
@@ -62,8 +68,8 @@ module.exports = function (options) {
         }
         catch (e) {
             res.json({
-                message: e.message,
-                stack: e.stack
+                message: (e as Error).message,
+                stack: (e as Error).stack
             });
         }
     })

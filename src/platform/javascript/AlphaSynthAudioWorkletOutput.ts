@@ -4,6 +4,7 @@ import { Logger } from '@src/Logger';
 import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
 import { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { Settings } from '@src/Settings';
 
 /**
  * @target web
@@ -18,7 +19,7 @@ interface AudioWorkletProcessor {
  */
 declare var AudioWorkletProcessor: {
     prototype: AudioWorkletProcessor;
-    new (options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
+    new(options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
 };
 
 // Bug 646: Safari 14.1 is buggy regarding audio worklets
@@ -62,8 +63,8 @@ export class AlphaSynthWebWorklet {
 
                     this._bufferCount = Math.floor(
                         (options.processorOptions.bufferTimeInMilliseconds * sampleRate) /
-                            1000 /
-                            AlphaSynthWebWorkletProcessor.BufferSize
+                        1000 /
+                        AlphaSynthWebWorkletProcessor.BufferSize
                     );
                     this._circularBuffer = new CircularSampleBuffer(
                         AlphaSynthWebWorkletProcessor.BufferSize * this._bufferCount
@@ -161,6 +162,12 @@ export class AlphaSynthWebWorklet {
 export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     private _worklet: AudioWorkletNode | null = null;
     private _bufferTimeInMilliseconds: number = 0;
+    private readonly _settings: Settings;
+
+    public constructor(settings: Settings) {
+        super();
+        this._settings = settings;
+    }
 
     public override open(bufferTimeInMilliseconds: number) {
         super.open(bufferTimeInMilliseconds);
@@ -172,7 +179,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
         super.play();
         let ctx = this._context!;
         // create a script processor node which will replace the silence with the generated audio
-        ctx.audioWorklet.addModule(Environment.scriptFile!).then(
+        Environment.createAudioWorklet(ctx, this._settings).then(
             () => {
                 this._worklet = new AudioWorkletNode(ctx!, 'alphatab', {
                     numberOfOutputs: 1,

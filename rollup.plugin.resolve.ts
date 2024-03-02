@@ -1,10 +1,19 @@
-const path = require('path');
-const glob = require('glob').sync;
-const fs = require('fs');
+import path from 'path';
+import glob from 'glob';
+import fs from 'fs';
+import { Plugin } from 'rollup';
 
-module.exports = function (options) {
+export interface ResolvePluginOptions {
+    mappings: {
+        [key: string]: string
+    },
+    types?: boolean
+}
+
+export default function resolve(options: ResolvePluginOptions) {
     const mappings = options.mappings;
     const types = options.types;
+
     return {
         name: 'resolve-typescript-paths',
         resolveId: function (importee, importer) {
@@ -22,7 +31,7 @@ module.exports = function (options) {
                 const importerDir = path.dirname(importer);
                 let resolved = importee;
 
-                const match = Object.entries(mappings).filter(m => importee.startsWith(m[0]));
+                let match = Object.entries(mappings).filter(m => importee.startsWith(m[0]));
                 if (match && match.length > 0) {
                     if (match[0][1].endsWith(extension)) {
                         resolved = path.join(process.cwd(), match[0][1]);
@@ -37,12 +46,17 @@ module.exports = function (options) {
                     resolved = path.join(resolved, 'index');
                 }
 
-                return resolved + extension;
+                resolved += extension;
+                if (fs.existsSync(resolved)) {
+                    return resolved;
+                }
+
+                return null;
             }
         },
         load(id) {
             if (id.startsWith('**')) {
-                const files = glob(id, {
+                const files = glob.sync(id, {
                     cwd: process.cwd()
                 });
                 const source = files
@@ -52,5 +66,5 @@ module.exports = function (options) {
             }
             return null;
         }
-    };
+    } as Plugin;
 };
