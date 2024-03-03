@@ -54,7 +54,16 @@ export class AlphaTabWebPackPlugin {
 
     apply(compiler: webpack.Compiler) {
         this.configureChunk(compiler);
+        this.configureSoundFont(compiler);
         this.configure(compiler);
+    }
+
+    configureSoundFont(compiler: webpack.Compiler) {
+        // register soundfont as resource
+        compiler.options.module.rules.push({
+            test: /\.sf2/,
+            type: "asset/resource",
+        });
     }
 
 
