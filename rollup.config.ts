@@ -144,7 +144,7 @@ export default [
                 file: 'dist/alphaTab.webpack.mjs',
                 plugins: [],
                 sourcemap: true,
-                format: 'cjs'
+                format: 'es'
             }
         ],
         external: [
