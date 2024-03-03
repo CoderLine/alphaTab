@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
       
     steps:
-    - uses: actions/checkout@v2
-    - uses: montudor/action-zip@v0.1.0
-    - uses: actions/setup-node@v2
+    - uses: actions/checkout@v4
+    - uses: montudor/action-zip@v1
+    - uses: actions/setup-node@v4
       with:
-        node-version: '16'
+        node-version: lts/*
     - run: npm install
     - run: npm install @coderline/alphatab@alpha
     - run: npm run build
