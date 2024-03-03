@@ -19,18 +19,23 @@ export class AlphaTabWorkletStartRuntimeModule extends webpack.RuntimeModule {
             const isWorkletEntry = chunkGraph
                 .getTreeRuntimeRequirements(chunk)
                 .has(AlphaTabWorkletRuntimeModule.Key);
-            webpack.Chunk
+
             if (isWorkletEntry) {
-                const workletChunks = Array.from(chunk.getAllReferencedChunks()).map(c => compilation.getPath(
-                    webpack.javascript.JavascriptModulesPlugin.getChunkFilenameTemplate(
-                        c,
-                        compilation.outputOptions
-                    ),
-                    {
-                        chunk: c,
-                        contentHashType: "javascript"
-                    }
-                ));
+
+                const workletChunks = Array.from(chunk.getAllReferencedChunks()).map(c => {
+                    // force content chunk to be created
+                    compilation.hooks.contentHash.call(c); 
+                    return compilation.getPath(
+                        webpack.javascript.JavascriptModulesPlugin.getChunkFilenameTemplate(
+                            c,
+                            compilation.outputOptions
+                        ),
+                        {
+                            chunk: c,
+                            contentHashType: "javascript"
+                        }
+                    )
+                });
                 workletChunkLookup.set(String(chunk.id), workletChunks);
             }
         }
