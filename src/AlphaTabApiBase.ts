@@ -1,4 +1,3 @@
-/**@target web */
 import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 
