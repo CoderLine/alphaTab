@@ -1,22 +1,13 @@
 import * as ts from 'typescript';
 import * as path from 'path'
 
-const ignoredFiles = new Set([
-    "alphaTab.webpack.ts",
-    "rollup.config.ts",
-    "rollup.config.cjs.ts",
-    "rollup.config.esm.ts",
-    "rollup.plugin.resolve.ts",
-    "rollup.plugin.server.ts",
-    "alphaTab.main.ts",
-    "alphaTab.worker.ts",
-    "alphaTab.worklet.ts",
-    "WebPack.test.ts"
-])
+const ignoredFiles = [
+    /rollup.*/
+]
 
 export function transpileFilter(file: string): boolean {
     const fileName = path.basename(file);
-    return !ignoredFiles.has(fileName);
+    return !!ignoredFiles.find(e => e.exec(fileName));
 }
 
 export function setMethodBody(m: ts.MethodDeclaration, body: ts.FunctionBody): ts.MethodDeclaration {

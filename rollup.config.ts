@@ -124,6 +124,7 @@ export default [
         external: [
             "webpack",
             "webpack/lib/ModuleTypeConstants",
+            "webpack/lib/util/makeSerializable",
             "fs",
             "path"
         ],
@@ -149,6 +150,7 @@ export default [
         external: [
             "webpack",
             "webpack/lib/ModuleTypeConstants",
+            "webpack/lib/util/makeSerializable",
             "fs",
             "path"
         ],

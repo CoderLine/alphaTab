@@ -86,6 +86,10 @@ export default class CSharpAstTransformer {
         const testClasses: ts.CallExpression[] = [];
         const globalExports: ts.ExportDeclaration[] = [];
 
+        if(this.shouldSkip(this._typeScriptFile.statements[0], false)) {
+            return;
+        }
+
         this._typeScriptFile.statements.forEach(s => {
             if (ts.isExportDeclaration(s)) {
                 globalExports.push(s);

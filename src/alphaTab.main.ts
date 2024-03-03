@@ -1,3 +1,4 @@
+/**@target web */
 export * from './alphaTab.core';
 import * as alphaTab from './alphaTab.core';
 
@@ -45,14 +46,10 @@ alphaTab.Environment.initializeMain(
             throw new alphaTab.AlphaTabError(alphaTab.AlphaTabErrorType.General, "Audio Worklets not yet supported in Node.js");
         }
 
-        if (alphaTab.Environment.isWebPackBundled) {
-            alphaTab.Logger.debug("AlphaTab", "Creating WebPack compatible worklet");
-            const alphaTabWorklet = context.audioWorklet; // this name triggers the WebPack Plugin
-            return alphaTabWorklet.addModule(new URL('./alphaTab.worklet', 'webpack-worklet'));
-        }
-        else if (alphaTab.Environment.isWebPackBundled && alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule) {
+        if (alphaTab.Environment.isWebPackBundled ||alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule) {
             alphaTab.Logger.debug("AlphaTab", "Creating Module worklet");
-            return context.audioWorklet.addModule(new URL('./alphaTab.worklet', import.meta.url));
+            const alphaTabWorklet = context.audioWorklet; // this name triggers the WebPack Plugin
+            return alphaTabWorklet.addModule(new URL('./alphaTab.worklet', import.meta.url));
         }
 
         alphaTab.Logger.debug("AlphaTab", "Creating Script worklet");
