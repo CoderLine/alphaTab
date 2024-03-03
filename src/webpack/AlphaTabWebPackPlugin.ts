@@ -35,10 +35,19 @@ export interface AlphaTabWebPackPluginOptions {
     alphaTabChunk?: AlphaTabWebPackPluginChunkOptions | false;
 
     /**
-     * The location where assets of alphaTab should be placed.
+     * The location where assets of alphaTab should be placed. 
+     * Set it to false to disable the copying of assets like fonts.
      * (default: compiler.options.output.path)
      */
-    assetOutputDir?: string;
+    assetOutputDir?: string | false;
+
+    /**
+     * Whether alphaTab should configure the audio worklet support in WebPack.
+     * This might break support for audio playback unless audio worklet support is added
+     * through other means to WebPack. 
+     * (default: true)
+     */
+    audioWorklets?: boolean;
 }
 
 const AlphaTabWorkletSpecifierTag = Symbol("alphatab worklet specifier tag");
@@ -59,6 +68,10 @@ export class AlphaTabWebPackPlugin {
     }
 
     configureSoundFont(compiler: webpack.Compiler) {
+        if(this.options.assetOutputDir === false) {
+            return;
+        }
+
         // register soundfont as resource
         compiler.options.module.rules.push({
             test: /\.sf2/,
@@ -81,6 +94,10 @@ export class AlphaTabWebPackPlugin {
         });
     }
     configureAssetCopy(pluginName: string, compiler: webpack.Compiler, compilation: webpack.Compilation) {
+        if(this.options.assetOutputDir === false) {
+            return;
+        }
+
         const options = this.options;
         compilation.hooks.processAssets.tapAsync(
             {
@@ -99,7 +116,7 @@ export class AlphaTabWebPackPlugin {
                     return;
                 }
 
-                const outputPath = options.assetOutputDir ?? compiler.options.output.path;
+                const outputPath = (options.assetOutputDir ?? compiler.options.output.path) as string;
                 if (!outputPath) {
                     compilation.errors.push(new webpack.WebpackError('Need output.path configured in application to store asset files.'));
                     return;
@@ -149,6 +166,10 @@ export class AlphaTabWebPackPlugin {
         );
     }
     configureAudioWorklet(pluginName: string, compiler: webpack.Compiler, compilation: webpack.Compilation, normalModuleFactory: any, cachedContextify: (s: string) => string) {
+        if(this.options.audioWorklets === false) {
+            return;
+        }
+
         compilation.dependencyFactories.set(
             AlphaTabWorkletDependency,
             normalModuleFactory

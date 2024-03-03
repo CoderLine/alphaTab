@@ -29,6 +29,7 @@ import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { ScalableHtmlElementContainer } from './ScalableHtmlElementContainer';
+import { PlayerOutputMode } from '@src/PlayerSettings';
 
 /**
  * @target web
@@ -504,7 +505,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         let supportsAudioWorklets: boolean =
             window.isSecureContext && 'AudioWorkletNode' in window;
 
-        if (supportsAudioWorklets) {
+        if (supportsAudioWorklets && this._api.settings.player.outputMode === PlayerOutputMode.WebAudioAudioWorklets) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
             player = new AlphaSynthWebWorkerApi(
                 new AlphaSynthAudioWorkletOutput(this._api.settings),
