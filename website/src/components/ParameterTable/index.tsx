@@ -1,12 +1,12 @@
 import React from "react";
-import ReactMarkdown from 'react-markdown'
 import {CodeBadge, Platform } from "../CodeBadge";
 import { SinceBadge } from "../SinceBadge";
+import {MDXProvider} from '@mdx-js/react'
 
 function renderChild(child: string | JSX.Element): JSX.Element {
     if (typeof child === "string") {
         return (
-            <ReactMarkdown children={child} />
+            <MDXProvider children={child} />
         )
     } else {
         return child;

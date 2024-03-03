@@ -1,10 +1,10 @@
-import {
+import type {
   PropSidebarItem,
   PropSidebarItemLink,
   PropVersionDoc,
+  DocFrontMatter,
+  DocMetadata
 } from "@docusaurus/plugin-content-docs";
-
-import { DocMetadata } from "@docusaurus/plugin-content-docs/src/types";
 
 export class Page {
   constructor(
@@ -34,7 +34,7 @@ export class Page {
 
     if ("frontMatter" in this.pageMeta && this.pageMeta.frontMatter) {
       if (
-        this.pageMeta.frontMatter.sidebar_custom_props &&
+        (this.pageMeta.frontMatter as DocFrontMatter).sidebar_custom_props &&
         key in this.pageMeta.frontMatter.sidebar_custom_props
       ) {
         return this.pageMeta.frontMatter.sidebar_custom_props[key] as T;

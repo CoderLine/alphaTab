@@ -2,24 +2,27 @@
 title: Installation (Web)
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import {InitDemo} from '@site/src/components/GettingStartedInitDemo'
+
 The web version of alphaTab is suitable for building websites displaying and playing musicsheets in different fashions. 
 You can create websites that offer Guitar Tabs for download, provide lessons to students or just if you want to share your 
 composed music with others. It's up to you what you make out of alphaTab. 
 
-You can either install alphaTab wia NPM or just download the package manually and place it in your project. So far we do not offer a CDN. 
-
-:::note 
-
-The web version of alphaTab is primarily meant for usage in Browser. 
-For usage in Node.js refer to [this guide](/docs/guides/nodejs). 
-
-:::
+You can either install alphaTab wia NPM or just download the package manually and place it in your project. So far we do not offer a CDN.
 
 ## Grab your Copy
 
-### NPM
+<Tabs defaultValue="npm" values={[
+   { label: "NPM", value: "npm"},
+   { label: "CDN", value: "cdn"},
+   { label: "Local Copy", value: "local"},
+]}>
 
-We provide NPM packages via npmjs.com. Just install the package via: 
+<TabItem value="npm">
+
+We provide [NPM packages via npmjs.com](https://www.npmjs.com/package/@coderline/alphaskia). Just install the package via: 
 
 ```
 npm install @coderline/alphatab
@@ -27,17 +30,22 @@ npm install @coderline/alphatab
 
 And alphaTab is downloaded to your node_modules for usage in your application. 
 
-### CDN
 
-We currently do not provide a CDN on our own but there are various CDNs on top of NPM. 
+</TabItem>
+
+<TabItem value="cdn">
+
+We do not provide a CDN on our own but there are various CDNs on top of NPM. 
 You can use one of these to integrate alphaTab to your installation.
 
 > https://www.jsdelivr.com/package/npm/@coderline/alphatab
 >
 > https://unpkg.com/@coderline/alphatab
 
+</TabItem>
 
-### Local Copy
+
+<TabItem value="local">
 
 The easiest way to obtain a local copy is to use the download button over at jsdelivr.com. 
 Select the version you want to have and press the download button on the top right side. 
@@ -46,57 +54,155 @@ Select the version you want to have and press the download button on the top rig
 
 Then unpack the assets to your project and you're all set to start developing. 
 
+</TabItem>
 
-## Initializing alphaTab
+</Tabs>
+
+# Using AlphaTab
 
 Once you have alphaTab in your project simply include it and start using it. The next pages will explain you how to configure 
 alphaTab and use it. You can also check out our [tutorials](/docs/tutorials) to learn in a more stepwise approach how to continue.
 
-```html
-<script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
-<!-- Include alphaTab -->
-<script src="alphaTab.js"></script>
-<!-- Create Element which should contain alphaTab -->
-<div id="alphaTab" data-tex="true">
-\title "Hello alphaTab"
-.
-:4 0.6 1.6 3.6 0.5 2.5 3.5 0.4 2.4 |
-   3.4 0.3 2.3 0.2 1.2 3.2 0.1 1.1 |
-   3.1.1
-</div>
-<!-- Initialize alphaTab -->
-<script type="text/javascript">
-const element = document.getElementById('alphaTab');
-const api = new alphaTab.AlphaTabApi(element);
-</script>
-```
+You can also find various sample projects for different usage types over at: 
 
-The output of this is: 
+> https://github.com/CoderLine/alphaTabSamplesWeb/
 
-import * as alphaTab from '@coderline/alphatab';
-export class InitDemo extends React.Component {
-	constructor(props) {
-        super(props);
-        this.state = {};
-	}
-	componentDidMount() {
+
+<Tabs defaultValue="browser-esm" 
+   values={[
+      { label: "Browser (ESM)", value: "browser-esm"},
+      { label: "Browser (Classic)", value: "browser-classic"},
+      { label: "Node.js", value: "node-js"},
+      { label: "Angular", value: "angular"},
+      { label: "React", value: "react"},
+      { label: "Vue.js", value: "vue"}
+   ]}>
+
+   <TabItem value="browser-esm">
+
+   You can `import` alphaTab from within the browser as JavaScript Module (ESM). 
+   The following code illustrates the setup in a script tag but you can also use imports
+   from within any other JavaScript module file. 
+
+   ```html
+   <div id="alphaTab">
+      \title "Hello alphaTab"
+      .
+      :4 0.6 1.6 3.6 0.5 2.5 3.5 0.4 2.4 |
+         3.4 0.3 2.3 0.2 1.2 3.2 0.1 1.1 |
+         3.1.1
+   </div>
+   <script type="module">
+        // here we use JsDelivr as source (notice the .mjs extension which indicates the module variant)
+        import * as alphaTab from 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.mjs'
+        // initialize alphaTab on the prepared element
         const element = document.getElementById('alphaTab');
-        this.state.api = new alphaTab.AlphaTabApi(element);
-    }
-    render() {
-        return (
-            <div id="alphaTab" data-tex="true" style={ { border: '1px solid #E5E6E7' } }>
-            \title "Hello alphaTab"
-            .
-            :4 0.6 1.6 3.6 0.5 2.5 3.5 0.4 2.4 |
-            3.4 0.3 2.3 0.2 1.2 3.2 0.1 1.1 |
-            3.1.1
-            </div>
-        );
-    }
-}
+        const api = new alphaTab.AlphaTabApi(element, {
+         tex: true
+        });
+    </script>
+   ```
 
-<InitDemo />
+   The output of this is: 
+
+   <InitDemo />
+
+   </TabItem>   
+
+   <TabItem value="browser-classic">
+
+   If you are not yet using JavaScript modules you can also import alphaTab 
+   as global variable into your browser via the [Universal Module Definition](https://github.com/umdjs/umd)
+   flavor.
+
+   ```html
+   <div id="alphaTab">
+      \title "Hello alphaTab"
+      .
+      :4 0.6 1.6 3.6 0.5 2.5 3.5 0.4 2.4 |
+         3.4 0.3 2.3 0.2 1.2 3.2 0.1 1.1 |
+         3.1.1
+   </div>
+   <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.js"></script>
+   <script type="text/javascript">
+        // initialize alphaTab on the prepared element
+        const element = document.getElementById('alphaTab');
+        const api = new alphaTab.AlphaTabApi(element, {
+         tex: true
+        });
+    </script>
+   ```
+
+   The output of this is: 
+
+   <InitDemo />   
+
+   </TabItem>
+
+   <TabItem value="node-js">
+
+   For usage in Node.js refer to [this guide](/docs/guides/nodejs). Generally alphaTab can be added in Node.js via both `require` and `import`
+   of the NPM package:
+
+   ```js
+   // alphaTab via CJS
+   const alphaTab = require("@coderline/alphatab");
+   // alphaTab via modules
+   import * as alphaTab from '@coderline/alphatab';
+   ```
+
+   For Node.js currently only low-level APIs are available but we also plan to improve the usage to render music sheets on a "virtual UI" producing 
+   images via [alphaSkia](https://github.com/CoderLine/alphaSkia). 
+
+   </TabItem>
+
+   <TabItem value="angular">
+
+   alphaTab doesn't provide yet an out-of-the box Angular control and integration which would take care of all bindings and UI hooks.
+   Therefore developers are expected to do the low level DOM mapping and Angular integration as part of their application. 
+   Through Angular means of creating DOM elements (e.g. ElementRef), alphaTab can be started into them. Then you can take care of bindings according to your needs
+   using the alphaTab APIs to update. 
+
+   AlphaTab is sensitive to bundling as it spawns background WebWorkers and AudioWorklets. AlphaTab comes with plugins for various bundlers which takes care
+   of the right configurations and bundling logic so that alphaTab can operate. 
+
+   * WebPack: [Installation (WebPack)](installation-webpack) 
+   * Rollup: [Installation (Rollup)](installation-rollup) 
+   * Vite: [Installation (Vite)](installation-vite) 
+
+   </TabItem>
+
+   <TabItem value="react">
+
+   alphaTab doesn't provide yet an out-of-the box React control and integration which would take care of all bindings and UI hooks.
+   Therefore developers are expected to do the low level DOM mapping and React integration as part of their application. 
+   Through React means of creating DOM elements (e.g. Refs), alphaTab can be started into them. Then you can take care of bindings according to your needs
+   using the alphaTab APIs to update. 
+
+   AlphaTab is sensitive to bundling as it spawns background WebWorkers and AudioWorklets. AlphaTab comes with plugins for various bundlers which takes care
+   of the right configurations and bundling logic so that alphaTab can operate. 
+
+   * WebPack: [Installation (WebPack)](installation-webpack) 
+   * Vite: [Installation (Vite)](installation-vite) 
+
+
+   </TabItem>
+
+   <TabItem value="vue">
+
+   alphaTab doesn't provide yet an out-of-the box Vue control and integration which would take care of all bindings and UI hooks.
+   Therefore developers are expected to do the low level DOM mapping and React integration as part of their application. 
+   Through React means of creating DOM elements (e.g. Refs), alphaTab can be started into them. Then you can take care of bindings according to your needs
+   using the alphaTab APIs to update. 
+
+   AlphaTab is sensitive to bundling as it spawns background WebWorkers and AudioWorklets. AlphaTab comes with plugins for various bundlers which takes care
+   of the right configurations and bundling logic so that alphaTab can operate. 
+
+   * WebPack: [Installation (WebPack)](installation-webpack) 
+   * Vite: [Installation (Vite)](installation-vite) 
+
+   </TabItem>
+</Tabs>
 
 ## Additional Notes
 
@@ -109,15 +215,3 @@ But to operate alphaTab in the web with all features there are still 2 dependenc
 AlphaTab bundles this font and it is placed right beside the script files.  
 - To play audio a [SoundFont2](https://en.wikipedia.org/wiki/SoundFont) file is needed. It contains the audio samples for the instruments to be played via the midi synthesizer of alphaTab. 
 AlphaTab comes with a copy of a SONiVOX based SoundFont which is part of the Android Open Source Project and available for free under [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
-
-### Bundling 
-
-It is very important to understand that **alphaTab cannot be bundled with other scripts unless they can run within a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)**.
-AlphaTab uses Web Workers to do all rendering and audio synthesis operations in the background without blocking the browser window. 
-
-To do this, alphaTab is launching a Web Worker with the JavaScript file it is contained in. If AlphaTab is bundled together with a script
-that accesses the DOM, this will fail as soon as AlphaTab spawns a worker with the file it is contained in. 
-
-AlphaTab cannot provide an out-of-the-box solution to this problem as it strongly depends on what bundling and compilation infrastructure your project is using. 
-To avoid issues we recommend to simply include alphaTab normally in your project or ensure that your bundling system keeps alphaTab in a standalone file
-which is reachable via AJAX. 

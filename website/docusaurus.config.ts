@@ -1,11 +1,10 @@
-// @ts-check
-// Note: type annotations allow type checking and IDEs autocompletion
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
-const path = require("path");
-const fs = require("fs");
-const CopyPlugin = require("copy-webpack-plugin");
+import * as path from "path";
+import * as fs from "fs";
+import { AlphaTabWebPackPlugin } from '@coderline/alphatab/webpack'
 
 const alphaTabVersionFull = JSON.parse(
   fs.readFileSync(
@@ -21,8 +20,7 @@ if (isPreRelease) {
   alphaTabVersion = alphaTabVersionFull;
 }
 
-/** @type {import('@docusaurus/types').Config} */
-const config = {
+const config: Config = {
   title: "alphaTab",
   tagline: "Build modern music notation apps for web, desktop and mobile",
   url: "https://alphatab.net",
@@ -38,25 +36,28 @@ const config = {
     alphaTabVersionFull: alphaTabVersionFull
   },
 
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid'],
+
   presets: [
     [
       "classic",
-      /** @type {import('@docusaurus/preset-classic').Options} */
-      ({
+      {
         docs: {
-          sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/CoderLine/alphaTabWebsite/tree/master/",
+          sidebarPath: "./sidebars.ts",
+          editUrl: "https://github.com/CoderLine/alphaTabWebsite/tree/main/",
         },
         theme: {
-          customCss: require.resolve("./src/css/custom.scss"),
+          customCss: "./src/css/custom.scss",
         },
-      }),
+      } satisfies Preset.Options,
     ],
   ],
 
   themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
+    {
       docs: {
         sidebar: {
           hideable: true
@@ -121,19 +122,19 @@ const config = {
         style: "dark",
         links: [
           {
-            title: "Docs",
+            title: "Docs", 
             items: [
               {
                 label: "Introduction",
                 to: "docs/introduction",
               },
-              {
+              { 
                 label: "Installation",
                 to: "docs/getting-started/installation-web",
               },
               {
                 label: "AlphaTex",
-                to: "docs/alphaTex/introduction",
+                to: "docs/alphatex/introduction",
               },
             ],
           },
@@ -154,18 +155,18 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} Daniel Kuschny and Contributors`,
       },
       prism: {
-        theme: lightCodeTheme,
-        darkCodeTheme: darkCodeTheme,
+        theme: prismThemes.github,
+        darkTheme: prismThemes.dracula,
         additionalLanguages: ["csharp"],
       },
       colorMode: {
         disableSwitch: true,
       },
-    }),
+    } satisfies Preset.ThemeConfig,
 
   plugins: [
     "docusaurus-plugin-sass",
-    require.resolve('./plugins/docusaurus-lunr-search'),
+    require.resolve('docusaurus-lunr-search'),
     () => ({
       name: "docusaurus-customization",
       injectHtmlTags() {
@@ -173,24 +174,11 @@ const config = {
       },
       configureWebpack(config, isServer, options) {
         return {
-          module: {
-            rules: [
-              {
-                test: /\.sf2/,
-                type: "asset/resource",
-              },
-            ],
-          },
           plugins: [
             // Copy the Font and SoundFont Files to the output
-            new CopyPlugin({
-              patterns: [
-                {
-                  from: "node_modules/@coderline/alphatab/dist/font/*.*",
-                  to: path.resolve(config.output.path, "font", "[name][ext]"),
-                },
-              ],
-            }),
+            new AlphaTabWebPackPlugin({ 
+              assetOutputDir: config.output.path
+            })
           ],
           resolve: {
             fallback: {
@@ -205,7 +193,7 @@ const config = {
               constants: false,
               child_process: false,
               module: false,
-            },
+            }
           },
         };
       },
@@ -213,4 +201,4 @@ const config = {
   ],
 };
 
-module.exports = config;
+export default config;
