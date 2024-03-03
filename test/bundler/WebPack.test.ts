@@ -1,3 +1,4 @@
+/**@target web */
 import { AlphaTabWebPackPlugin } from '../../src/alphaTab.webpack';
 import webpack from 'webpack';
 import path from 'path'
@@ -16,7 +17,7 @@ describe('WebPack', () => {
                         app: './src/app.mjs'
                     },
                     output: {
-                        filename: "[name].js",
+                        filename: "[name]-[contenthash:8].js",
                         path: path.resolve('./out')
                     },
                     plugins: [

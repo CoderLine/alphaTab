@@ -86,6 +86,20 @@ export default class CSharpAstTransformer {
         const testClasses: ts.CallExpression[] = [];
         const globalExports: ts.ExportDeclaration[] = [];
 
+        switch (this._typeScriptFile.statements[0].kind) {
+            case ts.SyntaxKind.ClassDeclaration:
+            case ts.SyntaxKind.InterfaceDeclaration:
+            case ts.SyntaxKind.FunctionDeclaration:
+            case ts.SyntaxKind.EnumDeclaration:
+            case ts.SyntaxKind.TypeAliasDeclaration:
+                break;
+            default:
+                if (this.shouldSkip(this._typeScriptFile.statements[0], false)) {
+                    return;
+                }
+                break;
+        }
+
         this._typeScriptFile.statements.forEach(s => {
             if (ts.isExportDeclaration(s)) {
                 globalExports.push(s);
