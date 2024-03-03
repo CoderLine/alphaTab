@@ -7,7 +7,7 @@ const ignoredFiles = [
 
 export function transpileFilter(file: string): boolean {
     const fileName = path.basename(file);
-    return !!ignoredFiles.find(e => e.exec(fileName));
+    return !ignoredFiles.find(e => e.exec(fileName));
 }
 
 export function setMethodBody(m: ts.MethodDeclaration, body: ts.FunctionBody): ts.MethodDeclaration {
