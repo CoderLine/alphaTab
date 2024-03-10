@@ -12,6 +12,12 @@ import { SinceBadge } from '@site/src/components/SinceBadge';
 **TL;DR:**  AlphaTab comes with a WebPack 5 plugin which should be added to your WebPack config to guarantee compatibility. 
 ```js
 import { AlphaTabWebPackPlugin } from '@coderline/alphatab/webpack';
+
+const webpackConfig =  {
+    plugins: [
+        new AlphaTabWebPackPlugin()
+    ]
+}
 ```
 :::
 
@@ -60,15 +66,15 @@ const config = {
 };
 ```
 
-# Configure Plugin
+## Configure Plugin
 
 The plugin behavior can be configured and customized depending on needs. 
 
 <Tabs defaultValue="source-dir" values={[
     { label: "alphaTab source directory", value: "source-dir"},
-    { label: "Chunk configuration", value: "chunk"},
     { label: "Asset copy", value: "assets"},
     { label: "Audio Worklets", value: "worklets"},
+    { label: "Web Workers", value: "workers"},
 ]}>
 
 <TabItem value="source-dir">
@@ -130,7 +136,7 @@ new AlphaTabWebPackPlugin({
 
 <TabItem value="worklets">
 
-WebPack comes with built-in support for Web Workers and alphaTab, but [not for Audio Worklets](https://github.com/webpack/webpack/issues/11543). 
+WebPack comes with built-in support for Web Workers but [not for Audio Worklets](https://github.com/webpack/webpack/issues/11543). 
 To bridge that gap until maybe the feature will be supported officially in WebPack, alphaTab ships this functionality itself.
 
 If there are problems with this feature or an alternative plugin is used for audio worklet support, this feature can be disabled:
@@ -142,10 +148,81 @@ new AlphaTabWebPackPlugin({
 ```
 
 :::warning 
-If this audio worklet support is disabled this might break the audio playback through worklets. You might configure alphaTab to use the 
-[`player.outputMode`](/docs/reference/settings/player/outputmode) of alphaTab to use always the ScriptProcessorNode.
+If this audio worklet support is disabled this might break the audio playback through worklets. You might configure
+[`player.outputMode`](/docs/reference/settings/player/outputmode) to use always the ScriptProcessorNode.
+:::
+
+</TabItem>
+
+<TabItem value="workers">
+
+WebPack comes with built-in support for Web Workers in some frameworks like Angular it might be disabled and its cumbersome to reenable it. 
+Hence alphaTab comes with a custom handler which ensures the WebWorker functionality works. 
+
+If there are problems with this feature or an alternative plugin is used for worker support, this feature can be disabled:
+
+```js
+new AlphaTabWebPackPlugin({
+    webWorkers: false
+})
+```
+
+:::warning 
+If this web worker support is disabled this might break the rendering audio playback through workers. You might configure  
+[`core.useWorkers`](/docs/reference/settings/core/useworkers) to use always the main thread. 
+The UI responsiveness and generally experienced performance might be degraded heavily by this. 
 :::
 
 </TabItem>
 
 </Tabs>
+
+## Angular
+
+Unfortunately Angular does not provide an out-of-the-box way to customize the used WebPack config and therefore it can be a bit tricky to get 
+the alphaTab plugin into place. The [`@angular-builders/custom-webpack`](https://www.npmjs.com/package/@angular-builders/custom-webpack) enables adding custom webpack configs.
+
+In our [Angular sample](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/webpack-angular) was created like this: 
+
+1. Create a new angular app via 
+    * `ng new alphatab-app`
+2. Install the package to enable custom webpack configs: 
+    * `npm i -D @angular-builders/custom-webpack`
+3. Modify the angular.json to enable the custom webpack config: 
+```diff
+{
+  "projects": {
+    "alphatab-app": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+-          "builder": "@angular-devkit/build-angular:application",
++          "builder": "@angular-builders/custom-webpack:browser",
++          "options": {
++            "customWebPackConfig": {
++              "path": "./custom-webpack.config.js"
++            }
+...
+        "serve": {
+-          "builder": "@angular-devkit/build-angular:dev-server",
++          "builder": "@angular-builders/custom-webpack:dev-server",
++          "options": {
++            "buildTarget": "alphatab-app:build"
++          },
+```
+4. Add a `custom-webpack.config.js` and add the alphaTab Plugin
+```js
+const { AlphaTabWebPackPlugin } = require('@coderline/alphatab/webpack');
+
+module.exports = {
+    plugins: [
+        new AlphaTabWebPackPlugin()
+    ]
+};
+```
+
+
