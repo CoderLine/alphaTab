@@ -662,6 +662,11 @@ export class Environment {
     /**
      * @target web
      */
+    public static get alphaTabWorker(): any { return this.globalThis.Worker };
+
+    /**
+     * @target web
+     */
     public static initializeWorker() {
         if (!Environment.isRunningInWorker) {
             throw new AlphaTabError(AlphaTabErrorType.General, "Not running in worker, cannot run worker initialization");

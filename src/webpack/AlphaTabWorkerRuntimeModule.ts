@@ -1,11 +1,11 @@
 /**@target web */
 import webpack from 'webpack'
 
-export class AlphaTabWorkletRuntimeModule extends webpack.RuntimeModule {
-    public static Key: string = "AlphaTabWorkletRuntime";
+export class AlphaTabWorkerRuntimeModule extends webpack.RuntimeModule {
+    public static Key: string = "AlphaTabWorkerRuntime";
 
     constructor() {
-        super("alphaTab audio worklet chunk loading", webpack.RuntimeModule.STAGE_BASIC);
+        super("alphaTab audio worker chunk loading", webpack.RuntimeModule.STAGE_BASIC);
     }
 
     override generate(): string | null {
