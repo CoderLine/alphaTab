@@ -6,8 +6,8 @@ import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import { ModuleFormat, RollupOptions } from 'rollup';
 
-import esm from './rollup.config.esm'
-import cjs from './rollup.config.cjs'
+import esm from './rollup.config.esm';
+import cjs from './rollup.config.cjs';
 
 function getGitBranch(): string {
     const filepath = '.git/HEAD';
@@ -35,7 +35,7 @@ const importMetaPlugin = {
 
 const bundlePlugins = [
     typescript({
-        tsconfig: "./tsconfig.build.json",
+        tsconfig: './tsconfig.build.json',
         outputToFilesystem: true
     }),
     license({
@@ -97,9 +97,7 @@ export default [
                 format: 'es'
             }
         ],
-        external: [
-            "webpack",
-        ],
+        external: ['webpack'],
         plugins: [
             dts(),
             resolve({
@@ -114,28 +112,19 @@ export default [
         input: 'src/alphaTab.webpack.ts',
         output: [
             {
-                name: "alphaTabWebPack",
+                name: 'alphaTabWebPack',
                 file: 'dist/alphaTab.webpack.js',
                 plugins: [importMetaPlugin],
                 sourcemap: true,
                 format: 'cjs'
             }
         ],
-        external: [
-            "webpack",
-            "webpack/lib/ModuleTypeConstants",
-            "webpack/lib/util/makeSerializable",
-            "fs",
-            "path"
-        ],
+        external: ['webpack', 'webpack/lib/ModuleTypeConstants', 'webpack/lib/util/makeSerializable', 'fs', 'path'],
         watch: {
             include: ['src/alphaTab.webpack.ts'],
             exclude: 'node_modules/**'
         },
-        plugins: [
-            ...bundlePlugins,
-            commonjs()
-        ]
+        plugins: [...bundlePlugins, commonjs()]
     },
     !isWatch && {
         input: 'src/alphaTab.webpack.ts',
@@ -147,30 +136,27 @@ export default [
                 format: 'es'
             }
         ],
-        external: [
-            "webpack",
-            "webpack/lib/ModuleTypeConstants",
-            "webpack/lib/util/makeSerializable",
-            "fs",
-            "path"
-        ],
+        external: ['webpack', 'webpack/lib/ModuleTypeConstants', 'webpack/lib/util/makeSerializable', 'fs', 'path'],
         watch: {
             include: ['src/alphaTab.webpack.ts'],
             exclude: 'node_modules/**'
         },
-        plugins: [
-            ...bundlePlugins
-        ]
+        plugins: [...bundlePlugins]
     }
-
-].filter(x => x).map(x => {
-    return {
-        ...x as RollupOptions,
-        onLog: (level, log, handler) => {
-            if (log.code === 'CIRCULAR_DEPENDENCY') {
-                return; // Ignore circular dependency warnings
+]
+    .filter(x => x)
+    .map(x => {
+        const c = {
+            ...(x as RollupOptions),
+            onLog: (level, log, handler) => {
+                if (log.code === 'CIRCULAR_DEPENDENCY') {
+                    return; // Ignore circular dependency warnings
+                }
+                handler(level, log);
             }
-            handler(level, log);
+        } as RollupOptions;
+        if (c.watch) {
+            c.watch.clearScreen = false;
         }
-    } as RollupOptions
-});
+        return c;
+    });
