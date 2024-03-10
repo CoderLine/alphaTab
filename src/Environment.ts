@@ -662,7 +662,7 @@ export class Environment {
     /**
      * @target web
      */
-    public static get alphaTabWorker(): any { return this.globalThis.Worker };
+    public static get alphaTabWorker(): any { return this.globalThis.Worker }
 
     /**
      * @target web
