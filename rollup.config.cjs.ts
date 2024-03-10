@@ -10,9 +10,14 @@ const importMetaPlugin = {
 /**
  * Creates the ESM flavor configurations for alphaTab
  */
-export default function cjs(isWatch: boolean, commonOutput: Partial<OutputOptions>, bundlePlugins: Plugin[]): (RollupOptions|boolean)[] {
+export default function cjs(
+    isWatch: boolean,
+    commonOutput: Partial<OutputOptions>,
+    bundlePlugins: Plugin[]
+): (RollupOptions | boolean)[] {
+    const withCjs = !isWatch || !!process.env.ALPHATAB_CJS;
     return [
-        !isWatch && {
+        withCjs && {
             input: `src/alphaTab.main.ts`,
             output: [
                 {
@@ -30,9 +35,7 @@ export default function cjs(isWatch: boolean, commonOutput: Partial<OutputOption
                 include: ['src/**'],
                 exclude: 'node_modules/**'
             },
-            plugins: [
-                ...bundlePlugins,
-            ]
+            plugins: [...bundlePlugins]
         }
-    ]
-} 
+    ];
+}
