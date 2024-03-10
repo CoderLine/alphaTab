@@ -2,6 +2,7 @@ import express from 'express';
 import opener from 'opener';
 import fs from 'fs';
 import path from 'path';
+import cors from 'cors';
 
 export interface ServerOptions {
     port: number,
@@ -16,6 +17,8 @@ export default function server(options: ServerOptions) {
 
     app = express();
 
+    app.use(cors());
+    
     const exposedFolders = [
         'dist',
         'src',

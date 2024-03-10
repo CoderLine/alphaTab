@@ -618,6 +618,10 @@ export class Environment {
         createWebWorker: (settings: Settings) => Worker,
         createAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>
     ) {
+        if(Environment.isRunningInWorker || Environment.isRunningInAudioWorklet) {
+            return;
+        }
+        
         // browser polyfills
         if (
             Environment.webPlatform === WebPlatform.Browser ||
