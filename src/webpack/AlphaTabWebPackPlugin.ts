@@ -2,57 +2,21 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import webpack from 'webpack'
+
+// webpack doesn't defined properly types for all these internals 
+// needed for the plugin
+
+// @ts-expect-error
 import { contextify } from "webpack/lib/util/identifier"
 
-import {
-    JAVASCRIPT_MODULE_TYPE_AUTO,
-    JAVASCRIPT_MODULE_TYPE_ESM
-} from "webpack/lib/ModuleTypeConstants";
+// @ts-expect-error
+import WorkerPlugin from 'webpack/lib/dependencies/WorkerPlugin'
 
-import { type VariableDeclarator, type Identifier, type Expression, type CallExpression, type NewExpression } from 'estree'
-import { AlphaTabWorkletDependency } from './AlphaTabWorkletDependency'
-import { AlphaTabWorkletRuntimeModule } from './AlphaTabWorkletRuntimeModule'
+import { AlphaTabWorkerRuntimeModule } from './AlphaTabWorkerRuntimeModule'
 import { AlphaTabWorkletStartRuntimeModule } from './AlphaTabWorkletStartRuntimeModule'
-
-export interface AlphaTabWebPackPluginChunkOptions {
-    name?: string;
-    minSize?: number;
-    priority?: number;
-}
-
-export interface AlphaTabWebPackPluginOptions {
-    /**
-     * The location where alphaTab can be found.
-     * (default: node_modules/@coderline/alphatab/dist)
-     */
-    alphaTabSourceDir?: string;
-    /**
-     * The options related to the chunk into which alphaTab is placed in case
-     * Webpack is configured with optimization.splitChunks.cacheGroups
-     * 
-     * (default: { name: "chunk-alphatab", minSize: 0, priority: 10 })
-     */
-    alphaTabChunk?: AlphaTabWebPackPluginChunkOptions | false;
-
-    /**
-     * The location where assets of alphaTab should be placed. 
-     * Set it to false to disable the copying of assets like fonts.
-     * (default: compiler.options.output.path)
-     */
-    assetOutputDir?: string | false;
-
-    /**
-     * Whether alphaTab should configure the audio worklet support in WebPack.
-     * This might break support for audio playback unless audio worklet support is added
-     * through other means to WebPack. 
-     * (default: true)
-     */
-    audioWorklets?: boolean;
-}
-
-const AlphaTabWorkletSpecifierTag = Symbol("alphatab worklet specifier tag");
-
-const workletIndexMap = new WeakMap<webpack.ParserState, number>();
+import { configureAudioWorklet } from './AlphaTabAudioWorklet';
+import { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions'
+import { configureWebWorker } from './AlphaTabWebWorker'
 
 export class AlphaTabWebPackPlugin {
     options: AlphaTabWebPackPluginOptions;
@@ -62,13 +26,12 @@ export class AlphaTabWebPackPlugin {
     }
 
     apply(compiler: webpack.Compiler) {
-        this.configureChunk(compiler);
         this.configureSoundFont(compiler);
         this.configure(compiler);
     }
 
     configureSoundFont(compiler: webpack.Compiler) {
-        if(this.options.assetOutputDir === false) {
+        if (this.options.assetOutputDir === false) {
             return;
         }
 
@@ -89,12 +52,29 @@ export class AlphaTabWebPackPlugin {
         );
 
         compiler.hooks.thisCompilation.tap(pluginName, (compilation, { normalModuleFactory }) => {
-            this.configureAudioWorklet(pluginName, compiler, compilation, normalModuleFactory, cachedContextify);
+
+
+            compilation.hooks.runtimeRequirementInTree
+                .for(AlphaTabWorkerRuntimeModule.Key)
+                .tap(pluginName, (chunk: webpack.Chunk) => {
+                    compilation.addRuntimeModule(chunk, new AlphaTabWorkerRuntimeModule());
+                });
+
+            compilation.hooks.runtimeRequirementInTree
+                .for(AlphaTabWorkletStartRuntimeModule.RuntimeGlobalWorkletGetStartupChunks)
+                .tap(pluginName, (chunk: webpack.Chunk) => {
+                    compilation.addRuntimeModule(chunk, new AlphaTabWorkletStartRuntimeModule());
+                });
+
+
+            configureAudioWorklet(pluginName, this.options, compiler, compilation, normalModuleFactory, cachedContextify);
+            configureWebWorker(pluginName, this.options, compiler, compilation, normalModuleFactory, cachedContextify);
             this.configureAssetCopy(pluginName, compiler, compilation);
         });
     }
+
     configureAssetCopy(pluginName: string, compiler: webpack.Compiler, compilation: webpack.Compilation) {
-        if(this.options.assetOutputDir === false) {
+        if (this.options.assetOutputDir === false) {
             return;
         }
 
@@ -164,162 +144,5 @@ export class AlphaTabWebPackPlugin {
                 callback();
             }
         );
-    }
-    configureAudioWorklet(pluginName: string, compiler: webpack.Compiler, compilation: webpack.Compilation, normalModuleFactory: any, cachedContextify: (s: string) => string) {
-        if(this.options.audioWorklets === false) {
-            return;
-        }
-
-        compilation.dependencyFactories.set(
-            AlphaTabWorkletDependency,
-            normalModuleFactory
-        );
-        compilation.dependencyTemplates.set(
-            AlphaTabWorkletDependency,
-            new AlphaTabWorkletDependency.Template()
-        );
-
-        compilation.hooks.runtimeRequirementInTree
-            .for(AlphaTabWorkletRuntimeModule.Key)
-            .tap(pluginName, (chunk: webpack.Chunk) => {
-                compilation.addRuntimeModule(chunk, new AlphaTabWorkletRuntimeModule());
-            });
-
-        compilation.hooks.runtimeRequirementInTree
-            .for(AlphaTabWorkletStartRuntimeModule.RuntimeGlobalWorkletGetStartupChunks)
-            .tap(pluginName, (chunk: webpack.Chunk) => {
-                compilation.addRuntimeModule(chunk, new AlphaTabWorkletStartRuntimeModule());
-            });
-
-        const parseModuleUrl = (parser: any, expr: Expression) => {
-            if (expr.type !== "NewExpression" && arguments.length !== 2) {
-                return;
-            }
-
-            const newExpr = expr as NewExpression;
-            const [arg1, arg2] = newExpr.arguments;
-            const callee = parser.evaluateExpression(newExpr.callee);
-
-            if (!callee.isIdentifier() || callee.identifier !== "URL") {
-                return;
-            }
-
-            const arg1Value = parser.evaluateExpression(arg1);
-            return [
-                arg1Value,
-                [
-                    (arg1.range!)[0],
-                    (arg2.range!)[1]
-                ]
-            ];
-        }
-
-        const handleAlphaTabWorklet = (parser: any, expr: CallExpression) => {
-            const [arg1] = expr.arguments;
-            const parsedUrl = parseModuleUrl(parser, arg1 as Expression);
-            if (!parsedUrl) {
-                return;
-            }
-
-            const [url] = parsedUrl;
-            if (!url.isString()) {
-                return;
-            }
-
-            let i = workletIndexMap.get(parser.state) || 0;
-            workletIndexMap.set(parser.state, i + 1);
-            let name = `${cachedContextify(
-                parser.state.module.identifier()
-            )}|${i}`;
-            const hash = webpack.util.createHash(compilation.outputOptions.hashFunction);
-            hash.update(name);
-            const digest = hash.digest(compilation.outputOptions.hashDigest) as string;
-            const runtime = digest.slice(
-                0,
-                compilation.outputOptions.hashDigestLength
-            );
-
-            const block = new webpack.AsyncDependenciesBlock({
-                entryOptions: {
-                    chunkLoading: false,
-                    wasmLoading: false,
-                    runtime: runtime
-                }
-            });
-
-            block.loc = expr.loc;
-
-            const workletBootstrap = new AlphaTabWorkletDependency(
-                url.string,
-                [expr.range![0], expr.range![1]],
-                compiler.options.output.workerPublicPath
-             
-            );
-            workletBootstrap.loc = expr.loc!;
-            block.addDependency(workletBootstrap);
-            parser.state.module.addBlock(block);
-
-            return true;
-        };
-
-        const parserPlugin = (parser: any) => {
-            const pattern = "alphaTabWorklet";
-            const itemMembers = "addModule";
-
-            parser.hooks.preDeclarator.tap(pluginName, (decl: VariableDeclarator) => {
-                if (decl.id.type === "Identifier" && decl.id.name === pattern) {
-                    parser.tagVariable(decl.id.name, AlphaTabWorkletSpecifierTag);
-                    return true;
-                }
-                return;
-            });
-            parser.hooks.pattern.for(pattern).tap(pluginName, (pattern: Identifier) => {
-                parser.tagVariable(pattern.name, AlphaTabWorkletSpecifierTag);
-                return true;
-            });
-
-            parser.hooks.callMemberChain
-                .for(AlphaTabWorkletSpecifierTag)
-                .tap(pluginName, (expression: CallExpression, members: string[]) => {
-                    if (itemMembers !== members.join(".")) {
-                        return;
-                    }
-                    return handleAlphaTabWorklet(parser, expression);
-                });
-        };
-
-        normalModuleFactory.hooks.parser
-            .for(JAVASCRIPT_MODULE_TYPE_AUTO)
-            .tap(pluginName, parserPlugin);
-        normalModuleFactory.hooks.parser
-            .for(JAVASCRIPT_MODULE_TYPE_ESM)
-            .tap(pluginName, parserPlugin);
-    }
-
-    configureChunk(compiler: webpack.Compiler) {
-        const options = this.options;
-        let alphaTabChunk: AlphaTabWebPackPluginChunkOptions | undefined;
-        if (options.alphaTabChunk !== false) {
-            alphaTabChunk = {
-                name: "chunk-alphatab",
-                minSize: 0,
-                priority: 10,
-                ...this.options.alphaTabChunk
-            };
-        }
-
-        if (alphaTabChunk && compiler.options.optimization.splitChunks && compiler.options.optimization.splitChunks.cacheGroups) {
-            const alphaTabSourceDir = options.alphaTabSourceDir ? path.resolve(options.alphaTabSourceDir) : `node_modules${path.sep}@coderline${path.sep}alphatab`;
-            compiler.options.optimization.splitChunks.cacheGroups["alphatab"] = {
-                ...alphaTabChunk,
-                chunks: "all",
-                test(module: { resource?: string }) {
-                    if (!module.resource) {
-                        return false;
-                    }
-                    return module.resource.includes(alphaTabSourceDir);
-                }
-            }
-        }
     }
 }

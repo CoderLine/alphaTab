@@ -33,6 +33,14 @@ describe('WebPack', () => {
                             },
                         },
                     },
+                    module: {
+                        parser: {
+                            javascript: {
+                                // angular sets this to false, our plugin needs to work like this
+                                worker: false
+                            }
+                        }
+                      },
                 }, (err, stats) => {
                     process.chdir(cwd);
                     if (err) {

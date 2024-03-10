@@ -1,6 +1,6 @@
 /**@target web */
 import webpack from 'webpack'
-import { AlphaTabWorkletRuntimeModule } from './AlphaTabWorkletRuntimeModule';
+import { AlphaTabWorkerRuntimeModule } from './AlphaTabWorkerRuntimeModule';
 
 export class AlphaTabWorkletStartRuntimeModule extends webpack.RuntimeModule {
     static readonly RuntimeGlobalWorkletGetStartupChunks = "__webpack_require__.wsc";
@@ -18,7 +18,7 @@ export class AlphaTabWorkletStartRuntimeModule extends webpack.RuntimeModule {
         for (const chunk of allChunks) {
             const isWorkletEntry = chunkGraph
                 .getTreeRuntimeRequirements(chunk)
-                .has(AlphaTabWorkletRuntimeModule.Key);
+                .has(AlphaTabWorkerRuntimeModule.Key);
 
             if (isWorkletEntry) {
 

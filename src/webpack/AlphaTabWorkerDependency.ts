@@ -7,8 +7,9 @@ import { Hash, ObjectDeserializerContext, ObjectSerializerContext, makeDependenc
 
 
 /**
- * This module dependency injects the relevant code into a worklet bootstrap script
- * to install chunks which have been added to the worklet via addModule before the bootstrap script starts.
+ * This module dependency injects the relevant code into a worker bootstrap script
+ * load chunks via importScript.
+ * 
  */
 export class AlphaTabWorkletDependency extends webpack.dependencies.ModuleDependency {
     publicPath: string | undefined;

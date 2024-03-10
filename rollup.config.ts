@@ -126,7 +126,7 @@ export default [
         },
         plugins: [...bundlePlugins, commonjs()]
     },
-    !isWatch && {
+    (!isWatch || !!process.env.ALPHATAB_WEBPACK) && {
         input: 'src/alphaTab.webpack.ts',
         output: [
             {
@@ -138,7 +138,7 @@ export default [
         ],
         external: ['webpack', 'webpack/lib/ModuleTypeConstants', 'webpack/lib/util/makeSerializable', 'fs', 'path'],
         watch: {
-            include: ['src/alphaTab.webpack.ts'],
+            include: ['src/alphaTab.webpack.ts', "src/webpack/**"],
             exclude: 'node_modules/**'
         },
         plugins: [...bundlePlugins]
