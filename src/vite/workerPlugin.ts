@@ -1,3 +1,5 @@
+/**@target web */
+
 // This file contains a customized and adapted version of the Vite built-in worker plugin
 // https://github.com/vitejs/vite/blob/main/packages/vite/src/node/plugins/worker.ts
 // This is more or less a 1:1 copy of the original worker plugin with following adaptions:

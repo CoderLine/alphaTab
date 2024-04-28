@@ -1,3 +1,5 @@
+/**@target web */
+
 // This file contains a customized and adapted version of the Vite built-in workerImportMetaUrl plugin
 // https://github.com/vitejs/vite/blob/main/packages/vite/src/node/plugins/workerImportMetaUrl.ts
 // The main adaptions are:

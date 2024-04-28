@@ -1,3 +1,5 @@
+/**@target web */
+
 // The files in this folder contain a wide range of internal functions we adapted or copy/pasted from
 // vite. Many of these functions are not exposed but needed to rebuild/adapt the worker
 // plugin. We hope to get the official worker and custom syntax support into

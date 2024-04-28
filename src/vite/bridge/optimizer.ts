@@ -1,3 +1,5 @@
+/**@target web */
+
 // index.ts for more details on contents and license of this file
 
 import { DepOptimizationMetadata, InternalResolveOptions, OptimizedDepInfo, normalizePath } from 'vite';

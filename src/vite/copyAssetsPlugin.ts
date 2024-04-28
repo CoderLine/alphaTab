@@ -1,3 +1,5 @@
+/**@target web */
+
 import type { Plugin, ResolvedConfig } from './bridge';
 import * as path from 'path';
 import * as fs from 'fs';

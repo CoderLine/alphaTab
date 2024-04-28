@@ -1,3 +1,5 @@
+/**@target web */
+
 // index.ts for more details on contents and license of this file
 
 import { type InternalModuleFormat } from 'rollup';
