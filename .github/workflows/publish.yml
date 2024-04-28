@@ -30,7 +30,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "latest"
+          node-version: 'lts/*'
           cache: 'npm'
 
       - run: npm install
@@ -40,7 +40,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "latest"
+          node-version: 'lts/*'
           registry-url: https://registry.npmjs.org/
 
       - run: npm publish --access public --tag alpha
@@ -57,7 +57,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "latest"
+          node-version: 'lts/*'
           cache: 'npm'
 
       - uses: actions/setup-dotnet@v3
@@ -88,7 +88,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "latest"
+          node-version: 'lts/*'
           cache: 'npm'
 
       - uses: actions/setup-java@v3
