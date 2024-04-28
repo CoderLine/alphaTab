@@ -16,7 +16,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                 );
             }
 
-	        if (alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule || alphaTab.Environment.isWebPackBundled) {
+	        if (alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule || alphaTab.Environment.isWebPackBundled || alphaTab.Environment.isViteBundled) {
 	            alphaTab.Logger.debug("AlphaTab", "Creating webworker");
 	            return new alphaTab.Environment.alphaTabWorker(new URL('./alphaTab.worker', import.meta.url), { type: 'module' });
 	        }
@@ -48,7 +48,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                 );
             }
 
-	        if (alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule || alphaTab.Environment.isWebPackBundled) {
+	        if (alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule || alphaTab.Environment.isWebPackBundled || alphaTab.Environment.isViteBundled) {
 	            alphaTab.Logger.debug("AlphaTab", "Creating Module worklet");
 	            const alphaTabWorklet = context.audioWorklet; // this name triggers the WebPack Plugin
 	            return alphaTabWorklet.addModule(new URL('./alphaTab.worklet', import.meta.url));

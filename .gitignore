@@ -22,3 +22,5 @@ gradle-app.setting
 local.properties
 .rollup.cache
 test-data/bundler/webpack/out/
+test-data/bundler/vite/public/
+test-data/bundler/dist/public/
