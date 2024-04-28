@@ -2,6 +2,7 @@ import { Plugin, RollupOptions } from 'rollup';
 import dts from 'rollup-plugin-dts';
 import resolve from './rollup.plugin.resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 const importMetaPlugin = {
     name: 'import-meta',
@@ -25,7 +26,7 @@ export default function vite(isWatch: boolean, bundlePlugins: Plugin[]): RollupO
                     format: 'es'
                 }
             ],
-            external: ['vite', 'rollup'],
+            external: ['vite', 'rollup', 'fs'],
             plugins: [
                 dts(),
                 resolve({
@@ -47,12 +48,12 @@ export default function vite(isWatch: boolean, bundlePlugins: Plugin[]): RollupO
                     format: 'cjs'
                 }
             ],
-            external: ['vite', 'rollup', 'fs', 'path'],
+            external: ['vite', 'rollup'],
             watch: {
                 include: ['src/alphaTab.vite.ts', 'src/vite/**'],
                 exclude: 'node_modules/**'
             },
-            plugins: [...bundlePlugins, commonjs()]
+            plugins: [...bundlePlugins, commonjs(), nodeResolve()]
         },
         {
             input: 'src/alphaTab.vite.ts',
@@ -69,7 +70,7 @@ export default function vite(isWatch: boolean, bundlePlugins: Plugin[]): RollupO
                 include: ['src/alphaTab.vite.ts', 'src/vite/**'],
                 exclude: 'node_modules/**'
             },
-            plugins: [...bundlePlugins]
+            plugins: [...bundlePlugins, nodeResolve()]
         }
     ];
 }

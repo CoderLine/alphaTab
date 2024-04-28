@@ -47,7 +47,16 @@ export default function webpack(isWatch: boolean, bundlePlugins: Plugin[]): Roll
                     format: 'cjs'
                 }
             ],
-            external: ['webpack', 'webpack/lib/ModuleTypeConstants', 'webpack/lib/util/makeSerializable', 'fs', 'path'],
+            external: [
+                'webpack',
+                'webpack/lib/ModuleTypeConstants',
+                'webpack/lib/util/makeSerializable',
+                'webpack/lib/util/identifier',
+                'webpack/lib/javascript/EnableChunkLoadingPlugin',
+                'webpack/lib/dependencies/WorkerDependency',
+                'fs',
+                'path'
+            ],
             watch: {
                 include: ['src/alphaTab.webpack.ts'],
                 exclude: 'node_modules/**'
@@ -64,7 +73,16 @@ export default function webpack(isWatch: boolean, bundlePlugins: Plugin[]): Roll
                     format: 'es'
                 }
             ],
-            external: ['webpack', 'webpack/lib/ModuleTypeConstants', 'webpack/lib/util/makeSerializable', 'fs', 'path'],
+            external: [
+                'webpack',
+                'webpack/lib/ModuleTypeConstants',
+                'webpack/lib/util/makeSerializable',
+                'webpack/lib/util/identifier',
+                'webpack/lib/javascript/EnableChunkLoadingPlugin',
+                'webpack/lib/dependencies/WorkerDependency',
+                'fs',
+                'path'
+            ],
             watch: {
                 include: ['src/alphaTab.webpack.ts', 'src/webpack/**'],
                 exclude: 'node_modules/**'
