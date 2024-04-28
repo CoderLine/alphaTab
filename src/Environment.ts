@@ -200,6 +200,11 @@ export class Environment {
     /**
      * @target web
      */
+    public static isViteBundled: boolean = Environment.detectVite();
+
+    /**
+     * @target web
+     */
     public static scriptFile: string | null = Environment.detectScriptFile();
 
     /**
@@ -695,6 +700,21 @@ export class Environment {
         try {
             // @ts-ignore
             if (typeof __webpack_require__ === 'function') {
+                return true;
+            }
+        } catch (e) {
+            // ignore any errors
+        }
+        return false;
+    }
+
+    /**
+     * @target web
+     */
+    private static detectVite(): boolean {
+        try {
+            // @ts-ignore
+            if (typeof __BASE__ === 'string') {
                 return true;
             }
         } catch (e) {

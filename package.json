@@ -34,6 +34,11 @@
             "require": "./dist/alphaTab.webpack.js",
             "types": "./dist/alphaTab.webpack.d.ts"
         },
+        "./vite": {
+            "import": "./dist/alphaTab.vite.mjs",
+            "require": "./dist/alphaTab.vite.js",
+            "types": "./dist/alphaTab.vite.d.ts"
+        },
         "./soundfont/*": "./dist/soundfont/*",
         "./font/*": "./dist/font/*"
     },
@@ -86,6 +91,7 @@
         "tslib": "^2.6.2",
         "tsx": "^4.7.1",
         "typescript": "^5.3.3",
+        "vite": "^5.2.8",
         "webpack": "^5.90.3",
         "webpack-cli": "^5.1.4"
     },
