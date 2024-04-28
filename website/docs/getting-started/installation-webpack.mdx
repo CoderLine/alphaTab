@@ -41,7 +41,6 @@ WebPack might splitup and merge files which makes it impossible for alphaTab to 
 Due to this reason alphaTab ships a custom WebPack plugin which takes care of configuring WebPack automatically and ensuring that all features work as intended:
 
 * It ensures the Web Font (Bravura) and the SoundFont (SONiVOX) shipped with alphaTab are copied to the build output and made available through `<root>/font/` and `<root>/soundfont/` of your application.
-* If chunk splitting is active, it puts alphaTab into a custom chunk to ensure the code can be shared in an optimal way.
 * It ensures Web Workers and Audio Worklets are correctly configured and working. 
 
 If you are using a framework like Angular, React or Vue.js you might read in their documentation on how the WebPack settings can be customized. 
@@ -85,28 +84,6 @@ or your project structure is special, you can tell the plugin through a setting 
 ```js
 new AlphaTabWebPackPlugin({
     alphaTabSourceDir: path.resolve('../../node_modules/@coderline/alphaTab/dist')
-})
-```
-
-</TabItem>
-
-<TabItem value="chunk">
-
-If the WebPack configuration already has chunk optimization enabled through [`optimization.splitChunks.cacheGroups`](https://webpack.js.org/plugins/split-chunks-plugin/)
-alphaTab will extend this configuration to create a dedicated chunk for alphaTab.
-This customization can either be disabled or adjusted: 
-
-```js
-// disable custom chunk 
-new AlphaTabWebPackPlugin({
-    alphaTabChunk: false
-})
-// change name and priority
-new AlphaTabWebPackPlugin({
-    alphaTabChunk: {
-        name: 'vendor-alphatab',
-        priority: 100
-    }
 })
 ```
 
