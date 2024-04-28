@@ -1,9 +1,9 @@
 [versions]
-agp = "8.3.0"
-kotlin = "1.9.22"
+agp = "8.3.2"
+kotlin = "1.9.23"
 
 kotlinx-coroutines = "1.8.0"
-dokka = "1.9.10"
+dokka = "1.9.20"
 
 androidx-appcompat = "1.6.1"
 androidx-test = "1.5.0"
