@@ -4,6 +4,7 @@ import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
+import { BendPoint } from '@src/model/BendPoint';
 import { Chord } from '@src/model/Chord';
 import { Clef } from '@src/model/Clef';
 import { Duration } from '@src/model/Duration';
@@ -993,6 +994,8 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseTechnical(element: XmlNode, note: Note): void {
+        var bends: XmlNode[] = [];
+        
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -1011,13 +1014,66 @@ export class MusicXmlImporter extends ScoreImporter {
                     case 'up-bow':
                         note.beat.pickStroke = PickStroke.Up;
                         break;
+                    case 'bend' :
+                        bends.push(c)
+                        
+
+                        console.log("bend")
+                        break;
                 }
             }
+        }
+        if (bends.length > 0) {
+            this.parseBends(bends, note);
         }
         if (note.string === -2147483648 || note.fret === -2147483648) {
             note.string = -1;
             note.fret = -1;
         }
+    }
+
+    private parseBends(elements: XmlNode[], note: Note): void {
+        console.log("bendsplus" + elements.length)
+        let baseOffset= BendPoint.MaxPosition/elements.length; 
+        let currentValue = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
+        let currentOffset = 0;
+        let isFistBend = true;
+        for (let bend of elements) {
+            let bendAlterElement = bend.findChildElement("bend-alter");
+            if (bendAlterElement) {
+                let absValue = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 4);
+                if (bend.findChildElement("pre-bend")) {
+                    if (isFistBend){
+                        currentValue += absValue;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        currentOffset += baseOffset
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        isFistBend = false;
+                    }
+                }else if (bend.findChildElement("release")) {
+                    if (!isFistBend){
+                        currentValue -= absValue;
+                        currentOffset += baseOffset;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    }
+                }else { // "regular" bend
+                    if (isFistBend) {
+                        note.addBendPoint(new BendPoint(0, 0));
+                        isFistBend = false;
+                    }
+                    currentValue += absValue
+                    currentOffset += baseOffset
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                }
+            }
+            //release offset : offset / note.beat.duration * 60
+            
+        }
+        /* let bendOrigin = new BendPoint(0, 4);
+        let bendDestination = new BendPoint(BendPoint.MaxPosition, 0);
+
+        note.addBendPoint(bendOrigin)
+        note.addBendPoint(bendDestination) */
     }
 
     private parseArticulations(element: XmlNode, note: Note): void {
