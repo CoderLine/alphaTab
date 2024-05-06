@@ -1015,17 +1015,16 @@ export class MusicXmlImporter extends ScoreImporter {
                         note.beat.pickStroke = PickStroke.Up;
                         break;
                     case 'bend' :
-                        bends.push(c)
-                        
-
-                        console.log("bend")
+                        bends.push(c);
                         break;
                 }
             }
         }
+
         if (bends.length > 0) {
             this.parseBends(bends, note);
         }
+
         if (note.string === -2147483648 || note.fret === -2147483648) {
             note.string = -1;
             note.fret = -1;
@@ -1033,30 +1032,30 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseBends(elements: XmlNode[], note: Note): void {
-        console.log("bendsplus" + elements.length)
-        let baseOffset= BendPoint.MaxPosition/elements.length; 
-        let currentValue = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
-        let currentOffset = 0;
-        let isFistBend = true;
+        var baseOffset: number = BendPoint.MaxPosition / elements.length; 
+        var currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
+        var currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
+        var isFistBend: boolean = true;
+
         for (let bend of elements) {
-            let bendAlterElement = bend.findChildElement("bend-alter");
+            let bendAlterElement: XmlNode | null = bend.findChildElement("bend-alter");
             if (bendAlterElement) {
-                let absValue = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 4);
+                let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 4);
                 if (bend.findChildElement("pre-bend")) {
                     if (isFistBend){
                         currentValue += absValue;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                        currentOffset += baseOffset
+                        currentOffset += baseOffset;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
                         isFistBend = false;
                     }
-                }else if (bend.findChildElement("release")) {
+                } else if (bend.findChildElement("release")) {
                     if (!isFistBend){
                         currentValue -= absValue;
                         currentOffset += baseOffset;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
                     }
-                }else { // "regular" bend
+                } else { // "regular" bend
                     if (isFistBend) {
                         note.addBendPoint(new BendPoint(0, 0));
                         isFistBend = false;
@@ -1065,15 +1064,8 @@ export class MusicXmlImporter extends ScoreImporter {
                     currentOffset += baseOffset
                     note.addBendPoint(new BendPoint(currentOffset, currentValue));
                 }
-            }
-            //release offset : offset / note.beat.duration * 60
-            
+            }            
         }
-        /* let bendOrigin = new BendPoint(0, 4);
-        let bendDestination = new BendPoint(BendPoint.MaxPosition, 0);
-
-        note.addBendPoint(bendOrigin)
-        note.addBendPoint(bendDestination) */
     }
 
     private parseArticulations(element: XmlNode, note: Note): void {
