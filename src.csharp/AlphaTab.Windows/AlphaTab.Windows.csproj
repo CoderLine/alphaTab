@@ -7,7 +7,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <TargetFrameworks>net8.0-windows</TargetFrameworks>
+        <TargetFramework>net8.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
         <NoWarn>$(NoWarn);NU5105</NoWarn>
