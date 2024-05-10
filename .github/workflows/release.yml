@@ -9,15 +9,15 @@ jobs:
     name: Web
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
       - run: npm install
       - run: node ./scripts/update-version.js ${{github.run_number}}
       - run: npm run build
       - run: npm pack
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           registry-url: https://registry.npmjs.org/
@@ -30,13 +30,13 @@ jobs:
     name: C#
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v1
         with:
           node-version: 'lts/*'
-      - uses: actions/setup-dotnet@v3
+      - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6'
+          dotnet-version: '8'
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
       - run: npm install

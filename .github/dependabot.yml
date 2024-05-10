@@ -23,3 +23,11 @@ updates:
       - platform-java
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    labels:
+      - area-dependencies
+      - platform-all
+    schedule:
+      interval: "weekly"
