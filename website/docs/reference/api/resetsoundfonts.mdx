@@ -28,6 +28,9 @@ instead of unloading the previous SoundFonts.
     <TypeRow type="net" name="void ResetSoundFonts()">
         Unloads all presets from the previous loaded SoundFonts.
     </TypeRow>
+    <TypeRow type="android" name="fun resetSoundFonts(): Unit">
+        Unloads all presets from the previous loaded SoundFonts.
+    </TypeRow>
 </TypeTable>
 
 ### Parameters
@@ -40,13 +43,14 @@ None
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.loadSoundFont('/assets/guitars.sf2', true);
 api.loadSoundFont('/assets/pianos.sf2', true);
 // ..
@@ -75,6 +79,18 @@ api.LoadSoundFont(System.IO.File.OpenRead("pianos.sf2"), true);
 ...
 api.ResetSoundFonts();
 api.LoadSoundFont(System.IO.File.OpenRead("synths.sf2"), true);
+```
+
+</TabItem>
+<TabItem value="androi">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.loadSoundFont(readResource("guitars.sf2"), true)
+api.loadSoundFont(readResource("pianos.sf2"), true)
+...
+api.ResetSoundFonts()
+api.LoadSoundFont(readResource("synths.sf2"), true)
 ```
 
 </TabItem>

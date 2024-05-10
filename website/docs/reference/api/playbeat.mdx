@@ -26,6 +26,7 @@ It is a playback of audio separate to the main song playback.
     <TypeRow type="js" name="function playBeat(beat)" />
     <TypeRow type="jquery" name="alphaTab('playBeat', beat)" />
     <TypeRow type="net" name="void PlayBeat(Beat beat)" />
+    <TypeRow type="android" name="fun playBeat(beat: Beat): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -35,6 +36,9 @@ It is a playback of audio separate to the main song playback.
         The single beat to play.
     </ParameterRow>
     <ParameterRow platform="net" name="beat" type="AlphaTab.Model.Beat">
+        The single beat to play.
+    </ParameterRow>
+    <ParameterRow platform="android" name="beat" type="alphaTab.model.Beat">
         The single beat to play.
     </ParameterRow>
 </ParameterTable>
@@ -50,13 +54,14 @@ It is a playback of audio separate to the main song playback.
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playBeat(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0]);
 ```
 
@@ -64,7 +69,7 @@ api.playBeat(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0]);
 <TabItem value="jq">
 
 ```js
-var beat = $('#alphaTab').alphaTab('score').tracks[0].staves[0].bars[0].voices[0].beats[0];
+const beat = $('#alphaTab').alphaTab('score').tracks[0].staves[0].bars[0].voices[0].beats[0];
 $('#alphaTab').alphaTab('playBeat', beat);
 ```
 
@@ -74,6 +79,14 @@ $('#alphaTab').alphaTab('playBeat', beat);
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.PlayBeat(api.Score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0]);
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.playBeat(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0])
 ```
 
 </TabItem>

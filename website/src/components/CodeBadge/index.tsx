@@ -13,7 +13,8 @@ export type Platform =
     'json' |
     'json-html' |
     'html' |
-    'jquery';
+    'jquery' |
+    'android';
 
 export class CodeBadge extends React.Component<{ type?: Platform, name?: string }> {
     public render() {
@@ -28,6 +29,9 @@ export class CodeBadge extends React.Component<{ type?: Platform, name?: string 
                 break;
             case 'net':
                 title = '.net';
+                break;
+            case 'android':
+                title = 'Android';
                 break;
             case 'net-wf':
                 title = '.net WinForms';

@@ -25,6 +25,7 @@ for playback. If the track shares the channels with another track, all tracks wi
     <TypeRow type="js" name="function changeTrackMute(tracks, mute)" />
     <TypeRow type="jquery" name="alphaTab('muteTracks', tracks, mute)" />
     <TypeRow type="net" name="void ChangeTrackMute(Track[] tracks, bool mute)" />
+    <TypeRow type="android" name="fun changeTrackMute(tracks: alphaTab.collections.List<alphaTab.model.Track>, mute: Boolean): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -33,6 +34,9 @@ for playback. If the track shares the channels with another track, all tracks wi
         The array of tracks that should be muted.
     </ParameterRow>
     <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Tracks[]">
+        The array of tracks that should be muted.
+    </ParameterRow>
+    <ParameterRow platform="android" name="tracks" type="alphaTab.collections.List<alphaTab.model.Track>">
         The array of tracks that should be muted.
     </ParameterRow>
     <ParameterRow platform="all" name="mute" type="bool">
@@ -50,13 +54,14 @@ Nothing
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
 ```
 
@@ -64,8 +69,8 @@ api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
 <TabItem value="jq">
 
 ```js
-var at = $('#alphaTab');
-var tracks = at.alphaTab('tracks');
+const at = $('#alphaTab');
+const tracks = at.alphaTab('tracks');
 at.alphaTab('muteTracks', [tracks[0], tracks[1]], true);
 ```
 
@@ -75,6 +80,14 @@ at.alphaTab('muteTracks', [tracks[0], tracks[1]], true);
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.ChangeTrackMute(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, true);
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.changeTrackMute(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), true);
 ```
 
 </TabItem>

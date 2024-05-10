@@ -34,13 +34,14 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.tickPosition = 4000;
 ```
 
@@ -57,6 +58,14 @@ $('#alphaTab').alphaTab('tickPosition', 4000)
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.TickPosition = 4000;
+```
+
+</TabItem>
+<TabItem value="android">
+
+```csharp
+val api = AlphaTabApi<MyControl>(...)
+api.tickPosition = 4000
 ```
 
 </TabItem>

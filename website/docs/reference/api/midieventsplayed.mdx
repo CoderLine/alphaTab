@@ -32,6 +32,7 @@ until some extend but highly encourage changing to the new models in case of pro
 <TypeTable>
     <TypeRow type="js" name="function(args)" />    
     <TypeRow type="net" name="Action<MidiEventsPlayedEventArgs>" />    
+    <TypeRow type="android" name="(e: MidiEventsPlayedEventArgs) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -43,6 +44,9 @@ until some extend but highly encourage changing to the new models in case of pro
     <ParameterRow platform="net" name="args" type="AlphaTab.Synth.MidiEventsPlayedEventArgs">
         The information about the played events. 
     </ParameterRow>
+    <ParameterRow platform="android" name="args" type="alphaTab.synth.MidiEventsPlayedEventArgs">
+        The information about the played events. 
+    </ParameterRow>
 </ParameterTable>
 
 ## MidiEventsPlayedEventArgs Properties
@@ -52,6 +56,9 @@ until some extend but highly encourage changing to the new models in case of pro
         The played midi events.
     </ParameterRow>
     <ParameterRow platform="net" name="Events" type="IList<AlphaTab.Midi.MidiEvent>">
+        The current time position within the song in milliseconds.
+    </ParameterRow>
+    <ParameterRow platform="android" name="events" type="alphaTab.collections.List<alphaTab.midi.MidiEvent>">
         The current time position within the song in milliseconds.
     </ParameterRow>
 </ParameterTable>
@@ -346,13 +353,14 @@ For special alphaTab specific events (e.g. rest played, metronome tick).
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.AlphaTabMetronome];
 api.midiEventsPlayed.on(function(e) {
   for(const midi of e.events) {
@@ -394,6 +402,21 @@ api.MidiEventsPlayed.On(e =>
     }
   }
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...);
+api.midiEventsPlayedFilter = alphaTab.collections.List<alphaTab.midi.MidiEventType>( alphaTab.midi.MidiEventType.AlphaTabMetronome )
+api.midiEventsPlayed.on { e ->
+  for (midi in e.events) {
+    if(midi instanceof alphaTab.midi.AlphaTabMetronomeEvent && midi.isMetronome) {
+      println("Metronome tick " + midi.tick); 
+    }
+  }
+}
 ```
 
 </TabItem>

@@ -25,17 +25,21 @@ considered. This allows to implement scenarios where maybe the scale or the layo
 ## Types
 
 <TypeTable>
-    <TypeRow type="js" name="function(e)" />    
+    <TypeRow type="js" name="function(args)" />    
     <TypeRow type="net" name="Action<ResizeEventArgs>" />    
+    <TypeRow type="android" name="(args : ResizeEventArgs) -> Unit" />    
 </TypeTable>
 
 ## Parameters
 
 <ParameterTable>
+    <ParameterRow platform="js" name="args" type="alphaTab.ResizeEventArgs">
+        The information about the resize event.  
+    </ParameterRow>
     <ParameterRow platform="net" name="args" type="AlphaTab.ResizeEventArgs">
         The information about the resize event.  
     </ParameterRow>
-    <ParameterRow platform="js" name="args" type="alphaTab.ResizeEventArgs">
+    <ParameterRow platform="resize" name="args" type="alphaTab.ResizeEventArgs">
         The information about the resize event.  
     </ParameterRow>
 </ParameterTable>
@@ -49,16 +53,25 @@ considered. This allows to implement scenarios where maybe the scale or the layo
     <ParameterRow platform="net" name="OldWidth" type="int">
         The size before the resizing happened. 
     </ParameterRow>
+    <ParameterRow platform="android" name="oldWidth" type="int">
+        The size before the resizing happened. 
+    </ParameterRow>
     <ParameterRow platform="js" name="newWidth" type="int">
         The size after the resize was complete. 
     </ParameterRow>
     <ParameterRow platform="net" name="NewWidth" type="int">
         The size after the resize was complete. 
     </ParameterRow>
+    <ParameterRow platform="android" name="newWidth" type="int">
+        The size after the resize was complete. 
+    </ParameterRow>
     <ParameterRow platform="js" name="settings" type="AlphaTab.Settings">
         The settings currently used for rendering. 
     </ParameterRow>
     <ParameterRow platform="net" name="Settings" type="AlphaTab.Settings">
+        The settings currently used for rendering. 
+    </ParameterRow>
+    <ParameterRow platform="android" name="settings" type="alphaTab.Settings">
         The settings currently used for rendering. 
     </ParameterRow>
 </ParameterTable>
@@ -71,7 +84,8 @@ considered. This allows to implement scenarios where maybe the scale or the layo
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -90,7 +104,7 @@ api.resize.on((args) => {
 
 ```js
 $('#alphaTab').on('alphaTab.resize', (e, args) => {
-    args.settings.scale = args.newWidth > 1300 
+    args.settings.display.scale = args.newWidth > 1300 
         ? 1.5 
         : (args.newWidth > 800) ? 1.3 : 1;
 });
@@ -101,7 +115,7 @@ $('#alphaTab').on('alphaTab.resize', (e, args) => {
 
 ```js
 document.querySelector('#alphaTab').addEventListener('alphaTab.resize', function(e) {
-    e.detail.settings.scale = e.detail.newWidth > 1300 
+    e.detail.settings.display.scale = e.detail.newWidth > 1300 
         ? 1.5 
         : (args.newWidth > 800) ? 1.3 : 1;
 }, false);
@@ -114,9 +128,21 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.resize', function
 var api = new AlphaTabApi<MyControl>(...);
 api.Resize.On(args => 
 {
-    args.Settings.Scale = args.NewWidth > 1300 
-        ? 1.5f 
-        : (args.NewWidth > 800) ? 1.3f : 1;
+    args.Settings.Display.Scale = args.NewWidth > 1300 
+        ? 1.5
+        : (args.NewWidth > 800) ? 1.3 : 1;
+});
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.resize.on { args ->
+    args.settings.display.scale = args.newWidth > 1300 
+        ? 1.5 
+        : (args.newWidth > 800) ? 1.3 : 1;
 });
 ```
 

@@ -25,6 +25,7 @@ it cannot be used anymore. Any further usage leads to unexpected behavior.
     <TypeRow type="net" name="void Destroy()" />
     <TypeRow type="js" name="function destroy()" />
     <TypeRow type="jquery" name="alphaTab('destroy')" />
+    <TypeRow type="android" name="fun destroy(): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -40,13 +41,14 @@ Nothing
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.destroy();
 ```
 
@@ -63,6 +65,14 @@ $('#alphaTab').alphaTab('destroy');
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.Destroy();
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.destroy()
 ```
 
 </TabItem>

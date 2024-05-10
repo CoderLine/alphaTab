@@ -21,28 +21,35 @@ Initiates a rendering of the score.
 
 <TypeTable>
     <TypeRow type="js" name="function renderScore(score)" />
-    <TypeRow type="js" name="function renderScore(score, tracks)" />
-    <TypeRow type="jquery" name="alphaTab('renderScore', score, tracks)" />
-    <TypeRow type="jquery" name="alphaTab('renderScore', tracks)" />
+    <TypeRow type="js" name="function renderScore(score, trackIndexes)" />
+    <TypeRow type="jquery" name="alphaTab('renderScore', score, trackIndexes)" />
+    <TypeRow type="jquery" name="alphaTab('renderScore', trackIndexes)" />
     <TypeRow type="net" name="bool RenderScore(Score score)" />
-    <TypeRow type="net" name="bool RenderScore(Score score, int[] tracks)" />
+    <TypeRow type="net" name="bool RenderScore(Score score, int[] trackIndexes)" />
+    <TypeRow type="android" name="fun renderScore(score: alphaTab.model.Score, trackIndexes: alphaTab.collections.DoubleList? = null): Unit" />
 </TypeTable>
 
 ### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="net" name="score" type="AlphaTab.Model.Score">
-        The score that contains the tracks to be rendered.
-    </ParameterRow>
-    <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Track[]">
-        The indexes of the tracks that should be rendered. If not provided, the first track of the song will be rendered.
-    </ParameterRow>
     <ParameterRow platform="js" name="score" type="alphaTab.model.Score">
         The score that contains the tracks to be rendered.
     </ParameterRow>
-    <ParameterRow platform="js" name="tracks" type="alphaTab.model.Track[]">
+    <ParameterRow platform="js" name="tracks" type="number[]">
         The indexes of the tracks that should be rendered. If not provided, the first track of the song will be rendered.
     </ParameterRow>    
+    <ParameterRow platform="net" name="score" type="AlphaTab.Model.Score">
+        The score that contains the tracks to be rendered.
+    </ParameterRow>
+    <ParameterRow platform="net" name="trackIndexes" type="double[]">
+        The indexes of the tracks that should be rendered. If not provided, the first track of the song will be rendered.
+    </ParameterRow>
+    <ParameterRow platform="android" name="trackIndexes" type="alphaTab.model.Score">
+        The score that contains the tracks to be rendered.
+    </ParameterRow>
+    <ParameterRow platform="android" name="trackIndexes" type="alphaTab.collections.DoubleList">
+        The indexes of the tracks that should be rendered. If not provided, the first track of the song will be rendered.
+    </ParameterRow>
 </ParameterTable>
 
 ### Returns
@@ -55,13 +62,14 @@ Nothing
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.RenderScore(generateScore(),[ 2, 3 ]);
 ```
 
@@ -69,8 +77,8 @@ api.RenderScore(generateScore(),[ 2, 3 ]);
 <TabItem value="jq">
 
 ```js
-var at = $('#alphaTab');
-var score = at.alphaTab('score');
+const at = $('#alphaTab');
+const score = at.alphaTab('score');
 at.alphaTab('renderScore', generateScore(), [ 2, 3 ]);
 ```
 
@@ -79,7 +87,15 @@ at.alphaTab('renderScore', generateScore(), [ 2, 3 ]);
 
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
-api.RenderScore(GenerateScore(), new [] { 2, 3 });
+api.RenderScore(GenerateScore(), new double[] { 2, 3 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.renderScore(generateScore(), alphaTab.collections.DoubleList(2, 3));
 ```
 
 </TabItem>

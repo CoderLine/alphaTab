@@ -27,6 +27,7 @@ This allows any modification of the score before further processing.
 <TypeTable>
     <TypeRow type="js" name="function(score)" />    
     <TypeRow type="net" name="Action<AlphaTab.Model.Score>" />    
+    <TypeRow type="android" name="(score: AlphaTab.Model.Score) : Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -35,7 +36,10 @@ This allows any modification of the score before further processing.
     <ParameterRow platform="js" name="score" type="alphaTab.model.Score">
         The score that was loaded with applied transpositions. 
     </ParameterRow>
-    <ParameterRow platform="all" name="score" type="AlphaTab.Model.Score">
+    <ParameterRow platform="net" name="score" type="AlphaTab.Model.Score">
+        The score that was loaded with applied transpositions. 
+    </ParameterRow>
+    <ParameterRow platform="android" name="score" type="alphaTab.model.Score">
         The score that was loaded with applied transpositions. 
     </ParameterRow>
 </ParameterTable>
@@ -48,7 +52,8 @@ This allows any modification of the score before further processing.
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -87,6 +92,16 @@ api.ScoreLoaded.On(score =>
 {
     UpdateSongInformationInUi(score);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.scoreLoaded.on { score ->
+    updateSongInformationInUi(score)
+}
 ```
 
 </TabItem>

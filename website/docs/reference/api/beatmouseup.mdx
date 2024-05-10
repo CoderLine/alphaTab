@@ -27,6 +27,7 @@ The parameter is null if the mouse was released somewhere beside the beat.
 <TypeTable>
     <TypeRow type="js" name="function(beat, originalEvent)" />    
     <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
+    <TypeRow type="android" name="(beat : alphaTab.model.Beat) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -43,6 +44,10 @@ The parameter is null if the mouse was released somewhere beside the beat.
     <ParameterRow platform="js-jquery" name="originalEvent" type="MouseEvent">
         The original mouse event that lead to trigger of the beat event. For the DOM event it is stored in the event.originalEvent.
     </ParameterRow>
+    <ParameterRow platform="android" name="beat" type="alphaTab.model.Beat">
+        Beat on which the mouse was released over after mouse down.
+        Might be null if no beat could be found in near location.
+    </ParameterRow>
 </ParameterTable>
 
 ## Examples
@@ -53,7 +58,8 @@ The parameter is null if the mouse was released somewhere beside the beat.
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -95,6 +101,16 @@ api.BeatMouseUp.On(beat =>
 {
     HideSelection(beat);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.beatMouseUp.on { beat ->
+    hideSelection(beat)
+}
 ```
 
 </TabItem>

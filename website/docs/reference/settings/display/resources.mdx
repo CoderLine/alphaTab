@@ -118,6 +118,7 @@ export function ResourceRow({resource, type}) {
                 <CodeBadge type="json" name={resource.name} /><br />
                 <CodeBadge type="html" name={resource.name.toLowerCase()} /><br />
                 <CodeBadge type="net" name={toPascalCase(resource.name)} />
+                <CodeBadge type="android" name={resource.name} />
             </td>
             <td>
                 <CodeBadge type="all" name={type} />
@@ -167,6 +168,7 @@ Due to space reasons in the following table the common prefix of the settings ar
 | HTML       | `data-display-resources-` | `<div data-display-resources-wordsfont="...">`                     |
 | HTML       | `data-resources-`         | `<div data-resources-wordsfont="...">`                             |
 | .net       | `Display.Resources.`      | `settings.Display.Resources.WordsFonts = ...`                      |
+| Android    | `display.resources.`      | `settings.display.resources.wordsFonts = ...`                      |
 
 
 ## Resources

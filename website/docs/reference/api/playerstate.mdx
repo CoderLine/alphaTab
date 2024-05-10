@@ -29,6 +29,7 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
         `1` for playing
     </TypeRow>
     <TypeRow type="net" name="AlphaTab.Synth.PlayerState" />
+    <TypeRow type="android" name="alphaTab.synth.PlayerState" />
 </TypeTable>
 
 ## Examples
@@ -38,13 +39,14 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 if(api.playerState != alphaTab.synth.PlayerState.Playing) api.play();
 ```
 
@@ -52,7 +54,7 @@ if(api.playerState != alphaTab.synth.PlayerState.Playing) api.play();
 <TabItem value="jq">
 
 ```js
-var at = $('#alphaTab');
+const at = $('#alphaTab');
 if(at.alphaTab('playerState') != alphaTab.synth.PlayerState.Playing) at.alphaTab('play');
 ```
 
@@ -62,6 +64,14 @@ if(at.alphaTab('playerState') != alphaTab.synth.PlayerState.Playing) at.alphaTab
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 if(api.PlayerState != PlayerState.Playing) api.Play();
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+if (api.playerState != PlayerState.Playing) api.play()
 ```
 
 </TabItem>

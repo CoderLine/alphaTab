@@ -26,6 +26,7 @@ If the track shares the channels with another track, all related tracks will be 
     <TypeRow type="js" name="function changeTrackSolo(tracks, solo)" />
     <TypeRow type="jquery" name="alphaTab('soloTracks', tracks, solo)" />
     <TypeRow type="net" name="void ChangeTrackSolo(Track[] tracks, bool solo)" />
+    <TypeRow type="android" name="fun changeTrackSolo(tracks: alphaTab.collections.List<alphaTab.model.Track>, solo: Boolean): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -35,6 +36,9 @@ If the track shares the channels with another track, all related tracks will be 
         The array of tracks that should be played solo.
     </ParameterRow>
     <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Tracks[]">
+        The array of tracks that should be played solo.
+    </ParameterRow>
+    <ParameterRow platform="android" name="tracks" type="alphaTab.collections.List<alphaTab.model.Track>">
         The array of tracks that should be played solo.
     </ParameterRow>
     <ParameterRow platform="all" name="solo" type="bool">
@@ -52,13 +56,14 @@ Nothing
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.changeTrackSolo([api.score.tracks[0], api.score.tracks[1]], true);
 ```
 
@@ -66,8 +71,8 @@ api.changeTrackSolo([api.score.tracks[0], api.score.tracks[1]], true);
 <TabItem value="jq">
 
 ```js
-var at = $('#alphaTab');
-var tracks = at.alphaTab('tracks');
+const at = $('#alphaTab');
+const tracks = at.alphaTab('tracks');
 at.alphaTab('soloTracks', [tracks[0], tracks[1]], true);
 ```
 
@@ -78,6 +83,14 @@ at.alphaTab('soloTracks', [tracks[0], tracks[1]], true);
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.ChangeTrackSolo(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, true);
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.changeTrackSolo(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), true);
 ```
 
 </TabItem>

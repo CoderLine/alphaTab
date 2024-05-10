@@ -25,6 +25,7 @@ This event is fired whenever a the user presses the mouse button on a beat.
 <TypeTable>
     <TypeRow type="js" name="function(beat, originalEvent)" />    
     <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
+    <TypeRow type="android" name="(beat: alphaTab.model.Beat) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -37,7 +38,10 @@ This event is fired whenever a the user presses the mouse button on a beat.
         The original mouse event that lead to trigger of the beat event. For the DOM event it is stored in the event.originalEvent.
     </ParameterRow>
     <ParameterRow platform="net" name="beat" type="AlphaTab.Model.Beat">
-        The new beat that is now being played..
+        The new beat that is now being played.
+    </ParameterRow>
+    <ParameterRow platform="android" name="beat" type="alphaTab.model.Beat">
+        The new beat that is now being played.
     </ParameterRow>
 </ParameterTable>
 
@@ -49,7 +53,8 @@ This event is fired whenever a the user presses the mouse button on a beat.
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -91,6 +96,16 @@ api.BeatMouseDown.On(beat =>
 {
     StartSelectionOnBeat(args);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.beatMouseDown.on { beat ->
+    startSelectionOnBeat(args)
+}
 ```
 
 </TabItem>

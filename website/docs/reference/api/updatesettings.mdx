@@ -24,6 +24,7 @@ to trigger an update of the settings in all components. Then a re-rendering can 
     <TypeRow type="js" name="function updateSettings()" />
     <TypeRow type="jquery" name="alphaTab('updateSettings')" />
     <TypeRow type="net" name="void UpdateSettings()" />
+    <TypeRow type="android" name="fun updateSettings(): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -39,14 +40,15 @@ Nothing
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-api.settings.scale = 2.0;
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.settings.display.scale = 2.0;
 api.updateSettings();
 api.render();
 ```
@@ -55,8 +57,8 @@ api.render();
 <TabItem value="jq">
 
 ```js
-var at = $('#alphaTab');
-at.alphaTab('settings').scale = 2.0;
+const at = $('#alphaTab');
+at.alphaTab('settings').display.scale = 2.0;
 at.alphaTab('updateSettings');
 at.alphaTab('render');
 ```
@@ -67,9 +69,20 @@ at.alphaTab('render');
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 
-api.Settings.Scale = 2.0;
+api.Settings.Display.Scale = 2.0;
 api.UpdateSettings();
 api.Render()
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+
+api.settings.display.scale = 2.0
+api.updateSettings()
+api.render()
 ```
 
 </TabItem>

@@ -26,6 +26,7 @@ the display component to visually display the rendered components when this even
 <TypeTable>
     <TypeRow type="js" name="function()" />    
     <TypeRow type="net" name="Action" />    
+    <TypeRow type="android" name="() -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -39,7 +40,8 @@ None
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -78,6 +80,16 @@ api.RenderFinished.On(() =>
 {
     UpdateProgressBar("Finishing");
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.renderFinished.on { 
+    updateProgressBar("Finishing")
+}
 ```
 
 </TabItem>

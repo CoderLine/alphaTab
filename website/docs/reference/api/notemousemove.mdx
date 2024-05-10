@@ -27,6 +27,7 @@ only then this hit detection can be done. A move on a note is considered if the 
 <TypeTable>
     <TypeRow type="js" name="function(note)" />    
     <TypeRow type="net" name="Action<AlphaTab.Model.Note>" />    
+    <TypeRow type="android" name="(note : alphaTab.model.Note) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -38,6 +39,9 @@ only then this hit detection can be done. A move on a note is considered if the 
     <ParameterRow platform="net" name="note" type="AlphaTab.Model.Note">
         Note on which the mouse was hovered over during mouse down. 
     </ParameterRow>
+    <ParameterRow platform="android" name="note" type="alphaTab.model.Note">
+        Note on which the mouse was hovered over during mouse down. 
+    </ParameterRow>
 </ParameterTable>
 
 ## Examples
@@ -47,7 +51,8 @@ only then this hit detection can be done. A move on a note is considered if the 
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -78,6 +83,16 @@ api.NoteMouseMove.On(note =>
 {
     ChangeNote(note);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.noteMouseMove.on { note -> 
+    changeNote(note)
+}
 ```
 
 </TabItem>

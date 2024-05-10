@@ -25,6 +25,7 @@ This event is fired when the Midi file needed for playback was loaded.
 <TypeTable>
     <TypeRow type="js" name="function(args)" />    
     <TypeRow type="net" name="Action<PositionChangedEventArgs>" />    
+    <TypeRow type="android" name="(e: PositionChangedEventArgs) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -34,6 +35,9 @@ This event is fired when the Midi file needed for playback was loaded.
     </ParameterRow>
     <ParameterRow platform="net" name="args" type="AlphaTab.Synth.PositionChangedEventArgs">
         The information about the song duration. <span class="badge badge--info">since 1.2.0-alpha.97</span>
+    </ParameterRow>
+    <ParameterRow platform="android" name="args" type="alphaTab.synth.PositionChangedEventArgs">
+        The information about the song duration.
     </ParameterRow>
 </ParameterTable>
 
@@ -49,7 +53,8 @@ See [`playerPositionChanged`](/docs/reference/api/playerpositionchanged)
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -93,6 +98,17 @@ api.MidiLoaded.On(e =>
     HideGeneratingAudioIndicator();
     UpdateSongDuration(e.EndTime);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.midiLoaded.on { e ->
+    hideGeneratingAudioIndicator()
+    updateSongDuration(e.endTime)
+}
 ```
 
 </TabItem>

@@ -25,6 +25,7 @@ If the track shares the channels with another track, all related tracks will be 
     <TypeRow type="js" name="function changeTrackVolume(tracks, volume)" />
     <TypeRow type="net" name="void ChangeTrackVolume(Track[] tracks, double volume)" />
     <TypeRow type="jquery" name="alphaTab('trackVolume', tracks, volume)" />
+    <TypeRow type="android" name="fun changeTrackVolume(tracks: alphaTab.collections.List<alphaTab.model.Track>, volume: Double): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -34,6 +35,9 @@ If the track shares the channels with another track, all related tracks will be 
         The array of tracks that should be changed.
     </ParameterRow>
     <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Tracks[]">
+        The array of tracks that should be changed.
+    </ParameterRow>
+    <ParameterRow platform="android" name="tracks" type="alphaTab.collections.List<alphaTab.model.Track>">
         The array of tracks that should be changed.
     </ParameterRow>
     <ParameterRow platform="all" name="volume" type="double">
@@ -52,13 +56,14 @@ Nothing
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.changeTrackVolume([api.score.tracks[0], api.score.tracks[1]], 1.5);
 api.changeTrackVolume([api.score.tracks[2]], 0.5);
 ```
@@ -67,8 +72,8 @@ api.changeTrackVolume([api.score.tracks[2]], 0.5);
 <TabItem value="jq">
 
 ```js
-var at = $('#alphaTab');
-var tracks = at.alphaTab('tracks');
+const at = $('#alphaTab');
+const tracks = at.alphaTab('tracks');
 at.alphaTab('trackVolume', [tracks[0], tracks[1]], 1.5);
 at.alphaTab('trackVolume', [tracks[0], tracks[1]], 0.5);
 ```
@@ -80,6 +85,15 @@ at.alphaTab('trackVolume', [tracks[0], tracks[1]], 0.5);
 var api = new AlphaTabApi<MyControl>(...);
 api.ChangeTrackVolume(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, 1.5);
 api.ChangeTrackVolume(new Track[] { api.Score.Tracks[2] }, 0.5);
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...);
+api.changeTrackVolume(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), 1.5);
+api.changeTrackVolume(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[2]), 0.5);
 ```
 
 </TabItem>

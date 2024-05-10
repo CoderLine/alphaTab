@@ -21,8 +21,9 @@ preparations are completed and the layout and render sequence is about to start.
 ## Types
 
 <TypeTable>
-    <TypeRow type="js" name="function()" />    
-    <TypeRow type="net" name="Action" />    
+    <TypeRow type="js" name="function(resize)" />    
+    <TypeRow type="net" name="Action<bool>" />    
+    <TypeRow type="android" name="(resize: Boolean) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -41,7 +42,8 @@ preparations are completed and the layout and render sequence is about to start.
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }    
   ]
 }>
 <TabItem value="js">
@@ -66,7 +68,7 @@ $('#alphaTab').on('alphaTab.renderStarted', () => {
 <TabItem value="html">
 
 ```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.renderStarted', (e) => {
+document.querySelector('#alphaTab').addEventListener('alphaTab.renderStarted', () => {
     updateProgressBar("Rendering");
 }, false);
 ```
@@ -76,10 +78,20 @@ document.querySelector('#alphaTab').addEventListener('alphaTab.renderStarted', (
 
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.RenderStarted.On(() => 
+api.RenderStarted.On(resized => 
 {
     UpdateProgressBar("Rendering");
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.renderStarted.on { resized ->
+    updateProgressBar("Rendering");
+}
 ```
 
 </TabItem>

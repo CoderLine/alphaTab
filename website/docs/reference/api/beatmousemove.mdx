@@ -25,6 +25,7 @@ This event is fired whenever the user moves the mouse over a beat after the user
 <TypeTable>
     <TypeRow type="js" name="function(beat, originalEvent)" />    
     <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
+    <TypeRow type="android" name="(beat: alphaTab.model.Beat) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -39,6 +40,9 @@ This event is fired whenever the user moves the mouse over a beat after the user
     <ParameterRow platform="net" name="beat" type="AlphaTab.Model.Beat">
         Beat on which the mouse was hovered over during mouse down. 
     </ParameterRow>
+    <ParameterRow platform="android" name="beat" type="alphaTab.model.Beat">
+        Beat on which the mouse was hovered over during mouse down. 
+    </ParameterRow>
 </ParameterTable>
 
 ## Examples
@@ -49,7 +53,8 @@ This event is fired whenever the user moves the mouse over a beat after the user
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -91,6 +96,16 @@ api.BeatMouseMove.On(beat =>
 {
     ExpandSelectionToBeat(beat);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.beatMouseMove.on { beat ->
+    expandSelectionToBeat(beat)
+}
 ```
 
 </TabItem>
