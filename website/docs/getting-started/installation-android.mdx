@@ -2,6 +2,144 @@
 title: Installation (Android)
 ---
 
-:::warning
-🚧 This page is under construction
-:::
+The Kotlin for Android version of alphaTab can be used to render music notation in native Android Apps. 
+
+## Grab your Copy
+
+### Maven Central
+
+We provide Maven packages based on the latest development version via Maven Central and Sonatype OSSRH.
+
+* Pre-Release Snapshots: https://s01.oss.sonatype.org/content/repositories/snapshots/net/alphatab/ 
+* Release Versions: https://central.sonatype.com/artifact/net.alphatab/alphaTab-android
+
+Install packages like usual by adding it as a dependency to your build System
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'Gradle (Kotlin)', value: 'gradle-kotlin', },
+    { label: 'Gradle (Groovy)', value: 'gradle-groovy', },
+    { label: 'Maven', value: 'maven', }
+  ]
+}>
+<TabItem value="gradle-kotlin">
+
+```kotlin
+repositories {
+    google()
+    mavenCentral() // release versions
+    // pre-release snapshots: maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") 
+}
+
+dependencies {
+    implementation("net.alphatab:alphaTab-android:1.3.0")
+    // pre-release snapshots: implementation("net.alphatab:alphaTab-android:1.3.0-SNAPSHOT") 
+}
+```
+
+</TabItem>
+<TabItem value="gradle-groovy">
+
+```groovy
+repositories {
+    google()
+    mavenCentral() // release versions
+    // pre-release snapshots: 
+    // maven {
+    //     url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+    // }
+}
+
+dependencies {
+    implementation "net.alphatab:alphaTab-android:1.3.0"
+    // pre-release snapshots: implementation "net.alphatab:alphaTab-android:1.3.0-SNAPSHOT"
+}
+```
+
+</TabItem>
+<TabItem value="xml">
+
+```xml
+<project>
+    ...
+    <dependencies>
+        <dependency>
+        <groupId>net.alphatab</groupId>
+        <artifactId>alphaTab-android</artifactId>
+        <version>1.3.0</version>
+        <!--  pre-release snapshots -->
+        <!--  <version>1.3.0-SNAPSHOT</version> -->
+        <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+</TabItem>
+</Tabs>
+
+## Initializing alphaTab
+
+After adding alphaTab as a dependency to your project, you can add the alphaTab control `alphaTab.AlphaTabView` to any layout.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="net.alphatab.android.MainActivity"
+    android:orientation="vertical">
+
+    <alphaTab.AlphaTabView
+        android:id="@+id/alphatab_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+In your activity code you can then interact with alphaTab by obtaining the reference to this control:
+
+```kotlin
+class MainActivity : ComponentActivity() {
+    private lateinit var _alphaTabView: AlphaTabView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.activity_main)
+        _alphaTabView = findViewById(R.id.alphatab_view)
+
+        val api = _alphaTabView.api;
+        // use alphaTab
+    }
+}
+
+```
+
+### Additional Notes
+
+You might want to check out the samples at https://github.com/CoderLine/alphaTabSamplesAndroid/ to get a small impression
+how to hook up things. 
+
+## Dependencies
+
+For the Kotlin for Android Version alphaTab needs to rely on some 3rd party libraries to do certain operations.
+
+1. For rendering, either the built-in Android Canvas can be used or alphaTab comes with a dependency to AlphaSkia for modern
+cross platform rendering of images. Skia is the graphics engine used in Chrome and is proven to be fast and reliable.
+We recommend using Skia as rendering engine over Android Canvas. 
+
+2. For asynchronous operations `org.jetbrains.kotlinx:kotlinx-coroutines-core` is used. 
+
+If you want to get support for other UI frameworks or audio libraries feel free to reach out to us.

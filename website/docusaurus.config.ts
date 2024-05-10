@@ -157,7 +157,7 @@ const config: Config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
-        additionalLanguages: ["csharp", "diff", "kotlin"],
+        additionalLanguages: ["csharp", "diff", "kotlin", "groovy"],
       },
       colorMode: {
         disableSwitch: true,

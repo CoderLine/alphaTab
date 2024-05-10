@@ -2,6 +2,94 @@
 title: Configuration (Android)
 ---
 
-:::warning
-🚧 This page is under construction
-:::
+Now with alphaTab [being part](/docs/getting-started/installation-android) of your project it is time for customization.
+alphaTab has quite a list of settings, events and API methods to interact with.
+
+## Setup
+
+On the installation guide you already saw that the setup of alphaTab depends on the UI framework you're using. 
+
+### Background Workers or Custom Controls
+
+For non-UI usage there is not much more to say than: Use the classes available. This usage might be a bit more complicated
+than relying on the pre-built UI components and will need some reading. Feel free to contact us if you need assistance on 
+getting certain things to run.
+Beside that, it might be the easiest to [check on how alphaTab is used](https://github.com/CoderLine/alphaTab/tree/develop/src.kontrol) to build the controls provided.
+
+### Android Control
+
+For normal Android UIs we provide a control with the main functionality out of the box. Just embed the control to your Layout XMLs and get hold of a reference to it. 
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="net.alphatab.android.MainActivity"
+    android:orientation="vertical">
+
+    <alphaTab.AlphaTabView
+        android:id="@+id/alphatab_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+In your activity code you can then interact with alphaTab by obtaining the reference to this control:
+
+```kotlin
+class MainActivity : ComponentActivity() {
+    private lateinit var _alphaTabView: AlphaTabView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.activity_main)
+        _alphaTabView = findViewById(R.id.alphatab_view)
+
+        val api = _alphaTabView.api;
+        // use alphaTab
+    }
+}
+
+```
+
+## Settings
+
+The settings are important to configure the display of alphaTab as you prefer it. 
+
+The UI control exposes a `settings` property which can be used to change any desired configuration. 
+Changes on the settings object itself are not automatically detected. It is required to call `_alphaTabView.api.updateSettings()` to trigger
+an update of alphaTab. 
+
+Additionally, a `tracks` property which can be filled to change the tracks being rendered by alphaTab.
+
+
+## API
+
+The main alphaTab API is available only on the UI controls via the `api` property. It provides a 
+handy set of methods, properties and events to control alphaTab. 
+
+```csharp
+_alphaTabView.api.tex("\\title \"Hello AlphaTab\" . 3.3*4");
+```
+
+## Events
+
+Event registration happens on the alphaTab classes. You can get an access to the main `AlphaTabApi` object via the `Api` property.
+From there you use any APIs and methods exposed by alphaTab.
+
+Events are subscribed and unsubscribed to via `eventName.on(handler)` and `eventName.off(handler)`. 
+
+```kotlin
+_alphaTabView.api.playedBeatChanged.on { beat -> {
+    updateFretboard(beat)
+}
+```
