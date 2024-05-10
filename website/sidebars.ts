@@ -13,6 +13,10 @@ const sidebars: SidebarsConfig = {
       "getting-started/installation-net",
       "getting-started/configuration-net",
     ],
+    "Getting Started (Android)": [
+      "getting-started/installation-android",
+      "getting-started/configuration-android",
+    ],
     Guides: [
       "guides/lowlevel-apis",
       "guides/styling-player",
@@ -119,6 +123,15 @@ const sidebars: SidebarsConfig = {
       "tutorial-net/controls",
       "tutorial-net/player",
       "tutorial-net/conclusion",
+    ],
+    "Tutorial (Android)": [
+      "tutorial-android/introduction",
+      "tutorial-android/setup",
+      "tutorial-android/viewport",
+      "tutorial-android/track-selector",
+      "tutorial-android/controls",
+      "tutorial-android/player",
+      "tutorial-android/conclusion",
     ],
   },
   alphaTex: {

@@ -44,14 +44,14 @@ But how is the big question. Before we actually touch the code it is helpful to 
 AlphaTab has a long history on the language it uses for developing. After all these years alphaTab ended up using TypeScript as the main language
 it is developed in. This change happened in April 2020. Before that AlphaTab was developed in C# with a special toolchain that ended up with JavaScript code via Haxe. 
 
-The .net version of alphaTab is still provided via a special Compiler based on the TypeScript compiler. It translates the TypeScript source code to C# 
+The .net and Kotlin for Android version of alphaTab is still provided via a special Compiler based on the TypeScript compiler. It translates the TypeScript source code to C# 
 from where it is compiled further. 
 
 <img src="/img/toolchain.svg" />
 
 Which brings me to the next aspect of alphaTab development. It aims for zero dependency and cross platform / language usage. 
 The main modules of alphaTab are written as standalone source code without 3rd party dependencies and with a style that allows 
-execution on any potential platform with a garbage collector built in (.net, JavaScript, Kotlin/Java,...). It is an active strategy
+execution on any potential platform with a garbage collector built in (.net, JavaScript, Kotlin for Android,...). It is an active strategy
 to provide a platform native solution to any major platform on the market. 
 
 ### Development Environment
@@ -62,7 +62,8 @@ We recommend Visual Studio Code.
 Beside the IDE you will need following tools: 
 
 * [Node.js](https://nodejs.org/)
-* [.net Core SDK](https://dotnet.microsoft.com/download)
+* [.net SDK](https://dotnet.microsoft.com/download)
+* [Java and Android SDK](https://developer.android.com/studio)
 
 After that you can run the following commands to get a compiled version of alphaTab in the output folder:
 
@@ -78,30 +79,25 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
 * `clean` - cleans all output
 * `lint` - checks the source code for style violations
+* `generate-typescript` - Generates some TypeScript sources (e.g. version info and serializers).
 
 #### Web
 
 * `build` - compiles a web version of alphaTab using the current code state
-* `build-ci` - compiles a web version of alphaTab using the current code state (used by GitHub Actions)
 * `start` - used during development time to build alphaTab quickly via watchers and incremental compilation
 * `test` - Runs the unit test suite in Chrome
-* `test-ci` - Runs the unit test suite in Chrome Headless (used by GitHub Actions)
 
 #### C#/.net
 
 * `generate-csharp` - Translates the TypeScript codebase to C#
 * `build-csharp` - compiles a C#/.net version of alphaTab using the current code state
-* `build-csharp-ci` - compiles a C#/.net version of alphaTab using the current code state (used by GitHub Actions)
 * `test-csharp` - runs the unit test suite for C#
-* `test-csharp-ci` - runs the unit test suite for C# (used by GitHub Actions)
 
-#### Kotlin
+#### Kotlin for Android
 
 * `generate-kotlin` - Translates the TypeScript codebase to Kotlin
 * `build-kotlin` - compiles a Kotlin version of alphaTab using the current code state
-* `build-kotlin-ci` - compiles a Kotlin version of alphaTab using the current code state (used by GitHub Actions)
 * `test-kotlin` - runs the unit test suite for Kotlin
-* `test-kotlin-ci` - runs the unit test suite for Kotlin (used by GitHub Actions)
 
 ### Project Structure
 
@@ -121,7 +117,7 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
   Contains the downloaded NPM dependencies needed during development time. 
 
-- **playground/**
+- **playground-template/**
 
   Contains a template for the local playground to use during development time. It contains some sample files which 
   can be opened in the browser for testing. 
@@ -136,12 +132,16 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
 - **src.compiler/**
 
-  Contains the special source code which extends the TypeScript compiler. The whole TypeScript to C# compiler lives here but also 
-  some [transformers](https://github.com/cevek/ttypescript) which generate things like the JSON serializer. 
+  Contains the special source code which extends the TypeScript compiler. The whole TypeScript to C#/Kotlin compiler lives here but also 
+  some scripts which generate things like the JSON serializer. 
 
 - **src.csharp/**
  
-  Contains the C# specific source code which is needed on top of the generated code from TypeScript. 
+  Contains the C# specific source code which is needed on top of the generated code from TypeScript.
+
+- **src.kotlin/**
+ 
+  Contains the Kotlin specific source code which is needed on top of the generated code from TypeScript. 
 
 - **test/**
 
@@ -151,17 +151,17 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
   Contains all files needed during the tests. 
 
-- **karma.conf.js**
+- **rollup.config.&lt;variant&gt;.ts**
 
-  This is the input file for Karma, the test runner we use. 
-
-- **rollup.config.js**
-
-  This is the main configuration for Rollup.js, the bundler we use. 
-
-- **rollup.resolve.js**
+  These are the rollup configurations for the different outputs we bundle. 
+  
+- **rollup.plugin.resolve.js**
 
   A custom rollup plugin to handle module resolving. 
+
+- **rollup.plugin.server.js**
+
+  A custom rollup plugin to handle hosting the playground. 
 
 - **tsconfig.base.json**
 
@@ -171,18 +171,6 @@ The repository has a set of NPM scripts that take over actions like compiling an
 
   The tsconfig which produces the production output (no tests).
 
-- **tsconfig.build-csharp.json**
-
-  The tsconfig used when compiling TypeScript to C#.
-
-- **tsconfig.build-kotlin.json**
-
-  The tsconfig used when compiling TypeScript to Kotlin.
-
 - **tsconfig.json**
 
   The tsconfig used during development and testing containing the main sources and tests.
-
-- **tslint.json**
-
-  The code style rules.

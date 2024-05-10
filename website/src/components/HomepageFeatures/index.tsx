@@ -23,10 +23,9 @@ const FeatureList: FeatureItem[] = [
     Image: require('@site/static/img/undraw-cross-platform.svg').default,
     description: (
       <>
-        The core of alphaTab is designed to run without external dependencies
+        The core of alphaTab is designed to run with minimal external dependencies
         and on multiple platforms. From one central code base we provide
-        alphaTab for web based apps, desktop apps using .net and support for
-        native Android and iOS apps is planed.
+        alphaTab for web based apps, apps using .net and Kotlin for Android.
       </>
     ),
   },
