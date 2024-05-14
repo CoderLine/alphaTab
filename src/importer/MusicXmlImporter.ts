@@ -994,7 +994,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseTechnical(element: XmlNode, note: Note): void {
-        var bends: XmlNode[] = [];
+        let bends: XmlNode[] = [];
         
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
@@ -1032,10 +1032,10 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseBends(elements: XmlNode[], note: Note): void {
-        var baseOffset: number = BendPoint.MaxPosition / elements.length; 
-        var currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
-        var currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
-        var isFistBend: boolean = true;
+        let baseOffset: number = BendPoint.MaxPosition / elements.length; 
+        let currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
+        let currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
+        let isFistBend: boolean = true;
 
         for (let bend of elements) {
             let bendAlterElement: XmlNode | null = bend.findChildElement("bend-alter");
