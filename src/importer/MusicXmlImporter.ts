@@ -1035,30 +1035,30 @@ export class MusicXmlImporter extends ScoreImporter {
         let baseOffset: number = BendPoint.MaxPosition / elements.length; 
         let currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
         let currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
-        let isFistBend: boolean = true;
+        let isFirstBend: boolean = true;
 
         for (let bend of elements) {
             let bendAlterElement: XmlNode | null = bend.findChildElement("bend-alter");
             if (bendAlterElement) {
                 let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 4);
                 if (bend.findChildElement("pre-bend")) {
-                    if (isFistBend){
+                    if (isFirstBend){
                         currentValue += absValue;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
                         currentOffset += baseOffset;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                        isFistBend = false;
+                        isFirstBend = false;
                     }
                 } else if (bend.findChildElement("release")) {
-                    if (!isFistBend){
+                    if (!isFirstBend){
                         currentValue -= absValue;
                         currentOffset += baseOffset;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
                     }
                 } else { // "regular" bend
-                    if (isFistBend) {
+                    if (isFirstBend) {
                         note.addBendPoint(new BendPoint(0, 0));
-                        isFistBend = false;
+                        isFirstBend = false;
                     }
                     currentValue += absValue
                     currentOffset += baseOffset
