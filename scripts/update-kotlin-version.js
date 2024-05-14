@@ -8,7 +8,7 @@ if(process.argv.length === 3) {
     // update-kotlin-version.js SNAPSHOT
     // -> version = "1.3.0-SNAPSHOT"
     version = `${version}-${process.argv[2]}`;
-} else if(process.argv.length === 3) {
+} else if(process.argv.length === 2) {
     // update-kotlin-version.js
     // -> version = "1.3.0"
 }
