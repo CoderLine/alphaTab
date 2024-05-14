@@ -1,0 +1,21 @@
+name: Build PR
+on: 
+  pull_request:
+          
+jobs:
+  build:
+    runs-on: ubuntu-latest
+      
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - run: npm install
+    - run: npm install @coderline/alphatab@alpha
+    - run: npm run build
+    - run: cp web.config ./build
+    - uses: actions/upload-artifact@v4
+      with: 
+        name: website
+        path: ./build/
