@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
-                                "http://www.musicxml.org/dtds/partwise.dtd">
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
   <identification>
     <miscellaneous>
       <miscellaneous-field name="description">Some tablature staves, with
-          explicit fingering information and different string tunings given
-          in the MusicXML file.</miscellaneous-field>
+        explicit fingering information and different string tunings given
+        in the MusicXML file.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -18,8 +17,8 @@
       <part-name>Guitar</part-name>
       <part-abbreviation>Gtr.</part-abbreviation>
     </score-part>
-    
-    <part-group number="1" type="stop"/>
+
+    <part-group number="1" type="stop" />
   </part-list>
   <!--=========================================================-->
   <part id="P1">
@@ -76,8 +75,8 @@
             <string>4</string>
             <fret>5</fret>
             <bend shape="curved">
-      <bend-alter>1</bend-alter>
-   </bend>
+              <bend-alter>1</bend-alter>
+            </bend>
           </technical>
         </notations>
       </note>
@@ -95,9 +94,9 @@
             <string>2</string>
             <fret>17</fret>
             <bend>
-            <bend-alter>-2</bend-alter>
-            <pre-bend/>
-         </bend>
+              <bend-alter>-2</bend-alter>
+              <pre-bend />
+            </bend>
           </technical>
         </notations>
       </note>
@@ -115,12 +114,12 @@
             <string>2</string>
             <fret>1</fret>
             <bend shape="curved">
-            <bend-alter>2</bend-alter>
-         </bend>
-         <bend shape="curved">
-            <bend-alter>-2</bend-alter>
-            <release offset="1"/>
-         </bend>
+              <bend-alter>2</bend-alter>
+            </bend>
+            <bend shape="curved">
+              <bend-alter>-2</bend-alter>
+              <release offset="1" />
+            </bend>
           </technical>
         </notations>
       </note>
@@ -129,21 +128,45 @@
           <step>E</step>
           <octave>3</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>0.5</duration>
         <voice>1</voice>
-        <type>quarter</type>
+        <type>eighth</type>
         <stem>none</stem>
         <notations>
           <technical>
             <string>4</string>
             <fret>2</fret>
-                        <bend>
-              <bend-alter>0.5</bend-alter>
-              <pre-bend/>
+            <bend>
+              <bend-alter>1</bend-alter>
+              <pre-bend />
             </bend>
             <bend shape="curved">
-              <bend-alter>-0.5</bend-alter>
-              <release/>
+              <bend-alter>-1</bend-alter>
+              <release />
+            </bend>
+          </technical>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>0.5</duration>
+        <voice>1</voice>
+        <type>eighth</type>
+        <stem>none</stem>
+        <notations>
+          <technical>
+            <string>4</string>
+            <fret>2</fret>
+            <bend>
+              <bend-alter>-1</bend-alter>
+              <pre-bend />
+            </bend>
+            <bend shape="curved">
+              <bend-alter>1</bend-alter>
+   
             </bend>
           </technical>
         </notations>
@@ -166,17 +189,17 @@
             <string>6</string>
             <fret>4</fret>
             <bend shape="curved">
-              <bend-alter>0.5</bend-alter>
+              <bend-alter>1</bend-alter>
             </bend>
             <bend shape="curved">
-              <bend-alter>-0.5</bend-alter>
-              <release/>
+              <bend-alter>-1</bend-alter>
+              <release />
             </bend>
           </technical>
         </notations>
       </note>
       <note>
-        <chord/>
+        <chord />
         <pitch>
           <step>F</step>
           <alter>1</alter>
@@ -191,17 +214,17 @@
             <string>4</string>
             <fret>4</fret>
             <bend shape="curved">
-              <bend-alter>0.5</bend-alter>
+              <bend-alter>1</bend-alter>
             </bend>
             <bend shape="curved">
-              <bend-alter>-0.5</bend-alter>
-              <release/>
+              <bend-alter>-1</bend-alter>
+              <release />
             </bend>
           </technical>
         </notations>
       </note>
       <note>
-        <chord/>
+        <chord />
         <pitch>
           <step>G</step>
           <octave>3</octave>
@@ -231,25 +254,25 @@
             <string>5</string>
             <fret>5</fret>
             <bend>
-              <bend-alter>-0.25</bend-alter>
-              <pre-bend/>
+              <bend-alter>-0.5</bend-alter>
+              <pre-bend />
             </bend>
             <bend shape="curved">
               <bend-alter>1</bend-alter>
-          </bend>
-          <bend shape="curved">
+            </bend>
+            <bend shape="curved">
               <bend-alter>0.5</bend-alter>
-          </bend>
-          <bend shape="curved">
-              <bend-alter>0.5</bend-alter>
-          </bend>
-          <bend shape="curved">
-              <bend-alter>-1.75</bend-alter>
-              <release/>
-          </bend>
-          <bend shape="curved">
+            </bend>
+            <bend shape="curved">
               <bend-alter>2</bend-alter>
-          </bend>
+            </bend>
+            <bend shape="curved">
+              <bend-alter>-2</bend-alter>
+              <release />
+            </bend>
+            <bend shape="curved">
+              <bend-alter>2</bend-alter>
+            </bend>
 
           </technical>
         </notations>
@@ -270,7 +293,7 @@
             <fret>1</fret>
             <bend shape="curved">
               <bend-alter>-0.5</bend-alter>
-              <release/>
+              <release />
             </bend>
           </technical>
         </notations>
@@ -289,11 +312,11 @@
             <string>2</string>
             <fret>5</fret>
             <bend shape="curved">
-              <bend-alter>-0.5</bend-alter>
+              <bend-alter>1</bend-alter>
             </bend>
             <bend>
-              <bend-alter>-0.5</bend-alter>
-              <pre-bend/>
+              <bend-alter>-1</bend-alter>
+              <pre-bend />
             </bend>
           </technical>
         </notations>
@@ -304,6 +327,6 @@
     </measure>
   </part>
   <!--=========================================================-->
-  
+
   <!--=========================================================-->
 </score-partwise>
