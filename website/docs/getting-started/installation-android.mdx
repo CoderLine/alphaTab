@@ -19,7 +19,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 <Tabs
-  defaultValue="js"
+  defaultValue="gradle-kotlin"
   values={[
     { label: 'Gradle (Kotlin)', value: 'gradle-kotlin', },
     { label: 'Gradle (Groovy)', value: 'gradle-groovy', },
@@ -85,6 +85,12 @@ dependencies {
 ## Initializing alphaTab
 
 After adding alphaTab as a dependency to your project, you can add the alphaTab control `alphaTab.AlphaTabView` to any layout.
+
+:::info
+
+Important: We currently only ship a classical "view" based control. If you have interest in a Jetpack Compose control, vote for [this issue](https://github.com/CoderLine/alphaTab/issues/1475) on our roadmap or try to [wrap the classical control](https://developer.android.com/develop/ui/compose/libraries).
+
+:::
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
