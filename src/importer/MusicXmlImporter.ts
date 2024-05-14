@@ -1040,7 +1040,7 @@ export class MusicXmlImporter extends ScoreImporter {
         for (let bend of elements) {
             let bendAlterElement: XmlNode | null = bend.findChildElement("bend-alter");
             if (bendAlterElement) {
-                let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 4);
+                let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 2);
                 if (bend.findChildElement("pre-bend")) {
                     if (isFirstBend){
                         currentValue += absValue;
