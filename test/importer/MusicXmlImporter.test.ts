@@ -94,4 +94,14 @@ describe('MusicXmlImporterTests', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[4]).to.equal(3);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[5]).to.equal(-1);
     });
+
+    it('compressed', async () => {
+        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+            'test-data/musicxml3/compressed.mxl'
+        );
+
+        expect(score.title).to.equal("Title");
+        expect(score.tracks.length).to.equal(1);
+        expect(score.masterBars.length).to.equal(1);
+    });
 });
