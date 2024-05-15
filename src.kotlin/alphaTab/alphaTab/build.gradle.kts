@@ -242,6 +242,7 @@ publishing {
     publications.withType<MavenPublication> {
         artifact(javadocJar)
         pom {
+            name = artifactId
             description.set(alphaTabDescription)
             url.set("https://github.com/CoderLine/alphaTab")
             licenses {
