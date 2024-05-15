@@ -189,7 +189,7 @@ export class TabBendGlyph extends Glyph {
             case BendType.BendRelease:
                 renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints![0].value));
                 renderingPoints.push(new TabBendRenderPoint((BendPoint.MaxPosition / 2) | 0, note.bendPoints![1].value));
-                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints![3].value));
+                renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints!.at(-1)?.value));
                 break;
             case BendType.Bend:
             case BendType.Hold:
