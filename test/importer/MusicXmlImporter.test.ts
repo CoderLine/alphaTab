@@ -95,32 +95,6 @@ describe('MusicXmlImporterTests', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[4]).to.equal(3);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[5]).to.equal(-1);
     });
-    it('chord-diagram', async () => {
-        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml3/chord-diagram.musicxml'
-        );
-
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.equal("C");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[0]).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[1]).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[2]).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[3]).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[4]).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[5]).to.equal(-1);
-
-
-        score = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score));
-
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.equal("C");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[0]).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[1]).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[2]).to.equal(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[3]).to.equal(2);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[4]).to.equal(3);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[5]).to.equal(-1);
-    });
     it('bend', async () => {
         let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
             'test-data/musicxml-testsuite/100a-Guitare-Bends.xml'
