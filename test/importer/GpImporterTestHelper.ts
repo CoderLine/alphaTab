@@ -525,4 +525,27 @@ export class GpImporterTestHelper {
             expect(actual.barreFrets.join(',')).to.equal(expected.barreFrets.join(','));
         }
     }
+
+    public static checkMultiTrackLayoutConfiguration(
+        track1: Score,
+        track2: Score,
+        trackAll: Score,
+        track1And3: Score,
+    ): void {
+        expect(track1.tracks[0].isVisibleOnMultiTrack).to.be.true;
+        expect(track1.tracks[1].isVisibleOnMultiTrack).to.be.false;
+        expect(track1.tracks[2].isVisibleOnMultiTrack).to.be.false;
+
+        expect(track2.tracks[0].isVisibleOnMultiTrack).to.be.false;
+        expect(track2.tracks[1].isVisibleOnMultiTrack).to.be.true;
+        expect(track2.tracks[2].isVisibleOnMultiTrack).to.be.false;
+
+        expect(trackAll.tracks[0].isVisibleOnMultiTrack).to.be.true;
+        expect(trackAll.tracks[1].isVisibleOnMultiTrack).to.be.true;
+        expect(trackAll.tracks[2].isVisibleOnMultiTrack).to.be.true;
+
+        expect(track1And3.tracks[0].isVisibleOnMultiTrack).to.be.true;
+        expect(track1And3.tracks[1].isVisibleOnMultiTrack).to.be.false;
+        expect(track1And3.tracks[2].isVisibleOnMultiTrack).to.be.true;
+    }
 }

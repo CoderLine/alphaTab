@@ -19,9 +19,6 @@ export class GpxFile {
 export class GpxFileSystem {
     public static readonly HeaderBcFs: string = 'BCFS';
     public static readonly HeaderBcFz: string = 'BCFZ';
-    public static readonly ScoreGpif: string = 'score.gpif';
-    public static readonly BinaryStylesheet: string = 'BinaryStylesheet';
-    public static readonly PartConfiguration: string = 'PartConfiguration';
 
     /**
      * You can set a file filter method using this setter. On parsing

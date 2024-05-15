@@ -49,6 +49,14 @@ export class Track {
     public name: string = '';
 
     /**
+     * Gets or sets whether this track should be visible in the UI.
+     * This information is purely informational and might not be provided by all input formats.
+     * In formats like Guitar Pro this flag indicates whether on the default "multi-track" layout
+     * tracks should be visible or not.
+     */
+    public isVisibleOnMultiTrack:boolean = true;
+
+    /**
      * Gets or sets the short name of this track.
      */
     public shortName: string = '';

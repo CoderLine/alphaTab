@@ -7,6 +7,7 @@ import { Score } from '@src/model/Score';
 import { Logger } from '@src/Logger';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { IOHelper } from '@src/io/IOHelper';
+import { LayoutConfiguration } from './LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 6 (gpx) files.
@@ -26,7 +27,7 @@ export class GpxImporter extends ScoreImporter {
         Logger.debug(this.name, 'Loading GPX filesystem');
         let fileSystem: GpxFileSystem = new GpxFileSystem();
         fileSystem.fileFilter = s => {
-            return s.endsWith('score.gpif') || s.endsWith('BinaryStylesheet') || s.endsWith('PartConfiguration');
+            return s.endsWith('score.gpif') || s.endsWith('BinaryStylesheet') || s.endsWith('PartConfiguration') || s.endsWith('LayoutConfiguration');
         };
         fileSystem.load(this.data);
         Logger.debug(this.name, 'GPX filesystem loaded');
@@ -34,6 +35,7 @@ export class GpxImporter extends ScoreImporter {
         let xml: string | null = null;
         let binaryStylesheetData: Uint8Array | null = null;
         let partConfigurationData: Uint8Array | null = null;
+        let layoutConfigurationData: Uint8Array | null = null;
         for (let entry of fileSystem.files) {
             switch (entry.fileName) {
                 case 'score.gpif':
@@ -44,6 +46,9 @@ export class GpxImporter extends ScoreImporter {
                     break;
                 case 'PartConfiguration':
                     partConfigurationData = entry.data;
+                    break;
+                case 'LayoutConfiguration':
+                    layoutConfigurationData = entry.data;
                     break;
             }
         }
@@ -67,11 +72,22 @@ export class GpxImporter extends ScoreImporter {
             Logger.debug(this.name, 'BinaryStylesheet parsed');
         }
 
+        let partConfigurationParser: PartConfiguration | null = null;
         if (partConfigurationData) {
             Logger.debug(this.name, 'Start Parsing Part Configuration');
-            let partConfiguration: PartConfiguration = new PartConfiguration(partConfigurationData);
-            partConfiguration.apply(score);
+            partConfigurationParser = new PartConfiguration(partConfigurationData);
+            partConfigurationParser.apply(score);
             Logger.debug(this.name, 'Part Configuration parsed');
+        }
+
+        if (layoutConfigurationData && partConfigurationParser != null) {
+            Logger.debug(this.name, 'Start Parsing Layout Configuration');
+            let layoutConfigurationParser: LayoutConfiguration = new LayoutConfiguration(
+                partConfigurationParser,
+                layoutConfigurationData
+            );
+            layoutConfigurationParser.apply(score);
+            Logger.debug(this.name, 'Layout Configuration parsed');
         }
 
         return score;

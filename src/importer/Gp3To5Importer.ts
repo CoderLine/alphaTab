@@ -344,11 +344,27 @@ export class Gp3To5Importer extends ScoreImporter {
         newTrack.ensureStaveCount(1);
         this._score.addTrack(newTrack);
         let mainStaff: Staff = newTrack.staves[0];
+
+        // Track Flags:
+        // 1   - Percussion Track
+        // 2   - 12 Stringed Track
+        // 4   - Unknown
+        // 8   - Is Visible on Multi Track 
+        // 16  - Unknown 
+        // 32  - Unknown 
+        // 64  - Unknown
+        // 128 - Unknown
+
         let flags: number = this.data.readByte();
         newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
         if ((flags & 0x01) !== 0) {
             mainStaff.isPercussion = true;
         }
+        if (this._versionNumber >= 500) {
+            newTrack.isVisibleOnMultiTrack = (flags & 0x08) !== 0;
+        }
+        
+        // 
         let stringCount: number = IOHelper.readInt32LE(this.data);
         let tuning: number[] = [];
         for (let i: number = 0; i < 7; i++) {

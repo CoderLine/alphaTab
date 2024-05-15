@@ -9,8 +9,9 @@ import { Score } from '@src/model/Score';
 import { Logger } from '@src/Logger';
 
 import { ZipReader } from '@src/zip/ZipReader';
-import { ZipEntry } from "@src/zip/ZipEntry";
+import { ZipEntry } from '@src/zip/ZipEntry';
 import { IOHelper } from '@src/io/IOHelper';
+import { LayoutConfiguration } from './LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 7 (gp) files.
@@ -40,6 +41,7 @@ export class Gp7Importer extends ScoreImporter {
         let xml: string | null = null;
         let binaryStylesheetData: Uint8Array | null = null;
         let partConfigurationData: Uint8Array | null = null;
+        let layoutConfigurationData: Uint8Array | null = null;
         for (let entry of entries) {
             switch (entry.fileName) {
                 case 'score.gpif':
@@ -50,6 +52,9 @@ export class Gp7Importer extends ScoreImporter {
                     break;
                 case 'PartConfiguration':
                     partConfigurationData = entry.data;
+                    break;
+                case 'LayoutConfiguration':
+                    layoutConfigurationData = entry.data;
                     break;
             }
         }
@@ -73,11 +78,21 @@ export class Gp7Importer extends ScoreImporter {
             Logger.debug(this.name, 'BinaryStylesheet parsed');
         }
 
+        let partConfigurationParser: PartConfiguration | null = null;
         if (partConfigurationData) {
             Logger.debug(this.name, 'Start Parsing Part Configuration');
-            let partConfigurationParser: PartConfiguration = new PartConfiguration(partConfigurationData);
+            partConfigurationParser = new PartConfiguration(partConfigurationData);
             partConfigurationParser.apply(score);
             Logger.debug(this.name, 'Part Configuration parsed');
+        }
+        if (layoutConfigurationData && partConfigurationParser != null) {
+            Logger.debug(this.name, 'Start Parsing Layout Configuration');
+            let layoutConfigurationParser: LayoutConfiguration = new LayoutConfiguration(
+                partConfigurationParser,
+                layoutConfigurationData
+            );
+            layoutConfigurationParser.apply(score);
+            Logger.debug(this.name, 'Layout Configuration parsed');
         }
         return score;
     }
