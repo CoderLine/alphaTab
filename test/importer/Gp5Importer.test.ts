@@ -228,4 +228,19 @@ describe('Gp5ImporterTest', () => {
 
         expect(actualChunks.join(';')).to.equal(expectedChunks.join(';'));
     });
+
+    it('layout-configuration', async () => {
+        const track1 = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1.gp5')).readScore();
+        const track2 = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-2.gp5')).readScore();
+        const trackAll = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-all.gp5')).readScore();
+        const track1And3 = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1-3.gp5')).readScore();
+
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
+            track1, 
+            track2,
+            trackAll,
+            track1And3
+        );
+    });
+
 });

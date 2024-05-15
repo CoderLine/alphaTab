@@ -27,6 +27,7 @@ export class TrackSerializer {
         o.set("playbackinfo", PlaybackInformationSerializer.toJson(obj.playbackInfo));
         o.set("color", Color.toJson(obj.color));
         o.set("name", obj.name);
+        o.set("isvisibleonmultitrack", obj.isVisibleOnMultiTrack);
         o.set("shortname", obj.shortName);
         o.set("defaultsystemslayout", obj.defaultSystemsLayout);
         o.set("systemslayout", obj.systemsLayout);
@@ -48,6 +49,9 @@ export class TrackSerializer {
                 return true;
             case "name":
                 obj.name = v! as string;
+                return true;
+            case "isvisibleonmultitrack":
+                obj.isVisibleOnMultiTrack = v! as boolean;
                 return true;
             case "shortname":
                 obj.shortName = v! as string;

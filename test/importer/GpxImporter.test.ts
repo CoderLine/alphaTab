@@ -267,4 +267,18 @@ describe('GpxImporterTest', () => {
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkColors(score);
     });
+
+    it('layout-configuration', async () => {
+        const track1 = (await prepareGpxImporterWithFile('guitarpro6/layout-configuration-multi-track-1.gpx')).readScore();
+        const track2 = (await prepareGpxImporterWithFile('guitarpro6/layout-configuration-multi-track-2.gpx')).readScore();
+        const trackAll = (await prepareGpxImporterWithFile('guitarpro6/layout-configuration-multi-track-all.gpx')).readScore();
+        const track1And3 = (await prepareGpxImporterWithFile('guitarpro6/layout-configuration-multi-track-1-3.gpx')).readScore();
+
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
+            track1, 
+            track2,
+            trackAll,
+            track1And3
+        );
+    });
 });

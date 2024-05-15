@@ -583,10 +583,16 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            30,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).to.equal(0);
 
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
@@ -594,7 +600,10 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(0);
 
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).to.equal(4);
@@ -602,13 +611,22 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            30,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
+            30,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![3].value).to.equal(-4);
 
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints!.length).to.equal(4);
@@ -616,13 +634,22 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(15, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            15,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(30.6, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
+            30.6,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(45, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(
+            45,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].value).to.equal(0);
     });
 
@@ -862,12 +889,12 @@ describe('Gp7ImporterTest', () => {
     it('beat-lyrics', async () => {
         const reader = await prepareGp7ImporterWithFile('guitarpro7/beat-lyrics.gp');
         let score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].lyrics![0]).to.be.equal("This");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics![0]).to.be.equal("is");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.be.equal("a");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![0]).to.be.equal("test file");
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].lyrics![0]).to.be.equal("for");
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].lyrics![0]).to.be.equal("lyrics");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].lyrics![0]).to.be.equal('This');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics![0]).to.be.equal('is');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.be.equal('a');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![0]).to.be.equal('test file');
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].lyrics![0]).to.be.equal('for');
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].lyrics![0]).to.be.equal('lyrics');
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].lyrics).to.be.equal(null);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].lyrics).to.be.equal(null);
     });
@@ -901,7 +928,9 @@ describe('Gp7ImporterTest', () => {
         let score: Score = reader.readScore();
 
         expect(score.tracks[0].playbackInfo.program).to.be.equal(25);
-        const automation = score.tracks[0].staves[0].bars[2].voices[0].beats[0].getAutomation(AutomationType.Instrument);
+        const automation = score.tracks[0].staves[0].bars[2].voices[0].beats[0].getAutomation(
+            AutomationType.Instrument
+        );
         expect(automation).to.be.ok;
         if (automation) {
             expect(automation.value).to.be.equal(29);
@@ -913,7 +942,35 @@ describe('Gp7ImporterTest', () => {
         let score: Score = reader.readScore();
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.be.equal("C");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.be.equal('C');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings.length).to.be.equal(0);
-    })
+    });
+
+    it('layout-configuration-gp7', async () => {
+        const track1 = (await prepareGp7ImporterWithFile('guitarpro7/layout-configuration-multi-track-1.gp')).readScore();
+        const track2 = (await prepareGp7ImporterWithFile('guitarpro7/layout-configuration-multi-track-2.gp')).readScore();
+        const trackAll = (await prepareGp7ImporterWithFile('guitarpro7/layout-configuration-multi-track-all.gp')).readScore();
+        const track1And3 = (await prepareGp7ImporterWithFile('guitarpro7/layout-configuration-multi-track-1-3.gp')).readScore();
+
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
+            track1, 
+            track2,
+            trackAll,
+            track1And3
+        );
+    });
+
+    it('layout-configuration-gp8', async () => {
+        const track1 = (await prepareGp7ImporterWithFile('guitarpro8/layout-configuration-multi-track-1.gp')).readScore();
+        const track2 = (await prepareGp7ImporterWithFile('guitarpro8/layout-configuration-multi-track-2.gp')).readScore();
+        const trackAll = (await prepareGp7ImporterWithFile('guitarpro8/layout-configuration-multi-track-all.gp')).readScore();
+        const track1And3 = (await prepareGp7ImporterWithFile('guitarpro8/layout-configuration-multi-track-1-3.gp')).readScore();
+
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
+            track1, 
+            track2,
+            trackAll,
+            track1And3
+        );
+    });
 });
