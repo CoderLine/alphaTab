@@ -1048,11 +1048,13 @@ export class MusicXmlImporter extends ScoreImporter {
                         currentOffset += baseOffset;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
                         isFirstBend = false;
+                    }else{
+                        currentOffset += baseOffset;
                     }
                 } else if (bend.findChildElement("release")) {
+                    currentOffset += baseOffset;
                     if (!isFirstBend){
                         currentValue -= absValue;
-                        currentOffset += baseOffset;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
                     }
                 } else { // "regular" bend

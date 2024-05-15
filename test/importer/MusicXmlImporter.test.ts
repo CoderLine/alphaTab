@@ -220,7 +220,7 @@ describe('MusicXmlImporterTests', () => {
         expect(note.bendPoints!.length).to.equal(2);
         expect(note.bendPoints![0].offset).to.equal(0);
         expect(note.bendPoints![0].value).to.equal(0);
-        expect(note.bendPoints![1].offset).to.equal(60);
+        expect(note.bendPoints![1].offset).to.equal(30);
         expect(note.bendPoints![1].value).to.equal(2);
     });
 });
