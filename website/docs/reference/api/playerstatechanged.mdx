@@ -25,6 +25,7 @@ This event is fired when the playback state changed.
 <TypeTable>
     <TypeRow type="js" name="function(e)" />    
     <TypeRow type="net" name="Action<PlayerStateChangedEventArgs>" />    
+    <TypeRow type="android" name="(e : PlayerStateChangedEventArgs): Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -34,6 +35,9 @@ This event is fired when the playback state changed.
         The information about the player state change event. 
     </ParameterRow>
     <ParameterRow platform="net" name="args" type="AlphaTab.Synth.PlayerStateChangedEventArgs">
+        The information about the player state change event. 
+    </ParameterRow>
+    <ParameterRow platform="android" name="args" type="alphaTab.synth.PlayerStateChangedEventArgs">
         The information about the player state change event. 
     </ParameterRow>
 </ParameterTable>
@@ -49,6 +53,9 @@ This event is fired when the playback state changed.
     <ParameterRow platform="net" name="State" type="AlphaTab.Synth.PlayerState">
         The new state of the player.  
     </ParameterRow>
+    <ParameterRow platform="net" name="state" type="alphaTab.synth.PlayerState">
+        The new state of the player.
+    </ParameterRow>
     <ParameterRow platform="all" name="stopped" type="bool">
         Whether the playback was fully stopped (including jump to start) or only paused.
     </ParameterRow>
@@ -62,7 +69,8 @@ This event is fired when the playback state changed.
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -102,6 +110,16 @@ api.PlayerStateChanged.On(args =>
 {
     UpdatePlayerControls(args);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.playerStateChanged.on { args ->
+    updatePlayerControls(args)
+}
 ```
 
 </TabItem>

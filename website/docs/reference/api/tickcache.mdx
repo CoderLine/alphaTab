@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Properties - Player
   since:  1.2.3
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="1.2.3" />
@@ -27,18 +29,22 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="AlphaTab.Midi.MidiTickLookup" />
     <TypeRow type="js" name="alphaTab.midi.MidiTickLookup" />
+    <TypeRow type="net" name="AlphaTab.Midi.MidiTickLookup" />
+    <TypeRow type="android" name="alphaTab.midi.MidiTickLookup" />
 </TypeTable>
 
 
 ## MidiTickLookup.findBeat Signatures
 
 <TypeTable>
-    <TypeRow type="net" name="MidiTickLookupFindBeatResult FindBeat(IList<Track> tracks, int tick, MidiTickLookupFindBeatResult? currentBeatHint = null)">
+    <TypeRow type="js" name="findBeat(trackLookup: Set<number>, tick: number, currentBeatHint: MidiTickLookupFindBeatResult | null): MidiTickLookupFindBeatResult | null">
         Find the beat played at a given midi tick. 
     </TypeRow>
-    <TypeRow type="js" name="findBeat(tracks: Track[], tick: number, currentBeatHint: MidiTickLookupFindBeatResult | null): MidiTickLookupFindBeatResult">
+    <TypeRow type="net" name="MidiTickLookupFindBeatResult? FindBeat(AlphaTab.Core.EcmaScript.Set<double> trackLookup, double tick, AlphaTab.Midi.MidiTickLookupFindBeatResult? currentBeatHint = null)">
+        Find the beat played at a given midi tick. 
+    </TypeRow>
+    <TypeRow type="android" name="MidiTickLookupFindBeatResult? findBeat(trackLookup: alphaTab.core.ecmaScript.Set<Double>, tick: Double, currentBeatHint: alphaTab.midi.MidiTickLookupFindBeatResult? = null)">
         Find the beat played at a given midi tick. 
     </TypeRow>
 </TypeTable>
@@ -46,13 +52,16 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
 ## MidiTickLookup.findBeat Parameters
 
 <ParameterTable>
-    <ParameterRow platform="js" name="tracks" type="alphaTab.model.Track[]">
-        The tracks which should be looked at to find the beat. This allows a filtered search if needed.
+    <ParameterRow platform="js" name="trackLookup" type="Set<number>">
+        The tracks indices in which to search the played beat for.
     </ParameterRow>
-    <ParameterRow platform="net" name="tracks" type="IList<AlphaTab.Model.Track>">
-        The tracks which should be looked at to find the beat. This allows a filtered search if needed.
+    <ParameterRow platform="net" name="trackLookup" type="AlphaTab.Core.EcmaScript.Set<double>">
+        The tracks indices in which to search the played beat for.
     </ParameterRow>
-    <ParameterRow platform="js" name="tick" type="int">
+    <ParameterRow platform="android" name="trackLookup" type="alphaTab.core.ecmaScript.Set<Double>">
+        The tracks indices in which to search the played beat for.
+    </ParameterRow>
+    <ParameterRow platform="js" name="tick" type="double">
         The midi tick for which the beat should be looked up. 
     </ParameterRow>
     <ParameterRow platform="net" name="tick" type="number">
@@ -64,6 +73,9 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
     <ParameterRow platform="net" name="currentBeatHint" type="alphaTab.midi.MidiTickLookupFindBeatResult">
         Used for optimized lookup during playback. By passing in a previous result lookup of the next one can be optimized using heuristics. (optional).
     </ParameterRow>
+    <ParameterRow platform="android" name="currentBeatHint" type="alphaTab.midi.MidiTickLookupFindBeatResult">
+        Used for optimized lookup during playback. By passing in a previous result lookup of the next one can be optimized using heuristics. (optional).
+    </ParameterRow>
 </ParameterTable>
 
 ## Examples
@@ -73,15 +85,16 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-var lookupResult = api.tickCache.findBeat(api.tracks, 100);
-var currentBeat = lookupResult?.currentBeat;
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const lookupResult = api.tickCache.findBeat(new Set([0, 1]), 100);
+const currentBeat = lookupResult?.currentBeat;
 ```
 
 </TabItem>
@@ -92,8 +105,17 @@ Not available
 
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
-var lookupResult = api.TickCache.FindBeat(api.Tracks, 100);
+var lookupResult = api.TickCache.FindBeat(new AlphaTab.Core.EcmaScript.Set(0, 1), 100);
 var currentBeat = lookupResult?.CurrentBeat;
+```
+
+</TabItem>
+<TabItem value="android">
+
+```csharp
+val api = AlphaTabApi<MyControl>(...)
+val lookupResult = api.tickCache.findBeat(alphaTab.core.ecmaScript.Set(0, 1), 100);
+val currentBeat = lookupResult?.CurrentBeat;
 ```
 
 </TabItem>

@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Properties - Player
   since:  0.9.4
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -26,6 +28,7 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
 <TypeTable>
     <TypeRow type="js" name="alphaTab.synth.PlaybackRange" />
     <TypeRow type="net" name="AlphaTab.Synth.PlaybackRange" />
+    <TypeRow type="android" name="alphaTab.synth.PlaybackRange" />
 </TypeTable>
 
 ## PlaybackRange Properties
@@ -42,7 +45,8 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
         <tr>
             <td>
                 <CodeBadge type="js" name="startTick" /><br />
-                <CodeBadge type="net" name="StartTick" />
+                <CodeBadge type="net" name="StartTick" /><br />
+                <CodeBadge type="android" name="startTick" />
             </td>
             <td><code>int</code></td>
             <td>
@@ -52,7 +56,8 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
         <tr>
             <td>
                 <CodeBadge type="js" name="endTick" /><br />
-                <CodeBadge type="net" name="EndTick" />
+                <CodeBadge type="net" name="EndTick" /><br />
+                <CodeBadge type="android" name="endTick" />
             </td>
             <td><code>int</code></td>
             <td>
@@ -73,13 +78,14 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playbackRange = { startTick: 1000, endTick: 50000 };
 ```
 
@@ -96,6 +102,17 @@ $('#alphaTab').alphaTab('playbackRange', { startTick: 1000, endTick: 50000 })
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.PlaybackRange = new PlaybackRange { StartTick = 1000, EndTick = 50000 };
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.playbackRange = PlaybackRange.apply { 
+    startTick = 1000
+    endTick = 50000
+}
 ```
 
 </TabItem>

@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Methods - Player
   since:  0.9.4
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -21,6 +23,7 @@ it will move the playback position to the start of this range, not the whole son
     <TypeRow type="js" name="function stop()" />
     <TypeRow type="jquery" name="alphaTab('stop')" />
     <TypeRow type="net" name="void Stop()" />
+    <TypeRow type="android" name="fun stop(): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -36,13 +39,14 @@ Nothing
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.stop();
 ```
 
@@ -59,6 +63,14 @@ $('#alphaTab').alphaTab('stop');
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.Stop();
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.stop()
 ```
 
 </TabItem>

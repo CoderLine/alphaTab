@@ -26,6 +26,7 @@ all background workers are started, the audio output is initialized, a soundfont
 <TypeTable>
     <TypeRow type="js" name="function()" />    
     <TypeRow type="net" name="Action" />    
+    <TypeRow type="android" name="() -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -39,7 +40,8 @@ none
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -78,6 +80,16 @@ api.PlayerReady.On(() =>
 {
     EnablePlayerControls()
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.playerReady.on {
+    enablePlayerControls()
+}
 ```
 
 </TabItem>

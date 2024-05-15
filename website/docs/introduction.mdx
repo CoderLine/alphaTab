@@ -4,7 +4,7 @@ title: Introduction
 
 ## What is alphaTab?
 
-**alphaTab** is a JavaScript and .net library for building music notation software and websites. It allows you to take any of 
+**alphaTab** is a JavaScript, .net and Android library for building music notation software and websites. It allows you to take any of 
 various supported input files, and embed good looking and feature rich music sheets into your website.
 
 As of today alphaTab is **not** a drop-in component that provides all functionality out of the box. You should rather consider it as 
@@ -33,7 +33,8 @@ import TabItem from '@theme/TabItem';
   defaultValue="js"
   values={[
     { label: 'Vanilla JavaScript', value: 'js', },
-    { label: '.net', value: 'net', }
+    { label: '.net', value: 'net', },
+    { label: 'Kotlin for Android', value: 'android' }
   ]
 }>
 <TabItem value="js">
@@ -41,6 +42,8 @@ import TabItem from '@theme/TabItem';
 alphaTab follows a "web first" approach and the related package is provided as [NPM package](https://www.npmjs.com/package/@coderline/alphatab). Most development and testing happens on this web version.
 alphaTab runs on all major and modern browsers supporting ES6. We do not maintain a full list
 of browsers as most of modern browsers are auto-updating anyhow. 
+
+
 
 **ES6 compatible browsers**
 
@@ -78,15 +81,32 @@ old Microsoft Edge before it was based on Chromium.
 
 The .net version of alphaTab comes as NuGet packages. 
 
-- The [base package](https://www.nuget.org/packages/AlphaTab) targets the .net standard 2.0 and can be used in almost all environments using the low level APIs.
-- The [windows package](https://www.nuget.org/packages/AlphaTab.Window) targets .net core 3.1+ and provides WinForms and WPF UI controls.
+- The [base package](https://central.sonatype.com/artifact/net.alphatab/alphaSkia) targets the .net standard 2.0 and can be used in almost all environments using the low level APIs.
+- The [windows package](https://www.nuget.org/packages/AlphaTab.Window) targets .net 8.0 and provides WinForms and WPF UI controls.
 
 The .net version of alphaTab has some 3rd party dependencies for drawing and audio APIs but we try to keep them at a minimum. 
 
 </TabItem>
+
+<TabItem value="android">
+
+The Kotlin for Android version of alphaTab comes as Maven package on Maven Central and the Sonatype OSS Index. 
+
+* Group: `net.alphatab`
+* Package Name: `alphaTab-android`
+
+
+:::warning
+The Kotlin for Android version is still fairly new and there might be still some problems. We rely on your feedback to continuously improve this target.
+:::
+
+- Pre-Release Snapshots: https://s01.oss.sonatype.org/content/repositories/snapshots/net/alphatab/ 
+- Release Versions: https://central.sonatype.com/artifact/net.alphatab/alphaTab-android
+
+The Kotlin for Android version of alphaTab has some 3rd party dependencies for drawing and coroutines but we try to keep them at a minimum. 
+
+</TabItem>
 </Tabs>
-
-
 
 ## The data model
 The data model holds all information about a piece of music. This includes general information like
@@ -102,7 +122,7 @@ the information about music sheets. alphaTab has importers for:
 * Guitar Pro 7 files `.gp` which are a zip archive storing the music information as XML
 * [MusicXML](https://www.musicxml.com/) files `.xml` which is an open XML based standard by an open consortium
 * [CapXML](https://www.capella.de/CapXML/) files `.cap` which is an open XML based standard by Capella Software
-* [alphaTex](/docs/alphaTex/introduction) which is a text based format optimized for writing music notation in a textual format
+* [alphaTex](/docs/alphatex/introduction) which is a text based format optimized for writing music notation in a textual format
 
 :::note
 There exist many *dialects* of MusicXML and due to its very nature of describing music sheets in a very visual way, 

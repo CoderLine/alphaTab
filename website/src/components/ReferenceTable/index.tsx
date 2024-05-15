@@ -2,7 +2,7 @@ import React from 'react';
 import { Page } from '@site/src/page';
 import { buildNames } from '@site/src/names';
 import { CodeBadge } from '../CodeBadge';
-import { PropSidebarItem, PropSidebarItemCategory } from '@docusaurus/plugin-content-docs/src/sidebars/types';
+import { PropSidebarItem, PropSidebarItemCategory } from '@docusaurus/plugin-content-docs';
 import { useDocById } from '@docusaurus/theme-common/internal';
 
 function buildPropertyUrl(property: Page) {
@@ -17,25 +17,28 @@ function buildPropertyUrl(property: Page) {
 
 class ReferenceRow extends React.Component<{ property: Page, showJson: boolean }> {
     public render() {
-        const { jsNames, csNames, jQueryNames, domNames } = buildNames(this.props.property);
+        const { jsNames, csNames, jQueryNames, domNames, androidNames } = buildNames(this.props.property);
         const jsonNames = this.props.showJson ? jsNames : [];
         return (
             <tr>
                 <td>
                     <a href={buildPropertyUrl(this.props.property)}>
-                        {jsNames.map(n => <CodeBadge type="js" name={n} />)}
+                        {jsNames.map(n => <CodeBadge key={n} type="js" name={n} />)}
 
                         {jsonNames.length > 0 && <br />}
-                        {jsonNames.map(n => <CodeBadge type="json" name={n} />)}
+                        {jsonNames.map(n => <CodeBadge key={n} type="json" name={n} />)}
 
                         {(jsonNames.length > 0 || jsonNames.length > 0) && jQueryNames.length > 0 && <br />}
-                        {jQueryNames.map(n => (<CodeBadge type="jquery" name={n} />))}
+                        {jQueryNames.map(n => (<CodeBadge key={n} type="jquery" name={n} />))}
 
                         {domNames.length > 0 && <br />}
-                        {domNames.map(n => (<CodeBadge type="html" name={n} />))}
+                        {domNames.map(n => (<CodeBadge key={n} type="html" name={n} />))}
 
                         {csNames.length > 0 && <br />}
-                        {csNames.map(n => (<CodeBadge type="net" name={n} />))}
+                        {csNames.map(n => (<CodeBadge key={n} type="net" name={n} />))}
+
+                        {androidNames.length > 0 && <br />}
+                        {androidNames.map(n => (<CodeBadge key={n} type="android" name={n} />))}
                     </a>
                 </td>
                 <td>{this.props.property.prop('description', '')}</td>

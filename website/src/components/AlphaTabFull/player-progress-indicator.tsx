@@ -34,7 +34,7 @@ export class PlayerProgressIndicator extends React.Component<PlayerProgressIndic
                                 transformOrigin: `50% 50%`,
                                 transform: 'rotate(-90deg)'
                             } }
-                            stroke-width={this._stroke}                            
+                            strokeWidth={this._stroke}                            
                             fill="transparent"
                             r={this._normalizedRadius}
                             cx={this._radius}

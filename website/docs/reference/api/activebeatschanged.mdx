@@ -26,6 +26,7 @@ this event contains the beats of all tracks and voices independent of them being
 <TypeTable>
     <TypeRow type="js" name="function(activeBeatsChangedEventArgs)" />    
     <TypeRow type="net" name="Action<AlphaTab.Synth.ActiveBeatsChangedEventArgs>" />    
+    <TypeRow type="android" name="(args : AlphaTab.Synth.ActiveBeatsChangedEventArgs) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -35,6 +36,9 @@ this event contains the beats of all tracks and voices independent of them being
         The event args containing the info about the active beats. 
     </ParameterRow>    
     <ParameterRow platform="net" name="beat" type="AlphaTab.Synth.ActiveBeatsChangedEventArgs">
+        The event args containing the info about the active beats.
+    </ParameterRow>
+    <ParameterRow platform="android" name="beat" type="alphaTab.synth.ActiveBeatsChangedEventArgs">
         The event args containing the info about the active beats.
     </ParameterRow>
 </ParameterTable>
@@ -48,6 +52,9 @@ this event contains the beats of all tracks and voices independent of them being
     <ParameterRow platform="net" name="ActiveBeats" type="IList<AlphaTab.Model.Beat>">
         The currently active beats across all tracks and voices.
     </ParameterRow>
+    <ParameterRow platform="android" name="activeBeats" type="alphaTab.collections.List<alphaTab.model.Beat>">
+        The currently active beats across all tracks and voices.
+    </ParameterRow>
 </ParameterTable>
 
 ## Examples
@@ -58,7 +65,8 @@ this event contains the beats of all tracks and voices independent of them being
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -98,6 +106,16 @@ api.ActiveBeatsChanged.On(args =>
 {
     UpdateHighlights(args.ActiveBeats);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.activeBeatsChanged.on { args ->
+    updateHighlights(args.activeBeats)
+}
 ```
 
 </TabItem>

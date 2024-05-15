@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Methods - Player
   since:  0.9.4
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -20,6 +22,7 @@ Starts the playback of the current song if possible.Reasons for not starting can
     <TypeRow type="js" name="function play()" />
     <TypeRow type="jquery" name="alphaTab('play')" />
     <TypeRow type="net" name="void Play()" />
+    <TypeRow type="android" name="fun play(): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -35,13 +38,14 @@ true if the playback was started, otherwise false. Reasons for not starting can 
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.play();
 ```
 
@@ -58,6 +62,14 @@ $('#alphaTab').alphaTab('play');
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.Play();
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.play()
 ```
 
 </TabItem>

@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Methods - Player
   since:  0.9.4
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -42,6 +44,15 @@ This function initiates a load of the soundfont using the given data. The suppor
     <TypeRow type="net" name="bool LoadSoundFont(Stream raw, append)">
         Load the soundfont from the given stream.
     </TypeRow>
+    <TypeRow type="android" name="fun loadSoundFont(raw: ByteArray, append: Boolean = false): Boolean">
+        Load the soundfont from the given raw bytes.
+    </TypeRow>
+    <TypeRow type="android" name="fun loadSoundFont(raw: UByteArray, append: Boolean = false): Boolean">
+        Load the soundfont from the given raw bytes.
+    </TypeRow>
+    <TypeRow type="android" name="fun loadSoundFont(stream: java.io.InputStream, append: Boolean = false): Boolean">
+        Load the soundfont from the given stream.
+    </TypeRow>
 </TypeTable>
 
 ### Parameters
@@ -62,6 +73,18 @@ This function initiates a load of the soundfont using the given data. The suppor
     <ParameterRow platform="net" name="raw" type="System.IO.Stream">
         The stream containing a SoundFont2 file.
     </ParameterRow>
+    <ParameterRow platform="android" name="raw" type="ByteArray">
+        The raw bytes containing a SoundFont2 file.
+    </ParameterRow>
+    <ParameterRow platform="android" name="raw" type="ByteArray">
+        The raw bytes containing a SoundFont2 file.
+    </ParameterRow>
+    <ParameterRow platform="android" name="raw" type="UByteArray">
+        The raw bytes containing a SoundFont2 file.
+    </ParameterRow>
+    <ParameterRow platform="android" name="stream" type="java.io.InputStream">
+        The stream containing a SoundFont2 file.
+    </ParameterRow>
     <ParameterRow platform="all" name="append" type="boolean">
         Whether to append the presets of the new soundfont to the already loaded
         ones. <span class="badge badge--info">Since: 1.1.0</span>
@@ -78,13 +101,14 @@ This function initiates a load of the soundfont using the given data. The suppor
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.loadSoundFont('/assets/MyFile.sf2');
 ```
 
@@ -101,6 +125,16 @@ $('#alphaTab').alphaTab('loadSoundFont', '/assets/MyFile.sf2');
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.LoadSoundFont(System.IO.File.OpenRead("MyFile.sf2"));
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+contentResolver.openInputStream(uri).use {
+    api.loadSoundFont(it)
+}
 ```
 
 </TabItem>

@@ -27,6 +27,7 @@ only then this hit detection can be done. A click on a note is considered if the
 <TypeTable>
     <TypeRow type="js" name="function(note)" />    
     <TypeRow type="net" name="Action<AlphaTab.Model.Note>" />    
+    <TypeRow type="android" name="(note: AlphaTab.Model.Note) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -38,6 +39,9 @@ only then this hit detection can be done. A click on a note is considered if the
     <ParameterRow platform="net" name="note" type="AlphaTab.Model.Note">
         The note which was clicked.
     </ParameterRow>
+    <ParameterRow platform="net" name="note" type="alphaTab.model.Note">
+        The note which was clicked.
+    </ParameterRow>
 </ParameterTable>
 
 ## Examples
@@ -47,7 +51,8 @@ only then this hit detection can be done. A click on a note is considered if the
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -78,6 +83,16 @@ api.NoteMouseDown.On(note =>
 {
     api.PlayNote(note);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.noteMouseDown.on { note -> 
+    api.playNote(note)
+}
 ```
 
 </TabItem>

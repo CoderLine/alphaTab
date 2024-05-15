@@ -1,3 +1,4 @@
 export default {
-    fontDirectory: '/font/'
+    fontDirectory: '/font/',
+    soundFontDirectory: '/soundfont/'
 };

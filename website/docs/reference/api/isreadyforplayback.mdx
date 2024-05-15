@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Properties - Player
   since:  0.9.4
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -33,13 +35,14 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 if(api.isReadyForPlayback)) api.play();
 ```
 
@@ -47,7 +50,7 @@ if(api.isReadyForPlayback)) api.play();
 <TabItem value="jq">
 
 ```js
-var at = $('#alphaTab');
+const at = $('#alphaTab');
 if(at.alphaTab('isReadyForPlayback')) at.alphaTab('play');
 ```
 
@@ -57,6 +60,14 @@ if(at.alphaTab('isReadyForPlayback')) at.alphaTab('play');
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 if(api.IsReadyForPlayback) api.Play();
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+if (api.isReadyForPlayback) api.play()
 ```
 
 </TabItem>

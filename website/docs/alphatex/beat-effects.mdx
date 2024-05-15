@@ -22,9 +22,9 @@ Please find the list of supported effects in the example below.
 // slap
 3.3{s}
 // pop
-3.3{p} 
+3.3{p}
 |
-// dotted 
+// dotted
 3.3{d}
 // double dotted
 3.3{dd}
@@ -83,7 +83,7 @@ The values indicate the number of quarter notes increased or decreased while pla
 
 ## Brushes / Arpeggio
 
-Brush stroke effetcs are: brush down `bd`, brush up `bu`, arpeggio down `ad`, and arpeggio up `au`.
+Brush stroke effects are: brush down `bd`, brush up `bu`, arpeggio down `ad`, and arpeggio up `au`.
 By default, the duration between notes is calculated based on the number of notes in the beat (the chord).
 A custom duration (in MIDI ticks) can also be specified with, for example `bd 120`.
 
@@ -109,7 +109,7 @@ This will annotate the chord name above the beat.
 
 A global metadata tag `\chord` can define the chord diagram for each chord.
 The format is `\chord ChordName String1 String2 ...`. A value must be defined for all strings. `x` annotates that the string is not played.
-Additionally there are 4 properties which adjust the chord details: 
+Additionally there are 4 properties which adjust the chord details:
 
 * `FirstFret Number` - shifts the first fret shown in the diagram higher.
 * `Barre Fret1 Fret2 ...` - defines on which frets a barré should be played (visually joins the dots to a bar).
@@ -129,7 +129,6 @@ Additionally there are 4 properties which adjust the chord details:
 \\chord{showname false barre 1 3} "Special" 3 3 3 1 1 1
 .
 \\ts 2 4
-\
 (0.1 1.2 0.3 2.4 3.5){ch "C"} (0.1 1.2 0.3 2.4 3.5) |
 (1.1 3.2 5.3 3.4 1.5){ch "A#add9"} (1.1 3.2 5.3 3.4 1.5)|
 (6.1 8.2 8.3 8.4 6.5){ch "D#"} (6.1 8.2 8.3 8.4 6.5) |

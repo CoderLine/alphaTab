@@ -4,49 +4,9 @@ full_width: true
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
-import * as alphaTab from '@coderline/alphatab'
+import {ScoreDetails } from '@site/src/components/ShowCaseGeneralScoreDetails'
 
 ## Score Details
-
-export class ScoreDetails extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			score: null,
-			error: null
-		};
-	}
-	componentDidMount() {
-		alphaTab.importer.ScoreLoader.loadScoreAsync(this.props.file, score =>
-		{
-			this.setState({score});
-		},
-		error => {
-			this.setState({error});
-		});
-	}
-	render() {
-    if (this.state.error) {
-		return this.state.error;
-    } else if(this.state.score) {
-		return (
-		<>
-			<p><strong>Title:</strong> {this.state.score.title}</p>
-			<p><strong>Subtitle:</strong> {this.state.score.subtitle}</p>
-			<p><strong>Album:</strong> {this.state.score.album}</p>
-			<p><strong>Tempo:</strong> {this.state.score.tempo}</p>
-			<p><strong>Bars:</strong> {this.state.score.masterBars.length}</p>
-			<p><strong>Tracks:</strong> {this.state.score.tracks.length}</p>
-			<ul>
-				{this.state.score.tracks.map(t => <li>{t.name}</li>)}
-			</ul>
-		</>);	
-	}
-	else {
-		return "Loading...";
-	}
-  }
-}
 
 The full score details are available as object dom. This way you can read and process any like you need. 
 

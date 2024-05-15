@@ -25,6 +25,7 @@ This event is fired when the playback range changed.
 <TypeTable>
     <TypeRow type="js" name="function(e)" />    
     <TypeRow type="net" name="Action<PlaybackRangeChangedEventArgs>" />    
+    <TypeRow type="android" name="(e: PlaybackRangeChangedEventArgs) : Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -34,6 +35,9 @@ This event is fired when the playback range changed.
         The information about the changed playback range. 
     </ParameterRow>
     <ParameterRow platform="net" name="args" type="AlphaTab.Synth.PlaybackRangeChangedEventArgs">
+        The information about the changed playback range.
+    </ParameterRow>
+    <ParameterRow platform="android" name="args" type="alphaTab.synth.PlaybackRangeChangedEventArgs">
         The information about the changed playback range.
     </ParameterRow>
 </ParameterTable>
@@ -47,6 +51,9 @@ This event is fired when the playback range changed.
     <ParameterRow platform="net" name="PlaybackRange" type="AlphaTab.Synth.PlaybackRange">
         The new playback range or null if no range is selected. (see [PlaybackRange](/docs/reference/api/playbackrange))
     </ParameterRow>
+    <ParameterRow platform="android" name="playbackRange" type="alphaTab.synth.PlaybackRange">
+        The new playback range or null if no range is selected. (see [PlaybackRange](/docs/reference/api/playbackrange))
+    </ParameterRow>
 </ParameterTable>
 
 ## Examples
@@ -57,7 +64,8 @@ This event is fired when the playback range changed.
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -116,6 +124,21 @@ api.PlaybackRangeChanged.On(args =>
         ClearHighlightInProgressBar();
     }
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.playbackRangeChanged.on { args ->
+    val playbackRange = args.playbackRange
+    if (playbackRange != null) {
+        highlightRangeInProgressBar(playbackRange.startTick, playbackRange.endTick)
+    } else {
+        clearHighlightInProgressBar()
+    }
+}
 ```
 
 </TabItem>

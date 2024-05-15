@@ -30,6 +30,11 @@ AlphaTab can use various render engines to draw the music notation. The availabl
         `gdi` - Only available desktop .net. Uses [GDI+](https://docs.microsoft.com/en-us/dotnet/framework/winforms/advanced/graphics-and-drawing-in-windows-forms) for rendering <br /> 
         `svg` - Available on all .net platforms. Outputs SVG strings. 
     </TypeRow>
+    <TypeRow type="android" name="string">
+        `skia` - Uses [Skia](https://skia.org/) for rendering<br />
+        `android` - Uses [android.graphics.Canvas](https://developer.android.com/reference/android/graphics/Canvas) for rendering<br />
+        `svg` - Outputs SVG strings. 
+    </TypeRow>
 </TypeTable>
 
 ## Default Value
@@ -39,4 +44,5 @@ AlphaTab can use various render engines to draw the music notation. The availabl
 <TypeTable>
     <TypeRow type="js-html" name="svg" />
     <TypeRow type="net" name="skia" />
+    <TypeRow type="android" name="skia" />
 </TypeTable>

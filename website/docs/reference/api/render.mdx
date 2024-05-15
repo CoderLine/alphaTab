@@ -5,6 +5,9 @@ sidebar_custom_props:
   category: Methods - Core
   since:  0.9.4
 ---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -20,6 +23,7 @@ Initiates a re-rendering of the current setup. If rendering is not yet possible,
     <TypeRow type="js" name="function render()" />
     <TypeRow type="jquery" name="alphaTab('render')" />
     <TypeRow type="net" name="void Render()" />
+    <TypeRow type="android" name="fun render(): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -36,13 +40,14 @@ Nothing
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.render();
 ```
 
@@ -61,6 +66,13 @@ var api = new AlphaTabApi<MyControl>(...);
 api.Render();
 ```
 
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.render()
+```
 
 </TabItem>
 </Tabs>

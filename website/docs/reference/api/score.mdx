@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Properties - Core
   since:  0.9.4
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -22,8 +24,9 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
 ## Types
 
 <TypeTable>
-    <TypeRow type="net" name="AlphaTab.Model.Score" />
     <TypeRow type="js" name="alphaTab.model.Score" />
+    <TypeRow type="net" name="AlphaTab.Model.Score" />
+    <TypeRow type="android" name="alphaTab.model.Score" />
 </TypeTable>
 
 ## Examples
@@ -33,13 +36,14 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 updateScoreInfo(api.score);
 ```
 
@@ -56,6 +60,14 @@ updateScoreInfo($('#alphaTab').alphaTab('score'));
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 UpdateScoreInfo(api.Score);
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+updateScoreInfo(api.score)
 ```
 
 </TabItem>

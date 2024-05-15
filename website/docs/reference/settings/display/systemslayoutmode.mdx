@@ -1,0 +1,107 @@
+---
+title: display.systemsLayoutMode
+description: The mode used to arrange staves and systems.
+sidebar_custom_props:
+  jsOnParent: true
+  category: Display
+  since: 1.3.0-alpha.671
+---
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.3.0-alpha.671" />
+
+import { PropertyDescription } from '@site/src/components/PropertyDescription';
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+
+## Description
+
+By default alphaTab uses an own (automatic) mode to arrange and scale the bars when 
+putting them into staves. This property allows changing this mode to change the music sheet arrangement.
+
+<PropertyDescription metadata={metadata} showJson={true} />
+
+## Types
+
+<TypeTable>
+    <TypeRow type="js" name="alphaTab.SystemsLayoutMode">
+        `Automatic`<br />
+        `UseModelLayout`
+    </TypeRow>
+    <TypeRow type="json-js-html" name="string">
+        `automatic`<br />
+        `usemodellayout`
+    </TypeRow>
+    <TypeRow type="json-js-html" name="int">
+        `0` - Automatic<br />
+        `1` - UseModelLayout
+    </TypeRow>
+    <TypeRow type="net" name="AlphaTab.SystemsLayoutMode">
+        `Automatic`<br />
+        `UseModelLayout`
+    </TypeRow>
+    <TypeRow type="android" name="alphaTab.SystemsLayoutMode">
+        `Automatic`<br />
+        `UseModelLayout`
+    </TypeRow>
+</TypeTable>
+
+## Default Value
+
+`automatic`
+
+## Supported File Formats:
+
+* Guitar Pro 6-8 <span class="badge badge--info">1.3.0-alpha.671</span>
+
+If you want/need support for more file formats to respect the sizing information feel free to [open a discussion](https://github.com/CoderLine/alphaTab/discussions/new?category=ideas) on GitHub. 
+
+## Automatic Mode
+
+In the automatic mode alphaTab arranges the bars and staves using its internal mechanisms.
+
+For the `page` layout this means it will scale the bars according to the `stretchForce` and available width. 
+Wrapping into new systems (rows) will happen when the row is considered "full".
+
+For the `horizontal` layout the `stretchForce` defines the sizing and no wrapping happens at all. 
+
+## Model Layout mode
+
+File formats like Guitar Pro embed information about the layout in the file and alphaTab can read and use this information. 
+When this mode is enabled, alphaTab will also actively use this information and try to respect it.
+
+alphaTab holds following information in the data model and developers can change those values (e.g. by tapping into the `scoreLoaded`) event.
+
+**Used when single tracks are rendered:**
+
+* `score.tracks[index].systemsLayout` - An array of numbers describing how many bars should be placed within each system (row).
+* `score.tracks[index].defaultSystemsLayout` - The number of bars to place in a system (row) when no value is defined in the `systemsLayout`.
+* `score.tracks[index].staves[index].bars[index].displayScale` - The relative size of this bar in the system it is placed. Note that this is not directly a percentage value. e.g. if there are 3 bars and all define scale 1, they are sized evenly. 
+* `score.tracks[index].staves[index].bars[index].displayWidth` - The absolute size of this bar when displayed. 
+
+**Used when multiple tracks are rendered:**
+
+* `score.systemsLayout` - Like the `systemsLayout` on track level. 
+* `score.defaultSystemsLayout` - Like the `defaultSystemsLayout` on track level. 
+* `score.masterBars[index].displayScale` - Like the `displayScale` on bar level.
+* `score.masterBars[index].displayWidth` - Like the `displayWidth` on bar level.
+
+### Page Layout
+
+The page layout uses the `systemsLayout` and `defaultSystemsLayout` to decide how many bars go into a single system (row). 
+Additionally when sizing the bars within the system the `displayScale` is used. As indicated above, the scale is rather a ratio than a percentage value but percentages work also:
+
+<img src="/img/reference/property/systems-layout-page-examples.png" />
+
+The page layout does not use `displayWidth`. The use of absolute widths would break the proper alignments needed for this kind of display.
+
+Also note that the sizing is including any glyphs and notation elements within the bar. e.g. if there are clefs in the bar, they are still "squeezed" into the available size. 
+It is not the case that the actual notes with their lengths are sized accordingly. This fits the sizing system of Guitar Pro and when files are customized there,
+alphaTab will match this layout quite close. 
+
+### Horizontal Layout
+
+The horizontal layout uses the `displayWidth` to scale the bars to size the bars exactly as specified. This kind of sizing and layout can be useful for usecases like: 
+
+* Comparing files against each other (top/bottom comparison)
+* Aligning the playback of multiple files on one screen assuming the same tempo (e.g. one file per track).
+

@@ -5,6 +5,9 @@ sidebar_custom_props:
   category: Methods - Player
   since:  1.1.0
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="1.1.0" />
@@ -23,6 +26,7 @@ It is a playback of audio separate to the main song playback.
     <TypeRow type="js" name="function playNote(note)" />
     <TypeRow type="jquery" name="alphaTab('playNote', note)" />
     <TypeRow type="net" name="void PlayNote(Note note)" />
+    <TypeRow type="android" name="fun playNote(note: Note): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -32,6 +36,9 @@ It is a playback of audio separate to the main song playback.
         The single note to play.
     </ParameterRow>
     <ParameterRow platform="net" name="beat" type="AlphaTab.Model.Note">
+        The single note to play.
+    </ParameterRow>
+    <ParameterRow platform="android" name="beat" type="alphaTab.model.Note">
         The single note to play.
     </ParameterRow>
 </ParameterTable>
@@ -47,13 +54,14 @@ It is a playback of audio separate to the main song playback.
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playNote(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0]);
 ```
 
@@ -61,7 +69,7 @@ api.playNote(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0]);
 <TabItem value="jq">
 
 ```js
-var note = $('#alphaTab').alphaTab('score').tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+const note = $('#alphaTab').alphaTab('score').tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
 $('#alphaTab').alphaTab('playNote', beat);
 ```
 
@@ -71,6 +79,14 @@ $('#alphaTab').alphaTab('playNote', beat);
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.PlayNote(api.Score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0]);
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.playNote(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0]);
 ```
 
 </TabItem>

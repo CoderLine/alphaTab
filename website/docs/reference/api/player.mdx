@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Properties - Player
   since:  0.9.4
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -24,6 +26,7 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
 <TypeTable>
     <TypeRow type="js" name="alphaTab.synth.IAlphaSynth" />
     <TypeRow type="net" name="AlphaTab.Synth.IAlphaSynth" />
+    <TypeRow type="android" name="alphaTab.synth.IAlphaSynth" />
 </TypeTable>
 
 ## Examples
@@ -33,13 +36,14 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 setupPlayerEvents(api.settings);
 ```
 
@@ -56,6 +60,14 @@ setupPlayerEvents($('#alphaTab').alphaTab('player'));
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 SetupPlayerEvents(api.Player);
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+setupPlayerEvents(api.player)
 ```
 
 </TabItem>

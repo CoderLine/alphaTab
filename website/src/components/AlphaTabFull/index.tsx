@@ -38,10 +38,11 @@ export class AlphaTabFull extends React.Component<AlphaTabProps, AlphaTabState> 
 
         // pull fonts
         const settings = new alphaTab.Settings();
+        settings.core.logLevel = alphaTab.LogLevel.Debug;
         settings.player.scrollOffsetY = -10;
         settings.player.enablePlayer = true;
         settings.core.fontDirectory = environment.fontDirectory;
-        settings.player.soundFont = require('@coderline/alphatab/soundfont/sonivox.sf2');
+        settings.player.soundFont = environment.soundFontDirectory + 'sonivox.sf2';
         settings.fillFromJson(props.settings);
 
         this.state = {

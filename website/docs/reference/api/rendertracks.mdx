@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Methods - Core
   since:  0.9.4
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -21,6 +23,7 @@ Initiates a rendering of the tracks. All tracks must be from the same score, oth
     <TypeRow type="js" name="function renderTracks(tracks)" />
     <TypeRow type="jquery" name="alphaTab('renderTracks', tracks)" />
     <TypeRow type="net" name="bool RenderTracks(Tracks[] track)" />
+    <TypeRow type="android" name="fun renderTracks(tracks: alphaTab.collections.List<alphaTab.model.Track>): Unit" />
 </TypeTable>
 
 ### Parameters
@@ -30,6 +33,9 @@ Initiates a rendering of the tracks. All tracks must be from the same score, oth
         The tracks that should be rendered.
     </ParameterRow>
     <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Track[]">
+        The tracks that should be rendered.
+    </ParameterRow>
+    <ParameterRow platform="android" name="tracks" type="alphaTab.collections.List<alphaTab.model.Track>">
         The tracks that should be rendered.
     </ParameterRow>
 </ParameterTable>
@@ -44,13 +50,14 @@ Nothing
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
 ```
 
@@ -58,8 +65,8 @@ api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
 <TabItem value="jq">
 
 ```js
-var at = $('#alphaTab');
-var score = at.alphaTab('score');
+const at = $('#alphaTab');
+const score = at.alphaTab('score');
 at.alphaTab('renderTracks', [
     api.score.tracks[2],
     api.score.tracks[3]
@@ -75,6 +82,17 @@ api.RenderTracks(new []{
     api.Score.Tracks[2], 
     api.Score.Tracks[3]
 });
+```
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.renderTracks(alphaTab.collections.List(
+    api.score.tracks[2], 
+    api.score.tracks[3]
+}
+
 ```
 </TabItem>
 </Tabs>

@@ -187,7 +187,7 @@ const settings = new alphaTab.Settings();
 
 // Setup generator and midi file handler
 const midiFile = new alphaTab.midi.MidiFile();
-const handler = new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile);
+const handler = new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile, true /* For SMF1.0 export */);
 const generator = new alphaTab.midi.MidiFileGenerator(score, settings, handler);
 
 // start generation
@@ -206,7 +206,7 @@ var settings = new AlphaTab.Settings();
 
 // Setup generator and midi file handler
 var midiFile = new AlphaTab.Midi.MidiFile();
-var handler = new AlphaTab.Midi.AlphaSynthMidiFileHandler(midiFile);
+var handler = new AlphaTab.Midi.AlphaSynthMidiFileHandler(midiFile, true /* For SMF1.0 export */);
 var generator = new AlphaTab.Midi.MidiFileGenerator(score, settings, handler);
 
 // start generation
@@ -258,9 +258,11 @@ The API is the same as on the normal `AlphaSynth` object but
 it needs a bit more input on creation but then the rest works as above. 
 
 ```js
+const supportsAudioWorklets: boolean = window.isSecureContext && 'AudioWorkletNode' in window;
 
 const player = new alphaTab.synth.AlphaSynthWebWorkerApi(
-    new AlphaSynthWebAudioOutput(), // the output to be used on the main browser thread
+    // the output to be used on the main browser thread
+    supportsAudioWorklets ? new alphaTab.synth.AlphaSynthAudioWorkletOutput() : new alphaTab.synth.AlphaSynthWebAudioOutput(),
     pathToAlphaSynthScriptFile, // this script will be used to launch the worker, must point to the main file containing alphaTab
     alphaTab.LogLevel.Info // the log level to use
 );

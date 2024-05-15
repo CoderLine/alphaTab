@@ -33,6 +33,7 @@ count-in ticks are handled within the synthesizer.
 <TypeTable>
     <TypeRow type="js" name="function(midiFile)" />    
     <TypeRow type="net" name="Action<MidiFile>" />    
+    <TypeRow type="android" name="(file: MidiFile) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -54,7 +55,8 @@ count-in ticks are handled within the synthesizer.
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -95,6 +97,16 @@ api.MidiLoad.On(file =>
 {
     InitializePianoPractice(file);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```cs
+val api = AlphaTabApi<MyControl>(...)
+api.midiLoad.on { file ->
+    initializePianoPractice(file)
+}
 ```
 
 </TabItem>

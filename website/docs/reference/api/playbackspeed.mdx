@@ -5,6 +5,8 @@ sidebar_custom_props:
   category: Properties - Player
   since:  0.9.4
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="0.9.4" />
@@ -36,13 +38,14 @@ import { PropertyDescription } from '@site/src/components/PropertyDescription';
   values={[
     { label: 'JavaScript', value: 'js', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
 
 ```js
-var api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playbackSpeed = 0.5;
 ```
 
@@ -59,6 +62,14 @@ $('#alphaTab').alphaTab('playbackSpeed', 0.5)
 ```csharp
 var api = new AlphaTabApi<MyControl>(...);
 api.PlaybackSpeed = 0.5;
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.playbackSpeed = 0.5
 ```
 
 </TabItem>

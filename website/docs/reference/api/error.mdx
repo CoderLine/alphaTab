@@ -27,6 +27,7 @@ Instead a signal to this error handlers will be sent.
 <TypeTable>
     <TypeRow type="net" name="Action<Error>" />    
     <TypeRow type="js" name="function(error)" />    
+    <TypeRow type="android" name="(error: alphaTab.core.ecmaScript.Error) -> Unit" />    
 </TypeTable>
 
 ## Parameters
@@ -45,7 +46,8 @@ Instead a signal to this error handlers will be sent.
     { label: 'JavaScript', value: 'js', },
     { label: 'HTML', value: 'html', },
     { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
   ]
 }>
 <TabItem value="js">
@@ -84,6 +86,16 @@ api.Error.On((error) =>
 {
     DisplayError(error);
 });
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.error.on { error -> 
+    displayError(error)
+}
 ```
 
 </TabItem>

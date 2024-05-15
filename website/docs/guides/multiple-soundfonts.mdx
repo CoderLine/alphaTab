@@ -119,7 +119,7 @@ The example below will already give some hints on how you might want to manage t
 	at.scoreLoaded.on(score => {
 		score.tracks.forEach(track => {
 			const program = track.playbackInfo.program;
-			if(track.playbackInfo === 9 /* drums */ || (program >= 24 && program <= 31)) {
+			if(track.playbackInfo.primaryChannel === 9 /* drums */ || (program >= 24 && program <= 31)) {
 				loadSoundFont('sonivox-main.sf2');
 			} else {
 				loadSoundFont('sonivox-others.sf2');
