@@ -21,7 +21,7 @@ audio playback elements like notes/rests played or metronome ticks.
 
 Refer to the [related guide](/docs/guides/handling-midi-events) to learn more about this feature. 
 
-Also note that the provided data models changed significantly in `1.3.0-alpha.720`. We try to provide backwards compatibility
+Also note that the provided data models changed significantly in `1.3.0`. We try to provide backwards compatibility
 until some extend but highly encourage changing to the new models in case of problems. 
 
 
@@ -85,7 +85,7 @@ The base class for all midi events. Check the `type` property to find out which 
     <ParameterRow platform="all" name="command" type="alphaTab.midi.MidiEventType">
         The type of this event. (Deprecated since 1.3, use `type` instead)
     </ParameterRow>    
-    <ParameterRow platform="all" name="type" type="alphaTab.midi.MidiEventType" since="1.3.0-alpha.720">
+    <ParameterRow platform="all" name="type" type="alphaTab.midi.MidiEventType" since="1.3.0">
         The type of this event.
     </ParameterRow>    
     <ParameterRow platform="all" name="data1" type="number">
