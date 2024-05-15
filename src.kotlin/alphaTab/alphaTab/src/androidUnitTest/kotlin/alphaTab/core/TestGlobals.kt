@@ -99,6 +99,14 @@ class Expector<T>(private val actual: T) {
         }
     }
 
+    fun `false`() {
+        if (actual is Boolean) {
+            kotlin.test.assertFalse(actual);
+        } else {
+            kotlin.test.fail("toBeFalse can only be used on booleans:");
+        }
+    }
+
 
     fun `throw`(expected: KClass<out Throwable>) {
         val actual = actual

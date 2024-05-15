@@ -123,7 +123,7 @@ export class LayoutConfiguration {
         }
 
         // Single Track Views for each track
-        for (const _ of score.tracks) {
+        for (const _track of score.tracks) {
             writer.writeByte(0xFF);
         }
 

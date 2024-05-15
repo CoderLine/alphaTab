@@ -119,6 +119,18 @@ namespace AlphaTab.Test
             }
         }
 
+        public void False()
+        {
+            if (_actual is bool b)
+            {
+                Assert.IsFalse(b);
+            }
+            else
+            {
+                Assert.Fail("ToBeFalse can only be used on bools:");
+            }
+        }
+
 
 
         public void Throw(Type expected)
