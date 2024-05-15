@@ -10,30 +10,30 @@ export class CoreSettingsSerializer {
     public static fromJson(obj: CoreSettings, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: CoreSettings | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
+        }
+        const o = new Map<string, unknown>();
         /*@target web*/
-        o.set("scriptfile", obj.scriptFile); 
+        o.set("scriptfile", obj.scriptFile);
         /*@target web*/
-        o.set("fontdirectory", obj.fontDirectory); 
+        o.set("fontdirectory", obj.fontDirectory);
         /*@target web*/
-        o.set("file", obj.file); 
+        o.set("file", obj.file);
         /*@target web*/
-        o.set("tex", obj.tex); 
+        o.set("tex", obj.tex);
         /*@target web*/
-        o.set("tracks", obj.tracks); 
-        o.set("enablelazyloading", obj.enableLazyLoading); 
-        o.set("engine", obj.engine); 
-        o.set("loglevel", obj.logLevel as number); 
-        o.set("useworkers", obj.useWorkers); 
-        o.set("includenotebounds", obj.includeNoteBounds); 
-        return o; 
+        o.set("tracks", obj.tracks);
+        o.set("enablelazyloading", obj.enableLazyLoading);
+        o.set("engine", obj.engine);
+        o.set("loglevel", obj.logLevel as number);
+        o.set("useworkers", obj.useWorkers);
+        o.set("includenotebounds", obj.includeNoteBounds);
+        return o;
     }
     public static setProperty(obj: CoreSettings, property: string, v: unknown): boolean {
         switch (property) {
@@ -72,8 +72,7 @@ export class CoreSettingsSerializer {
             case "includenotebounds":
                 obj.includeNoteBounds = v! as boolean;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

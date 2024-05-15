@@ -1,4 +1,4 @@
-import { DynamicValue } from '@src/model/DynamicValue';
+import { ControllerType } from "./ControllerType";
 
 /**
  * A handler is responsible for writing midi events to a custom structure
@@ -26,7 +26,7 @@ export interface IMidiFileHandler {
      * @param start The midi ticks when the note should start playing.
      * @param length The duration the note in midi ticks.
      * @param key The key of the note to play
-     * @param dynamicValue The dynamic which should be applied to the note.
+     * @param velocity The velocity which should be applied to the note (derived from the note dynamics).
      * @param channel The midi channel on which the note should be played.
      */
     addNote(
@@ -34,7 +34,7 @@ export interface IMidiFileHandler {
         start: number,
         length: number,
         key: number,
-        dynamicValue: DynamicValue,
+        velocity: number,
         channel: number
     ): void;
 
@@ -46,7 +46,7 @@ export interface IMidiFileHandler {
      * @param controller The midi controller that should change.
      * @param value The value to which the midi controller should change
      */
-    addControlChange(track: number, tick: number, channel: number, controller: number, value: number): void;
+    addControlChange(track: number, tick: number, channel: number, controller: ControllerType, value: number): void;
 
     /**
      * Add a program change to the generated midi file

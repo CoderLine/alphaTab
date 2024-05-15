@@ -14,20 +14,22 @@ export class BarSerializer {
     public static fromJson(obj: Bar, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: Bar | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("id", obj.id); 
-        o.set("clef", obj.clef as number); 
-        o.set("clefottava", obj.clefOttava as number); 
-        o.set("voices", obj.voices.map(i => VoiceSerializer.toJson(i))); 
-        o.set("similemark", obj.simileMark as number); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("id", obj.id);
+        o.set("clef", obj.clef as number);
+        o.set("clefottava", obj.clefOttava as number);
+        o.set("voices", obj.voices.map(i => VoiceSerializer.toJson(i)));
+        o.set("similemark", obj.simileMark as number);
+        o.set("displayscale", obj.displayScale);
+        o.set("displaywidth", obj.displayWidth);
+        return o;
     }
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
         switch (property) {
@@ -51,8 +53,13 @@ export class BarSerializer {
             case "similemark":
                 obj.simileMark = JsonHelper.parseEnum<SimileMark>(v, SimileMark)!;
                 return true;
-        } 
-        return false; 
+            case "displayscale":
+                obj.displayScale = v! as number;
+                return true;
+            case "displaywidth":
+                obj.displayWidth = v! as number;
+                return true;
+        }
+        return false;
     }
 }
-

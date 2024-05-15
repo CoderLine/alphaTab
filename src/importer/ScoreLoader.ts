@@ -76,8 +76,7 @@ export class ScoreLoader {
         let importers: ScoreImporter[] = Environment.buildImporters();
         Logger.debug(
             'ScoreLoader',
-            'Loading score from ' + data.length + ' bytes using ' + importers.length + ' importers',
-            null
+            `Loading score from ${data.length} bytes using ${importers.length} importers`
         );
         let score: Score | null = null;
         let bb: ByteBuffer = ByteBuffer.fromBuffer(data);
@@ -101,7 +100,6 @@ export class ScoreLoader {
         if (score) {
             return score;
         }
-        Logger.error('ScoreLoader', 'No compatible importer found for file');
         throw new UnsupportedFormatError('No compatible importer found for file');
     }
 }

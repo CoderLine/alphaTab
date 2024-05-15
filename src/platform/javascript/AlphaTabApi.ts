@@ -1,7 +1,7 @@
 import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
 import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
-import { MidiFile } from '@src/midi/MidiFile';
+import { MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
 import { LayoutMode } from '@src/LayoutMode';
 import { IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Track } from '@src/model/Track';
@@ -79,13 +79,13 @@ export class AlphaTabApi extends AlphaTabApiBase<any | Settings> {
                 ? window.innerWidth
                 : "clientWidth" in document.documentElement
                     ? document.documentElement.clientWidth
-                    : window.screen.width;
+                    : (window as Window).screen.width;
         let screenHeight: number =
             "innerHeight" in window
                 ? window.innerHeight
                 : "clientHeight" in document.documentElement
                     ? document.documentElement.clientHeight
-                    : window.screen.height;
+                    : (window as Window).screen.height;
         let w: number = a4.offsetWidth + 50;
         let h: number = window.innerHeight;
         let left: number = ((screenWidth / 2) | 0) - ((w / 2) | 0) + dualScreenLeft;
@@ -118,13 +118,14 @@ export class AlphaTabApi extends AlphaTabApiBase<any | Settings> {
 
     }
 
-    public downloadMidi(): void {
+    public downloadMidi(format: MidiFileFormat = MidiFileFormat.SingleTrackMultiChannel): void {
         if (!this.score) {
             return;
         }
 
         let midiFile: MidiFile = new MidiFile();
-        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        midiFile.format = format;
+        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile, true);
         let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
         generator.generate();
         let binary: Uint8Array = midiFile.toBinary();

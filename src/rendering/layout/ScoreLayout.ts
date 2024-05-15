@@ -1,7 +1,6 @@
 import { StaveProfile } from '@src/StaveProfile';
 import { Environment } from '@src/Environment';
 import { Bar } from '@src/model/Bar';
-import { Chord } from '@src/model/Chord';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
@@ -31,6 +30,26 @@ class LazyPartial {
 }
 
 /**
+ * Lists the different modes in which the staves and systems are arranged.
+ */
+export enum InternalSystemsLayoutMode {
+    /**
+     * Use the automatic alignment system provided by alphaTab (default)
+     */
+    Automatic,
+
+    /**
+     * Use the relative scaling information stored in the score model.
+     */
+    FromModelWithScale,
+
+    /**
+     * Use the absolute size information stored in the score model.
+     */
+    FromModelWithWidths
+}
+
+/**
  * This is the base class for creating new layouting engines for the score renderer.
  */
 export abstract class ScoreLayout {
@@ -45,6 +64,8 @@ export abstract class ScoreLayout {
     protected scoreInfoGlyphs: Map<NotationElement, TextGlyph> = new Map();
     protected chordDiagrams: ChordDiagramContainerGlyph | null = null;
     protected tuningGlyph: TuningContainerGlyph | null = null;
+
+    public systemsLayoutMode: InternalSystemsLayoutMode = InternalSystemsLayoutMode.Automatic;
 
     protected constructor(renderer: ScoreRenderer) {
         this.renderer = renderer;
@@ -83,11 +104,14 @@ export abstract class ScoreLayout {
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
-        (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
         if (!this.renderer.settings.core.enableLazyLoading) {
+            // in case of no lazy loading -> first notify about layout, then directly render
+            (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
             this.internalRenderLazyPartial(args, callback);
         } else {
+            // in case of lazy loading -> first register lazy, then notify
             this._lazyPartials.set(args.id, new LazyPartial(args, callback));
+            (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
         }
     }
 
@@ -187,15 +211,18 @@ export abstract class ScoreLayout {
         if (notation.isNotationElementVisible(NotationElement.ChordDiagrams)) {
             this.chordDiagrams = new ChordDiagramContainerGlyph(0, 0);
             this.chordDiagrams.renderer = fakeBarRenderer;
-            let chords: Map<string, Chord> = new Map<string, Chord>();
+            let chordIds: Set<string> = new Set<string>();
+
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
                     const sc = staff.chords;
-                    for (const [chordId, chord] of sc) {
-                        if (!chords.has(chordId)) {
-                            if (chord.showDiagram) {
-                                chords.set(chordId, chord);
-                                this.chordDiagrams!.addChord(chord);
+                    if (sc) {
+                        for (const [, chord] of sc) {
+                            if (!chordIds.has(chord.uniqueId)) {
+                                if (chord.showDiagram) {
+                                    chordIds.add(chord.uniqueId);
+                                    this.chordDiagrams!.addChord(chord);
+                                }
                             }
                         }
                     }
@@ -289,11 +316,11 @@ export abstract class ScoreLayout {
         const centered = Environment.getLayoutEngineFactory(this.renderer.settings.display.layoutMode).vertical;
         e.width = this.renderer.canvas!.measureText(msg);
         e.height = height;
-        e.x = centered 
-        ? (this.width - e.width) / 2
-        : this.firstBarX;
+        e.x = centered
+            ? (this.width - e.width) / 2
+            : this.firstBarX;
         e.y = y;
-        
+
         e.totalWidth = this.width;
         e.totalHeight = y + height;
         e.firstMasterBarIndex = -1;

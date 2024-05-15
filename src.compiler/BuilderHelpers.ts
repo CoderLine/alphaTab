@@ -1,4 +1,14 @@
 import * as ts from 'typescript';
+import * as path from 'path'
+
+const ignoredFiles = [
+    /rollup.*/
+]
+
+export function transpileFilter(file: string): boolean {
+    const fileName = path.basename(file);
+    return !ignoredFiles.find(e => e.exec(fileName));
+}
 
 export function setMethodBody(m: ts.MethodDeclaration, body: ts.FunctionBody): ts.MethodDeclaration {
     return ts.factory.updateMethodDeclaration(
@@ -46,9 +56,6 @@ function findNode(node: ts.Node, kind: ts.SyntaxKind): ts.Node | null {
     return null;
 }
 
-export function addNewLines(stmts: ts.Statement[]) {
-    return stmts.map(stmt => ts.addSyntheticTrailingComment(stmt, ts.SyntaxKind.SingleLineCommentTrivia, '', true));
-}
 export function getTypeWithNullableInfo(
     checker: ts.TypeChecker,
     node: ts.TypeNode | undefined,
@@ -79,9 +86,9 @@ export function getTypeWithNullableInfo(
                 } else {
                     throw new Error(
                         'Multi union types on JSON settings not supported: ' +
-                            node.getSourceFile().fileName +
-                            ':' +
-                            node.getText()
+                        node.getSourceFile().fileName +
+                        ':' +
+                        node.getText()
                     );
                 }
             } else {

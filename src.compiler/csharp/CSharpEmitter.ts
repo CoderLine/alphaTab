@@ -2,11 +2,14 @@ import * as ts from 'typescript';
 import CSharpAstTransformer from './CSharpAstTransformer';
 import CSharpEmitterContext from './CSharpEmitterContext';
 import CSharpAstPrinter from './CSharpAstPrinter';
+import { transpileFilter } from '../BuilderHelpers'
 
 export default function emit(program: ts.Program, diagnostics: ts.Diagnostic[]) {
     const context = new CSharpEmitterContext(program);
     console.log('[C#] Transforming to C# AST');
-    program.getRootFileNames().forEach(file => {
+    program.getRootFileNames()
+        .filter(transpileFilter)
+        .forEach(file => {
         const sourceFile = program.getSourceFile(file)!;
         const transformer = new CSharpAstTransformer(sourceFile, context);
         transformer.transform();
@@ -18,7 +21,7 @@ export default function emit(program: ts.Program, diagnostics: ts.Diagnostic[]) 
     context.rewriteVisibilities();
 
     if (!context.hasErrors) {
-        console.log('[C#] Writing Result');
+        console.log(`[C#] Writing Result to ${context.compilerOptions.outDir!} (${context.csharpFiles.length} files)`);
         context.csharpFiles.forEach(file => {
             const printer = new CSharpAstPrinter(file, context);
             printer.print();

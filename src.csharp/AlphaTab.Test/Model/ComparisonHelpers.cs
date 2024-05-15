@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.Test;
 
 namespace AlphaTab.Model
@@ -8,7 +9,7 @@ namespace AlphaTab.Model
         private static bool CompareObjects(object? expected, object? actual, string path,
             IList<string> ignoreKeys)
         {
-            Globals.Fail(
+            TestGlobals.Fail(
                 $"cannot compare unknown object types expected[{actual?.GetType().FullName}] expected[${expected?.GetType().FullName}]");
             return false;
         }

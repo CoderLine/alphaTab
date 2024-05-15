@@ -9,23 +9,23 @@ export class PlaybackInformationSerializer {
     public static fromJson(obj: PlaybackInformation, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
     }
     public static toJson(obj: PlaybackInformation | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("volume", obj.volume); 
-        o.set("balance", obj.balance); 
-        o.set("port", obj.port); 
-        o.set("program", obj.program); 
-        o.set("primarychannel", obj.primaryChannel); 
-        o.set("secondarychannel", obj.secondaryChannel); 
-        o.set("ismute", obj.isMute); 
-        o.set("issolo", obj.isSolo); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("volume", obj.volume);
+        o.set("balance", obj.balance);
+        o.set("port", obj.port);
+        o.set("program", obj.program);
+        o.set("primarychannel", obj.primaryChannel);
+        o.set("secondarychannel", obj.secondaryChannel);
+        o.set("ismute", obj.isMute);
+        o.set("issolo", obj.isSolo);
+        return o;
     }
     public static setProperty(obj: PlaybackInformation, property: string, v: unknown): boolean {
         switch (property) {
@@ -53,8 +53,7 @@ export class PlaybackInformationSerializer {
             case "issolo":
                 obj.isSolo = v! as boolean;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

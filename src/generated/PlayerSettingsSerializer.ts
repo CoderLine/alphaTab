@@ -7,38 +7,41 @@ import { PlayerSettings } from "@src/PlayerSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { VibratoPlaybackSettingsSerializer } from "@src/generated/VibratoPlaybackSettingsSerializer";
 import { SlidePlaybackSettingsSerializer } from "@src/generated/SlidePlaybackSettingsSerializer";
+import { PlayerOutputMode } from "@src/PlayerSettings";
 import { ScrollMode } from "@src/PlayerSettings";
 export class PlayerSettingsSerializer {
     public static fromJson(obj: PlayerSettings, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: PlayerSettings | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("soundfont", obj.soundFont); 
-        o.set("enableplayer", obj.enablePlayer); 
-        o.set("enablecursor", obj.enableCursor); 
-        o.set("enableanimatedbeatcursor", obj.enableAnimatedBeatCursor); 
-        o.set("enableelementhighlighting", obj.enableElementHighlighting); 
-        o.set("enableuserinteraction", obj.enableUserInteraction); 
-        o.set("scrolloffsetx", obj.scrollOffsetX); 
-        o.set("scrolloffsety", obj.scrollOffsetY); 
-        o.set("scrollmode", obj.scrollMode as number); 
-        o.set("scrollspeed", obj.scrollSpeed); 
+        }
+        const o = new Map<string, unknown>();
+        o.set("soundfont", obj.soundFont);
         /*@target web*/
-        o.set("nativebrowsersmoothscroll", obj.nativeBrowserSmoothScroll); 
-        o.set("songbookbendduration", obj.songBookBendDuration); 
-        o.set("songbookdipduration", obj.songBookDipDuration); 
-        o.set("vibrato", VibratoPlaybackSettingsSerializer.toJson(obj.vibrato)); 
-        o.set("slide", SlidePlaybackSettingsSerializer.toJson(obj.slide)); 
-        o.set("playtripletfeel", obj.playTripletFeel); 
-        o.set("buffertimeinmilliseconds", obj.bufferTimeInMilliseconds); 
-        return o; 
+        o.set("outputmode", obj.outputMode as number);
+        o.set("enableplayer", obj.enablePlayer);
+        o.set("enablecursor", obj.enableCursor);
+        o.set("enableanimatedbeatcursor", obj.enableAnimatedBeatCursor);
+        o.set("enableelementhighlighting", obj.enableElementHighlighting);
+        o.set("enableuserinteraction", obj.enableUserInteraction);
+        o.set("scrolloffsetx", obj.scrollOffsetX);
+        o.set("scrolloffsety", obj.scrollOffsetY);
+        o.set("scrollmode", obj.scrollMode as number);
+        o.set("scrollspeed", obj.scrollSpeed);
+        /*@target web*/
+        o.set("nativebrowsersmoothscroll", obj.nativeBrowserSmoothScroll);
+        o.set("songbookbendduration", obj.songBookBendDuration);
+        o.set("songbookdipduration", obj.songBookDipDuration);
+        o.set("vibrato", VibratoPlaybackSettingsSerializer.toJson(obj.vibrato));
+        o.set("slide", SlidePlaybackSettingsSerializer.toJson(obj.slide));
+        o.set("playtripletfeel", obj.playTripletFeel);
+        o.set("buffertimeinmilliseconds", obj.bufferTimeInMilliseconds);
+        return o;
     }
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
         switch (property) {
@@ -48,6 +51,10 @@ export class PlayerSettingsSerializer {
             /*@target web*/
             case "scrollelement":
                 obj.scrollElement = v! as string | HTMLElement;
+                return true;
+            /*@target web*/
+            case "outputmode":
+                obj.outputMode = JsonHelper.parseEnum<PlayerOutputMode>(v, PlayerOutputMode)!;
                 return true;
             case "enableplayer":
                 obj.enablePlayer = v! as boolean;
@@ -92,7 +99,7 @@ export class PlayerSettingsSerializer {
             case "buffertimeinmilliseconds":
                 obj.bufferTimeInMilliseconds = v! as number;
                 return true;
-        } 
+        }
         if (["vibrato"].indexOf(property) >= 0) {
             VibratoPlaybackSettingsSerializer.fromJson(obj.vibrato, v as Map<string, unknown>);
             return true;
@@ -105,7 +112,7 @@ export class PlayerSettingsSerializer {
                     }
                 }
             }
-        } 
+        }
         if (["slide"].indexOf(property) >= 0) {
             SlidePlaybackSettingsSerializer.fromJson(obj.slide, v as Map<string, unknown>);
             return true;
@@ -118,8 +125,7 @@ export class PlayerSettingsSerializer {
                     }
                 }
             }
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

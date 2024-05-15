@@ -17,18 +17,17 @@
         crossorigin="anonymous"></script>
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500,700&display=swap" rel="stylesheet" />
-    <script src="https://kit.fontawesome.com/b43f0e512e.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/handlebars@4.5.3/dist/handlebars.min.js"
         integrity="sha256-GwjGuGudzIwyNtTEBZuBYYPDvNlSMSKEDwECr6x6H9c=" crossorigin="anonymous"></script>
-
-    <script src="/dist/alphaTab.js"></script>
+    <script src="https://kit.fontawesome.com/b43f0e512e.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="control.css" />
 </head>
 
 <body>
     <div id="placeholder"></div>
-    <script type="text/javascript" src="control.js"></script>
-    <script type="text/javascript">
+    <script type="module">
+        import { setupControl } from './control.mjs';
+        
         const req = new XMLHttpRequest();
         req.onload = function (data) {
             document.getElementById('placeholder').outerHTML = req.responseText;

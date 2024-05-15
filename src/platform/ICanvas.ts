@@ -103,4 +103,6 @@ export interface ICanvas {
     bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void;
 
     quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void;
+
+    destroy(): void;
 }

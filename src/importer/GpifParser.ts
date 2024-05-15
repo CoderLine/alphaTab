@@ -248,6 +248,13 @@ export class GpifParser {
                     case 'Notices':
                         this.score.notices = c.firstChild!.innerText;
                         break;
+                    case 'ScoreSystemsDefaultLayout':
+                        this.score.defaultSystemsLayout = parseInt(c.innerText);
+                        break;
+                    case 'ScoreSystemsLayout':
+                        this.score.systemsLayout = c.innerText.split(' ').map(i => parseInt(i));
+                        break;
+
                 }
             }
         }
@@ -414,6 +421,12 @@ export class GpifParser {
                         break;
                     case 'ShortName':
                         track.shortName = c.innerText;
+                        break;
+                    case 'SystemsDefautLayout': // not a typo by alphaTab, this is a typo in the GPIF files.
+                        track.defaultSystemsLayout = parseInt(c.innerText);
+                        break;
+                    case 'SystemsLayout':
+                        track.systemsLayout = c.innerText.split(' ').map(i => parseInt(i));
                         break;
                     case 'Lyrics':
                         this.parseLyrics(trackId, c);
@@ -848,7 +861,13 @@ export class GpifParser {
 
     private parseDiagramItemForChord(chord: Chord, node: XmlNode): void {
         chord.name = node.getAttribute('name');
-        let diagram: XmlNode = node.findChildElement('Diagram')!;
+        
+        let diagram = node.findChildElement('Diagram');
+        if(!diagram) {
+            chord.showDiagram = false;
+            chord.showFingering = false;
+            return;
+        }
         let stringCount: number = parseInt(diagram.getAttribute('stringCount'));
         let baseFret: number = parseInt(diagram.getAttribute('baseFret'));
         chord.firstFret = baseFret + 1;
@@ -1209,6 +1228,10 @@ export class GpifParser {
                     case 'Fermatas':
                         this.parseFermatas(masterBar, c);
                         break;
+                    case "XProperties":
+                        this.parseMasterBarXProperties(c, masterBar);
+                        break;
+    
                 }
             }
         }
@@ -1334,6 +1357,9 @@ export class GpifParser {
                                 bar.simileMark = SimileMark.SecondOfDouble;
                                 break;
                         }
+                        break;
+                    case "XProperties":
+                        this.parseBarXProperties(c, bar);
                         break;
                 }
             }
@@ -1573,6 +1599,42 @@ export class GpifParser {
                             case '687935489':
                                 value = parseInt(c.findChildElement('Int')!.innerText);
                                 beat.brushDuration = value;
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+
+    private parseBarXProperties(node: XmlNode, bar: Bar) {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'XProperty':
+                        const id: string = c.getAttribute('id');
+                        switch (id) {
+                            case '1124139520':
+                                const childNode = c.findChildElement('Double') ?? c.findChildElement('Float');
+                                bar.displayScale = parseFloat(childNode!.innerText);
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    private parseMasterBarXProperties(node: XmlNode, masterBar: MasterBar) {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'XProperty':
+                        const id: string = c.getAttribute('id');
+                        switch (id) {
+                            case '1124073984':
+                                masterBar.displayScale = parseFloat(c.findChildElement('Double')!.innerText);
                                 break;
                         }
                         break;

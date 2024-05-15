@@ -8,22 +8,23 @@ import { Color } from "@src/model/Color";
 import { Font, FontStyle } from "@src/model/Font";
 import { JsonConverter } from "@src/model/JsonConverter";
 import { Score } from "@src/model/Score";
-import { NotationElement, TabRhythmMode, NotationMode, FingeringMode} from "@src/NotationSettings";
+import { NotationElement, TabRhythmMode, NotationMode, FingeringMode } from "@src/NotationSettings";
 import { TestPlatform } from "@test/TestPlatform";
 import { ComparisonHelpers } from "./ComparisonHelpers";
+import { assert, expect } from 'chai';
 
 describe('JsonConverterTest', () => {
-    const loadScore: (name: string) => Promise<Score | null> = async (name: string): Promise<Score | null> => {
-        const data = await TestPlatform.loadFile('test-data/' + name);
+    async function loadScore(name: string): Promise<Score | null> {
         try {
+            const data = await TestPlatform.loadFile('test-data/' + name);
             return ScoreLoader.loadScoreFromBytes(data);
         }
         catch (e) {
             return null;
         }
-    };
+    }
 
-    const testRoundTripEqual: (name: string) => Promise<void> = async (name: string): Promise<void> => {
+    async function testRoundTripEqual(name: string): Promise<void> {
         try {
             const expected = await loadScore(name);
             if (!expected) {
@@ -36,16 +37,16 @@ describe('JsonConverterTest', () => {
 
             ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + name.substr(name.lastIndexOf('/') + 1) + '>', null);
         } catch (e) {
-            fail(e);
+            assert.fail(String(e));
         }
-    };
+    }
 
-    const testRoundTripFolderEqual: (name: string) => Promise<void> = async (name: string): Promise<void> => {
+    async function testRoundTripFolderEqual(name: string): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
         for (const file of files) {
             await testRoundTripEqual(`${name}/${file}`);
         }
-    };
+    }
 
     it('importer', async () => {
         await testRoundTripFolderEqual('guitarpro7');
@@ -164,14 +165,14 @@ describe('JsonConverterTest', () => {
 
         SettingsSerializer.fromJson(settings, raw);
 
-        expect(settings.core.enableLazyLoading).toEqual(false);
-        expect(settings.core.logLevel).toEqual(LogLevel.Error);
-        expect(settings.display.layoutMode).toEqual(LayoutMode.Horizontal);
-        expect(settings.display.scale).toEqual(5);
-        expect(settings.notation.rhythmMode).toEqual(TabRhythmMode.ShowWithBars);
-        expect(settings.display.resources.copyrightFont.families[0]).toEqual('Roboto');
-        expect(settings.display.resources.copyrightFont.size).toEqual(18);
-        expect(settings.display.resources.copyrightFont.style).toEqual(FontStyle.Italic);
+        expect(settings.core.enableLazyLoading).to.equal(false);
+        expect(settings.core.logLevel).to.equal(LogLevel.Error);
+        expect(settings.display.layoutMode).to.equal(LayoutMode.Horizontal);
+        expect(settings.display.scale).to.equal(5);
+        expect(settings.notation.rhythmMode).to.equal(TabRhythmMode.ShowWithBars);
+        expect(settings.display.resources.copyrightFont.families[0]).to.equal('Roboto');
+        expect(settings.display.resources.copyrightFont.size).to.equal(18);
+        expect(settings.display.resources.copyrightFont.style).to.equal(FontStyle.Italic);
     });
 
 
@@ -197,13 +198,13 @@ describe('JsonConverterTest', () => {
 
         SettingsSerializer.fromJson(settings, raw);
 
-        expect(settings.core.enableLazyLoading).toEqual(false);
-        expect(settings.core.logLevel).toEqual(LogLevel.Error);
-        expect(settings.display.layoutMode).toEqual(LayoutMode.Horizontal);
-        expect(settings.display.scale).toEqual(5);
-        expect(settings.notation.rhythmMode).toEqual(TabRhythmMode.ShowWithBars);
-        expect(settings.display.resources.copyrightFont.families[0]).toEqual('Roboto');
-        expect(settings.display.resources.copyrightFont.size).toEqual(18);
-        expect(settings.display.resources.copyrightFont.style).toEqual(FontStyle.Italic);
+        expect(settings.core.enableLazyLoading).to.equal(false);
+        expect(settings.core.logLevel).to.equal(LogLevel.Error);
+        expect(settings.display.layoutMode).to.equal(LayoutMode.Horizontal);
+        expect(settings.display.scale).to.equal(5);
+        expect(settings.notation.rhythmMode).to.equal(TabRhythmMode.ShowWithBars);
+        expect(settings.display.resources.copyrightFont.families[0]).to.equal('Roboto');
+        expect(settings.display.resources.copyrightFont.size).to.equal(18);
+        expect(settings.display.resources.copyrightFont.style).to.equal(FontStyle.Italic);
     });
 });

@@ -14,7 +14,7 @@ import { Settings } from '@src/Settings';
 export class Score {
     private _currentRepeatGroup: RepeatGroup | null = null;
     private _openedRepeatGroups: RepeatGroup[] = [];
-    private _properlyOpenedRepeatGroups:number = 0;
+    private _properlyOpenedRepeatGroups: number = 0;
 
     /**
      * The album of this song.
@@ -89,6 +89,19 @@ export class Score {
     public tracks: Track[] = [];
 
     /**
+     * Defines how many bars are placed into the systems (rows) when displaying
+     * multiple tracks unless a value is set in the systemsLayout.
+     */
+    public defaultSystemsLayout: number = 3;
+
+    /**
+     * Defines how many bars are placed into the systems (rows) when displaying
+     * multiple tracks.
+     */
+    public systemsLayout: number[] = [];
+
+
+    /**
      * Gets or sets the rendering stylesheet for this song.
      */
     public stylesheet: RenderStylesheet = new RenderStylesheet();
@@ -137,14 +150,14 @@ export class Score {
         if (bar.isRepeatStart) {
             // if the current group was already closed (this opening doesn't cause nesting)
             // we consider the group as completed
-            if(this._currentRepeatGroup?.isClosed) {
+            if (this._currentRepeatGroup?.isClosed) {
                 this._openedRepeatGroups.pop();
                 this._properlyOpenedRepeatGroups--;
             }
             this._currentRepeatGroup = new RepeatGroup();
             this._openedRepeatGroups.push(this._currentRepeatGroup);
             this._properlyOpenedRepeatGroups++;
-        } else if(!this._currentRepeatGroup) {
+        } else if (!this._currentRepeatGroup) {
             this._currentRepeatGroup = new RepeatGroup();
             this._openedRepeatGroups.push(this._currentRepeatGroup);
         }

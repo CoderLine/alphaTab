@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab.Core
@@ -48,7 +49,7 @@ namespace AlphaTab.Core
 
         public static IList<T> Slice<T>(this IList<T> data)
         {
-            return new List<T>(data);
+            return new AlphaTab.Collections.List<T>(data);
         }
 
         public static void Reverse<T>(this IList<T> data)
@@ -116,7 +117,14 @@ namespace AlphaTab.Core
             data.Insert(0, item);
         }
 
-        public static T Shift<T>(this IList<T> data)
+        public static T? Shift<T>(this IList<T> data)
+        {
+            var i = data[0];
+            data.RemoveAt(0);
+            return i;
+        }
+
+        public static double? Shift(this IList<double> data)
         {
             var i = data[0];
             data.RemoveAt(0);
@@ -185,7 +193,7 @@ namespace AlphaTab.Core
         {
             switch (data)
             {
-                case List<T> l:
+                case System.Collections.Generic.List<T> l:
                     l.Sort();
                     break;
                 case T[] array:
@@ -275,19 +283,19 @@ namespace AlphaTab.Core
             return new List<string>(s.Split(new[] {separator}, StringSplitOptions.None));
         }
 
-        public static MapEntry<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
+        public static KeyValuePair<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
         {
-            return new MapEntry<double, TValue>(key, value);
+            return new KeyValuePair<double, TValue>(key, value);
         }
 
-        public static MapEntry<TKey, double> CreateMapEntry<TKey>(TKey key, int value)
+        public static KeyValuePair<TKey, double> CreateMapEntry<TKey>(TKey key, int value)
         {
-            return new MapEntry<TKey, double>(key, value);
+            return new KeyValuePair<TKey, double>(key, value);
         }
 
-        public static MapEntry<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
+        public static KeyValuePair<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
         {
-            return new MapEntry<TKey, TValue>(key, value);
+            return new KeyValuePair<TKey, TValue>(key, value);
         }
 
         public static string ToInvariantString(this double num, int radix)
@@ -377,9 +385,46 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Join(this IList<string> s, string separator)
+        {
+            return string.Join(separator, s);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReplaceAll(this string s, string before, string after)
         {
             return s.Replace(before, after);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T> Then<T>(this Task<T> s, Action<T> after)
+        {
+            s.ContinueWith(x => after(x.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+            return s;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T> Catch<T>(this Task<T> s, Action<Error> after)
+        {
+            s.ContinueWith(x =>
+            {
+                if (x.Exception?.InnerExceptions.Count == 1 &&
+                    x.Exception.InnerExceptions[0] is Error e)
+                {
+                    after(e);
+                }
+                else
+                {
+                    after(new Error(x.Exception.Message, x.Exception));
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+            return s;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T> Catch<T>(this Task<T> s, Action<object> after)
+        {
+            s.Catch((Error e) => after(e));
+            return s;
         }
 
         public static string TypeOf(object? actual)
@@ -420,5 +465,64 @@ namespace AlphaTab.Core
         {
             return items;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ToFixed(this double value, int decimals)
+        {
+            return value.ToString("F" + decimals);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string[] Split(this string value, RegExp pattern)
+        {
+            return pattern.Split(value);
+        }
+
+        public static Task CreatePromise(Action<Action, Action<object>> run)
+        {
+            var taskCompletionSource = new TaskCompletionSource<object?>();
+            void Resolve()
+            {
+                taskCompletionSource.SetResult(null);
+            }
+
+            void Reject(object o)
+            {
+                switch (o)
+                {
+                    case Exception e:
+                        taskCompletionSource.SetException(e);
+                        break;
+                    case string s:
+                        taskCompletionSource.SetException(new PromiseRejectedException(s));
+                        break;
+                    default:
+                        taskCompletionSource.SetException(new PromiseRejectedException("Promise was rejected", o));
+                        break;
+                }
+            }
+
+            run(Resolve, Reject);
+
+            return taskCompletionSource.Task;
+        }
+    }
+}
+
+public class PromiseRejectedException : Exception
+{
+    public object? RejectData { get; }
+
+    public PromiseRejectedException()
+    {
+    }
+
+    public PromiseRejectedException(string message) : base(message)
+    {
+
+    }
+
+    public PromiseRejectedException(string message, object rejectData) : base(message)
+    {
+        RejectData = rejectData;
     }
 }

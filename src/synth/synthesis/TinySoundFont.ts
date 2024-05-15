@@ -2,7 +2,7 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
-import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
+import { ControlChangeEvent, MidiEvent, MidiEventType, NoteBendEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
 import {
     Hydra,
     HydraIbag,
@@ -25,11 +25,9 @@ import { VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceEnvelope';
 import { SynthHelper } from '@src/synth/SynthHelper';
 import { TypeConversions } from '@src/io/TypeConversions';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { Midi20PerNotePitchBendEvent } from '@src/midi/Midi20PerNotePitchBendEvent';
-import { MetaEventType } from '@src/midi/MetaEvent';
-import { MetaNumberEvent } from '@src/midi/MetaNumberEvent';
-import { MetaDataEvent } from '@src/midi/MetaDataEvent';
 import { Queue } from '@src/synth/ds/Queue';
+import { ControllerType } from '@src/midi/ControllerType';
+import { Logger } from '@src/Logger';
 
 /**
  * This is a tiny soundfont based synthesizer.
@@ -43,6 +41,7 @@ export class TinySoundFont {
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
     private _isAnySolo: boolean = false;
+    private _transpositionPitches: Map<number, number> = new Map<number, number>();
 
     public currentTempo: number = 0;
     public timeSignatureNumerator: number = 0;
@@ -96,7 +95,36 @@ export class TinySoundFont {
     public resetChannelStates(): void {
         this._mutedChannels = new Map<number, boolean>();
         this._soloChannels = new Map<number, boolean>();
+
+        this.applyTranspositionPitches(new Map<number, number>());
         this._isAnySolo = false;
+    }
+
+    public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
+        // dynamically adjust actively playing voices to the new pitch they have. 
+        // we are not updating the used preset and regions though. 
+        const previousTransposePitches = this._transpositionPitches;
+        for (const voice of this._voices) {
+            if (voice.playingChannel >= 0 && voice.playingChannel !== 9 /*percussion*/) {
+                let pitchDifference = 0;
+
+                if(previousTransposePitches.has(voice.playingChannel)) {
+                    pitchDifference -= previousTransposePitches.get(voice.playingChannel)!;
+                }
+                
+                if(transpositionPitches.has(voice.playingChannel)) {
+                    pitchDifference += transpositionPitches.get(voice.playingChannel)!;
+                }
+
+                voice.playingKey += pitchDifference;
+
+                if(this._channels) {
+                    voice.updatePitchRatio(this._channels!.channelList[voice.playingChannel], this.outSampleRate);
+                }
+            }
+        }
+
+        this._transpositionPitches = transpositionPitches;
     }
 
     public dispatchEvent(synthEvent: SynthEvent): void {
@@ -144,47 +172,44 @@ export class TinySoundFont {
     }
 
     private processMidiMessage(e: MidiEvent): void {
-        const command: MidiEventType = e.command;
-        const channel: number = e.channel;
-        const data1: number = e.data1;
-        const data2: number = e.data2;
+        Logger.debug('MIdi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick)
+        const command: MidiEventType = e.type;
         switch (command) {
-            case MidiEventType.NoteOff:
-                this.channelNoteOff(channel, data1);
-                break;
+            case MidiEventType.TimeSignature:
+                const timeSignature = (e as TimeSignatureEvent);
+                this.timeSignatureNumerator = timeSignature.numerator;
+                this.timeSignatureDenominator = Math.pow(2, timeSignature.denominatorIndex);
+                break
             case MidiEventType.NoteOn:
-                this.channelNoteOn(channel, data1, data2 / 127.0);
+                const noteOn = e as NoteOnEvent;
+                this.channelNoteOn(noteOn.channel, noteOn.noteKey, noteOn.noteVelocity / 127.0);
                 break;
-            case MidiEventType.NoteAftertouch:
+            case MidiEventType.NoteOff:
+                const noteOff = e as NoteOffEvent;
+                this.channelNoteOff(noteOff.channel, noteOff.noteKey);
                 break;
-            case MidiEventType.Controller:
-                this.channelMidiControl(channel, data1, data2);
+            case MidiEventType.ControlChange:
+                const controlChange = e as ControlChangeEvent;
+                this.channelMidiControl(controlChange.channel, controlChange.controller, controlChange.value);
                 break;
             case MidiEventType.ProgramChange:
-                this.channelSetPresetNumber(channel, data1, channel === 9);
+                const programChange = e as ProgramChangeEvent;
+                this.channelSetPresetNumber(programChange.channel, programChange.program, programChange.channel === 9);
                 break;
-            case MidiEventType.ChannelAftertouch:
+            case MidiEventType.TempoChange:
+                const tempoChange = e as TempoChangeEvent
+                this.currentTempo = 60000000 / tempoChange.microSecondsPerQuarterNote;
                 break;
             case MidiEventType.PitchBend:
-                this.channelSetPitchWheel(channel, data1 | (data2 << 7));
+                const pitchBend = e as PitchBendEvent;
+                this.channelSetPitchWheel(pitchBend.channel, pitchBend.value);
                 break;
             case MidiEventType.PerNotePitchBend:
-                const midi20 = e as Midi20PerNotePitchBendEvent;
-                let perNotePitchWheel = midi20.pitch;
+                const noteBend = e as NoteBendEvent;
+                let perNotePitchWheel = noteBend.value;
                 // midi 2.0 -> midi 1.0
                 perNotePitchWheel = (perNotePitchWheel * SynthConstants.MaxPitchWheel) / SynthConstants.MaxPitchWheel20;
-                this.channelSetPerNotePitchWheel(channel, midi20.noteKey, perNotePitchWheel);
-                break;
-            case MidiEventType.Meta:
-                switch (e.data1 as MetaEventType) {
-                    case MetaEventType.Tempo:
-                        this.currentTempo = 60000000 / (e as MetaNumberEvent).value;
-                        break;
-                    case MetaEventType.TimeSignature:
-                        this.timeSignatureNumerator = (e as MetaDataEvent).data[0];
-                        this.timeSignatureDenominator = Math.pow(2, (e as MetaDataEvent).data[1]);
-                        break;
-                }
+                this.channelSetPerNotePitchWheel(noteBend.channel, noteBend.noteKey, perNotePitchWheel);
                 break;
         }
     }
@@ -586,6 +611,10 @@ export class TinySoundFont {
             return;
         }
 
+        if (this._transpositionPitches.has(channel)) {
+            key += this._transpositionPitches.get(channel)!;
+        }
+
         this._channels.activeChannel = channel;
         this.noteOn(this._channels.channelList[channel].presetIndex, key, vel);
     }
@@ -596,6 +625,10 @@ export class TinySoundFont {
      * @param key note value between 0 and 127 (60 being middle C)
      */
     public channelNoteOff(channel: number, key: number): void {
+        if (this._transpositionPitches.has(channel)) {
+            key += this._transpositionPitches.get(channel)!;
+        }
+
         const matches: Voice[] = [];
         let matchFirst: Voice | null = null;
         let matchLast: Voice | null = null;
@@ -809,6 +842,10 @@ export class TinySoundFont {
      * @param pitchWheel pitch wheel position 0 to 16383 (default 8192 unpitched)
      */
     public channelSetPerNotePitchWheel(channel: number, key: number, pitchWheel: number): void {
+        if (this._transpositionPitches.has(channel)) {
+            key += this._transpositionPitches.get(channel)!;
+        }
+
         const c: Channel = this.channelInit(channel);
         if (c.perNotePitchWheel.has(key) && c.perNotePitchWheel.get(key) === pitchWheel) {
             return;
@@ -859,23 +896,10 @@ export class TinySoundFont {
     /**
      * Apply a MIDI control change to the channel (not all controllers are supported!)
      */
-    public channelMidiControl(channel: number, controller: number, controlValue: number): void {
+    public channelMidiControl(channel: number, controller: ControllerType, controlValue: number): void {
         let c: Channel = this.channelInit(channel);
         switch (controller) {
-            case 5: /*Portamento_Time_MSB*/
-            case 96: /*DATA_BUTTON_INCREMENT*/
-            case 97: /*DATA_BUTTON_DECREMENT*/
-            case 64: /*HOLD_PEDAL*/
-            case 65: /*Portamento*/
-            case 66: /*SostenutoPedal */
-            case 122: /*LocalKeyboard */
-            case 124: /*OmniModeOff */
-            case 125: /*OmniModeon */
-            case 126: /*MonoMode */
-            case 127 /*PolyMode*/:
-                return;
-
-            case 38 /*DATA_ENTRY_LSB*/:
+            case ControllerType.DataEntryFine:
                 c.midiData = TypeConversions.int32ToUint16((c.midiData & 0x3f80) | controlValue);
 
                 if (c.midiRpn === 0) {
@@ -887,80 +911,80 @@ export class TinySoundFont {
                 }
                 return;
 
-            case 7 /*VOLUME_MSB*/:
+            case ControllerType.VolumeCoarse:
                 c.midiVolume = TypeConversions.int32ToUint16((c.midiVolume & 0x7f) | (controlValue << 7));
                 // Raising to the power of 3 seems to result in a decent sounding volume curve for MIDI
                 this.channelSetVolume(channel, Math.pow((c.midiVolume / 16383.0) * (c.midiExpression / 16383.0), 3.0));
                 return;
-            case 39 /*VOLUME_LSB*/:
+            case ControllerType.VolumeFine:
                 c.midiVolume = TypeConversions.int32ToUint16((c.midiVolume & 0x3f80) | controlValue);
                 // Raising to the power of 3 seems to result in a decent sounding volume curve for MIDI
                 this.channelSetVolume(channel, Math.pow((c.midiVolume / 16383.0) * (c.midiExpression / 16383.0), 3.0));
                 return;
-            case 11 /*EXPRESSION_MSB*/:
+            case ControllerType.ExpressionControllerCoarse:
                 c.midiExpression = TypeConversions.int32ToUint16((c.midiExpression & 0x7f) | (controlValue << 7));
                 // Raising to the power of 3 seems to result in a decent sounding volume curve for MIDI
                 this.channelSetVolume(channel, Math.pow((c.midiVolume / 16383.0) * (c.midiExpression / 16383.0), 3.0));
                 return;
-            case 43 /*EXPRESSION_LSB*/:
+            case ControllerType.ExpressionControllerFine:
                 c.midiExpression = TypeConversions.int32ToUint16((c.midiExpression & 0x3f80) | controlValue);
                 // Raising to the power of 3 seems to result in a decent sounding volume curve for MIDI
                 this.channelSetVolume(channel, Math.pow((c.midiVolume / 16383.0) * (c.midiExpression / 16383.0), 3.0));
                 return;
-            case 10 /*PAN_MSB*/:
+            case ControllerType.PanCoarse:
                 c.midiPan = TypeConversions.int32ToUint16((c.midiPan & 0x7f) | (controlValue << 7));
                 this.channelSetPan(channel, c.midiPan / 16383.0);
                 return;
-            case 42 /*PAN_LSB*/:
+            case ControllerType.PanFine:
                 c.midiPan = TypeConversions.int32ToUint16((c.midiPan & 0x3f80) | controlValue);
                 this.channelSetPan(channel, c.midiPan / 16383.0);
                 return;
-            case 6 /*DATA_ENTRY_MSB*/:
+            case ControllerType.DataEntryCoarse:
                 c.midiData = TypeConversions.int32ToUint16((c.midiData & 0x7f) | (controlValue << 7));
                 if (c.midiRpn === 0) {
                     this.channelSetPitchRange(channel, (c.midiData >> 7) + 0.01 * (c.midiData & 0x7f));
                 } else if (c.midiRpn === 1) {
                     this.channelSetTuning(channel, (c.tuning | 0) + (c.midiData - 8192.0) / 8192.0); // fine tune
-                } else if (c.midiRpn === 2 && controller === 6) {
+                } else if (c.midiRpn === 2 && controller === ControllerType.DataEntryCoarse) {
                     this.channelSetTuning(channel, controlValue - 64.0 + (c.tuning - (c.tuning | 0))); // coarse tune
                 }
                 return;
-            case 0 /*BANK_SELECT_MSB*/:
+            case ControllerType.BankSelectCoarse:
                 c.bank = TypeConversions.int32ToUint16(0x8000 | controlValue);
                 return;
             // bank select MSB alone acts like LSB
-            case 32 /*BANK_SELECT_LSB*/:
+            case ControllerType.BankSelectFine:
                 c.bank = TypeConversions.int32ToUint16(
                     ((c.bank & 0x8000) !== 0 ? (c.bank & 0x7f) << 7 : 0) | controlValue
                 );
                 return;
-            case 101 /*RPN_MSB*/:
+            case ControllerType.RegisteredParameterCourse:
                 c.midiRpn = TypeConversions.int32ToUint16(
                     ((c.midiRpn === 0xffff ? 0 : c.midiRpn) & 0x7f) | (controlValue << 7)
                 );
                 // TODO
                 return;
-            case 100 /*RPN_LSB*/:
+            case ControllerType.RegisteredParameterFine:
                 c.midiRpn = TypeConversions.int32ToUint16(
                     ((c.midiRpn === 0xffff ? 0 : c.midiRpn) & 0x3f80) | controlValue
                 );
                 // TODO
                 return;
-            case 98 /*NRPN_LSB*/:
+            case ControllerType.NonRegisteredParameterFine:
                 c.midiRpn = 0xffff;
                 // TODO
                 return;
-            case 99 /*NRPN_MSB*/:
+            case ControllerType.NonRegisteredParameterCourse:
                 c.midiRpn = 0xffff;
                 // TODO
                 return;
-            case 120 /*ALL_SOUND_OFF*/:
+            case ControllerType.AllSoundOff:
                 this.channelSoundsOffAll(channel);
                 return;
-            case 123 /*ALL_NOTES_OFF*/:
+            case ControllerType.AllNotesOff:
                 this.channelNoteOffAll(channel);
                 return;
-            case 121 /*ALL_CTRL_OFF*/:
+            case ControllerType.ResetControllers:
                 c.midiVolume = 16383;
                 c.midiExpression = 16383;
                 c.midiPan = 8192;
@@ -1055,7 +1079,7 @@ export class TinySoundFont {
     }
 
     public loadPresets(hydra: Hydra, append: boolean): void {
-        const newPresets:Preset[] = [];
+        const newPresets: Preset[] = [];
         for (let phdrIndex: number = 0; phdrIndex < hydra.phdrs.length - 1; phdrIndex++) {
             const phdr: HydraPhdr = hydra.phdrs[phdrIndex];
             let regionIndex: number = 0;

@@ -1,12 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
     <PropertyGroup>
         <RootNamespace>AlphaTab</RootNamespace>
         <AssemblyName>AlphaTab.Windows</AssemblyName>
         <PackageId>AlphaTab.Windows</PackageId>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <TargetFrameworks>netcoreapp3.1;net6.0-windows</TargetFrameworks>
+        <TargetFramework>net8.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
         <NoWarn>$(NoWarn);NU5105</NoWarn>
@@ -19,11 +20,13 @@
     </ItemGroup>
 
     <ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\"/>
         <EmbeddedResource Include="..\..\font\sonivox\sonivox.sf2" Link="default.sf2" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="NAudio.Core" Version="2.1.0" />
+      <PackageReference Include="NAudio.Core" Version="2.2.1" />
+      <PackageReference Include="AlphaSkia.Native.Windows" Version="2.1.120" />
     </ItemGroup>
 
 </Project>

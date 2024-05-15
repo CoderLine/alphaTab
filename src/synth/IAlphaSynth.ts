@@ -76,7 +76,6 @@ export interface IAlphaSynth {
 
     /**
      * Gets or sets the midi events which will trigger the `midiEventsPlayed` event.
-     * To subscribe to Metronome events use the `SystemExclusiveEvent2` event type and check against `event.isMetronome` 
      */
     midiEventsPlayedFilter: MidiEventType[];
 
@@ -129,6 +128,12 @@ export interface IAlphaSynth {
      * @param midi
      */
     loadMidiFile(midi: MidiFile): void;
+
+    /**
+     * Applies the given transposition pitches to be used during playback.
+     * @param transpositionPitches a map defining the transposition pitches for midi channel.
+     */
+    applyTranspositionPitches(transpositionPitches: Map<number, number>): void;
 
     /**
      * Sets the mute state of a channel.

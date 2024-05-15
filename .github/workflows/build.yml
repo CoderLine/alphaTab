@@ -3,35 +3,59 @@ on:
   push:
     branches: 
       - develop
-      - master
+      - main
   pull_request:
   workflow_dispatch:
 
 jobs:
   build_web:
     name: Build and Test Web
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '12.x'
+          node-version: 'lts/*'
       - run: npm install
-      - run: npm run build-ci
-      - run: npm run test-ci
+      - run: npm run build
+      - run: npm run test
 
   build_csharp:
     name: Build and Test C#
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '12.x'
-      - uses: actions/setup-dotnet@v1
+          node-version: 'lts/*'
+      - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version:  |
-            6.0.x
+          dotnet-version: '8'
       - run: npm install
-      - run: npm run build-csharp-ci
-      - run: npm run test-csharp-ci
+      - run: npm run build-csharp
+      - run: npm run test-csharp
+
+  build_kotlin:
+    name: Build and Test Kotlin
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-cache-v3-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-cache-v3-${{ github.job }}-
+      - run: npm install
+      - run: npm run build-kotlin
+      - run: npm run test-kotlin
+      - run: ./src.kotlin/alphaTab/gradlew --stop

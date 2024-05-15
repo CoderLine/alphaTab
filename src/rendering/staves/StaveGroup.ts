@@ -43,6 +43,8 @@ export class StaveGroup {
      * The width that the content bars actually need
      */
     public width: number = 0;
+    public computedWidth: number = 0;
+    public totalBarDisplayScale: number = 0;
 
     public isLast: boolean = false;
     public masterBarsRenderers: MasterBarsRenderers[] = [];
@@ -74,7 +76,7 @@ export class StaveGroup {
             }
         }
         // Width += renderers.Width;
-        this.updateWidth();
+        this.updateWidthFromLastBar();
         return renderers;
     }
 
@@ -105,7 +107,8 @@ export class StaveGroup {
         }
         barLayoutingInfo.finish();
         // ensure same widths of new renderer
-        result.width = this.updateWidth();
+        result.width = this.updateWidthFromLastBar();
+
         return result;
     }
 
@@ -113,28 +116,49 @@ export class StaveGroup {
         if (this.masterBarsRenderers.length > 1) {
             let toRemove: MasterBarsRenderers = this.masterBarsRenderers[this.masterBarsRenderers.length - 1];
             this.masterBarsRenderers.splice(this.masterBarsRenderers.length - 1, 1);
-            let w: number = 0;
+            let width: number = 0;
+            let barDisplayScale: number = 0;
             for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
                 let s: RenderStaff = this._allStaves[i];
                 let lastBar: BarRendererBase = s.revertLastBar();
-                w = Math.max(w, lastBar.width);
+                const computedWidth = lastBar.computedWidth;
+                if (computedWidth > width) {
+                    width = computedWidth;
+                }
+                const newBarDisplayScale = lastBar.barDisplayScale;
+                if(newBarDisplayScale > barDisplayScale) {
+                    barDisplayScale = newBarDisplayScale;
+                }
             }
-            this.width -= w;
+            this.width -= width;
+            this.computedWidth -= width;
+            this.totalBarDisplayScale -= barDisplayScale;
             return toRemove;
         }
         return null;
     }
 
-    public updateWidth(): number {
+    private updateWidthFromLastBar(): number {
         let realWidth: number = 0;
+        let barDisplayScale: number = 0;
         for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
             let s: RenderStaff = this._allStaves[i];
-            s.barRenderers[s.barRenderers.length - 1].applyLayoutingInfo();
-            if (s.barRenderers[s.barRenderers.length - 1].width > realWidth) {
-                realWidth = s.barRenderers[s.barRenderers.length - 1].width;
+
+            const last = s.barRenderers[s.barRenderers.length - 1];
+            last.applyLayoutingInfo();
+            if (last.computedWidth > realWidth) {
+                realWidth = last.computedWidth;
+            }
+
+            const newBarDisplayScale = last.barDisplayScale;
+            if (newBarDisplayScale > barDisplayScale) {
+                barDisplayScale = newBarDisplayScale;
             }
         }
         this.width += realWidth;
+        this.computedWidth += realWidth;
+        this.totalBarDisplayScale += barDisplayScale;
+
         return realWidth;
     }
 
@@ -153,6 +177,7 @@ export class StaveGroup {
                 this.accoladeSpacing *= this.layout.scale;
                 this.accoladeSpacing += 2 * StaveGroup.AccoladeLabelSpacing * this.layout.scale;
                 this.width += this.accoladeSpacing;
+                this.computedWidth += this.accoladeSpacing;
             }
         }
     }
@@ -398,7 +423,7 @@ export class StaveGroup {
                         masterBarBounds = new MasterBarBounds();
                         masterBarBounds.index = renderer.bar.masterBar.index;
                         masterBarBounds.isFirstOfLine = renderer.isFirstOfLine;
-                        masterBarBounds.realBounds =  new Bounds();
+                        masterBarBounds.realBounds = new Bounds();
                         masterBarBounds.realBounds.x = x + renderer.x;
                         masterBarBounds.realBounds.y = realTop;
                         masterBarBounds.realBounds.w = renderer.width;

@@ -16,17 +16,23 @@ export class ScoreBrushGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.width = 10 * this.scale;
+        this.width =
+            this._beat.brushType === BrushType.ArpeggioUp || this._beat.brushType === BrushType.ArpeggioDown
+                ? 10 * this.scale
+                : 0;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let scoreBarRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        let lineSize: number = scoreBarRenderer.lineOffset;
-        let startY: number = cy + this.y + (scoreBarRenderer.getNoteY(this._beat.maxNote!, NoteYPosition.Bottom) - lineSize);
-        let endY: number = cy + this.y + scoreBarRenderer.getNoteY(this._beat.minNote!, NoteYPosition.Top) + lineSize;
-        let arrowX: number = cx + this.x + this.width / 2;
-        let arrowSize: number = 8 * this.scale;
-        if (this._beat.brushType !== BrushType.None) {
+        if (this._beat.brushType === BrushType.ArpeggioUp || this._beat.brushType === BrushType.ArpeggioDown) {
+            let scoreBarRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+            let lineSize: number = scoreBarRenderer.lineOffset;
+            let startY: number =
+                cy + this.y + (scoreBarRenderer.getNoteY(this._beat.maxNote!, NoteYPosition.Bottom) - lineSize);
+            let endY: number =
+                cy + this.y + scoreBarRenderer.getNoteY(this._beat.minNote!, NoteYPosition.Top) + lineSize;
+            let arrowX: number = cx + this.x + this.width / 2;
+            let arrowSize: number = 8 * this.scale;
+
             let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
             glyph.renderer = this.renderer;
             glyph.doLayout();
@@ -34,11 +40,10 @@ export class ScoreBrushGlyph extends Glyph {
             let waveOffset = -glyph.height / 2;
 
             if (this._beat.brushType === BrushType.ArpeggioUp) {
-
                 let lineStartY: number = startY + arrowSize;
                 let lineEndY: number = endY - arrowSize;
                 glyph.width = Math.abs(lineEndY - lineStartY);
-              
+
                 canvas.beginRotate(cx + this.x + 5 * this.scale, lineEndY, -90);
                 glyph.paint(0, waveOffset, canvas);
                 canvas.endRotate();
@@ -50,7 +55,6 @@ export class ScoreBrushGlyph extends Glyph {
                 canvas.closePath();
                 canvas.fill();
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
-
                 let lineStartY: number = startY + arrowSize;
                 let lineEndY: number = endY;
                 glyph.width = Math.abs(lineEndY - lineStartY);

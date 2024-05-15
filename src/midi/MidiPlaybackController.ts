@@ -55,6 +55,7 @@ export class MidiPlaybackController {
                 this._repeatStack.push(repeat);
                 this._groupsOnStack.add(masterBar.repeatGroup);
                 this._previousAlternateEndings = 0;
+                masterBarAlternateEndings = masterBar.alternateEndings;
             }
         }
 

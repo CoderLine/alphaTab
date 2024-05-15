@@ -22,6 +22,15 @@ namespace AlphaTab.Core.EcmaScript
             _data = new ArraySegment<byte>(data.Select(d => (byte)d).ToArray());
         }
 
+        public Uint8Array(ArrayBuffer buffer)
+        {
+            _data = buffer.Raw;
+        }
+
+        public Uint8Array() : this(System.Array.Empty<byte>())
+        {
+        }
+
         public Uint8Array(byte[] data)
         {
             _data = new ArraySegment<byte>(data);
@@ -45,21 +54,21 @@ namespace AlphaTab.Core.EcmaScript
         public double this[double index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _data.Array[_data.Offset + (int)index];
+            get => _data.Array![_data.Offset + (int)index];
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => _data.Array[_data.Offset + (int)index] = (byte)value;
+            set => _data.Array![_data.Offset + (int)index] = (byte)value;
         }
 
         public Uint8Array Subarray(double begin, double end)
         {
-            return new Uint8Array(new ArraySegment<byte>(_data.Array, _data.Offset + (int)begin,
+            return new Uint8Array(new ArraySegment<byte>(_data.Array!, _data.Offset + (int)begin,
                 (int)(end - begin)));
         }
 
         public void Set(Uint8Array subarray, double pos)
         {
             var buffer = subarray.Buffer.Raw;
-            System.Buffer.BlockCopy(buffer.Array, (int)buffer.Offset, _data.Array,
+            System.Buffer.BlockCopy(buffer.Array!, buffer.Offset, _data.Array!,
                 _data.Offset + (int)pos, buffer.Count);
         }
 

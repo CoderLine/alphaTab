@@ -19,7 +19,6 @@ import { Voice } from '@src/model/Voice';
 import { WhammyType } from '@src/model/WhammyType';
 import { NotationMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { GraceGroup } from '@src/model/GraceGroup';
@@ -290,7 +289,7 @@ export class Beat {
      * @json_add addWhammyBarPoint
      * @clone_add addWhammyBarPoint
      */
-    public whammyBarPoints: BendPoint[] = [];
+    public whammyBarPoints: BendPoint[] | null = null;
 
     /**
      * Gets or sets the highest point with for the highest whammy bar value.
@@ -307,7 +306,7 @@ export class Beat {
     public minWhammyPoint: BendPoint | null = null;
 
     public get hasWhammyBar(): boolean {
-        return this.whammyBarType !== WhammyType.None;
+        return this.whammyBarPoints !== null && this.whammyBarType !== WhammyType.None;
     }
 
     /**
@@ -441,7 +440,12 @@ export class Beat {
     public beamingMode: BeatBeamingMode = BeatBeamingMode.Auto;
 
     public addWhammyBarPoint(point: BendPoint): void {
-        this.whammyBarPoints.push(point);
+        let points = this.whammyBarPoints;
+        if (points === null) {
+            points = [];
+            this.whammyBarPoints = points;
+        }
+        points.push(point);
         if (!this.maxWhammyPoint || point.value > this.maxWhammyPoint.value) {
             this.maxWhammyPoint = point;
         }
@@ -456,7 +460,7 @@ export class Beat {
     public removeWhammyBarPoint(index: number): void {
         // check index
         const points = this.whammyBarPoints;
-        if (index < 0 || index >= points.length) {
+        if (points === null || index < 0 || index >= points.length) {
             return;
         }
 
@@ -583,8 +587,7 @@ export class Beat {
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
-        if (
-            this.getAutomation(AutomationType.Instrument) === null &&
+        if (this.getAutomation(AutomationType.Instrument) === null &&
             this.index === 0 &&
             this.voice.index === 0 &&
             this.voice.bar.index === 0 &&
@@ -716,7 +719,7 @@ export class Beat {
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
         const points = this.whammyBarPoints;
-        if (points.length > 0 && this.whammyBarType === WhammyType.Custom) {
+        if (points !== null && points.length > 0 && this.whammyBarType === WhammyType.Custom) {
             if (displayMode === NotationMode.SongBook) {
                 this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
             }
@@ -757,11 +760,7 @@ export class Beat {
                         }
                         points.splice(2, 1);
                         points.splice(1, 1);
-                    } else {
-                        Logger.warning('Model', 'Unsupported whammy type detected, fallback to custom', null);
                     }
-                } else {
-                    Logger.warning('Model', 'Unsupported whammy type detected, fallback to custom', null);
                 }
             }
         }
@@ -779,7 +778,7 @@ export class Beat {
                 // remove bend on cloned note
                 cloneNote.bendType = BendType.None;
                 cloneNote.maxBendPoint = null;
-                cloneNote.bendPoints = [];
+                cloneNote.bendPoints = null;
                 cloneNote.bendStyle = BendStyle.Default;
                 cloneNote.id = Note.GlobalNoteId++;
 
@@ -799,7 +798,7 @@ export class Beat {
                     let tieDestination: Note | null = Note.findTieOrigin(note);
                     if (tieDestination && tieDestination.hasBend) {
                         cloneNote.bendType = BendType.Hold;
-                        let lastPoint: BendPoint = note.bendPoints[note.bendPoints.length - 1];
+                        let lastPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
                         cloneNote.addBendPoint(new BendPoint(0, lastPoint.value));
                         cloneNote.addBendPoint(new BendPoint(BendPoint.MaxPosition, lastPoint.value));
                     }
@@ -817,7 +816,7 @@ export class Beat {
 
             // ensure cloned beat has also a grace simple grace group for itself
             // (see Voice.finish where every beat gets one)
-            // this ensures later that grace rods are assigned correctly to this beat.
+            // this ensures later that grace rods are assigned correctly to this beat. 
             cloneBeat.graceGroup = new GraceGroup();
             cloneBeat.graceGroup.addBeat(this);
             cloneBeat.graceGroup.isComplete = true;

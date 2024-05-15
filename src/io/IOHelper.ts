@@ -179,4 +179,9 @@ export class IOHelper {
         o.writeByte((v >> 0) & 0xff);
         o.writeByte((v >> 8) & 0xff);
     }
+    
+    public static writeInt16BE(o: IWriteable, v: number) {
+        o.writeByte((v >> 8) & 0xff);
+        o.writeByte((v >> 0) & 0xff);
+    }
 }

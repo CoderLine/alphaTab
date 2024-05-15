@@ -91,6 +91,22 @@ export class SlidePlaybackSettings {
 }
 
 /**
+ * Lists the different modes how alphaTab will play the generated audio.
+ * @target web
+ */
+export enum PlayerOutputMode {
+    /**
+     * If audio worklets are available in the browser, they will be used for playing the audio.
+     * It will fallback to the ScriptProcessor output if unavailable. 
+     */
+    WebAudioAudioWorklets,
+    /**
+     * Uses the legacy ScriptProcessor output which might perform worse.
+     */
+    WebAudioScriptProcessor
+}
+
+/**
  * The player settings control how the audio playback and UI is behaving.
  * @json
  */
@@ -106,6 +122,12 @@ export class PlayerSettings {
      * @json_read_only
      */
     public scrollElement: string | HTMLElement = 'html,body';
+
+    /**
+     * Gets or sets which output mode alphaTab should use.
+     * @target web
+     */
+    public outputMode: PlayerOutputMode = PlayerOutputMode.WebAudioAudioWorklets;
 
     /**
      * Gets or sets whether the player should be enabled.

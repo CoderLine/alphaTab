@@ -572,8 +572,8 @@ export class GpifWriter {
     }
 
     private writeBend(properties: XmlNode, note: Note) {
-        if (note.hasBend && note.bendPoints.length <= 4) {
-            this.writeStandardBend(properties, note.bendPoints);
+        if (note.hasBend && note.bendPoints!.length <= 4) {
+            this.writeStandardBend(properties, note.bendPoints!);
         }
     }
 
@@ -863,8 +863,8 @@ export class GpifWriter {
     }
 
     private writeWhammyNode(parent: XmlNode, beat: Beat) {
-        if (beat.hasWhammyBar && beat.whammyBarPoints.length <= 4) {
-            this.writeStandardWhammy(parent, beat.whammyBarPoints);
+        if (beat.hasWhammyBar && beat.whammyBarPoints!.length <= 4) {
+            this.writeStandardWhammy(parent, beat.whammyBarPoints!);
         }
     }
 
@@ -924,8 +924,8 @@ export class GpifWriter {
         scoreNode.addElement('PageHeader').setCData('');
         scoreNode.addElement('PageFooter').setCData('');
 
-        scoreNode.addElement('ScoreSystemsDefaultLayout').setCData('4');
-        scoreNode.addElement('ScoreSystemsLayout').setCData('4');
+        scoreNode.addElement('ScoreSystemsDefaultLayout').setCData(score.defaultSystemsLayout.toString());
+        scoreNode.addElement('ScoreSystemsLayout').setCData(score.systemsLayout.join(' '));
 
         scoreNode.addElement('ScoreZoomPolicy').innerText = 'Value';
         scoreNode.addElement('ScoreZoom').innerText = '1';
@@ -991,9 +991,8 @@ export class GpifWriter {
         trackNode.addElement('ShortName').setCData(track.shortName);
         trackNode.addElement('Color').innerText = `${track.color.r} ${track.color.g} ${track.color.b}`;
 
-        // Note: unclear what these values mean, various combinations in GP7 lead to these values
-        trackNode.addElement('SystemsDefautLayout').innerText = '3';
-        trackNode.addElement('SystemsLayout').innerText = '1';
+        trackNode.addElement('SystemsDefautLayout').innerText = track.defaultSystemsLayout.toString();
+        trackNode.addElement('SystemsLayout').innerText = track.systemsLayout.join(' ');
 
         trackNode.addElement('AutoBrush');
         trackNode.addElement('PalmMute').innerText = '0';
@@ -1237,108 +1236,112 @@ export class GpifWriter {
         const diagramCollectionItems = diagramCollectionProperty.addElement('Items');
 
         const sc = staff.chords;
-        for (const [id, chord] of sc) {
-            const diagramCollectionItem = diagramCollectionItems.addElement('Item');
-            diagramCollectionItem.attributes.set('id', id);
-            diagramCollectionItem.attributes.set('name', chord.name);
+        if (sc) {
+            for (const [id, chord] of sc) {
+                const diagramCollectionItem = diagramCollectionItems.addElement('Item');
+                diagramCollectionItem.attributes.set('id', id);
+                diagramCollectionItem.attributes.set('name', chord.name);
 
-            const diagram = diagramCollectionItem.addElement('Diagram');
-            diagram.attributes.set('stringCount', chord.strings.length.toString());
-            diagram.attributes.set('fretCount', '5');
-            diagram.attributes.set('baseFret', (chord.firstFret - 1).toString());
-            diagram.attributes.set('barStates', chord.strings.map(_ => '1').join(' '));
+                const diagram = diagramCollectionItem.addElement('Diagram');
+                diagram.attributes.set('stringCount', chord.strings.length.toString());
+                diagram.attributes.set('fretCount', '5');
+                diagram.attributes.set('baseFret', (chord.firstFret - 1).toString());
+                diagram.attributes.set('barStates', chord.strings.map(_ => '1').join(' '));
 
-            const frets: number[] = [];
-            const fretToStrings = new Map<number, number[]>();
+                const frets: number[] = [];
+                const fretToStrings = new Map<number, number[]>();
 
-            for (let i = 0; i < chord.strings.length; i++) {
-                let chordFret = chord.strings[i];
-                if (chordFret !== -1) {
-                    const fretNode = diagram.addElement('Fret');
-                    const chordString = chord.strings.length - 1 - i;
-                    fretNode.attributes.set('string', chordString.toString());
-                    fretNode.attributes.set('fret', (chordFret - chord.firstFret + 1).toString());
-                    if (!fretToStrings.has(chordFret)) {
-                        fretToStrings.set(chordFret, []);
-                        frets.push(chordFret);
+                for (let i = 0; i < chord.strings.length; i++) {
+                    let chordFret = chord.strings[i];
+                    if (chordFret !== -1) {
+                        const fretNode = diagram.addElement('Fret');
+                        const chordString = (chord.strings.length - 1 - i);
+                        fretNode.attributes.set('string', chordString.toString());
+                        fretNode.attributes.set('fret', (chordFret - chord.firstFret + 1).toString());
+                        if (!fretToStrings.has(chordFret)) {
+                            fretToStrings.set(chordFret, []);
+                            frets.push(chordFret);
+                        }
+                        fretToStrings.get(chordFret)!.push(chordString);
                     }
-                    fretToStrings.get(chordFret)!.push(chordString);
                 }
-            }
 
-            frets.sort();
+                frets.sort();
 
-            // try to rebuild the barre frets
-            const fingering = diagram.addElement('Fingering');
-            if (chord.barreFrets.length > 0) {
-                const fingers = [
-                    Fingers.LittleFinger,
-                    Fingers.AnnularFinger,
-                    Fingers.MiddleFinger,
-                    Fingers.IndexFinger
-                ];
+                // try to rebuild the barre frets
+                const fingering = diagram.addElement('Fingering');
+                if (chord.barreFrets.length > 0) {
+                    const fingers = [
+                        Fingers.LittleFinger,
+                        Fingers.AnnularFinger,
+                        Fingers.MiddleFinger,
+                        Fingers.IndexFinger,
+                    ];
 
-                for (const fret of frets) {
-                    const fretStrings = fretToStrings.get(fret)!;
-                    if (fretStrings.length > 1 && chord.barreFrets.indexOf(fret) >= 0) {
-                        const finger = fingers.length > 0 ? fingers.pop() : Fingers.IndexFinger;
-                        for (const fretString of fretStrings) {
-                            const position = fingering.addElement('Position');
-                            switch (finger) {
-                                case Fingers.LittleFinger:
-                                    position.attributes.set('finger', 'Pinky');
-                                    break;
-                                case Fingers.AnnularFinger:
-                                    position.attributes.set('finger', 'Ring');
-                                    break;
-                                case Fingers.MiddleFinger:
-                                    position.attributes.set('finger', 'Middle');
-                                    break;
-                                case Fingers.IndexFinger:
-                                    position.attributes.set('finger', 'Index');
-                                    break;
+                    for (const fret of frets) {
+                        const fretStrings = fretToStrings.get(fret)!;
+                        if (fretStrings.length > 1 && chord.barreFrets.indexOf(fret) >= 0) {
+                            const finger = fingers.length > 0 ? fingers.pop() : Fingers.IndexFinger;
+                            for (const fretString of fretStrings) {
+                                const position = fingering.addElement('Position');
+                                switch (finger) {
+                                    case Fingers.LittleFinger:
+                                        position.attributes.set('finger', 'Pinky');
+                                        break;
+                                    case Fingers.AnnularFinger:
+                                        position.attributes.set('finger', 'Ring');
+                                        break;
+                                    case Fingers.MiddleFinger:
+                                        position.attributes.set('finger', 'Middle');
+                                        break;
+                                    case Fingers.IndexFinger:
+                                        position.attributes.set('finger', 'Index');
+                                        break;
+                                }
+                                position.attributes.set('fret', (fret - chord.firstFret + 1).toString());
+                                position.attributes.set('string', fretString.toString());
                             }
-                            position.attributes.set('fret', (fret - chord.firstFret + 1).toString());
-                            position.attributes.set('string', fretString.toString());
                         }
                     }
                 }
+
+
+                const showName = diagram.addElement('Property');
+                showName.attributes.set('name', 'ShowName');
+                showName.attributes.set('type', 'bool');
+                showName.attributes.set('value', chord.showName ? "true" : "false");
+
+                const showDiagram = diagram.addElement('Property');
+                showDiagram.attributes.set('name', 'ShowDiagram');
+                showDiagram.attributes.set('type', 'bool');
+                showDiagram.attributes.set('value', chord.showDiagram ? "true" : "false");
+
+                const showFingering = diagram.addElement('Property');
+                showFingering.attributes.set('name', 'ShowFingering');
+                showFingering.attributes.set('type', 'bool');
+                showFingering.attributes.set('value', chord.showFingering ? "true" : "false");
+
+
+                // TODO Chord details
+                const chordNode = diagram.addElement('Chord');
+                const keyNoteNode = chordNode.addElement('KeyNote');
+                keyNoteNode.attributes.set('step', 'C');
+                keyNoteNode.attributes.set('accidental', 'Natural');
+
+                const bassNoteNode = chordNode.addElement('BassNote');
+                bassNoteNode.attributes.set('step', 'C');
+                bassNoteNode.attributes.set('accidental', 'Natural');
+
+                const degree1Node = chordNode.addElement('Degree');
+                degree1Node.attributes.set('interval', 'Third');
+                degree1Node.attributes.set('alteration', 'Major');
+                degree1Node.attributes.set('omitted', 'false');
+
+                const degree2Node = chordNode.addElement('Degree');
+                degree2Node.attributes.set('interval', 'Fifth');
+                degree2Node.attributes.set('alteration', 'Perfect');
+                degree2Node.attributes.set('omitted', 'false');
             }
-
-            const showName = diagram.addElement('Property');
-            showName.attributes.set('name', 'ShowName');
-            showName.attributes.set('type', 'bool');
-            showName.attributes.set('value', chord.showName ? 'true' : 'false');
-
-            const showDiagram = diagram.addElement('Property');
-            showDiagram.attributes.set('name', 'ShowDiagram');
-            showDiagram.attributes.set('type', 'bool');
-            showDiagram.attributes.set('value', chord.showDiagram ? 'true' : 'false');
-
-            const showFingering = diagram.addElement('Property');
-            showFingering.attributes.set('name', 'ShowFingering');
-            showFingering.attributes.set('type', 'bool');
-            showFingering.attributes.set('value', chord.showFingering ? 'true' : 'false');
-
-            // TODO Chord details
-            const chordNode = diagram.addElement('Chord');
-            const keyNoteNode = chordNode.addElement('KeyNote');
-            keyNoteNode.attributes.set('step', 'C');
-            keyNoteNode.attributes.set('accidental', 'Natural');
-
-            const bassNoteNode = chordNode.addElement('BassNote');
-            bassNoteNode.attributes.set('step', 'C');
-            bassNoteNode.attributes.set('accidental', 'Natural');
-
-            const degree1Node = chordNode.addElement('Degree');
-            degree1Node.attributes.set('interval', 'Third');
-            degree1Node.attributes.set('alteration', 'Major');
-            degree1Node.attributes.set('omitted', 'false');
-
-            const degree2Node = chordNode.addElement('Degree');
-            degree2Node.attributes.set('interval', 'Fifth');
-            degree2Node.attributes.set('alteration', 'Perfect');
-            degree2Node.attributes.set('omitted', 'false');
         }
     }
 
@@ -1436,8 +1439,8 @@ export class GpifWriter {
 
             instrumentSet.addElement('Name').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetName;
             instrumentSet.addElement('Type').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetType;
-            let currentElementType: string = '';
-            let currentElementName: string = '';
+            let currentElementType: string = "";
+            let currentElementName: string = "";
             let currentArticulations: XmlNode = new XmlNode();
             let counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
@@ -1597,14 +1600,14 @@ export class GpifWriter {
     }
 
     private writeFermatas(parent: XmlNode, masterBar: MasterBar) {
-        const fermataCount = masterBar.fermata.size;
+        const fermataCount = (masterBar.fermata?.size ?? 0);
         if (fermataCount === 0) {
             return;
         }
 
         if (fermataCount > 0) {
             const fermatas = parent.addElement('Fermatas');
-            for (const [offset, fermata] of masterBar.fermata) {
+            for (const [offset, fermata] of masterBar.fermata!) {
                 this.writeFermata(fermatas, offset, fermata);
             }
         }

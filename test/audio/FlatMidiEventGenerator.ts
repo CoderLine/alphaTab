@@ -1,6 +1,5 @@
 import { ControllerType } from '@src/midi/ControllerType';
 import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
-import { DynamicValue } from '@src/model/DynamicValue';
 
 export class FlatMidiEventGenerator implements IMidiFileHandler {
     public midiEvents: FlatMidiEvent[];
@@ -10,12 +9,12 @@ export class FlatMidiEventGenerator implements IMidiFileHandler {
     }
 
     public addTimeSignature(tick: number, timeSignatureNumerator: number, timeSignatureDenominator: number): void {
-        let e = new TimeSignatureEvent(tick, timeSignatureNumerator, timeSignatureDenominator);
+        let e = new FlatTimeSignatureEvent(tick, timeSignatureNumerator, timeSignatureDenominator);
         this.midiEvents.push(e);
     }
 
     public addRest(track: number, tick: number, channel: number): void {
-        let e = new RestEvent(tick, track, channel);
+        let e = new FlatRestEvent(tick, track, channel);
         this.midiEvents.push(e);
     }
 
@@ -24,40 +23,40 @@ export class FlatMidiEventGenerator implements IMidiFileHandler {
         start: number,
         length: number,
         key: number,
-        dynamicValue: DynamicValue,
+        velocity: number,
         channel: number
     ): void {
-        let e = new NoteEvent(start, track, channel, length, key, dynamicValue);
+        let e = new FlatNoteEvent(start, track, channel, length, key, velocity);
         this.midiEvents.push(e);
     }
 
-    public addControlChange(track: number, tick: number, channel: number, controller: number, value: number): void {
-        let e = new ControlChangeEvent(tick, track, channel, controller as ControllerType, value);
+    public addControlChange(track: number, tick: number, channel: number, controller: ControllerType, value: number): void {
+        let e = new FlatControlChangeEvent(tick, track, channel, controller, value);
         this.midiEvents.push(e);
     }
 
     public addProgramChange(track: number, tick: number, channel: number, program: number): void {
-        let e = new ProgramChangeEvent(tick, track, channel, program);
+        let e = new FlatProgramChangeEvent(tick, track, channel, program);
         this.midiEvents.push(e);
     }
 
     public addTempo(tick: number, tempo: number): void {
-        let e = new TempoEvent(tick, tempo);
+        let e = new FlatTempoEvent(tick, tempo);
         this.midiEvents.push(e);
     }
 
     public addBend(track: number, tick: number, channel: number, value: number): void {
-        let e = new BendEvent(tick, track, channel, value);
+        let e = new FlatBendEvent(tick, track, channel, value);
         this.midiEvents.push(e);
     }
 
     public addNoteBend(track: number, tick: number, channel: number, key: number, value: number): void {
-        let e = new NoteBendEvent(tick, track, channel, key, value);
+        let e = new FlatNoteBendEvent(tick, track, channel, key, value);
         this.midiEvents.push(e);
     }
 
     public finishTrack(track: number, tick: number): void {
-        let e = new TrackEndEvent(tick, track);
+        let e = new FlatTrackEndEvent(tick, track);
         this.midiEvents.push(e);
     }
 }
@@ -93,7 +92,7 @@ export class FlatMidiEvent {
     }
 }
 
-export class TempoEvent extends FlatMidiEvent {
+export class FlatTempoEvent extends FlatMidiEvent {
     public tempo: number = 0;
 
     public constructor(tick: number, tempo: number) {
@@ -110,7 +109,7 @@ export class TempoEvent extends FlatMidiEvent {
             return false;
         }
 
-        if (obj instanceof TempoEvent) {
+        if (obj instanceof FlatTempoEvent) {
             return this.tempo === obj.tempo;
         }
 
@@ -118,7 +117,7 @@ export class TempoEvent extends FlatMidiEvent {
     }
 }
 
-export class TimeSignatureEvent extends FlatMidiEvent {
+export class FlatTimeSignatureEvent extends FlatMidiEvent {
     public numerator: number = 0;
     public denominator: number = 0;
 
@@ -137,7 +136,7 @@ export class TimeSignatureEvent extends FlatMidiEvent {
             return false;
         }
 
-        if (obj instanceof TimeSignatureEvent) {
+        if (obj instanceof FlatTimeSignatureEvent) {
             return this.numerator === obj.numerator && this.denominator === obj.denominator;
         }
 
@@ -145,7 +144,7 @@ export class TimeSignatureEvent extends FlatMidiEvent {
     }
 }
 
-export class TrackMidiEvent extends FlatMidiEvent {
+export class FlatTrackMidiEvent extends FlatMidiEvent {
     public track: number = 0;
 
     public constructor(tick: number, track: number) {
@@ -162,7 +161,7 @@ export class TrackMidiEvent extends FlatMidiEvent {
             return false;
         }
 
-        if (obj instanceof TrackMidiEvent) {
+        if (obj instanceof FlatTrackMidiEvent) {
             return this.track === obj.track;
         }
 
@@ -170,7 +169,7 @@ export class TrackMidiEvent extends FlatMidiEvent {
     }
 }
 
-export class TrackEndEvent extends TrackMidiEvent {
+export class FlatTrackEndEvent extends FlatTrackMidiEvent {
     public constructor(tick: number, track: number) {
         super(tick, track);
     }
@@ -180,7 +179,7 @@ export class TrackEndEvent extends TrackMidiEvent {
     }
 }
 
-export class ChannelMidiEvent extends TrackMidiEvent {
+export class FlatChannelMidiEvent extends FlatTrackMidiEvent {
     public channel: number = 0;
 
     public constructor(tick: number, track: number, channel: number) {
@@ -197,7 +196,7 @@ export class ChannelMidiEvent extends TrackMidiEvent {
             return false;
         }
 
-        if (obj instanceof ChannelMidiEvent) {
+        if (obj instanceof FlatChannelMidiEvent) {
             return this.channel === obj.channel;
         }
 
@@ -205,7 +204,7 @@ export class ChannelMidiEvent extends TrackMidiEvent {
     }
 }
 
-export class ControlChangeEvent extends ChannelMidiEvent {
+export class FlatControlChangeEvent extends FlatChannelMidiEvent {
     public controller: ControllerType;
     public value: number = 0;
 
@@ -224,7 +223,7 @@ export class ControlChangeEvent extends ChannelMidiEvent {
             return false;
         }
 
-        if (obj instanceof ControlChangeEvent) {
+        if (obj instanceof FlatControlChangeEvent) {
             return this.controller === obj.controller && this.channel === obj.channel && this.value === obj.value;
         }
 
@@ -232,7 +231,7 @@ export class ControlChangeEvent extends ChannelMidiEvent {
     }
 }
 
-export class RestEvent extends ChannelMidiEvent {
+export class FlatRestEvent extends FlatChannelMidiEvent {
     public constructor(tick: number, track: number, channel: number) {
         super(tick, track, channel);
     }
@@ -246,14 +245,14 @@ export class RestEvent extends ChannelMidiEvent {
             return false;
         }
 
-        if (obj instanceof TempoEvent) {
+        if (obj instanceof FlatTempoEvent) {
             return true;
         }
         return false;
     }
 }
 
-export class ProgramChangeEvent extends ChannelMidiEvent {
+export class FlatProgramChangeEvent extends FlatChannelMidiEvent {
     public program: number = 0;
 
     public constructor(tick: number, track: number, channel: number, program: number) {
@@ -270,7 +269,7 @@ export class ProgramChangeEvent extends ChannelMidiEvent {
             return false;
         }
 
-        if (obj instanceof ProgramChangeEvent) {
+        if (obj instanceof FlatProgramChangeEvent) {
             return this.program === obj.program;
         }
 
@@ -278,10 +277,10 @@ export class ProgramChangeEvent extends ChannelMidiEvent {
     }
 }
 
-export class NoteEvent extends ChannelMidiEvent {
+export class FlatNoteEvent extends FlatChannelMidiEvent {
     public length: number = 0;
     public key: number = 0;
-    public dynamicValue: DynamicValue;
+    public velocity: number;
 
     public constructor(
         tick: number,
@@ -289,16 +288,16 @@ export class NoteEvent extends ChannelMidiEvent {
         channel: number,
         length: number,
         key: number,
-        dynamicValue: DynamicValue
+        velocity: number
     ) {
         super(tick, track, channel);
         this.length = length;
         this.key = key;
-        this.dynamicValue = dynamicValue;
+        this.velocity = velocity;
     }
 
     public override toString(): string {
-        return `Note: ${super.toString()} Length[${this.length}] Key[${this.key}] Dynamic[${this.dynamicValue}]`;
+        return `Note: ${super.toString()} Length[${this.length}] Key[${this.key}] Velocity[${this.velocity}]`;
     }
 
     public override equals(obj: unknown): boolean {
@@ -306,15 +305,15 @@ export class NoteEvent extends ChannelMidiEvent {
             return false;
         }
 
-        if (obj instanceof NoteEvent) {
-            return this.length === obj.length && this.key === obj.key && this.dynamicValue === obj.dynamicValue;
+        if (obj instanceof FlatNoteEvent) {
+            return this.length === obj.length && this.key === obj.key && this.velocity === obj.velocity;
         }
 
         return false;
     }
 }
 
-export class BendEvent extends ChannelMidiEvent {
+export class FlatBendEvent extends FlatChannelMidiEvent {
     public value: number = 0;
 
     public constructor(tick: number, track: number, channel: number, value: number) {
@@ -331,14 +330,14 @@ export class BendEvent extends ChannelMidiEvent {
             return false;
         }
 
-        if (obj instanceof BendEvent) {
+        if (obj instanceof FlatBendEvent) {
             return this.value === obj.value;
         }
 
         return false;
     }
 }
-export class NoteBendEvent extends ChannelMidiEvent {
+export class FlatNoteBendEvent extends FlatChannelMidiEvent {
     public key: number;
     public value: number;
 
@@ -357,7 +356,7 @@ export class NoteBendEvent extends ChannelMidiEvent {
             return false;
         }
 
-        if (obj instanceof NoteBendEvent) {
+        if (obj instanceof FlatNoteBendEvent) {
             return this.value === obj.value && this.key === obj.key;
         }
 

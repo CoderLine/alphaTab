@@ -9,18 +9,18 @@ export class ImporterSettingsSerializer {
     public static fromJson(obj: ImporterSettings, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: ImporterSettings | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("encoding", obj.encoding); 
-        o.set("mergepartgroupsinmusicxml", obj.mergePartGroupsInMusicXml); 
-        o.set("beattextaslyrics", obj.beatTextAsLyrics); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("encoding", obj.encoding);
+        o.set("mergepartgroupsinmusicxml", obj.mergePartGroupsInMusicXml);
+        o.set("beattextaslyrics", obj.beatTextAsLyrics);
+        return o;
     }
     public static setProperty(obj: ImporterSettings, property: string, v: unknown): boolean {
         switch (property) {
@@ -33,8 +33,7 @@ export class ImporterSettingsSerializer {
             case "beattextaslyrics":
                 obj.beatTextAsLyrics = v! as boolean;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

@@ -1,6 +1,6 @@
 import { ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
-import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
+import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
@@ -8,6 +8,7 @@ import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
 import { NotationElement } from '@src/NotationSettings';
+import { SystemsLayoutMode } from '@src/DisplaySettings';
 
 /**
  * This layout arranges the bars into a fixed width and dynamic height region.
@@ -29,6 +30,15 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     protected doLayoutAndRender(): void {
+        switch (this.renderer.settings.display.systemsLayoutMode) {
+            case SystemsLayoutMode.Automatic:
+                this.systemsLayoutMode = InternalSystemsLayoutMode.Automatic;
+                break;
+            case SystemsLayoutMode.UseModelLayout:
+                this.systemsLayoutMode = InternalSystemsLayoutMode.FromModelWithScale;
+                break;
+        }
+
         this._pagePadding = this.renderer.settings.display.padding;
         if (!this._pagePadding) {
             this._pagePadding = PageViewLayout.PagePadding;
@@ -227,7 +237,9 @@ export class PageViewLayout extends ScoreLayout {
 
     private resizeAndRenderScore(y: number, oldHeight: number): number {
         // if we have a fixed number of bars per row, we only need to refit them.
-        if (this.renderer.settings.display.barsPerRow !== -1) {
+        const barsPerRowActive = this.renderer.settings.display.barsPerRow > 0 || this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale;
+
+        if (barsPerRowActive) {
             for (let i: number = 0; i < this._groups.length; i++) {
                 let group: StaveGroup = this._groups[i];
                 this.fitGroup(group);
@@ -334,7 +346,7 @@ export class PageViewLayout extends ScoreLayout {
      * Realignes the bars in this line according to the available space
      */
     private fitGroup(group: StaveGroup): void {
-        if (group.isFull || group.width > this.maxWidth) {
+        if (group.isFull || group.width > this.maxWidth || this.renderer.settings.display.justifyLastSystem) {
             group.scaleToWidth(this.maxWidth);
         }
         else {
@@ -343,10 +355,30 @@ export class PageViewLayout extends ScoreLayout {
         group.finalizeGroup();
     }
 
+    private getBarsPerRow(rowIndex:number) {
+        let barsPerRow: number = this.renderer.settings.display.barsPerRow;
+
+        if (this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale) {
+            let defaultSystemsLayout: number;
+            let systemsLayout: number[];
+            if (this.renderer.tracks!.length > 1) { // multi track applies
+                defaultSystemsLayout = this.renderer.score!.defaultSystemsLayout;
+                systemsLayout = this.renderer.score!.systemsLayout;
+            } else {
+                defaultSystemsLayout = this.renderer.tracks![0].defaultSystemsLayout;
+                systemsLayout = this.renderer.tracks![0].systemsLayout;
+            }
+
+            barsPerRow = (rowIndex < systemsLayout.length) ? systemsLayout[rowIndex] : defaultSystemsLayout;
+        }
+
+        return barsPerRow;
+    }
+
     private createStaveGroup(currentBarIndex: number, endIndex: number): StaveGroup {
         let group: StaveGroup = this.createEmptyStaveGroup();
         group.index = this._groups.length;
-        let barsPerRow: number = this.renderer.settings.display.barsPerRow;
+        let barsPerRow: number = this.getBarsPerRow(group.index);
         let maxWidth: number = this.maxWidth;
         let end: number = endIndex + 1;
 

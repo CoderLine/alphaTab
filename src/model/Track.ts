@@ -54,6 +54,18 @@ export class Track {
     public shortName: string = '';
 
     /**
+     * Defines how many bars are placed into the systems (rows) when displaying
+     * the track unless a value is set in the systemsLayout.
+     */
+    public defaultSystemsLayout: number = 3;
+
+    /**
+     * Defines how many bars are placed into the systems (rows) when displaying
+     * the track.
+     */
+    public systemsLayout: number[] = [];
+
+    /**
      * Gets or sets a mapping on which staff liens particular percussion instruments
      * should be shown.
      */
@@ -102,6 +114,7 @@ export class Track {
                         // initialize lyrics list for beat if required
                         if (!beat.lyrics) {
                             beat.lyrics = new Array<string>(lyrics.length);
+                            beat.lyrics.fill("");
                         }
                         // assign chunk
                         beat.lyrics[li] = lyric.chunks[ci];

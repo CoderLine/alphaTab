@@ -56,6 +56,9 @@ import { ResizeObserverPolyfill } from '@src/platform/javascript/ResizeObserverP
 import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 import { IntersectionObserverPolyfill } from '@src/platform/javascript/IntersectionObserverPolyfill';
 import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
+import { SkiaCanvas } from './platform/skia/SkiaCanvas';
+import { Font } from './model';
+import { Settings } from './Settings';
 import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
 
 export class LayoutEngineFactory {
@@ -197,7 +200,17 @@ export class Environment {
     /**
      * @target web
      */
+    public static isViteBundled: boolean = Environment.detectVite();
+
+    /**
+     * @target web
+     */
     public static scriptFile: string | null = Environment.detectScriptFile();
+
+    /**
+     * @target web
+     */
+    public static fontDirectory: string | null = Environment.detectFontDirectory();
 
     /**
      * @target web
@@ -220,42 +233,15 @@ export class Environment {
 
     /**
      * @target web
+     * @internal
      */
-    public static createAlphaTabWorker(scriptFile: string | null): Worker {
-        if (Environment.isWebPackBundled) {
-            // WebPack currently requires this exact syntax: new Worker(new URL(..., import.meta.url)))
-            // The module `@coderline/alphatab` will be resolved by WebPack to alphaTab consumed as library
-            // this will not work with CDNs because worker start scripts need to have the same origin like
-            // the current browser. 
+    public static createWebWorker: (settings: Settings) => Worker;
 
-            // https://github.com/webpack/webpack/discussions/14066
-
-            return new Worker(
-                // @ts-ignore
-                /* webpackChunkName: "alphatab.worker" */ new URL('@coderline/alphatab', import.meta.url)
-            );
-        }
-
-        if (!scriptFile) {
-            throw new AlphaTabError(AlphaTabErrorType.General, "Could not detect alphaTab script file, cannot initialize renderer");
-        }
-
-        try {
-            if (Environment.webPlatform === WebPlatform.BrowserModule) {
-                const script: string = `import * as alphaTab from '${scriptFile}'`;
-                const blob: Blob = new Blob([script], { type: 'text/javascript' });
-                return new Worker(URL.createObjectURL(blob), { type: 'module' });
-            } else {
-                const script: string = `importScripts('${scriptFile}')`;
-                const blob: Blob = new Blob([script]);
-                return new Worker(URL.createObjectURL(blob));
-            }
-        }
-        catch (e) {
-            Logger.warning('Rendering', 'Could not create inline worker, fallback to normal worker');
-            return new Worker(scriptFile);
-        }
-    }
+    /**
+     * @target web
+     * @internal
+     */
+    public static createAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>;
 
     /**
      * @target web
@@ -273,6 +259,14 @@ export class Environment {
      * @target web
      */
     private static detectScriptFile(): string | null {
+        // custom global constant
+        if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_ROOT) {
+            let scriptFile = Environment.globalThis.ALPHATAB_ROOT;
+            scriptFile = Environment.ensureFullUrl(scriptFile);
+            scriptFile = Environment.appendScriptName(scriptFile);
+            return scriptFile;
+        }
+
         // browser include as ES6 import
         // <script type="module">
         // import * as alphaTab from 'dist/alphaTab.js';
@@ -291,6 +285,76 @@ export class Environment {
         // normal browser include as <script>
         if ('document' in Environment.globalThis && document.currentScript) {
             return (document.currentScript as HTMLScriptElement).src;
+        }
+
+        return null;
+    }
+
+    /**
+     * @target web
+     */
+    public static ensureFullUrl(relativeUrl: string | null): string {
+        if (!relativeUrl) {
+            return '';
+        }
+
+        if (!relativeUrl.startsWith('http') && !relativeUrl.startsWith('https') && !relativeUrl.startsWith('file')) {
+            let root: string = '';
+            let location: Location = Environment.globalThis['location'];
+            root += location.protocol?.toString();
+            root += '//'?.toString();
+            if (location.hostname) {
+                root += location.hostname?.toString();
+            }
+            if (location.port) {
+                root += ':'?.toString();
+                root += location.port?.toString();
+            }
+            // as it is not clearly defined how slashes are treated in the location object
+            // better be safe than sorry here
+            if (!relativeUrl.startsWith('/')) {
+                let directory: string = location.pathname.split('/').slice(0, -1).join('/');
+                if (directory.length > 0) {
+                    if (!directory.startsWith('/')) {
+                        root += '/'?.toString();
+                    }
+                    root += directory?.toString();
+                }
+            }
+            if (!relativeUrl.startsWith('/')) {
+                root += '/'?.toString();
+            }
+            root += relativeUrl?.toString();
+            return root;
+        }
+        return relativeUrl;
+    }
+
+    private static appendScriptName(url: string): string {
+        // append script name
+        if (url && !url.endsWith('.js')) {
+            if (!url.endsWith('/')) {
+                url += '/';
+            }
+            url += 'alphaTab.js';
+        }
+        return url;
+    }
+
+    /**
+     * @target web
+     */
+    private static detectFontDirectory(): string | null {
+        if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_FONT) {
+            return Environment.ensureFullUrl(Environment.globalThis['ALPHATAB_FONT']);
+        }
+
+        const scriptFile = Environment.scriptFile;
+        if (scriptFile) {
+            let lastSlash: number = scriptFile.lastIndexOf(String.fromCharCode(47));
+            if (lastSlash >= 0) {
+                return scriptFile.substr(0, lastSlash) + '/font/';
+            }
         }
 
         return null;
@@ -363,8 +427,38 @@ export class Environment {
             })
         );
         renderEngines.set('default', renderEngines.get('svg')!);
+
+        renderEngines.set(
+            'skia',
+            new RenderEngineFactory(false, () => {
+                return new SkiaCanvas();
+            })
+        );
+
         Environment.createPlatformSpecificRenderEngines(renderEngines);
         return renderEngines;
+    }
+
+    /**
+     * Enables the usage of alphaSkia as rendering backend.
+     * @param musicFontData The raw binary data of the music font. 
+     * @param alphaSkia The alphaSkia module.
+     */
+    public static enableAlphaSkia(musicFontData: ArrayBuffer, alphaSkia: unknown) {
+        SkiaCanvas.enable(musicFontData, alphaSkia)
+    }
+
+    /**
+     * Registers a new custom font for the usage in the alphaSkia rendering backend using
+     * provided font information.
+     * @param fontData The raw binary data of the font.
+     * @param fontInfo If provided the font info provided overrules
+     * @returns The font info under which the font was registered.
+     */
+    public static registerAlphaSkiaCustomFont(
+        fontData: Uint8Array,
+        fontInfo?: Font | undefined): Font {
+        return SkiaCanvas.registerFont(fontData, fontInfo);
     }
 
     /**
@@ -524,15 +618,17 @@ export class Environment {
 
     /**
      * @target web
-     * @partial
      */
-    public static platformInit(): void {
-        if (Environment.isRunningInAudioWorklet) {
-            AlphaSynthWebWorklet.init();
-        } else if (Environment.isRunningInWorker) {
-            AlphaTabWebWorker.init();
-            AlphaSynthWebWorker.init();
-        } else if (
+    public static initializeMain(
+        createWebWorker: (settings: Settings) => Worker,
+        createAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>
+    ) {
+        if(Environment.isRunningInWorker || Environment.isRunningInAudioWorklet) {
+            return;
+        }
+        
+        // browser polyfills
+        if (
             Environment.webPlatform === WebPlatform.Browser ||
             Environment.webPlatform === WebPlatform.BrowserModule
         ) {
@@ -550,12 +646,12 @@ export class Environment {
             }
 
             if (!('replaceChildren' in Element.prototype)) {
-                Element.prototype.replaceChildren = function (...nodes: (Node | string)[]) {
+                (Element.prototype as Element).replaceChildren = function (...nodes: (Node | string)[]) {
                     this.innerHTML = '';
                     this.append(...nodes);
                 };
-                Document.prototype.replaceChildren = Element.prototype.replaceChildren;
-                DocumentFragment.prototype.replaceChildren = Element.prototype.replaceChildren;
+                (Document.prototype as Document).replaceChildren = (Element.prototype as Element).replaceChildren;
+                (DocumentFragment.prototype as DocumentFragment).replaceChildren = (Element.prototype as Element).replaceChildren;
             }
             if (!('replaceAll' in String.prototype)) {
                 (String.prototype as any).replaceAll = function (str: string, newStr: string) {
@@ -563,6 +659,38 @@ export class Environment {
                 };
             }
         }
+
+        Environment.createWebWorker = createWebWorker;
+        Environment.createAudioWorklet = createAudioWorklet;
+    }
+
+    /**
+     * @target web
+     */
+    public static get alphaTabWorker(): any { return this.globalThis.Worker }
+
+    /**
+     * @target web
+     */
+    public static initializeWorker() {
+        if (!Environment.isRunningInWorker) {
+            throw new AlphaTabError(AlphaTabErrorType.General, "Not running in worker, cannot run worker initialization");
+        }
+        AlphaTabWebWorker.init();
+        AlphaSynthWebWorker.init();
+        Environment.createWebWorker = _ => {
+            throw new AlphaTabError(AlphaTabErrorType.General, "Nested workers are not supported");
+        };
+    }
+
+    /**
+     * @target web
+     */
+    public static initializeAudioWorklet() {
+        if (!Environment.isRunningInAudioWorklet) {
+            throw new AlphaTabError(AlphaTabErrorType.General, "Not running in audio worklet, cannot run worklet initialization");
+        }
+        AlphaSynthWebWorklet.init();
     }
 
     /**
@@ -572,6 +700,21 @@ export class Environment {
         try {
             // @ts-ignore
             if (typeof __webpack_require__ === 'function') {
+                return true;
+            }
+        } catch (e) {
+            // ignore any errors
+        }
+        return false;
+    }
+
+    /**
+     * @target web
+     */
+    private static detectVite(): boolean {
+        try {
+            // @ts-ignore
+            if (typeof __BASE__ === 'string') {
                 return true;
             }
         } catch (e) {
@@ -610,5 +753,3 @@ export class Environment {
         return WebPlatform.Browser;
     }
 }
-
-Environment.platformInit();

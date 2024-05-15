@@ -6,6 +6,7 @@ import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
 import { StaveGroup } from '@src/rendering/staves/StaveGroup';
 import { StaveTrackGroup } from '@src/rendering/staves/StaveTrackGroup';
+import { InternalSystemsLayoutMode } from '../layout/ScoreLayout';
 
 /**
  * A Staff represents a single line within a StaveGroup.
@@ -110,6 +111,14 @@ export class RenderStaff {
         renderer.layoutingInfo = layoutingInfo;
         renderer.doLayout();
         renderer.registerLayoutingInfo();
+
+        // For cases like in the horizontal layout we need to set the fixed width early
+        // to have correct partials splitting
+        const barDisplayWidth = renderer.barDisplayWidth;
+        if (barDisplayWidth > 0 && this.staveGroup.layout.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths) {
+            renderer.width = barDisplayWidth;
+        }
+
         this.barRenderers.push(renderer);
         if (bar) {
             this.staveGroup.layout.registerBarRenderer(this.staveId, renderer);
@@ -125,19 +134,56 @@ export class RenderStaff {
 
     public scaleToWidth(width: number): void {
         this._sharedLayoutData = new Map<string, unknown>();
-        // Note: here we could do some "intelligent" distribution of
-        // the space over the bar renderers, for now we evenly apply the space to all bars
-        let difference: number = width - this.staveGroup.width;
-        let spacePerBar: number = difference / this.barRenderers.length;
-        let x = 0;
         let topOverflow: number = this.topOverflow;
-        for (let i: number = 0, j: number = this.barRenderers.length; i < j; i++) {
-            this.barRenderers[i].x = x;
-            this.barRenderers[i].y = this.topSpacing + topOverflow;
-            if(difference !== 0) {
-                this.barRenderers[i].scaleToWidth(this.barRenderers[i].width + spacePerBar);
-            }
-            x += this.barRenderers[i].width;
+        let x = 0;
+
+        switch (this.staveGroup.layout.systemsLayoutMode) {
+            case InternalSystemsLayoutMode.Automatic:
+                // Note: here we could do some "intelligent" distribution of
+                // the space over the bar renderers, for now we evenly apply the space to all bars
+                let difference: number = width - this.staveGroup.computedWidth;
+                let spacePerBar: number = difference / this.barRenderers.length;
+                for (const renderer of this.barRenderers) {
+                    renderer.x = x;
+                    renderer.y = this.topSpacing + topOverflow;
+
+                    let actualBarWidth = renderer.computedWidth + spacePerBar;
+                    renderer.scaleToWidth(actualBarWidth);
+                    x += renderer.width;
+                }
+                break;
+            case InternalSystemsLayoutMode.FromModelWithScale:
+                // each bar holds a percentual size where the sum of all scales make the width. 
+                // hence we can calculate the width accordingly by calculating how big each column needs to be percentual. 
+
+                width -= this.staveGroup.accoladeSpacing;
+                const totalScale = this.staveGroup.totalBarDisplayScale;
+
+                for (const renderer of this.barRenderers) {
+                    renderer.x = x;
+                    renderer.y = this.topSpacing + topOverflow;
+
+                    const actualBarWidth = renderer.barDisplayScale * width / totalScale;
+                    renderer.scaleToWidth(actualBarWidth);
+
+                    x += renderer.width;
+                }
+
+                break;
+            case InternalSystemsLayoutMode.FromModelWithWidths:
+                for (const renderer of this.barRenderers) {
+                    renderer.x = x;
+                    renderer.y = this.topSpacing + topOverflow;
+                    const displayWidth = renderer.barDisplayWidth;
+                    if(displayWidth > 0) {
+                        renderer.scaleToWidth(displayWidth);
+                    } else {
+                        renderer.scaleToWidth(renderer.computedWidth);
+                    }
+
+                    x += renderer.width;
+                }
+                break;
         }
     }
 

@@ -6,11 +6,12 @@
         <PackageId>AlphaTab</PackageId>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
         <NoWarn>$(NoWarn);0162;1591;1573;NU5105;0168</NoWarn>
         <NoWarn>$(NoWarn);8600;8601;8602;8603;8604;8605</NoWarn>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <LangVersion>8</LangVersion>
+        <LangVersion>10</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,13 +21,18 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="..\..\font\bravura\Bravura.ttf" Link="Platform\CSharp\Bravura.ttf" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AlphaSkia" Version="2.1.120" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-      <PackageReference Include="SkiaSharp" Version="2.88.3" />
-      <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.3" />
-      <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+      <PackageReference Include="System.Drawing.Common" Version="8.0.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="..\..\font\bravura\Bravura.ttf">
+        <Link>Platform\Skia\Bravura.ttf</Link>
+      </EmbeddedResource>
     </ItemGroup>
 </Project>

@@ -22,6 +22,7 @@ import { RenderingResources } from '@src/RenderingResources';
 import { Settings } from '@src/Settings';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { InternalSystemsLayoutMode } from './layout/ScoreLayout';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -106,6 +107,7 @@ export class BarRendererBase {
     public x: number = 0;
     public y: number = 0;
     public width: number = 0;
+    public computedWidth: number = 0;
     public height: number = 0;
     public index: number = 0;
     public topOverflow: number = 0;
@@ -179,6 +181,22 @@ export class BarRendererBase {
         return this.settings.display.scale;
     }
 
+    /**
+     * Gets the scale with which the bar should be displayed in case the model
+     * scale should be respected.
+     */
+    public get barDisplayScale(): number {
+        return this.staff.staveGroup.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
+    }
+
+    /**
+     * Gets the absolute width in which the bar should be displayed in case the model
+     * scale should be respected.
+     */
+    public get barDisplayWidth(): number {
+        return this.staff.staveGroup.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
+    }
+
     private _wasFirstOfLine: boolean = false;
 
     public get isFirstOfLine(): boolean {
@@ -195,8 +213,13 @@ export class BarRendererBase {
         if (info.preBeatSize < preSize) {
             info.preBeatSize = preSize;
         }
+        let postBeatStart = 0;
         for (const container of this._voiceContainers.values()) {
             container.registerLayoutingInfo(info);
+            let x: number = container.x + container.width;
+            if (postBeatStart < x) {
+                postBeatStart = x;
+            }
         }
         let postSize: number = this._postBeatGlyphs.width;
         if (info.postBeatSize < postSize) {
@@ -228,6 +251,17 @@ export class BarRendererBase {
         this._postBeatGlyphs.x = Math.floor(voiceEnd);
         this._postBeatGlyphs.width = this.layoutingInfo.postBeatSize;
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
+        this.computedWidth = this.width;
+        
+        // For cases like in the horizontal layout we need to set the fixed width early
+        // to have correct partials splitting. the proper alignment to this scale will happen
+        // later in the workflow.
+        const fixedBarWidth = this.barDisplayWidth;
+        if (fixedBarWidth > 0 && this.scoreRenderer.layout!.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths) {
+            this.width = fixedBarWidth;
+            this.computedWidth = fixedBarWidth;
+        }
+
         return true;
     }
 
@@ -307,6 +341,8 @@ export class BarRendererBase {
                 h.finish();
             }
         }
+
+        this.computedWidth = this.width;
     }
 
     protected hasVoiceContainer(voice: Voice): boolean {

@@ -9,23 +9,23 @@ export class VibratoPlaybackSettingsSerializer {
     public static fromJson(obj: VibratoPlaybackSettings, m: unknown): void {
         if (!m) {
             return;
-        } 
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v)); 
+        }
+        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: VibratoPlaybackSettings | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
-        } 
-        const o = new Map<string, unknown>(); 
-        o.set("notewidelength", obj.noteWideLength); 
-        o.set("notewideamplitude", obj.noteWideAmplitude); 
-        o.set("noteslightlength", obj.noteSlightLength); 
-        o.set("noteslightamplitude", obj.noteSlightAmplitude); 
-        o.set("beatwidelength", obj.beatWideLength); 
-        o.set("beatwideamplitude", obj.beatWideAmplitude); 
-        o.set("beatslightlength", obj.beatSlightLength); 
-        o.set("beatslightamplitude", obj.beatSlightAmplitude); 
-        return o; 
+        }
+        const o = new Map<string, unknown>();
+        o.set("notewidelength", obj.noteWideLength);
+        o.set("notewideamplitude", obj.noteWideAmplitude);
+        o.set("noteslightlength", obj.noteSlightLength);
+        o.set("noteslightamplitude", obj.noteSlightAmplitude);
+        o.set("beatwidelength", obj.beatWideLength);
+        o.set("beatwideamplitude", obj.beatWideAmplitude);
+        o.set("beatslightlength", obj.beatSlightLength);
+        o.set("beatslightamplitude", obj.beatSlightAmplitude);
+        return o;
     }
     public static setProperty(obj: VibratoPlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {
@@ -53,8 +53,7 @@ export class VibratoPlaybackSettingsSerializer {
             case "beatslightamplitude":
                 obj.beatSlightAmplitude = v! as number;
                 return true;
-        } 
-        return false; 
+        }
+        return false;
     }
 }
-

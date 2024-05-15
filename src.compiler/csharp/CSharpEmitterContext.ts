@@ -104,6 +104,11 @@ export default class CSharpEmitterContext {
                 (expr.tsSymbol.flags & ts.SymbolFlags.NamespaceModule && this.isKnownModule(expr.tsSymbol))
             ) {
                 return this.toPascalCase('alphaTab.core') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
+            } else if(expr.tsSymbol) {
+                let externalModule = this.resolveExternalModuleOfType(expr.tsSymbol);
+                if (externalModule) {
+                    return externalModule + this.toPascalCase(expr.tsSymbol.name);
+                }
             }
         }
         return undefined;
@@ -324,12 +329,30 @@ export default class CSharpEmitterContext {
         switch (tsSymbol.name) {
             case 'Promise':
                 const promiseType = tsType as ts.TypeReference;
+
+                let promiseReturnType: cs.TypeNode | null = null;
+
                 if (typeArguments) {
-                    return typeArguments[0];
+                    promiseReturnType = typeArguments[0];
                 } else if (promiseType.typeArguments) {
-                    return this.getTypeFromTsType(node, promiseType.typeArguments[0]);
+                    promiseReturnType = this.getTypeFromTsType(node, promiseType.typeArguments[0]);
                 }
-                return null;
+
+                if (promiseReturnType != null && cs.isPrimitiveTypeNode(promiseReturnType) &&
+                    promiseReturnType.type == cs.PrimitiveType.Void) {
+                    promiseReturnType = null;
+                }
+
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: node.parent,
+                    tsNode: node.tsNode,
+                    isAsync: true,
+                    reference: promiseReturnType != null ? promiseReturnType : {
+                        nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                        type: cs.PrimitiveType.Void
+                    } as cs.PrimitiveTypeNode
+                } as cs.TypeReference;
             case 'Map':
                 const mapType = tsType as ts.TypeReference;
                 let mapKeyType: cs.TypeNode | null = null;
@@ -370,14 +393,41 @@ export default class CSharpEmitterContext {
                 return csType;
 
             default:
+                let externalModule = this.resolveExternalModuleOfType(tsSymbol);
+                if (!externalModule) {
+                    externalModule = this.buildCoreNamespace(tsSymbol);
+                }
+
                 return {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: node.parent,
                     tsNode: node.tsNode,
-                    reference: this.buildCoreNamespace(tsSymbol) + tsSymbol.name,
+                    reference: externalModule + tsSymbol.name,
                     typeArguments: typeArguments
                 } as cs.TypeReference;
         }
+    }
+
+    private resolveExternalModuleOfType(tsSymbol: ts.Symbol): string | undefined {
+        // TODO: the future goal here is to find the import statement which brought the type into the current module
+        // and then do a semi-automatic mapping of external libraries 
+        // unfortunately we haven't found yet a good TS Compiler API to do so, hence we map manually some specific symbols we know
+        // check if the type as imported from an external module/package and then map the name accordingly. 
+
+        switch (tsSymbol.name) {
+            case 'AlphaSkiaCanvas':
+            case 'AlphaSkiaImage':
+            case 'AlphaSkiaTextAlign':
+            case 'AlphaSkiaTextBaseline':
+            case 'AlphaSkiaTypeface':
+                return this.alphaSkiaModule() + '.'
+        }
+
+        return undefined;
+    }
+
+    protected alphaSkiaModule(): string {
+        return 'AlphaTab.Platform.Skia.AlphaSkiaBridge';
     }
 
     protected createArrayListType(tsSymbol: ts.Symbol, node: cs.Node, arrayElementType: cs.TypeNode): cs.TypeNode {
@@ -582,7 +632,7 @@ export default class CSharpEmitterContext {
                 actualType = t;
             } else if (actualType != null && actualType.flags !== t.flags) {
                 let isEmitted = this.isNodeEmitted(parent);
-                if (isEmitted) {
+                if (isEmitted && t.symbol.name !== 'PromiseLike') {
                     this.addCsNodeDiagnostics(
                         parent,
                         'Union type covering multiple types detected, fallback to dynamic',
@@ -599,7 +649,7 @@ export default class CSharpEmitterContext {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
                 parent: parent,
-                type: cs.PrimitiveType.Dynamic,
+                type: cs.PrimitiveType.Object,
                 isNullable: isNullable,
                 isOptional: isOptional
             } as cs.PrimitiveTypeNode;
@@ -608,7 +658,21 @@ export default class CSharpEmitterContext {
         if (!actualType) {
             return null;
         }
-        const type = this.getTypeFromTsType(parent, actualType, undefined, typeArguments);
+
+
+        let type: cs.TypeNode | null;
+        if (actualType == tsType) {
+            type = {
+                nodeType: cs.SyntaxKind.TypeReference,
+                parent: parent,
+                reference: tsType.symbol.name,
+                isNullable: isNullable,
+                isOptional: isOptional
+            } as cs.TypeReference
+        } else {
+            type = this.getTypeFromTsType(parent, actualType, undefined, typeArguments)
+        }
+
         return {
             nodeType: cs.SyntaxKind.TypeReference,
             parent: parent,
@@ -667,7 +731,7 @@ export default class CSharpEmitterContext {
 
         // any -> dynamic
         if ((tsType.flags & ts.TypeFlags.Any) !== 0) {
-            return handleNullablePrimitive(cs.PrimitiveType.Dynamic);
+            return handleNullablePrimitive(cs.PrimitiveType.Object);
         }
 
         // object -> object
@@ -803,6 +867,10 @@ export default class CSharpEmitterContext {
     protected buildCoreNamespace(aliasSymbol: ts.Symbol) {
         let suffix = '';
 
+        if (aliasSymbol.name === 'Map') {
+            return this.toPascalCase('alphaTab.collections') + suffix + '.';
+        }
+
         if (aliasSymbol.declarations) {
             for (const decl of aliasSymbol.declarations) {
                 let fileName = path.basename(decl.getSourceFile().fileName).toLowerCase();
@@ -826,6 +894,9 @@ export default class CSharpEmitterContext {
         return this.toPascalCase('alphaTab.core') + suffix + '.';
     }
     protected toCoreTypeName(s: string) {
+        if (s === 'Map') {
+            return 'IMap';
+        }
         return s;
     }
 
@@ -892,8 +963,8 @@ export default class CSharpEmitterContext {
         const declaration = symbol.valueDeclaration
             ? symbol.valueDeclaration
             : symbol.declarations && symbol.declarations.length > 0
-            ? symbol.declarations[0]
-            : undefined;
+                ? symbol.declarations[0]
+                : undefined;
 
         if (declaration) {
             return symbol.name + '_' + declaration.getSourceFile().fileName + '_' + declaration.pos;
@@ -1338,6 +1409,25 @@ export default class CSharpEmitterContext {
         return !!ts.getJSDocTags(node).find(t => t.tagName.text === 'internal');
     }
 
+    public getDelegatedName(tsSymbol: ts.Symbol | undefined): string | null {
+        if (!tsSymbol || !tsSymbol.declarations) {
+            return null;
+        }
+
+        for (const declaration of tsSymbol.declarations) {
+            const delegation = ts.getJSDocTags(declaration).find(t => t.tagName.text === 'delegated' && (t.comment as string)?.indexOf(this.targetTag) >= 0 );
+            if (delegation) {
+                return (delegation.comment as string).substring(this.targetTag.length + 1);
+            }
+        }
+
+        return null;
+    }
+
+    public get targetTag(): string {
+        return 'csharp';
+    }
+
     public rewriteVisibilities() {
         const visitedVisibility: Set<SymbolKey> = new Set();
         const visitedVirtual: Map<SymbolKey, boolean> = new Map();
@@ -1525,7 +1615,7 @@ export default class CSharpEmitterContext {
         return (
             (tsSymbol.flags & ts.SymbolFlags.EnumMember) !== 0 ||
             !!tsSymbol.declarations?.find(
-                d => d.modifiers && !!d.modifiers.find(m => m.kind === ts.SyntaxKind.StaticKeyword)
+                d => 'modifiers' in d && d.modifiers && !!(d.modifiers as ts.NodeArray<ts.Modifier>).find(m => m.kind === ts.SyntaxKind.StaticKeyword)
             )
         );
     }

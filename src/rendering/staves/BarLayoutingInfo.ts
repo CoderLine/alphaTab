@@ -44,43 +44,43 @@ export class BarLayoutingInfo {
     }
 
     public setPreBeatSize(beat: Beat, size: number): void {
-        if (!this.preBeatSizes.has(beat.index) || this.preBeatSizes.get(beat.index)! < size) {
-            this.preBeatSizes.set(beat.index, size);
+        if (!this.preBeatSizes.has(beat.id) || this.preBeatSizes.get(beat.id)! < size) {
+            this.preBeatSizes.set(beat.id, size);
             this.version++;
         }
     }
 
     public getPreBeatSize(beat: Beat): number {
-        if (this.preBeatSizes.has(beat.index)) {
-            return this.preBeatSizes.get(beat.index)!;
+        if (this.preBeatSizes.has(beat.id)) {
+            return this.preBeatSizes.get(beat.id)!;
         }
         return 0;
     }
 
     public setOnBeatSize(beat: Beat, size: number): void {
-        if (!this.onBeatSizes.has(beat.index) || this.onBeatSizes.get(beat.index)! < size) {
-            this.onBeatSizes.set(beat.index, size);
+        if (!this.onBeatSizes.has(beat.id) || this.onBeatSizes.get(beat.id)! < size) {
+            this.onBeatSizes.set(beat.id, size);
             this.version++;
         }
     }
 
     public getOnBeatSize(beat: Beat): number {
-        if (this.onBeatSizes.has(beat.index)) {
-            return this.onBeatSizes.get(beat.index)!;
+        if (this.onBeatSizes.has(beat.id)) {
+            return this.onBeatSizes.get(beat.id)!;
         }
         return 0;
     }
 
     public getBeatCenterX(beat: Beat): number {
-        if (this.onBeatCenterX.has(beat.index)) {
-            return this.onBeatCenterX.get(beat.index)!;
+        if (this.onBeatCenterX.has(beat.id)) {
+            return this.onBeatCenterX.get(beat.id)!;
         }
         return 0;
     }
 
     public setBeatCenterX(beat: Beat, x: number): void {
-        if (!this.onBeatCenterX.has(beat.index) || this.onBeatCenterX.get(beat.index)! < x) {
-            this.onBeatCenterX.set(beat.index, x);
+        if (!this.onBeatCenterX.has(beat.id) || this.onBeatCenterX.get(beat.id)! < x) {
+            this.onBeatCenterX.set(beat.id, x);
             this.version++;
         }
     }
@@ -107,7 +107,7 @@ export class BarLayoutingInfo {
             if (this._timeSortedSprings.length > 0) {
                 let smallestDuration: number = duration;
                 let previousSpring: Spring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
-                for(const prevDuration of previousSpring.allDurations) {
+                for (const prevDuration of previousSpring.allDurations) {
                     let end: number = previousSpring.timePosition + prevDuration;
                     if (end >= start && prevDuration < smallestDuration) {
                         smallestDuration = prevDuration;
@@ -197,7 +197,7 @@ export class BarLayoutingInfo {
     }
 
     public finish(): void {
-        for(const [k,s] of this.allGraceRods) {
+        for (const [k, s] of this.allGraceRods) {
             let offset = 0;
             if (this.incompleteGraceRods.has(k)) {
                 for (const sp of s) {
@@ -216,7 +216,7 @@ export class BarLayoutingInfo {
             }
         }
         this._incompleteGraceRodsWidth = 0;
-        for(const s of this.incompleteGraceRods.values()) {
+        for (const s of this.incompleteGraceRods.values()) {
             for (const sp of s) {
                 this._incompleteGraceRodsWidth += sp.preBeatWidth + sp.postSpringWidth;
             }
@@ -229,7 +229,7 @@ export class BarLayoutingInfo {
     private calculateSpringConstants(): void {
         this._xMin = 0;
         let springs: Map<number, Spring> = this.springs;
-        for(const spring of springs.values()){
+        for (const spring of springs.values()) {
             if (spring.springWidth < this._xMin) {
                 this._xMin = spring.springWidth;
             }

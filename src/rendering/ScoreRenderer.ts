@@ -43,6 +43,7 @@ export class ScoreRenderer implements IScoreRenderer {
 
     public destroy(): void {
         this.score = null;
+        this.canvas?.destroy();
         this.canvas = null;
         this.layout = null;
         this.boundsLookup = null;
@@ -51,6 +52,7 @@ export class ScoreRenderer implements IScoreRenderer {
 
     private recreateCanvas(): boolean {
         if (this._currentRenderEngine !== this.settings.core.engine) {
+            this.canvas?.destroy();
             this.canvas = Environment.getRenderEngineFactory(this.settings.core.engine).createCanvas();
             this._currentRenderEngine = this.settings.core.engine;
             return true;
@@ -170,7 +172,7 @@ export class ScoreRenderer implements IScoreRenderer {
             this.onRenderFinished();
             (this.postRenderFinished as EventEmitter).trigger();
         } else {
-            Logger.warning('Rendering', 'Current layout does not support dynamic resizing, nothing was done', null);
+            Logger.debug('Rendering', 'Current layout does not support dynamic resizing, nothing was done', null);
         }
         Logger.debug('Rendering', 'Resize finished');
     }

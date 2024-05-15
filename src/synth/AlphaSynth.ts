@@ -183,7 +183,7 @@ export class AlphaSynth implements IAlphaSynth {
             this.checkReadyForPlayback();
         });
         this.output.sampleRequest.on(() => {
-            if (!this._sequencer.isFinished) {
+            if (this.state == PlayerState.Playing && !this._sequencer.isFinished) {
                 let samples: Float32Array = new Float32Array(
                     SynthConstants.MicroBufferSize * SynthConstants.MicroBufferCount * SynthConstants.AudioChannels
                 );
@@ -201,7 +201,7 @@ export class AlphaSynth implements IAlphaSynth {
                     // push all processed events into the queue
                     // for informing users about played events
                     for (const e of synthesizedEvents) {
-                        if (this._midiEventsPlayedFilter.has(e.event.command)) {
+                        if (this._midiEventsPlayedFilter.has(e.event.type)) {
                             this._playedEventsQueue.enqueue(e);
                         }
                     }
@@ -381,6 +381,10 @@ export class AlphaSynth implements IAlphaSynth {
         }
     }
 
+    public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
+        this._synthesizer.applyTranspositionPitches(transpositionPitches);
+    }
+
     public setChannelMute(channel: number, mute: boolean): void {
         this._synthesizer.channelSetMute(channel, mute);
     }
@@ -411,7 +415,8 @@ export class AlphaSynth implements IAlphaSynth {
     private checkForFinish() {
         let startTick = 0;
         let endTick = 0;
-        if (this.playbackRange) {
+
+        if (this.playbackRange && this._sequencer.isPlayingMain) {
             startTick = this.playbackRange.startTick;
             endTick = this.playbackRange.endTick;
         } else {

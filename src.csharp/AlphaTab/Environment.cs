@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using AlphaTab.Core.EcmaScript;
+using AlphaTab.Core;
+using AlphaTab.Collections;
 using AlphaTab.Platform.CSharp;
 
 namespace AlphaTab
@@ -11,6 +13,7 @@ namespace AlphaTab
         public const bool SupportsTextDecoder = true;
         public static void PlatformInit()
         {
+
         }
 
         public static Action Throttle(Action action, double delay)
@@ -30,12 +33,8 @@ namespace AlphaTab
             };
         }
 
-        private static void CreatePlatformSpecificRenderEngines(Map<string, RenderEngineFactory> renderEngines)
+        private static void CreatePlatformSpecificRenderEngines(IMap<string, RenderEngineFactory> renderEngines)
         {
-            renderEngines.Set(
-                "skia",
-                new RenderEngineFactory(true, () => new SkiaCanvas())
-            );
             renderEngines.Set(
                 "gdi",
                 new RenderEngineFactory(true, () => new GdiCanvas())

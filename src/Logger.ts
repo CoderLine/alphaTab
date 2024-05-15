@@ -33,7 +33,7 @@ export class ConsoleLogger implements ILogger {
 
 export class Logger {
     public static logLevel: LogLevel = LogLevel.Info;
-    public static log:ILogger = new ConsoleLogger();
+    public static log: ILogger = new ConsoleLogger();
 
     private static shouldLog(level: LogLevel): boolean {
         return Logger.logLevel !== LogLevel.None && level >= Logger.logLevel;

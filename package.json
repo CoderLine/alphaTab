@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab",
-    "version": "1.2.3",
+    "version": "1.3.0",
     "description": "alphaTab is a music notation and guitar tablature rendering library",
     "keywords": [
         "guitar",
@@ -26,7 +26,18 @@
     "exports": {
         ".": {
             "import": "./dist/alphaTab.mjs",
-            "require": "./dist/alphaTab.js"
+            "require": "./dist/alphaTab.js",
+            "types": "./dist/alphaTab.d.ts"
+        },
+        "./webpack": {
+            "import": "./dist/alphaTab.webpack.mjs",
+            "require": "./dist/alphaTab.webpack.js",
+            "types": "./dist/alphaTab.webpack.d.ts"
+        },
+        "./vite": {
+            "import": "./dist/alphaTab.vite.mjs",
+            "require": "./dist/alphaTab.vite.js",
+            "types": "./dist/alphaTab.vite.d.ts"
         },
         "./soundfont/*": "./dist/soundfont/*",
         "./font/*": "./dist/font/*"
@@ -36,56 +47,65 @@
     },
     "scripts": {
         "clean": "rimraf dist",
-        "lint": "tslint --project tsconfig.build.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
-        "generate-typescript": "rimraf src/generated && ts-node --project tsconfig.build-csharp.json src.compiler/typescript/AlphaTabGenerator.ts --project tsconfig.build-csharp.json",
-        "generate-csharp": "npm run generate-typescript && ts-node --project tsconfig.build-csharp.json src.compiler/csharp/CSharpTranspiler.ts --project tsconfig.build-csharp.json",
-        "build": "npm run generate-typescript && tsc --project tsconfig.build.json && rollup -c rollup.config.js",
-        "build-ci": "npm run clean && npm run build && npm pack",
+        "lint": "eslint .",
+        "start": "node scripts/setup-playground.js && npm run generate-typescript && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript -w",
+        "generate-typescript": "rimraf src/generated && tsx src.compiler/typescript/AlphaTabGenerator.ts",
+        "generate-csharp": "npm run generate-typescript && tsx src.compiler/csharp/CSharpTranspiler.ts --outDir dist/lib.csharp",
+        "generate-kotlin": "npm run generate-typescript && tsx src.compiler/kotlin/KotlinTranspiler.ts --outDir dist/lib.kotlin",
+        "build": "npm run generate-typescript && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
         "build-csharp": "npm run generate-csharp && cd src.csharp && dotnet build -c Release",
-        "build-csharp-ci": "npm run clean && npm run generate-csharp && cd src.csharp && dotnet build -c Release",
-        "start": "node scripts/setup-playground.js && npm run build && concurrently --kill-others \"tsc --project tsconfig.build.json --watch\" \"rollup -c rollup.config.js -w\"",
-        "test": "npm run generate-typescript && tsc --project tsconfig.json && concurrently --kill-others \"tsc --project tsconfig.json -w\" \"karma start karma.conf.js --browsers Chrome --no-single-run --reporters spec,kjhtml\"",
-        "test-ci": "npm run generate-typescript && tsc --project tsconfig.json && karma start karma.conf.js --browsers ChromeHeadless --single-run --reporters spec",
+        "build-kotlin": "npm run generate-kotlin && cd src.kotlin/alphaTab && gradlew assembleRelease",
+        "test": "mocha",
         "test-csharp": "cd src.csharp && dotnet test -c Release",
-        "test-csharp-ci": "cd src.csharp && dotnet test -c Release"
+        "test-kotlin": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^23.0.0",
-        "@types/jasmine": "^4.0.3",
-        "concurrently": "^7.2.1",
+        "@coderline/alphaskia": "^2.1.120",
+        "@coderline/alphaskia-windows": "^2.1.120",
+        "@rollup/plugin-commonjs": "^25.0.7",
+        "@rollup/plugin-node-resolve": "^15.2.3",
+        "@rollup/plugin-replace": "^5.0.5",
+        "@rollup/plugin-terser": "^0.4.4",
+        "@rollup/plugin-typescript": "^11.1.6",
+        "@types/chai": "^4.3.12",
+        "@types/cors": "^2.8.17",
+        "@types/mocha": "^10.0.6",
+        "@typescript-eslint/eslint-plugin": "^7.0.2",
+        "@typescript-eslint/parser": "^7.0.2",
+        "assert": "^2.1.0",
+        "chai": "^5.1.0",
+        "concurrently": "^8.2.2",
         "cors": "^2.8.5",
-        "fs-extra": "^10.1.0",
-        "karma": "^6.3.20",
-        "karma-chrome-launcher": "^3.1.1",
-        "karma-express-http-server": "0.0.1",
-        "karma-jasmine": "^5.0.1",
-        "karma-jasmine-html-reporter": "^2.0.0",
-        "karma-rollup-preprocessor": "^7.0.8",
-        "karma-spec-reporter": "0.0.34",
+        "eslint": "^8.57.0",
+        "express": "^4.18.2",
+        "fs-extra": "^11.2.0",
+        "html-webpack-plugin": "^5.6.0",
+        "mocha": "^10.3.0",
         "multer": "^1.4.5-lts.1",
-        "rimraf": "^3.0.2",
-        "rollup": "^2.75.1",
-        "rollup-plugin-copy": "^3.4.0",
-        "rollup-plugin-dts": "^4.2.2",
-        "rollup-plugin-license": "^2.8.0",
-        "rollup-plugin-serve": "^2.0.0",
-        "rollup-plugin-terser": "^7.0.2",
-        "terser": "^5.13.1",
-        "ts-node": "^10.8.0",
-        "tslint": "^6.1.3",
-        "tslint-config-prettier": "^1.18.0",
-        "tslint-config-standard": "^9.0.0",
-        "typescript": "^4.8.3"
+        "opener": "^1.5.2",
+        "rimraf": "^5.0.5",
+        "rollup": "^4.12.0",
+        "rollup-plugin-copy": "^3.5.0",
+        "rollup-plugin-dts": "^6.1.0",
+        "rollup-plugin-license": "^3.2.0",
+        "terser": "^5.28.1",
+        "tslib": "^2.6.2",
+        "tsx": "^4.7.1",
+        "typescript": "^5.3.3",
+        "vite": "^5.2.8",
+        "webpack": "^5.90.3",
+        "webpack-cli": "^5.1.4"
     },
     "files": [
-        "/dist/alphaTab.js",
-        "/dist/alphaTab.mjs",
-        "/dist/alphaTab.min.js",
-        "/dist/alphaTab.min.mjs",
-        "/dist/alphaTab.d.ts",
+        "/dist/alphaTab*",
         "/dist/font/Bravura.*",
+        "/dist/font/Bravura*.txt",
         "/dist/font/*.txt",
         "/dist/soundfont/*",
         "LICENSE.header"
-    ]
+    ],
+    "dependencies": {
+        "@types/express": "^4.17.21",
+        "@types/opener": "^1.4.3"
+    }
 }
