@@ -6,7 +6,7 @@ import java.util.Properties
 // Common
 
 group = "net.alphatab"
-version = "1.3.0-SNAPSHOT"
+version = "1.4.0-SNAPSHOT"
 plugins {
     // Common
     alias(libs.plugins.kotlinMultiplatform)
@@ -242,6 +242,7 @@ publishing {
     publications.withType<MavenPublication> {
         artifact(javadocJar)
         pom {
+            name = artifactId
             description.set(alphaTabDescription)
             url.set("https://github.com/CoderLine/alphaTab")
             licenses {

@@ -41,8 +41,8 @@ Node.js using `require` (UMD) | Access to all low level APIs and SVG rendering |
 .netcoreapp3.1 (WinForms) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.0-1.2.2
 Browsers using ES6 Modules (ESM) | Full experience including low level APIs, Background Workers, Audio Playback, SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.3 (pre-release :warning:)
 Node.js using `import` (ESM) | Access to all low level APIs and SVG rendering | 1.3 (pre-release :warning:)
-.net6.0-windows (WPF) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.3 (pre-release :warning:)
-.net6.0-windows (WinForms) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.3 (pre-release :warning:)
+.net8.0-windows (WPF) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.3 (pre-release :warning:)
+.net8.0-windows (WinForms) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.3 (pre-release :warning:)
 Android (Kotlin) | Full experience including low level APIs, Background Workers, Audio Playback, Android Canvas and SVG rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.3 (pre-release :warning:)
 
 ## Thanks to...

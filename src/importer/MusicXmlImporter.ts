@@ -28,6 +28,8 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { IOHelper } from '@src/io/IOHelper';
+import { ZipReader } from '@src/zip/ZipReader';
+import { ZipEntry } from '@src/zip/ZipEntry';
 
 export class MusicXmlImporter extends ScoreImporter {
     private _score!: Score;
@@ -55,7 +57,8 @@ export class MusicXmlImporter extends ScoreImporter {
         this._tieStarts = [];
         this._tieStartIds = new Map<number, boolean>();
         this._slurStarts = new Map<string, Note>();
-        let xml: string = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
+
+        let xml: string = this.extractMusicXml();
         let dom: XmlDocument = new XmlDocument();
         try {
             dom.parse(xml);
@@ -72,6 +75,65 @@ export class MusicXmlImporter extends ScoreImporter {
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
         return this._score;
+    }
+
+    extractMusicXml(): string {
+        const zip = new ZipReader(this.data);
+        let entries: ZipEntry[];
+        try {
+            entries = zip.read();
+        } catch (e) {
+            entries = [];
+        }
+
+        // no compressed MusicXML, try raw 
+        if(entries.length === 0) {
+            this.data.reset();
+            return IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
+        }
+
+        const container = entries.find(e => e.fullName === 'META-INF/container.xml');
+        if (!container) {
+            throw new UnsupportedFormatError('No compressed MusicXML');
+        }
+
+        const containerDom = new XmlDocument();
+        try {
+            containerDom.parse(IOHelper.toString(container.data, this.settings.importer.encoding));
+        } catch (e) {
+            throw new UnsupportedFormatError('Malformed container.xml, could not parse as XML', e as Error);
+        }
+
+        let root: XmlNode | null = containerDom.firstElement;
+        if (!root || root.localName !== "container") {
+            throw new UnsupportedFormatError("Malformed container.xml, root element not 'container'");
+        }
+
+        const rootFiles = root.findChildElement("rootfiles");
+        if(!rootFiles) {
+            throw new UnsupportedFormatError("Malformed container.xml, 'container/rootfiles' not found");
+        }
+        
+        let uncompressedFileFullPath:string = "";
+        for(const c of rootFiles.childNodes) {
+            if(c.nodeType == XmlNodeType.Element && c.localName === "rootfile") {
+                // The MusicXML root must be described in the first <rootfile> element.
+                // https://www.w3.org/2021/06/musicxml40/tutorial/compressed-mxl-files/
+                uncompressedFileFullPath = c.getAttribute("full-path");
+                break;
+            }
+        }
+
+        if(!uncompressedFileFullPath) {
+            throw new UnsupportedFormatError("Unsupported compressed MusicXML, missing rootfile");
+        }
+
+        const file = entries.find(e => e.fullName === uncompressedFileFullPath);
+        if(!file) {
+            throw new UnsupportedFormatError(`Malformed container.xml, '${uncompressedFileFullPath}' not contained in zip`);
+        }
+
+        return IOHelper.toString(file.data, this.settings.importer.encoding); 
     }
 
     private mergePartGroups(): void {
