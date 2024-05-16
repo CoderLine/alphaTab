@@ -143,6 +143,7 @@ const sidebars: SidebarsConfig = {
       "alphatex/tracks-staves",
       "alphatex/beat-effects",
       "alphatex/note-effects",
+      "alphatex/percussion",
     ],
   },
   showcase: {
