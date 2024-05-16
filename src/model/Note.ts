@@ -797,12 +797,11 @@ export class Note {
         if (points != null && points.length > 0 && this.bendType === BendType.Custom) {
             let isContinuedBend: boolean = this.isTieDestination && this.tieOrigin!.hasBend;
             this.isContinuedBend = isContinuedBend;
-            let isFourPointsBend = (points.length === 4);
-            if (points.length === 4 || points.length === 3) {
+            if (points.length === 4) {
                 let origin: BendPoint = points[0];
                 let middle1: BendPoint = points[1];
-                let middle2: BendPoint =  isFourPointsBend ? points[2] : points[1];
-                let destination: BendPoint = points.at(-1)!; //returns last element
+                let middle2: BendPoint = points[2];
+                let destination: BendPoint = points[3];
                 // the middle points are used for holds, anything else is a new feature we do not support yet
                 if (middle1.value === middle2.value) {
                     // bend higher?
@@ -811,29 +810,35 @@ export class Note {
                             this.bendType = BendType.BendRelease;
                         } else if (!isContinuedBend && origin.value > 0) {
                             this.bendType = BendType.PrebendBend;
-                            points.splice(1, isFourPointsBend ? 2 : 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         } else {
                             this.bendType = BendType.Bend;
-                            points.splice(1, isFourPointsBend ? 2 : 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         }
                     } else if (destination.value < origin.value) {
                         // origin must be > 0 otherwise it's no release, we cannot bend negative
                         if (isContinuedBend) {
                             this.bendType = BendType.Release;
-                            points.splice(1, isFourPointsBend ? 2 : 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         } else {
                             this.bendType = BendType.PrebendRelease;
-                            points.splice(1, isFourPointsBend ? 2 : 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         }
                     } else {
                         if (middle1.value > origin.value) {
                             this.bendType = BendType.BendRelease;
                         } else if (origin.value > 0 && !isContinuedBend) {
                             this.bendType = BendType.Prebend;
-                            points.splice(1, isFourPointsBend ? 2 : 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         } else {
                             this.bendType = BendType.Hold;
-                            points.splice(1, isFourPointsBend ? 2 : 1);
+                            points.splice(2, 1);
+                            points.splice(1, 1);
                         }
                     }
                 } else {
@@ -857,11 +862,7 @@ export class Note {
                         this.bendType = BendType.PrebendRelease;
                     }
                 } else {
-                    if (origin.value > 0 && !isContinuedBend) {
-                        this.bendType = BendType.Prebend;
-                    } else {
-                        this.bendType = BendType.Hold;
-                    }
+                    this.bendType = BendType.Hold;
                 }
             }
         } else if (points === null || points.length === 0) {
