@@ -883,9 +883,9 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
 
                 if (name === 'defaults') {
-                    for (const kvp of PercussionMapper.instrumentArticulationNames) {
-                        this._percussionArticulationNames.set(kvp[0].toLowerCase(), kvp[1]);
-                        this._percussionArticulationNames.set(AlphaTexImporter.toArticulationId(kvp[0]), kvp[1]);
+                    for (const [defaultName, defaultValue] of PercussionMapper.instrumentArticulationNames) {
+                        this._percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
+                        this._percussionArticulationNames.set(AlphaTexImporter.toArticulationId(defaultName), defaultValue);
                     }
                     return true;
                 }
