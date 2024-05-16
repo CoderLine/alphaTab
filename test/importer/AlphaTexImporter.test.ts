@@ -206,7 +206,6 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].isRest).to.equal(true);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushType).to.equal(BrushType.None);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushDuration).to.equal(0);
-
     });
 
     it('hamonics-issue79', () => {
@@ -668,7 +667,9 @@ describe('AlphaTexImporterTest', () => {
         let score: Score = parseTex(tex);
         expect(score.tracks.length).to.equal(1);
         expect(score.masterBars.length).to.equal(4);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].slideOutType).to.equal(SlideOutType.Legato);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].slideOutType).to.equal(
+            SlideOutType.Legato
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].slideTarget!.id).to.equal(
             score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].id
         );
@@ -716,22 +717,22 @@ describe('AlphaTexImporterTest', () => {
         \\ks F 3.3 | \\ks bbmajor 3.3 | \\ks CMINOR 3.3 | \\ks aB 3.3 | \\ks db 3.3 | \\ks d#minor 3.3 |
         \\ks g 3.3 | \\ks Dmajor 3.3 | \\ks f#minor 3.3 | \\ks E 3.3 | \\ks Bmajor 3.3 | \\ks Ebminor 3.3`;
         let score: Score = parseTex(tex);
-        expect(score.masterBars[0].keySignature).to.equal(KeySignature.C)
-        expect(score.masterBars[1].keySignature).to.equal(KeySignature.C)
-        expect(score.masterBars[2].keySignature).to.equal(KeySignature.C)
-        expect(score.masterBars[3].keySignature).to.equal(KeySignature.C)
-        expect(score.masterBars[4].keySignature).to.equal(KeySignature.F)
-        expect(score.masterBars[5].keySignature).to.equal(KeySignature.Bb)
-        expect(score.masterBars[6].keySignature).to.equal(KeySignature.Eb)
-        expect(score.masterBars[7].keySignature).to.equal(KeySignature.Ab)
-        expect(score.masterBars[8].keySignature).to.equal(KeySignature.Db)
-        expect(score.masterBars[9].keySignature).to.equal(KeySignature.Gb)
-        expect(score.masterBars[10].keySignature).to.equal(KeySignature.G)
-        expect(score.masterBars[11].keySignature).to.equal(KeySignature.D)
-        expect(score.masterBars[12].keySignature).to.equal(KeySignature.A)
-        expect(score.masterBars[13].keySignature).to.equal(KeySignature.E)
-        expect(score.masterBars[14].keySignature).to.equal(KeySignature.B)
-        expect(score.masterBars[15].keySignature).to.equal(KeySignature.FSharp)
+        expect(score.masterBars[0].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[1].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[2].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[3].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[4].keySignature).to.equal(KeySignature.F);
+        expect(score.masterBars[5].keySignature).to.equal(KeySignature.Bb);
+        expect(score.masterBars[6].keySignature).to.equal(KeySignature.Eb);
+        expect(score.masterBars[7].keySignature).to.equal(KeySignature.Ab);
+        expect(score.masterBars[8].keySignature).to.equal(KeySignature.Db);
+        expect(score.masterBars[9].keySignature).to.equal(KeySignature.Gb);
+        expect(score.masterBars[10].keySignature).to.equal(KeySignature.G);
+        expect(score.masterBars[11].keySignature).to.equal(KeySignature.D);
+        expect(score.masterBars[12].keySignature).to.equal(KeySignature.A);
+        expect(score.masterBars[13].keySignature).to.equal(KeySignature.E);
+        expect(score.masterBars[14].keySignature).to.equal(KeySignature.B);
+        expect(score.masterBars[15].keySignature).to.equal(KeySignature.FSharp);
     });
 
     it('pop-slap-tap', () => {
@@ -870,7 +871,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[0].alternateEndings).to.equal(0b0000);
         expect(score.masterBars[1].alternateEndings).to.equal(0b0111);
         expect(score.masterBars[2].alternateEndings).to.equal(0b1000);
-    })
+    });
 
     it('random-alternate-endings', () => {
         let tex: string = `
@@ -899,7 +900,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[7].alternateEndings).to.equal(0b000);
         expect(score.masterBars[8].alternateEndings).to.equal(0b101);
         expect(score.masterBars[9].alternateEndings).to.equal(0b010);
-    })
+    });
 
     it('default-transposition-on-instruments', () => {
         let tex: string = `
@@ -1013,8 +1014,8 @@ describe('AlphaTexImporterTest', () => {
         (1.2 1.1).4 x.2.8 0.1 1.1 | 1.2 3.2 0.1 1.1`);
 
         expect(score.title).to.equal(multiByteChars);
-        expect(score.tracks[0].name).to.equal("🎸");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.equal("🤘");
+        expect(score.tracks[0].name).to.equal('🎸');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.equal('🤘');
     });
 
     it('does-not-hang-on-backslash', () => {
@@ -1143,5 +1144,67 @@ describe('AlphaTexImporterTest', () => {
 
     it('tempo-invalid-float', () => {
         expect(() => parseTex('\\tempo 112.Q .')).to.throw(UnsupportedFormatError);
+    });
+
+    it('percussion-numbers', () => {
+        const score = parseTex(`
+            \\instrument "percussion"
+            .
+            30 31 33 34
+        `);
+        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(9);
+        expect(score.tracks[0].staves[0].isPercussion).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(30);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(31);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(33);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(34);
+    });
+
+    it('percussion-custom-articulation', () => {
+        const score = parseTex(`
+            \\instrument "percussion"
+            \\articulation A 30
+            \\articulation B 31
+            \\articulation C 33
+            \\articulation D 34
+            .
+            A B C D
+        `);
+        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(9);
+        expect(score.tracks[0].staves[0].isPercussion).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(30);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(31);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(33);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(34);
+    });
+
+    it('percussion-default-articulations', () => {
+        const score = parseTex(`
+            \\instrument "percussion"
+            \\articulation defaults
+            .
+            "Cymbal (hit)" "Snare (side stick)" "Snare (side stick) 2" "Snare (hit)"
+        `);
+        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(9);
+        expect(score.tracks[0].staves[0].isPercussion).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(30);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(31);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(33);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(34);
+    });
+
+    it('percussion-default-articulations-short', () => {
+        const score = parseTex(`
+            \\instrument "percussion"
+            \\articulation defaults
+            .
+            CymbalHit SnareSideStick SnareSideStick2 SnareHit
+        `);
+        expect(score.tracks[0].playbackInfo.primaryChannel).to.equal(9);
+        expect(score.tracks[0].staves[0].isPercussion).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(30);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(31);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(33);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(34);
     });
 });
