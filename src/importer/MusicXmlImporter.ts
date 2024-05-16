@@ -4,6 +4,7 @@ import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
+import { BendPoint } from '@src/model/BendPoint';
 import { Chord } from '@src/model/Chord';
 import { Clef } from '@src/model/Clef';
 import { Duration } from '@src/model/Duration';
@@ -1055,6 +1056,8 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseTechnical(element: XmlNode, note: Note): void {
+        let bends: XmlNode[] = [];
+        
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -1073,12 +1076,61 @@ export class MusicXmlImporter extends ScoreImporter {
                     case 'up-bow':
                         note.beat.pickStroke = PickStroke.Up;
                         break;
+                    case 'bend' :
+                        bends.push(c);
+                        break;
                 }
             }
         }
+
+        if (bends.length > 0) {
+            this.parseBends(bends, note);
+        }
+
         if (note.string === -2147483648 || note.fret === -2147483648) {
             note.string = -1;
             note.fret = -1;
+        }
+    }
+
+    private parseBends(elements: XmlNode[], note: Note): void {
+        let baseOffset: number = BendPoint.MaxPosition / elements.length; 
+        let currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
+        let currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
+        let isFirstBend: boolean = true;
+
+        for (let bend of elements) {
+            let bendAlterElement: XmlNode | null = bend.findChildElement("bend-alter");
+            if (bendAlterElement) {
+                let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 2);
+                if (bend.findChildElement("pre-bend")) {
+                    if (isFirstBend){
+                        currentValue += absValue;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        currentOffset += baseOffset;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        isFirstBend = false;
+                    }else{
+                        currentOffset += baseOffset;
+                    }
+                } else if (bend.findChildElement("release")) {
+                    if (isFirstBend){
+                        currentValue += absValue;
+                    }
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentOffset += baseOffset;
+                    currentValue -= absValue;
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                    
+                } else { // "regular" bend
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentValue += absValue
+                    currentOffset += baseOffset
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                }
+            }            
         }
     }
 

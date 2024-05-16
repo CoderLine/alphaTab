@@ -606,4 +606,12 @@ describe('MusicXmlImporterTestSuiteTests', () => {
             'test-data/musicxml-testsuite/99b-Lyrics-BeamsMelismata-IgnoreBeams.xml'
         );
     });
+
+    it('100a_Guitare_Bends', async () => {
+        await MusicXmlImporterTestHelper.testReferenceFile(
+            'test-data/musicxml-testsuite/100a-Guitare-Bends.xml'
+        );
+    });
+
+    
 });

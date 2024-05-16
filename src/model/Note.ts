@@ -862,7 +862,11 @@ export class Note {
                         this.bendType = BendType.PrebendRelease;
                     }
                 } else {
-                    this.bendType = BendType.Hold;
+                    if (origin.value > 0 && !isContinuedBend) {
+                        this.bendType = BendType.Prebend;
+                    } else {
+                        this.bendType = BendType.Hold;
+                    }
                 }
             }
         } else if (points === null || points.length === 0) {
