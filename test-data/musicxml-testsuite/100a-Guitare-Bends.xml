@@ -275,6 +275,7 @@
             </bend>
 
           </technical>
+          <tied type="start"/>
         </notations>
       </note>
       <note>
@@ -292,10 +293,11 @@
             <string>3</string>
             <fret>1</fret>
             <bend shape="curved">
-              <bend-alter>-0.5</bend-alter>
+              <bend-alter>-4</bend-alter>
               <release />
             </bend>
           </technical>
+          <tied type="stop"/>
         </notations>
       </note>
       <note>

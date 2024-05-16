@@ -1052,19 +1052,21 @@ export class MusicXmlImporter extends ScoreImporter {
                         currentOffset += baseOffset;
                     }
                 } else if (bend.findChildElement("release")) {
+                    if (isFirstBend){
+                        currentValue += absValue;
+                    }
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
                     currentOffset += baseOffset;
-                    if (!isFirstBend){
-                        currentValue -= absValue;
-                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                    }
+                    currentValue -= absValue;
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                    
                 } else { // "regular" bend
-                    if (isFirstBend) {
-                        note.addBendPoint(new BendPoint(0, 0));
-                        isFirstBend = false;
-                    }
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
                     currentValue += absValue
                     currentOffset += baseOffset
                     note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
                 }
             }            
         }
