@@ -5,7 +5,6 @@ import { Voice } from '@src/model/Voice';
 import { TabRhythmMode } from '@src/NotationSettings';
 import { ICanvas } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { TabBeatContainerGlyph } from '@src/rendering/glyphs/TabBeatContainerGlyph';
 import { TabBeatGlyph } from '@src/rendering/glyphs/TabBeatGlyph';
@@ -155,8 +154,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
-        for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
-            let b: Beat = v.beats[i];
+        for(const b of v.beats) {
             let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new TabBeatPreNotesGlyph();
             container.onNotes = new TabBeatGlyph();

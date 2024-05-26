@@ -8,7 +8,6 @@ import { Voice } from '@src/model/Voice';
 import { ICanvas } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
-import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { ClefGlyph } from '@src/rendering/glyphs/ClefGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreBeatGlyph } from '@src/rendering/glyphs/ScoreBeatGlyph';
@@ -73,15 +72,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return super.getLineHeight(steps / 2);
     }
 
-    public getBeatDirection(beat: Beat): BeamDirection {
-        return this.helpers.getBeamingHelperForBeat(beat).direction;
-    }
-
     public override doLayout(): void {
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
             let top: number = this.getScoreY(-2);
-            let bottom: number = this.getScoreY(6);
+            let bottom: number = this.getScoreY(10);
             let whammyOffset: number = this.simpleWhammyOverflow;
             this.registerOverflowTop(whammyOffset);
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine);
@@ -90,11 +85,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
                 maxNoteY -= maxNoteHelper.fingeringCount * this.resources.graceFont.size;
                 if (maxNoteHelper.hasTuplet) {
-                    maxNoteY -= this.resources.effectFont.size * 2;
+                    maxNoteY -= this.tupletSize;
                 }
-            }
-            if (maxNoteHelper.hasTuplet) {
-                maxNoteY -= this.resources.effectFont.size * 1.5;
             }
             if (maxNoteY < top) {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
@@ -104,6 +96,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
                 minNoteY += minNoteHelper.fingeringCount * this.resources.graceFont.size;
+                if (minNoteHelper.hasTuplet) {
+                    minNoteY += this.tupletSize;
+                }
             }
             if (minNoteY > bottom) {
                 this.registerOverflowBottom(Math.abs(minNoteY) - bottom);
@@ -185,13 +180,12 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return y;
     }
 
-
     public override applyLayoutingInfo(): boolean {
         const result = super.applyLayoutingInfo();
         if (result && this.bar.isMultiVoice) {
             // consider rest overflows
             let top: number = this.getScoreY(-2);
-            let bottom: number = this.getScoreY(6);
+            let bottom: number = this.getScoreY(10);
             let minMax = this.helpers.collisionHelper.getBeatMinMaxY();
             if (minMax[0] < top) {
                 this.registerOverflowTop(Math.abs(minMax[0]));
@@ -203,7 +197,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return result;
     }
 
-    protected calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
+    override calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         let stemSize: number = this.getStemSize(h);
 
         if (!h.drawingInfos.has(direction)) {
@@ -482,8 +476,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
-        for (let i: number = 0, j: number = v.beats.length; i < j; i++) {
-            let b: Beat = v.beats[i];
+        for (const b of v.beats) {
             let container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new ScoreBeatPreNotesGlyph();
             container.onNotes = new ScoreBeatGlyph();
@@ -519,7 +512,14 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
     }
 
-    protected override paintBeamingStem(beat: Beat, cy: number, x: number, topY: number, bottomY: number, canvas: ICanvas): void {
+    protected override paintBeamingStem(
+        beat: Beat,
+        cy: number,
+        x: number,
+        topY: number,
+        bottomY: number,
+        canvas: ICanvas
+    ): void {
         canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
         canvas.beginPath();
         canvas.moveTo(x, topY);
@@ -527,4 +527,3 @@ export class ScoreBarRenderer extends LineBarRenderer {
         canvas.stroke();
         canvas.lineWidth = this.scale;
     }
-}

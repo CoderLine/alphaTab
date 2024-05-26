@@ -23,6 +23,7 @@ import { Settings } from '@src/Settings';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { InternalSystemsLayoutMode } from './layout/ScoreLayout';
+import { BeamDirection } from './utils/BeamDirection';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -560,5 +561,9 @@ export class BarRendererBase {
 
     public completeBeamingHelper(helper: BeamingHelper) {
         // nothing by default
+    }
+
+    public getBeatDirection(beat: Beat): BeamDirection {
+        return this.helpers.getBeamingHelperForBeat(beat).direction;
     }
 }

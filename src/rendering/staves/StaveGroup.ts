@@ -224,8 +224,12 @@ export class StaveGroup {
         }
     }
 
+    public get bottomPadding() {
+        return 20 * this.layout.scale;
+    }
+
     public get height(): number {
-        return this._allStaves[this._allStaves.length - 1].y + this._allStaves[this._allStaves.length - 1].height;
+        return this._allStaves[this._allStaves.length - 1].y + this._allStaves[this._allStaves.length - 1].height + this.bottomPadding;
     }
 
     public scaleToWidth(width: number): void {
@@ -407,7 +411,7 @@ export class StaveGroup {
         staveGroupBounds.visualBounds.x = cx;
         staveGroupBounds.visualBounds.y = cy + this.y;
         staveGroupBounds.visualBounds.w = this.width;
-        staveGroupBounds.visualBounds.h = this.height;
+        staveGroupBounds.visualBounds.h = this.height - this.bottomPadding;
         staveGroupBounds.realBounds = new Bounds();
         staveGroupBounds.realBounds.x = cx;
         staveGroupBounds.realBounds.y = cy + this.y;

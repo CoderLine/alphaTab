@@ -38,6 +38,9 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 1;
     }
 
+    protected override get bottomGlyphOverflow(): number {
+        return 0;
+    }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);

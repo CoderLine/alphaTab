@@ -40,11 +40,19 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public abstract get heightLineCount(): number;
     public abstract get drawnLineCount(): number;
 
-    private initLineBasedSizes() {
+    protected get topGlyphOverflow() {
         const res = this.resources;
-        let glyphOverflow: number = (res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2) * this.scale;
-        this.topPadding = glyphOverflow;
-        this.bottomPadding = glyphOverflow;
+        return (res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2) * this.scale;
+    }
+
+    protected get bottomGlyphOverflow() {
+        const res = this.resources;
+        return (res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2) * this.scale;
+    }
+
+    protected initLineBasedSizes() {
+        this.topPadding = this.topGlyphOverflow;
+        this.bottomPadding = this.bottomGlyphOverflow;
         this.height = this.lineOffset * (this.heightLineCount - 1) + this.topPadding + this.bottomPadding;
     }
 
@@ -69,7 +77,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public override doLayout(): void {
         this.initLineBasedSizes();
         this.updateFirstLineY();
-        this.tupletSize = this.resources.effectFont.size * 0.8;
+        this.tupletSize = 15 * this.scale + this.resources.effectFont.size * 0.3;
         super.doLayout();
     }
 
@@ -522,7 +530,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             this.addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
         }
         this.createLinePreBeatGlyphs();
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.25), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(0.40), this.bar.index + 1));
     }
 
     protected abstract createLinePreBeatGlyphs(): void;
@@ -532,7 +540,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
             if (this.bar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount));
+                this.addPostBeatGlyph(
+                    new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
+                );
             }
         } else {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
