@@ -11,6 +11,7 @@ import { ScoreSlurGlyph } from '@src/rendering/glyphs/ScoreSlurGlyph';
 import { ScoreTieGlyph } from '@src/rendering/glyphs/ScoreTieGlyph';
 import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { BeamingHelper } from './utils/BeamingHelper';
 
 export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: ScoreBendGlyph | null = null;

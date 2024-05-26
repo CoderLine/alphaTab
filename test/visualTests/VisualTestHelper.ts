@@ -24,7 +24,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1,
+        tolerancePercent: number = 0,
         triggerResize: boolean = false
     ): Promise<void> {
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
@@ -49,7 +49,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0
     ): Promise<void> {
         try {
             const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
@@ -75,7 +75,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0
     ): Promise<void> {
         try {
             if (!settings) {
@@ -98,7 +98,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1,
+        tolerancePercent: number = 0,
         triggerResize: boolean = false
     ): Promise<void> {
         const widths = [1300];
@@ -129,7 +129,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0
     ): Promise<void> {
         if (!settings) {
             settings = new Settings();
@@ -292,7 +292,7 @@ export class VisualTestHelper {
         referenceFileName: string,
         referenceFileData: Uint8Array,
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0
     ): Promise<void> {
         // create final full image
         using actual = new AlphaSkiaCanvas();
@@ -314,7 +314,7 @@ export class VisualTestHelper {
         expected: AlphaSkiaImage,
         expectedFileName: string,
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0
     ): Promise<void> {
         const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
         const oldActual = actual;
@@ -356,7 +356,7 @@ export class VisualTestHelper {
             // only pixels that are not transparent are relevant for the diff-ratio
             let totalPixels = match.totalPixels - match.transparentPixels;
             let percentDifference = (match.differentPixels / totalPixels) * 100;
-            pass = percentDifference < tolerancePercent;
+            pass = percentDifference <= tolerancePercent;
             // result.pass = match.differentPixels === 0;
             errorMessage = '';
 

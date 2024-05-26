@@ -9,6 +9,7 @@ import { TabSlurGlyph } from '@src/rendering/glyphs/TabSlurGlyph';
 import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
 import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import { BeamingHelper } from '../utils/BeamingHelper';
 
 export class TabBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: TabBendGlyph | null = null;
@@ -16,6 +17,10 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
 
     public constructor(beat: Beat, voiceContainer: VoiceContainerGlyph) {
         super(beat, voiceContainer);
+    }
+
+    protected override drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
+        return helper.hasFlag((this.renderer as TabBarRenderer).drawBeamHelperAsFlags(helper), this.beat);
     }
 
     public override doLayout(): void {

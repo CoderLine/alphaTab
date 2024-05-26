@@ -13,6 +13,7 @@ import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { BeamingHelper } from '../utils/BeamingHelper';
 
 export class BeatContainerGlyph extends Glyph {
     public static readonly GraceBeatPadding: number = 3;
@@ -39,6 +40,10 @@ export class BeatContainerGlyph extends Glyph {
         this.ties.push(tie);
     }
 
+    protected drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
+        return helper.hasFlag(false, undefined);
+    }
+
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
         let preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
         if (this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
@@ -48,7 +53,7 @@ export class BeatContainerGlyph extends Glyph {
         let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.centerX;
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
-        if ((helper && helper.hasFlag) || this.beat.graceType !== GraceType.None) {
+        if ((helper && this.drawBeamHelperAsFlags(helper)) || this.beat.graceType !== GraceType.None) {
             postBeatStretch +=
                 FlagGlyph.FlagWidth *
                 this.scale *

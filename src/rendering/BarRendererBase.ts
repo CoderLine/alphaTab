@@ -455,10 +455,9 @@ export class BarRendererBase {
     }
 
     protected createBeatGlyphs(): void {
-        for (let v: number = 0; v < this.bar.voices.length; v++) {
-            let voice: Voice = this.bar.voices[v];
+        for(const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                this.createVoiceGlyphs(this.bar.voices[v]);
+                this.createVoiceGlyphs(voice);
             }
         }
     }
