@@ -225,7 +225,7 @@ export class StaveGroup {
     }
 
     public get bottomPadding() {
-        return 20 * this.layout.scale;
+        return 10 * this.layout.scale;
     }
 
     public get height(): number {

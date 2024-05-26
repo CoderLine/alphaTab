@@ -527,3 +527,4 @@ export class ScoreBarRenderer extends LineBarRenderer {
         canvas.stroke();
         canvas.lineWidth = this.scale;
     }
+}

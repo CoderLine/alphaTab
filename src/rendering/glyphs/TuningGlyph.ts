@@ -22,7 +22,7 @@ export class TuningGlyph extends GlyphGroup {
         }
         this.createGlyphs(this._tuning);
         for (const g of this.glyphs!) {
-            g.renderer = this.renderer
+            g.renderer = this.renderer;
             g.doLayout();
         }
     }
@@ -31,7 +31,6 @@ export class TuningGlyph extends GlyphGroup {
      * The height of the GuitarString# glyphs at scale 1
      */
     private static readonly CircleNumberHeight: number = 20;
-
 
     private createGlyphs(tuning: Tuning): void {
         const scale = this.renderer.scale;
@@ -54,14 +53,11 @@ export class TuningGlyph extends GlyphGroup {
         this.renderer.scoreRenderer.canvas!.font = res.effectFont;
         this.width = Math.max(
             this.renderer.scoreRenderer.canvas!.measureText(this._trackLabel) * scale,
-            Math.max(
-                this.renderer.scoreRenderer.canvas!.measureText(tuning.name) * scale,
-                2 * stringColumnWidth
-            )
-        )
+            Math.max(this.renderer.scoreRenderer.canvas!.measureText(tuning.name) * scale, 2 * stringColumnWidth)
+        );
 
-        this.height += rowHeight;
         if (!tuning.isStandard) {
+            this.height += rowHeight;
             const circleScale = 0.7;
             const circleHeight = TuningGlyph.CircleNumberHeight * circleScale * scale;
 
@@ -74,7 +70,9 @@ export class TuningGlyph extends GlyphGroup {
                 this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight / 1.2, circleScale, symbol));
 
                 const str: string = '= ' + Tuning.getTextForTuning(tuning.tunings[i], false);
-                this.addGlyph(new TextGlyph(currentX + circleHeight + 1 * scale, currentY, str, res.effectFont, TextAlign.Left));
+                this.addGlyph(
+                    new TextGlyph(currentX + circleHeight + 1 * scale, currentY, str, res.effectFont, TextAlign.Left)
+                );
                 currentY += rowHeight;
                 if (i === stringsPerColumn - 1) {
                     currentY = this.height;

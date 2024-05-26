@@ -133,7 +133,7 @@ export class Environment {
             }
             .at-surface-svg text {
                 dominant-baseline: central;
-            }             
+            }
             .at {
                  font-family: 'alphaTab';
                  speak: none;

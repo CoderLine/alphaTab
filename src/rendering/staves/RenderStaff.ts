@@ -45,7 +45,7 @@ export class RenderStaff {
      */
     public staveTop: number = 0;
 
-    public topSpacing: number = 0;
+    public topSpacing: number = 5;
     public bottomSpacing: number = 5;
 
     /**

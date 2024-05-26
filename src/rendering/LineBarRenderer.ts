@@ -530,7 +530,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             this.addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
         }
         this.createLinePreBeatGlyphs();
-        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(0.40), this.bar.index + 1));
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(0.4), this.bar.index + 1));
     }
 
     protected abstract createLinePreBeatGlyphs(): void;
@@ -540,9 +540,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
             if (this.bar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(
-                    new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
-                );
+                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(0.4), this.bar.masterBar.repeatCount));
             }
         } else {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));

@@ -5,7 +5,7 @@ import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@src/rendering/glyphs/ChordDiagramContainerGlyph';
@@ -306,7 +306,7 @@ export abstract class ScoreLayout {
         let msg: string = 'rendered by alphaTab';
         let resources: RenderingResources = this.renderer.settings.display.resources;
         let size: number = 12 * this.renderer.settings.display.scale;
-        let height: number = Math.floor(size * 2);
+        let height: number = Math.floor(size);
 
         const e = new RenderFinishedEventArgs();
         const font = Font.withFamilyList(resources.copyrightFont.families, size, FontStyle.Plain, FontWeight.Bold);
@@ -330,7 +330,8 @@ export abstract class ScoreLayout {
             canvas.color = resources.mainGlyphColor;
             canvas.font = font;
             canvas.textAlign = TextAlign.Left;
-            canvas.fillText(msg, 0, size);
+            canvas.textBaseline = TextBaseline.Top;
+            canvas.fillText(msg, 0, 0);
         });
 
         return y + height;
