@@ -280,4 +280,9 @@ describe('GpxImporterTest', () => {
             track1And3
         );
     });
+
+    it('slash', async () => {
+        const score = (await prepareImporterWithFile('guitarpro6/slash.gpx')).readScore();
+        GpImporterTestHelper.checkSlash(score);
+    });
 });

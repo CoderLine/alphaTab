@@ -78,6 +78,11 @@ export class Staff {
     }
 
     /**
+     * Gets or sets whether the slash notation is shown.
+     */
+    public showSlash: boolean = true;
+
+    /**
      * Gets or sets whether the tabs are shown.
      */
     public showTablature: boolean = true;

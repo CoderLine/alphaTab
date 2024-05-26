@@ -960,5 +960,8 @@ describe('Gp7ImporterTest', () => {
         );
     });
 
+    it('slash', async () => {
+        const score = (await prepareImporterWithFile('guitarpro7/slash.gp')).readScore();
+        GpImporterTestHelper.checkSlash(score);
     });
 });

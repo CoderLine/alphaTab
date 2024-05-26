@@ -31,4 +31,8 @@ describe('Gp8ImporterTest', () => {
         );
     });
 
+    it('slash', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/slash.gp')).readScore();
+        GpImporterTestHelper.checkSlash(score);
+    });
 });

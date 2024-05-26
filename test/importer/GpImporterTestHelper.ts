@@ -22,7 +22,10 @@ import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 
 export class GpImporterTestHelper {
-    public static async prepareImporterWithFile(name: string, settings: Settings | null = null): Promise<Gp3To5Importer> {
+    public static async prepareImporterWithFile(
+        name: string,
+        settings: Settings | null = null
+    ): Promise<Gp3To5Importer> {
         let path: string = 'test-data/';
         const buffer = await TestPlatform.loadFile(path + name);
         return GpImporterTestHelper.prepareImporterWithBytes(buffer, settings);
@@ -302,9 +305,8 @@ export class GpImporterTestHelper {
         expect(score.masterBars[4].tempoAutomation).to.be.ok;
         expect(score.masterBars[4].tempoAutomation!.value).to.equal(120.0);
         if (!skipInstrumentCheck) {
-            expect(
-                score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)
-            ).to.be.ok;
+            expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)).to.be
+                .ok;
             expect(
                 score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)!.value
             ).to.equal(25);
@@ -530,7 +532,7 @@ export class GpImporterTestHelper {
         track1: Score,
         track2: Score,
         trackAll: Score,
-        track1And3: Score,
+        track1And3: Score
     ): void {
         expect(track1.tracks[0].isVisibleOnMultiTrack).to.be.true;
         expect(track1.tracks[1].isVisibleOnMultiTrack).to.be.false;
@@ -547,5 +549,18 @@ export class GpImporterTestHelper {
         expect(track1And3.tracks[0].isVisibleOnMultiTrack).to.be.true;
         expect(track1And3.tracks[1].isVisibleOnMultiTrack).to.be.false;
         expect(track1And3.tracks[2].isVisibleOnMultiTrack).to.be.true;
+    }
+    public static checkSlash(score: Score): void {
+        expect(score.tracks.length).to.equal(2);
+        
+        expect(score.tracks[0].staves.length).to.equal(1);
+        expect(score.tracks[0].staves[0].showSlash).to.equal(true);
+        expect(score.tracks[0].staves[0].showTablature).to.equal(true);
+        expect(score.tracks[0].staves[0].showStandardNotation).to.equal(true);
+
+        expect(score.tracks[1].staves.length).to.equal(1);
+        expect(score.tracks[1].staves[0].showSlash).to.equal(false);
+        expect(score.tracks[1].staves[0].showTablature).to.equal(true);
+        expect(score.tracks[1].staves[0].showStandardNotation).to.equal(true);
     }
 }
