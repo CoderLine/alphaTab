@@ -80,7 +80,7 @@ export class Staff {
     /**
      * Gets or sets whether the slash notation is shown.
      */
-    public showSlash: boolean = true;
+    public showSlash: boolean = false;
 
     /**
      * Gets or sets whether the tabs are shown.
