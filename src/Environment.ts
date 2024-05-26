@@ -60,6 +60,7 @@ import { SkiaCanvas } from './platform/skia/SkiaCanvas';
 import { Font } from './model';
 import { Settings } from './Settings';
 import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
+import { SlashBarRendererFactory } from './rendering/SlashBarRendererFactory';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -479,12 +480,15 @@ export class Environment {
 
         // default combinations of stave textprofiles
         staveProfiles.set(StaveProfile.ScoreTab, [
-            new EffectBarRendererFactory('score-effects', [
+            new EffectBarRendererFactory('top-effects', [
                 new TempoEffectInfo(),
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
                 new TextEffectInfo(),
                 new ChordsEffectInfo(),
+            ]),
+            new SlashBarRendererFactory(),
+            new EffectBarRendererFactory('score-effects', [
                 new FermataEffectInfo(),
                 new WhammyBarEffectInfo(),
                 new TrillEffectInfo(),
@@ -526,12 +530,15 @@ export class Environment {
             new TabBarRendererFactory(false, false, false)
         ]);
         staveProfiles.set(StaveProfile.Score, [
-            new EffectBarRendererFactory('score-effects', [
+            new EffectBarRendererFactory('top-effects', [
                 new TempoEffectInfo(),
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
                 new TextEffectInfo(),
                 new ChordsEffectInfo(),
+            ]), 
+            new SlashBarRendererFactory(),
+            new EffectBarRendererFactory('score-effects', [
                 new FermataEffectInfo(),
                 new WhammyBarEffectInfo(),
                 new TrillEffectInfo(),
@@ -585,11 +592,13 @@ export class Environment {
             new AlternateEndingsEffectInfo()
         ];
         staveProfiles.set(StaveProfile.Tab, [
+            new SlashBarRendererFactory(),
             new EffectBarRendererFactory('tab-effects', tabEffectInfos),
             new TabBarRendererFactory(true, true, true),
             new EffectBarRendererFactory('tab-bottom-effects', [new LyricsEffectInfo()])
         ]);
         staveProfiles.set(StaveProfile.TabMixed, [
+            new SlashBarRendererFactory(),
             new EffectBarRendererFactory('tab-effects', tabEffectInfos),
             new TabBarRendererFactory(false, false, false),
             new EffectBarRendererFactory('tab-bottom-effects', [new LyricsEffectInfo()])
