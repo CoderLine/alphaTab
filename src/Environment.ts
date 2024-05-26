@@ -2,7 +2,7 @@ import { LayoutMode } from '@src/LayoutMode';
 import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
-import { Gp7Importer } from '@src/importer/Gp7Importer';
+import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { GpxImporter } from '@src/importer/GpxImporter';
 import { MusicXmlImporter } from '@src/importer/MusicXmlImporter';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
@@ -411,7 +411,7 @@ export class Environment {
         return [
             new Gp3To5Importer(),
             new GpxImporter(),
-            new Gp7Importer(),
+            new Gp7To8Importer(),
             new MusicXmlImporter(),
             new CapellaImporter(),
             new AlphaTexImporter()

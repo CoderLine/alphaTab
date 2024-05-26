@@ -14,11 +14,11 @@ import { IOHelper } from '@src/io/IOHelper';
 import { LayoutConfiguration } from './LayoutConfiguration';
 
 /**
- * This ScoreImporter can read Guitar Pro 7 (gp) files.
+ * This ScoreImporter can read Guitar Pro 7 and 8 (gp) files.
  */
-export class Gp7Importer extends ScoreImporter {
+export class Gp7To8Importer extends ScoreImporter {
     public get name(): string {
-        return 'Guitar Pro 7';
+        return 'Guitar Pro 7-8';
     }
 
     public constructor() {
