@@ -27,6 +27,8 @@ export class TabBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'tab';
     public static readonly TabLineSpacing: number = 10;
 
+    private _hasTuplets = false;
+
     public showTimeSignature: boolean = false;
     public showRests: boolean = false;
     public showTiedNotes: boolean = false;
@@ -55,10 +57,6 @@ export class TabBarRenderer extends LineBarRenderer {
      */
     public getTabY(line: number): number {
         return super.getLineY(line);
-    }
-
-    public override getLineY(line: number): number {
-        return this.getTabY(line);
     }
 
     public getTabHeight(line: number): number {
@@ -100,17 +98,17 @@ export class TabBarRenderer extends LineBarRenderer {
     public override doLayout(): void {
         super.doLayout();
         if (this.settings.notation.rhythmMode !== TabRhythmMode.Hidden) {
-            let hasTuplets: boolean = false;
+            this._hasTuplets = false;
             for (let voice of this.bar.voices) {
                 if (this.hasVoiceContainer(voice)) {
                     let c: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                     if (c.tupletGroups.length > 0) {
-                        hasTuplets = true;
+                        this._hasTuplets = true;
                         break;
                     }
                 }
             }
-            if (hasTuplets) {
+            if (this._hasTuplets) {
                 this.registerOverflowBottom(this.tupletSize);
             }
         }
@@ -154,7 +152,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
-        for(const b of v.beats) {
+        for (const b of v.beats) {
             let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new TabBeatPreNotesGlyph();
             container.onNotes = new TabBeatGlyph();
@@ -184,7 +182,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagBottomY(_beat: Beat): number {
-        return this.height - this.tupletSize;
+        return this.getFlagAndBarPos();
     }
 
     protected override getFlagStemSize(duration: Duration): number {
@@ -207,9 +205,13 @@ export class TabBarRenderer extends LineBarRenderer {
         return BeamDirection.Down;
     }
 
+    protected getFlagAndBarPos(): number {
+        return this.height - (this._hasTuplets ? this.tupletSize / 2 : 0);
+    }
+
     protected override calculateBeamYWithDirection(_h: BeamingHelper, _x: number, _direction: BeamDirection): number {
         // currently only used for duplets
-        return this.height - this.tupletSize;
+        return this.getFlagAndBarPos();
     }
 
     protected override shouldPaintFlag(beat: Beat, h: BeamingHelper): boolean {
