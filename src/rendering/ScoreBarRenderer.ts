@@ -120,7 +120,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return this.getScoreY(this.accidentalHelper.getMaxLine(beat));
     }
 
-    override getBeamDirection(helper: BeamingHelper): BeamDirection {
+    protected override getBeamDirection(helper: BeamingHelper): BeamDirection {
         return helper.direction;
     }
 
@@ -197,7 +197,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return result;
     }
 
-    override calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
+    protected override calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
         let stemSize: number = this.getStemSize(h);
 
         if (!h.drawingInfos.has(direction)) {
@@ -334,7 +334,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return h.drawingInfos.get(direction)!.calcY(x);
     }
 
-    override getBarLineStart(beat: Beat, direction: BeamDirection): number {
+    protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
         return direction === BeamDirection.Up
             ? this.getScoreY(this.accidentalHelper.getMaxLine(beat))
             : this.getScoreY(this.accidentalHelper.getMinLine(beat));

@@ -77,7 +77,7 @@ export class SlashBarRenderer extends LineBarRenderer {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
 
-    override getBeamDirection(_helper: BeamingHelper): BeamDirection {
+    protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Up;
     }
 
@@ -93,7 +93,7 @@ export class SlashBarRenderer extends LineBarRenderer {
         return this.getLineY(0) - this.getFlagStemSize(_h.shortestDuration);
     }
 
-    override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
+    protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
 

@@ -518,8 +518,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return this.getLineHeight(size);
     }
 
-    abstract getBarLineStart(beat: Beat, direction: BeamDirection): number;
-    abstract getBarLineStart(beat: Beat, direction: BeamDirection): number;
+    protected abstract getBarLineStart(beat: Beat, direction: BeamDirection): number;
 
     public calculateBeamY(h: BeamingHelper, x: number): number {
         return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));

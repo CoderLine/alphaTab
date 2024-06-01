@@ -342,8 +342,8 @@ export class VisualTestHelper {
     
             // do visual comparison
             const diffImageData = new ArrayBuffer(actualImageData.byteLength);
-            let pass = true;
-            let errorMessage = "";
+            pass = true;
+            errorMessage = "";
     
             try {
                 const options = new PixelMatchOptions();

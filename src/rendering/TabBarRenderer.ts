@@ -189,7 +189,7 @@ export class TabBarRenderer extends LineBarRenderer {
         return 0; // fixed size via getFlagBottomY
     }
 
-    override getBarLineStart(beat: Beat, direction: BeamDirection): number {
+    protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
         let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight * this.settings.display.scale - this.tupletSize;
@@ -201,7 +201,7 @@ export class TabBarRenderer extends LineBarRenderer {
         }
     }
 
-    override getBeamDirection(_helper: BeamingHelper): BeamDirection {
+    protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Down;
     }
 
