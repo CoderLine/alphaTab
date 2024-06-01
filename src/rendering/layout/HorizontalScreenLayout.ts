@@ -18,7 +18,8 @@ export class HorizontalScreenLayoutPartialInfo {
  * This layout arranges the bars all horizontally
  */
 export class HorizontalScreenLayout extends ScoreLayout {
-    public static PagePadding: number[] = [10, 10, 10, 10];
+    public static PagePadding: number[] = [20, 20, 20, 20];
+    public static readonly GroupSpacing: number = 20;
     private _group: StaveGroup | null = null;
     private _pagePadding: number[] | null = null;
 

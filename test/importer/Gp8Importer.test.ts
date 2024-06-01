@@ -3,7 +3,6 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Settings } from '@src/Settings';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
-import { expect } from 'chai';
 
 describe('Gp8ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {

@@ -15,6 +15,7 @@ import { SystemsLayoutMode } from '@src/DisplaySettings';
  */
 export class PageViewLayout extends ScoreLayout {
     public static PagePadding: number[] = [40, 40, 40, 40];
+    public static readonly GroupSpacing: number = 20;
     private _groups: StaveGroup[] = [];
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
     private _barsFromPreviousGroup: MasterBarsRenderers[] = [];
@@ -217,29 +218,25 @@ export class PageViewLayout extends ScoreLayout {
             infoHeight += musicOrWordsHeight;
         }
 
-        if (this.scoreInfoGlyphs.size > 0) {
-            infoHeight = Math.floor(infoHeight + 17 * this.scale);
-            e.width = this.width;
-            e.height = infoHeight;
-            e.totalWidth = this.width;
-            e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
-            this.registerPartial(e, (canvas: ICanvas) => {
-                canvas.color = res.scoreInfoColor;
-                canvas.textAlign = TextAlign.Center;
-                for (const g of this.scoreInfoGlyphs.values()) {
-                    g.paint(0, 0, canvas);
-                }
-            });
-        }
+        infoHeight = Math.floor(infoHeight + 17 * this.scale);
+        e.width = this.width;
+        e.height = infoHeight;
+        e.totalWidth = this.width;
+        e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
+        this.registerPartial(e, (canvas: ICanvas) => {
+            canvas.color = res.scoreInfoColor;
+            canvas.textAlign = TextAlign.Center;
+            for (const g of this.scoreInfoGlyphs.values()) {
+                g.paint(0, 0, canvas);
+            }
+        });
 
         return y + infoHeight;
     }
 
     private resizeAndRenderScore(y: number, oldHeight: number): number {
         // if we have a fixed number of bars per row, we only need to refit them.
-        const barsPerRowActive =
-            this.renderer.settings.display.barsPerRow > 0 ||
-            this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale;
+        const barsPerRowActive = this.renderer.settings.display.barsPerRow > 0 || this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale;
 
         if (barsPerRowActive) {
             for (let i: number = 0; i < this._groups.length; i++) {
@@ -350,7 +347,8 @@ export class PageViewLayout extends ScoreLayout {
     private fitGroup(group: StaveGroup): void {
         if (group.isFull || group.width > this.maxWidth || this.renderer.settings.display.justifyLastSystem) {
             group.scaleToWidth(this.maxWidth);
-        } else {
+        }
+        else {
             group.scaleToWidth(group.width);
         }
         group.finalizeGroup();
@@ -362,8 +360,7 @@ export class PageViewLayout extends ScoreLayout {
         if (this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale) {
             let defaultSystemsLayout: number;
             let systemsLayout: number[];
-            if (this.renderer.tracks!.length > 1) {
-                // multi track applies
+            if (this.renderer.tracks!.length > 1) { // multi track applies
                 defaultSystemsLayout = this.renderer.score!.defaultSystemsLayout;
                 systemsLayout = this.renderer.score!.systemsLayout;
             } else {
@@ -371,7 +368,7 @@ export class PageViewLayout extends ScoreLayout {
                 systemsLayout = this.renderer.tracks![0].systemsLayout;
             }
 
-            barsPerRow = rowIndex < systemsLayout.length ? systemsLayout[rowIndex] : defaultSystemsLayout;
+            barsPerRow = (rowIndex < systemsLayout.length) ? systemsLayout[rowIndex] : defaultSystemsLayout;
         }
 
         return barsPerRow;

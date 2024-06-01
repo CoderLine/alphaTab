@@ -76,7 +76,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
             let top: number = this.getScoreY(-2);
-            let bottom: number = this.getScoreY(10);
+            let bottom: number = this.getScoreY(6);
             let whammyOffset: number = this.simpleWhammyOverflow;
             this.registerOverflowTop(whammyOffset);
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine);
@@ -85,8 +85,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
                 maxNoteY -= maxNoteHelper.fingeringCount * this.resources.graceFont.size;
                 if (maxNoteHelper.hasTuplet) {
-                    maxNoteY -= this.tupletSize;
+                    maxNoteY -= this.resources.effectFont.size * 2;
                 }
+            }
+            if (maxNoteHelper.hasTuplet) {
+                maxNoteY -= this.resources.effectFont.size * 1.5;
             }
             if (maxNoteY < top) {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
@@ -96,9 +99,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
                 minNoteY += minNoteHelper.fingeringCount * this.resources.graceFont.size;
-                if (minNoteHelper.hasTuplet) {
-                    minNoteY += this.tupletSize;
-                }
             }
             if (minNoteY > bottom) {
                 this.registerOverflowBottom(Math.abs(minNoteY) - bottom);
