@@ -257,7 +257,7 @@ export class SkiaCanvas implements ICanvas {
     private static readonly FontSizeToLineHeight = 1.2;
 
     public measureText(text: string) {
-        return new TextMetrics(this._canvas.measureText(text, this.getTypeFace(), this.font.size * this.settings.display.scale), SkiaCanvas.FontSizeToLineHeight);
+        return new TextMetrics(this._canvas.measureText(text, this.getTypeFace(), this.font.size * this.settings.display.scale), this.font.size * SkiaCanvas.FontSizeToLineHeight);
     }
 
     public fillMusicFontSymbol(

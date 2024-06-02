@@ -32,8 +32,10 @@ export class DisplaySettingsSerializer {
         o.set("justifylastsystem", obj.justifyLastSystem);
         o.set("resources", RenderingResourcesSerializer.toJson(obj.resources));
         o.set("padding", obj.padding);
+        o.set("firstsystempaddingtop", obj.firstSystemPaddingTop);
         o.set("systempaddingtop", obj.systemPaddingTop);
         o.set("systempaddingbottom", obj.systemPaddingBottom);
+        o.set("lastsystempaddingbottom", obj.lastSystemPaddingBottom);
         o.set("systemlabelpaddingleft", obj.systemLabelPaddingLeft);
         o.set("systemlabelpaddingright", obj.systemLabelPaddingRight);
         o.set("accoladebarpaddingright", obj.accoladeBarPaddingRight);
@@ -76,11 +78,17 @@ export class DisplaySettingsSerializer {
             case "padding":
                 obj.padding = v! as number[];
                 return true;
+            case "firstsystempaddingtop":
+                obj.firstSystemPaddingTop = v! as number;
+                return true;
             case "systempaddingtop":
                 obj.systemPaddingTop = v! as number;
                 return true;
             case "systempaddingbottom":
                 obj.systemPaddingBottom = v! as number;
+                return true;
+            case "lastsystempaddingbottom":
+                obj.lastSystemPaddingBottom = v! as number;
                 return true;
             case "systemlabelpaddingleft":
                 obj.systemLabelPaddingLeft = v! as number;

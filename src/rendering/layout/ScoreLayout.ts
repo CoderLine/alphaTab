@@ -104,6 +104,9 @@ export abstract class ScoreLayout {
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
+        if(args.height == 0){
+            return;
+        }
         if (!this.renderer.settings.core.enableLazyLoading) {
             // in case of no lazy loading -> first notify about layout, then directly render
             (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
@@ -187,6 +190,11 @@ export abstract class ScoreLayout {
         }
 
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
+
+        for(const [_e, glyph] of this.scoreInfoGlyphs) {
+            glyph.renderer = fakeBarRenderer;
+            glyph.doLayout();
+        }
 
         if (notation.isNotationElementVisible(NotationElement.GuitarTuning)) {
             let tunings: Staff[] = [];

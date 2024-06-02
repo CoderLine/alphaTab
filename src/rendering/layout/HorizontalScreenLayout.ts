@@ -174,7 +174,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             // pull to local scope for lambda
             const partialBarIndex = currentBarIndex;
             const partialIndex = i;
-            this._system.buildBoundingsLookup(this._system!.x, this._system!.y);
+            this._system.buildBoundingsLookup(0, 0);
             this.registerPartial(e, canvas => {
                 let renderX: number = this._system!.getBarX(partial.masterBars[0].index) + this._system!.accoladeWidth;
                 if (partialIndex === 0) {

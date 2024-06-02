@@ -81,7 +81,7 @@ export class TuningGlyph extends GlyphGroup {
             let currentY: number = this.height;
             for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {
                 const symbol = ((MusicFontSymbol.GuitarString0 as number) + (i + 1)) as MusicFontSymbol;
-                this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight / 1.2, circleScale, symbol));
+                this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight / 2.5, circleScale, symbol));
 
                 const str: string = '= ' + Tuning.getTextForTuning(tuning.tunings[i], false);
                 this.addGlyph(

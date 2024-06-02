@@ -77,22 +77,33 @@ export class DisplaySettings {
     /**
      * Gets or sets the padding between the music notation and the border.
      */
-    public padding: number[] = [10, 10];
+    public padding: number[] = [35, 35];
+
+    /**
+     * Gets or sets the top padding applied to first system.
+     */
+    public firstSystemPaddingTop: number = 5;
 
     /**
      * Gets or sets the top padding applied to systems.
      */
-    public systemPaddingTop: number = 0;
+    public systemPaddingTop: number = 10;
 
     /**
      * Gets or sets the bottom padding applied to systems.
      */
-    public systemPaddingBottom: number = 10;
+    public systemPaddingBottom: number = 20;
+
+    /**
+     * Gets or sets the bottom padding applied to last system.
+     */
+    public lastSystemPaddingBottom: number = 0;
 
     /**
      * Gets or sets the padding left to the track name label of the system.
      */
     public systemLabelPaddingLeft: number = 0;
+
     /**
      * Gets or sets the padding right to the track name label of the system.
      */

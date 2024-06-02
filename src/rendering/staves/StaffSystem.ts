@@ -405,6 +405,14 @@ export class StaffSystem {
     }
 
     public finalizeSystem(): void {
+        const settings = this.layout.renderer.settings;
+        if (this.index === 0) {
+            this.topPadding = settings.display.firstSystemPaddingTop * settings.display.scale;
+        }
+        if (this.isLast) {
+            this.bottomPadding = settings.display.lastSystemPaddingBottom * settings.display.scale;
+        }
+
         let currentY: number = 0;
         for (let staff of this._allStaves) {
             staff.x = this.accoladeWidth;

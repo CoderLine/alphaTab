@@ -163,7 +163,7 @@ export class PageViewLayout extends ScoreLayout {
             canvas.textAlign = TextAlign.Center;
             this.chordDiagrams!.paint(0, 0, canvas);
         });
-
+       
         return y + diagramHeight;
     }
 
