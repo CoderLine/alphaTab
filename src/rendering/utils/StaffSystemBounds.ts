@@ -3,27 +3,27 @@ import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 
 /**
- * Represents the bounds of a stave group.
+ * Represents the bounds of a staff system.
  */
-export class StaveGroupBounds {
+export class StaffSystemBounds {
     /**
      * Gets or sets the index of the bounds within the parent lookup.
-     * This allows fast access of the next/previous groups.
+     * This allows fast access of the next/previous system.
      */
     public index: number = 0;
 
     /**
-     * Gets or sets the bounds covering all visually visible elements of this stave group.
+     * Gets or sets the bounds covering all visually visible elements of this staff system.
      */
     public visualBounds!: Bounds;
 
     /**
-     * Gets or sets the actual bounds of the elements in this stave group including whitespace areas.
+     * Gets or sets the actual bounds of the elements in this staff system including whitespace areas.
      */
     public realBounds!: Bounds;
 
     /**
-     * Gets or sets the list of master bar bounds related to this stave group.
+     * Gets or sets the list of master bar bounds related to this staff system.
      */
     public bars: MasterBarBounds[] = [];
 
@@ -47,7 +47,7 @@ export class StaveGroupBounds {
      */
     public addBar(bounds: MasterBarBounds): void {
         this.boundsLookup.addMasterBar(bounds);
-        bounds.staveGroupBounds = this;
+        bounds.staffSystemBounds = this;
         this.bars.push(bounds);
     }
 

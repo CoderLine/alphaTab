@@ -4,20 +4,20 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { StaveGroup } from '@src/rendering/staves/StaveGroup';
-import { StaveTrackGroup } from '@src/rendering/staves/StaveTrackGroup';
+import { StaffSystem } from '@src/rendering/staves/StaffSystem';
+import { StaffTrackGroup } from '@src/rendering/staves/StaffTrackGroup';
 import { InternalSystemsLayoutMode } from '../layout/ScoreLayout';
 
 /**
- * A Staff represents a single line within a StaveGroup.
+ * A Staff represents a single line within a StaffSystem.
  * It stores BarRenderer instances created from a given factory.
  */
 export class RenderStaff {
     private _factory: BarRendererFactory;
     private _sharedLayoutData: Map<string, unknown> = new Map();
 
-    public staveTrackGroup!: StaveTrackGroup;
-    public staveGroup!: StaveGroup;
+    public staffTrackGroup!: StaffTrackGroup;
+    public system!: StaffSystem;
     public barRenderers: BarRendererBase[] = [];
     public x: number = 0;
     public y: number = 0;
@@ -45,8 +45,8 @@ export class RenderStaff {
      */
     public staveTop: number = 0;
 
-    public topSpacing: number = 20;
-    public bottomSpacing: number = 5;
+    public topSpacing: number = 0;
+    public bottomSpacing: number = 0;
 
     /**
      * This is the visual offset from top where the
@@ -96,15 +96,15 @@ export class RenderStaff {
         renderer.index = this.barRenderers.length;
         renderer.reLayout();
         this.barRenderers.push(renderer);
-        this.staveGroup.layout.registerBarRenderer(this.staveId, renderer);
+        this.system.layout.registerBarRenderer(this.staveId, renderer);
     }
 
     public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo): void {
         let renderer: BarRendererBase;
         if (!bar) {
-            renderer = new BarRendererBase(this.staveGroup.layout.renderer, bar);
+            renderer = new BarRendererBase(this.system.layout.renderer, bar);
         } else {
-            renderer = this._factory.create(this.staveGroup.layout.renderer, bar);
+            renderer = this._factory.create(this.system.layout.renderer, bar);
         }
         renderer.staff = this;
         renderer.index = this.barRenderers.length;
@@ -115,20 +115,20 @@ export class RenderStaff {
         // For cases like in the horizontal layout we need to set the fixed width early
         // to have correct partials splitting
         const barDisplayWidth = renderer.barDisplayWidth;
-        if (barDisplayWidth > 0 && this.staveGroup.layout.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths) {
+        if (barDisplayWidth > 0 && this.system.layout.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths) {
             renderer.width = barDisplayWidth;
         }
 
         this.barRenderers.push(renderer);
         if (bar) {
-            this.staveGroup.layout.registerBarRenderer(this.staveId, renderer);
+            this.system.layout.registerBarRenderer(this.staveId, renderer);
         }
     }
 
     public revertLastBar(): BarRendererBase {
         let lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
-        this.staveGroup.layout.unregisterBarRenderer(this.staveId, lastBar);
+        this.system.layout.unregisterBarRenderer(this.staveId, lastBar);
         return lastBar;
     }
 
@@ -137,11 +137,11 @@ export class RenderStaff {
         let topOverflow: number = this.topOverflow;
         let x = 0;
 
-        switch (this.staveGroup.layout.systemsLayoutMode) {
+        switch (this.system.layout.systemsLayoutMode) {
             case InternalSystemsLayoutMode.Automatic:
                 // Note: here we could do some "intelligent" distribution of
                 // the space over the bar renderers, for now we evenly apply the space to all bars
-                let difference: number = width - this.staveGroup.computedWidth;
+                let difference: number = width - this.system.computedWidth;
                 let spacePerBar: number = difference / this.barRenderers.length;
                 for (const renderer of this.barRenderers) {
                     renderer.x = x;
@@ -156,8 +156,8 @@ export class RenderStaff {
                 // each bar holds a percentual size where the sum of all scales make the width. 
                 // hence we can calculate the width accordingly by calculating how big each column needs to be percentual. 
 
-                width -= this.staveGroup.accoladeSpacing;
-                const totalScale = this.staveGroup.totalBarDisplayScale;
+                width -= this.system.accoladeWidth;
+                const totalScale = this.system.totalBarDisplayScale;
 
                 for (const renderer of this.barRenderers) {
                     renderer.x = x;
@@ -210,6 +210,10 @@ export class RenderStaff {
     }
 
     public finalizeStaff(): void {
+        const settings = this.system.layout.renderer.settings;
+        this.topSpacing = this._factory.getStaffPaddingTop(this) * settings.display.scale;
+        this.bottomSpacing =  this._factory.getStaffPaddingBottom(this) * settings.display.scale;
+
         this.height = 0;
 
         // 1st pass: let all renderers finalize themselves, this might cause
@@ -245,7 +249,7 @@ export class RenderStaff {
         }
 
         // canvas.color = Color.random();
-        // canvas.fillRect(cx + this.x, cy + this.y, this.staveGroup.width, this.height);
+        // canvas.fillRect(cx + this.x, cy + this.y, this.system.width - this.x, this.height);
 
         for (
             let i: number = startIndex, j: number = Math.min(startIndex + count, this.barRenderers.length);

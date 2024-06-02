@@ -32,7 +32,7 @@ import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
-import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
+import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 import { ResizeEventArgs } from '@src/ResizeEventArgs';
 import { Settings } from '@src/Settings';
 
@@ -1026,15 +1026,15 @@ export class AlphaTabApiBase<TSettings> {
 
             if (this.settings.player.enableAnimatedBeatCursor) {
                 let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
-                // get position of next beat on same stavegroup
+                // get position of next beat on same system
                 if (nextBeat) {
                     // if we are moving within the same bar or to the next bar
                     // transition to the next beat, otherwise transition to the end of the bar.
                     let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
                     if (
                         nextBeatBoundings &&
-                        nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                        barBoundings.staveGroupBounds
+                        nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds ===
+                        barBoundings.staffSystemBounds
                     ) {
                         nextBeatX = nextBeatBoundings.visualBounds.x;
                     }
@@ -1343,16 +1343,16 @@ export class AlphaTabApiBase<TSettings> {
         }
         // if the selection goes across multiple staves, we need a special selection highlighting
         if (
-            startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds !==
-            endBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds
+            startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds !==
+            endBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds
         ) {
             // from the startbeat to the end of the staff,
             // then fill all staffs until the end-beat staff
             // then from staff-start to the end beat (or to end of bar if it's the last beat)
-            let staffStartX: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.x;
+            let staffStartX: number = startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.x;
             let staffEndX: number =
-                startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.x +
-                startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.w;
+                startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.x +
+                startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.w;
             let startSelection: IContainer = this.uiFacade.createSelectionElement()!;
             startSelection.setBounds(
                 startX,
@@ -1361,10 +1361,10 @@ export class AlphaTabApiBase<TSettings> {
                 startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
             );
             selectionWrapper.appendChild(startSelection);
-            let staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index + 1;
-            let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index;
+            let staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index + 1;
+            let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index;
             for (let staffIndex: number = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
-                let staffBounds: StaveGroupBounds = cache.staveGroups[staffIndex];
+                let staffBounds: StaffSystemBounds = cache.staffSystems[staffIndex];
                 let middleSelection: IContainer = this.uiFacade.createSelectionElement()!;
                 middleSelection.setBounds(
                     staffStartX,

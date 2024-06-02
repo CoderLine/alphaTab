@@ -4,7 +4,7 @@ import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/Sc
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
-import { StaveGroup } from '@src/rendering/staves/StaveGroup';
+import { StaffSystem } from '@src/rendering/staves/StaffSystem';
 import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
 import { NotationElement } from '@src/NotationSettings';
@@ -14,11 +14,9 @@ import { SystemsLayoutMode } from '@src/DisplaySettings';
  * This layout arranges the bars into a fixed width and dynamic height region.
  */
 export class PageViewLayout extends ScoreLayout {
-    public static PagePadding: number[] = [40, 40, 40, 40];
-    public static readonly GroupSpacing: number = 20;
-    private _groups: StaveGroup[] = [];
+    private _systems: StaffSystem[] = [];
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
-    private _barsFromPreviousGroup: MasterBarsRenderers[] = [];
+    private _barsFromPreviousSystem: MasterBarsRenderers[] = [];
     private _pagePadding: number[] | null = null;
 
     public get name(): string {
@@ -41,7 +39,7 @@ export class PageViewLayout extends ScoreLayout {
 
         this._pagePadding = this.renderer.settings.display.padding;
         if (!this._pagePadding) {
-            this._pagePadding = PageViewLayout.PagePadding;
+            this._pagePadding = [0, 0, 0, 0];
         }
         if (this._pagePadding.length === 1) {
             this._pagePadding = [
@@ -58,7 +56,7 @@ export class PageViewLayout extends ScoreLayout {
                 this._pagePadding[1]
             ];
         }
-        let y: number = 0;
+        let y: number = this._pagePadding[1];
         this.width = this.renderer.width;
         this._allMasterBarRenderers = [];
         //
@@ -71,7 +69,7 @@ export class PageViewLayout extends ScoreLayout {
         // 3. Chord Diagrms
         y = this.layoutAndRenderChordDiagrams(y, -1);
         //
-        // 4. One result per StaveGroup
+        // 4. One result per StaffSystem
         y = this.layoutAndRenderScore(y);
 
         y = this.layoutAndRenderAnnotation(y);
@@ -85,8 +83,8 @@ export class PageViewLayout extends ScoreLayout {
 
     public get firstBarX(): number {
         let x = this._pagePadding![0];
-        if (this._groups.length > 0) {
-            x += this._groups[0].accoladeSpacing;
+        if (this._systems.length > 0) {
+            x += this._systems[0].accoladeWidth;
         }
         return x;
     }
@@ -105,7 +103,7 @@ export class PageViewLayout extends ScoreLayout {
         // 3. Chord Digrams
         y = this.layoutAndRenderChordDiagrams(y, oldHeight);
         //
-        // 4. One result per StaveGroup
+        // 4. One result per StaffSystem
         y = this.resizeAndRenderScore(y, oldHeight);
 
         y = this.layoutAndRenderAnnotation(y);
@@ -123,7 +121,7 @@ export class PageViewLayout extends ScoreLayout {
         this.tuningGlyph.width = this.width;
         this.tuningGlyph.doLayout();
 
-        let tuningHeight = this.tuningGlyph.height + 11 * this.scale;
+        let tuningHeight = this.tuningGlyph.height;
 
         const e = new RenderFinishedEventArgs();
         e.x = 0;
@@ -176,7 +174,7 @@ export class PageViewLayout extends ScoreLayout {
         e.x = 0;
         e.y = y;
 
-        let infoHeight = this._pagePadding![1];
+        let infoHeight = 0;
 
         let scale: number = this.scale;
         let res: RenderingResources = this.renderer.settings.display.resources;
@@ -218,72 +216,76 @@ export class PageViewLayout extends ScoreLayout {
             infoHeight += musicOrWordsHeight;
         }
 
-        infoHeight = Math.floor(infoHeight + 17 * this.scale);
-        e.width = this.width;
-        e.height = infoHeight;
-        e.totalWidth = this.width;
-        e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
-        this.registerPartial(e, (canvas: ICanvas) => {
-            canvas.color = res.scoreInfoColor;
-            canvas.textAlign = TextAlign.Center;
-            for (const g of this.scoreInfoGlyphs.values()) {
-                g.paint(0, 0, canvas);
-            }
-        });
+        if (this.scoreInfoGlyphs.size > 0) {
+            infoHeight = Math.floor(infoHeight + 17 * this.scale);
+            e.width = this.width;
+            e.height = infoHeight;
+            e.totalWidth = this.width;
+            e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
+            this.registerPartial(e, (canvas: ICanvas) => {
+                canvas.color = res.scoreInfoColor;
+                canvas.textAlign = TextAlign.Center;
+                for (const g of this.scoreInfoGlyphs.values()) {
+                    g.paint(0, 0, canvas);
+                }
+            });
+        }
 
         return y + infoHeight;
     }
 
     private resizeAndRenderScore(y: number, oldHeight: number): number {
         // if we have a fixed number of bars per row, we only need to refit them.
-        const barsPerRowActive = this.renderer.settings.display.barsPerRow > 0 || this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale;
+        const barsPerRowActive =
+            this.renderer.settings.display.barsPerRow > 0 ||
+            this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale;
 
         if (barsPerRowActive) {
-            for (let i: number = 0; i < this._groups.length; i++) {
-                let group: StaveGroup = this._groups[i];
-                this.fitGroup(group);
-                y += this.paintGroup(group, oldHeight);
+            for (let i: number = 0; i < this._systems.length; i++) {
+                let system: StaffSystem = this._systems[i];
+                this.fitSystem(system);
+                y += this.paintSystem(system, oldHeight);
             }
         } else {
-            this._groups = [];
+            this._systems = [];
             let currentIndex: number = 0;
             let maxWidth: number = this.maxWidth;
-            let group: StaveGroup = this.createEmptyStaveGroup();
-            group.index = this._groups.length;
-            group.x = this._pagePadding![0];
-            group.y = y;
+            let system: StaffSystem = this.createEmptyStaffSystem();
+            system.index = this._systems.length;
+            system.x = this._pagePadding![0];
+            system.y = y;
             while (currentIndex < this._allMasterBarRenderers.length) {
-                // if the current renderer still has space in the current group add it
-                // also force adding in case the group is empty
+                // if the current renderer still has space in the current system add it
+                // also force adding in case the system is empty
                 let renderers: MasterBarsRenderers | null = this._allMasterBarRenderers[currentIndex];
-                if (group.width + renderers!.width <= maxWidth || group.masterBarsRenderers.length === 0) {
-                    group.addMasterBarRenderers(this.renderer.tracks!, renderers!);
-                    // move to next group
+                if (system.width + renderers!.width <= maxWidth || system.masterBarsRenderers.length === 0) {
+                    system.addMasterBarRenderers(this.renderer.tracks!, renderers!);
+                    // move to next system
                     currentIndex++;
                 } else {
                     // if we cannot wrap on the current bar, we remove the last bar
                     // (this might even remove multiple ones until we reach a bar that can wrap);
-                    while (renderers && !renderers.canWrap && group.masterBarsRenderers.length > 1) {
-                        renderers = group.revertLastBar();
+                    while (renderers && !renderers.canWrap && system.masterBarsRenderers.length > 1) {
+                        renderers = system.revertLastBar();
                         currentIndex--;
                     }
-                    // in case we do not have space, we create a new group
-                    group.isFull = true;
-                    group.isLast = this.lastBarIndex === group.lastBarIndex;
-                    this._groups.push(group);
-                    this.fitGroup(group);
-                    y += this.paintGroup(group, oldHeight);
-                    // note: we do not increase currentIndex here to have it added to the next group
-                    group = this.createEmptyStaveGroup();
-                    group.index = this._groups.length;
-                    group.x = this._pagePadding![0];
-                    group.y = y;
+                    // in case we do not have space, we create a new system
+                    system.isFull = true;
+                    system.isLast = this.lastBarIndex === system.lastBarIndex;
+                    this._systems.push(system);
+                    this.fitSystem(system);
+                    y += this.paintSystem(system, oldHeight);
+                    // note: we do not increase currentIndex here to have it added to the next system
+                    system = this.createEmptyStaffSystem();
+                    system.index = this._systems.length;
+                    system.x = this._pagePadding![0];
+                    system.y = y;
                 }
             }
-            group.isLast = this.lastBarIndex === group.lastBarIndex;
-            // don't forget to finish the last group
-            this.fitGroup(group);
-            y += this.paintGroup(group, oldHeight);
+            system.isLast = this.lastBarIndex === system.lastBarIndex;
+            // don't forget to finish the last system
+            this.fitSystem(system);
+            y += this.paintSystem(system, oldHeight);
         }
         return y;
     }
@@ -292,50 +294,50 @@ export class PageViewLayout extends ScoreLayout {
         let startIndex: number = this.firstBarIndex;
         let currentBarIndex: number = startIndex;
         let endBarIndex: number = this.lastBarIndex;
-        this._groups = [];
+        this._systems = [];
         while (currentBarIndex <= endBarIndex) {
-            // create group and align set proper coordinates
-            let group: StaveGroup = this.createStaveGroup(currentBarIndex, endBarIndex);
-            this._groups.push(group);
-            group.x = this._pagePadding![0];
-            group.y = y;
-            currentBarIndex = group.lastBarIndex + 1;
-            // finalize group (sizing etc).
-            this.fitGroup(group);
+            // create system and align set proper coordinates
+            let system: StaffSystem = this.createStaffSystem(currentBarIndex, endBarIndex);
+            this._systems.push(system);
+            system.x = this._pagePadding![0];
+            system.y = y;
+            currentBarIndex = system.lastBarIndex + 1;
+            // finalize system (sizing etc).
+            this.fitSystem(system);
             Logger.debug(
                 this.name,
-                'Rendering partial from bar ' + group.firstBarIndex + ' to ' + group.lastBarIndex,
+                'Rendering partial from bar ' + system.firstBarIndex + ' to ' + system.lastBarIndex,
                 null
             );
-            y += this.paintGroup(group, y);
+            y += this.paintSystem(system, y);
         }
         return y;
     }
 
-    private paintGroup(group: StaveGroup, totalHeight: number): number {
+    private paintSystem(system: StaffSystem, totalHeight: number): number {
         // paint into canvas
-        let height: number = Math.floor(group.height + 20 * this.scale);
+        let height: number = Math.floor(system.height);
 
         const args: RenderFinishedEventArgs = new RenderFinishedEventArgs();
         args.x = 0;
-        args.y = group.y;
+        args.y = system.y;
         args.totalWidth = this.width;
         args.totalHeight = totalHeight;
         args.width = this.width;
         args.height = height;
-        args.firstMasterBarIndex = group.firstBarIndex;
-        args.lastMasterBarIndex = group.lastBarIndex;
+        args.firstMasterBarIndex = system.firstBarIndex;
+        args.lastMasterBarIndex = system.lastBarIndex;
 
-        group.buildBoundingsLookup(0, 0);
+        system.buildBoundingsLookup(0, 0);
         this.registerPartial(args, canvas => {
             this.renderer.canvas!.color = this.renderer.settings.display.resources.mainGlyphColor;
             this.renderer.canvas!.textAlign = TextAlign.Left;
-            // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates
+            // NOTE: we use this negation trick to make the system paint itself to 0/0 coordinates
             // since we use partial drawing
-            group.paint(0, -args.y, canvas);
+            system.paint(0, -args.y, canvas);
         });
 
-        // calculate coordinates for next group
+        // calculate coordinates for next system
         totalHeight += height;
 
         return height;
@@ -344,23 +346,23 @@ export class PageViewLayout extends ScoreLayout {
     /**
      * Realignes the bars in this line according to the available space
      */
-    private fitGroup(group: StaveGroup): void {
-        if (group.isFull || group.width > this.maxWidth || this.renderer.settings.display.justifyLastSystem) {
-            group.scaleToWidth(this.maxWidth);
+    private fitSystem(system: StaffSystem): void {
+        if (system.isFull || system.width > this.maxWidth || this.renderer.settings.display.justifyLastSystem) {
+            system.scaleToWidth(this.maxWidth);
+        } else {
+            system.scaleToWidth(system.width);
         }
-        else {
-            group.scaleToWidth(group.width);
-        }
-        group.finalizeGroup();
+        system.finalizeSystem();
     }
 
-    private getBarsPerRow(rowIndex: number) {
+    private getBarsPerSystem(rowIndex: number) {
         let barsPerRow: number = this.renderer.settings.display.barsPerRow;
 
         if (this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale) {
             let defaultSystemsLayout: number;
             let systemsLayout: number[];
-            if (this.renderer.tracks!.length > 1) { // multi track applies
+            if (this.renderer.tracks!.length > 1) {
+                // multi track applies
                 defaultSystemsLayout = this.renderer.score!.defaultSystemsLayout;
                 systemsLayout = this.renderer.score!.systemsLayout;
             } else {
@@ -368,61 +370,61 @@ export class PageViewLayout extends ScoreLayout {
                 systemsLayout = this.renderer.tracks![0].systemsLayout;
             }
 
-            barsPerRow = (rowIndex < systemsLayout.length) ? systemsLayout[rowIndex] : defaultSystemsLayout;
+            barsPerRow = rowIndex < systemsLayout.length ? systemsLayout[rowIndex] : defaultSystemsLayout;
         }
 
         return barsPerRow;
     }
 
-    private createStaveGroup(currentBarIndex: number, endIndex: number): StaveGroup {
-        let group: StaveGroup = this.createEmptyStaveGroup();
-        group.index = this._groups.length;
-        let barsPerRow: number = this.getBarsPerRow(group.index);
+    private createStaffSystem(currentBarIndex: number, endIndex: number): StaffSystem {
+        let system: StaffSystem = this.createEmptyStaffSystem();
+        system.index = this._systems.length;
+        let barsPerRow: number = this.getBarsPerSystem(system.index);
         let maxWidth: number = this.maxWidth;
         let end: number = endIndex + 1;
 
         let barIndex = currentBarIndex;
         while (barIndex < end) {
-            if (this._barsFromPreviousGroup.length > 0) {
-                for (let renderer of this._barsFromPreviousGroup) {
-                    group.addMasterBarRenderers(this.renderer.tracks!, renderer);
+            if (this._barsFromPreviousSystem.length > 0) {
+                for (let renderer of this._barsFromPreviousSystem) {
+                    system.addMasterBarRenderers(this.renderer.tracks!, renderer);
                     barIndex = renderer.masterBar.index;
                 }
             } else {
-                let renderers: MasterBarsRenderers | null = group.addBars(this.renderer.tracks!, barIndex);
+                let renderers: MasterBarsRenderers | null = system.addBars(this.renderer.tracks!, barIndex);
                 if (renderers) {
                     this._allMasterBarRenderers.push(renderers);
                 }
             }
-            this._barsFromPreviousGroup = [];
-            let groupIsFull: boolean = false;
+            this._barsFromPreviousSystem = [];
+            let systemIsFull: boolean = false;
             // can bar placed in this line?
-            if (barsPerRow === -1 && group.width >= maxWidth && group.masterBarsRenderers.length !== 0) {
-                groupIsFull = true;
-            } else if (group.masterBarsRenderers.length === barsPerRow + 1) {
-                groupIsFull = true;
+            if (barsPerRow === -1 && system.width >= maxWidth && system.masterBarsRenderers.length !== 0) {
+                systemIsFull = true;
+            } else if (system.masterBarsRenderers.length === barsPerRow + 1) {
+                systemIsFull = true;
             }
-            if (groupIsFull) {
-                let reverted = group.revertLastBar();
+            if (systemIsFull) {
+                let reverted = system.revertLastBar();
                 if (reverted) {
-                    this._barsFromPreviousGroup.push(reverted);
-                    while (reverted && !reverted.canWrap && group.masterBarsRenderers.length > 1) {
-                        reverted = group.revertLastBar();
+                    this._barsFromPreviousSystem.push(reverted);
+                    while (reverted && !reverted.canWrap && system.masterBarsRenderers.length > 1) {
+                        reverted = system.revertLastBar();
                         if (reverted) {
-                            this._barsFromPreviousGroup.push(reverted);
+                            this._barsFromPreviousSystem.push(reverted);
                         }
                     }
                 }
-                group.isFull = true;
-                group.isLast = false;
-                this._barsFromPreviousGroup.reverse();
-                return group;
+                system.isFull = true;
+                system.isLast = false;
+                this._barsFromPreviousSystem.reverse();
+                return system;
             }
-            group.x = 0;
+            system.x = 0;
             barIndex++;
         }
-        group.isLast = endIndex === group.lastBarIndex;
-        return group;
+        system.isLast = endIndex === system.lastBarIndex;
+        return system;
     }
 
     private get maxWidth(): number {

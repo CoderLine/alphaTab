@@ -4,12 +4,21 @@ import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { EffectBarRenderer } from '@src/rendering/EffectBarRenderer';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import { RenderStaff } from './staves/RenderStaff';
 
 export class EffectBarRendererFactory extends BarRendererFactory {
     private _infos: EffectBarRendererInfo[];
     private _staffId: string;
     public get staffId(): string {
         return this._staffId;
+    }
+
+    public override getStaffPaddingTop(staff: RenderStaff): number {
+        return staff.system.layout.renderer.settings.display.effectStaffPaddingTop;
+    }
+
+    public override getStaffPaddingBottom(staff: RenderStaff): number {
+        return staff.system.layout.renderer.settings.display.effectStaffPaddingBottom;
     }
 
     public constructor(staffId: string, infos: EffectBarRendererInfo[]) {

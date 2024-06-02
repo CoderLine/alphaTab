@@ -7,30 +7,33 @@ import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
 import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
 import { RenderStaff } from '@src/rendering/staves/RenderStaff';
-import { StaveTrackGroup } from '@src/rendering/staves/StaveTrackGroup';
+import { StaffTrackGroup } from '@src/rendering/staves/StaffTrackGroup';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
-import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
+import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 import { RenderingResources } from '@src/RenderingResources';
 import { NotationElement } from '@src/NotationSettings';
 
 /**
- * A Staff consists of a list of different staves and groups
+ * A StaffSystem consists of a list of different staves and groups
  * them using an accolade.
  */
-export class StaveGroup {
-    private static readonly AccoladeLabelSpacing: number = 10;
-
+export class StaffSystem {
     private _allStaves: RenderStaff[] = [];
     private _firstStaffInAccolade: RenderStaff | null = null;
     private _lastStaffInAccolade: RenderStaff | null = null;
     private _accoladeSpacingCalculated: boolean = false;
 
+    private static readonly AccoladeBarSize: number = 3;
+
     public x: number = 0;
     public y: number = 0;
     public index: number = 0;
 
-    public accoladeSpacing: number = 0;
+    /**
+     * The width of the whole accolade inclusive text and bar.
+     */
+    public accoladeWidth: number = 0;
 
     /**
      * Indicates whether this line is full or not. If the line is full the
@@ -48,8 +51,17 @@ export class StaveGroup {
 
     public isLast: boolean = false;
     public masterBarsRenderers: MasterBarsRenderers[] = [];
-    public staves: StaveTrackGroup[] = [];
+    public staves: StaffTrackGroup[] = [];
     public layout!: ScoreLayout;
+
+    public topPadding: number;
+    public bottomPadding: number;
+
+    public constructor(layout: ScoreLayout) {
+        this.layout = layout;
+        this.topPadding = layout.renderer.settings.display.systemPaddingTop;
+        this.bottomPadding = layout.renderer.settings.display.systemPaddingBottom;
+    }
 
     public get firstBarIndex(): number {
         return this.masterBarsRenderers[0].masterBar.index;
@@ -68,7 +80,7 @@ export class StaveGroup {
         renderers.layoutingInfo.preBeatSize = 0;
         let src: number = 0;
         for (let i: number = 0, j: number = this.staves.length; i < j; i++) {
-            let g: StaveTrackGroup = this.staves[i];
+            let g: StaffTrackGroup = this.staves[i];
             for (let k: number = 0, l: number = g.staves.length; k < l; k++) {
                 let s: RenderStaff = g.staves[k];
                 let renderer: BarRendererBase = renderers.renderers[src++];
@@ -126,7 +138,7 @@ export class StaveGroup {
                     width = computedWidth;
                 }
                 const newBarDisplayScale = lastBar.barDisplayScale;
-                if(newBarDisplayScale > barDisplayScale) {
+                if (newBarDisplayScale > barDisplayScale) {
                     barDisplayScale = newBarDisplayScale;
                 }
             }
@@ -163,28 +175,37 @@ export class StaveGroup {
     }
 
     private calculateAccoladeSpacing(tracks: Track[]): void {
-        if (!this._accoladeSpacingCalculated && this.index === 0) {
+        const settings = this.layout.renderer.settings;
+        if (!this._accoladeSpacingCalculated) {
             this._accoladeSpacingCalculated = true;
-            if (!this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.TrackNames)) {
-                this.accoladeSpacing = 0;
-            } else {
+            if (
+                this.index === 0 &&
+                this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.TrackNames)
+            ) {
                 let canvas: ICanvas = this.layout.renderer.canvas!;
-                let res: Font = this.layout.renderer.settings.display.resources.effectFont;
+                let res: Font = settings.display.resources.effectFont;
                 canvas.font = res;
                 for (let t of tracks) {
-                    this.accoladeSpacing = Math.ceil(Math.max(this.accoladeSpacing, canvas.measureText(t.shortName)));
+                    this.accoladeWidth = Math.ceil(Math.max(this.accoladeWidth, canvas.measureText(t.shortName).width));
                 }
-                this.accoladeSpacing *= this.layout.scale;
-                this.accoladeSpacing += 2 * StaveGroup.AccoladeLabelSpacing * this.layout.scale;
-                this.width += this.accoladeSpacing;
-                this.computedWidth += this.accoladeSpacing;
+                this.accoladeWidth *= this.layout.scale;
+                this.accoladeWidth += settings.display.systemLabelPaddingLeft * this.layout.scale;
+                this.accoladeWidth += settings.display.systemLabelPaddingRight * this.layout.scale;
+            } else {
+                this.accoladeWidth = 0;
             }
+
+            this.accoladeWidth += StaffSystem.AccoladeBarSize * this.layout.scale;
+            this.accoladeWidth += settings.display.accoladeBarPaddingRight * this.layout.scale;
+
+            this.width += this.accoladeWidth;
+            this.computedWidth += this.accoladeWidth;
         }
     }
 
-    private getStaveTrackGroup(track: Track): StaveTrackGroup | null {
+    private getStaffTrackGroup(track: Track): StaffTrackGroup | null {
         for (let i: number = 0, j: number = this.staves.length; i < j; i++) {
-            let g: StaveTrackGroup = this.staves[i];
+            let g: StaffTrackGroup = this.staves[i];
             if (g.track === track) {
                 return g;
             }
@@ -193,13 +214,13 @@ export class StaveGroup {
     }
 
     public addStaff(track: Track, staff: RenderStaff): void {
-        let group: StaveTrackGroup | null = this.getStaveTrackGroup(track);
+        let group: StaffTrackGroup | null = this.getStaffTrackGroup(track);
         if (!group) {
-            group = new StaveTrackGroup(this, track);
+            group = new StaffTrackGroup(this, track);
             this.staves.push(group);
         }
-        staff.staveTrackGroup = group;
-        staff.staveGroup = this;
+        staff.staffTrackGroup = group;
+        staff.system = this;
         staff.index = this._allStaves.length;
         this._allStaves.push(staff);
         group.addStaff(staff);
@@ -225,7 +246,12 @@ export class StaveGroup {
     }
 
     public get height(): number {
-        return this._allStaves[this._allStaves.length - 1].y + this._allStaves[this._allStaves.length - 1].height;
+        return (
+            this._allStaves[this._allStaves.length - 1].y +
+            this._allStaves[this._allStaves.length - 1].height +
+            this.topPadding +
+            this.bottomPadding
+        );
     }
 
     public scaleToWidth(width: number): void {
@@ -236,6 +262,13 @@ export class StaveGroup {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
+        // const c = canvas.color;
+        // canvas.color = Color.random(255);
+        // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.height);
+        // canvas.color = c;
+
+        cy += this.topPadding;
+
         this.paintPartial(cx + this.x, cy + this.y, canvas, 0, this.masterBarsRenderers.length);
     }
 
@@ -275,8 +308,9 @@ export class StaveGroup {
             // Draw accolade for each track group
             //
             canvas.font = res.effectFont;
+            const settings = this.layout.renderer.settings;
             for (let i: number = 0, j: number = this.staves.length; i < j; i++) {
-                let g: StaveTrackGroup = this.staves[i];
+                let g: StaffTrackGroup = this.staves[i];
                 if (g.firstStaffInAccolade && g.lastStaffInAccolade) {
                     let firstStart: number =
                         cy +
@@ -290,28 +324,39 @@ export class StaveGroup {
                         g.lastStaffInAccolade.topSpacing +
                         g.lastStaffInAccolade.topOverflow +
                         g.lastStaffInAccolade.staveBottom;
-                    let acooladeX: number = cx + g.firstStaffInAccolade.x;
-                    let barSize: number = 3 * this.layout.renderer.settings.display.scale;
-                    let barOffset: number = barSize;
+
+                    const hasTrackName =
+                        this.index === 0 &&
+                        this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.TrackNames);
+
+                    let barStartX: number = cx + g.firstStaffInAccolade.x;
+                    let barSize: number = StaffSystem.AccoladeBarSize * this.layout.scale;
+                    let barOffset: number = settings.display.accoladeBarPaddingRight * this.layout.scale;
                     let accoladeStart: number = firstStart - barSize * 4;
                     let accoladeEnd: number = lastEnd + barSize * 4;
                     // text
-                    if (this.index === 0 && this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.TrackNames)) {
+                    if (hasTrackName) {
                         canvas.fillText(
                             g.track.shortName,
-                            cx + StaveGroup.AccoladeLabelSpacing * this.layout.scale,
+                            cx + settings.display.systemLabelPaddingLeft * this.layout.scale,
                             firstStart
                         );
+                        // canvas.strokeRect(
+                        //     cx + settings.display.systemLabelPaddingLeft * this.layout.scale,
+                        //     firstStart,
+                        //     canvas.measureText(g.track.shortName).width,
+                        //     10
+                        // );
                     }
                     // rect
                     canvas.fillRect(
-                        acooladeX - barOffset - barSize,
+                        barStartX - barOffset - barSize,
                         accoladeStart,
                         barSize,
                         accoladeEnd - accoladeStart
                     );
-                    let spikeStartX: number = acooladeX - barOffset - barSize;
-                    let spikeEndX: number = acooladeX + barSize * 2;
+                    let spikeStartX: number = barStartX - barOffset - barSize;
+                    let spikeEndX: number = barStartX + barSize * 2;
                     // top spike
                     canvas.beginPath();
                     canvas.moveTo(spikeStartX, accoladeStart);
@@ -324,7 +369,7 @@ export class StaveGroup {
                         accoladeStart - barSize
                     );
                     canvas.bezierCurveTo(
-                        acooladeX,
+                        barStartX,
                         accoladeStart + barSize,
                         spikeStartX,
                         accoladeStart + barSize,
@@ -339,13 +384,13 @@ export class StaveGroup {
                     canvas.bezierCurveTo(
                         spikeStartX,
                         accoladeEnd,
-                        acooladeX,
+                        barStartX,
                         accoladeEnd,
                         spikeEndX,
                         accoladeEnd + barSize
                     );
                     canvas.bezierCurveTo(
-                        acooladeX,
+                        barStartX,
                         accoladeEnd - barSize,
                         spikeStartX,
                         accoladeEnd - barSize,
@@ -359,10 +404,10 @@ export class StaveGroup {
         }
     }
 
-    public finalizeGroup(): void {
+    public finalizeSystem(): void {
         let currentY: number = 0;
         for (let staff of this._allStaves) {
-            staff.x = this.accoladeSpacing;
+            staff.x = this.accoladeWidth;
             staff.y = currentY;
             staff.finalizeStaff();
             currentY += staff.height;
@@ -376,6 +421,8 @@ export class StaveGroup {
         if (!this._firstStaffInAccolade || !this._lastStaffInAccolade) {
             return;
         }
+        cy += this.topPadding;
+
         let lastStaff: RenderStaff = this._allStaves[this._allStaves.length - 1];
         let visualTop: number = cy + this.y + this._firstStaffInAccolade.y;
         let visualBottom: number = cy + this.y + this._lastStaffInAccolade.y + this._lastStaffInAccolade.height;
@@ -402,18 +449,18 @@ export class StaveGroup {
         let lineHeight: number = lineBottom - lineTop;
         let realHeight: number = realBottom - realTop;
         let x: number = this.x + this._firstStaffInAccolade.x;
-        let staveGroupBounds: StaveGroupBounds = new StaveGroupBounds();
-        staveGroupBounds.visualBounds = new Bounds();
-        staveGroupBounds.visualBounds.x = cx;
-        staveGroupBounds.visualBounds.y = cy + this.y;
-        staveGroupBounds.visualBounds.w = this.width;
-        staveGroupBounds.visualBounds.h = this.height;
-        staveGroupBounds.realBounds = new Bounds();
-        staveGroupBounds.realBounds.x = cx;
-        staveGroupBounds.realBounds.y = cy + this.y;
-        staveGroupBounds.realBounds.w = this.width;
-        staveGroupBounds.realBounds.h = this.height;
-        this.layout.renderer.boundsLookup!.addStaveGroup(staveGroupBounds);
+        let staffSystemBounds = new StaffSystemBounds();
+        staffSystemBounds.visualBounds = new Bounds();
+        staffSystemBounds.visualBounds.x = cx;
+        staffSystemBounds.visualBounds.y = cy + this.y;
+        staffSystemBounds.visualBounds.w = this.width;
+        staffSystemBounds.visualBounds.h = this.height - this.topPadding - this.bottomPadding;
+        staffSystemBounds.realBounds = new Bounds();
+        staffSystemBounds.realBounds.x = cx;
+        staffSystemBounds.realBounds.y = cy + this.y;
+        staffSystemBounds.realBounds.w = this.width;
+        staffSystemBounds.realBounds.h = this.height;
+        this.layout.renderer.boundsLookup!.addStaffSystem(staffSystemBounds);
         let masterBarBoundsLookup: Map<number, MasterBarBounds> = new Map<number, MasterBarBounds>();
         for (let i: number = 0; i < this.staves.length; i++) {
             for (let staff of this.staves[i].stavesRelevantForBoundsLookup) {

@@ -5,6 +5,7 @@ import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import { RenderStaff } from './staves/RenderStaff';
 
 /**
  * This Factory produces TabBarRenderer instances
@@ -16,6 +17,14 @@ export class TabBarRendererFactory extends BarRendererFactory {
 
     public get staffId(): string {
         return TabBarRenderer.StaffId;
+    }
+
+    public override getStaffPaddingTop(staff: RenderStaff): number {
+        return staff.system.layout.renderer.settings.display.notationStaffPaddingTop;
+    }
+
+    public override getStaffPaddingBottom(staff: RenderStaff): number {
+        return staff.system.layout.renderer.settings.display.notationStaffPaddingBottom;
     }
 
     public constructor(showTimeSignature: boolean, showRests: boolean, showTiedNotes: boolean) {

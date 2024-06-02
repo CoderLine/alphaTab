@@ -1,17 +1,17 @@
 import { Track } from '@src/model/Track';
 import { RenderStaff } from '@src/rendering/staves/RenderStaff';
-import { StaveGroup } from '@src/rendering/staves/StaveGroup';
+import { StaffSystem } from '@src/rendering/staves/StaffSystem';
 
-export class StaveTrackGroup {
+export class StaffTrackGroup {
     public track: Track;
-    public staveGroup: StaveGroup;
+    public staffSystem: StaffSystem;
     public staves: RenderStaff[] = [];
     public stavesRelevantForBoundsLookup: RenderStaff[] = [];
     public firstStaffInAccolade: RenderStaff | null = null;
     public lastStaffInAccolade: RenderStaff | null = null;
 
-    public constructor(staveGroup: StaveGroup, track: Track) {
-        this.staveGroup = staveGroup;
+    public constructor(staffSystem: StaffSystem, track: Track) {
+        this.staffSystem = staffSystem;
         this.track = track;
     }
 

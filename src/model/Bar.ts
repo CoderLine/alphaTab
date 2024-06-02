@@ -72,7 +72,7 @@ export class Bar {
 
     /**
      * A relative scale for the size of the bar when displayed. The scale is relative 
-     * within a single line (system/stave group). The sum of all scales in one line make the total width,
+     * within a single line (system). The sum of all scales in one line make the total width,
      * and then this individual scale gives the relative size.
      */
     public displayScale:number = 1;

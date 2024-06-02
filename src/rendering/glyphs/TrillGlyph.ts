@@ -16,7 +16,7 @@ export class TrillGlyph extends EffectGlyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let res: RenderingResources = this.renderer.resources;
         canvas.font = res.markerFont;
-        let textw: number = canvas.measureText('tr');
+        let textw: number = canvas.measureText('tr').width;
         canvas.fillText('tr', cx + this.x, cy + this.y);
         let startX: number = textw + 3 * this.scale;
         let endX: number = this.width - startX;
