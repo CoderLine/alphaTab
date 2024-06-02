@@ -30,7 +30,6 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
         switch (this._duration) {
             case Duration.QuadrupleWhole:
             case Duration.DoubleWhole:
-            case Duration.DoubleWhole:
             case Duration.Whole:
                 this.width = SlashNoteHeadGlyph.WholeNoteHeadWidth * scale;
                 break;

@@ -307,16 +307,16 @@ export class VisualTestHelper {
         // convert reference image to canvas
         if(referenceFileData.length > 0) {
             using expected = AlphaSkiaImage.decode(referenceFileData.buffer);
-            await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, expected, referenceFileName, message, tolerancePercent);
+            await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, referenceFileName, expected, message, tolerancePercent);
         } else {
-            await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, undefined, referenceFileName, message, tolerancePercent);
+            await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, referenceFileName, undefined, message, tolerancePercent);
         }
     }
 
     private static async expectToEqualVisuallyAsync(
         actual: AlphaSkiaImage,
-        expected: AlphaSkiaImage|undefined,
         expectedFileName: string,
+        expected: AlphaSkiaImage|undefined,
         message?: string,
         tolerancePercent: number = 1
     ): Promise<void> {

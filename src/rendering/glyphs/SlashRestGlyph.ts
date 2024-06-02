@@ -6,7 +6,7 @@ export class SlashRestGlyph extends ScoreRestGlyph {
         super(x, y, duration);
     }
 
-    override updateBeamingHelper(cx: number): void {
+    public override updateBeamingHelper(cx: number): void {
         if (this.beamingHelper) {
             this.beamingHelper.registerBeatLineX(
                 'slash',

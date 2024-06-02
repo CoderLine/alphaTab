@@ -73,12 +73,12 @@ export enum NoteXPosition {
  * This is the base public class for creating blocks which can render bars.
  */
 export class BarRendererBase {
-    public static readonly LineSpacing: number = 8;
-    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.LineSpacing;
+    protected static readonly RawLineSpacing: number = 8;
+    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.RawLineSpacing;
     public static readonly StaffLineThickness: number =
-        0.13 /*bravura staffLineThickness */ * BarRendererBase.LineSpacing;
-    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.LineSpacing;
-    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.LineSpacing;
+        0.13 /*bravura staffLineThickness */ * BarRendererBase.RawLineSpacing;
+    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.RawLineSpacing;
+    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.RawLineSpacing;
 
     private _preBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
     private _voiceContainers: Map<number, VoiceContainerGlyph> = new Map();

@@ -27,7 +27,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     public override get lineSpacing(): number {
-        return BarRendererBase.LineSpacing;
+        return BarRendererBase.RawLineSpacing;
     }
 
     public override get heightLineCount(): number {
