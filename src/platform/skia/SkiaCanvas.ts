@@ -2,7 +2,7 @@ import { Environment } from '@src/Environment';
 import { Color } from '@src/model/Color';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline, TextMetrics } from '@src/platform/ICanvas';
 import { Settings } from '@src/Settings';
 import type * as alphaSkia from '@coderline/alphaskia';
 import type { AlphaSkiaTypeface }  from '@coderline/alphaskia';
@@ -251,8 +251,13 @@ export class SkiaCanvas implements ICanvas {
         this._canvas.fillText(text, this.getTypeFace(), this.font.size * this.settings.display.scale, x, y, textAlign, textBaseline);
     }
 
-    public measureText(text: string): number {
-        return this._canvas.measureText(text, this.getTypeFace(), this.font.size * this.settings.display.scale);
+    /**
+     * TODO: extend alphaSkia to provide font metrics.
+     */
+    private static readonly FontSizeToLineHeight = 1.2;
+
+    public measureText(text: string) {
+        return new TextMetrics(this._canvas.measureText(text, this.getTypeFace(), this.font.size * this.settings.display.scale), this.font.size * SkiaCanvas.FontSizeToLineHeight);
     }
 
     public fillMusicFontSymbol(

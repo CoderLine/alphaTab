@@ -21,7 +21,7 @@ export class RepeatCountGlyph extends Glyph {
         canvas.font = res.barNumberFont;
         canvas.textAlign = TextAlign.Right;
         let s: string = 'x' + this._count;
-        let w: number = canvas.measureText(s) / 1.5;
+        let w: number = canvas.measureText(s).width / 1.5;
         canvas.fillText(s, cx + this.x - w, cy + this.y);
         canvas.textAlign = oldAlign;
     }

@@ -280,7 +280,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             //
             // Calculate how many space the text will need
             canvas.font = res.effectFont;
-            let sw: number = canvas.measureText(s);
+            let sw: number = canvas.measureText(s).width;
             let sp: number = 3 * this.scale;
             //
             // Calculate the offsets where to break the bracket

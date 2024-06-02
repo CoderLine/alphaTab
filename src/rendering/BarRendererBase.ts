@@ -187,7 +187,7 @@ export class BarRendererBase {
      * scale should be respected.
      */
     public get barDisplayScale(): number {
-        return this.staff.staveGroup.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
+        return this.staff.system.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
     }
 
     /**
@@ -195,7 +195,7 @@ export class BarRendererBase {
      * scale should be respected.
      */
     public get barDisplayWidth(): number {
-        return this.staff.staveGroup.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
+        return this.staff.system.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
     }
 
     private _wasFirstOfLine: boolean = false;

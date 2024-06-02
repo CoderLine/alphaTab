@@ -36,7 +36,7 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         this.paintNonGrouped(cx, cy, canvas);
         let lineSpacing: number = 3 * this.scale;
-        let textWidth: number = canvas.measureText(this._label);
+        let textWidth: number = canvas.measureText(this._label).width;
         let startX: number = cx + this.x + textWidth / 2 + lineSpacing;
         let lineY: number = cy + this.y + 4 * this.scale;
         let lineSize: number = 8 * this.scale;

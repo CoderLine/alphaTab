@@ -63,7 +63,7 @@ export class DisplaySettings {
     public barCountPerPartial: number = 10;
 
     /**
-     * Whether the last system (row) should be also justified to the whole width of the music sheet. 
+     * Whether the last system (row) should be also justified to the whole width of the music sheet.
      * (applies only for page layout).
      */
     public justifyLastSystem: boolean = false;
@@ -77,7 +77,62 @@ export class DisplaySettings {
     /**
      * Gets or sets the padding between the music notation and the border.
      */
-    public padding: number[] | null = null;
+    public padding: number[] = [35, 35];
+
+    /**
+     * Gets or sets the top padding applied to first system.
+     */
+    public firstSystemPaddingTop: number = 5;
+
+    /**
+     * Gets or sets the top padding applied to systems.
+     */
+    public systemPaddingTop: number = 10;
+
+    /**
+     * Gets or sets the bottom padding applied to systems.
+     */
+    public systemPaddingBottom: number = 20;
+
+    /**
+     * Gets or sets the bottom padding applied to last system.
+     */
+    public lastSystemPaddingBottom: number = 0;
+
+    /**
+     * Gets or sets the padding left to the track name label of the system.
+     */
+    public systemLabelPaddingLeft: number = 0;
+
+    /**
+     * Gets or sets the padding right to the track name label of the system.
+     */
+    public systemLabelPaddingRight: number = 5;
+
+    /**
+     * Gets or sets the padding between the accolade bar and the start of the bar itself.
+     */
+    public accoladeBarPaddingRight: number = 3;
+
+    /**
+     * Gets or sets the top padding applied to main notation staffs.
+     */
+    public notationStaffPaddingTop: number = 5;
+
+    /**
+     * Gets or sets the bottom padding applied to main notation staffs.
+     */
+    public notationStaffPaddingBottom: number = 5;
+
+    /**
+     * Gets or sets the top padding applied to effect annotation staffs.
+     */
+    public effectStaffPaddingTop: number = 0;
+
+    /**
+     * Gets or sets the bottom padding applied to effect annotation staffs.
+     */
+    public effectStaffPaddingBottom: number = 0;
 
     /**
      * Gets how the systems should be layed out.
