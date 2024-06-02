@@ -1,6 +1,7 @@
 import { FontStyle, FontWeight } from '@src/model/Font';
 import { Environment } from '@src/Environment';
 import { TextMetrics } from '../ICanvas';
+import { WebPlatform } from '../javascript/WebPlatform';
 
 /**
  * Describes the sizes of a font for measuring purposes.
@@ -40,7 +41,7 @@ export class FontSizes {
             return;
         }
 
-        if (!Environment.isRunningInWorker) {
+        if (!Environment.isRunningInWorker && Environment.webPlatform != WebPlatform.NodeJs) {
             let canvas: HTMLCanvasElement = document.createElement('canvas');
             let measureContext: CanvasRenderingContext2D = canvas.getContext('2d')!;
             const measureSize = 11;

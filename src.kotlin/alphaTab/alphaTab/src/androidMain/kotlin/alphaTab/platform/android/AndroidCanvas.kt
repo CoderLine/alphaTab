@@ -9,6 +9,7 @@ import alphaTab.model.MusicFontSymbol
 import alphaTab.platform.ICanvas
 import alphaTab.platform.TextAlign
 import alphaTab.platform.TextBaseline
+import alphaTab.platform.TextMetrics
 import android.content.Context
 import android.graphics.*
 import kotlin.contracts.ExperimentalContracts
@@ -283,18 +284,20 @@ internal class AndroidCanvas : ICanvas {
     }
 
 
-    override fun measureText(text: String): Double {
+    override fun measureText(text: String): TextMetrics {
         if (text.isEmpty()) {
-            return 0.0
+            return TextMetrics(0.0, 0.0)
         }
-        var size = 0.0
+        var width = 0.0
+        var height = 0.0
 
         textRun(typeFace, font.size, fun(paint) {
             val bounds = Rect()
             paint.getTextBounds(text, 0, text.length, bounds)
-            size = bounds.width().toDouble()
+            width = bounds.width().toDouble()
+            height = bounds.height().toDouble()
         })
-        return size
+        return TextMetrics(width, height)
     }
 
     override fun fillMusicFontSymbol(

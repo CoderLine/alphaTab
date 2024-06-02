@@ -90,7 +90,7 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     public doResize(): void {
-        let y: number = 0;
+        let y: number = this._pagePadding![1];
         this.width = this.renderer.width;
         let oldHeight: number = this.height;
         //

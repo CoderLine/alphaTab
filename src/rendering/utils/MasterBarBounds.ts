@@ -47,7 +47,7 @@ export class MasterBarBounds {
      * Gets or sets a reference to the parent {@link staffSystemBounds}.
      * @deprecated use staffSystemBounds
      */
-    public get StaffSystemBounds(): StaffSystemBounds | null {
+    public get staveGroupBounds(): StaffSystemBounds | null {
         return this.staffSystemBounds;
     }
 

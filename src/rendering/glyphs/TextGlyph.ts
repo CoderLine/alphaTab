@@ -21,10 +21,10 @@ export class TextGlyph extends EffectGlyph {
 
         this._lineHeights = [];
         const c = this.renderer.scoreRenderer.canvas!;
-        for (let i = 0; i < this._lines.length; i++) {
+        for(const line of this._lines) {
             c.font = this.font;
-            const h = c!.measureText(this._lines[i]).height * this.scale;
-            this._lineHeights[i] = h;
+            const h = c!.measureText(line).height * this.scale;
+            this._lineHeights.push(h);
             this.height += h;
         }
     }
