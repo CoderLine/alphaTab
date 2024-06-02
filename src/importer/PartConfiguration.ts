@@ -60,6 +60,7 @@ export class PartConfiguration {
                     for(const staff of track.staves) {
                         staff.showTablature = trackConfig.showTablature;
                         staff.showStandardNotation = trackConfig.showStandardNotation;
+                        staff.showSlash = trackConfig.showSlash;
                     }
                 }
                 trackIndex++;
@@ -108,6 +109,7 @@ export class PartConfiguration {
             // in the Guitar Pro UI there is no individual staff config
             trackConfiguration.showStandardNotation = track.staves[0].showStandardNotation;
             trackConfiguration.showTablature = track.staves[0].showTablature;
+            trackConfiguration.showSlash = track.staves[0].showSlash;
 
             scoreViews[0].trackViewGroups.push(trackConfiguration);
 

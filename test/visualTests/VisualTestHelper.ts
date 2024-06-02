@@ -305,81 +305,95 @@ export class VisualTestHelper {
         }
 
         // convert reference image to canvas
-        using expected = AlphaSkiaImage.decode(referenceFileData.buffer);
-        await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, expected!, referenceFileName, message, tolerancePercent);
+        if(referenceFileData.length > 0) {
+            using expected = AlphaSkiaImage.decode(referenceFileData.buffer);
+            await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, referenceFileName, expected, message, tolerancePercent);
+        } else {
+            await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, referenceFileName, undefined, message, tolerancePercent);
+        }
     }
 
     private static async expectToEqualVisuallyAsync(
         actual: AlphaSkiaImage,
-        expected: AlphaSkiaImage,
         expectedFileName: string,
+        expected: AlphaSkiaImage|undefined,
         message?: string,
         tolerancePercent: number = 1
     ): Promise<void> {
-        const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
+        let pass = false;
+        let errorMessage = '';
         const oldActual = actual;
-        if (sizeMismatch) {
-            using newActual = new AlphaSkiaCanvas();
-            newActual.beginRender(expected.width, expected.height);
-            newActual.drawImage(actual, 0, 0, expected.width, expected.height);
-            newActual.color = AlphaSkiaCanvas.rgbaToColor(255, 0, 0, 255);
-            newActual.lineWidth = 2;
-            newActual.strokeRect(0, 0, expected.width, expected.height);
 
-            actual = newActual.endRender()!;
-        }
-
-        const actualImageData = actual.readPixels()!;
-        const expectedImageData = expected.readPixels()!;
-
-        // do visual comparison
-        const diffImageData = new ArrayBuffer(actualImageData.byteLength);
-        let pass = true;
-        let errorMessage = "";
-
-        try {
-            const options = new PixelMatchOptions();
-            options.threshold = 0.3;
-            options.includeAA = false;
-            options.diffMask = true;
-            options.alpha = 1;
-
-            let match = PixelMatch.match(
-                new Uint8Array(expectedImageData),
-                new Uint8Array(actualImageData),
-                new Uint8Array(diffImageData),
-                expected.width,
-                expected.height,
-                options
-            );
-
-            // only pixels that are not transparent are relevant for the diff-ratio
-            let totalPixels = match.totalPixels - match.transparentPixels;
-            let percentDifference = (match.differentPixels / totalPixels) * 100;
-            pass = percentDifference < tolerancePercent;
-            // result.pass = match.differentPixels === 0;
-            errorMessage = '';
-
-            if (!pass) {
-                let percentDifferenceText = percentDifference.toFixed(2);
-                errorMessage = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
-
-                using diffPng = AlphaSkiaImage.fromPixels(
-                    actual.width,
-                    actual.height,
-                    diffImageData)!;
-
-                await VisualTestHelper.saveFiles(expectedFileName, oldActual, diffPng);
-            }
-
+        if(expected) {
+            const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
             if (sizeMismatch) {
-                errorMessage += `Image sizes do not match: expected ${expected.width}x${expected.height} but got ${oldActual.width}x${oldActual.height}`;
-                pass = false;
+                using newActual = new AlphaSkiaCanvas();
+                newActual.beginRender(expected.width, expected.height);
+                newActual.drawImage(actual, 0, 0, expected.width, expected.height);
+                newActual.color = AlphaSkiaCanvas.rgbaToColor(255, 0, 0, 255);
+                newActual.lineWidth = 2;
+                newActual.strokeRect(0, 0, expected.width, expected.height);
+    
+                actual = newActual.endRender()!;
             }
-        } catch (e) {
-            pass = false;
-            errorMessage = `Error comparing images: ${e}, ${message}`;
+    
+            const actualImageData = actual.readPixels()!;
+            const expectedImageData = expected.readPixels()!;
+    
+            // do visual comparison
+            const diffImageData = new ArrayBuffer(actualImageData.byteLength);
+            pass = true;
+            errorMessage = "";
+    
+            try {
+                const options = new PixelMatchOptions();
+                options.threshold = 0.3;
+                options.includeAA = false;
+                options.diffMask = true;
+                options.alpha = 1;
+    
+                let match = PixelMatch.match(
+                    new Uint8Array(expectedImageData),
+                    new Uint8Array(actualImageData),
+                    new Uint8Array(diffImageData),
+                    expected.width,
+                    expected.height,
+                    options
+                );
+    
+                // only pixels that are not transparent are relevant for the diff-ratio
+                let totalPixels = match.totalPixels - match.transparentPixels;
+                let percentDifference = (match.differentPixels / totalPixels) * 100;
+                pass = percentDifference <= tolerancePercent;
+                // result.pass = match.differentPixels === 0;
+                errorMessage = '';
+    
+                if (!pass) {
+                    let percentDifferenceText = percentDifference.toFixed(2);
+                    errorMessage = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
+    
+                    using diffPng = AlphaSkiaImage.fromPixels(
+                        actual.width,
+                        actual.height,
+                        diffImageData)!;
+    
+                    await VisualTestHelper.saveFiles(expectedFileName, oldActual, diffPng);
+                }
+    
+                if (sizeMismatch) {
+                    errorMessage += `Image sizes do not match: expected ${expected.width}x${expected.height} but got ${oldActual.width}x${oldActual.height}`;
+                    pass = false;
+                }
+            } catch (e) {
+                pass = false;
+                errorMessage = `Error comparing images: ${e}, ${message}`;
+            }
         }
+       else {
+        pass = false;
+        errorMessage = 'Missing reference image file' + expectedFileName;
+        await VisualTestHelper.saveFiles(expectedFileName, oldActual, undefined);
+       }
 
         if (!pass) {
             throw new Error(errorMessage);
@@ -391,20 +405,21 @@ export class VisualTestHelper {
     static async saveFiles(
         expectedFilePath: string,
         actual: AlphaSkiaImage,
-        diff: AlphaSkiaImage
+        diff: AlphaSkiaImage | undefined
     ): Promise<void> {
         expectedFilePath = TestPlatform.joinPath(
             'test-data',
             'visual-tests',
             expectedFilePath
         );
+        if(diff) {
+            const diffData = diff.toPng()!;
+
+            const diffFileName = TestPlatform.changeExtension(expectedFilePath, '.diff.png');
+            await TestPlatform.saveFile(diffFileName, new Uint8Array(diffData));
+        }
 
         const actualData = actual.toPng()!;
-        const diffData = diff.toPng()!;
-
-        const diffFileName = TestPlatform.changeExtension(expectedFilePath, '.diff.png');
-        await TestPlatform.saveFile(diffFileName, new Uint8Array(diffData));
-
         const actualFile = TestPlatform.changeExtension(expectedFilePath, '.new.png');
         await TestPlatform.saveFile(actualFile, new Uint8Array(actualData));
     }

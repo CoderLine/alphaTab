@@ -12,4 +12,8 @@ describe('SpecialTracksTests', () => {
     it('grand-staff', async () => {
         await VisualTestHelper.runVisualTest('special-tracks/grand-staff.gp');
     });
+
+    it('slash', async () => {
+        await VisualTestHelper.runVisualTest('special-tracks/slash.gp');
+    });
 });

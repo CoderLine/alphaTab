@@ -243,6 +243,10 @@ export class RenderStaff {
         if (this.height === 0 || count === 0) {
             return;
         }
+
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x, cy + this.y, this.staveGroup.width, this.height);
+
         for (
             let i: number = startIndex, j: number = Math.min(startIndex + count, this.barRenderers.length);
             i < j;

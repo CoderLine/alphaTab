@@ -32,7 +32,6 @@ export class TuningGlyph extends GlyphGroup {
      */
     private static readonly CircleNumberHeight: number = 20;
 
-
     private createGlyphs(tuning: Tuning): void {
         const scale = this.renderer.scale;
         const res = this.renderer.resources;
@@ -55,10 +54,10 @@ export class TuningGlyph extends GlyphGroup {
         this.width = Math.max(
             this.renderer.scoreRenderer.canvas!.measureText(this._trackLabel) * scale,
             Math.max(
-                this.renderer.scoreRenderer.canvas!.measureText(tuning.name) * scale,
+                this.renderer.scoreRenderer.canvas!.measureText(tuning.name) * scale, 
                 2 * stringColumnWidth
             )
-        )
+        );
 
         this.height += rowHeight;
         if (!tuning.isStandard) {

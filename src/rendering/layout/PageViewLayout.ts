@@ -219,7 +219,6 @@ export class PageViewLayout extends ScoreLayout {
         }
 
         infoHeight = Math.floor(infoHeight + 17 * this.scale);
-
         e.width = this.width;
         e.height = infoHeight;
         e.totalWidth = this.width;
@@ -355,7 +354,7 @@ export class PageViewLayout extends ScoreLayout {
         group.finalizeGroup();
     }
 
-    private getBarsPerRow(rowIndex:number) {
+    private getBarsPerRow(rowIndex: number) {
         let barsPerRow: number = this.renderer.settings.display.barsPerRow;
 
         if (this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale) {

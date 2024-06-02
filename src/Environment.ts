@@ -2,7 +2,7 @@ import { LayoutMode } from '@src/LayoutMode';
 import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
-import { Gp7Importer } from '@src/importer/Gp7Importer';
+import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { GpxImporter } from '@src/importer/GpxImporter';
 import { MusicXmlImporter } from '@src/importer/MusicXmlImporter';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
@@ -60,6 +60,7 @@ import { SkiaCanvas } from './platform/skia/SkiaCanvas';
 import { Font } from './model';
 import { Settings } from './Settings';
 import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
+import { SlashBarRendererFactory } from './rendering/SlashBarRendererFactory';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -132,7 +133,7 @@ export class Environment {
             }
             .at-surface-svg text {
                 dominant-baseline: central;
-            }             
+            }
             .at {
                  font-family: 'alphaTab';
                  speak: none;
@@ -411,7 +412,7 @@ export class Environment {
         return [
             new Gp3To5Importer(),
             new GpxImporter(),
-            new Gp7Importer(),
+            new Gp7To8Importer(),
             new MusicXmlImporter(),
             new CapellaImporter(),
             new AlphaTexImporter()
@@ -479,12 +480,15 @@ export class Environment {
 
         // default combinations of stave textprofiles
         staveProfiles.set(StaveProfile.ScoreTab, [
-            new EffectBarRendererFactory('score-effects', [
+            new EffectBarRendererFactory('top-effects', [
                 new TempoEffectInfo(),
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
                 new TextEffectInfo(),
                 new ChordsEffectInfo(),
+            ]),
+            new SlashBarRendererFactory(),
+            new EffectBarRendererFactory('score-effects', [
                 new FermataEffectInfo(),
                 new WhammyBarEffectInfo(),
                 new TrillEffectInfo(),
@@ -526,12 +530,15 @@ export class Environment {
             new TabBarRendererFactory(false, false, false)
         ]);
         staveProfiles.set(StaveProfile.Score, [
-            new EffectBarRendererFactory('score-effects', [
+            new EffectBarRendererFactory('top-effects', [
                 new TempoEffectInfo(),
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
                 new TextEffectInfo(),
                 new ChordsEffectInfo(),
+            ]), 
+            new SlashBarRendererFactory(),
+            new EffectBarRendererFactory('score-effects', [
                 new FermataEffectInfo(),
                 new WhammyBarEffectInfo(),
                 new TrillEffectInfo(),
@@ -585,11 +592,13 @@ export class Environment {
             new AlternateEndingsEffectInfo()
         ];
         staveProfiles.set(StaveProfile.Tab, [
+            new SlashBarRendererFactory(),
             new EffectBarRendererFactory('tab-effects', tabEffectInfos),
             new TabBarRendererFactory(true, true, true),
             new EffectBarRendererFactory('tab-bottom-effects', [new LyricsEffectInfo()])
         ]);
         staveProfiles.set(StaveProfile.TabMixed, [
+            new SlashBarRendererFactory(),
             new EffectBarRendererFactory('tab-effects', tabEffectInfos),
             new TabBarRendererFactory(false, false, false),
             new EffectBarRendererFactory('tab-bottom-effects', [new LyricsEffectInfo()])

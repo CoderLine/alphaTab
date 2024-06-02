@@ -423,6 +423,30 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars.length).to.equal(2);
     });
 
+    it('single-staff-with-slash', () => {
+        let tex: string = '\\staff{slash} 1.1 | 1.1';
+        let score: Score = parseTex(tex);
+        expect(score.tracks.length).to.equal(1);
+        expect(score.masterBars.length).to.equal(2);
+        expect(score.tracks[0].staves.length).to.equal(1);
+        expect(score.tracks[0].staves[0].showSlash).to.be.equal(true);
+        expect(score.tracks[0].staves[0].showTablature).to.be.equal(false);
+        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(false);
+        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+    });
+
+    it('single-staff-with-score-and-slash', () => {
+        let tex: string = '\\staff{score slash} 1.1 | 1.1';
+        let score: Score = parseTex(tex);
+        expect(score.tracks.length).to.equal(1);
+        expect(score.masterBars.length).to.equal(2);
+        expect(score.tracks[0].staves.length).to.equal(1);
+        expect(score.tracks[0].staves[0].showSlash).to.be.equal(true);
+        expect(score.tracks[0].staves[0].showTablature).to.be.equal(false);
+        expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
+        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+    });
+
     it('multi-staff-with-settings', () => {
         const tex = `\\staff{score} 1.1 | 1.1 |
         \\staff{tabs} \\capo 2 2.1 | 2.1 |

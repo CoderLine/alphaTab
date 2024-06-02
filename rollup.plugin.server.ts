@@ -3,6 +3,9 @@ import opener from 'opener';
 import fs from 'fs';
 import path from 'path';
 import cors from 'cors';
+import url from 'url';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export interface ServerOptions {
     port: number,

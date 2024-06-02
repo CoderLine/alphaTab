@@ -48,6 +48,10 @@ export enum MusicFontSymbol {
     NoteheadHeavyX = 0xe0f8,
     NoteheadHeavyXHat = 0xe0f9,
 
+    NoteheadSlashVerticalEnds = 0xe100,
+    NoteheadSlashWhiteWhole = 0xe102,
+    NoteheadSlashWhiteHalf = 0xe103,
+
     NoteQuarterUp = 0xe1d5,
     NoteEighthUp = 0xe1d7,
 

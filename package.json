@@ -57,7 +57,8 @@
         "build-kotlin": "npm run generate-kotlin && cd src.kotlin/alphaTab && gradlew assembleRelease",
         "test": "mocha",
         "test-csharp": "cd src.csharp && dotnet test -c Release",
-        "test-kotlin": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info"
+        "test-kotlin": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info",
+        "test-accept-reference": "node scripts/accept-new-reference-files.mjs"
     },
     "devDependencies": {
         "@coderline/alphaskia": "^2.1.120",
