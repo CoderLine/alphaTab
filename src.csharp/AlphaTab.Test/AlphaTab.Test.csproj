@@ -12,7 +12,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.4.0" />
+        <PackageReference Include="MSTest.TestAdapter" Version="3.4.3" />
         <PackageReference Include="MSTest.TestFramework" Version="3.4.0" />
         <PackageReference Include="AlphaSkia" Version="2.1.120" />
         <PackageReference Include="AlphaSkia.Native.Windows" Version="2.1.120" Condition="$([MSBuild]::IsOsPlatform('Windows'))" />
