@@ -1,45 +1,38 @@
 /**@target web */
-import webpack from 'webpack'
 
-
-import { type Expression, type CallExpression } from 'estree'
+import { type Expression, type CallExpression } from 'estree';
 import { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
-import { getWorkerRuntime, parseModuleUrl, tapJavaScript } from './Utils';
-// @ts-expect-error
-import EnableChunkLoadingPlugin from "webpack/lib/javascript/EnableChunkLoadingPlugin";
-// @ts-expect-error
-import WorkerDependency from "webpack/lib/dependencies/WorkerDependency";
+import { getWorkerRuntime, parseModuleUrl, tapJavaScript, webPackWithAlphaTab, webpackTypes } from './Utils';
 
-const workerIndexMap = new WeakMap<webpack.ParserState, number>();
+const workerIndexMap = new WeakMap<webpackTypes.ParserState, number>();
 
 /**
  * Configures the WebWorker aspects within webpack.
  * The counterpart which this plugin detects sits in alphaTab.main.ts
- * @param pluginName 
- * @param options 
- * @param compiler 
- * @param compilation 
- * @param normalModuleFactory 
- * @param cachedContextify 
- * @returns 
+ * @param pluginName
+ * @param options
+ * @param compiler
+ * @param compilation
+ * @param normalModuleFactory
+ * @param cachedContextify
+ * @returns
  */
-export function configureWebWorker(pluginName: string,
+export function configureWebWorker(
+    webPackWithAlphaTab: webPackWithAlphaTab,
+    pluginName: string,
     options: AlphaTabWebPackPluginOptions,
-    compiler: webpack.Compiler, compilation: webpack.Compilation, normalModuleFactory: any, cachedContextify: (s: string) => string) {
+    compiler: webpackTypes.Compiler,
+    compilation: webpackTypes.Compilation,
+    normalModuleFactory: any,
+    cachedContextify: (s: string) => string
+) {
     if (options.audioWorklets === false) {
         return;
     }
 
-    compilation.dependencyFactories.set(
-        WorkerDependency,
-        normalModuleFactory
-    );
-    compilation.dependencyTemplates.set(
-        WorkerDependency,
-        new WorkerDependency.Template()
-    );
+    webPackWithAlphaTab.alphaTab.registerWebWorkerDependency(compilation, normalModuleFactory);
 
-    new EnableChunkLoadingPlugin('import-scripts').apply(compiler);
+    new webPackWithAlphaTab.webpack.javascript.EnableChunkLoadingPlugin('import-scripts').apply(compiler);
 
     const handleAlphaTabWorker = (parser: any, expr: CallExpression) => {
         const [arg1, arg2] = expr.arguments;
@@ -55,7 +48,7 @@ export function configureWebWorker(pluginName: string,
 
         const runtime = getWorkerRuntime(parser, compilation, cachedContextify, workerIndexMap);
 
-        const block = new webpack.AsyncDependenciesBlock({
+        const block = new webPackWithAlphaTab.webpack.AsyncDependenciesBlock({
             entryOptions: {
                 chunkLoading: 'import-scripts',
                 wasmLoading: false,
@@ -65,17 +58,17 @@ export function configureWebWorker(pluginName: string,
 
         block.loc = expr.loc;
 
-        const workletBootstrap = new WorkerDependency(
+        const workletBootstrap = webPackWithAlphaTab.alphaTab.createWebWorkerDependency(
             url.string,
             range,
-            compiler.options.output.workerPublicPath,
+            compiler.options.output.workerPublicPath
         );
         workletBootstrap.loc = expr.loc!;
         block.addDependency(workletBootstrap);
         parser.state.module.addBlock(block);
 
-        const dep1 = new webpack.dependencies.ConstDependency(
-            `{ type: ${compilation.options.output.module ? '"module"' : "undefined"} }`,
+        const dep1 = new webPackWithAlphaTab.webpack.dependencies.ConstDependency(
+            `{ type: ${compilation.options.output.module ? '"module"' : 'undefined'} }`,
             arg2.range!
         );
         dep1.loc = expr.loc!;
@@ -87,7 +80,9 @@ export function configureWebWorker(pluginName: string,
     };
 
     const parserPlugin = (parser: any) => {
-        parser.hooks.new.for("alphaTab.Environment.alphaTabWorker").tap(pluginName, (expr:CallExpression) => handleAlphaTabWorker(parser, expr));
+        parser.hooks.new
+            .for('alphaTab.Environment.alphaTabWorker')
+            .tap(pluginName, (expr: CallExpression) => handleAlphaTabWorker(parser, expr));
     };
 
     tapJavaScript(normalModuleFactory, pluginName, parserPlugin);
