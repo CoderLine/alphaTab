@@ -49,11 +49,6 @@ export default function webpack(isWatch: boolean, bundlePlugins: Plugin[]): Roll
             ],
             external: [
                 'webpack',
-                'webpack/lib/ModuleTypeConstants',
-                'webpack/lib/util/makeSerializable',
-                'webpack/lib/util/identifier',
-                'webpack/lib/javascript/EnableChunkLoadingPlugin',
-                'webpack/lib/dependencies/WorkerDependency',
                 'fs',
                 'path'
             ],
@@ -75,11 +70,6 @@ export default function webpack(isWatch: boolean, bundlePlugins: Plugin[]): Roll
             ],
             external: [
                 'webpack',
-                'webpack/lib/ModuleTypeConstants',
-                'webpack/lib/util/makeSerializable',
-                'webpack/lib/util/identifier',
-                'webpack/lib/javascript/EnableChunkLoadingPlugin',
-                'webpack/lib/dependencies/WorkerDependency',
                 'fs',
                 'path'
             ],
