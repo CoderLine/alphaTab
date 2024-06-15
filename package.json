@@ -98,7 +98,9 @@
         "webpack-cli": "^5.1.4"
     },
     "files": [
-        "/dist/alphaTab*",
+        "/dist/alphaTab*.js",
+        "/dist/alphaTab*.mjs",
+        "/dist/alphaTab*.ts",
         "/dist/font/Bravura.*",
         "/dist/font/Bravura*.txt",
         "/dist/font/*.txt",
