@@ -1,40 +1,37 @@
 /**@target web */
-import webpack from 'webpack'
 
-import { type VariableDeclarator, type Identifier, type Expression, type CallExpression } from 'estree'
+import { type VariableDeclarator, type Identifier, type Expression, type CallExpression } from 'estree';
 import { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
-import { AlphaTabWorkletDependency } from './AlphaTabWorkletDependency';
-import { getWorkerRuntime, parseModuleUrl, tapJavaScript } from './Utils';
+import { getWorkerRuntime, parseModuleUrl, tapJavaScript, webPackWithAlphaTab, webpackTypes } from './Utils';
 
-const AlphaTabWorkletSpecifierTag = Symbol("alphatab worklet specifier tag");
-const workletIndexMap = new WeakMap<webpack.ParserState, number>();
+const AlphaTabWorkletSpecifierTag = Symbol('alphatab worklet specifier tag');
+const workletIndexMap = new WeakMap<webpackTypes.ParserState, number>();
 
 /**
  * Configures the Audio Worklet aspects within webpack.
  * The counterpart which this plugin detects sits in alphaTab.main.ts
- * @param pluginName 
- * @param options 
- * @param compiler 
- * @param compilation 
- * @param normalModuleFactory 
- * @param cachedContextify 
- * @returns 
+ * @param pluginName
+ * @param options
+ * @param compiler
+ * @param compilation
+ * @param normalModuleFactory
+ * @param cachedContextify
+ * @returns
  */
-export function configureAudioWorklet(pluginName: string,
+export function configureAudioWorklet(
+    webPackWithAlphaTab: webPackWithAlphaTab,
+    pluginName: string,
     options: AlphaTabWebPackPluginOptions,
-    compiler: webpack.Compiler, compilation: webpack.Compilation, normalModuleFactory: any, cachedContextify: (s: string) => string) {
+    compiler: webpackTypes.Compiler,
+    compilation: webpackTypes.Compilation,
+    normalModuleFactory: any,
+    cachedContextify: (s: string) => string
+) {
     if (options.audioWorklets === false) {
         return;
     }
 
-    compilation.dependencyFactories.set(
-        AlphaTabWorkletDependency,
-        normalModuleFactory
-    );
-    compilation.dependencyTemplates.set(
-        AlphaTabWorkletDependency,
-        new AlphaTabWorkletDependency.Template()
-    );
+    webPackWithAlphaTab.alphaTab.registerWorkletDependency(compilation, normalModuleFactory);
 
     const handleAlphaTabWorklet = (parser: any, expr: CallExpression) => {
         const [arg1] = expr.arguments;
@@ -49,7 +46,7 @@ export function configureAudioWorklet(pluginName: string,
         }
 
         const runtime = getWorkerRuntime(parser, compilation, cachedContextify, workletIndexMap);
-        const block = new webpack.AsyncDependenciesBlock({
+        const block = new webPackWithAlphaTab.webpack.AsyncDependenciesBlock({
             entryOptions: {
                 chunkLoading: false,
                 wasmLoading: false,
@@ -59,10 +56,10 @@ export function configureAudioWorklet(pluginName: string,
 
         block.loc = expr.loc;
 
-        const workletBootstrap = new AlphaTabWorkletDependency(
+        const workletBootstrap = webPackWithAlphaTab.alphaTab.createWorkletDependency(
             url.string,
             [expr.range![0], expr.range![1]],
-            compiler.options.output.workerPublicPath,
+            compiler.options.output.workerPublicPath
         );
         workletBootstrap.loc = expr.loc!;
         block.addDependency(workletBootstrap);
@@ -72,11 +69,11 @@ export function configureAudioWorklet(pluginName: string,
     };
 
     const parserPlugin = (parser: any) => {
-        const pattern = "alphaTabWorklet";
-        const itemMembers = "addModule";
+        const pattern = 'alphaTabWorklet';
+        const itemMembers = 'addModule';
 
         parser.hooks.preDeclarator.tap(pluginName, (decl: VariableDeclarator) => {
-            if (decl.id.type === "Identifier" && decl.id.name === pattern) {
+            if (decl.id.type === 'Identifier' && decl.id.name === pattern) {
                 parser.tagVariable(decl.id.name, AlphaTabWorkletSpecifierTag);
                 return true;
             }
@@ -90,7 +87,7 @@ export function configureAudioWorklet(pluginName: string,
         parser.hooks.callMemberChain
             .for(AlphaTabWorkletSpecifierTag)
             .tap(pluginName, (expression: CallExpression, members: string[]) => {
-                if (itemMembers !== members.join(".")) {
+                if (itemMembers !== members.join('.')) {
                     return;
                 }
                 return handleAlphaTabWorklet(parser, expression);
