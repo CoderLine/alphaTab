@@ -6,7 +6,7 @@ import java.util.Properties
 // Common
 
 group = "net.alphatab"
-version = "1.3.0-SNAPSHOT"
+version = "1.3.1-SNAPSHOT"
 plugins {
     // Common
     alias(libs.plugins.kotlinMultiplatform)
