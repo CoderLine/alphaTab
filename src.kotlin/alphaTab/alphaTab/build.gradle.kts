@@ -172,6 +172,8 @@ var sonatypeSigningPassword = ""
 var sonatypeSigningKey = ""
 var ossrhUsername = ""
 var ossrhPassword = ""
+var ossrhUserTokenUsername = ""
+var ossrhUserTokenPassword = ""
 var sonatypeStagingProfileId = ""
 
 val props = Properties()
@@ -195,6 +197,8 @@ fun loadSetting(envKey: String, propKey: String, setter: (value: String) -> Unit
 
 loadSetting("OSSRH_USERNAME", "ossrhUsername") { ossrhUsername = it }
 loadSetting("OSSRH_PASSWORD", "ossrhPassword") { ossrhPassword = it }
+loadSetting("OSSRH_USERTOKEN_USERNAME", "ossrhUserTokenUsername") { ossrhUserTokenUsername = it }
+loadSetting("OSSRH_USERTOKEN_PASSWORD", "ossrhUserTokenPassword") { ossrhUserTokenPassword = it }
 loadSetting("SONATYPE_STAGING_PROFILE_ID", "sonatypeStagingProfileId") {
     sonatypeStagingProfileId = it
 }
@@ -226,8 +230,8 @@ publishing {
                     "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             )
             credentials {
-                username = ossrhUsername
-                password = ossrhPassword
+                username = ossrhUserTokenUsername
+                password = ossrhUserTokenPassword
             }
         }
     }
