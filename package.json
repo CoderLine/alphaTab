@@ -63,7 +63,7 @@
     "devDependencies": {
         "@coderline/alphaskia": "^2.1.120",
         "@coderline/alphaskia-windows": "^2.1.120",
-        "@rollup/plugin-commonjs": "^25.0.7",
+        "@rollup/plugin-commonjs": "^26.0.1",
         "@rollup/plugin-node-resolve": "^15.2.3",
         "@rollup/plugin-replace": "^5.0.5",
         "@rollup/plugin-terser": "^0.4.4",
