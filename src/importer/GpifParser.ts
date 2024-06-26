@@ -1162,8 +1162,8 @@ export class GpifParser {
                         break;
                     case 'Section':
                         masterBar.section = new Section();
-                        masterBar.section.marker = c.findChildElement('Letter')!.innerText;
-                        masterBar.section.text = c.findChildElement('Text')!.innerText;
+                        masterBar.section.marker = c.findChildElement('Letter')?.innerText ?? '';
+                        masterBar.section.text = c.findChildElement('Text')?.innerText ?? '';
                         break;
                     case 'Repeat':
                         if (c.getAttribute('start').toLowerCase() === 'true') {
