@@ -26,7 +26,7 @@ import { SynthHelper } from '@src/synth/SynthHelper';
 import { TypeConversions } from '@src/io/TypeConversions';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { Queue } from '@src/synth/ds/Queue';
-import { ControllerType } from '@src/midi';
+import { ControllerType } from '@src/midi/ControllerType';
 import { Logger } from '@src/Logger';
 
 /**
@@ -41,6 +41,7 @@ export class TinySoundFont {
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
     private _isAnySolo: boolean = false;
+    private _transpositionPitches: Map<number, number> = new Map<number, number>();
 
     public currentTempo: number = 0;
     public timeSignatureNumerator: number = 0;
@@ -94,7 +95,36 @@ export class TinySoundFont {
     public resetChannelStates(): void {
         this._mutedChannels = new Map<number, boolean>();
         this._soloChannels = new Map<number, boolean>();
+
+        this.applyTranspositionPitches(new Map<number, number>());
         this._isAnySolo = false;
+    }
+
+    public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
+        // dynamically adjust actively playing voices to the new pitch they have. 
+        // we are not updating the used preset and regions though. 
+        const previousTransposePitches = this._transpositionPitches;
+        for (const voice of this._voices) {
+            if (voice.playingChannel >= 0 && voice.playingChannel !== 9 /*percussion*/) {
+                let pitchDifference = 0;
+
+                if(previousTransposePitches.has(voice.playingChannel)) {
+                    pitchDifference -= previousTransposePitches.get(voice.playingChannel)!;
+                }
+                
+                if(transpositionPitches.has(voice.playingChannel)) {
+                    pitchDifference += transpositionPitches.get(voice.playingChannel)!;
+                }
+
+                voice.playingKey += pitchDifference;
+
+                if(this._channels) {
+                    voice.updatePitchRatio(this._channels!.channelList[voice.playingChannel], this.outSampleRate);
+                }
+            }
+        }
+
+        this._transpositionPitches = transpositionPitches;
     }
 
     public dispatchEvent(synthEvent: SynthEvent): void {
@@ -581,6 +611,10 @@ export class TinySoundFont {
             return;
         }
 
+        if (this._transpositionPitches.has(channel)) {
+            key += this._transpositionPitches.get(channel)!;
+        }
+
         this._channels.activeChannel = channel;
         this.noteOn(this._channels.channelList[channel].presetIndex, key, vel);
     }
@@ -591,6 +625,10 @@ export class TinySoundFont {
      * @param key note value between 0 and 127 (60 being middle C)
      */
     public channelNoteOff(channel: number, key: number): void {
+        if (this._transpositionPitches.has(channel)) {
+            key += this._transpositionPitches.get(channel)!;
+        }
+
         const matches: Voice[] = [];
         let matchFirst: Voice | null = null;
         let matchLast: Voice | null = null;
@@ -804,6 +842,10 @@ export class TinySoundFont {
      * @param pitchWheel pitch wheel position 0 to 16383 (default 8192 unpitched)
      */
     public channelSetPerNotePitchWheel(channel: number, key: number, pitchWheel: number): void {
+        if (this._transpositionPitches.has(channel)) {
+            key += this._transpositionPitches.get(channel)!;
+        }
+
         const c: Channel = this.channelInit(channel);
         if (c.perNotePitchWheel.has(key) && c.perNotePitchWheel.get(key) === pitchWheel) {
             return;

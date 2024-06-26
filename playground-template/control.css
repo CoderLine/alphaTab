@@ -29,8 +29,10 @@ body {
 
 body {
     display: flex;
-    align-content: stretch;
     flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 body > * {
@@ -39,8 +41,8 @@ body > * {
 
 .at-wrap {
     position: relative;
-    width: 80%;
-    height: 80vh;
+    width: 90vw;
+    height: 90vh;
     margin: 0 auto;
     border: 1px solid rgba(0, 0, 0, 0.12);
     background: #fff;

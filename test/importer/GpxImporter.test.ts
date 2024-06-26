@@ -6,20 +6,18 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
+import { expect } from 'chai';
 
 describe('GpxImporterTest', () => {
-    const prepareGpxImporterWithFile: (name: string) => Promise<GpxImporter> = async (
-        name: string
-    ): Promise<GpxImporter> => {
+    async function prepareImporterWithFile(name: string): Promise<GpxImporter> {
         const data = await TestPlatform.loadFile('test-data/' + name);
-        return prepareGpxImporterWithBytes(data);
-    };
+        return prepareImporterWithBytes(data);}
 
-    const prepareGpxImporterWithBytes: (buffer: Uint8Array) => GpxImporter = (buffer: Uint8Array): GpxImporter => {
+    function prepareImporterWithBytes(buffer: Uint8Array) {
         let readerBase: GpxImporter = new GpxImporter();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
-    };
+    }
 
     it('file-system-compressed', async () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro6/file-system-compressed.gpx');
@@ -36,236 +34,255 @@ describe('GpxImporterTest', () => {
         for (let i: number = 0; i < fileSystem.files.length; i++) {
             let file: GpxFile = fileSystem.files[i];
             Logger.info('Test', `${file.fileName} - ${file.fileSize}`);
-            expect(file.fileName).toEqual(names[i]);
-            expect(file.fileSize).toEqual(sizes[i]);
+            expect(file.fileName).to.equal(names[i]);
+            expect(file.fileSize).to.equal(sizes[i]);
         }
     });
 
     it('score-info', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/score-info.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/score-info.gpx');
         let score: Score = reader.readScore();
-        expect(score.title).toEqual('Title');
-        expect(score.subTitle).toEqual('Subtitle');
-        expect(score.artist).toEqual('Artist');
-        expect(score.album).toEqual('Album');
-        expect(score.words).toEqual('Words');
-        expect(score.music).toEqual('Music');
-        expect(score.copyright).toEqual('Copyright');
-        expect(score.tab).toEqual('Tab');
-        expect(score.instructions).toEqual('Instructions');
-        expect(score.notices).toEqual('Notice1\nNotice2');
-        expect(score.masterBars.length).toEqual(5);
-        expect(score.tracks.length).toEqual(2);
-        expect(score.tracks[0].name).toEqual('Track 1');
-        expect(score.tracks[1].name).toEqual('Track 2');
+        expect(score.title).to.equal('Title');
+        expect(score.subTitle).to.equal('Subtitle');
+        expect(score.artist).to.equal('Artist');
+        expect(score.album).to.equal('Album');
+        expect(score.words).to.equal('Words');
+        expect(score.music).to.equal('Music');
+        expect(score.copyright).to.equal('Copyright');
+        expect(score.tab).to.equal('Tab');
+        expect(score.instructions).to.equal('Instructions');
+        expect(score.notices).to.equal('Notice1\nNotice2');
+        expect(score.masterBars.length).to.equal(5);
+        expect(score.tracks.length).to.equal(2);
+        expect(score.tracks[0].name).to.equal('Track 1');
+        expect(score.tracks[1].name).to.equal('Track 2');
     });
 
     it('notes', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/notes.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/notes.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkNotes(score);
     });
 
     it('time-signatures', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/time-signatures.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/time-signatures.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkTimeSignatures(score);
     });
 
     it('dead', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/dead.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/dead.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkDead(score);
     });
 
     it('grace', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/grace.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/grace.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkGrace(score);
     });
 
     it('accentuations', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/accentuations.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/accentuations.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkAccentuations(score, true);
     });
 
     it('harmonics', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/harmonics.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/harmonics.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkHarmonics(score);
     });
 
     it('hammer', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/hammer.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/hammer.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkHammer(score);
     });
 
     it('bends', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/bends.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/bends.gpx');
         let score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).toEqual(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).toBeCloseTo(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).toBeCloseTo(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).to.equal(4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).toEqual(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).toBeCloseTo(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).toBeCloseTo(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].value).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].value).to.equal(4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints!.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).toBeCloseTo(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).toBeCloseTo(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].offset).toBeCloseTo(30);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].value).toEqual(12);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].value).to.equal(12);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].offset).toBeCloseTo(60);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].value).toEqual(6);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].value).to.equal(6);
     });
 
     it('tremolo', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/tremolo.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/tremolo.gpx');
         let score: Score = reader.readScore();
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).toBeCloseTo(0);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).toBeCloseTo(30);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).toBeCloseTo(60);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).toEqual(2);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).toBeCloseTo(0);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).toBeCloseTo(60);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).toEqual(3);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).toBeCloseTo(0);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).toBeCloseTo(30);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).toBeCloseTo(60);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints!.length).toEqual(4);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints!.length).to.equal(4);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].offset).toBeCloseTo(0);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].value).toEqual(-4);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).toBeCloseTo(15);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].value).toEqual(-12);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(15, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).toBeCloseTo(30.6);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].value).toEqual(-12);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(30.6, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).toBeCloseTo(45);
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].value).toEqual(0);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(45, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].value).to.equal(0);
     });
 
     it('slides', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/slides.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/slides.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkSlides(score);
     });
 
     it('vibrato', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/vibrato.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/vibrato.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkVibrato(score, true);
     });
 
     it('trills', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/trills.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/trills.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkTrills(score);
     });
 
     it('other-effects', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/other-effects.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/other-effects.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkOtherEffects(score, true);
     });
 
     it('fingering', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/fingering.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/fingering.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkFingering(score);
     });
 
     it('stroke', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/strokes.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/strokes.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkStroke(score);
     });
 
     it('tuplets', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/tuplets.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/tuplets.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkTuplets(score);
     });
 
     it('ranges', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/ranges.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/ranges.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkRanges(score);
     });
 
     it('effects', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/effects.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/effects.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkEffects(score);
     });
 
     it('serenade', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/serenade.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/serenade.gpx');
         reader.readScore();
         // only Check reading
     });
 
     it('strings', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/strings.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/strings.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkStrings(score);
     });
 
     it('key-signatures', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/key-signatures.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/key-signatures.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkKeySignatures(score);
     });
 
     it('chords', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/chords.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/chords.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkChords(score);
     });
 
     it('colors', async () => {
-        const reader = await prepareGpxImporterWithFile('guitarpro6/colors.gpx');
+        const reader = await prepareImporterWithFile('guitarpro6/colors.gpx');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkColors(score);
+    });
+
+    it('layout-configuration', async () => {
+        const track1 = (await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-1.gpx')).readScore();
+        const track2 = (await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-2.gpx')).readScore();
+        const trackAll = (await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-all.gpx')).readScore();
+        const track1And3 = (await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-1-3.gpx')).readScore();
+
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
+            track1, 
+            track2,
+            trackAll,
+            track1And3
+        );
+    });
+
+    it('slash', async () => {
+        const score = (await prepareImporterWithFile('guitarpro6/slash.gpx')).readScore();
+        GpImporterTestHelper.checkSlash(score);
     });
 });

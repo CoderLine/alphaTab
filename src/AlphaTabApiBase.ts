@@ -32,7 +32,7 @@ import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
-import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
+import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 import { ResizeEventArgs } from '@src/ResizeEventArgs';
 import { Settings } from '@src/Settings';
 
@@ -44,6 +44,7 @@ import { MidiEventType } from '@src/midi/MidiEvent';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { ActiveBeatsChangedEventArgs } from '@src/synth/ActiveBeatsChangedEventArgs';
+import { BeatTickLookupItem } from './midi/BeatTickLookup';
 
 class SelectionInfo {
     public beat: Beat;
@@ -63,6 +64,7 @@ class SelectionInfo {
 export class AlphaTabApiBase<TSettings> {
     private _startTime: number = 0;
     private _trackIndexes: number[] | null = null;
+    private _trackIndexLookup: Set<number> | null = null;
     private _isDestroyed: boolean = false;
     /**
      * Gets the UI facade to use for interacting with the user interface.
@@ -191,9 +193,13 @@ export class AlphaTabApiBase<TSettings> {
         // enable/disable player if needed
         if (this.settings.player.enablePlayer) {
             this.setupPlayer();
+            if (score) {
+                this.player?.applyTranspositionPitches(MidiFileGenerator.buildTranspositionPitches(score, this.settings));
+            }
         } else {
             this.destroyPlayer();
         }
+
         this.onSettingsUpdated();
     }
 
@@ -284,6 +290,7 @@ export class AlphaTabApiBase<TSettings> {
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
             }
+            this._trackIndexLookup = new Set<number>(this._trackIndexes)
             this.onScoreLoaded(score);
             this.loadMidiForScore();
             this.render();
@@ -293,6 +300,7 @@ export class AlphaTabApiBase<TSettings> {
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
             }
+            this._trackIndexLookup = new Set<number>(this._trackIndexes)
             this.render();
         }
     }
@@ -331,8 +339,8 @@ export class AlphaTabApiBase<TSettings> {
                 this._cursorWrapper.width = result.totalWidth;
                 this._cursorWrapper.height = result.totalHeight;
             }
-            
-            if(result.width > 0 || result.height > 0) {
+
+            if (result.width > 0 || result.height > 0) {
                 this.uiFacade.beginAppendRenderResults(result);
             }
         } else {
@@ -607,10 +615,15 @@ export class AlphaTabApiBase<TSettings> {
         let midiFile: MidiFile = new MidiFile();
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
         let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
+
+        // we pass the transposition pitches separately to alphaSynth.
+        generator.applyTranspositionPitches = false;
+
         generator.generate();
         this._tickCache = generator.tickLookup;
         this.onMidiLoad(midiFile);
         this.player.loadMidiFile(midiFile);
+        this.player.applyTranspositionPitches(generator.transpositionPitches);
     }
 
     /**
@@ -810,7 +823,7 @@ export class AlphaTabApiBase<TSettings> {
                     let currentBeat = this._currentBeat;
                     let tickCache = this._tickCache;
                     if (currentBeat && tickCache) {
-                        this.player!.tickPosition = tickCache.getBeatStart(currentBeat.currentBeat);
+                        this.player!.tickPosition = tickCache.getBeatStart(currentBeat.beat);
                     }
                 }
             });
@@ -826,8 +839,8 @@ export class AlphaTabApiBase<TSettings> {
     private cursorUpdateTick(tick: number, stop: boolean, shouldScroll: boolean = false): void {
         let cache: MidiTickLookup | null = this._tickCache;
         if (cache) {
-            let tracks: Track[] = this.tracks;
-            if (tracks.length > 0) {
+            let tracks = this._trackIndexLookup;
+            if (tracks != null && tracks.size > 0) {
                 let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
                 if (beat) {
                     this.cursorUpdateBeat(beat, stop, shouldScroll);
@@ -845,10 +858,10 @@ export class AlphaTabApiBase<TSettings> {
         shouldScroll: boolean,
         forceUpdate: boolean = false
     ): void {
-        const beat: Beat = lookupResult.currentBeat;
-        const nextBeat: Beat | null = lookupResult.nextBeat;
+        const beat: Beat = lookupResult.beat;
+        const nextBeat: Beat | null = lookupResult.nextBeat?.beat ?? null;
         const duration: number = lookupResult.duration;
-        const beatsToHighlight = lookupResult.beatsToHighlight;
+        const beatsToHighlight = lookupResult.beatLookup.highlightedBeats;
 
         if (!beat) {
             return;
@@ -862,7 +875,7 @@ export class AlphaTabApiBase<TSettings> {
         let previousState: PlayerState | null = this._previousStateForCursor;
         if (
             !forceUpdate &&
-            beat === previousBeat?.currentBeat &&
+            beat === previousBeat?.beat &&
             cache === previousCache &&
             previousState === this._playerState
         ) {
@@ -971,7 +984,7 @@ export class AlphaTabApiBase<TSettings> {
         nextBeat: Beat | null,
         duration: number,
         stop: boolean,
-        beatsToHighlight: Beat[],
+        beatsToHighlight: BeatTickLookupItem[],
         cache: BoundsLookup,
         beatBoundings: BeatBounds,
         shouldScroll: boolean
@@ -1006,32 +1019,26 @@ export class AlphaTabApiBase<TSettings> {
         if (this._playerState === PlayerState.Playing && !stop) {
             if (this.settings.player.enableElementHighlighting) {
                 for (let highlight of beatsToHighlight) {
-                    let className: string = BeatContainerGlyph.getGroupId(highlight);
+                    let className: string = BeatContainerGlyph.getGroupId(highlight.beat);
                     this.uiFacade.highlightElements(className, beat.voice.bar.index);
                 }
             }
 
             if (this.settings.player.enableAnimatedBeatCursor) {
                 let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
-                // get position of next beat on same stavegroup
+                // get position of next beat on same system
                 if (nextBeat) {
                     // if we are moving within the same bar or to the next bar
                     // transition to the next beat, otherwise transition to the end of the bar.
+                    let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
                     if (
-                        (nextBeat.voice.bar.index === beat.voice.bar.index && nextBeat.index > beat.index) ||
-                        nextBeat.voice.bar.index === beat.voice.bar.index + 1
+                        nextBeatBoundings &&
+                        nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds ===
+                        barBoundings.staffSystemBounds
                     ) {
-                        let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
-                        if (
-                            nextBeatBoundings &&
-                            nextBeatBoundings.barBounds.masterBarBounds.staveGroupBounds ===
-                            barBoundings.staveGroupBounds
-                        ) {
-                            nextBeatX = nextBeatBoundings.visualBounds.x;
-                        }
+                        nextBeatX = nextBeatBoundings.visualBounds.x;
                     }
                 }
-
                 // we need to put the transition to an own animation frame
                 // otherwise the stop animation above is not applied.
                 this.uiFacade.beginInvoke(() => {
@@ -1052,7 +1059,7 @@ export class AlphaTabApiBase<TSettings> {
         // trigger an event for others to indicate which beat/bar is played
         if (shouldNotifyBeatChange) {
             this.onPlayedBeatChanged(beat);
-            this.onActiveBeatsChanged(new ActiveBeatsChangedEventArgs(beatsToHighlight));
+            this.onActiveBeatsChanged(new ActiveBeatsChangedEventArgs(beatsToHighlight.map(i => i.beat)));
         }
     }
 
@@ -1145,8 +1152,11 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        if (this.settings.player.enableUserInteraction) {
-            // for the selection ensure start < end
+        if (
+            this.settings.player.enablePlayer &&
+            this.settings.player.enableCursor &&
+            this.settings.player.enableUserInteraction
+        ) {
             if (this._selectionEnd) {
                 let startTick: number = this._tickCache?.getBeatStart(this._selectionStart!.beat) ?? this._selectionStart!.beat.absolutePlaybackStart;
                 let endTick: number = this._tickCache?.getBeatStart(this._selectionEnd!.beat) ?? this._selectionEnd!.beat.absolutePlaybackStart;
@@ -1210,11 +1220,11 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
         if (range) {
-            const startBeat = this._tickCache.findBeat(this.tracks, range.startTick);
-            const endBeat = this._tickCache.findBeat(this.tracks, range.endTick);
+            const startBeat = this._tickCache.findBeat(this._trackIndexLookup!, range.startTick);
+            const endBeat = this._tickCache.findBeat(this._trackIndexLookup!, range.endTick);
             if (startBeat && endBeat) {
-                const selectionStart = new SelectionInfo(startBeat.currentBeat);
-                const selectionEnd = new SelectionInfo(endBeat.currentBeat);
+                const selectionStart = new SelectionInfo(startBeat.beat);
+                const selectionEnd = new SelectionInfo(endBeat.beat);
                 this.cursorSelectRange(selectionStart, selectionEnd);
             }
         } else {
@@ -1333,16 +1343,16 @@ export class AlphaTabApiBase<TSettings> {
         }
         // if the selection goes across multiple staves, we need a special selection highlighting
         if (
-            startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds !==
-            endBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds
+            startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds !==
+            endBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds
         ) {
             // from the startbeat to the end of the staff,
             // then fill all staffs until the end-beat staff
             // then from staff-start to the end beat (or to end of bar if it's the last beat)
-            let staffStartX: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.x;
+            let staffStartX: number = startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.x;
             let staffEndX: number =
-                startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.x +
-                startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.visualBounds.w;
+                startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.x +
+                startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.w;
             let startSelection: IContainer = this.uiFacade.createSelectionElement()!;
             startSelection.setBounds(
                 startX,
@@ -1351,10 +1361,10 @@ export class AlphaTabApiBase<TSettings> {
                 startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
             );
             selectionWrapper.appendChild(startSelection);
-            let staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index + 1;
-            let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staveGroupBounds!.index;
+            let staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index + 1;
+            let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index;
             for (let staffIndex: number = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
-                let staffBounds: StaveGroupBounds = cache.staveGroups[staffIndex];
+                let staffBounds: StaffSystemBounds = cache.staffSystems[staffIndex];
                 let middleSelection: IContainer = this.uiFacade.createSelectionElement()!;
                 middleSelection.setBounds(
                     staffStartX,

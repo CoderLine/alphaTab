@@ -15,13 +15,16 @@ import kotlin.contracts.ExperimentalContracts
 internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListener {
     private val _outerScroll: HorizontalScrollView
     private val _innerScroll: ScrollView
+    private val _uiInvoke: ( action: (() -> Unit) ) -> Unit
     internal val renderSurface: AlphaTabRenderSurface
 
-    public constructor(
+    constructor(
         outerScroll: HorizontalScrollView,
         innerScroll: ScrollView,
-        renderSurface: AlphaTabRenderSurface
+        renderSurface: AlphaTabRenderSurface,
+        uiInvoke: ( action: (() -> Unit) ) -> Unit
     ) {
+        _uiInvoke = uiInvoke
         _innerScroll = innerScroll
         _outerScroll = outerScroll
         this.renderSurface = renderSurface
@@ -37,11 +40,11 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
 
     override var width: Double
         get() = (_outerScroll.measuredWidth / Environment.HighDpiFactor)
-        set(value) {
+        set(@Suppress("UNUSED_PARAMETER") value) {
         }
     override var height: Double
         get() = (_outerScroll.measuredHeight / Environment.HighDpiFactor)
-        set(value) {
+        set(@Suppress("UNUSED_PARAMETER") value) {
         }
     override val isVisible: Boolean
         get() = _outerScroll.visibility == View.VISIBLE
@@ -49,12 +52,16 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
     override var scrollLeft: Double
         get() = _outerScroll.scrollX.toDouble()
         set(value) {
-            _outerScroll.scrollX = value.toInt()
+            _uiInvoke {
+                _outerScroll.scrollX = value.toInt()
+            }
         }
     override var scrollTop: Double
         get() = _innerScroll.scrollY.toDouble()
         set(value) {
-            _innerScroll.scrollY = value.toInt()
+            _uiInvoke {
+                _innerScroll.scrollY = value.toInt()
+            }
         }
 
     override fun appendChild(child: IContainer) {
@@ -88,21 +95,27 @@ internal class AndroidRootViewContainer : IContainer, View.OnLayoutChangeListene
         val widthChanged = (right - left) != (oldRight - oldLeft)
         val heightChanged = (bottom - top) != (oldTop - oldBottom)
         if (widthChanged || heightChanged) {
-            (resize as EventEmitter).trigger()
+            _uiInvoke {
+                (resize as EventEmitter).trigger()
+            }
         }
     }
 
     fun scrollToX(offset: Double) {
-        _outerScroll.smoothScrollTo(
-            (offset * Environment.HighDpiFactor).toInt(),
-            _outerScroll.scrollY
-        )
+        _uiInvoke {
+            _outerScroll.smoothScrollTo(
+                (offset * Environment.HighDpiFactor).toInt(),
+                _outerScroll.scrollY
+            )
+        }
     }
 
     fun scrollToY(offset: Double) {
-        _innerScroll.smoothScrollTo(
-            _innerScroll.scrollX,
-            (offset * Environment.HighDpiFactor).toInt()
-        )
+        _uiInvoke {
+            _innerScroll.smoothScrollTo(
+                _innerScroll.scrollX,
+                (offset * Environment.HighDpiFactor).toInt()
+            )
+        }
     }
 }

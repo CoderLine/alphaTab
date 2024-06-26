@@ -1,7 +1,7 @@
 import { JsonConverter } from '@src/model/JsonConverter';
 import { Score } from '@src/model/Score';
 import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
-import { FontSizes } from '@src/platform/svg/FontSizes';
+import { FontSizeDefinition, FontSizes } from '@src/platform/svg/FontSizes';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
@@ -80,7 +80,8 @@ export class AlphaTabWebWorker {
                 break;
             case 'alphaTab.renderScore':
                 this.updateFontSizes(data.fontSizes);
-                let score: any = data.score == null ? null : JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
+                let score: any =
+                    data.score == null ? null : JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
                 this.renderMultiple(score, data.trackIndexes);
                 break;
             case 'alphaTab.updateSettings':
@@ -89,13 +90,21 @@ export class AlphaTabWebWorker {
         }
     }
 
-    private updateFontSizes(fontSizes: any): void {
+    private updateFontSizes(fontSizes: { [key: string]: FontSizeDefinition } | Map<string, FontSizeDefinition>): void {
+        if (!(fontSizes instanceof Map)) {
+            const obj = fontSizes;
+            fontSizes = new Map<string, FontSizeDefinition>();
+            for (const font in obj) {
+                fontSizes.set(font, obj[font]);
+            }
+        }
+
         if (fontSizes) {
             if (!FontSizes.FontSizeLookupTables) {
-                FontSizes.FontSizeLookupTables = new Map<string, Uint8Array>();
+                FontSizes.FontSizeLookupTables = new Map<string, FontSizeDefinition>();
             }
-            for (let font in fontSizes) {
-                FontSizes.FontSizeLookupTables.set(font, fontSizes[font]);
+            for (let [k, v] of fontSizes) {
+                FontSizes.FontSizeLookupTables.set(k, v);
             }
         }
     }

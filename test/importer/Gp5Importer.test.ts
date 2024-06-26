@@ -2,25 +2,26 @@ import { Settings } from '@src/Settings';
 import { Beat } from '@src/model/Beat';
 import { Score } from '@src/model/Score';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
+import { expect } from 'chai';
 
 describe('Gp5ImporterTest', () => {
     it('score-info', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/score-info.gp5');
         let score: Score = reader.readScore();
-        expect(score.title).toEqual('Title');
-        expect(score.subTitle).toEqual('Subtitle');
-        expect(score.artist).toEqual('Artist');
-        expect(score.album).toEqual('Album');
-        expect(score.words).toEqual('Words');
-        expect(score.music).toEqual('Music');
-        expect(score.copyright).toEqual('Copyright');
-        expect(score.tab).toEqual('Tab');
-        expect(score.instructions).toEqual('Instructions');
-        expect(score.notices).toEqual('Notice1\r\nNotice2');
-        expect(score.masterBars.length).toEqual(5);
-        expect(score.tracks.length).toEqual(2);
-        expect(score.tracks[0].name).toEqual('Track 1');
-        expect(score.tracks[1].name).toEqual('Track 2');
+        expect(score.title).to.equal('Title');
+        expect(score.subTitle).to.equal('Subtitle');
+        expect(score.artist).to.equal('Artist');
+        expect(score.album).to.equal('Album');
+        expect(score.words).to.equal('Words');
+        expect(score.music).to.equal('Music');
+        expect(score.copyright).to.equal('Copyright');
+        expect(score.tab).to.equal('Tab');
+        expect(score.instructions).to.equal('Instructions');
+        expect(score.notices).to.equal('Notice1\r\nNotice2');
+        expect(score.masterBars.length).to.equal(5);
+        expect(score.tracks.length).to.equal(2);
+        expect(score.tracks[0].name).to.equal('Track 1');
+        expect(score.tracks[1].name).to.equal('Track 2');
     });
 
     it('notes', async () => {
@@ -164,36 +165,36 @@ describe('Gp5ImporterTest', () => {
     it('alternate-endings-section-error', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/alternate-endings-section-error.gp5');
         const score: Score = reader.readScore();
-        expect(score.masterBars.length).toBe(2);
-        expect(score.masterBars[1].alternateEndings).toBe(4);
-        expect(score.masterBars[1].section).toBeTruthy();
-        expect(score.masterBars[1].section?.text).toBe("Outro");
+        expect(score.masterBars.length).to.be.equal(2);
+        expect(score.masterBars[1].alternateEndings).to.be.equal(4);
+        expect(score.masterBars[1].section).to.be.ok;
+        expect(score.masterBars[1].section?.text).to.be.equal("Outro");
     });
 
     it('canon', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/canon.gp5');
         let score: Score = reader.readScore();
-        expect(score.title).toEqual('Canon Rock');
-        expect(score.subTitle).toEqual('');
-        expect(score.artist).toEqual('JerryC');
-        expect(score.album).toEqual('');
-        expect(score.words).toEqual('');
-        expect(score.music).toEqual('JerryC');
-        expect(score.copyright).toEqual('');
-        expect(score.tab).toEqual('');
-        expect(score.instructions).toEqual('');
-        expect(score.notices).toEqual('');
-        expect(score.masterBars.length).toEqual(224);
-        expect(score.tracks.length).toEqual(9);
-        expect(score.tracks[0].name).toEqual('Guitar Player');
-        expect(score.tracks[1].name).toEqual('Low Bassy Sound');
-        expect(score.tracks[2].name).toEqual('High Soundy Thing');
-        expect(score.tracks[3].name).toEqual('Second Guitar');
-        expect(score.tracks[4].name).toEqual('Drums');
-        expect(score.tracks[5].name).toEqual('Harmonizer');
-        expect(score.tracks[6].name).toEqual('The clean guitar');
-        expect(score.tracks[7].name).toEqual('Track 8');
-        expect(score.tracks[8].name).toEqual('Percussion');
+        expect(score.title).to.equal('Canon Rock');
+        expect(score.subTitle).to.equal('');
+        expect(score.artist).to.equal('JerryC');
+        expect(score.album).to.equal('');
+        expect(score.words).to.equal('');
+        expect(score.music).to.equal('JerryC');
+        expect(score.copyright).to.equal('');
+        expect(score.tab).to.equal('');
+        expect(score.instructions).to.equal('');
+        expect(score.notices).to.equal('');
+        expect(score.masterBars.length).to.equal(224);
+        expect(score.tracks.length).to.equal(9);
+        expect(score.tracks[0].name).to.equal('Guitar Player');
+        expect(score.tracks[1].name).to.equal('Low Bassy Sound');
+        expect(score.tracks[2].name).to.equal('High Soundy Thing');
+        expect(score.tracks[3].name).to.equal('Second Guitar');
+        expect(score.tracks[4].name).to.equal('Drums');
+        expect(score.tracks[5].name).to.equal('Harmonizer');
+        expect(score.tracks[6].name).to.equal('The clean guitar');
+        expect(score.tracks[7].name).to.equal('Track 8');
+        expect(score.tracks[8].name).to.equal('Percussion');
     });
     it('beat-text-lyrics', async () => {
         const settings = new Settings();
@@ -225,6 +226,21 @@ describe('Gp5ImporterTest', () => {
             beat = beat.nextBeat;
         }
 
-        expect(actualChunks.join(';')).toEqual(expectedChunks.join(';'));
+        expect(actualChunks.join(';')).to.equal(expectedChunks.join(';'));
     });
+
+    it('layout-configuration', async () => {
+        const track1 = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1.gp5')).readScore();
+        const track2 = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-2.gp5')).readScore();
+        const trackAll = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-all.gp5')).readScore();
+        const track1And3 = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1-3.gp5')).readScore();
+
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
+            track1, 
+            track2,
+            trackAll,
+            track1And3
+        );
+    });
+
 });

@@ -9,10 +9,9 @@ import alphaTab.model.MusicFontSymbol
 import alphaTab.platform.ICanvas
 import alphaTab.platform.TextAlign
 import alphaTab.platform.TextBaseline
+import alphaTab.platform.TextMetrics
 import android.content.Context
 import android.graphics.*
-import android.util.DisplayMetrics
-import java.io.ByteArrayOutputStream
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalUnsignedTypes
@@ -49,8 +48,8 @@ internal class AndroidCanvas : ICanvas {
         }
     }
 
-    private lateinit var _surface: Bitmap
-    private lateinit var _canvas: Canvas
+    private var _surface: Bitmap? = null
+    private var _canvas: Canvas? = null
     private var _path: Path? = null
     private var _typeFaceCache: String = ""
     private var _typeFace: Typeface? = null
@@ -92,8 +91,8 @@ internal class AndroidCanvas : ICanvas {
         newImage.isPremultiplied = true
 
         _surface = newImage
-        _canvas = Canvas(_surface)
-        _canvas.scale(Environment.HighDpiFactor.toFloat(), Environment.HighDpiFactor.toFloat())
+        _canvas = Canvas(_surface!!)
+        _canvas!!.scale(Environment.HighDpiFactor.toFloat(), Environment.HighDpiFactor.toFloat())
         _path?.close()
 
         textBaseline = TextBaseline.Top
@@ -103,8 +102,12 @@ internal class AndroidCanvas : ICanvas {
         _path = path
     }
 
-    override fun endRender(): Any {
+    override fun endRender(): Any? {
         return _surface
+    }
+
+    override fun destroy() {
+        _surface?.recycle()
     }
 
     override fun onRenderFinished(): Any? {
@@ -114,7 +117,7 @@ internal class AndroidCanvas : ICanvas {
     override fun fillRect(x: Double, y: Double, w: Double, h: Double) {
         createPaint().let {
             it.style = Paint.Style.FILL
-            _canvas.drawRect(
+            _canvas!!.drawRect(
                 RectF(
                     x.toInt().toFloat(),
                     y.toInt().toFloat(),
@@ -136,7 +139,7 @@ internal class AndroidCanvas : ICanvas {
     override fun strokeRect(x: Double, y: Double, w: Double, h: Double) {
         createPaint().let {
             it.style = Paint.Style.STROKE
-            _canvas.drawRect(
+            _canvas!!.drawRect(
                 RectF(
                     x.toInt().toFloat(),
                     y.toInt().toFloat(),
@@ -204,7 +207,7 @@ internal class AndroidCanvas : ICanvas {
         createPaint().let {
             it.strokeWidth = 0f
             it.style = Paint.Style.FILL
-            _canvas.drawPath(_path!!, it)
+            _canvas!!.drawPath(_path!!, it)
         }
         _path!!.reset()
     }
@@ -213,7 +216,7 @@ internal class AndroidCanvas : ICanvas {
         createPaint().let {
             it.strokeWidth = lineWidth.toFloat()
             it.style = Paint.Style.STROKE
-            _canvas.drawPath(_path!!, it)
+            _canvas!!.drawPath(_path!!, it)
         }
         _path!!.reset()
     }
@@ -237,7 +240,7 @@ internal class AndroidCanvas : ICanvas {
                 paint
             )
 
-            _canvas.drawText(
+            _canvas!!.drawText(
                 text,
                 x.toFloat(),
                 y.toFloat() + fontBaseLine,
@@ -281,18 +284,20 @@ internal class AndroidCanvas : ICanvas {
     }
 
 
-    override fun measureText(text: String): Double {
+    override fun measureText(text: String): TextMetrics {
         if (text.isEmpty()) {
-            return 0.0
+            return TextMetrics(0.0, 0.0)
         }
-        var size = 0.0
+        var width = 0.0
+        var height = 0.0
 
         textRun(typeFace, font.size, fun(paint) {
             val bounds = Rect()
             paint.getTextBounds(text, 0, text.length, bounds)
-            size = bounds.width().toDouble()
+            width = bounds.width().toDouble()
+            height = bounds.height().toDouble()
         })
-        return size
+        return TextMetrics(width, height)
     }
 
     override fun fillMusicFontSymbol(
@@ -322,7 +327,7 @@ internal class AndroidCanvas : ICanvas {
             if (centerAtPosition == true) {
                 paint.textAlign = Paint.Align.CENTER
             }
-            _canvas.drawText(
+            _canvas!!.drawText(
                 s,
                 x.toFloat(),
                 y.toFloat(),
@@ -332,12 +337,12 @@ internal class AndroidCanvas : ICanvas {
     }
 
     override fun beginRotate(centerX: Double, centerY: Double, angle: Double) {
-        _canvas.save()
-        _canvas.translate(centerX.toFloat(), centerY.toFloat())
-        _canvas.rotate(angle.toFloat())
+        _canvas!!.save()
+        _canvas!!.translate(centerX.toFloat(), centerY.toFloat())
+        _canvas!!.rotate(angle.toFloat())
     }
 
     override fun endRotate() {
-        _canvas.restore()
+        _canvas!!.restore()
     }
 }

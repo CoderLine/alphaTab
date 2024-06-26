@@ -1,5 +1,3 @@
-import { BeatTickLookup } from '@src/midi/BeatTickLookup';
-
 import { ControllerType } from '@src/midi/ControllerType';
 import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 
@@ -61,7 +59,6 @@ export class MidiFileGenerator {
     private _settings: Settings;
     private _handler: IMidiFileHandler;
     private _currentTempo: number = 0;
-    private _currentBarRepeatLookup: BeatTickLookup | null = null;
     private _programsPerChannel: Map<number, number> = new Map<number, number>();
 
     /**
@@ -69,6 +66,17 @@ export class MidiFileGenerator {
      * at a given midi tick position.
      */
     public readonly tickLookup: MidiTickLookup = new MidiTickLookup();
+
+    /**
+     * Gets or sets whether transposition pitches should be applied to the individual midi events or not.
+     */
+    public applyTranspositionPitches: boolean = true;
+
+
+    /**
+     * Gets the transposition pitches for the individual midi channels. 
+     */
+    public readonly transpositionPitches: Map<number, number> = new Map<number, number>();
 
     /**
      * Initializes a new instance of the {@link MidiFileGenerator} class.
@@ -87,6 +95,8 @@ export class MidiFileGenerator {
      * Starts the generation of the midi file.
      */
     public generate(): void {
+        this.transpositionPitches.clear();
+
         // initialize tracks
         for (const track of this._score.tracks) {
             this.generateTrack(track);
@@ -122,7 +132,6 @@ export class MidiFileGenerator {
             this._handler.finishTrack(track.index, controller.currentTick);
         }
 
-        this.tickLookup.finish();
         Logger.debug('Midi', 'Midi generation done');
     }
 
@@ -141,7 +150,24 @@ export class MidiFileGenerator {
         }
     }
 
+    public static buildTranspositionPitches(score: Score, settings: Settings): Map<number, number> {
+        const transpositionPitches = new Map<number, number>();
+        for (const track of score.tracks) {
+            const transpositionPitch = track.index < settings.notation.transpositionPitches.length
+                ? settings.notation.transpositionPitches[track.index]
+                : 0;
+            transpositionPitches.set(track.playbackInfo.primaryChannel, transpositionPitch);
+            transpositionPitches.set(track.playbackInfo.secondaryChannel, transpositionPitch);
+        }
+        return transpositionPitches;
+    }
+
     private generateChannel(track: Track, channel: number, playbackInfo: PlaybackInformation): void {
+        const transpositionPitch = track.index < this._settings.notation.transpositionPitches.length
+            ? this._settings.notation.transpositionPitches[track.index]
+            : 0;
+        this.transpositionPitches.set(channel, transpositionPitch);
+
         let volume: number = MidiFileGenerator.toChannelShort(playbackInfo.volume);
         let balance: number = MidiFileGenerator.toChannelShort(playbackInfo.balance);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.VolumeCoarse, volume);
@@ -202,7 +228,6 @@ export class MidiFileGenerator {
 
     private generateBar(bar: Bar, barStartTick: number): void {
         let playbackBar: Bar = this.getPlaybackBar(bar);
-        this._currentBarRepeatLookup = null;
 
         for (const v of playbackBar.voices) {
             this.generateVoice(v, barStartTick, bar);
@@ -264,29 +289,12 @@ export class MidiFileGenerator {
             }
         }
 
-        const beatLookup: BeatTickLookup = new BeatTickLookup();
-        beatLookup.start = barStartTick + beatStart;
-
-        const realTickOffset: number = !beat.nextBeat
-            ? audioDuration
-            : beat.nextBeat.absolutePlaybackStart - beat.absolutePlaybackStart;
-        beatLookup.end = barStartTick + beatStart;
-        beatLookup.highlightBeat(beat);
-        beatLookup.end += realTickOffset > audioDuration ? realTickOffset : audioDuration;
-
         // in case of normal playback register playback
         if (realBar === beat.voice.bar) {
-            beatLookup.beat = beat;
-            this.tickLookup.addBeat(beatLookup);
+            this.tickLookup.addBeat(beat, beatStart, audioDuration);
         } else {
-            beatLookup.isEmptyBar = true;
-            beatLookup.beat = realBar.voices[0].beats[0];
-            if (!this._currentBarRepeatLookup) {
-                this._currentBarRepeatLookup = beatLookup;
-                this.tickLookup.addBeat(this._currentBarRepeatLookup);
-            } else {
-                this._currentBarRepeatLookup.end = beatLookup.end;
-            }
+            // in case of simile marks where we repeat we also register 
+            this.tickLookup.addBeat(beat, 0, audioDuration);
         }
 
         const track: Track = beat.voice.bar.staff.track;
@@ -411,7 +419,7 @@ export class MidiFileGenerator {
     private generateNote(note: Note, beatStart: number, beatDuration: number, brushInfo: Int32Array): void {
         const track: Track = note.beat.voice.bar.staff.track;
         const staff: Staff = note.beat.voice.bar.staff;
-        let noteKey: number = note.realValue;
+        let noteKey: number = note.calculateRealValue(this.applyTranspositionPitches, true);
         if (note.isPercussion) {
             const articulation = PercussionMapper.getArticulation(note);
             if (articulation) {
@@ -478,7 +486,7 @@ export class MidiFileGenerator {
             this.generateWhammy(note.beat, noteStart, noteDuration, channel);
         } else if (note.slideInType !== SlideInType.None || note.slideOutType !== SlideOutType.None) {
             this.generateSlide(note, noteStart, noteDuration, noteKey, channel);
-        } else if (note.vibrato !== VibratoType.None ||  (note.isTieDestination && note.tieOrigin!.vibrato !== VibratoType.None)) {
+        } else if (note.vibrato !== VibratoType.None || (note.isTieDestination && note.tieOrigin!.vibrato !== VibratoType.None)) {
             this.generateVibrato(note, noteStart, noteDuration, noteKey, channel);
         }
 
@@ -669,8 +677,8 @@ export class MidiFileGenerator {
         let phaseLength: number = 0;
         let bendAmplitude: number = 0;
         const vibratoType = note.vibrato !== VibratoType.None ? note.vibrato : (
-            note.isTieDestination ? note.tieOrigin!.vibrato : 
-            VibratoType.Slight /* should never happen unless called wrongly */
+            note.isTieDestination ? note.tieOrigin!.vibrato :
+                VibratoType.Slight /* should never happen unless called wrongly */
         );
         switch (vibratoType) {
             case VibratoType.Slight:
@@ -691,7 +699,7 @@ export class MidiFileGenerator {
     }
 
 
-    public vibratoResolution:number = 16;
+    public vibratoResolution: number = 16;
     private generateVibratorWithParams(
         noteStart: number,
         noteDuration: number,
@@ -790,7 +798,7 @@ export class MidiFileGenerator {
             case SlideOutType.Shift:
                 playedBendPoints.push(new BendPoint(shiftSlideDurationOffset, 0));
                 // normal note values are in 1/2 tones, bends are in 1/4 tones
-                const dy = (note.slideTarget!.realValue - note.realValue) * 2;
+                const dy = (note.slideTarget!.calculateRealValue(this.applyTranspositionPitches, true) - note.calculateRealValue(this.applyTranspositionPitches, true)) * 2;
                 playedBendPoints.push(new BendPoint(BendPoint.MaxPosition, dy));
                 break;
             case SlideOutType.OutDown:

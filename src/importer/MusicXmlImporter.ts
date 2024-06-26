@@ -4,6 +4,7 @@ import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
+import { BendPoint } from '@src/model/BendPoint';
 import { Chord } from '@src/model/Chord';
 import { Clef } from '@src/model/Clef';
 import { Duration } from '@src/model/Duration';
@@ -27,6 +28,8 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { IOHelper } from '@src/io/IOHelper';
+import { ZipReader } from '@src/zip/ZipReader';
+import { ZipEntry } from '@src/zip/ZipEntry';
 
 export class MusicXmlImporter extends ScoreImporter {
     private _score!: Score;
@@ -54,7 +57,8 @@ export class MusicXmlImporter extends ScoreImporter {
         this._tieStarts = [];
         this._tieStartIds = new Map<number, boolean>();
         this._slurStarts = new Map<string, Note>();
-        let xml: string = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
+
+        let xml: string = this.extractMusicXml();
         let dom: XmlDocument = new XmlDocument();
         try {
             dom.parse(xml);
@@ -71,6 +75,65 @@ export class MusicXmlImporter extends ScoreImporter {
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
         return this._score;
+    }
+
+    extractMusicXml(): string {
+        const zip = new ZipReader(this.data);
+        let entries: ZipEntry[];
+        try {
+            entries = zip.read();
+        } catch (e) {
+            entries = [];
+        }
+
+        // no compressed MusicXML, try raw 
+        if(entries.length === 0) {
+            this.data.reset();
+            return IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
+        }
+
+        const container = entries.find(e => e.fullName === 'META-INF/container.xml');
+        if (!container) {
+            throw new UnsupportedFormatError('No compressed MusicXML');
+        }
+
+        const containerDom = new XmlDocument();
+        try {
+            containerDom.parse(IOHelper.toString(container.data, this.settings.importer.encoding));
+        } catch (e) {
+            throw new UnsupportedFormatError('Malformed container.xml, could not parse as XML', e as Error);
+        }
+
+        let root: XmlNode | null = containerDom.firstElement;
+        if (!root || root.localName !== "container") {
+            throw new UnsupportedFormatError("Malformed container.xml, root element not 'container'");
+        }
+
+        const rootFiles = root.findChildElement("rootfiles");
+        if(!rootFiles) {
+            throw new UnsupportedFormatError("Malformed container.xml, 'container/rootfiles' not found");
+        }
+        
+        let uncompressedFileFullPath:string = "";
+        for(const c of rootFiles.childNodes) {
+            if(c.nodeType == XmlNodeType.Element && c.localName === "rootfile") {
+                // The MusicXML root must be described in the first <rootfile> element.
+                // https://www.w3.org/2021/06/musicxml40/tutorial/compressed-mxl-files/
+                uncompressedFileFullPath = c.getAttribute("full-path");
+                break;
+            }
+        }
+
+        if(!uncompressedFileFullPath) {
+            throw new UnsupportedFormatError("Unsupported compressed MusicXML, missing rootfile");
+        }
+
+        const file = entries.find(e => e.fullName === uncompressedFileFullPath);
+        if(!file) {
+            throw new UnsupportedFormatError(`Malformed container.xml, '${uncompressedFileFullPath}' not contained in zip`);
+        }
+
+        return IOHelper.toString(file.data, this.settings.importer.encoding); 
     }
 
     private mergePartGroups(): void {
@@ -241,6 +304,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
+        let chordsByIdForTrack = new Map<string, Chord>();
         if (masterBar) {
             let attributesParsed: boolean = false;
             for (let c of element.childNodes) {
@@ -262,7 +326,7 @@ export class MusicXmlImporter extends ScoreImporter {
                             }
                             break;
                         case 'harmony':
-                            this.parseHarmony(c, track);
+                            this.parseHarmony(c, track, chordsByIdForTrack);
                             break;
                         case 'sound':
                             // TODO
@@ -414,131 +478,24 @@ export class MusicXmlImporter extends ScoreImporter {
     private _currentChord: string | null = null;
     private _divisionsPerQuarterNote: number = 0;
 
-    private parseHarmony(element: XmlNode, track: Track): void {
-        let rootStep: string | null = null;
-        let rootAlter: string = '';
-        // let kind: string | null = null;
-        // let kindText: string | null = null;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
+    private parseHarmony(element: XmlNode, track: Track, chordsByIdForTrack: Map<string, Chord>): void {
+        let chord: Chord = new Chord();
+        for (let childNode of element.childNodes) {
+            if (childNode.nodeType === XmlNodeType.Element) {
+                switch (childNode.localName) {
                     case 'root':
-                        for (let rootChild of c.childNodes) {
-                            if (rootChild.nodeType === XmlNodeType.Element) {
-                                switch (rootChild.localName) {
-                                    case 'root-step':
-                                        rootStep = rootChild.innerText;
-                                        break;
-                                    case 'root-alter':
-                                        switch (parseInt(c.innerText)) {
-                                            case -2:
-                                                rootAlter = ' bb';
-                                                break;
-                                            case -1:
-                                                rootAlter = ' b';
-                                                break;
-                                            case 0:
-                                                rootAlter = '';
-                                                break;
-                                            case 1:
-                                                rootAlter = ' #';
-                                                break;
-                                            case 2:
-                                                rootAlter = ' ##';
-                                                break;
-                                        }
-                                        break;
-                                }
-                            }
-                        }
+                        chord.name = this.parseHarmonyRoot(childNode);
                         break;
                     case 'kind':
-                        // kindText = c.getAttribute('text');
-                        // kind = c.innerText;
+                        chord.name = chord.name + this.parseHarmonyKind(childNode);
+                        break;
+                    case 'frame':
+                        this.parseHarmonyFrame(childNode, chord);
                         break;
                 }
             }
         }
-        let chord: Chord = new Chord();
-        chord.name = rootStep + rootAlter;
-        // TODO: find proper names for the rest
-        // switch (kind)
-        // {
-        //    // triads
-        //    case "major":
-        //        break;
-        //    case "minor":
-        //        chord.Name += "m";
-        //        break;
-        //    // Sevenths
-        //    case "augmented":
-        //        break;
-        //    case "diminished":
-        //        break;
-        //    case "dominant":
-        //        break;
-        //    case "major-seventh":
-        //        chord.Name += "7M";
-        //        break;
-        //    case "minor-seventh":
-        //        chord.Name += "m7";
-        //        break;
-        //    case "diminished-seventh":
-        //        break;
-        //    case "augmented-seventh":
-        //        break;
-        //    case "half-diminished":
-        //        break;
-        //    case "major-minor":
-        //        break;
-        //    // Sixths
-        //    case "major-sixth":
-        //        break;
-        //    case "minor-sixth":
-        //        break;
-        //    // Ninths
-        //    case "dominant-ninth":
-        //        break;
-        //    case "major-ninth":
-        //        break;
-        //    case "minor-ninth":
-        //        break;
-        //    // 11ths
-        //    case "dominant-11th":
-        //        break;
-        //    case "major-11th":
-        //        break;
-        //    case "minor-11th":
-        //        break;
-        //    // 13ths
-        //    case "dominant-13th":
-        //        break;
-        //    case "major-13th":
-        //        break;
-        //    case "minor-13th":
-        //        break;
-        //    // Suspended
-        //    case "suspended-second":
-        //        break;
-        //    case "suspended-fourth":
-        //        break;
-        //    // Functional sixths
-        //    case "Neapolitan":
-        //        break;
-        //    case "Italian":
-        //        break;
-        //    case "French":
-        //        break;
-        //    case "German":
-        //        break;
-        //    // Other
-        //    case "pedal":
-        //        break;
-        //    case "power":
-        //        break;
-        //    case "Tristan":
-        //        break;
-        // }
+
         // var degree = element.GetElementsByTagName("degree");
         // if (degree.Length > 0)
         // {
@@ -555,8 +512,201 @@ export class MusicXmlImporter extends ScoreImporter {
         //    }
         // }
         this._currentChord = ModelUtils.newGuid();
+        const chordKey: string = chord.uniqueId;
+        if (chordsByIdForTrack.has(chordKey)) {
+            // check if the chord is already present
+            chord.showDiagram = false;
+        }
         for (let staff of track.staves) {
             staff.addChord(this._currentChord, chord);
+        }
+        chordsByIdForTrack.set(chordKey, chord);
+    }
+
+    private parseHarmonyRoot(xmlNode: XmlNode): string {
+        let rootStep: string = '';
+        let rootAlter: string = '';
+        for (let rootChild of xmlNode.childNodes) {
+            if (rootChild.nodeType === XmlNodeType.Element) {
+                switch (rootChild.localName) {
+                    case 'root-step':
+                        rootStep = rootChild.innerText;
+                        break;
+                    case 'root-alter':
+                        switch (parseInt(xmlNode.innerText)) {
+                            case -2:
+                                rootAlter = 'bb';
+                                break;
+                            case -1:
+                                rootAlter = 'b';
+                                break;
+                            case 0:
+                                rootAlter = '';
+                                break;
+                            case 1:
+                                rootAlter = '#';
+                                break;
+                            case 2:
+                                rootAlter = '##';
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
+        return rootStep + rootAlter;
+    }
+
+    private parseHarmonyKind(xmlNode: XmlNode): string {
+        const kindText: string = xmlNode.getAttribute('text');
+        let resultKind: string = '';
+        if (kindText) {
+            // the abbreviation is already provided
+            resultKind = kindText;
+        } else {
+            const kindContent: string = xmlNode.innerText;
+            switch (kindContent) {
+                // triads
+                case 'major':
+                    resultKind = '';
+                    break;
+                case 'minor':
+                    resultKind = 'm';
+                    break;
+                // Sevenths
+                case 'augmented':
+                    resultKind = '+';
+                    break;
+                case 'diminished':
+                    resultKind = '\u25CB';
+                    break;
+                case 'dominant':
+                    resultKind = '7';
+                    break;
+                case 'major-seventh':
+                    resultKind = '7M';
+                    break;
+                case 'minor-seventh':
+                    resultKind = 'm7';
+                    break;
+                case 'diminished-seventh':
+                    resultKind = '\u25CB7';
+                    break;
+                case 'augmented-seventh':
+                    resultKind = '+7';
+                    break;
+                case 'half-diminished':
+                    resultKind = '\u2349';
+                    break;
+                case 'major-minor':
+                    resultKind = 'mMaj';
+                    break;
+                // Sixths
+                case 'major-sixth':
+                    resultKind = 'maj6';
+                    break;
+                case 'minor-sixth':
+                    resultKind = 'm6';
+                    break;
+                // Ninths
+                case 'dominant-ninth':
+                    resultKind = '9';
+                    break;
+                case 'major-ninth':
+                    resultKind = 'maj9';
+                    break;
+                case 'minor-ninth':
+                    resultKind = 'm9';
+                    break;
+                // 11ths
+                case 'dominant-11th':
+                    resultKind = '11';
+                    break;
+                case 'major-11th':
+                    resultKind = 'maj11';
+                    break;
+                case 'minor-11th':
+                    resultKind = 'm11';
+                    break;
+                // 13ths
+                case 'dominant-13th':
+                    resultKind = '13';
+                    break;
+                case 'major-13th':
+                    resultKind = 'maj13';
+                    break;
+                case 'minor-13th':
+                    resultKind = 'm13';
+                    break;
+                // Suspended
+                case 'suspended-second':
+                    resultKind = 'sus2';
+                    break;
+                case 'suspended-fourth':
+                    resultKind = 'sus4';
+                    break;
+                // TODO: find proper names for the rest
+                // Functional sixths
+                // case "Neapolitan":
+                //     break;
+                // case "Italian":
+                //     break;
+                // case "French":
+                //     break;
+                // case "German":
+                //     break;
+                // // Other
+                // case "pedal":
+                //     break;
+                // case "power":
+                //     break;
+                // case "Tristan":
+                //     break;
+            }
+        }
+
+        return resultKind;
+    }
+
+    private parseHarmonyFrame(xmlNode: XmlNode, chord: Chord) {
+        for (let frameChild of xmlNode.childNodes) {
+            if (frameChild.nodeType === XmlNodeType.Element) {
+                switch (frameChild.localName) {
+                    case 'frame-strings':
+                        const stringsCount: number = parseInt(frameChild.innerText);
+                        chord.strings = new Array<number>(stringsCount);
+                        for (let i = 0; i < stringsCount; i++) {
+                            // set strings unplayed as default
+                            chord.strings[i] = -1;
+                        }
+                        break;
+                    case 'first-fret':
+                        chord.firstFret = parseInt(frameChild.innerText);
+                        break;
+                    case 'frame-note':
+                        let stringNo: number | null = null;
+                        let fretNo: number | null = null;
+                        for (let noteChild of frameChild.childNodes) {
+                            switch (noteChild.localName) {
+                                case 'string':
+                                    stringNo = parseInt(noteChild.innerText);
+                                    break;
+                                case 'fret':
+                                    fretNo = parseInt(noteChild.innerText);
+                                    if (stringNo && fretNo >= 0) {
+                                        chord.strings[stringNo - 1] = fretNo;
+                                    }
+                                    break;
+                                case 'barre':
+                                    if (stringNo && fretNo && noteChild.getAttribute('type') === 'start') {
+                                        chord.barreFrets.push(fretNo);
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
         }
     }
 
@@ -812,9 +962,11 @@ export class MusicXmlImporter extends ScoreImporter {
         } else if (element.getAttribute('type') === 'stop' && this._tieStarts.length > 0 && !note.isTieDestination) {
             const tieOrigin = this._tieStarts[0];
             // no cross track/staff or voice ties supported for now
-            if(tieOrigin.beat.voice.index === note.beat.voice.index && 
-               tieOrigin.beat.voice.bar.staff.index === note.beat.voice.bar.staff.index &&
-               tieOrigin.beat.voice.bar.staff.track.index === note.beat.voice.bar.staff.track.index) {
+            if (
+                tieOrigin.beat.voice.index === note.beat.voice.index &&
+                tieOrigin.beat.voice.bar.staff.index === note.beat.voice.bar.staff.index &&
+                tieOrigin.beat.voice.bar.staff.track.index === note.beat.voice.bar.staff.track.index
+            ) {
                 note.isTieDestination = true;
                 note.tieOrigin = this._tieStarts[0];
             }
@@ -855,9 +1007,9 @@ export class MusicXmlImporter extends ScoreImporter {
                             slurNumber = '1';
                         }
 
-                        // slur numbers are unique in the way that they have the same ID across 
-                        // staffs/tracks etc. as long they represent the logically same slur. 
-                        // but in our case it must be globally unique to link the correct notes. 
+                        // slur numbers are unique in the way that they have the same ID across
+                        // staffs/tracks etc. as long they represent the logically same slur.
+                        // but in our case it must be globally unique to link the correct notes.
                         // adding the staff ID should be enough to achieve this
                         slurNumber = beat.voice.bar.staff.index + '_' + slurNumber;
 
@@ -904,6 +1056,8 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseTechnical(element: XmlNode, note: Note): void {
+        let bends: XmlNode[] = [];
+        
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -922,12 +1076,61 @@ export class MusicXmlImporter extends ScoreImporter {
                     case 'up-bow':
                         note.beat.pickStroke = PickStroke.Up;
                         break;
+                    case 'bend' :
+                        bends.push(c);
+                        break;
                 }
             }
         }
+
+        if (bends.length > 0) {
+            this.parseBends(bends, note);
+        }
+
         if (note.string === -2147483648 || note.fret === -2147483648) {
             note.string = -1;
             note.fret = -1;
+        }
+    }
+
+    private parseBends(elements: XmlNode[], note: Note): void {
+        let baseOffset: number = BendPoint.MaxPosition / elements.length; 
+        let currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
+        let currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
+        let isFirstBend: boolean = true;
+
+        for (let bend of elements) {
+            let bendAlterElement: XmlNode | null = bend.findChildElement("bend-alter");
+            if (bendAlterElement) {
+                let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 2);
+                if (bend.findChildElement("pre-bend")) {
+                    if (isFirstBend){
+                        currentValue += absValue;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        currentOffset += baseOffset;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        isFirstBend = false;
+                    }else{
+                        currentOffset += baseOffset;
+                    }
+                } else if (bend.findChildElement("release")) {
+                    if (isFirstBend){
+                        currentValue += absValue;
+                    }
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentOffset += baseOffset;
+                    currentValue -= absValue;
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                    
+                } else { // "regular" bend
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentValue += absValue
+                    currentOffset += baseOffset
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                }
+            }            
         }
     }
 
@@ -1072,7 +1275,7 @@ export class MusicXmlImporter extends ScoreImporter {
                             tempoAutomation.type = AutomationType.Tempo;
                             tempoAutomation.value = parseInt(tempo);
                             masterBar.tempoAutomation = tempoAutomation;
-                            if(masterBar.index === 0) {
+                            if (masterBar.index === 0) {
                                 masterBar.score.tempo = tempoAutomation.value;
                             }
                         }
@@ -1112,7 +1315,7 @@ export class MusicXmlImporter extends ScoreImporter {
         tempoAutomation.type = AutomationType.Tempo;
         tempoAutomation.value = perMinute * ((unit / 4) | 0);
         masterBar.tempoAutomation = tempoAutomation;
-        if(masterBar.index === 0) {
+        if (masterBar.index === 0) {
             masterBar.score.tempo = tempoAutomation.value;
         }
     }

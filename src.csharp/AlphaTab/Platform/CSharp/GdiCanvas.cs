@@ -264,6 +264,15 @@ namespace AlphaTab.Platform.CSharp
             RecreateImage();
         }
 
+
+        public void Destroy()
+        {
+            _image?.Dispose();
+            _graphics?.Dispose();
+            _brush?.Dispose();
+            _pen?.Dispose();
+        }
+
         public void BeginRender(double width, double height)
         {
             _width = width;
@@ -412,11 +421,12 @@ namespace AlphaTab.Platform.CSharp
             _graphics.DrawString(text, _font, _brush, new PointF((float) x, (float) y), _stringFormat);
         }
 
-        public double MeasureText(string text)
+        public TextMetrics MeasureText(string text)
         {
             lock (MeasurementGraphics)
             {
-                return MeasurementGraphics.MeasureString(text, _font, new PointF(0,0), _stringFormat).Width;
+                var measured = MeasurementGraphics.MeasureString(text, _font, new PointF(0,0), _stringFormat);
+                return new TextMetrics(measured.Width, measured.Height);
             }
         }
 

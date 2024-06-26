@@ -38,6 +38,26 @@ export enum TextBaseline {
 }
 
 /**
+ * The TextMetrics class represents the dimensions of a piece of text in the canvas;
+ */
+export class TextMetrics {
+    /**
+     * Returns the width of a segment of inline text in CSS pixels.
+     */
+    public width: number;
+
+    /**
+     * Returns the height of a segment of inline text in CSS pixels.
+     */
+    public height: number;
+
+    public constructor(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+    }
+}
+
+/**
  * This is the base public interface for canvas implementations on different plattforms.
  */
 export interface ICanvas {
@@ -66,7 +86,7 @@ export interface ICanvas {
 
     fillText(text: string, x: number, y: number): void;
 
-    measureText(text: string): number;
+    measureText(text: string): TextMetrics;
 
     fillMusicFontSymbol(x: number, y: number, scale: number, symbol: MusicFontSymbol, centerAtPosition?: boolean): void;
 
@@ -103,4 +123,6 @@ export interface ICanvas {
     bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void;
 
     quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void;
+
+    destroy(): void;
 }

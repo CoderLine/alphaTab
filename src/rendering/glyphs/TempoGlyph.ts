@@ -1,4 +1,4 @@
-import { ICanvas } from '@src/platform/ICanvas';
+import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { RenderingResources } from '@src/RenderingResources';
@@ -27,6 +27,7 @@ export class TempoGlyph extends EffectGlyph {
             MusicFontSymbol.NoteQuarterUp,
             false
         );
+        canvas.textBaseline = TextBaseline.Top;
         canvas.fillText('= ' + this._tempo.toString(), cx + this.x + this.height / 2, cy + this.y + canvas.font.size / 2);
     }
 }

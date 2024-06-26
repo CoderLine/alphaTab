@@ -1,5 +1,6 @@
 import { Tuning } from '@src/model/Tuning';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { expect } from 'chai';
 
 describe('TuningParserTest', () => {
     it('standard', () => {
@@ -11,7 +12,7 @@ describe('TuningParserTest', () => {
             tuning[i] = ModelUtils.getTuningForText(tuningText[i]);
             tuningText2[i] = Tuning.getTextForTuning(tuning[i], true);
         }
-        expect(tuning.join(',')).toEqual(standard.tunings.join(','));
-        expect(tuningText2.join(',')).toEqual(tuningText.join(','));
+        expect(tuning.join(',')).to.equal(standard.tunings.join(','));
+        expect(tuningText2.join(',')).to.equal(tuningText.join(','));
     });
 });

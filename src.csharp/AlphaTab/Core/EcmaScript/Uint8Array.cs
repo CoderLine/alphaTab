@@ -22,6 +22,11 @@ namespace AlphaTab.Core.EcmaScript
             _data = new ArraySegment<byte>(data.Select(d => (byte)d).ToArray());
         }
 
+        public Uint8Array(ArrayBuffer buffer)
+        {
+            _data = buffer.Raw;
+        }
+
         public Uint8Array() : this(System.Array.Empty<byte>())
         {
         }

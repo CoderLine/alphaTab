@@ -2,7 +2,7 @@ import { Environment } from '@src/Environment';
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline, TextMetrics } from '@src/platform/ICanvas';
 import { Settings } from '@src/Settings';
 
 /**
@@ -40,6 +40,8 @@ export class Html5Canvas implements ICanvas {
         this._measureContext.textBaseline = 'hanging';
     }
 
+    public destroy() {}
+
     public onRenderFinished(): unknown {
         return null;
     }
@@ -47,7 +49,7 @@ export class Html5Canvas implements ICanvas {
     public beginRender(width: number, height: number): void {
         this._canvas = document.createElement('canvas');
         this._canvas.width = (width * Environment.HighDpiFactor) | 0;
-        this._canvas.height = (height  * Environment.HighDpiFactor) | 0;
+        this._canvas.height = (height * Environment.HighDpiFactor) | 0;
         this._canvas.style.width = width + 'px';
         this._canvas.style.height = height + 'px';
         this._context = this._canvas.getContext('2d')!;
@@ -88,12 +90,12 @@ export class Html5Canvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this._context.fillRect((x | 0), (y | 0), w, h);
+            this._context.fillRect(x | 0, y | 0, w, h);
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
-        this._context.strokeRect((x | 0), (y | 0), w, h);
+        this._context.strokeRect(x | 0, y | 0, w, h);
     }
 
     public beginPath(): void {
@@ -122,27 +124,13 @@ export class Html5Canvas implements ICanvas {
 
     public fillCircle(x: number, y: number, radius: number): void {
         this._context.beginPath();
-        this._context.arc(
-            x,
-            y,
-            radius,
-            0,
-            Math.PI * 2,
-            true
-        );
+        this._context.arc(x, y, radius, 0, Math.PI * 2, true);
         this.fill();
     }
 
     public strokeCircle(x: number, y: number, radius: number): void {
         this._context.beginPath();
-        this._context.arc(
-            x,
-            y,
-            radius,
-            0,
-            Math.PI * 2,
-            true
-        );
+        this._context.arc(x, y, radius, 0, Math.PI * 2, true);
         this.stroke();
     }
 
@@ -234,8 +222,9 @@ export class Html5Canvas implements ICanvas {
         this._context.fillText(text, x, y);
     }
 
-    public measureText(text: string): number {
-        return this._measureContext.measureText(text).width;
+    public measureText(text: string): TextMetrics {
+        const metrics = this._measureContext.measureText(text);
+        return new TextMetrics(metrics.width, metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent);
     }
 
     public fillMusicFontSymbol(

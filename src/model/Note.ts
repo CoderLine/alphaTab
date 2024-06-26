@@ -103,6 +103,7 @@ export class Note {
 
     /**
      * Gets or sets the fret on which this note is played on the instrument.
+     * 0 is the nut.
      */
     public fret: number = -1;
 
@@ -504,28 +505,45 @@ export class Note {
     }
 
     public get realValue(): number {
-        let realValue = this.realValueWithoutHarmonic;
-        if (this.isStringed) {
-            if (this.harmonicType === HarmonicType.Natural) {
-                realValue = this.harmonicPitch + this.stringTuning - this.beat.voice.bar.staff.transpositionPitch;
-            } else {
-                realValue += this.harmonicPitch;
-            }
-        }
-        return realValue;
+        return this.calculateRealValue(true, true);
     }
 
     public get realValueWithoutHarmonic(): number {
-        if (this.isPercussion) {
-            return this.percussionArticulation;
+        return this.calculateRealValue(true, false);
+    }
+
+    /**
+     * Calculates the real note value of this note as midi key respecting the given options.
+     * @param applyTranspositionPitch Whether or not to apply the transposition pitch of the current staff. 
+     * @param applyHarmonic Whether or not to apply harmonic pitches to the note. 
+     * @returns The calculated note value as midi key.
+     */
+    public calculateRealValue(applyTranspositionPitch: boolean, applyHarmonic: boolean): number {
+        const transpositionPitch = applyTranspositionPitch ? this.beat.voice.bar.staff.transpositionPitch : 0;
+
+        if (applyHarmonic) {
+            let realValue = this.calculateRealValue(applyTranspositionPitch, false);
+            if (this.isStringed) {
+                if (this.harmonicType === HarmonicType.Natural) {
+                    realValue = this.harmonicPitch + this.stringTuning - transpositionPitch;
+                } else {
+                    realValue += this.harmonicPitch;
+                }
+            }
+            return realValue;
         }
-        if (this.isStringed) {
-            return this.fret + this.stringTuning - this.beat.voice.bar.staff.transpositionPitch;
+        else {
+            if (this.isPercussion) {
+                return this.percussionArticulation;
+            }
+            if (this.isStringed) {
+                return this.fret + this.stringTuning - transpositionPitch;
+            }
+            if (this.isPiano) {
+                return this.octave * 12 + this.tone - transpositionPitch;
+            }
+            return 0;
         }
-        if (this.isPiano) {
-            return this.octave * 12 + this.tone - this.beat.voice.bar.staff.transpositionPitch;
-        }
-        return 0;
     }
 
     public get harmonicPitch(): number {
@@ -844,7 +862,11 @@ export class Note {
                         this.bendType = BendType.PrebendRelease;
                     }
                 } else {
-                    this.bendType = BendType.Hold;
+                    if (origin.value > 0 && !isContinuedBend) {
+                        this.bendType = BendType.Prebend;
+                    } else {
+                        this.bendType = BendType.Hold;
+                    }
                 }
             }
         } else if (points === null || points.length === 0) {

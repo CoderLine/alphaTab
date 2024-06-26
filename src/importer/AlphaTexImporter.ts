@@ -37,6 +37,7 @@ import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { IOHelper } from '@src/io/IOHelper';
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
+import { PercussionMapper } from '@src/model/PercussionMapper';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -56,7 +57,7 @@ export enum AlphaTexSymbols {
     Pipe,
     MetaCommand,
     Multiply,
-    LowerThan,
+    LowerThan
 }
 
 export class AlphaTexError extends AlphaTabError {
@@ -76,7 +77,7 @@ export class AlphaTexError extends AlphaTabError {
         nonTerm: string | null,
         expected: AlphaTexSymbols | null,
         symbol: AlphaTexSymbols | null,
-        symbolData: unknown = null,
+        symbolData: unknown = null
     ) {
         super(AlphaTabErrorType.AlphaTex, message);
         this.position = position;
@@ -96,7 +97,7 @@ export class AlphaTexError extends AlphaTabError {
         nonTerm: string,
         expected: AlphaTexSymbols,
         symbol: AlphaTexSymbols,
-        symbolData: unknown = null,
+        symbolData: unknown = null
     ): AlphaTexError {
         let message = `MalFormed AlphaTex: @${position} (line ${line}, col ${col}): Error on block ${nonTerm}`;
         if (expected !== symbol) {
@@ -125,7 +126,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _score!: Score;
     private _currentTrack!: Track;
     private _currentStaff!: Staff;
-    private _input: string = "";
+    private _input: string = '';
     private _ch: number = AlphaTexImporter.Eof;
     // Keeps track of where in input string we are
     private _curChPos: number = 0;
@@ -134,8 +135,9 @@ export class AlphaTexImporter extends ScoreImporter {
     // Last known position that had valid syntax/symbols
     private _lastValidSpot: number[] = [0, 1, 0];
     private _sy: AlphaTexSymbols = AlphaTexSymbols.No;
-    private _syData: unknown = "";
+    private _syData: unknown = '';
     private _allowNegatives: boolean = false;
+    private _allowFloat: boolean = false;
     private _allowTuning: boolean = false;
     private _currentDuration: Duration = Duration.QuadrupleWhole;
     private _currentDynamics: DynamicValue = DynamicValue.PPP;
@@ -144,6 +146,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private _staffHasExplicitTuning: boolean = false;
     private _staffTuningApplied: boolean = false;
+    private _percussionArticulationNames = new Map<string, number>();
 
     public logErrors: boolean = false;
 
@@ -548,7 +551,7 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (this._ch === 0x2d /* - */) {
                 // negative number
                 // is number?
-                if (this._allowNegatives && this.isDigit(this._ch)) {
+                if (this._allowNegatives) {
                     this._sy = AlphaTexSymbols.Number;
                     this._syData = this.readNumber();
                 } else {
@@ -612,11 +615,8 @@ export class AlphaTexImporter extends ScoreImporter {
      */
     private static isNameLetter(ch: number): boolean {
         return (
-            !AlphaTexImporter.isTerminal(ch) && ( // no control characters, whitespaces, numbers or dots
-                (0x21 <= ch && ch <= 0x2f) ||
-                (0x3a <= ch && ch <= 0x7e) ||
-                0x80 <= ch // Unicode Symbols
-            )
+            !AlphaTexImporter.isTerminal(ch) && // no control characters, whitespaces, numbers or dots
+            ((0x21 <= ch && ch <= 0x2f) || (0x3a <= ch && ch <= 0x7e) || 0x80 <= ch) // Unicode Symbols
         );
     }
 
@@ -649,7 +649,8 @@ export class AlphaTexImporter extends ScoreImporter {
     private isDigit(ch: number): boolean {
         return (
             (ch >= 0x30 && ch <= 0x39) /* 0-9 */ ||
-            (this._allowNegatives && ch === 0x2d /* - */) // allow minus sign if negatives
+            (this._allowNegatives && ch === 0x2d) /* - */ || // allow minus sign if negatives
+            (this._allowFloat && ch === 0x2e) /* . */ // allow dot if float
         );
     }
 
@@ -676,7 +677,7 @@ export class AlphaTexImporter extends ScoreImporter {
             str += String.fromCharCode(this._ch);
             this._ch = this.nextChar();
         } while (this.isDigit(this._ch));
-        return parseInt(str);
+        return this._allowFloat ? parseFloat(str) : parseInt(str);
     }
 
     private metaData(): boolean {
@@ -726,7 +727,9 @@ export class AlphaTexImporter extends ScoreImporter {
                     anyMeta = true;
                     break;
                 case 'tempo':
+                    this._allowFloat = true;
                     this._sy = this.newSy();
+                    this._allowFloat = false;
                     if (this._sy === AlphaTexSymbols.Number) {
                         this._score.tempo = this._syData as number;
                     } else {
@@ -817,7 +820,15 @@ export class AlphaTexImporter extends ScoreImporter {
                     }
                 } else if (this._sy === AlphaTexSymbols.String) {
                     let instrumentName: string = (this._syData as string).toLowerCase();
-                    this._currentTrack.playbackInfo.program = GeneralMidi.getValue(instrumentName);
+                    if (instrumentName === 'percussion') {
+                        for (const staff of this._currentTrack.staves) {
+                            this.applyPercussionStaff(staff);
+                        }
+                        this._currentTrack.playbackInfo.primaryChannel = 9;
+                        this._currentTrack.playbackInfo.secondaryChannel = 9;
+                    } else {
+                        this._currentTrack.playbackInfo.program = GeneralMidi.getValue(instrumentName);
+                    }
                 } else {
                     this.error('instrument', AlphaTexSymbols.Number, true);
                 }
@@ -848,7 +859,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     chord.name = this._syData as string;
                     this._sy = this.newSy();
                 } else {
-                    this.error('chord-name', AlphaTexSymbols.Number, true);
+                    this.error('chord-name', AlphaTexSymbols.String, true);
                 }
                 for (let i: number = 0; i < this._currentStaff.tuning.length; i++) {
                     if (this._sy === AlphaTexSymbols.Number) {
@@ -860,9 +871,56 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 this._currentStaff.addChord(this.getChordId(this._currentStaff, chord.name), chord);
                 return true;
+            case 'articulation':
+                this._sy = this.newSy();
+
+                let name = '';
+                if (this._sy === AlphaTexSymbols.String) {
+                    name = this._syData as string;
+                    this._sy = this.newSy();
+                } else {
+                    this.error('articulation-name', AlphaTexSymbols.String, true);
+                }
+
+                if (name === 'defaults') {
+                    for (const [defaultName, defaultValue] of PercussionMapper.instrumentArticulationNames) {
+                        this._percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
+                        this._percussionArticulationNames.set(AlphaTexImporter.toArticulationId(defaultName), defaultValue);
+                    }
+                    return true;
+                }
+
+                let number = 0;
+                if (this._sy === AlphaTexSymbols.Number) {
+                    number = this._syData as number;
+                    this._sy = this.newSy();
+                } else {
+                    this.error('articulation-number', AlphaTexSymbols.Number, true);
+                }
+
+                if (!PercussionMapper.instrumentArticulations.has(number)) {
+                    this.errorMessage(
+                        `Unknown articulation ${number}. Refer to https://www.alphatab.net/docs/alphatex/percussion for available ids`
+                    );
+                }
+
+                this._percussionArticulationNames.set(name.toLowerCase(), number);
+                return true;
             default:
                 return false;
         }
+    }
+    
+    /**
+     * Encodes a given string to a shorthand text form without spaces or special characters
+     */
+    private static toArticulationId(plain: string): string {
+        return plain.replace(new RegExp("[^a-zA-Z0-9]", "g"), "").toLowerCase()
+    }
+
+    private applyPercussionStaff(staff: Staff) {
+        staff.isPercussion = true;
+        staff.showTablature = false;
     }
 
     private chordProperties(chord: Chord): void {
@@ -994,7 +1052,14 @@ export class AlphaTexImporter extends ScoreImporter {
             this._sy = this.newSy();
             if (this._currentTrack.staves[0].bars.length > 0) {
                 this._currentTrack.ensureStaveCount(this._currentTrack.staves.length + 1);
+
+                const isPercussion = this._currentStaff.isPercussion;
                 this._currentStaff = this._currentTrack.staves[this._currentTrack.staves.length - 1];
+
+                if (isPercussion) {
+                    this.applyPercussionStaff(this._currentStaff);
+                }
+
                 this._currentDynamics = DynamicValue.F;
             }
             this.staffProperties();
@@ -1009,6 +1074,7 @@ export class AlphaTexImporter extends ScoreImporter {
         this._sy = this.newSy();
         let showStandardNotation: boolean = false;
         let showTabs: boolean = false;
+        let showSlash: boolean = false;
         while (this._sy === AlphaTexSymbols.String) {
             switch ((this._syData as string).toLowerCase()) {
                 case 'score':
@@ -1019,14 +1085,19 @@ export class AlphaTexImporter extends ScoreImporter {
                     showTabs = true;
                     this._sy = this.newSy();
                     break;
+                case 'slash':
+                    showSlash = true;
+                    this._sy = this.newSy();
+                    break;
                 default:
                     this.error('staff-properties', AlphaTexSymbols.String, false);
                     break;
             }
         }
-        if (showStandardNotation || showTabs) {
+        if (showStandardNotation || showTabs || showSlash) {
             this._currentStaff.showStandardNotation = showStandardNotation;
             this._currentStaff.showTablature = showTabs;
+            this._currentStaff.showSlash = showSlash;
         }
         if (this._sy !== AlphaTexSymbols.RBrace) {
             this.error('staff-properties', AlphaTexSymbols.RBrace, true);
@@ -1066,7 +1137,15 @@ export class AlphaTexImporter extends ScoreImporter {
                 // bass G2 D2 A1 E1
                 this._currentStaff.displayTranspositionPitch = -12;
                 this._currentStaff.stringTuning.tunings = [43, 38, 33, 28];
-            } else if (program == 40 || program == 44 || program == 45 || program == 48 || program == 49 || program == 50 || program == 51) {
+            } else if (
+                program == 40 ||
+                program == 44 ||
+                program == 45 ||
+                program == 48 ||
+                program == 49 ||
+                program == 50 ||
+                program == 51
+            ) {
                 // violin E3 A3 D3 G2
                 this._currentStaff.stringTuning.tunings = [52, 57, 50, 43];
             } else if (program == 41) {
@@ -1130,15 +1209,20 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private beat(voice: Voice): boolean {
-        // duration specifier?
+        // duration specifier?       
         this.beatDuration();
+
         let beat: Beat = new Beat();
         voice.addBeat(beat);
+
+        this._allowTuning = !this._currentStaff.isPercussion;
+
         // notes
         if (this._sy === AlphaTexSymbols.LParensis) {
             this._sy = this.newSy();
             this.note(beat);
             while (this._sy !== AlphaTexSymbols.RParensis && this._sy !== AlphaTexSymbols.Eof) {
+                this._allowTuning = !this._currentStaff.isPercussion;
                 if (!this.note(beat)) {
                     break;
                 }
@@ -1506,15 +1590,27 @@ export class AlphaTexImporter extends ScoreImporter {
         switch (this._sy) {
             case AlphaTexSymbols.Number:
                 fret = this._syData as number;
+                if (this._currentStaff.isPercussion && !PercussionMapper.instrumentArticulations.has(fret)) {
+                    this.errorMessage(`Unknown percussion articulation ${fret}`);
+                } 
                 break;
             case AlphaTexSymbols.String:
-                isDead = (this._syData as string) === 'x';
-                isTie = (this._syData as string) === '-';
-
-                if (isTie || isDead) {
-                    fret = 0;
+                if (this._currentStaff.isPercussion) {
+                    const articulationName = (this._syData as string).toLowerCase();
+                    if (this._percussionArticulationNames.has(articulationName)) {
+                        fret = this._percussionArticulationNames.get(articulationName)!;
+                    } else {
+                        this.errorMessage(`Unknown percussion articulation '${this._syData}'`);
+                    }
                 } else {
-                    this.error('note-fret', AlphaTexSymbols.Number, true);
+                    isDead = (this._syData as string) === 'x';
+                    isTie = (this._syData as string) === '-';
+
+                    if (isTie || isDead) {
+                        fret = 0;
+                    } else {
+                        this.error('note-fret', AlphaTexSymbols.Number, true);
+                    }
                 }
                 break;
             case AlphaTexSymbols.Tuning:
@@ -1527,7 +1623,8 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy(); // Fret done
 
-        let isFretted: boolean = octave === -1 && this._currentStaff.tuning.length > 0;
+        let isFretted: boolean =
+            octave === -1 && this._currentStaff.tuning.length > 0 && !this._currentStaff.isPercussion;
         let noteString: number = -1;
         if (isFretted) {
             // Fret [Dot] String
@@ -1554,6 +1651,8 @@ export class AlphaTexImporter extends ScoreImporter {
             if (!isTie) {
                 note.fret = fret;
             }
+        } else if (this._currentStaff.isPercussion) {
+            note.percussionArticulation = fret;
         } else {
             note.octave = octave;
             note.tone = tone;
@@ -1878,7 +1977,9 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 this._sy = this.newSy();
             } else if (syData === 'tempo') {
+                this._allowFloat = true;
                 this._sy = this.newSy();
+                this._allowFloat = false;
                 if (this._sy !== AlphaTexSymbols.Number) {
                     this.error('tempo', AlphaTexSymbols.Number, true);
                 }

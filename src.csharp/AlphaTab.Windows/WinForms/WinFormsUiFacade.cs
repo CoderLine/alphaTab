@@ -6,9 +6,9 @@ using System.Windows.Forms;
 using AlphaTab.Synth;
 using AlphaTab.Platform;
 using AlphaTab.Platform.CSharp;
+using AlphaTab.Platform.Skia.AlphaSkiaBridge;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
-using SkiaSharp;
 
 namespace AlphaTab.WinForms
 {
@@ -143,10 +143,10 @@ namespace AlphaTab.WinForms
                     case string _:
                         // TODO: svg support
                         return;
-                    case SKImage skiaImage:
+                    case AlphaSkiaImage skiaImage:
                         using (skiaImage)
                         {
-                            source = SkiaUtil.ToBitmap(skiaImage);
+                            source = AlphaSkiaUtil.ToBitmap(skiaImage);
                         }
 
                         break;

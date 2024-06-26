@@ -354,7 +354,7 @@ export class TieGlyph extends Glyph {
         canvas.lineTo(x2, y2);
         canvas.stroke();
         if (slurText) {
-            let w: number = canvas.measureText(slurText);
+            let w: number = canvas.measureText(slurText).width;
             let textOffset: number = down ? 0 : -canvas.font.size;
             canvas.fillText(slurText, cp1X - w / 2, cp1Y + textOffset);
         }

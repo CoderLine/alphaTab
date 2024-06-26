@@ -4,6 +4,7 @@ private/
 playground/
 obj/
 bin/
+temp/
 .idea/
 .vs/
 *.user
@@ -19,3 +20,7 @@ gradle-app.setting
 .gradletasknamecache
 **/build/
 local.properties
+.rollup.cache
+test-data/bundler/webpack/out/
+test-data/bundler/vite/public/
+test-data/bundler/dist/public/

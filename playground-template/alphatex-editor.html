@@ -21,7 +21,6 @@
     <script src="https://cdn.jsdelivr.net/npm/handlebars@4.5.3/dist/handlebars.min.js"
         integrity="sha256-GwjGuGudzIwyNtTEBZuBYYPDvNlSMSKEDwECr6x6H9c=" crossorigin="anonymous"></script>
 
-    <script src="/dist/alphaTab.js"></script>
     <link rel="stylesheet" href="control.css" />
     <link rel="stylesheet" href="alphatex-editor.css" />
 
@@ -53,9 +52,28 @@
             15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}
         </div>
     </div>
-    <script type="text/javascript" src="control.js"></script>
-    <script type="text/javascript" src="alphatex-editor.js"></script>
-    <script type="text/javascript">
+    <script type="module">
+        import { setupControl } from './control.mjs';
+
+        function trimCode(code) {
+            return code
+                .trim()
+                .split(/\r?\n/)
+                .map(l => l.trimLeft())
+                .join('\r\n');
+        }
+
+        function setupEditor(api, selector) {
+            const element = document.querySelector(selector);
+            element.innerHTML = trimCode(element.innerHTML);
+            const editor = ace.edit(element, {
+                mode: 'ace/mode/tex'
+            });
+            editor.session.on('change', () => {
+                api.tex(editor.getSession().getDocument().getAllLines().join('\n'), 'all');
+            });
+        }
+
         const req = new XMLHttpRequest();
         req.onload = data => {
             document.getElementById('placeholder').outerHTML = req.responseText;
@@ -66,7 +84,7 @@
             element.dataset.tex = true;
             element.innerHTML = document.getElementById('editor').innerHTML;
 
-            window.at = setupControl('#alphaTab');
+            window.at = setupControl('#alphaTab', { file: undefined, tex: ''});
             setupEditor(window.at, '#editor');
         };
         req.open('GET', 'control-template.html');

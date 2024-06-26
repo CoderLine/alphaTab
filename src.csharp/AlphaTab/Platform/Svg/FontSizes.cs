@@ -13,7 +13,7 @@ namespace AlphaTab.Platform.Svg
             }
 
             // TODO: maybe allow fallback to GDI/Skia based on availability?
-            FontSizeLookupTables.Set(family, new Uint8Array(new[] {8}));
+            FontSizeLookupTables.Set(family, new FontSizeDefinition(new Uint8Array(new[] {8}), 1.2));
         }
     }
 }

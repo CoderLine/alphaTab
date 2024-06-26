@@ -35,19 +35,19 @@ import { Track } from '@src/model/Track';
 //  
 
 
-export class ScoreView {
+class PartConfigurationScoreView {
     public isMultiRest: boolean = false;
-    public trackViewGroups: TrackViewGroup[] = [];
+    public trackViewGroups: PartConfigurationTrackViewGroup[] = [];
 }
 
-export class TrackViewGroup {
+class PartConfigurationTrackViewGroup {
     public showSlash: boolean = false;
     public showStandardNotation: boolean = false;
     public showTablature: boolean = false;
 }
 
 export class PartConfiguration {
-    public scoreViews: ScoreView[] = [];
+    public scoreViews: PartConfigurationScoreView[] = [];
 
     public apply(score: Score): void {
         // for now we only look at the first score view which seem to hold
@@ -60,6 +60,7 @@ export class PartConfiguration {
                     for(const staff of track.staves) {
                         staff.showTablature = trackConfig.showTablature;
                         staff.showStandardNotation = trackConfig.showStandardNotation;
+                        staff.showSlash = trackConfig.showSlash;
                     }
                 }
                 trackIndex++;
@@ -74,7 +75,7 @@ export class PartConfiguration {
 
         for (let i: number = 0; i < scoreViewCount; i++) {
             
-            const scoreView = new ScoreView();
+            const scoreView = new PartConfigurationScoreView();
             this.scoreViews.push(scoreView);
 
             scoreView.isMultiRest = GpBinaryHelpers.gpReadBool(readable);
@@ -86,7 +87,7 @@ export class PartConfiguration {
                 if (flags === 0) {
                     flags = 1;
                 }
-                let trackConfiguration = new TrackViewGroup();
+                let trackConfiguration = new PartConfigurationTrackViewGroup();
                 trackConfiguration.showStandardNotation = (flags & 0x01) !== 0;
                 trackConfiguration.showTablature = (flags & 0x02) !== 0;
                 trackConfiguration.showSlash = (flags & 0x04) !== 0;
@@ -98,20 +99,21 @@ export class PartConfiguration {
     public static writeForScore(score: Score): Uint8Array {
         const writer = ByteBuffer.withCapacity(128);
 
-        const scoreViews: ScoreView[] = [
-            new ScoreView() // Multi Track Score View
+        const scoreViews: PartConfigurationScoreView[] = [
+            new PartConfigurationScoreView() // Multi Track Score View
         ];
 
         for (const track of score.tracks) {
-            const trackConfiguration = new TrackViewGroup();
+            const trackConfiguration = new PartConfigurationTrackViewGroup();
             // NOTE: unclear how multi staff settings are meant in this format
             // in the Guitar Pro UI there is no individual staff config
             trackConfiguration.showStandardNotation = track.staves[0].showStandardNotation;
             trackConfiguration.showTablature = track.staves[0].showTablature;
+            trackConfiguration.showSlash = track.staves[0].showSlash;
 
             scoreViews[0].trackViewGroups.push(trackConfiguration);
 
-            const singleTrackScoreView = new ScoreView();
+            const singleTrackScoreView = new PartConfigurationScoreView();
             singleTrackScoreView.trackViewGroups.push(trackConfiguration);
             scoreViews.push(singleTrackScoreView);
         }

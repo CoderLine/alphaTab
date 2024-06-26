@@ -3,7 +3,6 @@ import { MasterBarTickLookup } from '@src/midi/MasterBarTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { Beat } from '@src/model/Beat';
 import { MasterBar } from '@src/model/MasterBar';
-import { Track } from '@src/model/Track';
 
 /**
  * Represents the results of searching the currently played beat.
@@ -11,49 +10,81 @@ import { Track } from '@src/model/Track';
  */
 export class MidiTickLookupFindBeatResult {
     /**
-     * Gets or sets the beat that is currently played.
+     * Gets or sets the beat that is currently played and used for the start 
+     * position of the cursor animation.
      */
-    public get currentBeat(): Beat {
-        return this.currentBeatLookup.beat;
-    }
+    public beat!: Beat;
+
+    /**
+     * Gets or sets the parent MasterBarTickLookup to which this beat lookup belongs to.
+     */
+    public masterBar: MasterBarTickLookup;
+
+    /**
+     * Gets or sets the related beat tick lookup.
+     */
+    public beatLookup!: BeatTickLookup;
 
     /**
      * Gets or sets the beat that will be played next.
      */
-    public get nextBeat(): Beat | null {
-        return this.nextBeatLookup?.beat ?? null;
-    }
+    public nextBeat: MidiTickLookupFindBeatResult | null = null;
 
     /**
-     * Gets or sets the duration in milliseconds how long this beat is playing.
-     */
-    public duration: number = 0;
-
-    /**
-     * Gets or sets the duration in midi ticks for how long this tick lookup is valid
-     * starting at the `currentBeatLookup.start`
+     * Gets or sets the duration in midi ticks how long this lookup is valid.
      */
     public tickDuration: number = 0;
 
     /**
-     * Gets or sets the beats ot highlight along the current beat.
+     * Gets or sets the duration in milliseconds how long this lookup is valid.
      */
-    public beatsToHighlight!: Beat[];
+    public duration: number = 0;
 
-    /**
-     * Gets or sets the underlying beat lookup which
-     * was used for building this MidiTickLookupFindBeatResult.
-     */
-    public currentBeatLookup!: BeatTickLookup;
+    public get start(): number {
+        return this.masterBar.start + this.beatLookup.start;
+    }
 
-    /**
-     * Gets or sets the beat lookup for the next beat.
-     */
-    public nextBeatLookup: BeatTickLookup | null = null;
+    public get end(): number {
+        return this.start + this.tickDuration;
+    }
+
+    public constructor(masterBar: MasterBarTickLookup) {
+        this.masterBar = masterBar;
+    }
 }
 
 /**
  * This class holds all information about when {@link MasterBar}s and {@link Beat}s are played.
+ * 
+ * On top level it is organized into {@link MasterBarTickLookup} objects indicating the 
+ * master bar start and end times. This information is used to highlight the currently played bars
+ * and it gives access to the played beats in this masterbar and their times. 
+ * 
+ * The {@link BeatTickLookup} are then the slices into which the masterbar is separated by the voices and beats 
+ * of all tracks. An example how things are organized:
+ * 
+ * Time (eighths):  | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 
+ * 
+ * Track 1:         |        B1         |        B2         |    B3   |    B4   |    B5   |    B6   |
+ * Track 2:         |                  B7                   |         B7        | B9 | B10| B11| B12|
+ * Track 3:         |                                      B13                                      |
+ * 
+ * Lookup:          |        L1         |        L2         |    L3    |   L4   | L5 | L6 | L7 | L8 |
+ * Active Beats:    
+ * - L1             B1,B7,B13           
+ * - L2                                 B2,B7,B13           
+ * - L3                                                      B3,B7,B13    
+ * - L4                                                                 B4,B7,B13
+ * - L5                                                                          B5,B9,B13
+ * - L6                                                                               B5,B10,B13
+ * - L7                                                                                    B6,B11,B13
+ * - L8                                                                                         B6,B12,B13
+ * 
+ * Then during playback we build out of this list {@link MidiTickLookupFindBeatResult} objects which are sepcific
+ * to the visible tracks displayed. This is required because if only Track 2 is displayed we cannot use the the 
+ * Lookup L1 alone to determine the start and end of the beat cursor. In this case we will derive a 
+ * MidiTickLookupFindBeatResult which holds for Time 01 the lookup L1 as start and L3 as end. This will be used
+ * both for the cursor and beat highlighting. 
  */
 export class MidiTickLookup {
     private _currentMasterBar: MasterBarTickLookup | null = null;
@@ -72,163 +103,240 @@ export class MidiTickLookup {
     public readonly masterBars: MasterBarTickLookup[] = [];
 
     /**
-     * Performs the neccessary finalization steps after all information was written.
-     * @internal
-     */
-    public finish(): void {
-        let previous: MasterBarTickLookup | null = null;
-        let activeBeats: BeatTickLookup[] = [];
-
-        for (let bar of this.masterBars) {
-            bar.finish();
-            if (previous) {
-                previous.nextMasterBar = bar;
-            }
-
-            for (const beat of bar.beats) {
-                // 1. calculate newly which beats are still active
-                const newActiveBeats: BeatTickLookup[] = [];
-                // TODO: only create new list if current position changed
-                for (let activeBeat of activeBeats) {
-                    if (activeBeat.end > beat.start) {
-                        newActiveBeats.push(activeBeat);
-                        // 2. remember for current beat which active beats to highlight
-                        beat.highlightBeat(activeBeat.beat);
-                        // 3. ensure that active beat highlights current beat if they match the range
-                        if (beat.start <= activeBeat.start) {
-                            activeBeat.highlightBeat(beat.beat);
-                        }
-                    }
-                }
-                newActiveBeats.push(beat);
-                activeBeats = newActiveBeats;
-            }
-            previous = bar;
-        }
-    }
-
-    /**
      * Finds the currently played beat given a list of tracks and the current time.
-     * @param tracks The tracks in which to search the played beat for.
+     * @param trackLookup The tracks indices in which to search the played beat for.
      * @param tick The current time in midi ticks.
      * @returns The information about the current beat or null if no beat could be found.
      */
     public findBeat(
-        tracks: Track[],
+        trackLookup: Set<number>,
         tick: number,
         currentBeatHint: MidiTickLookupFindBeatResult | null = null
     ): MidiTickLookupFindBeatResult | null {
-        const trackLookup: Map<number, boolean> = new Map();
-        for (const track of tracks) {
-            trackLookup.set(track.index, true);
-        }
-
         let result: MidiTickLookupFindBeatResult | null = null;
         if (currentBeatHint) {
             result = this.findBeatFast(trackLookup, currentBeatHint, tick);
         }
 
         if (!result) {
-            result = this.findBeatSlow(trackLookup, tick);
+            result = this.findBeatSlow(trackLookup, currentBeatHint, tick, false);
         }
 
         return result;
     }
 
     private findBeatFast(
-        trackLookup: Map<number, boolean>,
+        trackLookup: Set<number>,
         currentBeatHint: MidiTickLookupFindBeatResult,
         tick: number
     ): MidiTickLookupFindBeatResult | null {
-        const end = currentBeatHint.currentBeatLookup.start + currentBeatHint.tickDuration;
-        if (tick >= currentBeatHint.currentBeatLookup.start && tick < end) {
-            // still same beat?
+        // still within current lookup.
+        if (tick >= currentBeatHint.start && tick < currentBeatHint.end) {
             return currentBeatHint;
-        } else if (
-            currentBeatHint.nextBeatLookup &&
-            tick >= currentBeatHint.nextBeatLookup.start &&
-            tick < currentBeatHint.nextBeatLookup.end
+        }
+        // already on the next beat?
+        else if (
+            currentBeatHint.nextBeat &&
+            tick >= currentBeatHint.nextBeat.start &&
+            tick < currentBeatHint.nextBeat.end
         ) {
-            // maybe next beat?
-            return this.createResult(currentBeatHint.nextBeatLookup, trackLookup);
+            const next = currentBeatHint.nextBeat!;
+            // fill next in chain
+            this.fillNextBeat(next, trackLookup);
+            return next;
         }
 
         // likely a loop or manual seek, need to fallback to slow path
         return null;
     }
 
-    private findBeatSlow(trackLookup: Map<number, boolean>, tick: number): MidiTickLookupFindBeatResult | null {
+    private fillNextBeat(current: MidiTickLookupFindBeatResult, trackLookup: Set<number>) {
+        current.nextBeat = this.findBeatInMasterBar(
+            current.masterBar,
+            current.beatLookup.nextBeat,
+            current.end, trackLookup, false, true);
+
+        if (current.nextBeat == null) {
+            current.nextBeat = this.findBeatSlow(trackLookup, current, current.end, true);
+        }
+
+        // if we have the next beat take the difference between the times as duration
+        if (current.nextBeat) {
+            current.tickDuration = current.nextBeat.start - current.start;
+            current.duration = MidiUtils.ticksToMillis(current.tickDuration, current.masterBar.tempo);
+        }
+
+        // no next beat, animate to the end of the bar (could be an incomplete bar)
+        if (!current.nextBeat) {
+            current.tickDuration = current.masterBar.end - current.start;
+            current.duration = MidiUtils.ticksToMillis(current.tickDuration, current.masterBar.tempo);
+        }
+    }
+
+    private findBeatSlow(trackLookup: Set<number>, currentBeatHint: MidiTickLookupFindBeatResult | null, tick: number, isNextSearch: boolean): MidiTickLookupFindBeatResult | null {
         // get all beats within the masterbar
-        const masterBar = this.findMasterBar(tick);
+        let masterBar: MasterBarTickLookup | null = null;
+        if (currentBeatHint != null) {
+            // same masterbar? 
+            if (currentBeatHint.masterBar.start <= tick &&
+                currentBeatHint.masterBar.end > tick) {
+                masterBar = currentBeatHint.masterBar;
+            }
+            // next masterbar
+            else if (currentBeatHint.masterBar.nextMasterBar &&
+                currentBeatHint.masterBar.nextMasterBar.start <= tick &&
+                currentBeatHint.masterBar.nextMasterBar.end > tick
+            ) {
+                masterBar = currentBeatHint.masterBar.nextMasterBar;
+            }
+        }
+
+        // slowest lookup
+        if (!masterBar) {
+            masterBar = this.findMasterBar(tick);
+        }
+
+        // no match
         if (!masterBar) {
             return null;
         }
 
-        let beat: BeatTickLookup | null = null;
-        let beats: BeatTickLookup[] = masterBar.beats;
-        for (let b: number = 0; b < beats.length; b++) {
-            // is the current beat played on the given tick?
-            let currentBeat: BeatTickLookup = beats[b];
-            // skip non relevant beats
-            if (!trackLookup.has(currentBeat.beat.voice.bar.staff.track.index)) {
-                continue;
+        // scan through beats and find first one which has a beat visible
+        while (masterBar) {
+            if (masterBar.firstBeat) {
+                let beat = this.findBeatInMasterBar(
+                    masterBar,
+                    masterBar.firstBeat,
+                    tick,
+                    trackLookup,
+                    true,
+                    isNextSearch);
+
+                if (beat) {
+                    return beat;
+                }
             }
 
-            if (currentBeat.start <= tick && tick < currentBeat.end) {
-                // take the latest played beat we can find. (most right)
-                if (!beat || beat.start < currentBeat.start) {
-                    beat = beats[b];
-                }
-            } else if (currentBeat.end > tick) {
-                break;
-            }
+
+            masterBar = masterBar.nextMasterBar;
         }
 
-        if (!beat) {
+        return null;
+    }
+
+    /**
+     * Finds the beat at a given tick position within the known master bar.
+     * @param masterBar 
+     * @param currentStartLookup 
+     * @param tick 
+     * @param visibleTracks 
+     * @param fillNext 
+     * @returns 
+     */
+    private findBeatInMasterBar(
+        masterBar: MasterBarTickLookup,
+        currentStartLookup: BeatTickLookup | null,
+        tick: number,
+        visibleTracks: Set<number>,
+        fillNext: boolean,
+        isNextSeach: boolean): MidiTickLookupFindBeatResult | null {
+        if (!currentStartLookup) {
             return null;
         }
 
-        return this.createResult(beat, trackLookup);
-    }
+        let startBeatLookup: BeatTickLookup | null = null;
+        let startBeat: Beat | null = null;
 
-    private createResult(beat: BeatTickLookup, trackLookup: Map<number, boolean>): MidiTickLookupFindBeatResult | null {
-        // search for next relevant beat in masterbar
-        const nextBeat = this.findNextBeat(beat, trackLookup);
-        const result = new MidiTickLookupFindBeatResult();
-        result.currentBeatLookup = beat;
-        result.nextBeatLookup = nextBeat;
-        result.tickDuration = !nextBeat ? beat.end - beat.start : nextBeat.start - beat.start;
-        result.duration = MidiUtils.ticksToMillis(result.tickDuration, beat.masterBar.tempo)
-        result.beatsToHighlight = beat.beatsToHighlight;
+        const relativeTick = tick - masterBar.start;
+
+        while (currentStartLookup != null && startBeat == null) {
+            if (currentStartLookup.start <= relativeTick && relativeTick < currentStartLookup.end) {
+                startBeatLookup = currentStartLookup;
+                startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
+
+                // found the matching beat lookup but none of the beats are visible
+                // in this case scan further to the next lookup which has any visible beat
+                if (!startBeat) {
+
+                    if (isNextSeach) {
+                        let currentMasterBar: MasterBarTickLookup | null = masterBar;
+                        while (currentMasterBar != null && startBeat == null) {
+                            while (currentStartLookup != null) {
+                                startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
+
+                                if (startBeat) {
+                                    startBeatLookup = currentStartLookup;
+                                    masterBar = currentMasterBar;
+                                    break;
+                                }
+
+                                currentStartLookup = currentStartLookup.nextBeat;
+                            }
+
+                            if (!startBeat || !startBeatLookup) {
+                                currentMasterBar = currentMasterBar.nextMasterBar;
+                                currentStartLookup = currentMasterBar?.firstBeat ?? null;
+                            }
+                        }
+
+                    } else {
+                        let currentMasterBar: MasterBarTickLookup | null = masterBar;
+                        while (currentMasterBar != null && startBeat == null) {
+                            while (currentStartLookup != null) {
+                                startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
+
+                                if (startBeat) {
+                                    startBeatLookup = currentStartLookup;
+                                    masterBar = currentMasterBar;
+                                    break;
+                                }
+
+                                currentStartLookup = currentStartLookup.previousBeat;
+                            }
+
+                            if (!startBeat || !startBeatLookup) {
+                                currentMasterBar = currentMasterBar.previousMasterBar;
+                                currentStartLookup = currentMasterBar?.firstBeat ?? null;
+                            }
+                        }
+                    }
+                }
+            } else if (currentStartLookup.end > relativeTick) {
+                break;
+            }
+
+            currentStartLookup = currentStartLookup?.nextBeat ?? null;
+        }
+
+        if (startBeat == null) {
+            return null;
+        }
+
+        const result = this.createResult(masterBar, startBeatLookup!, startBeat, fillNext, visibleTracks);
+
         return result;
     }
 
-    private findNextBeat(beat: BeatTickLookup, trackLookup: Map<number, boolean>): BeatTickLookup | null {
-        const masterBar = beat.masterBar;
-        let beats = masterBar.beats;
-        // search for next relevant beat in masterbar
-        let nextBeat: BeatTickLookup | null = null;
-        for (let b: number = beat.index + 1; b < beats.length; b++) {
-            const currentBeat: BeatTickLookup = beats[b];
-            if (currentBeat.start > beat.start && trackLookup.has(currentBeat.beat.voice.bar.staff.track.index)) {
-                nextBeat = currentBeat;
-                break;
-            }
+    private createResult(
+        masterBar: MasterBarTickLookup,
+        beatLookup: BeatTickLookup,
+        beat: Beat,
+        fillNext: boolean,
+        visibleTracks: Set<number>) {
+        const result = new MidiTickLookupFindBeatResult(masterBar);
+
+        result.beat = beat;
+        result.beatLookup = beatLookup;
+
+        result.tickDuration = beatLookup!.end - beatLookup!.start;
+
+        if (fillNext) {
+            this.fillNextBeat(result, visibleTracks);
         }
 
-        // first relevant beat in next bar
-        if (!nextBeat && masterBar.nextMasterBar) {
-            beats = masterBar.nextMasterBar.beats;
-            for (let b: number = 0; b < beats.length; b++) {
-                const currentBeat: BeatTickLookup = beats[b];
-                if (trackLookup.has(currentBeat.beat.voice.bar.staff.track.index)) {
-                    nextBeat = currentBeat;
-                    break;
-                }
-            }
-        }
+        result.duration = MidiUtils.ticksToMillis(result.tickDuration, masterBar.tempo);
 
-        return nextBeat;
+        return result;
     }
 
     private findMasterBar(tick: number): MasterBarTickLookup | null {
@@ -284,7 +392,7 @@ export class MidiTickLookup {
      * @param beat The beat to find the time period for.
      * @returns The time in midi ticks at which the beat is played the first time or 0 if the beat is not contained
      */
-    public getBeatStart(beat:Beat): number {
+    public getBeatStart(beat: Beat): number {
         if (!this.masterBarLookup.has(beat.voice.bar.index)) {
             return 0;
         }
@@ -298,17 +406,37 @@ export class MidiTickLookup {
      */
     public addMasterBar(masterBar: MasterBarTickLookup): void {
         this.masterBars.push(masterBar);
+        if (this._currentMasterBar) {
+            masterBar.previousMasterBar = this._currentMasterBar;
+            this._currentMasterBar.nextMasterBar = masterBar;
+        }
         this._currentMasterBar = masterBar;
         if (!this.masterBarLookup.has(masterBar.masterBar.index)) {
             this.masterBarLookup.set(masterBar.masterBar.index, masterBar);
         }
     }
 
-    /**
-     * Adds the given {@link BeatTickLookup} to the current {@link MidiTickLookup}.
-     * @param beat The lookup to add.
-     */
-    public addBeat(beat: BeatTickLookup): void {
-        this._currentMasterBar?.addBeat(beat);
+    public addBeat(beat: Beat, start: number, duration: number): void {
+        const currentMasterBar = this._currentMasterBar;
+        if (currentMasterBar) {
+            // pre-beat grace notes at the start of the bar we also add the beat to the previous bar
+            if (start < 0 && currentMasterBar.previousMasterBar) {
+                const relativeMasterBarEnd = currentMasterBar.previousMasterBar!.end - currentMasterBar.previousMasterBar!.start;
+                const previousStart = relativeMasterBarEnd + start;
+                const previousEnd = previousStart + duration;
+
+                // add to previous bar 
+                currentMasterBar.previousMasterBar!.addBeat(beat, previousStart, previousStart, duration);
+
+                // overlap to current bar?
+                if(previousEnd > relativeMasterBarEnd) {
+                    // the start is negative and representing the overlap to the previous bar.
+                    const overlapDuration = duration + start;
+                    currentMasterBar.addBeat(beat, start, 0, overlapDuration);
+                }
+            } else {
+                currentMasterBar.addBeat(beat, start, start, duration);
+            }
+        }
     }
 }

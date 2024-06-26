@@ -1,5 +1,5 @@
 package alphaTab.core.ecmaScript
 
-import kotlin.Exception
+import kotlin.Throwable
 
-typealias Error = Exception
+typealias Error = Throwable

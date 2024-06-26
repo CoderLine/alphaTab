@@ -5,7 +5,7 @@ import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@src/rendering/glyphs/ChordDiagramContainerGlyph';
@@ -13,7 +13,7 @@ import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { RenderStaff } from '@src/rendering/staves/RenderStaff';
-import { StaveGroup } from '@src/rendering/staves/StaveGroup';
+import { StaffSystem } from '@src/rendering/staves/StaffSystem';
 import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
 import { EventEmitterOfT } from '@src/EventEmitter';
@@ -104,11 +104,17 @@ export abstract class ScoreLayout {
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
-        (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
+        if(args.height == 0){
+            return;
+        }
         if (!this.renderer.settings.core.enableLazyLoading) {
+            // in case of no lazy loading -> first notify about layout, then directly render
+            (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
             this.internalRenderLazyPartial(args, callback);
         } else {
+            // in case of lazy loading -> first register lazy, then notify
             this._lazyPartials.set(args.id, new LazyPartial(args, callback));
+            (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
         }
     }
 
@@ -185,6 +191,11 @@ export abstract class ScoreLayout {
 
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
 
+        for(const [_e, glyph] of this.scoreInfoGlyphs) {
+            glyph.renderer = fakeBarRenderer;
+            glyph.doLayout();
+        }
+
         if (notation.isNotationElementVisible(NotationElement.GuitarTuning)) {
             let tunings: Staff[] = [];
             for (let track of this.renderer.tracks!) {
@@ -236,9 +247,8 @@ export abstract class ScoreLayout {
 
     public lastBarIndex: number = 0;
 
-    protected createEmptyStaveGroup(): StaveGroup {
-        let group: StaveGroup = new StaveGroup();
-        group.layout = this;
+    protected createEmptyStaffSystem(): StaffSystem {
+        let system: StaffSystem = new StaffSystem(this);
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
             let track: Track = this.renderer.tracks![trackIndex];
             let hasScore: boolean = false;
@@ -268,12 +278,12 @@ export abstract class ScoreLayout {
                 let profile: BarRendererFactory[] = Environment.staveProfiles.get(staveProfile)!;
                 for (let factory of profile) {
                     if (factory.canCreate(track, staff)) {
-                        group.addStaff(track, new RenderStaff(trackIndex, staff, factory));
+                        system.addStaff(track, new RenderStaff(trackIndex, staff, factory));
                     }
                 }
             }
         }
-        return group;
+        return system;
     }
 
     public registerBarRenderer(key: string, renderer: BarRendererBase): void {
@@ -303,7 +313,7 @@ export abstract class ScoreLayout {
         let msg: string = 'rendered by alphaTab';
         let resources: RenderingResources = this.renderer.settings.display.resources;
         let size: number = 12 * this.renderer.settings.display.scale;
-        let height: number = Math.floor(size * 2);
+        let height: number = Math.floor(size);
 
         const e = new RenderFinishedEventArgs();
         const font = Font.withFamilyList(resources.copyrightFont.families, size, FontStyle.Plain, FontWeight.Bold);
@@ -311,7 +321,7 @@ export abstract class ScoreLayout {
         this.renderer.canvas!.font = font;
 
         const centered = Environment.getLayoutEngineFactory(this.renderer.settings.display.layoutMode).vertical;
-        e.width = this.renderer.canvas!.measureText(msg);
+        e.width = this.renderer.canvas!.measureText(msg).width;
         e.height = height;
         e.x = centered
             ? (this.width - e.width) / 2
@@ -327,7 +337,8 @@ export abstract class ScoreLayout {
             canvas.color = resources.mainGlyphColor;
             canvas.font = font;
             canvas.textAlign = TextAlign.Left;
-            canvas.fillText(msg, 0, size);
+            canvas.textBaseline = TextBaseline.Top;
+            canvas.fillText(msg, 0, 0);
         });
 
         return y + height;

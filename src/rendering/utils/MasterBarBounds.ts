@@ -2,7 +2,7 @@ import { Beat } from '@src/model/Beat';
 import { BarBounds } from '@src/rendering/utils/BarBounds';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
-import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
+import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 
 /**
  * Represents the boundaries of a list of bars related to a single master bar.
@@ -39,9 +39,17 @@ export class MasterBarBounds {
     public bars: BarBounds[] = [];
 
     /**
-     * Gets or sets a reference to the parent {@link staveGroupBounds}.
+     * Gets or sets a reference to the parent {@link staffSystemBounds}.
      */
-    public staveGroupBounds: StaveGroupBounds | null = null;
+    public staffSystemBounds: StaffSystemBounds | null = null;
+
+    /**
+     * Gets or sets a reference to the parent {@link staffSystemBounds}.
+     * @deprecated use staffSystemBounds
+     */
+    public get staveGroupBounds(): StaffSystemBounds | null {
+        return this.staffSystemBounds;
+    }
 
     /**
      * Adds a new bar to this lookup.
@@ -102,6 +110,6 @@ export class MasterBarBounds {
      * @param bounds The beat bounds to add.
      */
     public addBeat(bounds: BeatBounds): void {
-        this.staveGroupBounds!.boundsLookup.addBeat(bounds);
+        this.staffSystemBounds!.boundsLookup.addBeat(bounds);
     }
 }

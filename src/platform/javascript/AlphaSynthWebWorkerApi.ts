@@ -17,6 +17,7 @@ import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs'
 import { MidiEventType } from '@src/midi/MidiEvent';
 import { Environment } from '@src/Environment';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import { Settings } from '@src/Settings';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -190,9 +191,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
 
     public constructor(
         player: ISynthOutput,
-        alphaSynthScriptFile: string,
-        logLevel: LogLevel,
-        bufferTimeInMilliseconds: number
+        settings: Settings
     ) {
         this._workerIsReadyForPlayback = false;
         this._workerIsReady = false;
@@ -209,9 +208,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._output.ready.on(this.onOutputReady.bind(this));
         this._output.samplesPlayed.on(this.onOutputSamplesPlayed.bind(this));
         this._output.sampleRequest.on(this.onOutputSampleRequest.bind(this));
-        this._output.open(bufferTimeInMilliseconds);
+        this._output.open(settings.player.bufferTimeInMilliseconds);
         try {
-            this._synth = Environment.createAlphaTabWorker(alphaSynthScriptFile);
+            this._synth = Environment.createWebWorker(settings);
         } catch (e) {
             Logger.error('AlphaSynth', 'Failed to create WebWorker: ' + e);
         }
@@ -219,8 +218,8 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._synth.postMessage({
             cmd: 'alphaSynth.initialize',
             sampleRate: this._output.sampleRate,
-            logLevel: logLevel,
-            bufferTimeInMilliseconds: bufferTimeInMilliseconds
+            logLevel: settings.core.logLevel,
+            bufferTimeInMilliseconds: settings.player.bufferTimeInMilliseconds
         });
         this.masterVolume = 1;
         this.playbackSpeed = 1;
@@ -309,6 +308,13 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._synth.postMessage({
             cmd: 'alphaSynth.loadMidi',
             midi: JsonConverter.midiFileToJsObject(midi)
+        });
+    }
+
+    public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
+        this._synth.postMessage({
+            cmd: 'alphaSynth.applyTranspositionPitches',
+            transpositionPitches: JSON.stringify(Array.from(transpositionPitches.entries()))
         });
     }
 

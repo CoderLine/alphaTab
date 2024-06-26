@@ -407,7 +407,7 @@ export class TabBendGlyph extends Glyph {
         }
         if (slurText && firstPt.offset < secondPt.offset) {
             canvas.font = res.graceFont;
-            let size: number = canvas.measureText(slurText);
+            let size: number = canvas.measureText(slurText).width;
             let y: number = 0;
             let x: number = 0;
             if (y1 > y2) {
@@ -447,7 +447,7 @@ export class TabBendGlyph extends Glyph {
                 }
                 // draw label
                 canvas.font = res.tablatureFont;
-                let size: number = canvas.measureText(s);
+                let size: number = canvas.measureText(s).width;
                 let y: number = startY - res.tablatureFont.size * 0.5 - 2 * this.scale;
                 let x: number = x2 - size / 2;
                 canvas.fillText(s, x, y);

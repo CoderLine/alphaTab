@@ -2,223 +2,224 @@ import { BinaryStylesheet } from '@src/importer/BinaryStylesheet';
 import { Color } from '@src/model/Color';
 import { TestPlatform } from '@test/TestPlatform';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { expect } from 'chai';
 
 describe('BinaryStylesheetParserTest', () => {
     it('testRead', async () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro7/BinaryStylesheet');
         let stylesheet: BinaryStylesheet = new BinaryStylesheet(data);
 
-        expect(stylesheet.raw.has('Global/chordNameStyle')).toBeTrue();
-        expect(stylesheet.raw.get('Global/chordNameStyle')).toEqual(2);
+        expect(stylesheet.raw.has('Global/chordNameStyle')).to.be.true;
+        expect(stylesheet.raw.get('Global/chordNameStyle')).to.equal(2);
 
-        expect(stylesheet.raw.has('StandardNotation/deadNoteSymbol')).toBeTrue();
-        expect(stylesheet.raw.get('StandardNotation/deadNoteSymbol')).toEqual(0);
+        expect(stylesheet.raw.has('StandardNotation/deadNoteSymbol')).to.be.true;
+        expect(stylesheet.raw.get('StandardNotation/deadNoteSymbol')).to.equal(0);
 
-        expect(stylesheet.raw.has('Header/WordsAndMusic')).toBeTrue();
-        expect(stylesheet.raw.get('Header/WordsAndMusic')).toEqual('Words & Music by %MUSIC%');
+        expect(stylesheet.raw.has('Header/WordsAndMusic')).to.be.true;
+        expect(stylesheet.raw.get('Header/WordsAndMusic')).to.equal('Words & Music by %MUSIC%');
 
-        expect(stylesheet.raw.has('Global/PickStrokePriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/PickStrokePriority')).toEqual(1100);
+        expect(stylesheet.raw.has('Global/PickStrokePriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/PickStrokePriority')).to.equal(1100);
 
-        expect(stylesheet.raw.has('Odd/drawOddFooter')).toBeTrue();
-        expect(stylesheet.raw.get('Odd/drawOddFooter')).toEqual(true);
+        expect(stylesheet.raw.has('Odd/drawOddFooter')).to.be.true;
+        expect(stylesheet.raw.get('Odd/drawOddFooter')).to.equal(true);
 
-        expect(stylesheet.raw.has('TablatureNotation/tabRhythmPlacementVoice3')).toBeTrue();
-        expect(stylesheet.raw.get('TablatureNotation/tabRhythmPlacementVoice3')).toEqual(2);
+        expect(stylesheet.raw.has('TablatureNotation/tabRhythmPlacementVoice3')).to.be.true;
+        expect(stylesheet.raw.get('TablatureNotation/tabRhythmPlacementVoice3')).to.equal(2);
 
-        expect(stylesheet.raw.has('Global/HideTupletBracket')).toBeTrue();
-        expect(stylesheet.raw.get('Global/HideTupletBracket')).toEqual(true);
+        expect(stylesheet.raw.has('Global/HideTupletBracket')).to.be.true;
+        expect(stylesheet.raw.get('Global/HideTupletBracket')).to.equal(true);
 
-        expect(stylesheet.raw.has('Global/DrawChords')).toBeTrue();
-        expect(stylesheet.raw.get('Global/DrawChords')).toEqual(true);
+        expect(stylesheet.raw.has('Global/DrawChords')).to.be.true;
+        expect(stylesheet.raw.get('Global/DrawChords')).to.equal(true);
 
-        expect(stylesheet.raw.has('System/codaSplitWidth')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/codaSplitWidth') as number, 2.0)).toBeTrue();
+        expect(stylesheet.raw.has('System/codaSplitWidth')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/codaSplitWidth') as number, 2.0)).to.be.true;
 
-        expect(stylesheet.raw.has('Global/HarmonicPriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/HarmonicPriority')).toEqual(2200);
+        expect(stylesheet.raw.has('Global/HarmonicPriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/HarmonicPriority')).to.equal(2200);
 
-        expect(stylesheet.raw.has('Global/LetRingThroughoutPriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/LetRingThroughoutPriority')).toEqual(2500);
+        expect(stylesheet.raw.has('Global/LetRingThroughoutPriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/LetRingThroughoutPriority')).to.equal(2500);
 
-        expect(stylesheet.raw.has('Global/stretchFactor')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/stretchFactor') as number, 0.5)).toBeTrue();
+        expect(stylesheet.raw.has('Global/stretchFactor')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/stretchFactor') as number, 0.5)).to.be.true;
 
-        expect(stylesheet.raw.has('StandardNotation/bendHeight')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/bendHeight') as number, 2.0)).toBeTrue();
+        expect(stylesheet.raw.has('StandardNotation/bendHeight')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/bendHeight') as number, 2.0)).to.be.true;
 
-        expect(stylesheet.raw.has('Global/ChordDiagramPriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/ChordDiagramPriority')).toEqual(3000);
+        expect(stylesheet.raw.has('Global/ChordDiagramPriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/ChordDiagramPriority')).to.equal(3000);
 
-        expect(stylesheet.raw.has('Global/AlternateEndingPriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/AlternateEndingPriority')).toEqual(2800);
+        expect(stylesheet.raw.has('Global/AlternateEndingPriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/AlternateEndingPriority')).to.equal(2800);
 
-        expect(stylesheet.raw.has('StandardNotation/tieOffsetX')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/tieOffsetX') as number, 0.105)).toBeTrue();
+        expect(stylesheet.raw.has('StandardNotation/tieOffsetX')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/tieOffsetX') as number, 0.105)).to.be.true;
 
-        expect(stylesheet.raw.has('Global/PalmMutePriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/PalmMutePriority')).toEqual(1200);
+        expect(stylesheet.raw.has('Global/PalmMutePriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/PalmMutePriority')).to.equal(1200);
 
-        expect(stylesheet.raw.has('System/hideLyrics')).toBeTrue();
-        expect(stylesheet.raw.get('System/hideLyrics')).toEqual(false);
+        expect(stylesheet.raw.has('System/hideLyrics')).to.be.true;
+        expect(stylesheet.raw.get('System/hideLyrics')).to.equal(false);
 
-        expect(stylesheet.raw.has('Global/drawArpeggioArrow')).toBeTrue();
-        expect(stylesheet.raw.get('Global/drawArpeggioArrow')).toEqual(true);
+        expect(stylesheet.raw.has('Global/drawArpeggioArrow')).to.be.true;
+        expect(stylesheet.raw.get('Global/drawArpeggioArrow')).to.equal(true);
 
-        expect(stylesheet.raw.has('Global/HoPoPriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/HoPoPriority')).toEqual(800);
+        expect(stylesheet.raw.has('Global/HoPoPriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/HoPoPriority')).to.equal(800);
 
-        expect(stylesheet.raw.has('Staff/repeatWidth')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Staff/repeatWidth') as number, 0.5)).toBeTrue();
+        expect(stylesheet.raw.has('Staff/repeatWidth')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Staff/repeatWidth') as number, 0.5)).to.be.true;
 
-        expect(stylesheet.raw.has('System/bracketWidth')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/bracketWidth') as number, 0.5)).toBeTrue();
+        expect(stylesheet.raw.has('System/bracketWidth')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/bracketWidth') as number, 0.5)).to.be.true;
 
-        expect(stylesheet.raw.has('Global/TuningSpaceInFrontOfStaff')).toBeTrue();
+        expect(stylesheet.raw.has('Global/TuningSpaceInFrontOfStaff')).to.be.true;
         expect(
             ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/TuningSpaceInFrontOfStaff') as number, 2.0)
-        ).toBeTrue();
+        ).to.be.true;
 
-        expect(stylesheet.raw.has('StandardNotation/drawWholeRestOnEmptyBars')).toBeTrue();
-        expect(stylesheet.raw.get('StandardNotation/drawWholeRestOnEmptyBars')).toEqual(false);
+        expect(stylesheet.raw.has('StandardNotation/drawWholeRestOnEmptyBars')).to.be.true;
+        expect(stylesheet.raw.get('StandardNotation/drawWholeRestOnEmptyBars')).to.equal(false);
 
-        expect(stylesheet.raw.has('Global/miniBrowserPosition')).toBeTrue();
-        expect(stylesheet.raw.get('Global/miniBrowserPosition')).toEqual(0);
+        expect(stylesheet.raw.has('Global/miniBrowserPosition')).to.be.true;
+        expect(stylesheet.raw.get('Global/miniBrowserPosition')).to.equal(0);
 
-        expect(stylesheet.raw.has('StandardNotation/hideUselessRests')).toBeTrue();
-        expect(stylesheet.raw.get('StandardNotation/hideUselessRests')).toEqual(true);
+        expect(stylesheet.raw.has('StandardNotation/hideUselessRests')).to.be.true;
+        expect(stylesheet.raw.get('StandardNotation/hideUselessRests')).to.equal(true);
 
-        expect(stylesheet.raw.has('Global/SpacingAffectFontsSize')).toBeTrue();
-        expect(stylesheet.raw.get('Global/SpacingAffectFontsSize')).toEqual(true);
+        expect(stylesheet.raw.has('Global/SpacingAffectFontsSize')).to.be.true;
+        expect(stylesheet.raw.get('Global/SpacingAffectFontsSize')).to.equal(true);
 
-        expect(stylesheet.raw.has('Even/drawEvenCopyright')).toBeTrue();
-        expect(stylesheet.raw.get('Even/drawEvenCopyright')).toEqual(true);
+        expect(stylesheet.raw.has('Even/drawEvenCopyright')).to.be.true;
+        expect(stylesheet.raw.get('Even/drawEvenCopyright')).to.equal(true);
 
-        expect(stylesheet.raw.has('Global/RepeatTargetPriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/RepeatTargetPriority')).toEqual(3300);
+        expect(stylesheet.raw.has('Global/RepeatTargetPriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/RepeatTargetPriority')).to.equal(3300);
 
-        expect(stylesheet.raw.has('Global/SVGFont')).toBeTrue();
-        expect(stylesheet.raw.get('Global/SVGFont')).toEqual(':/renderer/resources/notes.svg');
+        expect(stylesheet.raw.has('Global/SVGFont')).to.be.true;
+        expect(stylesheet.raw.get('Global/SVGFont')).to.equal(':/renderer/resources/notes.svg');
 
-        expect(stylesheet.raw.has('Footer/PageNumberAlignment')).toBeTrue();
-        expect(stylesheet.raw.get('Footer/PageNumberAlignment')).toEqual(2);
+        expect(stylesheet.raw.has('Footer/PageNumberAlignment')).to.be.true;
+        expect(stylesheet.raw.get('Footer/PageNumberAlignment')).to.equal(2);
 
-        expect(stylesheet.raw.has('Global/graceFlatScaleFactor')).toBeTrue();
+        expect(stylesheet.raw.has('Global/graceFlatScaleFactor')).to.be.true;
         expect(
             ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/graceFlatScaleFactor') as number, 0.8333282)
-        ).toBeTrue();
+        ).to.be.true;
 
-        expect(stylesheet.raw.has('Global/shadowColorEnd')).toBeTrue();
-        expect((stylesheet.raw.get('Global/shadowColorEnd') as Color).r).toEqual(90);
-        expect((stylesheet.raw.get('Global/shadowColorEnd') as Color).g).toEqual(90);
-        expect((stylesheet.raw.get('Global/shadowColorEnd') as Color).b).toEqual(90);
-        expect((stylesheet.raw.get('Global/shadowColorEnd') as Color).a).toEqual(10);
+        expect(stylesheet.raw.has('Global/shadowColorEnd')).to.be.true;
+        expect((stylesheet.raw.get('Global/shadowColorEnd') as Color).r).to.equal(90);
+        expect((stylesheet.raw.get('Global/shadowColorEnd') as Color).g).to.equal(90);
+        expect((stylesheet.raw.get('Global/shadowColorEnd') as Color).b).to.equal(90);
+        expect((stylesheet.raw.get('Global/shadowColorEnd') as Color).a).to.equal(10);
 
-        expect(stylesheet.raw.has('Even/EvenCopyright')).toBeTrue();
-        expect(stylesheet.raw.get('Even/EvenCopyright')).toEqual('%COPYRIGHT%');
+        expect(stylesheet.raw.has('Even/EvenCopyright')).to.be.true;
+        expect(stylesheet.raw.get('Even/EvenCopyright')).to.equal('%COPYRIGHT%');
 
-        expect(stylesheet.raw.has('Global/GolpePriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/GolpePriority')).toEqual(350);
+        expect(stylesheet.raw.has('Global/GolpePriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/GolpePriority')).to.equal(350);
 
-        expect(stylesheet.raw.has('Global/spaceSizeMM')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/spaceSizeMM') as number, 0.5)).toBeTrue();
+        expect(stylesheet.raw.has('Global/spaceSizeMM')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/spaceSizeMM') as number, 0.5)).to.be.true;
 
-        expect(stylesheet.raw.has('TablatureNotation/drawSecondNoteTrill')).toBeTrue();
-        expect(stylesheet.raw.get('TablatureNotation/drawSecondNoteTrill')).toEqual(true);
+        expect(stylesheet.raw.has('TablatureNotation/drawSecondNoteTrill')).to.be.true;
+        expect(stylesheet.raw.get('TablatureNotation/drawSecondNoteTrill')).to.equal(true);
 
-        expect(stylesheet.raw.has('System/insertSize')).toBeTrue();
-        expect(stylesheet.raw.get('System/insertSize')).toEqual(2);
+        expect(stylesheet.raw.has('System/insertSize')).to.be.true;
+        expect(stylesheet.raw.get('System/insertSize')).to.equal(2);
 
-        expect(stylesheet.raw.has('TablatureNotation/minimalInformationForHarmonic')).toBeTrue();
-        expect(stylesheet.raw.get('TablatureNotation/minimalInformationForHarmonic')).toEqual(true);
+        expect(stylesheet.raw.has('TablatureNotation/minimalInformationForHarmonic')).to.be.true;
+        expect(stylesheet.raw.get('TablatureNotation/minimalInformationForHarmonic')).to.equal(true);
 
-        expect(stylesheet.raw.has('PageSetup/pageTopMargin')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('PageSetup/pageTopMargin') as number, 8.0)).toBeTrue();
+        expect(stylesheet.raw.has('PageSetup/pageTopMargin')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('PageSetup/pageTopMargin') as number, 8.0)).to.be.true;
 
-        expect(stylesheet.raw.has('StandardNotation/augmentationDotRadius')).toBeTrue();
+        expect(stylesheet.raw.has('StandardNotation/augmentationDotRadius')).to.be.true;
         expect(
             ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/augmentationDotRadius') as number, 0.125)
-        ).toBeTrue();
+        ).to.be.true;
 
-        expect(stylesheet.raw.has('Odd/drawOddCopyright')).toBeTrue();
-        expect(stylesheet.raw.get('Odd/drawOddCopyright')).toEqual(false);
+        expect(stylesheet.raw.has('Odd/drawOddCopyright')).to.be.true;
+        expect(stylesheet.raw.get('Odd/drawOddCopyright')).to.equal(false);
 
-        expect(stylesheet.raw.has('TablatureNotation/forceRhythmicBand')).toBeTrue();
-        expect(stylesheet.raw.get('TablatureNotation/forceRhythmicBand')).toEqual(false);
+        expect(stylesheet.raw.has('TablatureNotation/forceRhythmicBand')).to.be.true;
+        expect(stylesheet.raw.get('TablatureNotation/forceRhythmicBand')).to.equal(false);
 
-        expect(stylesheet.raw.has('System/codaSplit')).toBeTrue();
-        expect(stylesheet.raw.get('System/codaSplit')).toEqual(true);
+        expect(stylesheet.raw.has('System/codaSplit')).to.be.true;
+        expect(stylesheet.raw.get('System/codaSplit')).to.equal(true);
 
-        expect(stylesheet.raw.has('StandardNotation/tieMaxHeight')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/tieMaxHeight') as number, 2.0)).toBeTrue();
+        expect(stylesheet.raw.has('StandardNotation/tieMaxHeight')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/tieMaxHeight') as number, 2.0)).to.be.true;
 
-        expect(stylesheet.raw.has('Header/WordsAndMusicAlignment')).toBeTrue();
-        expect(stylesheet.raw.get('Header/WordsAndMusicAlignment')).toEqual(2);
+        expect(stylesheet.raw.has('Header/WordsAndMusicAlignment')).to.be.true;
+        expect(stylesheet.raw.get('Header/WordsAndMusicAlignment')).to.equal(2);
 
-        expect(stylesheet.raw.has('Even/drawEvenFooter')).toBeTrue();
-        expect(stylesheet.raw.get('Even/drawEvenFooter')).toEqual(true);
+        expect(stylesheet.raw.has('Even/drawEvenFooter')).to.be.true;
+        expect(stylesheet.raw.get('Even/drawEvenFooter')).to.equal(true);
 
-        expect(stylesheet.raw.has('StandardNotation/rightFingeringPositionSN')).toBeTrue();
-        expect(stylesheet.raw.get('StandardNotation/rightFingeringPositionSN')).toEqual(1);
+        expect(stylesheet.raw.has('StandardNotation/rightFingeringPositionSN')).to.be.true;
+        expect(stylesheet.raw.get('StandardNotation/rightFingeringPositionSN')).to.equal(1);
 
-        expect(stylesheet.raw.has('System/bracketCurveHeight')).toBeTrue();
+        expect(stylesheet.raw.has('System/bracketCurveHeight')).to.be.true;
         expect(
             ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/bracketCurveHeight') as number, 1.600006)
-        ).toBeTrue();
+        ).to.be.true;
 
-        expect(stylesheet.raw.has('Global/FreeTimePriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/FreeTimePriority')).toEqual(2700);
+        expect(stylesheet.raw.has('Global/FreeTimePriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/FreeTimePriority')).to.equal(2700);
 
-        expect(stylesheet.raw.has('Global/ChordSpacingMillimeter')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/ChordSpacingMillimeter') as number, 2.0)).toBeTrue();
+        expect(stylesheet.raw.has('Global/ChordSpacingMillimeter')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/ChordSpacingMillimeter') as number, 2.0)).to.be.true;
 
-        expect(stylesheet.raw.has('Header/drawAlbum')).toBeTrue();
-        expect(stylesheet.raw.get('Header/drawAlbum')).toEqual(true);
+        expect(stylesheet.raw.has('Header/drawAlbum')).to.be.true;
+        expect(stylesheet.raw.get('Header/drawAlbum')).to.equal(true);
 
-        expect(stylesheet.raw.has('System/trackNameModeMulti')).toBeTrue();
-        expect(stylesheet.raw.get('System/trackNameModeMulti')).toEqual(1);
+        expect(stylesheet.raw.has('System/trackNameModeMulti')).to.be.true;
+        expect(stylesheet.raw.get('System/trackNameModeMulti')).to.equal(1);
 
-        expect(stylesheet.raw.has('System/insertSizeSameTrack')).toBeTrue();
-        expect(stylesheet.raw.get('System/insertSizeSameTrack')).toEqual(1);
+        expect(stylesheet.raw.has('System/insertSizeSameTrack')).to.be.true;
+        expect(stylesheet.raw.get('System/insertSizeSameTrack')).to.equal(1);
 
-        expect(stylesheet.raw.has('System/marginMinimalBeforeFirstNote')).toBeTrue();
+        expect(stylesheet.raw.has('System/marginMinimalBeforeFirstNote')).to.be.true;
         expect(
             ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/marginMinimalBeforeFirstNote') as number, 0.5)
-        ).toBeTrue();
+        ).to.be.true;
 
-        expect(stylesheet.raw.has('Header/Subtitle')).toBeTrue();
-        expect(stylesheet.raw.get('Header/Subtitle')).toEqual('%SUBTITLE%');
+        expect(stylesheet.raw.has('Header/Subtitle')).to.be.true;
+        expect(stylesheet.raw.get('Header/Subtitle')).to.equal('%SUBTITLE%');
 
-        expect(stylesheet.raw.has('Global/alphaSuggested')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/alphaSuggested') as number, 0.5)).toBeTrue();
+        expect(stylesheet.raw.has('Global/alphaSuggested')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/alphaSuggested') as number, 0.5)).to.be.true;
 
-        expect(stylesheet.raw.has('Even/EvenHeaderAlignment')).toBeTrue();
-        expect(stylesheet.raw.get('Even/EvenHeaderAlignment')).toEqual(0);
+        expect(stylesheet.raw.has('Even/EvenHeaderAlignment')).to.be.true;
+        expect(stylesheet.raw.get('Even/EvenHeaderAlignment')).to.equal(0);
 
-        expect(stylesheet.raw.has('Global/TechniqueSymbol')).toBeTrue();
-        expect(stylesheet.raw.get('Global/TechniqueSymbol')).toEqual(25);
+        expect(stylesheet.raw.has('Global/TechniqueSymbol')).to.be.true;
+        expect(stylesheet.raw.get('Global/TechniqueSymbol')).to.equal(25);
 
-        expect(stylesheet.raw.has('Global/tuningBoxed')).toBeTrue();
-        expect(stylesheet.raw.get('Global/tuningBoxed')).toEqual(false);
+        expect(stylesheet.raw.has('Global/tuningBoxed')).to.be.true;
+        expect(stylesheet.raw.get('Global/tuningBoxed')).to.equal(false);
 
-        expect(stylesheet.raw.has('StandardNotation/drawBends')).toBeTrue();
-        expect(stylesheet.raw.get('StandardNotation/drawBends')).toEqual(true);
+        expect(stylesheet.raw.has('StandardNotation/drawBends')).to.be.true;
+        expect(stylesheet.raw.get('StandardNotation/drawBends')).to.equal(true);
 
-        expect(stylesheet.raw.has('Global/mouseClickMaxTime')).toBeTrue();
-        expect(stylesheet.raw.get('Global/mouseClickMaxTime')).toEqual(200);
+        expect(stylesheet.raw.has('Global/mouseClickMaxTime')).to.be.true;
+        expect(stylesheet.raw.get('Global/mouseClickMaxTime')).to.equal(200);
 
-        expect(stylesheet.raw.has('Global/graceSharpScaleFactor')).toBeTrue();
+        expect(stylesheet.raw.has('Global/graceSharpScaleFactor')).to.be.true;
         expect(
             ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/graceSharpScaleFactor') as number, 1.333344)
-        ).toBeTrue();
+        ).to.be.true;
 
-        expect(stylesheet.raw.has('Global/GrayedOpacity')).toBeTrue();
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/GrayedOpacity') as number, 0.4000015)).toBeTrue();
+        expect(stylesheet.raw.has('Global/GrayedOpacity')).to.be.true;
+        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/GrayedOpacity') as number, 0.4000015)).to.be.true;
 
-        expect(stylesheet.raw.has('Global/WhammyBarVibratoPriority')).toBeTrue();
-        expect(stylesheet.raw.get('Global/WhammyBarVibratoPriority')).toEqual(1400);
+        expect(stylesheet.raw.has('Global/WhammyBarVibratoPriority')).to.be.true;
+        expect(stylesheet.raw.get('Global/WhammyBarVibratoPriority')).to.equal(1400);
 
-        expect(stylesheet.raw.has('TablatureNotation/noStaffLineForSlashs')).toBeTrue();
-        expect(stylesheet.raw.get('TablatureNotation/noStaffLineForSlashs')).toEqual(false);
+        expect(stylesheet.raw.has('TablatureNotation/noStaffLineForSlashs')).to.be.true;
+        expect(stylesheet.raw.get('TablatureNotation/noStaffLineForSlashs')).to.equal(false);
     });
 });

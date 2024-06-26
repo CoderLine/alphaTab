@@ -23,6 +23,7 @@ import { Settings } from '@src/Settings';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { InternalSystemsLayoutMode } from './layout/ScoreLayout';
+import { BeamDirection } from './utils/BeamDirection';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -72,12 +73,12 @@ export enum NoteXPosition {
  * This is the base public class for creating blocks which can render bars.
  */
 export class BarRendererBase {
-    public static readonly LineSpacing: number = 8;
-    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.LineSpacing;
+    protected static readonly RawLineSpacing: number = 8;
+    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.RawLineSpacing;
     public static readonly StaffLineThickness: number =
-        0.13 /*bravura staffLineThickness */ * BarRendererBase.LineSpacing;
-    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.LineSpacing;
-    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.LineSpacing;
+        0.13 /*bravura staffLineThickness */ * BarRendererBase.RawLineSpacing;
+    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.RawLineSpacing;
+    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.RawLineSpacing;
 
     private _preBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
     private _voiceContainers: Map<number, VoiceContainerGlyph> = new Map();
@@ -186,7 +187,7 @@ export class BarRendererBase {
      * scale should be respected.
      */
     public get barDisplayScale(): number {
-        return this.staff.staveGroup.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
+        return this.staff.system.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
     }
 
     /**
@@ -194,7 +195,7 @@ export class BarRendererBase {
      * scale should be respected.
      */
     public get barDisplayWidth(): number {
-        return this.staff.staveGroup.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
+        return this.staff.system.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
     }
 
     private _wasFirstOfLine: boolean = false;
@@ -455,10 +456,9 @@ export class BarRendererBase {
     }
 
     protected createBeatGlyphs(): void {
-        for (let v: number = 0; v < this.bar.voices.length; v++) {
-            let voice: Voice = this.bar.voices[v];
+        for(const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                this.createVoiceGlyphs(this.bar.voices[v]);
+                this.createVoiceGlyphs(voice);
             }
         }
     }
@@ -561,5 +561,9 @@ export class BarRendererBase {
 
     public completeBeamingHelper(helper: BeamingHelper) {
         // nothing by default
+    }
+
+    public getBeatDirection(beat: Beat): BeamDirection {
+        return this.helpers.getBeamingHelperForBeat(beat).direction;
     }
 }

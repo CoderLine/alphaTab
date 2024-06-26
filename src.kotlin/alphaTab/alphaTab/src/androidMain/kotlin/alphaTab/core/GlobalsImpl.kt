@@ -45,6 +45,9 @@ actual fun Double.toInvariantString(): String {
     }
     return this.toInt().toString();
 }
+actual fun Double.toFixed(decimals:Double): String {
+    return String.format("%.${decimals}f", this);
+}
 
 actual fun String.toDoubleOrNaN(): Double {
     try {

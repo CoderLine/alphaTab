@@ -1,6 +1,6 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline, TextMetrics } from '@src/platform/ICanvas';
 import { FontSizes } from '@src/platform/svg/FontSizes';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Settings } from '@src/Settings';
@@ -21,9 +21,12 @@ export abstract class SvgCanvas implements ICanvas {
     public textBaseline: TextBaseline = TextBaseline.Top;
     public settings!: Settings;
 
+    public destroy() {}
+
     public beginRender(width: number, height: number): void {
-        this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${height | 0
-            }px" class="at-surface-svg">\n`;
+        this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${
+            height | 0
+        }px" class="at-surface-svg">\n`;
         this._currentPath = '';
         this._currentPathIsEmpty = true;
         this.textBaseline = TextBaseline.Top;
@@ -130,7 +133,7 @@ export abstract class SvgCanvas implements ICanvas {
         }
         let s: string = `<text x="${x | 0}" y="${y | 0}" style="stroke: none; font:${this.font.toCssString(
             this.settings.display.scale
-        )}" ${this.getSvgBaseLine()}`;
+        )}; ${this.getSvgBaseLine()}"`;
         if (this.color.rgba !== '#000000') {
             s += ` fill="${this.color.rgba}"`;
         }
@@ -165,9 +168,9 @@ export abstract class SvgCanvas implements ICanvas {
     protected getSvgBaseLine(): string {
         switch (this.textBaseline) {
             case TextBaseline.Top:
-                return `dominant-baseline="hanging"`;
+                return `dominant-baseline: hanging`;
             case TextBaseline.Bottom:
-                return `dominant-baseline="bottom"`;
+                return `dominant-baseline: bottom`;
             // case TextBaseline.Middle:
             default:
                 // middle is set as default on the SVG tag via css
@@ -175,9 +178,9 @@ export abstract class SvgCanvas implements ICanvas {
         }
     }
 
-    public measureText(text: string): number {
+    public measureText(text: string) {
         if (!text) {
-            return 0;
+            return new TextMetrics(0, 0);
         }
         return FontSizes.measureString(text, this.font.families, this.font.size, this.font.style, this.font.weight);
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab.Core
@@ -27,6 +28,11 @@ namespace AlphaTab.Core
                     list.Add(i);
                 }
             }
+        }
+
+        public static T Find<T>(this IList<T> list, Func<T, bool> predicate)
+        {
+            return list.FirstOrDefault(predicate);
         }
 
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
@@ -116,7 +122,14 @@ namespace AlphaTab.Core
             data.Insert(0, item);
         }
 
-        public static T Shift<T>(this IList<T> data)
+        public static T? Shift<T>(this IList<T> data)
+        {
+            var i = data[0];
+            data.RemoveAt(0);
+            return i;
+        }
+
+        public static double? Shift(this IList<double> data)
         {
             var i = data[0];
             data.RemoveAt(0);
@@ -388,6 +401,37 @@ namespace AlphaTab.Core
             return s.Replace(before, after);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T> Then<T>(this Task<T> s, Action<T> after)
+        {
+            s.ContinueWith(x => after(x.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+            return s;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T> Catch<T>(this Task<T> s, Action<Error> after)
+        {
+            s.ContinueWith(x =>
+            {
+                if (x.Exception?.InnerExceptions.Count == 1 &&
+                    x.Exception.InnerExceptions[0] is Error e)
+                {
+                    after(e);
+                }
+                else
+                {
+                    after(new Error(x.Exception.Message, x.Exception));
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+            return s;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<T> Catch<T>(this Task<T> s, Action<object> after)
+        {
+            s.Catch((Error e) => after(e));
+            return s;
+        }
+
         public static string TypeOf(object? actual)
         {
             switch (actual)
@@ -426,5 +470,64 @@ namespace AlphaTab.Core
         {
             return items;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ToFixed(this double value, int decimals)
+        {
+            return value.ToString("F" + decimals);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string[] Split(this string value, RegExp pattern)
+        {
+            return pattern.Split(value);
+        }
+
+        public static Task CreatePromise(Action<Action, Action<object>> run)
+        {
+            var taskCompletionSource = new TaskCompletionSource<object?>();
+            void Resolve()
+            {
+                taskCompletionSource.SetResult(null);
+            }
+
+            void Reject(object o)
+            {
+                switch (o)
+                {
+                    case Exception e:
+                        taskCompletionSource.SetException(e);
+                        break;
+                    case string s:
+                        taskCompletionSource.SetException(new PromiseRejectedException(s));
+                        break;
+                    default:
+                        taskCompletionSource.SetException(new PromiseRejectedException("Promise was rejected", o));
+                        break;
+                }
+            }
+
+            run(Resolve, Reject);
+
+            return taskCompletionSource.Task;
+        }
+    }
+}
+
+public class PromiseRejectedException : Exception
+{
+    public object? RejectData { get; }
+
+    public PromiseRejectedException()
+    {
+    }
+
+    public PromiseRejectedException(string message) : base(message)
+    {
+
+    }
+
+    public PromiseRejectedException(string message, object rejectData) : base(message)
+    {
+        RejectData = rejectData;
     }
 }

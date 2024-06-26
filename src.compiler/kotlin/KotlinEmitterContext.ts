@@ -8,6 +8,14 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         this.noPascalCase = true;
     }
 
+    public override get targetTag(): string {
+        return 'kotlin';
+    }
+
+    protected override alphaSkiaModule(): string {
+        return 'alphaTab.platform.skia';
+    }
+
     protected override getClassName(type: cs.NamedTypeDeclaration, expr?: cs.Node) {
         let className = super.getClassName(type, expr);
         // partial member access

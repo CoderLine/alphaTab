@@ -36,10 +36,6 @@ namespace AlphaTab
         private static void CreatePlatformSpecificRenderEngines(IMap<string, RenderEngineFactory> renderEngines)
         {
             renderEngines.Set(
-                "skia",
-                new RenderEngineFactory(true, () => new SkiaCanvas())
-            );
-            renderEngines.Set(
                 "gdi",
                 new RenderEngineFactory(true, () => new GdiCanvas())
             );

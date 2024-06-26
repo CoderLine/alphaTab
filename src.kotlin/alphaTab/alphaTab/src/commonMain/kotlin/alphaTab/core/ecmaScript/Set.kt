@@ -1,11 +1,14 @@
 package alphaTab.core.ecmaScript
 
-internal class Set<T> : Iterable<T> {
+public class Set<T> : Iterable<T> {
     private val _set: HashSet<T>
 
     public constructor() {
         _set = HashSet()
     }
+
+    public val size : Double
+        get() = _set.size.toDouble()
 
     public constructor(values: Iterable<T>?) {
         _set = values?.toHashSet() ?: HashSet()
