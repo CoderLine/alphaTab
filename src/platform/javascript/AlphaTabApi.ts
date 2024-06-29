@@ -11,12 +11,13 @@ import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { Settings } from '@src/Settings';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
+import { SettingsJson } from '@src/generated/SettingsJson';
 
 /**
  * @target web
  */
-export class AlphaTabApi extends AlphaTabApiBase<any | Settings> {
-    public constructor(element: HTMLElement, options: any | Settings) {
+export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
+    public constructor(element: HTMLElement, options: SettingsJson | Settings) {
         super(new BrowserUiFacade(element), options);
     }
 

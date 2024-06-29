@@ -19,6 +19,7 @@ export enum ScrollMode {
 /**
  * This object defines the details on how to generate the vibrato effects.
  * @json
+ * @json_declaration
  */
 export class VibratoPlaybackSettings {
     /**
@@ -65,6 +66,7 @@ export class VibratoPlaybackSettings {
 /**
  * This object defines the details on how to generate the slide effects.
  * @json
+ * @json_declaration
  */
 export class SlidePlaybackSettings {
     /**
@@ -109,6 +111,7 @@ export enum PlayerOutputMode {
 /**
  * The player settings control how the audio playback and UI is behaving.
  * @json
+ * @json_declaration
  */
 export class PlayerSettings {
     /**

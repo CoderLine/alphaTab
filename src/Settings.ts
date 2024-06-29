@@ -8,6 +8,8 @@ import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 /**
  * This public class contains instance specific settings for alphaTab
  * @json
+ * @json_declaration
+ * @public_api
  */
 export class Settings {
     /**

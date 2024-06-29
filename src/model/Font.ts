@@ -87,7 +87,7 @@ class FontParser {
 
     private fontFamily() {
         if (!this._currentToken) {
-            if(this.parseOnlyFamilies) {
+            if (this.parseOnlyFamilies) {
                 return;
             } else {
                 throw new Error(`Missing font list`);
@@ -279,11 +279,11 @@ class FontParser {
     }
 
     public static quoteFont(f: string): string {
-        if(f.indexOf(' ') === -1) {
+        if (f.indexOf(' ') === -1) {
             return f;
         }
 
-        const escapedQuotes =  f.replaceAll('"', '\\"');
+        const escapedQuotes = f.replaceAll('"', '\\"');
         return `"${escapedQuotes}"`;
     }
 }
@@ -315,6 +315,21 @@ export enum FontWeight {
      */
     Bold = 1
 }
+
+/**
+ * Describes a font to be used. 
+ * If specified as string, a CSS `font` shorthand property compliant value needs to be used.
+ * @target web
+ */
+export type FontJson =
+    | Font
+    | string
+    | {
+          families: string[];
+          size: number;
+          style: FontStyle | keyof typeof FontStyle;
+          weight: FontWeight | keyof typeof FontWeight;
+      };
 
 /**
  * @json_immutable
@@ -448,7 +463,7 @@ export class Font {
         style: FontStyle = FontStyle.Plain,
         weight: FontWeight = FontWeight.Regular
     ) {
-        const f = new Font("", size, style, weight);
+        const f = new Font('', size, style, weight);
         f.families = families;
         return f;
     }
@@ -472,6 +487,10 @@ export class Font {
     }
 
     public static fromJson(v: unknown): Font | null {
+        if(v instanceof Font) {
+            return v;
+        }
+
         switch (typeof v) {
             case 'undefined':
                 return null;

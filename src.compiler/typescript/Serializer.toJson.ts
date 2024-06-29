@@ -94,13 +94,15 @@ function generateToJsonBody(
         if (!jsonName || prop.isReadOnly) {
             continue;
         }
-        const typeChecker = program.getTypeChecker();
-        const type = getTypeWithNullableInfo(typeChecker, prop.property.type!, false);
-        const isArray = isTypedArray(type.type!);
 
         let propertyStatements: ts.Statement[] = [];
+        
 
-        if (isPrimitiveToJson(type.type!, typeChecker)) {
+        const typeChecker = program.getTypeChecker();
+        const type = getTypeWithNullableInfo(typeChecker, prop.property.type!, prop.asRaw);
+        const isArray = isTypedArray(type.type!);
+
+        if (prop.asRaw || isPrimitiveToJson(type.type!, typeChecker)) {
             propertyStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
                     `

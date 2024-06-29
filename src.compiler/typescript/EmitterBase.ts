@@ -21,8 +21,8 @@ export default function createEmitter(
 
         const result = generate(program, classDeclaration);
         const defaultClass = result.statements.find(
-            stmt => ts.isClassDeclaration(stmt) && stmt.modifiers!.find(m => m.kind === ts.SyntaxKind.ExportKeyword)
-        ) as ts.ClassDeclaration;
+            stmt => (ts.isClassDeclaration(stmt) || ts.isInterfaceDeclaration(stmt)) && stmt.modifiers!.find(m => m.kind === ts.SyntaxKind.ExportKeyword)
+        ) as ts.DeclarationStatement;
 
         const targetFileName = path.join(
             path.resolve(program.getCompilerOptions().baseUrl!),

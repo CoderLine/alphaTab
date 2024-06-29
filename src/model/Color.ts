@@ -2,6 +2,15 @@ import { FormatError } from '@src/FormatError';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
+ * Describes a color for rendering.
+ * If provided as string one of these formats needs to be used: #RGB, #RGBA, #RRGGBB, #RRGGBBAA, rgb(r,g,b), rgba(r,g,b,a)
+ * If provided as number a raw RGBA value needs to be used.
+ * 
+ * @target web
+ */
+export type ColorJson = Color | string | number;
+
+/**
  * @json_immutable
  */
 export class Color {
@@ -62,6 +71,10 @@ export class Color {
     }
 
     public static fromJson(v: unknown): Color | null {
+        if (v instanceof Color) {
+            return v;
+        }
+
         switch (typeof v) {
             case 'number': {
                 const c = new Color(0, 0, 0, 0);
