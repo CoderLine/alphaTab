@@ -21,6 +21,7 @@ export class PlayerSettingsSerializer {
             return null;
         }
         const o = new Map<string, unknown>();
+        /*@target web*/
         o.set("soundfont", obj.soundFont);
         /*@target web*/
         o.set("outputmode", obj.outputMode as number);
@@ -45,6 +46,7 @@ export class PlayerSettingsSerializer {
     }
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
         switch (property) {
+            /*@target web*/
             case "soundfont":
                 obj.soundFont = v as string | null;
                 return true;
