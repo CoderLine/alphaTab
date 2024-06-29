@@ -4,6 +4,7 @@ import { GENERATED_FILE_HEADER } from './EmitterBase';
 import serializerEmit from './SerializerEmitter';
 import transpiler from '../TranspilerBase';
 import * as fs from 'fs';
+import jsonDeclarationEmit from './JsonDeclarationEmitter';
 
 transpiler([{
     name: 'Clone',
@@ -11,6 +12,9 @@ transpiler([{
 }, {
     name: 'Serializer',
     emit: serializerEmit
+}, {
+    name: 'JSON Declarations',
+    emit: jsonDeclarationEmit
 }], false);
 
 // Write version file

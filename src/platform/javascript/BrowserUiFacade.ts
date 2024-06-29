@@ -30,6 +30,7 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { ScalableHtmlElementContainer } from './ScalableHtmlElementContainer';
 import { PlayerOutputMode } from '@src/PlayerSettings';
+import { SettingsJson } from '@src/generated/SettingsJson';
 
 /**
  * @target web
@@ -166,7 +167,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         return new AlphaTabWorkerScoreRenderer<unknown>(this._api, this._api.settings);
     }
 
-    public initialize(api: AlphaTabApiBase<unknown>, raw: any | Settings): void {
+    public initialize(api: AlphaTabApiBase<unknown>, raw: SettingsJson | Settings): void {
         this._api = api;
         let settings: Settings;
         if (raw instanceof Settings) {

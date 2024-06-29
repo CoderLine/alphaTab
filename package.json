@@ -46,7 +46,7 @@
         "node": ">=6.0.0"
     },
     "scripts": {
-        "clean": "rimraf dist",
+        "clean": "rimraf dist && rimraf .rollup.cache",
         "lint": "eslint .",
         "start": "node scripts/setup-playground.js && npm run generate-typescript && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript -w",
         "generate-typescript": "rimraf src/generated && tsx src.compiler/typescript/AlphaTabGenerator.ts",

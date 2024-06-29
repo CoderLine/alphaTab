@@ -293,6 +293,7 @@ export enum NotationElement {
 /**
  * The notation settings control how various music notation elements are shown and behaving
  * @json
+ * @json_declaration
  */
 export class NotationSettings {
     /**

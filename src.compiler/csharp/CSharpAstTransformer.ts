@@ -124,7 +124,7 @@ export default class CSharpAstTransformer {
                     } else {
                         additionalNonExportDeclarations.push(s);
                     }
-                } else {
+                } else if(!this.shouldSkip(s, false)) {
                     this._context.addTsNodeDiagnostics(
                         s,
                         'Only FunctionType type aliases are allowed',
