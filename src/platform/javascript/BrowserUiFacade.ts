@@ -31,6 +31,8 @@ import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynt
 import { ScalableHtmlElementContainer } from './ScalableHtmlElementContainer';
 import { PlayerOutputMode } from '@src/PlayerSettings';
 import { SettingsJson } from '@src/generated/SettingsJson';
+import { Beat } from '@src/model/Beat';
+import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 
 /**
  * @target web
@@ -63,7 +65,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _totalResultCount: number = 0;
     private _initialTrackIndexes: number[] | null = null;
     private _intersectionObserver: IntersectionObserver;
-    private _barToElementLookup: Map<number, HTMLElement> = new Map<number, HTMLElement>();
+    private _barToElementLookup: Map<number, ResultPlaceholder> = new Map<number, ResultPlaceholder>();
     private _resultIdToElementLookup: Map<string, ResultPlaceholder> = new Map<string, ResultPlaceholder>();
 
     public rootContainerBecameVisible: IEventEmitter = new EventEmitter();
@@ -126,6 +128,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this._intersectionObserver.observe(rootElement);
     }
 
+    private renderSpeed: Map<string, number> = new Map<string, number>();
+
     private onElementVisibilityChanged(entries: IntersectionObserverEntry[]) {
         for (const e of entries) {
             const htmlElement = e.target as HTMLElement;
@@ -142,6 +146,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                         if (this._resultIdToElementLookup.has(placeholder.layoutResultId!)) {
                             if (placeholder.resultState !== ResultState.RenderRequested) {
                                 placeholder.resultState = ResultState.RenderRequested;
+                                this.renderSpeed.set(placeholder.layoutResultId!, performance.now());
+                                Logger.debug(
+                                    'Rendering',
+                                    `Requesting rendering of partial ${placeholder.layoutResultId!}`
+                                );
+
                                 this._api.renderer.renderResult(placeholder.layoutResultId!);
                             } else {
                                 // Already requested render of this partial, wait for result
@@ -442,6 +452,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         placeholder.resultState = ResultState.RenderDone;
         placeholder.renderedResultId = renderResult.id;
         placeholder.renderedResult = Array.from(placeholder.children);
+
+        const end = performance.now();
+        const start = this.renderSpeed.get(placeholder.layoutResultId!)!;
+        Logger.debug('Rendering', `Finished rendering of partial ${placeholder.layoutResultId!} in ${end - start}ms`);
     }
 
     public beginAppendRenderResults(renderResult: RenderFinishedEventArgs | null): void {
@@ -503,8 +517,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         let player: AlphaSynthWebWorkerApi | null = null;
         let supportsScriptProcessor: boolean = 'ScriptProcessorNode' in window;
 
-        let supportsAudioWorklets: boolean =
-            window.isSecureContext && 'AudioWorkletNode' in window;
+        let supportsAudioWorklets: boolean = window.isSecureContext && 'AudioWorkletNode' in window;
 
         if (supportsAudioWorklets && this._api.settings.player.outputMode === PlayerOutputMode.WebAudioAudioWorklets) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
@@ -513,11 +526,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 this._api.settings
             );
         } else if (supportsScriptProcessor) {
-            Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with ScriptProcessor for playback');
-            player = new AlphaSynthWebWorkerApi(
-                new AlphaSynthScriptProcessorOutput(),
-                this._api.settings
+            Logger.debug(
+                'Player',
+                'Will use webworkers for synthesizing and web audio api with ScriptProcessor for playback'
             );
+            player = new AlphaSynthWebWorkerApi(new AlphaSynthScriptProcessorOutput(), this._api.settings);
         }
 
         if (!player) {
@@ -539,24 +552,60 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private _highlightedElements: HTMLElement[] = [];
-    public highlightElements(groupId: string, masterBarIndex: number): void {
+    private _domHighlighting: boolean = false;
+    public highlightBeats(beats: Beat[], masterBarIndex: number): void {
         const element = this._barToElementLookup.get(masterBarIndex);
-        if (element) {
-            let elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
-            for (let i: number = 0; i < elementsToHighlight.length; i++) {
-                elementsToHighlight.item(i)!.classList.add('at-highlight');
-                this._highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
+
+        if (this._domHighlighting) {
+            // clear previous highlights
+            let highlightedElements = this._highlightedElements;
+            if (!highlightedElements) {
+                return;
+            }
+
+            for (const element of highlightedElements) {
+                element.classList.remove('at-highlight');
+            }
+
+            highlightedElements = [];
+            this._highlightedElements = highlightedElements;
+
+            // apply new highlights
+            if (element) {
+                for (const b of beats) {
+                    const groupId = BeatContainerGlyph.getGroupId(b);
+                    let elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
+                    for (let i: number = 0; i < elementsToHighlight.length; i++) {
+                        elementsToHighlight.item(i)!.classList.add('at-highlight');
+                        highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
+                    }
+                }
+            }
+        } else {
+            // clear previous highlights
+            if(this._highlightedElements.length === 1 && this._highlightedElements[0] !== element) {
+                this._api.renderer.renderResult(
+                    (this._highlightedElements[0] as ResultPlaceholder).layoutResultId!,
+                    []
+                );
+                this._highlightedElements = [];
+            }
+
+            if(element) {
+                this._api.renderer.renderResult(
+                    element.layoutResultId!,
+                    beats.map(b => b.id)
+                );
+                this._highlightedElements = [element];
             }
         }
     }
 
     public removeHighlights(): void {
-        const highlightedElements = this._highlightedElements;
-        if (!highlightedElements) {
-            return;
-        }
-        for (const element of highlightedElements) {
-            element.classList.remove('at-highlight');
+        if (this._domHighlighting) {
+        } else if (this._highlightedElements.length > 0) {
+            Logger.info('Rendering', 'Remove highlighting');
+            this._api.renderer.renderResult((this._highlightedElements[0] as ResultPlaceholder).layoutResultId!, []);
         }
         this._highlightedElements = [];
     }
@@ -755,5 +804,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             };
             window.requestAnimationFrame(step);
         }
+    }
+
+    public onRenderStarted() {
+        this._domHighlighting = Environment.getRenderEngineFactory(
+            this._api.settings.core.engine
+        ).supportsDomHighlighting;
     }
 }

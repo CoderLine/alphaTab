@@ -9,7 +9,7 @@ import kotlin.contracts.ExperimentalContracts
 internal actual fun createPlatformSpecificRenderEngines(engines: Map<String, RenderEngineFactory>) {
     engines.set(
         "android",
-        RenderEngineFactory(true) { AndroidCanvas() }
+        RenderEngineFactory(true, false) { AndroidCanvas() }
     )
     engines.set(
         "default",

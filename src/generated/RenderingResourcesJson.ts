@@ -73,11 +73,19 @@ export interface RenderingResourcesJson {
      */
     mainGlyphColor?: ColorJson;
     /**
-     * Gets or sets the color to use for music notation elements of the secondary voices.
+     * The color to use for music notation elements of the primary voice when they are highlighted during playback.
+     */
+    mainGlyphHighlightColor?: ColorJson;
+    /**
+     * The color to use for music notation elements of the secondary voices.
      */
     secondaryGlyphColor?: ColorJson;
     /**
-     * Gets or sets the color to use for displaying the song information above the music sheet.
+     * The color to use for music notation elements of the primary voice when they are highlighted during playback.
+     */
+    secondaryGlyphHighlightColor?: ColorJson;
+    /**
+     * The color to use for displaying the song information above the music sheet.
      */
     scoreInfoColor?: ColorJson;
 }

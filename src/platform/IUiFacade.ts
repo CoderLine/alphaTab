@@ -8,12 +8,14 @@ import { Cursors } from '@src/platform/Cursors';
 import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { Bounds } from '@src/rendering/utils/Bounds';
+import { Beat } from '@src/model';
 
 /**
  * This interface represents the UI abstraction between alphaTab and the corresponding UI framework being used.
  * @param <TSettings> The type of that holds the settings passed from the UI layer.
  */
 export interface IUiFacade<TSettings> {
+    onRenderStarted(resize: boolean): void;
     /**
      * Gets the root UI element that holds the whole alphaTab control.
      */
@@ -69,7 +71,7 @@ export interface IUiFacade<TSettings> {
 
     /**
      * Tells the UI layer to append the given render results to the UI. At this point
-     * the partial result is not actually rendered yet, only the layouting process 
+     * the partial result is not actually rendered yet, only the layouting process
      * completed.
      * @param renderResults The rendered partial that should be added to the UI. null indicates the rendering finished.
      */
@@ -111,16 +113,11 @@ export interface IUiFacade<TSettings> {
     beginInvoke(action: () => void): void;
 
     /**
-     * Tells the UI layer to remove all highlights from highlighted music notation elements.
-     */
-    removeHighlights(): void;
-
-    /**
-     * Tells the UI layer to highlight the music notation elements with the given ID.
-     * @param groupId The group id that identifies the elements to be highlighted.
+     * Tells the UI layer to highlight the music notation elements with the given beats.
+     * @param beats The beats that identifies the elements to be highlighted.
      * @param masterBarIndex The index of the related masterbar of the highlighted group.
      */
-    highlightElements(groupId: string, masterBarIndex: number): void;
+    highlightBeats(beats: Beat[], masterBarIndex: number): void;
 
     /**
      * Creates a new UI element that is used to display the selection rectangle.

@@ -37,7 +37,7 @@ namespace AlphaTab
         {
             renderEngines.Set(
                 "gdi",
-                new RenderEngineFactory(true, () => new GdiCanvas())
+                new RenderEngineFactory(true, false, () => new GdiCanvas())
             );
             renderEngines.Set("default", renderEngines.Get("skia")!);
         }

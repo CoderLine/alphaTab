@@ -155,6 +155,19 @@ export class BeatContainerGlyph extends Glyph {
         if (isEmptyGlyph) {
             return;
         }
+
+        // TODO: better mechanism to change colors across the rendering chain.
+        const highlight = this.renderer.scoreRenderer.layout?.beatIdsToHighlight.has(this.beat.id);
+        const res = this.renderer.resources;
+        const mainGlyphColor = res.mainGlyphColor;
+        const secondaryGlyphColor = res.secondaryGlyphColor;
+        const canvasColor = canvas.color;
+        if (highlight) {
+            canvas.color = this.beat.voice.index === 0 ?  res.mainGlyphHighlightColor : res.secondaryGlyphHighlightColor;
+            res.mainGlyphColor = res.mainGlyphHighlightColor;
+            res.secondaryGlyphColor = res.secondaryGlyphHighlightColor;
+        }
+
         canvas.beginGroup(BeatContainerGlyph.getGroupId(this.beat));
         // var c = canvas.color;
         // var ta = canvas.textAlign;
@@ -201,6 +214,12 @@ export class BeatContainerGlyph extends Glyph {
             t.paint(staffX, staffY, canvas);
         }
         canvas.endGroup();
+ 
+        if (highlight) {
+            canvas.color = canvasColor;
+            res.mainGlyphColor = mainGlyphColor;
+            res.secondaryGlyphColor = secondaryGlyphColor;
+        }
     }
 
     public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number, isEmptyBar: boolean) {

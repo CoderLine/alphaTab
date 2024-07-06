@@ -34,7 +34,9 @@ export class RenderingResourcesSerializer {
         o.set("fingeringfont", Font.toJson(obj.fingeringFont));
         o.set("markerfont", Font.toJson(obj.markerFont));
         o.set("mainglyphcolor", Color.toJson(obj.mainGlyphColor));
+        o.set("mainglyphhighlightcolor", Color.toJson(obj.mainGlyphHighlightColor));
         o.set("secondaryglyphcolor", Color.toJson(obj.secondaryGlyphColor));
+        o.set("secondaryglyphhighlightcolor", Color.toJson(obj.secondaryGlyphHighlightColor));
         o.set("scoreinfocolor", Color.toJson(obj.scoreInfoColor));
         return o;
     }
@@ -85,8 +87,14 @@ export class RenderingResourcesSerializer {
             case "mainglyphcolor":
                 obj.mainGlyphColor = Color.fromJson(v)!;
                 return true;
+            case "mainglyphhighlightcolor":
+                obj.mainGlyphHighlightColor = Color.fromJson(v)!;
+                return true;
             case "secondaryglyphcolor":
                 obj.secondaryGlyphColor = Color.fromJson(v)!;
+                return true;
+            case "secondaryglyphhighlightcolor":
+                obj.secondaryGlyphHighlightColor = Color.fromJson(v)!;
                 return true;
             case "scoreinfocolor":
                 obj.scoreInfoColor = Color.fromJson(v)!;

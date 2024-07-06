@@ -74,10 +74,12 @@ export class LayoutEngineFactory {
 
 export class RenderEngineFactory {
     public readonly supportsWorkers: boolean;
+    public readonly supportsDomHighlighting: boolean;
     public readonly createCanvas: () => ICanvas;
 
-    public constructor(supportsWorkers: boolean, canvas: () => ICanvas) {
+    public constructor(supportsWorkers: boolean, supportsDomHighlighting: boolean, canvas: () => ICanvas) {
         this.supportsWorkers = supportsWorkers;
+        this.supportsDomHighlighting = supportsDomHighlighting;
         this.createCanvas = canvas;
     }
 }
@@ -423,7 +425,7 @@ export class Environment {
         const renderEngines = new Map<string, RenderEngineFactory>();
         renderEngines.set(
             'svg',
-            new RenderEngineFactory(true, () => {
+            new RenderEngineFactory(true, true, () => {
                 return new CssFontSvgCanvas();
             })
         );
@@ -431,7 +433,7 @@ export class Environment {
 
         renderEngines.set(
             'skia',
-            new RenderEngineFactory(false, () => {
+            new RenderEngineFactory(false, false, () => {
                 return new SkiaCanvas();
             })
         );
@@ -442,11 +444,11 @@ export class Environment {
 
     /**
      * Enables the usage of alphaSkia as rendering backend.
-     * @param musicFontData The raw binary data of the music font. 
+     * @param musicFontData The raw binary data of the music font.
      * @param alphaSkia The alphaSkia module.
      */
     public static enableAlphaSkia(musicFontData: ArrayBuffer, alphaSkia: unknown) {
-        SkiaCanvas.enable(musicFontData, alphaSkia)
+        SkiaCanvas.enable(musicFontData, alphaSkia);
     }
 
     /**
@@ -456,9 +458,7 @@ export class Environment {
      * @param fontInfo If provided the font info provided overrules
      * @returns The font info under which the font was registered.
      */
-    public static registerAlphaSkiaCustomFont(
-        fontData: Uint8Array,
-        fontInfo?: Font | undefined): Font {
+    public static registerAlphaSkiaCustomFont(fontData: Uint8Array, fontInfo?: Font | undefined): Font {
         return SkiaCanvas.registerFont(fontData, fontInfo);
     }
 
@@ -469,7 +469,7 @@ export class Environment {
     private static createPlatformSpecificRenderEngines(renderEngines: Map<string, RenderEngineFactory>) {
         renderEngines.set(
             'html5',
-            new RenderEngineFactory(false, () => {
+            new RenderEngineFactory(false, false, () => {
                 return new Html5Canvas();
             })
         );
@@ -485,7 +485,7 @@ export class Environment {
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
                 new TextEffectInfo(),
-                new ChordsEffectInfo(),
+                new ChordsEffectInfo()
             ]),
             new SlashBarRendererFactory(),
             new EffectBarRendererFactory('score-effects', [
@@ -535,8 +535,8 @@ export class Environment {
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
                 new TextEffectInfo(),
-                new ChordsEffectInfo(),
-            ]), 
+                new ChordsEffectInfo()
+            ]),
             new SlashBarRendererFactory(),
             new EffectBarRendererFactory('score-effects', [
                 new FermataEffectInfo(),
@@ -632,15 +632,12 @@ export class Environment {
         createWebWorker: (settings: Settings) => Worker,
         createAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>
     ) {
-        if(Environment.isRunningInWorker || Environment.isRunningInAudioWorklet) {
+        if (Environment.isRunningInWorker || Environment.isRunningInAudioWorklet) {
             return;
         }
-        
+
         // browser polyfills
-        if (
-            Environment.webPlatform === WebPlatform.Browser ||
-            Environment.webPlatform === WebPlatform.BrowserModule
-        ) {
+        if (Environment.webPlatform === WebPlatform.Browser || Environment.webPlatform === WebPlatform.BrowserModule) {
             Environment.registerJQueryPlugin();
             Environment.HighDpiFactor = window.devicePixelRatio;
             // ResizeObserver API does not yet exist so long on Safari (only start 2020 with iOS Safari 13.7 and Desktop 13.1)
@@ -660,7 +657,9 @@ export class Environment {
                     this.append(...nodes);
                 };
                 (Document.prototype as Document).replaceChildren = (Element.prototype as Element).replaceChildren;
-                (DocumentFragment.prototype as DocumentFragment).replaceChildren = (Element.prototype as Element).replaceChildren;
+                (DocumentFragment.prototype as DocumentFragment).replaceChildren = (
+                    Element.prototype as Element
+                ).replaceChildren;
             }
             if (!('replaceAll' in String.prototype)) {
                 (String.prototype as any).replaceAll = function (str: string, newStr: string) {
@@ -676,19 +675,24 @@ export class Environment {
     /**
      * @target web
      */
-    public static get alphaTabWorker(): any { return this.globalThis.Worker }
+    public static get alphaTabWorker(): any {
+        return this.globalThis.Worker;
+    }
 
     /**
      * @target web
      */
     public static initializeWorker() {
         if (!Environment.isRunningInWorker) {
-            throw new AlphaTabError(AlphaTabErrorType.General, "Not running in worker, cannot run worker initialization");
+            throw new AlphaTabError(
+                AlphaTabErrorType.General,
+                'Not running in worker, cannot run worker initialization'
+            );
         }
         AlphaTabWebWorker.init();
         AlphaSynthWebWorker.init();
         Environment.createWebWorker = _ => {
-            throw new AlphaTabError(AlphaTabErrorType.General, "Nested workers are not supported");
+            throw new AlphaTabError(AlphaTabErrorType.General, 'Nested workers are not supported');
         };
     }
 
@@ -697,7 +701,10 @@ export class Environment {
      */
     public static initializeAudioWorklet() {
         if (!Environment.isRunningInAudioWorklet) {
-            throw new AlphaTabError(AlphaTabErrorType.General, "Not running in audio worklet, cannot run worklet initialization");
+            throw new AlphaTabError(
+                AlphaTabErrorType.General,
+                'Not running in audio worklet, cannot run worklet initialization'
+            );
         }
         AlphaSynthWebWorklet.init();
     }

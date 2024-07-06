@@ -115,14 +115,17 @@ export class ScoreRenderer implements IScoreRenderer {
         this.settings = settings;
     }
 
-    public renderResult(resultId: string): void {
+    public renderResult(resultId: string, beatIdsToHighlight?: number[]): void {
         try {
             const layout = this.layout;
             if (layout) {
                 Logger.debug('Rendering', 'Request render of lazy partial ' + resultId);
-                layout.renderLazyPartial(resultId);
+                layout.renderLazyPartial(resultId, beatIdsToHighlight);
             } else {
-                Logger.warning('Rendering', 'Request render of lazy partial ' + resultId + ' ignored, no layout exists');
+                Logger.warning(
+                    'Rendering',
+                    'Request render of lazy partial ' + resultId + ' ignored, no layout exists'
+                );
             }
         } catch (e) {
             (this.error as EventEmitterOfT<Error>).trigger(e as Error);

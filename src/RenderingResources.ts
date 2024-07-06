@@ -86,12 +86,26 @@ export class RenderingResources {
     public mainGlyphColor: Color = new Color(0, 0, 0, 0xff);
 
     /**
-     * Gets or sets the color to use for music notation elements of the secondary voices.
+     * The color to use for music notation elements of the primary voice when they are highlighted during playback.
+
+     */
+    public mainGlyphHighlightColor: Color = new Color(0, 120, 255, 0xff);
+
+    /**
+     * The color to use for music notation elements of the secondary voices.
+
      */
     public secondaryGlyphColor: Color = new Color(0, 0, 0, 100);
 
     /**
-     * Gets or sets the color to use for displaying the song information above the music sheet.
+     * The color to use for music notation elements of the primary voice when they are highlighted during playback.
+
+     */
+    public secondaryGlyphHighlightColor: Color = new Color(0, 120, 255, 100);
+
+    /**
+     * The color to use for displaying the song information above the music sheet.
+
      */
     public scoreInfoColor: Color = new Color(0, 0, 0, 0xff);
 }

@@ -104,13 +104,13 @@ export abstract class ScoreLayout {
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
-        if(args.height == 0){
+        if (args.height == 0) {
             return;
         }
         if (!this.renderer.settings.core.enableLazyLoading) {
             // in case of no lazy loading -> first notify about layout, then directly render
             (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
-            this.internalRenderLazyPartial(args, callback);
+            this.internalRenderLazyPartial(args, undefined, callback);
         } else {
             // in case of lazy loading -> first register lazy, then notify
             this._lazyPartials.set(args.id, new LazyPartial(args, callback));
@@ -118,18 +118,26 @@ export abstract class ScoreLayout {
         }
     }
 
-    private internalRenderLazyPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
+    public beatIdsToHighlight:Set<number> = new Set<number>();
+
+    private internalRenderLazyPartial(
+        args: RenderFinishedEventArgs,
+        beatIdsToHighlight: number[] | undefined,
+        callback: (canvas: ICanvas) => void
+    ) {
         const canvas = this.renderer.canvas!;
+        this.beatIdsToHighlight = new Set<number>(beatIdsToHighlight);
+
         canvas.beginRender(args.width, args.height);
         callback(canvas);
         args.renderResult = canvas.endRender();
         (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
     }
 
-    public renderLazyPartial(resultId: string) {
+    public renderLazyPartial(resultId: string, beatIdsToHighlight?: number[]) {
         if (this._lazyPartials.has(resultId)) {
             const lazyPartial = this._lazyPartials.get(resultId)!;
-            this.internalRenderLazyPartial(lazyPartial.args, lazyPartial.renderCallback);
+            this.internalRenderLazyPartial(lazyPartial.args, beatIdsToHighlight, lazyPartial.renderCallback);
         }
     }
 
@@ -191,7 +199,7 @@ export abstract class ScoreLayout {
 
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
 
-        for(const [_e, glyph] of this.scoreInfoGlyphs) {
+        for (const [_e, glyph] of this.scoreInfoGlyphs) {
             glyph.renderer = fakeBarRenderer;
             glyph.doLayout();
         }
@@ -323,9 +331,7 @@ export abstract class ScoreLayout {
         const centered = Environment.getLayoutEngineFactory(this.renderer.settings.display.layoutMode).vertical;
         e.width = this.renderer.canvas!.measureText(msg).width;
         e.height = height;
-        e.x = centered
-            ? (this.width - e.width) / 2
-            : this.firstBarX;
+        e.x = centered ? (this.width - e.width) / 2 : this.firstBarX;
         e.y = y;
 
         e.totalWidth = this.width;

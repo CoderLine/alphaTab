@@ -73,7 +73,7 @@ export class AlphaTabWebWorker {
                 this._renderer.resizeRender();
                 break;
             case 'alphaTab.renderResult':
-                this._renderer.renderResult(data.resultId);
+                this._renderer.renderResult(data.resultId, data.beatIdsToHighlight);
                 break;
             case 'alphaTab.setWidth':
                 this._renderer.width = data.width;

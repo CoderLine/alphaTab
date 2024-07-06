@@ -66,10 +66,11 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
-    public renderResult(resultId: string): void {
+    public renderResult(resultId: string, beatIdsToHighlight?: number[]): void {
         this._worker.postMessage({
             cmd: 'alphaTab.renderResult',
-            resultId: resultId
+            resultId: resultId,
+            beatIdsToHighlight: beatIdsToHighlight
         });
     }
 

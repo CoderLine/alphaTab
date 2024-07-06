@@ -115,7 +115,10 @@ export class RenderStaff {
         // For cases like in the horizontal layout we need to set the fixed width early
         // to have correct partials splitting
         const barDisplayWidth = renderer.barDisplayWidth;
-        if (barDisplayWidth > 0 && this.system.layout.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths) {
+        if (
+            barDisplayWidth > 0 &&
+            this.system.layout.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths
+        ) {
             renderer.width = barDisplayWidth;
         }
 
@@ -153,8 +156,8 @@ export class RenderStaff {
                 }
                 break;
             case InternalSystemsLayoutMode.FromModelWithScale:
-                // each bar holds a percentual size where the sum of all scales make the width. 
-                // hence we can calculate the width accordingly by calculating how big each column needs to be percentual. 
+                // each bar holds a percentual size where the sum of all scales make the width.
+                // hence we can calculate the width accordingly by calculating how big each column needs to be percentual.
 
                 width -= this.system.accoladeWidth;
                 const totalScale = this.system.totalBarDisplayScale;
@@ -163,7 +166,7 @@ export class RenderStaff {
                     renderer.x = x;
                     renderer.y = this.topSpacing + topOverflow;
 
-                    const actualBarWidth = renderer.barDisplayScale * width / totalScale;
+                    const actualBarWidth = (renderer.barDisplayScale * width) / totalScale;
                     renderer.scaleToWidth(actualBarWidth);
 
                     x += renderer.width;
@@ -175,7 +178,7 @@ export class RenderStaff {
                     renderer.x = x;
                     renderer.y = this.topSpacing + topOverflow;
                     const displayWidth = renderer.barDisplayWidth;
-                    if(displayWidth > 0) {
+                    if (displayWidth > 0) {
                         renderer.scaleToWidth(displayWidth);
                     } else {
                         renderer.scaleToWidth(renderer.computedWidth);
@@ -212,7 +215,7 @@ export class RenderStaff {
     public finalizeStaff(): void {
         const settings = this.system.layout.renderer.settings;
         this.topSpacing = this._factory.getStaffPaddingTop(this) * settings.display.scale;
-        this.bottomSpacing =  this._factory.getStaffPaddingBottom(this) * settings.display.scale;
+        this.bottomSpacing = this._factory.getStaffPaddingBottom(this) * settings.display.scale;
 
         this.height = 0;
 
@@ -247,6 +250,8 @@ export class RenderStaff {
         if (this.height === 0 || count === 0) {
             return;
         }
+
+        this._sharedLayoutData.clear();
 
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y, this.system.width - this.x, this.height);
