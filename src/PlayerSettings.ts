@@ -130,6 +130,7 @@ export class PlayerSettings {
      * @since 0.9.6
      * @target web
      * @default null
+     * @summary The sound font file to load for the player.
      */
     public soundFont: string | null = null;
 
@@ -141,6 +142,7 @@ export class PlayerSettings {
      * @json_read_only
      * @since 0.9.6
      * @default 'html,body'
+     * @summary The element to apply the scrolling on.
      */
     public scrollElement: string | HTMLElement = 'html,body';
 
@@ -149,6 +151,7 @@ export class PlayerSettings {
      * @target web
      * @since 1.3.0
      * @default PlayerOutputMode.WebAudioAudioWorklets
+     * @summary The mode used for playing audio samples
      */
     public outputMode: PlayerOutputMode = PlayerOutputMode.WebAudioAudioWorklets;
 
@@ -160,6 +163,7 @@ export class PlayerSettings {
      * AlphaTab does not ship a default UI for the player. The API must be hooked up to some UI controls to allow the user to interact with the player.
      * @since 0.9.6
      * @default false
+     * @summary Whether the player should be enabled.
      */
     public enablePlayer: boolean = false;
 
@@ -167,6 +171,7 @@ export class PlayerSettings {
      * This setting configures whether the playback cursors are shown or not. In case a developer decides to built an own cursor system the default one can be disabled with this setting. Enabling the cursor also requires the player to be active. 
      * @since 0.9.6
      * @default true
+     * @summary Whether playback cursors should be displayed.
      */
     public enableCursor: boolean = true;
 
@@ -175,6 +180,7 @@ export class PlayerSettings {
      * The animation of the cursor might not be available on all targets so it might not have any effect.
      * @since 1.2.3
      * @default true
+     * @summary Whether the beat cursor should be animated or just ticking.
      */
     public enableAnimatedBeatCursor: boolean = true;
 
@@ -183,6 +189,7 @@ export class PlayerSettings {
      * The highlighting of elements might not be available on all targets and render engine, so it might not have any effect.
      * @since 1.2.3
      * @default true
+     * @summary Whether the notation elements of the currently played beat should be highlighted.
      */
     public enableElementHighlighting: boolean = true;
 
@@ -191,6 +198,7 @@ export class PlayerSettings {
      * By default users can select the desired playback range with the mouse and also jump to individual beats by click. This behavior can be contolled w1ith this setting. 
      * @since 0.9.7
      * @default true
+     * @summary Whether the default user interaction behavior should be active or not.
      */
     public enableUserInteraction: boolean = true;
 
@@ -200,6 +208,7 @@ export class PlayerSettings {
      * scroll position. 
      * @since 0.9.6
      * @default 0
+     * @summary The X-offset to add when scrolling.
      */
     public scrollOffsetX: number = 0;
 
@@ -209,6 +218,7 @@ export class PlayerSettings {
      * scroll position. 
      * @since 0.9.6
      * @default 0
+     * @summary The Y-offset to add when scrolling.
      */
     public scrollOffsetY: number = 0;
 
@@ -216,6 +226,7 @@ export class PlayerSettings {
      * This setting controls how alphaTab behaves for scrolling.
      * @since 0.9.6
      * @default ScrollMode.Continuous
+     * @summary The mode how to scroll.
      */
     public scrollMode: ScrollMode = ScrollMode.Continuous;
 
@@ -225,6 +236,7 @@ export class PlayerSettings {
      * Note that {@link PlayerSettings.nativeBrowserSmoothScroll} must be set to `false` for this to have an effect.
      * @since 0.9.6
      * @default 300
+     * @summary How fast the scrolling to the new position should happen.
      */
     public scrollSpeed: number = 300;
 
@@ -235,6 +247,7 @@ export class PlayerSettings {
      * @since 1.2.3
      * @target web
      * @default true
+     * @summary Whether the native browser smooth scroll mechanism should be used over a custom animation.
      */
     public nativeBrowserSmoothScroll: boolean = true;
 
@@ -244,6 +257,7 @@ export class PlayerSettings {
      * the bends should always be played in the same speed, regardless of the song tempo. Midi ticks are tempo dependent. 
      * @since 0.9.6
      * @default 75
+     * @summary The bend duration in milliseconds for songbook bends.
      */
     public songBookBendDuration: number = 75;
 
@@ -253,6 +267,7 @@ export class PlayerSettings {
      * the whammy should always be pressed in the same speed, regardless of the song tempo. Midi ticks are tempo dependent. 
      * @since 0.9.6
      * @default 150
+     * @summary The duration of whammy dips in milliseconds for songbook whammys.
      */
     public songBookDipDuration: number = 150;
 
@@ -267,20 +282,24 @@ export class PlayerSettings {
      * 4. Note Wide - A slow vibrato on a single note. This vibrato is usually done with the finger on the fretboard.
      * @json_partial_names
      * @since 0.9.6
+     * @summary The Vibrato settings allow control how the different vibrato types are generated for audio.
      */
     public readonly vibrato: VibratoPlaybackSettings = new VibratoPlaybackSettings();
 
     /**
      * AlphaTab supports various types of slides which can be grouped into 3 types: 
      * 
+     * Type 1: 
      * * Shift Slides
      * * Legato Slides
      * 
+     * Type 2:
      * * Slide into from below
      * * Slide into from above
      * * Slide out to below
      * * Slide out to above 
      * 
+     * Type 3
      * * Pick Slide out to above
      * * Pick Slide out to below
      *  
@@ -291,6 +310,7 @@ export class PlayerSettings {
      * the duration/start-point and the pitch offset can be configured. 
      * @json_partial_names
      * @since 0.9.6
+     * @summary The slide settings allow control how the different slide types are generated for audio.
      */
     public readonly slide: SlidePlaybackSettings = new SlidePlaybackSettings();
 
@@ -298,6 +318,7 @@ export class PlayerSettings {
      * If this setting is enabled alphaTab will play the triplet feels accordingly, if it is disabled the triplet feel is only displayed but not played. 
      * @since 0.9.6
      * @default true
+     * @summary Whether the triplet feel should be played or only displayed.
      */
     public playTripletFeel: boolean = true;
 
@@ -308,6 +329,7 @@ export class PlayerSettings {
      * This buffer size can be changed whenever needed.
      * @since 1.2.3
      * @default 500
+     * @summary The number of milliseconds the player should buffer.
      */
     public bufferTimeInMilliseconds:number = 500;
 }

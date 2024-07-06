@@ -12,6 +12,7 @@ export class CoreSettings {
      * be defined before initializing. Please be aware that bundling alphaTab together with other scripts might cause errors
      * in case those scripts are not suitable for web workers. e.g. if there is a script bundled together with alphaTab that accesses the DOM,
      * this will cause an error when alphaTab starts this script as worker.
+     * @summary The full URL to the alphaTab JavaScript file.
      * @target web
      * @since 0.9.6
      * @default automatic
@@ -23,6 +24,7 @@ export class CoreSettings {
      * where the Web Font files of [Bravura](https://github.com/steinbergmedia/bravura) are. Normally alphaTab expects
      * them to be in a `font` subfolder beside the script file. If this is not the case, this setting must be used to configure the path.
      * Alternatively also a global variable `ALPHATAB_FONT` can be set on the page before initializing alphaTab.
+     * @summary The full URL to the alphaTab font directory.
      * @target web
      * @since 0.9.6
      * @default automatic
@@ -33,6 +35,7 @@ export class CoreSettings {
      * AlphaTab can automatically load and render a file after initialization. This eliminates the need of manually calling
      * one of the load methods which are available. alphaTab will automatically initiate an `XMLHttpRequest` after initialization
      * to load and display the provided url of this setting. Note that this setting is only interpreted once on initialization.
+     * @summary The full URL to the input file to be loaded.
      * @target web
      * @since 0.9.6
      * @default null
@@ -51,6 +54,7 @@ export class CoreSettings {
      * const api = new alphaTab.AlphaTabApi(document.getElementById('alphaTab'), { core: { tex: true } });
      * </script>
      * ```
+     * @summary Whether the contents of the DOM element should be loaded as alphaTex.
      * @default false
      */
     public tex: boolean = false;
@@ -58,6 +62,7 @@ export class CoreSettings {
     /**
      * This setting can be used in combinition with the `file` or `tex` option. It controls which of the tracks
      * of the initially loaded file should be displayed.
+     * @summary The tracks to display for the initally loaded file.
      * @target web
      * @since 0.9.6
      * @json_raw
@@ -72,6 +77,7 @@ export class CoreSettings {
      * This setting set to false, ensures that all rendered items are instantly appended to the DOM.#
      * @since 0.9.6
      * @default true
+     * @summary Enables lazy loading of the rendered music sheet chunks.
      */
     public enableLazyLoading: boolean = true;
 
@@ -81,10 +87,12 @@ export class CoreSettings {
      * | Type      | Values                                                                  | Available On Platform    |
      * |-----------|-------------------------------------------------------------------------|--------------------------|
      * | `default` | Platform specific default engine (`svg` for web, `skia` for others)     | all                      |
+     * | `svg`     | Uses a SVG string with Web Fonts to render the music notation.          | all                      |
      * | `html5`   | Uses HTML5 canvas elements to render the music notation.                | `web`                    |
      * | `skia`    | Uses alphaSkia (a cross platform Skia wrapper) to render music notation | `net`, `android`, `node` |
      * @since 0.9.6
      * @default 'default'
+     * @summary The engine which should be used to render the the tablature.
      */
     public engine: string = 'default';
 
@@ -93,6 +101,7 @@ export class CoreSettings {
      * The log level of alphaTab can be controlled via this setting.
      * @since 0.9.6
      * @default LogLevel.Info
+     * @summary The log level to use within alphaTab.
      */
     public logLevel: LogLevel = LogLevel.Info;
 
@@ -102,6 +111,7 @@ export class CoreSettings {
      * a synchronous rendering behavior. This setting can be set to false to synchronously render the music sheet on the UI side.
      * @since 0.9.6
      * @default true
+     * @summary Whether the rendering should be done in a worker if possible.
      */
     public useWorkers: boolean = true;
 
@@ -114,20 +124,21 @@ export class CoreSettings {
      * @example web
      * ```js
      * const settings = {
-     *      core: {
+     *     core: {
      *          includeNoteBounds: true
-     *      }
-     *  };
-     *  let api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'), settings);
-     *  api.renderFinished.on(function() {
-     *      var lookup = api.renderer.boundsLookup;
-     *      var x = 100;
-     *      var y = 100;
-     *      var beat = lookup.getBeatAtPos(x, y);
-     *      var note = lookup.getNoteAtPos(beat, x, y);
-     *  });
+     *     }
+     * };
+     * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+     * api.renderFinished.on(function() {
+     *     const lookup = api.renderer.boundsLookup;
+     *     const x = 100;
+     *     const y = 100;
+     *     const beat = lookup.getBeatAtPos(x, y);
+     *     const note = lookup.getNoteAtPos(beat, x, y);
+     * });
      * ```
      * @default false
+     * @summary Whether to include individual note positions in the BoundsLookup.
      */
     public includeNoteBounds: boolean = false;
 

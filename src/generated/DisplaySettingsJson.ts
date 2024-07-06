@@ -15,97 +15,252 @@ import { SystemsLayoutMode } from "@src/DisplaySettings";
  */
 export interface DisplaySettingsJson {
     /**
-     * Sets the zoom level of the rendered notation
+     * AlphaTab can scale up or down the rendered music notation for more optimized display scenarios.
+     * By default music notation is rendered at 100% scale (value 1) and can be scaled up or down by percental values.
+     * @since 0.9.6
+     * @default 1.0
+     * @summary The zoom level of the rendered notation.
      */
     scale?: number;
     /**
-     * The default stretch force to use for layouting.
+     * The stretch force is a setting that controls the spacing of the music notation. AlphaTab uses a varaint of the Gourlay algorithm for spacing which has springs and rods for
+     * aligning elements. This setting controls the "strength" of the springs. The stronger the springs, the wider the spacing.
+     *
+     * | Force 1                                                      | Force 0.5                                             |
+     * |--------------------------------------------------------------|-------------------------------------------------------|
+     * | ![Default](https://alphatab.net/img/reference/property/stretchforce-default.png) | ![0.5](https://alphatab.net/img/reference/property/stretchforce-half.png) |
+     * @since 0.9.6
+     * @default 1.0
+     * @summary The default stretch force to use for layouting.
      */
     stretchForce?: number;
     /**
-     * The layouting mode used to arrange the the notation.
+     * AlphaTab has various layout engines that arrange the rendered bars differently.
+     * This setting controls which layout mode is used.
+     * @since 0.9.6
+     * @default LayoutMode.Page
+     * @summary The mode used to arrange staves and systems.
      */
     layoutMode?: LayoutMode | keyof typeof LayoutMode;
     /**
-     * The stave profile to use.
+     * AlphaTab has various stave profiles that define which staves will be shown in for the rendered tracks.
+     * @since 0.9.6
+     * @default StaveProfile.Default
+     * @summary The stave profile defining which staves are shown for the music sheet.
      */
     staveProfile?: StaveProfile | keyof typeof StaveProfile;
     /**
-     * Limit the displayed bars per row.
+     * This setting sets the number of bars that should be put into one row during layouting. This setting is only respected
+     * when using the layoutMode `page` where bars are aligned in rows.
+     * @since 0.9.6
+     * @default -1
+     * @summary Limit the displayed bars per row.
      */
     barsPerRow?: number;
     /**
-     * The bar start number to start layouting with. Note that this is the bar number and not an index!
+     * This setting sets the index of the first bar that should be rendered from the overall song. This setting can be used to
+     * achieve a paging system or to only show partial bars of the same file. By this a tutorial alike display can be achieved
+     * that explains various parts of the song. Please note that this is the bar number as shown in the music sheet (1-based) not the array index (0-based).
+     * @since 0.9.6
+     * @default 1
+     * @summary The bar start index to start layouting with.
      */
     startBar?: number;
     /**
-     * The amount of bars to render overall.
+     * This setting sets the number of bars that should be rendered from the overall song. This setting can be used to
+     * achieve a paging system or to only show partial bars of the same file. By this, a tutorial alike display can be achieved
+     * that explains various parts of the song. Set this to `-1` (default) for showing all bars.
+     * @since 0.9.6
+     * @default -1
+     * @summary The total number of bars that should be rendered from the song.
      */
     barCount?: number;
     /**
-     * The number of bars that should be rendered per partial. This setting is not used by all layouts.
+     * AlphaTab renders the whole music sheet in smaller chunks named "partials". This is to reduce the risk of
+     * encountering browser performance restrictions and it gives faster visual feedback to the user. This
+     * setting controls how many bars are placed within such a partial.
+     * @since 0.9.6
+     * @default 10
+     * @summary The number of bars that should be placed within one partial render.
      */
     barCountPerPartial?: number;
     /**
-     * Whether the last system (row) should be also justified to the whole width of the music sheet.
-     * (applies only for page layout).
+     * Setting this option to `true` tells alphaTab to also justify the last system (row) like it
+     * already does for the systems which are full.
+     * | Justification Disabled                                       | Justification Enabled                                |
+     * |--------------------------------------------------------------|-------------------------------------------------------|
+     * | ![Disabled](https://alphatab.net/img/reference/property/justify-last-system-false.png) | ![Enabled](https://alphatab.net/img/reference/property/justify-last-system-true.png) |
+     *
+     * @since 1.3.0
+     * @default false
+     * @summary Whether to justify also the last system in page layouts.
      */
     justifyLastSystem?: boolean;
     /**
-     * Gets or sets the resources used during rendering. This defines all fonts and colors used.
+     * AlphaTab allows configuring the colors and fonts used for rendering via the rendering resources settings. Please note that as of today
+     * this is the primary way of changing the way how alphaTab styles elements. CSS styling in the browser cannot be guaranteed to work due to its flexibility.
+     *
+     * Due to space reasons in the following table the common prefix of the settings are removed. Please refer to these examples to eliminate confusion on the usage:
+     * | Platform   | Prefix                    | Example Usage                                                      |
+     * |------------|---------------------------|--------------------------------------------------------------------|
+     * | JavaScript | `display.resources.`      | `settings.display.resources.wordsFont = ...`                       |
+     * | JSON       | `display.resources.`      | `var settings = { display: { resources: { wordsFonts: '...'} } };` |
+     * | .net       | `Display.Resources.`      | `settings.Display.Resources.WordsFonts = ...`                      |
+     * | Android    | `display.resources.`      | `settings.display.resources.wordsFonts = ...`                      |
+     * @since 0.9.6
      * @json_partial_names
+     * @summary Allows adjusting of the used fonts and colors for rendering.
      */
     resources?: RenderingResourcesJson;
     /**
-     * Gets or sets the padding between the music notation and the border.
+     * AlphaTab by default has a padding between the border of the control and the start of the content.
+     * This setting controls this padding between border and content.
+     * @since 0.9.6
+     * @default [35,35]
+     * @summary Adjusts the padding between the music notation and the border
      */
     padding?: number[];
     /**
-     * Gets or sets the top padding applied to first system.
+     * The top padding applied to the first system right after top elements like the score information,
+     * tuning and chord diagrams.
+     * @since 1.4.0
+     * @default 5
+     * @summary The top padding applied to the first system.
      */
     firstSystemPaddingTop?: number;
     /**
-     * Gets or sets the top padding applied to systems.
+     * The top padding applied to all individual systems beside the first one.
+     * @since 1.4.0
+     * @default 10
+     * @summary The top padding applied to systems.
      */
     systemPaddingTop?: number;
     /**
-     * Gets or sets the bottom padding applied to systems.
+     * The bottom padding applied to all individual systems beside the last one.
+     * @since 1.4.0
+     * @default 20
+     * @summary
      */
     systemPaddingBottom?: number;
     /**
-     * Gets or sets the bottom padding applied to last system.
+     * The bottom padding applied to the last system below the last notation symbols and above
+     * the alphaTab annotation.
+     * @since 1.4.0
+     * @default 0
+     * @summary The bottom padding applied to last system.
      */
     lastSystemPaddingBottom?: number;
     /**
-     * Gets or sets the padding left to the track name label of the system.
+     * The padding left to the track name label or in general at the start of the system (if no label is shown).
+     * @since 1.4.0
+     * @default 0
+     * @summary The padding left to the track name label of the system.
      */
     systemLabelPaddingLeft?: number;
     /**
-     * Gets or sets the padding right to the track name label of the system.
+     * The padding right to the track name label of the system and right to the bracket of the first system
+     * @since 1.4.0
+     * @default 5
+     * @summary The padding right to the track name label of the system.
      */
     systemLabelPaddingRight?: number;
     /**
-     * Gets or sets the padding between the accolade bar and the start of the bar itself.
+     * The padding between the accolade (system bracket) and the start of the bar itself.
+     * @since 1.4.0
+     * @default 3
+     * @summary The padding between the accolade bar and the start of the bar itself.
      */
     accoladeBarPaddingRight?: number;
     /**
-     * Gets or sets the top padding applied to main notation staffs.
+     * The top padding applied to main notation staffs like the standard music notation or guitar tabs.
+     * It doesn't apply to "effect staffs" showing annotations like vibratos.
+     * @since 1.4.0
+     * @default 5
+     * @summary The top padding applied to main notation staffs.
      */
     notationStaffPaddingTop?: number;
     /**
-     * Gets or sets the bottom padding applied to main notation staffs.
+     * The bottom padding applied to main notation staffs like the standard music notation or guitar tabs.
+     * It doesn't apply to "effect staffs" showing annotations like vibratos.
+     * @since 1.4.0
+     * @default 5
+     * @summary The bottom padding applied to main notation staffs.
      */
     notationStaffPaddingBottom?: number;
     /**
-     * Gets or sets the top padding applied to effect annotation staffs.
+     * The top padding applied to effect annotation staffs showing details like vibratos, lyrics etc.
+     * @since 1.4.0
+     * @default 0
+     * @summary The top padding applied to effect annotation staffs.
      */
     effectStaffPaddingTop?: number;
     /**
-     * Gets or sets the bottom padding applied to effect annotation staffs.
+     * The bottom padding applied to effect annotation staffs showing details like vibratos, lyrics etc.
+     * @since 1.4.0
+     * @default 0
+     * @summary The bottom padding applied to effect annotation staffs.
      */
     effectStaffPaddingBottom?: number;
     /**
-     * Gets how the systems should be layed out.
+     * By default alphaTab uses an own (automatic) mode to arrange and scale the bars when
+     * putting them into staves. This property allows changing this mode to change the music sheet arrangement.
+     *
+     * ## Supported File Formats:
+     * * Guitar Pro 6-8 {@since 1.3.0}
+     *
+     * If you want/need support for more file formats to respect the sizing information feel free to [open a discussion](https://github.com/CoderLine/alphaTab/discussions/new?category=ideas) on GitHub.
+     *
+     * ## Automatic Mode
+     *
+     * In the automatic mode alphaTab arranges the bars and staves using its internal mechanisms.
+     *
+     * For the `page` layout this means it will scale the bars according to the `stretchForce` and available width.
+     * Wrapping into new systems (rows) will happen when the row is considered "full".
+     *
+     * For the `horizontal` layout the `stretchForce` defines the sizing and no wrapping happens at all.
+     *
+     * ## Model Layout mode
+     *
+     * File formats like Guitar Pro embed information about the layout in the file and alphaTab can read and use this information.
+     * When this mode is enabled, alphaTab will also actively use this information and try to respect it.
+     *
+     * alphaTab holds following information in the data model and developers can change those values (e.g. by tapping into the `scoreLoaded`) event.
+     *
+     * **Used when single tracks are rendered:**
+     * * `score.tracks[index].systemsLayout` - An array of numbers describing how many bars should be placed within each system (row).
+     * * `score.tracks[index].defaultSystemsLayout` - The number of bars to place in a system (row) when no value is defined in the `systemsLayout`.
+     * * `score.tracks[index].staves[index].bars[index].displayScale` - The relative size of this bar in the system it is placed. Note that this is not directly a percentage value. e.g. if there are 3 bars and all define scale 1, they are sized evenly.
+     * * `score.tracks[index].staves[index].bars[index].displayWidth` - The absolute size of this bar when displayed.
+     *
+     * **Used when multiple tracks are rendered:**
+     *
+     * * `score.systemsLayout` - Like the `systemsLayout` on track level.
+     * * `score.defaultSystemsLayout` - Like the `defaultSystemsLayout` on track level.
+     * * `score.masterBars[index].displayScale` - Like the `displayScale` on bar level.
+     * * `score.masterBars[index].displayWidth` - Like the `displayWidth` on bar level.
+     *
+     * ### Page Layout
+     *
+     * The page layout uses the `systemsLayout` and `defaultSystemsLayout` to decide how many bars go into a single system (row).
+     * Additionally when sizing the bars within the system the `displayScale` is used. As indicated above, the scale is rather a ratio than a percentage value but percentages work also:
+     * ![system layout page example](https://alphatab.net/img/reference/property/systems-layout-page-examples.png)
+     *
+     * The page layout does not use `displayWidth`. The use of absolute widths would break the proper alignments needed for this kind of display.
+     *
+     * Also note that the sizing is including any glyphs and notation elements within the bar. e.g. if there are clefs in the bar, they are still "squeezed" into the available size.
+     * It is not the case that the actual notes with their lengths are sized accordingly. This fits the sizing system of Guitar Pro and when files are customized there,
+     * alphaTab will match this layout quite close.
+     *
+     * ### Horizontal Layout
+     *
+     * The horizontal layout uses the `displayWidth` to scale the bars to size the bars exactly as specified. This kind of sizing and layout can be useful for usecases like:
+     *
+     * * Comparing files against each other (top/bottom comparison)
+     * * Aligning the playback of multiple files on one screen assuming the same tempo (e.g. one file per track).
+     *
+     * @since 1.4.0
+     * @default SystemsLayoutMode.Automatic
+     * @summary The mode used to arrange staves and systems.
      */
     systemsLayoutMode?: SystemsLayoutMode | keyof typeof SystemsLayoutMode;
 }

@@ -318,6 +318,7 @@ export class NotationSettings {
      * or more like the common practice in paper song books practices the display.
      * @since 0.9.6
      * @default NotationMode.GuitarPro
+     * @summary The mode to use for display and play music notation elements.
      */
     public notationMode: NotationMode = NotationMode.GuitarPro;
 
@@ -330,6 +331,7 @@ export class NotationSettings {
      * | ![Enabled](https://alphatab.net/img/reference/property/fingeringmode-score.png) | ![Disabled](https://alphatab.net/img/reference/property/fingeringmode-effectband.png) |
      * @since 0.9.6
      * @default FingeringMode.ScoreDefault
+     * @summary The fingering mode to use.
      */
     public fingeringMode: FingeringMode = FingeringMode.ScoreDefault;
 
@@ -363,6 +365,7 @@ export class NotationSettings {
      * settings.Notation.Elements[AlphaTab.NotationElement.ScoreTitle] = false;
      * settings.Notation.Elements[AlphaTab.NotationElement.TrackNames] = false;
      * ```
+     * @summary Controls the display of various elements on the music sheet.
      */
     public elements: Map<NotationElement, boolean> = new Map();
 
@@ -379,6 +382,7 @@ export class NotationSettings {
      * This setting enables the display of rhythm notation on tab staffs. [Demo](https://alphatab.net/docs/showcase/guitar-tabs)
      * @since 0.9.6
      * @default TabRhythmMode.Hidden
+     * @summary Controls how the rhythm notation is rendered for tab staves.
      */
     public rhythmMode: TabRhythmMode = TabRhythmMode.Hidden;
 
@@ -386,6 +390,7 @@ export class NotationSettings {
      * This setting can be used in combination with the `RhythmMode` setting to control how high the rhythm notation should be rendered below the tab staff. 
      * @since 0.9.6
      * @default 15
+     * @summary Controls how high the ryhthm notation is rendered below the tab staff
      */
     public rhythmHeight: number = 15;
 
@@ -394,6 +399,7 @@ export class NotationSettings {
      * The `transpositionPitches` setting allows defining an additional pitch offset per track, that is then considered when displaying the music sheet. 
      * @since 0.9.6
      * @default []
+     * @summary The transposition pitch offsets for the individual tracks used for rendering and playback.
      */
     public transpositionPitches: number[] = [];
 
@@ -408,6 +414,7 @@ export class NotationSettings {
      * The transposition is defined as number of semitones and one value per track of the song can be defined.
      * @since 0.9.6
      * @default []
+     * @summary The transposition pitch offsets for the individual tracks used for rendering only.
      */
     public displayTranspositionPitches: number[] = [];
 
@@ -419,6 +426,7 @@ export class NotationSettings {
      * | ![Enabled](https://alphatab.net/img/reference/property/smallgracetabnotes-enabled.png) | ![Disabled](https://alphatab.net/img/reference/property/smallgracetabnotes-disabled.png) |
      * @since 0.9.6
      * @default true
+     * @summary If set to true the guitar tabs on grace beats are rendered smaller.
      */
     public smallGraceTabNotes: boolean = true;
 
@@ -431,6 +439,7 @@ export class NotationSettings {
      * | ![Enabled](https://alphatab.net/img/reference/property/extendbendarrowsontiednotes-enabled.png) | ![Disabled](https://alphatab.net/img/reference/property/extendbendarrowsontiednotes-disabled.png) |
      * @since 0.9.6
      * @default true
+     * @summary If set to true bend arrows expand to the end of the last tied note of the string. Otherwise they end on the next beat.
      */
     public extendBendArrowsOnTiedNotes: boolean = true;
 
@@ -443,6 +452,7 @@ export class NotationSettings {
      * | ![Enabled](https://alphatab.net/img/reference/property/extendlineeffectstobeatend-enabled.png) | ![Disabled](https://alphatab.net/img/reference/property/extendlineeffectstobeatend-disabled.png) |
      * @since 0.9.6
      * @default false
+     * @summary If set to true, line effects like w/bar and let-ring are drawn until the end of the beat instead of the start
      */
     public extendLineEffectsToBeatEnd: boolean = false;
 
@@ -455,6 +465,7 @@ export class NotationSettings {
      * | ![Slur Height Default](https://alphatab.net/img/reference/property/slurheight-default.png) | ![Slur Height 14](https://alphatab.net/img/reference/property/slurheight-14.png)  |
      * @since 0.9.6
      * @default 5.0
+     * @summary The height scale factor for slurs
      */
     public slurHeight: number = 5.0;
 

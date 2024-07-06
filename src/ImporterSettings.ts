@@ -8,6 +8,7 @@ export class ImporterSettings {
      * The text encoding to use when decoding strings. By default UTF-8 is used.
      * @since 0.9.6
      * @default 'utf-8'
+     * @summary The text encoding to use when decoding strings.
      */
     public encoding: string = 'utf-8';
 
@@ -15,6 +16,7 @@ export class ImporterSettings {
      * If part-groups should be merged into a single track.
      * @since 0.9.6
      * @default false
+     * @summary If part-groups should be merged into a single track (MusicXML).
      */
     public mergePartGroupsInMusicXml: boolean = false;
 
@@ -24,6 +26,7 @@ export class ImporterSettings {
      * If a track/staff has explicit lyrics the beat texts will not be detected as lyrics.
      * @since 1.2.0
      * @default false
+     * @summary Enables detecting lyrics from beat texts
      */
     public beatTextAsLyrics: boolean = false;
 }

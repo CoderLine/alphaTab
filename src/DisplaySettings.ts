@@ -28,6 +28,7 @@ export class DisplaySettings {
      * By default music notation is rendered at 100% scale (value 1) and can be scaled up or down by percental values.
      * @since 0.9.6
      * @default 1.0
+     * @summary The zoom level of the rendered notation.
      */
     public scale: number = 1.0;
 
@@ -40,6 +41,7 @@ export class DisplaySettings {
      * | ![Default](https://alphatab.net/img/reference/property/stretchforce-default.png) | ![0.5](https://alphatab.net/img/reference/property/stretchforce-half.png) |
      * @since 0.9.6
      * @default 1.0
+     * @summary The default stretch force to use for layouting.
      */
     public stretchForce: number = 1.0;
 
@@ -48,6 +50,7 @@ export class DisplaySettings {
      * This setting controls which layout mode is used. 
      * @since 0.9.6
      * @default LayoutMode.Page
+     * @summary The mode used to arrange staves and systems.
      */
     public layoutMode: LayoutMode = LayoutMode.Page;
 
@@ -55,6 +58,7 @@ export class DisplaySettings {
      * AlphaTab has various stave profiles that define which staves will be shown in for the rendered tracks.
      * @since 0.9.6
      * @default StaveProfile.Default
+     * @summary The stave profile defining which staves are shown for the music sheet.
      */
     public staveProfile: StaveProfile = StaveProfile.Default; // TODO 2.0 - unify with the general staff config in the model
 
@@ -63,6 +67,7 @@ export class DisplaySettings {
      * when using the layoutMode `page` where bars are aligned in rows.
      * @since 0.9.6
      * @default -1
+     * @summary Limit the displayed bars per row.
      */ 
     public barsPerRow: number = -1; // TODO 2.0 - rename to barsPerSystem and unify with systemsLayout
 
@@ -72,6 +77,7 @@ export class DisplaySettings {
      * that explains various parts of the song. Please note that this is the bar number as shown in the music sheet (1-based) not the array index (0-based).
      * @since 0.9.6
      * @default 1
+     * @summary The bar start index to start layouting with.
      */
     public startBar: number = 1;
 
@@ -81,6 +87,7 @@ export class DisplaySettings {
      * that explains various parts of the song. Set this to `-1` (default) for showing all bars.
      * @since 0.9.6
      * @default -1
+     * @summary The total number of bars that should be rendered from the song.
      */
     public barCount: number = -1;
 
@@ -90,6 +97,7 @@ export class DisplaySettings {
      * setting controls how many bars are placed within such a partial.
      * @since 0.9.6
      * @default 10
+     * @summary The number of bars that should be placed within one partial render.
      */
     public barCountPerPartial: number = 10;
 
@@ -102,6 +110,7 @@ export class DisplaySettings {
      * 
      * @since 1.3.0
      * @default false
+     * @summary Whether to justify also the last system in page layouts.
      */
     public justifyLastSystem: boolean = false;
 
@@ -114,13 +123,11 @@ export class DisplaySettings {
      * |------------|---------------------------|--------------------------------------------------------------------|
      * | JavaScript | `display.resources.`      | `settings.display.resources.wordsFont = ...`                       |
      * | JSON       | `display.resources.`      | `var settings = { display: { resources: { wordsFonts: '...'} } };` |
-     * | JSON       | `resources.`              | `var settings = { resources: { wordsFonts: '...'} };`              |
-     * | HTML       | `data-display-resources-` | `<div data-display-resources-wordsfont="...">`                     |
-     * | HTML       | `data-resources-`         | `<div data-resources-wordsfont="...">`                             |
      * | .net       | `Display.Resources.`      | `settings.Display.Resources.WordsFonts = ...`                      |
      * | Android    | `display.resources.`      | `settings.display.resources.wordsFonts = ...`                      |
      * @since 0.9.6
      * @json_partial_names
+     * @summary Allows adjusting of the used fonts and colors for rendering.
      */
     public resources: RenderingResources = new RenderingResources();
 
@@ -129,83 +136,99 @@ export class DisplaySettings {
      * This setting controls this padding between border and content. 
      * @since 0.9.6
      * @default [35,35]
+     * @summary Adjusts the padding between the music notation and the border
      */
     public padding: number[] = [35, 35];
 
     /**
-     * The top padding applied to first system.
+     * The top padding applied to the first system right after top elements like the score information,
+     * tuning and chord diagrams.
      * @since 1.4.0
      * @default 5
+     * @summary The top padding applied to the first system.
      */
     public firstSystemPaddingTop: number = 5;
 
     /**
-     * The top padding applied to systems.
+     * The top padding applied to all individual systems beside the first one.
      * @since 1.4.0
      * @default 10
+     * @summary The top padding applied to systems.
      */
     public systemPaddingTop: number = 10;
 
     /**
-     * The bottom padding applied to systems.
+     * The bottom padding applied to all individual systems beside the last one.
      * @since 1.4.0
      * @default 20
+     * @summary 
      */
     public systemPaddingBottom: number = 20;
 
     /**
-     * The bottom padding applied to last system.
+     * The bottom padding applied to the last system below the last notation symbols and above
+     * the alphaTab annotation.
      * @since 1.4.0
      * @default 0
+     * @summary The bottom padding applied to last system.
      */
     public lastSystemPaddingBottom: number = 0;
 
     /**
-     * The padding left to the track name label of the system.
+     * The padding left to the track name label or in general at the start of the system (if no label is shown).
      * @since 1.4.0
      * @default 0
+     * @summary The padding left to the track name label of the system.
      */
     public systemLabelPaddingLeft: number = 0;
 
     /**
-     * The padding right to the track name label of the system.
+     * The padding right to the track name label of the system and right to the bracket of the first system
      * @since 1.4.0
      * @default 5
+     * @summary The padding right to the track name label of the system.
      */
     public systemLabelPaddingRight: number = 5;
 
     /**
-     * The padding between the accolade bar and the start of the bar itself.
+     * The padding between the accolade (system bracket) and the start of the bar itself.
      * @since 1.4.0
      * @default 3
+     * @summary The padding between the accolade bar and the start of the bar itself.
      */
     public accoladeBarPaddingRight: number = 3;
 
     /**
-     * The top padding applied to main notation staffs.
+     * The top padding applied to main notation staffs like the standard music notation or guitar tabs. 
+     * It doesn't apply to "effect staffs" showing annotations like vibratos.
      * @since 1.4.0
      * @default 5
+     * @summary The top padding applied to main notation staffs.
      */
     public notationStaffPaddingTop: number = 5;
 
     /**
-     * The bottom padding applied to main notation staffs.
+     * The bottom padding applied to main notation staffs like the standard music notation or guitar tabs. 
+     * It doesn't apply to "effect staffs" showing annotations like vibratos.
      * @since 1.4.0
      * @default 5
+     * @summary The bottom padding applied to main notation staffs.
      */
     public notationStaffPaddingBottom: number = 5;
 
     /**
-     * The top padding applied to effect annotation staffs.
+     * The top padding applied to effect annotation staffs showing details like vibratos, lyrics etc.
      * @since 1.4.0
      * @default 0
+     * @summary The top padding applied to effect annotation staffs.
      */
     public effectStaffPaddingTop: number = 0;
 
     /**
-     * The bottom padding applied to effect annotation staffs.
+     * The bottom padding applied to effect annotation staffs showing details like vibratos, lyrics etc.
      * @since 1.4.0
      * @default 0
+     * @summary The bottom padding applied to effect annotation staffs.
      */
     public effectStaffPaddingBottom: number = 0;
 
@@ -268,6 +291,7 @@ export class DisplaySettings {
      * 
      * @since 1.4.0
      * @default SystemsLayoutMode.Automatic
+     * @summary The mode used to arrange staves and systems.
      */
     public systemsLayoutMode: SystemsLayoutMode = SystemsLayoutMode.Automatic;
 }

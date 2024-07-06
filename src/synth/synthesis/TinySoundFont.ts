@@ -172,7 +172,7 @@ export class TinySoundFont {
     }
 
     private processMidiMessage(e: MidiEvent): void {
-        Logger.debug('MIdi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick)
+        Logger.debug('Midi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick)
         const command: MidiEventType = e.type;
         switch (command) {
             case MidiEventType.TimeSignature:
