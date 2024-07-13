@@ -28,4 +28,4 @@ export * as model from "./model";
 export * as rendering from "./rendering";
 export * as platform from "./platform";
 export * as synth from "./synth";
-
+export * as json from './generated/json'
