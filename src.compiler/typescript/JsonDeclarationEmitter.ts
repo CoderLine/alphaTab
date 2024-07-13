@@ -5,7 +5,7 @@
 import * as path from 'path';
 import * as url from 'url';
 import * as ts from 'typescript';
-import createEmitter from './EmitterBase';
+import createEmitter, { generateFile } from './EmitterBase';
 import {
     cloneTypeNode,
     getTypeWithNullableInfo,
@@ -147,7 +147,7 @@ function createJsonTypeNode(
     return undefined;
 }
 
-function cloneJsDoc<T extends ts.Node>(node: T, source: ts.Node, additionalTags:string[]): T {
+function cloneJsDoc<T extends ts.Node>(node: T, source: ts.Node, additionalTags: string[]): T {
     const docs = ts
         .getJSDocCommentsAndTags(source)
         .filter(s => ts.isJSDoc(s))
@@ -163,7 +163,7 @@ function cloneJsDoc<T extends ts.Node>(node: T, source: ts.Node, additionalTags:
                 .trimStart();
 
             for (const tag of additionalTags) {
-                if(!text.includes(tag)) {
+                if (!text.includes(tag)) {
                     text += `* ${tag}\n `;
                 }
             }
@@ -208,7 +208,8 @@ function createJsonMembers(
         .map(m => createJsonMember(program, m as ts.PropertyDeclaration, importer));
 }
 
-export default createEmitter('json_declaration', (program, input) => {
+let allJsonTypes: string[] = [];
+const emit = createEmitter('json_declaration', (program, input) => {
     console.log(`Writing JSON Type Declaration for ${input.name!.text}`);
     const statements: ts.Statement[] = [];
 
@@ -248,6 +249,7 @@ export default createEmitter('json_declaration', (program, input) => {
         )
     );
 
+    allJsonTypes.push(input.name!.text + 'Json');
     const sourceFile = ts.factory.createSourceFile(
         [...statements],
         ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
@@ -256,3 +258,27 @@ export default createEmitter('json_declaration', (program, input) => {
 
     return sourceFile;
 });
+export default function emitWithIndex(program: ts.Program, _diagnostics: ts.Diagnostic[]) {
+    allJsonTypes = [];
+
+    emit(program, _diagnostics);
+
+    const statements = allJsonTypes.map(type =>
+        ts.factory.createExportDeclaration(
+            undefined,
+            true,
+            ts.factory.createNamedExports([
+                ts.factory.createExportSpecifier(false, undefined, ts.factory.createIdentifier(type))
+            ]),
+            ts.factory.createStringLiteral(`./${type}`)
+        )
+    );
+
+    const sourceFile = ts.factory.createSourceFile(
+        [...statements],
+        ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
+        ts.NodeFlags.None
+    );
+
+    generateFile(program, sourceFile, 'json.ts');
+}

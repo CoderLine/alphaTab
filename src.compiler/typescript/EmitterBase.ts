@@ -9,77 +9,86 @@ export const GENERATED_FILE_HEADER = `\
 // the code is regenerated.
 // </auto-generated>`;
 
+export function generateFile(program: ts.Program, sourceFile: ts.SourceFile, fileName: string) {
+    const targetFileName = path.join(path.resolve(program.getCompilerOptions().baseUrl!), 'src/generated', fileName);
+
+    fs.mkdirSync(path.dirname(targetFileName), { recursive: true });
+
+    const fileHandle = fs.openSync(targetFileName, 'w');
+
+    fs.writeSync(fileHandle, `${GENERATED_FILE_HEADER}\n`);
+
+    const printer = ts.createPrinter();
+    const source = printer.printNode(ts.EmitHint.Unspecified, sourceFile, sourceFile);
+    const servicesHost: ts.LanguageServiceHost = {
+        getScriptFileNames: () => [targetFileName],
+        getScriptVersion: () => program.getSourceFiles()[0].languageVersion.toString(),
+        getScriptSnapshot: fileName => (fileName === targetFileName ? ts.ScriptSnapshot.fromString(source) : undefined),
+        getCurrentDirectory: () => process.cwd(),
+        getCompilationSettings: () => program.getCompilerOptions(),
+        getDefaultLibFileName: options => ts.getDefaultLibFilePath(options),
+        fileExists: fileName => fileName === targetFileName,
+        readFile: fileName => (fileName === targetFileName ? source : ''),
+        readDirectory: ts.sys.readDirectory,
+        directoryExists: ts.sys.directoryExists,
+        getDirectories: ts.sys.getDirectories
+    };
+
+    const languageService = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
+    const formattingChanges: ts.TextChange[] = languageService.getFormattingEditsForDocument(targetFileName, {
+        convertTabsToSpaces: true,
+        insertSpaceAfterCommaDelimiter: true,
+        insertSpaceAfterKeywordsInControlFlowStatements: true,
+        insertSpaceBeforeAndAfterBinaryOperators: true,
+        indentStyle: ts.IndentStyle.Smart,
+        indentSize: 4,
+        tabSize: 4,
+        trimTrailingWhitespace: true
+    } as ts.FormatCodeSettings);
+    formattingChanges.sort((a, b) => b.span.start - a.span.start);
+
+    let finalText = source;
+    for (const {
+        span: { start, length },
+        newText
+    } of formattingChanges) {
+        finalText = `${finalText.slice(0, start)}${newText}${finalText.slice(start + length)}`;
+    }
+
+    fs.writeSync(fileHandle, finalText);
+    fs.closeSync(fileHandle);
+}
+
+export function generateClass(
+    program: ts.Program,
+    classDeclaration: ts.ClassDeclaration,
+    generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration) => ts.SourceFile
+) {
+    const sourceFileName = path.relative(
+        path.resolve(program.getCompilerOptions().baseUrl!, 'src'),
+        path.resolve(classDeclaration.getSourceFile().fileName)
+    );
+
+    const result = generate(program, classDeclaration);
+    const defaultClass = result.statements.find(
+        stmt =>
+            (ts.isClassDeclaration(stmt) || ts.isInterfaceDeclaration(stmt)) &&
+            stmt.modifiers!.find(m => m.kind === ts.SyntaxKind.ExportKeyword)
+    ) as ts.DeclarationStatement;
+
+    const targetFileName = path.join(path.dirname(sourceFileName), `${defaultClass.name!.text}.ts`);
+
+    generateFile(program, result, targetFileName);
+}
+
 export default function createEmitter(
     jsDocMarker: string,
     generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration) => ts.SourceFile
 ) {
-    function generateClass(program: ts.Program, classDeclaration: ts.ClassDeclaration) {
-        const sourceFileName = path.relative(
-            path.resolve(program.getCompilerOptions().baseUrl!, 'src'),
-            path.resolve(classDeclaration.getSourceFile().fileName)
-        );
-
-        const result = generate(program, classDeclaration);
-        const defaultClass = result.statements.find(
-            stmt => (ts.isClassDeclaration(stmt) || ts.isInterfaceDeclaration(stmt)) && stmt.modifiers!.find(m => m.kind === ts.SyntaxKind.ExportKeyword)
-        ) as ts.DeclarationStatement;
-
-        const targetFileName = path.join(
-            path.resolve(program.getCompilerOptions().baseUrl!),
-            'src/generated',
-            path.dirname(sourceFileName),
-            `${defaultClass.name!.text}.ts`
-        );
-
-        fs.mkdirSync(path.dirname(targetFileName), { recursive: true });
-
-        const fileHandle = fs.openSync(targetFileName, 'w');
-
-        fs.writeSync(fileHandle, `${GENERATED_FILE_HEADER}\n`);
-
-        const printer = ts.createPrinter();
-        const source = printer.printNode(ts.EmitHint.Unspecified, result, result);
-        const servicesHost: ts.LanguageServiceHost = {
-            getScriptFileNames: () => [targetFileName],
-            getScriptVersion: () => result.languageVersion.toString(),
-            getScriptSnapshot: fileName =>
-                fileName === targetFileName ? ts.ScriptSnapshot.fromString(source) : undefined,
-            getCurrentDirectory: () => process.cwd(),
-            getCompilationSettings: () => program.getCompilerOptions(),
-            getDefaultLibFileName: options => ts.getDefaultLibFilePath(options),
-            fileExists: fileName => fileName === targetFileName,
-            readFile: fileName => (fileName === targetFileName ? source : ''),
-            readDirectory: ts.sys.readDirectory,
-            directoryExists: ts.sys.directoryExists,
-            getDirectories: ts.sys.getDirectories
-        };
-
-        const languageService = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
-        const formattingChanges: ts.TextChange[] = languageService.getFormattingEditsForDocument(targetFileName, {
-            convertTabsToSpaces: true,
-            insertSpaceAfterCommaDelimiter: true,
-            insertSpaceAfterKeywordsInControlFlowStatements: true,
-            insertSpaceBeforeAndAfterBinaryOperators: true,
-            indentStyle: ts.IndentStyle.Smart,
-            indentSize: 4,
-            tabSize: 4,
-            trimTrailingWhitespace: true
-        } as ts.FormatCodeSettings);
-        formattingChanges.sort((a, b) => b.span.start - a.span.start);
-
-        let finalText = source;
-        for (const { span: { start, length }, newText } of formattingChanges) {
-            finalText = `${finalText.slice(0, start)}${newText}${finalText.slice(start + length)}`;
-        }
-
-        fs.writeSync(fileHandle, finalText);
-        fs.closeSync(fileHandle);
-    }
-
     function scanSourceFile(program: ts.Program, sourceFile: ts.SourceFile) {
         sourceFile.statements.forEach(stmt => {
             if (ts.isClassDeclaration(stmt) && ts.getJSDocTags(stmt).some(t => t.tagName.text === jsDocMarker)) {
-                generateClass(program, stmt);
+                generateClass(program, stmt, generate);
             }
         });
     }
