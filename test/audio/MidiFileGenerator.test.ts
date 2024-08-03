@@ -32,6 +32,7 @@ import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { AccentuationType, VibratoType } from '@src/model';
 import { expect } from 'chai';
 import { ScoreLoader } from '@src/importer';
+import { MidiTickLookup } from '@src/midi';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
@@ -982,6 +983,15 @@ describe('MidiFileGeneratorTest', () => {
         assertEvents(handler.midiEvents, expectedEvents);
     });
 
+    
+    function expectBeat(tickLookup:MidiTickLookup, tick: number, fret: number, tickDuration: number, millisDuration: number) {
+        const res = tickLookup.findBeat(new Set<number>([0]), tick);
+        expect(res).to.be.ok;
+        expect(res!.beat.notes[0].fret).to.equal(fret);
+        expect(res!.tickDuration).to.equal(tickDuration);
+        expect(res!.duration).to.equal(millisDuration);
+    }
+
     it('beat-tempo-change', async () => {
         /**
          * ![image](../../test-data/visual-tests/effects-and-annotations/beat-tempo-change.png)
@@ -1014,26 +1024,17 @@ describe('MidiFileGeneratorTest', () => {
         expect(tempoChanges.map(t => t.tempo).join(',')).to.be.equal('120,60,100,120,121,120,121,120,121');
 
         const tickLookup = generator.tickLookup;
-        const tracks = new Set<number>([0]);
-
-        function expectBeat(tick: number, fret: number, tickDuration: number, millisDuration: number) {
-            const res = tickLookup.findBeat(tracks, tick);
-            expect(res).to.be.ok;
-            expect(res!.beat.notes[0].fret).to.eq(fret);
-            expect(res!.tickDuration).to.eq(tickDuration);
-            expect(res!.duration).to.eq(millisDuration);
-        }
 
         // two quarter notes at 120
-        expectBeat(MidiUtils.QuarterTime * 0, 0, MidiUtils.QuarterTime, 500);
-        expectBeat(MidiUtils.QuarterTime * 1, 1, MidiUtils.QuarterTime, 500);
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 0, 0, MidiUtils.QuarterTime, 500);
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 1, 1, MidiUtils.QuarterTime, 500);
         // then two quarter notes at 60
-        expectBeat(MidiUtils.QuarterTime * 2, 2, MidiUtils.QuarterTime, 1000);
-        expectBeat(MidiUtils.QuarterTime * 3, 3, MidiUtils.QuarterTime, 1000);
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 2, 2, MidiUtils.QuarterTime, 1000);
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 3, 3, MidiUtils.QuarterTime, 1000);
 
         // two quarter notes at 100
-        expectBeat(MidiUtils.QuarterTime * 4, 4, MidiUtils.QuarterTime, 600);
-        expectBeat(MidiUtils.QuarterTime * 5, 5, MidiUtils.QuarterTime, 600);
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 4, 4, MidiUtils.QuarterTime, 600);
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 5, 5, MidiUtils.QuarterTime, 600);
         // one quarter note partially at 100 then, switching to 120
         // - The beat starts at 5760
         // - The change is at ratio 0.6375, that's midi tick 6288
@@ -1044,12 +1045,12 @@ describe('MidiFileGeneratorTest', () => {
         const beatStart = MidiUtils.QuarterTime * 6;
         const beatEnd = MidiUtils.QuarterTime * 7;
         const tempoChangeTick = score.masterBars[1].start + score.masterBars[1].calculateDuration() * score.masterBars[1].tempoAutomations[1].ratioPosition;
-        expect(tempoChangeTick - beatStart).to.eq(528);
-        expect(beatEnd - tempoChangeTick).to.eq(432);
+        expect(tempoChangeTick - beatStart).to.equal(528);
+        expect(beatEnd - tempoChangeTick).to.equal(432);
         
         const firstPartMillis = MidiUtils.ticksToMillis(tempoChangeTick - beatStart, 100);
         const secondPartMillis = MidiUtils.ticksToMillis(beatEnd - tempoChangeTick, 120);
 
-        expectBeat(beatStart, 6, MidiUtils.QuarterTime, firstPartMillis + secondPartMillis);
+        expectBeat(tickLookup, beatStart, 6, MidiUtils.QuarterTime, firstPartMillis + secondPartMillis);
     });
 });

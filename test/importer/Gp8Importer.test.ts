@@ -40,15 +40,15 @@ describe('Gp8ImporterTest', () => {
         const score = (await prepareImporterWithFile('guitarpro8/beat-tempo-change.gp')).readScore();
 
         expect(score.masterBars[0].tempoAutomations).to.have.length(2);
-        expect(score.masterBars[0].tempoAutomations[0].value).to.have.eq(120);
-        expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.have.eq(0);
-        expect(score.masterBars[0].tempoAutomations[1].value).to.have.eq(60);
-        expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.have.eq(0.5);
+        expect(score.masterBars[0].tempoAutomations[0].value).to.have.equal(120);
+        expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.equal(0);
+        expect(score.masterBars[0].tempoAutomations[1].value).to.equal(60);
+        expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.equal(0.5);
 
         expect(score.masterBars[1].tempoAutomations).to.have.length(2);
-        expect(score.masterBars[1].tempoAutomations[0].value).to.have.eq(100);
-        expect(score.masterBars[1].tempoAutomations[0].ratioPosition).to.have.eq(0);
-        expect(score.masterBars[1].tempoAutomations[1].value).to.have.eq(120);
-        expect(score.masterBars[1].tempoAutomations[1].ratioPosition).to.have.eq(0.6375);
+        expect(score.masterBars[1].tempoAutomations[0].value).to.equal(100);
+        expect(score.masterBars[1].tempoAutomations[0].ratioPosition).to.equal(0);
+        expect(score.masterBars[1].tempoAutomations[1].value).to.equal(120);
+        expect(score.masterBars[1].tempoAutomations[1].ratioPosition).to.equal(0.6375);
     });
 });

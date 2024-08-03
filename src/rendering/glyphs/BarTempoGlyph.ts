@@ -1,6 +1,6 @@
 import { ICanvas, TextBaseline } from '@src/platform';
 import { EffectGlyph } from './EffectGlyph';
-import { Automation, Color, MusicFontSymbol } from '@src/model';
+import { Automation, MusicFontSymbol } from '@src/model';
 import { NoteHeadGlyph } from './NoteHeadGlyph';
 
 /**

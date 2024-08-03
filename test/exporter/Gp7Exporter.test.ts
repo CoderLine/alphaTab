@@ -8,7 +8,6 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { assert } from 'chai';
 
 describe('Gp7ExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {

@@ -1237,9 +1237,9 @@ describe('AlphaTexImporterTest', () => {
             . \\tempo 120 1.1.4 1.1 1.1{tempo 60} 1.1 | 1.1.4{tempo 100} 1.1 1.1{tempo 120} 1.1  
         `);
         expect(score.masterBars[0].tempoAutomations).to.have.length(2);
-        expect(score.masterBars[0].tempoAutomations[0].value).to.have.eq(120);
-        expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.have.eq(0);
-        expect(score.masterBars[0].tempoAutomations[1].value).to.have.eq(60);
-        expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.have.eq(0.5);
+        expect(score.masterBars[0].tempoAutomations[0].value).to.equal(120);
+        expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.equal(0);
+        expect(score.masterBars[0].tempoAutomations[1].value).to.equal(60);
+        expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.equal(0.5);
     });
 });
