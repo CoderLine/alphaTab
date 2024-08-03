@@ -141,9 +141,11 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
 
             let s: MagicString | undefined;
 
-            const alphaTabWorkerPattern =
-                /\b(alphaTabWorker|alphaTabWorklet\.addModule)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/dg;
-
+            const alphaTabWorkerPattern = new RegExp(
+                '\\b(alphaTabWorker|alphaTabWorklet\\.addModule)\\s*\\(\\s*(new\\s+URL\\s*\\(\\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\\s*,\\s*import\\.meta\\.url\\s*\\))',
+                "dg"
+            );
+            
             let match: RegExpExecArray | null;
             while ((match = alphaTabWorkerPattern.exec(code))) {
                 const workerType = getWorkerType(code, match);
