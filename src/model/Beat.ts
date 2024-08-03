@@ -584,14 +584,21 @@ export class Beat {
             }
             this.tupletGroup = currentTupletGroup;
         }
-        
+
         if (this.index > 0) {
             const barDuration = this.voice.bar.masterBar.calculateDuration();
+            const validBeatAutomations: Automation[] = [];
             for (const automation of this.automations) {
                 if (automation.ratioPosition === 0) {
                     automation.ratioPosition = this.playbackStart / barDuration;
                 }
+
+                // we store tempo automations only on masterbar level
+                if (automation.type !== AutomationType.Volume) {
+                    validBeatAutomations.push(automation);
+                }
             }
+            this.automations = validBeatAutomations;
         }
     }
 
