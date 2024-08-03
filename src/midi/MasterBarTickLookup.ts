@@ -39,6 +39,14 @@ export class MasterBarTickLookup {
     public end: number = 0;
 
     /**
+     * Gets or sets the current tempo when the MasterBar is played.
+     * @deprecated use {@link tempoChanges}
+     */
+    public get tempo(): number {
+        return this.tempoChanges[0].tempo;
+    }
+
+    /**
      * Gets the list of tempo changes within the tick lookup.
      */
     public readonly tempoChanges: MasterBarTickLookupTempoChange[] = [];
