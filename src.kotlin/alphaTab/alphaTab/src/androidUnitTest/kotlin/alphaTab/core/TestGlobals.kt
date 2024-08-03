@@ -44,6 +44,9 @@ class Expector<T>(private val actual: T) {
     val be
         get() = this
 
+    val have
+        get() = this
+
     fun equal(expected: Any?, message: String? = null) {
         var expectedTyped: Any? = expected
 
@@ -63,6 +66,18 @@ class Expector<T>(private val actual: T) {
             kotlin.test.assertEquals(expected, actual.toDouble(), delta, message)
         } else {
             kotlin.test.fail("toBeCloseTo can only be used with numeric operands");
+        }
+    }
+
+    fun length(expected:Double) {
+        if(actual is alphaTab.collections.List<*>) {
+            kotlin.test.assertEquals(expected.toInt(), actual.length.toInt())
+        } else if(actual is alphaTab.collections.DoubleList) {
+            kotlin.test.assertEquals(expected.toInt(), actual.length.toInt())
+        } else if(actual is alphaTab.collections.BooleanList) {
+            kotlin.test.assertEquals(expected.toInt(), actual.length.toInt())
+        } else {
+            kotlin.test.fail("length can only be used with collection operands");
         }
     }
 

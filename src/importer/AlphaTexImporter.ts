@@ -1500,6 +1500,12 @@ export class AlphaTexImporter extends ScoreImporter {
             beat.crescendo = CrescendoType.Crescendo;
         } else if (syData === 'dec') {
             beat.crescendo = CrescendoType.Decrescendo;
+        } else if(syData === 'tempo') {
+            // NOTE: playbackRatio is calculated on score finish when playback positions are known
+            const tempoAutomation = this.readTempoAutomation();
+            beat.automations.push(tempoAutomation);
+            beat.voice.bar.masterBar.tempoAutomations.push(tempoAutomation);
+            return true;
         } else if (syData === 'tp') {
             this._sy = this.newSy();
             beat.tremoloSpeed = Duration.Eighth;
@@ -1977,18 +1983,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 this._sy = this.newSy();
             } else if (syData === 'tempo') {
-                this._allowFloat = true;
-                this._sy = this.newSy();
-                this._allowFloat = false;
-                if (this._sy !== AlphaTexSymbols.Number) {
-                    this.error('tempo', AlphaTexSymbols.Number, true);
-                }
-                let tempoAutomation: Automation = new Automation();
-                tempoAutomation.isLinear = false;
-                tempoAutomation.type = AutomationType.Tempo;
-                tempoAutomation.value = this._syData as number;
-                master.tempoAutomation = tempoAutomation;
-                this._sy = this.newSy();
+                const tempoAutomation = this.readTempoAutomation();
+                master.tempoAutomations.push(tempoAutomation);
             } else if (syData === 'section') {
                 this._sy = this.newSy();
                 if (this._sy !== AlphaTexSymbols.String) {
@@ -2036,14 +2032,29 @@ export class AlphaTexImporter extends ScoreImporter {
             }
         }
 
-        if (master.index === 0 && !master.tempoAutomation) {
+        if (master.index === 0 && master.tempoAutomations.length === 0) {
             let tempoAutomation: Automation = new Automation();
             tempoAutomation.isLinear = false;
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = this._score.tempo;
-            master.tempoAutomation = tempoAutomation;
+            master.tempoAutomations.push(tempoAutomation);
         }
         return anyMeta;
+    }
+
+    private readTempoAutomation() {
+        this._allowFloat = true;
+        this._sy = this.newSy();
+        this._allowFloat = false;
+        if (this._sy !== AlphaTexSymbols.Number) {
+            this.error('tempo', AlphaTexSymbols.Number, true);
+        }
+        const tempoAutomation: Automation = new Automation();
+        tempoAutomation.isLinear = false;
+        tempoAutomation.type = AutomationType.Tempo;
+        tempoAutomation.value = this._syData as number;
+        this._sy = this.newSy();
+        return tempoAutomation;
     }
 
     private applyAlternateEnding(master: MasterBar): void {

@@ -110,6 +110,10 @@ public class List<T> : Iterable<T> {
         return List(_data.subList(start.toInt(), _data.size))
     }
 
+    public fun shift(): T {
+        return _data.removeAt(0)
+    }
+
     public fun splice(start: Double, deleteCount: Double, vararg newElements: T) {
         var actualStart = start.toInt()
         if (actualStart < 0)

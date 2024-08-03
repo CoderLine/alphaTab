@@ -8,7 +8,6 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { assert } from 'chai';
 
 describe('Gp7ExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
@@ -31,24 +30,20 @@ describe('Gp7ExporterTest', () => {
     }
 
     async function testRoundTripEqual(name: string, ignoreKeys: string[] | null): Promise<void> {
-        try {
-            const expected = await loadScore(name);
-            if (!expected) {
-                return;
-            }
+        const expected = await loadScore(name);
+        if (!expected) {
+            return;
+        }
 
-            const fileName = name.substr(name.lastIndexOf('/') + 1);
-            const exported = exportGp7(expected);
-            const actual = prepareImporterWithBytes(exported).readScore();
+        const fileName = name.substr(name.lastIndexOf('/') + 1);
+        const exported = exportGp7(expected);
+        const actual = prepareImporterWithBytes(exported).readScore();
 
-            const expectedJson = JsonConverter.scoreToJsObject(expected);
-            const actualJson = JsonConverter.scoreToJsObject(actual);
+        const expectedJson = JsonConverter.scoreToJsObject(expected);
+        const actualJson = JsonConverter.scoreToJsObject(actual);
 
-            if (!ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys)) {
-                await TestPlatform.saveFile(fileName, exported);
-            }
-        } catch (e) {
-            assert.fail(String(e));
+        if (!ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys)) {
+            await TestPlatform.saveFile(fileName, exported);
         }
     }
 

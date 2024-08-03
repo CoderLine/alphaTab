@@ -2332,7 +2332,7 @@ export class GpifParser {
                             this.score.tempoLabel = automation.text;
                         }
                     }
-                    masterBar.tempoAutomation = automation;
+                    masterBar.tempoAutomations.push(automation);
                 }
             }
         }

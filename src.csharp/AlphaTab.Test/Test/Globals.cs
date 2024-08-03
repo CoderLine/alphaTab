@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test
@@ -66,6 +67,7 @@ namespace AlphaTab.Test
         public Expector<T> To => this;
         public NotExpector<T> Not => new(_actual);
         public Expector<T> Be => this;
+        public Expector<T> Have => this;
 
         public void Equal(object? expected, string? message = null)
         {
@@ -107,6 +109,17 @@ namespace AlphaTab.Test
         public void Ok()
         {
             Assert.AreNotEqual(default!, _actual);
+        }
+        public void Length(int length)
+        {
+            if(_actual is ICollection collection) 
+            {
+                Assert.AreEqual(length, collection.Count);
+            }
+            else
+            {
+                Assert.Fail("Length can only be used with collection operands");
+            }
         }
 
         public void True()
