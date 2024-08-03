@@ -209,7 +209,8 @@ export class MidiFileGenerator {
             );
         }
 
-        // tempo
+        // tempo 
+        // TODO: all tempo changes at the right time
         if (masterBar.tempoAutomation) {
             this._handler.addTempo(currentTick, masterBar.tempoAutomation.value);
             this._currentTempo = masterBar.tempoAutomation.value;

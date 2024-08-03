@@ -890,8 +890,8 @@ describe('MidiFileGeneratorTest', () => {
         let score: Score = parseTex(tex);
 
         expect(score.tempo).to.be.equal(120);
-        expect(score.masterBars[0].tempoAutomation).to.be.ok;
-        expect(score.masterBars[0].tempoAutomation!.value).to.be.equal(60);
+        expect(score.masterBars[0].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[0].tempoAutomations[0]!.value).to.be.equal(60);
 
         const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);

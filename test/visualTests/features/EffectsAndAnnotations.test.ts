@@ -12,6 +12,10 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/tempo.gp');
     });
 
+    it('beat-tempo-change', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/beat-tempo-change.gp');
+    });
+
     it('text', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/text.gp');
     });

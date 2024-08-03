@@ -1163,7 +1163,7 @@ describe('AlphaTexImporterTest', () => {
     it('tempo-as-float-in-bar', () => {
         const score = parseTex('\\tempo 112 . 3.3.1 | \\tempo 333.3 3.3');
         expect(score.tempo).to.equal(112);
-        expect(score.tracks[0].staves[0].bars[1].masterBar.tempoAutomation?.value).to.equal(333.3);
+        expect(score.tracks[0].staves[0].bars[1].masterBar.tempoAutomations[0]?.value).to.equal(333.3);
     });
 
     it('tempo-invalid-float', () => {
@@ -1230,5 +1230,16 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(31);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(33);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(34);
+    });
+
+    it('beat-tempo-change', () => {
+        const score = parseTex(`
+            . \\tempo 120 1.1.4 1.1 1.1{tempo 60} 1.1 | 1.1.4{tempo 100} 1.1 1.1{tempo 120} 1.1  
+        `);
+        expect(score.masterBars[0].tempoAutomations).to.have.length(2);
+        expect(score.masterBars[0].tempoAutomations[0].value).to.have.eq(120);
+        expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.have.eq(0);
+        expect(score.masterBars[0].tempoAutomations[1].value).to.have.eq(60);
+        expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.have.eq(0.5);
     });
 });

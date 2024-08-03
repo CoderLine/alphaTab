@@ -137,8 +137,9 @@ export class Gp3To5Importer extends ScoreImporter {
         // To be more in line with the GP7 structure we create an
         // initial tempo automation on the first masterbar
         if (this._score.masterBars.length > 0) {
-            this._score.masterBars[0].tempoAutomation = Automation.buildTempoAutomation(false, 0, this._score.tempo, 2);
-            this._score.masterBars[0].tempoAutomation.text = this._score.tempoLabel;
+            const automation = Automation.buildTempoAutomation(false, 0, this._score.tempo, 2);;
+            automation.text = this._score.tempoLabel;
+            this._score.masterBars[0].tempoAutomations.push(automation);
         }
 
         this._score.finish(this.settings);
@@ -880,7 +881,7 @@ export class Gp3To5Importer extends ScoreImporter {
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = tableChange.tempo;
             beat.automations.push(tempoAutomation);
-            beat.voice.bar.masterBar.tempoAutomation = tempoAutomation;
+            beat.voice.bar.masterBar.tempoAutomations.push(tempoAutomation);
         }
     }
 
