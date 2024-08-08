@@ -13,6 +13,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public static readonly CmdOutputPlay: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'play';
     public static readonly CmdOutputPause: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'pause';
     public static readonly CmdOutputResetSamples: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'resetSamples';
+    public static readonly CmdOutputStop: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'stop';
     public static readonly CmdOutputSampleRequest: string =
         AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'sampleRequest';
     public static readonly CmdOutputSamplesPlayed: string =
