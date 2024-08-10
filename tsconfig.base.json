@@ -9,6 +9,7 @@
       "ES2017",
       "ES2021",
       "es2022.regexp",
+      "es2022.error",
       "dom"
     ],
     "strict": true,

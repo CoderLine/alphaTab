@@ -1141,11 +1141,11 @@ describe('AlphaTexImporterTest', () => {
                 assert.fail('Did not throw correct error');
                 return;
             }
-            if (!(e.inner instanceof AlphaTexError)) {
+            if (!(e.cause instanceof AlphaTexError)) {
                 assert.fail('Did not contain an AlphaTexError');
                 return;
             }
-            const i = e.inner as AlphaTexError;
+            const i = e.cause as AlphaTexError;
             expect(i.expected).to.equal(AlphaTexSymbols.Number);
             expect(i.message?.includes('Number')).to.be.true;
             expect(i.symbol).to.equal(AlphaTexSymbols.String);
