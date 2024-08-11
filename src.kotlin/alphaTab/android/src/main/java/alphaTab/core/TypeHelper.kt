@@ -63,6 +63,7 @@ internal class TypeHelper {
         }
 
         public fun <T> suspendToDeferred(block: suspend CoroutineScope.() -> T): kotlinx.coroutines.Deferred<T> {
+            @Suppress("OPT_IN_USAGE")
             return GlobalScope.async {
                 block()
             }
@@ -71,6 +72,7 @@ internal class TypeHelper {
         @JvmName("createPromiseWithValue")
         public fun <T> createPromise(action: (resolve: (T) -> Unit, reject: (Any) -> Unit) -> Unit): kotlinx.coroutines.Deferred<T> {
             val d = CompletableDeferred<T>()
+            @Suppress("DeferredResultUnused", "OPT_IN_USAGE")
             GlobalScope.async {
                 action(
                     { d.complete(it) },
@@ -78,10 +80,6 @@ internal class TypeHelper {
                         when (it) {
                             is alphaTab.core.ecmaScript.Error -> {
                                 d.completeExceptionally(it)
-                            }
-
-                            is Throwable -> {
-                                d.completeExceptionally(alphaTab.core.ecmaScript.Error(it.message, it))
                             }
 
                             else -> {
@@ -96,6 +94,7 @@ internal class TypeHelper {
 
         public fun createPromise(action: (resolve: () -> Unit, reject: (Any) -> Unit) -> Unit): kotlinx.coroutines.Deferred<Unit> {
             val d = CompletableDeferred<Unit>()
+            @Suppress("DeferredResultUnused", "OPT_IN_USAGE")
             GlobalScope.async {
                 action(
                     { d.complete(Unit) },

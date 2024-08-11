@@ -11,18 +11,37 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.Charset
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.util.Locale
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.suspendCoroutine
 
 @ExperimentalUnsignedTypes
-internal expect fun UByteArray.decodeToFloatArray(): FloatArray
+internal fun UByteArray.decodeToFloatArray(): FloatArray {
+    val fb = ByteBuffer.wrap(this.toByteArray()).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
+    val fa = FloatArray(fb.limit())
+    fb.get(fa)
+    return fa
+}
 
 @ExperimentalUnsignedTypes
-internal expect fun UByteArray.decodeToDoubleArray(): DoubleArray
+internal fun UByteArray.decodeToDoubleArray(): DoubleArray {
+    val db = ByteBuffer.wrap(this.toByteArray()).order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer();
+    val da = DoubleArray(db.limit())
+    db.get(da)
+    return da
+}
 
 @ExperimentalUnsignedTypes
-internal expect fun UByteArray.decodeToString(encoding: String): String
+internal fun UByteArray.decodeToString(encoding: String): String {
+    return String(this.toByteArray(), 0, this.size, Charset.forName(encoding))
+}
+
 
 internal fun <T : Comparable<T>> List<T>.sort() {
     this.sort { a, b ->
@@ -54,11 +73,32 @@ internal fun Double.toInvariantString(base: Double): String {
     return this.toInt().toString(base.toInt())
 }
 
-internal expect fun Double.toInvariantString(): String
+
+var invariantDoubleFormat = DecimalFormat().apply {
+    this.minimumFractionDigits = 0
+    this.maximumFractionDigits = 12
+    this.decimalFormatSymbols.decimalSeparator = '.'
+    this.isGroupingUsed = false
+}
+
+internal fun Double.toInvariantString(): String {
+    // TODO: On android/java the DecimalFormat is terribly slow, we need a more efficient
+    // mechanism to convert doubles to string.
+    val integerPart = this.toInt();
+    val fractionalPart = (this - integerPart)
+    if (fractionalPart > 0.0000001 || fractionalPart < -0.0000001) {
+        return invariantDoubleFormat.format(this)
+    }
+    return this.toInt().toString();
+}
+
 internal fun IAlphaTabEnum.toInvariantString(): String {
     return this.toString()
 }
-internal expect fun Double.toFixed(decimals:Double): String
+
+internal fun Double.toFixed(decimals: Double): String {
+    return String.format("%.${decimals}f", this);
+}
 
 internal fun String.lastIndexOfInDouble(item: String): Double {
     return this.lastIndexOf(item).toDouble()
@@ -131,9 +171,36 @@ internal fun Int?.toDouble(): Double? {
     return this?.toDouble()
 }
 
-internal expect fun String.toDoubleOrNaN(): Double;
-internal expect fun String.toIntOrNaN(): Double;
-internal expect fun String.toIntOrNaN(radix: Double): Double;
+internal fun String.toDoubleOrNaN(): Double {
+    try {
+        val number = NumberFormat.getInstance(Locale.ROOT).parse(this)
+        if (number != null) {
+            return number.toDouble()
+        }
+    } catch (e: Throwable) {
+    }
+    return Double.NaN
+}
+
+internal fun String.toIntOrNaN(): Double {
+    try {
+        val number = NumberFormat.getInstance(Locale.ROOT).parse(this)
+        if (number != null) {
+            return number.toInt().toDouble()
+        }
+    } catch (e: Throwable) {
+    }
+    return Double.NaN
+}
+
+internal fun String.toIntOrNaN(radix: Double): Double {
+    try {
+        return Integer.parseInt(this, radix.toInt()).toDouble();
+    } catch (e: Throwable) {
+    }
+    return Double.NaN
+}
+
 
 internal class Globals {
     companion object {
@@ -161,7 +228,7 @@ internal class Globals {
         }
 
         fun parseInt(s: Char, radix: Double): Double {
-            return parseInt(s.toString(), radix);
+            return parseInt(s.toString(), radix)
         }
 
         fun setImmediate(action: () -> Unit) {
@@ -169,6 +236,7 @@ internal class Globals {
         }
 
         fun setTimeout(action: () -> Unit, millis: Double): Deferred<Unit> {
+            @Suppress("OPT_IN_USAGE")
             return GlobalScope.async {
                 delay(millis.toLong())
                 action()
@@ -199,11 +267,7 @@ internal fun <T> Deferred<T>.then(callback: (T) -> Unit): Deferred<T> {
 internal fun <T> Deferred<T>.catch(callback: (alphaTab.core.ecmaScript.Error) -> Unit): Deferred<T> {
     this.invokeOnCompletion {
         if (it != null) {
-            if (it is alphaTab.core.ecmaScript.Error) {
-                callback(it)
-            } else {
-                callback(alphaTab.core.ecmaScript.Error(it.message, it))
-            }
+            callback(it)
         }
     }
     return this

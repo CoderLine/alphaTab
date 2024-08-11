@@ -4,16 +4,14 @@ import alphaTab.Environment
 import alphaTab.alphaSkia.AlphaSkiaLinux
 import alphaTab.alphaSkia.AlphaSkiaMacOs
 import alphaTab.alphaSkia.AlphaSkiaWindows
-import alphaTab.platform.skia.AlphaSkiaTypeface
-import alphaTab.platform.skia.SkiaCanvas
 import kotlin.contracts.ExperimentalContracts
 
-actual class VisualTestHelperPartials {
-    actual companion object {
+class VisualTestHelperPartials {
+    companion object {
         @ExperimentalUnsignedTypes
         @ExperimentalContracts
-        actual suspend fun enableAlphaSkia(bravura: alphaTab.core.ecmaScript.ArrayBuffer) {
-            val os = System.getProperty("os.name")
+        suspend fun enableAlphaSkia(bravura: alphaTab.core.ecmaScript.ArrayBuffer) {
+            val os = System.getProperty("os.name") ?: "none"
             when {
                 os == "Mac OS X" -> {
                     AlphaSkiaMacOs.INSTANCE.initialize()

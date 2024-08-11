@@ -3,6 +3,13 @@
 {
     public class Error : System.Exception
     {
+        public Error? Cause 
+        {
+            get
+            {
+                return InnerException is Error e ? e : null;
+            }
+        }
         public Error(string message) : base(message)
         {
         }
