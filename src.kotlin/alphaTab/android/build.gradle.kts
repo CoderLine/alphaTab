@@ -204,6 +204,7 @@ signing {
         useInMemoryPgpKeys(sonatypeSigningKeyId, sonatypeSigningKey, sonatypeSigningPassword)
         sign(publishing.publications["release"])
     } else if (System.getenv("GITHUB_ACTIONS") == "true") {
-        throw Exception("no signing configured")
+        logger.error("Missing Signing Key configuration")
+        throw Exception("Missing Signing Key configuration")
     }
 }
