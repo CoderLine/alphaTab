@@ -1,11 +1,14 @@
 package alphaTab.core
 
+import org.junit.Assert
 import kotlin.reflect.KClass
+
+typealias Test = org.junit.Test
 
 class assert {
     companion object {
         fun fail(message: Any?) {
-            kotlin.test.fail(message?.toString())
+            Assert.fail(message?.toString())
         }
     }
 }
@@ -17,19 +20,19 @@ class NotExpector<T>(private val actual: T) {
     fun ok() {
         when (actual) {
             is Int -> {
-                kotlin.test.assertEquals(0, actual)
+                Assert.assertEquals(0, actual)
             }
 
             is Double -> {
-                kotlin.test.assertEquals(0.0, actual)
+                Assert.assertEquals(0.0, actual, 0.0)
             }
 
             is String -> {
-                kotlin.test.assertEquals("", actual)
+                Assert.assertEquals("", actual)
             }
 
             else -> {
-                kotlin.test.assertNull(actual)
+                Assert.assertNull(actual)
             }
         }
     }
@@ -55,55 +58,47 @@ class Expector<T>(private val actual: T) {
             expectedTyped = expected.toInt();
         }
 
-        kotlin.test.assertEquals(expectedTyped, actual as Any?, message)
+        Assert.assertEquals(message, expectedTyped, actual as Any?)
     }
 
     fun closeTo(expected: Double, delta: Double, message: String? = null) {
         if (actual is Number) {
-            kotlin.test.assertEquals(expected, actual.toDouble(), delta, message)
+            Assert.assertEquals(message, expected, actual.toDouble(), delta)
         } else {
-            kotlin.test.fail("toBeCloseTo can only be used with numeric operands");
+            Assert.fail("toBeCloseTo can only be used with numeric operands");
         }
     }
 
-    //    fun toBe(expected: Any) {
-//        var expectedTyped = expected
-//        if (expected is Int && actual is Double) {
-//            expectedTyped = expected.toDouble();
-//        }
-//        kotlin.test.assertEquals(expectedTyped, actual as Any?)
-//    }
-//
     fun ok() {
-        kotlin.test.assertNotNull(actual)
+        Assert.assertNotNull(actual)
         when (actual) {
             is Int -> {
-                kotlin.test.assertNotEquals(0, actual)
+                Assert.assertNotEquals(0, actual)
             }
 
             is Double -> {
-                kotlin.test.assertNotEquals(0.0, actual)
+                Assert.assertNotEquals(0.0, actual)
             }
 
             is String -> {
-                kotlin.test.assertNotEquals("", actual)
+                Assert.assertNotEquals("", actual)
             }
         }
     }
 
     fun `true`() {
         if (actual is Boolean) {
-            kotlin.test.assertTrue(actual);
+            Assert.assertTrue(actual);
         } else {
-            kotlin.test.fail("toBeTrue can only be used on booleans:");
+            Assert.fail("toBeTrue can only be used on booleans:");
         }
     }
 
     fun `false`() {
         if (actual is Boolean) {
-            kotlin.test.assertFalse(actual);
+            Assert.assertFalse(actual);
         } else {
-            kotlin.test.fail("toBeFalse can only be used on booleans:");
+            Assert.fail("toBeFalse can only be used on booleans:");
         }
     }
 
@@ -113,16 +108,16 @@ class Expector<T>(private val actual: T) {
         if (actual is Function0<*>) {
             try {
                 actual()
-                kotlin.test.fail("Did not throw error " + expected.qualifiedName);
+                Assert.fail("Did not throw error " + expected.qualifiedName);
             } catch (e: Throwable) {
                 if (expected::class.isInstance(e::class)) {
                     return;
                 }
             }
 
-            kotlin.test.fail("Exception type didn't match");
+            Assert.fail("Exception type didn't match");
         } else {
-            kotlin.test.fail("ToThrowError can only be used with an exception");
+            Assert.fail("ToThrowError can only be used with an exception");
         }
     }
 }
@@ -138,7 +133,7 @@ class TestGlobals {
         }
 
         fun fail(message: Any?) {
-            kotlin.test.fail(message.toString())
+            Assert.fail(message.toString())
         }
     }
 }

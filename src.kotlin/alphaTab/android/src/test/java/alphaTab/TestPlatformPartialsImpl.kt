@@ -10,14 +10,14 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
-actual class TestPlatformPartials {
-    actual companion object {
-        actual fun deleteFile(path: String) {
+class TestPlatformPartials {
+    companion object {
+        fun deleteFile(path: String) {
             val filePath = Paths.get(projectRoot, path)
             filePath.toFile().delete()
         }
 
-        actual fun loadFile(path: String): Uint8Array {
+        fun loadFile(path: String): Uint8Array {
             val fs = openFileRead(path)
             val ms = ByteArrayOutputStream()
             fs.use {
@@ -50,7 +50,7 @@ actual class TestPlatformPartials {
         }
 
 
-        actual fun saveFile(name: String, data: Uint8Array) {
+        fun saveFile(name: String, data: Uint8Array) {
             val fs = openFileWrite(name)
             fs.use {
                 fs.write(data.buffer.asByteArray())
@@ -58,11 +58,11 @@ actual class TestPlatformPartials {
         }
 
 
-        actual fun joinPath(vararg path: String): String {
+        fun joinPath(vararg path: String): String {
             return path.joinToString(File.separator)
         }
 
-        actual fun listDirectory(path: String): alphaTab.collections.List<String> {
+        fun listDirectory(path: String): alphaTab.collections.List<String> {
             val dirPath = Paths.get(projectRoot, path)
             return alphaTab.collections.List(dirPath.toFile()
                 .listFiles()

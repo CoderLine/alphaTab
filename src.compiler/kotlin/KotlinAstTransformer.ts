@@ -8,7 +8,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
         super(typeScript, context);
         this._testClassAttribute = '';
-        this._testMethodAttribute = 'kotlin.test.Test';
+        this._testMethodAttribute = 'Test';
     }
 
     public override get extension(): string {
