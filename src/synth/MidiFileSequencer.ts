@@ -267,7 +267,7 @@ export class MidiFileSequencer {
         while (
             this._currentState.eventIndex < this._currentState.synthData.length &&
             this._currentState.synthData[this._currentState.eventIndex].time < this._currentState.currentTime &&
-            this._currentState.currentTime < endTime
+            this._currentState.currentTime < endTime 
         ) {
             this._synthesizer.dispatchEvent(this._currentState.synthData[this._currentState.eventIndex]);
             this._currentState.eventIndex++;
