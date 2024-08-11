@@ -514,10 +514,10 @@ export class TinySoundFont {
      */
     public noteOffAll(immediate: boolean): void {
         for (const voice of this._voices) {
-            if (voice.playingPreset !== -1 && voice.ampEnv.segment < VoiceEnvelopeSegment.Release) {
+            if (voice.playingPreset !== -1) {
                 if (immediate) {
                     voice.endQuick(this.outSampleRate);
-                } else {
+                } else if(voice.ampEnv.segment < VoiceEnvelopeSegment.Release) {
                     voice.end(this.outSampleRate);
                 }
             }

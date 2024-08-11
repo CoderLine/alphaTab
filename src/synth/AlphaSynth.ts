@@ -36,6 +36,7 @@ export class AlphaSynth implements IAlphaSynth {
     private _playedEventsQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
     private _midiEventsPlayedFilter: Set<MidiEventType> = new Set<MidiEventType>();
     private _notPlayedSamples: number = 0;
+    private _synthStopping = false;
 
     /**
      * Gets the {@link ISynthOutput} used for playing the generated samples.
@@ -183,7 +184,10 @@ export class AlphaSynth implements IAlphaSynth {
             this.checkReadyForPlayback();
         });
         this.output.sampleRequest.on(() => {
-            if (this.state == PlayerState.Playing && !this._sequencer.isFinished) {
+            if (
+                this.state == PlayerState.Playing &&
+                (!this._sequencer.isFinished || this._synthesizer.activeVoiceCount > 0)
+            ) {
                 let samples: Float32Array = new Float32Array(
                     SynthConstants.MicroBufferSize * SynthConstants.MicroBufferCount * SynthConstants.AudioChannels
                 );
@@ -254,6 +258,7 @@ export class AlphaSynth implements IAlphaSynth {
 
         Logger.debug('AlphaSynth', 'Starting playback');
         this._synthesizer.setupMetronomeChannel(this.metronomeVolume);
+        this._synthStopping = false;
         this.state = PlayerState.Playing;
         (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
             new PlayerStateChangedEventArgs(this.state, false)
@@ -436,15 +441,22 @@ export class AlphaSynth implements IAlphaSynth {
                 this.output.resetSamples();
                 this.state = PlayerState.Paused;
                 this.stopOneTimeMidi();
+            } else if (this.isLooping) {
+                Logger.debug('AlphaSynth', 'Finished playback (main looping)');
+                (this.finished as EventEmitter).trigger();
+                this.tickPosition = startTick;
+                this._synthStopping = false;
+            } else if (this._synthesizer.activeVoiceCount > 0) {
+                // smooth stop
+                if (!this._synthStopping) {
+                    this._synthesizer.noteOffAll(true);
+                    this._synthStopping = true;
+                }
             } else {
+                this._synthStopping = false;
                 Logger.debug('AlphaSynth', 'Finished playback (main)');
                 (this.finished as EventEmitter).trigger();
-
-                if (this.isLooping) {
-                    this.tickPosition = startTick;
-                } else {
-                    this.stop();
-                }
+                this.stop();
             }
         }
     }
@@ -458,19 +470,25 @@ export class AlphaSynth implements IAlphaSynth {
 
     private updateTimePosition(timePosition: number, isSeek: boolean): void {
         // update the real positions
-        const currentTime: number = timePosition;
+        let currentTime: number = timePosition;
         this._timePosition = currentTime;
-        const currentTick: number = this._sequencer.currentTimePositionToTickPosition(currentTime);
+        let currentTick: number = this._sequencer.currentTimePositionToTickPosition(currentTime);
         this._tickPosition = currentTick;
 
         const endTime: number = this._sequencer.currentEndTime;
         const endTick: number = this._sequencer.currentEndTick;
 
+        // on fade outs we can have some milliseconds longer, ensure we don't report this
+        if (currentTime > endTime) {
+            currentTime = endTime;
+            currentTick = endTick;
+        }
+
         const mode = this._sequencer.isPlayingMain
             ? 'main'
             : this._sequencer.isPlayingCountIn
-                ? 'count-in'
-                : 'one-time';
+            ? 'count-in'
+            : 'one-time';
 
         Logger.debug(
             'AlphaSynth',
