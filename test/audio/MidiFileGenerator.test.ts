@@ -31,6 +31,8 @@ import { TestPlatform } from '@test/TestPlatform';
 import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { AccentuationType, VibratoType } from '@src/model';
 import { expect } from 'chai';
+import { ScoreLoader } from '@src/importer';
+import { MidiTickLookup } from '@src/midi';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
@@ -39,12 +41,17 @@ describe('MidiFileGeneratorTest', () => {
         return importer.readScore();
     };
 
-    const assertEvents: (actualEvents: FlatMidiEvent[], expectedEvents: FlatMidiEvent[]) => void = (actualEvents: FlatMidiEvent[], expectedEvents: FlatMidiEvent[]) => {
+    const assertEvents: (actualEvents: FlatMidiEvent[], expectedEvents: FlatMidiEvent[]) => void = (
+        actualEvents: FlatMidiEvent[],
+        expectedEvents: FlatMidiEvent[]
+    ) => {
         for (let i: number = 0; i < actualEvents.length; i++) {
             Logger.info('Test', `i[${i}] ${actualEvents[i]}`);
             if (i < expectedEvents.length) {
-                expect(expectedEvents[i].equals(actualEvents[i]))
-                    .to.equal(true, `i[${i}] expected[${expectedEvents[i]}] !== actual[${actualEvents[i]}]`);
+                expect(expectedEvents[i].equals(actualEvents[i])).to.equal(
+                    true,
+                    `i[${i}] expected[${expectedEvents[i]}] !== actual[${actualEvents[i]}]`
+                );
             }
         }
         expect(actualEvents.length).to.equal(expectedEvents.length);
@@ -890,8 +897,8 @@ describe('MidiFileGeneratorTest', () => {
         let score: Score = parseTex(tex);
 
         expect(score.tempo).to.be.equal(120);
-        expect(score.masterBars[0].tempoAutomation).to.be.ok;
-        expect(score.masterBars[0].tempoAutomation!.value).to.be.equal(60);
+        expect(score.masterBars[0].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[0].tempoAutomations[0]!.value).to.be.equal(60);
 
         const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
@@ -974,5 +981,76 @@ describe('MidiFileGeneratorTest', () => {
         const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
         assertEvents(handler.midiEvents, expectedEvents);
-    })
+    });
+
+    
+    function expectBeat(tickLookup:MidiTickLookup, tick: number, fret: number, tickDuration: number, millisDuration: number) {
+        const res = tickLookup.findBeat(new Set<number>([0]), tick);
+        expect(res).to.be.ok;
+        expect(res!.beat.notes[0].fret).to.equal(fret);
+        expect(res!.tickDuration).to.equal(tickDuration);
+        expect(res!.duration).to.equal(millisDuration);
+    }
+
+    it('beat-tempo-change', async () => {
+        /**
+         * ![image](../../test-data/visual-tests/effects-and-annotations/beat-tempo-change.png)
+         */
+        const buffer = await TestPlatform.loadFile(
+            'test-data/visual-tests/effects-and-annotations/beat-tempo-change.gp'
+        );
+        const score = ScoreLoader.loadScoreFromBytes(buffer);
+
+        // rewrite frets for easier assertions
+        let fret = 0;
+        for (const bars of score.tracks[0].staves[0].bars) {
+            for (const b of bars.voices[0].beats) {
+                b.notes[0].fret = fret++;
+            }
+        }
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const tempoChanges: FlatTempoEvent[] = [];
+        for (const evt of handler.midiEvents) {
+            if (evt instanceof FlatTempoEvent) {
+                tempoChanges.push(evt as FlatTempoEvent);
+            }
+        }
+
+        expect(tempoChanges.map(t => t.tick).join(',')).to.be.equal('0,1920,3840,6288,7680,9120,11520,12960,15120');
+        expect(tempoChanges.map(t => t.tempo).join(',')).to.be.equal('120,60,100,120,121,120,121,120,121');
+
+        const tickLookup = generator.tickLookup;
+
+        // two quarter notes at 120
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 0, 0, MidiUtils.QuarterTime, 500);
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 1, 1, MidiUtils.QuarterTime, 500);
+        // then two quarter notes at 60
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 2, 2, MidiUtils.QuarterTime, 1000);
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 3, 3, MidiUtils.QuarterTime, 1000);
+
+        // two quarter notes at 100
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 4, 4, MidiUtils.QuarterTime, 600);
+        expectBeat(tickLookup, MidiUtils.QuarterTime * 5, 5, MidiUtils.QuarterTime, 600);
+        // one quarter note partially at 100 then, switching to 120
+        // - The beat starts at 5760
+        // - The change is at ratio 0.6375, that's midi tick 6288
+        // - Hence from tick 5760 to 6288 it plays with 100 BPM
+        // - From tick 6288 to 6720 it plays with 120 BPM
+        // - Thats 330ms + 224ms = 555ms
+
+        const beatStart = MidiUtils.QuarterTime * 6;
+        const beatEnd = MidiUtils.QuarterTime * 7;
+        const tempoChangeTick = score.masterBars[1].start + score.masterBars[1].calculateDuration() * score.masterBars[1].tempoAutomations[1].ratioPosition;
+        expect(tempoChangeTick - beatStart).to.equal(528);
+        expect(beatEnd - tempoChangeTick).to.equal(432);
+        
+        const firstPartMillis = MidiUtils.ticksToMillis(tempoChangeTick - beatStart, 100);
+        const secondPartMillis = MidiUtils.ticksToMillis(beatEnd - tempoChangeTick, 120);
+
+        expectBeat(tickLookup, beatStart, 6, MidiUtils.QuarterTime, firstPartMillis + secondPartMillis);
+    });
 });

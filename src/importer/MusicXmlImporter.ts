@@ -86,8 +86,8 @@ export class MusicXmlImporter extends ScoreImporter {
             entries = [];
         }
 
-        // no compressed MusicXML, try raw 
-        if(entries.length === 0) {
+        // no compressed MusicXML, try raw
+        if (entries.length === 0) {
             this.data.reset();
             return IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
         }
@@ -105,35 +105,37 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         let root: XmlNode | null = containerDom.firstElement;
-        if (!root || root.localName !== "container") {
+        if (!root || root.localName !== 'container') {
             throw new UnsupportedFormatError("Malformed container.xml, root element not 'container'");
         }
 
-        const rootFiles = root.findChildElement("rootfiles");
-        if(!rootFiles) {
+        const rootFiles = root.findChildElement('rootfiles');
+        if (!rootFiles) {
             throw new UnsupportedFormatError("Malformed container.xml, 'container/rootfiles' not found");
         }
-        
-        let uncompressedFileFullPath:string = "";
-        for(const c of rootFiles.childNodes) {
-            if(c.nodeType == XmlNodeType.Element && c.localName === "rootfile") {
+
+        let uncompressedFileFullPath: string = '';
+        for (const c of rootFiles.childNodes) {
+            if (c.nodeType == XmlNodeType.Element && c.localName === 'rootfile') {
                 // The MusicXML root must be described in the first <rootfile> element.
                 // https://www.w3.org/2021/06/musicxml40/tutorial/compressed-mxl-files/
-                uncompressedFileFullPath = c.getAttribute("full-path");
+                uncompressedFileFullPath = c.getAttribute('full-path');
                 break;
             }
         }
 
-        if(!uncompressedFileFullPath) {
-            throw new UnsupportedFormatError("Unsupported compressed MusicXML, missing rootfile");
+        if (!uncompressedFileFullPath) {
+            throw new UnsupportedFormatError('Unsupported compressed MusicXML, missing rootfile');
         }
 
         const file = entries.find(e => e.fullName === uncompressedFileFullPath);
-        if(!file) {
-            throw new UnsupportedFormatError(`Malformed container.xml, '${uncompressedFileFullPath}' not contained in zip`);
+        if (!file) {
+            throw new UnsupportedFormatError(
+                `Malformed container.xml, '${uncompressedFileFullPath}' not contained in zip`
+            );
         }
 
-        return IOHelper.toString(file.data, this.settings.importer.encoding); 
+        return IOHelper.toString(file.data, this.settings.importer.encoding);
     }
 
     private mergePartGroups(): void {
@@ -1057,7 +1059,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseTechnical(element: XmlNode, note: Note): void {
         let bends: XmlNode[] = [];
-        
+
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -1076,7 +1078,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     case 'up-bow':
                         note.beat.pickStroke = PickStroke.Up;
                         break;
-                    case 'bend' :
+                    case 'bend':
                         bends.push(c);
                         break;
                 }
@@ -1094,27 +1096,27 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseBends(elements: XmlNode[], note: Note): void {
-        let baseOffset: number = BendPoint.MaxPosition / elements.length; 
+        let baseOffset: number = BendPoint.MaxPosition / elements.length;
         let currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
         let currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
         let isFirstBend: boolean = true;
 
         for (let bend of elements) {
-            let bendAlterElement: XmlNode | null = bend.findChildElement("bend-alter");
+            let bendAlterElement: XmlNode | null = bend.findChildElement('bend-alter');
             if (bendAlterElement) {
                 let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 2);
-                if (bend.findChildElement("pre-bend")) {
-                    if (isFirstBend){
+                if (bend.findChildElement('pre-bend')) {
+                    if (isFirstBend) {
                         currentValue += absValue;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
                         currentOffset += baseOffset;
                         note.addBendPoint(new BendPoint(currentOffset, currentValue));
                         isFirstBend = false;
-                    }else{
+                    } else {
                         currentOffset += baseOffset;
                     }
-                } else if (bend.findChildElement("release")) {
-                    if (isFirstBend){
+                } else if (bend.findChildElement('release')) {
+                    if (isFirstBend) {
                         currentValue += absValue;
                     }
                     note.addBendPoint(new BendPoint(currentOffset, currentValue));
@@ -1122,15 +1124,15 @@ export class MusicXmlImporter extends ScoreImporter {
                     currentValue -= absValue;
                     note.addBendPoint(new BendPoint(currentOffset, currentValue));
                     isFirstBend = false;
-                    
-                } else { // "regular" bend
+                } else {
+                    // "regular" bend
                     note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                    currentValue += absValue
-                    currentOffset += baseOffset
+                    currentValue += absValue;
+                    currentOffset += baseOffset;
                     note.addBendPoint(new BendPoint(currentOffset, currentValue));
                     isFirstBend = false;
                 }
-            }            
+            }
         }
     }
 
@@ -1274,7 +1276,7 @@ export class MusicXmlImporter extends ScoreImporter {
                             tempoAutomation.isLinear = true;
                             tempoAutomation.type = AutomationType.Tempo;
                             tempoAutomation.value = parseInt(tempo);
-                            masterBar.tempoAutomation = tempoAutomation;
+                            masterBar.tempoAutomations.push(tempoAutomation);
                             if (masterBar.index === 0) {
                                 masterBar.score.tempo = tempoAutomation.value;
                             }
@@ -1313,11 +1315,22 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         let tempoAutomation: Automation = new Automation();
         tempoAutomation.type = AutomationType.Tempo;
-        tempoAutomation.value = perMinute * ((unit / 4) | 0);
-        masterBar.tempoAutomation = tempoAutomation;
-        if (masterBar.index === 0) {
-            masterBar.score.tempo = tempoAutomation.value;
+        tempoAutomation.value = (perMinute * (unit / 4)) | 0;
+
+        if (!this.hasSameTempo(masterBar, tempoAutomation)) {
+            masterBar.tempoAutomations.push(tempoAutomation);
+            if (masterBar.index === 0) {
+                masterBar.score.tempo = tempoAutomation.value;
+            }
         }
+    }
+    private hasSameTempo(masterBar: MasterBar, tempoAutomation: Automation) {
+        for (const existing of masterBar.tempoAutomations) {
+            if (tempoAutomation.ratioPosition === existing.ratioPosition && tempoAutomation.value == existing.value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private parseAttributes(element: XmlNode, bars: Bar[], masterBar: MasterBar, track: Track): void {

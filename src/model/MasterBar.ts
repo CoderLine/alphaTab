@@ -106,9 +106,17 @@ export class MasterBar {
     }
 
     /**
-     * Gets or sets the tempo automation for this bar.
+     * Gets or sets the first tempo automation for this bar.
+     * @deprecated Use {@link tempoAutomations}.
      */
-    public tempoAutomation: Automation | null = null;
+    public get tempoAutomation(): Automation | null {
+        return this.tempoAutomations.length > 0 ? this.tempoAutomations[0] : null;
+    }
+
+    /**
+     * Gets or sets all tempo automation for this bar.
+     */
+    public tempoAutomations: Automation[] = [];
 
     /**
      * Gets or sets the reference to the score this song belongs to.

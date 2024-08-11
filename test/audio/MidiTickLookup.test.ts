@@ -3,6 +3,7 @@ import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
 import { AlphaSynthMidiFileHandler, MasterBarTickLookup, MidiFile, MidiFileGenerator, MidiTickLookup, MidiTickLookupFindBeatResult } from '@src/midi';
+import { MasterBarTickLookupTempoChange } from '@src/midi/MasterBarTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { Beat, Duration, MasterBar, Note, Score } from '@src/model';
 import { Settings } from '@src/Settings';
@@ -24,7 +25,7 @@ describe('MidiTickLookupTest', () => {
         const masterBarLookup = new MasterBarTickLookup();
         masterBarLookup.masterBar = new MasterBar();
         masterBarLookup.start = 0;
-        masterBarLookup.tempo = 120;
+        masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(0, 120));
         masterBarLookup.end = masterBarLookup.start + masterBarLookup.masterBar.calculateDuration();
         lookup.addMasterBar(masterBarLookup);
 
@@ -44,7 +45,7 @@ describe('MidiTickLookupTest', () => {
         const masterBarLookup = new MasterBarTickLookup();
         masterBarLookup.masterBar = new MasterBar();
         masterBarLookup.start = 0;
-        masterBarLookup.tempo = 120;
+        masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(0, 120));
         masterBarLookup.end = masterBarLookup.start + masterBarLookup.masterBar.calculateDuration();
         lookup.addMasterBar(masterBarLookup);
 
@@ -470,7 +471,7 @@ describe('MidiTickLookupTest', () => {
         masterBar1Lookup.masterBar!.timeSignatureNumerator = 3;
         masterBar1Lookup.masterBar!.timeSignatureDenominator = 4;
         masterBar1Lookup.start = 0;
-        masterBar1Lookup.tempo = 120;
+        masterBar1Lookup.tempoChanges.push(new MasterBarTickLookupTempoChange(0, 120));
         masterBar1Lookup.end = masterBar1Lookup.start + masterBar1Lookup.masterBar.calculateDuration();
         lookup.addMasterBar(masterBar1Lookup);
 
@@ -489,7 +490,7 @@ describe('MidiTickLookupTest', () => {
         masterBar2Lookup.masterBar!.timeSignatureNumerator = 3;
         masterBar2Lookup.masterBar!.timeSignatureDenominator = 4;
         masterBar2Lookup.start = masterBar2Lookup.end;
-        masterBar2Lookup.tempo = 120;
+        masterBar2Lookup.tempoChanges.push(new MasterBarTickLookupTempoChange(0, 120));
         masterBar2Lookup.end = masterBar2Lookup.start + masterBar2Lookup.masterBar.calculateDuration();
         lookup.addMasterBar(masterBar2Lookup);
 

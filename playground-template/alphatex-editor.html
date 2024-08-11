@@ -78,13 +78,13 @@
         req.onload = data => {
             document.getElementById('placeholder').outerHTML = req.responseText;
 
-            const element = document.getElementById('alphaTab');
+            const element = document.getElementById('alphaTabControl');
             delete element.dataset.file;
             delete element.dataset.tracks;
             element.dataset.tex = true;
             element.innerHTML = document.getElementById('editor').innerHTML;
 
-            window.at = setupControl('#alphaTab', { file: undefined, tex: ''});
+            window.at = setupControl('#alphaTabControl', { file: undefined, tex: ''});
             setupEditor(window.at, '#editor');
         };
         req.open('GET', 'control-template.html');

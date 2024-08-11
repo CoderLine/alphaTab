@@ -55,6 +55,7 @@ export class AlphaSynthWebWorklet {
                 private _circularBuffer!: CircularSampleBuffer;
                 private _bufferCount: number = 0;
                 private _requestedBufferCount: number = 0;
+                private _isStopped = false;
 
                 constructor(options: AudioWorkletNodeOptions) {
                     super(options);
@@ -84,6 +85,9 @@ export class AlphaSynthWebWorklet {
                             break;
                         case AlphaSynthWorkerSynthOutput.CmdOutputResetSamples:
                             this._circularBuffer.clear();
+                            break;
+                        case AlphaSynthWorkerSynthOutput.CmdOutputStop:
+                            this._isStopped = true;
                             break;
                     }
                 }
@@ -116,17 +120,26 @@ export class AlphaSynthWebWorklet {
                         Math.min(buffer.length, this._circularBuffer.count)
                     );
                     let s: number = 0;
-                    for (let i: number = 0; i < left.length; i++) {
+                    const min = Math.min(left.length, samplesFromBuffer);
+                    for (let i: number = 0; i < min; i++) {
                         left[i] = buffer[s++];
                         right[i] = buffer[s++];
                     }
+
+                    if(samplesFromBuffer < left.length) {
+                        for(let i = samplesFromBuffer; i < left.length; i++) {
+                            left[i] = 0;
+                            right[i] = 0;
+                        }
+                    }
+                 
                     this.port.postMessage({
                         cmd: AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed,
                         samples: samplesFromBuffer / SynthConstants.AudioChannels
                     });
                     this.requestBuffers();
 
-                    return true;
+                    return this._circularBuffer.count > 0 || !this._isStopped;
                 }
 
                 private requestBuffers(): void {
@@ -215,6 +228,9 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     public override pause(): void {
         super.pause();
         if (this._worklet) {
+            this._worklet.port.postMessage({
+                cmd: AlphaSynthWorkerSynthOutput.CmdOutputStop
+            });
             this._worklet.port.onmessage = null;
             this._worklet.disconnect();
         }

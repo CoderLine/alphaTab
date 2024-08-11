@@ -4,6 +4,27 @@ import { Beat } from '@src/model/Beat';
 import { MasterBar } from '@src/model/MasterBar';
 
 /**
+ * Represents a single point in time defining the tempo of a {@link MasterBarTickLookup}.
+ * This is typically the initial tempo of a master bar or a tempo change.
+ */
+export class MasterBarTickLookupTempoChange {
+    /**
+     * Gets or sets the tick position within the {@link MasterBarTickLookup#start} and  {@link MasterBarTickLookup#end} range.
+     */
+    public tick: number;
+
+    /**
+     * Gets or sets the tempo at the tick position.
+     */
+    public tempo: number;
+
+    public constructor(tick: number, tempo: number) {
+        this.tick = tick;
+        this.tempo = tempo;
+    }
+}
+
+/**
  * Represents the time period, for which all bars of a {@link MasterBar} are played.
  */
 export class MasterBarTickLookup {
@@ -19,8 +40,16 @@ export class MasterBarTickLookup {
 
     /**
      * Gets or sets the current tempo when the MasterBar is played.
+     * @deprecated use {@link tempoChanges}
      */
-    public tempo: number = 0;
+    public get tempo(): number {
+        return this.tempoChanges[0].tempo;
+    }
+
+    /**
+     * Gets the list of tempo changes within the tick lookup.
+     */
+    public readonly tempoChanges: MasterBarTickLookupTempoChange[] = [];
 
     /**
      * Gets or sets the MasterBar which is played.
@@ -29,7 +58,6 @@ export class MasterBarTickLookup {
 
     public firstBeat: BeatTickLookup | null = null;
     public lastBeat: BeatTickLookup | null = null;
-
 
     /**
      * Inserts `newNextBeat` after `currentBeat` in the linked list of items and updates.
@@ -59,11 +87,11 @@ export class MasterBarTickLookup {
     }
 
     /**
-       * Inserts `newNextBeat` before `currentBeat` in the linked list of items and updates.
-       * the `firstBeat` and `lastBeat` respectively too.
-       * @param currentBeat The item in which to insert the new item afterwards
-       * @param newBeat The new item to insert
-       */
+     * Inserts `newNextBeat` before `currentBeat` in the linked list of items and updates.
+     * the `firstBeat` and `lastBeat` respectively too.
+     * @param currentBeat The item in which to insert the new item afterwards
+     * @param newBeat The new item to insert
+     */
     private insertBefore(currentBeat: BeatTickLookup | null, newBeat: BeatTickLookup) {
         if (this.firstBeat == null || currentBeat == null || this.lastBeat == null) {
             this.firstBeat = newBeat;
@@ -89,7 +117,6 @@ export class MasterBarTickLookup {
      */
     public nextMasterBar: MasterBarTickLookup | null = null;
 
-
     /**
      * Gets or sets the {@link MasterBarTickLookup} of the previous masterbar in the {@link Score}
      */
@@ -98,9 +125,9 @@ export class MasterBarTickLookup {
     /**
      * Adds a new beat to this masterbar following the slicing logic required by the MidiTickLookup.
      * @param beat The beat to add to this masterbat
-     * @param beatPlaybackStart The original start of this beat. This time is relevant for highlighting. 
-     * @param sliceStart The slice start to which this beat should be added. This time is relevant for creating new slices. 
-     * @param sliceDuration The slice duration to which this beat should be added. This time is relevant for creating new slices. 
+     * @param beatPlaybackStart The original start of this beat. This time is relevant for highlighting.
+     * @param sliceStart The slice start to which this beat should be added. This time is relevant for creating new slices.
+     * @param sliceDuration The slice duration to which this beat should be added. This time is relevant for creating new slices.
      * @returns The first item of the chain which was affected.
      */
     public addBeat(beat: Beat, beatPlaybackStart: number, sliceStart: number, sliceDuration: number) {
@@ -108,9 +135,9 @@ export class MasterBarTickLookup {
 
         // We have following scenarios we cover overall on inserts
         // Technically it would be possible to merge some code paths and work with loops
-        // to handle all scenarios in a shorter piece of code. 
-        // but this would make the core a lot harder to understand an less readable 
-        // and maintainable for the different scenarios. 
+        // to handle all scenarios in a shorter piece of code.
+        // but this would make the core a lot harder to understand an less readable
+        // and maintainable for the different scenarios.
         // we keep them separate here for that purpose and sacrifice some bytes of code for that.
 
         // Variant A (initial Insert)
@@ -130,7 +157,6 @@ export class MasterBarTickLookup {
         // Result C
         //              |     L1     |    L2     |       N1      |
 
-
         // Variant D (Starts before, ends exactly):
         //              |     L1     |    L2     |
         //      |  New  |
@@ -139,32 +165,31 @@ export class MasterBarTickLookup {
 
         // Variant E (Starts before, with gap):
         //              |     L1     |    L2     |
-        //    |  New  |   
+        //    |  New  |
         // Result E:
         //    |  N1     |     L1     |    L2     |
 
         // Variant F (starts before, overlaps partially):
         //              |     L1     |    L2     |
-        //      |      New      | 
+        //      |      New      |
         // Result F:
         //      |  N1   | N2    | L1 |    L2     |
 
         // Variant G (starts before, ends the same):
         //              |     L1     |    L2     |
-        //      |      New           | 
+        //      |      New           |
         // Result G:
         //      |  N1   | L1         |    L2     |
 
         // Variant H (starts before, ends after L1):
-        //              |     L1     |    L2     |        
-        //      |      New                  | 
+        //              |     L1     |    L2     |
+        //      |      New                  |
         // Result H:
-        //      Step 1 (only slice L1): 
+        //      Step 1 (only slice L1):
         //      |  N1   | L1          |    L2     |
-        //      Step 2 (call recursively with start time of 'new' adjusted): 
+        //      Step 2 (call recursively with start time of 'new' adjusted):
         //                            | New  |
         //      |  N1   | L1          |  N2  | L2 |
-
 
         // Variant I (starts in the middle, ends exactly)
         //              |     L1     |    L2     |
@@ -174,7 +199,7 @@ export class MasterBarTickLookup {
 
         // Variant J (starts in the middle, ends before)
         //              |     L1     |    L2     |
-        //                 | New |  
+        //                 | New |
         // Result J
         //              |N1| N2  |L1 |    L2     |
 
@@ -182,9 +207,9 @@ export class MasterBarTickLookup {
         //              |     L1     |    L2     |
         //                     | New       |
         // Result K
-        //      Step 1 (only slice L1): 
+        //      Step 1 (only slice L1):
         //              |  N1  | L1  |    L2     |
-        //      Step 2 (call recursively with start time of 'new' adjusted): 
+        //      Step 2 (call recursively with start time of 'new' adjusted):
         //                           | New  |
         //              |  N1  | L1  |    L2     |
 
@@ -196,7 +221,7 @@ export class MasterBarTickLookup {
 
         // Variant M (starts exactly, ends before)
         //              |     L1     |    L2     |
-        //              |  New |  
+        //              |  New |
         // Result M
         //              | N1   | L1  |    L2     |
 
@@ -204,9 +229,9 @@ export class MasterBarTickLookup {
         //              |     L1     |    L2     |
         //              | New              |
         // Result N
-        //      Step 1 (only update L1): 
+        //      Step 1 (only update L1):
         //              |      L1    |    L2     |
-        //      Step 2 (call recursively with start time of 'new' adjusted): 
+        //      Step 2 (call recursively with start time of 'new' adjusted):
         //                           | New |
         //              |     L 1    |    L2     |
 
@@ -225,8 +250,7 @@ export class MasterBarTickLookup {
             n1.highlightBeat(beat, beatPlaybackStart);
 
             this.insertAfter(this.lastBeat, n1);
-        }
-        else {
+        } else {
             let l1: BeatTickLookup | null = null;
             if (sliceStart < this.firstBeat.start) {
                 l1 = this.firstBeat!;
@@ -243,11 +267,11 @@ export class MasterBarTickLookup {
 
                 if (l1 === null) {
                     // should not be possible
-                    throw new AlphaTabError(AlphaTabErrorType.General, "Error on building lookup, unknown variant");
+                    throw new AlphaTabError(AlphaTabErrorType.General, 'Error on building lookup, unknown variant');
                 }
             }
 
-            // those scenarios should only happen if we insert before the 
+            // those scenarios should only happen if we insert before the
             // first item (e.g. for grace notes starting < 0)
             if (sliceStart < l1.start) {
                 // Variant D
@@ -282,10 +306,9 @@ export class MasterBarTickLookup {
                     l1.highlightBeat(beat, beatPlaybackStart);
 
                     this.insertBefore(l1, n1);
-                }
+                } /* end > this.firstBeat.end */
                 // Variant H
-                else /* end > this.firstBeat.end */ {
-
+                else {
                     const n1 = new BeatTickLookup(sliceStart, l1.start);
                     n1.highlightBeat(beat, beatPlaybackStart);
 
@@ -295,8 +318,7 @@ export class MasterBarTickLookup {
 
                     this.addBeat(beat, beatPlaybackStart, l1.end, end - l1.end);
                 }
-            }
-            else if (sliceStart > l1.start) {
+            } else if (sliceStart > l1.start) {
                 // variant I
                 if (end == l1.end) {
                     const n1 = new BeatTickLookup(l1.start, sliceStart);
@@ -307,26 +329,26 @@ export class MasterBarTickLookup {
                     l1.start = sliceStart;
                     l1.highlightBeat(beat, beatPlaybackStart);
 
-                    this.insertBefore(l1, n1)
+                    this.insertBefore(l1, n1);
                 }
                 // Variant J
                 else if (end < l1.end) {
                     const n1 = new BeatTickLookup(l1.start, sliceStart);
-                    this.insertBefore(l1, n1)
+                    this.insertBefore(l1, n1);
 
                     const n2 = new BeatTickLookup(sliceStart, end);
-                    this.insertBefore(l1, n2)
+                    this.insertBefore(l1, n2);
 
                     for (const b of l1.highlightedBeats) {
-                        n1.highlightBeat(b.beat, b.playbackStart)
-                        n2.highlightBeat(b.beat, b.playbackStart)
+                        n1.highlightBeat(b.beat, b.playbackStart);
+                        n2.highlightBeat(b.beat, b.playbackStart);
                     }
                     n2.highlightBeat(beat, beatPlaybackStart);
 
                     l1.start = end;
-                }
+                } /* end > l1.end */
                 // Variant K
-                else /* end > l1.end */ {
+                else {
                     const n1 = new BeatTickLookup(l1.start, sliceStart);
                     for (const b of l1.highlightedBeats) {
                         n1.highlightBeat(b.beat, b.playbackStart);
@@ -339,8 +361,7 @@ export class MasterBarTickLookup {
 
                     this.addBeat(beat, beatPlaybackStart, l1.end, end - l1.end);
                 }
-            }
-            else /* start == l1.start */ {
+            } /* start == l1.start */ else {
                 // Variant L
                 if (end === l1.end) {
                     l1.highlightBeat(beat, beatPlaybackStart);
@@ -356,9 +377,9 @@ export class MasterBarTickLookup {
                     l1.start = end;
 
                     this.insertBefore(l1, n1);
-                }
+                } /* end > l1.end */
                 // variant N
-                else /* end > l1.end */ {
+                else {
                     l1.highlightBeat(beat, beatPlaybackStart);
                     this.addBeat(beat, beatPlaybackStart, l1.end, end - l1.end);
                 }

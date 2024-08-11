@@ -944,28 +944,30 @@ export class GpifWriter {
             masterTrackNode.addElement('Anacrusis');
         }
 
-        const initialTempoAutomation = automations.addElement('Automation');
-        initialTempoAutomation.addElement('Type').innerText = 'Tempo';
-        initialTempoAutomation.addElement('Linear').innerText = 'false';
-        initialTempoAutomation.addElement('Bar').innerText = '0';
-        initialTempoAutomation.addElement('Position').innerText = '0';
-        initialTempoAutomation.addElement('Visible').innerText = 'true';
-        initialTempoAutomation.addElement('Value').innerText = `${score.tempo} 2`;
-        if (score.tempoLabel) {
-            initialTempoAutomation.addElement('Text').innerText = score.tempoLabel;
+        if(score.masterBars[0].tempoAutomations.length === 0){
+            const initialTempoAutomation = automations.addElement('Automation');
+            initialTempoAutomation.addElement('Type').innerText = 'Tempo';
+            initialTempoAutomation.addElement('Linear').innerText = 'false';
+            initialTempoAutomation.addElement('Bar').innerText = '0';
+            initialTempoAutomation.addElement('Position').innerText = '0';
+            initialTempoAutomation.addElement('Visible').innerText = 'true';
+            initialTempoAutomation.addElement('Value').innerText = `${score.tempo} 2`;
+            if (score.tempoLabel) {
+                initialTempoAutomation.addElement('Text').innerText = score.tempoLabel;
+            }
         }
-
+      
         for (const mb of score.masterBars) {
-            if (mb.index > 0 && mb.tempoAutomation) {
+            for (const automation of mb.tempoAutomations) {
                 const tempoAutomation = automations.addElement('Automation');
                 tempoAutomation.addElement('Type').innerText = 'Tempo';
-                tempoAutomation.addElement('Linear').innerText = mb.tempoAutomation.isLinear ? 'true' : 'false';
+                tempoAutomation.addElement('Linear').innerText = automation.isLinear ? 'true' : 'false';
                 tempoAutomation.addElement('Bar').innerText = mb.index.toString();
-                tempoAutomation.addElement('Position').innerText = mb.tempoAutomation.ratioPosition.toString();
+                tempoAutomation.addElement('Position').innerText = automation.ratioPosition.toString();
                 tempoAutomation.addElement('Visible').innerText = 'true';
-                tempoAutomation.addElement('Value').innerText = `${mb.tempoAutomation.value} 2`;
-                if (mb.tempoAutomation.text) {
-                    tempoAutomation.addElement('Text').innerText = mb.tempoAutomation.text;
+                tempoAutomation.addElement('Value').innerText = `${automation.value} 2`;
+                if (automation.text) {
+                    tempoAutomation.addElement('Text').innerText = automation.text;
                 }
             }
         }
@@ -1255,7 +1257,7 @@ export class GpifWriter {
                     let chordFret = chord.strings[i];
                     if (chordFret !== -1) {
                         const fretNode = diagram.addElement('Fret');
-                        const chordString = (chord.strings.length - 1 - i);
+                        const chordString = chord.strings.length - 1 - i;
                         fretNode.attributes.set('string', chordString.toString());
                         fretNode.attributes.set('fret', (chordFret - chord.firstFret + 1).toString());
                         if (!fretToStrings.has(chordFret)) {
@@ -1275,7 +1277,7 @@ export class GpifWriter {
                         Fingers.LittleFinger,
                         Fingers.AnnularFinger,
                         Fingers.MiddleFinger,
-                        Fingers.IndexFinger,
+                        Fingers.IndexFinger
                     ];
 
                     for (const fret of frets) {
@@ -1305,22 +1307,20 @@ export class GpifWriter {
                     }
                 }
 
-
                 const showName = diagram.addElement('Property');
                 showName.attributes.set('name', 'ShowName');
                 showName.attributes.set('type', 'bool');
-                showName.attributes.set('value', chord.showName ? "true" : "false");
+                showName.attributes.set('value', chord.showName ? 'true' : 'false');
 
                 const showDiagram = diagram.addElement('Property');
                 showDiagram.attributes.set('name', 'ShowDiagram');
                 showDiagram.attributes.set('type', 'bool');
-                showDiagram.attributes.set('value', chord.showDiagram ? "true" : "false");
+                showDiagram.attributes.set('value', chord.showDiagram ? 'true' : 'false');
 
                 const showFingering = diagram.addElement('Property');
                 showFingering.attributes.set('name', 'ShowFingering');
                 showFingering.attributes.set('type', 'bool');
-                showFingering.attributes.set('value', chord.showFingering ? "true" : "false");
-
+                showFingering.attributes.set('value', chord.showFingering ? 'true' : 'false');
 
                 // TODO Chord details
                 const chordNode = diagram.addElement('Chord');
@@ -1439,8 +1439,8 @@ export class GpifWriter {
 
             instrumentSet.addElement('Name').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetName;
             instrumentSet.addElement('Type').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetType;
-            let currentElementType: string = "";
-            let currentElementName: string = "";
+            let currentElementType: string = '';
+            let currentElementName: string = '';
             let currentArticulations: XmlNode = new XmlNode();
             let counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
@@ -1600,7 +1600,7 @@ export class GpifWriter {
     }
 
     private writeFermatas(parent: XmlNode, masterBar: MasterBar) {
-        const fermataCount = (masterBar.fermata?.size ?? 0);
+        const fermataCount = masterBar.fermata?.size ?? 0;
         if (fermataCount === 0) {
             return;
         }

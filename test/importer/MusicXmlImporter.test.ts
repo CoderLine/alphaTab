@@ -45,10 +45,10 @@ describe('MusicXmlImporterTests', () => {
         );
 
         expect(score.tempo).to.be.equal(60);
-        expect(score.masterBars[0].tempoAutomation).to.be.ok;
-        expect(score.masterBars[0].tempoAutomation?.value).to.be.equal(60);
-        expect(score.masterBars[1].tempoAutomation).to.be.ok;
-        expect(score.masterBars[1].tempoAutomation?.value).to.be.equal(60);
+        expect(score.masterBars[0].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[0].tempoAutomations[0]?.value).to.be.equal(60);
+        expect(score.masterBars[1].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[1].tempoAutomations[0].value).to.be.equal(60);
     });
     it('tie-destination', async () => {
         let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(

@@ -584,10 +584,27 @@ export class Beat {
             }
             this.tupletGroup = currentTupletGroup;
         }
+
+        if (this.index > 0) {
+            const barDuration = this.voice.bar.masterBar.calculateDuration();
+            const validBeatAutomations: Automation[] = [];
+            for (const automation of this.automations) {
+                if (automation.ratioPosition === 0) {
+                    automation.ratioPosition = this.playbackStart / barDuration;
+                }
+
+                // we store tempo automations only on masterbar level
+                if (automation.type !== AutomationType.Volume) {
+                    validBeatAutomations.push(automation);
+                }
+            }
+            this.automations = validBeatAutomations;
+        }
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
-        if (this.getAutomation(AutomationType.Instrument) === null &&
+        if (
+            this.getAutomation(AutomationType.Instrument) === null &&
             this.index === 0 &&
             this.voice.index === 0 &&
             this.voice.bar.index === 0 &&
@@ -765,6 +782,7 @@ export class Beat {
             }
         }
         this.updateDurations();
+
         if (needCopyBeatForBend) {
             // if this beat is a simple bend convert it to a grace beat
             // and generate a placeholder beat with tied notes
@@ -816,7 +834,7 @@ export class Beat {
 
             // ensure cloned beat has also a grace simple grace group for itself
             // (see Voice.finish where every beat gets one)
-            // this ensures later that grace rods are assigned correctly to this beat. 
+            // this ensures later that grace rods are assigned correctly to this beat.
             cloneBeat.graceGroup = new GraceGroup();
             cloneBeat.graceGroup.addBeat(this);
             cloneBeat.graceGroup.isComplete = true;
