@@ -49,6 +49,7 @@ jobs:
     name: Kotlin (Android)
     runs-on: windows-latest
     env:
+      KOTLIN_REQUIRE_SIGNING: true
       OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
       OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
       OSSRH_USERTOKEN_USERNAME: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
