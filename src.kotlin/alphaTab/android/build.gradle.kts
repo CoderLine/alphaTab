@@ -203,7 +203,7 @@ signing {
     if (sonatypeSigningKeyId.isNotBlank() && sonatypeSigningKey.isNotBlank() && sonatypeSigningPassword.isNotBlank()) {
         useInMemoryPgpKeys(sonatypeSigningKeyId, sonatypeSigningKey, sonatypeSigningPassword)
         sign(publishing.publications["release"])
-    } else if (System.getenv("GITHUB_ACTIONS") == "true") {
+    } else if (System.getenv("KOTLIN_REQUIRE_SIGNING") == "true") {
         logger.error("Missing Signing Key configuration")
         throw Exception("Missing Signing Key configuration")
     }
