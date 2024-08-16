@@ -63,9 +63,7 @@ export class EffectBarRenderer extends BarRendererBase {
     }
 
     public override applyLayoutingInfo(): boolean {
-        if (!super.applyLayoutingInfo()) {
-            return false;
-        }
+        const result = !super.applyLayoutingInfo();
         // we create empty slots for the same group
         if (this.index > 0) {
             let previousRenderer: EffectBarRenderer = this.previousRenderer as EffectBarRenderer;
@@ -81,7 +79,7 @@ export class EffectBarRenderer extends BarRendererBase {
             }
         }
         this.updateHeight();
-        return true;
+        return result;
     }
 
     public override scaleToWidth(width: number): void {

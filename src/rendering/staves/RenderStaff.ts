@@ -129,6 +129,9 @@ export class RenderStaff {
         let lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
         this.system.layout.unregisterBarRenderer(this.staveId, lastBar);
+        for (const r of this.barRenderers) {
+            r.applyLayoutingInfo();
+        }
         return lastBar;
     }
 
