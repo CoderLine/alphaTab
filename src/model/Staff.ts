@@ -83,6 +83,11 @@ export class Staff {
     public showSlash: boolean = false;
 
     /**
+     * Gets or sets whether the numbered notation is shown.
+     */
+    public showNumbered: boolean = false;
+
+    /**
      * Gets or sets whether the tabs are shown.
      */
     public showTablature: boolean = true;

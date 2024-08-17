@@ -9,21 +9,28 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { LineBarRenderer } from './LineBarRenderer';
 import { SlashNoteHeadGlyph } from './glyphs/SlashNoteHeadGlyph';
-import { SlashBeatContainerGlyph } from './SlashBeatContainerGlyph';
 import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
-import { SlashBeatGlyph } from './glyphs/SlashBeatGlyph';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
+import { NumberedBeatContainerGlyph } from './NumberedBeatContainerGlyph';
+import { NumberedBeatGlyph, NumberedBeatPreNotesGlyph } from './glyphs/NumberedBeatGlyph';
+import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
+import { SpacingGlyph } from './glyphs/SpacingGlyph';
+import { NumberedKeySignatureGlyph } from './glyphs/NumberedKeySignatureGlyph';
 
 /**
- * This BarRenderer renders a bar using Slash Rhythm notation
+ * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
  */
-export class SlashBarRenderer extends LineBarRenderer {
-    public static readonly StaffId: string = 'slash';
+export class NumberedBarRenderer extends LineBarRenderer {
+    public static readonly StaffId: string = 'numbered';
 
     public simpleWhammyOverflow: number = 0;
 
+    private _isOnlyNumbered: boolean;
+
+
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
+        this._isOnlyNumbered = !bar.staff.showSlash && !bar.staff.showTablature && !bar.staff.showStandardNotation;
     }
 
     public override get lineSpacing(): number {
@@ -35,7 +42,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     public override get drawnLineCount(): number {
-        return 1;
+        return this._isOnlyNumbered ? 1 : 0;
     }
 
     protected override get bottomGlyphOverflow(): number {
@@ -44,8 +51,7 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas);
-        this.paintTuplets(cx, cy, canvas);
+        // TODO(numbered): this.paintTuplets(cx, cy, canvas);
     }
 
     public override doLayout(): void {
@@ -60,7 +66,7 @@ export class SlashBarRenderer extends LineBarRenderer {
                 }
             }
         }
-        if (hasTuplets) { 
+        if (hasTuplets) {
             this.registerOverflowTop(this.tupletSize);
         }
     }
@@ -98,14 +104,59 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override createLinePreBeatGlyphs(): void {
-        // TOOD: create glyphs if slash is the only notation
+        // Key signature
+        if (
+            this.index === 0 ||
+            (this.bar.previousBar && this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature)
+        ) {
+            this.createStartSpacing();
+            this.createKeySignatureGlyphs();
+        }
+
+        if (this._isOnlyNumbered) {
+            this.createStartSpacing();
+            this.createTimeSignatureGlyphs();
+        }
     }
+    private createKeySignatureGlyphs() {
+        this.addPreBeatGlyph(
+            new NumberedKeySignatureGlyph(
+                0,
+                this.getLineY(0),
+                this.bar.masterBar.keySignature,
+                this.bar.masterBar.keySignatureType
+            )
+        );
+    }
+
+    private createTimeSignatureGlyphs(): void {
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+
+        const lines = (this.bar.staff.tuning.length + 1) / 2 - 1;
+        this.addPreBeatGlyph(
+            new ScoreTimeSignatureGlyph(
+                0,
+                this.getLineY(lines),
+                this.bar.masterBar.timeSignatureNumerator,
+                this.bar.masterBar.timeSignatureDenominator,
+                this.bar.masterBar.timeSignatureCommon
+            )
+        );
+    }
+
+    protected override createPostBeatGlyphs(): void {
+        if(this._isOnlyNumbered) {
+            super.createBeatGlyphs();
+        }
+    }
+
+    // TODO(Numbered): create bar separator glyphs if only notation
 
     protected override createVoiceGlyphs(v: Voice): void {
         for (const b of v.beats) {
-            let container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
-            container.preNotes = new BeatGlyphBase();
-            container.onNotes = v.index == 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
+            let container: NumberedBeatContainerGlyph = new NumberedBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+            container.preNotes = v.index == 0 ? new NumberedBeatPreNotesGlyph() : new BeatGlyphBase();
+            container.onNotes = v.index == 0 ? new NumberedBeatGlyph() : new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);
         }
     }

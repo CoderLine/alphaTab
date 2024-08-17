@@ -13,7 +13,7 @@ export class AccidentalGlyph extends MusicFontGlyph {
         this._accidentalType = accidentalType;
     }
 
-    private static getMusicSymbol(accidentalType: AccidentalType): MusicFontSymbol {
+    public static getMusicSymbol(accidentalType: AccidentalType): MusicFontSymbol {
         switch (accidentalType) {
             case AccidentalType.Natural:
                 return MusicFontSymbol.AccidentalNatural;
