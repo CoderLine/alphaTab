@@ -1,4 +1,4 @@
-import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { NoteHeadGlyph } from './NoteHeadGlyph';
 import { Glyph } from './Glyph';
 import { Duration } from '@src/model';
@@ -24,6 +24,7 @@ export class NumberedNoteHeadGlyph extends Glyph {
         const res = this.renderer.resources;
         canvas.font = this._isGrace ? res.numberedNotationGraceFont : res.numberedNotationFont;
         canvas.textBaseline = TextBaseline.Middle;
+        canvas.textAlign = TextAlign.Left;
         canvas.fillText(this._number.toString(), cx + this.x, cy + this.y);
     }
 

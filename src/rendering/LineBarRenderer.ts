@@ -374,7 +374,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return true;
     }
 
-    private paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    protected paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         for (const beat of h.beats) {
             if (!this.shouldPaintFlag(beat, h)) {
                 continue;
@@ -546,7 +546,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    private paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             let beat: Beat = h.beats[i];
             if (!h.hasBeatLineX(beat)) {
@@ -637,7 +637,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    private static paintSingleBar(canvas: ICanvas, x1: number, y1: number, x2: number, y2: number, size: number): void {
+    protected static paintSingleBar(canvas: ICanvas, x1: number, y1: number, x2: number, y2: number, size: number): void {
         canvas.beginPath();
         canvas.moveTo(x1, y1);
         canvas.lineTo(x2, y2);

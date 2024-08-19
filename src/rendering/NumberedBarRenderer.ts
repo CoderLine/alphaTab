@@ -16,6 +16,9 @@ import { NumberedBeatGlyph, NumberedBeatPreNotesGlyph } from './glyphs/NumberedB
 import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
 import { SpacingGlyph } from './glyphs/SpacingGlyph';
 import { NumberedKeySignatureGlyph } from './glyphs/NumberedKeySignatureGlyph';
+import { ModelUtils } from '@src/model/ModelUtils';
+import { Duration } from '@src/model';
+import { BeatXPosition } from './BeatXPosition';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
@@ -26,7 +29,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     public simpleWhammyOverflow: number = 0;
 
     private _isOnlyNumbered: boolean;
-
+public shortestDuration = Duration.QuadrupleWhole;
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
@@ -51,6 +54,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
+        this.paintBeams(cx, cy, canvas);
         // TODO(numbered): this.paintTuplets(cx, cy, canvas);
     }
 
@@ -69,6 +73,85 @@ export class NumberedBarRenderer extends LineBarRenderer {
         if (hasTuplets) {
             this.registerOverflowTop(this.tupletSize);
         }
+
+        if (!this.bar.isEmpty) {
+            let barCount: number = ModelUtils.getIndex(this.shortestDuration) - 2;
+            if(barCount > 0) {
+                let barSpacing: number = NumberedBarRenderer.BarSpacing * this.scale;
+                let barSize: number = NumberedBarRenderer.BarSize * this.scale;
+
+                this.registerOverflowBottom((barCount - 1) * barSpacing + barSize);
+            }
+
+        }
+    }
+
+    private static BarSpacing = (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness);
+    public static BarSize = 2;
+    
+
+    protected override paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+        // TODO
+    }
+
+    protected override paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+        for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
+            let beat: Beat = h.beats[i];
+            //
+            // draw line
+            //
+            let barSpacing: number = NumberedBarRenderer.BarSpacing * this.scale;
+            let barSize: number = NumberedBarRenderer.BarSize * this.scale;
+            let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
+            let barStart: number = cy + this.y;
+
+            let beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes) - this.beatGlyphsStart;
+
+            var beamY = this.calculateBeamY(h, beatLineX);
+
+            for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
+                let barStartX: number = 0;
+                let barEndX: number = 0;
+                let barStartY: number = 0;
+                let barY: number = barStart + barIndex * barSpacing;
+                //
+                // Bar to Next?
+                //
+                // if (i < h.beats.length - 1) {
+                // full bar?
+                if (i === h.beats.length - 1) {
+                    barStartX = beatLineX;
+                    barEndX = this.getBeatX(beat, BeatXPosition.PostNotes) - this.beatGlyphsStart;
+                } else {
+                    barStartX = beatLineX;
+                    barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes) - this.beatGlyphsStart;
+                }
+
+                barStartY = (barY + beamY) | 0;
+                LineBarRenderer.paintSingleBar(
+                    canvas,
+                    cx + this.x + barStartX,
+                    barStartY,
+                    cx + this.x + barEndX,
+                    barStartY,
+                    barSize
+                );
+                // } else if (i > 0 && !BeamingHelper.isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
+                // barStartX = beatLineX - brokenBarOffset;
+                // barEndX = beatLineX;
+                // barStartY = barY + this.calculateBeamY(h, barStartX);
+                // barEndY = barY + this.calculateBeamY(h, barEndX);
+                // LineBarRenderer.paintSingleBar(
+                //     canvas,
+                //     cx + this.x + barStartX,
+                //     barStartY,
+                //     cx + this.x + barEndX,
+                //     barEndY,
+                //     barSize
+                // );
+                // }
+            }
+        }
     }
 
     public getNoteLine() {
@@ -84,7 +167,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
-        return BeamDirection.Up;
+        return BeamDirection.Down;
     }
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
@@ -96,7 +179,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override calculateBeamYWithDirection(_h: BeamingHelper, _x: number, _direction: BeamDirection): number {
-        return this.getLineY(0) - this.getFlagStemSize(_h.shortestDuration);
+        const res = this.resources.numberedNotationFont;
+        return (this.getLineY(0) + res.size * this.scale);
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
@@ -132,11 +216,10 @@ export class NumberedBarRenderer extends LineBarRenderer {
     private createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
 
-        const lines = (this.bar.staff.tuning.length + 1) / 2 - 1;
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
                 0,
-                this.getLineY(lines),
+                this.getLineY(0),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon
@@ -145,12 +228,10 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override createPostBeatGlyphs(): void {
-        if(this._isOnlyNumbered) {
+        if (this._isOnlyNumbered) {
             super.createBeatGlyphs();
         }
     }
-
-    // TODO(Numbered): create bar separator glyphs if only notation
 
     protected override createVoiceGlyphs(v: Voice): void {
         for (const b of v.beats) {
