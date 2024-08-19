@@ -15,14 +15,13 @@ import { AccidentalGlyph } from './AccidentalGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NoteHeadGlyph } from './NoteHeadGlyph';
 import { SpacingGlyph } from './SpacingGlyph';
-import { GlyphGroup } from './GlyphGroup';
 import { CircleGlyph } from './CircleGlyph';
 import { NumberedDashGlyph } from './NumberedDashGlyph';
 
 export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
     public isNaturalizeAccidental = false;
     public accidental: AccidentalType = AccidentalType.None;
-
+    
     public override doLayout(): void {
         if (!this.container.beat.isRest && !this.container.beat.isEmpty) {
             let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
@@ -87,6 +86,8 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
 
 export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: NumberedNoteHeadGlyph | null = null;
+
+    public octaveDots:number = 0;
 
     public override getNoteX(_note: Note, requestedPosition: NoteXPosition): number {
         if (this.noteHeads) {
@@ -181,8 +182,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         const glyphY = sr.getLineY(sr.getNoteLine());
 
         if (!this.container.beat.isEmpty) {
-            // TODO(Numbered): Calculate values respecting key signature and note height
-            let octave = 0;
             let numberWithinOctave = '0';
             if (this.container.beat.notes.length > 0) {
                 const kst: number = this.renderer.bar.masterBar.keySignatureType;
@@ -208,6 +207,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                     if (noteValue < 0) {
                         dots *= -1;
                     }
+                    this.octaveDots = dots;
+                    sr.registerOctave(dots);
 
                     const stepList =
                         ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
@@ -228,10 +229,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                         }
                     }
 
-                    numberWithinOctave = steps.toString(); //+ '(' + dots + ')';
+                    numberWithinOctave = steps.toString();
                 }
-
-                octave = 0;
             }
 
             const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
@@ -239,8 +238,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 0,
                 glyphY,
                 numberWithinOctave,
-                this.container.beat.duration,
-                this.container.beat.dots,
                 isGrace
             );
             this.noteHeads = noteHeadGlyph;

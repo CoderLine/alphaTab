@@ -1,7 +1,6 @@
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { NoteHeadGlyph } from './NoteHeadGlyph';
 import { Glyph } from './Glyph';
-import { Duration } from '@src/model';
 
 export class NumberedNoteHeadGlyph extends Glyph {
     public static readonly NoteHeadHeight: number = 17;
@@ -9,15 +8,11 @@ export class NumberedNoteHeadGlyph extends Glyph {
 
     private _isGrace: boolean;
     private _number: string;
-    private _duration: Duration;
-    private _dots: number;
 
-    public constructor(x: number, y: number, number: string, duration: Duration, dots: number, isGrace: boolean) {
+    public constructor(x: number, y: number, number: string, isGrace: boolean) {
         super(x, y);
         this._isGrace = isGrace;
         this._number = number;
-        this._duration = duration;
-        this._dots = dots;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

@@ -29,7 +29,23 @@ export class NumberedBarRenderer extends LineBarRenderer {
     public simpleWhammyOverflow: number = 0;
 
     private _isOnlyNumbered: boolean;
-public shortestDuration = Duration.QuadrupleWhole;
+    public shortestDuration = Duration.QuadrupleWhole;
+    public lowestOctave = -1000;
+    public highestOctave = -1000;
+
+    public registerOctave(octave: number) {
+        if (this.lowestOctave === -1000) {
+            this.lowestOctave = octave;
+            this.highestOctave = octave;
+        } else {
+            if (octave < this.lowestOctave) {
+                this.lowestOctave = octave;
+            }
+            if (octave > this.highestOctave) {
+                this.highestOctave = octave;
+            }
+        }
+    }
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
@@ -76,25 +92,43 @@ public shortestDuration = Duration.QuadrupleWhole;
 
         if (!this.bar.isEmpty) {
             let barCount: number = ModelUtils.getIndex(this.shortestDuration) - 2;
-            if(barCount > 0) {
+            if (barCount > 0) {
                 let barSpacing: number = NumberedBarRenderer.BarSpacing * this.scale;
                 let barSize: number = NumberedBarRenderer.BarSize * this.scale;
+                let barOverflow = (barCount - 1) * barSpacing + barSize;
 
-                this.registerOverflowBottom((barCount - 1) * barSpacing + barSize);
+                let dotOverflow = 0;
+                if (this.lowestOctave < 0) {
+                    dotOverflow =
+                        (Math.abs(this.lowestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize) *
+                        this.scale;
+                }
+
+                this.registerOverflowBottom(barOverflow + dotOverflow);
             }
 
+            if (this.highestOctave > 0) {
+                const dotOverflow =
+                    (Math.abs(this.highestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize) *
+                    this.scale;
+                this.registerOverflowTop(dotOverflow);
+            }
         }
     }
 
-    private static BarSpacing = (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness);
+    private static BarSpacing = BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness;
     public static BarSize = 2;
-    
+
+    private static DotSpacing = 5;
+    public static DotSize = 2;
 
     protected override paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
-        // TODO
+        this.paintBar(cx, cy, canvas, h);
     }
 
     protected override paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+        const res = this.resources;
+
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             let beat: Beat = h.beats[i];
             //
@@ -114,11 +148,6 @@ public shortestDuration = Duration.QuadrupleWhole;
                 let barEndX: number = 0;
                 let barStartY: number = 0;
                 let barY: number = barStart + barIndex * barSpacing;
-                //
-                // Bar to Next?
-                //
-                // if (i < h.beats.length - 1) {
-                // full bar?
                 if (i === h.beats.length - 1) {
                     barStartX = beatLineX;
                     barEndX = this.getBeatX(beat, BeatXPosition.PostNotes) - this.beatGlyphsStart;
@@ -136,20 +165,26 @@ public shortestDuration = Duration.QuadrupleWhole;
                     barStartY,
                     barSize
                 );
-                // } else if (i > 0 && !BeamingHelper.isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
-                // barStartX = beatLineX - brokenBarOffset;
-                // barEndX = beatLineX;
-                // barStartY = barY + this.calculateBeamY(h, barStartX);
-                // barEndY = barY + this.calculateBeamY(h, barEndX);
-                // LineBarRenderer.paintSingleBar(
-                //     canvas,
-                //     cx + this.x + barStartX,
-                //     barStartY,
-                //     cx + this.x + barEndX,
-                //     barEndY,
-                //     barSize
-                // );
-                // }
+            }
+
+            const onNotes = this.getBeatContainer(beat)!.onNotes;
+            let dotCount = (onNotes as NumberedBeatGlyph).octaveDots;
+            let dotsY = 0;
+            let dotsOffset = 0;
+            if (dotCount > 0) {
+                dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size / 1.5;
+                dotsOffset = NumberedBarRenderer.DotSpacing - 1 * this.scale;
+            } else if (dotCount < 0) {
+                dotsY = barStart + beamY + barCount * barSpacing;
+                dotsOffset = NumberedBarRenderer.DotSpacing * this.scale;
+            }
+            let dotX: number = this.getBeatX(beat, BeatXPosition.OnNotes) + 4 * this.scale - this.beatGlyphsStart;
+
+            dotCount = Math.abs(dotCount);
+
+            for (let i = 0; i < dotCount; i++) {
+                canvas.fillCircle(cx + this.x + dotX, dotsY, NumberedBarRenderer.DotSize * this.scale);
+                dotsY += dotsOffset;
             }
         }
     }
@@ -180,7 +215,7 @@ public shortestDuration = Duration.QuadrupleWhole;
 
     protected override calculateBeamYWithDirection(_h: BeamingHelper, _x: number, _direction: BeamDirection): number {
         const res = this.resources.numberedNotationFont;
-        return (this.getLineY(0) + res.size * this.scale);
+        return this.getLineY(0) + res.size * this.scale;
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
