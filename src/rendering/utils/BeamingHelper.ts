@@ -122,7 +122,7 @@ export class BeamingHelper {
     }
 
     public getBeatLineX(beat: Beat, direction?: BeamDirection): number {
-        direction ??= this.direction;
+        direction = direction ?? this.direction;
 
         if (this.hasBeatLineX(beat)) {
             if (direction === BeamDirection.Up) {
