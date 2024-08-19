@@ -305,40 +305,40 @@ export class AccidentalHelper {
                             }
                         }
                     }
-                    break;
-            }
 
-            if (skipAccidental) {
-                accidentalToSet = AccidentalType.None;
-            } else {
-                // do we need an accidental on the note?
-                if (accidentalToSet !== AccidentalType.None) {
-                    // if we already have an accidental on this line we will reset it if it's the same
-                    if (this._registeredAccidentals.has(line)) {
-                        if (this._registeredAccidentals.get(line) === accidentalToSet) {
-                            accidentalToSet = AccidentalType.None;
-                        }
-                    } 
-
-                    // register the new accidental on the line if any.
-                    if (accidentalToSet !== AccidentalType.None) {
-                        this._registeredAccidentals.set(line, accidentalToSet);
-                    }
-                } else {
-                    // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
-                    // and clear the registration
-                    if (this._registeredAccidentals.has(line)) {
-                        // if there is already a naturalize symbol on the line, we don't care.
-                        if (this._registeredAccidentals.get(line) === AccidentalType.Natural) {
-                            accidentalToSet = AccidentalType.None;
-                        } else {
-                            accidentalToSet = AccidentalType.Natural;
-                            this._registeredAccidentals.set(line, accidentalToSet);
-                        }
+                    if (skipAccidental) {
+                        accidentalToSet = AccidentalType.None;
                     } else {
-                        this._registeredAccidentals.delete(line);
+                        // do we need an accidental on the note?
+                        if (accidentalToSet !== AccidentalType.None) {
+                            // if we already have an accidental on this line we will reset it if it's the same
+                            if (this._registeredAccidentals.has(line)) {
+                                if (this._registeredAccidentals.get(line) === accidentalToSet) {
+                                    accidentalToSet = AccidentalType.None;
+                                }
+                            }
+
+                            // register the new accidental on the line if any.
+                            if (accidentalToSet !== AccidentalType.None) {
+                                this._registeredAccidentals.set(line, accidentalToSet);
+                            }
+                        } else {
+                            // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
+                            // and clear the registration
+                            if (this._registeredAccidentals.has(line)) {
+                                // if there is already a naturalize symbol on the line, we don't care.
+                                if (this._registeredAccidentals.get(line) === AccidentalType.Natural) {
+                                    accidentalToSet = AccidentalType.None;
+                                } else {
+                                    accidentalToSet = AccidentalType.Natural;
+                                    this._registeredAccidentals.set(line, accidentalToSet);
+                                }
+                            } else {
+                                this._registeredAccidentals.delete(line);
+                            }
+                        }
                     }
-                }
+                    break;
             }
         }
 
@@ -410,7 +410,7 @@ export class AccidentalHelper {
 
         return steps;
     }
-    
+
     public getNoteLine(n: Note): number {
         return this._appliedScoreLines.get(n.id)!;
     }
