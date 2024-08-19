@@ -182,7 +182,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
             dotCount = Math.abs(dotCount);
 
-            for (let i = 0; i < dotCount; i++) {
+            for (let d = 0; d < dotCount; d++) {
                 canvas.fillCircle(cx + this.x + dotX, dotsY, NumberedBarRenderer.DotSize * this.scale);
                 dotsY += dotsOffset;
             }
