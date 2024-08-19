@@ -71,7 +71,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
         this.paintBeams(cx, cy, canvas);
-        // TODO(numbered): this.paintTuplets(cx, cy, canvas);
+        this.paintTuplets(cx, cy, canvas, true);
     }
 
     public override doLayout(): void {
@@ -193,6 +193,10 @@ export class NumberedBarRenderer extends LineBarRenderer {
         return 0;
     }
 
+    public override get tupletOffset(): number {
+        return super.tupletOffset + this.resources.numberedNotationFont.size * this.scale; 
+    }
+
     protected override getFlagTopY(_beat: Beat): number {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
@@ -203,6 +207,10 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Down;
+    }
+
+    protected override getTupletBeamDirection(_helper: BeamingHelper): BeamDirection {
+        return BeamDirection.Up;
     }
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
