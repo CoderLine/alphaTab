@@ -11,7 +11,7 @@ appcompat = "1.7.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-alphaskia = "2.1.120"
+alphaskia = "2.3.120"
 nexus = "2.0.0"
 
 
