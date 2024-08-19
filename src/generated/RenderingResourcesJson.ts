@@ -41,6 +41,10 @@ export interface RenderingResourcesJson {
      */
     numberedNotationFont?: FontJson;
     /**
+     * Gets or sets the font to use for displaying the grace notes in numbered music notation in the music sheet.
+     */
+    numberedNotationGraceFont?: FontJson;
+    /**
      * Gets or sets the font to use for displaying the guitar tablature numbers in the music sheet.
      */
     tablatureFont?: FontJson;

@@ -26,6 +26,7 @@ export class RenderingResourcesSerializer {
         o.set("effectfont", Font.toJson(obj.effectFont));
         o.set("fretboardnumberfont", Font.toJson(obj.fretboardNumberFont));
         o.set("numberednotationfont", Font.toJson(obj.numberedNotationFont));
+        o.set("numberednotationgracefont", Font.toJson(obj.numberedNotationGraceFont));
         o.set("tablaturefont", Font.toJson(obj.tablatureFont));
         o.set("gracefont", Font.toJson(obj.graceFont));
         o.set("stafflinecolor", Color.toJson(obj.staffLineColor));
@@ -61,6 +62,9 @@ export class RenderingResourcesSerializer {
                 return true;
             case "numberednotationfont":
                 obj.numberedNotationFont = Font.fromJson(v)!;
+                return true;
+            case "numberednotationgracefont":
+                obj.numberedNotationGraceFont = Font.fromJson(v)!;
                 return true;
             case "tablaturefont":
                 obj.tablatureFont = Font.fromJson(v)!;

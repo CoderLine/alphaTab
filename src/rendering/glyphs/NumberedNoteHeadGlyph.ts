@@ -22,7 +22,7 @@ export class NumberedNoteHeadGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const res = this.renderer.resources;
-        canvas.font = res.numberedNotationFont;
+        canvas.font = this._isGrace ? res.numberedNotationGraceFont : res.numberedNotationFont;
         canvas.textBaseline = TextBaseline.Middle;
         canvas.fillText(this._number.toString(), cx + this.x, cy + this.y);
     }

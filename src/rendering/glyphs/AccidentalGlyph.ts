@@ -1,15 +1,12 @@
 import { AccidentalType } from '@src/model/AccidentalType';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class AccidentalGlyph extends MusicFontGlyph {
-    private _isGrace: boolean;
     private _accidentalType: AccidentalType;
 
-    public constructor(x: number, y: number, accidentalType: AccidentalType, isGrace: boolean = false) {
-        super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, AccidentalGlyph.getMusicSymbol(accidentalType));
-        this._isGrace = isGrace;
+    public constructor(x: number, y: number, accidentalType: AccidentalType, scale: number) {
+        super(x, y, scale, AccidentalGlyph.getMusicSymbol(accidentalType));
         this._accidentalType = accidentalType;
     }
 
@@ -44,6 +41,6 @@ export class AccidentalGlyph extends MusicFontGlyph {
                 this.width = 8;
                 break;
         }
-        this.width = this.width * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+        this.width = this.width * this.glyphScale * this.scale;
     }
 }

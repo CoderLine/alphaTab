@@ -13,6 +13,7 @@ import { BeatGlyphBase } from './BeatGlyphBase';
 import { AccidentalGroupGlyph } from './AccidentalGroupGlyph';
 import { AccidentalGlyph } from './AccidentalGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { NoteHeadGlyph } from './NoteHeadGlyph';
 
 export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
     public isNaturalizeAccidental = false;
@@ -61,7 +62,14 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                     this.accidental = accidentalToSet;
                     let sr: NumberedBarRenderer = this.renderer as NumberedBarRenderer;
 
-                    let g = new AccidentalGlyph(0, sr.getLineY(0), accidentalToSet, true);
+                    let g = new AccidentalGlyph(
+                        0,
+                        sr.getLineY(0),
+                        accidentalToSet,
+                        note.beat.graceType !== GraceType.None
+                            ? NoteHeadGlyph.GraceScale * NoteHeadGlyph.GraceScale
+                            : NoteHeadGlyph.GraceScale
+                    );
                     g.renderer = this.renderer;
                     accidentals.addGlyph(g);
                     this.addGlyph(accidentals);
@@ -179,27 +187,36 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 const oneNoteValue = oneNoteValues[ksi];
 
                 const note = this.container.beat.notes[0];
-                let noteValue = note.displayValue - oneNoteValue;
 
-                let index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
+                if (note.isDead) {
+                    numberWithinOctave = 'X';
+                } else {
+                    let noteValue = note.displayValue - oneNoteValue;
 
-                const stepList =
-                    ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
-                        ? AccidentalHelper.FlatNoteSteps
-                        : AccidentalHelper.SharpNoteSteps;
+                    let index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
 
-                let steps = stepList[index] + 1;
+                    const stepList =
+                        ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
+                            ? AccidentalHelper.FlatNoteSteps
+                            : AccidentalHelper.SharpNoteSteps;
 
-                const hasAccidental = AccidentalHelper.AccidentalNotes[index];
-                if (hasAccidental && !(this.container.preNotes as NumberedBeatPreNotesGlyph).isNaturalizeAccidental) {
-                    if (ksi < 7) {
-                        steps++;
-                    } else {
-                        steps--;
+                    let steps = stepList[index] + 1;
+
+                    const hasAccidental = AccidentalHelper.AccidentalNotes[index];
+                    if (
+                        hasAccidental &&
+                        !(this.container.preNotes as NumberedBeatPreNotesGlyph).isNaturalizeAccidental
+                    ) {
+                        if (ksi < 7) {
+                            steps++;
+                        } else {
+                            steps--;
+                        }
                     }
+
+                    numberWithinOctave = steps.toString();
                 }
 
-                numberWithinOctave = steps.toString();
                 octave = 0;
             }
 
