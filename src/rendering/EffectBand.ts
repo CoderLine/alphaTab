@@ -19,6 +19,7 @@ export class EffectBand extends Glyph {
     public firstBeat: Beat | null = null;
     public lastBeat: Beat | null = null;
     public override height: number = 0;
+    public originalHeight: number = 0;
     public voice: Voice;
     public info: EffectBarRendererInfo;
     public slot: EffectBandSlot | null = null;
@@ -66,8 +67,13 @@ export class EffectBand extends Glyph {
             let glyph: EffectGlyph = this.createOrResizeGlyph(this.info.sizingMode, beat);
             if (glyph.height > this.height) {
                 this.height = glyph.height;
+                this.originalHeight = glyph.height;
             }
         }
+    }
+
+    public resetHeight() {
+        this.height = this.originalHeight;
     }
 
     private createOrResizeGlyph(sizing: EffectBarGlyphSizing, b: Beat): EffectGlyph {
