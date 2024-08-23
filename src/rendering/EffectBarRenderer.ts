@@ -72,6 +72,7 @@ export class EffectBarRenderer extends BarRendererBase {
             this.sizingInfo = new EffectBandSizingInfo();
         }
         for (let effectBand of this._bands) {
+            effectBand.resetHeight();
             effectBand.alignGlyphs();
             if (!effectBand.isEmpty) {
                 // find a slot that ended before the start of the band
