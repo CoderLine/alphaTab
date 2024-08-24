@@ -318,6 +318,14 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
+    public setChannelTranspositionPitch(channel: number, semitones: number): void {
+        this._synth.postMessage({
+            cmd: 'alphaSynth.setChannelTranspositionPitch',
+            channel: channel,
+            semitones: semitones
+        });
+    }
+
     public setChannelMute(channel: number, mute: boolean): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.setChannelMute',

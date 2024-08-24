@@ -115,6 +115,9 @@ export class AlphaSynthWebWorker {
             case 'alphaSynth.setChannelMute':
                 this._player.setChannelMute(data.channel, data.mute);
                 break;
+            case 'alphaSynth.setChannelTranspositionPitch':
+                this._player.setChannelTranspositionPitch(data.channel, data.semitones);
+                break;
             case 'alphaSynth.setChannelSolo':
                 this._player.setChannelSolo(data.channel, data.solo);
                 break;

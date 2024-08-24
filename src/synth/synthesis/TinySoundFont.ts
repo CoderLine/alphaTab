@@ -2,7 +2,18 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
-import { ControlChangeEvent, MidiEvent, MidiEventType, NoteBendEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
+import {
+    ControlChangeEvent,
+    MidiEvent,
+    MidiEventType,
+    NoteBendEvent,
+    NoteOffEvent,
+    NoteOnEvent,
+    PitchBendEvent,
+    ProgramChangeEvent,
+    TempoChangeEvent,
+    TimeSignatureEvent
+} from '@src/midi/MidiEvent';
 import {
     Hydra,
     HydraIbag,
@@ -41,7 +52,11 @@ export class TinySoundFont {
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
     private _isAnySolo: boolean = false;
+
+    // these are the transposition pitches applied generally on the song (via Settings or general transposition)
     private _transpositionPitches: Map<number, number> = new Map<number, number>();
+    // these are the transposition pitches only applied on playback (adjusting the pitch only during playback)
+    private _liveTranspositionPitches: Map<number, number> = new Map<number, number>();
 
     public currentTempo: number = 0;
     public timeSignatureNumerator: number = 0;
@@ -95,30 +110,58 @@ export class TinySoundFont {
     public resetChannelStates(): void {
         this._mutedChannels = new Map<number, boolean>();
         this._soloChannels = new Map<number, boolean>();
+        this._liveTranspositionPitches = new Map<number, number>();
 
         this.applyTranspositionPitches(new Map<number, number>());
         this._isAnySolo = false;
     }
 
+    public setChannelTranspositionPitch(channel: number, semitones: number): void {
+        let previousTransposition = 0;
+        if(this._liveTranspositionPitches.has(channel)) {
+            previousTransposition = this._liveTranspositionPitches.get(channel)!;
+        }
+
+        if (semitones === 0) {
+            this._liveTranspositionPitches.delete(channel);
+        } else {
+            this._liveTranspositionPitches.set(channel, semitones);
+        }
+
+        for (const voice of this._voices) {
+            if (voice.playingChannel === channel && voice.playingChannel !== 9 /*percussion*/) {
+                let pitchDifference = 0;
+                pitchDifference -= previousTransposition;
+                pitchDifference += semitones;
+
+                voice.playingKey += pitchDifference;
+
+                if (this._channels) {
+                    voice.updatePitchRatio(this._channels!.channelList[voice.playingChannel], this.outSampleRate);
+                }
+            }
+        }
+    }
+
     public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
-        // dynamically adjust actively playing voices to the new pitch they have. 
-        // we are not updating the used preset and regions though. 
+        // dynamically adjust actively playing voices to the new pitch they have.
+        // we are not updating the used preset and regions though.
         const previousTransposePitches = this._transpositionPitches;
         for (const voice of this._voices) {
             if (voice.playingChannel >= 0 && voice.playingChannel !== 9 /*percussion*/) {
                 let pitchDifference = 0;
 
-                if(previousTransposePitches.has(voice.playingChannel)) {
+                if (previousTransposePitches.has(voice.playingChannel)) {
                     pitchDifference -= previousTransposePitches.get(voice.playingChannel)!;
                 }
-                
-                if(transpositionPitches.has(voice.playingChannel)) {
+
+                if (transpositionPitches.has(voice.playingChannel)) {
                     pitchDifference += transpositionPitches.get(voice.playingChannel)!;
                 }
 
                 voice.playingKey += pitchDifference;
 
-                if(this._channels) {
+                if (this._channels) {
                     voice.updatePitchRatio(this._channels!.channelList[voice.playingChannel], this.outSampleRate);
                 }
             }
@@ -157,8 +200,9 @@ export class TinySoundFont {
                 const channel: number = voice.playingChannel;
                 // channel is muted if it is either explicitley muted, or another channel is set to solo but not this one.
                 // exception. metronome is implicitly added in solo
-                const isChannelMuted: boolean = this._mutedChannels.has(channel)
-                    || (anySolo && channel != SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
+                const isChannelMuted: boolean =
+                    this._mutedChannels.has(channel) ||
+                    (anySolo && channel != SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
 
                 if (!buffer) {
                     voice.kill();
@@ -172,14 +216,14 @@ export class TinySoundFont {
     }
 
     private processMidiMessage(e: MidiEvent): void {
-        Logger.debug('MIdi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick)
+        Logger.debug('MIdi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick);
         const command: MidiEventType = e.type;
         switch (command) {
             case MidiEventType.TimeSignature:
-                const timeSignature = (e as TimeSignatureEvent);
+                const timeSignature = e as TimeSignatureEvent;
                 this.timeSignatureNumerator = timeSignature.numerator;
                 this.timeSignatureDenominator = Math.pow(2, timeSignature.denominatorIndex);
-                break
+                break;
             case MidiEventType.NoteOn:
                 const noteOn = e as NoteOnEvent;
                 this.channelNoteOn(noteOn.channel, noteOn.noteKey, noteOn.noteVelocity / 127.0);
@@ -197,7 +241,7 @@ export class TinySoundFont {
                 this.channelSetPresetNumber(programChange.channel, programChange.program, programChange.channel === 9);
                 break;
             case MidiEventType.TempoChange:
-                const tempoChange = e as TempoChangeEvent
+                const tempoChange = e as TempoChangeEvent;
                 this.currentTempo = 60000000 / tempoChange.microSecondsPerQuarterNote;
                 break;
             case MidiEventType.PitchBend:
@@ -229,7 +273,6 @@ export class TinySoundFont {
             this.channelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
         }
     }
-
 
     public get masterVolume(): number {
         return SynthHelper.decibelsToGain(this.globalGainDb);
@@ -517,7 +560,7 @@ export class TinySoundFont {
             if (voice.playingPreset !== -1) {
                 if (immediate) {
                     voice.endQuick(this.outSampleRate);
-                } else if(voice.ampEnv.segment < VoiceEnvelopeSegment.Release) {
+                } else if (voice.ampEnv.segment < VoiceEnvelopeSegment.Release) {
                     voice.end(this.outSampleRate);
                 }
             }
@@ -615,6 +658,10 @@ export class TinySoundFont {
             key += this._transpositionPitches.get(channel)!;
         }
 
+        if(this._liveTranspositionPitches.has(channel)) {
+            key += this._liveTranspositionPitches.get(channel)!;
+        }
+
         this._channels.activeChannel = channel;
         this.noteOn(this._channels.channelList[channel].presetIndex, key, vel);
     }
@@ -627,6 +674,9 @@ export class TinySoundFont {
     public channelNoteOff(channel: number, key: number): void {
         if (this._transpositionPitches.has(channel)) {
             key += this._transpositionPitches.get(channel)!;
+        }
+        if (this._liveTranspositionPitches.has(channel)) {
+            key += this._liveTranspositionPitches.get(channel)!;
         }
 
         const matches: Voice[] = [];
@@ -749,7 +799,7 @@ export class TinySoundFont {
             presetIndex = this.getPresetIndex(c.bank & 0x7ff, presetNumber);
         }
         c.presetIndex = presetIndex;
-        return (presetIndex !== -1);
+        return presetIndex !== -1;
     }
 
     /**
@@ -844,6 +894,9 @@ export class TinySoundFont {
     public channelSetPerNotePitchWheel(channel: number, key: number, pitchWheel: number): void {
         if (this._transpositionPitches.has(channel)) {
             key += this._transpositionPitches.get(channel)!;
+        }
+        if (this._liveTranspositionPitches.has(channel)) {
+            key += this._liveTranspositionPitches.get(channel)!;
         }
 
         const c: Channel = this.channelInit(channel);
