@@ -48,7 +48,7 @@ export class TextGlyph extends EffectGlyph {
         let oldBaseLine = canvas.textBaseline;
         canvas.textAlign = this.textAlign;
         if (this.textBaseline !== null) {
-            canvas.textBaseline = this.textBaseline;
+            canvas.textBaseline = this.textBaseline!;
         }
         let y: number = cy + this.y;
         for (let i = 0; i < this._lines.length; i++) {

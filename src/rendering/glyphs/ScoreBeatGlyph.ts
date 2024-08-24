@@ -252,27 +252,27 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         }
 
-        const effectContainer = this.noteHeads!.belowBeatEffects;
+        const belowBeatEffects = this.noteHeads!.belowBeatEffects;
 
-        if (n.isStaccato && !effectContainer.has('Staccato')) {
-            effectContainer.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
+        if (n.isStaccato && !belowBeatEffects.has('Staccato')) {
+            belowBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
         }
-        if (n.accentuated === AccentuationType.Normal && !effectContainer.has('Accent')) {
-            effectContainer.set('Accent', new AccentuationGlyph(0, 0, n));
+        if (n.accentuated === AccentuationType.Normal && !belowBeatEffects.has('Accent')) {
+            belowBeatEffects.set('Accent', new AccentuationGlyph(0, 0, n));
         }
-        if (n.accentuated === AccentuationType.Heavy && !effectContainer.has('HAccent')) {
-            effectContainer.set('HAccent', new AccentuationGlyph(0, 0, n));
+        if (n.accentuated === AccentuationType.Heavy && !belowBeatEffects.has('HAccent')) {
+            belowBeatEffects.set('HAccent', new AccentuationGlyph(0, 0, n));
         }
-        if (n.accentuated === AccentuationType.Tenuto && !effectContainer.has('Tenuto')) {
-            effectContainer.set('Tenuto', new AccentuationGlyph(0, 0, n));
+        if (n.accentuated === AccentuationType.Tenuto && !belowBeatEffects.has('Tenuto')) {
+            belowBeatEffects.set('Tenuto', new AccentuationGlyph(0, 0, n));
         }
         if (n.showStringNumber && n.isStringed) {
             let container:StringNumberContainerGlyph;
-            if (!effectContainer.has('StringNumber')) {
+            if (!belowBeatEffects.has('StringNumber')) {
                 container = new StringNumberContainerGlyph(0, 0);
-                effectContainer.set('StringNumber', container);
+                belowBeatEffects.set('StringNumber', container);
             } else {
-                container = effectContainer.get('StringNumber')! as StringNumberContainerGlyph;
+                container = belowBeatEffects.get('StringNumber')! as StringNumberContainerGlyph;
             }
             container.addString(n.string);
         }

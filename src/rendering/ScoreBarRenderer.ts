@@ -91,15 +91,17 @@ export class ScoreBarRenderer extends LineBarRenderer {
             let bottom: number = this.getScoreY(10);
             let whammyOffset: number = this.simpleWhammyOverflow;
 
-            if (this.beatEffectsMinY != null) {
-                const beatEffectTopOverflow = top - this.beatEffectsMinY!;
+            const beatEffectsMinY = this.beatEffectsMinY;
+            if (beatEffectsMinY != null) {
+                const beatEffectTopOverflow = top - beatEffectsMinY!;
                 if (beatEffectTopOverflow > 0) {
                     this.registerOverflowTop(beatEffectTopOverflow);
                 }
             }
 
-            if (this.beatEffectsMaxY != null) {
-                const beatEffectBottomOverflow = this.beatEffectsMaxY! - bottom;
+            const beatEffectsMaxY = this.beatEffectsMaxY;
+            if (beatEffectsMaxY != null) {
+                const beatEffectBottomOverflow = beatEffectsMaxY! - bottom;
                 if (beatEffectBottomOverflow > 0) {
                     this.registerOverflowBottom(beatEffectBottomOverflow);
                 }
