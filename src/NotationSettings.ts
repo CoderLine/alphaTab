@@ -127,7 +127,7 @@ export enum NotationElement {
      * The track names which are shown in the accolade.
      */
     TrackNames,
-    
+
     /**
      * The chord diagrams for guitars. Usually shown
      * below the score info.
@@ -287,7 +287,12 @@ export enum NotationElement {
     /**
      * The left hand tap symbol shown above the staff.
      */
-    EffectLeftHandTap
+    EffectLeftHandTap,
+
+    /**
+     * The "Free time" text shown above the staff.
+     */
+    EffectFreeTime
 }
 
 /**

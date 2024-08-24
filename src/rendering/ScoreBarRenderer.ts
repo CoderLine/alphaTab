@@ -390,7 +390,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
             (this.bar.previousBar &&
                 this.bar.masterBar.timeSignatureNumerator !== this.bar.previousBar.masterBar.timeSignatureNumerator) ||
             (this.bar.previousBar &&
-                this.bar.masterBar.timeSignatureDenominator !== this.bar.previousBar.masterBar.timeSignatureDenominator)
+                this.bar.masterBar.timeSignatureDenominator !==
+                    this.bar.previousBar.masterBar.timeSignatureDenominator) ||
+            (this.bar.previousBar &&
+                this.bar.masterBar.isFreeTime &&
+                this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime)
         ) {
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
@@ -470,7 +474,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.getScoreY(lines),
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
-                this.bar.masterBar.timeSignatureCommon
+                this.bar.masterBar.timeSignatureCommon,
+                this.bar.masterBar.isFreeTime,
             )
         );
     }

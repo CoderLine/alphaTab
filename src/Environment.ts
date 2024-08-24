@@ -62,6 +62,7 @@ import { Settings } from './Settings';
 import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
 import { SlashBarRendererFactory } from './rendering/SlashBarRendererFactory';
 import { NumberedBarRendererFactory } from './rendering/NumberedBarRendererFactory';
+import { FreeTimeEffectInfo } from './rendering/effects/FreeTimeEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -484,6 +485,7 @@ export class Environment {
                 new TempoEffectInfo(),
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
+                new FreeTimeEffectInfo(),
                 new TextEffectInfo(),
                 new ChordsEffectInfo()
             ]),

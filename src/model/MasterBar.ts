@@ -92,6 +92,11 @@ export class MasterBar {
     public timeSignatureCommon: boolean = false;
 
     /**
+     * Gets or sets whether the bar indicates a free time playing.
+     */
+    public isFreeTime: boolean = false;
+
+    /**
      * Gets or sets the triplet feel that is valid for this bar.
      */
     public tripletFeel: TripletFeel = TripletFeel.NoTripletFeel;
@@ -148,7 +153,7 @@ export class MasterBar {
     /**
      * An absolute width of the bar to use when displaying in a multi-track layout.
      */
-    public displayWidth:number = -1;    
+    public displayWidth: number = -1;
 
     /**
      * Calculates the time spent in this bar. (unit: midi ticks)

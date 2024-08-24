@@ -885,7 +885,10 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (name === 'defaults') {
                     for (const [defaultName, defaultValue] of PercussionMapper.instrumentArticulationNames) {
                         this._percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
-                        this._percussionArticulationNames.set(AlphaTexImporter.toArticulationId(defaultName), defaultValue);
+                        this._percussionArticulationNames.set(
+                            AlphaTexImporter.toArticulationId(defaultName),
+                            defaultValue
+                        );
                     }
                     return true;
                 }
@@ -910,12 +913,12 @@ export class AlphaTexImporter extends ScoreImporter {
                 return false;
         }
     }
-    
+
     /**
      * Encodes a given string to a shorthand text form without spaces or special characters
      */
     private static toArticulationId(plain: string): string {
-        return plain.replace(new RegExp("[^a-zA-Z0-9]", "g"), "").toLowerCase()
+        return plain.replace(new RegExp('[^a-zA-Z0-9]', 'g'), '').toLowerCase();
     }
 
     private applyPercussionStaff(staff: Staff) {
@@ -1215,7 +1218,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private beat(voice: Voice): boolean {
-        // duration specifier?       
+        // duration specifier?
         this.beatDuration();
 
         let beat: Beat = new Beat();
@@ -1506,7 +1509,7 @@ export class AlphaTexImporter extends ScoreImporter {
             beat.crescendo = CrescendoType.Crescendo;
         } else if (syData === 'dec') {
             beat.crescendo = CrescendoType.Decrescendo;
-        } else if(syData === 'tempo') {
+        } else if (syData === 'tempo') {
             // NOTE: playbackRatio is calculated on score finish when playback positions are known
             const tempoAutomation = this.readTempoAutomation();
             beat.automations.push(tempoAutomation);
@@ -1604,7 +1607,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 fret = this._syData as number;
                 if (this._currentStaff.isPercussion && !PercussionMapper.instrumentArticulations.has(fret)) {
                     this.errorMessage(`Unknown percussion articulation ${fret}`);
-                } 
+                }
                 break;
             case AlphaTexSymbols.String:
                 if (this._currentStaff.isPercussion) {
@@ -1929,6 +1932,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 master.timeSignatureDenominator = this._syData as number;
                 this._sy = this.newSy();
+            } else if (syData == 'ft') {
+                master.isFreeTime = true;
             } else if (syData === 'ro') {
                 master.isRepeatStart = true;
                 this._sy = this.newSy();
