@@ -1548,6 +1548,12 @@ export class GpifWriter {
             'Time'
         ).innerText = `${masterBar.timeSignatureNumerator}/${masterBar.timeSignatureDenominator}`;
 
+        if(masterBar.isFreeTime) {
+            masterBarNode.addElement(
+                'FreeTime'
+            );
+        }
+
         let bars: string[] = [];
         for (const tracks of masterBar.score.tracks) {
             for (const staves of tracks.staves) {
