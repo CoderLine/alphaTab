@@ -99,15 +99,61 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public override doLayout(): void {
         super.doLayout();
+        let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+
         let direction: BeamDirection = this.direction;
+        let aboveBeatEffectsY = 0;
+        let belowBeatEffectsY = 0;
+        let belowEffectSpacing = 1;
+        let aboveEffectSpacing = -belowEffectSpacing;
+
+        if (this.direction === BeamDirection.Up) {
+            belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line);
+            aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
+        } else {
+            belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line - 1);
+            aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line + 1);
+            aboveEffectSpacing *= -1;
+            belowEffectSpacing *= -1;
+        }
+
+        let minEffectY: number | null = null;
+        let maxEffectY: number | null = null;
+
         for (const effect of this.aboveBeatEffects.values()) {
             effect.renderer = this.renderer;
             effect.doLayout();
+
+            aboveBeatEffectsY += aboveEffectSpacing * effect.height;
+            effect.y = aboveBeatEffectsY;
+            if (minEffectY === null || minEffectY > aboveBeatEffectsY) {
+                minEffectY = aboveBeatEffectsY;
+            }
+            if (maxEffectY === null || maxEffectY < aboveBeatEffectsY) {
+                maxEffectY = aboveBeatEffectsY;
+            }
         }
+
         for (const effect of this.belowBeatEffects.values()) {
             effect.renderer = this.renderer;
             effect.doLayout();
+
+            belowBeatEffectsY += belowEffectSpacing * effect.height;
+            effect.y = belowBeatEffectsY;
+
+            if (minEffectY === null || minEffectY > belowBeatEffectsY) {
+                minEffectY = belowBeatEffectsY;
+            }
+            if (maxEffectY === null || maxEffectY < belowBeatEffectsY) {
+                maxEffectY = belowBeatEffectsY;
+            }
         }
+
+        if(minEffectY !== null) {
+            scoreRenderer.registerBeatEffectOverflows(minEffectY, maxEffectY ?? 0);
+        }
+
+
         if (this.beat.isTremolo) {
             let offset: number = 0;
             let baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
@@ -133,7 +179,6 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         }
     }
 
-
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         for (let note of this._notes) {
             if (this._noteGlyphLookup.has(note.id)) {
@@ -151,34 +196,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        // TODO: this method seems to be quite heavy according to the profiler, why?
-        let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        //
-        // Note Effects only painted once
-        //
-        let aboveBeatEffectsY = 0;
-        let belowBeatEffectsY = 0;
-        let belowEffectSpacing = 1;
-        let aboveEffectSpacing = -belowEffectSpacing;
-
-        if (this.beamingHelper.direction === BeamDirection.Up) {
-            belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line);
-            aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
-        } else {
-            belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 1);
-            aboveBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line + 1);
-            aboveEffectSpacing *= -1;
-            belowEffectSpacing *= -1;
-        }
-
         for (const g of this.aboveBeatEffects.values()) {
-            aboveBeatEffectsY += aboveEffectSpacing * g.height;
-            g.paint(cx + this.x + 2 * this.scale, cy + this.y + aboveBeatEffectsY, canvas);
+            g.paint(cx + this.x + 2 * this.scale, cy + this.y, canvas);
         }
-
         for (const g of this.belowBeatEffects.values()) {
-            belowBeatEffectsY += belowEffectSpacing * g.height;
-            g.paint(cx + this.x + 2 * this.scale, cy + this.y + belowBeatEffectsY, canvas);
+            g.paint(cx + this.x + 2 * this.scale, cy + this.y, canvas);
         }
         super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {

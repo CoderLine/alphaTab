@@ -34,6 +34,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public simpleWhammyOverflow: number = 0;
 
+    public beatEffectsMinY: number | null = null;
+    public beatEffectsMaxY: number | null = null;
+
     public accidentalHelper: AccidentalHelper;
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
@@ -51,6 +54,15 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public override get drawnLineCount(): number {
         return this.bar.staff.standardNotationLineCount;
+    }
+
+    public registerBeatEffectOverflows(beatEffectsMinY: number, beatEffectsMaxY: number) {
+        if (this.beatEffectsMinY == null || beatEffectsMinY < this.beatEffectsMinY) {
+            this.beatEffectsMinY = beatEffectsMinY;
+        }
+        if (this.beatEffectsMaxY == null || beatEffectsMaxY > this.beatEffectsMaxY) {
+            this.beatEffectsMaxY = beatEffectsMaxY;
+        }
     }
 
     /**
@@ -78,7 +90,23 @@ export class ScoreBarRenderer extends LineBarRenderer {
             let top: number = this.getScoreY(-2);
             let bottom: number = this.getScoreY(10);
             let whammyOffset: number = this.simpleWhammyOverflow;
+
+            if (this.beatEffectsMinY != null) {
+                const beatEffectTopOverflow = top - this.beatEffectsMinY!;
+                if (beatEffectTopOverflow > 0) {
+                    this.registerOverflowTop(beatEffectTopOverflow);
+                }
+            }
+
+            if (this.beatEffectsMaxY != null) {
+                const beatEffectBottomOverflow = this.beatEffectsMaxY! - bottom;
+                if (beatEffectBottomOverflow > 0) {
+                    this.registerOverflowBottom(beatEffectBottomOverflow);
+                }
+            }
+
             this.registerOverflowTop(whammyOffset);
+
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine);
             let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
             if (maxNoteHelper.direction === BeamDirection.Up) {
