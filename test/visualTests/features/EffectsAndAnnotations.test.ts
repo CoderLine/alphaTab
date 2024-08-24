@@ -119,4 +119,16 @@ describe('EffectsAndAnnotationsTests', () => {
     it('free-time', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/free-time.gp');
     });
+
+    it('fingering-new', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/fingering-new.gp');
+    });
+
+    it('accentuations', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/accentuations.gp');
+    });
+
+    it('string-numbers', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/string-numbers.gp');
+    });
 });
