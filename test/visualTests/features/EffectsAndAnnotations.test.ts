@@ -115,4 +115,8 @@ describe('EffectsAndAnnotationsTests', () => {
     it('triplet-feel', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/triplet-feel.gp');
     });
+
+    it('free-time', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/free-time.gp');
+    });
 });

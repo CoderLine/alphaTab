@@ -35,6 +35,7 @@ export class MasterBarSerializer {
         o.set("timesignaturenumerator", obj.timeSignatureNumerator);
         o.set("timesignaturedenominator", obj.timeSignatureDenominator);
         o.set("timesignaturecommon", obj.timeSignatureCommon);
+        o.set("isfreetime", obj.isFreeTime);
         o.set("tripletfeel", obj.tripletFeel as number);
         o.set("section", SectionSerializer.toJson(obj.section));
         o.set("tempoautomations", obj.tempoAutomations.map(i => AutomationSerializer.toJson(i)));
@@ -79,6 +80,9 @@ export class MasterBarSerializer {
                 return true;
             case "timesignaturecommon":
                 obj.timeSignatureCommon = v! as boolean;
+                return true;
+            case "isfreetime":
+                obj.isFreeTime = v! as boolean;
                 return true;
             case "tripletfeel":
                 obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(v, TripletFeel)!;

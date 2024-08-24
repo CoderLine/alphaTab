@@ -1157,6 +1157,9 @@ export class GpifParser {
                         masterBar.timeSignatureNumerator = parseInt(timeParts[0]);
                         masterBar.timeSignatureDenominator = parseInt(timeParts[1]);
                         break;
+                    case 'FreeTime':
+                        masterBar.isFreeTime = true;
+                        break;
                     case 'DoubleBar':
                         masterBar.isDoubleBar = true;
                         break;

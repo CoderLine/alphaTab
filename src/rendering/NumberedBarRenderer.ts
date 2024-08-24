@@ -259,13 +259,15 @@ export class NumberedBarRenderer extends LineBarRenderer {
     private createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
 
+        const masterBar = this.bar.masterBar;
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
                 0,
                 this.getLineY(0),
-                this.bar.masterBar.timeSignatureNumerator,
-                this.bar.masterBar.timeSignatureDenominator,
-                this.bar.masterBar.timeSignatureCommon
+                masterBar.timeSignatureNumerator,
+                masterBar.timeSignatureDenominator,
+                masterBar.timeSignatureCommon,
+                masterBar.isFreeTime && masterBar.previousMasterBar == null || masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime,
             )
         );
     }
