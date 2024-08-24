@@ -1075,6 +1075,7 @@ export class AlphaTexImporter extends ScoreImporter {
         let showStandardNotation: boolean = false;
         let showTabs: boolean = false;
         let showSlash: boolean = false;
+        let showNumbered: boolean = false;
         while (this._sy === AlphaTexSymbols.String) {
             switch ((this._syData as string).toLowerCase()) {
                 case 'score':
@@ -1089,15 +1090,20 @@ export class AlphaTexImporter extends ScoreImporter {
                     showSlash = true;
                     this._sy = this.newSy();
                     break;
+                case 'numbered':
+                    showNumbered = true;
+                    this._sy = this.newSy();
+                    break;
                 default:
                     this.error('staff-properties', AlphaTexSymbols.String, false);
                     break;
             }
         }
-        if (showStandardNotation || showTabs || showSlash) {
+        if (showStandardNotation || showTabs || showSlash || showNumbered) {
             this._currentStaff.showStandardNotation = showStandardNotation;
             this._currentStaff.showTablature = showTabs;
             this._currentStaff.showSlash = showSlash;
+            this._currentStaff.showNumbered = showNumbered;
         }
         if (this._sy !== AlphaTexSymbols.RBrace) {
             this.error('staff-properties', AlphaTexSymbols.RBrace, true);

@@ -41,6 +41,7 @@ class PartConfigurationScoreView {
 }
 
 class PartConfigurationTrackViewGroup {
+    public showNumbered: boolean = false;
     public showSlash: boolean = false;
     public showStandardNotation: boolean = false;
     public showTablature: boolean = false;
@@ -61,6 +62,7 @@ export class PartConfiguration {
                         staff.showTablature = trackConfig.showTablature;
                         staff.showStandardNotation = trackConfig.showStandardNotation;
                         staff.showSlash = trackConfig.showSlash;
+                        staff.showNumbered = trackConfig.showNumbered;
                     }
                 }
                 trackIndex++;
@@ -91,6 +93,7 @@ export class PartConfiguration {
                 trackConfiguration.showStandardNotation = (flags & 0x01) !== 0;
                 trackConfiguration.showTablature = (flags & 0x02) !== 0;
                 trackConfiguration.showSlash = (flags & 0x04) !== 0;
+                trackConfiguration.showNumbered = (flags & 0x08) !== 0;
                 scoreView.trackViewGroups.push(trackConfiguration);
             }
         }
@@ -110,6 +113,7 @@ export class PartConfiguration {
             trackConfiguration.showStandardNotation = track.staves[0].showStandardNotation;
             trackConfiguration.showTablature = track.staves[0].showTablature;
             trackConfiguration.showSlash = track.staves[0].showSlash;
+            trackConfiguration.showNumbered = track.staves[0].showNumbered;
 
             scoreViews[0].trackViewGroups.push(trackConfiguration);
 
@@ -132,6 +136,9 @@ export class PartConfiguration {
                 }
                 if(track.showSlash) {
                     flags = flags | 0x04;
+                }
+                if(track.showNumbered) {
+                    flags = flags | 0x08;
                 }
                 writer.writeByte(flags);
             }

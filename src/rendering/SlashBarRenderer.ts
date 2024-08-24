@@ -13,6 +13,8 @@ import { SlashBeatContainerGlyph } from './SlashBeatContainerGlyph';
 import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
 import { SlashBeatGlyph } from './glyphs/SlashBeatGlyph';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
+import { SpacingGlyph } from './glyphs/SpacingGlyph';
+import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
 
 /**
  * This BarRenderer renders a bar using Slash Rhythm notation
@@ -21,9 +23,12 @@ export class SlashBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'slash';
 
     public simpleWhammyOverflow: number = 0;
+    private _isOnlySlash: boolean;
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
+        // ignore numbered notation here
+        this._isOnlySlash = !bar.staff.showTablature && !bar.staff.showStandardNotation;
     }
 
     public override get lineSpacing(): number {
@@ -60,7 +65,7 @@ export class SlashBarRenderer extends LineBarRenderer {
                 }
             }
         }
-        if (hasTuplets) { 
+        if (hasTuplets) {
             this.registerOverflowTop(this.tupletSize);
         }
     }
@@ -97,7 +102,28 @@ export class SlashBarRenderer extends LineBarRenderer {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
 
-    protected override createLinePreBeatGlyphs(): void {}
+    protected override createLinePreBeatGlyphs(): void {
+        // Key signature
+        if(this._isOnlySlash) {
+            this.createStartSpacing();
+            this.createTimeSignatureGlyphs();
+        }
+    }
+
+    
+    private createTimeSignatureGlyphs(): void {
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+
+        this.addPreBeatGlyph(
+            new ScoreTimeSignatureGlyph(
+                0,
+                this.getLineY(0),
+                this.bar.masterBar.timeSignatureNumerator,
+                this.bar.masterBar.timeSignatureDenominator,
+                this.bar.masterBar.timeSignatureCommon
+            )
+        );
+    }
 
     protected override createVoiceGlyphs(v: Voice): void {
         for (const b of v.beats) {

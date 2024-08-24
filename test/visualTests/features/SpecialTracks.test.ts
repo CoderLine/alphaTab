@@ -16,4 +16,8 @@ describe('SpecialTracksTests', () => {
     it('slash', async () => {
         await VisualTestHelper.runVisualTest('special-tracks/slash.gp');
     });
+
+    it('numbered', async () => {
+        await VisualTestHelper.runVisualTest('special-tracks/numbered.gp');
+    });
 });

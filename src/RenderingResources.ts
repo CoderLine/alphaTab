@@ -41,6 +41,16 @@ export class RenderingResources {
     public fretboardNumberFont: Font = new Font(RenderingResources.sansFont, 11, FontStyle.Plain);
 
     /**
+     * Gets or sets the font to use for displaying the numbered music notation in the music sheet.
+     */
+    public numberedNotationFont: Font = new Font(RenderingResources.sansFont, 16, FontStyle.Plain);
+
+    /**
+     * Gets or sets the font to use for displaying the grace notes in numbered music notation in the music sheet.
+     */
+    public numberedNotationGraceFont: Font = new Font(RenderingResources.sansFont, 14, FontStyle.Plain);
+
+    /**
      * Gets or sets the font to use for displaying the guitar tablature numbers in the music sheet.
      */
     public tablatureFont: Font = new Font(RenderingResources.sansFont, 13, FontStyle.Plain);

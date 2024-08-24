@@ -67,7 +67,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             this._postNoteParenthesis!.addParenthesisOnLine(line, true);
         }
         if (accidental !== AccidentalType.None) {
-            let g = new AccidentalGlyph(0, noteHeadGlyph.y, accidental, true);
+            let g = new AccidentalGlyph(0, noteHeadGlyph.y, accidental, NoteHeadGlyph.GraceScale);
             g.renderer = this.renderer;
             this._accidentals.renderer = this.renderer;
             this._accidentals.addGlyph(g);

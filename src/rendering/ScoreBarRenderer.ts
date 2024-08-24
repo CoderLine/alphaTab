@@ -427,13 +427,13 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (ModelUtils.keySignatureIsSharp(currentKey)) {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
                 let step: number = ScoreBarRenderer.SharpKsSteps[i] + offsetClef;
-                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Sharp, false));
+                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Sharp, 1));
                 newLines.set(step, true);
             }
         } else {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
                 let step: number = ScoreBarRenderer.FlatKsSteps[i] + offsetClef;
-                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Flat, false));
+                newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Flat, 1));
                 newLines.set(step, true);
             }
         }
@@ -450,7 +450,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                         0,
                         this.getScoreY(previousKeyPositions[i] + offsetClef),
                         AccidentalType.Natural,
-                        false
+                        1
                     )
                 );
             }

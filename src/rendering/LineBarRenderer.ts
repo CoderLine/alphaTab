@@ -36,6 +36,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return (this.lineSpacing + 1) * this.scale;
     }
 
+    public get tupletOffset(): number {
+        return 10 * this.scale;
+    }
+
     public abstract get lineSpacing(): number;
     public abstract get heightLineCount(): number;
     public abstract get drawnLineCount(): number;
@@ -153,21 +157,25 @@ export abstract class LineBarRenderer extends BarRendererBase {
         this._startSpacing = true;
     }
 
-    protected paintTuplets(cx: number, cy: number, canvas: ICanvas): void {
+    protected paintTuplets(cx: number, cy: number, canvas: ICanvas, bracketsAsArcs: boolean = false): void {
         for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 const container = this.getVoiceContainer(voice)!;
                 for (const tupletGroup of container.tupletGroups) {
-                    this.paintTupletHelper(cx + this.beatGlyphsStart, cy, canvas, tupletGroup);
+                    this.paintTupletHelper(cx + this.beatGlyphsStart, cy, canvas, tupletGroup, bracketsAsArcs);
                 }
             }
         }
     }
 
     protected abstract getBeamDirection(helper: BeamingHelper): BeamDirection;
+    protected getTupletBeamDirection(helper: BeamingHelper): BeamDirection {
+        return this.getBeamDirection(helper);
+    }
+
     protected abstract calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number;
 
-    private paintTupletHelper(cx: number, cy: number, canvas: ICanvas, h: TupletGroup): void {
+    private paintTupletHelper(cx: number, cy: number, canvas: ICanvas, h: TupletGroup, bracketsAsArcs: boolean): void {
         const res = this.resources;
         let oldAlign: TextAlign = canvas.textAlign;
         let oldBaseLine = canvas.textBaseline;
@@ -205,7 +213,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
 
         // check if we need to paint simple footer
-        let offset: number = 10 * this.scale;
+        let offset: number = this.tupletOffset;
         let size: number = 5 * this.scale;
 
         if (h.beats.length === 1 || !h.isFull) {
@@ -215,7 +223,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     continue;
                 }
 
-                let direction: BeamDirection = this.getBeamDirection(beamingHelper);
+                let direction: BeamDirection = this.getTupletBeamDirection(beamingHelper);
 
                 let tupletX: number = beamingHelper.getBeatLineX(beat);
                 let tupletY: number = this.calculateBeamYWithDirection(beamingHelper, tupletX, direction);
@@ -269,7 +277,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // calculate the y positions for our bracket
             let firstNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstNonRestBeat.index)!;
             let lastNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastNonRestBeat.index)!;
-            let direction = this.getBeamDirection(firstBeamingHelper);
+            let direction = this.getTupletBeamDirection(firstBeamingHelper);
             let startY: number = this.calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
             let endY: number = this.calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
             if (isRestOnly) {
@@ -302,13 +310,29 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // draw the bracket
             canvas.beginPath();
             canvas.moveTo(cx + this.x + startX, (cy + this.y + startY - offset) | 0);
-            canvas.lineTo(cx + this.x + startX, (cy + this.y + startY - offset - size) | 0);
-            canvas.lineTo(cx + this.x + offset1X, (cy + this.y + offset1Y - offset - size) | 0);
+            if (bracketsAsArcs) {
+                canvas.quadraticCurveTo(
+                    cx + this.x + (offset1X + startX) / 2, (cy + this.y + offset1Y - offset - size) | 0,
+                    cx + this.x + offset1X, (cy + this.y + offset1Y - offset - size) | 0
+                );
+            } else {
+                canvas.lineTo(cx + this.x + startX, (cy + this.y + startY - offset - size) | 0);
+                canvas.lineTo(cx + this.x + offset1X, (cy + this.y + offset1Y - offset - size) | 0);
+            }
             canvas.stroke();
+
             canvas.beginPath();
             canvas.moveTo(cx + this.x + offset2X, (cy + this.y + offset2Y - offset - size) | 0);
-            canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset - size) | 0);
-            canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset) | 0);
+            if (bracketsAsArcs) {
+                canvas.quadraticCurveTo(
+                    cx + this.x + (endX + offset2X) / 2, (cy + this.y + offset2Y - offset - size) | 0,
+                    cx + this.x + endX, (cy + this.y + endY - offset) | 0,
+                );
+            } else {
+                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset - size) | 0);
+                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset) | 0);
+            }
+
             canvas.stroke();
             //
             // Draw the string
@@ -374,7 +398,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return true;
     }
 
-    private paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    protected paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         for (const beat of h.beats) {
             if (!this.shouldPaintFlag(beat, h)) {
                 continue;
@@ -539,14 +563,16 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (this.bar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
             if (this.bar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount));
+                this.addPostBeatGlyph(
+                    new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
+                );
             }
         } else {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
         }
     }
 
-    private paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             let beat: Beat = h.beats[i];
             if (!h.hasBeatLineX(beat)) {
@@ -637,7 +663,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    private static paintSingleBar(canvas: ICanvas, x1: number, y1: number, x2: number, y2: number, size: number): void {
+    protected static paintSingleBar(
+        canvas: ICanvas,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        size: number
+    ): void {
         canvas.beginPath();
         canvas.moveTo(x1, y1);
         canvas.lineTo(x2, y2);

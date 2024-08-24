@@ -8,7 +8,7 @@ import { Staff } from '@src/model';
 import { RenderStaff } from './staves/RenderStaff';
 
 /**
- * This Factory procudes SlashBarRenderer instances
+ * This Factory produces SlashBarRenderer instances
  */
 export class SlashBarRendererFactory extends BarRendererFactory {
     public get staffId(): string {

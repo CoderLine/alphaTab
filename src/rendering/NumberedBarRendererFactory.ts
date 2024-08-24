@@ -1,16 +1,19 @@
 import { Bar } from '@src/model/Bar';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import { SlashBarRenderer } from '@src/rendering/SlashBarRenderer';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import { Track } from '@src/model/Track';
+import { Staff } from '@src/model';
 import { RenderStaff } from './staves/RenderStaff';
+import { NumberedBarRenderer } from './NumberedBarRenderer';
 
 /**
- * This Factory produces ScoreBarRenderer instances
+ * This Factory produces NumberedBarRenderer instances
  */
-export class ScoreBarRendererFactory extends BarRendererFactory {
+export class NumberedBarRendererFactory extends BarRendererFactory {
     public get staffId(): string {
-        return ScoreBarRenderer.StaffId;
+        return SlashBarRenderer.StaffId;
     }
 
     public override getStaffPaddingTop(staff: RenderStaff): number {
@@ -22,7 +25,11 @@ export class ScoreBarRendererFactory extends BarRendererFactory {
     }
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {
-        return new ScoreBarRenderer(renderer, bar);
+        return new NumberedBarRenderer(renderer, bar);
+    }
+
+    public override canCreate(track: Track, staff: Staff): boolean {
+        return super.canCreate(track, staff) && staff.showNumbered;
     }
 
     public constructor() {
