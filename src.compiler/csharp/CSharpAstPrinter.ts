@@ -156,7 +156,8 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         if (p.type) {
             this.writeType(p.type, false, p.params);
         }
-        this.write(` ${p.name}`);
+        this.write(' ');
+        this.writeIdentifier(p.name);
 
         if (p.initializer) {
             this.write(' = ');

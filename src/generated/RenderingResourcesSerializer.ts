@@ -34,6 +34,7 @@ export class RenderingResourcesSerializer {
         o.set("barnumberfont", Font.toJson(obj.barNumberFont));
         o.set("barnumbercolor", Color.toJson(obj.barNumberColor));
         o.set("fingeringfont", Font.toJson(obj.fingeringFont));
+        o.set("inlinefingeringfont", Font.toJson(obj.inlineFingeringFont));
         o.set("markerfont", Font.toJson(obj.markerFont));
         o.set("mainglyphcolor", Color.toJson(obj.mainGlyphColor));
         o.set("secondaryglyphcolor", Color.toJson(obj.secondaryGlyphColor));
@@ -86,6 +87,9 @@ export class RenderingResourcesSerializer {
                 return true;
             case "fingeringfont":
                 obj.fingeringFont = Font.fromJson(v)!;
+                return true;
+            case "inlinefingeringfont":
+                obj.inlineFingeringFont = Font.fromJson(v)!;
                 return true;
             case "markerfont":
                 obj.markerFont = Font.fromJson(v)!;

@@ -1,14 +1,13 @@
-import { Bar, Beat, Duration, Fingers, GraceType, Note, TupletGroup } from '@src/model';
+import { Bar, Beat, Duration, GraceType, TupletGroup } from '@src/model';
 import { BarRendererBase } from './BarRendererBase';
 import { ScoreRenderer } from './ScoreRenderer';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { SpacingGlyph } from './glyphs/SpacingGlyph';
 import { BeamingHelper } from './utils/BeamingHelper';
 import { BeamDirection } from './utils/BeamDirection';
-import { FingeringMode, NotationMode } from '@src/NotationSettings';
+import { NotationMode } from '@src/NotationSettings';
 import { FlagGlyph } from './glyphs/FlagGlyph';
 import { NoteHeadGlyph } from './glyphs/NoteHeadGlyph';
-import { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { RepeatOpenGlyph } from './glyphs/RepeatOpenGlyph';
 import { BarSeperatorGlyph } from './glyphs/BarSeperatorGlyph';
@@ -415,18 +414,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
             let topY: number = this.getFlagTopY(beat);
             let bottomY: number = this.getFlagBottomY(beat);
             let beamY: number = 0;
-            let fingeringY: number = 0;
             if (direction === BeamDirection.Down) {
                 bottomY += stemSize * scaleMod;
                 beamY = bottomY;
-                fingeringY = cy + this.y + bottomY;
             } else {
                 topY -= stemSize * scaleMod;
                 beamY = topY;
-                fingeringY = cy + this.y + topY;
             }
 
-            this.paintFingering(canvas, beat, cx + this.x + beatLineX, direction, fingeringY);
             if (!h.hasLine(true, beat)) {
                 continue;
             }
@@ -479,47 +474,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
         bottomY: number,
         canvas: ICanvas
     ): void;
-
-    protected paintFingering(
-        canvas: ICanvas,
-        beat: Beat,
-        beatLineX: number,
-        direction: BeamDirection,
-        topY: number
-    ): void {
-        let settings: Settings = this.settings;
-        if (
-            settings.notation.fingeringMode !== FingeringMode.ScoreDefault &&
-            settings.notation.fingeringMode !== FingeringMode.ScoreForcePiano
-        ) {
-            return;
-        }
-        if (direction === BeamDirection.Up) {
-            beatLineX -= 10 * this.scale;
-        } else {
-            beatLineX += 3 * this.scale;
-        }
-        // sort notes ascending in their value to ensure
-        // we are drawing the numbers according to their order on the stave
-        let noteList: Note[] = beat.notes.slice(0);
-        noteList.sort((a, b) => {
-            return a.realValue - b.realValue;
-        });
-        for (let n: number = 0; n < noteList.length; n++) {
-            let note: Note = noteList[n];
-            let text: string | null = null;
-            if (note.leftHandFinger !== Fingers.Unknown) {
-                text = ModelUtils.fingerToString(settings, beat, note.leftHandFinger, true);
-            } else if (note.rightHandFinger !== Fingers.Unknown) {
-                text = ModelUtils.fingerToString(settings, beat, note.rightHandFinger, false);
-            }
-            if (!text) {
-                continue;
-            }
-            canvas.fillText(text, beatLineX, topY);
-            topY -= canvas.font.size | 0;
-        }
-    }
 
     protected getFlagStemSize(duration: Duration): number {
         let size: number = 0;
@@ -604,7 +558,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
             } else if (i !== 0) {
                 fingeringY -= canvas.font.size * 1.5;
             }
-            this.paintFingering(canvas, beat, cx + this.x + beatLineX, direction, fingeringY);
             let brokenBarOffset: number = 6 * this.scale * scaleMod;
             let barSpacing: number =
                 (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * this.scale * scaleMod;

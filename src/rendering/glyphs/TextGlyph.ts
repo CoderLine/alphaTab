@@ -1,5 +1,5 @@
 import { Font } from '@src/model/Font';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export class TextGlyph extends EffectGlyph {
@@ -8,12 +8,21 @@ export class TextGlyph extends EffectGlyph {
 
     public font: Font;
     public textAlign: TextAlign;
+    public textBaseline: TextBaseline | null;
 
-    public constructor(x: number, y: number, text: string, font: Font, textAlign: TextAlign = TextAlign.Left) {
+    public constructor(
+        x: number,
+        y: number,
+        text: string,
+        font: Font,
+        textAlign: TextAlign = TextAlign.Left,
+        testBaseline: TextBaseline | null = null
+    ) {
         super(x, y);
         this._lines = text.split('\n');
         this.font = font;
         this.textAlign = textAlign;
+        this.textBaseline = testBaseline;
     }
 
     public override doLayout(): void {
@@ -21,11 +30,13 @@ export class TextGlyph extends EffectGlyph {
 
         this._lineHeights = [];
         const c = this.renderer.scoreRenderer.canvas!;
-        for(const line of this._lines) {
+        for (const line of this._lines) {
             c.font = this.font;
-            const h = c!.measureText(line).height * this.scale;
+            const size = c!.measureText(line);
+            const h = size.height * this.scale;
             this._lineHeights.push(h);
             this.height += h;
+            this.width = Math.max(this.width, size.width);
         }
     }
 
@@ -33,13 +44,18 @@ export class TextGlyph extends EffectGlyph {
         let color = canvas.color;
         canvas.color = color;
         canvas.font = this.font;
-        let old: TextAlign = canvas.textAlign;
+        let old = canvas.textAlign;
+        let oldBaseLine = canvas.textBaseline;
         canvas.textAlign = this.textAlign;
+        if (this.textBaseline !== null) {
+            canvas.textBaseline = this.textBaseline!;
+        }
         let y: number = cy + this.y;
         for (let i = 0; i < this._lines.length; i++) {
             canvas.fillText(this._lines[i], cx + this.x, y);
             y += this._lineHeights![i];
         }
         canvas.textAlign = old;
+        canvas.textBaseline = oldBaseLine;
     }
 }

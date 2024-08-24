@@ -21,6 +21,7 @@ export class NoteCloner {
         }
         clone.fret = original.fret;
         clone.string = original.string;
+        clone.showStringNumber = original.showStringNumber;
         clone.octave = original.octave;
         clone.tone = original.tone;
         clone.percussionArticulation = original.percussionArticulation;

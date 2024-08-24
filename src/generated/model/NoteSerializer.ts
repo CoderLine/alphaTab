@@ -40,6 +40,7 @@ export class NoteSerializer {
         }
         o.set("fret", obj.fret);
         o.set("string", obj.string);
+        o.set("showstringnumber", obj.showStringNumber);
         o.set("octave", obj.octave);
         o.set("tone", obj.tone);
         o.set("percussionarticulation", obj.percussionArticulation);
@@ -101,6 +102,9 @@ export class NoteSerializer {
                 return true;
             case "string":
                 obj.string = v! as number;
+                return true;
+            case "showstringnumber":
+                obj.showStringNumber = v! as boolean;
                 return true;
             case "octave":
                 obj.octave = v! as number;

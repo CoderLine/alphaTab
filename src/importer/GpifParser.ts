@@ -1819,6 +1819,9 @@ export class GpifParser {
                         if ((accentFlags & 0x08) !== 0) {
                             note.accentuated = AccentuationType.Normal;
                         }
+                        if ((accentFlags & 0x10) !== 0) {
+                            note.accentuated = AccentuationType.Tenuto;
+                        }
                         break;
                     case 'Tie':
                         if (c.getAttribute('destination').toLowerCase() === 'true') {
@@ -1901,6 +1904,11 @@ export class GpifParser {
                     case 'Property':
                         let name: string = c.getAttribute('name');
                         switch (name) {
+                            case 'ShowStringNumber':
+                                if (c.findChildElement('Enable')) {
+                                    note.showStringNumber = true;
+                                }
+                                break;
                             case 'String':
                                 note.string = parseInt(c.findChildElement('String')!.innerText) + 1;
                                 break;

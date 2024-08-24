@@ -35,7 +35,8 @@ export class TuningGlyph extends GlyphGroup {
     /**
      * The height of the GuitarString# glyphs at scale 1
      */
-    private static readonly CircleNumberHeight: number = 20;
+    public static readonly CircleNumberHeight: number = 20;
+    public static readonly CircleNumberScale: number = 0.7;
 
     private createGlyphs(tuning: Tuning): void {
         const scale = this.renderer.scale;
@@ -72,7 +73,7 @@ export class TuningGlyph extends GlyphGroup {
 
         if (!tuning.isStandard) {
             this.height += rowHeight;
-            const circleScale = 0.7;
+            const circleScale = TuningGlyph.CircleNumberScale;
             const circleHeight = TuningGlyph.CircleNumberHeight * circleScale * scale;
 
             // Strings

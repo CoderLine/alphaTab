@@ -1149,6 +1149,9 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'detached-legato':
                     note.isStaccato = true;
                     break;
+                case 'tenuto':
+                    note.accentuated = AccentuationType.Tenuto;
+                    break;
             }
         }
     }

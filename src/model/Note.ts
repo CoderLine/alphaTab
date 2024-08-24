@@ -114,6 +114,11 @@ export class Note {
      */
     public string: number = -1;
 
+    /**
+     * Gets or sets whether the string number for this note should be shown.
+     */
+    public showStringNumber: boolean = false;
+
     public get isPiano(): boolean {
         return !this.isStringed && this.octave >= 0 && this.tone >= 0;
     }

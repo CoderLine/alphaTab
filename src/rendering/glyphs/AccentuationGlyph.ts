@@ -1,21 +1,27 @@
 import { AccentuationType } from '@src/model/AccentuationType';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ICanvas } from '@src/platform/ICanvas';
+import { Note } from '@src/model';
+import { EffectGlyph } from './EffectGlyph';
+import { BeamDirection } from '../utils/BeamDirection';
 
-export class AccentuationGlyph extends MusicFontGlyph {
-    public constructor(x: number, y: number, accentuation: AccentuationType) {
-        super(x, y, 1, AccentuationGlyph.getSymbol(accentuation));
+export class AccentuationGlyph extends EffectGlyph {
+    private _note: Note;
+    public constructor(x: number, y: number, note: Note) {
+        super(x, y);
+        this._note = note;
     }
 
-    private static getSymbol(accentuation: AccentuationType): MusicFontSymbol {
+    private static getSymbol(accentuation: AccentuationType, above: boolean): MusicFontSymbol {
         switch (accentuation) {
             case AccentuationType.None:
                 return MusicFontSymbol.None;
             case AccentuationType.Normal:
-                return MusicFontSymbol.ArticAccentAbove;
+                return above ? MusicFontSymbol.ArticAccentAbove : MusicFontSymbol.ArticAccentBelow;
             case AccentuationType.Heavy:
-                return MusicFontSymbol.ArticMarcatoAbove;
+                return above ? MusicFontSymbol.ArticMarcatoAbove : MusicFontSymbol.ArticMarcatoBelow;
+            case AccentuationType.Tenuto:
+                return above ? MusicFontSymbol.ArticTenutoAbove : MusicFontSymbol.ArticTenutoBelow;
             default:
                 return MusicFontSymbol.None;
         }
@@ -27,6 +33,11 @@ export class AccentuationGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx - 2 * this.scale, cy + this.height, canvas);
+        const dir = this.renderer.getBeatDirection(this._note.beat);
+        const symbol = AccentuationGlyph.getSymbol(this._note.accentuated, dir == BeamDirection.Down);
+        
+        const padding = 2 * this.scale;
+        const y = dir == BeamDirection.Up ? cy + this.y : cy + this.y + this.height - padding;
+        canvas.fillMusicFontSymbol(cx + this.x - 2 * this.scale, y, this.scale, symbol, false);
     }
 }

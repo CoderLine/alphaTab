@@ -30,6 +30,7 @@ import { PickStrokeGlyph } from '@src/rendering/glyphs/PickStrokeGlyph';
 import { PickStroke } from '@src/model/PickStroke';
 import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { StringNumberContainerGlyph } from './StringNumberContainerGlyph';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
@@ -58,13 +59,18 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         } else if (this.restGlyph) {
             this.restGlyph.updateBeamingHelper(this.container.x + this.x);
             if (this.renderer.bar.isMultiVoice && this._collisionOffset === -1000) {
-                this._collisionOffset = this.renderer.helpers.collisionHelper.applyRestCollisionOffset(this.container.beat, this.restGlyph.y,
-                    (this.renderer as ScoreBarRenderer).getScoreHeight(1));
+                this._collisionOffset = this.renderer.helpers.collisionHelper.applyRestCollisionOffset(
+                    this.container.beat,
+                    this.restGlyph.y,
+                    (this.renderer as ScoreBarRenderer).getScoreHeight(1)
+                );
                 this.y += this._collisionOffset;
                 const existingRests = this.renderer.helpers.collisionHelper.restDurationsByDisplayTime;
-                if (existingRests.has(this.container.beat.playbackStart) &&
+                if (
+                    existingRests.has(this.container.beat.playbackStart) &&
                     existingRests.get(this.container.beat.playbackStart)!.has(this.container.beat.playbackDuration) &&
-                    existingRests.get(this.container.beat.playbackStart)!.get(this.container.beat.playbackDuration) !== this.container.beat.id
+                    existingRests.get(this.container.beat.playbackStart)!.get(this.container.beat.playbackDuration) !==
+                        this.container.beat.id
                 ) {
                     this._skipPaint = true;
                 }
@@ -105,8 +111,8 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                             0,
                             0,
                             4 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                            this.scale
+                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
+                                this.scale
                         )
                     );
                     this.addGlyph(ghost);
@@ -137,8 +143,8 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 let line = Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2;
 
                 // this positioning is quite strange, for most staff line counts
-                // the whole/rest are aligned as half below the whole rest. 
-                // but for staff line count 1 and 3 they are aligned centered on the same line. 
+                // the whole/rest are aligned as half below the whole rest.
+                // but for staff line count 1 and 3 they are aligned centered on the same line.
                 if (
                     this.container.beat.duration === Duration.Whole &&
                     this.renderer.bar.staff.standardNotationLineCount !== 1 &&
@@ -245,16 +251,31 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             noteHeadGlyph.y = sr.getScoreY(line);
             this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         }
-        if (n.isStaccato && !this.noteHeads!.aboveBeatEffects.has('Staccato')) {
-            this.noteHeads!.belowBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
-        }
-        if (n.accentuated === AccentuationType.Normal && !this.noteHeads!.aboveBeatEffects.has('Accent')) {
-            this.noteHeads!.belowBeatEffects.set('Accent', new AccentuationGlyph(0, 0, AccentuationType.Normal));
-        }
-        if (n.accentuated === AccentuationType.Heavy && !this.noteHeads!.aboveBeatEffects.has('HAccent')) {
-            this.noteHeads!.belowBeatEffects.set('HAccent', new AccentuationGlyph(0, 0, AccentuationType.Heavy));
-        }
 
+        const belowBeatEffects = this.noteHeads!.belowBeatEffects;
+
+        if (n.isStaccato && !belowBeatEffects.has('Staccato')) {
+            belowBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
+        }
+        if (n.accentuated === AccentuationType.Normal && !belowBeatEffects.has('Accent')) {
+            belowBeatEffects.set('Accent', new AccentuationGlyph(0, 0, n));
+        }
+        if (n.accentuated === AccentuationType.Heavy && !belowBeatEffects.has('HAccent')) {
+            belowBeatEffects.set('HAccent', new AccentuationGlyph(0, 0, n));
+        }
+        if (n.accentuated === AccentuationType.Tenuto && !belowBeatEffects.has('Tenuto')) {
+            belowBeatEffects.set('Tenuto', new AccentuationGlyph(0, 0, n));
+        }
+        if (n.showStringNumber && n.isStringed) {
+            let container:StringNumberContainerGlyph;
+            if (!belowBeatEffects.has('StringNumber')) {
+                container = new StringNumberContainerGlyph(0, 0);
+                belowBeatEffects.set('StringNumber', container);
+            } else {
+                container = belowBeatEffects.get('StringNumber')! as StringNumberContainerGlyph;
+            }
+            container.addString(n.string);
+        }
         if (n.isPercussion) {
             const articulation = PercussionMapper.getArticulation(n);
             if (articulation && articulation.techniqueSymbolPlacement !== TextBaseline.Middle) {

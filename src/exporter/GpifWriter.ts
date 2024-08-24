@@ -312,6 +312,9 @@ export class GpifWriter {
             case AccentuationType.Heavy:
                 accentFlags |= 0x04;
                 break;
+            case AccentuationType.Tenuto:
+                accentFlags |= 0x10;
+                break;
         }
 
         if (accentFlags > 0) {
@@ -387,6 +390,9 @@ export class GpifWriter {
             this.writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
             this.writeSimplePropertyNode(properties, 'Fret', 'Fret', note.fret.toString());
             this.writeSimplePropertyNode(properties, 'Midi', 'Number', note.realValue.toString());
+            if(note.showStringNumber) {
+                this.writeSimplePropertyNode(properties, 'ShowStringNumber', 'Enable', null);
+            }
         }
 
         if (note.isPiano) {

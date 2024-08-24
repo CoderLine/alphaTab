@@ -34,6 +34,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public simpleWhammyOverflow: number = 0;
 
+    public beatEffectsMinY: number | null = null;
+    public beatEffectsMaxY: number | null = null;
+
     public accidentalHelper: AccidentalHelper;
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
@@ -51,6 +54,18 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public override get drawnLineCount(): number {
         return this.bar.staff.standardNotationLineCount;
+    }
+
+    public registerBeatEffectOverflows(beatEffectsMinY: number, beatEffectsMaxY: number) {
+        const currentBeatEffectsMinY = this.beatEffectsMinY;
+        if (currentBeatEffectsMinY == null || beatEffectsMinY < currentBeatEffectsMinY) {
+            this.beatEffectsMinY = beatEffectsMinY;
+        }
+
+        const currentBeatEffectsMaxY = this.beatEffectsMaxY;
+        if (currentBeatEffectsMaxY == null || beatEffectsMaxY > currentBeatEffectsMaxY) {
+            this.beatEffectsMaxY = beatEffectsMaxY;
+        }
     }
 
     /**
@@ -78,12 +93,29 @@ export class ScoreBarRenderer extends LineBarRenderer {
             let top: number = this.getScoreY(-2);
             let bottom: number = this.getScoreY(10);
             let whammyOffset: number = this.simpleWhammyOverflow;
+
+            const beatEffectsMinY = this.beatEffectsMinY;
+            if (beatEffectsMinY !== null) {
+                const beatEffectTopOverflow = top - beatEffectsMinY;
+                if (beatEffectTopOverflow > 0) {
+                    this.registerOverflowTop(beatEffectTopOverflow);
+                }
+            }
+
+            const beatEffectsMaxY = this.beatEffectsMaxY;
+            if (beatEffectsMaxY !== null) {
+                const beatEffectBottomOverflow = beatEffectsMaxY - bottom;
+                if (beatEffectBottomOverflow > 0) {
+                    this.registerOverflowBottom(beatEffectBottomOverflow);
+                }
+            }
+
             this.registerOverflowTop(whammyOffset);
+
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine);
             let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
             if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
-                maxNoteY -= maxNoteHelper.fingeringCount * this.resources.graceFont.size;
                 if (maxNoteHelper.hasTuplet) {
                     maxNoteY -= this.tupletSize;
                 }
@@ -95,7 +127,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
             let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
-                minNoteY += minNoteHelper.fingeringCount * this.resources.graceFont.size;
                 if (minNoteHelper.hasTuplet) {
                     minNoteY += this.tupletSize;
                 }
@@ -475,7 +506,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon,
-                this.bar.masterBar.isFreeTime,
+                this.bar.masterBar.isFreeTime
             )
         );
     }
