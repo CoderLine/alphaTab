@@ -57,10 +57,13 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     public registerBeatEffectOverflows(beatEffectsMinY: number, beatEffectsMaxY: number) {
-        if (this.beatEffectsMinY == null || beatEffectsMinY < this.beatEffectsMinY) {
+        const currentBeatEffectsMinY = this.beatEffectsMinY;
+        if (currentBeatEffectsMinY == null || beatEffectsMinY < currentBeatEffectsMinY) {
             this.beatEffectsMinY = beatEffectsMinY;
         }
-        if (this.beatEffectsMaxY == null || beatEffectsMaxY > this.beatEffectsMaxY) {
+
+        const currentBeatEffectsMaxY = this.beatEffectsMaxY;
+        if (currentBeatEffectsMaxY == null || beatEffectsMaxY > currentBeatEffectsMaxY) {
             this.beatEffectsMaxY = beatEffectsMaxY;
         }
     }
