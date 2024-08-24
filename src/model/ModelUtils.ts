@@ -83,10 +83,11 @@ export class ModelUtils {
         if (leftHand) {
             switch (finger) {
                 case Fingers.Unknown:
+                    return null;
                 case Fingers.NoOrDead:
                     return '0';
                 case Fingers.Thumb:
-                    return 'T';
+                    return 't';
                 case Fingers.IndexFinger:
                     return '1';
                 case Fingers.MiddleFinger:

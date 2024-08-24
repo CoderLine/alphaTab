@@ -83,7 +83,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
             let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
             if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
-                maxNoteY -= maxNoteHelper.fingeringCount * this.resources.graceFont.size;
                 if (maxNoteHelper.hasTuplet) {
                     maxNoteY -= this.tupletSize;
                 }
@@ -95,7 +94,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
             let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
-                minNoteY += minNoteHelper.fingeringCount * this.resources.graceFont.size;
                 if (minNoteHelper.hasTuplet) {
                     minNoteY += this.tupletSize;
                 }
@@ -475,7 +473,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon,
-                this.bar.masterBar.isFreeTime,
+                this.bar.masterBar.isFreeTime
             )
         );
     }

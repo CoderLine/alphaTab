@@ -81,9 +81,14 @@ export class RenderingResources {
     public barNumberColor: Color = new Color(200, 0, 0, 0xff);
 
     /**
-     * Gets or sets the font to use for displaying finger information in the music sheet.
+     * Gets or sets the font to use for displaying finger information above the music sheet.
      */
     public fingeringFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain);
+
+    /**
+     * Gets or sets the font to use for displaying finger information when inline into the music sheet.
+     */
+    public inlineFingeringFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Plain);
 
     /**
      * Gets or sets the font to use for section marker labels shown above the music sheet.

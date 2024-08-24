@@ -1,7 +1,6 @@
 import { Bar } from '@src/model/Bar';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
-import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
 import { Note } from '@src/model/Note';
@@ -57,11 +56,6 @@ export class BeamingHelper {
     public voice: Voice | null = null;
     public beats: Beat[] = [];
     public shortestDuration: Duration = Duration.QuadrupleWhole;
-
-    /**
-     * the number of fingering indicators that will be drawn
-     */
-    public fingeringCount: number = 0;
 
     /**
      * an indicator whether any beat has a tuplet on it.
@@ -319,16 +313,6 @@ export class BeamingHelper {
                 }
                 if (beat.hasTuplet) {
                     this.hasTuplet = true;
-                }
-                let fingeringCount: number = 0;
-                for (let n: number = 0; n < beat.notes.length; n++) {
-                    let note: Note = beat.notes[n];
-                    if (note.leftHandFinger !== Fingers.Unknown || note.rightHandFinger !== Fingers.Unknown) {
-                        fingeringCount++;
-                    }
-                }
-                if (fingeringCount > this.fingeringCount) {
-                    this.fingeringCount = fingeringCount;
                 }
                 this.checkNote(beat.minNote);
                 this.checkNote(beat.maxNote);
