@@ -283,9 +283,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 dash.renderer = this.renderer;
                 this.addGlyph(dash);
             }
-
-            // TODO(Numbered): Add Dots above and below based on note height
-            // TODO(Numbered): Lines and dots for durations
         }
 
         super.doLayout();
