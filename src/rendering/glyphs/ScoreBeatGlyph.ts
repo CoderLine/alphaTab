@@ -30,6 +30,7 @@ import { PickStrokeGlyph } from '@src/rendering/glyphs/PickStrokeGlyph';
 import { PickStroke } from '@src/model/PickStroke';
 import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { StringNumberContainerGlyph } from './StringNumberContainerGlyph';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
@@ -265,6 +266,15 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (n.accentuated === AccentuationType.Tenuto && !effectContainer.has('Tenuto')) {
             effectContainer.set('Tenuto', new AccentuationGlyph(0, 0, n));
         }
+        if (n.showStringNumber && n.isStringed) {
+            let container:StringNumberContainerGlyph;
+            if (!effectContainer.has('StringNumber')) {
+                container = new StringNumberContainerGlyph(0, 0);
+                effectContainer.set('StringNumber', container);
+            } else {
+                container = effectContainer.get('StringNumber')! as StringNumberContainerGlyph;
+            }
+            container.addString(n.string);
         }
         if (n.isPercussion) {
             const articulation = PercussionMapper.getArticulation(n);

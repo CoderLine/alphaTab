@@ -69,9 +69,13 @@ export interface RenderingResourcesJson {
      */
     barNumberColor?: ColorJson;
     /**
-     * Gets or sets the font to use for displaying finger information in the music sheet.
+     * Gets or sets the font to use for displaying finger information above the music sheet.
      */
     fingeringFont?: FontJson;
+    /**
+     * Gets or sets the font to use for displaying finger information when inline into the music sheet.
+     */
+    inlineFingeringFont?: FontJson;
     /**
      * Gets or sets the font to use for section marker labels shown above the music sheet.
      */
