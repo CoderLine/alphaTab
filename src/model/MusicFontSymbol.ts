@@ -82,8 +82,13 @@ export enum MusicFontSymbol {
     AccidentalQuarterToneNaturalArrowUp = 0xe272,
     
     ArticAccentAbove = 0xe4a0,
+    ArticAccentBelow = 0xe4a1,
     ArticStaccatoAbove = 0xe4a2,
+    ArticStaccatoBelow = 0xe4a3,
+    ArticTenutoAbove = 0xe4a4,
+    ArticTenutoBelow = 0xe4a5,
     ArticMarcatoAbove = 0xe4ac,
+    ArticMarcatoBelow = 0xe4aD,
 
     FermataAbove = 0xe4c0,
     FermataShortAbove = 0xe4c4,

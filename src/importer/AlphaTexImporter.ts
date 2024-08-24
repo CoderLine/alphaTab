@@ -1825,6 +1825,9 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (syData === 'hac') {
                 this._sy = this.newSy();
                 note.accentuated = AccentuationType.Heavy;
+            } else if (syData === 'ten') {
+                this._sy = this.newSy();
+                note.accentuated = AccentuationType.Tenuto;
             } else if (syData === 'pm') {
                 this._sy = this.newSy();
                 note.isPalmMute = true;

@@ -312,6 +312,9 @@ export class GpifWriter {
             case AccentuationType.Heavy:
                 accentFlags |= 0x04;
                 break;
+            case AccentuationType.Tenuto:
+                accentFlags |= 0x10;
+                break;
         }
 
         if (accentFlags > 0) {
