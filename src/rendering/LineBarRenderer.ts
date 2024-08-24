@@ -1,4 +1,4 @@
-import { Bar, Beat, Duration, Fingers, GraceType, Note, TupletGroup } from '@src/model';
+import { Bar, Beat, Duration, GraceType, TupletGroup } from '@src/model';
 import { BarRendererBase } from './BarRendererBase';
 import { ScoreRenderer } from './ScoreRenderer';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
