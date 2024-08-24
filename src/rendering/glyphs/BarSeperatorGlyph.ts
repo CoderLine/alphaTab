@@ -45,9 +45,7 @@ export class BarSeperatorGlyph extends Glyph {
             if (this.renderer.bar.masterBar.isFreeTime) {
                 const dashSize: number = BarSeperatorGlyph.DashSize * this.scale;
                 const x = ((left + this.width - this.scale) | 0) + 0.5;
-                const bottom = top + h;
-
-                let dashes: number = Math.ceil(h / 2 / dashSize);
+                const dashes: number = Math.ceil(h / 2 / dashSize);
 
                 canvas.beginPath();
                 if (dashes < 1) {
