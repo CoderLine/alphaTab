@@ -189,7 +189,8 @@ export class AccidentalHelper {
         keySignature: KeySignature,
         accidentalMode: NoteAccidentalMode,
         noteValue: number,
-        quarterBend: boolean
+        quarterBend: boolean,
+        currentAccidental: AccidentalType | null = null
     ) {
         let ks: number = keySignature;
         let ksi: number = ks + 7;
@@ -249,11 +250,30 @@ export class AccidentalHelper {
                     }
                     break;
             }
-        }
 
-        // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
-        if (hasKeySignatureAccidentalSetForNote && accidentalToSet === accidentalForKeySignature) {
-            accidentalToSet = AccidentalType.None;
+            // do we need an accidental on the note?
+            if (accidentalToSet !== AccidentalType.None) {
+                // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
+                if (currentAccidental != null) {
+                    if (currentAccidental === accidentalToSet) {
+                        accidentalToSet = AccidentalType.None;
+                    }
+                }
+                // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
+                else if (hasKeySignatureAccidentalSetForNote && accidentalToSet === accidentalForKeySignature) {
+                    accidentalToSet = AccidentalType.None;
+                }
+            } else {
+                // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
+                // and clear the registration
+                if (currentAccidental !== null) {
+                    if(currentAccidental === AccidentalType.Natural) {
+                        accidentalToSet = AccidentalType.None;
+                    } else {
+                        accidentalToSet = AccidentalType.Natural;
+                    }
+                }
+            }
         }
 
         return accidentalToSet;
@@ -274,15 +294,19 @@ export class AccidentalHelper {
             line = AccidentalHelper.getPercussionLine(this._bar, noteValue);
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
+            line = AccidentalHelper.calculateNoteLine(this._bar, noteValue);
+
+            const currentAccidental = this._registeredAccidentals.has(line)
+                ? this._registeredAccidentals.get(line)!
+                : null;
 
             accidentalToSet = AccidentalHelper.computeAccidental(
                 this._bar.masterBar.keySignature,
                 accidentalMode,
                 noteValue,
-                quarterBend
+                quarterBend,
+                currentAccidental
             );
-
-            line = AccidentalHelper.calculateNoteLine(this._bar, noteValue);
 
             let skipAccidental = false;
             switch (accidentalToSet) {
@@ -311,31 +335,7 @@ export class AccidentalHelper {
                     } else {
                         // do we need an accidental on the note?
                         if (accidentalToSet !== AccidentalType.None) {
-                            // if we already have an accidental on this line we will reset it if it's the same
-                            if (this._registeredAccidentals.has(line)) {
-                                if (this._registeredAccidentals.get(line) === accidentalToSet) {
-                                    accidentalToSet = AccidentalType.None;
-                                }
-                            }
-
-                            // register the new accidental on the line if any.
-                            if (accidentalToSet !== AccidentalType.None) {
-                                this._registeredAccidentals.set(line, accidentalToSet);
-                            }
-                        } else {
-                            // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
-                            // and clear the registration
-                            if (this._registeredAccidentals.has(line)) {
-                                // if there is already a naturalize symbol on the line, we don't care.
-                                if (this._registeredAccidentals.get(line) === AccidentalType.Natural) {
-                                    accidentalToSet = AccidentalType.None;
-                                } else {
-                                    accidentalToSet = AccidentalType.Natural;
-                                    this._registeredAccidentals.set(line, accidentalToSet);
-                                }
-                            } else {
-                                this._registeredAccidentals.delete(line);
-                            }
+                            this._registeredAccidentals.set(line, accidentalToSet);
                         }
                     }
                     break;
