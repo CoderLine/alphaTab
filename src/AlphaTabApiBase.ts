@@ -673,6 +673,22 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     /**
+     * Changes the pitch transpose applied to the given tracks. These pitches are additional to the ones
+     * applied to the song via the settings and allows a more live-update.
+     * @param tracks The list of tracks to change.
+     * @param semitones The number of semitones to apply as pitch offset.
+     */
+    public changeTrackTranspositionPitch(tracks: Track[], semitones: number): void {
+        if (!this.player) {
+            return;
+        }
+        for (let track of tracks) {
+            this.player.setChannelTranspositionPitch(track.playbackInfo.primaryChannel, semitones);
+            this.player.setChannelTranspositionPitch(track.playbackInfo.secondaryChannel, semitones);
+        }
+    }
+
+    /**
      * Starts the playback of the current song.
      * @returns true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing.
      */

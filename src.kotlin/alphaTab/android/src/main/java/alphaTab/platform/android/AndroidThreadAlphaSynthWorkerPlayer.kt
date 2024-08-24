@@ -247,6 +247,10 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
         _workerQueue.add { _player?.setChannelVolume(channel, volume) }
     }
 
+    override fun setChannelTranspositionPitch(channel: Double, semitones: Double) {
+        _workerQueue.add { _player?.setChannelTranspositionPitch(channel, semitones) }
+    }
+
     override val ready: IEventEmitter = EventEmitter()
     override val readyForPlayback: IEventEmitter = EventEmitter()
     override val finished: IEventEmitter = EventEmitter()

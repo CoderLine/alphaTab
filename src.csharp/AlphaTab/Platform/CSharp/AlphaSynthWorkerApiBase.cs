@@ -184,6 +184,11 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnWorkerThread(() => { Player.SetChannelVolume(channel, volume); });
         }
 
+        public void SetChannelTranspositionPitch(double channel, double semitones)
+        {
+            DispatchOnWorkerThread(() => { Player.SetChannelTranspositionPitch(channel, semitones); });
+        }
+
         public IEventEmitter Ready { get; } = new EventEmitter();
         public IEventEmitter ReadyForPlayback { get; } = new EventEmitter();
         public IEventEmitter Finished { get; } = new EventEmitter();

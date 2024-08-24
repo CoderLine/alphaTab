@@ -390,6 +390,10 @@ export class AlphaSynth implements IAlphaSynth {
         this._synthesizer.applyTranspositionPitches(transpositionPitches);
     }
 
+    public setChannelTranspositionPitch(channel: number, semitones: number): void {
+        this._synthesizer.setChannelTranspositionPitch(channel, semitones);
+    }
+
     public setChannelMute(channel: number, mute: boolean): void {
         this._synthesizer.channelSetMute(channel, mute);
     }
