@@ -35,6 +35,11 @@ namespace AlphaTab.Core
             return list.FirstOrDefault(predicate);
         }
 
+        public static bool Some<T>(this IList<T> list, Func<T, bool> predicate)
+        {
+            return list.Any(predicate);
+        }
+
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
         {
             var items = data.GetRange((int) start, (int) deleteCount);
