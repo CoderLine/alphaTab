@@ -1565,6 +1565,9 @@ export class GpifParser {
                         beat.lyrics = this.parseBeatLyrics(c);
                         this._skipApplyLyrics = true;
                         break;
+                    case 'Slashed':
+                        beat.slashed = true;
+                        break;
                 }
             }
         }

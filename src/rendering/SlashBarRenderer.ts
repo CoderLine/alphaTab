@@ -29,6 +29,7 @@ export class SlashBarRenderer extends LineBarRenderer {
         super(renderer, bar);
         // ignore numbered notation here
         this._isOnlySlash = !bar.staff.showTablature && !bar.staff.showStandardNotation;
+        this.helpers.preferredBeamDirection = BeamDirection.Up;
     }
 
     public override get lineSpacing(): number {
@@ -74,11 +75,11 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    protected override getFlagTopY(_beat: Beat): number {
+    protected override getFlagTopY(_beat: Beat, _direction:BeamDirection): number {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
 
-    protected override getFlagBottomY(_beat: Beat): number {
+    protected override getFlagBottomY(_beat: Beat, _direction:BeamDirection): number {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
 

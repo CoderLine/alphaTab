@@ -4,12 +4,14 @@ import { Voice } from '@src/model/Voice';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarCollisionHelper } from '@src/rendering/utils/BarCollisionHelper';
+import { BeamDirection } from './BeamDirection';
 
 export class BarHelpers {
     private _renderer: BarRendererBase;
     public beamHelpers: BeamingHelper[][] = [];
     public beamHelperLookup: Map<number, BeamingHelper>[] = [];
     public collisionHelper: BarCollisionHelper;
+    public preferredBeamDirection: BeamDirection | null = null;
 
     public constructor(renderer: BarRendererBase) {
         this._renderer = renderer;
@@ -43,6 +45,7 @@ export class BarHelpers {
                     }
                     // if not possible, create the next beaming helper
                     helperForBeat = new BeamingHelper(bar.staff, barRenderer);
+                    helperForBeat.preferredBeamDirection = this.preferredBeamDirection;
                     helperForBeat.checkBeat(b);
                     if (b.graceType !== GraceType.None) {
                         currentGraceBeamHelper = helperForBeat;

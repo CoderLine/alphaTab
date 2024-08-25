@@ -173,6 +173,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                     offset = direction === BeamDirection.Up ? -10 : 15;
                     break;
             }
+
+            if(this.beat.duration < Duration.Half) {
+                tremoloX = this.width / 2;
+            }
+
             this._tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y + offset * this.scale, speed);
             this._tremoloPicking.renderer = this.renderer;
             this._tremoloPicking.doLayout();

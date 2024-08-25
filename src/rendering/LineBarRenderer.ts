@@ -311,8 +311,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             canvas.moveTo(cx + this.x + startX, (cy + this.y + startY - offset) | 0);
             if (bracketsAsArcs) {
                 canvas.quadraticCurveTo(
-                    cx + this.x + (offset1X + startX) / 2, (cy + this.y + offset1Y - offset - size) | 0,
-                    cx + this.x + offset1X, (cy + this.y + offset1Y - offset - size) | 0
+                    cx + this.x + (offset1X + startX) / 2,
+                    (cy + this.y + offset1Y - offset - size) | 0,
+                    cx + this.x + offset1X,
+                    (cy + this.y + offset1Y - offset - size) | 0
                 );
             } else {
                 canvas.lineTo(cx + this.x + startX, (cy + this.y + startY - offset - size) | 0);
@@ -324,8 +326,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             canvas.moveTo(cx + this.x + offset2X, (cy + this.y + offset2Y - offset - size) | 0);
             if (bracketsAsArcs) {
                 canvas.quadraticCurveTo(
-                    cx + this.x + (endX + offset2X) / 2, (cy + this.y + offset2Y - offset - size) | 0,
-                    cx + this.x + endX, (cy + this.y + endY - offset) | 0,
+                    cx + this.x + (endX + offset2X) / 2,
+                    (cy + this.y + offset2Y - offset - size) | 0,
+                    cx + this.x + endX,
+                    (cy + this.y + endY - offset) | 0
                 );
             } else {
                 canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset - size) | 0);
@@ -367,8 +371,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    protected abstract getFlagTopY(beat: Beat): number;
-    protected abstract getFlagBottomY(beat: Beat): number;
+    protected abstract getFlagTopY(beat: Beat, direction: BeamDirection): number;
+    protected abstract getFlagBottomY(beat: Beat, direction: BeamDirection): number;
     protected shouldPaintFlag(beat: Beat, h: BeamingHelper): boolean {
         // no flags for bend grace beats
         if (beat.graceType === GraceType.BendGrace) {
@@ -411,8 +415,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
             let stemSize: number = this.getFlagStemSize(h.shortestDuration);
             let beatLineX: number = h.getBeatLineX(beat);
             let direction: BeamDirection = this.getBeamDirection(h);
-            let topY: number = this.getFlagTopY(beat);
-            let bottomY: number = this.getFlagBottomY(beat);
+            let topY: number = this.getFlagTopY(beat, direction);
+            let bottomY: number = this.getFlagBottomY(beat, direction);
             let beamY: number = 0;
             if (direction === BeamDirection.Down) {
                 bottomY += stemSize * scaleMod;

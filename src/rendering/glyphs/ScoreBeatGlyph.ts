@@ -31,11 +31,13 @@ import { PickStroke } from '@src/model/PickStroke';
 import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { StringNumberContainerGlyph } from './StringNumberContainerGlyph';
+import { SlashNoteHeadGlyph } from './SlashNoteHeadGlyph';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
     private _skipPaint: boolean = false;
 
+    public slash: SlashNoteHeadGlyph | null = null;
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
 
@@ -75,6 +77,8 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this._skipPaint = true;
                 }
             }
+        } else if(this.slash) {
+            this.slash.updateBeamingHelper(this.container.x + this.x);
         }
     }
 
@@ -89,34 +93,46 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         if (!this.container.beat.isEmpty) {
             if (!this.container.beat.isRest) {
-                //
-                // Note heads
-                //
-                const noteHeads = new ScoreNoteChordGlyph();
-                this.noteHeads = noteHeads;
-                noteHeads.beat = this.container.beat;
-                noteHeads.beamingHelper = this.beamingHelper;
-                let ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(false);
-                ghost.renderer = this.renderer;
-                for (let note of this.container.beat.notes) {
-                    if (note.isVisible) {
-                        this.createNoteGlyph(note);
-                        ghost.addParenthesis(note);
+                if (this.container.beat.slashed) {
+                    const isGrace = this.container.beat.graceType !== GraceType.None;
+                    const line = (sr.heightLineCount - 1) / 2;
+                    const slashY = sr.getLineY(line);
+                    const slashNoteHead = new SlashNoteHeadGlyph(0, slashY, this.container.beat.duration, isGrace);
+                    this.slash = slashNoteHead;
+                    slashNoteHead.beat = this.container.beat;
+                    slashNoteHead.beamingHelper = this.beamingHelper;
+                    this.addGlyph(slashNoteHead);
+                } else {
+                    //
+                    // Note heads
+                    //
+                    const noteHeads = new ScoreNoteChordGlyph();
+                    this.noteHeads = noteHeads;
+                    noteHeads.beat = this.container.beat;
+                    noteHeads.beamingHelper = this.beamingHelper;
+                    let ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(false);
+                    ghost.renderer = this.renderer;
+                    for (let note of this.container.beat.notes) {
+                        if (note.isVisible) {
+                            this.createNoteGlyph(note);
+                            ghost.addParenthesis(note);
+                        }
+                    }
+                    this.addGlyph(noteHeads);
+                    if (!ghost.isEmpty) {
+                        this.addGlyph(
+                            new SpacingGlyph(
+                                0,
+                                0,
+                                4 *
+                                    (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
+                                    this.scale
+                            )
+                        );
+                        this.addGlyph(ghost);
                     }
                 }
-                this.addGlyph(noteHeads);
-                if (!ghost.isEmpty) {
-                    this.addGlyph(
-                        new SpacingGlyph(
-                            0,
-                            0,
-                            4 *
-                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                                this.scale
-                        )
-                    );
-                    this.addGlyph(ghost);
-                }
+
                 //
                 // Whammy Bar
                 if (this.container.beat.hasWhammyBar) {
@@ -191,10 +207,12 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         super.doLayout();
         if (this.container.beat.isEmpty) {
             this.centerX = this.width / 2;
-        } else if (this.container.beat.isRest) {
+        } else if (this.restGlyph) {
             this.centerX = this.restGlyph!.x + this.restGlyph!.width / 2;
-        } else {
+        } else if(this.noteHeads) {
             this.centerX = this.noteHeads!.x + this.noteHeads!.width / 2;
+        } else if(this.slash) {
+            this.centerX = this.slash!.x + this.slash!.width / 2;
         }
     }
 
@@ -267,7 +285,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             belowBeatEffects.set('Tenuto', new AccentuationGlyph(0, 0, n));
         }
         if (n.showStringNumber && n.isStringed) {
-            let container:StringNumberContainerGlyph;
+            let container: StringNumberContainerGlyph;
             if (!belowBeatEffects.has('StringNumber')) {
                 container = new StringNumberContainerGlyph(0, 0);
                 belowBeatEffects.set('StringNumber', container);

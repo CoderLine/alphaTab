@@ -242,6 +242,11 @@ export class Beat {
     public text: string | null = null;
 
     /**
+     * Gets or sets whether this beat should be rendered as slashed note.
+     */
+    public slashed: boolean = false;
+
+    /**
      * Gets or sets the brush type applied to the notes of this beat.
      */
     public brushType: BrushType = BrushType.None;

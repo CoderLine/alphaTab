@@ -177,7 +177,7 @@ export class TabBarRenderer extends LineBarRenderer {
         return super.drawBeamHelperAsFlags(h) || this.settings.notation.rhythmMode === TabRhythmMode.ShowWithBeams;
     }
 
-    protected override getFlagTopY(beat: Beat): number {
+    protected override getFlagTopY(beat: Beat, _direction:BeamDirection): number {
         const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight * this.settings.display.scale - this.tupletSize;
@@ -186,7 +186,7 @@ export class TabBarRenderer extends LineBarRenderer {
         }
     }
 
-    protected override getFlagBottomY(_beat: Beat): number {
+    protected override getFlagBottomY(_beat: Beat, _direction:BeamDirection): number {
         return this.getFlagAndBarPos();
     }
 

@@ -70,14 +70,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
 
     public override updateBeamingHelper(): void {
         if (this.noteHeads) {
-            if (this.beamingHelper) {
-                this.beamingHelper.registerBeatLineX(
-                    'slash',
-                    this.container.beat,
-                    this.container.x + this.x + this.noteHeads.x + this.noteHeads.width,
-                    this.container.x + this.x + this.noteHeads.x + this.noteHeads.width
-                );
-            }
+            this.noteHeads.updateBeamingHelper(this.container.x + this.x);
         } else if (this.restGlyph) {
             this.restGlyph.updateBeamingHelper(this.container.x + this.x);
         }
@@ -89,13 +82,13 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
 
         const line: number = sr.getNoteLine();
         const glyphY = sr.getLineY(line);
-
         if (!this.container.beat.isEmpty) {
             if (!this.container.beat.isRest) {
                 const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
                 const noteHeadGlyph = new SlashNoteHeadGlyph(0, glyphY, this.container.beat.duration, isGrace);
                 this.noteHeads = noteHeadGlyph;
-
+                noteHeadGlyph.beat = this.container.beat;
+                noteHeadGlyph.beamingHelper = this.beamingHelper;
                 this.addGlyph(noteHeadGlyph);
             } else {
                 const restGlyph = new SlashRestGlyph(0, glyphY, this.container.beat.duration);

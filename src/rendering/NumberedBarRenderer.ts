@@ -197,11 +197,11 @@ export class NumberedBarRenderer extends LineBarRenderer {
         return super.tupletOffset + this.resources.numberedNotationFont.size * this.scale; 
     }
 
-    protected override getFlagTopY(_beat: Beat): number {
+    protected override getFlagTopY(_beat: Beat, _direction:BeamDirection): number {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
 
-    protected override getFlagBottomY(_beat: Beat): number {
+    protected override getFlagBottomY(_beat: Beat, _direction:BeamDirection): number {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
 
