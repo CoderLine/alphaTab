@@ -237,7 +237,7 @@ export class VisualTestHelper {
         if(errors.length === 1) {
             throw errors[0];
         } else if(errors.length > 0) {
-            const errorMessages = errors.map(e=>e.message).join('\n');
+            const errorMessages = errors.map(e => e.message ?? "Unknown error").join('\n');
             throw new Error(errorMessages);
         }
     }
