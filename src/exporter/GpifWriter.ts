@@ -737,6 +737,9 @@ export class GpifWriter {
         }
 
         beatNode.addElement('ConcertPitchStemOrientation').innerText = 'Undefined';
+        if(beat.slashed) {
+            beatNode.addElement('Slashed');
+        }
         if (!beat.isRest) {
             beatNode.addElement('Notes').innerText = beat.notes.map(n => n.id).join(' ');
         }
