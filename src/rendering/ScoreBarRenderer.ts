@@ -143,11 +143,41 @@ export class ScoreBarRenderer extends LineBarRenderer {
         this.paintTuplets(cx, cy, canvas);
     }
 
-    protected override getFlagTopY(beat: Beat): number {
+    private getSlashFlagY(duration: Duration, direction: BeamDirection) {
+        let line = (this.heightLineCount - 1) / 2;
+        let offset = 0;
+        switch (duration) {
+            case Duration.QuadrupleWhole:
+            case Duration.DoubleWhole:
+            case Duration.Whole:
+                offset += 2;
+                break;
+            default:
+                offset += 1;
+                break;
+        }
+
+        if (direction == BeamDirection.Down) {
+            line += offset;
+        } else {
+            line -= offset;
+        }
+
+        const slashY = this.getLineY(line);
+        return slashY;
+    }
+
+    protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
+        if (beat.slashed) {
+            return this.getSlashFlagY(beat.duration, direction);
+        }
         return this.getScoreY(this.accidentalHelper.getMinLine(beat));
     }
 
-    protected override getFlagBottomY(beat: Beat): number {
+    protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
+        if (beat.slashed) {
+            return this.getSlashFlagY(beat.duration, direction);
+        }
         return this.getScoreY(this.accidentalHelper.getMaxLine(beat));
     }
 
@@ -200,6 +230,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+        if(note.beat.slashed) {
+            let line = (this.heightLineCount - 1) / 2;
+            return this.getLineY(line);
+        }
+
         let y = super.getNoteY(note, requestedPosition);
         if (isNaN(y)) {
             // NOTE: some might request the note position before the glyphs have been created
@@ -244,7 +279,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             const firstBeat = h.beats[0];
             const lastBeat = h.beats[h.beats.length - 1];
 
-            let isRest = h.isRestBeamHelper;
+            const isRest = h.isRestBeamHelper;
 
             // 1. put direct diagonal line.
             drawingInfo.startBeat = firstBeat;
@@ -255,8 +290,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
             } else {
                 drawingInfo.startY =
                     direction === BeamDirection.Up
-                        ? this.getScoreY(this.accidentalHelper.getMinLine(firstBeat)) - stemSize
-                        : this.getScoreY(this.accidentalHelper.getMaxLine(firstBeat)) + stemSize;
+                        ? this.getFlagTopY(firstBeat, direction) - stemSize
+                        : this.getFlagBottomY(firstBeat, direction) + stemSize;
             }
 
             drawingInfo.endBeat = lastBeat;
@@ -267,8 +302,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
             } else {
                 drawingInfo.endY =
                     direction === BeamDirection.Up
-                        ? this.getScoreY(this.accidentalHelper.getMinLine(lastBeat)) - stemSize
-                        : this.getScoreY(this.accidentalHelper.getMaxLine(lastBeat)) + stemSize;
+                        ? this.getFlagTopY(lastBeat, direction) - stemSize
+                        : this.getFlagBottomY(lastBeat, direction) + stemSize;
             }
             // 2. ensure max height
             // we use the min/max notes to place the beam along their real position
@@ -359,6 +394,26 @@ export class ScoreBarRenderer extends LineBarRenderer {
                         }
                     }
                 }
+
+                // check if slash shifts bar up or down
+                if (h.slashBeats.length > 0) {
+                    for (const b of h.slashBeats) {
+                        const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(b));
+                        let yNeededForSlash = this.getSlashFlagY(b.duration, direction);
+
+                        if (direction === BeamDirection.Up) {
+                            yNeededForSlash -= stemSize;
+                        } else if (direction === BeamDirection.Down) {
+                            yNeededForSlash += stemSize;
+                        }
+
+                        const diff = yNeededForSlash - yGivenByCurrentValues;
+                        if (diff > 0) {
+                            drawingInfo.startY += diff;
+                            drawingInfo.endY += diff;
+                        }
+                    }
+                }
             }
         }
 
@@ -366,6 +421,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
+        if (beat.slashed) {
+            return this.getSlashFlagY(beat.duration, direction);
+        }
+
         return direction === BeamDirection.Up
             ? this.getScoreY(this.accidentalHelper.getMaxLine(beat))
             : this.getScoreY(this.accidentalHelper.getMinLine(beat));

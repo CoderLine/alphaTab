@@ -14,42 +14,61 @@ import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import { SlashNoteHeadGlyph } from './SlashNoteHeadGlyph';
 
 export class TabBeatGlyph extends BeatOnNoteGlyphBase {
+    public slash: SlashNoteHeadGlyph | null = null;
     public noteNumbers: TabNoteChordGlyph | null = null;
     public restGlyph: TabRestGlyph | null = null;
 
     public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         return this.noteNumbers ? this.noteNumbers.getNoteX(note, requestedPosition) : 0;
     }
-    
+
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return this.noteNumbers ? this.noteNumbers.getNoteY(note, requestedPosition) : 0;
     }
 
-    public override buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
-        if(this.noteNumbers) {
+    public override buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+        if (this.noteNumbers) {
             this.noteNumbers.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
         }
     }
 
     public override doLayout(): void {
         let tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
+
         if (!this.container.beat.isRest) {
             //
             // Note numbers
             let isGrace: boolean =
                 this.renderer.settings.notation.smallGraceTabNotes && this.container.beat.graceType !== GraceType.None;
-            const noteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
-            this.noteNumbers = noteNumbers;
-            noteNumbers.beat = this.container.beat;
-            noteNumbers.beamingHelper = this.beamingHelper;
-            for (let note of this.container.beat.notes) {
-                if (note.isVisible) {
-                    this.createNoteGlyph(note);
+
+            let beatEffects: Map<string, Glyph>;
+
+            if (this.container.beat.slashed && !this.container.beat.notes.find(x => x.isTieDestination)) {
+                const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
+                const slashY = tabRenderer.getLineY(line);
+                const slashNoteHead = new SlashNoteHeadGlyph(0, slashY, this.container.beat.duration, isGrace);
+                this.slash = slashNoteHead;
+                slashNoteHead.beat = this.container.beat;
+                slashNoteHead.beamingHelper = this.beamingHelper;
+                this.addGlyph(slashNoteHead);
+                beatEffects = slashNoteHead.beatEffects;
+            } else {
+                const tabNoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
+                this.noteNumbers = tabNoteNumbers;
+                tabNoteNumbers.beat = this.container.beat;
+                tabNoteNumbers.beamingHelper = this.beamingHelper;
+                for (let note of this.container.beat.notes) {
+                    if (note.isVisible) {
+                        this.createNoteGlyph(note);
+                    }
                 }
+                this.addGlyph(tabNoteNumbers);
+                beatEffects = tabNoteNumbers.beatEffects;
             }
-            this.addGlyph(noteNumbers);
+
             //
             // Whammy Bar
             if (this.container.beat.hasWhammyBar) {
@@ -60,9 +79,10 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             }
             //
             // Tremolo Picking
-            if (this.container.beat.isTremolo && !this.noteNumbers.beatEffects.has('tremolo')) {
+            if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {
                 let offset: number = 0;
                 let speed = this.container.beat.tremoloSpeed!;
+                let tremoloX = 5 * this.scale;
                 switch (speed) {
                     case Duration.ThirtySecond:
                         offset = 10;
@@ -74,10 +94,12 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                         offset = 0;
                         break;
                 }
-                this.noteNumbers.beatEffects.set(
-                    'tremolo',
-                    new TremoloPickingGlyph(5 * this.scale, offset * this.scale, speed)
-                );
+
+                if (this.container.beat.duration < Duration.Half) {
+                    tremoloX = 0;
+                }
+
+                beatEffects.set('tremolo', new TremoloPickingGlyph(tremoloX, offset * this.scale, speed));
             }
             //
             // Note dots
@@ -96,7 +118,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 }
             }
         } else {
-            let line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2) ;
+            let line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
             let y: number = tabRenderer.getTabY(line);
             const restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
             this.restGlyph = restGlyph;
@@ -129,18 +151,22 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         this.computedWidth = w;
         if (this.container.beat.isEmpty) {
             this.centerX = this.width / 2;
-        } else if (this.container.beat.isRest) {
+        } else if (this.restGlyph) {
             this.centerX = this.restGlyph!.x + this.restGlyph!.width / 2;
-        } else {
+        } else if (this.noteNumbers) {
             this.centerX = this.noteNumbers!.x + this.noteNumbers!.noteStringWidth / 2;
+        } else if (this.slash) {
+            this.centerX = this.slash!.x + this.slash!.width / 2;
         }
     }
 
     public override updateBeamingHelper(): void {
-        if (!this.container.beat.isRest) {
-            this.noteNumbers!.updateBeamingHelper(this.container.x + this.x);
-        } else {
-            this.restGlyph!.updateBeamingHelper(this.container.x + this.x);
+        if (this.noteNumbers) {
+            this.noteNumbers.updateBeamingHelper(this.container.x + this.x);
+        } else if (this.restGlyph) {
+            this.restGlyph.updateBeamingHelper(this.container.x + this.x);
+        } else if (this.slash) {
+            this.slash.updateBeamingHelper(this.container.x + this.x);
         }
     }
 

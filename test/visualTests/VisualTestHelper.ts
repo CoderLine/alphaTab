@@ -210,18 +210,35 @@ export class VisualTestHelper {
 
         api.destroy();
 
+        const errors: Error[] =[];
         for (let i = 0; i < results.length; i++) {
             if (referenceImages[i] !== null) {
-                await VisualTestHelper.compareVisualResult(
-                    totalWidths[i],
-                    totalHeights[i],
-                    results[i],
-                    referenceImages[i]!,
-                    referenceFileData[i]!,
-                    message,
-                    tolerancePercent
-                );
+                try {
+                    await VisualTestHelper.compareVisualResult(
+                        totalWidths[i],
+                        totalHeights[i],
+                        results[i],
+                        referenceImages[i]!,
+                        referenceFileData[i]!,
+                        message,
+                        tolerancePercent
+                    );
+                }
+                catch(e) {
+                    if(e instanceof Error) {
+                        errors.push(e);
+                    } else {
+                        throw e;
+                    }
+                }
             }
+        }
+
+        if(errors.length === 1) {
+            throw errors[0];
+        } else if(errors.length > 0) {
+            const errorMessages = errors.map(e=>e.message).join('\n');
+            throw new Error(errorMessages);
         }
     }
 

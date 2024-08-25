@@ -131,4 +131,8 @@ describe('EffectsAndAnnotationsTests', () => {
     it('string-numbers', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/string-numbers.gp');
     });
+
+    it('beat-slash', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/beat-slash.gp');
+    });
 });

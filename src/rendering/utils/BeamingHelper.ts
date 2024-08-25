@@ -62,6 +62,8 @@ export class BeamingHelper {
      */
     public hasTuplet: boolean = false;
 
+    public slashBeats: Beat[] = [];
+
     private _firstBeatLowestNoteCompareValue: number = -1;
     private _firstBeatHighestNoteCompareValue: number = -1;
     private _lastBeatLowestNoteCompareValue: number = -1;
@@ -298,8 +300,16 @@ export class BeamingHelper {
         }
 
         if (add) {
-            if (beat.preferredBeamDirection !== null) {
+            if (this.preferredBeamDirection == null && beat.preferredBeamDirection !== null) {
                 this.preferredBeamDirection = beat.preferredBeamDirection;
+            }
+
+            if (beat.hasTuplet) {
+                this.hasTuplet = true;
+            }
+
+            if (beat.graceType !== GraceType.None) {
+                this.isGrace = true;
             }
 
             if (!beat.isRest) {
@@ -307,13 +317,6 @@ export class BeamingHelper {
                     this.beats = [];
                 }
                 this.beats.push(beat);
-
-                if (beat.graceType !== GraceType.None) {
-                    this.isGrace = true;
-                }
-                if (beat.hasTuplet) {
-                    this.hasTuplet = true;
-                }
                 this.checkNote(beat.minNote);
                 this.checkNote(beat.maxNote);
                 if (this.shortestDuration < beat.duration) {
@@ -326,8 +329,8 @@ export class BeamingHelper {
             } else if (this.beats.length === 0) {
                 this.beats.push(beat);
             }
-            if (beat.hasTuplet) {
-                this.hasTuplet = true;
+            if (beat.slashed) {
+                this.slashBeats.push(beat);
             }
         }
         return add;

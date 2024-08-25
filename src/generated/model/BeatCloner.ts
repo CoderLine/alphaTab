@@ -34,6 +34,7 @@ export class BeatCloner {
         clone.slap = original.slap;
         clone.tap = original.tap;
         clone.text = original.text;
+        clone.slashed = original.slashed;
         clone.brushType = original.brushType;
         clone.brushDuration = original.brushDuration;
         clone.tupletDenominator = original.tupletDenominator;
