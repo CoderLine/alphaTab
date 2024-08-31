@@ -485,7 +485,7 @@ export class Environment {
         );
     }
 
-    private static createDefaultRenderers() {
+    private static createDefaultRenderers(): BarRendererFactory[] {
         return [
             //
             // Slash
