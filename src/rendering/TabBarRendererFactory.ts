@@ -11,9 +11,9 @@ import { RenderStaff } from './staves/RenderStaff';
  * This Factory produces TabBarRenderer instances
  */
 export class TabBarRendererFactory extends BarRendererFactory {
-    private _showTimeSignature: boolean;
-    private _showRests: boolean;
-    private _showTiedNotes: boolean;
+    public showTimeSignature: boolean | null = null;
+    public showRests: boolean| null = null;
+    public showTiedNotes: boolean| null = null;
 
     public get staffId(): string {
         return TabBarRenderer.StaffId;
@@ -27,23 +27,26 @@ export class TabBarRendererFactory extends BarRendererFactory {
         return staff.system.layout.renderer.settings.display.notationStaffPaddingBottom;
     }
 
-    public constructor(showTimeSignature: boolean, showRests: boolean, showTiedNotes: boolean) {
+    public constructor() {
         super();
-        this._showTimeSignature = showTimeSignature;
-        this._showRests = showRests;
-        this._showTiedNotes = showTiedNotes;
         this.hideOnPercussionTrack = true;
     }
 
     public override canCreate(track: Track, staff: Staff): boolean {
-        return staff.tuning.length > 0 && super.canCreate(track, staff);
+        return staff.showTablature && staff.tuning.length > 0 && super.canCreate(track, staff);
     }
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {
         let tabBarRenderer: TabBarRenderer = new TabBarRenderer(renderer, bar);
-        tabBarRenderer.showRests = this._showRests;
-        tabBarRenderer.showTimeSignature = this._showTimeSignature;
-        tabBarRenderer.showTiedNotes = this._showTiedNotes;
+        if(this.showRests !== null){
+            tabBarRenderer.showRests = this.showRests!;
+        }
+        if(this.showTimeSignature !== null){
+            tabBarRenderer.showTimeSignature = this.showTimeSignature!;
+        }
+        if(this.showTiedNotes !== null){
+            tabBarRenderer.showTiedNotes = this.showTiedNotes!;
+        }
         return tabBarRenderer;
     }
 }

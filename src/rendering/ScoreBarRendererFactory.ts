@@ -4,6 +4,8 @@ import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { RenderStaff } from './staves/RenderStaff';
+import { Track } from '@src/model/Track';
+import { Staff } from '@src/model/Staff';
 
 /**
  * This Factory produces ScoreBarRenderer instances
@@ -23,6 +25,10 @@ export class ScoreBarRendererFactory extends BarRendererFactory {
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {
         return new ScoreBarRenderer(renderer, bar);
+    }
+
+    public override canCreate(track: Track, staff: Staff): boolean {
+        return super.canCreate(track, staff) && staff.showStandardNotation;
     }
 
     public constructor() {

@@ -30,18 +30,18 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     private _isOnlyNumbered: boolean;
     public shortestDuration = Duration.QuadrupleWhole;
-    public lowestOctave = -1000;
-    public highestOctave = -1000;
+    public lowestOctave:number | null = null;
+    public highestOctave:number | null = null;
 
     public registerOctave(octave: number) {
-        if (this.lowestOctave === -1000) {
+        if (this.lowestOctave === null) {
             this.lowestOctave = octave;
             this.highestOctave = octave;
         } else {
-            if (octave < this.lowestOctave) {
+            if (octave < this.lowestOctave!) {
                 this.lowestOctave = octave;
             }
-            if (octave > this.highestOctave) {
+            if (octave > this.highestOctave!) {
                 this.highestOctave = octave;
             }
         }
@@ -61,7 +61,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     public override get drawnLineCount(): number {
-        return this._isOnlyNumbered ? 1 : 0;
+        return 0;
     }
 
     protected override get bottomGlyphOverflow(): number {
@@ -98,18 +98,20 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 let barOverflow = (barCount - 1) * barSpacing + barSize;
 
                 let dotOverflow = 0;
-                if (this.lowestOctave < 0) {
+                const lowestOctave = this.lowestOctave;
+                if (lowestOctave  !== null) {
                     dotOverflow =
-                        (Math.abs(this.lowestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize) *
+                        (Math.abs(lowestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize) *
                         this.scale;
                 }
 
                 this.registerOverflowBottom(barOverflow + dotOverflow);
             }
 
-            if (this.highestOctave > 0) {
+            const highestOctave = this.highestOctave;
+            if (highestOctave !== null) {
                 const dotOverflow =
-                    (Math.abs(this.highestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize) *
+                    (Math.abs(highestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize) *
                     this.scale;
                 this.registerOverflowTop(dotOverflow);
             }
@@ -173,7 +175,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             let dotsOffset = 0;
             if (dotCount > 0) {
                 dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size / 1.5;
-                dotsOffset = NumberedBarRenderer.DotSpacing - 1 * this.scale;
+                dotsOffset = NumberedBarRenderer.DotSpacing * (-1) * this.scale;
             } else if (dotCount < 0) {
                 dotsY = barStart + beamY + barCount * barSpacing;
                 dotsOffset = NumberedBarRenderer.DotSpacing * this.scale;
@@ -233,14 +235,26 @@ export class NumberedBarRenderer extends LineBarRenderer {
     protected override createLinePreBeatGlyphs(): void {
         // Key signature
         if (
-            this.index === 0 ||
-            (this.bar.previousBar && this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature)
+            !this.bar.previousBar ||
+            (this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature)
         ) {
             this.createStartSpacing();
             this.createKeySignatureGlyphs();
         }
 
-        if (this._isOnlyNumbered) {
+        if (this._isOnlyNumbered && 
+            ( 
+                !this.bar.previousBar ||
+                (this.bar.previousBar &&
+                    this.bar.masterBar.timeSignatureNumerator !== this.bar.previousBar.masterBar.timeSignatureNumerator) ||
+                (this.bar.previousBar &&
+                    this.bar.masterBar.timeSignatureDenominator !==
+                        this.bar.previousBar.masterBar.timeSignatureDenominator) ||
+                (this.bar.previousBar &&
+                    this.bar.masterBar.isFreeTime &&
+                    this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime)
+
+            )) {
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
         }
@@ -267,14 +281,14 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 masterBar.timeSignatureNumerator,
                 masterBar.timeSignatureDenominator,
                 masterBar.timeSignatureCommon,
-                masterBar.isFreeTime && masterBar.previousMasterBar == null || masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime,
+                masterBar.isFreeTime && (masterBar.previousMasterBar == null || masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime),
             )
         );
     }
 
     protected override createPostBeatGlyphs(): void {
         if (this._isOnlyNumbered) {
-            super.createBeatGlyphs();
+            super.createPostBeatGlyphs();
         }
     }
 

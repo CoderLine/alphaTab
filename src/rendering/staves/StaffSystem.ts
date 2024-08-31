@@ -246,7 +246,7 @@ export class StaffSystem {
     }
 
     public get height(): number {
-        return (
+        return this._allStaves.length === 0 ? 0 : (
             this._allStaves[this._allStaves.length - 1].y +
             this._allStaves[this._allStaves.length - 1].height +
             this.topPadding +

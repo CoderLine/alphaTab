@@ -41,7 +41,6 @@ import { TripletFeelEffectInfo } from '@src/rendering/effects/TripletFeelEffectI
 import { WhammyBarEffectInfo } from '@src/rendering/effects/WhammyBarEffectInfo';
 import { WideBeatVibratoEffectInfo } from '@src/rendering/effects/WideBeatVibratoEffectInfo';
 import { WideNoteVibratoEffectInfo } from '@src/rendering/effects/WideNoteVibratoEffectInfo';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { HorizontalScreenLayout } from '@src/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@src/rendering/layout/PageViewLayout';
 import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
@@ -63,6 +62,8 @@ import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
 import { SlashBarRendererFactory } from './rendering/SlashBarRendererFactory';
 import { NumberedBarRendererFactory } from './rendering/NumberedBarRendererFactory';
 import { FreeTimeEffectInfo } from './rendering/effects/FreeTimeEffectInfo';
+import { ScoreBarRenderer } from './rendering/ScoreBarRenderer';
+import { TabBarRenderer } from './rendering/TabBarRenderer';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -94,6 +95,14 @@ export class RenderEngineFactory {
  * @partial
  */
 export class Environment {
+    private static readonly StaffIdBeforeSlashAlways = 'before-slash-always';
+    private static readonly StaffIdBeforeScoreAlways = 'before-score-always';
+    private static readonly StaffIdBeforeScoreHideable = 'before-score-hideable';
+    private static readonly StaffIdBeforeNumberedAlways = 'before-numbered-always';
+    private static readonly StaffIdBeforeTabAlways = 'before-tab-always';
+    private static readonly StaffIdBeforeTabHideable = 'before-tab-hideable';
+
+
     /**
      * The font size of the music font in pixel.
      */
@@ -476,136 +485,141 @@ export class Environment {
         );
     }
 
-    private static createDefaultStaveProfiles(): Map<StaveProfile, BarRendererFactory[]> {
-        const staveProfiles = new Map<StaveProfile, BarRendererFactory[]>();
-
-        // default combinations of stave textprofiles
-        staveProfiles.set(StaveProfile.ScoreTab, [
-            new EffectBarRendererFactory('top-effects', [
+    private static createDefaultRenderers() {
+        return [
+            //
+            // Slash
+            new EffectBarRendererFactory(Environment.StaffIdBeforeSlashAlways, [
                 new TempoEffectInfo(),
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
+                new AlternateEndingsEffectInfo(),
                 new FreeTimeEffectInfo(),
                 new TextEffectInfo(),
                 new ChordsEffectInfo()
             ]),
+            // no before-slash-hideable
             new SlashBarRendererFactory(),
-            new EffectBarRendererFactory('score-effects', [
-                new FermataEffectInfo(),
-                new WhammyBarEffectInfo(),
-                new TrillEffectInfo(),
-                new OttaviaEffectInfo(true),
-                new WideBeatVibratoEffectInfo(),
-                new SlightBeatVibratoEffectInfo(),
-                new WideNoteVibratoEffectInfo(),
-                new SlightNoteVibratoEffectInfo(),
-                new LeftHandTapEffectInfo(),
-                new AlternateEndingsEffectInfo()
-            ]),
+
+            //
+            // Score (standard notation)
+            new EffectBarRendererFactory(Environment.StaffIdBeforeScoreAlways, [new FermataEffectInfo()]),
+            new EffectBarRendererFactory(
+                Environment.StaffIdBeforeScoreHideable,
+                [
+                    new WhammyBarEffectInfo(),
+                    new TrillEffectInfo(),
+                    new OttaviaEffectInfo(true),
+                    new WideBeatVibratoEffectInfo(),
+                    new SlightBeatVibratoEffectInfo(),
+                    new WideNoteVibratoEffectInfo(),
+                    new SlightNoteVibratoEffectInfo(),
+                    new LeftHandTapEffectInfo()
+                ],
+                (_, staff) => staff.showStandardNotation
+            ),
             new ScoreBarRendererFactory(),
+
+            //
+            // Numbered
+            new EffectBarRendererFactory(Environment.StaffIdBeforeNumberedAlways, [
+                new CrescendoEffectInfo(),
+                new OttaviaEffectInfo(false),
+                new DynamicsEffectInfo()
+            ]),
+            // no before-numbered-hideable
             new NumberedBarRendererFactory(),
-            new EffectBarRendererFactory('tab-effects', [
-                new CrescendoEffectInfo(),
-                new OttaviaEffectInfo(false),
-                new DynamicsEffectInfo(),
-                new LyricsEffectInfo(),
-                new TrillEffectInfo(),
-                new WideBeatVibratoEffectInfo(),
-                new SlightBeatVibratoEffectInfo(),
-                new WideNoteVibratoEffectInfo(),
-                new SlightNoteVibratoEffectInfo(),
-                new TapEffectInfo(),
-                new FadeInEffectInfo(),
-                new HarmonicsEffectInfo(HarmonicType.Natural),
-                new HarmonicsEffectInfo(HarmonicType.Artificial),
-                new HarmonicsEffectInfo(HarmonicType.Pinch),
-                new HarmonicsEffectInfo(HarmonicType.Tap),
-                new HarmonicsEffectInfo(HarmonicType.Semi),
-                new HarmonicsEffectInfo(HarmonicType.Feedback),
-                new LetRingEffectInfo(),
-                new CapoEffectInfo(),
-                new FingeringEffectInfo(),
-                new PalmMuteEffectInfo(),
-                new PickStrokeEffectInfo(),
-                new PickSlideEffectInfo(),
-                new LeftHandTapEffectInfo()
-            ]),
-            new TabBarRendererFactory(false, false, false)
-        ]);
-        staveProfiles.set(StaveProfile.Score, [
-            new EffectBarRendererFactory('top-effects', [
-                new TempoEffectInfo(),
-                new TripletFeelEffectInfo(),
-                new MarkerEffectInfo(),
-                new TextEffectInfo(),
-                new ChordsEffectInfo()
-            ]),
-            new SlashBarRendererFactory(),
-            new EffectBarRendererFactory('score-effects', [
-                new FermataEffectInfo(),
-                new WhammyBarEffectInfo(),
-                new TrillEffectInfo(),
-                new OttaviaEffectInfo(true),
-                new WideBeatVibratoEffectInfo(),
-                new SlightBeatVibratoEffectInfo(),
-                new WideNoteVibratoEffectInfo(),
-                new SlightNoteVibratoEffectInfo(),
-                new FadeInEffectInfo(),
-                new LetRingEffectInfo(),
-                new PalmMuteEffectInfo(),
-                new PickStrokeEffectInfo(),
-                new PickSlideEffectInfo(),
-                new LeftHandTapEffectInfo(),
-                new AlternateEndingsEffectInfo()
-            ]),
-            new ScoreBarRendererFactory(),
-            new EffectBarRendererFactory('score-bottom-effects', [
-                new CrescendoEffectInfo(),
-                new OttaviaEffectInfo(false),
-                new DynamicsEffectInfo(),
-                new LyricsEffectInfo()
-            ])
-        ]);
-        let tabEffectInfos: EffectBarRendererInfo[] = [
-            new TempoEffectInfo(),
-            new TripletFeelEffectInfo(),
-            new MarkerEffectInfo(),
-            new TextEffectInfo(),
-            new ChordsEffectInfo(),
-            new FermataEffectInfo(),
-            new TrillEffectInfo(),
-            new WideBeatVibratoEffectInfo(),
-            new SlightBeatVibratoEffectInfo(),
-            new WideNoteVibratoEffectInfo(),
-            new SlightNoteVibratoEffectInfo(),
-            new TapEffectInfo(),
-            new FadeInEffectInfo(),
-            new HarmonicsEffectInfo(HarmonicType.Artificial),
-            new HarmonicsEffectInfo(HarmonicType.Pinch),
-            new HarmonicsEffectInfo(HarmonicType.Tap),
-            new HarmonicsEffectInfo(HarmonicType.Semi),
-            new HarmonicsEffectInfo(HarmonicType.Feedback),
-            new LetRingEffectInfo(),
-            new CapoEffectInfo(),
-            new FingeringEffectInfo(),
-            new PalmMuteEffectInfo(),
-            new PickStrokeEffectInfo(),
-            new PickSlideEffectInfo(),
-            new LeftHandTapEffectInfo(),
-            new AlternateEndingsEffectInfo()
+
+            //
+            // Tabs
+            new EffectBarRendererFactory(Environment.StaffIdBeforeTabAlways, [new LyricsEffectInfo()]),
+            new EffectBarRendererFactory(
+                Environment.StaffIdBeforeTabHideable,
+                [
+                    // TODO: whammy line effect
+                    new TrillEffectInfo(),
+                    new WideBeatVibratoEffectInfo(),
+                    new SlightBeatVibratoEffectInfo(),
+                    new WideNoteVibratoEffectInfo(),
+                    new SlightNoteVibratoEffectInfo(),
+                    new TapEffectInfo(),
+                    new FadeInEffectInfo(),
+                    new HarmonicsEffectInfo(HarmonicType.Natural),
+                    new HarmonicsEffectInfo(HarmonicType.Artificial),
+                    new HarmonicsEffectInfo(HarmonicType.Pinch),
+                    new HarmonicsEffectInfo(HarmonicType.Tap),
+                    new HarmonicsEffectInfo(HarmonicType.Semi),
+                    new HarmonicsEffectInfo(HarmonicType.Feedback),
+                    new LetRingEffectInfo(),
+                    new CapoEffectInfo(),
+                    new FingeringEffectInfo(),
+                    new PalmMuteEffectInfo(),
+                    new PickStrokeEffectInfo(),
+                    new PickSlideEffectInfo(),
+                    new LeftHandTapEffectInfo()
+                ],
+                (_, staff) => staff.showTablature
+            ),
+            new TabBarRendererFactory()
         ];
-        staveProfiles.set(StaveProfile.Tab, [
-            new SlashBarRendererFactory(),
-            new EffectBarRendererFactory('tab-effects', tabEffectInfos),
-            new TabBarRendererFactory(true, true, true),
-            new EffectBarRendererFactory('tab-bottom-effects', [new LyricsEffectInfo()])
+    }
+
+    private static createDefaultStaveProfiles(): Map<StaveProfile, BarRendererFactory[]> {
+        const staveProfiles = new Map<StaveProfile, BarRendererFactory[]>();
+
+        // the general layout is repeating the same pattern across the different notation staffs:
+        // * general effects before notation renderer, shown also if notation renderer is hidden (`before-xxxx-always`)
+        // * effects specific to the notation renderer, hidden if the nottation renderer is hidden (`before-xxxx-hideable`)
+        // * the notation renderer itself, hidden based on settings (`xxxx`)
+
+        const defaultRenderers = Environment.createDefaultRenderers();
+        staveProfiles.set(StaveProfile.Default, defaultRenderers);
+        staveProfiles.set(StaveProfile.ScoreTab, defaultRenderers);
+
+        const scoreRenderers = new Set<string>([
+            Environment.StaffIdBeforeSlashAlways,
+            Environment.StaffIdBeforeScoreAlways,
+            Environment.StaffIdBeforeNumberedAlways,
+            Environment.StaffIdBeforeTabAlways,
+            ScoreBarRenderer.StaffId
         ]);
-        staveProfiles.set(StaveProfile.TabMixed, [
-            new SlashBarRendererFactory(),
-            new EffectBarRendererFactory('tab-effects', tabEffectInfos),
-            new TabBarRendererFactory(false, false, false),
-            new EffectBarRendererFactory('tab-bottom-effects', [new LyricsEffectInfo()])
+        staveProfiles.set(
+            StaveProfile.Score,
+            defaultRenderers.filter(r => scoreRenderers.has(r.staffId))
+        );
+
+        const tabRenderers = new Set<string>([
+            Environment.StaffIdBeforeSlashAlways,
+            Environment.StaffIdBeforeScoreAlways,
+            Environment.StaffIdBeforeNumberedAlways,
+            Environment.StaffIdBeforeTabAlways,
+            TabBarRenderer.StaffId
         ]);
+        staveProfiles.set(
+            StaveProfile.Tab,
+            Environment.createDefaultRenderers().filter(r => {
+                if (r instanceof TabBarRendererFactory) {
+                    const tab = r as TabBarRendererFactory;
+                    tab.showTimeSignature = true;
+                    tab.showRests = true;
+                    tab.showTiedNotes = true;
+                }
+                return tabRenderers.has(r.staffId);
+            })
+        );
+
+        staveProfiles.set(
+            StaveProfile.TabMixed,
+            Environment.createDefaultRenderers().filter(r => {
+                if (r instanceof TabBarRendererFactory) {
+                    const tab = r as TabBarRendererFactory;
+                    tab.showTimeSignature = false;
+                    tab.showRests = false;
+                    tab.showTiedNotes = false;
+                }
+                return tabRenderers.has(r.staffId);
+            })
+        );
 
         return staveProfiles;
     }
