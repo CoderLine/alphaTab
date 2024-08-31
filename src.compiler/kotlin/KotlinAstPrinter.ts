@@ -779,6 +779,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             case cs.SyntaxKind.FunctionTypeNode:
                 const functionType = type as cs.FunctionTypeNode;
                 this.write('(');
+                this.write('(');
                 if (functionType.parameterTypes.length > 0) {
                     let i = 1;
                     this.writeCommaSeparated(functionType.parameterTypes, p => {
@@ -788,6 +789,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 }
                 this.write(') -> ');
                 this.writeType(functionType.returnType);
+                this.write(')');
                 break;
             case cs.SyntaxKind.TypeReference:
                 const typeReference = type as cs.TypeReference;

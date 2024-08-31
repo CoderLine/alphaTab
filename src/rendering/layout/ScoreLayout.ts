@@ -1,4 +1,3 @@
-import { StaveProfile } from '@src/StaveProfile';
 import { Environment } from '@src/Environment';
 import { Bar } from '@src/model/Bar';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
@@ -251,31 +250,9 @@ export abstract class ScoreLayout {
         let system: StaffSystem = new StaffSystem(this);
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
             let track: Track = this.renderer.tracks![trackIndex];
-            let hasScore: boolean = false;
-            for (let staff of track.staves) {
-                if (staff.showStandardNotation) {
-                    hasScore = true;
-                    break;
-                }
-            }
             for (let staffIndex: number = 0; staffIndex < track.staves.length; staffIndex++) {
                 let staff: Staff = track.staves[staffIndex];
-                // use optimal profile for track
-                let staveProfile: StaveProfile;
-                if (staff.isPercussion) {
-                    staveProfile = StaveProfile.Score;
-                } else if (this.renderer.settings.display.staveProfile !== StaveProfile.Default) {
-                    staveProfile = this.renderer.settings.display.staveProfile;
-                } else if (staff.showTablature && staff.showStandardNotation) {
-                    staveProfile = StaveProfile.ScoreTab;
-                } else if (staff.showTablature) {
-                    staveProfile = hasScore ? StaveProfile.TabMixed : StaveProfile.Tab;
-                } else if (staff.showStandardNotation) {
-                    staveProfile = StaveProfile.Score;
-                } else {
-                    continue;
-                }
-                let profile: BarRendererFactory[] = Environment.staveProfiles.get(staveProfile)!;
+                let profile: BarRendererFactory[] = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
                 for (let factory of profile) {
                     if (factory.canCreate(track, staff)) {
                         system.addStaff(track, new RenderStaff(trackIndex, staff, factory));

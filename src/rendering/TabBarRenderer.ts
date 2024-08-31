@@ -35,6 +35,12 @@ export class TabBarRenderer extends LineBarRenderer {
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
+
+        if(!bar.staff.showStandardNotation) {
+            this.showTimeSignature = true;
+            this.showRests = true;
+            this.showTiedNotes = true;
+        }
     }
 
     public override get lineSpacing(): number {

@@ -75,11 +75,11 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    protected override getFlagTopY(_beat: Beat, _direction:BeamDirection): number {
+    protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
 
-    protected override getFlagBottomY(_beat: Beat, _direction:BeamDirection): number {
+    protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
         return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
     }
 
@@ -105,13 +105,24 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     protected override createLinePreBeatGlyphs(): void {
         // Key signature
-        if(this._isOnlySlash) {
+        if (
+            this._isOnlySlash &&
+            (!this.bar.previousBar ||
+                (this.bar.previousBar &&
+                    this.bar.masterBar.timeSignatureNumerator !==
+                        this.bar.previousBar.masterBar.timeSignatureNumerator) ||
+                (this.bar.previousBar &&
+                    this.bar.masterBar.timeSignatureDenominator !==
+                        this.bar.previousBar.masterBar.timeSignatureDenominator) ||
+                (this.bar.previousBar &&
+                    this.bar.masterBar.isFreeTime &&
+                    this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
+        ) {
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
         }
     }
 
-    
     private createTimeSignatureGlyphs(): void {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
 
@@ -123,7 +134,9 @@ export class SlashBarRenderer extends LineBarRenderer {
                 masterBar.timeSignatureNumerator,
                 masterBar.timeSignatureDenominator,
                 masterBar.timeSignatureCommon,
-                masterBar.isFreeTime && masterBar.previousMasterBar == null || masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime,
+                masterBar.isFreeTime &&
+                    (masterBar.previousMasterBar == null ||
+                        masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
             )
         );
     }
