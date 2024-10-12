@@ -1,6 +1,6 @@
 /**@target web */
 import { alphaTab } from '../../src/alphaTab.vite';
-import vite from 'vite';
+import * as vite from 'vite';
 import path from 'path';
 import fs from 'fs';
 import { expect } from 'chai';
