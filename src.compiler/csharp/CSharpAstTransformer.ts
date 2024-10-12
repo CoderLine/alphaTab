@@ -3668,7 +3668,7 @@ export default class CSharpAstTransformer {
                 (node.tsSymbol.flags & ts.SymbolFlags.BlockScopedVariable) === ts.SymbolFlags.BlockScopedVariable
             ) {
                 let smartCastType = this._context.getSmartCastType(expression);
-                if (smartCastType) {
+                if (smartCastType && !this._context.isIterable(smartCastType)) {
                     if (smartCastType.flags & ts.TypeFlags.Boolean) {
                         return this.makeTruthy(node, true);
                     }
@@ -3690,7 +3690,7 @@ export default class CSharpAstTransformer {
                         expression: node,
                         parent: paren,
                         tsNode: expression,
-                        nodeType: cs.SyntaxKind.CastExpression
+                        nodeType: cs.SyntaxKind.CastExpression,
                     } as cs.CastExpression);
 
                     castExpression.type.parent = castExpression;
