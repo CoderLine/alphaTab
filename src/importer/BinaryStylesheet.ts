@@ -132,9 +132,11 @@ export class BinaryStylesheet {
 
     public static writeForScore(score: Score): Uint8Array {
         const writer = ByteBuffer.withCapacity(128);
-        IOHelper.writeInt32BE(writer, 1); // entry count
+        IOHelper.writeInt32BE(writer, 3); // entry count
 
         BinaryStylesheet.writeBooleanEntry(writer, 'StandardNotation/hideDynamics', score.stylesheet.hideDynamics);
+        BinaryStylesheet.writeNumberEntry(writer, 'System/bracketExtendMode', score.stylesheet.bracketExtendMode);
+        BinaryStylesheet.writeBooleanEntry(writer, 'Global/useSystemSignSeparator', score.stylesheet.useSystemSignSeparator);
 
         return writer.toArray();
     }
@@ -143,5 +145,11 @@ export class BinaryStylesheet {
         GpBinaryHelpers.gpWriteString(writer, key);
         writer.writeByte(DataType.Boolean as number);
         writer.writeByte(value ? 1 : 0);
+    }
+
+    private static writeNumberEntry(writer: ByteBuffer, key: string, value: number) {
+        GpBinaryHelpers.gpWriteString(writer, key);
+        writer.writeByte(DataType.Integer as number);
+        IOHelper.writeInt32BE(writer, value)
     }
 }
