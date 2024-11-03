@@ -1,3 +1,4 @@
+import { SystemsLayoutMode } from '@src/DisplaySettings';
 import { LayoutMode } from '@src/LayoutMode';
 import { Settings } from '@src/Settings';
 import { ScoreLoader } from '@src/importer';
@@ -53,5 +54,41 @@ describe('LayoutTests', () => {
         settings.display.startBar = 5;
         settings.display.barCount = 4;
         await VisualTestHelper.runVisualTest('layout/horizontal-layout-5to8.gp', settings);
+    });
+
+    it('brackets-braces-none', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest(
+            'layout/brackets-braces-none.gp',
+            settings,
+            [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        );
+    });
+
+    it('brackets-braces-similar', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest(
+            'layout/brackets-braces-similar.gp',
+            settings,
+            [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        );
+    });
+
+    it('brackets-braces-staves', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest(
+            'layout/brackets-braces-staves.gp',
+            settings,
+            [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        );
+    });
+
+    it('brackets-braces-system-divider', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest('layout/system-divider.gp', settings, [0, 1]);
     });
 });
