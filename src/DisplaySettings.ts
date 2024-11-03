@@ -136,9 +136,14 @@ export class DisplaySettings {
     public effectStaffPaddingBottom: number = 0;
 
     /**
-     * Gets or sets the left padding applied between the left line of the staff marking the start, and the first glyph in it.
+     * Gets or sets the left padding applied between the left line and the first glyph in the first staff in a system.
      */
-    public staffPaddingLeft: number = 6;
+    public staffPaddingBegin: number = 6;
+
+    /**
+     * Gets or sets the left padding applied between the left line and the first glyph in the following staff in a system.
+     */
+    public staffPaddingLeft: number = 2;
 
     /**
      * Gets how the systems should be layed out.

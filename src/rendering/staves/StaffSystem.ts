@@ -429,6 +429,8 @@ export class StaffSystem {
                 this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.TrackNames);
             canvas.font = res.effectFont;
             if (hasTrackName) {
+                const oldBaseLine = canvas.textBaseline;
+                const oldTextAlign = canvas.textAlign;
                 for (const g of this.staves) {
                     if (g.firstStaffInBracket && g.lastStaffInBracket) {
                         let firstStart: number = cy + g.firstStaffInBracket.contentTop;
@@ -448,6 +450,8 @@ export class StaffSystem {
                         canvas.fillText(g.track.shortName, textX, (firstStart + lastEnd) / 2);
                     }
                 }
+                canvas.textBaseline = oldBaseLine;
+                canvas.textAlign = oldTextAlign;
             }
 
             //
