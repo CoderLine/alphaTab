@@ -230,7 +230,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        if(note.beat.slashed) {
+        if (note.beat.slashed) {
             let line = (this.heightLineCount - 1) / 2;
             return this.getLineY(line);
         }
@@ -532,23 +532,26 @@ export class ScoreBarRenderer extends LineBarRenderer {
             }
         }
         // naturalize previous key
-        let naturalizeSymbols: number = Math.abs(previousKey);
-        let previousKeyPositions = ModelUtils.keySignatureIsSharp(previousKey)
-            ? ScoreBarRenderer.SharpKsSteps
-            : ScoreBarRenderer.FlatKsSteps;
-        for (let i: number = 0; i < naturalizeSymbols; i++) {
-            let step: number = previousKeyPositions[i] + offsetClef;
-            if (!newLines.has(step)) {
-                this.addPreBeatGlyph(
-                    new AccidentalGlyph(
-                        0,
-                        this.getScoreY(previousKeyPositions[i] + offsetClef),
-                        AccidentalType.Natural,
-                        1
-                    )
-                );
+        if (this.index > 0) {
+            let naturalizeSymbols: number = Math.abs(previousKey);
+            let previousKeyPositions = ModelUtils.keySignatureIsSharp(previousKey)
+                ? ScoreBarRenderer.SharpKsSteps
+                : ScoreBarRenderer.FlatKsSteps;
+            for (let i: number = 0; i < naturalizeSymbols; i++) {
+                let step: number = previousKeyPositions[i] + offsetClef;
+                if (!newLines.has(step)) {
+                    this.addPreBeatGlyph(
+                        new AccidentalGlyph(
+                            0,
+                            this.getScoreY(previousKeyPositions[i] + offsetClef),
+                            AccidentalType.Natural,
+                            1
+                        )
+                    );
+                }
             }
         }
+
         for (let newGlyph of newGlyphs) {
             this.addPreBeatGlyph(newGlyph);
         }

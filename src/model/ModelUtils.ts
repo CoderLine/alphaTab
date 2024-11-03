@@ -5,14 +5,24 @@ import { Fingers } from '@src/model/Fingers';
 import { Score } from '@src/model/Score';
 import { FingeringMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
+import { NoteAccidentalMode } from './NoteAccidentalMode';
 
 export class TuningParseResult {
     public note: string | null = null;
-    public noteValue: number = 0;
+    public tone: TuningParseResultTone = new TuningParseResultTone();
     public octave: number = 0;
 
     public get realValue(): number {
-        return this.octave * 12 + this.noteValue;
+        return this.octave * 12 + this.tone.noteValue;
+    }
+}
+
+export class TuningParseResultTone {
+    public noteValue: number;
+    public accidentalMode: NoteAccidentalMode;
+    public constructor(noteValue: number = 0, accidentalMode: NoteAccidentalMode = NoteAccidentalMode.Default) {
+        this.noteValue = noteValue;
+        this.accidentalMode = accidentalMode;
     }
 }
 
@@ -138,8 +148,8 @@ export class ModelUtils {
                     return null;
                 }
                 octave += String.fromCharCode(c);
-            } else if ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) || c === 0x23) /* A-Za-Z# */ {
-                note += String.fromCharCode(c);
+            } else if ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) || c === 0x23) {
+                /* A-Za-Z# */ note += String.fromCharCode(c);
             } else {
                 return null;
             }
@@ -148,9 +158,18 @@ export class ModelUtils {
             return null;
         }
         let result: TuningParseResult = new TuningParseResult();
+
         result.octave = parseInt(octave) + 1;
         result.note = note.toLowerCase();
-        result.noteValue = ModelUtils.getToneForText(result.note);
+        result.tone = ModelUtils.getToneForText(result.note);
+
+        // if tone.noteValue is negative (eg. on Cb note)
+        // we adjust roll-over to a lower octave
+        if (result.tone.noteValue < 0) {
+            result.octave--;
+            result.tone.noteValue += 12;
+        }
+
         return result;
     }
 
@@ -162,40 +181,98 @@ export class ModelUtils {
         return result.realValue;
     }
 
-    public static getToneForText(note: string): number {
-        switch (note.toLowerCase()) {
+    public static getToneForText(note: string): TuningParseResultTone {
+        const noteName = note.substring(0, 1);
+        const accidental = note.substring(1);
+
+        let noteValue: number;
+        let noteAccidenalMode: NoteAccidentalMode;
+
+        switch (noteName.toLowerCase()) {
             case 'c':
-                return 0;
-            case 'c#':
-            case 'db':
-                return 1;
+                noteValue = 0;
+                break;
             case 'd':
-                return 2;
-            case 'd#':
-            case 'eb':
-                return 3;
+                noteValue = 2;
+                break;
             case 'e':
-                return 4;
+                noteValue = 4;
+                break;
             case 'f':
-                return 5;
-            case 'f#':
-            case 'gb':
-                return 6;
+                noteValue = 5;
+                break;
             case 'g':
-                return 7;
-            case 'g#':
-            case 'ab':
-                return 8;
+                noteValue = 7;
+                break;
             case 'a':
-                return 9;
-            case 'a#':
-            case 'bb':
-                return 10;
+                noteValue = 9;
+                break;
             case 'b':
-                return 11;
+                noteValue = 11;
+                break;
             default:
-                return 0;
+                noteValue = 0;
+                break;
         }
+
+        noteAccidenalMode = ModelUtils.parseAccidentalMode(accidental);
+        switch (noteAccidenalMode) {
+            case NoteAccidentalMode.Default:
+                break;
+            case NoteAccidentalMode.ForceNone:
+                break;
+            case NoteAccidentalMode.ForceNatural:
+                break;
+            case NoteAccidentalMode.ForceSharp:
+                noteValue++;
+                break;
+            case NoteAccidentalMode.ForceDoubleSharp:
+                noteValue += 2;
+                break;
+            case NoteAccidentalMode.ForceFlat:
+                noteValue--;
+                break;
+            case NoteAccidentalMode.ForceDoubleFlat:
+                noteValue -= 2;
+                break;
+        }
+
+        return new TuningParseResultTone(noteValue, noteAccidenalMode);
+    }
+
+    /**
+     * @internal
+     */
+    public static readonly accidentalModeMapping = new Map<string, NoteAccidentalMode>([
+        ['default', NoteAccidentalMode.Default],
+        ['d', NoteAccidentalMode.Default],
+
+        ['forcenone', NoteAccidentalMode.ForceNone],
+        ['-', NoteAccidentalMode.ForceNone],
+
+        ['forcenatural', NoteAccidentalMode.ForceNatural],
+        ['n', NoteAccidentalMode.ForceNatural],
+
+        ['forcesharp', NoteAccidentalMode.ForceSharp],
+        ['#', NoteAccidentalMode.ForceSharp],
+
+        ['forcedoublesharp', NoteAccidentalMode.ForceDoubleSharp],
+        ['##', NoteAccidentalMode.ForceDoubleSharp],
+        ['x', NoteAccidentalMode.ForceDoubleSharp],
+
+        ['forceflat', NoteAccidentalMode.ForceFlat],
+        ['b', NoteAccidentalMode.ForceFlat],
+
+        ['forcedoubleflat', NoteAccidentalMode.ForceDoubleFlat],
+        ['bb', NoteAccidentalMode.ForceDoubleFlat]
+    ]);
+
+    public static parseAccidentalMode(data: string): NoteAccidentalMode {
+        const key = data.toLowerCase();
+        if (ModelUtils.accidentalModeMapping.has(key)) {
+            return ModelUtils.accidentalModeMapping.get(key)!;
+        }
+        return NoteAccidentalMode.Default;
     }
 
     public static newGuid(): string {
