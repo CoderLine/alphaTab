@@ -28,9 +28,14 @@ export abstract class SystemBracket {
     public abstract includesStaff(s: RenderStaff): boolean;
 
     public finalize() {
+        // systems with just a single staff do not have a bracket
+        if (this.firstStaffInBracket === this.lastStaffInBracket) {
+            this.width = 0;
+            return;
+        }
+
         // normal bracket width
         this.width = 3;
-
         if (!this.drawAsBrace || !this.firstStaffInBracket || !this.lastStaffInBracket) {
             return;
         }

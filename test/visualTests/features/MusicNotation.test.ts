@@ -8,6 +8,7 @@ import { Score } from '@src/model';
 import { TestPlatform } from '@test/TestPlatform';
 import { ScoreLoader } from '@src/importer';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { BracketExtendMode } from '@src/model/RenderStylesheet';
 
 describe('MusicNotationTests', () => {
     it('clefs', async () => {
@@ -103,13 +104,9 @@ describe('MusicNotationTests', () => {
         await VisualTestHelper.runVisualTest('music-notation/brushes-ukulele.gp');
     });
 
-    function assertAccidentalsAdvanced(score: Score) {
-        // TODO: check additional stuff
-    }
-
     it('accidentals-advanced', async () => {
         const settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.barsPerRow = 5;
 
         const inputFile = 'music-notation/accidentals-advanced.gp';
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
@@ -117,7 +114,6 @@ describe('MusicNotationTests', () => {
         const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
 
         await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings);
-        assertAccidentalsAdvanced(score);
     });
 
     it('accidentals-advanced-alphatex', async () => {
@@ -173,20 +169,18 @@ describe('MusicNotationTests', () => {
         tex = tex.substring(0, tex.length - 2) /* last |\n */;
 
         const settings = new Settings();
-        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        settings.display.barsPerRow = 5;
 
         const importer = new AlphaTexImporter();
         importer.initFromString(tex, settings);
         const score = importer.readScore();
 
-        score.defaultSystemsLayout = 5;
-        score.tracks[0].defaultSystemsLayout = 5;
         score.tracks[0].shortName = 'pno.';
         score.stylesheet.hideDynamics = true;
+        // score.stylesheet.bracketExtendMode = BracketExtendMode.NoBrackets;
 
         const referenceFileName = 'music-notation/accidentals-advanced.png';
 
         await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings);
-        assertAccidentalsAdvanced(score);
     });
 });
