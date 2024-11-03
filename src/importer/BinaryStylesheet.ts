@@ -111,13 +111,16 @@ export class BinaryStylesheet {
     }
 
     public apply(score: Score): void {
-        for(const [key, value] of this.raw) {
+        for (const [key, value] of this.raw) {
             switch (key) {
                 case 'StandardNotation/hideDynamics':
                     score.stylesheet.hideDynamics = value as boolean;
                     break;
                 case 'System/bracketExtendMode':
                     score.stylesheet.bracketExtendMode = value as number;
+                    break;
+                case 'Global/useSystemSignSeparator':
+                    score.stylesheet.useSystemSignSeparator = value as boolean;
                     break;
             }
         }

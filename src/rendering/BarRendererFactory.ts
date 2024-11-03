@@ -9,7 +9,7 @@ import { RenderStaff } from './staves/RenderStaff';
  * This is the base public class for creating factories providing BarRenderers
  */
 export abstract class BarRendererFactory {
-    public isInAccolade: boolean = true;
+    public isInsideBracket: boolean = true;
     public isRelevantForBoundsLookup: boolean = true;
     public hideOnMultiTrack: boolean = false;
     public hideOnPercussionTrack: boolean = false;

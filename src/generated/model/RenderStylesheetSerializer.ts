@@ -5,6 +5,7 @@
 // </auto-generated>
 import { RenderStylesheet } from "@src/model/RenderStylesheet";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { BracketExtendMode } from "@src/model/RenderStylesheet";
 export class RenderStylesheetSerializer {
     public static fromJson(obj: RenderStylesheet, m: unknown): void {
         if (!m) {
@@ -18,12 +19,20 @@ export class RenderStylesheetSerializer {
         }
         const o = new Map<string, unknown>();
         o.set("hidedynamics", obj.hideDynamics);
+        o.set("bracketextendmode", obj.bracketExtendMode as number);
+        o.set("usesystemsignseparator", obj.useSystemSignSeparator);
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
         switch (property) {
             case "hidedynamics":
                 obj.hideDynamics = v! as boolean;
+                return true;
+            case "bracketextendmode":
+                obj.bracketExtendMode = JsonHelper.parseEnum<BracketExtendMode>(v, BracketExtendMode)!;
+                return true;
+            case "usesystemsignseparator":
+                obj.useSystemSignSeparator = v! as boolean;
                 return true;
         }
         return false;

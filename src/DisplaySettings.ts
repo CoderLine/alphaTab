@@ -136,6 +136,11 @@ export class DisplaySettings {
     public effectStaffPaddingBottom: number = 0;
 
     /**
+     * Gets or sets the left padding applied between the left line of the staff marking the start, and the first glyph in it.
+     */
+    public staffPaddingLeft: number = 6;
+
+    /**
      * Gets how the systems should be layed out.
      */
     public systemsLayoutMode: SystemsLayoutMode = SystemsLayoutMode.Automatic;

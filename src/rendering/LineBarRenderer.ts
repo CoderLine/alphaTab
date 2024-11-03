@@ -152,7 +152,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (this._startSpacing) {
             return;
         }
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 2 * this.scale));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.settings.display.staffPaddingLeft * this.scale));
         this._startSpacing = true;
     }
 

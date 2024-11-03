@@ -240,6 +240,19 @@ export class Html5Canvas implements ICanvas {
         this.fillMusicFontSymbolText(x, y, scale, String.fromCharCode(symbol), centerAtPosition);
     }
 
+    public fillMusicFontSymbolFit(
+        x: number,
+        y: number,
+        maxWidth: number,
+        scale: number,
+        symbol: MusicFontSymbol
+    ): void {
+        if (symbol === MusicFontSymbol.None) {
+            return;
+        }
+        this.fillMusicFontSymbolText(x, y, scale, String.fromCharCode(symbol), false, maxWidth);
+    }
+
     public fillMusicFontSymbols(
         x: number,
         y: number,
@@ -261,7 +274,8 @@ export class Html5Canvas implements ICanvas {
         y: number,
         scale: number,
         symbols: string,
-        centerAtPosition: boolean = false
+        centerAtPosition: boolean,
+        maxWidth: number = 0
     ): void {
         let textAlign = this._context.textAlign;
         let baseLine = this._context.textBaseline;
@@ -273,7 +287,7 @@ export class Html5Canvas implements ICanvas {
         } else {
             this._context.textAlign = 'left';
         }
-        this._context.fillText(symbols, x, y);
+        this._context.fillText(symbols, x, y, maxWidth);
         this._context.textBaseline = baseLine;
         this._context.font = font;
         this._context.textAlign = textAlign;

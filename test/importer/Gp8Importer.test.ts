@@ -66,4 +66,9 @@ describe('Gp8ImporterTest', () => {
         ).readScore();
         expect(groupSimilarInstruments.stylesheet.bracketExtendMode).to.equal(BracketExtendMode.GroupSimilarInstruments);
     });
+
+    it('system-separator', async () => {
+        const noBrackets = (await prepareImporterWithFile('visual-tests/layout/system-divider.gp')).readScore();
+        expect(noBrackets.stylesheet.useSystemSignSeparator).to.be.true;
+    });
 });

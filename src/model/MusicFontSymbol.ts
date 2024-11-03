@@ -1,9 +1,14 @@
 /**
  * Lists all music font symbols used within alphaTab. The names
- * and values are aligned with the SMuFL standard. 
+ * and values are aligned with the SMuFL standard.
  */
 export enum MusicFontSymbol {
     None = -1,
+
+    Brace = 0xe000,
+    BracketTop = 0xe003,
+    BracketBottom = 0xe004,
+    SystemDivider = 0xe007,
 
     GClef = 0xe050,
     CClef = 0xe05c,
@@ -80,7 +85,7 @@ export enum MusicFontSymbol {
     AccidentalQuarterToneFlatArrowUp = 0xe270,
     AccidentalQuarterToneSharpArrowUp = 0xe274,
     AccidentalQuarterToneNaturalArrowUp = 0xe272,
-    
+
     ArticAccentAbove = 0xe4a0,
     ArticAccentBelow = 0xe4a1,
     ArticStaccatoAbove = 0xe4a2,
@@ -88,7 +93,7 @@ export enum MusicFontSymbol {
     ArticTenutoAbove = 0xe4a4,
     ArticTenutoBelow = 0xe4a5,
     ArticMarcatoAbove = 0xe4ac,
-    ArticMarcatoBelow = 0xe4aD,
+    ArticMarcatoBelow = 0xe4ad,
 
     FermataAbove = 0xe4c0,
     FermataShortAbove = 0xe4c4,
@@ -114,7 +119,7 @@ export enum MusicFontSymbol {
     OttavaBassaVb = 0xe51c,
     Quindicesima = 0xe514,
     QuindicesimaAlta = 0xe515,
-    
+
     DynamicPPP = 0xe52a,
     DynamicPP = 0xe52b,
     DynamicPiano = 0xe520,
@@ -138,9 +143,9 @@ export enum MusicFontSymbol {
     GuitarString4 = 0xe837,
     GuitarString5 = 0xe838,
     GuitarString6 = 0xe839,
-    GuitarString7 = 0xe83A,
-    GuitarString8 = 0xe83B,
-    GuitarString9 = 0xe83C,
+    GuitarString7 = 0xe83a,
+    GuitarString8 = 0xe83b,
+    GuitarString9 = 0xe83c,
 
     GuitarGolpe = 0xe842,
 

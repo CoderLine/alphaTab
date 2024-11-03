@@ -28,12 +28,17 @@ export enum BracketExtendMode {
  */
 export class RenderStylesheet {
     /**
-     * Gets or sets whether dynamics are hidden.
+     * Whether dynamics are hidden.
      */
     public hideDynamics: boolean = false;
 
     /**
-     * Gets or sets the mode in which brackets and braces are drawn.
+     * The mode in which brackets and braces are drawn.
      */
     public bracketExtendMode: BracketExtendMode = BracketExtendMode.GroupStaves;
+
+    /**
+     * Whether to draw the // sign to separate systems.
+     */
+    public useSystemSignSeparator: boolean = false;
 }

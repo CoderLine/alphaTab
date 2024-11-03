@@ -28,7 +28,7 @@ export class EffectBarRendererFactory extends BarRendererFactory {
         super();
         this.infos = infos;
         this._staffId = staffId;
-        this.isInAccolade = false;
+        this.isInsideBracket = false;
         this.isRelevantForBoundsLookup = false;
         this.shouldShow = shouldShow;
     }
