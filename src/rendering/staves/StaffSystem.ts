@@ -100,6 +100,7 @@ export class StaffSystem {
     private _accoladeSpacingCalculated: boolean = false;
 
     private _brackets: SystemBracket[] = [];
+    private _hasSystemSeparator = false;
 
     public x: number = 0;
     public y: number = 0;
@@ -392,6 +393,23 @@ export class StaffSystem {
         cy += this.topPadding;
 
         this.paintPartial(cx + this.x, cy + this.y, canvas, 0, this.masterBarsRenderers.length);
+
+        if (this._hasSystemSeparator) {
+            canvas.fillMusicFontSymbol(
+                cx + this.x,
+                cy + this.y + this.height - 10 * this.layout.scale,
+                1,
+                MusicFontSymbol.SystemDivider,
+                false
+            );
+            canvas.fillMusicFontSymbol(
+                cx + this.x + this.width - StaffSystem.SystemSignSeparatorWidth * this.layout.scale,
+                cy + this.y + this.height - StaffSystem.SystemSignSeparatorPadding * this.layout.scale,
+                1,
+                MusicFontSymbol.SystemDivider,
+                false
+            );
+        }
     }
 
     public paintPartial(cx: number, cy: number, canvas: ICanvas, startIndex: number, count: number): void {
@@ -493,13 +511,24 @@ export class StaffSystem {
         }
     }
 
+    private static readonly SystemSignSeparatorHeight = 40;
+    private static readonly SystemSignSeparatorPadding = 10;
+    private static readonly SystemSignSeparatorWidth = 36;
+
     public finalizeSystem(): void {
         const settings = this.layout.renderer.settings;
         if (this.index === 0) {
             this.topPadding = settings.display.firstSystemPaddingTop * settings.display.scale;
         }
+
         if (this.isLast) {
             this.bottomPadding = settings.display.lastSystemPaddingBottom * settings.display.scale;
+        } else if (
+            this.layout.renderer.score!.stylesheet.useSystemSignSeparator &&
+            this.layout.renderer.tracks!.length > 1
+        ) {
+            this.bottomPadding += StaffSystem.SystemSignSeparatorHeight * settings.display.scale;
+            this._hasSystemSeparator = true;
         }
 
         let currentY: number = 0;

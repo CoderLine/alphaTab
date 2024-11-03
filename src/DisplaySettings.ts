@@ -138,7 +138,7 @@ export class DisplaySettings {
     /**
      * Gets or sets the left padding applied between the left line and the first glyph in the first staff in a system.
      */
-    public staffPaddingBegin: number = 6;
+    public firstStaffPaddingLeft: number = 6;
 
     /**
      * Gets or sets the left padding applied between the left line and the first glyph in the following staff in a system.

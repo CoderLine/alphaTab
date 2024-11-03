@@ -152,7 +152,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (this._startSpacing) {
             return;
         }
-        const padding = this.index === 0 ? this.settings.display.staffPaddingBegin : this.settings.display.staffPaddingLeft;
+        const padding = this.index === 0 ? this.settings.display.firstStaffPaddingLeft : this.settings.display.staffPaddingLeft;
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, padding * this.scale));
         this._startSpacing = true;
     }
