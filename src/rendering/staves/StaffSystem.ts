@@ -14,7 +14,7 @@ import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 import { RenderingResources } from '@src/RenderingResources';
 import { NotationElement } from '@src/NotationSettings';
 import { BracketExtendMode } from '@src/model/RenderStylesheet';
-import { Color, MusicFontSymbol } from '@src/model';
+import { MusicFontSymbol } from '@src/model';
 import { Environment } from '@src/Environment';
 
 export abstract class SystemBracket {
@@ -384,10 +384,10 @@ export class StaffSystem {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
-        const c = canvas.color;
-        canvas.color = Color.random(255);
-        canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.height);
-        canvas.color = c;
+        // const c = canvas.color;
+        // canvas.color = Color.random(255);
+        // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.height);
+        // canvas.color = c;
 
         cy += this.topPadding;
 
