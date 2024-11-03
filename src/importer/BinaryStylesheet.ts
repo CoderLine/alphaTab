@@ -116,6 +116,9 @@ export class BinaryStylesheet {
                 case 'StandardNotation/hideDynamics':
                     score.stylesheet.hideDynamics = value as boolean;
                     break;
+                case 'System/bracketExtendMode':
+                    score.stylesheet.bracketExtendMode = value as number;
+                    break;
             }
         }
     }

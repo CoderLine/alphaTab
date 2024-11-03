@@ -1,5 +1,6 @@
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
+import { BracketExtendMode } from '@src/model/RenderStylesheet';
 import { Settings } from '@src/Settings';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
@@ -20,15 +21,14 @@ describe('Gp8ImporterTest', () => {
     it('layout-configuration', async () => {
         const track1 = (await prepareImporterWithFile('guitarpro8/layout-configuration-multi-track-1.gp')).readScore();
         const track2 = (await prepareImporterWithFile('guitarpro8/layout-configuration-multi-track-2.gp')).readScore();
-        const trackAll = (await prepareImporterWithFile('guitarpro8/layout-configuration-multi-track-all.gp')).readScore();
-        const track1And3 = (await prepareImporterWithFile('guitarpro8/layout-configuration-multi-track-1-3.gp')).readScore();
+        const trackAll = (
+            await prepareImporterWithFile('guitarpro8/layout-configuration-multi-track-all.gp')
+        ).readScore();
+        const track1And3 = (
+            await prepareImporterWithFile('guitarpro8/layout-configuration-multi-track-1-3.gp')
+        ).readScore();
 
-        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
-            track1, 
-            track2,
-            trackAll,
-            track1And3
-        );
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(track1, track2, trackAll, track1And3);
     });
 
     it('slash', async () => {
@@ -50,5 +50,20 @@ describe('Gp8ImporterTest', () => {
         expect(score.masterBars[1].tempoAutomations[0].ratioPosition).to.equal(0);
         expect(score.masterBars[1].tempoAutomations[1].value).to.equal(120);
         expect(score.masterBars[1].tempoAutomations[1].ratioPosition).to.equal(0.6375);
+    });
+
+    it('bracket-braces', async () => {
+        const noBrackets = (await prepareImporterWithFile('visual-tests/layout/brackets-braces-none.gp')).readScore();
+        expect(noBrackets.stylesheet.bracketExtendMode).to.equal(BracketExtendMode.NoBrackets);
+        
+        const groupStaves = (
+            await prepareImporterWithFile('visual-tests/layout/brackets-braces-staves.gp')
+        ).readScore();
+        expect(groupStaves.stylesheet.bracketExtendMode).to.equal(BracketExtendMode.GroupStaves);
+
+        const groupSimilarInstruments = (
+            await prepareImporterWithFile('visual-tests/layout/brackets-braces-similar.gp')
+        ).readScore();
+        expect(groupSimilarInstruments.stylesheet.bracketExtendMode).to.equal(BracketExtendMode.GroupSimilarInstruments);
     });
 });
