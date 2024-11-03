@@ -27,7 +27,7 @@ export abstract class SystemBracket {
 
     public abstract includesStaff(s: RenderStaff): boolean;
 
-    public finalize() {
+    public finalizeBracket() {
         // systems with just a single staff do not have a bracket
         if (this.firstStaffInBracket === this.lastStaffInBracket) {
             this.width = 0;
@@ -60,15 +60,15 @@ class SingleTrackSystemBracket extends SystemBracket {
     public constructor(track: Track) {
         super();
         this.track = track;
-        this.drawAsBrace = SingleTrackSystemBracket.trackDrawAsBrace(track);
+        this.drawAsBrace = SingleTrackSystemBracket.isTrackDrawAsBrace(track);
     }
 
     public override includesStaff(r: RenderStaff): boolean {
         return r.modelStaff.track === this.track;
     }
 
-    public static trackDrawAsBrace(track: Track) {
-        return track.staves.filter(s => s.showStandardNotation).length > 1;
+    public static isTrackDrawAsBrace(track: Track) {
+        return track.staves.filter(s => s.showStandardNotation as boolean).length > 1;
     }
 }
 
@@ -300,7 +300,7 @@ export class StaffSystem {
 
             let braceWidth = 0;
             for (const b of this._brackets) {
-                b.finalize();
+                b.finalizeBracket();
                 braceWidth = Math.max(braceWidth, b.width * this.layout.scale);
             }
 
@@ -545,7 +545,7 @@ export class StaffSystem {
         }
 
         for (const b of this._brackets!) {
-            b.finalize();
+            b.finalizeBracket();
         }
     }
 

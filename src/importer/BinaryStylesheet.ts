@@ -5,6 +5,7 @@ import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
 import { BendPoint } from '@src/model/BendPoint';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Color } from '@src/model/Color';
+import { BracketExtendMode } from '@src/model/RenderStylesheet';
 
 enum DataType {
     Boolean,
@@ -117,7 +118,7 @@ export class BinaryStylesheet {
                     score.stylesheet.hideDynamics = value as boolean;
                     break;
                 case 'System/bracketExtendMode':
-                    score.stylesheet.bracketExtendMode = value as number;
+                    score.stylesheet.bracketExtendMode = (value as number) as BracketExtendMode;
                     break;
                 case 'Global/useSystemSignSeparator':
                     score.stylesheet.useSystemSignSeparator = value as boolean;
@@ -135,7 +136,7 @@ export class BinaryStylesheet {
         IOHelper.writeInt32BE(writer, 3); // entry count
 
         BinaryStylesheet.writeBooleanEntry(writer, 'StandardNotation/hideDynamics', score.stylesheet.hideDynamics);
-        BinaryStylesheet.writeNumberEntry(writer, 'System/bracketExtendMode', score.stylesheet.bracketExtendMode);
+        BinaryStylesheet.writeNumberEntry(writer, 'System/bracketExtendMode', score.stylesheet.bracketExtendMode as number);
         BinaryStylesheet.writeBooleanEntry(writer, 'Global/useSystemSignSeparator', score.stylesheet.useSystemSignSeparator);
 
         return writer.toArray();

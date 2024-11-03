@@ -105,7 +105,11 @@ export interface DisplaySettingsJson {
      */
     effectStaffPaddingBottom?: number;
     /**
-     * Gets or sets the left padding applied between the left line of the staff marking the start, and the first glyph in it.
+     * Gets or sets the left padding applied between the left line and the first glyph in the first staff in a system.
+     */
+    firstStaffPaddingLeft?: number;
+    /**
+     * Gets or sets the left padding applied between the left line and the first glyph in the following staff in a system.
      */
     staffPaddingLeft?: number;
     /**
