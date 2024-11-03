@@ -4,7 +4,7 @@ import { Settings } from '@src/Settings';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { NotationElement } from '@src/NotationSettings';
 import { SystemsLayoutMode } from '@src/DisplaySettings';
-import { KeySignature, NoteAccidentalMode, Score } from '@src/model';
+import { Score } from '@src/model';
 import { TestPlatform } from '@test/TestPlatform';
 import { ScoreLoader } from '@src/importer';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';

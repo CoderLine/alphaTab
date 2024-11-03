@@ -531,8 +531,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 newLines.set(step, true);
             }
         }
-        // naturalize previous key
-        if (this.index > 0) {
+        // naturalize previous key if naturalizing
+        if (this.bar.masterBar.keySignature === KeySignature.C) {
             let naturalizeSymbols: number = Math.abs(previousKey);
             let previousKeyPositions = ModelUtils.keySignatureIsSharp(previousKey)
                 ? ScoreBarRenderer.SharpKsSteps
