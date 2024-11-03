@@ -1224,7 +1224,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 }
             }
         }
-        let value: number = octave * 12 + ModelUtils.getToneForText(step) + semitones;
+        let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + semitones;
         note.octave = (value / 12) | 0;
         note.tone = value - note.octave * 12;
     }
@@ -1252,7 +1252,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 }
             }
         }
-        let value: number = octave * 12 + ModelUtils.getToneForText(step) + (semitones | 0);
+        let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + (semitones | 0);
         note.octave = (value / 12) | 0;
         note.tone = value - note.octave * 12;
     }

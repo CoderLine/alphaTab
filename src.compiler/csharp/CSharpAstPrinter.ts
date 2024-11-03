@@ -727,7 +727,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         let exprs: cs.Expression[] = [];
         expr.chunks.forEach(c => {
             if (cs.isStringLiteral(c)) {
-                const escapedText = c.text.split('"').join('""');
+                const escapedText = c.text
+                .replaceAll('"', '""')
+                .replaceAll('{', '{{')
+                .replaceAll('}', '}}');
                 this.write(escapedText);
             } else {
                 this.write(`{${exprs.length}}`);

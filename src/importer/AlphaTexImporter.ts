@@ -38,6 +38,7 @@ import { IOHelper } from '@src/io/IOHelper';
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
+import { NoteAccidentalMode } from '@src/model';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -117,6 +118,11 @@ export class AlphaTexError extends AlphaTabError {
     }
 }
 
+enum AlphaTexAccidentalMode {
+    Auto,
+    Explicit
+}
+
 /**
  * This importer can parse alphaTex markup into a score structure.
  */
@@ -147,6 +153,8 @@ export class AlphaTexImporter extends ScoreImporter {
     private _staffHasExplicitTuning: boolean = false;
     private _staffTuningApplied: boolean = false;
     private _percussionArticulationNames = new Map<string, number>();
+
+    private _accidentalMode: AlphaTexAccidentalMode = AlphaTexAccidentalMode.Explicit;
 
     public logErrors: boolean = false;
 
@@ -783,9 +791,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     case AlphaTexSymbols.String:
                         let text: string = (this._syData as string).toLowerCase();
                         if (text === 'piano' || text === 'none' || text === 'voice') {
-                            // clear tuning
-                            this._currentStaff.stringTuning.tunings = [];
-                            this._currentStaff.displayTranspositionPitch = 0;
+                            this.makeCurrentStaffPitched();
                         } else {
                             this.error('tuning', AlphaTexSymbols.Tuning, true);
                         }
@@ -909,9 +915,36 @@ export class AlphaTexImporter extends ScoreImporter {
 
                 this._percussionArticulationNames.set(name.toLowerCase(), number);
                 return true;
+            case 'accidentals':
+                this.handleAccidentalMode();
+                return true;
             default:
                 return false;
         }
+    }
+
+    private handleAccidentalMode() {
+        this._sy = this.newSy();
+        if (this._sy !== AlphaTexSymbols.String) {
+            this.error('accidental-mode', AlphaTexSymbols.String, true);
+        }
+
+        switch (this._syData as string) {
+            case 'auto':
+                this._accidentalMode = AlphaTexAccidentalMode.Auto;
+                break;
+            case 'explicit':
+                this._accidentalMode = AlphaTexAccidentalMode.Explicit;
+                break;
+        }
+
+        this._sy = this.newSy();
+    }
+
+    private makeCurrentStaffPitched() {
+        // clear tuning
+        this._currentStaff.stringTuning.tunings = [];
+        this._currentStaff.displayTranspositionPitch = 0;
     }
 
     /**
@@ -1355,6 +1388,13 @@ export class AlphaTexImporter extends ScoreImporter {
             beat.pop = true;
         } else if (syData === 'tt') {
             beat.tap = true;
+        } else if (syData === 'txt') {
+            this._sy = this.newSy();
+            if (this._sy !== AlphaTexSymbols.String) {
+                this.error('beat-text', AlphaTexSymbols.String, true);
+                return false;
+            }
+            beat.text = this._syData as string;
         } else if (syData === 'dd') {
             beat.dots = 2;
         } else if (syData === 'd') {
@@ -1536,7 +1576,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
             }
             return true;
-        }  else if (syData === 'slashed') {
+        } else if (syData === 'slashed') {
             beat.slashed = true;
             this._sy = this.newSy();
             return true;
@@ -1600,12 +1640,13 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private note(beat: Beat): boolean {
-        // fret.string
+        // fret.string or TuningWithAccidentals
         let isDead: boolean = false;
         let isTie: boolean = false;
         let fret: number = -1;
         let octave: number = -1;
         let tone: number = -1;
+        let accidentalMode: NoteAccidentalMode = NoteAccidentalMode.Default;
         switch (this._sy) {
             case AlphaTexSymbols.Number:
                 fret = this._syData as number;
@@ -1633,9 +1674,17 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 break;
             case AlphaTexSymbols.Tuning:
+                // auto convert staff
+                if (beat.index === 0 && beat.voice.index === 0 && beat.voice.bar.index === 0) {
+                    this.makeCurrentStaffPitched();
+                }
+
                 let tuning: TuningParseResult = this._syData as TuningParseResult;
                 octave = tuning.octave;
-                tone = tuning.noteValue;
+                tone = tuning.tone.noteValue;
+                if (this._accidentalMode == AlphaTexAccidentalMode.Explicit) {
+                    accidentalMode = tuning.tone.accidentalMode;
+                }
                 break;
             default:
                 return false;
@@ -1675,6 +1724,7 @@ export class AlphaTexImporter extends ScoreImporter {
         } else {
             note.octave = octave;
             note.tone = tone;
+            note.accidentalMode = accidentalMode;
             note.isTieDestination = isTie;
         }
         beat.addNote(note);
@@ -1864,6 +1914,15 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                 }
                 note.rightHandFinger = finger;
+            } else if (syData === 'acc') {
+                this._sy = this.newSy();
+
+                if (this._sy !== AlphaTexSymbols.String) {
+                    this.error('note-accidental', AlphaTexSymbols.String, true);
+                }
+
+                note.accidentalMode = ModelUtils.parseAccidentalMode(this._syData as string);
+                this._sy = this.newSy();
             } else if (this.applyBeatEffect(note.beat)) {
                 // Success
             } else {
@@ -2039,6 +2098,8 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (syData === 'ac') {
                 master.isAnacrusis = true;
                 this._sy = this.newSy();
+            } else if (syData === 'accidentals') {
+                this.handleAccidentalMode();
             } else {
                 if (bar.index === 0) {
                     if (!this.handleStaffMeta()) {

@@ -852,7 +852,7 @@ export class CapellaParser {
         const note = new Note();
         const pitch = ModelUtils.parseTuning(element.getAttribute('pitch'));
         note.octave = pitch!.octave - 1;
-        note.tone = pitch!.noteValue;
+        note.tone = pitch!.tone.noteValue;
         note.isStaccato = articulation.isStaccato;
         note.accentuated = articulation.accentuated;
         beat.addNote(note);

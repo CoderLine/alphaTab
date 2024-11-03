@@ -10,7 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { KeySignature } from '@src/model';
+import { KeySignature, NoteAccidentalMode } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -22,6 +22,7 @@ import { HarmonicsEffectInfo } from '@src/rendering/effects/HarmonicsEffectInfo'
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { assert, expect } from 'chai';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
@@ -1241,5 +1242,47 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.equal(0);
         expect(score.masterBars[0].tempoAutomations[1].value).to.equal(60);
         expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.equal(0.5);
+    });
+
+    it('note-accidentals', () => {
+        let tex = '. \n';
+        const expectedAccidentalModes: NoteAccidentalMode[] = [];
+        for (const [k, v] of ModelUtils.accidentalModeMapping) {
+            tex += `3.3 { acc ${k} } \n`;
+            expectedAccidentalModes.push(v);
+        }
+
+        const score = parseTex(tex);
+
+        const actualAccidentalModes: NoteAccidentalMode[] = [];
+
+        let b: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        while (b != null) {
+            actualAccidentalModes.push(b.notes[0].accidentalMode);
+            b = b.nextBeat;
+        }
+
+        expect(actualAccidentalModes.join(',')).to.equal(expectedAccidentalModes.join(','));
+    });
+
+    it('accidental-mode', () => {
+        // song level
+        let score = parseTex('\\accidentals auto . F##4')
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.Default);
+
+        // track level
+        score = parseTex('\\track "T1" F##4 | \\track "T2" \\accidentals auto F##4')
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.ForceDoubleSharp);
+        expect(score.tracks[1].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.Default);
+
+        // staff level
+        score = parseTex('\\track "T1" \\staff F##4 \\staff \\accidentals auto F##4')
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.ForceDoubleSharp);
+        expect(score.tracks[0].staves[1].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.Default);
+
+        // bar level
+        score = parseTex('F##4 | \\accidentals auto F##4')
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.ForceDoubleSharp);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.Default);
     });
 });
