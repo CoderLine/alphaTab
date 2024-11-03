@@ -3,12 +3,9 @@ import { StaveProfile } from '@src/StaveProfile';
 import { Settings } from '@src/Settings';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { NotationElement } from '@src/NotationSettings';
-import { SystemsLayoutMode } from '@src/DisplaySettings';
-import { Score } from '@src/model';
 import { TestPlatform } from '@test/TestPlatform';
 import { ScoreLoader } from '@src/importer';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { BracketExtendMode } from '@src/model/RenderStylesheet';
 
 describe('MusicNotationTests', () => {
     it('clefs', async () => {
