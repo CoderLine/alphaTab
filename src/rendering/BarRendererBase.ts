@@ -528,12 +528,16 @@ export class BarRendererBase {
         // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
         // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
         if ((this._wasFirstOfLine && !this.isFirstOfLine) || (!this._wasFirstOfLine && this.isFirstOfLine)) {
-            this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
-            this._preBeatGlyphs.renderer = this;
-            this.createPreBeatGlyphs();
+            this.recreatePreBeatGlyphs();
         }
         this.updateSizes();
         this.registerLayoutingInfo();
+    }
+    
+    protected recreatePreBeatGlyphs() {
+        this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
+        this._preBeatGlyphs.renderer = this;
+        this.createPreBeatGlyphs();
     }
 
     protected paintSimileMark(cx: number, cy: number, canvas: ICanvas): void {

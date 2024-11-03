@@ -17,7 +17,7 @@ export class BarNumberGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        if (!this.renderer.staff.isFirstInAccolade) {
+        if (!this.renderer.staff.isFirstInSystem) {
             return;
         }
         let res: RenderingResources = this.renderer.resources;

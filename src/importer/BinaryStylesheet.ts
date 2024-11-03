@@ -5,6 +5,7 @@ import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
 import { BendPoint } from '@src/model/BendPoint';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Color } from '@src/model/Color';
+import { BracketExtendMode } from '@src/model/RenderStylesheet';
 
 enum DataType {
     Boolean,
@@ -111,10 +112,16 @@ export class BinaryStylesheet {
     }
 
     public apply(score: Score): void {
-        for(const [key, value] of this.raw) {
+        for (const [key, value] of this.raw) {
             switch (key) {
                 case 'StandardNotation/hideDynamics':
                     score.stylesheet.hideDynamics = value as boolean;
+                    break;
+                case 'System/bracketExtendMode':
+                    score.stylesheet.bracketExtendMode = (value as number) as BracketExtendMode;
+                    break;
+                case 'Global/useSystemSignSeparator':
+                    score.stylesheet.useSystemSignSeparator = value as boolean;
                     break;
             }
         }
@@ -126,9 +133,11 @@ export class BinaryStylesheet {
 
     public static writeForScore(score: Score): Uint8Array {
         const writer = ByteBuffer.withCapacity(128);
-        IOHelper.writeInt32BE(writer, 1); // entry count
+        IOHelper.writeInt32BE(writer, 3); // entry count
 
         BinaryStylesheet.writeBooleanEntry(writer, 'StandardNotation/hideDynamics', score.stylesheet.hideDynamics);
+        BinaryStylesheet.writeNumberEntry(writer, 'System/bracketExtendMode', score.stylesheet.bracketExtendMode as number);
+        BinaryStylesheet.writeBooleanEntry(writer, 'Global/useSystemSignSeparator', score.stylesheet.useSystemSignSeparator);
 
         return writer.toArray();
     }
@@ -137,5 +146,11 @@ export class BinaryStylesheet {
         GpBinaryHelpers.gpWriteString(writer, key);
         writer.writeByte(DataType.Boolean as number);
         writer.writeByte(value ? 1 : 0);
+    }
+
+    private static writeNumberEntry(writer: ByteBuffer, key: string, value: number) {
+        GpBinaryHelpers.gpWriteString(writer, key);
+        writer.writeByte(DataType.Integer as number);
+        IOHelper.writeInt32BE(writer, value)
     }
 }

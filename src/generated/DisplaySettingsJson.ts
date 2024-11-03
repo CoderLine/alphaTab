@@ -105,6 +105,14 @@ export interface DisplaySettingsJson {
      */
     effectStaffPaddingBottom?: number;
     /**
+     * Gets or sets the left padding applied between the left line and the first glyph in the first staff in a system.
+     */
+    firstStaffPaddingLeft?: number;
+    /**
+     * Gets or sets the left padding applied between the left line and the first glyph in the following staff in a system.
+     */
+    staffPaddingLeft?: number;
+    /**
      * Gets how the systems should be layed out.
      */
     systemsLayoutMode?: SystemsLayoutMode | keyof typeof SystemsLayoutMode;

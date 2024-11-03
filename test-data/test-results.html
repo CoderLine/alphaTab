@@ -19,12 +19,6 @@
             width: 100%;
         }
 
-        .toggle {
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-
         .expected {
             background: #FFF;
             position: absolute;
@@ -58,6 +52,17 @@
             position: absolute;
             left: 0;
         }
+
+        .controls {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .accepted .diff,
+        .accepted .expected,
+        .accepted .actual {
+            border-color: green;
+        }
     </style>
 </head>
 
@@ -69,7 +74,7 @@
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
     <script>
-        function setupComparer(el) {
+        function setupComparer(el, result) {
             const ex = el.querySelector('.expected');
             const ac = el.querySelector('.actual');
             const df = el.querySelector('.diff');
@@ -110,6 +115,29 @@
                     df.style.display = 'none';
                 }
             };
+            const acceptButton = el.querySelector('.accept');
+            acceptButton.onclick = () => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/accept-test-result', true, null, null);
+                xhr.responseType = 'text';
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = () => {
+                    acceptButton.classList.add('disabled');
+                    const response = JSON.parse(xhr.responseText);
+                    if(response.message){
+                        acceptButton.innerText = response.message;
+                    } else {
+                        acceptButton.innerText = 'Accepted';
+                    }
+                    el.classList.add('accepted');
+                };
+                xhr.onerror = () => {
+                    alert('error accepting test result');
+                    acceptButton.innerText = 'Accept';
+                }
+                acceptButton.innerText = 'Accepting...';
+                xhr.send(JSON.stringify(result));
+            };
         }
 
         async function createComparer(result) {
@@ -120,10 +148,15 @@
                 <div class="actual"><img /></div>
                 <div class="diff"><img /></div>
                 <input type="range" min="0" max="1" step="0.001" value="0.5" class="slider" />
-                <label class="toggle">
-                    <input type="checkbox" />
-                    Show Diff
-                </label>
+                <div class="controls">
+                    <label class="toggle">
+                        <input type="checkbox" />
+                        Show Diff
+                    </label>
+                    <button class="accept btn btn-secondary btn-sm">
+                        Accept
+                    </button>
+                </div>
             `;
 
             const expected = new Promise((resolve, reject) => {
@@ -162,7 +195,7 @@
 
             await Promise.all([expected, actual, diff]);
 
-            setupComparer(comparer);
+            setupComparer(comparer, result);
 
             return comparer;
         }

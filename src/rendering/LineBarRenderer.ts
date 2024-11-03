@@ -152,7 +152,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (this._startSpacing) {
             return;
         }
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 2 * this.scale));
+        const padding = this.index === 0 ? this.settings.display.firstStaffPaddingLeft : this.settings.display.staffPaddingLeft;
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, padding * this.scale));
         this._startSpacing = true;
     }
 
@@ -499,6 +500,12 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
         return this.getLineHeight(size);
     }
+
+    protected override recreatePreBeatGlyphs(): void {
+        this._startSpacing = false;
+        super.recreatePreBeatGlyphs();
+    }
+
 
     protected abstract getBarLineStart(beat: Beat, direction: BeamDirection): number;
 
