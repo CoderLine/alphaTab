@@ -20,7 +20,7 @@ import { CapoEffectInfo } from '@src/rendering/effects/CapoEffectInfo';
 import { ChordsEffectInfo } from '@src/rendering/effects/ChordsEffectInfo';
 import { CrescendoEffectInfo } from '@src/rendering/effects/CrescendoEffectInfo';
 import { DynamicsEffectInfo } from '@src/rendering/effects/DynamicsEffectInfo';
-import { FadeInEffectInfo } from '@src/rendering/effects/FadeInEffectInfo';
+import { FadeEffectInfo } from '@src/rendering/effects/FadeEffectInfo';
 import { FermataEffectInfo } from '@src/rendering/effects/FermataEffectInfo';
 import { FingeringEffectInfo } from '@src/rendering/effects/FingeringEffectInfo';
 import { HarmonicsEffectInfo } from '@src/rendering/effects/HarmonicsEffectInfo';
@@ -549,7 +549,7 @@ export class Environment {
                     new WideNoteVibratoEffectInfo(),
                     new SlightNoteVibratoEffectInfo(),
                     new TapEffectInfo(),
-                    new FadeInEffectInfo(),
+                    new FadeEffectInfo(),
                     new HarmonicsEffectInfo(HarmonicType.Natural),
                     new HarmonicsEffectInfo(HarmonicType.Artificial),
                     new HarmonicsEffectInfo(HarmonicType.Pinch),

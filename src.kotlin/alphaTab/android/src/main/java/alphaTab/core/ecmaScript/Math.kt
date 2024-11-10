@@ -1,6 +1,7 @@
 package alphaTab.core.ecmaScript
 
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 internal class Math {
     companion object {
@@ -10,7 +11,7 @@ internal class Math {
         }
 
         public fun round(x: Double): Double {
-            return kotlin.math.round(x)
+            return x.roundToInt().toDouble()
         }
 
         public fun exp(x: Double): Double {

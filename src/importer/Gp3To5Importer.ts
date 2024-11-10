@@ -41,6 +41,7 @@ import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { IWriteable } from '@src/io/IWriteable';
 import { Tuning } from '@src/model/Tuning';
+import { FadeType } from '@src/model/FadeType';
 
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
@@ -683,7 +684,9 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 400) {
             flags2 = this.data.readByte();
         }
-        beat.fadeIn = (flags & 0x10) !== 0;
+        if((flags & 0x10) !== 0) {
+            beat.fade = FadeType.FadeIn;
+        }
         if ((this._versionNumber < 400 && (flags & 0x01) !== 0) || (flags & 0x02) !== 0) {
             beat.vibrato = VibratoType.Slight;
         }

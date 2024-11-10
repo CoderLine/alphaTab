@@ -40,6 +40,7 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { NoteAccidentalMode } from '@src/model';
 import { GolpeType } from '@src/model/GolpeType';
+import { FadeType } from '@src/model/FadeType';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -1389,7 +1390,11 @@ export class AlphaTexImporter extends ScoreImporter {
     private applyBeatEffect(beat: Beat): boolean {
         let syData: string = (this._syData as string).toLowerCase();
         if (syData === 'f') {
-            beat.fadeIn = true;
+            beat.fade = FadeType.FadeIn;
+        } else if (syData === 'fo') {
+            beat.fade = FadeType.FadeOut;
+        } else if (syData === 'vs') {
+            beat.fade = FadeType.VolumeSwell;
         } else if (syData === 'v') {
             beat.vibrato = VibratoType.Slight;
         } else if (syData === 's') {

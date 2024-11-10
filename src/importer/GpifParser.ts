@@ -47,6 +47,7 @@ import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { NoteCloner } from '@src/generated/model/NoteCloner';
 import { Logger } from '@src/Logger';
 import { GolpeType } from '@src/model/GolpeType';
+import { FadeType } from '@src/model/FadeType';
 
 /**
  * This structure represents a duration within a gpif
@@ -1473,8 +1474,16 @@ export class GpifParser {
                         this._rhythmOfBeat.set(beatId, c.getAttribute('ref'));
                         break;
                     case 'Fadding':
-                        if (c.innerText === 'FadeIn') {
-                            beat.fadeIn = true;
+                        switch (c.innerText) {
+                            case 'FadeIn':
+                                beat.fade = FadeType.FadeIn;
+                                break;
+                            case 'FadeOut':
+                                beat.fade = FadeType.FadeOut;
+                                break;
+                            case 'VolumeSwell':
+                                beat.fade = FadeType.VolumeSwell;
+                                break;
                         }
                         break;
                     case 'Tremolo':
