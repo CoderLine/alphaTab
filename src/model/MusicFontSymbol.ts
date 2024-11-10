@@ -130,6 +130,10 @@ export enum MusicFontSymbol {
     DynamicFFF = 0xe530,
 
     OrnamentTrill = 0xe566,
+    OrnamentTurn = 0xe567,
+    OrnamentTurnInverted = 0xe568,
+    OrnamentShortTrill = 0xe56c,
+    OrnamentMordent = 0xe56d,
 
     StringsDownBow = 0xe610,
     StringsUpBow = 0xe612,

@@ -18,6 +18,7 @@ import { Fingers } from "@src/model/Fingers";
 import { Duration } from "@src/model/Duration";
 import { NoteAccidentalMode } from "@src/model/NoteAccidentalMode";
 import { DynamicValue } from "@src/model/DynamicValue";
+import { NoteOrnament } from "@src/model/NoteOrnament";
 export class NoteSerializer {
     public static fromJson(obj: Note, m: unknown): void {
         if (!m) {
@@ -67,6 +68,7 @@ export class NoteSerializer {
         o.set("durationpercent", obj.durationPercent);
         o.set("accidentalmode", obj.accidentalMode as number);
         o.set("dynamics", obj.dynamics as number);
+        o.set("ornament", obj.ornament as number);
         obj.toJson(o);
         return o;
     }
@@ -183,6 +185,9 @@ export class NoteSerializer {
                 return true;
             case "dynamics":
                 obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
+                return true;
+            case "ornament":
+                obj.ornament = JsonHelper.parseEnum<NoteOrnament>(v, NoteOrnament)!;
                 return true;
         }
         return obj.setProperty(property, v);

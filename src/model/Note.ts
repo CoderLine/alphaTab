@@ -20,6 +20,7 @@ import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PickStroke } from '@src/model/PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
+import { NoteOrnament } from './NoteOrnament';
 
 class NoteIdBag {
     public tieDestinationNoteId: number = -1;
@@ -497,6 +498,11 @@ export class Note {
      * @json_ignore
      */
     public effectSlurDestination: Note | null = null;
+
+    /**
+     * The ornament applied on the note.
+     */
+    public ornament: NoteOrnament = NoteOrnament.None;
 
     public get stringTuning(): number {
         return this.beat.voice.bar.staff.capo + Note.getStringTuning(this.beat.voice.bar.staff, this.string);

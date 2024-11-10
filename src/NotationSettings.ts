@@ -316,7 +316,12 @@ export enum NotationElement {
     /**
      * The Beat barre effect signs above and below the staff "1/2B IV ─────┐"
      */
-    BeatBarre
+    EffectBeatBarre,
+
+    /**
+     * The note ornaments like turns and mordents.
+     */
+    EffectNoteOrnament,
 }
 
 /**
