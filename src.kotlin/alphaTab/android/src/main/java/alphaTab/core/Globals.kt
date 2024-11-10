@@ -276,3 +276,8 @@ internal fun <T> Deferred<T>.catch(callback: (alphaTab.core.ecmaScript.Error) ->
 @OptIn(ExperimentalUnsignedTypes::class)
 internal val ArrayBuffer.byteLength: Int
     get() = this.size
+
+internal fun String.repeat(count:Double): String {
+    return this.repeat(count.toInt())
+}
+

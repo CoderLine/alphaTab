@@ -26,6 +26,7 @@ import { DynamicValue } from "@src/model/DynamicValue";
 import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
 import { WahPedal } from "@src/model/WahPedal";
+import { BarreShape } from "@src/model/BarreShape";
 export class BeatSerializer {
     public static fromJson(obj: Beat, m: unknown): void {
         if (!m) {
@@ -81,6 +82,8 @@ export class BeatSerializer {
         o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null);
         o.set("beamingmode", obj.beamingMode as number);
         o.set("wahpedal", obj.wahPedal as number);
+        o.set("barrefret", obj.barreFret);
+        o.set("barreshape", obj.barreShape as number);
         return o;
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
@@ -224,6 +227,12 @@ export class BeatSerializer {
                 return true;
             case "wahpedal":
                 obj.wahPedal = JsonHelper.parseEnum<WahPedal>(v, WahPedal)!;
+                return true;
+            case "barrefret":
+                obj.barreFret = v! as number;
+                return true;
+            case "barreshape":
+                obj.barreShape = JsonHelper.parseEnum<BarreShape>(v, BarreShape)!;
                 return true;
         }
         return false;

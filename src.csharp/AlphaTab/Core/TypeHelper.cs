@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using AlphaTab.Core.EcmaScript;
 
@@ -485,6 +486,23 @@ namespace AlphaTab.Core
         public static string[] Split(this string value, RegExp pattern)
         {
             return pattern.Split(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Repeat(this string value, double count)
+        {
+            var icount = (int)count;
+            if (icount == 0)
+            {
+                return "";
+            }
+
+            var builder = new StringBuilder(value.Length * icount);
+            for (var i = 0; i < icount; i++)
+            {
+                builder.Append(value);
+            }
+            return builder.ToString();
         }
 
         public static Task CreatePromise(Action<Action, Action<object>> run)

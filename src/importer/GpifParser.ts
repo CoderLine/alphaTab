@@ -49,6 +49,7 @@ import { Logger } from '@src/Logger';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
+import { BarreShape } from '@src/model/BarreShape';
 
 /**
  * This structure represents a duration within a gpif
@@ -1825,6 +1826,19 @@ export class GpifParser {
                                 whammyDestination.offset = this.toBendOffset(
                                     parseFloat(c.findChildElement('Float')!.innerText)
                                 );
+                                break;
+                            case 'BarreFret':
+                                beat.barreFret = parseInt(c.findChildElement('Fret')!.innerText);
+                                break;
+                            case 'BarreString':
+                                switch (c.findChildElement('String')!.innerText) {
+                                    case '0':
+                                        beat.barreShape = BarreShape.Full;
+                                        break;
+                                    case '1':
+                                        beat.barreShape = BarreShape.Half;
+                                        break;
+                                }
                                 break;
                         }
                         break;

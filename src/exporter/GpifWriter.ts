@@ -3,6 +3,7 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { AutomationType } from '@src/model/Automation';
 import { Bar, SustainPedalMarkerType } from '@src/model/Bar';
+import { BarreShape } from '@src/model/BarreShape';
 import { Beat } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
@@ -818,6 +819,18 @@ export class GpifWriter {
             case VibratoType.Slight:
                 this.writeSimplePropertyNode(beatProperties, 'VibratoWTremBar', 'Strength', 'Slight');
                 break;
+        }
+
+        if (beat.isBarre) {
+            this.writeSimplePropertyNode(beatProperties, 'BarreFret', 'Fret', beat.barreFret.toString());
+            switch (beat.barreShape) {
+                case BarreShape.Full:
+                    this.writeSimplePropertyNode(beatProperties, 'BarreString', 'String', '0');
+                    break;
+                case BarreShape.Half:
+                    this.writeSimplePropertyNode(beatProperties, 'BarreString', 'String', '1');
+                    break;
+            }
         }
     }
 
